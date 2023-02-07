@@ -131,6 +131,10 @@ public class ClientObject : MonoBehaviour
 
         transform.position += new Vector3(data.x * xGain, data.z * yGain, data.y * zGain);
 
+        // use the roll pitch yaw to rotate the camera by amount of degrees from data
+
+        transform.Rotate(new Vector3(data.roll, data.pitch, data.yaw));
+
         // transform using the data
         // transform.position = new Vector3(data.x * xGain, data.z * yGain, data.y * zGain);
     }
