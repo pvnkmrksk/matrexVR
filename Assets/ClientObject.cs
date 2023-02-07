@@ -126,8 +126,13 @@ public class ClientObject : MonoBehaviour
 
         Data data = JsonConvert.DeserializeObject<Data>(message);
 
+        // use the x y z from data to apply the force to the rigidbody and move the camera and use
+        // the roll pitch yaw to rotate the camera
+
+        transform.position += new Vector3(data.x * xGain, data.z * yGain, data.y * zGain);
+
         // transform using the data
-        transform.position = new Vector3(data.x * xGain, data.z * yGain, data.y * zGain);
+        // transform.position = new Vector3(data.x * xGain, data.z * yGain, data.y * zGain);
     }
 
     public void Start()
