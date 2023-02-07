@@ -564,6 +564,7 @@ GameObject:
   - component: {fileID: 1339283325}
   - component: {fileID: 1339283326}
   - component: {fileID: 1339283327}
+  - component: {fileID: 1339283328}
   m_Layer: 0
   m_Name: Cameras
   m_TagString: Untagged
@@ -619,6 +620,18 @@ MonoBehaviour:
   led_panel_height: 128
   start_row: 1
   start_col: 0
+--- !u!114 &1339283328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339283324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4f90e1efd3547ee09edf5a78639a9f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1406940396
 GameObject:
   m_ObjectHideFlags: 0
