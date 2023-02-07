@@ -633,8 +633,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   xGain: 50
-  yGain: 50
-  zGain: 50
+  yGain: -50
+  zGain: -50
 --- !u!1 &1406940396
 GameObject:
   m_ObjectHideFlags: 0
