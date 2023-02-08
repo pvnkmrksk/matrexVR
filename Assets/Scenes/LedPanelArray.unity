@@ -620,6 +620,7 @@ MonoBehaviour:
   led_panel_height: 128
   start_row: 1
   start_col: 0
+  horizontal: 1
 --- !u!114 &1339283328
 MonoBehaviour:
   m_ObjectHideFlags: 0

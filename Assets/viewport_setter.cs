@@ -18,6 +18,9 @@ public class viewport_setter : MonoBehaviour
     [SerializeField]
     private int start_col = 0;
 
+    [SerializeField]
+    private bool horizontal = true;
+
     void Start()
     {
         //create a four tiny viewport for each camera based on the led panel size in pixels and the
@@ -52,30 +55,84 @@ public class viewport_setter : MonoBehaviour
         // 4. set the viewport for each camera in the scene, starting from the top left corner of the screen.
         // the camera name is Main Camera L, Main Camera F, Main Camera R, Main Camera B
         Camera camera = GameObject.Find("Main Camera L").GetComponent<Camera>();
+
         camera.rect = new Rect(viewport_x, viewport_y, viewport_width, viewport_height);
 
-        camera = GameObject.Find("Main Camera F").GetComponent<Camera>();
-        camera.rect = new Rect(
-            viewport_x + viewport_width,
-            viewport_y,
-            viewport_width,
-            viewport_height
-        );
+        if (horizontal)
+        {
+            camera = GameObject.Find("Main Camera F").GetComponent<Camera>();
+            camera.rect = new Rect(
+                viewport_x + viewport_width,
+                viewport_y,
+                viewport_width,
+                viewport_height
+            );
 
-        camera = GameObject.Find("Main Camera R").GetComponent<Camera>();
-        camera.rect = new Rect(
-            viewport_x + 2 * viewport_width,
-            viewport_y,
-            viewport_width,
-            viewport_height
-        );
+            camera = GameObject.Find("Main Camera R").GetComponent<Camera>();
+            camera.rect = new Rect(
+                viewport_x + 2 * viewport_width,
+                viewport_y,
+                viewport_width,
+                viewport_height
+            );
 
-        camera = GameObject.Find("Main Camera B").GetComponent<Camera>();
-        camera.rect = new Rect(
-            viewport_x + 3 * viewport_width,
-            viewport_y,
-            viewport_width,
-            viewport_height
-        );
+            camera = GameObject.Find("Main Camera B").GetComponent<Camera>();
+            camera.rect = new Rect(
+                viewport_x + 3 * viewport_width,
+                viewport_y,
+                viewport_width,
+                viewport_height
+            );
+        }
+        else
+        {
+            camera = GameObject.Find("Main Camera F").GetComponent<Camera>();
+            camera.rect = new Rect(
+                viewport_x,
+                viewport_y - viewport_height,
+                viewport_width,
+                viewport_height
+            );
+
+            camera = GameObject.Find("Main Camera R").GetComponent<Camera>();
+            camera.rect = new Rect(
+                viewport_x,
+                viewport_y - 2 * viewport_height,
+                viewport_width,
+                viewport_height
+            );
+
+            camera = GameObject.Find("Main Camera B").GetComponent<Camera>();
+            camera.rect = new Rect(
+                viewport_x,
+                viewport_y - 3 * viewport_height,
+                viewport_width,
+                viewport_height
+            );
+        }
+        // }
+        // camera = GameObject.Find("Main Camera F").GetComponent<Camera>();
+        // camera.rect = new Rect(
+        //     viewport_x + viewport_width,
+        //     viewport_y,
+        //     viewport_width,
+        //     viewport_height
+        // );
+
+        // camera = GameObject.Find("Main Camera R").GetComponent<Camera>();
+        // camera.rect = new Rect(
+        //     viewport_x + 2 * viewport_width,
+        //     viewport_y,
+        //     viewport_width,
+        //     viewport_height
+        // );
+
+        // camera = GameObject.Find("Main Camera B").GetComponent<Camera>();
+        // camera.rect = new Rect(
+        //     viewport_x + 3 * viewport_width,
+        //     viewport_y,
+        //     viewport_width,
+        //     viewport_height
+        // );
     }
 }
