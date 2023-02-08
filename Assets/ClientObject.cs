@@ -107,14 +107,14 @@ public class ClientObject : MonoBehaviour
     [SerializeField]
     private float zGain = 1.0f;
 
-    // [SerializeField]
-    // private float rollGain = 1.0f;
+    [SerializeField]
+    private float rollGain = 1.0f;
 
-    // [SerializeField]
-    // private float pitchGain = 1.0f;
+    [SerializeField]
+    private float pitchGain = 1.0f;
 
-    // [SerializeField]
-    // private float yawGain = 1.0f;
+    [SerializeField]
+    private float yawGain = 1.0f;
 
     //
 
@@ -126,14 +126,22 @@ public class ClientObject : MonoBehaviour
 
         Data data = JsonConvert.DeserializeObject<Data>(message);
 
-        // use the x y z from data to apply the force to the rigidbody and move the camera and use
-        // the roll pitch yaw to rotate the camera
+        // use the x y z from data to move the camera in the direction Camera.main.transform.forward
+        transform.position += Camera.main.transform.forward * data.y * yGain;
+        transform.position += Camera.main.transform.right * data.x * xGain;
+        transform.position += Camera.main.transform.up * data.z * zGain;
 
-        transform.position += new Vector3(data.x * xGain, data.z * yGain, data.y * zGain);
+        // transform.position += new Vector3(data.x * xGain, data.z * yGain, data.y * zGain);
 
+        // rotate the camera by amount of degrees from data
+        // transform.Rotate(new Vector3(data.roll * gain, data.pitch * gain, data.yaw * gain));
+        transform.Rotate(
+            new Vector3(data.roll * rollGain, data.yaw * yawGain, data.pitch * pitchGain)
+        // new Vector3(data.roll * rollGain, data.pitch * pitchGain, data.yaw * yawGain)
+        );
         // use the roll pitch yaw to rotate the camera by amount of degrees from data
 
-        transform.Rotate(new Vector3(data.roll, data.pitch, data.yaw));
+        // transform.Rotate(new Vector3(data.roll, data.pitch, data.yaw));
 
         // transform using the data
         // transform.position = new Vector3(data.x * xGain, data.z * yGain, data.y * zGain);

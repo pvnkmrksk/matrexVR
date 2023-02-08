@@ -621,6 +621,7 @@ MonoBehaviour:
   start_row: 1
   start_col: 0
   horizontal: 1
+  interactive: 1
 --- !u!114 &1339283328
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -636,6 +637,9 @@ MonoBehaviour:
   xGain: 50
   yGain: -50
   zGain: -50
+  rollGain: 0.02
+  pitchGain: 0.02
+  yawGain: 0.1
 --- !u!1 &1406940396
 GameObject:
   m_ObjectHideFlags: 0
