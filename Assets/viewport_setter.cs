@@ -1,3 +1,30 @@
+// Author: Pavan Kaushik
+// Email: pkaushik@ab.mpg.de
+// Date: 2022-02-08
+// Description:
+// This script sets the viewport for each camera in the scene. The viewport is a tiny rectangle in the screen
+// that the camera renders to. The viewport size is the same as the led panel size. The viewport position
+// starts from the top left corner of the screen. The four viewports will be arranged in a row, starting
+// from the top left corner of the screen. The four viewports will be the same resolution as the led panel.
+// The four viewports will be arranged in a row, starting from the top left corner of the screen.
+// The four viewports will be the same resolution as the led panel.
+//
+//
+//
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,7 +48,15 @@ public class viewport_setter : MonoBehaviour
     [SerializeField]
     private bool horizontal = true;
 
+    [SerializeField]
+    private bool interactive = false;
+
     void Start()
+    {
+        set_viewport();
+    }
+
+    void set_viewport()
     {
         //create a four tiny viewport for each camera based on the led panel size in pixels and the
         // screen resolution. each camera will render to one viewport. the four viewports will be arranged
@@ -29,15 +64,11 @@ public class viewport_setter : MonoBehaviour
         // the four viewports will be the same resolution as the led panel.
         // the four viewports will be arranged in a row, starting from the top left corner of the screen.
 
+        // // clear the old viewport image in the screen
+        // GL.Clear(true, true, Color.black);
 
-
-        // 5. set the background color of the scene to black
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
         // 1. get the screen resolution
+
         int screen_width = Screen.width;
         int screen_height = Screen.height;
 
@@ -110,29 +141,14 @@ public class viewport_setter : MonoBehaviour
                 viewport_height
             );
         }
-        // }
-        // camera = GameObject.Find("Main Camera F").GetComponent<Camera>();
-        // camera.rect = new Rect(
-        //     viewport_x + viewport_width,
-        //     viewport_y,
-        //     viewport_width,
-        //     viewport_height
-        // );
+    }
 
-        // camera = GameObject.Find("Main Camera R").GetComponent<Camera>();
-        // camera.rect = new Rect(
-        //     viewport_x + 2 * viewport_width,
-        //     viewport_y,
-        //     viewport_width,
-        //     viewport_height
-        // );
-
-        // camera = GameObject.Find("Main Camera B").GetComponent<Camera>();
-        // camera.rect = new Rect(
-        //     viewport_x + 3 * viewport_width,
-        //     viewport_y,
-        //     viewport_width,
-        //     viewport_height
-        // );
+    // Update is called once per frame
+    void Update()
+    {
+        if (interactive)
+        {
+            set_viewport();
+        }
     }
 }
