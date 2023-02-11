@@ -2,79 +2,80 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class keyboard : MonoBehaviour
+public class Keyboard : MonoBehaviour
 {
     [SerializeField]
-    private float translate_speed = 10.0f;
+    private float translateSpeed = 10.0f;
     [SerializeField]
-    private float rotate_speed = 10.0f;
+    private float rotateSpeed = 10.0f;
     [SerializeField]
-    private float max_translate_speed = 100.0f;
+    private float maxTranslateSpeed = 100.0f;
     [SerializeField]
-    private float max_rotate_speed = 300.0f;
+    private float maxRotateSpeed = 300.0f;
 
     // Start is called before the first frame update
     void Start() { }
+
 
     // Update is called once per frame
     void Update()
     {
         
-        //use the keyboard to move, add a translate_speed factor
+        //use the keyboard to move, add a translateSpeed factor
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            transform.Translate(Vector3.forward * Time.deltaTime * translate_speed);
+            transform.Translate(Vector3.forward * Time.deltaTime * translateSpeed);
         }
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            transform.Translate(Vector3.back * Time.deltaTime * translate_speed);
+            transform.Translate(Vector3.back * Time.deltaTime * translateSpeed);
         }
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            transform.Translate(Vector3.left * Time.deltaTime * translate_speed);
+            transform.Translate(Vector3.left * Time.deltaTime * translateSpeed);
         }
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            transform.Translate(Vector3.right * Time.deltaTime * translate_speed);
+            transform.Translate(Vector3.right * Time.deltaTime * translateSpeed);
         }
 
                 //use the keyboard to go up and down using c and z
-        if (Input.GetKey(KeyCode.C))
-        {
-            transform.Translate(Vector3.down * Time.deltaTime * translate_speed);
-        }
         if (Input.GetKey(KeyCode.Z))
         {
-            transform.Translate(Vector3.up * Time.deltaTime * translate_speed);
+            transform.Translate(Vector3.down * Time.deltaTime * translateSpeed);
+        }
+        if (Input.GetKey(KeyCode.C))
+        {
+            transform.Translate(Vector3.up * Time.deltaTime * translateSpeed);
         }
 
 
         //use the keyboard to yaw left right
         if (Input.GetKey(KeyCode.A))
         {
-            transform.Rotate(Vector3.up * Time.deltaTime * rotate_speed);
+            transform.Rotate(Vector3.up * Time.deltaTime * rotateSpeed);
         }
         if (Input.GetKey(KeyCode.D))
         {
-            transform.Rotate(Vector3.down * Time.deltaTime * rotate_speed);
+            transform.Rotate(Vector3.down * Time.deltaTime * rotateSpeed);
         }
         //use the keyboard to roll left right
         if (Input.GetKey(KeyCode.Q))
         {
-            transform.Rotate(Vector3.back * Time.deltaTime * rotate_speed);
+            transform.Rotate(Vector3.back * Time.deltaTime * rotateSpeed);
         }
         if (Input.GetKey(KeyCode.E))
         {
-            transform.Rotate(Vector3.forward * Time.deltaTime * rotate_speed);
+            transform.Rotate(Vector3.forward * Time.deltaTime * rotateSpeed);
         }
         //use the keyboard to pitch up down
         if (Input.GetKey(KeyCode.W))
         {
-            transform.Rotate(Vector3.right * Time.deltaTime * rotate_speed);
+            transform.Rotate(Vector3.right * Time.deltaTime * rotateSpeed);
         }
         if (Input.GetKey(KeyCode.S))
         {
-            transform.Rotate(Vector3.left * Time.deltaTime * rotate_speed);
+            transform.Rotate(Vector3.left * Time.deltaTime * rotateSpeed);
         }
 
 
@@ -82,42 +83,42 @@ public class keyboard : MonoBehaviour
 
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.UpArrow))
         {
-            translate_speed += 1.0f;
+            translateSpeed += 1.0f;
 
         }
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.DownArrow))
         {
-            translate_speed -= 1.0f;
+            translateSpeed -= 1.0f;
         }
 
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.W))
         {
-            rotate_speed += 1.0f;
+            rotateSpeed += 1.0f;
 
         }
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.S))
         {
-            rotate_speed -= 1.0f;
+            rotateSpeed -= 1.0f;
         }
 
         
-        if (translate_speed > max_translate_speed)
+        if (translateSpeed > maxTranslateSpeed)
         {
-            translate_speed = max_translate_speed;
+            translateSpeed = maxTranslateSpeed;
         }
-        else if (translate_speed < 0.0f)
+        else if (translateSpeed < 0.0f)
         {
-            translate_speed = 0.0f;
+            translateSpeed = 0.0f;
         }
 
 
-        if (rotate_speed > max_rotate_speed)
+        if (rotateSpeed > maxRotateSpeed)
         {
-            rotate_speed = max_rotate_speed;
+            rotateSpeed = maxRotateSpeed;
         }
-        else if (rotate_speed < 0.0f)
+        else if (rotateSpeed < 0.0f)
         {
-            rotate_speed = 0.0f;
+            rotateSpeed = 0.0f;
         }
 
         // exit the game

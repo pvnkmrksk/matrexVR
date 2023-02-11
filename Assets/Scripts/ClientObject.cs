@@ -119,8 +119,6 @@ public class ClientObject : MonoBehaviour
     [SerializeField]
     private bool closedLoop = false;
 
-    //
-
     private NetMqListener _netMqListener;
 
     private void HandleMessage(string message)
