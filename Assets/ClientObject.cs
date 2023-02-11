@@ -162,11 +162,11 @@ public class ClientObject : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.O))
         {
-            closedLoop = false
+            closedLoop = false;
         }
         if (Input.GetKey(KeyCode.P))
         {
-            closedLoop = true
+            closedLoop = true;
         }
         _netMqListener.Update();
     }
