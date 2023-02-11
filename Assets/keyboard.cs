@@ -9,7 +9,9 @@ public class keyboard : MonoBehaviour
     [SerializeField]
     private float rotate_speed = 10.0f;
     [SerializeField]
-    private float max_speed = 100.0f;
+    private float max_translate_speed = 100.0f;
+    [SerializeField]
+    private float max_rotate_speed = 300.0f;
 
     // Start is called before the first frame update
     void Start() { }
@@ -87,14 +89,36 @@ public class keyboard : MonoBehaviour
         {
             translate_speed -= 1.0f;
         }
-                    if (translate_speed > max_speed)
-            {
-                translate_speed = max_speed;
-            }
-            else if (translate_speed < 0.0f)
-            {
-                translate_speed = 0.0f;
-            }
+
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.W))
+        {
+            rotate_speed += 1.0f;
+
+        }
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.S))
+        {
+            rotate_speed -= 1.0f;
+        }
+
+        
+        if (translate_speed > max_translate_speed)
+        {
+            translate_speed = max_translate_speed;
+        }
+        else if (translate_speed < 0.0f)
+        {
+            translate_speed = 0.0f;
+        }
+
+
+        if (rotate_speed > max_rotate_speed)
+        {
+            rotate_speed = max_rotate_speed;
+        }
+        else if (rotate_speed < 0.0f)
+        {
+            rotate_speed = 0.0f;
+        }
 
         // exit the game
         if (Input.GetKey(KeyCode.Escape))
