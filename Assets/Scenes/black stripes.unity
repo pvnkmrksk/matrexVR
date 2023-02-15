@@ -297,11 +297,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea484bbfa2e8d412c866c413cdf0bdcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 100
-  numberOfObjects: 20
-  prefab: {fileID: 5743975537212482408, guid: fbacf3a82953b477280aa3f7eb3484a3, type: 3}
-  rotationSpeed: 10
-  initAngle: 0
+  stripeSize: 10
+  numberOfObjects: 18
+  prefab: {fileID: 3253443836737324442, guid: 87c74147022f34823bd12334097a745d, type: 3}
+  angularSpeed: -20
 --- !u!4 &642019823
 Transform:
   m_ObjectHideFlags: 0
@@ -389,7 +388,7 @@ Camera:
     y: 0
     width: 0.25
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.1
   far clip plane: 1000
   field of view: 90.104904
   orthographic: 0
@@ -481,7 +480,7 @@ Camera:
     y: 0.76296294
     width: 0.03333334
     height: 0.05925926
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 90
   orthographic: 0
@@ -665,7 +664,7 @@ Camera:
     y: 0
     width: 0.25
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.1
   far clip plane: 1000
   field of view: 90.104904
   orthographic: 0
@@ -943,7 +942,7 @@ Camera:
     y: 0
     width: 0.25
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.1
   far clip plane: 1000
   field of view: 90.104904
   orthographic: 0
