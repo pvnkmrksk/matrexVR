@@ -28,6 +28,10 @@ public class GenerateStripes : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            angularSpeed = -angularSpeed; // Reverse the direction of rotation
+        }
         float radius = (1/(2*Mathf.Tan(stripeSize * Mathf.Deg2Rad)/2));
         float angleStep = 360f / numberOfObjects;
         for (int i = 0; i< numberOfObjects; i++)
