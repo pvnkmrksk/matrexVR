@@ -69,78 +69,171 @@ public class ViewportSetter : MonoBehaviour
         // GL.Clear(true, true, Color.black);
         // 1. get the screen resolution
 
-        int screenWidth = Screen.width;
-        int screenHeight = Screen.height;
+        int screen_width = Screen.width;
+        int screen_height = Screen.height;
 
         // 2. calculate the viewport size. the viewport size is the same as the led panel size.
-        float viewportWidth = (float)ledPanelWidth / (float)screenWidth;
-        float viewportHeight = (float)ledPanelHeight / (float)screenHeight;
+        float viewport_width = (float)ledPanelWidth / (float)screen_width;
+        float viewport_height = (float)ledPanelHeight / (float)screen_height;
 
         // 3. calculate the viewport position. the viewport position starts from the top left corner of the screen.
         // adjust the start location based on the start row and start column. flip the start row because the screen
         // coordinate system starts from the top left corner.
 
-        float viewportX = (float)startCol * viewportWidth;
-        float viewportY = 1.0f - viewportHeight - (float)startRow * viewportHeight;
+        float viewport_x = (float)startCol * viewport_width;
+        float viewport_y = 1.0f - viewport_height - (float)startRow * viewport_height;
 
         // 4. set the viewport for each camera in the scene, starting from the top left corner of the screen.
         // the camera name is Main Camera L, Main Camera F, Main Camera R, Main Camera B
-        Camera camera = GameObject.Find("Main Camera L").GetComponent<Camera>();
+        // Camera camera = GameObject.Find("Main Camera L").GetComponent<Camera>();
 
-        camera.rect = new Rect(viewportX, viewportY, viewportWidth, viewportHeight);
+        // camera.rect = new Rect(viewport_x, viewport_y, viewport_width, viewport_height);
+
+
+
+        // find the camera with the name "Main Camera L" in list cameras
+        // set the viewport for each camera in the scene, starting from the top left corner of the screen.
+        // the camera name is Main Camera L, Main Camera F, Main Camera R, Main Camera B
+        // if horizontal, then place the cameras in a row, otherwise place the cameras in a column
+
+        // find all the cameras in the children of the script is attached to
+        Camera[] cameras = GetComponentsInChildren<Camera>();
 
         if (horizontal)
         {
-            camera = GameObject.Find("Main Camera F").GetComponent<Camera>();
-            camera.rect = new Rect(
-                viewportX + viewportWidth,
-                viewportY,
-                viewportWidth,
-                viewportHeight
-            );
+            // find the camera with the name "Main Camera L" in list cameras
+            foreach (Camera cam in cameras)
+            {
+                if (cam.name == "Main Camera L")
+                {
+                    cam.rect = new Rect(viewport_x, viewport_y, viewport_width, viewport_height);
+                }
 
-            camera = GameObject.Find("Main Camera R").GetComponent<Camera>();
-            camera.rect = new Rect(
-                viewportX + 2 * viewportWidth,
-                viewportY,
-                viewportWidth,
-                viewportHeight
-            );
+                if (cam.name == "Main Camera F")
+                {
+                    cam.rect = new Rect(
+                        viewport_x + viewport_width,
+                        viewport_y,
+                        viewport_width,
+                        viewport_height
+                    );
+                }
 
-            camera = GameObject.Find("Main Camera B").GetComponent<Camera>();
-            camera.rect = new Rect(
-                viewportX + 3 * viewportWidth,
-                viewportY,
-                viewportWidth,
-                viewportHeight
-            );
+                if (cam.name == "Main Camera R")
+                {
+                    cam.rect = new Rect(
+                        viewport_x + 2 * viewport_width,
+                        viewport_y,
+                        viewport_width,
+                        viewport_height
+                    );
+                }
+
+                if (cam.name == "Main Camera B")
+                {
+                    cam.rect = new Rect(
+                        viewport_x + 3 * viewport_width,
+                        viewport_y,
+                        viewport_width,
+                        viewport_height
+                    );
+                }
+            }
         }
         else
         {
-            camera = GameObject.Find("Main Camera F").GetComponent<Camera>();
-            camera.rect = new Rect(
-                viewportX,
-                viewportY - viewportHeight,
-                viewportWidth,
-                viewportHeight
-            );
+            // find the camera with the name "Main Camera L" in list cameras
+            foreach (Camera cam in cameras)
+            {
+                if (cam.name == "Main Camera L")
+                {
+                    cam.rect = new Rect(viewport_x, viewport_y, viewport_width, viewport_height);
+                }
 
-            camera = GameObject.Find("Main Camera R").GetComponent<Camera>();
-            camera.rect = new Rect(
-                viewportX,
-                viewportY - 2 * viewportHeight,
-                viewportWidth,
-                viewportHeight
-            );
+                if (cam.name == "Main Camera F")
+                {
+                    cam.rect = new Rect(
+                        viewport_x,
+                        viewport_y - viewport_height,
+                        viewport_width,
+                        viewport_height
+                    );
+                }
 
-            camera = GameObject.Find("Main Camera B").GetComponent<Camera>();
-            camera.rect = new Rect(
-                viewportX,
-                viewportY - 3 * viewportHeight,
-                viewportWidth,
-                viewportHeight
-            );
+                if (cam.name == "Main Camera R")
+                {
+                    cam.rect = new Rect(
+                        viewport_x,
+                        viewport_y - 2 * viewport_height,
+                        viewport_width,
+                        viewport_height
+                    );
+                }
+
+                if (cam.name == "Main Camera B")
+                {
+                    cam.rect = new Rect(
+                        viewport_x,
+                        viewport_y - 3 * viewport_height,
+                        viewport_width,
+                        viewport_height
+                    );
+                }
+            }
         }
+
+        // if (horizontal)
+        // {
+        //     camera = GameObject.Find("Main Camera F").GetComponent<Camera>();
+        //     camera.rect = new Rect(
+        //         viewport_x + viewport_width,
+        //         viewport_y,
+        //         viewport_width,
+        //         viewport_height
+        //     );
+
+        //     camera = GameObject.Find("Main Camera R").GetComponent<Camera>();
+        //     camera.rect = new Rect(
+        //         viewport_x + 2 * viewport_width,
+        //         viewport_y,
+        //         viewport_width,
+        //         viewport_height
+        //     );
+
+        //     camera = GameObject.Find("Main Camera B").GetComponent<Camera>();
+        //     camera.rect = new Rect(
+        //         viewport_x + 3 * viewport_width,
+        //         viewport_y,
+        //         viewport_width,
+        //         viewport_height
+        //     );
+        // }
+        // else
+        // {
+        //     camera = GameObject.Find("Main Camera F").GetComponent<Camera>();
+        //     camera.rect = new Rect(
+        //         viewport_x,
+        //         viewport_y - viewport_height,
+        //         viewport_width,
+        //         viewport_height
+        //     );
+
+        //     camera = GameObject.Find("Main Camera R").GetComponent<Camera>();
+        //     camera.rect = new Rect(
+        //         viewport_x,
+        //         viewport_y - 2 * viewport_height,
+        //         viewport_width,
+        //         viewport_height
+        //     );
+
+        //     camera = GameObject.Find("Main Camera B").GetComponent<Camera>();
+        //     camera.rect = new Rect(
+        //         viewport_x,
+        //         viewport_y - 3 * viewport_height,
+        //         viewport_width,
+        //         viewport_height
+        //     );
+        // }
     }
 
     // Update is called once per frame

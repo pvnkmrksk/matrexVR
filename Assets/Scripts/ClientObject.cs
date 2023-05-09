@@ -154,6 +154,13 @@ public class ClientObject : MonoBehaviour
     {
         _netMqListener = new NetMqListener(HandleMessage);
         _netMqListener.Start();
+
+        // set the location of transform in random position between -10,10 in x and z axis, keep y as it is
+        transform.position = new Vector3(
+            Random.Range(-10, 10),
+            transform.position.y,
+            Random.Range(-10, 10)
+        );
     }
 
     private void Update()
