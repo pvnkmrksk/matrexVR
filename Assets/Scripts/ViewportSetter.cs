@@ -104,12 +104,12 @@ public class ViewportSetter : MonoBehaviour
             // find the camera with the name "Main Camera L" in list cameras
             foreach (Camera cam in cameras)
             {
-                if (cam.name == "Main Camera L")
+                if (cam.name == "Main Camera R")
                 {
                     cam.rect = new Rect(viewport_x, viewport_y, viewport_width, viewport_height);
                 }
 
-                if (cam.name == "Main Camera F")
+                if (cam.name == "Main Camera B")
                 {
                     cam.rect = new Rect(
                         viewport_x + viewport_width,
@@ -119,7 +119,7 @@ public class ViewportSetter : MonoBehaviour
                     );
                 }
 
-                if (cam.name == "Main Camera R")
+                if (cam.name == "Main Camera L")
                 {
                     cam.rect = new Rect(
                         viewport_x + 2 * viewport_width,
@@ -129,7 +129,7 @@ public class ViewportSetter : MonoBehaviour
                     );
                 }
 
-                if (cam.name == "Main Camera B")
+                if (cam.name == "Main Camera F")
                 {
                     cam.rect = new Rect(
                         viewport_x + 3 * viewport_width,
