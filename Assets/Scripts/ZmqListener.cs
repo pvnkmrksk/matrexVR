@@ -2,6 +2,8 @@ using UnityEngine;
 using NetMQ;
 using NetMQ.Sockets;
 using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
 
 public class ZmqListener : MonoBehaviour
 {
@@ -11,11 +13,17 @@ public class ZmqListener : MonoBehaviour
     private Vector3 positionToUpdate;
     private Quaternion rotationToUpdate;
 
+    public int rotationAverageCount = 5; // How many rotation values to average
+    private Queue<float> recentRotations; // Queue to hold the most recent rotations
+
     void Start()
     {
         subscriber = new SubscriberSocket();
         subscriber.Connect(address);
         subscriber.SubscribeToAnyTopic(); // Subscribe to all topics
+
+        // Initialize the queue
+        recentRotations = new Queue<float>(rotationAverageCount);
 
         // Start listening for messages on a separate thread
         new Thread(() =>
@@ -37,7 +45,15 @@ public class ZmqListener : MonoBehaviour
 
                     // Transform the rotation
                     float heading = float.Parse(values[2].Split(':')[1])* Mathf.Rad2Deg;
-                    rotationToUpdate = Quaternion.Euler(0.0f, heading , 0.0f);
+
+                    // Add the new rotation to the queue. If the queue is full, remove the oldest value.
+                    if (recentRotations.Count == rotationAverageCount)
+                        recentRotations.Dequeue();
+                    recentRotations.Enqueue(heading);
+
+                    // Compute the average of the recent rotations and use this for the updated rotation
+                    float averageHeading = recentRotations.Average();
+                    rotationToUpdate = Quaternion.Euler(0.0f, averageHeading , 0.0f);
                 }
                 catch (NetMQException ex)
                 {
