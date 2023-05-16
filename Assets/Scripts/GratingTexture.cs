@@ -24,7 +24,17 @@ public class GratingTexture : MonoBehaviour
     [SerializeField]
     private bool useContinuousMapping = false; // whether to use a continuous or binary mapping for the texture
 
+    public Shader replacementShader; // assign the desired shader in the inspector
+    private Material replacementMaterial; // store the new material
+
     void Start()
+    {
+        replacementShader = Shader.Find("Legacy Shaders/Particles/Alpha Blended"); // find the shader by name
+        replacementMaterial = new Material(replacementShader); // create a new material with the replacement shader
+        GetComponent<Renderer>().material = replacementMaterial; // assign the new material to the object's renderer
+    }
+
+    void Update()
     {
         // Create a grating texture using the variables
         Texture2D texture = GenerateGratingTexture(
@@ -61,12 +71,11 @@ public class GratingTexture : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                // Convert x and y to polar coordinates
-                float r = Mathf.Sqrt(x * x + y * y);
-                float theta = Mathf.Atan2(y, x);
+                // Convert x to a normalized value between 0 and 1
+                float u = (float)x / width;
 
                 // Calculate the sine wave value
-                float value = Mathf.Sin(frequency * theta + phase);
+                float value = Mathf.Sin(frequency * u + phase);
 
                 // Map the value to black and white colors
                 Color color = MapValueToColor(value, contrast, continuous);
@@ -78,6 +87,7 @@ public class GratingTexture : MonoBehaviour
 
         // Apply the changes to the texture
         texture.Apply();
+        texture.wrapMode = TextureWrapMode.Clamp; // set the wrap mode to clamp
 
         // Return the texture
         return texture;

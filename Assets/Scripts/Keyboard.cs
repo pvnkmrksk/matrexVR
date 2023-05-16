@@ -17,28 +17,25 @@ public class Keyboard : MonoBehaviour
     private float maxRotateSpeed = 300.0f;
 
     // Start is called before the first frame update
-    void Start()
-    {
-        Camera.main.eventMask = 0;
-    }
+    void Start() { }
 
     // Update is called once per frame
     void Update()
     {
         //use the keyboard to move, add a translateSpeed factor
-        if (Input.GetKey(KeyCode.W))
+        if (Input.GetKey(KeyCode.UpArrow))
         {
             transform.Translate(Vector3.forward * Time.deltaTime * translateSpeed);
         }
-        if (Input.GetKey(KeyCode.S))
+        if (Input.GetKey(KeyCode.DownArrow))
         {
             transform.Translate(Vector3.back * Time.deltaTime * translateSpeed);
         }
-        if (Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.LeftArrow))
         {
             transform.Translate(Vector3.left * Time.deltaTime * translateSpeed);
         }
-        if (Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.RightArrow))
         {
             transform.Translate(Vector3.right * Time.deltaTime * translateSpeed);
         }
