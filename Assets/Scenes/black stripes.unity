@@ -177,7 +177,7 @@ Camera:
   m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
-  m_FOVAxisMode: 1
+  m_FOVAxisMode: 0
   m_Iso: 200
   m_ShutterSpeed: 0.005
   m_Aperture: 16
@@ -288,6 +288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1d9dee094eb5bb59c8706fc55c91ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotationAverageCount: 5
 --- !u!1 &642019821
 GameObject:
   m_ObjectHideFlags: 0
@@ -317,8 +318,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea484bbfa2e8d412c866c413cdf0bdcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stripeSize: 10
-  numberOfObjects: 18
+  stripeSize: 5
+  numberOfObjects: 5
   prefab: {fileID: 3253443836737324442, guid: 87c74147022f34823bd12334097a745d, type: 3}
   angularSpeed: -20
 --- !u!4 &642019823
@@ -410,7 +411,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1012292143585755914, guid: 36bf96a5bb7c34300a4bc0e5cbfe246b, type: 3}
       propertyPath: field of view
-      value: 83.26707
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1012292143585755914, guid: 36bf96a5bb7c34300a4bc0e5cbfe246b, type: 3}
+      propertyPath: m_FOVAxisMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1012292143585755914, guid: 36bf96a5bb7c34300a4bc0e5cbfe246b, type: 3}
       propertyPath: m_TargetDisplay
@@ -434,7 +439,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1012292143748133914, guid: 36bf96a5bb7c34300a4bc0e5cbfe246b, type: 3}
       propertyPath: field of view
-      value: 83.26707
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1012292143748133914, guid: 36bf96a5bb7c34300a4bc0e5cbfe246b, type: 3}
+      propertyPath: m_FOVAxisMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1012292143748133914, guid: 36bf96a5bb7c34300a4bc0e5cbfe246b, type: 3}
       propertyPath: m_TargetDisplay
@@ -458,7 +467,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1012292143866390693, guid: 36bf96a5bb7c34300a4bc0e5cbfe246b, type: 3}
       propertyPath: field of view
-      value: 83.26707
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1012292143866390693, guid: 36bf96a5bb7c34300a4bc0e5cbfe246b, type: 3}
+      propertyPath: m_FOVAxisMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1012292143866390693, guid: 36bf96a5bb7c34300a4bc0e5cbfe246b, type: 3}
       propertyPath: m_TargetDisplay
@@ -482,7 +495,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1012292144132318566, guid: 36bf96a5bb7c34300a4bc0e5cbfe246b, type: 3}
       propertyPath: field of view
-      value: 83.26707
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1012292144132318566, guid: 36bf96a5bb7c34300a4bc0e5cbfe246b, type: 3}
+      propertyPath: m_FOVAxisMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1012292144132318566, guid: 36bf96a5bb7c34300a4bc0e5cbfe246b, type: 3}
       propertyPath: m_TargetDisplay
@@ -563,7 +580,7 @@ Camera:
   m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
-  m_FOVAxisMode: 1
+  m_FOVAxisMode: 0
   m_Iso: 200
   m_ShutterSpeed: 0.005
   m_Aperture: 16
@@ -655,7 +672,7 @@ Camera:
   m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
-  m_FOVAxisMode: 1
+  m_FOVAxisMode: 0
   m_Iso: 200
   m_ShutterSpeed: 0.005
   m_Aperture: 16
@@ -915,7 +932,7 @@ Camera:
   m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
-  m_FOVAxisMode: 1
+  m_FOVAxisMode: 0
   m_Iso: 200
   m_ShutterSpeed: 0.005
   m_Aperture: 16
