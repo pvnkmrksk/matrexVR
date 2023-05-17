@@ -31,36 +31,33 @@ public class ViewportSetter : MonoBehaviour
 
     void setViewport()
     {
-        //create a four tiny viewport for each camera based on the led panel size in pixels and the
-        // screen resolution. each camera will render to one viewport. the four viewports will be arranged
-        // in a row, starting from the top left corner of the screen.
-        // the four viewports will be the same resolution as the led panel.
-        // the four viewports will be arranged in a row, starting from the top left corner of the screen.
+        // This method creates four viewports for four cameras that render a portion of the led panel.
+        // The viewports have the same pixel size as the led panel and are aligned to the top left corner of the screen.
+        // The viewports can be arranged horizontally or vertically depending on the horizontal flag.
+        // The viewports can be updated every frame or only once depending on the interactive flag.
 
-        // // clear the old viewport image in the screen
-        // GL.Clear(true, true, Color.black);
-        // 1. get the screen resolution
+        // Clear the previous frame from the screen with a black color
+        GL.Clear(true, true, Color.black);
 
+        // Get the current screen resolution in pixels
         int screen_width = Screen.width;
         int screen_height = Screen.height;
 
-        // 2. calculate the viewport size. the viewport size is the same as the led panel size.
+        // Calculate the viewport size as a fraction of the screen size
         float viewport_width = (float)ledPanelWidth / (float)screen_width;
         float viewport_height = (float)ledPanelHeight / (float)screen_height;
 
-        // 3. calculate the viewport position. the viewport position starts from the top left corner of the screen.
-        // adjust the start location based on the start row and start column. flip the start row because the screen
-        // coordinate system starts from the top left corner.
-
+        // Calculate the viewport position as a fraction of the screen size
+        // The position is based on the start row and start column parameters
+        // The position is inverted on the y-axis because the screen origin is at the top left corner
         float viewport_x = (float)startCol * viewport_width;
         float viewport_y = 1.0f - viewport_height - (float)startRow * viewport_height;
 
-        // 4. set the viewport for each camera in the scene, starting from the top left corner of the screen.
-        // the camera name is Main Camera L, Main Camera F, Main Camera R, Main Camera B
+        // Set the viewport and fov for each camera in the scene by name
+        // The cameras are named Main Camera L, Main Camera F, Main Camera R, Main Camera B
         // Camera camera = GameObject.Find("Main Camera L").GetComponent<Camera>();
 
         // camera.rect = new Rect(viewport_x, viewport_y, viewport_width, viewport_height);
-
 
 
         // find all the cameras in the children of this script

@@ -606,9 +606,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ledPanelWidth: 128
   ledPanelHeight: 128
-  startRow: 1
-  startCol: 0
-  horizontal: 1
+  startRow: 3
+  startCol: 2
+  horizontal: 0
   interactive: 0
 --- !u!114 &1339283329
 MonoBehaviour:
@@ -868,6 +868,7 @@ MonoBehaviour:
   textureContrast: 1
   useContinuousMapping: 0
   replacementShader: {fileID: 0}
+  replacementMaterial: {fileID: 0}
 --- !u!114 &1533525729
 MonoBehaviour:
   m_ObjectHideFlags: 0
