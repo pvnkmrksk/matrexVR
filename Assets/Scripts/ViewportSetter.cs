@@ -182,58 +182,6 @@ public class ViewportSetter : MonoBehaviour
             }
         }
 
-        // if (horizontal)
-        // {
-        //     camera = GameObject.Find("Main Camera F").GetComponent<Camera>();
-        //     camera.rect = new Rect(
-        //         viewport_x + viewport_width,
-        //         viewport_y,
-        //         viewport_width,
-        //         viewport_height
-        //     );
-
-        //     camera = GameObject.Find("Main Camera R").GetComponent<Camera>();
-        //     camera.rect = new Rect(
-        //         viewport_x + 2 * viewport_width,
-        //         viewport_y,
-        //         viewport_width,
-        //         viewport_height
-        //     );
-
-        //     camera = GameObject.Find("Main Camera B").GetComponent<Camera>();
-        //     camera.rect = new Rect(
-        //         viewport_x + 3 * viewport_width,
-        //         viewport_y,
-        //         viewport_width,
-        //         viewport_height
-        //     );
-        // }
-        // else
-        // {
-        //     camera = GameObject.Find("Main Camera F").GetComponent<Camera>();
-        //     camera.rect = new Rect(
-        //         viewport_x,
-        //         viewport_y - viewport_height,
-        //         viewport_width,
-        //         viewport_height
-        //     );
-
-        //     camera = GameObject.Find("Main Camera R").GetComponent<Camera>();
-        //     camera.rect = new Rect(
-        //         viewport_x,
-        //         viewport_y - 2 * viewport_height,
-        //         viewport_width,
-        //         viewport_height
-        //     );
-
-        //     camera = GameObject.Find("Main Camera B").GetComponent<Camera>();
-        //     camera.rect = new Rect(
-        //         viewport_x,
-        //         viewport_y - 3 * viewport_height,
-        //         viewport_width,
-        //         viewport_height
-        //     );
-        // }
     }
 
     // Update is called once per frame
