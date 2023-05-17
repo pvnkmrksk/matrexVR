@@ -14,20 +14,10 @@ public class SinusoidalGrating : MonoBehaviour
     [Range(0f, 10f)]
     private float frequency = 4f;
 
-    // The power level of the sinusoidal value
-    [SerializeField]
-    [Range(1f, 10f)]
-    private float power = 4f;
-
     // The combined power and amplitude level
     [SerializeField]
     [Range(0f, 1f)]
     private float level = 0.5f;
-
-    // The amplitude level of the sinusoidal wave
-    [SerializeField]
-    [Range(0f, 2f)]
-    private float amplitude = 1f;
 
     // The colors of the grating
     [SerializeField]
@@ -68,7 +58,10 @@ public class SinusoidalGrating : MonoBehaviour
         texture = new Texture2D(textureWidth, textureHeight);
         FillTexture();
         //         // Create a new material in code using the Standard shader
-        material = new Material(Shader.Find("Standard"));
+        // material = new Material(Shader.Find("Standard"));
+        // Create a new material in code using an Unlit shader
+        material = new Material(Shader.Find("Unlit/Texture"));
+
         //         material.mainTexture = texture;
 
         // Assign the texture to the material
@@ -76,7 +69,7 @@ public class SinusoidalGrating : MonoBehaviour
 
         // Create the cylinder mesh and assign it to a new game object
         mesh = CreateCylinderMesh(cylinderRadius, cylinderHeight, cylinderSegments, cylinderStacks);
-        GameObject cylinder = new GameObject("Cylinder");
+        GameObject cylinder = new GameObject("GratingDrum");
         cylinder.AddComponent<MeshFilter>().mesh = mesh;
         cylinder.AddComponent<MeshRenderer>().material = material;
     }
@@ -87,7 +80,6 @@ public class SinusoidalGrating : MonoBehaviour
         if (interactive)
         {
             FillTexture();
-            // UpdateCylinderMesh();
         }
     }
 
