@@ -1,31 +1,3 @@
-// Author: Pavan Kaushik
-// Email: pkaushik@ab.mpg.de
-// Date: 2022-02-08
-// Description:
-// This script sets the viewport for each camera in the scene. The viewport is a tiny rectangle in the screen
-// that the camera renders to. The viewport size is the same as the led panel size. The viewport position
-// starts from the top left corner of the screen. The four viewports will be arranged in a row, starting
-// from the top left corner of the screen. The four viewports will be the same resolution as the led panel.
-// The four viewports will be arranged in a row, starting from the top left corner of the screen.
-// The four viewports will be the same resolution as the led panel.
-//
-//
-//
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -91,17 +63,12 @@ public class ViewportSetter : MonoBehaviour
 
 
 
-        // find the camera with the name "Main Camera L" in list cameras
-        // set the viewport for each camera in the scene, starting from the top left corner of the screen.
-        // the camera name is Main Camera L, Main Camera F, Main Camera R, Main Camera B
-        // if horizontal, then place the cameras in a row, otherwise place the cameras in a column
-
-        // find all the cameras in the children of the script is attached to
+        // find all the cameras in the children of this script
         Camera[] cameras = GetComponentsInChildren<Camera>();
 
         if (horizontal)
         {
-            // find the camera with the name "Main Camera L" in list cameras
+            // find and set each camera by name
             foreach (Camera cam in cameras)
             {
                 if (cam.name == "Main Camera R")
@@ -138,11 +105,12 @@ public class ViewportSetter : MonoBehaviour
                         viewport_height
                     );
                 }
+                cam.fieldOfView = 90; // set fov to 90 degrees
             }
         }
         else
         {
-            // find the camera with the name "Main Camera L" in list cameras
+            // find and set each camera by name
             foreach (Camera cam in cameras)
             {
                 if (cam.name == "Main Camera L")
@@ -179,9 +147,9 @@ public class ViewportSetter : MonoBehaviour
                         viewport_height
                     );
                 }
+                cam.fieldOfView = 90; // set fov to 90 degrees
             }
         }
-
     }
 
     // Update is called once per frame
