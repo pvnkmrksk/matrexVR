@@ -74,8 +74,7 @@ public class SinusoidalGrating : MonoBehaviour
         cylinder.AddComponent<MeshRenderer>().material = material;
 
         // attach drumRotator script to the cylinder
-        cylinder.AddComponent<drumRotator>();
-
+        cylinder.AddComponent<DrumRotator>();
     }
 
     void Update()
