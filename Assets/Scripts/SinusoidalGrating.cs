@@ -72,6 +72,10 @@ public class SinusoidalGrating : MonoBehaviour
         GameObject cylinder = new GameObject("GratingDrum");
         cylinder.AddComponent<MeshFilter>().mesh = mesh;
         cylinder.AddComponent<MeshRenderer>().material = material;
+
+        // attach drumRotator script to the cylinder
+        cylinder.AddComponent<drumRotator>();
+
     }
 
     void Update()
