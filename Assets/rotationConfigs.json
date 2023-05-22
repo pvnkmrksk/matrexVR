@@ -1,0 +1,16 @@
+{
+  "rotationConfigs": [
+    {
+      "speed": 100,
+      "clockwise": true,
+      "duration": 1,
+      "externalRotationAxis": "Yaw"
+    },{
+      "speed": 100,
+      "clockwise": false,
+      "duration": 1,
+      "externalRotationAxis": "Yaw"
+    }
+
+  ]
+}
