@@ -2,123 +2,93 @@ using UnityEngine;
 
 public class SinusoidalGrating : MonoBehaviour
 {
-    // The width and height of the texture in pixels
+    [Header("Texture Settings")]
     [SerializeField]
     private int textureWidth = 256;
 
     [SerializeField]
     private int textureHeight = 256;
 
-    // The frequency and amplitude of the sinusoidal wave
+    [Header("Sinusoidal Settings")]
     [SerializeField]
     [Range(0f, 10f)]
     private float frequency = 4f;
 
-    // The combined power and amplitude level
     [SerializeField]
     [Range(0f, 1f)]
     private float level = 0.5f;
 
-    // The colors of the grating
+    [Header("Color Settings")]
     [SerializeField]
     private Color color1 = Color.black;
 
     [SerializeField]
     private Color color2 = Color.white;
 
-    // The radius and height of the cylinder
+    [Header("Cylinder Settings")]
     [SerializeField]
     private float cylinderRadius = 1f;
 
     [SerializeField]
     private float cylinderHeight = 2f;
 
-    // The number of segments along the circumference and height of the cylinder
     [SerializeField]
     private int cylinderSegments = 32;
 
     [SerializeField]
     private int cylinderStacks = 16;
 
-    // The material to apply the texture to
+    [Header("Miscellaneous Settings")]
     [SerializeField]
     private Material material;
 
-    // The flag for interactive mode
     [SerializeField]
     private bool interactive = false;
 
-    // The texture and mesh references
     private Texture2D texture;
     private Mesh mesh;
 
-    void Start()
+    private void Start()
     {
-        // Create the texture and fill it with the sinusoidal grating pattern
         texture = new Texture2D(textureWidth, textureHeight);
         FillTexture();
-        //         // Create a new material in code using the Standard shader
-        // material = new Material(Shader.Find("Standard"));
-        // Create a new material in code using an Unlit shader
         material = new Material(Shader.Find("Unlit/Texture"));
-
-        //         material.mainTexture = texture;
-
-        // Assign the texture to the material
         material.mainTexture = texture;
 
-        // Create the cylinder mesh and assign it to a new game object
         mesh = CreateCylinderMesh(cylinderRadius, cylinderHeight, cylinderSegments, cylinderStacks);
         GameObject cylinder = new GameObject("GratingDrum");
         cylinder.AddComponent<MeshFilter>().mesh = mesh;
         cylinder.AddComponent<MeshRenderer>().material = material;
-
-        // attach drumRotator script to the cylinder
         cylinder.AddComponent<DrumRotator>();
     }
 
-    void Update()
+    private void Update()
     {
-        // If interactive mode is on, update the texture and mesh every frame
         if (interactive)
         {
             FillTexture();
         }
     }
 
-    // A helper method to fill the texture with the sinusoidal grating pattern
-    // A helper method to fill the texture with the sinusoidal grating pattern
-    void FillTexture()
+    private void FillTexture()
     {
         for (int x = 0; x < textureWidth; x++)
         {
             for (int y = 0; y < textureHeight; y++)
             {
-                // Calculate the normalized coordinate along the x-axis
                 float u = (float)x / (textureWidth - 1);
-
-                // Calculate the sinusoidal value at this coordinate
                 float s = Mathf.Sin(u * frequency * 2 * Mathf.PI);
-
-                // // Map the sinusoidal value to a color between color1 and color2 with variable amplitude
-                // Calculate the normal sine and the raised power sine
                 float normalSine = s * level + 0.5f;
                 float powerSine = Mathf.Pow(normalSine, 4f);
-
-                // Interpolate between them based on the level
                 float t = Mathf.Lerp(normalSine, powerSine, level * 2 - 1);
                 Color c = Color.Lerp(color1, color2, t);
-                // Set the pixel color at this coordinate
                 texture.SetPixel(x, y, c);
             }
         }
-
-        // Apply the changes to the texture
         texture.Apply();
     }
 
-    // Or define your own saturate function
-    float saturate(float x)
+    private float Saturate(float x)
     {
         return Mathf.Max(0f, Mathf.Min(1f, x));
     }
