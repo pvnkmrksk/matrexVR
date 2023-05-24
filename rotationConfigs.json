@@ -1,13 +1,13 @@
 {
   "rotationConfigs": [
     {
-      "speed": 100,
+      "speed": 720,
       "clockwise": true,
-      "duration": 1,
+      "duration": 0.25,
       "externalRotationAxis": "Yaw"
     },
     {
-      "speed": 100,
+      "speed": 90,
       "clockwise": false,
       "duration": 1,
       "externalRotationAxis": "Pitch"
