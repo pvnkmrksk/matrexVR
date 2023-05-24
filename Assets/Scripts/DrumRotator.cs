@@ -34,6 +34,8 @@ public class DrumRotator : MonoBehaviour
     public string configFilePath = "rotationConfigs.json";
     private int currentIndex = 0;
     private List<RotationConfig> configs;
+    private bool isPaused = false;
+    private bool isStepping = false;
 
     private Vector3 StringToAxis(string axisName)
     {
@@ -104,9 +106,6 @@ public class DrumRotator : MonoBehaviour
 
             Vector3 axis = StringToAxis(config.externalRotationAxis);
 
-            // // Convert speed from degrees/second to degrees/frame
-            // float speedPerFrame = config.speed / 60f;
-
             // Assuming deltaTime represents the time elapsed since the last frame
             float speedPerSecond = config.speed; // Speed in degrees/second
             float speedPerFrame = speedPerSecond * Time.deltaTime; // Speed in degrees/frame
@@ -119,16 +118,54 @@ public class DrumRotator : MonoBehaviour
 
             // Calculate total rotation
             float totalRotation = 0;
-            while (totalRotation < (config.speed * config.duration))
+            bool isRotationFinished = false;
+            while (!isRotationFinished)
             {
-                drum.transform.Rotate(axis, speedPerFrame);
-                totalRotation += Math.Abs(speedPerFrame);
+                if (!isPaused && !isStepping)
+                {
+                    drum.transform.Rotate(axis, speedPerFrame);
+                    totalRotation += Mathf.Abs(speedPerFrame);
+                }
                 yield return null;
+
+                if (isStepping || totalRotation >= (config.speed * config.duration))
+                {
+                    isRotationFinished = true;
+                }
             }
             Debug.Log("Finished rotation " + currentIndex + " of " + configs.Count);
 
             // Increment index or reset to 0 if end of list
+            if (!isStepping)
+            {
+                currentIndex = (currentIndex + 1) % configs.Count;
+                isStepping = false;
+            }
+            else
+            {
+                isStepping = false;
+            }
+        }
+    }
+
+    void Update()
+    {
+        // Step forward or backward through the index using square brackets
+        if (Input.GetKeyDown(KeyCode.RightBracket))
+        {
             currentIndex = (currentIndex + 1) % configs.Count;
+            isStepping = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftBracket))
+        {
+            currentIndex = (currentIndex - 1 + configs.Count) % configs.Count;
+            isStepping = true;
+        }
+
+        // Pause and play using backslash
+        if (Input.GetKeyDown(KeyCode.Backslash))
+        {
+            isPaused = !isPaused;
         }
     }
 }
