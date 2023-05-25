@@ -34,7 +34,7 @@ public class DrumRotator : MonoBehaviour
     public string configFilePath = "rotationConfigs.json";
     private int currentIndex = 0;
     private List<RotationConfig> configs;
-    private bool isPaused = false;
+    private bool isPaused = true;
     private bool isStepping = false;
 
     private Vector3 StringToAxis(string axisName)
@@ -52,6 +52,8 @@ public class DrumRotator : MonoBehaviour
         }
     }
 
+    public int initialDelayFrames = 10; // Number of frames to delay before starting the rotation
+
     void Start()
     {
         drum = this.gameObject;
@@ -61,12 +63,24 @@ public class DrumRotator : MonoBehaviour
 
         if (configs != null)
         {
-            StartCoroutine(RotateDrum());
+            StartCoroutine(StartRotationWithDelay());
         }
         else
         {
             Debug.LogError("Failed to load rotation configs from " + configFilePath);
         }
+    }
+
+    private IEnumerator StartRotationWithDelay()
+    {
+        // Delay for the specified number of frames
+        for (int i = 0; i < initialDelayFrames; i++)
+        {
+            yield return null;
+        }
+
+        // Start the rotation
+        StartCoroutine(RotateDrum());
     }
 
     private List<RotationConfig> LoadRotationConfigsFromJson(string path)
