@@ -42,11 +42,10 @@ public class SinusoidalGrating : MonoBehaviour
     [SerializeField]
     private Material material;
 
-    [SerializeField]
-    private bool interactive = false;
-
     private Texture2D texture;
     private Mesh mesh;
+
+    public DrumRotator drumRotator; // Reference to the DrumRotator script
 
     private void Start()
     {
@@ -59,33 +58,70 @@ public class SinusoidalGrating : MonoBehaviour
         GameObject cylinder = new GameObject("GratingDrum");
         cylinder.AddComponent<MeshFilter>().mesh = mesh;
         cylinder.AddComponent<MeshRenderer>().material = material;
-        cylinder.AddComponent<DrumRotator>();
+        drumRotator = cylinder.AddComponent<DrumRotator>(); // Assign the DrumRotator component
+
+        // Subscribe to the ConfigurationChanged event
+        drumRotator.ConfigurationChanged += HandleConfigurationChanged;
+
+        // Apply the initial rotation config
+        ApplyRotationConfig();
     }
 
-    private void Update()
+    // Event handler for the ConfigurationChanged event
+    private void HandleConfigurationChanged()
     {
-        if (interactive)
+        ApplyRotationConfig();
+    }
+
+    // Method to apply the rotation config to the sinusoidal grating
+    private void ApplyRotationConfig()
+    {
+        if (
+            drumRotator != null
+            && drumRotator.configs != null
+            && drumRotator.currentIndex < drumRotator.configs.Count
+        )
         {
+            frequency = drumRotator.configs[drumRotator.currentIndex].frequency;
+            level = drumRotator.configs[drumRotator.currentIndex].level;
             FillTexture();
         }
     }
 
+    private void Update()
+    {
+        // Handle input or any other logic here
+    }
+
     private void FillTexture()
     {
-        for (int x = 0; x < textureWidth; x++)
+        if (
+            drumRotator != null
+            && drumRotator.configs != null
+            && drumRotator.currentIndex < drumRotator.configs.Count
+        )
         {
-            for (int y = 0; y < textureHeight; y++)
+            RotationConfig currentConfig = drumRotator.configs[drumRotator.currentIndex];
+
+            frequency = currentConfig.frequency;
+            level = currentConfig.level;
+            // Debug.Log("Frequency: " + frequency + " Level: " + level);
+            for (int x = 0; x < textureWidth; x++)
             {
-                float u = (float)x / (textureWidth - 1);
-                float s = Mathf.Sin(u * frequency * 2 * Mathf.PI);
-                float normalSine = s * level + 0.5f;
-                float powerSine = Mathf.Pow(normalSine, 4f);
-                float t = Mathf.Lerp(normalSine, powerSine, level * 2 - 1);
-                Color c = Color.Lerp(color1, color2, t);
-                texture.SetPixel(x, y, c);
+                for (int y = 0; y < textureHeight; y++)
+                {
+                    float u = (float)x / (textureWidth - 1);
+                    float s = Mathf.Sin(u * frequency * 2 * Mathf.PI);
+                    float normalSine = s * level + 0.5f;
+                    float powerSine = Mathf.Pow(normalSine, 4f);
+                    float t = Mathf.Lerp(normalSine, powerSine, level * 2 - 1);
+                    Color c = Color.Lerp(color1, color2, t);
+                    texture.SetPixel(x, y, c);
+                }
             }
+
+            texture.Apply();
         }
-        texture.Apply();
     }
 
     private float Saturate(float x)

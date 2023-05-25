@@ -1,8 +1,8 @@
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System;
 
 public enum RotationAxis
 {
@@ -18,6 +18,8 @@ public class RotationConfig
     public bool clockwise;
     public float duration;
     public string externalRotationAxis;
+    public float frequency; // Remove the get and set methods
+    public float level; // Remove the get and set methods
 }
 
 [System.Serializable]
@@ -32,8 +34,9 @@ public class DrumRotator : MonoBehaviour
     public Quaternion initialRotation;
 
     public string configFilePath = "rotationConfigs.json";
-    private int currentIndex = 0;
-    private List<RotationConfig> configs;
+    public int currentIndex = 0; // Change access modifier to public
+    public List<RotationConfig> configs; // Change access modifier to public
+
     private bool isPaused = true;
     private bool isStepping = false;
 
@@ -81,6 +84,21 @@ public class DrumRotator : MonoBehaviour
 
         // Start the rotation
         StartCoroutine(RotateDrum());
+    }
+
+    // Define a custom event for configuration change
+    public event Action ConfigurationChanged;
+
+    // Method to raise the configuration change event
+    private void RaiseConfigurationChanged()
+    {
+        ConfigurationChanged?.Invoke();
+        Debug.Log(
+            "Configuration changed: Frequency = "
+                + configs[currentIndex].frequency
+                + ", Level = "
+                + configs[currentIndex].level
+        );
     }
 
     private List<RotationConfig> LoadRotationConfigsFromJson(string path)
@@ -148,7 +166,7 @@ public class DrumRotator : MonoBehaviour
                 }
             }
             Debug.Log("Finished rotation " + currentIndex + " of " + configs.Count);
-
+            RaiseConfigurationChanged(); // Raise the event when the configuration changes
             // Increment index or reset to 0 if end of list
             if (!isStepping)
             {
@@ -169,11 +187,13 @@ public class DrumRotator : MonoBehaviour
         {
             currentIndex = (currentIndex + 1) % configs.Count;
             isStepping = true;
+            RaiseConfigurationChanged(); // Raise the event when the configuration changes
         }
         else if (Input.GetKeyDown(KeyCode.LeftBracket))
         {
             currentIndex = (currentIndex - 1 + configs.Count) % configs.Count;
             isStepping = true;
+            RaiseConfigurationChanged(); // Raise the event when the configuration changes
         }
 
         // Pause and play using backslash
