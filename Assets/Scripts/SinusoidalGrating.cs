@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class SinusoidalGrating : MonoBehaviour
 {
@@ -50,7 +51,6 @@ public class SinusoidalGrating : MonoBehaviour
     private void Start()
     {
         texture = new Texture2D(textureWidth, textureHeight);
-        FillTexture();
         material = new Material(Shader.Find("Unlit/Texture"));
         material.mainTexture = texture;
 
@@ -65,6 +65,21 @@ public class SinusoidalGrating : MonoBehaviour
 
         // Apply the initial rotation config
         ApplyRotationConfig();
+
+        // Delay the filling of the texture
+        StartCoroutine(DelayedFillTexture());
+    }
+
+    private IEnumerator DelayedFillTexture()
+    {
+        // Wait for one frame
+        yield return null;
+
+        // Fill the texture
+        FillTexture();
+
+        // Apply the texture to the material
+        material.mainTexture = texture;
     }
 
     // Event handler for the ConfigurationChanged event
@@ -105,7 +120,7 @@ public class SinusoidalGrating : MonoBehaviour
 
             frequency = currentConfig.frequency;
             level = currentConfig.level;
-            // Debug.Log("Frequency: " + frequency + " Level: " + level);
+
             for (int x = 0; x < textureWidth; x++)
             {
                 for (int y = 0; y < textureHeight; y++)
@@ -120,7 +135,7 @@ public class SinusoidalGrating : MonoBehaviour
                 }
             }
 
-            texture.Apply();
+            texture.Apply(); // Apply the texture after all pixels have been set
         }
     }
 
