@@ -14,13 +14,16 @@ public class DataLogger : MonoBehaviour
     private List<string> bufferedLines;
     private bool isLogging;
     private bool isBuffering;
+    private bool isFirstLine;
 
     void Start()
     {
-        InitLog();
         bufferedLines = new List<string>();
         isLogging = true;
         isBuffering = true;
+        isFirstLine = true;
+
+        InitLog();
 
         StartCoroutine(FlushBufferedLinesRoutine());
     }
@@ -37,9 +40,11 @@ public class DataLogger : MonoBehaviour
             new GZipStream(File.Create(logPath), System.IO.Compression.CompressionLevel.Optimal)
         );
 
+        // Write the header row
         logFile.WriteLine(
             "Current Time,DrumPosX,DrumPosY,DrumPosZ,DrumRotX,DrumRotY,DrumRotZ,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ"
         );
+
         Debug.Log("Writing data to: " + logPath);
     }
 
@@ -61,7 +66,14 @@ public class DataLogger : MonoBehaviour
 
         if (isBuffering)
         {
-            bufferedLines.Add(line);
+            if (isFirstLine)
+            {
+                isFirstLine = false;
+            }
+            else
+            {
+                bufferedLines.Add(line);
+            }
         }
         else
         {
@@ -83,7 +95,7 @@ public class DataLogger : MonoBehaviour
 
         foreach (var line in linesToWrite)
         {
-            WriteLogLine(line);
+            await logFile.WriteLineAsync(line);
         }
 
         await logFile.FlushAsync();
