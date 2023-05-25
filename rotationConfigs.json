@@ -22,6 +22,18 @@
       "clockwise": false,
       "duration": 4,
       "externalRotationAxis": "Pitch"
+    },
+    {
+      "speed": 90,
+      "clockwise": true,
+      "duration": 4,
+      "externalRotationAxis": "Roll"
+    },
+    {
+      "speed": 90,
+      "clockwise": false,
+      "duration": 4,
+      "externalRotationAxis": "Roll"
     }
   ]
 }
