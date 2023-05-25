@@ -13,11 +13,11 @@ public class SinusoidalGrating : MonoBehaviour
     [Header("Sinusoidal Settings")]
     [SerializeField]
     [Range(0f, 10f)]
-    private float frequency = 4f;
+    public float frequency = 4f;
 
     [SerializeField]
     [Range(0f, 1f)]
-    private float level = 0.5f;
+    public float level = 0.5f;
 
     [Header("Color Settings")]
     [SerializeField]

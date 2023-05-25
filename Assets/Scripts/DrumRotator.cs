@@ -37,8 +37,8 @@ public class DrumRotator : MonoBehaviour
     public int currentIndex = 0; // Change access modifier to public
     public List<RotationConfig> configs; // Change access modifier to public
 
-    private bool isPaused = true;
-    private bool isStepping = false;
+    public bool isPaused = true;
+    public bool isStepping = false;
 
     private Vector3 StringToAxis(string axisName)
     {

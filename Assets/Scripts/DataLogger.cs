@@ -1,8 +1,8 @@
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System;
 using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +16,10 @@ public class DataLogger : MonoBehaviour
     private bool isBuffering;
     private bool isFirstLine;
 
+    private SinusoidalGrating sinusoidalGrating;
+    private DrumRotator drumRotator;
+    private ZmqListener zmq;
+
     void Start()
     {
         bufferedLines = new List<string>();
@@ -26,6 +30,10 @@ public class DataLogger : MonoBehaviour
         InitLog();
 
         StartCoroutine(FlushBufferedLinesRoutine());
+
+        sinusoidalGrating = FindObjectOfType<SinusoidalGrating>();
+        drumRotator = FindObjectOfType<DrumRotator>();
+        zmq = FindObjectOfType<ZmqListener>();
     }
 
     void InitLog()
@@ -42,7 +50,7 @@ public class DataLogger : MonoBehaviour
 
         // Write the header row
         logFile.WriteLine(
-            "Current Time,DrumPosX,DrumPosY,DrumPosZ,DrumRotX,DrumRotY,DrumRotZ,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ"
+            "Current Time,DrumPosX,DrumPosY,DrumPosZ,DrumRotX,DrumRotY,DrumRotZ,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ,Frequency,Level,IsPaused,IsStepping"
         );
 
         Debug.Log("Writing data to: " + logPath);
@@ -55,14 +63,27 @@ public class DataLogger : MonoBehaviour
         GameObject gratingDrum = GameObject.Find("GratingDrum"); // Replace "GratingDrum" with the actual name of the drum object
         Vector3 drumPosition = gratingDrum.transform.position;
         Quaternion drumRotation = gratingDrum.transform.rotation;
-        Vector3 sensPosition = FindObjectOfType<ZmqListener>().positionToUpdate;
-        Quaternion sensRotation = FindObjectOfType<ZmqListener>().rotationToUpdate;
+
+        Vector3 sensPosition = zmq.pose.position;
+        Quaternion sensRotation = zmq.pose.rotation;
+
+        // Vector3 sensPosition = FindObjectOfType<ZmqListener>().positionToUpdate;
+        // Quaternion sensRotation = FindObjectOfType<ZmqListener>().rotationToUpdate;
+
+        // Get frequency and level from SinusoidalGrating
+        float frequency = sinusoidalGrating.frequency;
+        float level = sinusoidalGrating.level;
+
+        // Get isPaused and isStepping from DrumRotator
+        bool isPaused = drumRotator.isPaused;
+        bool isStepping = drumRotator.isStepping;
 
         // Log the data
         string line =
             $"{currentTime},{drumPosition.x},{drumPosition.y},{drumPosition.z},{drumRotation.eulerAngles.x},"
             + $"{drumRotation.eulerAngles.y},{drumRotation.eulerAngles.z},{sensPosition.x},{sensPosition.y},"
-            + $"{sensPosition.z},{sensRotation.eulerAngles.x},{sensRotation.eulerAngles.y},{sensRotation.eulerAngles.z}";
+            + $"{sensPosition.z},{sensRotation.eulerAngles.x},{sensRotation.eulerAngles.y},{sensRotation.eulerAngles.z},"
+            + $"{frequency},{level},{isPaused},{isStepping}";
 
         if (isBuffering)
         {
