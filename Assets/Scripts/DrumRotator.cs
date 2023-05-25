@@ -201,5 +201,13 @@ public class DrumRotator : MonoBehaviour
         {
             isPaused = !isPaused;
         }
+
+        // Use R to reset the drum to the initial rotation
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Debug.Log("Resetting drum rotation");
+            drum.transform.rotation = initialRotation;
+
+        }
     }
 }

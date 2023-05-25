@@ -72,6 +72,13 @@ public class ClosedLoop : MonoBehaviour
                     )
                 );
             }
+
+            //reset to zero if the user presses the R key
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                transform.position = Vector3.zero;
+                transform.rotation = Quaternion.identity;
+            }
         }
     }
 }
