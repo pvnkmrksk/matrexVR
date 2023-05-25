@@ -4,36 +4,49 @@
       "speed": 90,
       "clockwise": true,
       "duration": 4,
-      "externalRotationAxis": "Yaw"
+      "externalRotationAxis": "Yaw",
+      "frequency": 4,
+      "level": 0.5
     },
     {
       "speed": 90,
       "clockwise": false,
       "duration": 4,
-      "externalRotationAxis": "Yaw"},
-      {
-      "speed": 90,
-      "clockwise": true,
-      "duration": 4,
-      "externalRotationAxis": "Pitch"
-    },
-    {
-      "speed": 90,
-      "clockwise": false,
-      "duration": 4,
-      "externalRotationAxis": "Pitch"
+      "externalRotationAxis": "Yaw",
+      "frequency": 8,
+      "level": 0.5
     },
     {
       "speed": 90,
       "clockwise": true,
       "duration": 4,
-      "externalRotationAxis": "Roll"
+      "externalRotationAxis": "Pitch",
+      "frequency": 4,
+      "level": 0.5
     },
     {
       "speed": 90,
       "clockwise": false,
       "duration": 4,
-      "externalRotationAxis": "Roll"
+      "externalRotationAxis": "Pitch",
+      "frequency": 4,
+      "level": 0
+    },
+    {
+      "speed": 90,
+      "clockwise": true,
+      "duration": 4,
+      "externalRotationAxis": "Roll",
+      "frequency": 4,
+      "level": 1
+    },
+    {
+      "speed": 90,
+      "clockwise": false,
+      "duration": 4,
+      "externalRotationAxis": "Roll",
+      "frequency": 4,
+      "level": 0.5
     }
   ]
 }
