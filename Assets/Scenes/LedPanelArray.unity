@@ -564,8 +564,8 @@ GameObject:
   - component: {fileID: 1339283325}
   - component: {fileID: 1339283328}
   - component: {fileID: 1339283329}
-  - component: {fileID: 1339283330}
   - component: {fileID: 1339283331}
+  - component: {fileID: 1339283332}
   m_Layer: 0
   m_Name: Cameras
   m_TagString: Untagged
@@ -622,20 +622,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1d9dee094eb5bb59c8706fc55c91ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1339283330
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1339283324}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3145f3a684dce898192c8b28dc2252bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  angularSpeed: 0
-  stripeStartTime: 0
 --- !u!114 &1339283331
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -652,6 +638,25 @@ MonoBehaviour:
   rotateSpeed: 100
   maxTranslateSpeed: 100
   maxRotateSpeed: 6000
+--- !u!114 &1339283332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339283324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c75a3f1e40cc87811bdffcc067133c2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  xGain: 1
+  yGain: 1
+  zGain: 1
+  rollGain: 1
+  pitchGain: 1
+  yawGain: 1
+  closedLoop: 0
 --- !u!1 &1406940396
 GameObject:
   m_ObjectHideFlags: 0
@@ -854,7 +859,7 @@ MonoBehaviour:
   cylinderSegments: 32
   cylinderStacks: 16
   material: {fileID: 0}
-  interactive: 0
+  drumRotator: {fileID: 0}
 --- !u!4 &2072652017
 Transform:
   m_ObjectHideFlags: 0
