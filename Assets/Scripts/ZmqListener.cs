@@ -10,8 +10,17 @@ public class ZmqListener : MonoBehaviour
     private readonly string address = "tcp://localhost:9872"; // Replace with your socket address
     private SubscriberSocket subscriber;
     private string message; // The message received from the socket
-    public Vector3 positionToUpdate { get; private set; }
-    public Quaternion rotationToUpdate { get; private set; }
+    public Pose pose { get; private set; }
+
+    private class ZmqMessage
+    {
+        public float x;
+        public float y;
+        public float z;
+        public float roll;
+        public float pitch;
+        public float yaw;
+    }
 
     void Start()
     {
@@ -29,17 +38,9 @@ public class ZmqListener : MonoBehaviour
                     string topic = subscriber.ReceiveFrameString();
                     message = subscriber.ReceiveFrameString();
 
-                    // Update the position and rotation based on the received values
-                    string[] values = message.Split(',');
-
-                    // Transform the position
-                    float posx = float.Parse(values[0].Split(':')[1]) * 5;
-                    float posy = float.Parse(values[1].Split(':')[1]) * 5;
-                    positionToUpdate = new Vector3(posx, 0.0f, posy);
-
-                    // Transform the rotation
-                    float heading = float.Parse(values[2].Split(':')[1]) * Mathf.Rad2Deg;
-                    rotationToUpdate = Quaternion.Euler(0.0f, heading, 0.0f);
+                    // Update the pose based on the received values
+                    ZmqMessage zmqMessage = JsonUtility.FromJson<ZmqMessage>(message);
+                    UpdatePose(zmqMessage);
                 }
                 catch (NetMQException ex)
                 {
@@ -54,5 +55,17 @@ public class ZmqListener : MonoBehaviour
     void OnDestroy()
     {
         subscriber.Dispose();
+    }
+
+    private void UpdatePose(ZmqMessage zmqMessage)
+    {
+        // Transform the position
+        Vector3 position = new Vector3(zmqMessage.x, zmqMessage.y, zmqMessage.z);
+
+        // Transform the rotation
+        Quaternion rotation = Quaternion.Euler(zmqMessage.pitch, zmqMessage.yaw, zmqMessage.roll);
+
+        // Update the pose
+        pose = new Pose(position, rotation);
     }
 }
