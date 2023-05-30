@@ -650,13 +650,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c75a3f1e40cc87811bdffcc067133c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xGain: 1
-  yGain: 1
-  zGain: 1
-  rollGain: 1
-  pitchGain: 1
-  yawGain: 1
-  closedLoop: 0
+  xGain: 100
+  yGain: 100
+  zGain: 100
+  rollGain: 100
+  pitchGain: 100
+  yawGain: 100
 --- !u!1 &1406940396
 GameObject:
   m_ObjectHideFlags: 0

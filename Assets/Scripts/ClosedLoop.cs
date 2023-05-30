@@ -2,23 +2,23 @@ using UnityEngine;
 
 public class ClosedLoop : MonoBehaviour
 {
-    [SerializeField, Range(0, 10)]
-    private float xGain = 1.0f;
+    [SerializeField, Range(0, 1000)]
+    private float xGain = 100.0f;
 
-    [SerializeField, Range(0, 10)]
-    private float yGain = 1.0f;
+    [SerializeField, Range(0, 1000)]
+    private float yGain = 100.0f;
 
-    [SerializeField, Range(0, 10)]
-    private float zGain = 1.0f;
+    [SerializeField, Range(0, 1000)]
+    private float zGain = 100.0f;
 
-    [SerializeField, Range(0, 10)]
-    private float rollGain = 1.0f;
+    [SerializeField, Range(0, 1000)]
+    private float rollGain = 100.0f;
 
-    [SerializeField, Range(0, 10)]
-    private float pitchGain = 1.0f;
+    [SerializeField, Range(0, 1000)]
+    private float pitchGain = 100.0f;
 
-    [SerializeField, Range(0, 10)]
-    private float yawGain = 1.0f;
+    [SerializeField, Range(0, 1000)]
+    private float yawGain = 100.0f;
 
     private bool closedLoopOrientation = false;
     private bool closedLoopPosition = false;
@@ -30,6 +30,9 @@ public class ClosedLoop : MonoBehaviour
     {
         _zmqListener = GetComponent<ZmqListener>();
         mainCamera = Camera.main;
+
+        Application.targetFrameRate = 60;
+        Time.fixedDeltaTime = 1f / 60f;
     }
 
     private void Update()

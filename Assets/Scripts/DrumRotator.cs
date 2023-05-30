@@ -57,8 +57,13 @@ public class DrumRotator : MonoBehaviour
 
     public int initialDelayFrames = 10; // Number of frames to delay before starting the rotation
 
+    //get the Cameras gameobject which holds all the cameras
+    GameObject camerasObject;
+
     void Start()
     {
+        GameObject camerasObject = GameObject.Find("Cameras");
+
         drum = this.gameObject;
         initialRotation = drum.transform.rotation;
 
@@ -140,7 +145,9 @@ public class DrumRotator : MonoBehaviour
 
             // Assuming deltaTime represents the time elapsed since the last frame
             float speedPerSecond = config.speed; // Speed in degrees/second
-            float speedPerFrame = speedPerSecond * Time.deltaTime; // Speed in degrees/frame
+            // float speedPerFrame = speedPerSecond * Time.deltaTime; // Speed in degrees/frame
+            // Assuming deltaTime represents the time elapsed since the last frame
+            float speedPerFrame = speedPerSecond * (1f / 60f); // Speed in degrees/frame at 60 fps
 
             // Adjust speed for clockwise/counter-clockwise
             if (!config.clockwise)
@@ -155,7 +162,7 @@ public class DrumRotator : MonoBehaviour
             {
                 if (!isPaused && !isStepping)
                 {
-                    drum.transform.Rotate(axis, speedPerFrame);
+                    drum.transform.Rotate(Vector3.up, speedPerFrame);
                     totalRotation += Mathf.Abs(speedPerFrame);
                 }
                 yield return null;
@@ -207,7 +214,6 @@ public class DrumRotator : MonoBehaviour
         {
             Debug.Log("Resetting drum rotation");
             drum.transform.rotation = initialRotation;
-
         }
     }
 }
