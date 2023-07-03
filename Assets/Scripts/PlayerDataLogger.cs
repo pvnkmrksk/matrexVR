@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerDataLogger : MonoBehaviour
 {
@@ -18,18 +19,21 @@ public class PlayerDataLogger : MonoBehaviour
         Directory.CreateDirectory(directoryPath); // Creates the directory if it doesn't exist
         logPath = Path.Combine(directoryPath, $"{date}_{time}.csv");
         logFile = new StreamWriter(logPath);
-        logFile.WriteLine("Time,Position,Heading,AngularSpeed,StripeStartTime");
+        logFile.WriteLine("Current Time,X Position,Z Position,Y Rotation,Stripe Start Time,Angular Speed,Scene Name");
         Debug.Log("Writing data to: " + logPath);
     }
 
     void Update()
     {
-        Vector3 position = transform.position;
-        Vector3 forward = transform.forward;
-        float angularSpeed = stripeGenerator.GetAngularSpeed(); // This method does not exist yet, you'll need to add it to your GenerateStripes script
-        float stripeStartTime = stripeGenerator.GetStripeStartTime(); // This method does not exist yet, you'll need to add it to your GenerateStripes script
+        string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        float xPos = transform.position.x;
+        float zPos = transform.position.z;
+        float yRot = transform.eulerAngles.y;
+        float angularSpeed = stripeGenerator.GetAngularSpeed(); // This method should be in your GenerateStripes script
+        float stripeStartTime = stripeGenerator.GetStripeStartTime(); // This method should be in your GenerateStripes script
+        string sceneName = SceneManager.GetActiveScene().name;
 
-        string line = $"{Time.time},{position},{forward},{angularSpeed},{stripeStartTime}";
+        string line = $"{currentTime},{xPos},{zPos},{yRot},{stripeStartTime},{angularSpeed},{sceneName}";
         logFile.WriteLine(line);
     }
 

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657815, g: 0.49641192, b: 0.57481617, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -197,7 +197,7 @@ Camera:
     height: 0.5
   near clip plane: 0.3
   far clip plane: 50
-  field of view: 83.71296
+  field of view: 53.130104
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -289,7 +289,7 @@ Camera:
     height: 0.05925926
   near clip plane: 0.3
   far clip plane: 50
-  field of view: 77.06314
+  field of view: 47.924988
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -381,7 +381,7 @@ Camera:
     height: 0.5
   near clip plane: 0.3
   far clip plane: 50
-  field of view: 83.71296
+  field of view: 53.130104
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -473,7 +473,7 @@ Camera:
     height: 0.5
   near clip plane: 0.3
   far clip plane: 50
-  field of view: 83.71296
+  field of view: 53.130104
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -659,7 +659,7 @@ Camera:
     height: 0.5
   near clip plane: 0.3
   far clip plane: 50
-  field of view: 83.71296
+  field of view: 53.130104
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -751,7 +751,7 @@ Camera:
     height: 0.05925926
   near clip plane: 0.3
   far clip plane: 50
-  field of view: 77.06314
+  field of view: 47.924988
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -843,7 +843,7 @@ Camera:
     height: 0.05925926
   near clip plane: 0.3
   far clip plane: 50
-  field of view: 77.06314
+  field of view: 47.924988
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -920,7 +920,7 @@ Camera:
     height: 0.05925926
   near clip plane: 0.3
   far clip plane: 50
-  field of view: 77.06314
+  field of view: 47.924988
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -962,9 +962,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1339283325}
-  - component: {fileID: 1339283326}
-  - component: {fileID: 1339283327}
   - component: {fileID: 1339283328}
+  - component: {fileID: 1339283329}
+  - component: {fileID: 1339283330}
   m_Layer: 0
   m_Name: Cameras
   m_TagString: Untagged
@@ -980,7 +980,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1339283324}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.69, y: 4.28, z: -17.81}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -993,39 +993,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1339283326
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1339283324}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b0a9c5710e8b7b1e99f60d24fed7d85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  translateSpeed: 10
-  rotateSpeed: 10
---- !u!114 &1339283327
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1339283324}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4f90e1efd3547ee09edf5a78639a9f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  xGain: 1
-  yGain: 1
-  zGain: 1
-  rollGain: 1
-  pitchGain: 1
-  yawGain: 1
-  closedLoop: 0
 --- !u!114 &1339283328
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1044,6 +1011,32 @@ MonoBehaviour:
   startCol: 0
   horizontal: 1
   interactive: 0
+--- !u!114 &1339283329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339283324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1d9dee094eb5bb59c8706fc55c91ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1339283330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339283324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3145f3a684dce898192c8b28dc2252bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  angularSpeed: 0
+  stripeStartTime: 0
 --- !u!1 &1406940396
 GameObject:
   m_ObjectHideFlags: 0
