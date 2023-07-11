@@ -7,7 +7,8 @@ using System.IO;
 
 public class ZmqListener : MonoBehaviour
 {
-    private readonly string address = "tcp://localhost:9872"; // Replace with your socket address
+    [SerializeField]
+    string address = "tcp://localhost:9872"; // Replace with your socket address
     private SubscriberSocket subscriber;
     private string message; // The message received from the socket
     public Pose pose { get; private set; }
