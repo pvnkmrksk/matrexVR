@@ -87,6 +87,27 @@ The project has the following dependencies:
 - Use the provided keyboard controls to interact with the objects and observe their behaviors.
 - Refer to the specific script documentation for detailed usage instructions and customization options.
 
+## Keyboard Controls
+
+- `W` - Pitch down.
+- `S` - Pitch up.
+- `D` - Yaw right.
+- `A` - Yaw left.
+- `E` - Roll CW.
+- `Q` - Roll CCW.
+- `Up Arrow` - Move forward.
+- `Down Arrow` - Move backward.
+- `Right Arrow` - Move right.
+- `Left Arrow` - Move left.
+- `C` - Move up.
+- `Z` - Move down.
+
+- `O` - Toggle Closed Loop Orientation Control.
+- `P` - Toggle Closed Loop Position Control.
+- `M` - Toggle Closed Loop Momentum Control.
+
+
+
 ## Contributing
 
 Contributions to the project are welcome! If you find any issues or have suggestions for improvements, please submit a pull request or create an issue.
