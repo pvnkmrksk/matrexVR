@@ -137,7 +137,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: address
-      value: tcp://localhost:9873
+      value: 10.126.18.49
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: xGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: yGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: zGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: yawGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: rollGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: pitchGain
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: m_Name
@@ -203,8 +227,36 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: port
+      value: 9874
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: address
-      value: tcp://localhost:9875
+      value: 10.126.18.49
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: xGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: yGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: zGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: yawGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: rollGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: pitchGain
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: m_Name
@@ -364,8 +416,36 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: port
+      value: 9873
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: address
-      value: tcp://localhost:9874
+      value: 10.126.18.49
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: xGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: yGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: zGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: yawGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: rollGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: pitchGain
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: m_Name
@@ -677,6 +757,38 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: port
+      value: 9871
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: address
+      value: 10.126.18.49
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: xGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: yGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: zGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: yawGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: rollGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: pitchGain
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: m_Name
       value: Cameras1

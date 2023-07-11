@@ -8,7 +8,12 @@ using System.IO;
 public class ZmqListener : MonoBehaviour
 {
     [SerializeField]
-    string address = "tcp://localhost:9872"; // Replace with your socket address
+    [Tooltip("The ip address of the socket to connect to")]
+    string address = "localhost"; // Replace with your socket address
+
+    [Tooltip("The port of the socket to connect to")]
+    [SerializeField]
+    int port = 9872; // Replace with your port number
     private SubscriberSocket subscriber;
     private string message; // The message received from the socket
     public Pose pose { get; private set; }
@@ -26,7 +31,7 @@ public class ZmqListener : MonoBehaviour
     void Start()
     {
         subscriber = new SubscriberSocket();
-        subscriber.Connect(address);
+        subscriber.Connect($"tcp://{address}:{port}");
         subscriber.SubscribeToAnyTopic(); // Subscribe to all topics
 
         // Start listening for messages on a separate thread
