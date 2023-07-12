@@ -16,8 +16,6 @@ public class DataLogger : MonoBehaviour
     private bool isBuffering;
     private bool isFirstLine;
 
-    private SinusoidalGrating sinusoidalGrating;
-    private DrumRotator drumRotator;
     private ZmqListener zmq;
 
     void Start()
@@ -31,77 +29,76 @@ public class DataLogger : MonoBehaviour
 
         StartCoroutine(FlushBufferedLinesRoutine());
 
-        sinusoidalGrating = FindObjectOfType<SinusoidalGrating>();
-        drumRotator = FindObjectOfType<DrumRotator>();
-        zmq = FindObjectOfType<ZmqListener>();
-    }
-
-    void InitLog()
-    {
-        string date = DateTime.Now.ToString("yyyy-MM-dd");
-        string time = DateTime.Now.ToString("HH-mm-ss");
-        string rootDirectoryPath = Application.dataPath;
-        string directoryPath = Path.Combine(rootDirectoryPath, "data", date);
-        Directory.CreateDirectory(directoryPath);
-        logPath = Path.Combine(directoryPath, $"{date}_{time}.csv.gz");
-        logFile = new StreamWriter(
-            new GZipStream(File.Create(logPath), System.IO.Compression.CompressionLevel.Optimal)
-        );
-
-        // Write the header row
-        logFile.WriteLine(
-            "Current Time,DrumPosX,DrumPosY,DrumPosZ,DrumRotX,DrumRotY,DrumRotZ,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ,Frequency,Level,IsPaused,IsStepping"
-        );
-
-        Debug.Log("Writing data to: " + logPath);
-    }
-
-    void Update()
-    {
-        // Collect the necessary information
-        string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-        GameObject gratingDrum = GameObject.Find("GratingDrum"); // Replace "GratingDrum" with the actual name of the drum object
-        Vector3 drumPosition = gratingDrum.transform.position;
-        Quaternion drumRotation = gratingDrum.transform.rotation;
-
-        Vector3 sensPosition = zmq.pose.position;
-        Quaternion sensRotation = zmq.pose.rotation;
-
-        // Vector3 sensPosition = FindObjectOfType<ZmqListener>().positionToUpdate;
-        // Quaternion sensRotation = FindObjectOfType<ZmqListener>().rotationToUpdate;
-
-        // Get frequency and level from SinusoidalGrating
-        float frequency = sinusoidalGrating.frequency;
-        float level = sinusoidalGrating.level;
-
-        // Get isPaused and isStepping from DrumRotator
-        bool isPaused = drumRotator.isPaused;
-        bool isStepping = drumRotator.isStepping;
-
-        // Log the data
-        string line =
-            $"{currentTime},{drumPosition.x},{drumPosition.y},{drumPosition.z},{drumRotation.eulerAngles.x},"
-            + $"{drumRotation.eulerAngles.y},{drumRotation.eulerAngles.z},{sensPosition.x},{sensPosition.y},"
-            + $"{sensPosition.z},{sensRotation.eulerAngles.x},{sensRotation.eulerAngles.y},{sensRotation.eulerAngles.z},"
-            + $"{frequency},{level},{isPaused},{isStepping}";
-
-        if (isBuffering)
+        zmq = GetComponent<ZmqListener>();
+        if (zmq == null)
         {
-            if (isFirstLine)
-            {
-                isFirstLine = false;
-            }
-            else
-            {
-                bufferedLines.Add(line);
-            }
+            Debug.LogError("ZmqListener component not found in the GameObject. Please attach ZmqListener script to the GameObject.");
+        }
+    }
+void InitLog()
+{
+    string date = DateTime.Now.ToString("yyyy-MM-dd");
+    string time = DateTime.Now.ToString("HH-mm-ss");
+    string gameObjectName = this.gameObject.name; // Get the name of the GameObject the script is attached to
+    string rootDirectoryPath = Application.dataPath;
+    string directoryPath = Path.Combine(rootDirectoryPath, "data", date);
+    Directory.CreateDirectory(directoryPath);
+
+    // Add GameObject name in the log filename
+    logPath = Path.Combine(directoryPath, $"{date}_{time}_{gameObjectName}_.csv.gz");
+    
+    logFile = new StreamWriter(
+        new GZipStream(File.Create(logPath), System.IO.Compression.CompressionLevel.Optimal)
+    );
+
+    // Write the header row
+    logFile.WriteLine(
+        "Current Time,VR,Scene,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ,InsectPosX,InsectPosY,InsectPosZ,InsectRotX,InsectRotY,InsectRotZ"
+    );
+
+    Debug.Log("Writing data to: " + logPath);
+}
+
+void Update()
+{
+    if (zmq == null)
+        return;
+
+    // Collect the necessary information
+    string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+    string vr = this.gameObject.name; // The name of the GameObject this script is attached to
+    string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name; // The name of the current scene
+
+    Vector3 sensPosition = zmq.pose.position;
+    Quaternion sensRotation = zmq.pose.rotation;
+
+    // The current position and rotation of the GameObject this script is attached to
+    Vector3 insectPosition = this.transform.position;
+    Quaternion insectRotation = this.transform.rotation;
+
+    // Log the data
+    string line =
+        $"{currentTime},{vr},{scene},{sensPosition.x},{sensPosition.y},{sensPosition.z},"
+        + $"{sensRotation.eulerAngles.x},{sensRotation.eulerAngles.y},{sensRotation.eulerAngles.z},"
+        + $"{insectPosition.x},{insectPosition.y},{insectPosition.z},{insectRotation.eulerAngles.x},"
+        + $"{insectRotation.eulerAngles.y},{insectRotation.eulerAngles.z}";
+
+    if (isBuffering)
+    {
+        if (isFirstLine)
+        {
+            isFirstLine = false;
         }
         else
         {
-            WriteLogLine(line);
+            bufferedLines.Add(line);
         }
     }
-
+    else
+    {
+        WriteLogLine(line);
+    }
+}
     void OnDestroy()
     {
         isLogging = false;
