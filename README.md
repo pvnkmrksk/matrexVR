@@ -5,12 +5,15 @@ This repository contains a Unity project that demonstrates various functionaliti
 ## Scripts
 
 - [x] ClosedLoop.cs
-- [x] DataLogger.cs
+- [x] DrumLogger.cs
 - [x] DrumRotator.cs
 - [x] Keyboard.cs
 - [x] SinusoidalGrating.cs
 - [x] ViewportSetter.cs
 - [x] ZmqListener.cs
+- [x] DataLogger.cs
+- [] jsonLogger.cs
+- [] replayscript.cs
 
 ### ClosedLoop.cs
 
@@ -21,7 +24,7 @@ This repository contains a Unity project that demonstrates various functionaliti
   - [ ] Add individual axis gain control.
   - [ ] Implement real-time physics for force-torque transform.
 
-### DataLogger.cs
+### DrumLogger.cs
 
 - Logs the position, rotation, frequency, level, and other parameters of various objects in the scene to a compressed CSV file.
   - [x] Implement data logging functionality.
@@ -63,6 +66,23 @@ This repository contains a Unity project that demonstrates various functionaliti
 - Listens to a ZeroMQ socket for pose messages and updates the position and rotation of an object accordingly.
   - [x] Implement ZMQ listener functionality.
   - [ ] Add better README and documentation.
+  
+### DataLogger.cs
+
+It can be attached to any GameObject and will continuously log data to a .csv.gz file. The script will generate a new log file each time the application starts.
+Features
+The script buffers the log lines and flushes them in the file when it's optimal.
+The script logs the following data:
+Current Time: The current date and time at the time of logging.
+VR: The name of the GameObject the script is attached to.
+Scene: The name of the current active scene in Unity.
+SensPosX, SensPosY, SensPosZ: The position of the sensor (from ZmqListener script).
+SensRotX, SensRotY, SensRotZ: The rotation of the sensor (from ZmqListener script).
+InsectPosX, InsectPosY, InsectPosZ: The position of the GameObject the script is attached to.
+InsectRotX, InsectRotY, InsectRotZ: The rotation of the GameObject the script is attached to.
+
+    Attach the DataLogger script to the GameObject you want to log data from.
+    Ensure the GameObject also has the ZmqListener script attached.
 
 ## Dependencies
 
