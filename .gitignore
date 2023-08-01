@@ -86,3 +86,6 @@ pilot_2_yaw.csv
 pilot_3_roll.csv
 pilot_4_pitch.csv
 Assets/data/*
+*.csv.gz
+*.x86_64
+led_array_*
