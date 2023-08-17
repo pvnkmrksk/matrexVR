@@ -135,14 +135,17 @@ public class ClosedLoop : MonoBehaviour
         }
         else
         {
-            // Directly set rotation
-            transform.rotation = Quaternion.Euler(
+            // Directly set rotation and subtract the rotOffset
+            Quaternion desiredRotation = Quaternion.Euler(
                 _zmqListener.pose.rotation.eulerAngles.x * pitchGain,
                 _zmqListener.pose.rotation.eulerAngles.y * yawGain,
                 _zmqListener.pose.rotation.eulerAngles.z * rollGain
             );
+
+            transform.rotation = Quaternion.Inverse(rotOffset) * desiredRotation;
         }
     }
+
 
     private void ToggleClosedLoopOrientation()
     {
