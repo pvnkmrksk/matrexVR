@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657815, g: 0.49641192, b: 0.57481617, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -104,7 +104,7 @@ NavMeshSettings:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_BuildSettings:
-    serializedVersion: 2
+    serializedVersion: 3
     agentTypeID: 0
     agentRadius: 0.5
     agentHeight: 2
@@ -117,7 +117,7 @@ NavMeshSettings:
     cellSize: 0.16666667
     manualTileSize: 0
     tileSize: 256
-    accuratePlacement: 0
+    buildHeightMesh: 0
     maxJobWorkers: 0
     preserveTilesOutsideBounds: 0
     debug:
@@ -128,7 +128,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7120401496769025128, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
@@ -137,7 +137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: address
-      value: 10.42.0.132
+      value: 127.0.01
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: xGain
@@ -212,7 +212,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 210472779}
   m_SourcePrefab: {fileID: 100100000, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
 --- !u!1 &210472778 stripped
 GameObject:
@@ -240,7 +245,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7120401496769025128, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
@@ -253,19 +258,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: address
-      value: 10.42.0.132
+      value: 127.0.01
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: xGain
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: yGain
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: zGain
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: yawGain
@@ -328,7 +333,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 685794695}
   m_SourcePrefab: {fileID: 100100000, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
 --- !u!1 &685794694 stripped
 GameObject:
@@ -450,7 +460,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7120401496769025128, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
@@ -467,7 +477,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: address
-      value: 10.42.0.132
+      value: 127.0.01
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: xGain
@@ -542,7 +552,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 959539056}
   m_SourcePrefab: {fileID: 100100000, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
 --- !u!1 &959539055 stripped
 GameObject:
@@ -613,9 +628,17 @@ MeshCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1406940396}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 4
+  serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
@@ -691,7 +714,7 @@ LightingSettings:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  serializedVersion: 5
+  serializedVersion: 6
   m_GIWorkflowMode: 1
   m_EnableBakedLightmaps: 1
   m_EnableRealtimeLightmaps: 0
@@ -730,7 +753,7 @@ LightingSettings:
   m_PVREnvironmentReferencePointCount: 2048
   m_LightProbeSampleCountMultiplier: 4
   m_PVRBounces: 2
-  m_PVRMinBounces: 1
+  m_PVRMinBounces: 2
   m_PVREnvironmentImportanceSampling: 1
   m_PVRFilteringMode: 1
   m_PVRDenoiserTypeDirect: 1
@@ -747,6 +770,7 @@ LightingSettings:
   m_PVRFilteringAtrousPositionSigmaAO: 1
   m_PVRTiledBaking: 0
   m_NumRaysToShootPerTexel: -1
+  m_RespectSceneVisibilityWhenBakingGI: 0
 --- !u!1 &2072652015
 GameObject:
   m_ObjectHideFlags: 0
@@ -821,7 +845,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 7120401496769025128, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
@@ -838,7 +862,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: address
-      value: 10.42.0.132
+      value: 127.0.01
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: xGain
@@ -913,5 +937,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1339283333}
   m_SourcePrefab: {fileID: 100100000, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
