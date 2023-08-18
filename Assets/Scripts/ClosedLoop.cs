@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class ClosedLoop : MonoBehaviour
 {
+    [Header("Initial Settings")]
+    public Vector3 initialPosition = Vector3.zero;
+
     [Header("Gain Settings")]
     [SerializeField, Range(0, 1000)]
     private float xGain = 100.0f;
@@ -46,6 +49,7 @@ public class ClosedLoop : MonoBehaviour
         mainCamera = Camera.main;
         Application.targetFrameRate = 60;
         Time.fixedDeltaTime = 1f / 60f;
+        transform.position = initialPosition;
     }
 
     private void Update()
@@ -174,8 +178,8 @@ public class ClosedLoop : MonoBehaviour
 
    private void ResetPosition()
 {
-    // Set position to (0,0,0)
-    transform.position = Vector3.zero;
+    // Set position to initialPosition
+    transform.position = initialPosition;
 
     // Update posOffset based on current _zmqListener values
     if (_zmqListener.pose != null)
@@ -184,8 +188,9 @@ public class ClosedLoop : MonoBehaviour
             _zmqListener.pose.position.x * xGain,
             _zmqListener.pose.position.z * zGain,
             _zmqListener.pose.position.y * yGain
-        );
+        ) - initialPosition;
     }
+    rotOffsetPosition = transform.position;
 }
 private void ResetRotation()
 {
@@ -204,6 +209,11 @@ private void ResetRotation()
         rotOffsetPosition = transform.position;
         print(rotOffsetPosition);
         print(rotOffset);
+            posOffset = new Vector3(
+                _zmqListener.pose.position.x * xGain,
+                _zmqListener.pose.position.z * zGain,
+                _zmqListener.pose.position.y * yGain
+            )+transform.position;
     }
 }
 // Public methods for external scripts to control the behaviors
