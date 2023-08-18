@@ -69,7 +69,12 @@ public class ClosedLoop : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            ResetTransform();
+            ResetPosition();
+        }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            ResetRotation();
         }
     }
 
@@ -162,13 +167,12 @@ public class ClosedLoop : MonoBehaviour
         momentumClosedLoop = !momentumClosedLoop;
     }
 
-   private void ResetTransform()
+   private void ResetPosition()
 {
-    // Set position and rotation to (0,0,0)
+    // Set position to (0,0,0)
     transform.position = Vector3.zero;
-    transform.rotation = Quaternion.Euler(Vector3.zero);
 
-    // Update posOffset and rotOffset to current _zmqListener values
+    // Update posOffset based on current _zmqListener values
     if (_zmqListener.pose != null)
     {
         posOffset = new Vector3(
@@ -176,7 +180,16 @@ public class ClosedLoop : MonoBehaviour
             _zmqListener.pose.position.z * zGain,
             _zmqListener.pose.position.y * yGain
         );
+    }
+}
+private void ResetRotation()
+{
+    // Set rotation to (0,0,0)
+    transform.rotation = Quaternion.Euler(Vector3.zero);
 
+    // Update rotOffset based on current _zmqListener values
+    if (_zmqListener.pose != null)
+    {
         rotOffset = Quaternion.Euler(
             _zmqListener.pose.rotation.eulerAngles.x * pitchGain,
             _zmqListener.pose.rotation.eulerAngles.y * yawGain,
