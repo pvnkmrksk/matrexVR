@@ -33,6 +33,10 @@ public class ClosedLoop : MonoBehaviour
     [Tooltip("Initial rotation offset.")]
     private Quaternion rotOffset = Quaternion.identity;
 
+    [Header("Rotation Offset Position")]
+    [Tooltip("Initial rotation offset position.")]
+    private Vector3 rotOffsetPosition = Vector3.zero;
+
     private Camera mainCamera;
     private ZmqListener _zmqListener;
 
@@ -121,6 +125,7 @@ public class ClosedLoop : MonoBehaviour
                 _zmqListener.pose.position.y * yGain
             ) - posOffset;
         }
+        newPosition =Quaternion.Inverse(rotOffset) * (newPosition - rotOffsetPosition);
         transform.position = newPosition;
     }
 
@@ -195,6 +200,10 @@ private void ResetRotation()
             _zmqListener.pose.rotation.eulerAngles.y * yawGain,
             _zmqListener.pose.rotation.eulerAngles.z * rollGain
         );
+
+        rotOffsetPosition = transform.position;
+        print(rotOffsetPosition);
+        print(rotOffset);
     }
 }
 // Public methods for external scripts to control the behaviors
