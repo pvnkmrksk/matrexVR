@@ -163,6 +163,14 @@ PrefabInstance:
       propertyPath: pitchGain
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: initialPosition.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: initialPosition.z
+      value: -1
+      objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: m_Name
       value: Cameras2
@@ -282,6 +290,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: pitchGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: initialPosition.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: initialPosition.z
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
@@ -502,6 +518,14 @@ PrefabInstance:
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: pitchGain
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: initialPosition.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: initialPosition.z
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: m_Name
@@ -848,6 +872,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4027017998482077924, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_Animations.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025128, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: startCol
       value: 4
@@ -886,6 +914,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: pitchGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: initialPosition.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: initialPosition.z
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}

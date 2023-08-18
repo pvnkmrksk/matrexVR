@@ -84,6 +84,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c75a3f1e40cc87811bdffcc067133c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  initialPosition: {x: 0, y: 0, z: 0}
   xGain: 100
   yGain: 100
   zGain: 100
@@ -381,15 +382,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1419422906409699745, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
       propertyPath: m_LocalScale.x
-      value: 100
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1419422906409699745, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
       propertyPath: m_LocalScale.y
-      value: 100
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1419422906409699745, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
       propertyPath: m_LocalScale.z
-      value: 100
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1419422906409699745, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
       propertyPath: m_LocalPosition.x
