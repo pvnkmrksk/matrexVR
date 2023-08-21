@@ -534,7 +534,7 @@ MonoBehaviour:
   numberOfLocusts: 400
   spawnAreaSize: 20
   mu: 0
-  kappa: 1
+  kappa: 100000
   locustSpeed: 0.3
 --- !u!4 &1052315885
 Transform:

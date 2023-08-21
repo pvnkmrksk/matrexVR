@@ -50,6 +50,7 @@ public class ClosedLoop : MonoBehaviour
         Application.targetFrameRate = 60;
         Time.fixedDeltaTime = 1f / 60f;
         transform.position = initialPosition;
+        Debug.Log("Initial Position: " + initialPosition);
     }
 
     private void Update()
@@ -130,6 +131,7 @@ public class ClosedLoop : MonoBehaviour
             ) - posOffset;
         }
         newPosition =Quaternion.Inverse(rotOffset) * (newPosition - rotOffsetPosition);
+        //newPosition =newPosition + initialPosition;
         transform.position = newPosition;
     }
 
@@ -178,6 +180,8 @@ public class ClosedLoop : MonoBehaviour
 
    private void ResetPosition()
 {
+    Debug.Log("Resetting position to: " + initialPosition);
+    Debug.Log("Offset position: " + posOffset);
     // Set position to initialPosition
     transform.position = initialPosition;
 
@@ -190,7 +194,8 @@ public class ClosedLoop : MonoBehaviour
             _zmqListener.pose.position.y * yGain
         ) - initialPosition;
     }
-    rotOffsetPosition = transform.position;
+    rotOffsetPosition = transform.position - initialPosition;
+
 }
 private void ResetRotation()
 {
