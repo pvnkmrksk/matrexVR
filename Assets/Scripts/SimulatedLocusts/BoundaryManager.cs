@@ -15,17 +15,17 @@ public class BoundaryManager : MonoBehaviour
 
             // Handle x-axis boundaries
             if (locustTransform.position.x > transform.position.x + boundarySize / 2)
-                locustTransform.position = new Vector3(transform.position.x - boundarySize / 2 + boundaryBuffer, locustTransform.position.y, locustTransform.position.z);
+                locustTransform.position = new Vector3(locustTransform.position.x - boundarySize / 2 + boundaryBuffer, locustTransform.position.y, locustTransform.position.z);
             
             if (locustTransform.position.x < transform.position.x - boundarySize / 2)
-                locustTransform.position = new Vector3(transform.position.x + boundarySize / 2 - boundaryBuffer, locustTransform.position.y, locustTransform.position.z);
+                locustTransform.position = new Vector3(locustTransform.position.x + boundarySize / 2 - boundaryBuffer, locustTransform.position.y, locustTransform.position.z);
             
             // Handle z-axis boundaries
             if (locustTransform.position.z > transform.position.z + boundarySize / 2)
-                locustTransform.position = new Vector3(locustTransform.position.x, locustTransform.position.y, transform.position.z - boundarySize / 2 + boundaryBuffer);
+                locustTransform.position = new Vector3(locustTransform.position.x, locustTransform.position.y, locustTransform.position.z - boundarySize / 2 + boundaryBuffer);
             
             if (locustTransform.position.z < transform.position.z - boundarySize / 2)
-                locustTransform.position = new Vector3(locustTransform.position.x, locustTransform.position.y, transform.position.z + boundarySize / 2 - boundaryBuffer);
+                locustTransform.position = new Vector3(locustTransform.position.x, locustTransform.position.y, locustTransform.position.z + boundarySize / 2 - boundaryBuffer);
         }
     }
 }

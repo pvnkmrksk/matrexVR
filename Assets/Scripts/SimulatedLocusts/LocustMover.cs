@@ -1,11 +1,27 @@
 using UnityEngine;
-
 public class LocustMover : MonoBehaviour
 {
-    public float speed = 0.1f;
 
+public BoundaryManager boundaryManager;
+public float speed = 0.1f;
     void Update()
     {
         transform.Translate(Vector3.forward * speed * Time.deltaTime, Space.Self); // Move based on local space
+
+        // Check boundaries and reposition if out of bounds
+        if (boundaryManager)
+        {
+            Vector3 pos = transform.position;
+            if (pos.x > boundaryManager.transform.position.x + boundaryManager.boundarySize / 2)
+                pos.x = boundaryManager.transform.position.x - boundaryManager.boundarySize / 2 + boundaryManager.boundaryBuffer;
+            if (pos.x < boundaryManager.transform.position.x - boundaryManager.boundarySize / 2)
+                pos.x = boundaryManager.transform.position.x + boundaryManager.boundarySize / 2 - boundaryManager.boundaryBuffer;
+            if (pos.z > boundaryManager.transform.position.z + boundaryManager.boundarySize / 2)
+                pos.z = boundaryManager.transform.position.z - boundaryManager.boundarySize / 2 + boundaryManager.boundaryBuffer;
+            if (pos.z < boundaryManager.transform.position.z - boundaryManager.boundarySize / 2)
+                pos.z = boundaryManager.transform.position.z + boundaryManager.boundarySize / 2 - boundaryManager.boundaryBuffer;
+            
+            transform.position = pos;
+        }
     }
 }
