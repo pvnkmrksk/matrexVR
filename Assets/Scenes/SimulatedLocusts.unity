@@ -223,6 +223,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7120401497839568180, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 16439
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401498221653659, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 16439
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401498340373028, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 16439
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401498367255384, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 16439
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -230,6 +246,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 688675470}
+    - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 688675476}
+    - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 688675477}
   m_SourcePrefab: {fileID: 100100000, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
 --- !u!1001 &298086137
 PrefabInstance:
@@ -335,6 +357,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7120401497839568180, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 8247
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401498221653659, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 8247
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401498340373028, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 8247
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401498367255384, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 8247
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -342,6 +380,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1369842184}
+    - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1369842191}
+    - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1369842190}
   m_SourcePrefab: {fileID: 100100000, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
 --- !u!1001 &483258772
 PrefabInstance:
@@ -451,6 +495,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7120401497839568180, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 2103
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401498221653659, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 2103
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401498340373028, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 2103
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401498367255384, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 2103
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -486,6 +546,40 @@ MonoBehaviour:
   rotateSpeed: 50
   maxTranslateSpeed: 100
   maxRotateSpeed: 300
+--- !u!114 &513163497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 513163490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69ff4b24e73374176aeddbf675cd3ff2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
+  numberOfLocusts: 5
+  spawnAreaSize: 100
+  mu: 0
+  kappa: 10
+  locustSpeed: 20
+  layerName: SimulatedLocustsVR2
+  boundaryManager: {fileID: 513163498}
+--- !u!114 &513163498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 513163490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boundarySize: 100
+  boundaryBuffer: 0.5
 --- !u!1 &688675469 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
@@ -507,6 +601,40 @@ MonoBehaviour:
   rotateSpeed: 50
   maxTranslateSpeed: 100
   maxRotateSpeed: 300
+--- !u!114 &688675476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688675469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69ff4b24e73374176aeddbf675cd3ff2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
+  numberOfLocusts: 5
+  spawnAreaSize: 100
+  mu: 0
+  kappa: 10
+  locustSpeed: 20
+  layerName: SimulatedLocustsVR4
+  boundaryManager: {fileID: 688675477}
+--- !u!114 &688675477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688675469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boundarySize: 100
+  boundaryBuffer: 0.5
 --- !u!1 &1106250504
 GameObject:
   m_ObjectHideFlags: 0
@@ -701,7 +829,7 @@ Transform:
   m_GameObject: {fileID: 1261579207}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 50, y: -0.3, z: 50}
-  m_LocalScale: {x: 100, y: 1, z: 100}
+  m_LocalScale: {x: 200, y: 1, z: 200}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -803,6 +931,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7120401497839568180, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 4151
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401498221653659, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 4151
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401498340373028, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 8247
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401498367255384, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 16439
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -810,6 +954,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 513163491}
+    - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 513163498}
+    - targetCorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 513163497}
   m_SourcePrefab: {fileID: 100100000, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
 --- !u!1 &1369842183 stripped
 GameObject:
@@ -832,6 +982,40 @@ MonoBehaviour:
   rotateSpeed: 50
   maxTranslateSpeed: 100
   maxRotateSpeed: 300
+--- !u!114 &1369842190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1369842183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boundarySize: 100
+  boundaryBuffer: 0.5
+--- !u!114 &1369842191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1369842183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69ff4b24e73374176aeddbf675cd3ff2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
+  numberOfLocusts: 5
+  spawnAreaSize: 100
+  mu: 0
+  kappa: 10
+  locustSpeed: 20
+  layerName: SimulatedLocustsVR3
+  boundaryManager: {fileID: 1369842190}
 --- !u!1 &1972202734 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
@@ -866,11 +1050,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
-  numberOfLocusts: 20
-  spawnAreaSize: 20
+  numberOfLocusts: 5
+  spawnAreaSize: 100
   mu: 0
-  kappa: 10000
-  locustSpeed: 5
+  kappa: 10
+  locustSpeed: 7
+  layerName: SimulatedLocustsVR1
+  boundaryManager: {fileID: 1972202742}
 --- !u!114 &1972202742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -883,4 +1069,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundarySize: 20
+  boundarySize: 100
+  boundaryBuffer: 0.5

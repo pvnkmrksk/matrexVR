@@ -34,7 +34,7 @@ public class LocustSpawner : MonoBehaviour
                 Random.Range(transform.position.z - spawnAreaSize / 2, transform.position.z + spawnAreaSize / 2)
             );
 
-            GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity, transform); // Spawned independent of the game object
+            GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity); // Spawned independent of the game object
             locust.layer = locustLayer; // Set the layer of the spawned locust
             SetLayerRecursively(locust.transform, locustLayer);  // Set layer for all children
             locust.transform.localRotation = GenerateVanMisesRotation(mu, kappa);  // Set the local rotation
