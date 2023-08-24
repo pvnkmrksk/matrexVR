@@ -9,6 +9,8 @@ public class LocustSpawner : MonoBehaviour
     public float kappa = 10000f;  // kappa value for Van Mises
     public float locustSpeed = 0.1f;      // Default speed for locusts
     public string layerName = "LocustLayer";  // Default value
+    public BoundaryManager boundaryManager;
+
 
 
     void Start()
@@ -32,7 +34,7 @@ public class LocustSpawner : MonoBehaviour
                 Random.Range(transform.position.z - spawnAreaSize / 2, transform.position.z + spawnAreaSize / 2)
             );
 
-            GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity); // Spawned independent of the game object
+            GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity, transform); // Spawned independent of the game object
             locust.layer = locustLayer; // Set the layer of the spawned locust
             SetLayerRecursively(locust.transform, locustLayer);  // Set layer for all children
             locust.transform.localRotation = GenerateVanMisesRotation(mu, kappa);  // Set the local rotation
@@ -46,6 +48,13 @@ public class LocustSpawner : MonoBehaviour
                 AnimatorStateInfo state = locustAnimator.GetCurrentAnimatorStateInfo(0);
                 locustAnimator.Play(state.fullPathHash, -1, Random.value);  // Random normalized time between 0 and 1
             }
+
+            // Set the boundary manager for the locust
+            LocustMover locustMover = locust.GetComponent<LocustMover>();
+            if (locustMover)
+            {
+                locustMover.boundaryManager = boundaryManager;
+            } 
         }
     }
     private void SetLayerRecursively(Transform parent, int layer)
