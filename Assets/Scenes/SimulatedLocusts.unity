@@ -559,11 +559,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
-  numberOfLocusts: 5
-  spawnAreaSize: 100
+  numberOfLocusts: 50
+  spawnAreaSize: 200
   mu: 0
   kappa: 10
-  locustSpeed: 20
+  locustSpeed: 7
   layerName: SimulatedLocustsVR2
   boundaryManager: {fileID: 513163498}
 --- !u!114 &513163498
@@ -578,7 +578,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundarySize: 100
+  boundarySize: 200
   boundaryBuffer: 0.5
 --- !u!1 &688675469 stripped
 GameObject:
@@ -614,11 +614,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
-  numberOfLocusts: 5
-  spawnAreaSize: 100
+  numberOfLocusts: 50
+  spawnAreaSize: 200
   mu: 0
   kappa: 10
-  locustSpeed: 20
+  locustSpeed: 7
   layerName: SimulatedLocustsVR4
   boundaryManager: {fileID: 688675477}
 --- !u!114 &688675477
@@ -633,7 +633,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundarySize: 100
+  boundarySize: 200
   boundaryBuffer: 0.5
 --- !u!1 &1106250504
 GameObject:
@@ -941,11 +941,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7120401498340373028, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: m_CullingMask.m_Bits
-      value: 8247
+      value: 4151
       objectReference: {fileID: 0}
     - target: {fileID: 7120401498367255384, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: m_CullingMask.m_Bits
-      value: 16439
+      value: 4151
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -994,7 +994,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundarySize: 100
+  boundarySize: 200
   boundaryBuffer: 0.5
 --- !u!114 &1369842191
 MonoBehaviour:
@@ -1009,11 +1009,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
-  numberOfLocusts: 5
-  spawnAreaSize: 100
+  numberOfLocusts: 50
+  spawnAreaSize: 200
   mu: 0
   kappa: 10
-  locustSpeed: 20
+  locustSpeed: 7
   layerName: SimulatedLocustsVR3
   boundaryManager: {fileID: 1369842190}
 --- !u!1 &1972202734 stripped
@@ -1050,8 +1050,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
-  numberOfLocusts: 5
-  spawnAreaSize: 100
+  numberOfLocusts: 50
+  spawnAreaSize: 200
   mu: 0
   kappa: 10
   locustSpeed: 7
@@ -1069,5 +1069,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundarySize: 100
+  boundarySize: 200
   boundaryBuffer: 0.5
