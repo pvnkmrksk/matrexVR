@@ -19,12 +19,12 @@ public class LocustSpawner : MonoBehaviour
         for (int i = 0; i < numberOfLocusts; i++)
         {
             Vector3 spawnPosition = new Vector3(
-                Random.Range(-spawnAreaSize / 2, spawnAreaSize / 2),
+                Random.Range(transform.position.x - spawnAreaSize / 2, transform.position.x + spawnAreaSize / 2),
                 0,
-                Random.Range(-spawnAreaSize / 2, spawnAreaSize / 2)
+                Random.Range(transform.position.z - spawnAreaSize / 2, transform.position.z + spawnAreaSize / 2)
             );
 
-            GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity);
+            GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity); // Spawned independent of the game object
             locust.transform.localRotation = GenerateVanMisesRotation(mu, kappa);  // Set the local rotation
             locust.GetComponent<LocustMover>().speed = locustSpeed;  // Set the speed of the locust
             // Get the Animator component
