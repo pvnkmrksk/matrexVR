@@ -8,6 +8,8 @@ public class LocustSpawner : MonoBehaviour
     public float mu = 0.0f;  // mu value for Van Mises
     public float kappa = 10000f;  // kappa value for Van Mises
     public float locustSpeed = 0.1f;      // Default speed for locusts
+    public string layerName = "LocustLayer";  // Default value
+
 
     void Start()
     {
@@ -16,6 +18,12 @@ public class LocustSpawner : MonoBehaviour
 
     void SpawnLocusts()
     {
+        int locustLayer = LayerMask.NameToLayer(layerName); // Get the layer by name
+        if (locustLayer == -1) // Layer not found
+        {
+            Debug.LogWarning("Layer " + layerName + " not found. Make sure it's created in Unity. Defaulting to object's layer.");
+            locustLayer = gameObject.layer;  // Default to the game object's layer
+        }
         for (int i = 0; i < numberOfLocusts; i++)
         {
             Vector3 spawnPosition = new Vector3(
@@ -25,6 +33,8 @@ public class LocustSpawner : MonoBehaviour
             );
 
             GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity); // Spawned independent of the game object
+            locust.layer = locustLayer; // Set the layer of the spawned locust
+            SetLayerRecursively(locust.transform, locustLayer);  // Set layer for all children
             locust.transform.localRotation = GenerateVanMisesRotation(mu, kappa);  // Set the local rotation
             locust.GetComponent<LocustMover>().speed = locustSpeed;  // Set the speed of the locust
             // Get the Animator component
@@ -38,6 +48,15 @@ public class LocustSpawner : MonoBehaviour
             }
         }
     }
+    private void SetLayerRecursively(Transform parent, int layer)
+{
+    parent.gameObject.layer = layer;
+    foreach (Transform child in parent)
+    {
+        SetLayerRecursively(child, layer);
+    }
+}
+
 
     Quaternion GenerateVanMisesRotation(float mu, float kappa)
     {
