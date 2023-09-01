@@ -137,11 +137,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: port
-      value: 9874
+      value: 9871
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: address
-      value: 127.0.01
+      value: 10.126.17.83
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: xGain
@@ -271,11 +271,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: port
-      value: 9873
+      value: 9872
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: address
-      value: 127.0.01
+      value: 10.126.17.83
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: xGain
@@ -409,11 +409,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: port
-      value: 9871
+      value: 9873
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: address
-      value: 127.0.01
+      value: 10.126.17.83
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: xGain
@@ -562,7 +562,7 @@ MonoBehaviour:
   numberOfLocusts: 50
   spawnAreaSize: 200
   mu: 0
-  kappa: 10
+  kappa: 10000
   locustSpeed: 7
   layerName: SimulatedLocustsVR2
   boundaryManager: {fileID: 513163498}
@@ -617,7 +617,7 @@ MonoBehaviour:
   numberOfLocusts: 50
   spawnAreaSize: 200
   mu: 0
-  kappa: 10
+  kappa: 10000
   locustSpeed: 7
   layerName: SimulatedLocustsVR4
   boundaryManager: {fileID: 688675477}
@@ -848,8 +848,12 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: port
+      value: 9874
+      objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025129, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: address
-      value: 127.0.01
+      value: 10.126.17.83
       objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: xGain
@@ -1012,7 +1016,7 @@ MonoBehaviour:
   numberOfLocusts: 50
   spawnAreaSize: 200
   mu: 0
-  kappa: 10
+  kappa: 10000
   locustSpeed: 7
   layerName: SimulatedLocustsVR3
   boundaryManager: {fileID: 1369842190}
@@ -1053,7 +1057,7 @@ MonoBehaviour:
   numberOfLocusts: 50
   spawnAreaSize: 200
   mu: 0
-  kappa: 10
+  kappa: 10000
   locustSpeed: 7
   layerName: SimulatedLocustsVR1
   boundaryManager: {fileID: 1972202742}
