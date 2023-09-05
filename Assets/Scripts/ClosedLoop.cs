@@ -125,9 +125,9 @@ public class ClosedLoop : MonoBehaviour
         {
             // Directly set position and subtract the posOffset
             newPosition = new Vector3(
-                _zmqListener.pose.position.x * xGain,
-                _zmqListener.pose.position.z * zGain,
-                _zmqListener.pose.position.y * yGain
+                _zmqListener.pose.position.y * yGain,
+                _zmqListener.pose.position.z * -zGain,
+                _zmqListener.pose.position.x * xGain
             ) - posOffset;
         }
         newPosition =Quaternion.Inverse(rotOffset) * (newPosition - rotOffsetPosition);
