@@ -39,6 +39,8 @@ public class LocustSpawner : MonoBehaviour
             SetLayerRecursively(locust.transform, locustLayer);  // Set layer for all children
             locust.transform.localRotation = GenerateVanMisesRotation(mu, kappa);  // Set the local rotation
             locust.GetComponent<LocustMover>().speed = locustSpeed;  // Set the speed of the locust
+            locust.name = layerName + "_Locust_" + i; // Set the name
+            locust.tag = "SimulatedLocust"; // Set the tag for the locust
             // Get the Animator component
             Animator locustAnimator = locust.GetComponent<Animator>();
 
