@@ -102,6 +102,16 @@ public class ViewportSetter : MonoBehaviour
                         viewport_height
                     );
                 }
+
+                if (cam.name == "Main Camera Up")
+                {
+                    cam.rect = new Rect(
+                        viewport_x + 3 * viewport_width/2,
+                        viewport_y + viewport_height,
+                        viewport_width,
+                        viewport_height
+                    );
+                }
                 cam.fieldOfView = 90; // set fov to 90 degrees
             }
         }
