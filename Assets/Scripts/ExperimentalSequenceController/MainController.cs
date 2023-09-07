@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 public class MainController : MonoBehaviour
 {
@@ -55,7 +56,15 @@ public class MainController : MonoBehaviour
 
     void LoadSequenceConfiguration()
     {
-        // Read the sequence configuration (from a file or Editor)
+        string jsonPath = Application.dataPath + "/Config/sequenceConfig.json";
+        string jsonString = File.ReadAllText(jsonPath);
+
+        SequenceConfig config = JsonUtility.FromJson<SequenceConfig>(jsonString);
+
+        foreach (SequenceItem item in config.sequences)
+        {
+            sequenceSteps.Add(new SequenceStep(item.sceneName, item.duration, item.parameters));
+        }
     }
 
     void ManageTimerAndTransitions()
@@ -94,4 +103,17 @@ public class SequenceStep
         this.duration = duration;
         this.parameters = parameters;
     }
+}
+[System.Serializable]
+public class SequenceConfig
+{
+    public SequenceItem[] sequences;
+}
+
+[System.Serializable]
+public class SequenceItem
+{
+    public string sceneName;
+    public float duration;
+    public Dictionary<string, object> parameters;
 }
