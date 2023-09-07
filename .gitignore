@@ -95,3 +95,5 @@ Assets/RunData/20230907094454/2023-09-07_09-44-54_Cameras1_.csv.gz.meta
 Assets/RunData/20230907094454/2023-09-07_09-44-54_Cameras2_.csv.gz.meta
 Assets/RunData/20230907094454/2023-09-07_09-44-54_Cameras3_.csv.gz.meta
 Assets/RunData/20230907094454/2023-09-07_09-44-54_Cameras4_.csv.gz.meta
+
+*.csv
