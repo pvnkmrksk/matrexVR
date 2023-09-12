@@ -697,11 +697,12 @@ MonoBehaviour:
   locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
   numberOfLocusts: 50
   spawnAreaSize: 200
-  mu: 1.570796
+  mu: 0
   kappa: 10000
-  locustSpeed: 7
+  locustSpeed: 3
   layerName: SimulatedLocustsVR2
   boundaryManager: {fileID: 513163498}
+  loadConfigFromJsonFile: 1
 --- !u!114 &513163498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -757,11 +758,12 @@ MonoBehaviour:
   locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
   numberOfLocusts: 50
   spawnAreaSize: 200
-  mu: 1.570796
+  mu: 0
   kappa: 10000
-  locustSpeed: 7
+  locustSpeed: 3
   layerName: SimulatedLocustsVR4
   boundaryManager: {fileID: 688675477}
+  loadConfigFromJsonFile: 1
 --- !u!114 &688675477
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1234,11 +1236,12 @@ MonoBehaviour:
   locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
   numberOfLocusts: 50
   spawnAreaSize: 200
-  mu: 1.570796
+  mu: 0
   kappa: 10000
-  locustSpeed: 7
+  locustSpeed: 3
   layerName: SimulatedLocustsVR3
   boundaryManager: {fileID: 1369842190}
+  loadConfigFromJsonFile: 1
 --- !u!4 &1369842196 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7120401496769025173, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
@@ -1415,11 +1418,12 @@ MonoBehaviour:
   locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
   numberOfLocusts: 50
   spawnAreaSize: 200
-  mu: 1.570796
+  mu: 0
   kappa: 10000
-  locustSpeed: 7
+  locustSpeed: 3
   layerName: SimulatedLocustsVR1
   boundaryManager: {fileID: 1972202742}
+  loadConfigFromJsonFile: 1
 --- !u!114 &1972202742
 MonoBehaviour:
   m_ObjectHideFlags: 0

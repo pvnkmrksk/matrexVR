@@ -1,0 +1,7 @@
+{
+    "numberOfLocusts": 10,
+    "spawnAreaSize": 50.0,
+    "mu": 0.0,
+    "kappa": 10000.0,
+    "locustSpeed": 3
+}
