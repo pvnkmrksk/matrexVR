@@ -15,7 +15,7 @@ public class LocustSpawner : MonoBehaviour
     [Range(0.0f, 360.0f)]
     public float mu = 0.0f;  // mu value for Van Mises in degrees (0 to 360) 
 
-    [Tooltip("The kappa value for the Van Mises distribution (0 to infinity). 0 is uniform distribution, infinity is a point distribution.")]
+    [Tooltip("The kappa value for the Van Mises distribution (0 to infinity). 0 + eps is uniform distribution, infinity is a point distribution.")]
     public float kappa = 10000f;  // kappa value for Van Mises
     [Tooltip("The speed of the locusts")]
     public float locustSpeed = 3.0f;      // Default speed for locusts
@@ -73,6 +73,8 @@ public class LocustSpawner : MonoBehaviour
             GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity); // Spawned independent of the game object
             locust.layer = locustLayer; // Set the layer of the spawned locust
             SetLayerRecursively(locust.transform, locustLayer);  // Set layer for all children
+
+            
             locust.transform.localRotation = GenerateVanMisesRotation(mu, kappa);  // Set the local rotation
             locust.GetComponent<LocustMover>().speed = locustSpeed;  // Set the speed of the locust
             locust.name = layerName + "_Locust_" + i; // Set the name
@@ -107,6 +109,13 @@ public class LocustSpawner : MonoBehaviour
 
     Quaternion GenerateVanMisesRotation(float mu, float kappa)
     {
+        // if kappa is 0 or less than 0 , add a small epsilon to prevent div by 0 error
+        
+        if (kappa <= 0)
+        {
+            kappa = 0.0001f;
+        }
+
         float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad * mu, kappa);  // Generate angles by converting from deg to radians for the function to work
         Debug.Log("Generated Angle (in degrees): " + angle * Mathf.Rad2Deg);
         return Quaternion.Euler(0, angle * Mathf.Rad2Deg, 0);  // Convert radians to degrees for the Quaternion rotation
