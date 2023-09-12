@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/Scenes/SimulatedLocusts.unity
+    guid: ee3c77b2ae528404ea7981ceb78bd856
   m_configObjects: {}
