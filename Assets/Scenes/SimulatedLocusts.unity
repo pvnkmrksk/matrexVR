@@ -470,8 +470,9 @@ GameObject:
   - component: {fileID: 299212655}
   - component: {fileID: 299212654}
   - component: {fileID: 299212656}
+  - component: {fileID: 299212657}
   m_Layer: 0
-  m_Name: MasterDatalogger
+  m_Name: SceneMaster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -514,6 +515,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cfb238c4202b540ffabe6ae3bdcc731d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &299212657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 299212653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c3b9be28f19f4a578dcfd2d5b23790b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &483258772

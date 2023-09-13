@@ -5,6 +5,7 @@ public class SimulatedLocustsController : MonoBehaviour
 {
     public void InitializeScene(Dictionary<string, object> parameters)
     {
+        Debug.Log("Initializing Scene with: " + parameters.ToString());  // In InitializeScene
         // Find all GameObjects with the LocustSpawner script
         LocustSpawner[] locustSpawners = FindObjectsOfType<LocustSpawner>();
 
@@ -37,6 +38,8 @@ public class SimulatedLocustsController : MonoBehaviour
             }
             
             // You can continue for other parameters you wish to control
+            Debug.Log("Parameters received: " + parameters.ToString());
+
         }
     }
 
