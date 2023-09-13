@@ -8,12 +8,23 @@
           "spawnAreaSize": 100,
           "mu": 2,
           "kappa": 1,
-          "locustSpeed": 0.1
+          "locustSpeed": 7
         }
       },
       {
         "sceneName": "SimulatedLocusts",
-        "duration": 10,
+        "duration": 2,
+        "parameters": {
+          "numberOfLocusts": 5,
+          "spawnAreaSize": 100,
+          "mu": 2,
+          "kappa": 1,
+          "locustSpeed": 7
+        }
+      },
+      {
+        "sceneName": "SimulatedLocusts",
+        "duration": 2,
         "parameters": {
           "numberOfLocusts": 5,
           "spawnAreaSize": 10,
@@ -24,7 +35,7 @@
       },
       {
         "sceneName": "SimulatedLocusts",
-        "duration": 10,
+        "duration": 2,
         "parameters": {
           "numberOfLocusts": 50,
           "spawnAreaSize": 10,
