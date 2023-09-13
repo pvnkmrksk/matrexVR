@@ -24,6 +24,21 @@ public class MainController : MonoBehaviour
         
         // Initialize the first scene
         LoadScene(sequenceSteps[currentStep]);
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        SimulatedLocustsController currentSceneController = FindObjectOfType<SimulatedLocustsController>();
+        if (currentSceneController != null) {
+            Debug.Log("Found the controller after scene loaded.");
+            currentSceneController.InitializeScene(sequenceSteps[currentStep].parameters);
+        } else {
+            Debug.Log("Controller still not found after scene loaded.");
+        }
+    }
+    void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;  // Unsubscribe from sceneLoaded event
     }
 
     // Update is called once per frame
@@ -42,10 +57,6 @@ public class MainController : MonoBehaviour
         
         // Load the scene
         SceneManager.LoadScene(step.sceneName);
-        
-        // Initialize the scene via its Scene Controller Script
-        //SceneController currentSceneController = FindObjectOfType<SceneController>();
-        //currentSceneController.InitializeScene(step.parameters);
     }
 
     void SyncTimestamp()
@@ -58,6 +69,7 @@ public class MainController : MonoBehaviour
     {
         string jsonPath = Application.dataPath + "/Config/sequenceConfig.json";
         string jsonString = File.ReadAllText(jsonPath);
+        Debug.Log("Loaded Sequence: " + jsonString);  // In LoadSequenceConfiguration
 
         SequenceConfig config = JsonUtility.FromJson<SequenceConfig>(jsonString);
 

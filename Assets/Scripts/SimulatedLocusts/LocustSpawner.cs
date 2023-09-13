@@ -72,7 +72,6 @@ public class LocustSpawner : MonoBehaviour
     Quaternion GenerateVanMisesRotation(float mu, float kappa)
     {
         float angle = VanMisesDistribution.Generate(mu, kappa);
-        Debug.Log("Generated Angle (in degrees): " + angle * Mathf.Rad2Deg);
         return Quaternion.Euler(0, angle * Mathf.Rad2Deg, 0);  // Convert radians to degrees for the Quaternion rotation
     }
 }
