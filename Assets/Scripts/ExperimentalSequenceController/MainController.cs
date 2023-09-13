@@ -86,8 +86,19 @@ public class MainController : MonoBehaviour
 
         // Log the loaded sequences for debugging
         Debug.Log("Loaded sequences: " + sequenceSteps.Count);
-    }
+        
+        foreach (SequenceStep step in sequenceSteps)
+        {
+            Debug.Log("Scene Name: " + step.sceneName);
+            Debug.Log("Duration: " + step.duration);
 
+            // Log each key in the parameters dictionary for the current SequenceStep
+            foreach (string key in step.parameters.Keys)
+            {
+                Debug.Log("Parameter Key: " + key);
+            }
+        }
+    }
     void ManageTimerAndTransitions()
     {
         // Decrease the timer
@@ -100,7 +111,9 @@ public class MainController : MonoBehaviour
             currentStep++;
             if (currentStep >= sequenceSteps.Count)
             {
-                // Loop or end sequence here
+                // End the sequence and return to the ControlScene
+                SceneManager.LoadScene("EndScene");  // Transition back to ControlScene
+                Destroy(this.gameObject);  // Destroy the MainController GameObject
             }
             else
             {
@@ -110,6 +123,7 @@ public class MainController : MonoBehaviour
         }
     }
 }
+
 
 [System.Serializable]
 public class SequenceStep
