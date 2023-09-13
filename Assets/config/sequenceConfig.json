@@ -2,12 +2,12 @@
     "sequences": [
       {
         "sceneName": "SimulatedLocusts",
-        "duration": 10,
+        "duration": 1000,
         "parameters": {
-          "numberOfLocusts": 50,
-          "spawnAreaSize": 10,
-          "mu": 0.0,
-          "kappa": 10000,
+          "numberOfLocusts": 5,
+          "spawnAreaSize": 100,
+          "mu": 2,
+          "kappa": 1,
           "locustSpeed": 0.1
         }
       },

@@ -1,82 +1,91 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
+using Newtonsoft.Json;
+
+public interface ISceneController
+{
+    void InitializeScene(Dictionary<string, object> parameters);
+}
 
 public class MainController : MonoBehaviour
 {
-    // List to hold sequence steps
     public List<SequenceStep> sequenceSteps = new List<SequenceStep>();
-    
-    // Variable to keep track of current step
     private int currentStep = 0;
-    
-    // Timer
     private float timer;
 
-    // Start is called before the first frame update
     void Start()
     {
-        DontDestroyOnLoad(this.gameObject);  // This line ensures the GameObject persists
-        // Load initial sequence configuration
+        DontDestroyOnLoad(this.gameObject);
         LoadSequenceConfiguration();
-        
-        // Initialize the first scene
         LoadScene(sequenceSteps[currentStep]);
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
+
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        SimulatedLocustsController currentSceneController = FindObjectOfType<SimulatedLocustsController>();
-        if (currentSceneController != null) {
-            Debug.Log("Found the controller after scene loaded.");
-            currentSceneController.InitializeScene(sequenceSteps[currentStep].parameters);
-        } else {
-            Debug.Log("Controller still not found after scene loaded.");
+        SequenceStep currentStepData = sequenceSteps[currentStep];
+        
+        ISceneController currentSceneController = null;
+        foreach (var obj in FindObjectsOfType<MonoBehaviour>())  // MonoBehaviour is the base class for all Unity Behaviours
+        {
+            if (obj is ISceneController)
+            {
+                currentSceneController = (ISceneController)obj;
+                break;
+            }
+        }
+
+        if (currentSceneController != null && currentStepData.parameters != null)
+        {
+            currentSceneController.InitializeScene(currentStepData.parameters);
+            timer = currentStepData.duration;
+        }
+        else
+        {
+            Debug.LogError("Either the scene controller or the parameters are null.");
         }
     }
+
     void OnDestroy()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;  // Unsubscribe from sceneLoaded event
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // Handle timer and scene transitions
         ManageTimerAndTransitions();
-        
-        // Optionally: Handle real-time adjustments
     }
 
     void LoadScene(SequenceStep step)
     {
-        // Generate and synchronize timestamp
         SyncTimestamp();
-        
-        // Load the scene
         SceneManager.LoadScene(step.sceneName);
     }
 
     void SyncTimestamp()
     {
         string timestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
-        //MasterDataLogger.Instance.SetTimestamp(timestamp);
     }
 
-    void LoadSequenceConfiguration()
+     void LoadSequenceConfiguration()
     {
         string jsonPath = Application.dataPath + "/Config/sequenceConfig.json";
         string jsonString = File.ReadAllText(jsonPath);
-        Debug.Log("Loaded Sequence: " + jsonString);  // In LoadSequenceConfiguration
-
-        SequenceConfig config = JsonUtility.FromJson<SequenceConfig>(jsonString);
+        
+        // Deserialize the JSON content into a custom object
+        SequenceConfig config = JsonConvert.DeserializeObject<SequenceConfig>(jsonString);
 
         foreach (SequenceItem item in config.sequences)
         {
-            sequenceSteps.Add(new SequenceStep(item.sceneName, item.duration, item.parameters));
+            SequenceStep newStep = new SequenceStep(item.sceneName, item.duration, item.parameters);
+            sequenceSteps.Add(newStep);
+            Debug.Log("Added sequence step: " + JsonUtility.ToJson(newStep));
         }
+
+        // Log the loaded sequences for debugging
+        Debug.Log("Loaded sequences: " + sequenceSteps.Count);
     }
 
     void ManageTimerAndTransitions()
@@ -116,6 +125,7 @@ public class SequenceStep
         this.parameters = parameters;
     }
 }
+
 [System.Serializable]
 public class SequenceConfig
 {
