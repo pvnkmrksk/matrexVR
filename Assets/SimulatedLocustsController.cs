@@ -1,47 +1,90 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SimulatedLocustsController : MonoBehaviour
+public class SimulatedLocustsController : MonoBehaviour, ISceneController
 {
     public void InitializeScene(Dictionary<string, object> parameters)
     {
-        Debug.Log("Initializing Scene with: " + parameters.ToString());  // In InitializeScene
+        // Check if parameters is null
+        if (parameters == null) 
+        {
+            Debug.LogError("Parameters is null.");
+            return;
+        }
+        
+        Debug.Log("Initializing Scene with: " + parameters.ToString());
+
+        // Debug log the values of parameters
+        foreach (var entry in parameters)
+        {
+            Debug.Log($"Parameter Key: {entry.Key}, Value: {entry.Value}");
+        }
+        
         // Find all GameObjects with the LocustSpawner script
         LocustSpawner[] locustSpawners = FindObjectsOfType<LocustSpawner>();
+        
+        // Check if locustSpawners is null or empty
+        if (locustSpawners == null || locustSpawners.Length == 0) 
+        {
+            Debug.LogWarning("No LocustSpawners found.");
+            return;
+        }
 
         foreach (LocustSpawner spawner in locustSpawners)
         {
             // Update parameters from the provided dictionary
-            if (parameters.ContainsKey("numberOfLocusts"))
+
+            if (parameters.TryGetValue("numberOfLocusts", out object numberOfLocustsValue) && numberOfLocustsValue is int)
             {
-                spawner.numberOfLocusts = (int)parameters["numberOfLocusts"];
+                spawner.numberOfLocusts = (int)numberOfLocustsValue;
             }
-            
-            if (parameters.ContainsKey("spawnAreaSize"))
+            else
             {
-                spawner.spawnAreaSize = (float)parameters["spawnAreaSize"];
-            }
-            
-            if (parameters.ContainsKey("mu"))
-            {
-                spawner.mu = (float)parameters["mu"];
+                Debug.LogWarning("Invalid or missing 'numberOfLocusts' parameter.");
+                
             }
 
-            if (parameters.ContainsKey("kappa"))
+            if (parameters.TryGetValue("spawnAreaSize", out object spawnAreaSizeValue) && spawnAreaSizeValue is float)
             {
-                spawner.kappa = (float)parameters["kappa"];
+                spawner.spawnAreaSize = (float)spawnAreaSizeValue;
+            }
+            else
+            {
+                Debug.LogWarning("Invalid or missing 'spawnAreaSize' parameter.");
             }
 
-            if (parameters.ContainsKey("locustSpeed"))
+            if (parameters.TryGetValue("mu", out object muValue) && muValue is float)
             {
-                spawner.locustSpeed = (float)parameters["locustSpeed"];
+                spawner.mu = (float)muValue;
             }
-            
+            else
+            {
+                Debug.LogWarning("Invalid or missing 'mu' parameter.");
+            }
+
+            if (parameters.TryGetValue("kappa", out object kappaValue) && kappaValue is float)
+            {
+                spawner.kappa = (float)kappaValue;
+            }
+            else
+            {
+                Debug.LogWarning("Invalid or missing 'kappa' parameter.");
+            }
+
+            if (parameters.TryGetValue("locustSpeed", out object locustSpeedValue) && locustSpeedValue is float)
+            {
+                spawner.locustSpeed = (float)locustSpeedValue;
+            }
+            else
+            {
+                Debug.LogWarning("Invalid or missing 'locustSpeed' parameter.");
+            }
+
             // You can continue for other parameters you wish to control
-            Debug.Log("Parameters received: " + parameters.ToString());
-
+            Debug.Log("Initializing SimulatedLocusts scene with parameters: " + parameters.ToString());
         }
     }
+
 
     public void StartDataLogging(string timestamp)
     {
