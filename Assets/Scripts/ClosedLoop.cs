@@ -21,9 +21,9 @@ public class ClosedLoop : MonoBehaviour
 
     [Header("Loop Settings")]
     [Tooltip("Toggle closed loop orientation.")]
-    private bool closedLoopOrientation = false;
+    private bool closedLoopOrientation = true;
     [Tooltip("Toggle closed loop position.")]
-    private bool closedLoopPosition = false;
+    private bool closedLoopPosition = true;
     [Tooltip("To close the loop on the raw position or on velocity as applying a force or torque")]
     [SerializeField]
     private bool momentumClosedLoop = false;
