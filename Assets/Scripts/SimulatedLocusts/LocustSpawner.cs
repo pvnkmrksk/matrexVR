@@ -1,22 +1,58 @@
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 public class LocustSpawner : MonoBehaviour
 {
+
     public GameObject locustPrefab;
-    public int numberOfLocusts;
-    public float spawnAreaSize;
-    public float mu = 0.0f;  // mu value for Van Mises
+    [Tooltip("The number of locusts to spawn")]
+    public int numberOfLocusts = 50;
+    [Tooltip("The size of the area in which the locusts will be spawned")]
+    public float spawnAreaSize = 200;
+
+    //add tooltip
+    [Tooltip("The mu value for the Van Mises distribution in degrees (0 to 360)")]
+    [Range(0.0f, 360.0f)]
+    public float mu = 0.0f;  // mu value for Van Mises in degrees (0 to 360) 
+
+    [Tooltip("The kappa value for the Van Mises distribution (0 to infinity). 0 + eps is uniform distribution, infinity is a point distribution.")]
     public float kappa = 10000f;  // kappa value for Van Mises
-    public float locustSpeed = 0.1f;      // Default speed for locusts
+    [Tooltip("The speed of the locusts")]
+    public float locustSpeed = 3.0f;      // Default speed for locusts
     public string layerName = "LocustLayer";  // Default value
     public BoundaryManager boundaryManager;
 
-
+    public bool loadConfigFromJsonFile = true;  // If true, load config from json file, else use default values
 
     void Start()
     {
+        // if load config from json file bool is true, load config from json file
+        // else use default values
+        if (loadConfigFromJsonFile)
+        {
+            LoadConfig();
+        }
         SpawnLocusts();
     }
+
+    void LoadConfig()
+    {
+        // Load the JSON file from the Resources folder
+        TextAsset jsonFile = Resources.Load<TextAsset>("LocustConfig");
+
+        // Parse the JSON string
+        JObject config = JObject.Parse(jsonFile.text);
+
+        // Update class variables
+        // locustPrefab = Resources.Load<GameObject>((string)config["locustPrefab"]);
+        numberOfLocusts = (int)config["numberOfLocusts"];
+        spawnAreaSize = (float)config["spawnAreaSize"];
+        mu = (float)config["mu"];
+        kappa = (float)config["kappa"];
+        locustSpeed = (float)config["locustSpeed"];
+        // layerName = (string)config["layerName"];
+    }
+
 
     void SpawnLocusts()
     {
@@ -37,6 +73,8 @@ public class LocustSpawner : MonoBehaviour
             GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity); // Spawned independent of the game object
             locust.layer = locustLayer; // Set the layer of the spawned locust
             SetLayerRecursively(locust.transform, locustLayer);  // Set layer for all children
+
+            
             locust.transform.localRotation = GenerateVanMisesRotation(mu, kappa);  // Set the local rotation
             locust.GetComponent<LocustMover>().speed = locustSpeed;  // Set the speed of the locust
             locust.name = layerName + "_Locust_" + i; // Set the name
@@ -71,7 +109,15 @@ public class LocustSpawner : MonoBehaviour
 
     Quaternion GenerateVanMisesRotation(float mu, float kappa)
     {
-        float angle = VanMisesDistribution.Generate(mu, kappa);
+        // if kappa is 0 or less than 0 , add a small epsilon to prevent div by 0 error
+        
+        if (kappa <= 0)
+        {
+            kappa = 0.0001f;
+        }
+
+        float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad * mu, kappa);  // Generate angles by converting from deg to radians for the function to work
+        Debug.Log("Generated Angle (in degrees): " + angle * Mathf.Rad2Deg);
         return Quaternion.Euler(0, angle * Mathf.Rad2Deg, 0);  // Convert radians to degrees for the Quaternion rotation
     }
 }
