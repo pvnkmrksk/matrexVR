@@ -760,7 +760,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundarySize: 200
+  boundarySize: 100
   boundaryBuffer: 0.5
 --- !u!4 &513163503 stripped
 Transform:
@@ -836,7 +836,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundarySize: 200
+  boundarySize: 100
   boundaryBuffer: 0.5
 --- !u!4 &688675482 stripped
 Transform:
@@ -1301,7 +1301,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundarySize: 200
+  boundarySize: 100
   boundaryBuffer: 0.5
 --- !u!114 &1369842191
 MonoBehaviour:
@@ -1541,7 +1541,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundarySize: 200
+  boundarySize: 100
   boundaryBuffer: 0.5
 --- !u!4 &1972202747 stripped
 Transform:
