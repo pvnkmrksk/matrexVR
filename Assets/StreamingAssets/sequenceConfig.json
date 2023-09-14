@@ -2,10 +2,10 @@
     "sequences": [
       {
         "sceneName": "SimulatedLocusts",
-        "duration": 1000,
+        "duration": 10,
         "parameters": {
           "numberOfLocusts": 5,
-          "spawnAreaSize": 100,
+          "spawnAreaSize": 1,
           "mu": 2,
           "kappa": 1,
           "locustSpeed": 7
@@ -17,7 +17,7 @@
         "parameters": {
           "numberOfLocusts": 5,
           "spawnAreaSize": 100,
-          "mu": 2,
+          "mu": 1,
           "kappa": 1,
           "locustSpeed": 7
         }
@@ -28,7 +28,7 @@
         "parameters": {
           "numberOfLocusts": 5,
           "spawnAreaSize": 10,
-          "mu": 0.0,
+          "mu": 3,
           "kappa": 10000,
           "locustSpeed": 0.1
         }
@@ -39,14 +39,14 @@
         "parameters": {
           "numberOfLocusts": 50,
           "spawnAreaSize": 10,
-          "mu": 0.0,
+          "mu": 1,
           "kappa": 10,
           "locustSpeed": 0.1
         }
       },
       {
         "sceneName": "SimulatedLocusts",
-        "duration": 10,
+        "duration": 2,
         "parameters": {
           "numberOfLocusts": 5,
           "spawnAreaSize": 10,

@@ -71,7 +71,7 @@ public class MainController : MonoBehaviour
 
      void LoadSequenceConfiguration()
     {
-        string jsonPath = Application.dataPath + "/Config/sequenceConfig.json";
+        string jsonPath = Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json");
         string jsonString = File.ReadAllText(jsonPath);
         
         // Deserialize the JSON content into a custom object
