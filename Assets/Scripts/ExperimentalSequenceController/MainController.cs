@@ -14,17 +14,26 @@ public class MainController : MonoBehaviour
     public List<SequenceStep> sequenceSteps = new List<SequenceStep>();
     private int currentStep = 0;
     private float timer;
+    private bool sequenceStarted = false;
 
     void Start()
     {
+        Debug.Log("MainController.Start()");
         DontDestroyOnLoad(this.gameObject);
         LoadSequenceConfiguration();
+
+    }
+
+    public void StartSequence()
+    {
+        Debug.Log("MainController.StartSequence()");
+        sequenceStarted = true;
         LoadScene(sequenceSteps[currentStep]);
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
-
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        Debug.Log("MainController.OnSceneLoaded()");
         SequenceStep currentStepData = sequenceSteps[currentStep];
         
         ISceneController currentSceneController = null;
@@ -53,13 +62,18 @@ public class MainController : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    void Update()
+void Update()
+{
+    if (sequenceStarted)
     {
         ManageTimerAndTransitions();
     }
+}
+
 
     void LoadScene(SequenceStep step)
     {
+        Debug.Log("MainController.LoadScene()");
         SyncTimestamp();
         SceneManager.LoadScene(step.sceneName);
     }
