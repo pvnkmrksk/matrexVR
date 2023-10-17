@@ -4,7 +4,7 @@
       {
 
         "sceneName":"LedPanelArray",
-        "duration": 50
+        "duration": 5
       },
       {
         "sceneName": "SimulatedLocusts",

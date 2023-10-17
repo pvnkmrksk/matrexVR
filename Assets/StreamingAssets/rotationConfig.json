@@ -3,9 +3,25 @@
       {
         "speed": 50,
         "clockwise": true,
-        "duration": 3,
+        "duration": 2,
         "externalRotationAxis": "Yaw",
         "frequency": 10,
+        "level": 1
+      },
+      {
+        "speed": 4,
+        "clockwise": false,
+        "duration": 2,
+        "externalRotationAxis": "Pitch",
+        "frequency": 5,
+        "level": 1
+      },
+      {
+        "speed": 50,
+        "clockwise": true,
+        "duration": 3,
+        "externalRotationAxis": "Roll",
+        "frequency": 2,
         "level": 1
       },
       {
