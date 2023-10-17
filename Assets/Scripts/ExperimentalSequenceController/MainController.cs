@@ -28,6 +28,7 @@ public class MainController : MonoBehaviour
     {
         Debug.Log("MainController.StartSequence()");
         sequenceStarted = true;
+        timer = sequenceSteps[currentStep].duration;  // Initialize timer for the first scene
         LoadScene(sequenceSteps[currentStep]);
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
