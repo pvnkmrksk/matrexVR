@@ -1,0 +1,22 @@
+{
+    "rotationConfigs": [
+      {
+        "speed": 50,
+        "clockwise": true,
+        "duration": 3,
+        "externalRotationAxis": "Yaw",
+        "frequency": 10,
+        "level": 1
+      },
+      {
+        "speed": 50,
+        "clockwise": false,
+        "duration": 1,
+        "externalRotationAxis": "Yaw",
+        "frequency": 5,
+        "level": 1
+      }
+      
+    ]
+  }
+  

@@ -33,7 +33,9 @@ public class DrumRotator : MonoBehaviour
     public GameObject drum;
     public Quaternion initialRotation;
 
-    public string configFilePath = "rotationConfigs.json";
+
+    string configFilePath = Path.Combine(Application.streamingAssetsPath, "rotationConfig.json");
+    // string jsonString = File.ReadAllText(jsonPath);
     public int currentIndex = 0; // Change access modifier to public
     public List<RotationConfig> configs; // Change access modifier to public
 
