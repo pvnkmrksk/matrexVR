@@ -127,7 +127,7 @@ void Update()
             if (currentStep >= sequenceSteps.Count)
             {
                 // End the sequence and return to the ControlScene
-                SceneManager.LoadScene("EndScene");  // Transition back to ControlScene
+                SceneManager.LoadScene("ControllScene");  // Transition back to ControlScene
                 Destroy(this.gameObject);  // Destroy the MainController GameObject
             }
             else
