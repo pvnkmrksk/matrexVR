@@ -5,7 +5,9 @@ using UnityEngine;
 public class MasterDataLogger : MonoBehaviour
 {
     public string directoryPath { get; private set; }
-
+    //todo: add data loggers for scene based data
+    //todo: add metadata files such as json files for scene based data
+    
     void Start()
     {
         Debug.Log("Start() is executed");

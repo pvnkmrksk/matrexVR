@@ -28,6 +28,7 @@ public class RotationConfigList
     public List<RotationConfig> rotationConfigs;
 }
 
+//todo: rotation change is glitchy and reverses at times
 public class DrumRotator : MonoBehaviour
 {
     public GameObject drum;
@@ -81,6 +82,7 @@ public class DrumRotator : MonoBehaviour
         }
     }
 
+    //todo: move to sscene controller json handling system
     private IEnumerator StartRotationWithDelay()
     {
         // Delay for the specified number of frames
