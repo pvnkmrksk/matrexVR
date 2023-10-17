@@ -1,0 +1,44 @@
+{
+    "objects": [
+      {
+        "type": "cube",
+        "position": {
+          "radius": 5,
+          "angle": 45
+        },
+        "material": "red",
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        }
+      },
+      {
+        "type": "sphere",
+        "position": {
+          "radius": 7,
+          "angle": 90
+        },
+        "material": "blue",
+        "scale": {
+          "x": 0.5,
+          "y": 0.5,
+          "z": 0.5
+        }
+      },
+      {
+        "type": "cylinder",
+        "position": {
+          "radius": 4,
+          "angle": 135
+        },
+        "material": "green",
+        "scale": {
+          "x": 0.75,
+          "y": 1.5,
+          "z": 0.75
+        }
+      }
+    ]
+  }
+  

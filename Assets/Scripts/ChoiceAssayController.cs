@@ -1,0 +1,84 @@
+using System.Collections.Generic;
+using UnityEngine;
+using Newtonsoft.Json;
+using System.IO;
+
+public class ChoiceAssayController : MonoBehaviour
+
+{
+    public GameObject cubePrefab;
+    public GameObject spherePrefab;
+    public GameObject cylinderPrefab;
+
+    public Material redMaterial;
+    public Material blueMaterial;
+    public Material greenMaterial;
+
+
+    public void InitializeScene(Dictionary<string, object> parameters)
+    {
+        // Path to scene configuration JSON
+        string configFile = parameters["configFile"].ToString();
+
+        // Load and parse JSON
+        string jsonPath = Path.Combine(Application.streamingAssetsPath, configFile);
+        string jsonString = File.ReadAllText(jsonPath);
+        SceneConfig config = JsonConvert.DeserializeObject<SceneConfig>(jsonString);
+
+        // Instantiate objects
+        foreach (var obj in config.objects)
+        {
+            GameObject prefab = null;
+
+            // Match prefab based on type
+            switch (obj.type)
+            {
+                case "cube":
+                    prefab = cubePrefab;
+                    break;
+                case "sphere":
+                    prefab = spherePrefab;
+                    break;
+                case "cylinder":
+                    prefab = cylinderPrefab;
+                    break;
+            }
+
+            if (prefab != null)
+            {
+                // Compute position based on radius and angle
+                Vector3 position = new Vector3(obj.position.radius * Mathf.Cos(obj.position.angle * Mathf.Deg2Rad), 0, 
+                                               obj.position.radius * Mathf.Sin(obj.position.angle * Mathf.Deg2Rad));
+
+                // Instantiate and initialize object
+                GameObject instance = Instantiate(prefab, position, Quaternion.identity);
+                // TODO: Set material, scale, etc.
+            }
+        }
+        
+        // TODO: Set sky and grass textures
+    }
+}
+
+[System.Serializable]
+public class SceneConfig
+{
+    public SceneObject[] objects;
+}
+
+[System.Serializable]
+public class SceneObject
+{
+    public string type;
+    public Position position;
+    public string material;
+    // TODO: Add any other required fields.
+}
+
+[System.Serializable]
+public class Position
+{
+    public float radius;
+    public float angle;
+}
+
