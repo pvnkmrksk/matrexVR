@@ -12,6 +12,9 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
     public Material redMaterial;
     public Material blueMaterial;
     public Material greenMaterial;
+    public Material blackMaterial;
+    public Material grey14Material;
+    public Material grey50Material;
 
     public void InitializeScene(Dictionary<string, object> parameters)
     {
@@ -63,6 +66,15 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
                 Material materialToSet = null;
                 switch (obj.material)
                 {
+                    case "Black_000000":
+                        materialToSet = blackMaterial;
+                        break;
+                    case "Grey_141414":
+                        materialToSet = grey14Material;
+                        break;
+                    case "Grey_505050":
+                        materialToSet = grey50Material;
+                        break;
                     case "red":
                         materialToSet = redMaterial;
                         break;
