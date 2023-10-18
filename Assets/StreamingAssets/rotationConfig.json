@@ -9,7 +9,7 @@
         "level": 1
       },
       {
-        "speed": 4,
+        "speed": 50,
         "clockwise": false,
         "duration": 2,
         "externalRotationAxis": "Pitch",
@@ -19,7 +19,7 @@
       {
         "speed": 50,
         "clockwise": true,
-        "duration": 3,
+        "duration": 2,
         "externalRotationAxis": "Roll",
         "frequency": 2,
         "level": 1
@@ -27,7 +27,7 @@
       {
         "speed": 50,
         "clockwise": false,
-        "duration": 1,
+        "duration": 2,
         "externalRotationAxis": "Yaw",
         "frequency": 5,
         "level": 1

@@ -146,7 +146,7 @@ public class DrumRotator : MonoBehaviour
             drum.transform.rotation = initialRotation;
 
             Vector3 axis = StringToAxis(config.externalRotationAxis);
-
+            // Debug.Log("Axis: " + axis);
             // Assuming deltaTime represents the time elapsed since the last frame
             float speedPerSecond = config.speed; // Speed in degrees/second
             // float speedPerFrame = speedPerSecond * Time.deltaTime; // Speed in degrees/frame
@@ -166,7 +166,8 @@ public class DrumRotator : MonoBehaviour
             {
                 if (!isPaused && !isStepping)
                 {
-                    drum.transform.Rotate(Vector3.up, speedPerFrame);
+                    //rotate the drum along the axis specified by the config
+                    drum.transform.Rotate(axis, speedPerFrame);
                     totalRotation += Mathf.Abs(speedPerFrame);
                 }
                 yield return null;
