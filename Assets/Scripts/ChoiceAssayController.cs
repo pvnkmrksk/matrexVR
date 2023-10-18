@@ -3,8 +3,7 @@ using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
 
-public class ChoiceAssayController : MonoBehaviour
-
+public class ChoiceAssayController : MonoBehaviour, ISceneController
 {
     public GameObject cubePrefab;
     public GameObject spherePrefab;
@@ -14,9 +13,10 @@ public class ChoiceAssayController : MonoBehaviour
     public Material blueMaterial;
     public Material greenMaterial;
 
-
     public void InitializeScene(Dictionary<string, object> parameters)
     {
+        Debug.Log("InitializeScene called.");
+
         // Path to scene configuration JSON
         string configFile = parameters["configFile"].ToString();
 
@@ -52,7 +52,31 @@ public class ChoiceAssayController : MonoBehaviour
 
                 // Instantiate and initialize object
                 GameObject instance = Instantiate(prefab, position, Quaternion.identity);
-                // TODO: Set material, scale, etc.
+                
+                // Set scale
+                if (obj.scale != null)
+                {
+                    instance.transform.localScale = new Vector3(obj.scale.x, obj.scale.y, obj.scale.z);
+                }
+
+                // Set material
+                Material materialToSet = null;
+                switch (obj.material)
+                {
+                    case "red":
+                        materialToSet = redMaterial;
+                        break;
+                    case "blue":
+                        materialToSet = blueMaterial;
+                        break;
+                    case "green":
+                        materialToSet = greenMaterial;
+                        break;
+                }
+                if (materialToSet != null)
+                {
+                    instance.GetComponent<Renderer>().material = materialToSet;
+                }
             }
         }
         
@@ -72,7 +96,7 @@ public class SceneObject
     public string type;
     public Position position;
     public string material;
-    // TODO: Add any other required fields.
+    public ScaleConfig scale;
 }
 
 [System.Serializable]
@@ -82,3 +106,10 @@ public class Position
     public float angle;
 }
 
+[System.Serializable]
+public class ScaleConfig
+{
+    public float x;
+    public float y;
+    public float z;
+}
