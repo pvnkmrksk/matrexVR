@@ -4,7 +4,7 @@
           "sceneName": "ChoiceAssay",
           "duration": 10.0,
           "parameters": {
-              "configFile": "choiceAssayConfig.json"
+              "configFile": "BuridansParadigmConfig.json"
           }
       }
   ]
