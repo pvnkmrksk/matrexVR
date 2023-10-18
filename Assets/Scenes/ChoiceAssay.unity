@@ -1084,7 +1084,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   translateSpeed: 10
-  rotateSpeed: 10
+  rotateSpeed: 50
   maxTranslateSpeed: 100
   maxRotateSpeed: 300
 --- !u!1 &1563120702 stripped

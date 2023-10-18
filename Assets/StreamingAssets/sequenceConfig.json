@@ -6,6 +6,13 @@
           "parameters": {
               "configFile": "BuridansParadigmConfig.json"
           }
-      }
+      },
+      {
+        "sceneName": "ChoiceAssay",
+        "duration": 20.0,
+        "parameters": {
+            "configFile": "StripeFixationConfig.json"
+        }
+    }
   ]
 }
