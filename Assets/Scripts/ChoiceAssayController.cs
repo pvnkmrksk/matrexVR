@@ -90,8 +90,18 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
                     instance.GetComponent<Renderer>().material = materialToSet;
                 }
             }
+            
         }
-        
+        ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
+        Debug.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length);
+
+        foreach (ClosedLoop cl in closedLoopComponents)
+        {
+            Debug.Log("Setting values for ClosedLoop script..." + config.closedLoopOrientation);
+            cl.SetClosedLoopOrientation(config.closedLoopOrientation);
+            cl.SetClosedLoopPosition(config.closedLoopPosition);
+
+        }
         // TODO: Set sky and grass textures
     }
 }
@@ -100,6 +110,9 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
 public class SceneConfig
 {
     public SceneObject[] objects;
+    public bool closedLoopOrientation;
+    public bool closedLoopPosition;
+
 }
 
 [System.Serializable]

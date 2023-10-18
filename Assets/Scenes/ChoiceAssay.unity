@@ -551,6 +551,10 @@ PrefabInstance:
       propertyPath: initialPosition.z
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7120401496769025132, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
+      propertyPath: momentumClosedLoop
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7120401496769025172, guid: 6df113ba409f07cceb0637ec8b08a92f, type: 3}
       propertyPath: m_Name
       value: VR1

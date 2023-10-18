@@ -2,7 +2,7 @@
   "sequences": [
       {
           "sceneName": "ChoiceAssay",
-          "duration": 10.0,
+          "duration": 20.0,
           "parameters": {
               "configFile": "BuridansParadigmConfig.json"
           }
