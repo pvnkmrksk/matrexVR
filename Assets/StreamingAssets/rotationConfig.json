@@ -5,7 +5,7 @@
         "clockwise": true,
         "duration": 2,
         "externalRotationAxis": "Yaw",
-        "frequency": 10,
+        "frequency": 50,
         "level": 1
       },
       {
