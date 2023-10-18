@@ -26,6 +26,8 @@
           "z": 4
         }
       }
-    ]
+    ],
+    "closedLoopOrientation": true,
+    "closedLoopPosition": true
   }
   
