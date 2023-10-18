@@ -1,49 +1,11 @@
 {
-    "sequences": [
+  "sequences": [
       {
-        "sceneName": "SimulatedLocusts",
-        "duration": 5,
-        "parameters": {
-          "numberOfLocusts": 50,
-          "spawnAreaSize": 100,
-          "mu": 0,
-          "kappa":10000,
-          "locustSpeed": 3
-                }
-      },
-      {
-        "sceneName": "SimulatedLocusts",
-        "duration": 5,
-        "parameters": {
-          "numberOfLocusts": 0,
-          "spawnAreaSize": 100,
-          "mu": 0,
-          "kappa":10000,
-          "locustSpeed": 3
-                }
-      },
-      {
-        "sceneName": "SimulatedLocusts",
-        "duration": 5,
-        "parameters": {
-          "numberOfLocusts": 50,
-          "spawnAreaSize": 100,
-          "mu": 180,
-          "kappa":10000,
-          "locustSpeed": 3
-                }
-      },
-      {
-        "sceneName": "SimulatedLocusts",
-        "duration": 5,
-        "parameters": {
-          "numberOfLocusts": 0,
-          "spawnAreaSize": 100,
-          "mu": 0,
-          "kappa":0,
-          "locustSpeed": 3
-        }
-      }        
-      
-    ]
-  }
+          "sceneName": "ChoiceAssay",
+          "duration": 10.0,
+          "parameters": {
+              "configFile": "choiceAssayConfig.json"
+          }
+      }
+  ]
+}
