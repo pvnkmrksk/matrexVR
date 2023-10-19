@@ -69,6 +69,12 @@ void Update()
     {
         ManageTimerAndTransitions();
     }
+
+    // if esc is pressed, quit
+    else if (Input.GetKeyUp(KeyCode.Escape))
+    {
+        Application.Quit();
+    }
 }
 
 

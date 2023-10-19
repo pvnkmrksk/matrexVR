@@ -8,13 +8,13 @@
         },
         "material": "black",
         "scale": {
-          "x": 4,
+          "x": 12,
           "y": 150,
-          "z": 4
+          "z": 12
         }
       }
     ],
-    "closedLoopOrientation": false,
-    "closedLoopPosition": true
+    "closedLoopOrientation": true,
+    "closedLoopPosition": false
   }
   

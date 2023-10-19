@@ -116,10 +116,10 @@ public class Keyboard : MonoBehaviour
             rotateSpeed = 0.0f;
         }
 
-        // exit the game
-        if (Input.GetKey(KeyCode.Escape))
+        // if esc is pressed, return to control scene
+        if (Input.GetKeyUp(KeyCode.Escape))
         {
-            Application.Quit();
+            UnityEngine.SceneManagement.SceneManager.LoadScene("ControlScene");
         }
     }
 }
