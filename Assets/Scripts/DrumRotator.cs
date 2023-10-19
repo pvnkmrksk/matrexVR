@@ -20,6 +20,8 @@ public class RotationConfig
     public string externalRotationAxis;
     public float frequency; // Remove the get and set methods
     public float level; // Remove the get and set methods
+
+    
 }
 
 [System.Serializable]
@@ -107,6 +109,8 @@ public class DrumRotator : MonoBehaviour
                 + configs[currentIndex].frequency
                 + ", Level = "
                 + configs[currentIndex].level
+                + ", Speed = "
+                + configs[currentIndex].speed
         );
     }
 

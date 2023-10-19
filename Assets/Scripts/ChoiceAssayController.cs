@@ -66,7 +66,7 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
                 Material materialToSet = null;
                 switch (obj.material)
                 {
-                    case "Black_000000":
+                    case "black":
                         materialToSet = blackMaterial;
                         break;
                     case "Grey_141414":

@@ -1,0 +1,98 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &2537013245616612649
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2798074368093061210, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: port
+      value: 9874
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061211, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: startCol
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061211, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: startRow
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061287, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_Name
+      value: VR4 Swarm
+      objectReference: {fileID: 0}
+    - target: {fileID: 7510037034238600751, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: locustLayerMask.m_Bits
+      value: 16384
+      objectReference: {fileID: 0}
+    - target: {fileID: 8294218554251575998, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: layerName
+      value: SimulatedLocustsVR4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8294218554251575998, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: boundaryManager
+      value: 
+      objectReference: {fileID: 5668886444344209865}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+--- !u!114 &5668886444344209865 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7898933544298845408, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+  m_PrefabInstance: {fileID: 2537013245616612649}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
