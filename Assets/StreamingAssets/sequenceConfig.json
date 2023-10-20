@@ -1,27 +1,36 @@
 {
   "sequences": [
+
+    {
+      "sceneName": "LedPanelArray",
+      "duration": 5.0
+  },
+  {
+      "sceneName": "ChoiceAssay",
+      "duration": 5.0,
+      "parameters": {
+          "configFile": "BuridansParadigmConfig.json"
+      }
+    },
     {
       "sceneName": "SimulatedLocusts",
-      "duration": 120.0,
+      "duration": 5.0,
       "parameters": {
           "kappa": 10000,
           "mu": 0,
           "numberOfLocusts": 100
       }
-    }, 
-    {
-      "sceneName": "ChoiceAssay",
-      "duration": 20.0,
-      "parameters": {
-          "configFile": "BuridansParadigmConfig.json"
-      }
-    }, 
+    },  
       {
         "sceneName": "ChoiceAssay",
-        "duration": 20.0,
+        "duration": 5.0,
         "parameters": {
             "configFile": "StripeFixationConfig.json"
         }
-    }
+    },  
+    {
+      "sceneName": "LedPanelArray",
+      "duration": 5.0
+  }
   ]
 }
