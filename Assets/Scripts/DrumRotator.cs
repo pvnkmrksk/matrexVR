@@ -115,7 +115,7 @@ public class DrumRotator : MonoBehaviour
     }
 
     private List<RotationConfig> LoadRotationConfigsFromJson(string path)
-    {
+    {  
         if (File.Exists(path))
         {
             string jsonText = File.ReadAllText(path);
