@@ -51,7 +51,7 @@ public class SimulatedLocustLogger : MonoBehaviour
         layerNames = layerNames.TrimEnd('_');  // Remove trailing underscore
 
         // Include metadata in the file name
-        logPath = Path.Combine(directoryPath, $"SimulatedLocustData_{layerNames}_{locustSpawner.numberOfLocusts}_{locustSpawner.spawnAreaSize}_{locustSpawner.mu}_{locustSpawner.kappa}_{locustSpawner.locustSpeed}_{date}_{time}.csv.gz");
+        logPath = Path.Combine(directoryPath, $"{date}_{time}_SimulatedLocustData_{layerNames}_{locustSpawner.numberOfLocusts}_{locustSpawner.spawnAreaSize}_{locustSpawner.mu}_{locustSpawner.kappa}_{locustSpawner.locustSpeed}.csv.gz");
 
         logFile = new StreamWriter(
             new GZipStream(File.Create(logPath), System.IO.Compression.CompressionLevel.Optimal)
