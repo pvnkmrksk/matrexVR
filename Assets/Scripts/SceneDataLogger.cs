@@ -1,18 +1,32 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+// Data logger for scene-specific data
 public class SceneDataLogger : DataLogger
 {
-    protected override void InitLog()
+    // Initializes the log file
+    public override void InitLog()
+    // In C#, when a method in a derived class has the same name as a method in its base class, the compiler needs to know whether the derived class's method is intended to:
+    // 1. Override the base class's method: This means the derived class's method will be used instead of the base class's method when called on an instance of the derived class. To indicate this, you use the override keyword.
+    // 2. Hide the base class's method: This means the derived class's method is unrelated to the base class's method, even though they have the same name. To indicate this, you use the new keyword.
+    // In your case, you want to override the InitLog method in the DataLogger class, so you should add the override keyword to the InitLog method in the SceneDataLogger class:
+
     {
+        // Call the base class's InitLog method
         base.InitLog();
 
-        // Add new column to the header row
-        logFile.WriteLine(",Active GameObjects");
+        // Add a new column to the header row
+        logFile.Write(",Active GameObjects");
     }
 
+    // Called every frame
     protected override void Update()
     {
+        // Call the base class's Update method
         base.Update();
 
-        // Log the number of active GameObjects in the scene
+        // Count the number of active GameObjects in the scene
         int activeGameObjectCount = 0;
         foreach (GameObject go in UnityEngine.Object.FindObjectsOfType<GameObject>())
         {
@@ -22,6 +36,7 @@ public class SceneDataLogger : DataLogger
             }
         }
 
+        // Log the number of active GameObjects
         string line = "," + activeGameObjectCount.ToString();
         LogData(line);
     }
