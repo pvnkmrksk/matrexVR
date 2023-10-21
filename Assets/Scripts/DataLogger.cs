@@ -34,6 +34,9 @@ public class DataLogger : MonoBehaviour
     // ZMQ listener for receiving data
     protected ZmqListener zmq;
 
+    // Flag to indicate whether to include ZMQ data in the log
+    public bool includeZmqData = true;
+
     // Called at the start of the scene
     protected virtual void Start()
     {
@@ -92,27 +95,46 @@ public class DataLogger : MonoBehaviour
             new GZipStream(File.Create(logPath), System.IO.Compression.CompressionLevel.Optimal)
         );
 
-        // Write the header row without a newline character at the end
+
+    // Write the header to the log file depending on whether ZMQ data is included
+    if (includeZmqData)
+    {
         logFile.Write(
             "Current Time,VR,Scene,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
         );
+    }
+    else
+    {
+        logFile.Write(
+            "Current Time,VR,Scene,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
+        );
+    }
+
+
 
         Debug.Log("Writing data to: " + logPath);
     }
 
+    public void UpdateLogger()
+
+    
+    {
+        /* 
+
+        */
+        Update();
+    }
     // Called every frame
     protected virtual void Update()
     {
-        // If the ZmqListener is null, return
-        if (zmq == null)
-            return;
+
 
         // Prepare and log the data
         PrepareLogData();
         LogData(line);
     }
 
-    // Prepares a line of data to be logged
+        // Prepares a line of data to be logged
     protected virtual void PrepareLogData()
     {
         // Collect the necessary information
@@ -120,32 +142,27 @@ public class DataLogger : MonoBehaviour
         string vr = this.gameObject.name; // The name of the GameObject this script is attached to
         string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name; // The name of the current scene
 
-        Vector3 sensPosition = zmq.pose.position; // The position of the ZMQ pose
-        Quaternion sensRotation = zmq.pose.rotation; // The rotation of the ZMQ pose
-
         // The current position and rotation of the GameObject this script is attached to
         Vector3 gameObjectPosition = this.transform.position;
         Quaternion gameObjectRotation = this.transform.rotation;
 
         // Prepare the data
-        line =
-            $"\n{currentTime},{vr},{scene},{sensPosition.x},{sensPosition.y},{sensPosition.z},"
-            + $"{sensRotation.eulerAngles.x},{sensRotation.eulerAngles.y},{sensRotation.eulerAngles.z},"
-            + $"{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},"
-            + $"{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
+        line = $"\n{currentTime},{vr},{scene},{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
+
+        // Add ZMQ data if includeZmqData is true
+        if (includeZmqData)
+        {
+            Vector3 sensPosition = zmq.pose.position; // The position of the ZMQ pose
+            Quaternion sensRotation = zmq.pose.rotation; // The rotation of the ZMQ pose
+
+            line += $",{sensPosition.x},{sensPosition.y},{sensPosition.z},{sensRotation.eulerAngles.x},{sensRotation.eulerAngles.y},{sensRotation.eulerAngles.z}";
+        }
     }
 
-
-        // Logs a line of data
-    protected virtual void LogData(string line)//, string additionalData = null)
+    // Logs a line of data
+    protected virtual void LogData(string line)
     {
-        // if (additionalData != null)
-        // {
-        //     line += "," + additionalData;
-        // }
-
-
-            // If buffering is enabled...
+        // If buffering is enabled...
         if (isBuffering)
         {
             // If this is the first line, set isFirstLine to false
@@ -160,7 +177,7 @@ public class DataLogger : MonoBehaviour
             }
         }
         // If buffering is not enabled, write the line to the log file
-               else
+        else
         {
             WriteLogLine(line);
         }

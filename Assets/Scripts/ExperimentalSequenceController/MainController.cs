@@ -89,37 +89,61 @@ void Update()
     {
         string timestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
     }
+void LoadSequenceConfiguration()
+{
+    string jsonPath = Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json");
 
-     void LoadSequenceConfiguration()
+    if (Directory.Exists(Application.streamingAssetsPath))
     {
-        string jsonPath = Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json");
-        string jsonString = File.ReadAllText(jsonPath);
-        
-        // Deserialize the JSON content into a custom object
-        SequenceConfig config = JsonConvert.DeserializeObject<SequenceConfig>(jsonString);
-
-        foreach (SequenceItem item in config.sequences)
+        if (File.Exists(jsonPath))
         {
-            SequenceStep newStep = new SequenceStep(item.sceneName, item.duration, item.parameters);
-            sequenceSteps.Add(newStep);
-            Debug.Log("Added sequence step: " + JsonUtility.ToJson(newStep));
-        }
+            string jsonString = File.ReadAllText(jsonPath);
 
-        // Log the loaded sequences for debugging
-        Debug.Log("Loaded sequences: " + sequenceSteps.Count);
-        
-        foreach (SequenceStep step in sequenceSteps)
-        {
-            Debug.Log("Scene Name: " + step.sceneName);
-            Debug.Log("Duration: " + step.duration);
+            // Deserialize the JSON content into a custom object
+            SequenceConfig config = JsonConvert.DeserializeObject<SequenceConfig>(jsonString);
 
-            // Log each key in the parameters dictionary for the current SequenceStep
-            foreach (string key in step.parameters.Keys)
+            if (config != null)
             {
-                Debug.Log("Parameter Key: " + key);
+                foreach (SequenceItem item in config.sequences)
+                {
+                    SequenceStep newStep = new SequenceStep(item.sceneName, item.duration, item.parameters);
+                    sequenceSteps.Add(newStep);
+                    Debug.Log("Added sequence step: " + JsonUtility.ToJson(newStep));
+                }
+
+                // Log the loaded sequences for debugging
+                Debug.Log("Loaded sequences: " + sequenceSteps.Count);
+
+                foreach (SequenceStep step in sequenceSteps)
+                {
+                    Debug.Log("Scene Name: " + step.sceneName);
+                    Debug.Log("Duration: " + step.duration);
+
+                    // Log each key in the parameters dictionary for the current SequenceStep
+                    if (step.parameters != null)
+                    {
+                        foreach (string key in step.parameters.Keys)
+                        {
+                            Debug.Log("Parameter Key: " + key);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogError("Failed to deserialize sequence configuration JSON.");
             }
         }
+        else
+        {
+            Debug.LogError("sequenceConfig.json file not found.");
+        }
     }
+    else
+    {
+        Debug.LogError("StreamingAssets folder not found.");
+    }
+}
     void ManageTimerAndTransitions()
     {
         // Decrease the timer
