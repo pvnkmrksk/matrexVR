@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 2386836546770343662}
   - component: {fileID: 2386836546770343663}
   - component: {fileID: 2386836546770343658}
-  - component: {fileID: 2724895639058036618}
   - component: {fileID: 4886124528207133730}
+  - component: {fileID: 633135531330507614}
   m_Layer: 0
   m_Name: VR
   m_TagString: Untagged
@@ -28,6 +28,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2386836546770343442}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -39,7 +40,6 @@ Transform:
   - {fileID: 2386836545147478464}
   - {fileID: 3931112815789675833}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2386836546770343662
 MonoBehaviour:
@@ -93,18 +93,6 @@ MonoBehaviour:
   pitchGain: 1
   yawGain: 1
   momentumClosedLoop: 0
---- !u!114 &2724895639058036618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2386836546770343442}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7177fac88d7075dda8e803d594f71ad9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &4886124528207133730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121,6 +109,18 @@ MonoBehaviour:
   rotateSpeed: 50
   maxTranslateSpeed: 100
   maxRotateSpeed: 300
+--- !u!114 &633135531330507614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2386836546770343442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7177fac88d7075dda8e803d594f71ad9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &124890606341847571
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -64,7 +64,8 @@ PrefabInstance:
       propertyPath: port
       value: 9873
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2724895639058036618, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
