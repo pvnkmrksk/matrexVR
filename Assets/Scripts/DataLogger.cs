@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 // Base class for all data loggers
-public abstract class DataLogger : MonoBehaviour
+public class DataLogger : MonoBehaviour
 {
     // Path to the directory where the log file will be saved
     protected string directoryPath;
@@ -81,8 +81,11 @@ public abstract class DataLogger : MonoBehaviour
         // Get the name of the GameObject the script is attached to
         string gameObjectName = this.gameObject.name;
 
+        // get the scene name
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
         // Set the path to the log file
-        logPath = Path.Combine(directoryPath, $"{date}_{time}_{gameObjectName}_.csv.gz");
+        logPath = Path.Combine(directoryPath, $"{date}_{time}_{sceneName}_{gameObjectName}_.csv.gz");
 
         // Create the log file and a StreamWriter for it
         logFile = new StreamWriter(
@@ -104,6 +107,14 @@ public abstract class DataLogger : MonoBehaviour
         if (zmq == null)
             return;
 
+        // Prepare and log the data
+        PrepareLogData();
+        LogData(line);
+    }
+
+    // Prepares a line of data to be logged
+    protected virtual void PrepareLogData()
+    {
         // Collect the necessary information
         string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"); // The current time
         string vr = this.gameObject.name; // The name of the GameObject this script is attached to
@@ -116,23 +127,22 @@ public abstract class DataLogger : MonoBehaviour
         Vector3 gameObjectPosition = this.transform.position;
         Quaternion gameObjectRotation = this.transform.rotation;
 
-        // Log the data
+        // Prepare the data
         line =
             $"\n{currentTime},{vr},{scene},{sensPosition.x},{sensPosition.y},{sensPosition.z},"
             + $"{sensRotation.eulerAngles.x},{sensRotation.eulerAngles.y},{sensRotation.eulerAngles.z},"
             + $"{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},"
             + $"{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
-
-        // LogData(line);
     }
 
+
         // Logs a line of data
-    protected virtual void LogData(string line, string additionalData = null)
+    protected virtual void LogData(string line)//, string additionalData = null)
     {
-        if (additionalData != null)
-        {
-            line += "," + additionalData;
-        }
+        // if (additionalData != null)
+        // {
+        //     line += "," + additionalData;
+        // }
 
 
             // If buffering is enabled...
