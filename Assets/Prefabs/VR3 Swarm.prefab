@@ -64,6 +64,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: VR3 Swarm
       objectReference: {fileID: 0}
+    - target: {fileID: 2798074369155322119, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 8247
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074369262183959, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 8247
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074369411840680, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 8247
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074369683044203, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 8247
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550350148596630418, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 8247
+      objectReference: {fileID: 0}
     - target: {fileID: 7510037034238600751, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: locustLayerMask.m_Bits
       value: 8192

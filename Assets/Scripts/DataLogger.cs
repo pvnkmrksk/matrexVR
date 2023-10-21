@@ -120,7 +120,15 @@ public class DataLogger : MonoBehaviour
     
     {
         /* 
+            Making the Update() method public would indeed solve the immediate problem, but it's generally not a good practice. Here's why:
 
+            1. Encapsulation: In object-oriented programming, it's a good practice to hide the internal workings of a class and only expose what's necessary. This is known as encapsulation. The Update() method is part of Unity's MonoBehaviour lifecycle and is intended to be used internally by the class itself. By keeping it protected, you're adhering to the principle of encapsulation.
+
+            2. Preventing unintended usage: If you make the Update() method public, it can be called from anywhere. This could lead to unintended behavior if, for example, another script calls it at the wrong time or more often than expected.
+
+            3. Maintaining Unity's conventions: Unity's MonoBehaviour methods like Start(), Update(), Awake(), etc., are typically kept private or protected. This is a convention in Unity development, and following it makes your code easier to understand for other Unity developers.
+
+            By creating a separate public method (UpdateLogger()) that calls Update(), you're providing a clear interface for other scripts to interact with, while keeping the internal workings of your class hidden. This is a cleaner and more elegant solution that adheres to good programming practices.
         */
         Update();
     }
