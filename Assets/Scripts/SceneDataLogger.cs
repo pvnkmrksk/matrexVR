@@ -20,11 +20,11 @@ public class SceneDataLogger : DataLogger
         logFile.WriteLine  (",Active GameObjects");
     }
 
-    // Called every frame
-    protected override void Update()
+    // Prepares a line of data to be logged
+    protected override void PrepareLogData()
     {
-        // Call the base class's Update method
-        base.Update();
+        // Call the base class's PrepareLogData method to prepare the basic data
+        base.PrepareLogData();
 
         // Count the number of active GameObjects in the scene
         int activeGameObjectCount = 0;
@@ -36,7 +36,8 @@ public class SceneDataLogger : DataLogger
             }
         }
 
-        // Log the number of active GameObjects
-        LogData(base.line, activeGameObjectCount.ToString());
+        // Append the number of active GameObjects to line
+        line += "," + activeGameObjectCount.ToString();
     }
+    
 }
