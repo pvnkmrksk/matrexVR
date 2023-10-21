@@ -2,32 +2,32 @@
   "sequences": [
 
     {"sceneName":"Optomotor",
-    "duration":30
+    "duration":10
   
   }
-  // ,
-  //   {
-  //     "sceneName": "SimulatedLocusts",
-  //     "duration": 120.0,
-  //     "parameters": {
-  //         "kappa": 10000,
-  //         "mu": 0,
-  //         "numberOfLocusts": 100
-  //     }
-  //   }, 
-  //   {
-  //     "sceneName": "ChoiceAssay",
-  //     "duration": 20.0,
-  //     "parameters": {
-  //         "configFile": "BuridansParadigmConfig.json"
-  //     }
-  //   }, 
-  //     {
-  //       "sceneName": "ChoiceAssay",
-  //       "duration": 20.0,
-  //       "parameters": {
-  //           "configFile": "StripeFixationConfig.json"
-  //       }
-  //   }
+  ,
+    {
+      "sceneName": "SimulatedLocusts",
+      "duration": 10.0,
+      "parameters": {
+          "kappa": 10000,
+          "mu": 0,
+          "numberOfLocusts": 100
+      }
+    }, 
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 10.0,
+      "parameters": {
+          "configFile": "BuridansParadigmConfig.json"
+      }
+    }, 
+      {
+        "sceneName": "ChoiceAssay",
+        "duration": 10.0,
+        "parameters": {
+            "configFile": "StripeFixationConfig.json"
+        }
+    }
   ]
 }
