@@ -20,17 +20,15 @@ public class MainController : MonoBehaviour
     [Tooltip("0: Off, ,1: Error, 2: Warning, 3: Info, 4: Debug")]
     [SerializeField][Range(0, 4)] private int logLevel = 0; // 0: All, 1: Error, 2: Warning, 3: Info, 4: Debug
 
-    void Awake()
+    void Start()
     {
         // Set the log level
         Logger.CurrentLogLevel = logLevel;
-        Logger.Log("MainController.Awake()", 3);
+        Logger.Log("MainController.Start()", 3);
 
         // Make sure the MainController persists across scene changes
         DontDestroyOnLoad(this.gameObject);
 
-        // Load the sequence configuration
-        LoadSequenceConfiguration();
 
         // Find the MasterDataLogger component
         masterDataLogger = GetComponentInChildren<MasterDataLogger>();
@@ -40,32 +38,13 @@ public class MainController : MonoBehaviour
         }
         else
         {
-            Logger.Log("MasterDataLogger found on the GameObject or its children.", 1);
-            Logger.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath, 1);
+            Logger.Log("MasterDataLogger found on the GameObject or its children.", 3);
+            Logger.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath, 4);
         }
-    }
 
-    void Start()
-    {
-        Debug.Log("MainController.Start()");
-
-        // Make sure the MainController persists across scene changes
-        DontDestroyOnLoad(this.gameObject);
 
         // Load the sequence configuration
         LoadSequenceConfiguration();
-
-        // Find the MasterDataLogger component
-        masterDataLogger = GetComponentInChildren<MasterDataLogger>();
-        if (masterDataLogger == null)
-        {
-            Debug.LogError("MasterDataLogger not found on the GameObject.");
-        }
-        else
-        {
-            Debug.Log("MasterDataLogger found on the GameObject.");
-            Debug.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath);
-        }
     }
 
     public void StartSequence()
@@ -177,17 +156,22 @@ public class MainController : MonoBehaviour
                         }
                     }
 
-                    // Copy the JSON file to the data logging directory
-                    string timestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
+                    // Get the timestamp from the MasterDataLogger component
+                    string timestamp = masterDataLogger.timestamp;
+                    Logger.Log("Timestamp: " + timestamp);
                     if (masterDataLogger != null)
                     {
+                        Debug.Log("MasterDataLogger is not null");
+                        Debug.Log("Timestamp: " + timestamp);
+
+                        // Copy the JSON file to the data logging directory with the desired filename format
                         string sceneName = SceneManager.GetActiveScene().name;
-                        string destinationPath = Path.Combine(masterDataLogger.directoryPath, timestamp + "_" + sceneName + "_sequenceConfig.json");
+                        string destinationPath = Path.Combine(masterDataLogger.directoryPath, $"{timestamp}_{sceneName}_sequenceConfig.json");
                         File.Copy(jsonPath, destinationPath);
                     }
                     else
                     {
-                        Logger.Log("Failed to deserialize sequence configuration JSON.", 1);
+                        Debug.Log("MasterDataLogger is null");
                     }
                 }
                 else
@@ -204,6 +188,11 @@ public class MainController : MonoBehaviour
         {
             Logger.Log("StreamingAssets folder not found.", 1);
         }
+    }
+
+    void OnDisable()
+    {
+        Debug.Log("MainController was disabled.");
     }
     void ManageTimerAndTransitions()
     {
