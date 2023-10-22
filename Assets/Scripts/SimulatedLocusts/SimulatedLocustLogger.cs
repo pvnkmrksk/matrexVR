@@ -23,7 +23,7 @@ public class SimulatedLocustLogger : MonoBehaviour
         }
         else
         {
-            Debug.LogError("MasterDataLogger not found.");
+            Logger.Log("MasterDataLogger not found.", 1);
             return;
         }
 
@@ -31,7 +31,7 @@ public class SimulatedLocustLogger : MonoBehaviour
         LocustSpawner locustSpawner = GetComponent<LocustSpawner>();
         if (locustSpawner == null)
         {
-            Debug.LogError("LocustSpawner script not found on this GameObject.");
+            Logger.Log("LocustSpawner script not found on this GameObject.", 1);
             return;
         }
 
@@ -69,7 +69,7 @@ public class SimulatedLocustLogger : MonoBehaviour
 
         foreach (GameObject locust in locusts)
         {
-             if (locustLayerMask == (locustLayerMask | (1 << locust.layer)))  // Check if the locust's layer is in the mask
+            if (locustLayerMask == (locustLayerMask | (1 << locust.layer)))  // Check if the locust's layer is in the mask
             {
                 Vector3 position = locust.transform.position;
                 string data = $"{timestamp},{locust.name},{LayerMask.LayerToName(locust.layer)},{position.x},{position.y},{position.z}";

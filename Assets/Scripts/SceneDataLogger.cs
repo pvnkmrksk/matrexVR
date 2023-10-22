@@ -17,7 +17,7 @@ public class SceneDataLogger : DataLogger
         base.InitLog();
 
         // Add a new column to the header row
-        logFile.WriteLine  (",Active GameObjects");
+        logFile.WriteLine(",Active GameObjects");
     }
 
     // Prepares a line of data to be logged
@@ -39,5 +39,5 @@ public class SceneDataLogger : DataLogger
         // Append the number of active GameObjects to line
         line += "," + activeGameObjectCount.ToString();
     }
-    
+
 }
