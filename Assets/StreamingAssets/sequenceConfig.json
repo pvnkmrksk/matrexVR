@@ -4,7 +4,11 @@
     {"sceneName":"Optomotor",
     "duration":10
   
-  }
+  },
+  {"sceneName":"Optomotor",
+  "duration":10
+
+}
   ,
     {
       "sceneName": "SimulatedLocusts",
