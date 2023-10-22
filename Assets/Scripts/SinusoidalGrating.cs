@@ -49,9 +49,9 @@ public class SinusoidalGrating : MonoBehaviour
     public DrumRotator drumRotator; // Reference to the DrumRotator script
 
     // public DataLogger dataLogger; // Reference to the DataLogger script 
- 
 
-     private void Start()
+
+    private void Start()
     {
         texture = new Texture2D(textureWidth, textureHeight);
         material = new Material(Shader.Find("Unlit/Texture"));
