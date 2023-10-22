@@ -222,6 +222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sequenceSteps: []
+  logLevel: 4
 --- !u!4 &484890815
 Transform:
   m_ObjectHideFlags: 0

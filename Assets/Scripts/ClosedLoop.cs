@@ -50,7 +50,7 @@ public class ClosedLoop : MonoBehaviour
         Application.targetFrameRate = 60;
         Time.fixedDeltaTime = 1f / 60f;
         transform.position = initialPosition;
-        // Debug.Log("Initial Position: " + initialPosition);
+        // Logger.Log("Initial Position: " + initialPosition);
     }
 
     private void Update()
@@ -91,7 +91,7 @@ public class ClosedLoop : MonoBehaviour
     {
         if (mainCamera == null)
         {
-            Debug.LogError("Main Camera is missing in the scene");
+            Logger.Log("Main Camera is missing in the scene", 1);
             return;
         }
 
@@ -130,7 +130,7 @@ public class ClosedLoop : MonoBehaviour
                 _zmqListener.pose.position.x * xGain
             ) - posOffset;
         }
-        newPosition =Quaternion.Inverse(rotOffset) * (newPosition - rotOffsetPosition);
+        newPosition = Quaternion.Inverse(rotOffset) * (newPosition - rotOffsetPosition);
         //newPosition =newPosition + initialPosition;
         transform.position = newPosition;
     }
@@ -178,72 +178,72 @@ public class ClosedLoop : MonoBehaviour
         momentumClosedLoop = !momentumClosedLoop;
     }
 
-   private void ResetPosition()
-{
-    Debug.Log("Resetting position to: " + initialPosition);
-    Debug.Log("Offset position: " + posOffset);
-    // Set position to initialPosition
-    transform.position = initialPosition;
-
-    // Update posOffset based on current _zmqListener values
-    if (_zmqListener.pose != null)
+    private void ResetPosition()
     {
-        posOffset = new Vector3(
-            _zmqListener.pose.position.x * xGain,
-            _zmqListener.pose.position.z * zGain,
-            _zmqListener.pose.position.y * yGain
-        ) - initialPosition;
-    }
-    rotOffsetPosition = transform.position - initialPosition;
+        Logger.Log("Resetting position to: " + initialPosition);
+        Logger.Log("Offset position: " + posOffset);
+        // Set position to initialPosition
+        transform.position = initialPosition;
 
-}
-private void ResetRotation()
-{
-    // Set rotation to (0,0,0)
-    transform.rotation = Quaternion.Euler(Vector3.zero);
-
-    // Update rotOffset based on current _zmqListener values
-    if (_zmqListener.pose != null)
-    {
-        rotOffset = Quaternion.Euler(
-            _zmqListener.pose.rotation.eulerAngles.x * pitchGain,
-            _zmqListener.pose.rotation.eulerAngles.y * yawGain,
-            _zmqListener.pose.rotation.eulerAngles.z * rollGain
-        );
-
-        rotOffsetPosition = transform.position;
-        print(rotOffsetPosition);
-        print(rotOffset);
+        // Update posOffset based on current _zmqListener values
+        if (_zmqListener.pose != null)
+        {
             posOffset = new Vector3(
                 _zmqListener.pose.position.x * xGain,
                 _zmqListener.pose.position.z * zGain,
                 _zmqListener.pose.position.y * yGain
-            )+transform.position;
+            ) - initialPosition;
+        }
+        rotOffsetPosition = transform.position - initialPosition;
+
     }
-}
-// Public methods for external scripts to control the behaviors
-public void SetClosedLoopOrientation(bool value)
-{
-    closedLoopOrientation = value;
-}
+    private void ResetRotation()
+    {
+        // Set rotation to (0,0,0)
+        transform.rotation = Quaternion.Euler(Vector3.zero);
 
-public void SetClosedLoopPosition(bool value)
-{
-    closedLoopPosition = value;
-}
+        // Update rotOffset based on current _zmqListener values
+        if (_zmqListener.pose != null)
+        {
+            rotOffset = Quaternion.Euler(
+                _zmqListener.pose.rotation.eulerAngles.x * pitchGain,
+                _zmqListener.pose.rotation.eulerAngles.y * yawGain,
+                _zmqListener.pose.rotation.eulerAngles.z * rollGain
+            );
 
-public void SetMomentumClosedLoop(bool value)
-{
-    momentumClosedLoop = value;
-}
+            rotOffsetPosition = transform.position;
+            print(rotOffsetPosition);
+            print(rotOffset);
+            posOffset = new Vector3(
+                _zmqListener.pose.position.x * xGain,
+                _zmqListener.pose.position.z * zGain,
+                _zmqListener.pose.position.y * yGain
+            ) + transform.position;
+        }
+    }
+    // Public methods for external scripts to control the behaviors
+    public void SetClosedLoopOrientation(bool value)
+    {
+        closedLoopOrientation = value;
+    }
 
-public void SetPositionOffset(Vector3 offset)
-{
-    posOffset = offset;
-}
-// Public method to set rotation offset from external scripts
-public void SetRotationOffset(Quaternion offset)
-{
-    rotOffset = offset;
-}
+    public void SetClosedLoopPosition(bool value)
+    {
+        closedLoopPosition = value;
+    }
+
+    public void SetMomentumClosedLoop(bool value)
+    {
+        momentumClosedLoop = value;
+    }
+
+    public void SetPositionOffset(Vector3 offset)
+    {
+        posOffset = offset;
+    }
+    // Public method to set rotation offset from external scripts
+    public void SetRotationOffset(Quaternion offset)
+    {
+        rotOffset = offset;
+    }
 }
