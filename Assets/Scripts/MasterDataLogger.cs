@@ -50,14 +50,13 @@ public class MasterDataLogger : MonoBehaviour
     public void ZipDataFolder()
     {
         // Set the path to the zip file
-        string zipPath = Application.dataPath + "/RunData/" + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".zip";
-
+        string zipPath = Application.dataPath + $"/RunData/{timestamp}.zip";
         // Create the zip file from the directory
         ZipFile.CreateFromDirectory(directoryPath, zipPath);
     }
 
     void OnDestroy()
     {
-        // ZipDataFolder();
+        ZipDataFolder();
     }
 }

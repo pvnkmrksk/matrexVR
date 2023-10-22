@@ -1,6 +1,13 @@
 {
   "sequences": [
     { "sceneName": "Optomotor", "duration": 4 },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 10.0,
+      "parameters": {
+        "configFile": "BuridansParadigmConfig.json"
+      }
+    },
     { "sceneName": "Optomotor", "duration": 3 },
     {
       "sceneName": "SimulatedLocusts",
@@ -11,13 +18,7 @@
         "numberOfLocusts": 100
       }
     },
-    {
-      "sceneName": "ChoiceAssay",
-      "duration": 10.0,
-      "parameters": {
-        "configFile": "BuridansParadigmConfig.json"
-      }
-    },
+
     {
       "sceneName": "ChoiceAssay",
       "duration": 10.0,
