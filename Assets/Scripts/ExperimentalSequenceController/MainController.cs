@@ -23,7 +23,6 @@ public class MainController : MonoBehaviour
 
 
 
-
     void Awake()
     {
         Logger.CurrentLogLevel = logLevel;
@@ -32,25 +31,34 @@ public class MainController : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
         LoadSequenceConfiguration();
 
+        masterDataLogger = GetComponentInChildren<MasterDataLogger>();
+        if (masterDataLogger == null)
+        {
+            Logger.Log("MasterDataLogger not found on the GameObject or its children.", 1);
+        }
+        else
+        {
+            Logger.Log("MasterDataLogger found on the GameObject or its children.", 1);
+            Logger.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath, 1);
+        }
+    }
+
+    void Start()
+    {
+        Debug.Log("MainController.Start()");
+        DontDestroyOnLoad(this.gameObject);
+        LoadSequenceConfiguration();
+
         masterDataLogger = GetComponent<MasterDataLogger>();
         if (masterDataLogger == null)
         {
-            Logger.Log("MasterDataLogger not found on the GameObject.", 1);
+            Debug.LogError("MasterDataLogger not found on the GameObject.");
         }
-
         else
         {
-            Logger.Log("MasterDataLogger found on the GameObject.", 3);
-            Logger.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath, 3);
+            Debug.Log("MasterDataLogger found on the GameObject.");
+            Debug.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath);
         }
-    }
-    void Start()
-    {
-        // Logger.Log("MainController.Start()");
-        // DontDestroyOnLoad(this.gameObject);
-        // LoadSequenceConfiguration();
-
-        // masterDataLogger = GetComponent<MasterDataLogger>();
     }
 
     public void StartSequence()
