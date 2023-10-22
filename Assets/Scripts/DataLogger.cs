@@ -14,7 +14,7 @@ public class DataLogger : MonoBehaviour
     protected string directoryPath;
 
     // Path to the log file
-    protected string logPath;
+    protected string logPath;{ get; }
 
     protected string line;  // Or 'public string line;'
 
