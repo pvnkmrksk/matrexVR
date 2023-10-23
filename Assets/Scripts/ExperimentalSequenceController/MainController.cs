@@ -12,7 +12,7 @@ public interface ISceneController
 public class MainController : MonoBehaviour
 {
     public List<SequenceStep> sequenceSteps = new List<SequenceStep>();
-    private int currentStep = 0;
+    public int currentStep = 0;
     private float timer;
     private bool sequenceStarted = false;
     private MasterDataLogger masterDataLogger;
