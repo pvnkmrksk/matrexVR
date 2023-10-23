@@ -66,7 +66,7 @@ public class LocustSpawner : MonoBehaviour
         {
             Vector3 spawnPosition = new Vector3(
                 Random.Range(transform.position.x - spawnAreaSize / 2, transform.position.x + spawnAreaSize / 2),
-                -0.3f,
+                -1f,
                 Random.Range(transform.position.z - spawnAreaSize / 2, transform.position.z + spawnAreaSize / 2)
             );
 
