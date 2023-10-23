@@ -3,7 +3,7 @@ using UnityEngine;
 public class LocustMover : MonoBehaviour
 {
     public BoundaryManager boundaryManager;
-    public float speed = 0.1f;
+    public float speed = 4.0f;
 
     void Update()
     {
