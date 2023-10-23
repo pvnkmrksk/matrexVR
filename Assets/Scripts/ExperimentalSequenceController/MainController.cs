@@ -15,47 +15,18 @@ public class MainController : MonoBehaviour
     private int currentStep = 0;
     private float timer;
     private bool sequenceStarted = false;
-    private MasterDataLogger masterDataLogger;
 
-    [Tooltip("0: Off, ,1: Error, 2: Warning, 3: Info, 4: Debug")]
-    //SerializeField allows the variable to be edited in the inspector from values  0 to 4 int only
-    [SerializeField][Range(0, 4)] private int logLevel = 0; // 0: All, 1: Error, 2: Warning, 3: Info, 4: Debug
-
-
-
-
-    void Awake()
+    void Start()
     {
-        Logger.CurrentLogLevel = logLevel;
-        Logger.Log("MainController.Awake()", 3);
-
+        Debug.Log("MainController.Start()");
         DontDestroyOnLoad(this.gameObject);
         LoadSequenceConfiguration();
 
-        masterDataLogger = GetComponent<MasterDataLogger>();
-        if (masterDataLogger == null)
-        {
-            Logger.Log("MasterDataLogger not found on the GameObject.", 1);
-        }
-
-        else
-        {
-            Logger.Log("MasterDataLogger found on the GameObject.", 3);
-            Logger.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath, 3);
-        }
-    }
-    void Start()
-    {
-        // Logger.Log("MainController.Start()");
-        // DontDestroyOnLoad(this.gameObject);
-        // LoadSequenceConfiguration();
-
-        // masterDataLogger = GetComponent<MasterDataLogger>();
     }
 
     public void StartSequence()
     {
-        Logger.Log("MainController.StartSequence()");
+        Debug.Log("MainController.StartSequence()");
         sequenceStarted = true;
         timer = sequenceSteps[currentStep].duration;  // Initialize timer for the first scene
         LoadScene(sequenceSteps[currentStep]);
@@ -63,9 +34,9 @@ public class MainController : MonoBehaviour
     }
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Logger.Log("MainController.OnSceneLoaded()");
+        Debug.Log("MainController.OnSceneLoaded()");
         SequenceStep currentStepData = sequenceSteps[currentStep];
-
+        
         ISceneController currentSceneController = null;
         foreach (var obj in FindObjectsOfType<MonoBehaviour>())  // MonoBehaviour is the base class for all Unity Behaviours
         {
@@ -83,7 +54,7 @@ public class MainController : MonoBehaviour
         }
         else
         {
-            Logger.Log("Either the scene controller or the parameters are null.", 1);
+            Debug.LogError("Either the scene controller or the parameters are null.");
         }
     }
 
@@ -92,24 +63,24 @@ public class MainController : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    void Update()
+void Update()
+{
+    if (sequenceStarted)
     {
-        if (sequenceStarted)
-        {
-            ManageTimerAndTransitions();
-        }
-
-        // if esc is pressed, quit
-        else if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
+        ManageTimerAndTransitions();
     }
+
+    // if esc is pressed, quit
+    else if (Input.GetKeyUp(KeyCode.Escape))
+    {
+        Application.Quit();
+    }
+}
 
 
     void LoadScene(SequenceStep step)
     {
-        Logger.Log("MainController.LoadScene()");
+        Debug.Log("MainController.LoadScene()");
         SyncTimestamp();
         SceneManager.LoadScene(step.sceneName);
     }
@@ -118,73 +89,61 @@ public class MainController : MonoBehaviour
     {
         string timestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
     }
-    void LoadSequenceConfiguration()
+void LoadSequenceConfiguration()
+{
+    string jsonPath = Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json");
+
+    if (Directory.Exists(Application.streamingAssetsPath))
     {
-        string jsonPath = Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json");
-
-        if (Directory.Exists(Application.streamingAssetsPath))
+        if (File.Exists(jsonPath))
         {
-            if (File.Exists(jsonPath))
+            string jsonString = File.ReadAllText(jsonPath);
+
+            // Deserialize the JSON content into a custom object
+            SequenceConfig config = JsonConvert.DeserializeObject<SequenceConfig>(jsonString);
+
+            if (config != null)
             {
-                string jsonString = File.ReadAllText(jsonPath);
-
-                // Deserialize the JSON content into a custom object
-                SequenceConfig config = JsonConvert.DeserializeObject<SequenceConfig>(jsonString);
-
-                if (config != null)
+                foreach (SequenceItem item in config.sequences)
                 {
-                    foreach (SequenceItem item in config.sequences)
+                    SequenceStep newStep = new SequenceStep(item.sceneName, item.duration, item.parameters);
+                    sequenceSteps.Add(newStep);
+                    Debug.Log("Added sequence step: " + JsonUtility.ToJson(newStep));
+                }
+
+                // Log the loaded sequences for debugging
+                Debug.Log("Loaded sequences: " + sequenceSteps.Count);
+
+                foreach (SequenceStep step in sequenceSteps)
+                {
+                    Debug.Log("Scene Name: " + step.sceneName);
+                    Debug.Log("Duration: " + step.duration);
+
+                    // Log each key in the parameters dictionary for the current SequenceStep
+                    if (step.parameters != null)
                     {
-                        SequenceStep newStep = new SequenceStep(item.sceneName, item.duration, item.parameters);
-                        sequenceSteps.Add(newStep);
-                        Logger.Log("Added sequence step: " + JsonUtility.ToJson(newStep), 3);
-                    }
-
-                    // Log the loaded sequences for debugging
-                    Logger.Log("Loaded sequences: " + sequenceSteps.Count, 4);
-
-                    foreach (SequenceStep step in sequenceSteps)
-                    {
-                        Logger.Log("Scene Name: " + step.sceneName, 4);
-                        Logger.Log("Duration: " + step.duration, 4);
-
-                        // Log each key in the parameters dictionary for the current SequenceStep
-                        if (step.parameters != null)
+                        foreach (string key in step.parameters.Keys)
                         {
-                            foreach (string key in step.parameters.Keys)
-                            {
-                                Logger.Log("Parameter Key: " + key, 4);
-                            }
+                            Debug.Log("Parameter Key: " + key);
                         }
                     }
-
-                    // Copy the JSON file to the data logging directory
-                    string timestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
-                    if (masterDataLogger != null)
-                    {
-                        string destinationPath = Path.Combine(masterDataLogger.directoryPath, "sequenceConfig_" + timestamp + ".json");
-                        File.Copy(jsonPath, destinationPath);
-                    }
-                    else
-                    {
-                        Logger.Log("MasterDataLogger not found.", 1);
-                    }
-                }
-                else
-                {
-                    Logger.Log("Failed to deserialize sequence configuration JSON.", 1);
                 }
             }
             else
             {
-                Logger.Log("sequenceConfig.json file not found.", 1);
+                Debug.LogError("Failed to deserialize sequence configuration JSON.");
             }
         }
         else
         {
-            Logger.Log("StreamingAssets folder not found.", 1);
+            Debug.LogError("sequenceConfig.json file not found.");
         }
     }
+    else
+    {
+        Debug.LogError("StreamingAssets folder not found.");
+    }
+}
     void ManageTimerAndTransitions()
     {
         // Decrease the timer

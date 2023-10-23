@@ -61,7 +61,7 @@ public class DataLogger : MonoBehaviour
             zmq = GetComponent<ZmqListener>();
             if (zmq == null)
             {
-                Logger.Log("ZmqListener component not found in the GameObject. Please attach ZmqListener script to the GameObject.", 1);
+                Debug.LogError("ZmqListener component not found in the GameObject. Please attach ZmqListener script to the GameObject.");
             }
 
             // Initialize the log file and start the routine to flush buffered lines
@@ -70,7 +70,7 @@ public class DataLogger : MonoBehaviour
         }
         else
         {
-            Logger.Log("MasterDataLogger not found.");
+            Debug.LogError("MasterDataLogger not found.");
         }
     }
 
@@ -96,28 +96,28 @@ public class DataLogger : MonoBehaviour
         );
 
 
-        // Write the header to the log file depending on whether ZMQ data is included
-        if (includeZmqData)
-        {
-            logFile.Write(
-                "Current Time,VR,Scene,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
-            );
-        }
-        else
-        {
-            logFile.Write(
-                "Current Time,VR,Scene,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
-            );
-        }
+    // Write the header to the log file depending on whether ZMQ data is included
+    if (includeZmqData)
+    {
+        logFile.Write(
+            "Current Time,VR,Scene,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
+        );
+    }
+    else
+    {
+        logFile.Write(
+            "Current Time,VR,Scene,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
+        );
+    }
 
 
 
-        Logger.Log("Writing data to: " + logPath);
+        Debug.Log("Writing data to: " + logPath);
     }
 
     public void UpdateLogger()
 
-
+    
     {
         /* 
             Making the Update() method public would indeed solve the immediate problem, but it's generally not a good practice. Here's why:
@@ -142,7 +142,7 @@ public class DataLogger : MonoBehaviour
         LogData(line);
     }
 
-    // Prepares a line of data to be logged
+        // Prepares a line of data to be logged
     protected virtual void PrepareLogData()
     {
         // Collect the necessary information

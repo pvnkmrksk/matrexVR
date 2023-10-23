@@ -18,7 +18,7 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
 
     public void InitializeScene(Dictionary<string, object> parameters)
     {
-        Logger.Log("InitializeScene called.");
+        Debug.Log("InitializeScene called.");
 
         // Path to scene configuration JSON
         string configFile = parameters["configFile"].ToString();
@@ -50,12 +50,12 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
             if (prefab != null)
             {
                 // Compute position based on radius and angle
-                Vector3 position = new Vector3(obj.position.radius * Mathf.Cos(obj.position.angle * Mathf.Deg2Rad), 0,
+                Vector3 position = new Vector3(obj.position.radius * Mathf.Cos(obj.position.angle * Mathf.Deg2Rad), 0, 
                                                obj.position.radius * Mathf.Sin(obj.position.angle * Mathf.Deg2Rad));
 
                 // Instantiate and initialize object
                 GameObject instance = Instantiate(prefab, position, Quaternion.identity);
-
+                
                 // Set scale
                 if (obj.scale != null)
                 {
@@ -90,14 +90,14 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
                     instance.GetComponent<Renderer>().material = materialToSet;
                 }
             }
-
+            
         }
         ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
-        Logger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length);
+        Debug.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length);
 
         foreach (ClosedLoop cl in closedLoopComponents)
         {
-            Logger.Log("Setting values for ClosedLoop script..." + config.closedLoopOrientation);
+            Debug.Log("Setting values for ClosedLoop script..." + config.closedLoopOrientation);
             cl.SetClosedLoopOrientation(config.closedLoopOrientation);
             cl.SetClosedLoopPosition(config.closedLoopPosition);
 

@@ -59,7 +59,7 @@ public class LocustSpawner : MonoBehaviour
         int locustLayer = LayerMask.NameToLayer(layerName); // Get the layer by name
         if (locustLayer == -1) // Layer not found
         {
-            Logger.Log("Layer " + layerName + " not found. Make sure it's created in Unity. Defaulting to object's layer.", 2);
+            Debug.LogWarning("Layer " + layerName + " not found. Make sure it's created in Unity. Defaulting to object's layer.");
             locustLayer = gameObject.layer;  // Default to the game object's layer
         }
         for (int i = 0; i < numberOfLocusts; i++)
@@ -74,7 +74,7 @@ public class LocustSpawner : MonoBehaviour
             locust.layer = locustLayer; // Set the layer of the spawned locust
             SetLayerRecursively(locust.transform, locustLayer);  // Set layer for all children
 
-
+            
             locust.transform.localRotation = GenerateVanMisesRotation(mu, kappa);  // Set the local rotation
             locust.GetComponent<LocustMover>().speed = locustSpeed;  // Set the speed of the locust
             locust.name = layerName + "_Locust_" + i; // Set the name
@@ -94,30 +94,30 @@ public class LocustSpawner : MonoBehaviour
             if (locustMover)
             {
                 locustMover.boundaryManager = boundaryManager;
-            }
+            } 
         }
     }
     private void SetLayerRecursively(Transform parent, int layer)
+{
+    parent.gameObject.layer = layer;
+    foreach (Transform child in parent)
     {
-        parent.gameObject.layer = layer;
-        foreach (Transform child in parent)
-        {
-            SetLayerRecursively(child, layer);
-        }
+        SetLayerRecursively(child, layer);
     }
+}
 
 
     Quaternion GenerateVanMisesRotation(float mu, float kappa)
     {
         // if kappa is 0 or less than 0 , add a small epsilon to prevent div by 0 error
-
+        
         if (kappa <= 0)
         {
             kappa = 0.0001f;
         }
 
         float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad * mu, kappa);  // Generate angles by converting from deg to radians for the function to work
-        // Logger.Log("Generated Angle (in degrees): " + angle * Mathf.Rad2Deg);
+        // Debug.Log("Generated Angle (in degrees): " + angle * Mathf.Rad2Deg);
         return Quaternion.Euler(0, angle * Mathf.Rad2Deg, 0);  // Convert radians to degrees for the Quaternion rotation
     }
 }
@@ -128,7 +128,7 @@ public static class VanMisesDistribution
     {
         float s = 0.5f / kappa;
         float r = s + Mathf.Sqrt(1 + s * s);
-
+        
         while (true)
         {
             float u1 = Random.value;

@@ -21,7 +21,7 @@ public class RotationConfig
     public float frequency; // Remove the get and set methods
     public float level; // Remove the get and set methods
 
-
+    
 }
 
 [System.Serializable]
@@ -80,7 +80,7 @@ public class DrumRotator : MonoBehaviour
         }
         else
         {
-            Logger.Log("Failed to load rotation configs from " + configFilePath, 1);
+            Debug.LogError("Failed to load rotation configs from " + configFilePath);
         }
     }
 
@@ -104,7 +104,7 @@ public class DrumRotator : MonoBehaviour
     private void RaiseConfigurationChanged()
     {
         ConfigurationChanged?.Invoke();
-        Logger.Log(
+        Debug.Log(
             "Configuration changed: Frequency = "
                 + configs[currentIndex].frequency
                 + ", Level = "
@@ -115,7 +115,7 @@ public class DrumRotator : MonoBehaviour
     }
 
     private List<RotationConfig> LoadRotationConfigsFromJson(string path)
-    {
+    {  
         if (File.Exists(path))
         {
             string jsonText = File.ReadAllText(path);
@@ -150,7 +150,7 @@ public class DrumRotator : MonoBehaviour
             drum.transform.rotation = initialRotation;
 
             Vector3 axis = StringToAxis(config.externalRotationAxis);
-            // Logger.Log("Axis: " + axis);
+            // Debug.Log("Axis: " + axis);
             // Assuming deltaTime represents the time elapsed since the last frame
             float speedPerSecond = config.speed; // Speed in degrees/second
             // float speedPerFrame = speedPerSecond * Time.deltaTime; // Speed in degrees/frame
@@ -181,7 +181,7 @@ public class DrumRotator : MonoBehaviour
                     isRotationFinished = true;
                 }
             }
-            Logger.Log("Finished rotation " + currentIndex + " of " + configs.Count);
+            Debug.Log("Finished rotation " + currentIndex + " of " + configs.Count);
             RaiseConfigurationChanged(); // Raise the event when the configuration changes
             // Increment index or reset to 0 if end of list
             if (!isStepping)
@@ -221,7 +221,7 @@ public class DrumRotator : MonoBehaviour
         // Use R to reset the drum to the initial rotation
         if (Input.GetKeyDown(KeyCode.R))
         {
-            Logger.Log("Resetting drum rotation");
+            Debug.Log("Resetting drum rotation");
             drum.transform.rotation = initialRotation;
         }
     }
