@@ -13,14 +13,11 @@ public class MasterDataLogger : MonoBehaviour
     // List of all DataLogger instances in the scene
     private List<DataLogger> dataLoggers;
 
-    //cretae timestamp  variable that can be publicly accessed but not changed with get methods only
-    public string timestamp { get; private set; }
-
     // Called at the start of the scene
     void Start()
     {
         // Get the current timestamp
-        timestamp = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        string timestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
 
         // Set the directory path
         directoryPath = Application.dataPath + "/RunData/" + timestamp;
@@ -44,7 +41,6 @@ public class MasterDataLogger : MonoBehaviour
             logger.InitLog();
         }
     }
-
 
     // Zips the data folder
     public void ZipDataFolder()

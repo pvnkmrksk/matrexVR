@@ -13,9 +13,8 @@ public class DataLogger : MonoBehaviour
     // Path to the directory where the log file will be saved
     protected string directoryPath;
 
-    // Path to the log file, with get method to allow access from derived classes
-
-    protected string logPath { get; private set; }
+    // Path to the log file
+    protected string logPath;{ get; }
 
     protected string line;  // Or 'public string line;'
 
@@ -78,8 +77,9 @@ public class DataLogger : MonoBehaviour
     // Initializes the log file
     public virtual void InitLog()
     {
-        // Get the timestamp from the MasterDataLogger
-        string timestamp = FindObjectOfType<MasterDataLogger>().timestamp;
+        // Get the current date and time
+        string date = DateTime.Now.ToString("yyyy-MM-dd");
+        string time = DateTime.Now.ToString("HH-mm-ss");
 
         // Get the name of the GameObject the script is attached to
         string gameObjectName = this.gameObject.name;
@@ -88,7 +88,7 @@ public class DataLogger : MonoBehaviour
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
         // Set the path to the log file
-        logPath = Path.Combine(directoryPath, $"{timestamp}_{sceneName}_{gameObjectName}_.csv.gz");
+        logPath = Path.Combine(directoryPath, $"{date}_{time}_{sceneName}_{gameObjectName}_.csv.gz");
 
         // Create the log file and a StreamWriter for it
         logFile = new StreamWriter(
