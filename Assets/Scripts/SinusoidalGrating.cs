@@ -48,7 +48,6 @@ public class SinusoidalGrating : MonoBehaviour
 
     public DrumRotator drumRotator; // Reference to the DrumRotator script
 
-    public DataLogger dataLogger; // Reference to the DataLogger script 
     private void Start()
     {
         texture = new Texture2D(textureWidth, textureHeight);
@@ -61,9 +60,6 @@ public class SinusoidalGrating : MonoBehaviour
         cylinder.AddComponent<MeshRenderer>().material = material;
         drumRotator = cylinder.AddComponent<DrumRotator>(); // Assign the DrumRotator component
 
-        dataLogger = cylinder.AddComponent<DataLogger>(); // Assign the DataLogger component
-        // Set the bool to include ZMQ data as false
-        dataLogger.includeZmqData = false;
         // Subscribe to the ConfigurationChanged event
         drumRotator.ConfigurationChanged += HandleConfigurationChanged;
 
@@ -106,13 +102,12 @@ public class SinusoidalGrating : MonoBehaviour
             FillTexture();
         }
     }
+
     private void Update()
     {
         // Handle input or any other logic here
-
-        // Call the UpdateLogger method of the DataLogger script
-        dataLogger?.UpdateLogger();
     }
+
     private void FillTexture()
     {
         if (

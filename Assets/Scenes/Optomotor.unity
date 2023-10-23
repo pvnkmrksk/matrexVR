@@ -599,7 +599,6 @@ MonoBehaviour:
   cylinderStacks: 16
   material: {fileID: 0}
   drumRotator: {fileID: 0}
-  dataLogger: {fileID: 0}
 --- !u!4 &2072652017
 Transform:
   m_ObjectHideFlags: 0

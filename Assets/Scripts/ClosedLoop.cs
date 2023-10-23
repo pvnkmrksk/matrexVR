@@ -50,7 +50,7 @@ public class ClosedLoop : MonoBehaviour
         Application.targetFrameRate = 60;
         Time.fixedDeltaTime = 1f / 60f;
         transform.position = initialPosition;
-        // Debug.Log("Initial Position: " + initialPosition);
+        Debug.Log("Initial Position: " + initialPosition);
     }
 
     private void Update()
