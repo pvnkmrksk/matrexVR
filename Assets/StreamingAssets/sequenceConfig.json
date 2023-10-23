@@ -1,10 +1,5 @@
 {
   "sequences": [
-
-    {"sceneName":"LedPanelArray",
-    "duration":30
-  
-  },
     {
       "sceneName": "SimulatedLocusts",
       "duration": 120.0,

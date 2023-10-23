@@ -16,8 +16,6 @@ public abstract class DataLogger : MonoBehaviour
     // Path to the log file
     protected string logPath;
 
-    protected string line;  // Or 'public string line;'
-
     // StreamWriter used to write to the log file
     protected StreamWriter logFile;
 
@@ -117,25 +115,19 @@ public abstract class DataLogger : MonoBehaviour
         Quaternion gameObjectRotation = this.transform.rotation;
 
         // Log the data
-        line =
+        string line =
             $"\n{currentTime},{vr},{scene},{sensPosition.x},{sensPosition.y},{sensPosition.z},"
             + $"{sensRotation.eulerAngles.x},{sensRotation.eulerAngles.y},{sensRotation.eulerAngles.z},"
             + $"{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},"
             + $"{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
 
-        // LogData(line);
+        LogData(line);
     }
 
-        // Logs a line of data
-    protected virtual void LogData(string line, string additionalData = null)
+    // Logs a line of data
+    protected virtual void LogData(string line)
     {
-        if (additionalData != null)
-        {
-            line += "," + additionalData;
-        }
-
-
-            // If buffering is enabled...
+        // If buffering is enabled...
         if (isBuffering)
         {
             // If this is the first line, set isFirstLine to false
