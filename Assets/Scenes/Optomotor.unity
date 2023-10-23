@@ -568,8 +568,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2072652017}
   - component: {fileID: 2072652016}
-  - component: {fileID: 2072652018}
-  - component: {fileID: 2072652019}
   m_Layer: 0
   m_Name: Grating Generator
   m_TagString: Untagged
@@ -601,6 +599,7 @@ MonoBehaviour:
   cylinderStacks: 16
   material: {fileID: 0}
   drumRotator: {fileID: 0}
+  dataLogger: {fileID: 0}
 --- !u!4 &2072652017
 Transform:
   m_ObjectHideFlags: 0
@@ -616,38 +615,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2072652018
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2072652015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5a8bc4a0619fd6f9956e32f8f6b310d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  drum: {fileID: 0}
-  initialRotation: {x: 0, y: 0, z: 0, w: 0}
-  currentIndex: 0
-  configs: []
-  isPaused: 1
-  isStepping: 0
-  initialDelayFrames: 10
---- !u!114 &2072652019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2072652015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7177fac88d7075dda8e803d594f71ad9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  includeZmqData: 0
 --- !u!1001 &2132154180
 PrefabInstance:
   m_ObjectHideFlags: 0
