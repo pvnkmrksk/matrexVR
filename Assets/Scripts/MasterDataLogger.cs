@@ -16,6 +16,7 @@ public class MasterDataLogger : MonoBehaviour
     // Called at the start of the scene
     void Start()
     {
+        // Logger.Log("MasterDataLogger.Start()");
         // Get the current timestamp
         string timestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
 
@@ -54,6 +55,7 @@ public class MasterDataLogger : MonoBehaviour
 
     void OnDestroy()
     {
+        Logger.Log("MasterDataLogger.OnDestroy()");
         // ZipDataFolder();
     }
 }

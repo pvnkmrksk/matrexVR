@@ -18,21 +18,19 @@ public class MainController : MonoBehaviour
     private MasterDataLogger masterDataLogger;
 
     [Tooltip("0: Off, ,1: Error, 2: Warning, 3: Info, 4: Debug")]
+    //SerializeField allows the variable to be edited in the inspector from values  0 to 4 int only
     [SerializeField][Range(0, 4)] private int logLevel = 0; // 0: All, 1: Error, 2: Warning, 3: Info, 4: Debug
+
+
 
     void Awake()
     {
-        // Set the log level
         Logger.CurrentLogLevel = logLevel;
         Logger.Log("MainController.Awake()", 3);
 
-        // Make sure the MainController persists across scene changes
         DontDestroyOnLoad(this.gameObject);
-
-        // Load the sequence configuration
         LoadSequenceConfiguration();
 
-        // Find the MasterDataLogger component
         masterDataLogger = GetComponentInChildren<MasterDataLogger>();
         if (masterDataLogger == null)
         {
@@ -48,15 +46,10 @@ public class MainController : MonoBehaviour
     void Start()
     {
         Debug.Log("MainController.Start()");
-
-        // Make sure the MainController persists across scene changes
         DontDestroyOnLoad(this.gameObject);
-
-        // Load the sequence configuration
         LoadSequenceConfiguration();
 
-        // Find the MasterDataLogger component
-        masterDataLogger = GetComponentInChildren<MasterDataLogger>();
+        masterDataLogger = GetComponent<MasterDataLogger>();
         if (masterDataLogger == null)
         {
             Debug.LogError("MasterDataLogger not found on the GameObject.");
@@ -135,16 +128,12 @@ public class MainController : MonoBehaviour
     }
     void LoadSequenceConfiguration()
     {
-        // Get the path to the sequence configuration JSON file
         string jsonPath = Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json");
 
-        // Check if the streamingAssetsPath directory exists
         if (Directory.Exists(Application.streamingAssetsPath))
         {
-            // Check if the sequenceConfig.json file exists
             if (File.Exists(jsonPath))
             {
-                // Read the JSON file contents
                 string jsonString = File.ReadAllText(jsonPath);
 
                 // Deserialize the JSON content into a custom object
@@ -181,13 +170,12 @@ public class MainController : MonoBehaviour
                     string timestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
                     if (masterDataLogger != null)
                     {
-                        string sceneName = SceneManager.GetActiveScene().name;
-                        string destinationPath = Path.Combine(masterDataLogger.directoryPath, timestamp + "_" + sceneName + "_sequenceConfig.json");
+                        string destinationPath = Path.Combine(masterDataLogger.directoryPath, "sequenceConfig_" + timestamp + ".json");
                         File.Copy(jsonPath, destinationPath);
                     }
                     else
                     {
-                        Logger.Log("Failed to deserialize sequence configuration JSON.", 1);
+                        Logger.Log("MasterDataLogger not found.", 1);
                     }
                 }
                 else
@@ -229,6 +217,7 @@ public class MainController : MonoBehaviour
         }
     }
 }
+
 
 [System.Serializable]
 public class SequenceStep
