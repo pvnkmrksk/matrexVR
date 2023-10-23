@@ -132,7 +132,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 299212655}
-  - component: {fileID: 299212656}
   - component: {fileID: 299212657}
   m_Layer: 0
   m_Name: SceneMaster
@@ -156,21 +155,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &299212656
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 299212653}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfb238c4202b540ffabe6ae3bdcc731d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  locustLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!114 &299212657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -548,6 +532,10 @@ PrefabInstance:
     - target: {fileID: 1330193872785025171, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6672099834599656986, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
+      propertyPath: locustLayerMask.m_Bits
+      value: 4096
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
