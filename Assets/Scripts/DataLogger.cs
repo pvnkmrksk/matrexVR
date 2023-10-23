@@ -38,9 +38,17 @@ public class DataLogger : MonoBehaviour
     // Flag to indicate whether to include ZMQ data in the log
     public bool includeZmqData = true;
 
+
+    //Maincontroller
+    private MainController mainController;
+
     // Called at the start of the scene
     protected virtual void Start()
     {
+
+        // find the MainController
+        mainController = FindObjectOfType<MainController>();
+
         // Find the MasterDataLogger in the scene
         MasterDataLogger masterDataLogger = FindObjectOfType<MasterDataLogger>();
         if (masterDataLogger != null)
@@ -100,13 +108,13 @@ public class DataLogger : MonoBehaviour
         if (includeZmqData)
         {
             logFile.Write(
-                "Current Time,VR,Scene,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
+                "Current Time,VR,Scene,CurrentStep,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
             );
         }
         else
         {
             logFile.Write(
-                "Current Time,VR,Scene,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
+                "Current Time,VR,Scene,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
             );
         }
 
@@ -155,7 +163,7 @@ public class DataLogger : MonoBehaviour
         Quaternion gameObjectRotation = this.transform.rotation;
 
         // Prepare the data
-        line = $"\n{currentTime},{vr},{scene},{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
+        line = $"\n{currentTime},{vr},{scene},{mainController.currentStep},{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
 
         // Add ZMQ data if includeZmqData is true
         if (includeZmqData)
@@ -248,6 +256,6 @@ public class DataLogger : MonoBehaviour
         logFile.BaseStream.Write(lineBytes, 0, lineBytes.Length);
 
         // Write a newline character to the log file
-        logFile.BaseStream.WriteByte((byte)'\n');
+        // logFile.BaseStream.WriteByte((byte)'\n');
     }
 }
