@@ -106,7 +106,7 @@ public class ViewportSetter : MonoBehaviour
                 if (cam.name == "Main Camera U")
                 {
                     cam.rect = new Rect(
-                        viewport_x + 3 * viewport_width/2,
+                        viewport_x + 3 * viewport_width / 2,
                         viewport_y + viewport_height,
                         viewport_width,
                         viewport_height
