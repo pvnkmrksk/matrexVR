@@ -14,7 +14,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_Name
-      value: VR1 Swarm
+      value: VR1
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586073, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_RootOrder
@@ -60,10 +60,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3520139331059622445, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 2103
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -102,7 +98,7 @@ MonoBehaviour:
   kappa: 10000
   locustSpeed: 3
   layerName: SimulatedLocustsVR1
-  boundaryManager: {fileID: 7898933544298845408}
+  boundaryManager: {fileID: 0}
   loadConfigFromJsonFile: 0
 --- !u!114 &7898933544298845408
 MonoBehaviour:
