@@ -1,32 +1,19 @@
-using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using UnityEngine;
 
 public class MasterDataLogger : MonoBehaviour
 {
     public string directoryPath { get; private set; }
-    private List<DataLogger> dataLoggers;
-
+    //todo: add data loggers for scene based data
+    //todo: add metadata files such as json files for scene based data
+    
     void Start()
     {
         Debug.Log("Start() is executed");
         string timestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
         directoryPath = Application.dataPath + "/RunData/" + timestamp;
         Directory.CreateDirectory(directoryPath);
-
-        // Find all DataLogger instances in the scene
-        dataLoggers = new List<DataLogger>();
-        foreach (var logger in FindObjectsOfType<DataLogger>())
-        {
-            if (logger.gameObject.scene == gameObject.scene)
-            {
-                dataLoggers.Add(logger);
-            }
-        }
-        // Initialize all DataLogger instances
-        foreach (var logger in dataLoggers)
-        {
-            logger.InitLog();
-        }
     }
 
     public void ZipDataFolder()
