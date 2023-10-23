@@ -30,17 +30,15 @@ public class MainController : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
 
 
-        // Access the MasterDataLogger instance
-        
-        masterDataLogger = MasterDataLogger.Instance;
-
+        // Find the MasterDataLogger component
+        masterDataLogger = GetComponentInChildren<MasterDataLogger>();
         if (masterDataLogger == null)
         {
-            Logger.Log("MasterDataLogger instance not found", 1);
+            Logger.Log("MasterDataLogger not found on the GameObject or its children.", 1);
         }
         else
         {
-            Logger.Log("MasterDataLogger instance found.", 3);
+            Logger.Log("MasterDataLogger found on the GameObject or its children.", 3);
             Logger.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath, 4);
         }
 
