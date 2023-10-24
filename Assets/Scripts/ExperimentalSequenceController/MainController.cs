@@ -160,7 +160,7 @@ public class MainController : MonoBehaviour
 
                     // Get the timestamp from the MasterDataLogger component
                     string timestamp = masterDataLogger.timestamp;
-                    Logger.Log("Timestamp: " + timestamp);
+                    Logger.Log("Timestamp: " + timestamp,4);
                     if (masterDataLogger != null)
                     {
                         Debug.Log("MasterDataLogger is not null");
