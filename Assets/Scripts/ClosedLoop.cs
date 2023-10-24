@@ -5,6 +5,10 @@ public class ClosedLoop : MonoBehaviour
     [Header("Initial Settings")]
     public Vector3 initialPosition = Vector3.zero;
 
+    [Header("FicTrac Settings")]
+    public float sphereRadius = 5.0f;  // Default value is 5.0 cm
+
+
     [Header("Gain Settings")]
     [SerializeField, Range(0, 1000)]
     private float xGain = 100.0f;
@@ -125,10 +129,11 @@ public class ClosedLoop : MonoBehaviour
         {
             // Directly set position and subtract the posOffset
             newPosition = new Vector3(
-                _zmqListener.pose.position.y * yGain,
-                _zmqListener.pose.position.z * -zGain,
-                _zmqListener.pose.position.x * xGain
+                _zmqListener.pose.position.y * yGain * sphereRadius,
+                _zmqListener.pose.position.z * -zGain * sphereRadius,
+                _zmqListener.pose.position.x * xGain * sphereRadius
             ) - posOffset;
+
         }
         newPosition = Quaternion.Inverse(rotOffset) * (newPosition - rotOffsetPosition);
         //newPosition =newPosition + initialPosition;
