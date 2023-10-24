@@ -48,7 +48,12 @@ public class MainController : MonoBehaviour
         // Load the sequence configuration
         LoadSequenceConfiguration();
     }
-
+    public void StopSequence()
+    {
+        sequenceStarted = false;
+        currentStep = 0;
+        
+    }
     public void StartSequence()
     {
         Logger.Log("MainController.StartSequence()");

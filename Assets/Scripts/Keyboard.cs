@@ -16,8 +16,14 @@ public class Keyboard : MonoBehaviour
     [SerializeField]
     private float maxRotateSpeed = 300.0f;
 
+    private MainController mainController;
+
     // Start is called before the first frame update
-    void Start() { }
+    void Start()
+    {
+        // find the MainController
+        mainController = FindObjectOfType<MainController>();
+    }
 
     // Update is called once per frame
     void Update()
@@ -119,6 +125,7 @@ public class Keyboard : MonoBehaviour
         // if esc is pressed, return to control scene
         if (Input.GetKeyUp(KeyCode.Escape))
         {
+            mainController.StopSequence();
             UnityEngine.SceneManagement.SceneManager.LoadScene("ControlScene");
         }
     }
