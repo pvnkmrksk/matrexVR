@@ -1,6 +1,6 @@
 {
   "sequences": [
-    { "sceneName": "Optomotor", "duration": 4 },
+    { "sceneName": "Optomotor", "duration": 40 },
     {
       "sceneName": "ChoiceAssay",
       "duration": 10.0,
