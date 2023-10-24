@@ -16,6 +16,8 @@ public class MainController : MonoBehaviour
     private float timer;
     private bool sequenceStarted = false;
     private MasterDataLogger masterDataLogger;
+    public bool loopSequence = false;
+
 
     [Tooltip("0: Off, ,1: Error, 2: Warning, 3: Info, 4: Debug")]
     [SerializeField][Range(0, 4)] private int logLevel = 0; // 0: All, 1: Error, 2: Warning, 3: Info, 4: Debug
@@ -211,11 +213,23 @@ public class MainController : MonoBehaviour
         {
             // Move to the next step
             currentStep++;
+            
+            // If at the end of the sequence
             if (currentStep >= sequenceSteps.Count)
             {
-                // End the sequence and return to the ControlScene
-                SceneManager.LoadScene("ControlScene");  // Transition back to ControlScene
-                Destroy(this.gameObject);  // Destroy the MainController GameObject
+                // Check if looping is enabled
+                if (loopSequence)
+                {
+                    // Restart the sequence from the first step
+                    currentStep = 0;
+                    LoadScene(sequenceSteps[currentStep]);
+                }
+                else
+                {
+                    // End the sequence and return to the ControlScene
+                    SceneManager.LoadScene("ControlScene");  // Transition back to ControlScene
+                    Destroy(this.gameObject);  // Destroy the MainController GameObject
+                }
             }
             else
             {
@@ -224,6 +238,7 @@ public class MainController : MonoBehaviour
             }
         }
     }
+
 }
 
 [System.Serializable]

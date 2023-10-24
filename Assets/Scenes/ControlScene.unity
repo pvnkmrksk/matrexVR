@@ -223,6 +223,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sequenceSteps: []
   currentStep: 0
+  loopSequence: 1
   logLevel: 4
 --- !u!4 &484890815
 Transform:
