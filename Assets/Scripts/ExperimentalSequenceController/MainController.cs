@@ -58,7 +58,7 @@ public class MainController : MonoBehaviour
     }
     public void StartSequence()
     {
-        Logger.Log("MainController.StartSequence()");
+        Logger.Log("MainController.StartSequence()",3);
         sequenceStarted = true;
         timer = sequenceSteps[currentStep].duration;  // Initialize timer for the first scene
         LoadScene(sequenceSteps[currentStep]);
@@ -66,7 +66,7 @@ public class MainController : MonoBehaviour
     }
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Logger.Log("MainController.OnSceneLoaded()");
+        Logger.Log("MainController.OnSceneLoaded()",3);
         SequenceStep currentStepData = sequenceSteps[currentStep];
 
         ISceneController currentSceneController = null;
@@ -86,7 +86,7 @@ public class MainController : MonoBehaviour
         }
         else
         {
-            Logger.Log("Either the scene controller or the parameters are null.", 1);
+            Logger.Log("Either the scene controller or the parameters are null.", 2);
         }
     }
 
@@ -112,7 +112,7 @@ public class MainController : MonoBehaviour
 
     void LoadScene(SequenceStep step)
     {
-        Logger.Log("MainController.LoadScene()");
+        Logger.Log("MainController.LoadScene()",3);
         SyncTimestamp();
         SceneManager.LoadScene(step.sceneName);
     }

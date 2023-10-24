@@ -42,8 +42,11 @@ public class DrumRotator : MonoBehaviour
     public int currentIndex = 0; // Change access modifier to public
     public List<RotationConfig> configs; // Change access modifier to public
 
-    public bool isPaused = true;
+    public bool isPaused = false;
     public bool isStepping = false;
+
+    [SerializeField] bool closedLoopOrientation = true;
+    [SerializeField] bool closedLoopPosition = false;
 
     private Vector3 StringToAxis(string axisName)
     {
@@ -82,6 +85,18 @@ public class DrumRotator : MonoBehaviour
         {
             Logger.Log("Failed to load rotation configs from " + configFilePath, 1);
         }
+
+        ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
+        Logger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length,4);
+
+        foreach (ClosedLoop cl in closedLoopComponents)
+        {
+            Logger.Log("Setting values for ClosedLoop script..." +closedLoopOrientation,4);
+            cl.SetClosedLoopOrientation(closedLoopOrientation);
+            cl.SetClosedLoopPosition(closedLoopPosition);
+ 
+          }
+
     }
 
     //todo: move to sscene controller json handling system
@@ -111,7 +126,7 @@ public class DrumRotator : MonoBehaviour
                 + configs[currentIndex].level
                 + ", Speed = "
                 + configs[currentIndex].speed
-        );
+        ,3);
     }
 
     private List<RotationConfig> LoadRotationConfigsFromJson(string path)
@@ -181,7 +196,7 @@ public class DrumRotator : MonoBehaviour
                     isRotationFinished = true;
                 }
             }
-            Logger.Log("Finished rotation " + currentIndex + " of " + configs.Count);
+            Logger.Log("Finished rotation " + currentIndex + " of " + configs.Count,4);
             RaiseConfigurationChanged(); // Raise the event when the configuration changes
             // Increment index or reset to 0 if end of list
             if (!isStepping)

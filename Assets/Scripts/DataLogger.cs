@@ -120,7 +120,7 @@ public class DataLogger : MonoBehaviour
 
 
 
-        Logger.Log("Writing data to: " + logPath);
+        Logger.Log("Writing data to: " + logPath,3);
     }
 
     public void UpdateLogger()
