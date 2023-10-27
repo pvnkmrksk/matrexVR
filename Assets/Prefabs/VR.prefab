@@ -28,7 +28,6 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2386836546770343442}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -40,6 +39,7 @@ Transform:
   - {fileID: 2386836545147478464}
   - {fileID: 3931112815789675833}
   m_Father: {fileID: 0}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2386836546770343662
 MonoBehaviour:
@@ -71,7 +71,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1d9dee094eb5bb59c8706fc55c91ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  address: 10.42.0.132
+  address: 10.126.17.53
   port: 9871
 --- !u!114 &2386836546770343658
 MonoBehaviour:
@@ -86,12 +86,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initialPosition: {x: 0, y: 0, z: 0}
+  sphereRadius: 5
   xGain: 1
   yGain: 1
   zGain: 1
   rollGain: 1
   pitchGain: 1
   yawGain: 1
+  closedLoopOrientation: 1
+  closedLoopPosition: 1
   momentumClosedLoop: 0
 --- !u!114 &4886124528207133730
 MonoBehaviour:
@@ -121,6 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7177fac88d7075dda8e803d594f71ad9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  includeZmqData: 1
 --- !u!1001 &124890606341847571
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -15,7 +15,7 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
     public Material blackMaterial;
     public Material grey14Material;
     public Material grey50Material;
-
+    
     public void InitializeScene(Dictionary<string, object> parameters)
     {
         Logger.Log("InitializeScene called.");
@@ -100,6 +100,8 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
             Logger.Log("Setting values for ClosedLoop script..." + config.closedLoopOrientation);
             cl.SetClosedLoopOrientation(config.closedLoopOrientation);
             cl.SetClosedLoopPosition(config.closedLoopPosition);
+            cl.ResetPosition();
+            cl.ResetRotation();
 
         }
         // TODO: Set sky and grass textures

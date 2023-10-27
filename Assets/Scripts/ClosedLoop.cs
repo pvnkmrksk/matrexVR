@@ -183,7 +183,7 @@ public class ClosedLoop : MonoBehaviour
         momentumClosedLoop = !momentumClosedLoop;
     }
 
-    private void ResetPosition()
+    public void ResetPosition()
     {
         Logger.Log("Resetting position to: " + initialPosition);
         Logger.Log("Offset position: " + posOffset);
@@ -202,7 +202,7 @@ public class ClosedLoop : MonoBehaviour
         rotOffsetPosition = transform.position - initialPosition;
 
     }
-    private void ResetRotation()
+    public void ResetRotation()
     {
         // Set rotation to (0,0,0)
         transform.rotation = Quaternion.Euler(Vector3.zero);
