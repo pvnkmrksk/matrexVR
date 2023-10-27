@@ -92,36 +92,37 @@ public class DataLogger : MonoBehaviour
         // Get the name of the GameObject the script is attached to
         string gameObjectName = this.gameObject.name;
 
-        // get the scene name
+        // Get the scene name
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
         // Set the path to the log file
-        logPath = Path.Combine(directoryPath, $"{timestamp}_{sceneName}_{gameObjectName}_.csv.gz");
+        logPath = Path.Combine(directoryPath, $"{timestamp}_{sceneName}_{gameObjectName}_.csv");
 
-        // Create the log file and a StreamWriter for it
-        logFile = new StreamWriter(
-            new GZipStream(File.Create(logPath), System.IO.Compression.CompressionLevel.Optimal)
-        );
+        // Create or open the log file in append mode
+        FileStream fileStream = new FileStream(logPath, FileMode.Append, FileAccess.Write, FileShare.Read);
+        logFile = new StreamWriter(fileStream);
 
-
-        // Write the header to the log file depending on whether ZMQ data is included
-        if (includeZmqData)
+        // Check if the file was just created or if it existed before
+        if (fileStream.Length == 0)
         {
-            logFile.Write(
-                "Current Time,VR,Scene,CurrentStep,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
-            );
+            // Write the header to the log file depending on whether ZMQ data is included
+            if (includeZmqData)
+            {
+                logFile.Write(
+                    "Current Time,VR,Scene,CurrentStep,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
+                );
+            }
+            else
+            {
+                logFile.Write(
+                    "Current Time,VR,Scene,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
+                );
+            }
         }
-        else
-        {
-            logFile.Write(
-                "Current Time,VR,Scene,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
-            );
-        }
 
-
-
-        Logger.Log("Writing data to: " + logPath,3);
+        Logger.Log("Writing data to: " + logPath, 3);
     }
+
 
     public void UpdateLogger()
 
