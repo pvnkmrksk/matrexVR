@@ -1,9 +1,9 @@
 {
   "sequences": [
-    { "sceneName": "Optomotor", "duration": 40 },
+    { "sceneName": "Optomotor", "duration": 20 },
     {
       "sceneName": "ChoiceAssay",
-      "duration": 10.0,
+      "duration": 20.0,
       "parameters": {
         "configFile": "BuridansParadigmConfig.json"
       }
@@ -11,7 +11,7 @@
     { "sceneName": "Optomotor", "duration": 3 },
     {
       "sceneName": "SimulatedLocusts",
-      "duration": 10.0,
+      "duration": 20.0,
       "parameters": {
         "kappa": 10000,
         "mu": 0,
@@ -21,7 +21,7 @@
 
     {
       "sceneName": "ChoiceAssay",
-      "duration": 10.0,
+      "duration": 20.0,
       "parameters": {
         "configFile": "StripeFixationConfig.json"
       }
