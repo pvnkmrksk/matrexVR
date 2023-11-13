@@ -152,13 +152,13 @@ public class ClosedLoop : MonoBehaviour
     public void ResetPosition()
     {
         transform.position = initialPosition;
-        lastSensorData = currentSensorData;
+        //lastSensorData = currentSensorData;
     }
 
     public void ResetRotation()
     {
         transform.rotation = Quaternion.Euler(initialRotation);
-        lastSensorData = currentSensorData;
+        //lastSensorData = currentSensorData;
  
     }
     private void ToggleClosedLoopOrientation()
