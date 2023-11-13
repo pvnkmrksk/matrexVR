@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
@@ -100,12 +101,27 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
             Logger.Log("Setting values for ClosedLoop script..." + config.closedLoopOrientation);
             cl.SetClosedLoopOrientation(config.closedLoopOrientation);
             cl.SetClosedLoopPosition(config.closedLoopPosition);
-            cl.ResetPosition();
-            cl.ResetRotation();
-
         }
         // TODO: Set sky and grass textures
+        // Start the coroutine from here
+        StartCoroutine(DelayedOnLoaded(0.05f));
     }
+    // Coroutine to delay the execution of OnLoaded
+    private IEnumerator DelayedOnLoaded(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        OnLoaded();
+    }
+    private void OnLoaded()
+    {
+        ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
+        foreach (ClosedLoop cl in closedLoopComponents)
+        {
+            cl.ResetPosition();
+            cl.ResetRotation();
+        }
+    }
+
 }
 
 [System.Serializable]
