@@ -7,7 +7,7 @@ public class ClosedLoop : MonoBehaviour
     public Vector3 initialRotation = Vector3.zero;
 
     [Header("FicTrac Settings")]
-    public float sphereRadius = 5.0f; // Default value for sphere radius in centimeters
+    public float sphereRadius = 0.45f; // Default value for sphere radius in centimeters
 
     [Header("Gain Settings")]
     [SerializeField, Range(0, 1000)]
