@@ -109,7 +109,7 @@ public class DataLogger : MonoBehaviour
             if (includeZmqData)
             {
                 logFile.Write(
-                    "Current Time,VR,Scene,CurrentStep,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
+                    "Current Time,VR,Scene,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZSensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ"
                 );
             }
             else
