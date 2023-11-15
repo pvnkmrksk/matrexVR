@@ -8,9 +8,9 @@
         },
         "material": "black",
         "scale": {
-          "x": 4,
+          "x": 8,
           "y": 150,
-          "z": 4
+          "z": 8
         }
       },
       {
@@ -21,13 +21,13 @@
         },
         "material": "black",
         "scale": {
-          "x": 4,
+          "x": 8,
           "y": 150,
-          "z": 4
+          "z": 8
         }
       }
     ],
     "closedLoopOrientation": true,
-    "closedLoopPosition": true
+    "closedLoopPosition": false
   }
   

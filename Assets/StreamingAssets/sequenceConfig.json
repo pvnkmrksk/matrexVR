@@ -1,20 +1,67 @@
-{
-  "sequences": [
-    { "sceneName": "Optomotor", "duration": 120 },
-    {
-      "sceneName": "ChoiceAssay",
-      "duration": 120.0,
-      "parameters": {
-        "configFile": "BuridansParadigmConfig.json"
+  {
+    "sequences": [
+      {
+        "sceneName": "ChoiceAssay",
+        "duration": 60.0,
+        "parameters": {
+          "configFile": "20_DecisionConfig.json"
+        }
+      },
+      {
+        "sceneName": "ChoiceAssay",
+        "duration": 60.0,
+        "parameters": {
+          "configFile": "40_DecisionConfig.json"
+        }
+      },
+      {
+        "sceneName": "ChoiceAssay",
+        "duration": 60.0,
+        "parameters": {
+          "configFile": "60_DecisionConfig.json"
+        }
+      },
+      {
+        "sceneName": "ChoiceAssay",
+        "duration": 60.0,
+        "parameters": {
+          "configFile": "80_DecisionConfig.json"
+        }
+      },
+      {
+        "sceneName": "ChoiceAssay",
+        "duration": 60.0,
+        "parameters": {
+          "configFile": "100_DecisionConfig.json"
+        }
+      },
+      {
+        "sceneName": "ChoiceAssay",
+        "duration": 60.0,
+        "parameters": {
+          "configFile": "120_DecisionConfig.json"
+        }
+      },
+      {
+        "sceneName": "ChoiceAssay",
+        "duration": 60.0,
+        "parameters": {
+          "configFile": "140_DecisionConfig.json"
+        }
+      },
+      {
+        "sceneName": "ChoiceAssay",
+        "duration": 60.0,
+        "parameters": {
+          "configFile": "160_DecisionConfig.json"
+        }
+      },
+      {
+        "sceneName": "ChoiceAssay",
+        "duration": 60.0,
+        "parameters": {
+          "configFile": "BuridansParadigmConfig.json"
+        }
       }
-    },
-    { "sceneName": "Optomotor", "duration": 60 },
-    {
-      "sceneName": "ChoiceAssay",
-      "duration": 120.0,
-      "parameters": {
-        "configFile": "StripeFixationConfig.json"
-      }
-    }
-  ]
-}
+    ]
+  }
