@@ -1,0 +1,14 @@
+{
+  "Paradigms": [
+    {
+      "Name": "CognitiveAssessment",
+      "ExperimentsConfig": "Choice1"
+    },
+    {
+      "Name": "SensoryEvaluation",
+      "ExperimentsConfig": "Choice2"
+    }
+
+
+  ]
+}

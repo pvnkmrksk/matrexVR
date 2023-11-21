@@ -1,0 +1,21 @@
+{
+  "Experiments": [
+    {
+      "Name": "MemoryTest",
+      "SceneName": "MemoryScene",
+      "PreStimulusDuration": 5.0,
+      "PostStimulusDuration": 5.0,
+      "TrialRepetitions": 3,
+      "AdditionalParameters": { }
+    },
+
+    {
+      "Name": "MemoryTest2",
+      "SceneName": "MemoryScene",
+      "PreStimulusDuration": 5.0,
+      "PostStimulusDuration": 5.0,
+      "TrialRepetitions": 3,
+      "AdditionalParameters": { }
+    }
+  ]
+}

@@ -5,16 +5,25 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ControlScene.unity
     guid: 4af081ad6480f455f8bf0f8b4968e18a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SimulatedLocusts.unity
     guid: ee3c77b2ae528404ea7981ceb78bd856
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ChoiceAssay.unity
     guid: 7397d1b569aa64b27ab919a5ed55c5e6
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Optomotor.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/MainControlScene.unity
+    guid: 7b899ec2f57b948ab96db9679e621ff3
+  - enabled: 1
+    path: Assets/Scenes/MemoryScene.unity
+    guid: ce290f477f2ea4ca5a995f2e20f4a1eb
+  - enabled: 1
+    path: Assets/Scenes/ChoiceScene2.unity
+    guid: 934501c28759d47a0b651dff3182215d
   m_configObjects: {}
