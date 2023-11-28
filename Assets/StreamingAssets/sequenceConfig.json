@@ -2,65 +2,37 @@
     "sequences": [
       {
         "sceneName": "ChoiceAssay",
-        "duration": 60.0,
+        "duration": 5,
         "parameters": {
-          "configFile": "20_DecisionConfig.json"
+          "configFile": "StripeFixationConfig.json"
         }
       },
       {
         "sceneName": "ChoiceAssay",
-        "duration": 60.0,
+        "duration": 5,
         "parameters": {
-          "configFile": "40_DecisionConfig.json"
+          "configFile": "StripeFixationConfig_90.json"
         }
       },
       {
         "sceneName": "ChoiceAssay",
-        "duration": 60.0,
+        "duration": 5,
         "parameters": {
-          "configFile": "60_DecisionConfig.json"
+          "configFile": "StripeFixationConfig_180.json"
         }
       },
       {
         "sceneName": "ChoiceAssay",
-        "duration": 60.0,
+        "duration": 5,
         "parameters": {
-          "configFile": "80_DecisionConfig.json"
+          "configFile": "StripeFixationConfig_270.json"
         }
       },
       {
         "sceneName": "ChoiceAssay",
-        "duration": 60.0,
+        "duration": 5,
         "parameters": {
-          "configFile": "100_DecisionConfig.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 60.0,
-        "parameters": {
-          "configFile": "120_DecisionConfig.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 60.0,
-        "parameters": {
-          "configFile": "140_DecisionConfig.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 60.0,
-        "parameters": {
-          "configFile": "160_DecisionConfig.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 60.0,
-        "parameters": {
-          "configFile": "BuridansParadigmConfig.json"
+          "configFile": "StripeFixationConfig_translation.json"
         }
       }
     ]

@@ -15,6 +15,6 @@
       }
     ],
     "closedLoopOrientation": true,
-    "closedLoopPosition": false
+    "closedLoopPosition": true
   }
   
