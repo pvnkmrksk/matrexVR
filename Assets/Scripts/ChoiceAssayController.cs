@@ -53,8 +53,11 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
             if (prefab != null)
             {
                 // Compute position based on radius and angle
-                Vector3 position = new Vector3(obj.position.radius * Mathf.Cos(obj.position.angle * Mathf.Deg2Rad), 0,
-                                               obj.position.radius * Mathf.Sin(obj.position.angle * Mathf.Deg2Rad));
+                float x = obj.position.radius * Mathf.Sin(obj.position.angle * Mathf.Deg2Rad);
+                float y = 0;
+                float z = obj.position.radius * Mathf.Cos(obj.position.angle * Mathf.Deg2Rad);
+
+                Vector3 position = new Vector3(x, y, z);
 
                 // Instantiate and initialize object
                 GameObject instance = Instantiate(prefab, position, Quaternion.identity);
