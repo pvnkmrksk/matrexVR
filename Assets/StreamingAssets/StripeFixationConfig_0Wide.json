@@ -1,0 +1,21 @@
+{
+    "objects": [
+      {
+        "type": "cylinder",
+        "position": {
+          "radius": 30,
+          "angle": 0
+        },
+        "material": "black",
+        "scale": {
+          "x": 32,
+          "y": 150,
+          "z": 32
+        }
+      }
+    ],
+    "closedLoopOrientation": true,
+    "closedLoopPosition": false
+
+  }
+  

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
+using System.Linq;
 
 public class ChoiceAssayController : MonoBehaviour, ISceneController
 {
@@ -16,6 +17,7 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
     public Material blackMaterial;
     public Material grey14Material;
     public Material grey50Material;
+    public Material whiteMaterial;
     
     public void InitializeScene(Dictionary<string, object> parameters)
     {
@@ -85,6 +87,9 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
                     case "green":
                         materialToSet = greenMaterial;
                         break;
+                    case "white":
+                        materialToSet = whiteMaterial;
+                        break;    
                 }
                 if (materialToSet != null)
                 {
@@ -101,6 +106,20 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
             Logger.Log("Setting values for ClosedLoop script..." + config.closedLoopOrientation);
             cl.SetClosedLoopOrientation(config.closedLoopOrientation);
             cl.SetClosedLoopPosition(config.closedLoopPosition);
+        }
+            // Read and set the background color of cameras
+        if (config.backgroundColor != null)
+        {
+            Color bgColor = new Color(config.backgroundColor.r, config.backgroundColor.g, config.backgroundColor.b, config.backgroundColor.a);
+            Camera[] cameras = GameObject.FindGameObjectsWithTag("MainCamera").Select(obj => obj.GetComponent<Camera>()).ToArray();
+
+            foreach (Camera cam in cameras)
+            {
+                if (cam != null)
+                {
+                    cam.backgroundColor = bgColor;
+                }
+            }
         }
         // TODO: Set sky and grass textures
         // Start the coroutine from here
@@ -130,6 +149,7 @@ public class SceneConfig
     public SceneObject[] objects;
     public bool closedLoopOrientation;
     public bool closedLoopPosition;
+    public ColorConfig backgroundColor;
 
 }
 
@@ -155,4 +175,12 @@ public class ScaleConfig
     public float x;
     public float y;
     public float z;
+}
+[System.Serializable]
+public class ColorConfig
+{
+    public float r;
+    public float g;
+    public float b;
+    public float a;
 }
