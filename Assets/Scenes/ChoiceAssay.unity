@@ -255,6 +255,7 @@ MonoBehaviour:
   blackMaterial: {fileID: 2100000, guid: cc1b699790543fbe9b646ada19484422, type: 2}
   grey14Material: {fileID: 2100000, guid: 5197157949f244b49a0174c9827f6749, type: 2}
   grey50Material: {fileID: 2100000, guid: ec6108d163be740298cf03b9719cb424, type: 2}
+  whiteMaterial: {fileID: 2100000, guid: 3a2871cee947502c9ab9fd873ac72f72, type: 2}
 --- !u!4 &1947130651
 Transform:
   m_ObjectHideFlags: 0
