@@ -1,32 +1,62 @@
-  {
-    "sequences": [
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 10,
-        "parameters": {
-          "configFile": "StripeFixationConfig_45_fruit.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 10,
-        "parameters": {
-          "configFile": "StripeFixationConfig_45_tree.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 10,
-        "parameters": {
-          "configFile": "StripeFixationConfig_135_fruit.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 10,
-        "parameters": {
-          "configFile": "StripeFixationConfig_135_tree.json"
-        }
+{
+  "sequences": [
+    { "sceneName": "Optomotor", "duration": 180 },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 30,
+      "parameters": {
+        "configFile": "StripeFixationConfig_45_fruit.json"
       }
-    ]
-  }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 30,
+      "parameters": {
+        "configFile": "StripeFixationConfig_45_tree.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 30,
+      "parameters": {
+        "configFile": "StripeFixationConfig_315_fruit.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 30,
+      "parameters": {
+        "configFile": "StripeFixationConfig_315_tree.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 30,
+      "parameters": {
+        "configFile": "StripeFixationConfig_135_fruit.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 30,
+      "parameters": {
+        "configFile": "StripeFixationConfig_135_tree.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 30,
+      "parameters": {
+        "configFile": "StripeFixationConfig_225_fruit.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 30,
+      "parameters": {
+        "configFile": "StripeFixationConfig_225_tree.json"
+      }
+    }
+    
+  ]
+}
