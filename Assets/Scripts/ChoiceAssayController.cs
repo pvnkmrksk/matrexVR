@@ -10,6 +10,7 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
     public GameObject cubePrefab;
     public GameObject spherePrefab;
     public GameObject cylinderPrefab;
+    public GameObject fruitPrefab;
 
     public Material redMaterial;
     public Material blueMaterial;
@@ -18,6 +19,7 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
     public Material grey14Material;
     public Material grey50Material;
     public Material whiteMaterial;
+    public Material fruitMaterial;
     
     public void InitializeScene(Dictionary<string, object> parameters)
     {
@@ -47,6 +49,9 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
                     break;
                 case "cylinder":
                     prefab = cylinderPrefab;
+                    break;
+                case "fruit":
+                    prefab = fruitPrefab;
                     break;
             }
 
@@ -92,6 +97,9 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
                         break;
                     case "white":
                         materialToSet = whiteMaterial;
+                        break;
+                    case "fruit":
+                        materialToSet = fruitMaterial;
                         break;    
                 }
                 if (materialToSet != null)
