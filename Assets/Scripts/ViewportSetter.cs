@@ -26,6 +26,10 @@ public class ViewportSetter : MonoBehaviour
 
     void Start()
     {
+
+        // set vsyn to true to avoid tearing and 60 fps
+        QualitySettings.vSyncCount = 1;
+        
         setViewport();
     }
 
