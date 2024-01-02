@@ -1,4 +1,29 @@
-# Unity Project Readme
+**MATREX VR: Bridging Virtual Reality and Naturalistic Behaviors in Neuroscience**
+
+**Overview:**
+
+This repository hosts the code and resources for MATREX VR (MATREX Architecture Terraforming Realistic Environments in X), a groundbreaking project at the intersection of behavioral neuroscience, virtual reality, and ecological studies. Our system, inspired by the concept of 'Prakruti Maye', blends tangible reality with carefully crafted illusion, challenging traditional boundaries between actuality and artifice.
+
+**Project Aim:**
+
+The MATREX VR project aims to revolutionize our understanding of collective foraging behaviors, particularly in locusts and other species. We focus on creating simulated yet highly realistic environments that replicate the complexity of natural settings. This approach seeks to overcome the limitations of reductionist models historically used in neuroscience and behavioral studies.
+
+**Key Features:**
+
+- **Immersive Virtual Reality Environments:** Utilizes high refresh rate, commercial LED panels, and off-the-shelf components to create panoramic, naturalistic visual stimuli.
+- **Parametric 3D Printable Modules:** Designed to accommodate a range of organisms, enabling scalable and cost-effective study of both walking and flying behaviors.
+- **Advanced Sensory System:** Features a fully 3D printable, 6-axis force-torque sensor capturing nuanced dynamics like pitch, yaw, roll, and translational forces.
+- **Open Source Contribution:** Simplifies the data capture process in VR research and democratizes access, promoting an inclusive approach in behavioral neuroscience.
+
+**Applications and Impact:**
+
+MATREX VR is not just a technological advancement but a paradigm shift in how we approach naturalistic behavior studies. By integrating complex, real-world stimuli into virtual environments, we open new avenues for understanding the neural basis of individual and collective decision-making. This repository serves as a resource for researchers and academicians interested in exploring similar paths or expanding upon our work.
+
+**Note for Contributors and Users:**
+
+This repository is a living document of our journey in understanding the complex tapestry of collective behavior. We encourage collaboration, suggestions, and constructive feedback. For detailed instructions, usage guidelines, and contribution policies, please refer to the documentation within.
+
+---
 
 This repository contains a Unity project that demonstrates various functionalities and features. The project includes scripts for closed-loop control, data logging, object rotation, keyboard controls, texture generation, viewport setup, and socket communication.
 
