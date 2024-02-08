@@ -1,12 +1,12 @@
 {
   "objects": [
     {
-      "prefabName": "Lemon",
-      "materialName": "",
+      "type": "Lemon",
       "position": {
         "radius": 30,
         "angle": 30
       },
+      "material": "",
       "scale": {
         "x": 300,
         "y": 300,
@@ -15,12 +15,12 @@
       "flip": false
     },
     {
-      "prefabName": "Lemon",
-      "materialName": "",
+      "type": "Lemon",
       "position": {
         "radius": 30,
         "angle": 330
       },
+      "material": "",
       "scale": {
         "x": 300,
         "y": 300,

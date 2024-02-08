@@ -1,19 +1,18 @@
 {
-    "objects": [
-      {
-        "type": "fruit",
-        "position": {
-          "radius": 30,
-          "angle": 45
-        },
-        "scale": {
-          "x": 300,
-          "y": 300,
-          "z": 300
-        }
+  "objects": [
+    {
+      "type": "Lemon",
+      "position": {
+        "radius": 30,
+        "angle": 45
+      },
+      "scale": {
+        "x": 300,
+        "y": 300,
+        "z": 300
       }
-    ],
-    "closedLoopOrientation": true,
-    "closedLoopPosition": true
-  }
-  
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true
+}
