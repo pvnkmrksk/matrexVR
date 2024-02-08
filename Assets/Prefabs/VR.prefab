@@ -71,7 +71,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1d9dee094eb5bb59c8706fc55c91ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  address: 10.126.17.53
+  address: 10.126.17.45
   port: 9871
 --- !u!114 &2386836546770343658
 MonoBehaviour:
@@ -86,6 +86,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initialPosition: {x: 0, y: 0, z: 0}
+  initialRotation: {x: 0, y: 0, z: 0}
   sphereRadius: 5
   xGain: 1
   yGain: 1
@@ -95,7 +96,6 @@ MonoBehaviour:
   yawGain: 1
   closedLoopOrientation: 1
   closedLoopPosition: 1
-  momentumClosedLoop: 0
 --- !u!114 &4886124528207133730
 MonoBehaviour:
   m_ObjectHideFlags: 0

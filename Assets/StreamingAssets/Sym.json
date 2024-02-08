@@ -1,0 +1,34 @@
+{
+  "objects": [
+    {
+      "prefabName": "Lemon",
+      "materialName": "",
+      "position": {
+        "radius": 30,
+        "angle": 30
+      },
+      "scale": {
+        "x": 300,
+        "y": 300,
+        "z": 300
+      },
+      "flip": false
+    },
+    {
+      "prefabName": "Lemon",
+      "materialName": "",
+      "position": {
+        "radius": 30,
+        "angle": 330
+      },
+      "scale": {
+        "x": 300,
+        "y": 300,
+        "z": 300
+      },
+      "flip": true
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true
+}
