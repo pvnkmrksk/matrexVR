@@ -5,27 +5,43 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Linq;
 
-public class ChoiceAssayController : MonoBehaviour, ISceneController
+public class ChoiceAssayController: MonoBehaviour , ISceneController
 {
-    public GameObject cubePrefab;
-    public GameObject spherePrefab;
-    public GameObject cylinderPrefab;
-    public GameObject fruitPrefab;
+    // Assuming these prefabs are assigned in the Unity Editor
+    public GameObject[] prefabs;
+    private Dictionary<string, GameObject> prefabDict = new Dictionary<string, GameObject>();
 
-    public Material redMaterial;
-    public Material blueMaterial;
-    public Material greenMaterial;
-    public Material blackMaterial;
-    public Material grey14Material;
-    public Material grey50Material;
-    public Material whiteMaterial;
-    public Material fruitMaterial;
-    
+    public Material[] materials;
+    private Dictionary<string, Material> materialDict = new Dictionary<string, Material>();
+
+    private void Awake()
+    {
+        // Initialize prefab dictionary
+        foreach (var prefab in prefabs)
+        {
+            if (!prefabDict.ContainsKey(prefab.name))
+            {
+                prefabDict.Add(prefab.name, prefab);
+                // Debug.Log("Added prefab: " + prefab.name);
+            }
+        }
+
+        // Initialize material dictionary
+        foreach (var material in materials)
+        {
+            if (!materialDict.ContainsKey(material.name))
+            {
+                materialDict.Add(material.name, material);
+                
+            }
+        }
+    }
+
     public void InitializeScene(Dictionary<string, object> parameters)
     {
         Logger.Log("InitializeScene called.");
 
-        // Path to scene configuration JSON
+// Path to scene configuration JSON
         string configFile = parameters["configFile"].ToString();
 
         // Load and parse JSON
@@ -33,88 +49,40 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
         string jsonString = File.ReadAllText(jsonPath);
         SceneConfig config = JsonConvert.DeserializeObject<SceneConfig>(jsonString);
 
-        // Instantiate objects
+// Instantiate objects
         foreach (var obj in config.objects)
         {
-            GameObject prefab = null;
-
-            // Match prefab based on type
-            switch (obj.type)
+            if (prefabDict.TryGetValue(obj.prefabName, out GameObject prefab))
             {
-                case "cube":
-                    prefab = cubePrefab;
-                    break;
-                case "sphere":
-                    prefab = spherePrefab;
-                    break;
-                case "cylinder":
-                    prefab = cylinderPrefab;
-                    break;
-                case "fruit":
-                    prefab = fruitPrefab;
-                    break;
-            }
-
-            if (prefab != null)
-            {
-                // Compute position based on radius and angle
-                float x = obj.position.radius * Mathf.Sin(obj.position.angle * Mathf.Deg2Rad);
-                float y = 0;
-                float z = obj.position.radius * Mathf.Cos(obj.position.angle * Mathf.Deg2Rad);
-
-                Vector3 position = new Vector3(x, y, z);
-
-                // Instantiate and initialize object
+                Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
                 GameObject instance = Instantiate(prefab, position, Quaternion.identity);
 
-                // Set scale
-                if (obj.scale != null)
+  
+                // Set scale, Optionally flip the object if flip is true, set flip my scale * -1 in x axis
+
+                if (obj.flip)
+                {
+                    instance.transform.localScale = new Vector3(obj.scale.x * -1, obj.scale.y , obj.scale.z);
+                }
+                else
                 {
                     instance.transform.localScale = new Vector3(obj.scale.x, obj.scale.y, obj.scale.z);
                 }
 
-                // Set material
-                Material materialToSet = null;
-                switch (obj.material)
+                // Optionally apply material
+                if (!string.IsNullOrEmpty(obj.materialName) && materialDict.TryGetValue(obj.materialName, out Material material))
                 {
-                    case "black":
-                        materialToSet = blackMaterial;
-                        break;
-                    case "Grey_141414":
-                        materialToSet = grey14Material;
-                        break;
-                    case "Grey_505050":
-                        materialToSet = grey50Material;
-                        break;
-                    case "red":
-                        materialToSet = redMaterial;
-                        break;
-                    case "blue":
-                        materialToSet = blueMaterial;
-                        break;
-                    case "green":
-                        materialToSet = greenMaterial;
-                        break;
-                    case "white":
-                        materialToSet = whiteMaterial;
-                        break;
-                    case "fruit":
-                        materialToSet = fruitMaterial;
-                        break;    
-                }
-                if (materialToSet != null)
-                {
-                    instance.GetComponent<Renderer>().material = materialToSet;
+                    instance.GetComponent<Renderer>().material = material;
                 }
             }
-
-        }
+        
+               }
         ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
-        Logger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length);
+        Logger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length, 4);
 
         foreach (ClosedLoop cl in closedLoopComponents)
         {
-            Logger.Log("Setting values for ClosedLoop script..." + config.closedLoopOrientation);
+            Logger.Log("Setting values for ClosedLoop script..." + config.closedLoopOrientation, 4);
             cl.SetClosedLoopOrientation(config.closedLoopOrientation);
             cl.SetClosedLoopPosition(config.closedLoopPosition);
         }
@@ -152,6 +120,16 @@ public class ChoiceAssayController : MonoBehaviour, ISceneController
         }
     }
 
+
+
+    private Vector3 CalculatePosition(float radius, float angle)
+    {
+        float x = radius * Mathf.Sin(angle * Mathf.Deg2Rad);
+        float z = radius * Mathf.Cos(angle * Mathf.Deg2Rad);
+        return new Vector3(x, 0, z); // Assuming y is always 0
+    }
+
+    // Update SceneConfig and other classes as needed to reflect JSON changes
 }
 
 [System.Serializable]
@@ -167,10 +145,12 @@ public class SceneConfig
 [System.Serializable]
 public class SceneObject
 {
-    public string type;
+    public string prefabName;
+    public string materialName; // Optional
     public Position position;
-    public string material;
     public ScaleConfig scale;
+    public bool flip;
+    // Include other properties as before
 }
 
 [System.Serializable]
@@ -195,3 +175,4 @@ public class ColorConfig
     public float b;
     public float a;
 }
+

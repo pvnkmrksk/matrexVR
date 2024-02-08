@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.451401, g: 0.5008942, b: 0.5723129, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -315,8 +315,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1470736537}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalRotation: {x: 0.2588191, y: 0, z: 0, w: 0.9659258}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -332,7 +332,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1947130651}
-  - component: {fileID: 1947130650}
+  - component: {fileID: 1947130652}
   m_Layer: 0
   m_Name: SceneController
   m_TagString: Untagged
@@ -340,30 +340,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1947130650
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1947130649}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 807bbca16059343c8b923116b813e3e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cubePrefab: {fileID: 1139572726157748, guid: 3c98bb4bee2f2ba4b92a2fbca7b8831f, type: 3}
-  spherePrefab: {fileID: 1931617803381333906, guid: 1695d22eb5f8d458e8d19ce4729a7bd9, type: 3}
-  cylinderPrefab: {fileID: 4200047036864494803, guid: 9b515e49167a84113aabe1d555d9bdf0, type: 3}
-  fruitPrefab: {fileID: 1274570263506488403, guid: eed7da0dd105843ff8b63e74c2eb7805, type: 3}
-  redMaterial: {fileID: 2100000, guid: 40980a71a99a444baa9ee262da880583, type: 2}
-  blueMaterial: {fileID: 2100000, guid: 04a0ce8100d744a8eab46dbe477643a8, type: 2}
-  greenMaterial: {fileID: 2100000, guid: c3bee356da6944c539ff6c2360cba73d, type: 2}
-  blackMaterial: {fileID: 2100000, guid: cc1b699790543fbe9b646ada19484422, type: 2}
-  grey14Material: {fileID: 2100000, guid: 5197157949f244b49a0174c9827f6749, type: 2}
-  grey50Material: {fileID: 2100000, guid: ec6108d163be740298cf03b9719cb424, type: 2}
-  whiteMaterial: {fileID: 2100000, guid: 3a2871cee947502c9ab9fd873ac72f72, type: 2}
-  fruitMaterial: {fileID: 0}
 --- !u!4 &1947130651
 Transform:
   m_ObjectHideFlags: 0
@@ -379,6 +355,33 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1947130652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1947130649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 807bbca16059343c8b923116b813e3e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabs:
+  - {fileID: 613882636469030215, guid: 640fd9f1faa774ed08f8a945c42d4ecf, type: 3}
+  - {fileID: 4200047036864494803, guid: 9b515e49167a84113aabe1d555d9bdf0, type: 3}
+  - {fileID: 1931617803381333906, guid: 1695d22eb5f8d458e8d19ce4729a7bd9, type: 3}
+  - {fileID: 1274570263506488403, guid: eed7da0dd105843ff8b63e74c2eb7805, type: 3}
+  - {fileID: 1139572726157748, guid: 3c98bb4bee2f2ba4b92a2fbca7b8831f, type: 3}
+  materials:
+  - {fileID: 2100000, guid: 30698065bf4d05413851dbea62a8c3b6, type: 2}
+  - {fileID: 2100000, guid: cc1b699790543fbe9b646ada19484422, type: 2}
+  - {fileID: 2100000, guid: 04a0ce8100d744a8eab46dbe477643a8, type: 2}
+  - {fileID: 2100000, guid: c3bee356da6944c539ff6c2360cba73d, type: 2}
+  - {fileID: 2100000, guid: 5197157949f244b49a0174c9827f6749, type: 2}
+  - {fileID: 2100000, guid: ec6108d163be740298cf03b9719cb424, type: 2}
+  - {fileID: 2100000, guid: 40980a71a99a444baa9ee262da880583, type: 2}
+  - {fileID: 2100000, guid: 3a2871cee947502c9ab9fd873ac72f72, type: 2}
 --- !u!1 &2136380289
 GameObject:
   m_ObjectHideFlags: 0
@@ -396,7 +399,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &2136380290
 AudioListener:
   m_ObjectHideFlags: 0

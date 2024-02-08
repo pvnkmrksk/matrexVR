@@ -5,6 +5,13 @@
       "sceneName": "ChoiceAssay",
       "duration": 30,
       "parameters": {
+        "configFile": "Sym.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 30,
+      "parameters": {
         "configFile": "StripeFixationConfig_45_fruit.json"
       }
     },
@@ -57,6 +64,5 @@
         "configFile": "StripeFixationConfig_225_tree.json"
       }
     }
-    
   ]
 }
