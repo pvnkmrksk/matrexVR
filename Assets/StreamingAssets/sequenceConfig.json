@@ -1,12 +1,12 @@
 {
   "sequences": [
-    { "sceneName": "Optomotor", "duration": 180 },
+    // { "sceneName": "Optomotor", "duration": 180 },
     {
       "sceneName": "ChoiceAssay",
-      "duration": 30,
-      "parameters": {
-        "configFile": "Sym.json"
-      }
+    "duration": 30,
+    "parameters": {
+    "configFile": "Sym.json"
+    }
     },
     {
       "sceneName": "ChoiceAssay",

@@ -8,10 +8,10 @@ using System.Linq;
 public class ChoiceAssayController: MonoBehaviour , ISceneController
 {
     // Assuming these prefabs are assigned in the Unity Editor
-    public GameObject[] prefabs;
+public GameObject[] prefabs;
     private Dictionary<string, GameObject> prefabDict = new Dictionary<string, GameObject>();
 
-    public Material[] materials;
+    public Material[] materials; // Materials are assigned in the Unity Editor
     private Dictionary<string, Material> materialDict = new Dictionary<string, Material>();
 
     private void Awake()
@@ -32,7 +32,7 @@ public class ChoiceAssayController: MonoBehaviour , ISceneController
             if (!materialDict.ContainsKey(material.name))
             {
                 materialDict.Add(material.name, material);
-                
+
             }
         }
     }
@@ -41,7 +41,7 @@ public class ChoiceAssayController: MonoBehaviour , ISceneController
     {
         Logger.Log("InitializeScene called.");
 
-// Path to scene configuration JSON
+        // Path to scene configuration JSON
         string configFile = parameters["configFile"].ToString();
 
         // Load and parse JSON
@@ -49,15 +49,15 @@ public class ChoiceAssayController: MonoBehaviour , ISceneController
         string jsonString = File.ReadAllText(jsonPath);
         SceneConfig config = JsonConvert.DeserializeObject<SceneConfig>(jsonString);
 
-// Instantiate objects
+        // Instantiate objects
         foreach (var obj in config.objects)
         {
-            if (prefabDict.TryGetValue(obj.prefabName, out GameObject prefab))
+            if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
             {
                 Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
                 GameObject instance = Instantiate(prefab, position, Quaternion.identity);
 
-  
+                
                 // Set scale, Optionally flip the object if flip is true, set flip my scale * -1 in x axis
 
                 if (obj.flip)
@@ -70,7 +70,7 @@ public class ChoiceAssayController: MonoBehaviour , ISceneController
                 }
 
                 // Optionally apply material
-                if (!string.IsNullOrEmpty(obj.materialName) && materialDict.TryGetValue(obj.materialName, out Material material))
+                if (!string.IsNullOrEmpty(obj.material) && materialDict.TryGetValue(obj.material, out Material material))
                 {
                     instance.GetComponent<Renderer>().material = material;
                 }
@@ -145,9 +145,9 @@ public class SceneConfig
 [System.Serializable]
 public class SceneObject
 {
-    public string prefabName;
-    public string materialName; // Optional
+    public string type;
     public Position position;
+    public string material;
     public ScaleConfig scale;
     public bool flip;
     // Include other properties as before
