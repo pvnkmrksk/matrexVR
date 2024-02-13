@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3266277269612255564}
   - component: {fileID: 770347081779588486}
   m_Layer: 0
-  m_Name: Lemon
+  m_Name: LemonRed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 5911932637532464255, guid: 06fedd0883ac8437fb6a952b18e4b1c3, type: 3}
+  - {fileID: 2100000, guid: 1f73bc75e6ba9484399c0fcbb5989d5d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
