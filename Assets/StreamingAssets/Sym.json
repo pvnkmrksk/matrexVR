@@ -6,13 +6,13 @@
         "radius": 30,
         "angle": 30
       },
-      "material": "",
+      "material": "Lemon",
       "scale": {
         "x": 300,
         "y": 300,
         "z": 300
       },
-      "flip": false
+      "flip": true
     },
     {
       "type": "Lemon",
@@ -20,13 +20,13 @@
         "radius": 30,
         "angle": 330
       },
-      "material": "",
+      "material": "LemonRed",
       "scale": {
         "x": 300,
         "y": 300,
         "z": 300
       },
-      "flip": true
+      "flip": false
     }
   ],
   "closedLoopOrientation": true,
