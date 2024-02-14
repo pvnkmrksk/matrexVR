@@ -3,10 +3,10 @@
     // { "sceneName": "Optomotor", "duration": 180 },
     {
       "sceneName": "ChoiceAssay",
-    "duration": 30,
-    "parameters": {
-    "configFile": "Sym.json"
-    }
+      "duration": 300,
+      "parameters": {
+        "configFile": "Sym.json"
+      }
     },
     {
       "sceneName": "ChoiceAssay",
