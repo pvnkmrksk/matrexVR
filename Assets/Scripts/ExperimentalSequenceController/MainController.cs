@@ -13,6 +13,7 @@ public class MainController : MonoBehaviour
 {
     public List<SequenceStep> sequenceSteps = new List<SequenceStep>();
     public int currentStep = 0;
+    public int currentTrial = 0;
     private float timer;
     private bool sequenceStarted = false;
     private MasterDataLogger masterDataLogger;
@@ -222,6 +223,9 @@ public class MainController : MonoBehaviour
                 {
                     // Restart the sequence from the first step
                     currentStep = 0;
+
+                    // Increment the trial counter
+                    currentTrial++;
                     LoadScene(sequenceSteps[currentStep]);
                 }
                 else
