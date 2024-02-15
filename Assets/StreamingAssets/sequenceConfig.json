@@ -8,35 +8,6 @@
     //     "configFile": "Sym.json"
     //   }
     // },
-    {
-      "sceneName": "ChoiceAssay",
-      "duration": 30,
-      "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
-      }
-    },
-    {
-      "sceneName": "ChoiceAssay",
-      "duration": 30,
-      "parameters": {
-        "configFile": "Choice_Empty_LemonRed.json"
-      }
-    },
-    {
-      "sceneName": "ChoiceAssay",
-      "duration": 30,
-      "parameters": {
-        "configFile": "Choice_LemonRed_Empty.json"
-      }
-    },
-
-    {
-      "sceneName": "ChoiceAssay",
-      "duration": 30,
-      "parameters": {
-        "configFile": "Choice_LemonRed_LemonRed_asym.json"
-      }
-    },
 
     {
       "sceneName": "ChoiceAssay",
@@ -50,9 +21,70 @@
       "sceneName": "ChoiceAssay",
       "duration": 30,
       "parameters": {
-        "configFile": "Choice_Lemon_LemonRed_sym.json"
+        "configFile": "Choice_LemonRed_LemonRedFar_sym.json"
+      }
+    },
+
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 30,
+      "parameters": {
+        "configFile": "Choice_LemonRedFar_LemonRed_sym.json"
+      }
+    },
+
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 30,
+      "parameters": {
+        "configFile": "Choice_LemonRedFar_LemonRedFar_sym.json"
       }
     }
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "Choice_Empty_Empty.json"
+    //   }
+    // },
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "Choice_Empty_LemonRed.json"
+    //   }
+    // },
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "Choice_LemonRed_Empty.json"
+    //   }
+    // },
+
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "Choice_LemonRed_LemonRed_asym.json"
+    //   }
+    // },
+
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "Choice_LemonRed_LemonRed_sym.json"
+    //   }
+    // },
+
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "Choice_Lemon_LemonRed_sym.json"
+    //   }
+    // }
 
     // {
     //   "sceneName": "ChoiceAssay",
