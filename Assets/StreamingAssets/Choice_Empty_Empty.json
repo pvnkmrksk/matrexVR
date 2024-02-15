@@ -1,0 +1,12 @@
+{
+  "objects": [
+    {     
+      "type": ""
+     },
+     {     
+     "type": ""
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true
+}

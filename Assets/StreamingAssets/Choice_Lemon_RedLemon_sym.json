@@ -1,0 +1,34 @@
+{
+  "objects": [
+    {
+      "type": "Lemon",
+      "position": {
+        "radius": 30,
+        "angle": -30
+      },
+      "material": "LemonYellow",
+      "scale": {
+        "x": 300,
+        "y": 300,
+        "z": 300
+      },
+      "flip": true
+    },
+    {
+      "type": "Lemon",
+      "position": {
+        "radius": 30,
+        "angle": 30
+      },
+      "material": "LemonRed",
+      "scale": {
+        "x": 300,
+        "y": 300,
+        "z": 300
+      },
+      "flip": false
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true
+}
