@@ -1,68 +1,120 @@
 {
   "sequences": [
     // { "sceneName": "Optomotor", "duration": 180 },
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 300,
+    //   "parameters": {
+    //     "configFile": "Sym.json"
+    //   }
+    // }, 
+
     {
       "sceneName": "ChoiceAssay",
-      "duration": 300,
+      "duration": 30,
       "parameters": {
-        "configFile": "Sym.json"
+        "configFile": "Choice_Empty_Empty.json"
       }
     },
     {
       "sceneName": "ChoiceAssay",
       "duration": 30,
       "parameters": {
-        "configFile": "StripeFixationConfig_45_fruit.json"
+         "configFile": "Choice_Empty_Lemon.json"
       }
-    },
+    },    
     {
       "sceneName": "ChoiceAssay",
       "duration": 30,
       "parameters": {
-        "configFile": "StripeFixationConfig_45_tree.json"
+        "configFile": "Choice_Lemon_Empty.json"
       }
-    },
+    }, 
+
     {
       "sceneName": "ChoiceAssay",
       "duration": 30,
       "parameters": {
-        "configFile": "StripeFixationConfig_315_fruit.json"
+        "configFile": "Choice_Lemon_Lemon_asym.json"
       }
-    },
+    },   
+
+
+ 
     {
       "sceneName": "ChoiceAssay",
       "duration": 30,
       "parameters": {
-        "configFile": "StripeFixationConfig_315_tree.json"
+        "configFile": "Choice_Lemon_Lemon_sym.json"
       }
-    },
+    },    
+
     {
       "sceneName": "ChoiceAssay",
       "duration": 30,
       "parameters": {
-        "configFile": "StripeFixationConfig_135_fruit.json"
+        "configFile": "Choice_Lemon_RedLemon_sym.json"
       }
-    },
-    {
-      "sceneName": "ChoiceAssay",
-      "duration": 30,
-      "parameters": {
-        "configFile": "StripeFixationConfig_135_tree.json"
-      }
-    },
-    {
-      "sceneName": "ChoiceAssay",
-      "duration": 30,
-      "parameters": {
-        "configFile": "StripeFixationConfig_225_fruit.json"
-      }
-    },
-    {
-      "sceneName": "ChoiceAssay",
-      "duration": 30,
-      "parameters": {
-        "configFile": "StripeFixationConfig_225_tree.json"
-      }
-    }
+    },    
+
+
+
+
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 3,
+    //   "parameters": {
+    //     "configFile": "StripeFixationConfig_45_fruit.json"
+    //   }
+    // },
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "StripeFixationConfig_45_tree.json"
+    //   }
+    // },
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "StripeFixationConfig_315_fruit.json"
+    //   }
+    // },
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "StripeFixationConfig_315_tree.json"
+    //   }
+    // },
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "StripeFixationConfig_135_fruit.json"
+    //   }
+    // },
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "StripeFixationConfig_135_tree.json"
+    //   }
+    // },
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "StripeFixationConfig_225_fruit.json"
+    //   }
+    // },
+    // {
+    //   "sceneName": "ChoiceAssay",
+    //   "duration": 30,
+    //   "parameters": {
+    //     "configFile": "StripeFixationConfig_225_tree.json"
+    //   }
+    // }
   ]
 }
