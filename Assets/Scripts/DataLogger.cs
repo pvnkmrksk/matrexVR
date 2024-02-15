@@ -109,13 +109,13 @@ public class DataLogger : MonoBehaviour
             if (includeZmqData)
             {
                 logFile.Write(
-                    "Current Time,VR,Scene,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ"
+                    "Current Time,VR,Scene,CurrentTrial,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ"
                 );
             }
             else
             {
                 logFile.Write(
-                    "Current Time,VR,Scene,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
+                    "Current Time,VR,Scene,CurrentTrial,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
                 );
             }
         }
@@ -164,7 +164,7 @@ public class DataLogger : MonoBehaviour
         Quaternion gameObjectRotation = this.transform.rotation;
 
         // Prepare the data
-        line = $"\n{currentTime},{vr},{scene},{mainController.currentStep},{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
+        line = $"\n{currentTime},{vr},{scene},{mainController.currentTrial},{mainController.currentStep},{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
 
         // Add ZMQ data if includeZmqData is true
         if (includeZmqData)
