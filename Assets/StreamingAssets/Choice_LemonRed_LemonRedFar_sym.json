@@ -8,9 +8,9 @@
       },
       "material": "LemonRed",
       "scale": {
-        "x": 300,
-        "y": 300,
-        "z": 300
+        "x": 120,
+        "y": 120,
+        "z": 120
       },
       "flip": true
     },
@@ -22,9 +22,9 @@
       },
       "material": "LemonRed",
       "scale": {
-        "x": 600,
-        "y": 600,
-        "z": 600
+        "x": 240,
+        "y": 240,
+        "z": 240
       },
       "flip": false
     }

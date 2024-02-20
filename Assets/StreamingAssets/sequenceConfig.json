@@ -1,6 +1,6 @@
 {
   "sequences": [
-    // { "sceneName": "Optomotor", "duration": 180 },
+    // { "sceneName": "Optomotor", "duration": 300 },
     // {
     //   "sceneName": "ChoiceAssay",
     //   "duration": 300,
@@ -40,6 +40,14 @@
         "configFile": "Choice_LemonRedFar_LemonRedFar_sym.json"
       }
     }
+
+
+
+
+
+
+
+
     // {
     //   "sceneName": "ChoiceAssay",
     //   "duration": 30,
@@ -76,7 +84,18 @@
     //   "parameters": {
     //     "configFile": "Choice_LemonRed_LemonRed_sym.json"
     //   }
-    // },
+    // }
+
+
+
+
+
+
+
+
+
+
+
 
     // {
     //   "sceneName": "ChoiceAssay",
