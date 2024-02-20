@@ -11,9 +11,9 @@
       },
       "material": "LemonRed",
       "scale": {
-        "x": 300,
-        "y": 300,
-        "z": 300
+        "x": 120,
+        "y": 120,
+        "z": 120
       },
       "flip": false
     }
