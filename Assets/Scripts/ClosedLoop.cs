@@ -16,12 +16,12 @@ public class ClosedLoop : MonoBehaviour
     private float yGain = 100.0f;
     [SerializeField, Range(0, 1000)]
     private float zGain = 100.0f;
-    [SerializeField, Range(0, 1000)]
-    private float rollGain = 100.0f;
-    [SerializeField, Range(0, 1000)]
-    private float pitchGain = 100.0f;
-    [SerializeField, Range(0, 1000)]
-    private float yawGain = 100.0f;
+    [SerializeField, Range(0, 100)]
+    private float rollGain = 1.0f;
+    [SerializeField, Range(0, 100)]
+    private float pitchGain = 1.0f;
+    [SerializeField, Range(0, 100)]
+    private float yawGain = 1.0f;
 
     [Header("Loop Settings")]
     [Tooltip("Toggle closed loop orientation.")]
@@ -114,39 +114,47 @@ public class ClosedLoop : MonoBehaviour
 
     private void ApplyDeltaTransformations()
     {
-           if (closedLoopPosition)
+        if (closedLoopPosition)
         {
-            // Calculate position deltas
-        Vector3 positionDelta = new Vector3(
-            currentSensorData.y - lastSensorData.y,
-            -(currentSensorData.z - lastSensorData.z), // Unity's Y is up, sensor's Z is up (negative Unity Y)
-            currentSensorData.x - lastSensorData.x
-        );
+                // Calculate position deltas
+            Vector3 positionDelta = new Vector3(
+                currentSensorData.x - lastSensorData.x, // Unity's X is right, sensor's X is right
 
-        // Apply the gains and sphereRadius scaling to position delta
-        positionDelta = new Vector3(positionDelta.x * yGain, positionDelta.y * -zGain, positionDelta.z * xGain) * sphereRadius;
+                (currentSensorData.z - lastSensorData.z), // Unity's Y is up, sensor's Z is down (negative Unity Y)
+                -(currentSensorData.y - lastSensorData.y)  // Unity's Z is forward, sensor's Y is backward
 
-        // Apply position deltas
-        transform.position += positionDelta;
+            );
+
+            // Apply the gains and sphereRadius scaling to position delta
+            positionDelta = new Vector3(positionDelta.x * yGain, positionDelta.y * -zGain, positionDelta.z * xGain) * sphereRadius;
+
+            // Apply position deltas
+            transform.position += positionDelta;
         }
-           if (closedLoopOrientation)
-        {
-        // Calculate rotation deltas
-        Vector3 rotationDelta = new Vector3(
-            currentSensorData.pitch - lastSensorData.pitch, // Pitch - rotation around X-axis
-            currentSensorData.yaw - lastSensorData.yaw,     // Yaw - rotation around Y-axis
-            currentSensorData.roll - lastSensorData.roll    // Roll - rotation around Z-axis
-        );
 
-        // Apply the gains to rotation delta
-        rotationDelta = new Vector3(rotationDelta.x * pitchGain, rotationDelta.y * yawGain, rotationDelta.z * rollGain);
+        if (closedLoopOrientation)
+            {
+            // Calculate rotation deltas
+            // Vector3 rotationDelta = new Vector3(
+            //     currentSensorData.pitch - lastSensorData.pitch, // Pitch - rotation around X-axis
+            //     currentSensorData.yaw - lastSensorData.yaw,     // Yaw - rotation around Y-axis
+            //     currentSensorData.roll - lastSensorData.roll    // Roll - rotation around Z-axis
+            // );
 
-        // Apply rotation deltas as torque
-        transform.Rotate(rotationDelta.x, rotationDelta.y, rotationDelta.z, Space.Self);
+            // // Apply the gains to rotation delta differential/delta rotation
+            // rotationDelta = new Vector3(rotationDelta.x * pitchGain, rotationDelta.y * yawGain, rotationDelta.z * rollGain);
 
-        // Update lastSensorData for the next frame
-        lastSensorData = currentSensorData;
-        }
+            // Apply rotation deltas as torque by using the direct sensor data scaled with the gains, integrated over time/torque
+            transform.Rotate(- currentSensorData.pitch * pitchGain, 
+                            currentSensorData.yaw * yawGain, 
+                            - currentSensorData.roll * rollGain, Space.Self);
+
+            // transform.Rotate(rotationDelta.x, rotationDelta.y, rotationDelta.z, Space.Self);
+            
+
+            // Update lastSensorData for the next frame
+            lastSensorData = currentSensorData;
+            }
     }
 
     public void ResetPosition()
