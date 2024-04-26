@@ -116,45 +116,40 @@ public class ClosedLoop : MonoBehaviour
     {
         if (closedLoopPosition)
         {
-                // Calculate position deltas
-            Vector3 positionDelta = new Vector3(
-                currentSensorData.x - lastSensorData.x, // Unity's X is right, sensor's X is right
-
-                (currentSensorData.z - lastSensorData.z), // Unity's Y is up, sensor's Z is down (negative Unity Y)
-                -(currentSensorData.y - lastSensorData.y)  // Unity's Z is forward, sensor's Y is backward
-
+            // Apply the raw sensor data as positional changes
+            Vector3 positionChange = new Vector3(
+                currentSensorData.x, // Unity's X is right, sensor's X is right
+                currentSensorData.z, // Unity's Y is up, sensor's Z is down (negative Unity Y)
+                -currentSensorData.y // Unity's Z is forward, sensor's Y is backward
             );
 
-            // Apply the gains and sphereRadius scaling to position delta
-            positionDelta = new Vector3(positionDelta.x * yGain, positionDelta.y * -zGain, positionDelta.z * xGain) * sphereRadius;
+            // Scale the changes by the appropriate gains
+            positionChange = new Vector3(positionChange.x * yGain, positionChange.y * -zGain, positionChange.z * xGain);
 
-            // Apply position deltas
-            transform.position += positionDelta;
+            // Apply these changes to the transform in local coordinates
+            transform.Translate(positionChange, Space.Self);
         }
 
         if (closedLoopOrientation)
-            {
-            // Calculate rotation deltas
-            // Vector3 rotationDelta = new Vector3(
-            //     currentSensorData.pitch - lastSensorData.pitch, // Pitch - rotation around X-axis
-            //     currentSensorData.yaw - lastSensorData.yaw,     // Yaw - rotation around Y-axis
-            //     currentSensorData.roll - lastSensorData.roll    // Roll - rotation around Z-axis
-            // );
+        {
+            // Apply the raw sensor data as rotational changes
+            Vector3 rotationChange = new Vector3(
+                -currentSensorData.pitch, // Pitch - rotation around X-axis
+                currentSensorData.yaw,    // Yaw - rotation around Y-axis
+                -currentSensorData.roll   // Roll - rotation around Z-axis
+            );
 
-            // // Apply the gains to rotation delta differential/delta rotation
-            // rotationDelta = new Vector3(rotationDelta.x * pitchGain, rotationDelta.y * yawGain, rotationDelta.z * rollGain);
+            // Scale the rotation changes by the appropriate gains
+            rotationChange = new Vector3(rotationChange.x * pitchGain, rotationChange.y * yawGain, rotationChange.z * rollGain);
 
-            // Apply rotation deltas as torque by using the direct sensor data scaled with the gains, integrated over time/torque
-            transform.Rotate(- currentSensorData.pitch * pitchGain, 
-                            currentSensorData.yaw * yawGain, 
-                            - currentSensorData.roll * rollGain, Space.Self);
+            // Apply these changes to the transform in local coordinates
+            transform.Rotate(rotationChange, Space.Self);
+        }
 
-            // transform.Rotate(rotationDelta.x, rotationDelta.y, rotationDelta.z, Space.Self);
-            
+        // Since we're using the raw data directly, no need to update lastSensorData
 
-            // Update lastSensorData for the next frame
-            lastSensorData = currentSensorData;
-            }
+
+
     }
 
     public void ResetPosition()

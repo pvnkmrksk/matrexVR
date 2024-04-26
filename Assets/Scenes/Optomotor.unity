@@ -487,6 +487,38 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7808337221820661112, guid: a96eb579eaac873f88a529a3094c685f, type: 3}
+      propertyPath: xGain
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7808337221820661112, guid: a96eb579eaac873f88a529a3094c685f, type: 3}
+      propertyPath: yGain
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7808337221820661112, guid: a96eb579eaac873f88a529a3094c685f, type: 3}
+      propertyPath: zGain
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7808337221820661112, guid: a96eb579eaac873f88a529a3094c685f, type: 3}
+      propertyPath: yawGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7808337221820661112, guid: a96eb579eaac873f88a529a3094c685f, type: 3}
+      propertyPath: rollGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7808337221820661112, guid: a96eb579eaac873f88a529a3094c685f, type: 3}
+      propertyPath: pitchGain
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7808337221820661117, guid: a96eb579eaac873f88a529a3094c685f, type: 3}
+      propertyPath: port
+      value: 9872
+      objectReference: {fileID: 0}
+    - target: {fileID: 7808337221820661117, guid: a96eb579eaac873f88a529a3094c685f, type: 3}
+      propertyPath: address
+      value: localhost
+      objectReference: {fileID: 0}
     - target: {fileID: 7808337221820661120, guid: a96eb579eaac873f88a529a3094c685f, type: 3}
       propertyPath: m_Name
       value: HighResVR
