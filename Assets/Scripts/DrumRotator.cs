@@ -97,6 +97,15 @@ public class DrumRotator : MonoBehaviour
  
           }
 
+
+        // activate all the monitors connected to the pc for multi monitor setup
+        Display.displays[0].Activate(); // Main display always activated by default
+        for (int i = 1; i < Display.displays.Length; i++)
+        {
+            Display.displays[i].Activate();
+        }
+
+
     }
 
     //todo: move to sscene controller json handling system

@@ -50,6 +50,7 @@ public class MainController : MonoBehaviour
 
         // Load the sequence configuration
         LoadSequenceConfiguration();
+
     }
     public void StopSequence()
     {
