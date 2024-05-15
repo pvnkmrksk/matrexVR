@@ -1,61 +1,32 @@
-  {
-    "sequences": [
-      { "sceneName": "Optomotor", "duration": 180 },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 180,
-        "parameters": {
-          "configFile": "StripeFixationConfig_0.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 180,
-        "parameters": {
-          "configFile": "StripeFixationConfig_0Black.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 180,
-        "parameters": {
-          "configFile": "StripeFixationConfig_0Wide.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 180,
-        "parameters": {
-          "configFile": "StripeFixationConfig_0BlackWide.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 180,
-        "parameters": {
-          "configFile": "StripeFixationConfig_0.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 180,
-        "parameters": {
-          "configFile": "StripeFixationConfig_0Black.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 180,
-        "parameters": {
-          "configFile": "StripeFixationConfig_0Wide.json"
-        }
-      },
-      {
-        "sceneName": "ChoiceAssay",
-        "duration": 180,
-        "parameters": {
-          "configFile": "StripeFixationConfig_0BlackWide.json"
-        }
+{
+  "sequences": [
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig_0Black.json"
       }
-    ]
-  }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig_90BlackWide.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig_0BlackWide.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig_90BlackWide.json"
+      }
+    }
+  ]
+}
