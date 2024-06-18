@@ -3,7 +3,23 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
-using TMPro;  // Add this at the top of your script
+using System;
+
+public class FlyData
+{
+    public string ExperimenterName { get; set; }
+    public List<Fly> Flies { get; set; }
+    public string Comments { get; set; }
+}
+
+public class Fly
+{
+    public string VR { get; set; }
+    public string AgeDays { get; set; }
+    public string StarvedSinceHours { get; set; }
+    public string Sex { get; set; }
+    public string FlyID { get; set; }
+}
 
 
 public class UIDataLogger : MonoBehaviour
@@ -19,27 +35,37 @@ public class UIDataLogger : MonoBehaviour
 
 
     private string directoryPath; // This will store the path to save data files
+    private string backupDirectoryPath;
 
     private void Start()
     {
-        // Find the MasterDataLogger and get the directory path
         MasterDataLogger masterDataLogger = FindObjectOfType<MasterDataLogger>();
         if (masterDataLogger != null)
         {
             directoryPath = masterDataLogger.directoryPath;
-            //add debug log to check the directory path
+            // Set backupDirectoryPath to be a subdirectory or the same directory
+            backupDirectoryPath = Application.dataPath + "/RunData/Backup"; 
             Debug.Log("UI Directory Path: " + directoryPath);
+            Debug.Log("Backup Directory Path: " + backupDirectoryPath);
         }
         else
         {
             Debug.LogError("MasterDataLogger not found in the scene. Data will not be saved.");
-            // Optionally set a default path or disable data saving
-            directoryPath = Application.persistentDataPath; // A default fallback path
+            //directoryPath = Application.persistentDataPath;  // Use a default path
+            //backupDirectoryPath = Path.Combine(Application.persistentDataPath, "Backup");
         }
-
+        //check if backup path exists
+        if (!Directory.Exists(backupDirectoryPath))
+        {
+            Directory.CreateDirectory(backupDirectoryPath);
+            Debug.Log("Backup Directory created: " + backupDirectoryPath);
+        }
         newFliesButton.onClick.AddListener(GenerateNewFlyIDs);
         saveButton.onClick.AddListener(SaveData);
+
+        LoadLastSessionData(); // Call to load data from the last session
     }
+
 
     public void GenerateNewFlyIDs()
     {
@@ -83,19 +109,91 @@ public class UIDataLogger : MonoBehaviour
         WriteJsonToFile(json);
     }
 
+    private void SaveNormalData(string jsonContent)
+    {
+        string fileName = GenerateFileName();
+        try
+        {
+            WriteToFile(directoryPath, fileName, jsonContent);
+            Debug.Log("Normal data saved to file: " + Path.Combine(directoryPath, fileName));
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Failed to write normal data: " + ex.Message);
+        }
+    }
+
+    private void SaveBackupData(string jsonContent)
+    {
+        string fileName = "FlyMetaData.json";
+        try
+        {
+            WriteToFile(backupDirectoryPath, fileName, jsonContent);
+            Debug.Log("Backup data saved to file: " + Path.Combine(backupDirectoryPath, fileName));
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Failed to write backup data: " + ex.Message);
+        }
+    }
+
+    private void WriteToFile(string path, string fileName, string content)
+    {
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+            Debug.Log("Directory created: " + path);
+        }
+        string filePath = Path.Combine(path, fileName);
+        File.WriteAllText(filePath, content);
+        Debug.Log("Data saved to file: " + filePath);
+    }
+
+    private string GenerateFileName()
+    {
+        // Generates a filename with a date-time prefix
+        string dateTimePrefix = DateTime.Now.ToString("yyyyMMddHHmmss");
+        return dateTimePrefix + "_FlyMetaData.json";
+    }
+
+    // Usage
     private void WriteJsonToFile(string jsonContent)
     {
-        if (!Directory.Exists(directoryPath))
-        {
-            Directory.CreateDirectory(directoryPath);
-            //add debug log to check if the directory is created
-            Debug.Log("Directory Created from UI script: " + directoryPath);
-        }
-        string dateTimePrefix = Path.GetFileName(directoryPath);
-
-        // Create the filename with the date-time prefix
-        string fileName = dateTimePrefix + "_FlyMetaData.json";
-        string filePath = Path.Combine(directoryPath, fileName);
-        File.WriteAllText(filePath, jsonContent);
+        SaveNormalData(jsonContent);
+        SaveBackupData(jsonContent);
     }
+
+    private void LoadLastSessionData()
+    {
+        string filePath = Path.Combine(backupDirectoryPath, "FlyMetaData.json");
+        if (File.Exists(filePath))
+        {
+            string jsonContent = File.ReadAllText(filePath);
+            DeserializeAndSetData(jsonContent);
+            Debug.Log("Data loaded from last session.");
+        }
+        else
+        {
+            Debug.LogError("No backup data file found.");
+        }
+    }
+
+     private void DeserializeAndSetData(string jsonData)
+    {
+        var flyData = JsonConvert.DeserializeObject<FlyData>(jsonData);
+
+        experimenterNameInput.text = flyData.ExperimenterName;
+
+        for (int i = 0; i < flyData.Flies.Count; i++)
+        {
+            var fly = flyData.Flies[i];
+            ageInputs[i].text = fly.AgeDays;
+            starvedSinceInputs[i].text = fly.StarvedSinceHours;
+            sexDropdowns[i].value = sexDropdowns[i].options.FindIndex(option => option.text == fly.Sex);
+            flyIDInputs[i].text = fly.FlyID;
+        }
+        commentsInput.text = flyData.Comments;
+    }
+
+    
 }
