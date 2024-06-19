@@ -34,6 +34,7 @@ public class UIDataLogger : MonoBehaviour
     public InputField commentsInput;
     public Button saveButton;
     public Button newFliesButton;
+    public Button reloadButton;  // New button for reloading data
 
     private FlyData FliesData; // This will store the current session's fly data
     private string directoryPath; // This will store the path to save data files
@@ -64,6 +65,7 @@ public class UIDataLogger : MonoBehaviour
         }
         newFliesButton.onClick.AddListener(GenerateNewFlyIDs);
         saveButton.onClick.AddListener(SaveData);
+        reloadButton.onClick.AddListener(LoadLastSessionData);
 
         LoadLastSessionData(); // Call to load data from the last session
     }
@@ -181,7 +183,7 @@ public class UIDataLogger : MonoBehaviour
         SaveBackupData(jsonContent);
     }
 
-    private void LoadLastSessionData()
+    public void LoadLastSessionData()
     {
         string filePath = Path.Combine(backupDirectoryPath, "FlyMetaData.json");
         if (File.Exists(filePath))
