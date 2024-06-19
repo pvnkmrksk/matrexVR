@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 
 public class FlyData
 {
     public string ExperimenterName { get; set; }
     public List<Fly> Flies { get; set; }
     public string Comments { get; set; }
+    public List<int> UsedFlyIDs { get; set; } = new List<int>();  // Stores all used IDs
 }
 
 public class Fly
@@ -33,7 +35,7 @@ public class UIDataLogger : MonoBehaviour
     public Button saveButton;
     public Button newFliesButton;
 
-
+    private FlyData FliesData; // This will store the current session's fly data
     private string directoryPath; // This will store the path to save data files
     private string backupDirectoryPath;
 
@@ -69,45 +71,61 @@ public class UIDataLogger : MonoBehaviour
 
     public void GenerateNewFlyIDs()
     {
-        int maxFlyID = 0;
-        foreach (var input in flyIDInputs)
+        // Initialize the list from FliesData if it exists and has used IDs; otherwise, start fresh
+        List<int> usedIds = FliesData?.UsedFlyIDs ?? new List<int>();
+
+        int newID;
+        if (usedIds.Count > 0)
         {
-            if (int.TryParse(input.text, out int currentID) && currentID > maxFlyID)
-            {
-                maxFlyID = currentID;
-            }
+            // Start with the next ID after the highest used ID
+            newID = usedIds.Max() + 1;
         }
-        
+        else
+        {
+            // Start from 1 if no IDs have been used yet
+            newID = 1;
+        }
+
         for (int i = 0; i < flyIDInputs.Count; i++)
         {
-            flyIDInputs[i].text = (maxFlyID + 1 + i).ToString();
+            flyIDInputs[i].text = newID.ToString();
+            // Update the used ID list by adding new IDs
+            // This ensures the IDs will be added only if they will be saved later
+            //usedIds.Add(newID);
+            newID++;
         }
+
     }
+
 
     public void SaveData()
     {
-        var flyData = new Dictionary<string, object>();
-        flyData.Add("ExperimenterName", experimenterNameInput.text);
-        List<object> flies = new List<object>();
+        FlyData flyData = new FlyData
+        {
+            ExperimenterName = experimenterNameInput.text,
+            Comments = commentsInput.text,
+            Flies = new List<Fly>(),
+            UsedFlyIDs = FliesData != null ? new List<int>(FliesData.UsedFlyIDs) : new List<int>()
+        };
 
         for (int i = 0; i < flyIDInputs.Count; i++)
         {
-            flies.Add(new 
-            {  
-                VR = "VR" + (i + 1),  // Add a VR number dynamically based on the index
+            Fly newFly = new Fly
+            {
+                VR = "VR" + (i + 1),
                 AgeDays = ageInputs[i].text,
                 StarvedSinceHours = starvedSinceInputs[i].text,
                 Sex = sexDropdowns[i].options[sexDropdowns[i].value].text,
                 FlyID = flyIDInputs[i].text
-            });
+            };
+            flyData.Flies.Add(newFly);
+            flyData.UsedFlyIDs.Add(int.Parse(flyIDInputs[i].text));
         }
-
-        flyData.Add("Flies", flies);
-        flyData.Add("Comments", commentsInput.text);
 
         string json = JsonConvert.SerializeObject(flyData, Formatting.Indented);
         WriteJsonToFile(json);
     }
+
 
     private void SaveNormalData(string jsonContent)
     {
@@ -180,20 +198,20 @@ public class UIDataLogger : MonoBehaviour
 
      private void DeserializeAndSetData(string jsonData)
     {
-        var flyData = JsonConvert.DeserializeObject<FlyData>(jsonData);
+        FlyData flyData = JsonConvert.DeserializeObject<FlyData>(jsonData);
 
         experimenterNameInput.text = flyData.ExperimenterName;
+        commentsInput.text = flyData.Comments;
+
+        FliesData = flyData;  // Store the deserialized FlyData including used IDs
 
         for (int i = 0; i < flyData.Flies.Count; i++)
         {
-            var fly = flyData.Flies[i];
+            Fly fly = flyData.Flies[i];
             ageInputs[i].text = fly.AgeDays;
             starvedSinceInputs[i].text = fly.StarvedSinceHours;
             sexDropdowns[i].value = sexDropdowns[i].options.FindIndex(option => option.text == fly.Sex);
             flyIDInputs[i].text = fly.FlyID;
         }
-        commentsInput.text = flyData.Comments;
-    }
-
-    
+    }    
 }
