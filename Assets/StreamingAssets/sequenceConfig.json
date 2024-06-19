@@ -2,9 +2,23 @@
   "sequences": [
     {
       "sceneName": "ChoiceAssay",
-      "duration": 1800,
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_0.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
@@ -16,9 +30,23 @@
     },
     {
       "sceneName": "ChoiceAssay",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_30.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
@@ -30,9 +58,23 @@
     },
     {
       "sceneName": "ChoiceAssay",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_90.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
@@ -44,9 +86,23 @@
     },
     {
       "sceneName": "ChoiceAssay",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_150.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
@@ -58,9 +114,23 @@
     },
     {
       "sceneName": "ChoiceAssay",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_180.json"
+      }
+    },
+    {
+      "sceneName": "ChoiceAssay",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
       }
     }
   ]
