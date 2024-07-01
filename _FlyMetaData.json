@@ -1,0 +1,34 @@
+{
+  "ExperimenterName": "Experimenter Name\n",
+  "Flies": [
+    {
+      "VR": "VR1",
+      "AgeDays": "Age",
+      "StarvedSinceHours": "Starved since",
+      "Sex": "Female",
+      "FlyID": "Fly ID"
+    },
+    {
+      "VR": "VR2",
+      "AgeDays": "Age",
+      "StarvedSinceHours": "Starved since",
+      "Sex": "Female",
+      "FlyID": "Fly ID"
+    },
+    {
+      "VR": "VR3",
+      "AgeDays": "Age",
+      "StarvedSinceHours": "Starved since",
+      "Sex": "Female",
+      "FlyID": "Fly ID"
+    },
+    {
+      "VR": "VR4",
+      "AgeDays": "Age",
+      "StarvedSinceHours": "Starved since",
+      "Sex": "Female",
+      "FlyID": "Fly ID"
+    }
+  ],
+  "Comments": "Comments\n"
+}
