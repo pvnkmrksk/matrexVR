@@ -4,12 +4,25 @@
       "type": "cylinder",
       "position": {
         "radius": 30,
-        "angle": 0
+        "angle": 255
       },
       "material": "white",
       "scale": {
         "x": 8,
-        "y": 150,
+        "y": 17,
+        "z": 8
+      }
+    },
+    {
+      "type": "cylinder",
+      "position": {
+        "radius": 30,
+        "angle": 105
+      },
+      "material": "white",
+      "scale": {
+        "x": 8,
+        "y": 17,
         "z": 8
       }
     }
@@ -17,10 +30,9 @@
   "closedLoopOrientation": true,
   "closedLoopPosition": false,
   "backgroundColor": {
-    "r": 0,
-    "g": 0,
-    "b": 0,
+    "r": 0.15,
+    "g": 0.15,
+    "b": 0.15,
     "a": 1
   }
 }
-  
