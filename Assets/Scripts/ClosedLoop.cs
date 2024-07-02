@@ -6,174 +6,180 @@ public class ClosedLoop : MonoBehaviour
     public Vector3 initialPosition = Vector3.zero;
     public Vector3 initialRotation = Vector3.zero;
 
-    [Header("FicTrac Settings")]
-    public float sphereRadius = 0.45f; // Default value for sphere radius in centimeters
-
     [Header("Gain Settings")]
     [SerializeField, Range(0, 1000)]
     private float xGain = 100.0f;
+
     [SerializeField, Range(0, 1000)]
     private float yGain = 100.0f;
+
     [SerializeField, Range(0, 1000)]
     private float zGain = 100.0f;
-    [SerializeField, Range(0, 100)]
-    private float rollGain = 1.0f;
-    [SerializeField, Range(0, 100)]
-    private float pitchGain = 1.0f;
-    [SerializeField, Range(0, 100)]
-    private float yawGain = 1.0f;
 
-    [Header("Loop Settings")]
-    [Tooltip("Toggle closed loop orientation.")]
-    public bool closedLoopOrientation = true;
-    [Tooltip("Toggle closed loop position.")]
-    public bool closedLoopPosition = true;
+    [SerializeField, Range(0, 1)]
+    private float rotationGain = 1f;
 
-    // Placeholder structure for the sensor data
-    private struct SensorData
-    {
-        public float x;
-        public float y;
-        public float z;
-        public float roll;
-        public float pitch;
-        public float yaw;
-    }
+    [Header("Closed Loop Settings")]
+    [SerializeField]
+    private bool closedLoopPosition = true;
 
-    private SensorData lastSensorData;
-    private SensorData currentSensorData;
+    [SerializeField]
+    private bool closedLoopOrientation = true;
 
-    // Reference to the ZmqListener component
+    [SerializeField]
+    private bool accumulatePosition = true;
+
+    [SerializeField]
+    private bool accumulateRotation = true;
+
     private ZmqListener _zmqListener;
-
-    // Reference to the main camera
-    private Camera mainCamera;
-
-    // Position and Rotation Offsets
-    private Vector3 posOffset = Vector3.zero;
-    private Quaternion rotOffset = Quaternion.identity;
+    private Vector3 accumulatedPosition;
+    private Quaternion accumulatedRotation;
 
     private void Start()
     {
         _zmqListener = GetComponent<ZmqListener>();
-        mainCamera = Camera.main;
-        Application.targetFrameRate = 60;
-        Time.fixedDeltaTime = 1f / 60f;
-
-        // Set initial sensor data
-        UpdateSensorData();
-
-        // Apply the initial position to the transform
-        transform.position = initialPosition;
-        transform.rotation = Quaternion.Euler(initialRotation);
+        ResetPosition();
+        ResetRotation();
     }
 
     private void Update()
     {
         HandleInput();
-        UpdateSensorData();
-        ApplyDeltaTransformations();
+
+        if (_zmqListener.pose != null)
+        {
+            UpdateTransform();
+        }
     }
 
     private void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.O))
-        {
             ToggleClosedLoopOrientation();
-        }
-
         if (Input.GetKeyDown(KeyCode.P))
-        {
             ToggleClosedLoopPosition();
-        }
-
+        if (Input.GetKeyDown(KeyCode.LeftBracket))
+            ToggleAccumulateRotation();
+        if (Input.GetKeyDown(KeyCode.RightBracket))
+            ToggleAccumulatePosition();
         if (Input.GetKeyDown(KeyCode.R))
-        {
             ResetPosition();
-        }
-
         if (Input.GetKeyDown(KeyCode.T))
-        {
             ResetRotation();
-        }
     }
 
-    private void UpdateSensorData()
+    private void UpdateTransform()
     {
-        if (_zmqListener.pose != null)
-        {
-            // Update current sensor data from the ZmqListener
-            currentSensorData.x = _zmqListener.pose.position.x;
-            currentSensorData.y = _zmqListener.pose.position.y;
-            currentSensorData.z = _zmqListener.pose.position.z;
-            currentSensorData.pitch = _zmqListener.pose.rotation.eulerAngles.x;
-            currentSensorData.yaw = _zmqListener.pose.rotation.eulerAngles.y;
-            currentSensorData.roll = _zmqListener.pose.rotation.eulerAngles.z;
-        }
-    }
+        Vector3 newPosition = _zmqListener.pose.position;
+        Quaternion newRotation = _zmqListener.pose.rotation;
 
-    private void ApplyDeltaTransformations()
-    {
-        if (closedLoopPosition)
+        // Handle position
+        if (closedLoopPosition && IsValidVector3(newPosition))
         {
-            // Apply the raw sensor data as positional changes
             Vector3 positionChange = new Vector3(
-                currentSensorData.x, // Unity's X is right, sensor's X is right
-                currentSensorData.z, // Unity's Y is up, sensor's Z is down (negative Unity Y)
-                -currentSensorData.y // Unity's Z is forward, sensor's Y is backward
+                newPosition.x * xGain,
+                newPosition.z * -zGain,
+                -newPosition.y * yGain
             );
 
-            // Scale the changes by the appropriate gains
-            positionChange = new Vector3(positionChange.x * yGain, positionChange.y * -zGain, positionChange.z * xGain);
-
-            // Apply these changes to the transform in local coordinates
-            transform.Translate(positionChange, Space.Self);
+            if (accumulatePosition)
+            {
+                accumulatedPosition += positionChange * Time.deltaTime;
+                transform.position = initialPosition + accumulatedPosition;
+            }
+            else
+            {
+                transform.position = initialPosition + positionChange;
+            }
         }
 
-        if (closedLoopOrientation)
+        // Handle rotation
+        if (closedLoopOrientation && IsValidQuaternion(newRotation))
         {
-            // Apply the raw sensor data as rotational changes
-            Vector3 rotationChange = new Vector3(
-                -currentSensorData.pitch, // Pitch - rotation around X-axis
-                currentSensorData.yaw,    // Yaw - rotation around Y-axis
-                -currentSensorData.roll   // Roll - rotation around Z-axis
+            Quaternion rotationChange = Quaternion.Slerp(
+                Quaternion.identity,
+                newRotation,
+                rotationGain
             );
 
-            // Scale the rotation changes by the appropriate gains
-            rotationChange = new Vector3(rotationChange.x * pitchGain, rotationChange.y * yawGain, rotationChange.z * rollGain);
-
-            // Apply these changes to the transform in local coordinates
-            transform.Rotate(rotationChange, Space.Self);
+            if (accumulateRotation)
+            {
+                accumulatedRotation *= rotationChange;
+                transform.rotation = Quaternion.Euler(initialRotation) * accumulatedRotation;
+            }
+            else
+            {
+                transform.rotation = Quaternion.Euler(initialRotation) * rotationChange;
+            }
         }
-
-        // Since we're using the raw data directly, no need to update lastSensorData
-
-
-
     }
 
     public void ResetPosition()
     {
         transform.position = initialPosition;
-        //lastSensorData = currentSensorData;
+        accumulatedPosition = Vector3.zero;
+        Debug.Log("Position reset");
     }
 
     public void ResetRotation()
     {
         transform.rotation = Quaternion.Euler(initialRotation);
-        //lastSensorData = currentSensorData;
- 
-    }
-    private void ToggleClosedLoopOrientation()
-    {
-        closedLoopOrientation = !closedLoopOrientation;
+        accumulatedRotation = Quaternion.identity;
+        Debug.Log("Rotation reset");
     }
 
-    private void ToggleClosedLoopPosition()
+    public void ToggleClosedLoopPosition()
     {
         closedLoopPosition = !closedLoopPosition;
+        Debug.Log($"Closed Loop Position: {(closedLoopPosition ? "ON" : "OFF")}");
     }
-     // Public methods for external scripts to control the behaviors
+
+    public void ToggleClosedLoopOrientation()
+    {
+        closedLoopOrientation = !closedLoopOrientation;
+        Debug.Log($"Closed Loop Orientation: {(closedLoopOrientation ? "ON" : "OFF")}");
+    }
+
+    public void ToggleAccumulatePosition()
+    {
+        accumulatePosition = !accumulatePosition;
+        if (!accumulatePosition)
+            ResetPosition();
+        Debug.Log($"Accumulate Position: {(accumulatePosition ? "ON" : "OFF")}");
+    }
+
+    public void ToggleAccumulateRotation()
+    {
+        accumulateRotation = !accumulateRotation;
+        if (!accumulateRotation)
+            ResetRotation();
+        Debug.Log($"Accumulate Rotation: {(accumulateRotation ? "ON" : "OFF")}");
+    }
+
+    private bool IsValidVector3(Vector3 v)
+    {
+        return !float.IsNaN(v.x)
+            && !float.IsNaN(v.y)
+            && !float.IsNaN(v.z)
+            && !float.IsInfinity(v.x)
+            && !float.IsInfinity(v.y)
+            && !float.IsInfinity(v.z);
+    }
+
+    private bool IsValidQuaternion(Quaternion q)
+    {
+        return !float.IsNaN(q.x)
+            && !float.IsNaN(q.y)
+            && !float.IsNaN(q.z)
+            && !float.IsNaN(q.w)
+            && !float.IsInfinity(q.x)
+            && !float.IsInfinity(q.y)
+            && !float.IsInfinity(q.z)
+            && !float.IsInfinity(q.w);
+    }
+
+    // Public methods for external scripts to control the behaviors
     public void SetClosedLoopOrientation(bool value)
     {
         closedLoopOrientation = value;
@@ -183,6 +189,4 @@ public class ClosedLoop : MonoBehaviour
     {
         closedLoopPosition = value;
     }
-
 }
-
