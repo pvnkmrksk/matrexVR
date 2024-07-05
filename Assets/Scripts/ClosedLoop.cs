@@ -16,7 +16,7 @@ public class ClosedLoop : MonoBehaviour
     [SerializeField, Range(0, 1000)]
     private float zGain = 100.0f;
 
-    [SerializeField, Range(0, 1)]
+    [SerializeField, Range(0, 10)]
     private float rotationGain = 1f;
 
     [Header("Closed Loop Settings")]

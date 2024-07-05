@@ -486,6 +486,22 @@ PrefabInstance:
       propertyPath: rotationGain
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3963765251659798559, guid: 9d9d86002867f134da49c0366695ccda, type: 3}
+      propertyPath: accumulatePosition
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3963765251659798559, guid: 9d9d86002867f134da49c0366695ccda, type: 3}
+      propertyPath: accumulateRotation
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3963765251659798559, guid: 9d9d86002867f134da49c0366695ccda, type: 3}
+      propertyPath: closedLoopPosition
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3963765251659798559, guid: 9d9d86002867f134da49c0366695ccda, type: 3}
+      propertyPath: closedLoopOrientation
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5610891262150120139, guid: 9d9d86002867f134da49c0366695ccda, type: 3}
       propertyPath: m_RootOrder
       value: 3
