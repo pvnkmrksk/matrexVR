@@ -87,15 +87,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialPosition: {x: 0, y: 0, z: 0}
   initialRotation: {x: 0, y: 0, z: 0}
-  sphereRadius: 5
   xGain: 1
   yGain: 1
   zGain: 1
-  rollGain: 1
-  pitchGain: 1
-  yawGain: 1
-  closedLoopOrientation: 1
+  rotationGain: 1
   closedLoopPosition: 1
+  closedLoopOrientation: 1
+  accumulatePosition: 1
+  accumulateRotation: 1
 --- !u!114 &4886124528207133730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -308,6 +307,10 @@ PrefabInstance:
     - target: {fileID: 1184338997741697998, guid: 38498a089eca3465a99371864465e0e9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1184338997741698000, guid: 38498a089eca3465a99371864465e0e9, type: 3}
+      propertyPath: field of view
+      value: 144.88461
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
