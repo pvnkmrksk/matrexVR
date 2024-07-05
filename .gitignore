@@ -103,3 +103,4 @@ Assets/RunData/*
 *.csv.gz.meta
 Assets/RunData/
 *_led_array_*
+matrix_choice_Data/*

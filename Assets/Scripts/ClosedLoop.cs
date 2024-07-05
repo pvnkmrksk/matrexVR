@@ -6,6 +6,9 @@ public class ClosedLoop : MonoBehaviour
     public Vector3 initialPosition = Vector3.zero;
     public Vector3 initialRotation = Vector3.zero;
 
+    [Header("FicTrac Settings")]
+    public float sphereRadius = 5f; // Default value for sphere radius in centimeters
+
     [Header("Gain Settings")]
     [SerializeField, Range(0, 1000)]
     private float xGain = 100.0f;
@@ -51,6 +54,7 @@ public class ClosedLoop : MonoBehaviour
         {
             UpdateTransform();
         }
+
     }
 
     private void HandleInput()
@@ -67,6 +71,11 @@ public class ClosedLoop : MonoBehaviour
             ResetPosition();
         if (Input.GetKeyDown(KeyCode.T))
             ResetRotation();
+
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 
     private void UpdateTransform()
@@ -81,7 +90,7 @@ public class ClosedLoop : MonoBehaviour
                 newPosition.x * xGain,
                 newPosition.z * -zGain,
                 -newPosition.y * yGain
-            );
+            ) * sphereRadius;
 
             if (accumulatePosition)
             {
