@@ -105,7 +105,7 @@ public class MainController : MonoBehaviour
         }
 
         // if esc is pressed, quit
-        else if (Input.GetKeyUp(KeyCode.Escape))
+        if (Input.GetKeyUp(KeyCode.Escape))
         {
             Application.Quit();
         }
