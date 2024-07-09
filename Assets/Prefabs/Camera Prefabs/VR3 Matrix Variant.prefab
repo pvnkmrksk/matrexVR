@@ -178,6 +178,10 @@ PrefabInstance:
     - {fileID: 863590093427946895, guid: a122962340c890a529580fd616e93595, type: 3}
     - {fileID: 2066409646460556615, guid: a122962340c890a529580fd616e93595, type: 3}
     - {fileID: 8356889410609725835, guid: a122962340c890a529580fd616e93595, type: 3}
+    - {fileID: 4743754197697885894, guid: a122962340c890a529580fd616e93595, type: 3}
+    - {fileID: 9109329768469810320, guid: a122962340c890a529580fd616e93595, type: 3}
+    - {fileID: 1045043208560574982, guid: a122962340c890a529580fd616e93595, type: 3}
+    - {fileID: 5338523530073873854, guid: a122962340c890a529580fd616e93595, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -203,5 +207,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 1616747004011761651, guid: 4ddc52669d76f426187bd17a1e19775a, type: 3}
-  numberOfRings: 1
-  spacing: 10
+  numberOfRings: 2
+  spacing: 20
