@@ -26,7 +26,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2386836546770343443, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2386836546770343443, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
       propertyPath: m_LocalPosition.z
@@ -92,5 +92,68 @@ PrefabInstance:
     - {fileID: 0}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2386836546770343442, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3565062472216254174}
+    - targetCorrespondingSourceObject: {fileID: 2386836546770343442, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1064609864577363080}
+    - targetCorrespondingSourceObject: {fileID: 2386836546770343442, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9091689455583650334}
   m_SourcePrefab: {fileID: 100100000, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
+--- !u!1 &2831547437447586072 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2386836546770343442, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
+  m_PrefabInstance: {fileID: 456009619065648906}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3565062472216254174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2831547437447586072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e70685f7abae4fe598f6bfcc79ae164, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boundaryManager: {fileID: 9091689455583650334}
+  speed: 4
+--- !u!114 &1064609864577363080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2831547437447586072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69ff4b24e73374176aeddbf675cd3ff2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
+  numberOfLocusts: 20
+  spawnAreaSize: 200
+  mu: 0
+  kappa: 10000
+  locustSpeed: 3
+  layerName: SimulatedLocustsVR1
+  boundaryManager: {fileID: 9091689455583650334}
+  loadConfigFromJsonFile: 0
+--- !u!114 &9091689455583650334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2831547437447586072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boundarySize: 100
+  boundaryBuffer: 0.5
