@@ -1,8 +1,28 @@
 {
   "sequences": [
     {
+      "sceneName": "Swarm",
+      "duration": 3,
+      "parameters": {
+        "numberOfLocusts": 2,
+        "mu": 0,
+        "kappa" :250,
+        "locustSpeed" : 3
+      }
+    },
+    {
+      "sceneName": "Swarm",
+      "duration": 3,
+      "parameters": {
+        "numberOfLocusts": 200,
+        "mu": 0,
+        "kappa" :250,
+        "locustSpeed" : 3
+      }
+    },
+    {
       "sceneName": "Choice",
-      "duration": 20,
+      "duration": 2,
       "parameters": {
         "configFile": "Choice_Empty_Empty.json"
       }

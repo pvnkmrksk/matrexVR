@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class BoundaryManager : MonoBehaviour
 {
-    public float boundarySize;
+    public float boundarySize = 200;
     public float boundaryBuffer = 0.1f;
     void OnDrawGizmos()
 {

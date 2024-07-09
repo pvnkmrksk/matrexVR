@@ -24,9 +24,29 @@ PrefabInstance:
       propertyPath: numberOfLocusts
       value: 50
       objectReference: {fileID: 0}
+    - target: {fileID: 2831547435824584393, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 2831547436059712277, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 2831547436178360237, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 2831547436349780157, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_Name
       value: VR1 Swarm
+      objectReference: {fileID: 0}
+    - target: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586073, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_LocalPosition.x
@@ -68,8 +88,75 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3520139331059622448, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5687458890810039266}
+    - targetCorrespondingSourceObject: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3417642753999500469}
+    - targetCorrespondingSourceObject: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1176120221395219327}
   m_SourcePrefab: {fileID: 100100000, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+--- !u!1 &2798074368093061287 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+  m_PrefabInstance: {fileID: 116931637713510847}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5687458890810039266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2798074368093061287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69ff4b24e73374176aeddbf675cd3ff2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
+  numberOfLocusts: 50
+  spawnAreaSize: 200
+  mu: 0
+  kappa: 10000
+  locustSpeed: 3
+  layerName: SimulatedLocustsVR1
+  boundaryManager: {fileID: 1176120221395219327}
+  loadConfigFromJsonFile: 0
+--- !u!114 &3417642753999500469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2798074368093061287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e70685f7abae4fe598f6bfcc79ae164, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boundaryManager: {fileID: 1176120221395219327}
+  speed: 4
+--- !u!114 &1176120221395219327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2798074368093061287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boundarySize: 200
+  boundaryBuffer: 0.5
