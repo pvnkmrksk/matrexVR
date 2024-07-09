@@ -26,7 +26,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: m_LocalPosition.z
@@ -86,7 +86,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7510037034238600751, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: locustLayerMask.m_Bits
-      value: 6144
+      value: 4096
       objectReference: {fileID: 0}
     - target: {fileID: 8294218554251575998, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: layerName
@@ -96,17 +96,43 @@ PrefabInstance:
       propertyPath: boundaryManager
       value: 
       objectReference: {fileID: 6431047508482931925}
+    - target: {fileID: 8294218554251575998, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: numberOfLocusts
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2798074368093061287, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      insertIndex: 6
+      addedObject: {fileID: 4471900763313018305}
   m_SourcePrefab: {fileID: 100100000, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+--- !u!1 &1330193872785025170 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2798074368093061287, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+  m_PrefabInstance: {fileID: 3792327305705072693}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4471900763313018305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1330193872785025170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e70685f7abae4fe598f6bfcc79ae164, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boundaryManager: {fileID: 6431047508482931925}
+  speed: 4
 --- !u!114 &6431047508482931925 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7898933544298845408, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
   m_PrefabInstance: {fileID: 3792327305705072693}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1330193872785025170}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}

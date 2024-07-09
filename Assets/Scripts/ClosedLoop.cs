@@ -7,6 +7,7 @@ public class ClosedLoop : MonoBehaviour
     public Vector3 initialRotation = Vector3.zero;
 
     [Header("FicTrac Settings")]
+    [Tooltip("Radius of the sphere in centimeters")]
     public float sphereRadius = 5f; // Default value for sphere radius in centimeters
 
     [Header("Gain Settings")]
@@ -54,7 +55,6 @@ public class ClosedLoop : MonoBehaviour
         {
             UpdateTransform();
         }
-
     }
 
     private void HandleInput()
@@ -86,11 +86,9 @@ public class ClosedLoop : MonoBehaviour
         // Handle position
         if (closedLoopPosition && IsValidVector3(newPosition))
         {
-            Vector3 positionChange = new Vector3(
-                newPosition.x * xGain,
-                newPosition.z * -zGain,
-                -newPosition.y * yGain
-            ) * sphereRadius;
+            Vector3 positionChange =
+                new Vector3(newPosition.x * xGain, newPosition.z * -zGain, -newPosition.y * yGain)
+                * sphereRadius;
 
             if (accumulatePosition)
             {

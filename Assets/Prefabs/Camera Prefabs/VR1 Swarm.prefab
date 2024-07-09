@@ -26,7 +26,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586073, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586073, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_LocalPosition.z
@@ -60,9 +60,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: initialPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: accumulatePosition
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: accumulateRotation
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3520139331059622445, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_CullingMask.m_Bits
       value: 2103
+      objectReference: {fileID: 0}
+    - target: {fileID: 3520139331059622448, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -70,7 +86,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7084973621561165747}
+      addedObject: {fileID: 8849551312106353704}
     - targetCorrespondingSourceObject: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8294218554251575998}
@@ -86,7 +102,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
   m_PrefabInstance: {fileID: 116931637713510847}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7084973621561165747
+--- !u!114 &8849551312106353704
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -95,12 +111,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2798074368093061287}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9447f38b5f005209bfce356aa69e551, type: 3}
+  m_Script: {fileID: 11500000, guid: 4e70685f7abae4fe598f6bfcc79ae164, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilePrefab: {fileID: 1616747004011761651, guid: 4ddc52669d76f426187bd17a1e19775a, type: 3}
-  numberOfRings: 3
-  spacing: 10
+  boundaryManager: {fileID: 7898933544298845408}
+  speed: 4
 --- !u!114 &8294218554251575998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,7 +129,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   locustPrefab: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
-  numberOfLocusts: 50
+  numberOfLocusts: 20
   spawnAreaSize: 200
   mu: 0
   kappa: 10000

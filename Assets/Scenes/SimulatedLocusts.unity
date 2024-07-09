@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -104,7 +103,7 @@ NavMeshSettings:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_BuildSettings:
-    serializedVersion: 2
+    serializedVersion: 3
     agentTypeID: 0
     agentRadius: 0.5
     agentHeight: 2
@@ -117,7 +116,7 @@ NavMeshSettings:
     cellSize: 0.16666667
     manualTileSize: 0
     tileSize: 256
-    accuratePlacement: 0
+    buildHeightMesh: 0
     maxJobWorkers: 0
     preserveTilesOutsideBounds: 0
     debug:
@@ -147,13 +146,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 299212653}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &299212657
 MonoBehaviour:
@@ -253,13 +252,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1106250504}
+  serializedVersion: 2
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &1261579207
 GameObject:
@@ -288,9 +287,17 @@ MeshCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1261579207}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 4
+  serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
@@ -351,29 +358,25 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1261579207}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 50, y: 0, z: 50}
   m_LocalScale: {x: 200, y: 1, z: 200}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1384029795
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 423771344688145806, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
       propertyPath: m_Name
       value: VR4 Swarm
-      objectReference: {fileID: 0}
-    - target: {fileID: 423771344688145807, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
-      propertyPath: m_RootOrder
-      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 423771344688145807, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -415,29 +418,19 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5778034546313193367, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
-      propertyPath: numberOfLocusts
-      value: 20
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
 --- !u!1001 &1690590056
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2798074368093061215, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
-      propertyPath: rollGain
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
-      propertyPath: m_RootOrder
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -482,19 +475,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: VR1 Swarm
       objectReference: {fileID: 0}
-    - target: {fileID: 8294218554251575998, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
-      propertyPath: numberOfLocusts
-      value: 20
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
 --- !u!1001 &4722025727024341857
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1330193872785025170, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
@@ -502,10 +493,6 @@ PrefabInstance:
       value: VR2 Swarm
       objectReference: {fileID: 0}
     - target: {fileID: 1330193872785025171, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
-      propertyPath: m_RootOrder
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 1330193872785025171, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -545,36 +532,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5168995765482039947, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
-      propertyPath: numberOfLocusts
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 6672099834599656986, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
-      propertyPath: locustLayerMask.m_Bits
-      value: 4096
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
 --- !u!1001 &6539561719468639700
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 155657044337083161, guid: a122962340c890a529580fd616e93595, type: 3}
-      propertyPath: numberOfLocusts
-      value: 20
-      objectReference: {fileID: 0}
     - target: {fileID: 6334096569946685696, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: m_Name
       value: VR3 Swarm
-      objectReference: {fileID: 0}
-    - target: {fileID: 6334096569946685697, guid: a122962340c890a529580fd616e93595, type: 3}
-      propertyPath: m_RootOrder
-      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6334096569946685697, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: m_LocalPosition.x
@@ -617,5 +590,18 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a122962340c890a529580fd616e93595, type: 3}
+--- !u!1660057539 &9223372036854775807
+SceneRoots:
+  m_ObjectHideFlags: 0
+  m_Roots:
+  - {fileID: 1106250506}
+  - {fileID: 299212655}
+  - {fileID: 1690590056}
+  - {fileID: 4722025727024341857}
+  - {fileID: 6539561719468639700}
+  - {fileID: 1384029795}
+  - {fileID: 1261579211}

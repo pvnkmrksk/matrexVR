@@ -3,26 +3,30 @@ using UnityEngine;
 
 public class LocustSpawner : MonoBehaviour
 {
-
     public GameObject locustPrefab;
+
     [Tooltip("The number of locusts to spawn")]
     public int numberOfLocusts = 50;
+
     [Tooltip("The size of the area in which the locusts will be spawned")]
     public float spawnAreaSize = 200;
 
     //add tooltip
     [Tooltip("The mu value for the Van Mises distribution in degrees (0 to 360)")]
     [Range(0.0f, 360.0f)]
-    public float mu = 0.0f;  // mu value for Van Mises in degrees (0 to 360) 
+    public float mu = 0.0f; // mu value for Van Mises in degrees (0 to 360)
 
-    [Tooltip("The kappa value for the Van Mises distribution (0 to infinity). 0 + eps is uniform distribution, infinity is a point distribution.")]
-    public float kappa = 10000f;  // kappa value for Van Mises
+    [Tooltip(
+        "The kappa value for the Van Mises distribution (0 to infinity). 0 + eps is uniform distribution, infinity is a point distribution."
+    )]
+    public float kappa = 10000f; // kappa value for Van Mises
+
     [Tooltip("The speed of the locusts")]
-    public float locustSpeed = 3.0f;      // Default speed for locusts
-    public string layerName = "LocustLayer";  // Default value
+    public float locustSpeed = 3.0f; // Default speed for locusts
+    public string layerName = "LocustLayer"; // Default value
     public BoundaryManager boundaryManager;
 
-    public bool loadConfigFromJsonFile = true;  // If true, load config from json file, else use default values
+    public bool loadConfigFromJsonFile = true; // If true, load config from json file, else use default values
 
     void Start()
     {
@@ -53,30 +57,39 @@ public class LocustSpawner : MonoBehaviour
         // layerName = (string)config["layerName"];
     }
 
-
     void SpawnLocusts()
     {
         int locustLayer = LayerMask.NameToLayer(layerName); // Get the layer by name
         if (locustLayer == -1) // Layer not found
         {
-            Logger.Log("Layer " + layerName + " not found. Make sure it's created in Unity. Defaulting to object's layer.", 2);
-            locustLayer = gameObject.layer;  // Default to the game object's layer
+            Logger.Log(
+                "Layer "
+                    + layerName
+                    + " not found. Make sure it's created in Unity. Defaulting to object's layer.",
+                2
+            );
+            locustLayer = gameObject.layer; // Default to the game object's layer
         }
         for (int i = 0; i < numberOfLocusts; i++)
         {
             Vector3 spawnPosition = new Vector3(
-                Random.Range(transform.position.x - spawnAreaSize / 2, transform.position.x + spawnAreaSize / 2),
-                -1f,
-                Random.Range(transform.position.z - spawnAreaSize / 2, transform.position.z + spawnAreaSize / 2)
+                Random.Range(
+                    transform.position.x - spawnAreaSize / 2,
+                    transform.position.x + spawnAreaSize / 2
+                ),
+                -0.25f,
+                Random.Range(
+                    transform.position.z - spawnAreaSize / 2,
+                    transform.position.z + spawnAreaSize / 2
+                )
             );
 
             GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity); // Spawned independent of the game object
             locust.layer = locustLayer; // Set the layer of the spawned locust
-            SetLayerRecursively(locust.transform, locustLayer);  // Set layer for all children
+            SetLayerRecursively(locust.transform, locustLayer); // Set layer for all children
 
-
-            locust.transform.localRotation = GenerateVanMisesRotation(mu, kappa);  // Set the local rotation
-            locust.GetComponent<LocustMover>().speed = locustSpeed;  // Set the speed of the locust
+            locust.transform.localRotation = GenerateVanMisesRotation(mu, kappa); // Set the local rotation
+            locust.GetComponent<LocustMover>().speed = locustSpeed; // Set the speed of the locust
             locust.name = layerName + "_Locust_" + i; // Set the name
             locust.tag = "SimulatedLocust"; // Set the tag for the locust
             // Get the Animator component
@@ -86,7 +99,7 @@ public class LocustSpawner : MonoBehaviour
             {
                 // Assuming the animation state you want to desynchronize is the default one at layer 0
                 AnimatorStateInfo state = locustAnimator.GetCurrentAnimatorStateInfo(0);
-                locustAnimator.Play(state.fullPathHash, -1, Random.value);  // Random normalized time between 0 and 1
+                locustAnimator.Play(state.fullPathHash, -1, Random.value); // Random normalized time between 0 and 1
             }
 
             // Set the boundary manager for the locust
@@ -97,6 +110,7 @@ public class LocustSpawner : MonoBehaviour
             }
         }
     }
+
     private void SetLayerRecursively(Transform parent, int layer)
     {
         parent.gameObject.layer = layer;
@@ -105,7 +119,6 @@ public class LocustSpawner : MonoBehaviour
             SetLayerRecursively(child, layer);
         }
     }
-
 
     Quaternion GenerateVanMisesRotation(float mu, float kappa)
     {
@@ -116,9 +129,9 @@ public class LocustSpawner : MonoBehaviour
             kappa = 0.0001f;
         }
 
-        float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad * mu, kappa);  // Generate angles by converting from deg to radians for the function to work
+        float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad * mu, kappa); // Generate angles by converting from deg to radians for the function to work
         // Logger.Log("Generated Angle (in degrees): " + angle * Mathf.Rad2Deg);
-        return Quaternion.Euler(0, angle * Mathf.Rad2Deg, 0);  // Convert radians to degrees for the Quaternion rotation
+        return Quaternion.Euler(0, angle * Mathf.Rad2Deg, 0); // Convert radians to degrees for the Quaternion rotation
     }
 }
 
@@ -152,4 +165,3 @@ public static class VanMisesDistribution
         }
     }
 }
-
