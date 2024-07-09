@@ -50,7 +50,7 @@ public class ZmqListener : MonoBehaviour
                 }
                 catch (NetMQException ex)
                 {
-                    Logger.Log("NetMQException: " + ex.ToString());
+                    Debugger.Log("NetMQException: " + ex.ToString());
                     Thread.Sleep(100);
                     continue;
                 }

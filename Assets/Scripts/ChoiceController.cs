@@ -5,10 +5,10 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Linq;
 
-public class ChoiceAssayController: MonoBehaviour , ISceneController
+public class ChoiceController : MonoBehaviour, ISceneController
 {
     // Assuming these prefabs are assigned in the Unity Editor
-public GameObject[] prefabs;
+    public GameObject[] prefabs;
     private Dictionary<string, GameObject> prefabDict = new Dictionary<string, GameObject>();
 
     public Material[] materials; // Materials are assigned in the Unity Editor
@@ -32,14 +32,13 @@ public GameObject[] prefabs;
             if (!materialDict.ContainsKey(material.name))
             {
                 materialDict.Add(material.name, material);
-
             }
         }
     }
 
     public void InitializeScene(Dictionary<string, object> parameters)
     {
-        Logger.Log("InitializeScene called.");
+        Debugger.Log("InitializeScene called.");
 
         // Path to scene configuration JSON
         string configFile = parameters["configFile"].ToString();
@@ -57,40 +56,60 @@ public GameObject[] prefabs;
                 Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
                 GameObject instance = Instantiate(prefab, position, Quaternion.identity);
 
-                
                 // Set scale, Optionally flip the object if flip is true, set flip my scale * -1 in x axis
 
                 if (obj.flip)
                 {
-                    instance.transform.localScale = new Vector3(obj.scale.x * -1, obj.scale.y , obj.scale.z);
+                    instance.transform.localScale = new Vector3(
+                        obj.scale.x * -1,
+                        obj.scale.y,
+                        obj.scale.z
+                    );
                 }
                 else
                 {
-                    instance.transform.localScale = new Vector3(obj.scale.x, obj.scale.y, obj.scale.z);
+                    instance.transform.localScale = new Vector3(
+                        obj.scale.x,
+                        obj.scale.y,
+                        obj.scale.z
+                    );
                 }
 
                 // Optionally apply material
-                if (!string.IsNullOrEmpty(obj.material) && materialDict.TryGetValue(obj.material, out Material material))
+                if (
+                    !string.IsNullOrEmpty(obj.material)
+                    && materialDict.TryGetValue(obj.material, out Material material)
+                )
                 {
                     instance.GetComponent<Renderer>().material = material;
                 }
             }
-        
-               }
+        }
         ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
-        Logger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length, 4);
+        Debugger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length, 4);
 
         foreach (ClosedLoop cl in closedLoopComponents)
         {
-            Logger.Log("Setting values for ClosedLoop script..." + config.closedLoopOrientation, 4);
+            Debugger.Log(
+                "Setting values for ClosedLoop script..." + config.closedLoopOrientation,
+                4
+            );
             cl.SetClosedLoopOrientation(config.closedLoopOrientation);
             cl.SetClosedLoopPosition(config.closedLoopPosition);
         }
-            // Read and set the background color of cameras
+        // Read and set the background color of cameras
         if (config.backgroundColor != null)
         {
-            Color bgColor = new Color(config.backgroundColor.r, config.backgroundColor.g, config.backgroundColor.b, config.backgroundColor.a);
-            Camera[] cameras = GameObject.FindGameObjectsWithTag("MainCamera").Select(obj => obj.GetComponent<Camera>()).ToArray();
+            Color bgColor = new Color(
+                config.backgroundColor.r,
+                config.backgroundColor.g,
+                config.backgroundColor.b,
+                config.backgroundColor.a
+            );
+            Camera[] cameras = GameObject
+                .FindGameObjectsWithTag("MainCamera")
+                .Select(obj => obj.GetComponent<Camera>())
+                .ToArray();
 
             foreach (Camera cam in cameras)
             {
@@ -104,12 +123,14 @@ public GameObject[] prefabs;
         // Start the coroutine from here
         StartCoroutine(DelayedOnLoaded(0.05f));
     }
+
     // Coroutine to delay the execution of OnLoaded
     private IEnumerator DelayedOnLoaded(float delay)
     {
         yield return new WaitForSeconds(delay);
         OnLoaded();
     }
+
     private void OnLoaded()
     {
         ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
@@ -119,8 +140,6 @@ public GameObject[] prefabs;
             cl.ResetRotation();
         }
     }
-
-
 
     private Vector3 CalculatePosition(float radius, float angle)
     {
@@ -139,7 +158,6 @@ public class SceneConfig
     public bool closedLoopOrientation;
     public bool closedLoopPosition;
     public ColorConfig backgroundColor;
-
 }
 
 [System.Serializable]
@@ -167,6 +185,7 @@ public class ScaleConfig
     public float y;
     public float z;
 }
+
 [System.Serializable]
 public class ColorConfig
 {
@@ -175,4 +194,3 @@ public class ColorConfig
     public float b;
     public float a;
 }
-

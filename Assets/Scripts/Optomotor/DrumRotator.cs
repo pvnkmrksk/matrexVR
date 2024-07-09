@@ -20,8 +20,6 @@ public class RotationConfig
     public string externalRotationAxis;
     public float frequency; // Remove the get and set methods
     public float level; // Remove the get and set methods
-
-
 }
 
 [System.Serializable]
@@ -36,8 +34,8 @@ public class DrumRotator : MonoBehaviour
     public GameObject drum;
     public Quaternion initialRotation;
 
-
     string configFilePath = Path.Combine(Application.streamingAssetsPath, "rotationConfig.json");
+
     // string jsonString = File.ReadAllText(jsonPath);
     public int currentIndex = 0; // Change access modifier to public
     public List<RotationConfig> configs; // Change access modifier to public
@@ -45,8 +43,11 @@ public class DrumRotator : MonoBehaviour
     public bool isPaused = false;
     public bool isStepping = false;
 
-    [SerializeField] bool closedLoopOrientation = true;
-    [SerializeField] bool closedLoopPosition = false;
+    [SerializeField]
+    bool closedLoopOrientation = true;
+
+    [SerializeField]
+    bool closedLoopPosition = false;
 
     private Vector3 StringToAxis(string axisName)
     {
@@ -83,20 +84,18 @@ public class DrumRotator : MonoBehaviour
         }
         else
         {
-            Logger.Log("Failed to load rotation configs from " + configFilePath, 1);
+            Debugger.Log("Failed to load rotation configs from " + configFilePath, 1);
         }
 
         ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
-        Logger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length,4);
+        Debugger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length, 4);
 
         foreach (ClosedLoop cl in closedLoopComponents)
         {
-            Logger.Log("Setting values for ClosedLoop script..." +closedLoopOrientation,4);
+            Debugger.Log("Setting values for ClosedLoop script..." + closedLoopOrientation, 4);
             cl.SetClosedLoopOrientation(closedLoopOrientation);
             cl.SetClosedLoopPosition(closedLoopPosition);
- 
-          }
-
+        }
 
         // activate all the monitors connected to the pc for multi monitor setup
         Display.displays[0].Activate(); // Main display always activated by default
@@ -104,8 +103,6 @@ public class DrumRotator : MonoBehaviour
         {
             Display.displays[i].Activate();
         }
-
-
     }
 
     //todo: move to sscene controller json handling system
@@ -128,14 +125,15 @@ public class DrumRotator : MonoBehaviour
     private void RaiseConfigurationChanged()
     {
         ConfigurationChanged?.Invoke();
-        Logger.Log(
+        Debugger.Log(
             "Configuration changed: Frequency = "
                 + configs[currentIndex].frequency
                 + ", Level = "
                 + configs[currentIndex].level
                 + ", Speed = "
-                + configs[currentIndex].speed
-        ,3);
+                + configs[currentIndex].speed,
+            3
+        );
     }
 
     private List<RotationConfig> LoadRotationConfigsFromJson(string path)
@@ -174,7 +172,7 @@ public class DrumRotator : MonoBehaviour
             drum.transform.rotation = initialRotation;
 
             Vector3 axis = StringToAxis(config.externalRotationAxis);
-            // Logger.Log("Axis: " + axis);
+            // Debugger.Log("Axis: " + axis);
             // Assuming deltaTime represents the time elapsed since the last frame
             float speedPerSecond = config.speed; // Speed in degrees/second
             // float speedPerFrame = speedPerSecond * Time.deltaTime; // Speed in degrees/frame
@@ -205,7 +203,7 @@ public class DrumRotator : MonoBehaviour
                     isRotationFinished = true;
                 }
             }
-            Logger.Log("Finished rotation " + currentIndex + " of " + configs.Count,4);
+            Debugger.Log("Finished rotation " + currentIndex + " of " + configs.Count, 4);
             RaiseConfigurationChanged(); // Raise the event when the configuration changes
             // Increment index or reset to 0 if end of list
             if (!isStepping)
@@ -245,7 +243,7 @@ public class DrumRotator : MonoBehaviour
         // Use R to reset the drum to the initial rotation
         if (Input.GetKeyDown(KeyCode.R))
         {
-            Logger.Log("Resetting drum rotation");
+            Debugger.Log("Resetting drum rotation");
             drum.transform.rotation = initialRotation;
         }
     }

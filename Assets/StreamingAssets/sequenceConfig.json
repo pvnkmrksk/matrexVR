@@ -1,133 +1,133 @@
 {
   "sequences": [
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 20,
       "parameters": {
         "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_0.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 20,
       "parameters": {
         "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_0c.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 20,
       "parameters": {
         "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_30.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 20,
       "parameters": {
         "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_30c.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 20,
       "parameters": {
         "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_90.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 20,
       "parameters": {
         "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_90c.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 20,
       "parameters": {
         "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_150.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 20,
       "parameters": {
         "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_150c.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 20,
       "parameters": {
         "configFile": "StripeFixationConfig2_empty.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 180,
       "parameters": {
         "configFile": "StripeFixationConfig2_180.json"
       }
     },
     {
-      "sceneName": "ChoiceAssay",
+      "sceneName": "Choice",
       "duration": 20,
       "parameters": {
         "configFile": "StripeFixationConfig2_empty.json"

@@ -17,7 +17,7 @@ public class DataLogger : MonoBehaviour
 
     protected string logPath { get; private set; }
 
-    protected string line;  // Or 'public string line;'
+    protected string line; // Or 'public string line;'
 
     // StreamWriter used to write to the log file
     protected StreamWriter logFile;
@@ -38,14 +38,12 @@ public class DataLogger : MonoBehaviour
     // Flag to indicate whether to include ZMQ data in the log
     public bool includeZmqData = true;
 
-
     //Maincontroller
     private MainController mainController;
 
     // Called at the start of the scene
     protected virtual void Start()
     {
-
         // find the MainController
         mainController = FindObjectOfType<MainController>();
 
@@ -70,7 +68,10 @@ public class DataLogger : MonoBehaviour
             zmq = GetComponent<ZmqListener>();
             if (zmq == null)
             {
-                Logger.Log("ZmqListener component not found in the GameObject. Please attach ZmqListener script to the GameObject.", 1);
+                Debugger.Log(
+                    "ZmqListener component not found in the GameObject. Please attach ZmqListener script to the GameObject.",
+                    1
+                );
             }
 
             // Initialize the log file and start the routine to flush buffered lines
@@ -79,7 +80,7 @@ public class DataLogger : MonoBehaviour
         }
         else
         {
-            Logger.Log("MasterDataLogger not found.");
+            Debugger.Log("MasterDataLogger not found.");
         }
     }
 
@@ -99,7 +100,12 @@ public class DataLogger : MonoBehaviour
         logPath = Path.Combine(directoryPath, $"{timestamp}_{sceneName}_{gameObjectName}_.csv");
 
         // Create or open the log file in append mode
-        FileStream fileStream = new FileStream(logPath, FileMode.Append, FileAccess.Write, FileShare.Read);
+        FileStream fileStream = new FileStream(
+            logPath,
+            FileMode.Append,
+            FileAccess.Write,
+            FileShare.Read
+        );
         logFile = new StreamWriter(fileStream);
 
         // Check if the file was just created or if it existed before
@@ -120,15 +126,12 @@ public class DataLogger : MonoBehaviour
             }
         }
 
-        Logger.Log("Writing data to: " + logPath, 3);
+        Debugger.Log("Writing data to: " + logPath, 3);
     }
 
-
     public void UpdateLogger()
-
-
     {
-        /* 
+        /*
             Making the Update() method public would indeed solve the immediate problem, but it's generally not a good practice. Here's why:
 
             1. Encapsulation: In object-oriented programming, it's a good practice to hide the internal workings of a class and only expose what's necessary. This is known as encapsulation. The Update() method is part of Unity's MonoBehaviour lifecycle and is intended to be used internally by the class itself. By keeping it protected, you're adhering to the principle of encapsulation.
@@ -141,11 +144,10 @@ public class DataLogger : MonoBehaviour
         */
         Update();
     }
+
     // Called every frame
     protected virtual void Update()
     {
-
-
         // Prepare and log the data
         PrepareLogData();
         LogData(line);
@@ -164,7 +166,8 @@ public class DataLogger : MonoBehaviour
         Quaternion gameObjectRotation = this.transform.rotation;
 
         // Prepare the data
-        line = $"\n{currentTime},{vr},{scene},{mainController.currentTrial},{mainController.currentStep},{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
+        line =
+            $"\n{currentTime},{vr},{scene},{mainController.currentTrial},{mainController.currentStep},{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
 
         // Add ZMQ data if includeZmqData is true
         if (includeZmqData)
@@ -172,7 +175,8 @@ public class DataLogger : MonoBehaviour
             Vector3 sensPosition = zmq.pose.position; // The position of the ZMQ pose
             Quaternion sensRotation = zmq.pose.rotation; // The rotation of the ZMQ pose
 
-            line += $",{sensPosition.x},{sensPosition.y},{sensPosition.z},{sensRotation.eulerAngles.x},{sensRotation.eulerAngles.y},{sensRotation.eulerAngles.z}";
+            line +=
+                $",{sensPosition.x},{sensPosition.y},{sensPosition.z},{sensRotation.eulerAngles.x},{sensRotation.eulerAngles.y},{sensRotation.eulerAngles.z}";
         }
     }
 

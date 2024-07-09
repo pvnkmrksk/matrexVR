@@ -2,28 +2,30 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SimulatedLocustsController : MonoBehaviour, ISceneController
+public class SwarmController : MonoBehaviour, ISceneController
 {
     public void InitializeScene(Dictionary<string, object> parameters)
     {
         if (parameters == null)
         {
-            Logger.Log("Parameters is null.", 1);
+            Debugger.Log("Parameters is null.", 1);
             return;
         }
 
-        Logger.Log("Initializing Scene with: " + parameters.ToString());
+        Debugger.Log("Initializing Scene with: " + parameters.ToString());
 
         foreach (var entry in parameters)
         {
-            Logger.Log($"Parameter Key: {entry.Key}, Value: {entry.Value}, Type: {entry.Value?.GetType()}");
+            Debugger.Log(
+                $"Parameter Key: {entry.Key}, Value: {entry.Value}, Type: {entry.Value?.GetType()}"
+            );
         }
 
         LocustSpawner[] locustSpawners = FindObjectsOfType<LocustSpawner>();
 
         if (locustSpawners == null || locustSpawners.Length == 0)
         {
-            Logger.Log("No LocustSpawners found.", 2);
+            Debugger.Log("No LocustSpawners found.", 2);
             return;
         }
 
@@ -35,7 +37,7 @@ public class SimulatedLocustsController : MonoBehaviour, ISceneController
             }
             else
             {
-                Logger.Log("Invalid or missing 'numberOfLocusts' parameter.", 2);
+                Debugger.Log("Invalid or missing 'numberOfLocusts' parameter.", 2);
             }
 
             if (parameters.TryGetValue("spawnAreaSize", out object spawnAreaSizeValue))
@@ -44,7 +46,7 @@ public class SimulatedLocustsController : MonoBehaviour, ISceneController
             }
             else
             {
-                Logger.Log("Invalid or missing 'spawnAreaSize' parameter.", 2);
+                Debugger.Log("Invalid or missing 'spawnAreaSize' parameter.", 2);
             }
 
             if (parameters.TryGetValue("mu", out object muValue))
@@ -53,7 +55,7 @@ public class SimulatedLocustsController : MonoBehaviour, ISceneController
             }
             else
             {
-                Logger.Log("Invalid or missing 'mu' parameter.", 2);
+                Debugger.Log("Invalid or missing 'mu' parameter.", 2);
             }
 
             if (parameters.TryGetValue("kappa", out object kappaValue))
@@ -62,7 +64,7 @@ public class SimulatedLocustsController : MonoBehaviour, ISceneController
             }
             else
             {
-                Logger.Log("Invalid or missing 'kappa' parameter.", 2);
+                Debugger.Log("Invalid or missing 'kappa' parameter.", 2);
             }
 
             if (parameters.TryGetValue("locustSpeed", out object locustSpeedValue))
@@ -71,13 +73,12 @@ public class SimulatedLocustsController : MonoBehaviour, ISceneController
             }
             else
             {
-                Logger.Log("Invalid or missing 'locustSpeed' parameter.", 2);
+                Debugger.Log("Invalid or missing 'locustSpeed' parameter.", 2);
             }
 
-            Logger.Log("Initializing SimulatedLocusts scene with parameters: " + parameters.ToString());
+            Debugger.Log("Initializing Swarm scene with parameters: " + parameters.ToString());
         }
     }
-
 
     public void StartDataLogging(string timestamp)
     {

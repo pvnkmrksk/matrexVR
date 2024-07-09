@@ -21,11 +21,11 @@
 //         if (drum != null)
 //         {
 //             // Log the drum's transform
-//             Logger.Log("Found GratingDrum GameObject: " + drum.name);
+//             Debugger.Log("Found GratingDrum GameObject: " + drum.name);
 //         }
 //         else
 //         {
-//             Logger.Log("GratingDrum GameObject not found in the scene.", 1);
+//             Debugger.Log("GratingDrum GameObject not found in the scene.", 1);
 //         }
 //     }
 
@@ -44,7 +44,7 @@
 
 //         // Add a new column to the header row
 //         logFile.WriteLine(",DrumPosX,DrumPosY,DrumPosZ,DrumRotX,DrumRotY,DrumRotZ");
-//         Logger.Log("OptomotorDataLogger.InitLog()");
+//         Debugger.Log("OptomotorDataLogger.InitLog()");
 //     }
 
 //     // Prepares a line of data to be logged
@@ -60,13 +60,13 @@
 //             Vector3 drumPosition = drum.transform.position;
 //             Quaternion drumRotation = drum.transform.rotation;
 
-//             Logger.Log("OptomotorDataLogger.PrepareLogData()");
+//             Debugger.Log("OptomotorDataLogger.PrepareLogData()");
 //             // Append the drum's position and rotation to line
 //             line += $",{drumPosition.x},{drumPosition.y},{drumPosition.z},{drumRotation.eulerAngles.x},{drumRotation.eulerAngles.y},{drumRotation.eulerAngles.z}";
 //         }
 //         else
 //         {
-//             Logger.Log("Drum GameObject is not assigned in the OptomotorDataLogger.", 1);
+//             Debugger.Log("Drum GameObject is not assigned in the OptomotorDataLogger.", 1);
 //         }
 //     }
 // }

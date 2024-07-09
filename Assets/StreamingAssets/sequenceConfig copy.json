@@ -1,35 +1,35 @@
   {
     "sequences": [
       {
-        "sceneName": "ChoiceAssay",
+        "sceneName": "Choice",
         "duration": 5,
         "parameters": {
           "configFile": "StripeFixationConfig_0Black.json"
         }
       },
       {
-        "sceneName": "ChoiceAssay",
+        "sceneName": "Choice",
         "duration": 5,
         "parameters": {
           "configFile": "StripeFixationConfig_90BlackWide.json"
         }
       },
       {
-        "sceneName": "ChoiceAssay",
+        "sceneName": "Choice",
         "duration": 5,
         "parameters": {
           "configFile": "StripeFixationConfig_0BlackWide.json"
         }
       },
       {
-        "sceneName": "ChoiceAssay",
+        "sceneName": "Choice",
         "duration": 5,
         "parameters": {
           "configFile": "StripeFixationConfig_90BlackWide.json"
         }
       },
       {
-        "sceneName": "ChoiceAssay",
+        "sceneName": "Choice",
         "duration": 5,
         "parameters": {
           "configFile": "StripeFixationConfig_translation.json"

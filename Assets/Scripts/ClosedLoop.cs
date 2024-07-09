@@ -63,13 +63,15 @@ public class ClosedLoop : MonoBehaviour
             ToggleClosedLoopOrientation();
         if (Input.GetKeyDown(KeyCode.P))
             ToggleClosedLoopPosition();
-        if (Input.GetKeyDown(KeyCode.LeftBracket))
-            ToggleAccumulateRotation();
-        if (Input.GetKeyDown(KeyCode.RightBracket))
-            ToggleAccumulatePosition();
-        if (Input.GetKeyDown(KeyCode.R))
+
+        //todo. Add shortcuts for accumulate position and rotation
+        // if (Input.GetKeyDown(KeyCode.LeftBracket))
+        //     ToggleAccumulateRotation();
+        // if (Input.GetKeyDown(KeyCode.RightBracket))
+        //     ToggleAccumulatePosition();
+        if (Input.GetKeyDown(KeyCode.T)) // Reset Translation
             ResetPosition();
-        if (Input.GetKeyDown(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.R)) // Reset Rotation
             ResetRotation();
 
         if (Input.GetKeyUp(KeyCode.Escape))

@@ -1,8 +1,7 @@
 using UnityEngine;
 
-public static class Logger
+public static class Debugger
 {
-
     public static int CurrentLogLevel = 0; // 0: All, 1: Error, 2: Warning, 3: Info, 4: Debug
 
     /// <summary>
@@ -10,15 +9,19 @@ public static class Logger
     /// </summary>
     /// <param name="message">The message to log.</param>
     /// <param name="level">The log level of the message (1: Error, 2: Warning, 3: Info, 4: Debug).</param>
-/*     feat: Add Logger class for flexible logging with different log levels
-
-    Description:
-    - Implemented the Logger class to provide a simple logging mechanism with different log levels.
-    - The Logger class allows logging messages with different levels such as Error, Warning, Info, and Debug.
-    - The log level can be set to control which messages are logged based on their severity.
-    - The Logger class uses the Debug.LogError, Debug.LogWarning, and Debug.Log methods from Unity for logging.
-    - Added a SetLogLevel method to dynamically change the log level at runtime.
-    - The Logger class is designed to be easy to use and can be integrated into any Unity project. */
+    /*     feat: Add Debugger class for flexible logging with different log levels
+    
+        Description:
+        - Implemented the D
+    ebugger class to provide a simple logging mechanism with different log levels.
+        - The D
+    ebugger class allows logging messages with different levels such as Error, Warning, Info, and Debug.
+        - The log level can be set to control which messages are logged based on their severity.
+        - The D
+    ebugger class uses the Debug.LogError, Debug.LogWarning, and Debug.Log methods from Unity for logging.
+        - Added a SetLogLevel method to dynamically change the log level at runtime.
+        - The D
+    ebugger class is designed to be easy to use and can be integrated into any Unity project. */
     public static void Log(string message, int level)
     {
         if (level <= CurrentLogLevel)
@@ -35,7 +38,7 @@ public static class Logger
                     Debug.Log(message);
                     break;
                 case 4:
-                    Debug.Log(message); // Debug level uses the same Logger.Log method
+                    Debug.Log(message); // Debug level uses the same Debugger.Log method
                     break;
             }
         }
@@ -45,6 +48,7 @@ public static class Logger
     {
         Log(message, 1); // Default to level 1 if no level is provided
     }
+
     public static void SetLogLevel(int level)
     {
         CurrentLogLevel = level;

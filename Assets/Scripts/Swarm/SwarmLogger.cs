@@ -6,9 +6,9 @@ using System;
 using System.Text;
 using System.IO.Compression;
 
-public class SimulatedLocustLogger : MonoBehaviour
+public class SwarmLogger : MonoBehaviour
 {
-    public LayerMask locustLayerMask;  // Public LayerMask variable
+    public LayerMask locustLayerMask; // Public LayerMask variable
     private string directoryPath;
     private string logPath;
     private StreamWriter logFile;
@@ -23,7 +23,7 @@ public class SimulatedLocustLogger : MonoBehaviour
         }
         else
         {
-            Logger.Log("MasterDataLogger not found.", 1);
+            Debugger.Log("MasterDataLogger not found.", 1);
             return;
         }
 
@@ -31,7 +31,7 @@ public class SimulatedLocustLogger : MonoBehaviour
         LocustSpawner locustSpawner = GetComponent<LocustSpawner>();
         if (locustSpawner == null)
         {
-            Logger.Log("LocustSpawner script not found on this GameObject.", 1);
+            Debugger.Log("LocustSpawner script not found on this GameObject.", 1);
             return;
         }
 
@@ -41,27 +41,34 @@ public class SimulatedLocustLogger : MonoBehaviour
         // Correctly extract layer names from the LayerMask
         string layerNames = "";
         int layerMaskValue = locustLayerMask.value;
-        for (int i = 0; i < 32; i++)  // Unity supports up to 32 layers
+        for (int i = 0; i < 32; i++) // Unity supports up to 32 layers
         {
             if ((layerMaskValue & (1 << i)) != 0)
             {
                 layerNames += LayerMask.LayerToName(i) + "_";
             }
         }
-        layerNames = layerNames.TrimEnd('_');  // Remove trailing underscore
+        layerNames = layerNames.TrimEnd('_'); // Remove trailing underscore
 
         // Include metadata in the file name
-        logPath = Path.Combine(directoryPath, $"SimulatedLocustData_{layerNames}_{locustSpawner.numberOfLocusts}_{locustSpawner.spawnAreaSize}_{locustSpawner.mu}_{locustSpawner.kappa}_{locustSpawner.locustSpeed}_{date}_{time}.csv.gz");
+        logPath = Path.Combine(
+            directoryPath,
+            $"SimulatedLocustData_{layerNames}_{locustSpawner.numberOfLocusts}_{locustSpawner.spawnAreaSize}_{locustSpawner.mu}_{locustSpawner.kappa}_{locustSpawner.locustSpeed}_{date}_{time}.csv.gz"
+        );
         // Include metadata in the file name
-        logPath = Path.Combine(directoryPath, $"{date}_{time}_SimulatedLocustData_{layerNames}_{locustSpawner.numberOfLocusts}_{locustSpawner.spawnAreaSize}_{locustSpawner.mu}_{locustSpawner.kappa}_{locustSpawner.locustSpeed}.csv.gz");
+        logPath = Path.Combine(
+            directoryPath,
+            $"{date}_{time}_SimulatedLocustData_{layerNames}_{locustSpawner.numberOfLocusts}_{locustSpawner.spawnAreaSize}_{locustSpawner.mu}_{locustSpawner.kappa}_{locustSpawner.locustSpeed}.csv.gz"
+        );
 
         logFile = new StreamWriter(
             new GZipStream(File.Create(logPath), System.IO.Compression.CompressionLevel.Optimal)
         );
 
         // Write header with parameters from LocustSpawner
-        logFile.WriteLine($"Timestamp,Name,Layer,X,Y,Z,NumberOfLocusts:{locustSpawner.numberOfLocusts},SpawnAreaSize:{locustSpawner.spawnAreaSize},Mu:{locustSpawner.mu},Kappa:{locustSpawner.kappa},LocustSpeed:{locustSpawner.locustSpeed}");
-
+        logFile.WriteLine(
+            $"Timestamp,Name,Layer,X,Y,Z,NumberOfLocusts:{locustSpawner.numberOfLocusts},SpawnAreaSize:{locustSpawner.spawnAreaSize},Mu:{locustSpawner.mu},Kappa:{locustSpawner.kappa},LocustSpeed:{locustSpawner.locustSpeed}"
+        );
     }
 
     void Update()
@@ -71,10 +78,11 @@ public class SimulatedLocustLogger : MonoBehaviour
 
         foreach (GameObject locust in locusts)
         {
-            if (locustLayerMask == (locustLayerMask | (1 << locust.layer)))  // Check if the locust's layer is in the mask
+            if (locustLayerMask == (locustLayerMask | (1 << locust.layer))) // Check if the locust's layer is in the mask
             {
                 Vector3 position = locust.transform.position;
-                string data = $"{timestamp},{locust.name},{LayerMask.LayerToName(locust.layer)},{position.x},{position.y},{position.z}";
+                string data =
+                    $"{timestamp},{locust.name},{LayerMask.LayerToName(locust.layer)},{position.x},{position.y},{position.z}";
                 logFile.WriteLine(data);
             }
         }

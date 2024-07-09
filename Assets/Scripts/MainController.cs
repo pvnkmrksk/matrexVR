@@ -19,60 +19,60 @@ public class MainController : MonoBehaviour
     private MasterDataLogger masterDataLogger;
     public bool loopSequence = false;
 
-
     [Tooltip("0: Off, ,1: Error, 2: Warning, 3: Info, 4: Debug")]
-    [SerializeField][Range(0, 4)] private int logLevel = 0; // 0: All, 1: Error, 2: Warning, 3: Info, 4: Debug
+    [SerializeField]
+    [Range(0, 4)]
+    private int logLevel = 0; // 0: All, 1: Error, 2: Warning, 3: Info, 4: Debug
 
     void Start()
     {
         // Set the log level
-        Logger.CurrentLogLevel = logLevel;
-        Logger.Log("MainController.Start()", 3);
+        Debugger.CurrentLogLevel = logLevel;
+        Debugger.Log("MainController.Start()", 3);
 
         // Make sure the MainController persists across scene changes
         DontDestroyOnLoad(this.gameObject);
 
-
         // Access the MasterDataLogger instance
-        
+
         masterDataLogger = MasterDataLogger.Instance;
 
         if (masterDataLogger == null)
         {
-            Logger.Log("MasterDataLogger instance not found", 1);
+            Debugger.Log("MasterDataLogger instance not found", 1);
         }
         else
         {
-            Logger.Log("MasterDataLogger instance found.", 3);
-            Logger.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath, 4);
+            Debugger.Log("MasterDataLogger instance found.", 3);
+            Debugger.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath, 4);
         }
-
 
         // Load the sequence configuration
         LoadSequenceConfiguration();
-
     }
+
     public void StopSequence()
     {
         sequenceStarted = false;
         currentStep = 0;
-        
     }
+
     public void StartSequence()
     {
-        Logger.Log("MainController.StartSequence()",3);
+        Debugger.Log("MainController.StartSequence()", 3);
         sequenceStarted = true;
-        timer = sequenceSteps[currentStep].duration;  // Initialize timer for the first scene
+        timer = sequenceSteps[currentStep].duration; // Initialize timer for the first scene
         LoadScene(sequenceSteps[currentStep]);
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
+
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Logger.Log("MainController.OnSceneLoaded()",3);
+        Debugger.Log("MainController.OnSceneLoaded()", 3);
         SequenceStep currentStepData = sequenceSteps[currentStep];
 
         ISceneController currentSceneController = null;
-        foreach (var obj in FindObjectsOfType<MonoBehaviour>())  // MonoBehaviour is the base class for all Unity Behaviours
+        foreach (var obj in FindObjectsOfType<MonoBehaviour>()) // MonoBehaviour is the base class for all Unity Behaviours
         {
             if (obj is ISceneController)
             {
@@ -88,7 +88,7 @@ public class MainController : MonoBehaviour
         }
         else
         {
-            Logger.Log("Either the scene controller or the parameters are null.", 2);
+            Debugger.Log("Either the scene controller or the parameters are null.", 2);
         }
     }
 
@@ -111,10 +111,9 @@ public class MainController : MonoBehaviour
         }
     }
 
-
     void LoadScene(SequenceStep step)
     {
-        Logger.Log("MainController.LoadScene()",3);
+        Debugger.Log("MainController.LoadScene()", 3);
         SyncTimestamp();
         SceneManager.LoadScene(step.sceneName);
     }
@@ -123,6 +122,7 @@ public class MainController : MonoBehaviour
     {
         string timestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
     }
+
     void LoadSequenceConfiguration()
     {
         // Get the path to the sequence configuration JSON file
@@ -144,32 +144,36 @@ public class MainController : MonoBehaviour
                 {
                     foreach (SequenceItem item in config.sequences)
                     {
-                        SequenceStep newStep = new SequenceStep(item.sceneName, item.duration, item.parameters);
+                        SequenceStep newStep = new SequenceStep(
+                            item.sceneName,
+                            item.duration,
+                            item.parameters
+                        );
                         sequenceSteps.Add(newStep);
-                        Logger.Log("Added sequence step: " + JsonUtility.ToJson(newStep), 3);
+                        Debugger.Log("Added sequence step: " + JsonUtility.ToJson(newStep), 3);
                     }
 
                     // Log the loaded sequences for debugging
-                    Logger.Log("Loaded sequences: " + sequenceSteps.Count, 4);
+                    Debugger.Log("Loaded sequences: " + sequenceSteps.Count, 4);
 
                     foreach (SequenceStep step in sequenceSteps)
                     {
-                        Logger.Log("Scene Name: " + step.sceneName, 4);
-                        Logger.Log("Duration: " + step.duration, 4);
+                        Debugger.Log("Scene Name: " + step.sceneName, 4);
+                        Debugger.Log("Duration: " + step.duration, 4);
 
                         // Log each key in the parameters dictionary for the current SequenceStep
                         if (step.parameters != null)
                         {
                             foreach (string key in step.parameters.Keys)
                             {
-                                Logger.Log("Parameter Key: " + key, 4);
+                                Debugger.Log("Parameter Key: " + key, 4);
                             }
                         }
                     }
 
                     // Get the timestamp from the MasterDataLogger component
                     string timestamp = masterDataLogger.timestamp;
-                    Logger.Log("Timestamp: " + timestamp,4);
+                    Debugger.Log("Timestamp: " + timestamp, 4);
                     if (masterDataLogger != null)
                     {
                         Debug.Log("MasterDataLogger is not null");
@@ -177,7 +181,10 @@ public class MainController : MonoBehaviour
 
                         // Copy the JSON file to the data logging directory with the desired filename format
                         string sceneName = SceneManager.GetActiveScene().name;
-                        string destinationPath = Path.Combine(masterDataLogger.directoryPath, $"{timestamp}_{sceneName}_sequenceConfig.json");
+                        string destinationPath = Path.Combine(
+                            masterDataLogger.directoryPath,
+                            $"{timestamp}_{sceneName}_sequenceConfig.json"
+                        );
                         File.Copy(jsonPath, destinationPath);
                     }
                     else
@@ -187,17 +194,17 @@ public class MainController : MonoBehaviour
                 }
                 else
                 {
-                    Logger.Log("Failed to deserialize sequence configuration JSON.", 1);
+                    Debugger.Log("Failed to deserialize sequence configuration JSON.", 1);
                 }
             }
             else
             {
-                Logger.Log("sequenceConfig.json file not found.", 1);
+                Debugger.Log("sequenceConfig.json file not found.", 1);
             }
         }
         else
         {
-            Logger.Log("StreamingAssets folder not found.", 1);
+            Debugger.Log("StreamingAssets folder not found.", 1);
         }
     }
 
@@ -205,6 +212,7 @@ public class MainController : MonoBehaviour
     {
         Debug.Log("MainController was disabled.");
     }
+
     void ManageTimerAndTransitions()
     {
         // Decrease the timer
@@ -215,7 +223,7 @@ public class MainController : MonoBehaviour
         {
             // Move to the next step
             currentStep++;
-            
+
             // If at the end of the sequence
             if (currentStep >= sequenceSteps.Count)
             {
@@ -232,8 +240,8 @@ public class MainController : MonoBehaviour
                 else
                 {
                     // End the sequence and return to the ControlScene
-                    SceneManager.LoadScene("ControlScene");  // Transition back to ControlScene
-                    Destroy(this.gameObject);  // Destroy the MainController GameObject
+                    SceneManager.LoadScene("ControlScene"); // Transition back to ControlScene
+                    Destroy(this.gameObject); // Destroy the MainController GameObject
                 }
             }
             else
@@ -243,7 +251,6 @@ public class MainController : MonoBehaviour
             }
         }
     }
-
 }
 
 [System.Serializable]

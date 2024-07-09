@@ -62,7 +62,7 @@ public class LocustSpawner : MonoBehaviour
         int locustLayer = LayerMask.NameToLayer(layerName); // Get the layer by name
         if (locustLayer == -1) // Layer not found
         {
-            Logger.Log(
+            Debugger.Log(
                 "Layer "
                     + layerName
                     + " not found. Make sure it's created in Unity. Defaulting to object's layer.",
@@ -130,7 +130,7 @@ public class LocustSpawner : MonoBehaviour
         }
 
         float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad * mu, kappa); // Generate angles by converting from deg to radians for the function to work
-        // Logger.Log("Generated Angle (in degrees): " + angle * Mathf.Rad2Deg);
+        // Debugger.Log("Generated Angle (in degrees): " + angle * Mathf.Rad2Deg);
         return Quaternion.Euler(0, angle * Mathf.Rad2Deg, 0); // Convert radians to degrees for the Quaternion rotation
     }
 }
