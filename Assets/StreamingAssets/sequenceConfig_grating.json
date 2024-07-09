@@ -1,0 +1,137 @@
+{
+  "sequences": [
+    {
+      "sceneName": "Choice",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_0.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_0c.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_30.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_30c.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_90.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_90c.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_150.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_150c.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 180,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_180.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    }
+  ]
+}
