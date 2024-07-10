@@ -385,6 +385,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 423771344688145782, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+      propertyPath: initialRotation.y
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 423771344688145806, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
       propertyPath: m_Name
       value: VR4 Swarm
@@ -429,6 +433,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7915254056391474891, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+      propertyPath: layerName
+      value: SimulatedLocustsVR4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -462,6 +470,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2798074368093061215, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: initialRotation.y
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -539,6 +551,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1330193872785025130, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
+      propertyPath: initialRotation.y
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 1330193872785025170, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
       propertyPath: m_Name
       value: VR2 Swarm
@@ -583,6 +599,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8812669456100504535, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
+      propertyPath: layerName
+      value: SimulatedLocustsVR2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -616,6 +636,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4602136961950407237, guid: a122962340c890a529580fd616e93595, type: 3}
+      propertyPath: layerName
+      value: SimulatedLocustsVR3
+      objectReference: {fileID: 0}
     - target: {fileID: 6334096569946685696, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: m_Name
       value: VR3 Swarm
@@ -659,6 +683,10 @@ PrefabInstance:
     - target: {fileID: 6334096569946685697, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6334096569946685944, guid: a122962340c890a529580fd616e93595, type: 3}
+      propertyPath: initialRotation.y
+      value: 90
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
