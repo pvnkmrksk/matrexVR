@@ -4,7 +4,7 @@ from pathlib import Path
 # Read the JSON file
 insert_isi=True
 config_file_name='sequenceConfig_swarm.json'
-shuffle_file_name='shuffled_sequenceConfig_swarm1.json'
+shuffle_file_name='shuffled_sequenceConfig_swarm2.json'
 with open(Path(config_file_name),'r') as file:
     data = json.load(file)
 
