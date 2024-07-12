@@ -9,14 +9,14 @@ EditorBuildSettings:
     path: Assets/Scenes/ControlScene.unity
     guid: 4af081ad6480f455f8bf0f8b4968e18a
   - enabled: 1
+    path: Assets/Scenes/Optomotor.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
     path: Assets/Scenes/Swarm.unity
     guid: ee3c77b2ae528404ea7981ceb78bd856
   - enabled: 1
     path: Assets/Scenes/Matrix.unity
     guid: ae866fd6e891642e4b6b6f687c19e9a9
-  - enabled: 1
-    path: Assets/Scenes/Optomotor.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 1
     path: Assets/Scenes/Choice.unity
     guid: 7397d1b569aa64b27ab919a5ed55c5e6
