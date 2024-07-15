@@ -1,0 +1,70 @@
+{
+    "rotationConfigs": [
+      {
+        "speed": 2,
+        "clockwise": true,
+        "duration": 2,
+        "externalRotationAxis": "Yaw",
+        "frequency": 10,
+        "level": 1
+      },
+      {
+        "speed": 2,
+        "clockwise": false,
+        "duration": 2,
+        "externalRotationAxis": "Yaw",
+        "frequency": 10,
+        "level": 1
+      },
+      {
+        "speed": 4,
+        "clockwise": true,
+        "duration": 2,
+        "externalRotationAxis": "Yaw",
+        "frequency": 10,
+        "level": 1
+      },
+      {
+        "speed": 4,
+        "clockwise": false,
+        "duration": 2,
+        "externalRotationAxis": "Yaw",
+        "frequency": 10,
+        "level": 1
+      },
+      {
+        "speed": 8,
+        "clockwise": true,
+        "duration": 2,
+        "externalRotationAxis": "Yaw",
+        "frequency": 10,
+        "level": 1
+      },
+      {
+        "speed": 8,
+        "clockwise": false,
+        "duration": 2,
+        "externalRotationAxis": "Yaw",
+        "frequency": 10,
+        "level": 1
+      },
+      {
+        "speed": 16,
+        "clockwise": true,
+        "duration": 2,
+        "externalRotationAxis": "Yaw",
+        "frequency": 10,
+        "level": 1
+      },
+      {
+        "speed": 16,
+        "clockwise": false,
+        "duration": 2,
+        "externalRotationAxis": "Yaw",
+        "frequency": 10,
+        "level": 1
+      }
+      ]}
+      
+      
+      
