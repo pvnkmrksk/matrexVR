@@ -5,8 +5,6 @@
 
 
 
-test*
-
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
@@ -76,31 +74,12 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-black_stripes_test*
-landscape_test*
-black_stripes_test_Data*
-landscape_test_Data*
-pilot_1.csv
-pilot_2_pitch.csv
-pilot_2_yaw.csv
-pilot_3_roll.csv
-pilot_4_pitch.csv
-Assets/data/*
 *.csv.gz
 *.x86_64
-led_array_*
-Assets/RunData/20230907094454.meta
-Assets/RunData/.DS_Store
-Assets/RunData/20230907094454/2023-09-07_09-44-54_Cameras1_.csv.gz.meta
-Assets/RunData/20230907094454/2023-09-07_09-44-54_Cameras2_.csv.gz.meta
-Assets/RunData/20230907094454/2023-09-07_09-44-54_Cameras3_.csv.gz.meta
-Assets/RunData/20230907094454/2023-09-07_09-44-54_Cameras4_.csv.gz.meta
 
 *.csv
-*_locustswarm_*Data
+*_Data/*
 Assets/RunData/*
 
 *.csv.gz.meta
 Assets/RunData/
-*_led_array_*
-matrix_choice_Data/*
