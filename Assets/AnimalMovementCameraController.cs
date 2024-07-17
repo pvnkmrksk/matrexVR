@@ -1,15 +1,8 @@
 using UnityEngine;
 
-public class AnimalMovementCameraController : MonoBehaviour
+public class SimpleFicTracUnityController : MonoBehaviour
 {
     [SerializeField] private float sphereRadius = 1f; // Radius of the sphere in Unity units
-    [SerializeField] private Vector3 initialPosition = Vector3.zero;
-    [SerializeField] private Vector3 initialRotation = Vector3.zero;
-
-    private Vector2 _integratedPosition;
-    private float _integratedHeading;
-    private Vector2 _positionOffset;
-    private float _headingOffset;
 
     private UdpAnimalDataReceiver _dataReceiver;
 
@@ -20,8 +13,6 @@ public class AnimalMovementCameraController : MonoBehaviour
         {
             Debug.LogError("UdpAnimalDataReceiver component not found!");
         }
-        ResetPosition();
-        ResetRotation();
     }
 
     private void Update()
@@ -35,30 +26,14 @@ public class AnimalMovementCameraController : MonoBehaviour
     private void UpdateTransform(float[] data)
     {
         // Update position
-        _integratedPosition.x = data[14]; // Integrated x position (lab)
-        _integratedPosition.y = data[15]; // Integrated y position (lab)
-        Vector3 newPosition = new Vector3(
-            (_integratedPosition.x - _positionOffset.x) * sphereRadius,
-            0,
-            (_integratedPosition.y - _positionOffset.y) * sphereRadius
-        );
-        transform.position = initialPosition + newPosition;
+        // Using columns 15 and 14 for X and Z in Unity (swapped for correct orientation)
+        float x = data[16] * sphereRadius; // FicTrac Y (east) to Unity X
+        float z = data[15] * sphereRadius; // FicTrac X (north) to Unity Z
+        transform.position = new Vector3(x, 0, z);
 
         // Update rotation
-        _integratedHeading = data[16]; // Integrated animal heading (lab)
-        float newHeading = (_integratedHeading - _headingOffset) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(initialRotation.x, newHeading, initialRotation.z);
-    }
-
-    public void ResetPosition()
-    {
-        _positionOffset = _integratedPosition;
-        transform.position = initialPosition;
-    }
-
-    public void ResetRotation()
-    {
-        _headingOffset = _integratedHeading;
-        transform.rotation = Quaternion.Euler(initialRotation);
+        // Using column 16 for rotation around Y axis in Unity
+        float yRotation = data[17] * Mathf.Rad2Deg; // Convert to degrees and negate for Unity's clockwise rotation
+        transform.rotation = Quaternion.Euler(0, yRotation, 0);
     }
 }
