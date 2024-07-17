@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.451401, g: 0.5008942, b: 0.5723129, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -642,11 +641,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5665556470671942801, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
       propertyPath: address
-      value: localhost
+      value: 10.126.17.125
       objectReference: {fileID: 0}
     - target: {fileID: 5665556470671942804, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
       propertyPath: sphereDiameter
-      value: 9.9
+      value: 0.45
       objectReference: {fileID: 0}
     - target: {fileID: 5665556470671942804, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
       propertyPath: closedLoopOrientation
@@ -675,19 +674,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318578, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: address
-      value: localhost
+      value: 10.126.17.125
       objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318579, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: startCol
-      value: 0
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318579, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: startRow
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318583, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: sphereDiameter
-      value: 9.9
+      value: 0.45
       objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318583, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: closedLoopOrientation
@@ -800,7 +799,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: sphereDiameter
-      value: 9.9
+      value: 0.45
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: closedLoopOrientation
@@ -808,15 +807,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586276, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: startCol
-      value: 0
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586276, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: startRow
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586277, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: address
-      value: localhost
+      value: 10.126.17.125
       objectReference: {fileID: 0}
     - target: {fileID: 3520139331059622448, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_IsActive
@@ -837,7 +836,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 668772779780633178, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: address
-      value: localhost
+      value: 10.126.17.125
       objectReference: {fileID: 0}
     - target: {fileID: 668772779780633179, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: startRow
@@ -849,7 +848,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 668772779780633183, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: sphereDiameter
-      value: 9.9
+      value: 0.45
       objectReference: {fileID: 0}
     - target: {fileID: 668772779780633183, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: closedLoopOrientation
