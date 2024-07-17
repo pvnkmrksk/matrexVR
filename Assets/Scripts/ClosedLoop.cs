@@ -2,142 +2,106 @@ using UnityEngine;
 
 public class ClosedLoop : MonoBehaviour
 {
-    [Header("Initial Settings")]
-    public Vector3 initialPosition = Vector3.zero;
-    public Vector3 initialRotation = Vector3.zero;
-
-    [Header("FicTrac Settings")]
-    [Tooltip("Radius of the sphere in centimeters")]
-    public float sphereRadius = 5f; // Default value for sphere radius in centimeters
-
-    [Header("Gain Settings")]
-    [SerializeField, Range(0, 1000)]
-    private float xGain = 100.0f;
-
-    [SerializeField, Range(0, 1000)]
-    private float yGain = 100.0f;
-
-    [SerializeField, Range(0, 1000)]
-    private float zGain = 100.0f;
-
-    [SerializeField, Range(0, 10)]
-    private float rotationGain = 1f;
-
-    [Header("Closed Loop Settings")]
-    [SerializeField]
-    private bool closedLoopPosition = true;
-
-    [SerializeField]
-    private bool closedLoopOrientation = true;
-
-    [SerializeField]
-    private bool accumulatePosition = true;
-
-    [SerializeField]
-    private bool accumulateRotation = true;
+    [SerializeField] private float sphereRadius = 1f;
+    [SerializeField] private KeyCode resetKey = KeyCode.R;
+    [SerializeField] private float initializationDelay = 0.1f;
 
     private ZmqListener _zmqListener;
-    private Vector3 accumulatedPosition;
-    private Quaternion accumulatedRotation;
+    private Vector3 _initialPosition;
+    private Quaternion _initialRotation;
+    private Vector3 _lastFicTracData;
+    private bool _isInitialized = false;
+    private Quaternion _ficTracRotationOffset;
+    private float _initializationTimer;
+
+    // Add these new variables
+    private bool closedLoopPosition = true;
+    private bool closedLoopOrientation = true;
 
     private void Start()
     {
         _zmqListener = GetComponent<ZmqListener>();
-        ResetPosition();
-        ResetRotation();
+        if (_zmqListener == null)
+            Debug.LogError("ZmqListener component not found!");
+        _initialPosition = transform.position;
+        _initialRotation = transform.rotation;
+        ResetPositionAndRotation();
     }
 
     private void Update()
     {
         HandleInput();
 
-        if (_zmqListener.pose != null)
+        if (_zmqListener.pose == null) return;
+
+        if (Input.GetKeyDown(resetKey))
+        {
+            ResetPositionAndRotation();
+            return;
+        }
+
+        if (!_isInitialized)
+        {
+            _initializationTimer += Time.deltaTime;
+            if (_initializationTimer >= initializationDelay)
+            {
+                InitializeFicTracData();
+            }
+        }
+        else
         {
             UpdateTransform();
         }
     }
 
-    private void HandleInput()
+    private void InitializeFicTracData()
     {
-        if (Input.GetKeyDown(KeyCode.O))
-            ToggleClosedLoopOrientation();
-        if (Input.GetKeyDown(KeyCode.P))
-            ToggleClosedLoopPosition();
-
-        //todo. Add shortcuts for accumulate position and rotation
-        // if (Input.GetKeyDown(KeyCode.LeftBracket))
-        //     ToggleAccumulateRotation();
-        // if (Input.GetKeyDown(KeyCode.RightBracket))
-        //     ToggleAccumulatePosition();
-        if (Input.GetKeyDown(KeyCode.T)) // Reset Translation
-            ResetPosition();
-        if (Input.GetKeyDown(KeyCode.R)) // Reset Rotation
-            ResetRotation();
-
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
+        _lastFicTracData = GetCurrentFicTracData();
+        float initialYaw = _lastFicTracData.z;
+        _ficTracRotationOffset = Quaternion.Euler(0, -initialYaw * Mathf.Rad2Deg, 0);
+        _isInitialized = true;
+        Debug.Log($"Initialized with FicTrac data: ({_lastFicTracData.x}, {_lastFicTracData.y}, {_lastFicTracData.z})");
     }
 
     private void UpdateTransform()
     {
-        Vector3 newPosition = _zmqListener.pose.position;
-        Quaternion newRotation = _zmqListener.pose.rotation;
+        Vector3 currentFicTracData = GetCurrentFicTracData();
+        Vector3 ficTracDelta = currentFicTracData - _lastFicTracData;
 
-        // Handle position
-        if (closedLoopPosition && IsValidVector3(newPosition))
+        // Apply position change only if closedLoopPosition is true
+        if (closedLoopPosition)
         {
-            Vector3 positionChange =
-                new Vector3(newPosition.x * xGain, newPosition.z * -zGain, -newPosition.y * yGain)
-                * sphereRadius;
-
-            if (accumulatePosition)
-            {
-                accumulatedPosition += positionChange * Time.deltaTime;
-                transform.position = initialPosition + accumulatedPosition;
-            }
-            else
-            {
-                transform.position = initialPosition + positionChange;
-            }
+            Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius;
+            transform.Translate(positionDelta, Space.World);
         }
 
-        // Handle rotation
-        if (closedLoopOrientation && IsValidQuaternion(newRotation))
+        // Apply rotation change only if closedLoopOrientation is true
+        if (closedLoopOrientation)
         {
-            Quaternion rotationChange = Quaternion.Slerp(
-                Quaternion.identity,
-                newRotation,
-                rotationGain
-            );
-
-            if (accumulateRotation)
-            {
-                accumulatedRotation *= rotationChange;
-                transform.rotation = Quaternion.Euler(initialRotation) * accumulatedRotation;
-            }
-            else
-            {
-                transform.rotation = Quaternion.Euler(initialRotation) * rotationChange;
-            }
+            float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg;
+            transform.Rotate(0, rotationDelta, 0, Space.World);
         }
+
+        _lastFicTracData = currentFicTracData;
     }
 
-    public void ResetPosition()
+    public void ResetPositionAndRotation()
     {
-        transform.position = initialPosition;
-        accumulatedPosition = Vector3.zero;
-        Debug.Log("Position reset");
+        transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+        _isInitialized = false;
+        _ficTracRotationOffset = Quaternion.identity;
+        _initializationTimer = 0f;
+        _lastFicTracData = Vector3.zero;
+        Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
     }
 
-    public void ResetRotation()
+    private Vector3 GetCurrentFicTracData()
     {
-        transform.rotation = Quaternion.Euler(initialRotation);
-        accumulatedRotation = Quaternion.identity;
-        Debug.Log("Rotation reset");
+        Pose pose = _zmqListener.pose;
+        return new Vector3(pose.position.y, pose.position.x, pose.rotation.eulerAngles.y * Mathf.Deg2Rad);
     }
 
+    // New methods
     public void ToggleClosedLoopPosition()
     {
         closedLoopPosition = !closedLoopPosition;
@@ -150,44 +114,6 @@ public class ClosedLoop : MonoBehaviour
         Debug.Log($"Closed Loop Orientation: {(closedLoopOrientation ? "ON" : "OFF")}");
     }
 
-    public void ToggleAccumulatePosition()
-    {
-        accumulatePosition = !accumulatePosition;
-        if (!accumulatePosition)
-            ResetPosition();
-        Debug.Log($"Accumulate Position: {(accumulatePosition ? "ON" : "OFF")}");
-    }
-
-    public void ToggleAccumulateRotation()
-    {
-        accumulateRotation = !accumulateRotation;
-        if (!accumulateRotation)
-            ResetRotation();
-        Debug.Log($"Accumulate Rotation: {(accumulateRotation ? "ON" : "OFF")}");
-    }
-
-    private bool IsValidVector3(Vector3 v)
-    {
-        return !float.IsNaN(v.x)
-            && !float.IsNaN(v.y)
-            && !float.IsNaN(v.z)
-            && !float.IsInfinity(v.x)
-            && !float.IsInfinity(v.y)
-            && !float.IsInfinity(v.z);
-    }
-
-    private bool IsValidQuaternion(Quaternion q)
-    {
-        return !float.IsNaN(q.x)
-            && !float.IsNaN(q.y)
-            && !float.IsNaN(q.z)
-            && !float.IsNaN(q.w)
-            && !float.IsInfinity(q.x)
-            && !float.IsInfinity(q.y)
-            && !float.IsInfinity(q.z)
-            && !float.IsInfinity(q.w);
-    }
-
     // Public methods for external scripts to control the behaviors
     public void SetClosedLoopOrientation(bool value)
     {
@@ -197,5 +123,18 @@ public class ClosedLoop : MonoBehaviour
     public void SetClosedLoopPosition(bool value)
     {
         closedLoopPosition = value;
+    }
+
+    private void HandleInput()
+    {
+        if (Input.GetKeyDown(KeyCode.O))
+            ToggleClosedLoopOrientation();
+        if (Input.GetKeyDown(KeyCode.P))
+            ToggleClosedLoopPosition();
+
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 }

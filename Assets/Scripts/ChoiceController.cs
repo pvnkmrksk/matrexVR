@@ -136,8 +136,9 @@ public class ChoiceController : MonoBehaviour, ISceneController
         ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
         foreach (ClosedLoop cl in closedLoopComponents)
         {
-            cl.ResetPosition();
-            cl.ResetRotation();
+            // cl.ResetPosition();
+            // cl.ResetRotation();
+            cl.ResetPositionAndRotation();
         }
     }
 
