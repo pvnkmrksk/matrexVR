@@ -4,24 +4,21 @@ public class CorrectFicTracUnityController : MonoBehaviour
 {
     [SerializeField] private float sphereRadius = 1f;
     [SerializeField] private KeyCode resetKey = KeyCode.R;
-    [SerializeField] private float initializationDelay = 0.1f; // Delay before starting to use FicTrac data
+    [SerializeField] private float initializationDelay = 0.1f;
 
-    private UdpAnimalDataReceiver _dataReceiver;
+    private ZmqListener _zmqListener;
     private Vector3 _initialPosition;
     private Quaternion _initialRotation;
     private Vector3 _lastFicTracData;
     private bool _isInitialized = false;
-    private const int COL_X = 15;
-    private const int COL_Y = 16;
-    private const int COL_ROT = 17;
     private Quaternion _ficTracRotationOffset;
     private float _initializationTimer;
 
     private void Start()
     {
-        _dataReceiver = GetComponent<UdpAnimalDataReceiver>();
-        if (_dataReceiver == null)
-            Debug.LogError("UdpAnimalDataReceiver component not found!");
+        _zmqListener = GetComponent<ZmqListener>();
+        if (_zmqListener == null)
+            Debug.LogError("ZmqListener component not found!");
         _initialPosition = transform.position;
         _initialRotation = transform.rotation;
         ResetPositionAndRotation();
@@ -29,7 +26,7 @@ public class CorrectFicTracUnityController : MonoBehaviour
 
     private void Update()
     {
-        if (_dataReceiver?.AnimalData == null) return;
+        if (_zmqListener.pose == null) return;
 
         if (Input.GetKeyDown(resetKey))
         {
@@ -88,7 +85,9 @@ public class CorrectFicTracUnityController : MonoBehaviour
 
     private Vector3 GetCurrentFicTracData()
     {
-        float[] data = _dataReceiver.AnimalData;
-        return new Vector3(data[COL_Y], data[COL_X], data[COL_ROT]);
+        Pose pose = _zmqListener.pose;
+        // Assuming the ZMQ data is in the same format as your previous UDP data
+        // You may need to adjust this based on the actual data format from ZMQ
+        return new Vector3(pose.position.y, pose.position.x, pose.rotation.eulerAngles.y * Mathf.Deg2Rad);
     }
 }
