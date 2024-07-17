@@ -112,6 +112,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 14
       objectReference: {fileID: 0}
+    - target: {fileID: 5687458890810039266, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: layerName
+      value: SimulatedLocustsVR4
+      objectReference: {fileID: 0}
     - target: {fileID: 7510037034238600751, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: locustLayerMask.m_Bits
       value: 16384

@@ -101,10 +101,13 @@ PrefabInstance:
       addedObject: {fileID: 5687458890810039266}
     - targetCorrespondingSourceObject: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3417642753999500469}
+      addedObject: {fileID: 1176120221395219327}
     - targetCorrespondingSourceObject: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1176120221395219327}
+      addedObject: {fileID: 7956890610437731453}
+    - targetCorrespondingSourceObject: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1219847608452332865}
   m_SourcePrefab: {fileID: 100100000, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
 --- !u!1 &2798074368093061287 stripped
 GameObject:
@@ -132,20 +135,6 @@ MonoBehaviour:
   layerName: SimulatedLocustsVR1
   boundaryManager: {fileID: 1176120221395219327}
   loadConfigFromJsonFile: 0
---- !u!114 &3417642753999500469
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2798074368093061287}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e70685f7abae4fe598f6bfcc79ae164, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  boundaryManager: {fileID: 1176120221395219327}
-  speed: 4
 --- !u!114 &1176120221395219327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -160,3 +149,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boundarySize: 200
   boundaryBuffer: 0.5
+--- !u!114 &7956890610437731453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2798074368093061287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c3b9be28f19f4a578dcfd2d5b23790b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1219847608452332865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2798074368093061287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4d9a648f6b02a9b39420b55a4c3b96a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  locustLayerMask:
+    serializedVersion: 2
+    m_Bits: 2048

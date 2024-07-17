@@ -331,7 +331,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c719e38f25a9480abd2480ab621a2949, type: 2}
+  - {fileID: 2100000, guid: 1447f2ee7f990c88b8fc3088b9ef75cc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -384,10 +384,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 423771344688145782, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
-      propertyPath: initialRotation.y
-      value: 90
-      objectReference: {fileID: 0}
     - target: {fileID: 423771344688145806, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
       propertyPath: m_Name
       value: VR4 Swarm
@@ -432,53 +428,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7915254056391474891, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
-      propertyPath: layerName
-      value: SimulatedLocustsVR4
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 423771344688145806, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1384029797}
-    - targetCorrespondingSourceObject: {fileID: 423771344688145806, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1384029807}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
---- !u!1 &1384029796 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 423771344688145806, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
-  m_PrefabInstance: {fileID: 1384029795}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1384029797
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1384029796}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c3b9be28f19f4a578dcfd2d5b23790b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1384029807
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1384029796}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4d9a648f6b02a9b39420b55a4c3b96a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  locustLayerMask:
-    serializedVersion: 2
-    m_Bits: 16384
 --- !u!1001 &1690590056
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -487,10 +441,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2798074368093061215, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
-      propertyPath: initialRotation.y
-      value: 90
-      objectReference: {fileID: 0}
     - target: {fileID: 2798074368093061286, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -535,53 +485,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: VR1 Swarm
       objectReference: {fileID: 0}
-    - target: {fileID: 5687458890810039266, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
-      propertyPath: kappa
-      value: 100000
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2798074368093061287, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1690590058}
-    - targetCorrespondingSourceObject: {fileID: 2798074368093061287, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1690590068}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
---- !u!1 &1690590057 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2798074368093061287, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
-  m_PrefabInstance: {fileID: 1690590056}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1690590058
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1690590057}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c3b9be28f19f4a578dcfd2d5b23790b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1690590068
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1690590057}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4d9a648f6b02a9b39420b55a4c3b96a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  locustLayerMask:
-    serializedVersion: 2
-    m_Bits: 2048
 --- !u!1001 &4722025727024341857
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -590,10 +498,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1330193872785025130, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
-      propertyPath: initialRotation.y
-      value: 90
-      objectReference: {fileID: 0}
     - target: {fileID: 1330193872785025170, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
       propertyPath: m_Name
       value: VR2 Swarm
@@ -638,53 +542,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8812669456100504535, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
-      propertyPath: layerName
-      value: SimulatedLocustsVR2
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1330193872785025170, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4722025727024341859}
-    - targetCorrespondingSourceObject: {fileID: 1330193872785025170, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4722025727024341869}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
---- !u!1 &4722025727024341858 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1330193872785025170, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
-  m_PrefabInstance: {fileID: 4722025727024341857}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &4722025727024341859
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4722025727024341858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c3b9be28f19f4a578dcfd2d5b23790b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4722025727024341869
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4722025727024341858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4d9a648f6b02a9b39420b55a4c3b96a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  locustLayerMask:
-    serializedVersion: 2
-    m_Bits: 4096
 --- !u!1001 &6539561719468639700
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -693,10 +555,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4602136961950407237, guid: a122962340c890a529580fd616e93595, type: 3}
-      propertyPath: layerName
-      value: SimulatedLocustsVR3
-      objectReference: {fileID: 0}
     - target: {fileID: 6334096569946685696, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: m_Name
       value: VR3 Swarm
@@ -741,53 +599,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6334096569946685944, guid: a122962340c890a529580fd616e93595, type: 3}
-      propertyPath: initialRotation.y
-      value: 90
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6334096569946685696, guid: a122962340c890a529580fd616e93595, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6539561719468639702}
-    - targetCorrespondingSourceObject: {fileID: 6334096569946685696, guid: a122962340c890a529580fd616e93595, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6539561719468639712}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a122962340c890a529580fd616e93595, type: 3}
---- !u!1 &6539561719468639701 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6334096569946685696, guid: a122962340c890a529580fd616e93595, type: 3}
-  m_PrefabInstance: {fileID: 6539561719468639700}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &6539561719468639702
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6539561719468639701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c3b9be28f19f4a578dcfd2d5b23790b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &6539561719468639712
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6539561719468639701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4d9a648f6b02a9b39420b55a4c3b96a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  locustLayerMask:
-    serializedVersion: 2
-    m_Bits: 8192
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

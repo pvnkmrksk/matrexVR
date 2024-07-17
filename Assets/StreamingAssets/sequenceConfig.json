@@ -1,5 +1,26 @@
 {
   "sequences": [
+  
+  {
+      "sceneName": "Swarm",
+      "duration": 10,
+      "parameters": {
+        "numberOfLocusts": 128,
+        "mu": 0,
+        "kappa" :1000,
+        "locustSpeed" : 2
+      }
+    },
+    {
+      "sceneName": "Swarm",
+      "duration": 10,
+      "parameters": {
+        "numberOfLocusts": 128,
+        "mu": 90,
+        "kappa" :1000,
+        "locustSpeed" : 2
+      }
+    },
     {
       "sceneName": "Choice",
       "duration": 20,

@@ -85,17 +85,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c75a3f1e40cc87811bdffcc067133c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPosition: {x: 0, y: 0, z: 0}
-  initialRotation: {x: 0, y: 0, z: 0}
-  sphereRadius: 5
-  xGain: 1
-  yGain: 1
-  zGain: 1
-  rotationGain: 1
+  sphereDiameter: 9.9
+  resetKey: 114
+  initializationDelay: 0.1
   closedLoopPosition: 1
   closedLoopOrientation: 1
-  accumulatePosition: 1
-  accumulateRotation: 1
 --- !u!114 &4886124528207133730
 MonoBehaviour:
   m_ObjectHideFlags: 0

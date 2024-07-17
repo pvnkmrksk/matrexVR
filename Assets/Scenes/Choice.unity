@@ -646,7 +646,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5665556470671942804, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
       propertyPath: sphereDiameter
-      value: 10
+      value: 9.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 5665556470671942804, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
+      propertyPath: closedLoopOrientation
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6427121423757256516, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
       propertyPath: m_IsActive
@@ -683,7 +687,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318583, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: sphereDiameter
-      value: 10
+      value: 9.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2640750660579318583, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
+      propertyPath: closedLoopOrientation
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318734, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: m_RootOrder
@@ -792,7 +800,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: sphereDiameter
-      value: 10
+      value: 9.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: closedLoopOrientation
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586276, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: startCol
@@ -837,7 +849,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 668772779780633183, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: sphereDiameter
-      value: 10
+      value: 9.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 668772779780633183, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
+      propertyPath: closedLoopOrientation
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 668772779780633254, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -898,6 +914,6 @@ SceneRoots:
   - {fileID: 1947130651}
   - {fileID: 6789758097467590959}
   - {fileID: 604776878787064245}
-  - {fileID: 163937260}
   - {fileID: 1638632443318510459}
   - {fileID: 7076154443342934818}
+  - {fileID: 163937260}
