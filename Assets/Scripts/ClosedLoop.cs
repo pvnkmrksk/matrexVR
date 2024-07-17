@@ -2,9 +2,13 @@ using UnityEngine;
 
 public class ClosedLoop : MonoBehaviour
 {
-    [SerializeField] private float sphereRadius = 1f;
-    [SerializeField] private KeyCode resetKey = KeyCode.R;
-    [SerializeField] private float initializationDelay = 0.1f;
+
+
+    [SerializeField] [Tooltip("The diameter of the sphere in cm")] private float sphereDiameter = 1f;
+
+    private float sphereRadius;
+    [SerializeField] [Tooltip("The key to reset the position and rotation")] private KeyCode resetKey = KeyCode.R;
+    [SerializeField] [Tooltip("The delay in seconds before starting to use FicTrac data after reset.")] private float initializationDelay = 0.1f;
 
     private ZmqListener _zmqListener;
     private Vector3 _initialPosition;
@@ -15,11 +19,12 @@ public class ClosedLoop : MonoBehaviour
     private float _initializationTimer;
 
     // Add these new variables
-    private bool closedLoopPosition = true;
-    private bool closedLoopOrientation = true;
+    [SerializeField] [Tooltip("Whether to apply the FicTrac position in closed loop")] private bool closedLoopPosition = true;
+    [SerializeField] [Tooltip("Whether to apply the FicTrac rotation in closed loop")] private bool closedLoopOrientation = true;
 
     private void Start()
     {
+        sphereRadius = sphereDiameter / 2f;
         _zmqListener = GetComponent<ZmqListener>();
         if (_zmqListener == null)
             Debug.LogError("ZmqListener component not found!");
