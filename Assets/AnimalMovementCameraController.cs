@@ -4,6 +4,7 @@ public class CorrectFicTracUnityController : MonoBehaviour
 {
     [SerializeField] private float sphereRadius = 1f;
     [SerializeField] private KeyCode resetKey = KeyCode.R;
+    [SerializeField] private float initializationDelay = 0.1f; // Delay before starting to use FicTrac data
 
     private UdpAnimalDataReceiver _dataReceiver;
     private Vector3 _initialPosition;
@@ -14,6 +15,7 @@ public class CorrectFicTracUnityController : MonoBehaviour
     private const int COL_Y = 16;
     private const int COL_ROT = 17;
     private Quaternion _ficTracRotationOffset;
+    private float _initializationTimer;
 
     private void Start()
     {
@@ -22,7 +24,7 @@ public class CorrectFicTracUnityController : MonoBehaviour
             Debug.LogError("UdpAnimalDataReceiver component not found!");
         _initialPosition = transform.position;
         _initialRotation = transform.rotation;
-        _ficTracRotationOffset = Quaternion.identity;
+        ResetPositionAndRotation();
     }
 
     private void Update()
@@ -36,18 +38,25 @@ public class CorrectFicTracUnityController : MonoBehaviour
         }
 
         if (!_isInitialized)
-            InitializeFicTracData();
+        {
+            _initializationTimer += Time.deltaTime;
+            if (_initializationTimer >= initializationDelay)
+            {
+                InitializeFicTracData();
+            }
+        }
         else
+        {
             UpdateTransform();
+        }
     }
 
     private void InitializeFicTracData()
     {
         _lastFicTracData = GetCurrentFicTracData();
-        _isInitialized = true;
-        // Calculate the initial rotation offset
         float initialYaw = _lastFicTracData.z;
         _ficTracRotationOffset = Quaternion.Euler(0, -initialYaw * Mathf.Rad2Deg, 0);
+        _isInitialized = true;
         Debug.Log($"Initialized with FicTrac data: ({_lastFicTracData.x}, {_lastFicTracData.y}, {_lastFicTracData.z})");
     }
 
@@ -71,8 +80,10 @@ public class CorrectFicTracUnityController : MonoBehaviour
     {
         transform.SetPositionAndRotation(_initialPosition, _initialRotation);
         _isInitialized = false;
-        InitializeFicTracData();
-        Debug.Log("Reset to initial position and rotation. Re-initialized FicTrac data reference.");
+        _ficTracRotationOffset = Quaternion.identity;
+        _initializationTimer = 0f;
+        _lastFicTracData = Vector3.zero;
+        Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
     }
 
     private Vector3 GetCurrentFicTracData()
