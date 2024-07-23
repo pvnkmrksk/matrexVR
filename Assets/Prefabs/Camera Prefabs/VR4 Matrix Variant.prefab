@@ -170,30 +170,11 @@ PrefabInstance:
     - {fileID: 3201045201294059550, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
     - {fileID: 6667033672847271560, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
     - {fileID: 1301312831835937095, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+    - {fileID: 5573703444968526164, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+    - {fileID: 3735890875781830760, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+    - {fileID: 3703967730535896662, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+    - {fileID: 7915254056391474891, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 423771344688145806, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4970598104264280157}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
---- !u!1 &6521467020865543445 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 423771344688145806, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
-  m_PrefabInstance: {fileID: 6872895998004164763}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &4970598104264280157
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6521467020865543445}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9447f38b5f005209bfce356aa69e551, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tilePrefab: {fileID: 1616747004011761651, guid: 4ddc52669d76f426187bd17a1e19775a, type: 3}
-  numberOfRings: 2
-  spacing: 20

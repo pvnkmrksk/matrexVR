@@ -428,6 +428,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1389632807788785094, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3735890875781830760, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
       propertyPath: locustLayerMask.m_Bits
       value: 16384
@@ -440,7 +444,8 @@ PrefabInstance:
       propertyPath: locustSpeed
       value: 2
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1389632807788785094, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -497,6 +502,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: VR1 Swarm
       objectReference: {fileID: 0}
+    - target: {fileID: 3494159682821081327, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5687458890810039266, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: kappa
       value: 1
@@ -505,7 +514,8 @@ PrefabInstance:
       propertyPath: locustSpeed
       value: 2
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3494159682821081327, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -518,6 +528,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 350350723476250842, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1330193872785025170, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
       propertyPath: m_Name
       value: VR2 Swarm
@@ -574,7 +588,8 @@ PrefabInstance:
       propertyPath: locustSpeed
       value: 2
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 350350723476250842, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -594,6 +609,10 @@ PrefabInstance:
     - target: {fileID: 4602136961950407237, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: locustSpeed
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4705774676183058760, guid: a122962340c890a529580fd616e93595, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6334096569946685696, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: m_Name
@@ -643,7 +662,8 @@ PrefabInstance:
       propertyPath: locustLayerMask.m_Bits
       value: 8192
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4705774676183058760, guid: a122962340c890a529580fd616e93595, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

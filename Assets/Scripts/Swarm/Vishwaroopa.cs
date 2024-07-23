@@ -1,9 +1,11 @@
 using UnityEngine;
+using System;
+using System.Collections.Generic;
 
 /// <summary>
-/// Generates a hexagonal grid of tiles around the center.
+/// Generates a vishwaroopa of hexagonal grid of tiles around the center cloning all of them.
 /// </summary>
-public class HexGridGenerator : MonoBehaviour
+public class Vishwaroopa : MonoBehaviour, ISceneController
 {
     public GameObject tilePrefab; // Prefab for the tile. Locust prefab
     public int numberOfRings = 3; // Number of rings outward from the center
@@ -17,6 +19,57 @@ public class HexGridGenerator : MonoBehaviour
     {
         GenerateHexGrid();
     }
+
+    public void InitializeScene(Dictionary<string, object> parameters)
+    {
+        if (parameters == null)
+        {
+            Debugger.Log("Parameters is null.", 1);
+            return;
+        }
+
+
+        foreach (var entry in parameters)
+        {
+            Debugger.Log(
+                $"Parames Key: {entry.Key}, Value: {entry.Value}, Type: {entry.Value?.GetType()}"
+            );
+        }
+
+        Vishwaroopa[] Vishwaroopas = FindObjectsOfType<Vishwaroopa>();
+
+        if (Vishwaroopas == null || Vishwaroopas.Length == 0)
+        {
+            Debugger.Log("No Vishwaroopas found.", 2);
+            return;
+        }
+
+        foreach (Vishwaroopa roopa in Vishwaroopas)
+{
+
+        if (parameters.TryGetValue("numberOfRings", out object numberOfRings))
+        {
+            roopa.numberOfRings = Convert.ToInt32(numberOfRings);
+            Debug.Log("numberOfRings: test " + roopa.numberOfRings);
+        }
+        else
+        {
+            Debugger.Log("Invalid or missing 'numberOfRings' parameter.", 2);
+        }
+
+        if (parameters.TryGetValue("spacing", out object spacing))
+        {
+            roopa.spacing = Convert.ToSingle(spacing);
+        }
+        else
+        {
+            Debugger.Log("Invalid or missing 'spacing' parameter.", 2);
+        }
+
+        Debugger.Log("Initializingf Swarm scene with parameters: " + parameters.ToString());
+}
+    }
+
 
     void Update()
     {
