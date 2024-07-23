@@ -129,7 +129,7 @@ public class ViewportSetter : MonoBehaviour
                     cam.rect = new Rect(viewport_x, viewport_y, viewport_width, viewport_height);
                 }
 
-                if (cam.name == "Main Camera F")
+                if (cam.name == "Main Camera B")
                 {
                     cam.rect = new Rect(
                         viewport_x,
@@ -149,7 +149,7 @@ public class ViewportSetter : MonoBehaviour
                     );
                 }
 
-                if (cam.name == "Main Camera B")
+                if (cam.name == "Main Camera F")
                 {
                     cam.rect = new Rect(
                         viewport_x,
