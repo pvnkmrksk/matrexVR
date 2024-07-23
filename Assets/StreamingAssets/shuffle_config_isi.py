@@ -4,7 +4,7 @@ from pathlib import Path
 # Read the JSON file
 insert_isi=True
 config_file_name='sequenceConfig_swarm.json'
-shuffle_file_name='shuffled_sequenceConfig_swarm2.json'
+shuffle_file_name='shuffled_sequenceConfig_2dir.json'
 with open(Path(config_file_name),'r') as file:
     data = json.load(file)
 
@@ -19,7 +19,7 @@ if insert_isi==True:
       "parameters": {
         "numberOfLocusts": 0,
         "mu": 0,
-        "kappa" :1000,
+        "kappa" :10000,
         "locustSpeed" : 2
       }
     }

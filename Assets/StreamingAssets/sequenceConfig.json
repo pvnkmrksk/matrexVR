@@ -1,125 +1,84 @@
 {
-  "sequences": [
-  
-  {
-      "sceneName": "Swarm",
-      "duration": 10,
-      "parameters": {
-        "numberOfLocusts": 128,
-        "mu": 0,
-        "kappa" :1000,
-        "locustSpeed" : 2
-      }
-    },
-    {
-      "sceneName": "Swarm",
-      "duration": 10,
-      "parameters": {
-        "numberOfLocusts": 128,
-        "mu": 90,
-        "kappa" :1000,
-        "locustSpeed" : 2
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
-      }
-    },{
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_Empty_Lemon.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_Lemon_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_Lemon_Lemon_asym.json"
-      }
-    },
-  
-
-
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_Lemon_Lemon_sym.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_Empty_LemonRed.json"
-      }
-    },
-
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_LemonRed_Empty.json"
-      }
-    },
-
-
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_LemonRed_LemonRed_asym.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_LemonRed_LemonRed_sym.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_Lemon_LemonRed_sym.json"
-      }
-    },
-
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_LemonRed_LemonRedFar_sym.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_LemonRedFar_LemonRed_sym.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_LemonRedFar_LemonRedFar_sym.json"
-      }
-    }
-
-
-    
-  ]
+    "sequences": [
+        {
+            "sceneName": "Swarm",
+            "duration": 3,
+            "parameters": {
+                "numberOfLocusts": 0,
+                "mu": 0,
+                "kappa": 1000,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 900,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 0,
+                "kappa": 10,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 60,
+            "parameters": {
+                "numberOfLocusts": 0,
+                "mu": 0,
+                "kappa": 1000,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 900,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 0,
+                "kappa": 10000,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 60,
+            "parameters": {
+                "numberOfLocusts": 0,
+                "mu": 0,
+                "kappa": 1000,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 900,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 0,
+                "kappa": 1,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 60,
+            "parameters": {
+                "numberOfLocusts": 0,
+                "mu": 0,
+                "kappa": 1000,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 900,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 0,
+                "kappa": 100,
+                "locustSpeed": 2
+            }
+        }
+    ]
 }

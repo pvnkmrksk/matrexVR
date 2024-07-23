@@ -183,7 +183,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c719e38f25a9480abd2480ab621a2949, type: 2}
+  - {fileID: 2100000, guid: 9212c0db92a2b6b4191ee4bd0a08ffab, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -330,6 +330,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1606903240016801972, guid: b50b70a6cbb13e4698d82adc128c898c, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483639338145049348, guid: b50b70a6cbb13e4698d82adc128c898c, type: 3}
+      propertyPath: numberOfRings
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3949016526517346091, guid: b50b70a6cbb13e4698d82adc128c898c, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6842254202370524270, guid: b50b70a6cbb13e4698d82adc128c898c, type: 3}
       propertyPath: m_Name
       value: VR3 Matrix
@@ -374,6 +386,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7551855763518470536, guid: b50b70a6cbb13e4698d82adc128c898c, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7551855763518470536, guid: b50b70a6cbb13e4698d82adc128c898c, type: 3}
+      propertyPath: locustLayerMask.m_Bits
+      value: 8192
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -387,6 +407,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1967434564645447521, guid: c4d7aaaf42da35e578e856bae2f97c8e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1967434564645447521, guid: c4d7aaaf42da35e578e856bae2f97c8e, type: 3}
+      propertyPath: locustLayerMask.m_Bits
+      value: 6144
+      objectReference: {fileID: 0}
     - target: {fileID: 3275452216181086854, guid: c4d7aaaf42da35e578e856bae2f97c8e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -431,6 +459,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: VR2 Matrix
       objectReference: {fileID: 0}
+    - target: {fileID: 4993812512462062018, guid: c4d7aaaf42da35e578e856bae2f97c8e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7335504411145629277, guid: c4d7aaaf42da35e578e856bae2f97c8e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8808907630169314738, guid: c4d7aaaf42da35e578e856bae2f97c8e, type: 3}
+      propertyPath: numberOfRings
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -444,6 +484,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2199504554372699630, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2936118820554942472, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
       propertyPath: m_Name
       value: VR1 Matrix
@@ -488,6 +532,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4649431052258554701, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5595696835651559976, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+      propertyPath: numberOfRings
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919636278302219474, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -501,6 +557,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1312988125446121935, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3655181126471976528, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4970598104264280157, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}
+      propertyPath: numberOfRings
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6521467020865543444, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -544,6 +612,14 @@ PrefabInstance:
     - target: {fileID: 6521467020865543445, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}
       propertyPath: m_Name
       value: VR4 Matrix
+      objectReference: {fileID: 0}
+    - target: {fileID: 7834542116664811763, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7834542116664811763, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}
+      propertyPath: locustLayerMask.m_Bits
+      value: 18432
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
