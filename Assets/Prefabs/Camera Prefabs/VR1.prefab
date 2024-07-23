@@ -61,6 +61,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2386836546770343658, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
+      propertyPath: sphereDiameter
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2386836546770343658, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
       propertyPath: initialPosition.y
       value: 1
       objectReference: {fileID: 0}
@@ -79,6 +83,14 @@ PrefabInstance:
     - target: {fileID: 2386836546770343662, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
       propertyPath: startRow
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2386836546770343662, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
+      propertyPath: ledPanelWidth
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 2386836546770343662, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
+      propertyPath: ledPanelHeight
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 2386836546770343663, guid: 96d2f5120a0f5576e9eb1ed0f9d55e34, type: 3}
       propertyPath: address

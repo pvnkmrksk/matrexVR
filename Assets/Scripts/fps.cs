@@ -27,7 +27,7 @@ public class fps : MonoBehaviour
         GUIStyle style = new GUIStyle();
 
         // place the fps at the top left corner of the screen, 128 px below the top
-        Rect rect = new Rect(200, 12, w, h * 2 / 100);
+        Rect rect = new Rect(200, 128, w, h * 12 / 100);
         style.alignment = TextAnchor.UpperLeft;
         style.fontSize = h * 2 / 100;
         style.normal.textColor = new Color(0.0f, 0.0f, 0.5f, 1.0f);

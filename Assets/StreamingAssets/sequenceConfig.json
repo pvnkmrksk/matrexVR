@@ -1,22 +1,26 @@
 {
     "sequences": [
-        {
-            "sceneName": "Matrix",
-            "duration": 20,
-            "parameters": {
-              "configFile": "Choice_Empty_Empty.json"
-            }
-          },
+
       {
         "sceneName": "Choice",
-        "duration": 20,
+        "duration": 5,
         "parameters": {
           "configFile": "Choice_Empty_Lemon.json"
         }
       },
       {
+        "sceneName": "Swarm",
+        "duration": 5,
+        "parameters": {
+          "numberOfLocusts": 128,
+          "mu": 0,
+          "kappa" :10000,
+          "locustSpeed" : 2
+        }
+      },
+      {
         "sceneName": "Choice",
-        "duration": 20,
+        "duration": 5,
         "parameters": {
           "configFile": "Choice_Lemon_Empty.json"
         }

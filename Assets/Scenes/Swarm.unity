@@ -388,6 +388,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: VR4 Swarm
       objectReference: {fileID: 0}
+    - target: {fileID: 423771344688145806, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 423771344688145807, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -522,6 +526,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: VR2 Swarm
       objectReference: {fileID: 0}
+    - target: {fileID: 1330193872785025170, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1330193872785025171, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -598,6 +606,10 @@ PrefabInstance:
     - target: {fileID: 6334096569946685696, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: m_Name
       value: VR3 Swarm
+      objectReference: {fileID: 0}
+    - target: {fileID: 6334096569946685696, guid: a122962340c890a529580fd616e93595, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6334096569946685697, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: m_LocalPosition.x
