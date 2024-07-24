@@ -19,8 +19,14 @@ public class ClosedLoop : MonoBehaviour
     [SerializeField, Range(0, 1000)]
     private float zGain = 100.0f;
 
-    [SerializeField, Range(0, 10)]
-    private float rotationGain = 1f;
+    [SerializeField, Range(0, 1000)]
+    private float rollGain = 1f;
+
+    [SerializeField, Range(0, 1000)]
+    private float yawGain = 1f;
+
+    [SerializeField, Range(0, 1000)]
+    private float pitchGain = 1f;
 
     [Header("Closed Loop Settings")]
     [SerializeField]
@@ -54,7 +60,6 @@ public class ClosedLoop : MonoBehaviour
         {
             UpdateTransform();
         }
-
     }
 
     private void HandleInput()
@@ -83,22 +88,26 @@ public class ClosedLoop : MonoBehaviour
         Vector3 newPosition = _zmqListener.pose.position;
         Quaternion newRotation = _zmqListener.pose.rotation;
 
-        // Handle position
+        // Handle position (Force mode)
         if (closedLoopPosition && IsValidVector3(newPosition))
         {
-            Vector3 positionChange = new Vector3(
-                newPosition.x * xGain,
-                newPosition.z * -zGain,
-                -newPosition.y * yGain
-            ) * sphereRadius;
+            // Calculate position change based on input, applying gains and scaling
+            Vector3 positionChange =
+                new Vector3(
+                    newPosition.x * xGain,
+                    newPosition.z * -zGain, // Note: Z and Y are swapped and Y is negated
+                    -newPosition.y * yGain
+                ) * sphereRadius;
 
             if (accumulatePosition)
             {
-                accumulatedPosition += positionChange * Time.deltaTime;
-                transform.position = initialPosition + accumulatedPosition;
+                // Treat position change as velocity for continuous movement
+                Vector3 velocity = positionChange;
+                transform.Translate(velocity * Time.deltaTime, Space.World);
             }
             else
             {
+                // Set position directly for immediate response
                 transform.position = initialPosition + positionChange;
             }
         }
@@ -106,20 +115,29 @@ public class ClosedLoop : MonoBehaviour
         // Handle rotation
         if (closedLoopOrientation && IsValidQuaternion(newRotation))
         {
-            Quaternion rotationChange = Quaternion.Slerp(
-                Quaternion.identity,
-                newRotation,
-                rotationGain
-            );
-
             if (accumulateRotation)
             {
-                accumulatedRotation *= rotationChange;
-                transform.rotation = Quaternion.Euler(initialRotation) * accumulatedRotation;
+                // Torque mode: Continuous rotation based on input
+                Quaternion rotationDelta = Quaternion.identity;
+                // Apply rotation around local right axis (X)
+                rotationDelta *= Quaternion.AngleAxis(-newRotation.x * rollGain, transform.right);
+                // Apply rotation around local up axis (Y)
+                rotationDelta *= Quaternion.AngleAxis(newRotation.y * yawGain, transform.up);
+                // Apply rotation around local forward axis (Z)
+                rotationDelta *= Quaternion.AngleAxis(newRotation.z * pitchGain, transform.forward);
+
+                // Apply the calculated rotation
+                transform.rotation *= rotationDelta;
             }
             else
             {
-                transform.rotation = Quaternion.Euler(initialRotation) * rotationChange;
+                // Direct rotation mode: Smoothly interpolate to target rotation
+                Quaternion targetRotation = Quaternion.Euler(initialRotation) * newRotation;
+                transform.rotation = Quaternion.Slerp(
+                    transform.rotation,
+                    targetRotation,
+                    Time.deltaTime * 20f
+                );
             }
         }
     }
