@@ -131,12 +131,17 @@ public class ClosedLoop : MonoBehaviour
             }
             else
             {
-                // Direct rotation mode: Smoothly interpolate to target rotation
-                Quaternion targetRotation = Quaternion.Euler(initialRotation) * newRotation;
+                // Direct rotation mode: Flip the rotation about X-axis
+                Vector3 eulerRotation = newRotation.eulerAngles;
+                eulerRotation.x = -eulerRotation.x; // Flip the X-axis rotation
+                Quaternion flippedRotation = Quaternion.Euler(eulerRotation);
+
+                // Combine with initial rotation and apply
+                Quaternion targetRotation = Quaternion.Euler(initialRotation) * flippedRotation;
                 transform.rotation = Quaternion.Slerp(
                     transform.rotation,
                     targetRotation,
-                    Time.deltaTime * 20f
+                    Time.deltaTime * 10f
                 );
             }
         }
