@@ -72,9 +72,9 @@ public class ClosedLoop : MonoBehaviour
             ToggleAccumulateRotation();
         if (Input.GetKeyDown(KeyCode.RightBracket))
             ToggleAccumulatePosition();
-        if (Input.GetKeyDown(KeyCode.R))
-            ResetPosition();
         if (Input.GetKeyDown(KeyCode.T))
+            ResetPosition();
+        if (Input.GetKeyDown(KeyCode.R))
             ResetRotation();
 
         if (Input.GetKeyUp(KeyCode.Escape))
