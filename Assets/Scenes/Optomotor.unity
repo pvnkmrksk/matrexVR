@@ -491,16 +491,28 @@ PrefabInstance:
       value: HighRes VR
       objectReference: {fileID: 0}
     - target: {fileID: 3963765251659798559, guid: 9d9d86002867f134da49c0366695ccda, type: 3}
+      propertyPath: yawGain
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3963765251659798559, guid: 9d9d86002867f134da49c0366695ccda, type: 3}
+      propertyPath: rollGain
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3963765251659798559, guid: 9d9d86002867f134da49c0366695ccda, type: 3}
+      propertyPath: pitchGain
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3963765251659798559, guid: 9d9d86002867f134da49c0366695ccda, type: 3}
       propertyPath: rotationGain
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3963765251659798559, guid: 9d9d86002867f134da49c0366695ccda, type: 3}
       propertyPath: accumulatePosition
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3963765251659798559, guid: 9d9d86002867f134da49c0366695ccda, type: 3}
       propertyPath: accumulateRotation
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3963765251659798559, guid: 9d9d86002867f134da49c0366695ccda, type: 3}
       propertyPath: closedLoopPosition

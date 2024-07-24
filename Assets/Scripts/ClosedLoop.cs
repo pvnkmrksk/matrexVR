@@ -119,19 +119,22 @@ public class ClosedLoop : MonoBehaviour
             {
                 // Torque mode: Continuous rotation based on input
                 Quaternion rotationDelta = Quaternion.identity;
-                // Apply rotation around local right axis (X)
-                rotationDelta *= Quaternion.AngleAxis(-newRotation.x * rollGain, transform.right);
-                // Apply rotation around local up axis (Y)
+
+                // Pitch: Rotation around local X-axis (right axis in Unity)
+                rotationDelta *= Quaternion.AngleAxis(-newRotation.x * pitchGain, transform.right);
+
+                // Yaw: Rotation around local Y-axis (up axis in Unity)
                 rotationDelta *= Quaternion.AngleAxis(newRotation.y * yawGain, transform.up);
-                // Apply rotation around local forward axis (Z)
-                rotationDelta *= Quaternion.AngleAxis(newRotation.z * pitchGain, transform.forward);
+
+                // Roll: Rotation around local Z-axis (forward axis in Unity)
+                rotationDelta *= Quaternion.AngleAxis(newRotation.z * rollGain, transform.forward);
 
                 // Apply the calculated rotation
                 transform.rotation *= rotationDelta;
             }
             else
             {
-                // Direct rotation mode: Flip the rotation about X-axis
+                // Direct rotation mode
                 Vector3 eulerRotation = newRotation.eulerAngles;
                 eulerRotation.x = -eulerRotation.x; // Flip the X-axis rotation
                 Quaternion flippedRotation = Quaternion.Euler(eulerRotation);
@@ -141,7 +144,7 @@ public class ClosedLoop : MonoBehaviour
                 transform.rotation = Quaternion.Slerp(
                     transform.rotation,
                     targetRotation,
-                    Time.deltaTime * 10f
+                    Time.deltaTime * 20f
                 );
             }
         }
