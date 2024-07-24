@@ -10,22 +10,22 @@ public class ClosedLoop : MonoBehaviour
     public float sphereRadius = 5f; // Default value for sphere radius in centimeters
 
     [Header("Gain Settings")]
-    [SerializeField, Range(0, 1000)]
+    [SerializeField, Range(0, 10000)]
     private float xGain = 100.0f;
 
-    [SerializeField, Range(0, 1000)]
+    [SerializeField, Range(0, 10000)]
     private float yGain = 100.0f;
 
-    [SerializeField, Range(0, 1000)]
+    [SerializeField, Range(0, 10000)]
     private float zGain = 100.0f;
 
-    [SerializeField, Range(0, 1000)]
+    [SerializeField, Range(0, 10000)]
     private float rollGain = 1f;
 
-    [SerializeField, Range(0, 1000)]
+    [SerializeField, Range(0, 10000)]
     private float yawGain = 1f;
 
-    [SerializeField, Range(0, 1000)]
+    [SerializeField, Range(0, 10000)]
     private float pitchGain = 1f;
 
     [Header("Closed Loop Settings")]
@@ -77,10 +77,54 @@ public class ClosedLoop : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
             ResetRotation();
 
+        //Use J and K to increase or decrease all the transaltion gains
+        if (Input.GetKeyDown(KeyCode.Semicolon))
+            IncreaseTranslationGain();
+        if (Input.GetKeyDown(KeyCode.L))
+            DecreaseTranslationGain();
+
+        // Use  l and ; to increase or decrease all the rotation gains
+        if (Input.GetKeyDown(KeyCode.K))
+            IncreaseRotationGain();
+        if (Input.GetKeyDown(KeyCode.J))
+            DecreaseRotationGain();
+
         if (Input.GetKeyUp(KeyCode.Escape))
         {
             Application.Quit();
         }
+    }
+
+    private void IncreaseTranslationGain()
+    {
+        //increase x y z gains by 10%. Limit it to range of 0 and 10000
+        xGain = Mathf.Min(xGain * 1.1f, 10000f);
+        yGain = Mathf.Min(yGain * 1.1f, 10000f);
+        zGain = Mathf.Min(zGain * 1.1f, 10000f);
+    }
+
+    private void DecreaseTranslationGain()
+    {
+        //increase x y z gains by 10%. Limit it to range of 0 and 1000
+        xGain = Mathf.Max(xGain * 0.9f, 0f);
+        yGain = Mathf.Max(yGain * 0.9f, 0f);
+        zGain = Mathf.Max(zGain * 0.9f, 0f);
+    }
+
+    private void IncreaseRotationGain()
+    {
+        //increase x y z gains by 10%. Limit it to range of 0 and 1000
+        rollGain = Mathf.Min(rollGain * 1.1f, 10000f);
+        yawGain = Mathf.Min(yawGain * 1.1f, 10000f);
+        pitchGain = Mathf.Min(pitchGain * 1.1f, 10000f);
+    }
+
+    private void DecreaseRotationGain()
+    {
+        //increase x y z gains by 10%. Limit it to range of 0 and 1000
+        rollGain = Mathf.Max(rollGain * 0.9f, 0f);
+        yawGain = Mathf.Max(yawGain * 0.9f, 0f);
+        pitchGain = Mathf.Max(pitchGain * 0.9f, 0f);
     }
 
     private void UpdateTransform()
@@ -179,16 +223,28 @@ public class ClosedLoop : MonoBehaviour
     public void ToggleAccumulatePosition()
     {
         accumulatePosition = !accumulatePosition;
-        if (!accumulatePosition)
+
+        if (accumulatePosition)
+            closedLoopPosition = true;
+        else
+        {
+            closedLoopPosition = false;
             ResetPosition();
+        }
         Debug.Log($"Accumulate Position: {(accumulatePosition ? "ON" : "OFF")}");
     }
 
     public void ToggleAccumulateRotation()
     {
         accumulateRotation = !accumulateRotation;
-        if (!accumulateRotation)
+
+        if (accumulateRotation)
+            closedLoopOrientation = true;
+        else
+        {
+            closedLoopOrientation = false;
             ResetRotation();
+        }
         Debug.Log($"Accumulate Rotation: {(accumulateRotation ? "ON" : "OFF")}");
     }
 

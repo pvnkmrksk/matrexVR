@@ -27,6 +27,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1089562538694770136}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -36,7 +37,6 @@ Transform:
   - {fileID: 7423676971825585771}
   - {fileID: 1441046639182049999}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8147302641586814161
 MonoBehaviour:
@@ -66,15 +66,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialPosition: {x: 0, y: 0, z: 0}
   initialRotation: {x: 0, y: 0, z: 0}
-  sphereRadius: 0.45
+  sphereRadius: 1
   xGain: 100
   yGain: 100
   zGain: 100
-  rollGain: 1
-  pitchGain: 1
-  yawGain: 1
-  closedLoopOrientation: 1
+  rollGain: 10
+  yawGain: 10
+  pitchGain: 10
   closedLoopPosition: 1
+  closedLoopOrientation: 1
+  accumulatePosition: 1
+  accumulateRotation: 1
 --- !u!114 &3392600262036474481
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -88,7 +90,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   translateSpeed: 10
-  rotateSpeed: 10
+  rotateSpeed: 50
   maxTranslateSpeed: 100
   maxRotateSpeed: 300
 --- !u!114 &921770703091716340
@@ -109,9 +111,17 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 5610891262150120139}
     m_Modifications:
+    - target: {fileID: 7091663093206049481, guid: d2a628cd4be5d33aa807c35f9dc20078, type: 3}
+      propertyPath: field of view
+      value: 121.284485
+      objectReference: {fileID: 0}
+    - target: {fileID: 7091663093206049481, guid: d2a628cd4be5d33aa807c35f9dc20078, type: 3}
+      propertyPath: m_TargetDisplay
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 7091663093206049492, guid: d2a628cd4be5d33aa807c35f9dc20078, type: 3}
       propertyPath: m_Name
       value: HighRes Camera L Variant
@@ -134,7 +144,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7091663093206049495, guid: d2a628cd4be5d33aa807c35f9dc20078, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.49999994
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 7091663093206049495, guid: d2a628cd4be5d33aa807c35f9dc20078, type: 3}
       propertyPath: m_LocalRotation.x
@@ -142,7 +152,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7091663093206049495, guid: d2a628cd4be5d33aa807c35f9dc20078, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.86602545
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 7091663093206049495, guid: d2a628cd4be5d33aa807c35f9dc20078, type: 3}
       propertyPath: m_LocalRotation.z
@@ -154,14 +164,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7091663093206049495, guid: d2a628cd4be5d33aa807c35f9dc20078, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -120
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 7091663093206049495, guid: d2a628cd4be5d33aa807c35f9dc20078, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d2a628cd4be5d33aa807c35f9dc20078, type: 3}
 --- !u!4 &7423676971825585771 stripped
 Transform:
@@ -173,9 +185,17 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 5610891262150120139}
     m_Modifications:
+    - target: {fileID: 2402017026735488749, guid: c61f80e38d3d8e1d996d00c56ec7c835, type: 3}
+      propertyPath: field of view
+      value: 121.284485
+      objectReference: {fileID: 0}
+    - target: {fileID: 2402017026735488749, guid: c61f80e38d3d8e1d996d00c56ec7c835, type: 3}
+      propertyPath: m_TargetDisplay
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2402017026735488752, guid: c61f80e38d3d8e1d996d00c56ec7c835, type: 3}
       propertyPath: m_Name
       value: HighRes Camera R Variant
@@ -198,7 +218,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2402017026735488755, guid: c61f80e38d3d8e1d996d00c56ec7c835, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.49999994
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 2402017026735488755, guid: c61f80e38d3d8e1d996d00c56ec7c835, type: 3}
       propertyPath: m_LocalRotation.x
@@ -206,7 +226,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2402017026735488755, guid: c61f80e38d3d8e1d996d00c56ec7c835, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.86602545
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 2402017026735488755, guid: c61f80e38d3d8e1d996d00c56ec7c835, type: 3}
       propertyPath: m_LocalRotation.z
@@ -218,14 +238,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2402017026735488755, guid: c61f80e38d3d8e1d996d00c56ec7c835, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 120
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 2402017026735488755, guid: c61f80e38d3d8e1d996d00c56ec7c835, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c61f80e38d3d8e1d996d00c56ec7c835, type: 3}
 --- !u!4 &1441046639182049999 stripped
 Transform:
@@ -237,9 +259,17 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TransformParent: {fileID: 5610891262150120139}
     m_Modifications:
+    - target: {fileID: 2863384497360505641, guid: dad8e8039be14c0b79a96f5955639355, type: 3}
+      propertyPath: field of view
+      value: 121.284485
+      objectReference: {fileID: 0}
+    - target: {fileID: 2863384497360505641, guid: dad8e8039be14c0b79a96f5955639355, type: 3}
+      propertyPath: m_TargetDisplay
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 2863384497360505652, guid: dad8e8039be14c0b79a96f5955639355, type: 3}
       propertyPath: m_Name
       value: HighRes Camera F Variant
@@ -289,7 +319,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dad8e8039be14c0b79a96f5955639355, type: 3}
 --- !u!4 &8274807109609895888 stripped
 Transform:
