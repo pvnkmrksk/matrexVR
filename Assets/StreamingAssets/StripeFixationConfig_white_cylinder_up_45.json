@@ -4,26 +4,14 @@
       "type": "Cylinder",
       "position": {
         "radius": 30,
-        "angle": 0,
-        "height": 10
+        "angle": 45,
+        "height": 9
       },
       "material": "White",
       "scale": {
         "x": 8,
-        "y": 17,
-        "z": 8
-      }
-    },
-    {
-      "type": "Cylinder",
-      "position": {
-        "radius": 30,
-        "angle": 0
-      },
-      "material": "White",
-      "scale": {
-        "x": 8,
-        "y": 10,
+        "y": 9
+        ,
         "z": 8
       }
     }
