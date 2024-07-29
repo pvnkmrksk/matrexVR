@@ -4,7 +4,8 @@
       "type": "Lemon",
       "position": {
         "radius": 30,
-        "angle": -30
+        "angle": -30,
+        "height": 0
       },
       "material": "LemonYellow",
       "scale": {

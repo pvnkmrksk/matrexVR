@@ -1,12 +1,13 @@
 {
   "objects": [
     {
-      "type": "cylinder",
+      "type": "Cylinder",
       "position": {
         "radius": 30,
-        "angle": 0
+        "angle": 0,
+        "height": 10
       },
-      "material": "white",
+      "material": "White",
       "scale": {
         "x": 8,
         "y": 17,
@@ -14,12 +15,12 @@
       }
     },
     {
-      "type": "cylinder",
+      "type": "Cylinder",
       "position": {
         "radius": 30,
         "angle": 0
       },
-      "material": "white",
+      "material": "White",
       "scale": {
         "x": 8,
         "y": 10,
