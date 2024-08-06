@@ -1,0 +1,26 @@
+{
+  "objects": [
+    {
+      "type": "Cylinder",
+      "position": {
+        "radius": 30,
+        "angle": -30,
+        "height": 0
+      },
+      "material": "White",
+      "scale": {
+        "x": 8,
+        "y": 9,
+        "z": 8
+      }
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0.15,
+    "g": 0.15,
+    "b": 0.15,
+    "a": 1
+  }
+}

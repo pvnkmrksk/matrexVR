@@ -1,62 +1,59 @@
 {
   "sequences": [
     {
-      "sceneName": "Choice_noBG",
-      "duration": 2,
+      "sceneName": "Optomotor",
+      "duration":40 ,
       "parameters": {
-        "configFile": "StripeFixationConfig2_empty.json"
+        "configFile": "Choice_Empty_Empty.json"
+      }
+    },{
+      "sceneName": "Choice",
+      "duration":40 ,
+      "parameters": {
+        "configFile": "Choice_Empty_Lemon.json"
       }
     },
     {
-      "sceneName": "Choice_noBG",
-      "duration": 2,
+      "sceneName": "Choice",
+      "duration":40 ,
       "parameters": {
-        "configFile": "StripeFixationConfig_white_cylinder_down_-45.json"
+        "configFile": "Choice_Lemon_Empty.json"
       }
     },
     {
-      "sceneName": "Choice_noBG",
-      "duration": 2,
+      "sceneName": "Choice",
+      "duration":40 ,
       "parameters": {
-        "configFile": "StripeFixationConfig2_empty.json"
+        "configFile": "Choice_Empty_LemonRed.json"
       }
     },
     {
-      "sceneName": "Choice_noBG",
-      "duration": 2,
+      "sceneName": "Choice",
+      "duration":40 ,
       "parameters": {
-        "configFile": "StripeFixationConfig_white_cylinder_up_45.json"
-      }
-    },
-    {
-      "sceneName": "Choice_noBG",
-      "duration": 2,
-      "parameters": {
-        "configFile": "StripeFixationConfig2_empty.json"
+        "configFile": "StripeFixationConfig_white_cylinder_up_30.json"
       }
     },
       {
-        "sceneName": "Choice_noBG",
-        "duration": 2,
+        "sceneName": "Choice",
+        "duration":40 ,
         "parameters": {
-          "configFile": "StripeFixationConfig_white_cylinder_down_45.json"
+          "configFile": "StripeFixationConfig_white_cylinder_up_-30.json"
         }
       },
+    {
+      "sceneName": "Choice",
+      "duration":40 ,
+      "parameters": {
+        "configFile": "StripeFixationConfig_black_cylinder_up_30.json"
+      }
+    },
       {
-        "sceneName": "Choice_noBG",
-        "duration": 2,
+        "sceneName": "Choice",
+        "duration":40 ,
         "parameters": {
-          "configFile": "StripeFixationConfig2_empty.json"
-        }
-      },
-      {
-        "sceneName": "Choice_noBG",
-        "duration": 2,
-        "parameters": {
-          "configFile": "StripeFixationConfig_white_cylinder_up_-45.json"
+          "configFile": "StripeFixationConfig_black_cylinder_up_-30.json"
         }
       }
-
-    
   ]
 }
