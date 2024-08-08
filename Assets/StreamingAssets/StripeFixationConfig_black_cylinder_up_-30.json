@@ -3,16 +3,16 @@
     {
       "type": "Cylinder",
       "position": {
-        "radius": 30,
+        "radius": 15,
         "angle": -30,
-        "height": 9
+        "height": 5
       },
       "material": "Black",
       "scale": {
-        "x": 8,
-        "y": 9
+        "x": 4,
+        "y": 5
         ,
-        "z": 8
+        "z": 4
       }
     }
   ],

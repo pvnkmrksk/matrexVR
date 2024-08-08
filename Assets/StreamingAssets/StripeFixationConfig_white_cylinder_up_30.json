@@ -3,21 +3,21 @@
     {
       "type": "Cylinder",
       "position": {
-        "radius": 30,
+        "radius": 15,
         "angle": 30,
-        "height": 9
+        "height": 5
       },
       "material": "White",
       "scale": {
-        "x": 8,
-        "y": 9
+        "x": 4,
+        "y": 5
         ,
-        "z": 8
+        "z": 4
       }
     }
   ],
   "closedLoopOrientation": true,
-  "closedLoopPosition": false,
+  "closedLoopPosition": true,
   "backgroundColor": {
     "r": 0.15,
     "g": 0.15,
