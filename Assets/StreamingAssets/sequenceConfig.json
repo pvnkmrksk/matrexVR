@@ -1,59 +1,32 @@
 {
   "sequences": [
     {
-      "sceneName": "Optomotor",
-      "duration":40 ,
+      "sceneName": "Choice_noBG",
+      "duration": 15,
       "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
-      }
-    },{
-      "sceneName": "Choice",
-      "duration":40 ,
-      "parameters": {
-        "configFile": "Choice_Empty_Lemon.json"
+        "configFile": "BlackSky.json"
       }
     },
     {
-      "sceneName": "Choice",
-      "duration":40 ,
+      "sceneName": "Choice_noBG",
+      "duration": 30,
       "parameters": {
-        "configFile": "Choice_Lemon_Empty.json"
+        "configFile": "BlackSky_BlackStripe.json"
       }
     },
     {
-      "sceneName": "Choice",
-      "duration":40 ,
+      "sceneName": "Choice_noBG",
+      "duration": 15,
       "parameters": {
-        "configFile": "Choice_Empty_LemonRed.json"
+        "configFile": "BlackSky.json"
       }
     },
     {
-      "sceneName": "Choice",
-      "duration":40 ,
+      "sceneName": "Choice_noBG",
+      "duration": 30,
       "parameters": {
-        "configFile": "StripeFixationConfig_white_cylinder_up_30.json"
+        "configFile": "BlackSky_ChangingBlackStripe.json"
       }
-    },
-      {
-        "sceneName": "Choice",
-        "duration":40 ,
-        "parameters": {
-          "configFile": "StripeFixationConfig_white_cylinder_up_-30.json"
-        }
-      },
-    {
-      "sceneName": "Choice",
-      "duration":40 ,
-      "parameters": {
-        "configFile": "StripeFixationConfig_black_cylinder_up_30.json"
-      }
-    },
-      {
-        "sceneName": "Choice",
-        "duration":40 ,
-        "parameters": {
-          "configFile": "StripeFixationConfig_black_cylinder_up_-30.json"
-        }
-      }
+    }
   ]
 }
