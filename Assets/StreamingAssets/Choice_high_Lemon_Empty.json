@@ -1,17 +1,17 @@
 {
   "objects": [
     {
-      "type": "Cylinder",
+      "type": "Lemon",
       "position": {
-        "radius": 30,
+        "radius": 15,
         "angle": -30,
-        "height": 0
+        "height": 10
       },
-      "material": "Black",
+      "material": "LemonYellow",
       "scale": {
-        "x": 5.25,
+        "x": 100,
         "y": 100,
-        "z": 5.25
+        "z": 100
       },
       "flip": true
     },

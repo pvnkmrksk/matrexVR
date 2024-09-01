@@ -3,28 +3,28 @@
     {
       "type": "Lemon",
       "position": {
-        "radius": 45,
-        "angle": -15
+        "radius": 30,
+        "angle": -30
       },
-      "material": "LemonYellow",
+      "material": "Lemonveryred",
       "scale": {
-        "x": 300,
-        "y": 300,
-        "z": 300
+        "x": 120,
+        "y": 120,
+        "z": 120
       },
       "flip": true
     },
     {
       "type": "Lemon",
       "position": {
-        "radius": 45,
-        "angle": 15
+        "radius": 30,
+        "angle": 30
       },
       "material": "LemonYellow",
       "scale": {
-        "x": 300,
-        "y": 300,
-        "z": 300
+        "x": 120,
+        "y": 120,
+        "z": 120
       },
       "flip": false
     }

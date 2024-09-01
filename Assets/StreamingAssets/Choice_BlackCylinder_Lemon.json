@@ -3,8 +3,8 @@
     {
       "type": "Cylinder",
       "position": {
-        "radius": 30,
-        "angle": -30,
+        "radius": 45,
+        "angle": -15,
         "height": 0
       },
       "material": "Black",
@@ -16,7 +16,19 @@
       "flip": true
     },
     {
-      "type": ""
+      "type": "Lemon",
+      "position": {
+        "radius": 45,
+        "angle": 15,
+        "height": 0
+      },
+      "material": "LemonYellow",
+      "scale": {
+        "x": 100,
+        "y": 100,
+        "z": 100
+      },
+      "flip": false
     }
   ],
   "closedLoopOrientation": true,

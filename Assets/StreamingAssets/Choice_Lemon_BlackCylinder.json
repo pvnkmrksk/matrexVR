@@ -4,29 +4,31 @@
       "type": "Lemon",
       "position": {
         "radius": 45,
-        "angle": -15
+        "angle": -15,
+        "height": 0
       },
       "material": "LemonYellow",
       "scale": {
-        "x": 300,
-        "y": 300,
-        "z": 300
+        "x": 100,
+        "y": 100,
+        "z": 100
       },
       "flip": true
     },
     {
-      "type": "Lemon",
+      "type": "Cylinder",
       "position": {
         "radius": 45,
-        "angle": 15
+        "angle": 15,
+        "height": 0
       },
-      "material": "LemonYellow",
+      "material": "Black",
       "scale": {
-        "x": 300,
-        "y": 300,
-        "z": 300
+        "x": 5.25,
+        "y": 100,
+        "z": 5.25
       },
-      "flip": false
+      "flip": true
     }
   ],
   "closedLoopOrientation": true,
