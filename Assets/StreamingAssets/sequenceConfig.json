@@ -25,21 +25,7 @@
       "sceneName": "Choice",
       "duration": 15,
       "parameters": {
-        "configFile": "Choice_Lemon_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_Lemon_Lemon_sym.json"
+        "configFile": "Choice_Empty_BlackCylinder.json"
       }
     },
     {
@@ -67,21 +53,63 @@
       "sceneName": "Choice",
       "duration": 15,
       "parameters": {
-        "configFile": "Choice_Lemon_BlackCylinder.json"
+        "configFile": "Choice_BlackCylinder_Buridan.json"
       }
     },
     {
-      "sceneName": "Choice",
+      "sceneName": "Choice_noBG",
       "duration": 15,
       "parameters": {
         "configFile": "Choice_Empty_Empty.json"
       }
     },
     {
-      "sceneName": "Choice",
+      "sceneName": "Choice_noBG",
       "duration": 15,
       "parameters": {
-        "configFile": "Choice_BlackCylinder_lemon.json"
+        "configFile": "Choice_BlackCylinder_Empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 15,
+      "parameters": {
+        "configFile": "Choice_Empty_Empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 15,
+      "parameters": {
+        "configFile": "Choice_Empty_BlackCylinder.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 15,
+      "parameters": {
+        "configFile": "Choice_Empty_Empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 15,
+      "parameters": {
+        "configFile": "Choice_BlackCylinder_BlackCylinder.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 15,
+      "parameters": {
+        "configFile": "Choice_Empty_Empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 15,
+      "parameters": {
+        "configFile": "Choice_BlackCylinder_Buridan.json"
       }
     }
   ]

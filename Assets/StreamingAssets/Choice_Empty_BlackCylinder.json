@@ -1,25 +1,13 @@
 {
   "objects": [
     {
-      "type": "Cylinder",
-      "position": {
-        "radius": 30,
-        "angle": -15,
-        "height": 0
-      },
-      "material": "Black",
-      "scale": {
-        "x": 5.25,
-        "y": 100,
-        "z": 5.25
-      },
-      "flip": true
+      "type": ""
     },
     {
       "type": "Cylinder",
       "position": {
         "radius": 30,
-        "angle": 15,
+        "angle": 30,
         "height": 0
       },
       "material": "Black",
