@@ -1,0 +1,84 @@
+{
+    "sequences": [
+        {
+            "sceneName": "Swarm",
+            "duration": 60,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 0,
+                "kappa": 100000,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 60,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 45,
+                "kappa": 100000,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 60,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 90,
+                "kappa": 100000,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 60,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 135,
+                "kappa": 100000,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 60,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 180,
+                "kappa": 100000,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 60,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 225,
+                "kappa": 100000,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 60,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 270,
+                "kappa": 100000,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 60,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 315,
+                "kappa": 100000,
+                "locustSpeed": 2
+            }
+        }
+    ]
+}

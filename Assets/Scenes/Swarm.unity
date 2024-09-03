@@ -254,13 +254,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1106250504}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!45 &1106250507
 Skybox:
   m_ObjectHideFlags: 0
@@ -384,6 +384,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 423771342850662273, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 423771343000896318, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 423771343098827330, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 423771343642735662, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 423771344688145806, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
       propertyPath: m_Name
       value: VR4 Swarm
@@ -437,12 +453,20 @@ PrefabInstance:
       value: 16384
       objectReference: {fileID: 0}
     - target: {fileID: 7915254056391474891, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+      propertyPath: mu
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7915254056391474891, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
       propertyPath: kappa
-      value: 1
+      value: 10000
       objectReference: {fileID: 0}
     - target: {fileID: 7915254056391474891, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
       propertyPath: locustSpeed
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7915254056391474891, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
+      propertyPath: numberOfLocusts
+      value: 128
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1389632807788785094, guid: d7a9672b5af80e0f4b63c75cfcb030c1, type: 3}
@@ -502,17 +526,41 @@ PrefabInstance:
       propertyPath: m_Name
       value: VR1 Swarm
       objectReference: {fileID: 0}
+    - target: {fileID: 2798074369155322119, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074369262183959, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074369411840680, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074369683044203, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 3494159682821081327, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5687458890810039266, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: mu
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687458890810039266, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: kappa
-      value: 1
+      value: 10000
       objectReference: {fileID: 0}
     - target: {fileID: 5687458890810039266, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: locustSpeed
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687458890810039266, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: numberOfLocusts
+      value: 128
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3494159682821081327, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
@@ -576,17 +624,41 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1330193873832540466, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1330193874089038493, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1330193874205789730, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1330193874374991710, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 2615687002396923252, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
       propertyPath: locustLayerMask.m_Bits
       value: 4096
       objectReference: {fileID: 0}
     - target: {fileID: 8812669456100504535, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
+      propertyPath: mu
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8812669456100504535, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
       propertyPath: kappa
-      value: 1
+      value: 10000
       objectReference: {fileID: 0}
     - target: {fileID: 8812669456100504535, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
       propertyPath: locustSpeed
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8812669456100504535, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
+      propertyPath: numberOfLocusts
+      value: 128
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 350350723476250842, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
@@ -603,16 +675,40 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4602136961950407237, guid: a122962340c890a529580fd616e93595, type: 3}
+      propertyPath: mu
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4602136961950407237, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: kappa
-      value: 1
+      value: 10000
       objectReference: {fileID: 0}
     - target: {fileID: 4602136961950407237, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: locustSpeed
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 4602136961950407237, guid: a122962340c890a529580fd616e93595, type: 3}
+      propertyPath: numberOfLocusts
+      value: 128
+      objectReference: {fileID: 0}
     - target: {fileID: 4705774676183058760, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6334096568882401440, guid: a122962340c890a529580fd616e93595, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 6334096569114961840, guid: a122962340c890a529580fd616e93595, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 6334096569231194895, guid: a122962340c890a529580fd616e93595, type: 3}
+      propertyPath: field of view
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 6334096569430996684, guid: a122962340c890a529580fd616e93595, type: 3}
+      propertyPath: field of view
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 6334096569946685696, guid: a122962340c890a529580fd616e93595, type: 3}
       propertyPath: m_Name
