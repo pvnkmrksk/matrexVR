@@ -186,6 +186,9 @@ public class MainController : MonoBehaviour
                             $"{timestamp}_{sceneName}_sequenceConfig.json"
                         );
                         File.Copy(jsonPath, destinationPath);
+
+
+                        // Todo.add save the choice configs also to the masterDataLogger
                     }
                     else
                     {

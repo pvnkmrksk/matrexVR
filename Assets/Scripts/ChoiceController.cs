@@ -86,6 +86,8 @@ public class ChoiceController : MonoBehaviour, ISceneController
                     instance.transform.localRotation = Quaternion.Euler(0, obj.mu, 0);
                 }
 
+                //todo. add individual datalogger to each instance. 
+                
                 // Optionally apply material
                 if (
                     !string.IsNullOrEmpty(obj.material)
