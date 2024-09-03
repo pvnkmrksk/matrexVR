@@ -1,6 +1,13 @@
 {
   "sequences": [
     {
+      "sceneName": "Choice",
+      "duration": 20,
+      "parameters": {
+        "configFile": "Choice_locust.json"
+      }
+    },
+    {
       "sceneName": "Swarm",
       "duration": 300,
       "parameters": {

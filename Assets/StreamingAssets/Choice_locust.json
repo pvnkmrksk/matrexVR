@@ -1,0 +1,38 @@
+{
+  "objects": [
+    {
+      "type": "SimulatedLocust",
+      "position": {
+        "radius": 30,
+        "angle": -30
+      },
+      "scale": {
+        "x": 120,
+        "y": 120,
+        "z": 120
+      },
+      "flip": true,
+
+      "speed": 2,
+      "mu": 36.5
+    },
+    {
+        "type": "SimulatedLocust",
+        "position": {
+          "radius": 30,
+          "angle": -30
+        },
+        "scale": {
+          "x": 120,
+          "y": 120,
+          "z": 120
+        },
+        "flip": true,
+  
+        "speed": 4,
+        "mu": 36.5
+      }
+      ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true
+}

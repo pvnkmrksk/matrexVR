@@ -56,6 +56,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
                 GameObject instance = Instantiate(prefab, position, Quaternion.identity);
 
+                Debug.Log("Instance position: " + instance.transform.position);
                 // Set scale, Optionally flip the object if flip is true, set flip my scale * -1 in x axis
 
                 if (obj.flip)
@@ -73,6 +74,16 @@ public class ChoiceController : MonoBehaviour, ISceneController
                         obj.scale.y,
                         obj.scale.z
                     );
+                }
+                
+                if (obj.speed != 0)
+                {
+                    instance.GetComponent<LocustMover>().speed = obj.speed;
+                }
+
+                if (obj.mu != 0)
+                {
+                    instance.transform.localRotation = Quaternion.Euler(0, obj.mu, 0);
                 }
 
                 // Optionally apply material
@@ -144,6 +155,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
     private Vector3 CalculatePosition(float radius, float angle)
     {
+        //todo.add initial position for the object postions
         float x = radius * Mathf.Sin(angle * Mathf.Deg2Rad);
         float z = radius * Mathf.Cos(angle * Mathf.Deg2Rad);
         return new Vector3(x, 0, z); // Assuming y is always 0
@@ -169,6 +181,10 @@ public class SceneObject
     public string material;
     public ScaleConfig scale;
     public bool flip;
+
+    public float speed;
+
+    public float mu;
     // Include other properties as before
 }
 
