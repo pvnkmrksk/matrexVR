@@ -1,115 +1,25 @@
 {
   "sequences": [
-    {
-      "sceneName": "Choice",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_BlackCylinder_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_Empty_BlackCylinder.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_BlackCylinder_BlackCylinder.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_BlackCylinder_Buridan.json"
-      }
-    },
+    
     {
       "sceneName": "Choice_noBG",
-      "duration": 15,
+      "duration": 5,
       "parameters": {
         "configFile": "Choice_Empty_Empty.json"
       }
     },
     {
       "sceneName": "Choice_noBG",
-      "duration": 15,
+      "duration": 30,
       "parameters": {
-        "configFile": "Choice_BlackCylinder_Empty.json"
+        "configFile": "Choice_BlackCylinder_GreyCylinder.json"
       }
     },
     {
       "sceneName": "Choice_noBG",
-      "duration": 15,
+      "duration": 30,
       "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice_noBG",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_Empty_BlackCylinder.json"
-      }
-    },
-    {
-      "sceneName": "Choice_noBG",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice_noBG",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_BlackCylinder_BlackCylinder.json"
-      }
-    },
-    {
-      "sceneName": "Choice_noBG",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice_noBG",
-      "duration": 15,
-      "parameters": {
-        "configFile": "Choice_BlackCylinder_Buridan.json"
+        "configFile": "Choice_GreyCylinder_BlackCylinder.json"
       }
     }
   ]
