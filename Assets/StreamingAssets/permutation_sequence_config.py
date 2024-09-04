@@ -5,7 +5,7 @@ import numpy as np
 from itertools import cycle
 # Read the JSON file
 random_seed=1
-rep=3
+rep=12
 seed_range=np.arange(100)
 seed_list=seed_range.tolist()
 random.Random(random_seed).shuffle(seed_list)
@@ -14,10 +14,12 @@ random.Random(random_seed).shuffle(seed_list)
 seed_list=seed_list[:rep]
 insert_isi=True
 varying_isi_length=True
+choice_assay=True
 #config_file_name='swarm_4kappa_condition.json'
 #config_file_name='swarm_8dir_condition.json'
-config_file_name='swarm_4spe_condition.json'
-shuffle_file_name='shuffled_sequenceConfig_varying_isi.json'
+#config_file_name='swarm_4spe_condition.json'
+config_file_name='choice_3dire_condition.json'
+shuffle_file_name=f'shuffle_{config_file_name}'
 pre_stim_interval=240 #unit is sec
 with open(Path(config_file_name),'r') as file:
     data = json.load(file)
@@ -28,21 +30,34 @@ with open(Path(config_file_name),'r') as file:
 # Define the dictionary to be inserted
 if insert_isi==True:
     if varying_isi_length:
-        isi_file_name='isi_condition.json'
+        if choice_assay:
+            isi_file_name='isi_condition_choice_assay.json'
+        else:
+            isi_file_name='isi_condition.json'
         with open(Path(isi_file_name),'r') as file:
             isi_list = json.load(file)
+            print(isi_list)
 
     else:
-        insert_dict = {
-        "sceneName": "Swarm",
-        "duration": 240,
-        "parameters": {
-            "numberOfLocusts": 0,
-            "mu": 0,
-            "kappa" :1,
-            "locustSpeed" : 2
-        }
-        }
+        if choice_assay:
+            insert_dict = {
+            "sceneName": "Choice",
+            "duration": 240,
+            "parameters": {
+                "configFile": "Choice_empty.json"
+            }
+            }
+        else:
+            insert_dict = {
+            "sceneName": "Swarm",
+            "duration": 240,
+            "parameters": {
+                "numberOfLocusts": 0,
+                "mu": 0,
+                "kappa" :1,
+                "locustSpeed" : 2
+            }
+            }
 
 # Insert the dictionary between each existing dictionary
 new_sequences = []
@@ -50,9 +65,15 @@ for this_seed in seed_list:
     random.Random(this_seed).shuffle(data['sequences'])
     if insert_isi and varying_isi_length:
         random.Random(this_seed).shuffle(isi_list['sequences'])
-        for this_trial,this_isi in zip(data['sequences'],cycle(isi_list['sequences'])):
-            new_sequences.append(this_isi)
-            new_sequences.append(this_trial)
+        if len(data['sequences'])==len(isi_list['sequences']):
+            for this_trial,this_isi in zip(data['sequences'],isi_list['sequences']):
+                new_sequences.append(this_isi)
+                new_sequences.append(this_trial)
+
+        else:
+            for this_trial,this_isi in zip(data['sequences'],cycle(isi_list['sequences'])):
+                new_sequences.append(this_isi)
+                new_sequences.append(this_trial)
     else:
         for sequence in data['sequences']:
             if insert_isi==True:
@@ -63,11 +84,11 @@ for this_seed in seed_list:
 # Remove the last inserted dictionary to avoid an extra one at the end
 # new_sequences = new_sequences[:-1]
 
-# set the duration in the first scene to be a predefined value
-new_sequences[0]["duration"]=pre_stim_interval
+# # # set the duration in the first scene to be a predefined value
+# new_sequences[0]["duration"]=pre_stim_interval this command has a bug
+
 # Update the sequences in the data
 data['sequences'] = new_sequences
-
 # Write the new data back to a new JSON file
 with open(Path(shuffle_file_name), 'w') as file:
     json.dump(data, file, indent=4)
