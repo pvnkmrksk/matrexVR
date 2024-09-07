@@ -3,18 +3,18 @@
     {
       "type": "LeaderLocust",
       "position": {
-        "radius": 30,
-        "angle": -30
+        "radius": 8,
+        "angle": 60
       },
       "scale": {
-        "x": 120,
-        "y": 120,
-        "z": 120
+        "x": 100,
+        "y": 100,
+        "z": 100
       },
-      "flip": true,
+      "flip": false,
 
       "speed": 2,
-      "mu": 36.5
+      "mu": 60
     }
       ],
   "closedLoopOrientation": true,
