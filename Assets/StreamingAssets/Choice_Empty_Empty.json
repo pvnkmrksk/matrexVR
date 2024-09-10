@@ -1,10 +1,10 @@
 {
   "objects": [
-    {     
+    {
       "type": ""
-     },
-     {     
-     "type": ""
+    },
+    {
+      "type": ""
     }
   ],
   "closedLoopOrientation": true,

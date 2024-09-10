@@ -1,6 +1,5 @@
 {
   "sequences": [
-    
     {
       "sceneName": "Choice_noBG",
       "duration": 5,
@@ -12,14 +11,28 @@
       "sceneName": "Choice_noBG",
       "duration": 30,
       "parameters": {
-        "configFile": "Choice_BlackCylinder_GreyCylinder.json"
+        "configFile": "BinaryChoice11_BlackCylinder_BlackCylinder.json"
       }
     },
     {
       "sceneName": "Choice_noBG",
-      "duration": 30,
+      "duration": 20,
       "parameters": {
-        "configFile": "Choice_GreyCylinder_BlackCylinder.json"
+        "configFile": "BinaryChoice11_BlackCylinder_BlackCylinder.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 10,
+      "parameters": {
+        "configFile": "BinaryChoice11_BlackCylinder_BlackCylinder.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 5,
+      "parameters": {
+        "configFile": "BinaryChoice11_BlackCylinder_BlackCylinder.json"
       }
     }
   ]
