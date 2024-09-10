@@ -179,13 +179,16 @@ public class MainController : MonoBehaviour
                         Debug.Log("MasterDataLogger is not null");
                         Debug.Log("Timestamp: " + timestamp);
 
-                        // Copy the JSON file to the data logging directory with the desired filename format
+                        // Copy the sequence config JSON file
                         string sceneName = SceneManager.GetActiveScene().name;
                         string destinationPath = Path.Combine(
                             masterDataLogger.directoryPath,
                             $"{timestamp}_{sceneName}_sequenceConfig.json"
                         );
                         File.Copy(jsonPath, destinationPath);
+
+                        // Save referenced choice config JSON files
+                        SaveReferencedChoiceConfigs(config, timestamp, sceneName);
                     }
                     else
                     {
@@ -248,6 +251,32 @@ public class MainController : MonoBehaviour
             {
                 // Load the next scene
                 LoadScene(sequenceSteps[currentStep]);
+            }
+        }
+    }
+
+    void SaveReferencedChoiceConfigs(SequenceConfig config, string timestamp, string sceneName)
+    {
+        foreach (SequenceItem item in config.sequences)
+        {
+            if (item.parameters != null && item.parameters.ContainsKey("configFile"))
+            {
+                string configFileName = item.parameters["configFile"].ToString();
+                string sourcePath = Path.Combine(Application.streamingAssetsPath, configFileName);
+                
+                if (File.Exists(sourcePath))
+                {
+                    string destinationPath = Path.Combine(
+                        masterDataLogger.directoryPath,
+                        $"{timestamp}_{sceneName}_{configFileName}"
+                    );
+                    File.Copy(sourcePath, destinationPath);
+                    Debugger.Log($"Copied choice config: {configFileName}", 3);
+                }
+                else
+                {
+                    Debugger.Log($"Choice config file not found: {configFileName}", 2);
+                }
             }
         }
     }

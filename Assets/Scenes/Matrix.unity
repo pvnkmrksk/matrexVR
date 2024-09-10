@@ -183,7 +183,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c719e38f25a9480abd2480ab621a2949, type: 2}
+  - {fileID: 2100000, guid: 9212c0db92a2b6b4191ee4bd0a08ffab, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -444,6 +444,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2199504554372699630, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2936118820554942472, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
       propertyPath: m_Name
       value: VR1 Matrix
@@ -488,7 +492,24 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 4649431052258554701, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5595696835651559976, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+      propertyPath: numberOfRings
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6919636278302219474, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 5595696835651559976, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+    - {fileID: 6919636278302219474, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+    - {fileID: 2199504554372699630, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+    - {fileID: 4649431052258554701, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+    - {fileID: 2177941558395821008, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

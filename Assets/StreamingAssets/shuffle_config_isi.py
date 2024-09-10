@@ -2,13 +2,16 @@ import json
 import random
 from pathlib import Path
 # Read the JSON file
+# random_seed=3
+# rep=3
 insert_isi=True
-config_file_name='sequenceConfig_swarm.json'
-shuffle_file_name='shuffled_sequenceConfig_swarm2.json'
+config_file_name='swarm_4kappa_condition.json'
+shuffle_file_name='shuffled_sequenceConfig_4kappa3.json'
 with open(Path(config_file_name),'r') as file:
     data = json.load(file)
 
 # Shuffle the sequences
+# random.Random(random_seed).shuffle(data['sequences'])
 random.shuffle(data['sequences'])
 
 # Define the dictionary to be inserted
@@ -19,13 +22,14 @@ if insert_isi==True:
       "parameters": {
         "numberOfLocusts": 0,
         "mu": 0,
-        "kappa" :1000,
+        "kappa" :1,
         "locustSpeed" : 2
       }
     }
 
 # Insert the dictionary between each existing dictionary
 new_sequences = []
+# for this_rep in range(rep):
 for sequence in data['sequences']:
     if insert_isi==True:
         new_sequences.append(insert_dict)

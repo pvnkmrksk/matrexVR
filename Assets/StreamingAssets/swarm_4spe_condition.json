@@ -1,0 +1,44 @@
+{
+    "sequences": [
+        {
+            "sceneName": "Swarm",
+            "duration": 300,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 0,
+                "kappa": 10,
+                "locustSpeed": 8
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 300,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 0,
+                "kappa": 10,
+                "locustSpeed": 1
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 300,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 0,
+                "kappa": 10,
+                "locustSpeed": 2
+            }
+        },
+        {
+            "sceneName": "Swarm",
+            "duration": 300,
+            "parameters": {
+                "numberOfLocusts": 128,
+                "mu": 0,
+                "kappa": 10,
+                "locustSpeed": 4
+            }
+        }
+    ]
+}

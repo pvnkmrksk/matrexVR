@@ -82,6 +82,7 @@ public class LocustSpawner : MonoBehaviour
                     transform.position.z - spawnAreaSize / 2,
                     transform.position.z + spawnAreaSize / 2
                 )
+                //transform.position.x+initial_receding_distance*sin(mu),-0.25f,transform.position.z+initial_receding_distance*cos(mu)
             );
 
             GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity); // Spawned independent of the game object
@@ -128,6 +129,14 @@ public class LocustSpawner : MonoBehaviour
         {
             kappa = 0.0001f;
         }
+        //if kappa >= 10000, fixed angle mu is returned
+        else if (kappa>=10000)
+        {
+
+            return Quaternion.Euler(0,mu,0);
+            
+        }
+
 
         float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad * mu, kappa); // Generate angles by converting from deg to radians for the function to work
         // Debugger.Log("Generated Angle (in degrees): " + angle * Mathf.Rad2Deg);
