@@ -37,7 +37,7 @@ public class AntUserController : MonoBehaviour {
             antCharacter.EatEnd();
         }
 
-        antCharacter.forwardSpeed = Input.GetAxis("Vertical");
+        antCharacter.forwardSpeed = 1f;//Input.GetAxis("Vertical");
         antCharacter.turnSpeed = Input.GetAxis("Horizontal");
     }
 }

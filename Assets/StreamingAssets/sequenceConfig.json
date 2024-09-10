@@ -1,5 +1,13 @@
 {
   "sequences": [
+
+    {
+      "sceneName": "Choice",
+      "duration": 500,
+      "parameters": {
+        "configFile": "Choice_Empty_Ant.json"
+      }
+    },
     {
       "sceneName": "Choice_noBG",
       "duration": 5,

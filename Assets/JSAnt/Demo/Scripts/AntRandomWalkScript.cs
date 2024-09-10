@@ -4,7 +4,7 @@ using System.Collections;
 public class AntRandomWalkScript : MonoBehaviour {
     AntCharacter antCharacter;
 
-    float forwardSpeed = 0f;
+    float forwardSpeed = 10f;
     float turnSpeed = 0f;
     float nextForwardSpeed = 0f;
     float nextTurnSpeed = 0f;
