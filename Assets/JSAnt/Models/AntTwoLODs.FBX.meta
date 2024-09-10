@@ -1,0 +1,154 @@
+fileFormatVersion: 2
+guid: a746bebfee1047d4a90bfe554e84be4b
+timeCreated: 1549223378
+licenseType: Store
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Abdomen
+    100002: Abdomen.001
+    100004: Abdomen.002
+    100006: Ant
+    100008: Antenna_L.1
+    100010: Antenna_L.2
+    100012: Antenna_L.3
+    100014: Antenna_R.1
+    100016: Antenna_R.2
+    100018: Antenna_R.3
+    100020: AntMiddlePoly
+    100022: //RootNode
+    100024: Bone
+    100026: Head
+    100028: Leg11_L
+    100030: Leg11_R
+    100032: Leg12_L
+    100034: Leg12_R
+    100036: Leg13_L
+    100038: Leg13_R
+    100040: Leg14_L
+    100042: Leg14_R
+    100044: Leg21_L
+    100046: Leg21_R
+    100048: Leg22_L
+    100050: Leg22_R
+    100052: Leg23_L
+    100054: Leg23_R
+    100056: Leg24_L
+    100058: Leg24_R
+    100060: Leg31_L
+    100062: Leg31_R
+    100064: Leg32_L
+    100066: Leg32_R
+    100068: Leg33_L
+    100070: Leg33_R
+    100072: Leg34_L
+    100074: Leg34_R
+    100076: Mouth_L
+    100078: Mouth_R
+    100080: Root
+    100082: Thorax
+    400000: Abdomen
+    400002: Abdomen.001
+    400004: Abdomen.002
+    400006: Ant
+    400008: Antenna_L.1
+    400010: Antenna_L.2
+    400012: Antenna_L.3
+    400014: Antenna_R.1
+    400016: Antenna_R.2
+    400018: Antenna_R.3
+    400020: AntMiddlePoly
+    400022: //RootNode
+    400024: Bone
+    400026: Head
+    400028: Leg11_L
+    400030: Leg11_R
+    400032: Leg12_L
+    400034: Leg12_R
+    400036: Leg13_L
+    400038: Leg13_R
+    400040: Leg14_L
+    400042: Leg14_R
+    400044: Leg21_L
+    400046: Leg21_R
+    400048: Leg22_L
+    400050: Leg22_R
+    400052: Leg23_L
+    400054: Leg23_R
+    400056: Leg24_L
+    400058: Leg24_R
+    400060: Leg31_L
+    400062: Leg31_R
+    400064: Leg32_L
+    400066: Leg32_R
+    400068: Leg33_L
+    400070: Leg33_R
+    400072: Leg34_L
+    400074: Leg34_R
+    400076: Mouth_L
+    400078: Mouth_R
+    400080: Root
+    400082: Thorax
+    4300000: AntMiddlePoly
+    4300002: Ant
+    9500000: //RootNode
+    13700000: Ant
+    13700002: AntMiddlePoly
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: Root
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
