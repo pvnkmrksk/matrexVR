@@ -53,9 +53,10 @@ public class ChoiceController : MonoBehaviour, ISceneController
         {
             if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
             {
-                Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
+                Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle, obj.position.height);
                 GameObject instance = Instantiate(prefab, position, Quaternion.identity);
 
+                Debug.Log("Instance position: " + instance.transform.position);
                 // Set scale, Optionally flip the object if flip is true, set flip my scale * -1 in x axis
 
                 if (obj.flip)
@@ -74,7 +75,19 @@ public class ChoiceController : MonoBehaviour, ISceneController
                         obj.scale.z
                     );
                 }
+                
+                if (obj.speed != 0)
+                {
+                    instance.GetComponent<LocustMover>().speed = obj.speed;
+                }
 
+                if (obj.mu != 0)
+                {
+                    instance.transform.localRotation = Quaternion.Euler(0, obj.mu, 0);
+                }
+
+                //todo. add individual datalogger to each instance. 
+                
                 // Optionally apply material
                 if (
                     !string.IsNullOrEmpty(obj.material)
@@ -136,16 +149,18 @@ public class ChoiceController : MonoBehaviour, ISceneController
         ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
         foreach (ClosedLoop cl in closedLoopComponents)
         {
-            cl.ResetPosition();
-            cl.ResetRotation();
+            // cl.ResetPosition();
+            // cl.ResetRotation();
+            cl.ResetPositionAndRotation();
         }
     }
 
-    private Vector3 CalculatePosition(float radius, float angle)
+    private Vector3 CalculatePosition(float radius, float angle, float height)
     {
+        //todo.add initial position for the object postions
         float x = radius * Mathf.Sin(angle * Mathf.Deg2Rad);
         float z = radius * Mathf.Cos(angle * Mathf.Deg2Rad);
-        return new Vector3(x, 0, z); // Assuming y is always 0
+        return new Vector3(x, height, z); // Assuming y is always 0
     }
 
     // Update SceneConfig and other classes as needed to reflect JSON changes
@@ -168,6 +183,10 @@ public class SceneObject
     public string material;
     public ScaleConfig scale;
     public bool flip;
+
+    public float speed;
+
+    public float mu;
     // Include other properties as before
 }
 
@@ -176,6 +195,7 @@ public class Position
 {
     public float radius;
     public float angle;
+    public float height;
 }
 
 [System.Serializable]

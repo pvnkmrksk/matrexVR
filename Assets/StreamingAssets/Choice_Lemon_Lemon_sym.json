@@ -3,8 +3,8 @@
     {
       "type": "Lemon",
       "position": {
-        "radius": 30,
-        "angle": -30
+        "radius": 45,
+        "angle": -15
       },
       "material": "LemonYellow",
       "scale": {
@@ -17,8 +17,8 @@
     {
       "type": "Lemon",
       "position": {
-        "radius": 30,
-        "angle": 30
+        "radius": 45,
+        "angle": 15
       },
       "material": "LemonYellow",
       "scale": {

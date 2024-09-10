@@ -1,104 +1,39 @@
 {
   "sequences": [
     {
-      "sceneName": "Choice",
-      "duration": 20,
+      "sceneName": "Choice_noBG",
+      "duration": 5,
       "parameters": {
         "configFile": "Choice_Empty_Empty.json"
       }
-    },{
-      "sceneName": "Choice",
-      "duration": 20,
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 30,
       "parameters": {
-        "configFile": "Choice_Empty_Lemon.json"
+        "configFile": "BinaryChoice11_BlackCylinder_BlackCylinder.json"
       }
     },
     {
-      "sceneName": "Choice",
+      "sceneName": "Choice_noBG",
       "duration": 20,
       "parameters": {
-        "configFile": "Choice_Lemon_Empty.json"
+        "configFile": "BinaryChoice11_BlackCylinder_BlackCylinder.json"
       }
     },
     {
-      "sceneName": "Choice",
-      "duration": 20,
+      "sceneName": "Choice_noBG",
+      "duration": 10,
       "parameters": {
-        "configFile": "Choice_Lemon_Lemon_asym.json"
-      }
-    },
-  
-
-
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_Lemon_Lemon_sym.json"
+        "configFile": "BinaryChoice11_BlackCylinder_BlackCylinder.json"
       }
     },
     {
-      "sceneName": "Choice",
-      "duration": 20,
+      "sceneName": "Choice_noBG",
+      "duration": 5,
       "parameters": {
-        "configFile": "Choice_Empty_LemonRed.json"
-      }
-    },
-
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_LemonRed_Empty.json"
-      }
-    },
-
-
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_LemonRed_LemonRed_asym.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_LemonRed_LemonRed_sym.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_Lemon_LemonRed_sym.json"
-      }
-    },
-
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_LemonRed_LemonRedFar_sym.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_LemonRedFar_LemonRed_sym.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration": 20,
-      "parameters": {
-        "configFile": "Choice_LemonRedFar_LemonRedFar_sym.json"
+        "configFile": "BinaryChoice11_BlackCylinder_BlackCylinder.json"
       }
     }
-
-
-    
   ]
 }

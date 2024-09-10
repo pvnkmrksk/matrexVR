@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1105965471027006775, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: layerName
+      value: SimulatedLocustsVR4
+      objectReference: {fileID: 0}
     - target: {fileID: 2798074368093061210, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: port
       value: 9874
@@ -68,9 +72,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: VR4 Swarm
       objectReference: {fileID: 0}
+    - target: {fileID: 2798074368093061287, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_Layer
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074369155322114, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_Layer
+      value: 14
+      objectReference: {fileID: 0}
     - target: {fileID: 2798074369155322119, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: m_CullingMask.m_Bits
       value: 16439
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074369262183954, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_Layer
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 2798074369262183959, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: m_CullingMask.m_Bits
@@ -80,9 +96,25 @@ PrefabInstance:
       propertyPath: m_CullingMask.m_Bits
       value: 16439
       objectReference: {fileID: 0}
+    - target: {fileID: 2798074369411840682, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_Layer
+      value: 14
+      objectReference: {fileID: 0}
     - target: {fileID: 2798074369683044203, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: m_CullingMask.m_Bits
       value: 16439
+      objectReference: {fileID: 0}
+    - target: {fileID: 2798074369683044214, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_Layer
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 3550350148596630415, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: m_Layer
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 5687458890810039266, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+      propertyPath: layerName
+      value: SimulatedLocustsVR4
       objectReference: {fileID: 0}
     - target: {fileID: 7510037034238600751, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: locustLayerMask.m_Bits
@@ -95,46 +127,15 @@ PrefabInstance:
     - target: {fileID: 8294218554251575998, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: boundaryManager
       value: 
-      objectReference: {fileID: 5668886444344209865}
+      objectReference: {fileID: 0}
     - target: {fileID: 8294218554251575998, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
       propertyPath: numberOfLocusts
       value: 20
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3523725698389620577, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
+    - {fileID: 9201777455089664929, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2798074368093061287, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
-      insertIndex: 6
-      addedObject: {fileID: 8052999017058129287}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
---- !u!1 &423771344688145806 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2798074368093061287, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
-  m_PrefabInstance: {fileID: 2537013245616612649}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &8052999017058129287
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 423771344688145806}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e70685f7abae4fe598f6bfcc79ae164, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  boundaryManager: {fileID: 5668886444344209865}
-  speed: 4
---- !u!114 &5668886444344209865 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7898933544298845408, guid: 5215d64bb35f3ec5aab32cd6976ccab2, type: 3}
-  m_PrefabInstance: {fileID: 2537013245616612649}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 423771344688145806}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c36713afef5694ef7b42c7cb71c14e1d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

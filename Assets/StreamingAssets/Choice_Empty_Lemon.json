@@ -6,14 +6,15 @@
     {
       "type": "Lemon",
       "position": {
-        "radius": 30,
-        "angle": 30
+        "radius": 15,
+        "angle": 30,
+        "height": 0
       },
       "material": "LemonYellow",
       "scale": {
-        "x": 300,
-        "y": 300,
-        "z": 300
+        "x": 100,
+        "y": 100,
+        "z": 100
       },
       "flip": false
     }

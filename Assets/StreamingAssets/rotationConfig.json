@@ -34,7 +34,138 @@
     },
     {
       "speed": 40,
-      "clockwise": true,
+      "clockwise": true,{
+        "rotationConfigs": [
+            {
+                "speed": 2,
+                "clockwise": true,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 1
+            },
+            {
+                "speed": 0.1,
+                "clockwise": true,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 0
+            },
+            {
+                "speed": 8,
+                "clockwise": false,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 1
+            },
+            {
+                "speed": 0.1,
+                "clockwise": true,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 0
+            },
+            {
+                "speed": 16,
+                "clockwise": false,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 1
+            },
+            {
+                "speed": 0.1,
+                "clockwise": true,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 0
+            },
+            {
+                "speed": 4,
+                "clockwise": false,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 1
+            },
+            {
+                "speed": 0.1,
+                "clockwise": true,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 0
+            },
+            {
+                "speed": 16,
+                "clockwise": true,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 1
+            },
+            {
+                "speed": 0.1,
+                "clockwise": true,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 0
+            },
+            {
+                "speed": 8,
+                "clockwise": true,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 1
+            },
+            {
+                "speed": 0.1,
+                "clockwise": true,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 0
+            },
+            {
+                "speed": 2,
+                "clockwise": false,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 1
+            },
+            {
+                "speed": 0.1,
+                "clockwise": true,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 0
+            },
+            {
+                "speed": 4,
+                "clockwise": true,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 1
+            },
+            {
+                "speed": 0.1,
+                "clockwise": true,
+                "duration": 20,
+                "externalRotationAxis": "Yaw",
+                "frequency": 10,
+                "level": 0
+            }
+        ]
+    }
       "duration": 15,
       "externalRotationAxis": "Yaw",
       "frequency": 10,
