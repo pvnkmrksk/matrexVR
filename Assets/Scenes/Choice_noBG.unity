@@ -20,12 +20,12 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientSkyColor: {r: 1, g: 1, b: 1, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 0
-  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
+  m_AmbientMode: 3
+  m_SubtractiveShadowColor: {r: 1, g: 1, b: 1, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
@@ -443,7 +443,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &1470736538
 Light:
   m_ObjectHideFlags: 0
@@ -578,7 +578,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 04a0ce8100d744a8eab46dbe477643a8, type: 2}
   - {fileID: 2100000, guid: c3bee356da6944c539ff6c2360cba73d, type: 2}
   - {fileID: 2100000, guid: 5197157949f244b49a0174c9827f6749, type: 2}
-  - {fileID: 2100000, guid: ec6108d163be740298cf03b9719cb424, type: 2}
+  - {fileID: 2100000, guid: 02a83612009978475abe0611adcb4bb2, type: 2}
   - {fileID: 2100000, guid: 40980a71a99a444baa9ee262da880583, type: 2}
   - {fileID: 2100000, guid: 3a2871cee947502c9ab9fd873ac72f72, type: 2}
   - {fileID: 2100000, guid: 8bf719516907744c296a0214354a32a2, type: 2}

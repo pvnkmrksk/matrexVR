@@ -2,31 +2,53 @@
   "randomise": true,
   "sequences": [
     {
-      "sceneName": "Choice",
-      "duration": 0.5,
+      "sceneName": "Choice_noBG",
+      "duration": 5,
       "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
+        "configFile": "BinaryChoice00_empty_control.json"
+      }
+    },    
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 5,
+      "parameters": {
+        "configFile": "BinaryChoice10_BlackCylinder_control.json"
       }
     },
     {
-      "sceneName": "Choice",
-      "duration": 0.5,
+      "sceneName": "Choice_noBG",
+      "duration": 5,
       "parameters": {
         "configFile": "BinaryChoice11_BlackCylinder_BlackCylinder.json"
       }
     },
     {
       "sceneName": "Choice_noBG",
-      "duration": 0.5,
+      "duration": 5,
       "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
+        "configFile": "BinaryChoice12_BlackCylinder_GreyCylinder.json"
+      }
+    },
+
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 5,
+      "parameters": {
+        "configFile": "BinaryChoice20_GreyCylinder_control.json"
       }
     },
     {
       "sceneName": "Choice_noBG",
-      "duration": 0.5,
+      "duration": 5,
       "parameters": {
-        "configFile": "BinaryChoice11_BlackCylinder_BlackCylinder.json"
+        "configFile": "BinaryChoice21_GreyCylinder_BlackCylinder.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 5,
+      "parameters": {
+        "configFile": "BinaryChoice22_GreyCylinder_GreyCylinder.json"
       }
     }
   ]
