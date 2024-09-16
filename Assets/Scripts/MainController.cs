@@ -12,17 +12,29 @@ public interface ISceneController
 public class MainController : MonoBehaviour
 {
     public List<SequenceStep> sequenceSteps = new List<SequenceStep>();
+    public List<int> executionOrder = new List<int>();
     public int currentStep = 0;
     public int currentTrial = 0;
     private float timer;
     private bool sequenceStarted = false;
     private MasterDataLogger masterDataLogger;
     public bool loopSequence = false;
+    private bool randomise = false; // Added field
 
     [Tooltip("0: Off, ,1: Error, 2: Warning, 3: Info, 4: Debug")]
     [SerializeField]
     [Range(0, 4)]
     private int logLevel = 0; // 0: All, 1: Error, 2: Warning, 3: Info, 4: Debug
+    // In MainController class
+    public SequenceStep GetCurrentSequenceStep()
+    {
+        if (currentStep < executionOrder.Count)
+        {
+            int stepIndex = executionOrder[currentStep];
+            return sequenceSteps[stepIndex];
+        }
+        return null;
+    }
 
     void Start()
     {
@@ -34,7 +46,6 @@ public class MainController : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
 
         // Access the MasterDataLogger instance
-
         masterDataLogger = MasterDataLogger.Instance;
 
         if (masterDataLogger == null)
@@ -61,15 +72,59 @@ public class MainController : MonoBehaviour
     {
         Debugger.Log("MainController.StartSequence()", 3);
         sequenceStarted = true;
-        timer = sequenceSteps[currentStep].duration; // Initialize timer for the first scene
-        LoadScene(sequenceSteps[currentStep]);
+
+        // Initialize execution order
+        if (randomise)
+        {
+            InitializeExecutionOrder();
+        }
+        else
+        {
+            // Sequential order
+            executionOrder.Clear();
+            for (int i = 0; i < sequenceSteps.Count; i++)
+            {
+                executionOrder.Add(i);
+            }
+        }
+
+        currentStep = 0;
+        timer = sequenceSteps[executionOrder[currentStep]].duration; // Initialize timer for the first scene
+        LoadScene(sequenceSteps[executionOrder[currentStep]]);
         SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void InitializeExecutionOrder()
+    {
+        executionOrder.Clear();
+        for (int i = 0; i < sequenceSteps.Count; i++)
+        {
+            executionOrder.Add(i);
+        }
+        // Shuffle executionOrder
+        ShuffleList(executionOrder);
+    }
+
+    void ShuffleList<T>(IList<T> list)
+    {
+        // Implement a simple Fisher-Yates shuffle
+        System.Random rng = new System.Random();
+        int n = list.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            // Swap list[k] with list[n]
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+        }
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debugger.Log("MainController.OnSceneLoaded()", 3);
-        SequenceStep currentStepData = sequenceSteps[currentStep];
+        SequenceStep currentStepData = sequenceSteps[executionOrder[currentStep]];
 
         ISceneController currentSceneController = null;
         foreach (var obj in FindObjectsOfType<MonoBehaviour>()) // MonoBehaviour is the base class for all Unity Behaviours
@@ -142,6 +197,8 @@ public class MainController : MonoBehaviour
 
                 if (config != null)
                 {
+                    randomise = config.randomise; // Get the randomise parameter
+
                     foreach (SequenceItem item in config.sequences)
                     {
                         SequenceStep newStep = new SequenceStep(
@@ -238,7 +295,14 @@ public class MainController : MonoBehaviour
 
                     // Increment the trial counter
                     currentTrial++;
-                    LoadScene(sequenceSteps[currentStep]);
+
+                    // Re-initialize execution order if randomise is true
+                    if (randomise)
+                    {
+                        InitializeExecutionOrder();
+                    }
+
+                    LoadScene(sequenceSteps[executionOrder[currentStep]]);
                 }
                 else
                 {
@@ -250,7 +314,7 @@ public class MainController : MonoBehaviour
             else
             {
                 // Load the next scene
-                LoadScene(sequenceSteps[currentStep]);
+                LoadScene(sequenceSteps[executionOrder[currentStep]]);
             }
         }
     }
@@ -263,7 +327,7 @@ public class MainController : MonoBehaviour
             {
                 string configFileName = item.parameters["configFile"].ToString();
                 string sourcePath = Path.Combine(Application.streamingAssetsPath, configFileName);
-                
+
                 if (File.Exists(sourcePath))
                 {
                     string destinationPath = Path.Combine(
@@ -300,6 +364,7 @@ public class SequenceStep
 [System.Serializable]
 public class SequenceConfig
 {
+    public bool randomise = false; // Added field
     public SequenceItem[] sequences;
 }
 

@@ -134,6 +134,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ant
       objectReference: {fileID: 0}
+    - target: {fileID: 152672, guid: 365a6af1237885f448ba3d55607568db, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 498974, guid: 365a6af1237885f448ba3d55607568db, type: 3}
       propertyPath: m_LocalScale.x
       value: 10
