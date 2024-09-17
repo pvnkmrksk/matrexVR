@@ -571,7 +571,7 @@ MonoBehaviour:
   - {fileID: 1931617803381333906, guid: 1695d22eb5f8d458e8d19ce4729a7bd9, type: 3}
   - {fileID: 1274570263506488403, guid: eed7da0dd105843ff8b63e74c2eb7805, type: 3}
   - {fileID: 1139572726157748, guid: 3c98bb4bee2f2ba4b92a2fbca7b8831f, type: 3}
-  - {fileID: 4200047036864494803, guid: 75197810c9f6e11a7a70fa2d0b85c939, type: 3}
+  - {fileID: 2847650824615190857, guid: b1de23ca45fde9afb9402d7563db3786, type: 3}
   materials:
   - {fileID: 2100000, guid: 68412cf8cf2347368bd2519a5752bb70, type: 2}
   - {fileID: 2100000, guid: c21ae454203097ed6b5a6c0e7d294929, type: 2}
@@ -834,6 +834,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: VR1
       objectReference: {fileID: 0}
+    - target: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: m_TagString
+      value: ScaleReference
+      objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586073, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -880,7 +884,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: sphereDiameter
-      value: 0.9
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: closedLoopOrientation
@@ -1032,8 +1036,8 @@ SceneRoots:
   - {fileID: 1470736539}
   - {fileID: 143658773}
   - {fileID: 1947130651}
-  - {fileID: 6789758097467590959}
   - {fileID: 604776878787064245}
   - {fileID: 163937260}
   - {fileID: 7076154443342934818}
   - {fileID: 1638632443318510459}
+  - {fileID: 6789758097467590959}
