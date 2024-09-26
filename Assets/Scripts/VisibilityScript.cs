@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class VisibilityScript : MonoBehaviour
 {
-    public float cycleDuration = 5f;      // Total duration of one visibility cycle
-    public float visibleDuration = 2f;    // Duration when the instance is visible
+    public float cycleDuration = 4f;      // Total duration of one visibility cycle
+    public float visibleDuration = 1f;    // Duration when the instance is visible
     public float phaseOffset = 0f;        // Phase offset at the start
 
     private Renderer[] renderers;

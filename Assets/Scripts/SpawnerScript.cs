@@ -8,35 +8,52 @@ public class SpawnerScript : MonoBehaviour
     public GameObject instancePrefab;
 
     // Parameters
-    public float speed = 5f;
+    public float speed = 2f;
     public float mu = 0f; // Mean direction in degrees (on the XZ plane)
     public Vector3 bandCenter = Vector3.zero; // XYZ of the band center
-    public float bandWidth = 10f;
-    public float bandLength = 5f;
+    public float bandWidth = 30f;
+    public float bandDepth = 50f;
 
-    public float boundaryWidth = 20f; // Width along the X-axis chiyu note: this can be the same as bandlength, the orientation of the instance moving direction is not correct
-    public float boundaryDepth = 20f; // Depth along the Z-axi chiyu note: this can be the same as bandlength
+    public float boundaryWidth = 30f; // Width along the X-axis chiyu note: this can be the same as bandlength, the orientation of the instance moving direction is not correct
+    public float boundaryDepth = 50f; // Depth along the Z-axi chiyu note: this can be the same as bandlength
     
-    public int numberOfInstances = 10;
-    public float kappa = 0f; // Orientation parameter
+    public int numberOfInstances = 32;
+    public float kappa = 10000f; // Orientation parameter
     public bool moveWithTransform = false;
     public Transform targetTransform;
 
-    private GameObject[] instances;
-    private Vector3[] initialRelativePositions;
-
     // Visibility Parameters
     public bool enableVisibilityCycling = false;
-    public float cycleDuration = 5f;      // Total cycle duration
-    public float visibleDuration = 2f;    // Duration when the instance is visible
+    public float cycleDuration = 4f;      // Total cycle duration
+    public float visibleDuration = 1f;    // Duration when the instance is visible
     public float phaseOffset = 0f;        // Phase offset of the cycle
     public bool randomizePhase = false;   // Randomize phase for each instance
+
+    public float minimumDistance = 1f; // Minimum distance between instances
+
+    // New parameter for uniform distribution
+    public bool useHexagonalGrid = false;
+    private GameObject[] instances;
+    private Vector3[] initialRelativePositions;
 
 
     void Start()
     {
-        instances = new GameObject[numberOfInstances];
-        initialRelativePositions = new Vector3[numberOfInstances];
+        if (useHexagonalGrid)
+        {
+            float hexagonRadius = CalculateHexagonRadius();
+            List<Vector3> positions = GenerateHexagonalGridPositions(hexagonRadius);
+            int maxInstances = Mathf.Min(numberOfInstances, positions.Count);
+
+            instances = new GameObject[maxInstances];
+            initialRelativePositions = new Vector3[maxInstances];
+        }
+        else
+        {
+            instances = new GameObject[numberOfInstances];
+            initialRelativePositions = new Vector3[numberOfInstances];
+        }
+
         SpawnInstances();
     }
     void Update()
@@ -56,64 +73,180 @@ public class SpawnerScript : MonoBehaviour
             }
         }
     }
+
     void SpawnInstances()
     {
-        for (int i = 0; i < numberOfInstances; i++)
+        if (useHexagonalGrid)
         {
-            // Random position within the band
+            float hexagonRadius = CalculateHexagonRadius();
+            List<Vector3> positions = GenerateHexagonalGridPositions(hexagonRadius);
 
-            Vector3 position = bandCenter + new Vector3(
-                Random.Range(-bandWidth / 2f, bandWidth / 2f),
-                0f, // Y is zero for ground plane
-                Random.Range(-bandLength / 2f, bandLength / 2f)
-            );
-            if (moveWithTransform && targetTransform != null)
+            int instancesToSpawn = Mathf.Min(numberOfInstances, positions.Count);
+
+            for (int i = 0; i < instancesToSpawn; i++)
             {
-                // Calculate initial relative positions
-                initialRelativePositions[i] = position - targetTransform.position;
-                position = targetTransform.position + initialRelativePositions[i];
+                Vector3 position = positions[i];
+
+                // Proceed with instantiation and setup
+                SpawnInstanceAtPosition(position, i);
             }
-            // Instantiate the prefab
-            GameObject instance = Instantiate(instancePrefab, position, Quaternion.identity);
+        }
+        else if (minimumDistance > 0f)
+        {
+            // Grid-based placement with randomness
+            // Calculate number of instances along each axis based on desired minimum distance
 
-            // Get orientation angle using Von Mises distribution
-            float angle = GetOrientationAngle();
+            int countX = Mathf.FloorToInt(bandWidth / minimumDistance);
+            int countZ = Mathf.FloorToInt(bandDepth / minimumDistance);
+            int totalPositions = countX * countZ;
 
-            // Convert angle to direction vector
-            Vector3 direction = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+            int instancesToSpawn = Mathf.Min(numberOfInstances, totalPositions);
 
-            // Apply rotation
-            instance.transform.rotation = Quaternion.LookRotation(direction);
+            List<Vector3> positions = new List<Vector3>();
+            float startX = bandCenter.x - bandWidth / 2f;
+            float startZ = bandCenter.z - bandDepth / 2f;
+            float stepX = bandWidth / countX;
+            float stepZ = bandDepth / countZ;
 
-            // Add movement script to instance
-            MovementScript movement = instance.AddComponent<MovementScript>();
-            movement.speed = speed;
-            movement.boundaryCenter = bandCenter;
-            movement.boundaryWidth = boundaryWidth;
-            movement.boundaryDepth = boundaryDepth;
-            movement.moveWithTransform = moveWithTransform;
-            movement.targetTransform = targetTransform;
-
-            instances[i] = instance; // Store for position updates
-
-                    // Add VisibilityScript and pass parameters
-            if (enableVisibilityCycling)
+            for (int x = 0; x < countX; x++)
             {
-                VisibilityScript visibility = instance.AddComponent<VisibilityScript>();
-                visibility.cycleDuration = cycleDuration;
-                visibility.visibleDuration = visibleDuration;
-
-                if (randomizePhase)
+                for (int z = 0; z < countZ; z++)
                 {
-                    // Generate a random phase offset between 0 and cycleDuration
-                    visibility.phaseOffset = Random.Range(0f, cycleDuration);
+                    float posX = startX + x * stepX + Random.Range(-stepX / 4f, stepX / 4f);
+                    float posZ = startZ + z * stepZ + Random.Range(-stepZ / 4f, stepZ / 4f);
+                    positions.Add(new Vector3(posX, 0f, posZ));
                 }
-                else
+            }
+
+            Shuffle(positions);
+
+            for (int i = 0; i < instancesToSpawn; i++)
+            {
+                Vector3 position = positions[i];
+                SpawnInstanceAtPosition(position, i);
+            }
+        }
+        else
+        {
+                        // Random distribution using the provided method
+            for (int i = 0; i < numberOfInstances; i++)
+            {
+                // Random position within the band
+                Vector3 position = bandCenter + new Vector3(
+                    Random.Range(-bandWidth / 2f, bandWidth / 2f),
+                    0f, // Y is zero for ground plane
+                    Random.Range(-bandDepth / 2f, bandDepth / 2f)
+                );
+
+                // Proceed with instantiation and setup
+                SpawnInstanceAtPosition(position, i);
+            }  
+        }
+
+    }
+
+    void SpawnInstanceAtPosition(Vector3 position, int index)
+    {
+        if (moveWithTransform && targetTransform != null)
+        {
+            initialRelativePositions[index] = position - targetTransform.position;
+            position = targetTransform.position + initialRelativePositions[index];
+        }
+
+        GameObject instance = Instantiate(instancePrefab, position, Quaternion.identity);
+
+        float angle = GetOrientationAngle();
+        Vector3 direction = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+        instance.transform.rotation = Quaternion.LookRotation(direction);
+
+        MovementScript movement = instance.AddComponent<MovementScript>();
+        movement.speed = speed;
+        movement.boundaryCenter = bandCenter;
+        movement.boundaryWidth = boundaryWidth;
+        movement.boundaryDepth = boundaryDepth;
+        movement.moveWithTransform = moveWithTransform;
+        movement.targetTransform = targetTransform;
+
+        if (enableVisibilityCycling)
+        {
+            VisibilityScript visibility = instance.AddComponent<VisibilityScript>();
+            visibility.cycleDuration = cycleDuration;
+            visibility.visibleDuration = visibleDuration;
+
+            if (randomizePhase)
+            {
+                visibility.phaseOffset = Random.Range(0f, cycleDuration);
+            }
+            else
+            {
+                visibility.phaseOffset = phaseOffset;
+            }
+        }
+
+        instances[index] = instance;
+    }
+
+    float CalculateHexagonRadius()
+    {
+        // Total band area
+        float bandArea = bandWidth * bandDepth;
+
+        // Area per instance
+        float areaPerInstance = bandArea / numberOfInstances;
+
+        // Calculate hexagon radius
+        float hexagonRadius = Mathf.Sqrt((2f * areaPerInstance) / (3f * Mathf.Sqrt(3f)));
+
+        return hexagonRadius;
+    }
+
+    List<Vector3> GenerateHexagonalGridPositions(float hexagonRadius)
+    {
+        List<Vector3> positions = new List<Vector3>();
+
+        // Hexagon dimensions
+        float hexWidth = 2f * hexagonRadius;
+        float hexHeight = Mathf.Sqrt(3f) * hexagonRadius;
+
+        // Spacing between hexagon centers
+        float horizSpacing = hexWidth * 0.75f;
+        float vertSpacing = hexHeight;
+
+        // Number of hexagons that fit within the band dimensions
+        int numHexX = Mathf.CeilToInt(bandWidth / horizSpacing);
+        int numHexZ = Mathf.CeilToInt(bandDepth / vertSpacing);
+
+        // Starting offsets to center the grid
+        float offsetX = bandCenter.x - ((numHexX - 1) * horizSpacing) / 2f;
+        float offsetZ = bandCenter.z - ((numHexZ - 1) * vertSpacing) / 2f;
+
+        for (int x = 0; x < numHexX; x++)
+        {
+            for (int z = 0; z < numHexZ; z++)
+            {
+                // Calculate position
+                float posX = offsetX + x * horizSpacing;
+                float posZ = offsetZ + z * vertSpacing;
+
+                // Offset every other column
+                if (x % 2 == 1)
                 {
-                    visibility.phaseOffset = phaseOffset;
+                    posZ += vertSpacing / 2f;
+                }
+
+                // Check if position is within band boundaries
+                if (posX >= bandCenter.x - bandWidth / 2f && posX <= bandCenter.x + bandWidth / 2f &&
+                    posZ >= bandCenter.z - bandDepth / 2f && posZ <= bandCenter.z + bandDepth / 2f)
+                {
+                    positions.Add(new Vector3(posX, 0f, posZ));
                 }
             }
         }
+
+        // Optionally shuffle positions
+        Shuffle(positions);
+
+        return positions;
     }
 
     float GetOrientationAngle()
@@ -157,6 +290,17 @@ public class SpawnerScript : MonoBehaviour
                 float theta = sign * Mathf.Acos(f);
                 return mu + theta;
             }
+        }
+    }
+    void Shuffle<T>(List<T> list)
+    {
+        int n = list.Count;
+        for (int i = 0; i < n; i++)
+        {
+            int r = Random.Range(i, n);
+            T tmp = list[r];
+            list[r] = list[i];
+            list[i] = tmp;
         }
     }
 }
