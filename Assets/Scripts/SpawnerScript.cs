@@ -27,9 +27,27 @@ public class SpawnerScript : MonoBehaviour
 
     void Start()
     {
+        instances = new GameObject[numberOfInstances];
+        initialRelativePositions = new Vector3[numberOfInstances];
         SpawnInstances();
     }
+    void Update()
+    {
+        if (moveWithTransform && targetTransform != null)
+        {
+            // Update the band and periodic boundaries to follow the targetTransform
+            bandCenter = targetTransform.position;
 
+            // Update instances' positions relative to the targetTransform
+            for (int i = 0; i < instances.Length; i++)
+            {
+                if (instances[i] != null)
+                {
+                    instances[i].transform.position = targetTransform.position + initialRelativePositions[i];
+                }
+            }
+        }
+    }
     void SpawnInstances()
     {
         for (int i = 0; i < numberOfInstances; i++)
@@ -41,6 +59,12 @@ public class SpawnerScript : MonoBehaviour
                 0f, // Y is zero for ground plane
                 Random.Range(-bandLength / 2f, bandLength / 2f)
             );
+            if (moveWithTransform && targetTransform != null)
+            {
+                // Calculate initial relative positions
+                initialRelativePositions[i] = position - targetTransform.position;
+                position = targetTransform.position + initialRelativePositions[i];
+            }
             // Instantiate the prefab
             GameObject instance = Instantiate(instancePrefab, position, Quaternion.identity);
 
@@ -55,8 +79,14 @@ public class SpawnerScript : MonoBehaviour
 
             // Add movement script to instance
             MovementScript movement = instance.AddComponent<MovementScript>();
-            movement.direction = direction.normalized;
             movement.speed = speed;
+            movement.boundaryCenter = bandCenter;
+            movement.boundaryWidth = boundaryWidth;
+            movement.boundaryDepth = boundaryDepth;
+            movement.moveWithTransform = moveWithTransform;
+            movement.targetTransform = targetTransform;
+
+            instances[i] = instance; // Store for position updates
         }
     }
 
