@@ -25,6 +25,14 @@ public class SpawnerScript : MonoBehaviour
     private GameObject[] instances;
     private Vector3[] initialRelativePositions;
 
+    // Visibility Parameters
+    public bool enableVisibilityCycling = false;
+    public float cycleDuration = 5f;      // Total cycle duration
+    public float visibleDuration = 2f;    // Duration when the instance is visible
+    public float phaseOffset = 0f;        // Phase offset of the cycle
+    public bool randomizePhase = false;   // Randomize phase for each instance
+
+
     void Start()
     {
         instances = new GameObject[numberOfInstances];
@@ -87,6 +95,24 @@ public class SpawnerScript : MonoBehaviour
             movement.targetTransform = targetTransform;
 
             instances[i] = instance; // Store for position updates
+
+                    // Add VisibilityScript and pass parameters
+            if (enableVisibilityCycling)
+            {
+                VisibilityScript visibility = instance.AddComponent<VisibilityScript>();
+                visibility.cycleDuration = cycleDuration;
+                visibility.visibleDuration = visibleDuration;
+
+                if (randomizePhase)
+                {
+                    // Generate a random phase offset between 0 and cycleDuration
+                    visibility.phaseOffset = Random.Range(0f, cycleDuration);
+                }
+                else
+                {
+                    visibility.phaseOffset = phaseOffset;
+                }
+            }
         }
     }
 
