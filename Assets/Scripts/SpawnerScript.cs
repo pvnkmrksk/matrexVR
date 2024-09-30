@@ -24,9 +24,13 @@ public class SpawnerScript : MonoBehaviour
 
     // Visibility Parameters
     public bool enableVisibilityCycling = false;
-    public float cycleDuration = 4f;      // Total cycle duration
-    public float visibleDuration = 1f;    // Duration when the instance is visible
-    public float phaseOffset = 0f;        // Phase offset of the cycle
+    public float visibleOffDuration = 4f;      // Total cycle duration
+    public float visibleOnDuration = 1f;    // Duration when the instance is visible
+
+    private float cycleDuration;
+
+    [Tooltip("Phase offset duration between 0 and total duration in seconds.")]    public float phaseOffset = 0f;        // Phase offset at the start in seconds
+
     public bool randomizePhase = false;   // Randomize phase for each instance
 
     public float minimumDistance = 1f; // Minimum distance between instances
@@ -170,8 +174,10 @@ public class SpawnerScript : MonoBehaviour
         if (enableVisibilityCycling)
         {
             VisibilityScript visibility = instance.AddComponent<VisibilityScript>();
-            visibility.cycleDuration = cycleDuration;
-            visibility.visibleDuration = visibleDuration;
+            //visibility.cycleDuration = cycleDuration;
+            visibility.visibleOffDuration = visibleOffDuration;
+            visibility.visibleOnDuration = visibleOnDuration;
+            cycleDuration=visibleOffDuration+visibleOnDuration;
 
             if (randomizePhase)
             {

@@ -4,17 +4,21 @@ using UnityEngine;
 
 public class VisibilityScript : MonoBehaviour
 {
-    public float cycleDuration = 4f;      // Total duration of one visibility cycle
-    public float visibleDuration = 1f;    // Duration when the instance is visible
-    public float phaseOffset = 0f;        // Phase offset at the start
+    public float visibleOffDuration = 4f;      // Total duration of one visibility cycle
+    public float visibleOnDuration = 1f;    // Duration when the instance is visible
+
+    private float cycleDuration;
+    [Tooltip("Phase offset duration between 0 and total duration in seconds.")]    public float phaseOffset = 0f;        // Phase offset at the start in seconds
 
     private Renderer[] renderers;
     private float timer;
 
     void Start()
     {
+        //todo add duty cycle instead of durations
         // Get all Renderer components in the instance (in case it has multiple parts)
         renderers = GetComponentsInChildren<Renderer>();
+        cycleDuration=visibleOnDuration+visibleOffDuration;
 
         // Initialize the timer with the phase offset
         timer = phaseOffset % cycleDuration;
@@ -32,7 +36,7 @@ public class VisibilityScript : MonoBehaviour
         }
 
         // Determine visibility
-        if (timer <= visibleDuration)
+        if (timer <= visibleOnDuration)
         {
             SetVisibility(true);
         }
