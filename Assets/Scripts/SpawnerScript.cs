@@ -21,6 +21,18 @@ public class SpawnerScript : MonoBehaviour
     public float mu = 0f; // Mean direction in degrees
     public float kappa = 10f; // Concentration parameter
 
+    [Header("Movement Parameters")]
+    public float speed = 3f;
+
+    [Header("Visibility Parameters")]
+    public float visibleOffDuration = 4f;
+    public float visibleOnDuration = 1f;
+
+    [Header("Periodic Boundary Parameters")]
+    public Vector3 boundaryCenter = Vector3.zero;
+    public float boundaryWidth = 20f;
+    public float boundaryDepth = 20f;
+
     private List<Vector3> spawnPositions = new List<Vector3>();
 
     void Start()
@@ -108,8 +120,27 @@ public class SpawnerScript : MonoBehaviour
             // Set orientation using von Mises distribution
             float orientation = GenerateVanMisesRotation(mu, kappa);
             instance.transform.rotation = Quaternion.Euler(0f, orientation, 0f);
+
+            // Add and configure DirectionalMovement
+            DirectionalMovement movement = instance.AddComponent<DirectionalMovement>();
+            // movement.SetSpeed(Random.Range(minSpeed, maxSpeed));
+            movement.SetSpeed(speed);
+            movement.SetDirection(orientation);
+
+            // Add and configure VisibilityScript
+            VisibilityScript visibility = instance.AddComponent<VisibilityScript>();
+            visibility.visibleOffDuration = visibleOffDuration;
+            visibility.visibleOnDuration = visibleOnDuration;
+            visibility.phaseOffset = Random.Range(0f, visibleOffDuration + visibleOnDuration);
+
+            // Add and configure PeriodicBoundary
+            PeriodicBoundary boundary = instance.AddComponent<PeriodicBoundary>();
+            boundary.boundaryCenter = boundaryCenter;
+            boundary.boundaryWidth = boundaryWidth;
+            boundary.boundaryDepth = boundaryDepth;
         }
     }
+
     float GenerateVanMisesRotation(float mu, float kappa)
     {
         if (kappa <= 0)
