@@ -1,60 +1,50 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class MovementScript : MonoBehaviour
+public class DirectionalMovement : MonoBehaviour
 {
-    public float speed;
+    [SerializeField] private float speed = 2f;
+    [SerializeField] private float directionAngle = 0f; // Direction angle in degrees (on the XZ plane)
 
-    // Periodic Boundary Parameters
-    public Vector3 boundaryCenter = Vector3.zero;
-    public float boundaryWidth = 20f;
-    public float boundaryDepth = 20f;
-
-    // Band Movement Parameters
-    public bool moveWithTransform = false;
-    public Transform targetTransform;
+    void Start()
+    {
+        UpdateRotation();
+    }
 
     void Update()
     {
-        // Move forward
-        transform.position += transform.forward * speed * Time.deltaTime;
-
-        // Update boundary center if moving with transform
-        Vector3 center = moveWithTransform && targetTransform != null ? targetTransform.position : boundaryCenter;
-
-        // Handle periodic boundaries
-        HandlePeriodicBoundaries(center);
+        MoveForward();
     }
 
-    void HandlePeriodicBoundaries(Vector3 center)
+    private void MoveForward()
     {
-        Vector3 position = transform.position;
+        transform.position += transform.forward * speed * Time.deltaTime;
+    }
 
-        float halfWidth = boundaryWidth / 2f;
-        float halfDepth = boundaryDepth / 2f;
+    private void UpdateRotation()
+    {
+        float angleInRadians = directionAngle * Mathf.Deg2Rad;
+        Vector3 direction = new Vector3(Mathf.Cos(angleInRadians), 0f, Mathf.Sin(angleInRadians));
+        transform.rotation = Quaternion.LookRotation(direction);
+    }
 
-        // Check X-axis boundaries
-        if (position.x > center.x + halfWidth)
-        {
-            position.x -= boundaryWidth;
-        }
-        else if (position.x < center.x - halfWidth)
-        {
-            position.x += boundaryWidth;
-        }
+    public void SetSpeed(float newSpeed)
+    {
+        speed = Mathf.Max(0f, newSpeed); // Ensure non-negative speed
+    }
 
-        // Check Z-axis boundaries
-        if (position.z > center.z + halfDepth)
-        {
-            position.z -= boundaryDepth;
-        }
-        else if (position.z < center.z - halfDepth)
-        {
-            position.z += boundaryDepth;
-        }
+    public float GetSpeed()
+    {
+        return speed;
+    }
 
-        transform.position = position;
+    public void SetDirection(float newAngle)
+    {
+        directionAngle = newAngle % 360f; // Normalize angle to 0-360 range
+        UpdateRotation();
+    }
+
+    public float GetDirection()
+    {
+        return directionAngle;
     }
 }
-

@@ -159,25 +159,25 @@ public class SpawnerScript : MonoBehaviour
 
         GameObject instance = Instantiate(instancePrefab, position, Quaternion.identity);
 
-        float angle = GetOrientationAngle();
-        Vector3 direction = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
-        instance.transform.rotation = Quaternion.LookRotation(direction);
+        // Add and configure PeriodicBoundary component
+        PeriodicBoundary periodicBoundary = instance.AddComponent<PeriodicBoundary>();
+        periodicBoundary.boundaryCenter = bandCenter;
+        periodicBoundary.boundaryWidth = boundaryWidth;
+        periodicBoundary.boundaryDepth = boundaryDepth;
+        periodicBoundary.moveWithTransform = moveWithTransform;
+        periodicBoundary.targetTransform = targetTransform;
 
-        MovementScript movement = instance.AddComponent<MovementScript>();
-        movement.speed = speed;
-        movement.boundaryCenter = bandCenter;
-        movement.boundaryWidth = boundaryWidth;
-        movement.boundaryDepth = boundaryDepth;
-        movement.moveWithTransform = moveWithTransform;
-        movement.targetTransform = targetTransform;
+        // Add and configure DirectionalMovement component
+        DirectionalMovement movement = instance.AddComponent<DirectionalMovement>();
+        movement.SetSpeed(speed);
+        movement.SetDirection(GetOrientationAngle() * Mathf.Rad2Deg);
 
         if (enableVisibilityCycling)
         {
             VisibilityScript visibility = instance.AddComponent<VisibilityScript>();
-            //visibility.cycleDuration = cycleDuration;
             visibility.visibleOffDuration = visibleOffDuration;
             visibility.visibleOnDuration = visibleOnDuration;
-            cycleDuration=visibleOffDuration+visibleOnDuration;
+            cycleDuration = visibleOffDuration + visibleOnDuration;
 
             if (randomizePhase)
             {
