@@ -1,25 +1,11 @@
 {
-  "sequences": [
-    {
-      "sceneName": "Choice_noBG",
-      "duration": 30,
-      "parameters": {
-        "configFile": "Choice_Empty_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice_noBG",
-      "duration": 30,
-      "parameters": {
-        "configFile": "Choice_BlackCylinder_BlackCylinder.json"
-      }
-    },
-    {
-      "sceneName": "Choice_noBG",
-      "duration": 30,
-      "parameters": {
-        "configFile": "Choice_Scaling_BlackCylinder_BlackCylinder.json"
-      }
-    }
-  ]
+    "sequences": [
+        {
+            "sceneName": "Demo",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice00_empty_control.json"
+            }
+        }
+    ]
 }

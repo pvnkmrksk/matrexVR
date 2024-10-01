@@ -75,7 +75,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
                         obj.scale.z
                     );
                 }
-                
+
                 if (obj.speed != 0)
                 {
                     instance.GetComponent<LocustMover>().speed = obj.speed;
@@ -87,7 +87,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 }
 
                 //todo. add individual datalogger to each instance. 
-                
+
                 // Optionally apply material
                 if (
                     !string.IsNullOrEmpty(obj.material)
@@ -109,6 +109,21 @@ public class ChoiceController : MonoBehaviour, ISceneController
             );
             cl.SetClosedLoopOrientation(config.closedLoopOrientation);
             cl.SetClosedLoopPosition(config.closedLoopPosition);
+
+            // Set the initial position and rotation in one go, convert the rotation to a quaternion
+            //if randomInitialRotation is true, then set the rotation to a random value
+            Quaternion initialRotation;
+            if (config.randomInitialRotation)
+            {
+                //random angle
+                initialRotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
+            }
+            else
+            {
+                initialRotation = Quaternion.Euler(config.initialRotation);
+            }
+            cl.SetPositionAndRotation(config.initialPosition, initialRotation);
+
         }
         // Read and set the background color of cameras
         if (config.backgroundColor != null)
@@ -172,6 +187,11 @@ public class SceneConfig
     public SceneObject[] objects;
     public bool closedLoopOrientation;
     public bool closedLoopPosition;
+
+    public Vector3 initialPosition;
+    public Vector3 initialRotation;
+
+    public bool randomInitialRotation;
     public ColorConfig backgroundColor;
 }
 

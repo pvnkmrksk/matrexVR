@@ -4,11 +4,11 @@ public class ClosedLoop : MonoBehaviour
 {
 
 
-    [SerializeField] [Tooltip("The diameter of the sphere in cm")] private float sphereDiameter = 1f;
+    [SerializeField][Tooltip("The diameter of the sphere in cm")] private float sphereDiameter = 1f;
 
     private float sphereRadius;
-    [SerializeField] [Tooltip("The key to reset the position and rotation")] private KeyCode resetKey = KeyCode.R;
-    [SerializeField] [Tooltip("The delay in seconds before starting to use FicTrac data after reset.")] private float initializationDelay = 0.1f;
+    [SerializeField][Tooltip("The key to reset the position and rotation")] private KeyCode resetKey = KeyCode.R;
+    [SerializeField][Tooltip("The delay in seconds before starting to use FicTrac data after reset.")] private float initializationDelay = 0.1f;
 
     private ZmqListener _zmqListener;
     private Vector3 _initialPosition;
@@ -19,8 +19,8 @@ public class ClosedLoop : MonoBehaviour
     private float _initializationTimer;
 
     // Add these new variables
-    [SerializeField] [Tooltip("Whether to apply the FicTrac position in closed loop")] private bool closedLoopPosition = true;
-    [SerializeField] [Tooltip("Whether to apply the FicTrac rotation in closed loop")] private bool closedLoopOrientation = true;
+    [SerializeField][Tooltip("Whether to apply the FicTrac position in closed loop")] private bool closedLoopPosition = true;
+    [SerializeField][Tooltip("Whether to apply the FicTrac rotation in closed loop")] private bool closedLoopOrientation = true;
 
     private void Start()
     {
@@ -78,6 +78,7 @@ public class ClosedLoop : MonoBehaviour
         {
             Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius;
             transform.Translate(positionDelta, Space.World);
+            
         }
 
         // Apply rotation change only if closedLoopOrientation is true
@@ -128,6 +129,16 @@ public class ClosedLoop : MonoBehaviour
     public void SetClosedLoopPosition(bool value)
     {
         closedLoopPosition = value;
+    }
+
+    public void SetPositionAndRotation(Vector3 initialPosition, Quaternion initialRotation)
+    {
+
+        _initialPosition = initialPosition;
+        _initialRotation = initialRotation;
+
+        transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+
     }
 
     private void HandleInput()

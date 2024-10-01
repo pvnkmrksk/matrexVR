@@ -85,7 +85,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c75a3f1e40cc87811bdffcc067133c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sphereDiameter: 9.9
+  sphereDiameter: 2.5
   resetKey: 114
   initializationDelay: 0.1
   closedLoopPosition: 1

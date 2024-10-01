@@ -9,5 +9,16 @@
     "g": 0.8,
     "b": 0.8,
     "a": 1
-  }
+  },
+  "initialPosition": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "randomInitialRotation": true
 }
