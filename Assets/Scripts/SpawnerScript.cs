@@ -31,13 +31,57 @@ public class SpawnerScript : MonoBehaviour
     [Header("Periodic Boundary Parameters")]
     [Tooltip("Boundary Width in centimeters. Please make sure that the boundary width is greater than the spawn width to avoid agents spawning on the boundary.")] public float boundaryWidth = 20f;
     [Tooltip("Boundary Length in centimeters. Please make sure that the boundary length is greater than the spawn length to avoid agents spawning on the boundary.")] public float boundaryLength = 20f;
+    [Tooltip("If true, the spawner will move relative to the custom transform.")] public bool moveWithCustomTransform = false;
+    [Tooltip("Custom transform to use as the reference when moveWithCustomTransform is true.")] public Transform customParentTransform;
+
+    private Vector3 initialOffset;
 
     private List<Vector3> spawnPositions = new List<Vector3>();
+    private bool isInitialized = false;
 
     void Start()
     {
+        SetupInitialTransform();
         GenerateSpawnPositions();
         SpawnInstances();
+        isInitialized = true;
+    }
+
+    void SetupInitialTransform()
+    {
+        if (moveWithCustomTransform && customParentTransform != null)
+        {
+            initialOffset = transform.position - customParentTransform.position;
+        }
+    }
+
+    void Update()
+    {
+        if (moveWithCustomTransform && customParentTransform != null)
+        {
+            UpdateTransform();
+        }
+
+        if (isInitialized)
+        {
+            UpdateBoundaryCenter();
+        }
+    }
+
+    void UpdateTransform()
+    {
+        // Only apply translation, ignoring rotation completely
+        transform.position = customParentTransform.position + initialOffset;
+    }
+
+    void UpdateBoundaryCenter()
+    {
+        Vector3 center = transform.position;
+        PeriodicBoundary[] boundaries = GetComponentsInChildren<PeriodicBoundary>();
+        foreach (PeriodicBoundary boundary in boundaries)
+        {
+            boundary.boundaryCenter = center;
+        }
     }
 
     void GenerateSpawnPositions()
@@ -134,10 +178,11 @@ public class SpawnerScript : MonoBehaviour
 
             // Add and configure PeriodicBoundary
             PeriodicBoundary boundary = instance.AddComponent<PeriodicBoundary>();
-            boundary.boundaryCenter = transform.position;
             boundary.boundaryWidth = boundaryWidth;
             boundary.boundaryLength = boundaryLength;
         }
+
+        UpdateBoundaryCenter();
     }
 
     float GenerateVanMisesRotation(float mu, float kappa)
