@@ -167,40 +167,49 @@ public class BandSpawner : MonoBehaviour
     public void SpawnInstances()
     {
         int instancesToSpawn = Mathf.Min(numberOfInstances, spawnPositions.Count);
+        int parentLayer = gameObject.layer;  // Get the layer of the BandSpawner
 
         for (int i = 0; i < instancesToSpawn; i++)
         {
             Vector3 position = spawnPositions[i];
             GameObject instance = Instantiate(instancePrefab, position, Quaternion.identity, transform);
             
+            // Set the instance's layer to match the parent
+            instance.layer = parentLayer;
+
             // Assign a unique name with serial number
             instance.name = $"{instancePrefab.name}_{gameObject.name}_{globalInstanceCounter:D6}";
             globalInstanceCounter++;
             localInstanceCounter++;
-            // Set orientation using von Mises distribution
 
+            // Set orientation using von Mises distribution
             float orientation = GenerateVanMisesRotation(mu, kappa);
             instance.transform.rotation = Quaternion.Euler(0f, orientation, 0f);
 
-            // Add and configure DirectionalMovement
-            DirectionalMovement movement = instance.AddComponent<DirectionalMovement>();
-            // movement.SetSpeed(Random.Range(minSpeed, maxSpeed)); might be useful for rendering agents with different speeds in the future
-            movement.SetSpeed(speed);
-            movement.SetDirection(orientation);
-
-            // Add and configure VisibilityScript
-            VisibilityScript visibility = instance.AddComponent<VisibilityScript>();
-            visibility.visibleOffDuration = visibleOffDuration;
-            visibility.visibleOnDuration = visibleOnDuration;
-            visibility.phaseOffset = UnityEngine.Random.Range(0f, visibleOffDuration + visibleOnDuration);
-
-            // Add and configure PeriodicBoundary
-            PeriodicBoundary boundary = instance.AddComponent<PeriodicBoundary>();
-            boundary.boundaryWidth = boundaryWidth;
-            boundary.boundaryLength = boundaryLength;
+            // Add and configure components (DirectionalMovement, VisibilityScript, PeriodicBoundary)
+            SetupInstanceComponents(instance, orientation);
         }
 
         UpdateBoundaryCenter();
+    }
+
+    private void SetupInstanceComponents(GameObject instance, float orientation)
+    {
+        // Add and configure DirectionalMovement
+        DirectionalMovement movement = instance.AddComponent<DirectionalMovement>();
+        movement.SetSpeed(speed);
+        movement.SetDirection(orientation);
+
+        // Add and configure VisibilityScript
+        VisibilityScript visibility = instance.AddComponent<VisibilityScript>();
+        visibility.visibleOffDuration = visibleOffDuration;
+        visibility.visibleOnDuration = visibleOnDuration;
+        visibility.phaseOffset = UnityEngine.Random.Range(0f, visibleOffDuration + visibleOnDuration);
+
+        // Add and configure PeriodicBoundary
+        PeriodicBoundary boundary = instance.AddComponent<PeriodicBoundary>();
+        boundary.boundaryWidth = boundaryWidth;
+        boundary.boundaryLength = boundaryLength;
     }
 
     float GenerateVanMisesRotation(float mu, float kappa)

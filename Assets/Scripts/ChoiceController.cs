@@ -163,7 +163,13 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
             // Set layer
             string layerName = $"SimulatedLocustsVR{vrIndex}";
-            bandInstance.layer = LayerMask.NameToLayer(layerName);
+            int layerIndex = LayerMask.NameToLayer(layerName);
+            if (layerIndex == -1)
+            {
+                Debug.LogError($"Layer {layerName} does not exist. Please create it in the Unity Layer settings.");
+                return;
+            }
+            bandInstance.layer = layerIndex;
 
             BandSpawner spawner = bandInstance.GetComponent<BandSpawner>();
             if (spawner != null)
@@ -185,7 +191,15 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 spawner.moveWithCustomTransform = obj.moveWithTransform;
                 if (obj.moveWithTransform)
                 {
-                    spawner.customParentTransform = GameObject.Find($"VR{vrIndex}")?.transform;
+                    GameObject vrObject = GameObject.Find($"VR{vrIndex}");
+                    if (vrObject != null)
+                    {
+                        spawner.customParentTransform = vrObject.transform;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"VR{vrIndex} object not found in the scene.");
+                    }
                 }
             }
 
@@ -217,7 +231,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
         }
         else
         {
-            Debug.LogError("Band prefab is not assigned in the ChoiceController.");
+            Debug.LogError($"Band prefab '{obj.type}' is not assigned in the ChoiceController.");
         }
     }
 
