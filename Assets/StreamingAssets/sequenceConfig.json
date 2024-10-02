@@ -4,7 +4,7 @@
       "sceneName": "Choice",
       "duration": 2000,
       "parameters": {
-        "configFile": "Choice_locust315.json"
+        "configFile": "Choice_band.json"
       }
     },
     {

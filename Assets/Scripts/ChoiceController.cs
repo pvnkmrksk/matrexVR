@@ -14,6 +14,10 @@ public class ChoiceController : MonoBehaviour, ISceneController
     public Material[] materials; // Materials are assigned in the Unity Editor
     private Dictionary<string, Material> materialDict = new Dictionary<string, Material>();
 
+    // New field for band prefab
+    public GameObject bandPrefab;
+    private int numberOfVR = 4;
+
     private void Awake()
     {
         // Initialize prefab dictionary
@@ -48,56 +52,22 @@ public class ChoiceController : MonoBehaviour, ISceneController
         string jsonString = File.ReadAllText(jsonPath);
         SceneConfig config = JsonConvert.DeserializeObject<SceneConfig>(jsonString);
 
-        // Instantiate objects
-        foreach (var obj in config.objects)
+
+        for (int i = 0; i < numberOfVR; i++)
         {
-            if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
+            foreach (var obj in config.objects)
             {
-                Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
-                GameObject instance = Instantiate(prefab, position, Quaternion.identity);
-
-                Debug.Log("Instance position: " + instance.transform.position);
-                // Set scale, Optionally flip the object if flip is true, set flip my scale * -1 in x axis
-
-                if (obj.flip)
+                if (obj.type == "Band")
                 {
-                    instance.transform.localScale = new Vector3(
-                        obj.scale.x * -1,
-                        obj.scale.y,
-                        obj.scale.z
-                    );
+                    InstantiateBand(obj, i + 1);
                 }
                 else
                 {
-                    instance.transform.localScale = new Vector3(
-                        obj.scale.x,
-                        obj.scale.y,
-                        obj.scale.z
-                    );
-                }
-                
-                if (obj.speed != 0)
-                {
-                    instance.GetComponent<LocustMover>().speed = obj.speed;
-                }
-
-                if (obj.mu != 0)
-                {
-                    instance.transform.localRotation = Quaternion.Euler(0, obj.mu, 0);
-                }
-
-                //todo. add individual datalogger to each instance. 
-                
-                // Optionally apply material
-                if (
-                    !string.IsNullOrEmpty(obj.material)
-                    && materialDict.TryGetValue(obj.material, out Material material)
-                )
-                {
-                    instance.GetComponent<Renderer>().material = material;
+                    InstantiateRegularObject(obj);
                 }
             }
         }
+
         ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
         Debugger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length, 4);
 
@@ -135,6 +105,119 @@ public class ChoiceController : MonoBehaviour, ISceneController
         // TODO: Set sky and grass textures
         // Start the coroutine from here
         StartCoroutine(DelayedOnLoaded(0.05f));
+    }
+
+    private void InstantiateRegularObject(SceneObject obj)
+    {
+        if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
+        {
+            Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
+            GameObject instance = Instantiate(prefab, position, Quaternion.identity);
+
+            Debug.Log("Instance position: " + instance.transform.position);
+            // Set scale, Optionally flip the object if flip is true, set flip my scale * -1 in x axis
+
+            if (obj.flip)
+            {
+                instance.transform.localScale = new Vector3(
+                    obj.scale.x * -1,
+                    obj.scale.y,
+                    obj.scale.z
+                );
+            }
+            else
+            {
+                instance.transform.localScale = new Vector3(
+                    obj.scale.x,
+                    obj.scale.y,
+                    obj.scale.z
+                );
+            }
+            
+            if (obj.speed != 0)
+            {
+                instance.GetComponent<LocustMover>().speed = obj.speed;
+            }
+
+            if (obj.mu != 0)
+            {
+                instance.transform.localRotation = Quaternion.Euler(0, obj.mu, 0);
+            }
+
+            //todo. add individual datalogger to each instance. 
+            
+            // Optionally apply material
+            if (
+                !string.IsNullOrEmpty(obj.material)
+                && materialDict.TryGetValue(obj.material, out Material material)
+            )
+            {
+                instance.GetComponent<Renderer>().material = material;
+            }
+        }
+    }
+
+    private void InstantiateBand(SceneObject obj, int vrIndex)
+    {
+        if (bandPrefab != null)
+        {
+            Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
+            GameObject bandInstance = Instantiate(bandPrefab, position, Quaternion.identity);
+
+            // Set layer
+            string layerName = $"SimulatedLocustsVR{vrIndex}";
+            bandInstance.layer = LayerMask.NameToLayer(layerName);
+
+            BandSpawner spawner = bandInstance.GetComponent<BandSpawner>();
+            if (spawner != null)
+            {
+                // Set BandSpawner properties
+                spawner.numberOfInstances = obj.numberOfInstances;
+                spawner.spawnWidth = obj.spawnWidth;
+                spawner.spawnLength = obj.spawnLength;
+                spawner.gridType = obj.gridType;
+                spawner.mu = obj.mu;
+                spawner.kappa = obj.kappa;
+                spawner.speed = obj.speed;
+                spawner.visibleOffDuration = obj.visibleOffDuration;
+                spawner.visibleOnDuration = obj.visibleOnDuration;
+                spawner.boundaryWidth = obj.boundaryWidth;
+                spawner.boundaryLength = obj.boundaryLength;
+
+                // Set custom parent transform
+                spawner.moveWithCustomTransform = true;
+                spawner.customParentTransform = GameObject.Find($"VR{vrIndex}")?.transform;
+            }
+
+            // Set BandLogger properties
+            BandLogger logger = bandInstance.GetComponent<BandLogger>();
+            if (logger != null)
+            {
+                logger.targetLayerMask = LayerMask.GetMask(layerName);
+            }
+
+            // Set scale
+            bandInstance.transform.localScale = new Vector3(obj.scale.x, obj.scale.y, obj.scale.z);
+
+            // Apply flip if needed
+            if (obj.flip)
+            {
+                bandInstance.transform.localScale = new Vector3(
+                    bandInstance.transform.localScale.x * -1,
+                    bandInstance.transform.localScale.y,
+                    bandInstance.transform.localScale.z
+                );
+            }
+
+            // Apply rotation
+            bandInstance.transform.localRotation = Quaternion.Euler(0, obj.mu, 0);
+
+            // TODO: Add individual datalogger to the band instance if needed
+        }
+        else
+        {
+            Debug.LogError("Band prefab is not assigned in the ChoiceController.");
+        }
     }
 
     // Coroutine to delay the execution of OnLoaded
@@ -183,12 +266,20 @@ public class SceneObject
     public string material;
     public ScaleConfig scale;
     public bool flip;
-
     public float speed;
-
     public float mu;
-    // Include other properties as before
+    // New properties for bands
+    public int numberOfInstances;
+    public float spawnWidth;
+    public float spawnLength;
+    public SpawnGridType gridType;
+    public float kappa;
+    public float visibleOffDuration;
+    public float visibleOnDuration;
+    public float boundaryWidth;
+    public float boundaryLength;
 }
+
 
 [System.Serializable]
 public class Position

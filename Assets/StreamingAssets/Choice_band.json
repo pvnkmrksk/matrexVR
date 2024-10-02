@@ -1,0 +1,36 @@
+{
+  "objects": [
+    
+    {
+      "type": "Band",
+      "position": {
+        "radius": 0,
+        "angle": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "flip": false,
+      "speed": 3,
+      "mu": 0,
+      "numberOfInstances": 32,
+      "spawnWidth": 30,
+      "spawnLength": 50,
+      "gridType": "Random",
+      "kappa": 10,
+      "visibleOffDuration": 4,
+      "visibleOnDuration": 1,
+      "boundaryWidth": 40,
+      "boundaryLength": 60
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0.1,
+    "g": 0.1,
+    "b": 0.1
+  }
+}
