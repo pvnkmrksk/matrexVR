@@ -29,7 +29,6 @@ public class SpawnerScript : MonoBehaviour
     [Tooltip("Agent Visible Duration in seconds.")] public float visibleOnDuration = 1f;
 
     [Header("Periodic Boundary Parameters")]
-    [Tooltip("Boundary Center coordinates")] public Vector3 boundaryCenter = Vector3.zero;
     [Tooltip("Boundary Width in centimeters. Please make sure that the boundary width is greater than the spawn width to avoid agents spawning on the boundary.")] public float boundaryWidth = 20f;
     [Tooltip("Boundary Length in centimeters. Please make sure that the boundary length is greater than the spawn length to avoid agents spawning on the boundary.")] public float boundaryLength = 20f;
 
@@ -135,7 +134,7 @@ public class SpawnerScript : MonoBehaviour
 
             // Add and configure PeriodicBoundary
             PeriodicBoundary boundary = instance.AddComponent<PeriodicBoundary>();
-            boundary.boundaryCenter = boundaryCenter;
+            boundary.boundaryCenter = transform.position;
             boundary.boundaryWidth = boundaryWidth;
             boundary.boundaryLength = boundaryLength;
         }
