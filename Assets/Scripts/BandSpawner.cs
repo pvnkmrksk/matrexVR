@@ -9,7 +9,7 @@ public enum SpawnGridType
     Random
 }
 
-public class SpawnerScript : MonoBehaviour
+public class BandSpawner : MonoBehaviour
 {
     public GameObject instancePrefab;
     [Tooltip("Number of instances to spawn.")] public int numberOfInstances = 32;
@@ -161,7 +161,7 @@ public class SpawnerScript : MonoBehaviour
         }
     }
 
-    void SpawnInstances()
+    public void SpawnInstances()
     {
         int instancesToSpawn = Mathf.Min(numberOfInstances, spawnPositions.Count);
 
@@ -184,7 +184,7 @@ public class SpawnerScript : MonoBehaviour
             VisibilityScript visibility = instance.AddComponent<VisibilityScript>();
             visibility.visibleOffDuration = visibleOffDuration;
             visibility.visibleOnDuration = visibleOnDuration;
-            visibility.phaseOffset = Random.Range(0f, visibleOffDuration + visibleOnDuration);
+            visibility.phaseOffset = UnityEngine.Random.Range(0f, visibleOffDuration + visibleOnDuration);
 
             // Add and configure PeriodicBoundary
             PeriodicBoundary boundary = instance.AddComponent<PeriodicBoundary>();

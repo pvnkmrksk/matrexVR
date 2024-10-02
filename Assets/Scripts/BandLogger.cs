@@ -1,17 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System.IO;
 using System;
-using System.Text;
+using System.IO;
 using System.IO.Compression;
+using UnityEngine;
 
-public class SwarmLogger : MonoBehaviour
+public class BandLogger : MonoBehaviour
 {
-    public LayerMask locustLayerMask; // Public LayerMask variable
+    public LayerMask targetLayerMask; // Renamed from locustLayerMask
     private string directoryPath;
     private string logPath;
     private StreamWriter logFile;
+    private BandSpawner bandSpawner;
 
     void Start()
     {
@@ -27,62 +25,100 @@ public class SwarmLogger : MonoBehaviour
             return;
         }
 
-        // Get a reference to the LocustSpawner script
-        LocustSpawner locustSpawner = GetComponent<LocustSpawner>();
-        if (locustSpawner == null)
+        // Get a reference to the BandSpawner script
+        bandSpawner = GetComponent<BandSpawner>();
+        if (bandSpawner == null)
         {
-            Debugger.Log("LocustSpawner script not found on this GameObject.", 1);
+            Debugger.Log("BandSpawner script not found on this GameObject.", 1);
             return;
         }
 
         // Initialize the log file
         string date = DateTime.Now.ToString("yyyy-MM-dd");
         string time = DateTime.Now.ToString("HH-mm-ss");
-        // Correctly extract layer names from the LayerMask
-        string layerNames = "";
-        int layerMaskValue = locustLayerMask.value;
-        for (int i = 0; i < 32; i++) // Unity supports up to 32 layers
-        {
-            if ((layerMaskValue & (1 << i)) != 0)
-            {
-                layerNames += LayerMask.LayerToName(i) + "_";
-            }
-        }
-        layerNames = layerNames.TrimEnd('_'); // Remove trailing underscore
+        string layerNames = GetLayerNames(targetLayerMask);
 
-        // Include metadata in the file name
+        string prefabName = bandSpawner.instancePrefab.name;
+        string bandName = gameObject.name; // Get the name of the GameObject this script is attached to
+
         logPath = Path.Combine(
             directoryPath,
-            $"SimulatedLocustData_{layerNames}_{locustSpawner.numberOfLocusts}_{locustSpawner.spawnAreaSize}_{locustSpawner.mu}_{locustSpawner.kappa}_{locustSpawner.locustSpeed}_{date}_{time}.csv.gz"
-        );
-        // Include metadata in the file name
-        logPath = Path.Combine(
-            directoryPath,
-            $"{date}_{time}_SimulatedLocustData_{layerNames}_{locustSpawner.numberOfLocusts}_{locustSpawner.spawnAreaSize}_{locustSpawner.mu}_{locustSpawner.kappa}_{locustSpawner.locustSpeed}.csv.gz"
+            $"{date}_{time}_SimulatedData_{prefabName}_{bandName}_{layerNames}_{bandSpawner.numberOfInstances}_{bandSpawner.spawnWidth}_{bandSpawner.spawnLength}_{bandSpawner.mu}_{bandSpawner.kappa}_{bandSpawner.speed}.csv.gz"
         );
 
         logFile = new StreamWriter(
             new GZipStream(File.Create(logPath), System.IO.Compression.CompressionLevel.Optimal)
         );
 
-        // Write header with parameters from LocustSpawner
+        // Write header
         logFile.WriteLine(
-            $"Timestamp,Name,Layer,X,Y,Z,NumberOfLocusts:{locustSpawner.numberOfLocusts},SpawnAreaSize:{locustSpawner.spawnAreaSize},Mu:{locustSpawner.mu},Kappa:{locustSpawner.kappa},LocustSpeed:{locustSpawner.locustSpeed}"
+            $"Timestamp,Name,Layer,X,Y,Z,Rotation,Speed,VisibilityPhase," +
+            $"PrefabName:{prefabName}," +
+            $"BandName:{bandName}," + // Add the band name to the header
+            $"NumberOfInstances:{bandSpawner.numberOfInstances}," +
+            $"SpawnWidth:{bandSpawner.spawnWidth}," +
+            $"SpawnLength:{bandSpawner.spawnLength}," +
+            $"GridType:{bandSpawner.gridType}," +
+            $"Mu:{bandSpawner.mu}," +
+            $"Kappa:{bandSpawner.kappa}," +
+            $"Speed:{bandSpawner.speed}," +
+            $"VisibleOffDuration:{bandSpawner.visibleOffDuration}," +
+            $"VisibleOnDuration:{bandSpawner.visibleOnDuration}," +
+            $"BoundaryWidth:{bandSpawner.boundaryWidth}," +
+            $"BoundaryLength:{bandSpawner.boundaryLength}"
         );
+
+        LogSpawnData();
+    }
+
+    string GetLayerNames(LayerMask layerMask)
+    {
+        string layerNames = "";
+        for (int i = 0; i < 32; i++)
+        {
+            if ((layerMask.value & (1 << i)) != 0)
+            {
+                layerNames += LayerMask.LayerToName(i) + "_";
+            }
+        }
+        return layerNames.TrimEnd('_');
+    }
+
+    void LogSpawnData()
+    {
+        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        foreach (Transform child in bandSpawner.transform)
+        {
+            GameObject instance = child.gameObject;
+            if (targetLayerMask == (targetLayerMask | (1 << instance.layer)))
+            {
+                Vector3 position = instance.transform.position;
+                float rotation = instance.transform.eulerAngles.y;
+                
+                DirectionalMovement movement = instance.GetComponent<DirectionalMovement>();
+                float speed = movement ? movement.GetSpeed() : 0f;
+
+                VisibilityScript visibility = instance.GetComponent<VisibilityScript>();
+                float visibilityPhase = visibility ? visibility.phaseOffset : 0f;
+
+                string data = $"{timestamp},{instance.name},{LayerMask.LayerToName(instance.layer)}," +
+                              $"{position.x},{position.y},{position.z},{rotation},{speed},{visibilityPhase}";
+                logFile.WriteLine(data);
+            }
+        }
     }
 
     void Update()
     {
-        GameObject[] locusts = GameObject.FindGameObjectsWithTag("SimulatedLocust");
         string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-
-        foreach (GameObject locust in locusts)
+        foreach (Transform child in bandSpawner.transform)
         {
-            if (locustLayerMask == (locustLayerMask | (1 << locust.layer))) // Check if the locust's layer is in the mask
+            GameObject instance = child.gameObject;
+            if (targetLayerMask == (targetLayerMask | (1 << instance.layer)))
             {
-                Vector3 position = locust.transform.position;
-                string data =
-                    $"{timestamp},{locust.name},{LayerMask.LayerToName(locust.layer)},{position.x},{position.y},{position.z}";
+                Vector3 position = instance.transform.position;
+                string data = $"{timestamp},{instance.name},{LayerMask.LayerToName(instance.layer)}," +
+                              $"{position.x},{position.y},{position.z}";
                 logFile.WriteLine(data);
             }
         }

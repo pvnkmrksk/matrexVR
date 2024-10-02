@@ -2,7 +2,7 @@
   "sequences": [
 	  {
       "sceneName": "Choice",
-      "duration": 20,
+      "duration": 2000,
       "parameters": {
         "configFile": "Choice_locust315.json"
       }
