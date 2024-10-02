@@ -53,4 +53,9 @@ public class VisibilityScript : MonoBehaviour
             rend.enabled = isVisible;
         }
     }
+
+    public float GetCurrentPhase()
+    {
+        return (Time.time + phaseOffset) % (visibleOffDuration + visibleOnDuration);
+    }
 }

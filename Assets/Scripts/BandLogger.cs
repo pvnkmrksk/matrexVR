@@ -52,10 +52,7 @@ public class BandLogger : MonoBehaviour
 
         // Write header
         logFile.WriteLine(
-            $"Timestamp,Name,Layer,X,Y,Z,Rotation,Speed,VisibilityPhase," +
-            $"PrefabName:{prefabName}," +
-            $"BandName:{bandName}," + // Add the band name to the header
-            $"NumberOfInstances:{bandSpawner.numberOfInstances}," +
+            "Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase," +
             $"SpawnWidth:{bandSpawner.spawnWidth}," +
             $"SpawnLength:{bandSpawner.spawnLength}," +
             $"GridType:{bandSpawner.gridType}," +
@@ -68,7 +65,43 @@ public class BandLogger : MonoBehaviour
             $"BoundaryLength:{bandSpawner.boundaryLength}"
         );
 
-        LogSpawnData();
+        LogAllInstances();
+    }
+
+    void Update()
+    {
+        LogAllInstances();
+    }
+
+    void LogAllInstances()
+    {
+        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        foreach (Transform child in bandSpawner.transform)
+        {
+            GameObject instance = child.gameObject;
+            if (targetLayerMask == (targetLayerMask | (1 << instance.layer)))
+            {
+                LogInstanceData(timestamp, instance);
+            }
+        }
+    }
+
+    void LogInstanceData(string timestamp, GameObject instance)
+    {
+        Vector3 position = instance.transform.position;
+        Vector3 rotation = instance.transform.eulerAngles;
+        
+        DirectionalMovement movement = instance.GetComponent<DirectionalMovement>();
+        float speed = movement ? movement.GetSpeed() : 0f;
+
+        VisibilityScript visibility = instance.GetComponent<VisibilityScript>();
+        float visibilityPhase = visibility ? visibility.GetCurrentPhase() : 0f;
+
+        string data = $"{timestamp},{instance.name},{LayerMask.LayerToName(instance.layer)}," +
+                      $"{position.x},{position.y},{position.z}," +
+                      $"{rotation.x},{rotation.y},{rotation.z}," +
+                      $"{speed},{visibilityPhase}";
+        logFile.WriteLine(data);
     }
 
     string GetLayerNames(LayerMask layerMask)
@@ -82,46 +115,6 @@ public class BandLogger : MonoBehaviour
             }
         }
         return layerNames.TrimEnd('_');
-    }
-
-    void LogSpawnData()
-    {
-        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-        foreach (Transform child in bandSpawner.transform)
-        {
-            GameObject instance = child.gameObject;
-            if (targetLayerMask == (targetLayerMask | (1 << instance.layer)))
-            {
-                Vector3 position = instance.transform.position;
-                float rotation = instance.transform.eulerAngles.y;
-                
-                DirectionalMovement movement = instance.GetComponent<DirectionalMovement>();
-                float speed = movement ? movement.GetSpeed() : 0f;
-
-                VisibilityScript visibility = instance.GetComponent<VisibilityScript>();
-                float visibilityPhase = visibility ? visibility.phaseOffset : 0f;
-
-                string data = $"{timestamp},{instance.name},{LayerMask.LayerToName(instance.layer)}," +
-                              $"{position.x},{position.y},{position.z},{rotation},{speed},{visibilityPhase}";
-                logFile.WriteLine(data);
-            }
-        }
-    }
-
-    void Update()
-    {
-        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-        foreach (Transform child in bandSpawner.transform)
-        {
-            GameObject instance = child.gameObject;
-            if (targetLayerMask == (targetLayerMask | (1 << instance.layer)))
-            {
-                Vector3 position = instance.transform.position;
-                string data = $"{timestamp},{instance.name},{LayerMask.LayerToName(instance.layer)}," +
-                              $"{position.x},{position.y},{position.z}";
-                logFile.WriteLine(data);
-            }
-        }
     }
 
     void OnDestroy()

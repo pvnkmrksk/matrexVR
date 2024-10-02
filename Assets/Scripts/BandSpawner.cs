@@ -39,6 +39,9 @@ public class BandSpawner : MonoBehaviour
 
     private PeriodicBoundary boundaryComponent;
 
+    private static int globalInstanceCounter = 0;
+    private int localInstanceCounter = 0;
+
     /// <summary>
     /// Initializes the spawner, sets up the initial transform, and spawns instances.
     /// </summary>
@@ -170,7 +173,12 @@ public class BandSpawner : MonoBehaviour
             Vector3 position = spawnPositions[i];
             GameObject instance = Instantiate(instancePrefab, position, Quaternion.identity, transform);
             
+            // Assign a unique name with serial number
+            instance.name = $"{instancePrefab.name}_{gameObject.name}_{globalInstanceCounter:D6}";
+            globalInstanceCounter++;
+            localInstanceCounter++;
             // Set orientation using von Mises distribution
+
             float orientation = GenerateVanMisesRotation(mu, kappa);
             instance.transform.rotation = Quaternion.Euler(0f, orientation, 0f);
 
