@@ -35,18 +35,23 @@ public class SpawnerScript : MonoBehaviour
     [Tooltip("Custom transform to use as the reference when moveWithCustomTransform is true.")] public Transform customParentTransform;
 
     private Vector3 initialOffset;
-
     private List<Vector3> spawnPositions = new List<Vector3>();
-    private bool isInitialized = false;
 
+    private PeriodicBoundary boundaryComponent;
+
+    /// <summary>
+    /// Initializes the spawner, sets up the initial transform, and spawns instances.
+    /// </summary>
     void Start()
     {
         SetupInitialTransform();
         GenerateSpawnPositions();
         SpawnInstances();
-        isInitialized = true;
     }
 
+    /// <summary>
+    /// Sets up the initial offset if custom transform movement is enabled.
+    /// </summary>
     void SetupInitialTransform()
     {
         if (moveWithCustomTransform && customParentTransform != null)
@@ -55,25 +60,30 @@ public class SpawnerScript : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Updates the spawner's position and boundary center each frame if custom transform movement is enabled.
+    /// </summary>
     void Update()
     {
         if (moveWithCustomTransform && customParentTransform != null)
         {
             UpdateTransform();
-        }
-
-        if (isInitialized)
-        {
             UpdateBoundaryCenter();
         }
     }
 
+    /// <summary>
+    /// Updates the spawner's position based on the custom parent transform.
+    /// </summary>
     void UpdateTransform()
     {
         // Only apply translation, ignoring rotation completely
         transform.position = customParentTransform.position + initialOffset;
     }
 
+    /// <summary>
+    /// Updates the boundary center for all PeriodicBoundary components to match the spawner's current position.
+    /// </summary>
     void UpdateBoundaryCenter()
     {
         Vector3 center = transform.position;
