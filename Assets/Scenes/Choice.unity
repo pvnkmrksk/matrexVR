@@ -259,6 +259,7 @@ MonoBehaviour:
   - {fileID: 1274570263506488403, guid: eed7da0dd105843ff8b63e74c2eb7805, type: 3}
   - {fileID: 1139572726157748, guid: 3c98bb4bee2f2ba4b92a2fbca7b8831f, type: 3}
   - {fileID: 751920776276428372, guid: 1aeca6fee807789d1b0943f5bb918d28, type: 3}
+  - {fileID: 5359356435596721786, guid: 4115d46fd76421756b8310ec56af56da, type: 3}
   materials:
   - {fileID: 2100000, guid: 30698065bf4d05413851dbea62a8c3b6, type: 2}
   - {fileID: 2100000, guid: cc1b699790543fbe9b646ada19484422, type: 2}
@@ -271,7 +272,6 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 8bf719516907744c296a0214354a32a2, type: 2}
   - {fileID: 2100000, guid: 463a29183fd6db830be6acd798abb4b0, type: 2}
   - {fileID: 2100000, guid: fd28db8498f04a02890e57c80d65f409, type: 2}
-  bandPrefab: {fileID: 4006871233168333227, guid: 819ebf525bd3cb63dbe6997158a1de0d, type: 3}
 --- !u!4 &402538950
 Transform:
   m_ObjectHideFlags: 0

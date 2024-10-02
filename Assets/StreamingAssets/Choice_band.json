@@ -2,7 +2,7 @@
   "objects": [
     
     {
-      "type": "Band",
+      "type": "LocustBand",
       "position": {
         "radius": 0,
         "angle": 0
@@ -23,7 +23,8 @@
       "visibleOffDuration": 4,
       "visibleOnDuration": 1,
       "boundaryWidth": 40,
-      "boundaryLength": 60
+      "boundaryLength": 60,
+      "moveWithTransform": true
     }
   ],
   "closedLoopOrientation": true,

@@ -7,15 +7,12 @@ using System.Linq;
 
 public class ChoiceController : MonoBehaviour, ISceneController
 {
-    // Assuming these prefabs are assigned in the Unity Editor
     public GameObject[] prefabs;
     private Dictionary<string, GameObject> prefabDict = new Dictionary<string, GameObject>();
 
-    public Material[] materials; // Materials are assigned in the Unity Editor
+    public Material[] materials;
     private Dictionary<string, Material> materialDict = new Dictionary<string, Material>();
 
-    // New field for band prefab
-    public GameObject bandPrefab;
     private int numberOfVR = 4;
 
     private void Awake()
@@ -23,20 +20,13 @@ public class ChoiceController : MonoBehaviour, ISceneController
         // Initialize prefab dictionary
         foreach (var prefab in prefabs)
         {
-            if (!prefabDict.ContainsKey(prefab.name))
-            {
-                prefabDict.Add(prefab.name, prefab);
-                // Debug.Log("Added prefab: " + prefab.name);
-            }
+            prefabDict[prefab.name] = prefab;
         }
 
         // Initialize material dictionary
         foreach (var material in materials)
         {
-            if (!materialDict.ContainsKey(material.name))
-            {
-                materialDict.Add(material.name, material);
-            }
+            materialDict[material.name] = material;
         }
     }
 
@@ -57,13 +47,20 @@ public class ChoiceController : MonoBehaviour, ISceneController
         {
             foreach (var obj in config.objects)
             {
-                if (obj.type == "Band")
+                if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
                 {
-                    InstantiateBand(obj, i + 1);
+                    if (obj.type.ToLower().Contains("band"))
+                    {
+                        InstantiateBand(obj, i + 1);
+                    }
+                    else
+                    {
+                        InstantiateRegularObject(obj);
+                    }
                 }
                 else
                 {
-                    InstantiateRegularObject(obj);
+                    Debug.LogError($"Prefab '{obj.type}' not found in prefabs list.");
                 }
             }
         }
@@ -159,7 +156,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
     private void InstantiateBand(SceneObject obj, int vrIndex)
     {
-        if (bandPrefab != null)
+        if (prefabDict.TryGetValue(obj.type, out GameObject bandPrefab))
         {
             Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
             GameObject bandInstance = Instantiate(bandPrefab, position, Quaternion.identity);
@@ -185,8 +182,11 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 spawner.boundaryLength = obj.boundaryLength;
 
                 // Set custom parent transform
-                spawner.moveWithCustomTransform = true;
-                spawner.customParentTransform = GameObject.Find($"VR{vrIndex}")?.transform;
+                spawner.moveWithCustomTransform = obj.moveWithTransform;
+                if (obj.moveWithTransform)
+                {
+                    spawner.customParentTransform = GameObject.Find($"VR{vrIndex}")?.transform;
+                }
             }
 
             // Set BandLogger properties
@@ -194,6 +194,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
             if (logger != null)
             {
                 logger.targetLayerMask = LayerMask.GetMask(layerName);
+                logger.enabled = true; // Ensure logger is enabled
             }
 
             // Set scale
@@ -278,6 +279,7 @@ public class SceneObject
     public float visibleOnDuration;
     public float boundaryWidth;
     public float boundaryLength;
+    public bool moveWithTransform; // New field
 }
 
 
