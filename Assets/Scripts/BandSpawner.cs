@@ -42,6 +42,8 @@ public class BandSpawner : MonoBehaviour
     private static int globalInstanceCounter = 0;
     private int localInstanceCounter = 0;
 
+    public int vrIndex = 0; // This will be set by ChoiceController
+
     /// <summary>
     /// Initializes the spawner, sets up the initial transform, and spawns instances.
     /// </summary>
@@ -167,17 +169,16 @@ public class BandSpawner : MonoBehaviour
     public void SpawnInstances()
     {
         int instancesToSpawn = Mathf.Min(numberOfInstances, spawnPositions.Count);
-        int parentLayer = gameObject.layer;  // Get the layer of the BandSpawner
+        int parentLayer = gameObject.layer;
 
         for (int i = 0; i < instancesToSpawn; i++)
         {
             Vector3 position = spawnPositions[i];
             GameObject instance = Instantiate(instancePrefab, position, Quaternion.identity, transform);
             
-            // Set the instance's layer to match the parent
             instance.layer = parentLayer;
 
-            // Assign a unique name with serial number
+            // Keep the naming convention you like
             instance.name = $"{instancePrefab.name}_{gameObject.name}_{globalInstanceCounter:D6}";
             globalInstanceCounter++;
             localInstanceCounter++;

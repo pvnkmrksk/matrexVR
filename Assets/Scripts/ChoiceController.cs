@@ -161,6 +161,9 @@ public class ChoiceController : MonoBehaviour, ISceneController
             Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
             GameObject bandInstance = Instantiate(bandPrefab, position, Quaternion.identity);
 
+            // Set a proper name for the band instance
+            bandInstance.name = $"{bandPrefab.name}_{vrIndex}";
+
             // Set layer
             string layerName = $"SimulatedLocustsVR{vrIndex}";
             int layerIndex = LayerMask.NameToLayer(layerName);
@@ -174,6 +177,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
             BandSpawner spawner = bandInstance.GetComponent<BandSpawner>();
             if (spawner != null)
             {
+                spawner.vrIndex = vrIndex; // Set the VR index
                 // Set BandSpawner properties
                 spawner.numberOfInstances = obj.numberOfInstances;
                 spawner.spawnWidth = obj.spawnWidth;
