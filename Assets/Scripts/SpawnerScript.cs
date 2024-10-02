@@ -12,26 +12,26 @@ public enum SpawnGridType
 public class SpawnerScript : MonoBehaviour
 {
     public GameObject instancePrefab;
-    public int numberOfInstances = 32;
-    public float spawnWidth = 30f;
-    public float spawnHeight = 50f;
-    public SpawnGridType gridType = SpawnGridType.Random;
+    [Tooltip("Number of instances to spawn.")] public int numberOfInstances = 32;
+    [Tooltip("Width of the spawn area in centimeters.")] public float spawnWidth = 30f;
+    [Tooltip("Length of the spawn area in centimeters.")] public float spawnLength = 50f;
+    [Tooltip("Pattern of the spawn grid. Note: Manhattan and hexagonal grid need optimization for the balance between number of instances and pair-wise distance.")] public SpawnGridType gridType = SpawnGridType.Random;
 
     [Header("Orientation Parameters")]
-    public float mu = 0f; // Mean direction in degrees
-    public float kappa = 10f; // Concentration parameter
+    [Tooltip("Mean heading direction in degrees. Note: Unity's polar coordinate system uses left-handed coordinates.")] public float mu = 0f;
+    [Tooltip("Coherence or order parameter, close to 0 means random orientation, 100000 means no randomization.")] public float kappa = 10f;
 
     [Header("Movement Parameters")]
-    public float speed = 3f;
+    [Tooltip("Speed of the instances in centimeters per second.")] public float speed = 3f;
 
     [Header("Visibility Parameters")]
-    public float visibleOffDuration = 4f;
-    public float visibleOnDuration = 1f;
+    [Tooltip("Agent Invisible Duration in seconds.")] public float visibleOffDuration = 4f;
+    [Tooltip("Agent Visible Duration in seconds.")] public float visibleOnDuration = 1f;
 
     [Header("Periodic Boundary Parameters")]
-    public Vector3 boundaryCenter = Vector3.zero;
-    public float boundaryWidth = 20f;
-    public float boundaryDepth = 20f;
+    [Tooltip("Boundary Center coordinates")] public Vector3 boundaryCenter = Vector3.zero;
+    [Tooltip("Boundary Width in centimeters. Please make sure that the boundary width is greater than the spawn width to avoid agents spawning on the boundary.")] public float boundaryWidth = 20f;
+    [Tooltip("Boundary Length in centimeters. Please make sure that the boundary length is greater than the spawn length to avoid agents spawning on the boundary.")] public float boundaryLength = 20f;
 
     private List<Vector3> spawnPositions = new List<Vector3>();
 
@@ -59,12 +59,12 @@ public class SpawnerScript : MonoBehaviour
 
     void GenerateHexagonalGrid()
     {
-        float hexRadius = Mathf.Sqrt((spawnWidth * spawnHeight) / (2f * Mathf.Sqrt(3f) * numberOfInstances));
+        float hexRadius = Mathf.Sqrt((spawnWidth * spawnLength) / (2f * Mathf.Sqrt(3f) * numberOfInstances));
         float horizontalDistance = hexRadius * 2f;
         float verticalDistance = hexRadius * Mathf.Sqrt(3f);
 
         int columns = Mathf.FloorToInt(spawnWidth / horizontalDistance);
-        int rows = Mathf.FloorToInt(spawnHeight / verticalDistance);
+        int rows = Mathf.FloorToInt(spawnLength / verticalDistance);
 
         for (int row = 0; row < rows; row++)
         {
@@ -74,7 +74,7 @@ public class SpawnerScript : MonoBehaviour
                 float zPos = row * verticalDistance;
 
                 xPos -= spawnWidth / 2f;
-                zPos -= spawnHeight / 2f;
+                zPos -= spawnLength / 2f;
 
                 spawnPositions.Add(new Vector3(xPos, 0f, zPos));
             }
@@ -83,16 +83,16 @@ public class SpawnerScript : MonoBehaviour
 
     void GenerateManhattanGrid()
     {
-        float cellSize = Mathf.Sqrt((spawnWidth * spawnHeight) / numberOfInstances);
+        float cellSize = Mathf.Sqrt((spawnWidth * spawnLength) / numberOfInstances);
         int cols = Mathf.FloorToInt(spawnWidth / cellSize);
-        int rows = Mathf.FloorToInt(spawnHeight / cellSize);
+        int rows = Mathf.FloorToInt(spawnLength / cellSize);
 
         for (int x = 0; x < cols; x++)
         {
             for (int y = 0; y < rows; y++)
             {
                 float posX = -spawnWidth / 2f + (x + 0.5f) * cellSize;
-                float posZ = -spawnHeight / 2f + (y + 0.5f) * cellSize;
+                float posZ = -spawnLength / 2f + (y + 0.5f) * cellSize;
                 spawnPositions.Add(new Vector3(posX, 0f, posZ));
             }
         }
@@ -103,7 +103,7 @@ public class SpawnerScript : MonoBehaviour
         for (int i = 0; i < numberOfInstances; i++)
         {
             float posX = Random.Range(-spawnWidth / 2f, spawnWidth / 2f);
-            float posZ = Random.Range(-spawnHeight / 2f, spawnHeight / 2f);
+            float posZ = Random.Range(-spawnLength / 2f, spawnLength / 2f);
             spawnPositions.Add(new Vector3(posX, 0f, posZ));
         }
     }
@@ -123,7 +123,7 @@ public class SpawnerScript : MonoBehaviour
 
             // Add and configure DirectionalMovement
             DirectionalMovement movement = instance.AddComponent<DirectionalMovement>();
-            // movement.SetSpeed(Random.Range(minSpeed, maxSpeed));
+            // movement.SetSpeed(Random.Range(minSpeed, maxSpeed)); might be useful for rendering agents with different speeds in the future
             movement.SetSpeed(speed);
             movement.SetDirection(orientation);
 
@@ -137,7 +137,7 @@ public class SpawnerScript : MonoBehaviour
             PeriodicBoundary boundary = instance.AddComponent<PeriodicBoundary>();
             boundary.boundaryCenter = boundaryCenter;
             boundary.boundaryWidth = boundaryWidth;
-            boundary.boundaryDepth = boundaryDepth;
+            boundary.boundaryLength = boundaryLength;
         }
     }
 

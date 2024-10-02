@@ -5,16 +5,16 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ControlScene.unity
     guid: 4af081ad6480f455f8bf0f8b4968e18a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Choice.unity
     guid: 0094462a0c85490ae978b6f0ae21f1fc
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Optomotor.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Swarm.unity
     guid: ee3c77b2ae528404ea7981ceb78bd856
   - enabled: 1

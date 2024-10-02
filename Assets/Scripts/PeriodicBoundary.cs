@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class PeriodicBoundary: MonoBehaviour
 {
-    public Vector3 boundaryCenter = Vector3.zero;
-    public float boundaryWidth = 20f;
-    public float boundaryDepth = 20f;
+    [Tooltip("Boundary Center coordinates")] public Vector3 boundaryCenter = Vector3.zero;
+    [Tooltip("Boundary Width in centimeters.")] public float boundaryWidth = 20f;
+    [Tooltip("Boundary Length in centimeters.")] public float boundaryLength = 20f;
 
-    public bool moveWithTransform = false;
-    public Transform targetTransform;
+    [Tooltip("Moving the boundary with the transform attached to this script.")] public bool moveWithTransform = false;
+    [Tooltip("Target Transform to move the boundary with.")] public Transform targetTransform;
 
     public void HandlePeriodicBoundaries(Transform objectTransform)
     {
@@ -15,7 +15,7 @@ public class PeriodicBoundary: MonoBehaviour
         Vector3 position = objectTransform.position;
 
         float halfWidth = boundaryWidth / 2f;
-        float halfDepth = boundaryDepth / 2f;
+        float halfLength = boundaryLength / 2f;
 
         // Check X-axis boundaries
         if (position.x > center.x + halfWidth)
@@ -24,10 +24,10 @@ public class PeriodicBoundary: MonoBehaviour
             position.x += boundaryWidth;
 
         // Check Z-axis boundaries
-        if (position.z > center.z + halfDepth)
-            position.z -= boundaryDepth;
-        else if (position.z < center.z - halfDepth)
-            position.z += boundaryDepth;
+        if (position.z > center.z + halfLength)
+            position.z -= boundaryLength;
+        else if (position.z < center.z - halfLength)
+            position.z += boundaryLength;
 
         objectTransform.position = position;
     }
