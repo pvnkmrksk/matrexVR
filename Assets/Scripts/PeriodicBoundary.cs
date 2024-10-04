@@ -9,6 +9,18 @@ public class PeriodicBoundary: MonoBehaviour
     [Tooltip("Moving the boundary with the transform attached to this script.")] public bool moveWithTransform = false;
     [Tooltip("Target Transform to move the boundary with.")] public Transform targetTransform;
 
+    private void OnDrawGizmos()
+    {
+        // Set the color for the boundary visualization
+        Gizmos.color = Color.red;
+        // Calculate the boundary box dimensions and position
+        Vector3 size = new Vector3(boundaryWidth, 1f, boundaryLength);
+        Vector3 center = moveWithTransform && targetTransform != null ? targetTransform.position : boundaryCenter;
+
+        // Draw a wire cube to represent the boundary
+        Gizmos.DrawWireCube(center, size);
+    }
+
     public void HandlePeriodicBoundaries(Transform objectTransform)
     {
         Vector3 center = moveWithTransform && targetTransform != null ? targetTransform.position : boundaryCenter;
@@ -38,7 +50,7 @@ public class PeriodicBoundary: MonoBehaviour
         
         if (targetTransform != null)
         {
-            HandlePeriodicBoundaries(targetTransform);
+            HandlePeriodicBoundaries(targetTransform);            
         }
         else
         {
