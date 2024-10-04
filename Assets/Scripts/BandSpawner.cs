@@ -19,18 +19,18 @@ public class BandSpawner : MonoBehaviour
 
     [Header("Orientation Parameters")]
     [Tooltip("Mean heading direction in degrees. Note: Unity's polar coordinate system uses left-handed coordinates.")] public float mu = 0f;
-    [Tooltip("Coherence or order parameter, close to 0 means random orientation, 100000 means no randomization.")] public float kappa = 10f;
+    [Tooltip("Coherence or order parameter, close to 0 means random orientation, 100000 means no randomization.")] public float kappa = 100000f;
 
     [Header("Movement Parameters")]
-    [Tooltip("Speed of the instances in centimeters per second.")] public float speed = 3f;
+    [Tooltip("Speed of the instances in centimeters per second.")] public float speed = 2f;
 
     [Header("Visibility Parameters")]
-    [Tooltip("Agent Invisible Duration in seconds.")] public float visibleOffDuration = 4f;
+    [Tooltip("Agent Invisible Duration in seconds.")] public float visibleOffDuration = 0f;
     [Tooltip("Agent Visible Duration in seconds.")] public float visibleOnDuration = 1f;
 
     [Header("Periodic Boundary Parameters")]
-    [Tooltip("Boundary Width in centimeters. Please make sure that the boundary width is greater than the spawn width to avoid agents spawning on the boundary.")] public float boundaryWidth = 20f;
-    [Tooltip("Boundary Length in centimeters. Please make sure that the boundary length is greater than the spawn length to avoid agents spawning on the boundary.")] public float boundaryLength = 20f;
+    [Tooltip("Boundary Width in centimeters. Please make sure that the boundary width is greater than the spawn width to avoid agents spawning on the boundary.")] public float boundaryWidth = 30f;
+    [Tooltip("Boundary Length in centimeters. Please make sure that the boundary length is greater than the spawn length to avoid agents spawning on the boundary.")] public float boundaryLength = 50f;
     [Tooltip("If true, the spawner will move relative to the custom transform.")] public bool moveWithCustomTransform = false;
     [Tooltip("Custom transform to use as the reference when moveWithCustomTransform is true.")] public Transform customParentTransform;
 
@@ -185,10 +185,11 @@ public class BandSpawner : MonoBehaviour
 
             // Set orientation using von Mises distribution
             float orientation = GenerateVanMisesRotation(mu, kappa);
-            instance.transform.rotation = Quaternion.Euler(0f, orientation, 0f);
+            // Add 90 degrees to rotate the reference direction from x-axis to z-axis
+            instance.transform.rotation = Quaternion.Euler(0f, orientation + 90f, 0f);
 
             // Add and configure components (DirectionalMovement, VisibilityScript, PeriodicBoundary)
-            SetupInstanceComponents(instance, orientation);
+            SetupInstanceComponents(instance, orientation+ 90f);
         }
 
         UpdateBoundaryCenter();
@@ -225,6 +226,7 @@ public class BandSpawner : MonoBehaviour
         }
 
         float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad * mu, kappa);
+        // No need to add 90 degrees here, as we're doing it when setting the rotation
         return angle * Mathf.Rad2Deg;
     }
 }

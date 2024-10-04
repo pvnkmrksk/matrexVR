@@ -15,7 +15,7 @@
       "flip": false,
       "speed": 2,
       "mu": 0,
-      "numberOfInstances": 36,
+      "numberOfInstances": 32,
       "spawnWidth": 30,
       "spawnLength": 50,
       "gridType": "Hexagonal",
@@ -24,7 +24,32 @@
       "visibleOnDuration": 1,
       "boundaryWidth": 30,
       "boundaryLength": 50,
-      "moveWithTransform": false
+      "moveWithTransform": true
+    },
+    {
+      "type": "LocustBand",
+      "position": {
+        "radius": 23,
+        "angle": 270
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "flip": false,
+      "speed": 2,
+      "mu": 0,
+      "numberOfInstances": 32,
+      "spawnWidth": 30,
+      "spawnLength": 50,
+      "gridType": "Hexagonal",
+      "kappa": 10000,
+      "visibleOffDuration": 0,
+      "visibleOnDuration": 1,
+      "boundaryWidth": 30,
+      "boundaryLength": 50,
+      "moveWithTransform": true
     }
   ],
   "closedLoopOrientation": true,
