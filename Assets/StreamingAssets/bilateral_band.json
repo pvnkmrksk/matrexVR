@@ -2,7 +2,7 @@
   "objects": [
     
     {
-      "type": "LocustBand",
+      "type": "LocustBand_R",
       "position": {
         "radius": 23,
         "angle": 90
