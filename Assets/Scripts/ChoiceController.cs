@@ -205,6 +205,15 @@ public class ChoiceController : MonoBehaviour, ISceneController
                         Debug.LogWarning($"VR{vrIndex} object not found in the scene.");
                     }
                 }
+                if (obj.gridType == SpawnGridType.Hexagonal)
+                {
+                    spawner.hexRadius = obj.hexRadius;
+                }
+                else if (obj.gridType == SpawnGridType.Manhattan)
+                {
+                    spawner.sectionLength = obj.sectionLength;
+                    spawner.sectionWidth = obj.sectionWidth;
+                }
             }
 
             // Set BandLogger properties
@@ -297,7 +306,11 @@ public class SceneObject
     public float visibleOnDuration;
     public float boundaryWidth;
     public float boundaryLength;
-    public bool moveWithTransform; // New field
+    public bool moveWithTransform;
+    public float hexRadius;
+
+    public float sectionLength;
+    public float sectionWidth;
 }
 
 

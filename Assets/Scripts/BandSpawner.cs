@@ -12,38 +12,59 @@ public enum SpawnGridType
 public class BandSpawner : MonoBehaviour
 {
     public GameObject instancePrefab;
-    [Tooltip("Number of instances to spawn.")] public int numberOfInstances = 32;
-    [Tooltip("Width of the spawn area in centimeters.")] public float spawnWidth = 30f;
-    [Tooltip("Length of the spawn area in centimeters.")] public float spawnLength = 50f;
-    [Tooltip("Pattern of the spawn grid. Note: Manhattan and hexagonal grid need optimization for the balance between number of instances and pair-wise distance.")] public SpawnGridType gridType = SpawnGridType.Random;
+    [Header("Instance Parameters")]
 
-    [Header("Orientation Parameters")]
+    [Header("Orientation")]
     [Tooltip("Mean heading direction in degrees. Note: Unity's polar coordinate system uses left-handed coordinates.")] public float mu = 0f;
     [Tooltip("Coherence or order parameter, close to 0 means random orientation, 100000 means no randomization.")] public float kappa = 100000f;
 
-    [Header("Movement Parameters")]
+    [Header("Movement")]
     [Tooltip("Speed of the instances in centimeters per second.")] public float speed = 2f;
 
-    [Header("Visibility Parameters")]
-    [Tooltip("Agent Invisible Duration in seconds.")] public float visibleOffDuration = 0f;
-    [Tooltip("Agent Visible Duration in seconds.")] public float visibleOnDuration = 1f;
-
-    [Header("Periodic Boundary Parameters")]
-    [Tooltip("Boundary Width in centimeters. Please make sure that the boundary width is greater than the spawn width to avoid agents spawning on the boundary.")] public float boundaryWidth = 30f;
-    [Tooltip("Boundary Length in centimeters. Please make sure that the boundary length is greater than the spawn length to avoid agents spawning on the boundary.")] public float boundaryLength = 50f;
     [Tooltip("If true, the spawner will move relative to the custom transform.")] public bool moveWithCustomTransform = false;
     [Tooltip("Custom transform to use as the reference when moveWithCustomTransform is true.")] public Transform customParentTransform;
 
     private Vector3 initialOffset;
     private List<Vector3> spawnPositions = new List<Vector3>();
 
-    private PeriodicBoundary boundaryComponent;
+    [Header("Visibility")]
+    [Tooltip("Agent Invisible Duration in seconds.")] public float visibleOffDuration = 0f;
+    [Tooltip("Agent Visible Duration in seconds.")] public float visibleOnDuration = 1f;
 
-    private static int globalInstanceCounter = 0;
-    private int localInstanceCounter = 0;
+
+
+    [Header("Others")]
 
     public int vrIndex = 0; // This will be set by ChoiceController
 
+    [Header("Boundary & Spawn Area Parameters")]
+
+    [Tooltip("Pattern of the spawn grid. Note: Manhattan and hexagonal grid need optimization for the balance between number of instances and pair-wise distance.")] public SpawnGridType gridType = SpawnGridType.Random;
+    [Tooltip("Boundary Width in centimeters. Please make sure that the boundary width is greater than the spawn width to avoid agents spawning on the boundary.")] public float boundaryWidth = 24f;
+    [Tooltip("Boundary Length in centimeters. Please make sure that the boundary length is greater than the spawn length to avoid agents spawning on the boundary.")] public float boundaryLength = 52f;
+
+    [Tooltip("Width of the spawn area in centimeters.")] public float spawnWidth = 24f;
+    [Tooltip("Length of the spawn area in centimeters.")] public float spawnLength = 52f;
+
+    [HideInInspector] 
+    [Tooltip("Radius of hexagons when using Hexagonal grid type. Note for Boundary and Spawn Area: Ensure the Width to be m*2*hexRadius and Length to be n*1.732*hexRadius to avoid gaps in the grid")] 
+    public float hexRadius = 1f;
+    [HideInInspector]
+    [Tooltip("Number of instances to spawn when using random grid type.")] 
+    public int numberOfInstances = 32;
+
+    [HideInInspector]
+    [Tooltip("Length of sections when using Manhattan grid type.")] 
+    public float sectionLength = 1f;
+
+    [HideInInspector]
+    [Tooltip("Width of sections when using Manhattan grid type.")] 
+    public float sectionWidth = 1f;
+
+
+    private PeriodicBoundary boundaryComponent;
+    private static int globalInstanceCounter = 0;
+    private int localInstanceCounter = 0;
     /// <summary>
     /// Initializes the spawner, sets up the initial transform, and spawns instances.
     /// </summary>
@@ -117,12 +138,22 @@ public class BandSpawner : MonoBehaviour
 
     void GenerateHexagonalGrid()
     {
-        float hexRadius = Mathf.Sqrt((spawnWidth * spawnLength) / (2f * Mathf.Sqrt(3f) * numberOfInstances));
         float horizontalDistance = hexRadius * 2f;
         float verticalDistance = hexRadius * Mathf.Sqrt(3f);
 
         int columns = Mathf.FloorToInt(spawnWidth / horizontalDistance);
         int rows = Mathf.FloorToInt(spawnLength / verticalDistance);
+        //The use of FloorToInt prevent agents simulated at overlap location but at the cost of missing one row or column (whose direction is parallel to the moving direction) at the edge.
+        //For example, if mu is 0, then one column on the right edge will not be simulated, which can be fixed by hardcode +1 to the columns when the mu is 0, however, if mu is not zero, this will cause a column to be duplicated
+        //Therefore, we add the additional one row or column depends on the mu to avoid the edge effect.
+        if (mu == 0 || mu == 180)
+        {
+            columns += 1;
+        }
+        else if (mu == 90 || mu == 270)
+        {
+            rows += 1;
+        }
 
         for (int row = 0; row < rows; row++)
         {
@@ -137,23 +168,29 @@ public class BandSpawner : MonoBehaviour
                 spawnPositions.Add(new Vector3(xPos, 0f, zPos));
             }
         }
+
+        // Update numberOfInstances based on the actual number of spawned positions
+        numberOfInstances = spawnPositions.Count;
     }
 
     void GenerateManhattanGrid()
     {
-        float cellSize = Mathf.Sqrt((spawnWidth * spawnLength) / numberOfInstances);
-        int cols = Mathf.FloorToInt(spawnWidth / cellSize);
-        int rows = Mathf.FloorToInt(spawnLength / cellSize);
+        //float cellSize = Mathf.Sqrt((spawnWidth * spawnLength) / numberOfInstances);
+        int cols = Mathf.FloorToInt(spawnWidth / sectionWidth);
+        int rows = Mathf.FloorToInt(spawnLength / sectionLength);
 
         for (int x = 0; x < cols; x++)
         {
             for (int y = 0; y < rows; y++)
             {
-                float posX = -spawnWidth / 2f + (x + 0.5f) * cellSize;
-                float posZ = -spawnLength / 2f + (y + 0.5f) * cellSize;
+                float posX = -spawnWidth / 2f + (x + 0.5f) * sectionWidth;
+                float posZ = -spawnLength / 2f + (y + 0.5f) * sectionLength;
                 spawnPositions.Add(new Vector3(posX, 0f, posZ));
             }
         }
+
+        // Update numberOfInstances based on the actual number of spawned positions
+        numberOfInstances = spawnPositions.Count;
     }
 
     void GenerateRandomPositions()
@@ -168,7 +205,7 @@ public class BandSpawner : MonoBehaviour
 
     public void SpawnInstances()
     {
-        int instancesToSpawn = Mathf.Min(numberOfInstances, spawnPositions.Count);
+        int instancesToSpawn = spawnPositions.Count;
         int parentLayer = gameObject.layer;
 
         for (int i = 0; i < instancesToSpawn; i++)
