@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(BandSpawner))]
-public class CustomInspecorEditor : Editor
+public class CustomInspectorEditor : Editor
 {
     public override void OnInspectorGUI()
     {

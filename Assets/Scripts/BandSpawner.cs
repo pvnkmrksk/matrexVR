@@ -43,11 +43,10 @@ public class BandSpawner : MonoBehaviour
     [Tooltip("Boundary Width in centimeters. Please make sure that the boundary width is greater than the spawn width to avoid agents spawning on the boundary.")] public float boundaryWidth = 24f;
     [Tooltip("Boundary Length in centimeters. Please make sure that the boundary length is greater than the spawn length to avoid agents spawning on the boundary.")] public float boundaryLength = 52f;
 
-    [Tooltip("Width of the spawn area in centimeters.")] public float spawnWidth = 24f;
-    [Tooltip("Length of the spawn area in centimeters.")] public float spawnLength = 52f;
+    [Tooltip("Width of the spawn area in centimeters. Note: Ensure the Width to be m*2*hexRadius for gridtype Hexagonal and, n*sectionWidth for gridtype Manhattan to avoid gaps in the area")] public float spawnWidth = 24f;
+    [Tooltip("Length of the spawn area in centimeters. Note: Ensure the Length to be n*1.732*hexRadius for gridtype Hexagonal and, n*sectionLength for gridtype Manhattan to avoid gaps in the area")] public float spawnLength = 52f;
 
     [HideInInspector] 
-    [Tooltip("Radius of hexagons when using Hexagonal grid type. Note for Boundary and Spawn Area: Ensure the Width to be m*2*hexRadius and Length to be n*1.732*hexRadius to avoid gaps in the grid")] 
     public float hexRadius = 1f;
     [HideInInspector]
     [Tooltip("Number of instances to spawn when using random grid type.")] 

@@ -4,7 +4,7 @@
     {
       "type": "LocustBand",
       "position": {
-        "radius": 23,
+        "radius": 24,
         "angle": 90
       },
       "scale": {
@@ -16,20 +16,21 @@
       "speed": 2,
       "mu": 0,
       "numberOfInstances": 32,
-      "spawnWidth": 30,
-      "spawnLength": 50,
-      "gridType": "Random",
+      "spawnWidth": 32,
+      "spawnLength": 55.5,
+      "gridType": "Hexagonal",
       "kappa": 10000,
       "visibleOffDuration": 0,
       "visibleOnDuration": 1,
-      "boundaryWidth": 30,
-      "boundaryLength": 50,
+      "boundaryWidth": 32,
+      "boundaryLength": 55.5,
+      "hexRadius": 4,
       "moveWithTransform": true
     },
     {
       "type": "LocustBand",
       "position": {
-        "radius": 23,
+        "radius": 24,
         "angle": 270
       },
       "scale": {
@@ -41,14 +42,15 @@
       "speed": 2,
       "mu": 0,
       "numberOfInstances": 32,
-      "spawnWidth": 30,
-      "spawnLength": 50,
-      "gridType": "Random",
+      "spawnWidth": 32,
+      "spawnLength": 55.5,
+      "gridType": "Hexagonal",
       "kappa": 10000,
       "visibleOffDuration": 0,
       "visibleOnDuration": 1,
-      "boundaryWidth": 30,
-      "boundaryLength": 50,
+      "boundaryWidth": 32,
+      "boundaryLength": 55.5,
+      "hexRadius": 4,
       "moveWithTransform": true
     }
   ],

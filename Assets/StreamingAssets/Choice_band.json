@@ -24,6 +24,7 @@
       "visibleOnDuration": 1,
       "boundaryWidth": 30,
       "boundaryLength": 50,
+
       "moveWithTransform": false
     }
   ],
