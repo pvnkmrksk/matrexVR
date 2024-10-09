@@ -4,7 +4,7 @@
       "sceneName": "Choice",
       "duration": 2000,
       "parameters": {
-        "configFile": "Choice_band.json"
+        "configFile": "bilateral_band.json"
       }
     },
     {

@@ -2,7 +2,7 @@
   "objects": [
     
     {
-      "type": "LocustBand_R",
+      "type": "LocustBand",
       "position": {
         "radius": 23,
         "angle": 90
@@ -18,7 +18,7 @@
       "numberOfInstances": 32,
       "spawnWidth": 30,
       "spawnLength": 50,
-      "gridType": "Hexagonal",
+      "gridType": "Random",
       "kappa": 10000,
       "visibleOffDuration": 0,
       "visibleOnDuration": 1,
@@ -43,7 +43,7 @@
       "numberOfInstances": 32,
       "spawnWidth": 30,
       "spawnLength": 50,
-      "gridType": "Hexagonal",
+      "gridType": "Random",
       "kappa": 10000,
       "visibleOffDuration": 0,
       "visibleOnDuration": 1,

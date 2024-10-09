@@ -41,10 +41,14 @@ public class BandLogger : MonoBehaviour
         string prefabName = bandSpawner.instancePrefab.name;
         string bandName = gameObject.name; // Get the name of the GameObject this script is attached to
 
-        logPath = Path.Combine(
-            directoryPath,
-            $"{date}_{time}_SimulatedData_{prefabName}_{bandName}_{layerNames}_{bandSpawner.numberOfInstances}_{bandSpawner.spawnWidth}_{bandSpawner.spawnLength}_{bandSpawner.mu}_{bandSpawner.kappa}_{bandSpawner.speed}.csv.gz"
-        );
+        // Construct the base filename without the counter
+        string baseFileName = $"{date}_{time}_SimulatedData_{prefabName}_{bandName}";
+        string filenameSuffix = $"{layerNames}_{bandSpawner.numberOfInstances}_{bandSpawner.spawnWidth}_{bandSpawner.spawnLength}_{bandSpawner.mu}_{bandSpawner.kappa}_{bandSpawner.speed}.csv.gz";
+
+        // Ensure unique file name
+        string uniqueFileName = GetUniqueFileName(directoryPath, baseFileName, filenameSuffix);
+
+        logPath = Path.Combine(directoryPath, uniqueFileName);
 
         logFile = new StreamWriter(
             new GZipStream(File.Create(logPath), System.IO.Compression.CompressionLevel.Optimal)
@@ -115,6 +119,19 @@ public class BandLogger : MonoBehaviour
             }
         }
         return layerNames.TrimEnd('_');
+    }
+
+    private string GetUniqueFileName(string directory, string baseFileName, string suffix)
+    {
+        int counter = 0;
+        string fileName;
+        do
+        {
+            fileName = $"{baseFileName}_{counter}_{suffix}";
+            counter++;
+        } while (File.Exists(Path.Combine(directory, fileName)));
+
+        return fileName;
     }
 
     void OnDestroy()
