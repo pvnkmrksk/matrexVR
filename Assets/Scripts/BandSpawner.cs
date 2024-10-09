@@ -213,7 +213,8 @@ public class BandSpawner : MonoBehaviour
             Vector3 position = spawnPositions[i];
             GameObject instance = Instantiate(instancePrefab, position, Quaternion.identity, transform);
             
-            instance.layer = parentLayer;
+            // Recursively set the layer for the instance and all its children
+            SetLayerRecursively(instance, parentLayer);
 
             // Keep the naming convention you like
             instance.name = $"{instancePrefab.name}_{gameObject.name}_{globalInstanceCounter:D6}";
@@ -265,5 +266,15 @@ public class BandSpawner : MonoBehaviour
         float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad * mu, kappa);
         // No need to add 90 degrees here, as we're doing it when setting the rotation
         return angle * Mathf.Rad2Deg;
+    }
+
+    // Add this new method to recursively set the layer
+    private void SetLayerRecursively(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
+        }
     }
 }
