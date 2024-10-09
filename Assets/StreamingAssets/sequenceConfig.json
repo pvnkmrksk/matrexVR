@@ -1,7 +1,7 @@
 {
   "sequences": [
 	  {
-      "sceneName": "Choice",
+      "sceneName": "Choice_noBG",
       "duration": 2000,
       "parameters": {
         "configFile": "bilateral_band.json"
