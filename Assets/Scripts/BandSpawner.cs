@@ -46,6 +46,10 @@ public class BandSpawner : MonoBehaviour
     [Tooltip("Width of the spawn area in centimeters. Note: Ensure the Width to be m*2*hexRadius for gridtype Hexagonal and, n*sectionWidth for gridtype Manhattan to avoid gaps in the area")] public float spawnWidth = 24f;
     [Tooltip("Length of the spawn area in centimeters. Note: Ensure the Length to be n*1.732*hexRadius for gridtype Hexagonal and, n*sectionLength for gridtype Manhattan to avoid gaps in the area")] public float spawnLength = 52f;
 
+
+    [Tooltip("Rotation angle in degrees around the Y-axis for both spawn and boundary areas.")] 
+    public float rotationAngle = 0f;
+
     [HideInInspector] 
     public float hexRadius = 1f;
     [HideInInspector]
@@ -61,6 +65,7 @@ public class BandSpawner : MonoBehaviour
     public float sectionWidth = 1f;
 
 
+    private Quaternion areaRotation;
     private PeriodicBoundary boundaryComponent;
     private static int globalInstanceCounter = 0;
     private int localInstanceCounter = 0;
@@ -70,6 +75,7 @@ public class BandSpawner : MonoBehaviour
     void Start()
     {
         SetupInitialTransform();
+        areaRotation = Quaternion.Euler(0, rotationAngle, 0);
         GenerateSpawnPositions();
         SpawnInstances();
     }
@@ -145,14 +151,14 @@ public class BandSpawner : MonoBehaviour
         //The use of FloorToInt prevent agents simulated at overlap location but at the cost of missing one row or column (whose direction is parallel to the moving direction) at the edge.
         //For example, if mu is 0, then one column on the right edge will not be simulated, which can be fixed by hardcode +1 to the columns when the mu is 0, however, if mu is not zero, this will cause a column to be duplicated
         //Therefore, we add the additional one row or column depends on the mu to avoid the edge effect.
-        if (mu == 0 || mu == 180)
-        {
-            columns += 1;
-        }
-        else if (mu == 90 || mu == 270)
-        {
-            rows += 1;
-        }
+        // if (mu == 0 || mu == 180)
+        // {
+        //     columns += 1;
+        // }
+        // else if (mu == 90 || mu == 270)
+        // {
+        //     rows += 1; 
+        // }
 
         for (int row = 0; row < rows; row++)
         {
@@ -163,8 +169,10 @@ public class BandSpawner : MonoBehaviour
 
                 xPos -= spawnWidth / 2f;
                 zPos -= spawnLength / 2f;
+                Vector3 position = new Vector3(xPos, 0f, zPos);
+                position = areaRotation * position;
 
-                spawnPositions.Add(new Vector3(xPos, 0f, zPos));
+                spawnPositions.Add(position);
             }
         }
 
@@ -184,7 +192,9 @@ public class BandSpawner : MonoBehaviour
             {
                 float posX = -spawnWidth / 2f + (x + 0.5f) * sectionWidth;
                 float posZ = -spawnLength / 2f + (y + 0.5f) * sectionLength;
-                spawnPositions.Add(new Vector3(posX, 0f, posZ));
+                Vector3 position = new Vector3(posX, 0f, posZ);
+                position = areaRotation * position;
+                spawnPositions.Add(position);
             }
         }
 
@@ -198,7 +208,9 @@ public class BandSpawner : MonoBehaviour
         {
             float posX = Random.Range(-spawnWidth / 2f, spawnWidth / 2f);
             float posZ = Random.Range(-spawnLength / 2f, spawnLength / 2f);
-            spawnPositions.Add(new Vector3(posX, 0f, posZ));
+            Vector3 position = new Vector3(posX, 0f, posZ);
+            position = areaRotation * position;
+            spawnPositions.Add(position);
         }
     }
 
@@ -249,6 +261,7 @@ public class BandSpawner : MonoBehaviour
         PeriodicBoundary boundary = instance.AddComponent<PeriodicBoundary>();
         boundary.boundaryWidth = boundaryWidth;
         boundary.boundaryLength = boundaryLength;
+        boundary.boundaryRotation = rotationAngle; // Add this line
     }
 
     float GenerateVanMisesRotation(float mu, float kappa)

@@ -190,6 +190,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 spawner.visibleOnDuration = obj.visibleOnDuration;
                 spawner.boundaryWidth = obj.boundaryWidth;
                 spawner.boundaryLength = obj.boundaryLength;
+                spawner.rotationAngle = obj.rotationAngle;
 
                 // Set custom parent transform
                 spawner.moveWithCustomTransform = obj.moveWithTransform;
@@ -311,6 +312,7 @@ public class SceneObject
 
     public float sectionLength;
     public float sectionWidth;
+    public float rotationAngle;
 }
 
 

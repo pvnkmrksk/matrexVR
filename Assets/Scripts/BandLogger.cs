@@ -66,7 +66,8 @@ public class BandLogger : MonoBehaviour
             $"VisibleOffDuration:{bandSpawner.visibleOffDuration}," +
             $"VisibleOnDuration:{bandSpawner.visibleOnDuration}," +
             $"BoundaryWidth:{bandSpawner.boundaryWidth}," +
-            $"BoundaryLength:{bandSpawner.boundaryLength}"
+            $"BoundaryLength:{bandSpawner.boundaryLength}," +
+            $"RotationAngle:{bandSpawner.rotationAngle}"
         );
 
         LogAllInstances();
