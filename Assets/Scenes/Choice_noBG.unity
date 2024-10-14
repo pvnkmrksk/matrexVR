@@ -584,6 +584,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 8bf719516907744c296a0214354a32a2, type: 2}
   - {fileID: 2100000, guid: 463a29183fd6db830be6acd798abb4b0, type: 2}
   - {fileID: 2100000, guid: fd28db8498f04a02890e57c80d65f409, type: 2}
+  - {fileID: 2100000, guid: aa430a8afd269c26fb8b9b428811755c, type: 2}
 --- !u!1001 &604776878787064245
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -654,7 +655,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5665556470671942804, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
       propertyPath: sphereDiameter
-      value: 0.45
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 5665556470671942804, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
       propertyPath: closedLoopOrientation
@@ -711,7 +712,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318583, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: sphereDiameter
-      value: 0.45
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318583, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: closedLoopOrientation
@@ -884,7 +885,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: sphereDiameter
-      value: 0.9
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: closedLoopOrientation
@@ -961,7 +962,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 668772779780633183, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: sphereDiameter
-      value: 0.45
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 668772779780633183, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: closedLoopOrientation
@@ -1036,8 +1037,8 @@ SceneRoots:
   - {fileID: 1470736539}
   - {fileID: 143658773}
   - {fileID: 1947130651}
-  - {fileID: 604776878787064245}
-  - {fileID: 163937260}
-  - {fileID: 7076154443342934818}
-  - {fileID: 1638632443318510459}
   - {fileID: 6789758097467590959}
+  - {fileID: 604776878787064245}
+  - {fileID: 1638632443318510459}
+  - {fileID: 7076154443342934818}
+  - {fileID: 163937260}

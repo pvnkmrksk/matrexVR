@@ -101,6 +101,8 @@ public class ChoiceController : MonoBehaviour, ISceneController
         ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
         Debugger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length, 4);
 
+
+        Quaternion initialRandRotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
         foreach (ClosedLoop cl in closedLoopComponents)
         {
             Debugger.Log(
@@ -116,7 +118,8 @@ public class ChoiceController : MonoBehaviour, ISceneController
             if (config.randomInitialRotation)
             {
                 //random angle
-                initialRotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
+                initialRotation = initialRandRotation;
+                Debug.Log("Initial rotation: " + initialRotation.eulerAngles);
             }
             else
             {
