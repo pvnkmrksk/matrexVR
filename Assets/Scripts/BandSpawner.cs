@@ -40,29 +40,32 @@ public class BandSpawner : MonoBehaviour
     [Header("Boundary & Spawn Area Parameters")]
 
     [Tooltip("Pattern of the spawn grid. Note: Manhattan and hexagonal grid need optimization for the balance between number of instances and pair-wise distance.")] public SpawnGridType gridType = SpawnGridType.Random;
-    [Tooltip("Boundary Width in centimeters. Please make sure that the boundary width is greater than the spawn width to avoid agents spawning on the boundary.")] public float boundaryWidth = 24f;
-    [Tooltip("Boundary Length in centimeters. Please make sure that the boundary length is greater than the spawn length to avoid agents spawning on the boundary.")] public float boundaryLength = 52f;
+    [Tooltip("Boundary Width in centimeters. Please make sure that the boundary width is greater than the spawn width to avoid agents spawning on the boundary.")] public float boundaryLengthX = 24f;
+    [Tooltip("Boundary Length in centimeters. Please make sure that the boundary length is greater than the spawn length to avoid agents spawning on the boundary.")] public float boundaryLengthZ = 52f;
 
-    [Tooltip("Width of the spawn area in centimeters. Note: Ensure the Width to be m*2*hexRadius for gridtype Hexagonal and, n*sectionWidth for gridtype Manhattan to avoid gaps in the area")] public float spawnWidth = 24f;
-    [Tooltip("Length of the spawn area in centimeters. Note: Ensure the Length to be n*1.732*hexRadius for gridtype Hexagonal and, n*sectionLength for gridtype Manhattan to avoid gaps in the area")] public float spawnLength = 52f;
+    [Tooltip("Width of the spawn area in centimeters. Note: Ensure the Width to be m*2*hexRadius for gridtype Hexagonal and, n*sectionLengthX for gridtype Manhattan to avoid gaps in the area")] public float spawnLengthX = 24f;
+    [Tooltip("Length of the spawn area in centimeters. Note: Ensure the Length to be n*1.732*hexRadius for gridtype Hexagonal and, n*sectionLengthZ for gridtype Manhattan to avoid gaps in the area")] public float spawnLengthZ = 52f;
 
 
     [Tooltip("Rotation angle in degrees around the Y-axis for both spawn and boundary areas.")] 
     public float rotationAngle = 0f;
+    [Tooltip("If true, the spawner will prioritize numbers of instances over the distance between each grid points.")] public bool prioritizeNumbers = false;
 
-    [HideInInspector] 
-    public float hexRadius = 1f;
+
     [HideInInspector]
     [Tooltip("Number of instances to spawn when using random grid type.")] 
     public int numberOfInstances = 32;
 
     [HideInInspector]
+    [Tooltip("Radius of the hexagon when using hexagonal grid type.")] public float hexRadius = 1f;
+
+    [HideInInspector]
     [Tooltip("Length of sections when using Manhattan grid type.")] 
-    public float sectionLength = 1f;
+    public float sectionLengthZ = 1f;
 
     [HideInInspector]
     [Tooltip("Width of sections when using Manhattan grid type.")] 
-    public float sectionWidth = 1f;
+    public float sectionLengthX = 1f;
 
 
     private Quaternion areaRotation;
@@ -146,8 +149,8 @@ public class BandSpawner : MonoBehaviour
         float horizontalDistance = hexRadius * 2f;
         float verticalDistance = hexRadius * Mathf.Sqrt(3f);
 
-        int columns = Mathf.FloorToInt(spawnWidth / horizontalDistance);
-        int rows = Mathf.FloorToInt(spawnLength / verticalDistance);
+        int columns = Mathf.FloorToInt(spawnLengthX / horizontalDistance);
+        int rows = Mathf.FloorToInt(spawnLengthZ / verticalDistance);
         //The use of FloorToInt prevent agents simulated at overlap location but at the cost of missing one row or column (whose direction is parallel to the moving direction) at the edge.
         //For example, if mu is 0, then one column on the right edge will not be simulated, which can be fixed by hardcode +1 to the columns when the mu is 0, however, if mu is not zero, this will cause a column to be duplicated
         //Therefore, we add the additional one row or column depends on the mu to avoid the edge effect.
@@ -167,8 +170,8 @@ public class BandSpawner : MonoBehaviour
                 float xPos = col * horizontalDistance + ((row % 2 == 0) ? 0 : hexRadius);
                 float zPos = row * verticalDistance;
 
-                xPos -= spawnWidth / 2f;
-                zPos -= spawnLength / 2f;
+                xPos -= spawnLengthX / 2f;
+                zPos -= spawnLengthZ / 2f;
                 Vector3 position = new Vector3(xPos, 0f, zPos);
                 position = areaRotation * position;
 
@@ -177,21 +180,24 @@ public class BandSpawner : MonoBehaviour
         }
 
         // Update numberOfInstances based on the actual number of spawned positions
-        numberOfInstances = spawnPositions.Count;
+        if (prioritizeNumbers==false)
+        {
+            numberOfInstances = spawnPositions.Count;
+        }
     }
 
     void GenerateManhattanGrid()
     {
-        //float cellSize = Mathf.Sqrt((spawnWidth * spawnLength) / numberOfInstances);
-        int cols = Mathf.FloorToInt(spawnWidth / sectionWidth);
-        int rows = Mathf.FloorToInt(spawnLength / sectionLength);
+        //float cellSize = Mathf.Sqrt((spawnLengthX * spawnLengthZ) / numberOfInstances);
+        int cols = Mathf.FloorToInt(spawnLengthX / sectionLengthX);
+        int rows = Mathf.FloorToInt(spawnLengthZ / sectionLengthZ);
 
         for (int x = 0; x < cols; x++)
         {
             for (int y = 0; y < rows; y++)
             {
-                float posX = -spawnWidth / 2f + (x + 0.5f) * sectionWidth;
-                float posZ = -spawnLength / 2f + (y + 0.5f) * sectionLength;
+                float posX = -spawnLengthX / 2f + (x + 0.5f) * sectionLengthX;
+                float posZ = -spawnLengthZ / 2f + (y + 0.5f) * sectionLengthZ;
                 Vector3 position = new Vector3(posX, 0f, posZ);
                 position = areaRotation * position;
                 spawnPositions.Add(position);
@@ -199,15 +205,18 @@ public class BandSpawner : MonoBehaviour
         }
 
         // Update numberOfInstances based on the actual number of spawned positions
-        numberOfInstances = spawnPositions.Count;
+        if (prioritizeNumbers==false)
+        {
+            numberOfInstances = spawnPositions.Count;
+        }
     }
 
     void GenerateRandomPositions()
     {
         for (int i = 0; i < numberOfInstances; i++)
         {
-            float posX = Random.Range(-spawnWidth / 2f, spawnWidth / 2f);
-            float posZ = Random.Range(-spawnLength / 2f, spawnLength / 2f);
+            float posX = Random.Range(-spawnLengthX / 2f, spawnLengthX / 2f);
+            float posZ = Random.Range(-spawnLengthZ / 2f, spawnLengthZ / 2f);
             Vector3 position = new Vector3(posX, 0f, posZ);
             position = areaRotation * position;
             spawnPositions.Add(position);
@@ -216,8 +225,17 @@ public class BandSpawner : MonoBehaviour
 
     public void SpawnInstances()
     {
-        int instancesToSpawn = spawnPositions.Count;
+        int instancesToSpawn;
         int parentLayer = gameObject.layer;
+        if (prioritizeNumbers)
+        {
+            instancesToSpawn = numberOfInstances;
+        }
+        else
+        {
+            instancesToSpawn = spawnPositions.Count;
+        }
+
 
         for (int i = 0; i < instancesToSpawn; i++)
         {
@@ -259,8 +277,8 @@ public class BandSpawner : MonoBehaviour
 
         // Add and configure PeriodicBoundary
         PeriodicBoundary boundary = instance.AddComponent<PeriodicBoundary>();
-        boundary.boundaryWidth = boundaryWidth;
-        boundary.boundaryLength = boundaryLength;
+        boundary.boundaryLengthX = boundaryLengthX;
+        boundary.boundaryLengthZ = boundaryLengthZ;
         boundary.boundaryRotation = rotationAngle; // Add this line
     }
 
@@ -272,10 +290,10 @@ public class BandSpawner : MonoBehaviour
         }
         else if (kappa >= 10000)
         {
-            return mu;
+            return -1*mu;
         }
 
-        float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad * mu, kappa);
+        float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad*-1*mu, kappa);
         // No need to add 90 degrees here, as we're doing it when setting the rotation
         return angle * Mathf.Rad2Deg;
     }
