@@ -43,7 +43,7 @@ public class BandLogger : MonoBehaviour
 
         // Construct the base filename without the counter
         string baseFileName = $"{date}_{time}_SimulatedData_{prefabName}_{bandName}";
-        string filenameSuffix = $"{layerNames}_{bandSpawner.numberOfInstances}_{bandSpawner.spawnWidth}_{bandSpawner.spawnLength}_{bandSpawner.mu}_{bandSpawner.kappa}_{bandSpawner.speed}.csv.gz";
+        string filenameSuffix = $"{layerNames}_{bandSpawner.numberOfInstances}_{bandSpawner.spawnLengthX}_{bandSpawner.spawnLengthZ}_{bandSpawner.mu}_{bandSpawner.kappa}_{bandSpawner.speed}.csv.gz";
 
         // Ensure unique file name
         string uniqueFileName = GetUniqueFileName(directoryPath, baseFileName, filenameSuffix);
@@ -57,16 +57,16 @@ public class BandLogger : MonoBehaviour
         // Write header
         logFile.WriteLine(
             "Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase," +
-            $"SpawnWidth:{bandSpawner.spawnWidth}," +
-            $"SpawnLength:{bandSpawner.spawnLength}," +
+            $"SpawnLengthX:{bandSpawner.spawnLengthX}," +
+            $"SpawnLengthZ:{bandSpawner.spawnLengthZ}," +
             $"GridType:{bandSpawner.gridType}," +
             $"Mu:{bandSpawner.mu}," +
             $"Kappa:{bandSpawner.kappa}," +
             $"Speed:{bandSpawner.speed}," +
             $"VisibleOffDuration:{bandSpawner.visibleOffDuration}," +
             $"VisibleOnDuration:{bandSpawner.visibleOnDuration}," +
-            $"BoundaryWidth:{bandSpawner.boundaryWidth}," +
-            $"BoundaryLength:{bandSpawner.boundaryLength}," +
+            $"BoundaryLengthX:{bandSpawner.boundaryLengthX}," +
+            $"BoundaryLengthZ:{bandSpawner.boundaryLengthZ}," +
             $"RotationAngle:{bandSpawner.rotationAngle}"
         );
 

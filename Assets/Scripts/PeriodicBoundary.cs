@@ -3,8 +3,8 @@ using UnityEngine;
 public class PeriodicBoundary : MonoBehaviour
 {
     [Tooltip("Boundary Center coordinates")] public Vector3 boundaryCenter = Vector3.zero;
-    [Tooltip("Boundary Width in centimeters.")] public float boundaryWidth = 20f;
-    [Tooltip("Boundary Length in centimeters.")] public float boundaryLength = 20f;
+    [Tooltip("Boundary Width in centimeters.")] public float boundaryLengthX = 20f;
+    [Tooltip("Boundary Length in centimeters.")] public float boundaryLengthZ = 20f;
 
     [Tooltip("Moving the boundary with the transform attached to this script.")] public bool moveWithTransform = false;
     [Tooltip("Target Transform to move the boundary with.")] public Transform targetTransform;
@@ -22,7 +22,7 @@ public class PeriodicBoundary : MonoBehaviour
         // Set the color for the boundary visualization
         Gizmos.color = Color.red;
         // Calculate the boundary box dimensions and position
-        Vector3 size = new Vector3(boundaryWidth, 1f, boundaryLength);
+        Vector3 size = new Vector3(boundaryLengthX, 1f, boundaryLengthZ);
         Vector3 center = moveWithTransform && targetTransform != null ? targetTransform.position : boundaryCenter;
 
         // Apply rotation to the gizmo
@@ -41,20 +41,20 @@ public class PeriodicBoundary : MonoBehaviour
         // Convert position to local space relative to the rotated boundary
         Vector3 localPosition = Quaternion.Inverse(rotationQuaternion) * (position - center);
 
-        float halfWidth = boundaryWidth / 2f;
-        float halfLength = boundaryLength / 2f;
+        float halfWidth = boundaryLengthX / 2f;
+        float halfLength = boundaryLengthZ / 2f;
 
         // Check X-axis boundaries
         if (localPosition.x > halfWidth)
-            localPosition.x -= boundaryWidth;
+            localPosition.x -= boundaryLengthX;
         else if (localPosition.x < -halfWidth)
-            localPosition.x += boundaryWidth;
+            localPosition.x += boundaryLengthX;
 
         // Check Z-axis boundaries
         if (localPosition.z > halfLength)
-            localPosition.z -= boundaryLength;
+            localPosition.z -= boundaryLengthZ;
         else if (localPosition.z < -halfLength)
-            localPosition.z += boundaryLength;
+            localPosition.z += boundaryLengthZ;
 
         // Convert back to world space
         position = center + (rotationQuaternion * localPosition);

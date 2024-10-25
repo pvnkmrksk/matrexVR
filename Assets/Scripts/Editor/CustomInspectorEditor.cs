@@ -19,11 +19,11 @@ public class CustomInspectorEditor : Editor
         // Show numberOfInstances only when gridType is Manhattan
         if (spawner.gridType == SpawnGridType.Manhattan)
         {
-            spawner.sectionWidth = EditorGUILayout.FloatField("Section Width", spawner.sectionWidth);
-            spawner.sectionLength = EditorGUILayout.FloatField("Section Length", spawner.sectionLength);
+            spawner.sectionLengthX = EditorGUILayout.FloatField("Section Length X", spawner.sectionLengthX);
+            spawner.sectionLengthZ = EditorGUILayout.FloatField("Section Length Z", spawner.sectionLengthZ);
         }
 
-        if (spawner.gridType == SpawnGridType.Random)
+        if (spawner.gridType == SpawnGridType.Random || spawner.prioritizeNumbers)
         {
             spawner.numberOfInstances = EditorGUILayout.IntField("Number of Instances", spawner.numberOfInstances);
         }

@@ -180,20 +180,21 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 spawner.vrIndex = vrIndex; // Set the VR index
                 // Set BandSpawner properties
                 spawner.numberOfInstances = obj.numberOfInstances;
-                spawner.spawnWidth = obj.spawnWidth;
-                spawner.spawnLength = obj.spawnLength;
+                spawner.spawnLengthX = obj.spawnLengthX;
+                spawner.spawnLengthZ = obj.spawnLengthZ;
                 spawner.gridType = obj.gridType;
                 spawner.mu = obj.mu;
                 spawner.kappa = obj.kappa;
                 spawner.speed = obj.speed;
                 spawner.visibleOffDuration = obj.visibleOffDuration;
                 spawner.visibleOnDuration = obj.visibleOnDuration;
-                spawner.boundaryWidth = obj.boundaryWidth;
-                spawner.boundaryLength = obj.boundaryLength;
+                spawner.boundaryLengthX = obj.boundaryLengthX;
+                spawner.boundaryLengthZ = obj.boundaryLengthZ;
                 spawner.rotationAngle = obj.rotationAngle;
 
                 // Set custom parent transform
                 spawner.moveWithCustomTransform = obj.moveWithTransform;
+                spawner.prioritizeNumbers = obj.prioritizeNumbers;
                 if (obj.moveWithTransform)
                 {
                     GameObject vrObject = GameObject.Find($"VR{vrIndex}");
@@ -212,8 +213,8 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 }
                 else if (obj.gridType == SpawnGridType.Manhattan)
                 {
-                    spawner.sectionLength = obj.sectionLength;
-                    spawner.sectionWidth = obj.sectionWidth;
+                    spawner.sectionLengthZ = obj.sectionLengthZ;
+                    spawner.sectionLengthX = obj.sectionLengthX;
                 }
             }
 
@@ -299,19 +300,20 @@ public class SceneObject
     public float mu;
     // New properties for bands
     public int numberOfInstances;
-    public float spawnWidth;
-    public float spawnLength;
+    public float spawnLengthX;
+    public float spawnLengthZ;
     public SpawnGridType gridType;
     public float kappa;
     public float visibleOffDuration;
     public float visibleOnDuration;
-    public float boundaryWidth;
-    public float boundaryLength;
+    public float boundaryLengthZ;
+    public float boundaryLengthX;
     public bool moveWithTransform;
+    public bool prioritizeNumbers;
     public float hexRadius;
 
-    public float sectionLength;
-    public float sectionWidth;
+    public float sectionLengthZ;
+    public float sectionLengthX;
     public float rotationAngle;
 }
 
