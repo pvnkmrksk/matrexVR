@@ -1,19 +1,12 @@
 {
   "objects": [
     {
-      "type": "Cylinder",
+      "type": "tree02",
       "position": {
         "radius": 20,
         "angle": -22.5,
         "height": 0
-      },
-      "material": "Black",
-      "scale": {
-        "x": 5.25,
-        "y": 100,
-        "z": 5.25
-      },
-      "flip": true
+      }
     }
   ],
   "closedLoopOrientation": true,

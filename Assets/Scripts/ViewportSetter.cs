@@ -72,12 +72,12 @@ public class ViewportSetter : MonoBehaviour
             // find and set each camera by name
             foreach (Camera cam in cameras)
             {
-                if (cam.name == "Main Camera R")
+                if (cam.name == "Main Camera D")
                 {
                     cam.rect = new Rect(viewport_x, viewport_y, viewport_width, viewport_height);
                 }
 
-                if (cam.name == "Main Camera B")
+                if (cam.name == "Main Camera R")
                 {
                     cam.rect = new Rect(
                         viewport_x + viewport_width,
@@ -87,7 +87,7 @@ public class ViewportSetter : MonoBehaviour
                     );
                 }
 
-                if (cam.name == "Main Camera L")
+                if (cam.name == "Main Camera B")
                 {
                     cam.rect = new Rect(
                         viewport_x + 2 * viewport_width,
@@ -97,7 +97,7 @@ public class ViewportSetter : MonoBehaviour
                     );
                 }
 
-                if (cam.name == "Main Camera F")
+                if (cam.name == "Main Camera L")
                 {
                     cam.rect = new Rect(
                         viewport_x + 3 * viewport_width,
@@ -107,11 +107,20 @@ public class ViewportSetter : MonoBehaviour
                     );
                 }
 
+                if (cam.name == "Main Camera F")
+                {
+                    cam.rect = new Rect(
+                        viewport_x + 4 * viewport_width,
+                        viewport_y,
+                        viewport_width,
+                        viewport_height
+                    );
+                }
                 if (cam.name == "Main Camera U")
                 {
                     cam.rect = new Rect(
-                        viewport_x + 3 * viewport_width / 2,
-                        viewport_y + viewport_height,
+                        viewport_x + 5 * viewport_width,
+                        viewport_y,
                         viewport_width,
                         viewport_height
                     );

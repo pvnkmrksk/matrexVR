@@ -1,10 +1,10 @@
 {
     "sequences": [
         {
-            "sceneName": "Demo",
-            "duration": 5,
+            "sceneName": "Choice_Forrest",
+            "duration": 50,
             "parameters": {
-                "configFile": "BinaryChoice00_empty_control.json"
+                "configFile": "BinaryChoice10_tree01_control.json"
             }
         }
     ]

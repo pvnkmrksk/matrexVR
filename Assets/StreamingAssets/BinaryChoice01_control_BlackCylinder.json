@@ -4,7 +4,7 @@
       "type": "Cylinder",
       "position": {
         "radius": 20,
-        "angle": -22.5,
+        "angle": 22.5,
         "height": 0
       },
       "material": "Black",
