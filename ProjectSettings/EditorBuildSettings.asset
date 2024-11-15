@@ -29,4 +29,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Choice_Forrest.unity
     guid: 0b5651547a64f3a46b220dc72cdfffe4
+  - enabled: 1
+    path: Assets/Scenes/Demo.unity
+    guid: 2af8698b16cf099989721bfc00f41db1
   m_configObjects: {}

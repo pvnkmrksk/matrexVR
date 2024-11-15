@@ -3,8 +3,8 @@
     {
       "type": "tree01",
       "position": {
-        "radius": 20,
-        "angle": -22.5,
+        "radius": 10,
+        "angle": 180,
         "height": 0
       },
       "scale": {
