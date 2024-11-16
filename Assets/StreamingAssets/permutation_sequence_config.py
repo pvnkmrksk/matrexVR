@@ -4,9 +4,9 @@ from pathlib import Path
 import numpy as np
 from itertools import cycle
 # Read the JSON file
-random_seed=6
+random_seed=8
 rep=10
-scene_name='Choice_noBG'
+scene_name='Choice'
 seed_range=np.arange(100)
 seed_list=seed_range.tolist()
 random.Random(random_seed).shuffle(seed_list)
@@ -14,13 +14,13 @@ random.Random(random_seed).shuffle(seed_list)
 #ran_seed_range=rng.random(seed_range)
 seed_list=seed_list[:rep]
 insert_isi=True
-varying_isi_length=True
-choice_assay=True
+varying_isi_length=False
 #config_file_name='swarm_4kappa_condition.json'
 #config_file_name='swarm_8dir_condition.json'
 #config_file_name='swarm_4spe_condition.json'
 #config_file_name='choice_3dire_condition.json'
-config_file_name='choice_5dir_band.json'
+#config_file_name='choice_4dire_2_color.json'
+config_file_name='choice_3dir_2_color.json'
 shuffle_file_name=f'shuffle_{config_file_name}'
 pre_stim_interval=60 #unit is sec
 with open(Path(config_file_name),'r') as file:

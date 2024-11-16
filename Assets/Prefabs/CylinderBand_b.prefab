@@ -23,14 +23,14 @@ PrefabInstance:
     - target: {fileID: 3501958347067539159, guid: 819ebf525bd3cb63dbe6997158a1de0d, type: 3}
       propertyPath: instancePrefab
       value: 
-      objectReference: {fileID: 6398141713017070807, guid: b1cc2416f1c95572593ad438c53d4c8d, type: 3}
+      objectReference: {fileID: 4961463237354851949, guid: 910aab7e55085edadbf17aaab051aa79, type: 3}
     - target: {fileID: 3501958347067539159, guid: 819ebf525bd3cb63dbe6997158a1de0d, type: 3}
       propertyPath: numberOfInstances
       value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 4006871233168333227, guid: 819ebf525bd3cb63dbe6997158a1de0d, type: 3}
       propertyPath: m_Name
-      value: BcyclinerBand
+      value: CylinderBand_b
       objectReference: {fileID: 0}
     - target: {fileID: 8630152013397053633, guid: 819ebf525bd3cb63dbe6997158a1de0d, type: 3}
       propertyPath: m_LocalPosition.x

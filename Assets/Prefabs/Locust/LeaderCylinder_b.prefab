@@ -10,11 +10,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6398141713017070807, guid: b1cc2416f1c95572593ad438c53d4c8d, type: 3}
       propertyPath: m_Name
-      value: LeaderCylinderB
+      value: LeaderCylinder_b
       objectReference: {fileID: 0}
     - target: {fileID: 6398141713017070807, guid: b1cc2416f1c95572593ad438c53d4c8d, type: 3}
       propertyPath: m_Layer
-      value: 11
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6398141713017070807, guid: b1cc2416f1c95572593ad438c53d4c8d, type: 3}
       propertyPath: m_TagString

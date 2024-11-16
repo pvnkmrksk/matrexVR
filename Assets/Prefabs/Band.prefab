@@ -46,19 +46,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instancePrefab: {fileID: 1896519034921468216, guid: 0902920cc4ec1a39db432e4752c0485d, type: 3}
-  numberOfInstances: 9
-  spawnWidth: 30
-  spawnLength: 30
-  gridType: 2
   mu: 0
   kappa: 10000
   speed: 2
-  visibleOffDuration: 1
-  visibleOnDuration: 1
-  boundaryWidth: 30
-  boundaryLength: 30
   moveWithCustomTransform: 1
   customParentTransform: {fileID: 0}
+  visibleOffDuration: 1
+  visibleOnDuration: 1
+  vrIndex: 0
+  gridType: 0
+  boundaryLengthX: 24
+  boundaryLengthZ: 52
+  spawnLengthX: 24
+  spawnLengthZ: 52
+  rotationAngle: 0
+  prioritizeNumbers: 0
+  numberOfInstances: 9
+  hexRadius: 1
+  sectionLengthZ: 1
+  sectionLengthX: 1
 --- !u!114 &-84669034459085077
 MonoBehaviour:
   m_ObjectHideFlags: 0

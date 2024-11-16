@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5359356435596721786, guid: 5e09f5292def14f05809d7df65715aa4, type: 3}
       propertyPath: m_Name
-      value: CyclinerBand_w
+      value: CylinderBand_w
       objectReference: {fileID: 0}
     - target: {fileID: 5576145662797699334, guid: 5e09f5292def14f05809d7df65715aa4, type: 3}
       propertyPath: instancePrefab
