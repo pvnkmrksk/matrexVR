@@ -2,9 +2,16 @@
     "sequences": [
         {
             "sceneName": "Choice_noBG",
-            "duration":3,
+            "duration":20,
             "parameters": {
-                "configFile": "BlackCylinder_grey_background.json"
+                "configFile": "Choice_empty_floor.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration":20,
+            "parameters": {
+                "configFile": "Choice_Empty_BlackCylinder_floor.json"
             }
         }
     ]
