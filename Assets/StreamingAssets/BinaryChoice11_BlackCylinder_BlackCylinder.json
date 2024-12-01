@@ -3,30 +3,30 @@
     {
       "type": "Cylinder",
       "position": {
-        "radius": 20,
-        "angle": -22.5,
+        "radius": 40,
+        "angle": -15,
         "height": 0
       },
       "material": "Black",
       "scale": {
-        "x": 5.25,
+        "x": 7,
         "y": 100,
-        "z": 5.25
+        "z": 7
       },
       "flip": true
     },
     {
       "type": "Cylinder",
       "position": {
-        "radius": 20,
-        "angle": 22.5,
+        "radius": 40,
+        "angle": 15,
         "height": 0
       },
       "material": "Black",
       "scale": {
-        "x": 5.25,
+        "x": 7,
         "y": 100,
-        "z": 5.25
+        "z": 7
       },
       "flip": true
     }
@@ -38,5 +38,10 @@
     "g": 0.8,
     "b": 0.8,
     "a": 1
+  },
+  "initialPosition": {
+    "x": 0,
+    "y": 0,
+    "z": 0
   }
 }

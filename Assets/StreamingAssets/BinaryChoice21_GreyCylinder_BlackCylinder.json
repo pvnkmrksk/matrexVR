@@ -3,11 +3,11 @@
     {
       "type": "Cylinder",
       "position": {
-        "radius": 20,
-        "angle": -22.5,
+        "radius": 40,
+        "angle": 15,
         "height": 0
       },
-      "material": "Grey_646464",
+      "material": "Black",
       "scale": {
         "x": 5.25,
         "y": 100,
@@ -18,11 +18,11 @@
     {
       "type": "Cylinder",
       "position": {
-        "radius": 20,
-        "angle": 22.5,
+        "radius": 40,
+        "angle": -15,
         "height": 0
       },
-      "material": "Black",
+      "material": "Grey_696969",
       "scale": {
         "x": 5.25,
         "y": 100,

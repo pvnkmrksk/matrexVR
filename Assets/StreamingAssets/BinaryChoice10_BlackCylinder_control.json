@@ -3,32 +3,16 @@
     {
       "type": "Cylinder",
       "position": {
-        "radius": 20,
-        "angle": -22.5,
+        "radius": 40,
+        "angle": 0,
         "height": 0
       },
       "material": "Black",
       "scale": {
-        "x": 5.25,
+        "x": 7,
         "y": 100,
-        "z": 5.25
-      },
-      "flip": true
-    },
-    {
-      "type": "Cylinder",
-      "position": {
-        "radius": 20,
-        "angle": 22.5,
-        "height": 0
-      },
-      "material": "Black",
-      "scale": {
-        "x": 5.25,
-        "y": 100,
-        "z": 5.25
-      },
-      "flip": true
+        "z": 7
+      }
     }
   ],
   "closedLoopOrientation": true,
@@ -38,5 +22,6 @@
     "g": 0.8,
     "b": 0.8,
     "a": 1
-  }
+  },
+  "randomInitialRotation": true
 }

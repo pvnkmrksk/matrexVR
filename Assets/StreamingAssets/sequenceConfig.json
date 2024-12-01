@@ -1,10 +1,73 @@
 {
     "sequences": [
         {
-            "sceneName": "Forrest_choice",
-            "duration": 10,
+            "sceneName": "Choice_noBG",
+            "duration": 5,
             "parameters": {
-                "configFile": "Treecircle.json"
+                "configFile": "BinaryChoice10_BlackCylinder_control.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice10_constantSize_BlackCylinder_control.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice11_BlackCylinder_BlackCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice11_constantSize_BlackCylinder_BlackCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice12_constantSize_30deg.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice12_constantSize_90deg.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice12_constantSize_180deg.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice21_constantSize_30deg.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice21_constantSize_90deg.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice21_constantSize_180deg.json"
             }
         }
     ]
