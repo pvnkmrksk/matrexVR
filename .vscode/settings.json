@@ -56,5 +56,5 @@
     },
     "python.formatting.provider": "none",
     "dotnet.preferCSharpExtension": true,
-    "dotnet.defaultSolution": "matrexVR.sln"
+    "dotnet.defaultSolution": "ledpanelVR.sln"
 }
