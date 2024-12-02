@@ -13,7 +13,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
     public Material[] materials; // Materials are assigned in the Unity Editor
     private Dictionary<string, Material> materialDict = new Dictionary<string, Material>();
-
+    string[] tags = new string[] { "ChoiceVR1", "ChoiceVR2", "ChoiceVR3", "ChoiceVR4" };
     private void Awake()
     {
         // Initialize prefab dictionary
@@ -47,18 +47,35 @@ public class ChoiceController : MonoBehaviour, ISceneController
         string jsonPath = Path.Combine(Application.streamingAssetsPath, configFile);
         string jsonString = File.ReadAllText(jsonPath);
         SceneConfig config = JsonConvert.DeserializeObject<SceneConfig>(jsonString);
+    
+    //instantiate objects
 
-        // Instantiate objects
-        foreach (var obj in config.objects)
+    foreach (var obj in config.objects)
+    {
+        if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
         {
-            if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
+            for (int i = 0; i < tags.Length; i++)
             {
                 Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle, obj.position.height);
                 GameObject instance = Instantiate(prefab, position, Quaternion.identity);
 
-                Debug.Log("Instance position: " + instance.transform.position);
-                // Set scale, Optionally flip the object if flip is true, set flip my scale * -1 in x axis
+                // Set the tag
+                instance.tag = tags[i];
+                
+                // **Assign the layer based on the tag**
+                string layerName = "ChoiceVR" + (i + 1); // "Choice1", "Choice2", etc.
+                int layer = LayerMask.NameToLayer(layerName);
+                if (layer == -1)
+                {
+                    Debug.LogError("Layer '" + layerName + "' not found. Please add it in the Tags and Layers manager.");
+                }
+                else
+                {
+                    SetLayerRecursively(instance, layer);
+                }
 
+                // Rest of your instance initialization code
+                // Set scale
                 if (obj.flip)
                 {
                     instance.transform.localScale = new Vector3(
@@ -76,28 +93,27 @@ public class ChoiceController : MonoBehaviour, ISceneController
                     );
                 }
 
+                // Set speed
                 if (obj.speed != 0)
                 {
                     instance.GetComponent<LocustMover>().speed = obj.speed;
                 }
 
+                // Set rotation
                 if (obj.mu != 0)
                 {
                     instance.transform.localRotation = Quaternion.Euler(0, obj.mu, 0);
                 }
 
-                //todo. add individual datalogger to each instance. 
-
-                // Optionally apply material
-                if (
-                    !string.IsNullOrEmpty(obj.material)
-                    && materialDict.TryGetValue(obj.material, out Material material)
-                )
+                // Apply material if specified
+                if (!string.IsNullOrEmpty(obj.material) && materialDict.TryGetValue(obj.material, out Material material))
                 {
                     instance.GetComponent<Renderer>().material = material;
                 }
             }
         }
+    }
+
         ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
         Debugger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length, 4);
 
@@ -153,6 +169,16 @@ public class ChoiceController : MonoBehaviour, ISceneController
         // TODO: Set sky and grass textures
         // Start the coroutine from here
         StartCoroutine(DelayedOnLoaded(0.05f));
+    }
+
+    //helper method
+    private void SetLayerRecursively(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
+        }
     }
 
     // Coroutine to delay the execution of OnLoaded

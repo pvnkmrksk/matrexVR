@@ -29,4 +29,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Forrest_choice.unity
     guid: 6ac85b5260ce74c4fa0843946844a788
+  - enabled: 1
+    path: Assets/Scenes/Choice_noBG_seperate.unity
+    guid: d65bee420890d444ba3afd9d8041ba0f
   m_configObjects: {}

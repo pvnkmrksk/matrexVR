@@ -6,6 +6,10 @@ TagManager:
   tags:
   - SimulatedLocust
   - ScaleReference
+  - ChoiceVR1
+  - ChoiceVR2
+  - ChoiceVR3
+  - ChoiceVR4
   layers:
   - Default
   - TransparentFX
@@ -22,10 +26,10 @@ TagManager:
   - SimulatedLocustsVR2
   - SimulatedLocustsVR3
   - SimulatedLocustsVR4
-  - 
-  - 
-  - 
-  - 
+  - ChoiceVR1
+  - ChoiceVR2
+  - ChoiceVR3
+  - ChoiceVR4
   - 
   - 
   - 
