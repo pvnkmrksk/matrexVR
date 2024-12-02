@@ -1,10 +1,10 @@
 {
   "objects": [
     {
-      "type": "ScalingCylinder",
+      "type": "Cylinder",
       "position": {
-        "radius": 40,
-        "angle": -15,
+        "radius": 80,
+        "angle": 7.5,
         "height": 0
       },
       "material": "Black",
@@ -16,13 +16,13 @@
       "flip": true
     },
     {
-      "type": "ScalingCylinder",
+      "type": "Cylinder",
       "position": {
-        "radius": 40,
-        "angle": 15,
+        "radius": 80,
+        "angle": -7.5,
         "height": 0
       },
-      "material": "Grey_969696",
+      "material": "Grey_141414",
       "scale": {
         "x": 5.25,
         "y": 100,

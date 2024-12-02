@@ -3,8 +3,8 @@
     {
       "type": "Cylinder",
       "position": {
-        "radius": 40,
-        "angle": -15,
+        "radius": 80,
+        "angle": -7.5,
         "height": 0
       },
       "material": "Black",
@@ -18,8 +18,8 @@
     {
       "type": "Cylinder",
       "position": {
-        "radius": 40,
-        "angle": 15,
+        "radius": 80,
+        "angle": 7.5,
         "height": 0
       },
       "material": "Grey_696969",

@@ -1,7 +1,7 @@
 {
   "objects": [
     {
-      "type": "Cylinder",
+      "type": "ScalingCylinder",
       "position": {
         "radius": 40,
         "angle": 45,
@@ -16,7 +16,7 @@
       "flip": true
     },
     {
-      "type": "Cylinder",
+      "type": "ScalingCylinder",
       "position": {
         "radius": 40,
         "angle": -45,
