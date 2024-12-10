@@ -3,7 +3,7 @@
     {
       "type": "ScalingCylinder",
       "position": {
-        "radius": 40,
+        "radius": 60,
         "angle": 0,
         "height": 0
       },
