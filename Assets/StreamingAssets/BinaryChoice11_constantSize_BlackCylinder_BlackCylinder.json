@@ -3,8 +3,8 @@
     {
       "type": "ScalingCylinder",
       "position": {
-        "radius": 40,
-        "angle": -15,
+        "radius": 60,
+        "angle": -10,
         "height": 0
       },
       "material": "Black",
@@ -17,8 +17,8 @@
     {
       "type": "ScalingCylinder",
       "position": {
-        "radius": 40,
-        "angle": 15,
+        "radius": 60,
+        "angle": 10,
         "height": 0
       },
       "material": "Black",

@@ -3,7 +3,7 @@
     {
       "type": "Cylinder",
       "position": {
-        "radius": 40,
+        "radius": 60,
         "angle": 0,
         "height": 0
       },
@@ -23,5 +23,6 @@
     "b": 0.8,
     "a": 1
   },
-  "randomInitialRotation": true
+  "randomInitialRotation": true,
+  "flip": true
 }

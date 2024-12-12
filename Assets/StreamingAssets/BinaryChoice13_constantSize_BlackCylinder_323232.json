@@ -1,32 +1,32 @@
 {
   "objects": [
     {
-      "type": "Cylinder",
-      "position": {
-        "radius": 60,
-        "angle": 10,
-        "height": 0
-      },
-      "material": "Black",
-      "scale": {
-        "x": 5.25,
-        "y": 100,
-        "z": 5.25
-      },
-      "flip": true
-    },
-    {
-      "type": "Cylinder",
+      "type": "ScalingCylinder",
       "position": {
         "radius": 60,
         "angle": -10,
         "height": 0
       },
+      "material": "Black",
+      "scale": {
+        "x": 7,
+        "y": 100,
+        "z": 7
+      },
+      "flip": true
+    },
+    {
+      "type": "ScalingCylinder",
+      "position": {
+        "radius": 60,
+        "angle": 10,
+        "height": 0
+      },
       "material": "Grey_323232",
       "scale": {
-        "x": 5.25,
+        "x": 7,
         "y": 100,
-        "z": 5.25
+        "z": 7
       },
       "flip": true
     }
