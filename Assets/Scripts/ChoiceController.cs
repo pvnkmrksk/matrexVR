@@ -110,6 +110,13 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 {
                     instance.GetComponent<Renderer>().material = material;
                 }
+                
+                // **Apply the visual angle setting if the ScaleWithDistance component is present**
+                ScaleWithDistance scaleScript = instance.GetComponent<ScaleWithDistance>();
+                if (scaleScript != null)
+                {
+                    scaleScript.visualAngleDegrees = obj.visualAngleDegrees; 
+                }
             }
         }
     }
@@ -236,6 +243,8 @@ public class SceneObject
     public float speed;
 
     public float mu;
+        // New field for visual angle
+    public float visualAngleDegrees;
     // Include other properties as before
 }
 
