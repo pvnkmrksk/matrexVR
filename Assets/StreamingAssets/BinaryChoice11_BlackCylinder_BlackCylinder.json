@@ -13,7 +13,7 @@
         "y": 100,
         "z": 7
       },
-      "flip": true
+      "visualAngleDegrees": 10
     },
     {
       "type": "Cylinder",
@@ -28,7 +28,7 @@
         "y": 100,
         "z": 7
       },
-      "flip": true
+      "visualAngleDegrees": 10
     }
   ],
   "closedLoopOrientation": true,

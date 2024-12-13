@@ -12,7 +12,8 @@
         "x": 5.25,
         "y": 100,
         "z": 5.25
-      }
+      },
+      "visualAngleDegrees": 10
     }
   ],
   "closedLoopOrientation": true,
