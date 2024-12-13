@@ -1,18 +1,34 @@
 {
-    "sequences": [
-        {
-            "sceneName": "Choice_noBG",
-            "duration":20,
-            "parameters": {
-                "configFile": "Choice_empty_floor.json"
-            }
-        },
-        {
-            "sceneName": "Choice_noBG",
-            "duration":20,
-            "parameters": {
-                "configFile": "Choice_Empty_BlackCylinder_floor.json"
-            }
-        }
-    ]
+  "sequences": [
+ {
+
+      "sceneName": "Choice",
+      "duration":40,
+      "parameters": {
+        "configFile": "Choice_Empty_Spider.json"
+      }
+    },
+
+    {
+      "sceneName": "Choice",
+      "duration":4 ,
+      "parameters": {
+        "configFile": "Choice_Lemon_Empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration":4 ,
+      "parameters": {
+        "configFile": "Choice_Lemonveryred_Empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration":4 ,
+      "parameters": {
+        "configFile": "Choice_Lemonveryred_LemonYellow.json"
+      }
+    }
+  ]
 }
