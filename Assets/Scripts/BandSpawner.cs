@@ -213,13 +213,22 @@ public class BandSpawner : MonoBehaviour
 
     void GenerateRandomPositions()
     {
-        for (int i = 0; i < numberOfInstances; i++)
+        if (prioritizeNumbers && numberOfInstances ==1)
         {
-            float posX = Random.Range(-spawnLengthX / 2f, spawnLengthX / 2f);
-            float posZ = Random.Range(-spawnLengthZ / 2f, spawnLengthZ / 2f);
-            Vector3 position = new Vector3(posX, 0f, posZ);
+            Vector3 position = new Vector3(0f, 0f, 0f);
             position = areaRotation * position;
             spawnPositions.Add(position);
+        }
+        else
+        {
+            for (int i = 0; i < numberOfInstances; i++)
+            {
+                float posX = Random.Range(-spawnLengthX / 2f, spawnLengthX / 2f);
+                float posZ = Random.Range(-spawnLengthZ / 2f, spawnLengthZ / 2f);
+                Vector3 position = new Vector3(posX, 0f, posZ);
+                position = areaRotation * position;
+                spawnPositions.Add(position);
+            }
         }
     }
 
