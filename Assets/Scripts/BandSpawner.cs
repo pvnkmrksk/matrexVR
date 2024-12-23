@@ -163,6 +163,8 @@ public class BandSpawner : MonoBehaviour
         //     rows += 1; 
         // }
 
+        Vector3 initialSpawnerPosition = transform.position;
+
         for (int row = 0; row < rows; row++)
         {
             for (int col = 0; col < columns; col++)
@@ -173,7 +175,7 @@ public class BandSpawner : MonoBehaviour
                 xPos -= spawnLengthX / 2f;
                 zPos -= spawnLengthZ / 2f;
                 Vector3 position = new Vector3(xPos, 0f, zPos);
-                position = areaRotation * position;
+                position = areaRotation * position + initialSpawnerPosition;
 
                 spawnPositions.Add(position);
             }
@@ -191,7 +193,7 @@ public class BandSpawner : MonoBehaviour
         //float cellSize = Mathf.Sqrt((spawnLengthX * spawnLengthZ) / numberOfInstances);
         int cols = Mathf.FloorToInt(spawnLengthX / sectionLengthX);
         int rows = Mathf.FloorToInt(spawnLengthZ / sectionLengthZ);
-
+        Vector3 initialSpawnerPosition = transform.position;
         for (int x = 0; x < cols; x++)
         {
             for (int y = 0; y < rows; y++)
@@ -199,7 +201,7 @@ public class BandSpawner : MonoBehaviour
                 float posX = -spawnLengthX / 2f + (x + 0.5f) * sectionLengthX;
                 float posZ = -spawnLengthZ / 2f + (y + 0.5f) * sectionLengthZ;
                 Vector3 position = new Vector3(posX, 0f, posZ);
-                position = areaRotation * position;
+                position = areaRotation * position + initialSpawnerPosition;
                 spawnPositions.Add(position);
             }
         }
@@ -213,11 +215,13 @@ public class BandSpawner : MonoBehaviour
 
     void GenerateRandomPositions()
     {
-        if (prioritizeNumbers && numberOfInstances ==1)
+        Vector3 initialSpawnerPosition = transform.position; // Use the spawner's current position as the initial position
+
+        if (prioritizeNumbers && numberOfInstances == 1)
         {
-            Vector3 position = new Vector3(0f, 0f, 0f);
-            position = areaRotation * position;
-            spawnPositions.Add(position);
+            // Render the only instance at the center of the spawn area
+            Vector3 centerPosition = initialSpawnerPosition;
+            spawnPositions.Add(centerPosition);
         }
         else
         {
@@ -226,7 +230,7 @@ public class BandSpawner : MonoBehaviour
                 float posX = Random.Range(-spawnLengthX / 2f, spawnLengthX / 2f);
                 float posZ = Random.Range(-spawnLengthZ / 2f, spawnLengthZ / 2f);
                 Vector3 position = new Vector3(posX, 0f, posZ);
-                position = areaRotation * position;
+                position = areaRotation * position + initialSpawnerPosition;
                 spawnPositions.Add(position);
             }
         }
