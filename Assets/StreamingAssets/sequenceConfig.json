@@ -2,32 +2,10 @@
   "sequences": [
  {
 
-      "sceneName": "Choice",
-      "duration":40,
+      "sceneName": "Choice_TVM",
+      "duration":60,
       "parameters": {
-        "configFile": "Choice_Empty_Spider.json"
-      }
-    },
-
-    {
-      "sceneName": "Choice",
-      "duration":4 ,
-      "parameters": {
-        "configFile": "Choice_Lemon_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration":4 ,
-      "parameters": {
-        "configFile": "Choice_Lemonveryred_Empty.json"
-      }
-    },
-    {
-      "sceneName": "Choice",
-      "duration":4 ,
-      "parameters": {
-        "configFile": "Choice_Lemonveryred_LemonYellow.json"
+        "configFile": "BinaryChoice_Forest_Grass.json"
       }
     }
   ]
