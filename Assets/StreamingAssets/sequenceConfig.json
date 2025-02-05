@@ -1,17 +1,10 @@
 {
     "sequences": [
         {
-            "sceneName": "Choice_noBG",
-            "duration":20,
+            "sceneName": "Demo",
+            "duration":180,
             "parameters": {
-                "configFile": "Choice_empty_floor.json"
-            }
-        },
-        {
-            "sceneName": "Choice_noBG",
-            "duration":20,
-            "parameters": {
-                "configFile": "Choice_Empty_BlackCylinder_floor.json"
+                "configFile": "BinaryChoice00_empty_control.json"
             }
         }
     ]
