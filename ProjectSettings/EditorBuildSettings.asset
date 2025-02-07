@@ -35,4 +35,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Choice_TVM.unity
     guid: 3a6e560bedd59351da0481ac36dd45d2
+  - enabled: 1
+    path: Assets/Scenes/Choice_TVM_skybox.unity
+    guid: 2400622221133c0bcb48b15caf62ccfc
   m_configObjects: {}
