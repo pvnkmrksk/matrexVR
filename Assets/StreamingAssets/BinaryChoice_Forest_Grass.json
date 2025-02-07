@@ -20,5 +20,6 @@
     "y": 0,
     "z": 0
   },
-  "randomInitialRotation":  true
+  "randomInitialRotation": true,
+  "skyboxPath": "Photosphere/bsb_ant2.jpg"
 }

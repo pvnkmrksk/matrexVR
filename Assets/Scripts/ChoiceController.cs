@@ -154,6 +154,11 @@ public class ChoiceController : MonoBehaviour, ISceneController
         // TODO: Set sky and grass textures
         // Start the coroutine from here
         StartCoroutine(DelayedOnLoaded(0.05f));
+
+        if (!string.IsNullOrEmpty(config.skyboxPath))
+        {
+            SetSkybox(config.skyboxPath);
+        }
     }
 
     // Coroutine to delay the execution of OnLoaded
@@ -182,6 +187,51 @@ public class ChoiceController : MonoBehaviour, ISceneController
         return new Vector3(x, height, z); // Assuming y is always 0
     }
 
+    private void SetSkybox(string skyboxPath)
+    {
+        // If skyboxPath is empty, retain existing skybox
+        if (string.IsNullOrEmpty(skyboxPath))
+        {
+            return;
+        }
+
+        // Construct full path in StreamingAssets
+        string fullPath = Path.Combine(Application.streamingAssetsPath, skyboxPath);
+        
+        if (File.Exists(fullPath))
+        {
+            try
+            {
+                // Load the image bytes
+                byte[] imageBytes = File.ReadAllBytes(fullPath);
+                
+                // Create and load the texture
+                Texture2D skyboxTexture = new Texture2D(2, 2);
+                if (skyboxTexture.LoadImage(imageBytes))
+                {
+                    // Create a new material using the skybox shader
+                    Material skyboxMaterial = new Material(Shader.Find("Skybox/Panoramic"));
+                    skyboxMaterial.mainTexture = skyboxTexture;
+                    
+                    // Apply the skybox material
+                    RenderSettings.skybox = skyboxMaterial;
+                }
+                else
+                {
+                    Debug.LogWarning($"Failed to load skybox texture from: {fullPath}");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Error loading skybox: {e.Message}");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"Skybox file not found at: {fullPath}");
+        }
+    }
+
     // Update SceneConfig and other classes as needed to reflect JSON changes
 }
 
@@ -197,6 +247,8 @@ public class SceneConfig
 
     public bool randomInitialRotation;
     public ColorConfig backgroundColor;
+
+    public string skyboxPath;
 }
 
 [System.Serializable]
@@ -212,6 +264,7 @@ public class SceneObject
 
     public float mu;
     // Include other properties as before
+
 }
 
 [System.Serializable]

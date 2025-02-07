@@ -2,7 +2,7 @@
   "sequences": [
  {
 
-      "sceneName": "Choice_TVM",
+      "sceneName": "Choice",
       "duration":60,
       "parameters": {
         "configFile": "BinaryChoice_Forest_Grass.json"
