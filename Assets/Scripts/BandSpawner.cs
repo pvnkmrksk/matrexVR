@@ -297,7 +297,15 @@ public class BandSpawner : MonoBehaviour
         PeriodicBoundary boundary = instance.AddComponent<PeriodicBoundary>();
         boundary.boundaryLengthX = boundaryLengthX;
         boundary.boundaryLengthZ = boundaryLengthZ;
-        boundary.boundaryRotation = rotationAngle; // Add this line
+        boundary.boundaryRotation = rotationAngle;
+
+        // Configure boundary movement with custom parent transform
+        if (lockBoundaryWithAnimalPosition && customParentTransform != null)
+        {
+            boundary.moveWithTransform = true;
+            boundary.targetTransform = customParentTransform;
+            boundary.boundaryCenter = customParentTransform.position;
+        }
     }
 
     float GenerateVanMisesRotation(float mu, float kappa)

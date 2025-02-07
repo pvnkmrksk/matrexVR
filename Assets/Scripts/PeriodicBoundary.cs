@@ -11,10 +11,15 @@ public class PeriodicBoundary : MonoBehaviour
     [Tooltip("Rotation angle in degrees around the Y-axis for the boundary area.")] public float boundaryRotation = 0f;
 
     private Quaternion rotationQuaternion;
+    private Vector3 initialOffset;
 
     private void Start()
     {
         rotationQuaternion = Quaternion.Euler(0, boundaryRotation, 0);
+        if (moveWithTransform && targetTransform != null)
+        {
+            initialOffset = boundaryCenter - targetTransform.position;
+        }
     }
 
     private void OnDrawGizmos()
@@ -61,16 +66,15 @@ public class PeriodicBoundary : MonoBehaviour
         objectTransform.position = position;
     }
 
-    void Update()
+    private void Update()
     {
-        // Handle periodic boundaries and update the position of the GameObject this script is attached to.
-        if (targetTransform != null)
+        // Update boundary center if moving with transform
+        if (moveWithTransform && targetTransform != null)
         {
-            HandlePeriodicBoundaries(targetTransform);
+            boundaryCenter = targetTransform.position + initialOffset;
         }
-        else
-        {
-            HandlePeriodicBoundaries(transform);
-        }
+
+        // Always handle periodic boundaries for this object
+        HandlePeriodicBoundaries(transform);
     }
 }
