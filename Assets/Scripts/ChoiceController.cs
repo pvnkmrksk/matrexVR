@@ -130,7 +130,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
                     obj.scale.z
                 );
             }
-            
+
             if (obj.speed != 0)
             {
                 instance.GetComponent<LocustMover>().speed = obj.speed;
@@ -142,7 +142,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
             }
 
             //todo. add individual datalogger to each instance. 
-            
+
             // Optionally apply material
             if (
                 !string.IsNullOrEmpty(obj.material)
@@ -177,8 +177,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
             BandSpawner spawner = bandInstance.GetComponent<BandSpawner>();
             if (spawner != null)
             {
-                spawner.vrIndex = vrIndex; // Set the VR index
-                // Set BandSpawner properties
+                spawner.vrIndex = vrIndex;
                 spawner.numberOfInstances = obj.numberOfInstances;
                 spawner.spawnLengthX = obj.spawnLengthX;
                 spawner.spawnLengthZ = obj.spawnLengthZ;
@@ -192,10 +191,13 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 spawner.boundaryLengthZ = obj.boundaryLengthZ;
                 spawner.rotationAngle = obj.rotationAngle;
 
-                // Set custom parent transform
-                spawner.moveWithCustomTransform = obj.moveWithTransform;
+                // Set the new locking properties
+                spawner.lockBoundaryWithAnimalPosition = obj.lockBoundaryWithAnimalPosition;
+                spawner.lockAgentWithAnimalPosition = obj.lockAgentWithAnimalPosition;
                 spawner.prioritizeNumbers = obj.prioritizeNumbers;
-                if (obj.moveWithTransform)
+
+                // Set custom parent transform if either locking is enabled
+                if (obj.lockBoundaryWithAnimalPosition || obj.lockAgentWithAnimalPosition)
                 {
                     GameObject vrObject = GameObject.Find($"VR{vrIndex}");
                     if (vrObject != null)
@@ -298,7 +300,7 @@ public class SceneObject
     public bool flip;
     public float speed;
     public float mu;
-    // New properties for bands
+    // Band properties
     public int numberOfInstances;
     public float spawnLengthX;
     public float spawnLengthZ;
@@ -308,10 +310,10 @@ public class SceneObject
     public float visibleOnDuration;
     public float boundaryLengthZ;
     public float boundaryLengthX;
-    public bool moveWithTransform;
+    public bool lockBoundaryWithAnimalPosition;  // Renamed from moveWithTransform
+    public bool lockAgentWithAnimalPosition;     // Renamed from agentsMoveWithParent
     public bool prioritizeNumbers;
     public float hexRadius;
-
     public float sectionLengthZ;
     public float sectionLengthX;
     public float rotationAngle;

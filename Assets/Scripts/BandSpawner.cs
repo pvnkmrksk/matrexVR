@@ -21,8 +21,9 @@ public class BandSpawner : MonoBehaviour
     [Header("Movement")]
     [Tooltip("Speed of the instances in centimeters per second.")] public float speed = 2f;
 
-    [Tooltip("If true, the spawner will move relative to the custom transform.")] public bool moveWithCustomTransform = false;
-    [Tooltip("Custom transform to use as the reference when moveWithCustomTransform is true.")] public Transform customParentTransform;
+    [Tooltip("If true, the boundary will move with the animal's position.")] public bool lockBoundaryWithAnimalPosition = false;
+    [Tooltip("If true, the agents will move with the animal's position.")] public bool lockAgentWithAnimalPosition = false;
+    [Tooltip("Custom transform to use as the reference for position locking.")] public Transform customParentTransform;
 
     private Vector3 initialOffset;
     private List<Vector3> spawnPositions = new List<Vector3>();
@@ -47,24 +48,24 @@ public class BandSpawner : MonoBehaviour
     [Tooltip("Length of the spawn area in centimeters. Note: Ensure the Length to be n*1.732*hexRadius for gridtype Hexagonal and, n*sectionLengthZ for gridtype Manhattan to avoid gaps in the area")] public float spawnLengthZ = 52f;
 
 
-    [Tooltip("Rotation angle in degrees around the Y-axis for both spawn and boundary areas.")] 
+    [Tooltip("Rotation angle in degrees around the Y-axis for both spawn and boundary areas.")]
     public float rotationAngle = 0f;
     [Tooltip("If true, the spawner will prioritize numbers of instances over the distance between each grid points.")] public bool prioritizeNumbers = false;
 
 
     [HideInInspector]
-    [Tooltip("Number of instances to spawn when using random grid type.")] 
+    [Tooltip("Number of instances to spawn when using random grid type.")]
     public int numberOfInstances = 32;
 
     [HideInInspector]
     [Tooltip("Radius of the hexagon when using hexagonal grid type.")] public float hexRadius = 1f;
 
     [HideInInspector]
-    [Tooltip("Length of sections when using Manhattan grid type.")] 
+    [Tooltip("Length of sections when using Manhattan grid type.")]
     public float sectionLengthZ = 1f;
 
     [HideInInspector]
-    [Tooltip("Width of sections when using Manhattan grid type.")] 
+    [Tooltip("Width of sections when using Manhattan grid type.")]
     public float sectionLengthX = 1f;
 
 
@@ -88,7 +89,7 @@ public class BandSpawner : MonoBehaviour
     /// </summary>
     void SetupInitialTransform()
     {
-        if (moveWithCustomTransform && customParentTransform != null)
+        if ((lockBoundaryWithAnimalPosition || lockAgentWithAnimalPosition) && customParentTransform != null)
         {
             initialOffset = transform.position - customParentTransform.position;
         }
@@ -99,10 +100,13 @@ public class BandSpawner : MonoBehaviour
     /// </summary>
     void Update()
     {
-        if (moveWithCustomTransform && customParentTransform != null)
+        if ((lockBoundaryWithAnimalPosition || lockAgentWithAnimalPosition) && customParentTransform != null)
         {
             UpdateTransform();
-            UpdateBoundaryCenter();
+            if (lockBoundaryWithAnimalPosition)
+            {
+                UpdateBoundaryCenter();
+            }
         }
     }
 
@@ -182,7 +186,7 @@ public class BandSpawner : MonoBehaviour
         }
 
         // Update numberOfInstances based on the actual number of spawned positions
-        if (prioritizeNumbers==false)
+        if (prioritizeNumbers == false)
         {
             numberOfInstances = spawnPositions.Count;
         }
@@ -207,7 +211,7 @@ public class BandSpawner : MonoBehaviour
         }
 
         // Update numberOfInstances based on the actual number of spawned positions
-        if (prioritizeNumbers==false)
+        if (prioritizeNumbers == false)
         {
             numberOfInstances = spawnPositions.Count;
         }
@@ -249,12 +253,13 @@ public class BandSpawner : MonoBehaviour
             instancesToSpawn = spawnPositions.Count;
         }
 
-
         for (int i = 0; i < instancesToSpawn; i++)
         {
             Vector3 position = spawnPositions[i];
-            GameObject instance = Instantiate(instancePrefab, position, Quaternion.identity, transform);
-            
+            // Parent to transform only if agents should move with animal
+            GameObject instance = Instantiate(instancePrefab, position, Quaternion.identity,
+                lockAgentWithAnimalPosition ? transform : null);
+
             // Recursively set the layer for the instance and all its children
             SetLayerRecursively(instance, parentLayer);
 
@@ -269,7 +274,7 @@ public class BandSpawner : MonoBehaviour
             instance.transform.rotation = Quaternion.Euler(0f, orientation + 90f, 0f);
 
             // Add and configure components (DirectionalMovement, VisibilityScript, PeriodicBoundary)
-            SetupInstanceComponents(instance, orientation+ 90f);
+            SetupInstanceComponents(instance, orientation + 90f);
         }
 
         UpdateBoundaryCenter();
@@ -303,10 +308,10 @@ public class BandSpawner : MonoBehaviour
         }
         else if (kappa >= 10000)
         {
-            return -1*mu;
+            return -1 * mu;
         }
 
-        float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad*-1*mu, kappa);
+        float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad * -1 * mu, kappa);
         // No need to add 90 degrees here, as we're doing it when setting the rotation
         return angle * Mathf.Rad2Deg;
     }
