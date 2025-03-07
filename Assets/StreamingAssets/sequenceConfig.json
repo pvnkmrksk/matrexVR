@@ -2,79 +2,1129 @@
     "sequences": [
         {
             "sceneName": "Forrest_choice",
-            "duration": 1,
+            "duration": 4,
             "parameters": {
                 "configFile": "Treecircle.json"
             }
         },
         {
             "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
             "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
             "parameters": {
                 "configFile": "BinaryChoice11_constantSize_BlackCylinder_BlackCylinder.json"
             }
         },
         {
-            "sceneName": "Choice_noBG",
+            "sceneName": "Forrest_choice",
             "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
             "parameters": {
                 "configFile": "3Cylinders111_constantSize.json"
             }
         },
         {
-            "sceneName": "Choice_noBG",
+            "sceneName": "Forrest_choice",
             "duration": 4,
             "parameters": {
-                "configFile": "BinaryChoice_constantSize_BlueCylinder_GreenCylinder.json"
+                "configFile": "Treecircle.json"
             }
         },
         {
             "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
             "duration": 4,
             "parameters": {
-                "configFile": "BinaryChoice_constantSize_90deg_BlueCylinder_GreenCylinder.json"
+                "configFile": "Treecircle.json"
             }
         },
         {
             "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
             "duration": 4,
             "parameters": {
-                "configFile": "BinaryChoice_constantSize_180deg_BlueCylinder_GreenCylinder.json"
+                "configFile": "Treecircle.json"
             }
         },
         {
             "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
             "duration": 4,
             "parameters": {
-                "configFile": "BinaryChoice_constantSize_GreenCylinder_BlueCylinder.json"
+                "configFile": "Treecircle.json"
             }
         },
         {
             "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
             "duration": 4,
             "parameters": {
-                "configFile": "BinaryChoice_constantSize_90deg_GreenCylinder_BlueCylinder.json"
+                "configFile": "Treecircle.json"
             }
         },
         {
             "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
             "duration": 4,
             "parameters": {
-                "configFile": "BinaryChoice_constantSize_180deg_GreenCylinder_BlueCylinder.json"
+                "configFile": "Treecircle.json"
             }
         },
         {
             "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "3Cylinders111_constantSize.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
             "duration": 4,
             "parameters": {
-                "configFile": "BinaryChoice_constantSize_GreenCylinder_GreenCylinder.json"
+                "configFile": "Treecircle.json"
             }
         },
         {
             "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
             "duration": 4,
             "parameters": {
-                "configFile": "BinaryChoice_constantSize_BlueCylinder_BlueCylinder.json"
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice11_constantSize_BlackCylinder_BlackCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "3Cylinders111_constantSize.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice11_constantSize_BlackCylinder_BlackCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice11_constantSize_BlackCylinder_BlackCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "3Cylinders111_constantSize.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "3Cylinders111_constantSize.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice11_constantSize_BlackCylinder_BlackCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice11_constantSize_BlackCylinder_BlackCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "3Cylinders111_constantSize.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "3Cylinders111_constantSize.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice11_constantSize_BlackCylinder_BlackCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice11_constantSize_BlackCylinder_BlackCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "3Cylinders111_constantSize.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice11_constantSize_BlackCylinder_BlackCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "3Cylinders111_constantSize.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "3Cylinders111_constantSize.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_90deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice11_constantSize_BlackCylinder_BlackCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_180deg_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueGreenCylinder_BlueCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 5,
+            "parameters": {
+                "configFile": "BinaryChoice_constantSize_BlueCylinder_BlueGreenCylinder.json"
+            }
+        },
+        {
+            "sceneName": "Forrest_choice",
+            "duration": 4,
+            "parameters": {
+                "configFile": "Treecircle.json"
             }
         }
     ]
