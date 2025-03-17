@@ -16,27 +16,27 @@ MonoBehaviour:
     stripPassesFromAllShaders: 0
     stripPasses: 0
   ImportPlugins:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: -7323022939929632876}
+  - {fileID: -2907954909093059735}
+  - {fileID: 7754430640696462346}
+  - {fileID: -7507132910281017295}
+  - {fileID: 6734033265094712710}
+  - {fileID: -1764149022026841381}
+  - {fileID: 1744265833047880071}
+  - {fileID: -4822389111463498871}
+  - {fileID: -5139656402982425606}
+  - {fileID: 5882590006058820622}
   ExportPlugins:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 7183714953029123966}
+  - {fileID: 6046418836017711034}
+  - {fileID: -447664382117993820}
+  - {fileID: 8893454482479232857}
+  - {fileID: 2960563180575965110}
+  - {fileID: -951092132088586860}
+  - {fileID: 1353557113218507255}
+  - {fileID: 5557240259403263094}
+  - {fileID: 5196249712057472074}
+  - {fileID: -5522459328692467033}
   exportNames: 1
   exportFullPath: 0
   requireExtensions: 0

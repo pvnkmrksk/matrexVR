@@ -7,6 +7,7 @@
     "com.unity.textmeshpro": "3.0.7",
     "com.unity.timeline": "1.7.6",
     "com.unity.toolchain.linux-x86_64": "2.0.4",
+    "com.unity.toolchain.macos-arm64-linux-x86_64": "2.0.4",
     "com.unity.ugui": "1.0.0",
     "com.unity.visualscripting": "1.9.4",
     "org.khronos.unitygltf": "https://github.com/KhronosGroup/UnityGLTF.git",
