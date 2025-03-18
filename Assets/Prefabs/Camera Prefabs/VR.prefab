@@ -137,7 +137,7 @@ MonoBehaviour:
   antSize: 1
   raycastOriginHeight: 5
   sampleCount: 9
-  alignSpeed: 1
+  alignSpeed: 10
 --- !u!1001 &124890606341847571
 PrefabInstance:
   m_ObjectHideFlags: 0
