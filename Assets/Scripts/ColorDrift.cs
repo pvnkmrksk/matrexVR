@@ -21,6 +21,17 @@ public class ColorDrift : MonoBehaviour
     private float timer;
     private bool useMeanA = true;
     private List<string> dataBuffer;  // To batch up data before writing
+    
+    // -- Add public read-only properties so external scripts can read them:
+    public float CurrentBlue
+    {
+        get { return currentBlue; }
+    }
+
+    public bool IsUsingMeanA
+    {
+        get { return useMeanA; }
+    }
 
     void Start()
     {
@@ -36,6 +47,7 @@ public class ColorDrift : MonoBehaviour
             dataBuffer.Add("Time,CurrentBlue");
         }
     }
+    
 
     void Update()
     {
