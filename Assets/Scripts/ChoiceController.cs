@@ -117,6 +117,15 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 {
                     scaleScript.visualAngleDegrees = obj.visualAngleDegrees; 
                 }
+                ColorDrift colorDrift = instance.GetComponent<ColorDrift>();
+                if (colorDrift != null)
+                {
+                    // If using typed fields in `SceneObject`:
+                    colorDrift.meanBlueA      = obj.meanBlueA;
+                    colorDrift.meanBlueB      = obj.meanBlueB;
+                    colorDrift.switchInterval = obj.switchInterval;
+                }
+
             }
         }
     }
@@ -246,6 +255,11 @@ public class SceneObject
         // New field for visual angle
     public float visualAngleDegrees;
     // Include other properties as before
+        // Optional: add these for your dynamic cylinder
+    public float meanBlueA;
+    public float meanBlueB;
+    public float switchInterval;
+
 }
 
 [System.Serializable]
