@@ -24,29 +24,25 @@ public class ViewportSetter : MonoBehaviour
     [SerializeField]
     private bool interactive = false;
 
-    // VR identifier for config lookup
-    [SerializeField]
-    public string vrId = "VR1";
-
     void Start()
     {
         // set vsyn to true to avoid tearing and 60 fps
         QualitySettings.vSyncCount = 1;
 
-        // Apply VR config at start
-        ApplyVRConfig();
+        // Apply system config at start
+        ApplySystemConfig();
 
         setViewport();
     }
 
-    private void ApplyVRConfig()
+    private void ApplySystemConfig()
     {
         // Find the MainController
         MainController mainController = FindObjectOfType<MainController>();
         if (mainController != null)
         {
-            // Get config values based on vrId
-            VRConfig config = mainController.GetVRConfig(vrId);
+            // Get config values based on GameObject name
+            SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
 
             // Apply config values directly
             ledPanelWidth = config.ledPanelWidth;
@@ -54,6 +50,8 @@ public class ViewportSetter : MonoBehaviour
             startRow = config.startRow;
             startCol = config.startCol;
             horizontal = config.horizontal;
+
+            Debug.Log($"Applied system config to {gameObject.name}: Panel={ledPanelWidth}x{ledPanelHeight}, Position={startCol},{startRow}, Horizontal={horizontal}");
         }
     }
 

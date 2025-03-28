@@ -249,7 +249,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3566022865473237825, guid: 3da5134150cfdd55ba618e94f185766f, type: 3}
       propertyPath: m_Name
-      value: VR1 Cube
+      value: VR1
       objectReference: {fileID: 0}
     - target: {fileID: 3566022865473237825, guid: 3da5134150cfdd55ba618e94f185766f, type: 3}
       propertyPath: m_IsActive
@@ -389,7 +389,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5117967683176737136, guid: d2690eb4b8728b3e79ae415a26d57bef, type: 3}
       propertyPath: m_Name
-      value: VR2 Cube
+      value: VR2
       objectReference: {fileID: 0}
     - target: {fileID: 5117967683176737136, guid: d2690eb4b8728b3e79ae415a26d57bef, type: 3}
       propertyPath: m_IsActive

@@ -15,10 +15,6 @@ public class ZmqListener : MonoBehaviour
     [SerializeField]
     public int port = 9872; // Replace with your port number
 
-    // VR identifier for config lookup
-    [SerializeField]
-    public string vrId = "VR1";
-
     private SubscriberSocket subscriber;
     private string message; // The message received from the socket
     public Pose pose { get; private set; }
@@ -35,8 +31,8 @@ public class ZmqListener : MonoBehaviour
 
     void Start()
     {
-        // Apply VR config at start
-        ApplyVRConfig();
+        // Apply system config at start
+        ApplySystemConfig();
 
         subscriber = new SubscriberSocket();
         subscriber.Connect($"tcp://{address}:{port}");
@@ -66,18 +62,20 @@ public class ZmqListener : MonoBehaviour
         }).Start();
     }
 
-    private void ApplyVRConfig()
+    private void ApplySystemConfig()
     {
         // Find the MainController
         MainController mainController = FindObjectOfType<MainController>();
         if (mainController != null)
         {
-            // Get config values based on vrId
-            VRConfig config = mainController.GetVRConfig(vrId);
+            // Get config values based on GameObject name
+            SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
 
             // Apply config values directly
             address = config.zmqAddress;
             port = config.zmqPort;
+
+            Debug.Log($"Applied system config to {gameObject.name}: ZMQ={address}:{port}");
         }
     }
 

@@ -21,12 +21,12 @@ public class MainController : MonoBehaviour
     public bool loopSequence = false;
     private bool randomise = false; // Added field
 
-    // VR Config properties
+    // System Config properties
     [SerializeField]
-    private string vrConfigFileName = "default_config.json";
+    private string systemConfigFileName = "default_config.json";
 
-    // Dictionary to store loaded VR configs
-    private Dictionary<string, VRConfig> vrConfigs = new Dictionary<string, VRConfig>();
+    // Dictionary to store loaded system configs
+    private Dictionary<string, SystemConfig> systemConfigs = new Dictionary<string, SystemConfig>();
 
     [Tooltip("0: Off, ,1: Error, 2: Warning, 3: Info, 4: Debug")]
     [SerializeField]
@@ -66,79 +66,102 @@ public class MainController : MonoBehaviour
             Debugger.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath, 4);
         }
 
-        // Load VR configurations first
-        LoadVRConfigurations();
+        // Load system configurations first
+        LoadSystemConfigurations();
 
         // Load the sequence configuration
         LoadSequenceConfiguration();
     }
 
-    // Load VR configurations from the specified file
-    private void LoadVRConfigurations()
+    // Load system configurations from the specified file
+    private void LoadSystemConfigurations()
     {
-        string vrConfigPath = Path.Combine(Application.streamingAssetsPath, vrConfigFileName);
+        string configPath = Path.Combine(Application.streamingAssetsPath, systemConfigFileName);
 
-        if (!File.Exists(vrConfigPath))
+        if (!File.Exists(configPath))
         {
-            Debugger.Log($"VR config file not found: {vrConfigPath}", 1);
+            Debugger.Log($"System config file not found: {configPath}", 1);
             return;
         }
 
         try
         {
-            string jsonText = File.ReadAllText(vrConfigPath);
+            string jsonText = File.ReadAllText(configPath);
             // Parse the JSON array directly with Newtonsoft.Json
-            VRConfig[] loadedConfigs = JsonConvert.DeserializeObject<VRConfig[]>(jsonText);
+            SystemConfig[] loadedConfigs = JsonConvert.DeserializeObject<SystemConfig[]>(jsonText);
 
             // Clear existing configs
-            vrConfigs.Clear();
+            systemConfigs.Clear();
 
             // Add each config to dictionary with VR ID as key
-            foreach (VRConfig config in loadedConfigs)
+            foreach (SystemConfig config in loadedConfigs)
             {
-                vrConfigs[config.vrId] = config;
-                Debugger.Log($"Loaded VR config for: {config.vrId}", 3);
+                systemConfigs[config.vrId] = config;
+                Debugger.Log($"Loaded system config for: {config.vrId}", 3);
             }
 
-            Debugger.Log($"Successfully loaded VR config file: {vrConfigFileName}", 3);
+            Debugger.Log($"Successfully loaded system config file: {systemConfigFileName}", 3);
 
-            // Copy the VR config file to the log directory
+            // Copy the system config file to the log directory
             if (masterDataLogger != null)
             {
                 string timestamp = masterDataLogger.timestamp;
                 string sceneName = SceneManager.GetActiveScene().name;
                 string destPath = Path.Combine(
                     masterDataLogger.directoryPath,
-                    $"{timestamp}_{sceneName}_{vrConfigFileName}"
+                    $"{timestamp}_{sceneName}_{systemConfigFileName}"
                 );
-                File.Copy(vrConfigPath, destPath);
-                Debugger.Log($"Copied VR config file to: {destPath}", 3);
+                File.Copy(configPath, destPath);
+                Debugger.Log($"Copied system config file to: {destPath}", 3);
             }
         }
         catch (System.Exception e)
         {
-            Debugger.Log($"Error loading VR config file: {e.Message}", 1);
+            Debugger.Log($"Error loading system config file: {e.Message}", 1);
         }
     }
 
-    // Get VR config for the specified VR ID
-    public VRConfig GetVRConfig(string vrId)
+    // Get system config based on GameObject name
+    public SystemConfig GetSystemConfigForGameObject(GameObject gameObject)
     {
-        if (vrConfigs.ContainsKey(vrId))
+        // Check if the GameObject name contains any of our known VR IDs
+        foreach (var kvp in systemConfigs)
         {
-            return vrConfigs[vrId];
+            if (gameObject.name.Contains(kvp.Key))
+            {
+                return kvp.Value;
+            }
         }
 
-        Debugger.Log($"VR config for {vrId} not found, returning default", 2);
-        return new VRConfig { vrId = vrId };
+        // If no match, try to get config for "VR1" as default
+        if (systemConfigs.ContainsKey("VR1"))
+        {
+            Debugger.Log($"No matching config for {gameObject.name}, using VR1 config", 2);
+            return systemConfigs["VR1"];
+        }
+
+        Debugger.Log($"No config found for {gameObject.name}", 1);
+        return new SystemConfig { vrId = "VR1" };
     }
 
-    // Method to set a different VR config file
-    public void SetVRConfigFile(string fileName)
+    // Get system config for a specific VR ID
+    public SystemConfig GetSystemConfig(string vrId)
     {
-        vrConfigFileName = fileName;
-        LoadVRConfigurations();
-        Debugger.Log($"Loaded new VR config file: {fileName}", 3);
+        if (systemConfigs.ContainsKey(vrId))
+        {
+            return systemConfigs[vrId];
+        }
+
+        Debugger.Log($"System config for {vrId} not found, returning default", 2);
+        return new SystemConfig { vrId = vrId };
+    }
+
+    // Method to set a different system config file
+    public void SetSystemConfigFile(string fileName)
+    {
+        systemConfigFileName = fileName;
+        LoadSystemConfigurations();
+        Debugger.Log($"Loaded new system config file: {fileName}", 3);
     }
 
     public void StopSequence()
@@ -459,7 +482,7 @@ public class SequenceItem
 }
 
 [System.Serializable]
-public class VRConfig
+public class SystemConfig
 {
     public float sphereDiameter = 1.0f;
     public int ledPanelWidth = 128;
@@ -473,7 +496,7 @@ public class VRConfig
 }
 
 [System.Serializable]
-public class VRConfigArray
+public class SystemConfigArray
 {
-    public VRConfig[] configs;
+    public SystemConfig[] configs;
 }
