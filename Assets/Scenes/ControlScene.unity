@@ -3175,9 +3175,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sequenceSteps: []
+  executionOrder: 
   currentStep: 0
   currentTrial: 0
   loopSequence: 1
+  systemConfigFileName: system_config.json
   logLevel: 4
 --- !u!4 &484890815
 Transform:

@@ -23,7 +23,7 @@ public class MainController : MonoBehaviour
 
     // System Config properties
     [SerializeField]
-    private string systemConfigFileName = "default_config.json";
+    private string systemConfigFileName = "system_config.json";
 
     // Dictionary to store loaded system configs
     private Dictionary<string, SystemConfig> systemConfigs = new Dictionary<string, SystemConfig>();
