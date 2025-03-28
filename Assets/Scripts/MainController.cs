@@ -21,10 +21,18 @@ public class MainController : MonoBehaviour
     public bool loopSequence = false;
     private bool randomise = false; // Added field
 
+    // VR Config properties
+    [SerializeField]
+    private string vrConfigFileName = "default_config.json";
+
+    // Dictionary to store loaded VR configs
+    private Dictionary<string, VRConfig> vrConfigs = new Dictionary<string, VRConfig>();
+
     [Tooltip("0: Off, ,1: Error, 2: Warning, 3: Info, 4: Debug")]
     [SerializeField]
     [Range(0, 4)]
     private int logLevel = 0; // 0: All, 1: Error, 2: Warning, 3: Info, 4: Debug
+
     // In MainController class
     public SequenceStep GetCurrentSequenceStep()
     {
@@ -58,8 +66,79 @@ public class MainController : MonoBehaviour
             Debugger.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath, 4);
         }
 
+        // Load VR configurations first
+        LoadVRConfigurations();
+
         // Load the sequence configuration
         LoadSequenceConfiguration();
+    }
+
+    // Load VR configurations from the specified file
+    private void LoadVRConfigurations()
+    {
+        string vrConfigPath = Path.Combine(Application.streamingAssetsPath, vrConfigFileName);
+
+        if (!File.Exists(vrConfigPath))
+        {
+            Debugger.Log($"VR config file not found: {vrConfigPath}", 1);
+            return;
+        }
+
+        try
+        {
+            string jsonText = File.ReadAllText(vrConfigPath);
+            // Parse the JSON array directly with Newtonsoft.Json
+            VRConfig[] loadedConfigs = JsonConvert.DeserializeObject<VRConfig[]>(jsonText);
+
+            // Clear existing configs
+            vrConfigs.Clear();
+
+            // Add each config to dictionary with VR ID as key
+            foreach (VRConfig config in loadedConfigs)
+            {
+                vrConfigs[config.vrId] = config;
+                Debugger.Log($"Loaded VR config for: {config.vrId}", 3);
+            }
+
+            Debugger.Log($"Successfully loaded VR config file: {vrConfigFileName}", 3);
+
+            // Copy the VR config file to the log directory
+            if (masterDataLogger != null)
+            {
+                string timestamp = masterDataLogger.timestamp;
+                string sceneName = SceneManager.GetActiveScene().name;
+                string destPath = Path.Combine(
+                    masterDataLogger.directoryPath,
+                    $"{timestamp}_{sceneName}_{vrConfigFileName}"
+                );
+                File.Copy(vrConfigPath, destPath);
+                Debugger.Log($"Copied VR config file to: {destPath}", 3);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debugger.Log($"Error loading VR config file: {e.Message}", 1);
+        }
+    }
+
+    // Get VR config for the specified VR ID
+    public VRConfig GetVRConfig(string vrId)
+    {
+        if (vrConfigs.ContainsKey(vrId))
+        {
+            return vrConfigs[vrId];
+        }
+
+        Debugger.Log($"VR config for {vrId} not found, returning default", 2);
+        return new VRConfig { vrId = vrId };
+    }
+
+    // Method to set a different VR config file
+    public void SetVRConfigFile(string fileName)
+    {
+        vrConfigFileName = fileName;
+        LoadVRConfigurations();
+        Debugger.Log($"Loaded new VR config file: {fileName}", 3);
     }
 
     public void StopSequence()
@@ -125,6 +204,9 @@ public class MainController : MonoBehaviour
     {
         Debugger.Log("MainController.OnSceneLoaded()", 3);
         SequenceStep currentStepData = sequenceSteps[executionOrder[currentStep]];
+
+        // Note: Components will load their own configs based on vrId
+        // No need to scan for them here
 
         ISceneController currentSceneController = null;
         foreach (var obj in FindObjectsOfType<MonoBehaviour>()) // MonoBehaviour is the base class for all Unity Behaviours
@@ -374,4 +456,24 @@ public class SequenceItem
     public string sceneName;
     public float duration;
     public Dictionary<string, object> parameters;
+}
+
+[System.Serializable]
+public class VRConfig
+{
+    public float sphereDiameter = 1.0f;
+    public int ledPanelWidth = 128;
+    public int ledPanelHeight = 128;
+    public int startRow = 0;
+    public int startCol = 0;
+    public bool horizontal = true;
+    public string zmqAddress = "localhost";
+    public int zmqPort = 9872;
+    public string vrId = "VR1";
+}
+
+[System.Serializable]
+public class VRConfigArray
+{
+    public VRConfig[] configs;
 }

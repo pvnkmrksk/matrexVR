@@ -7,30 +7,54 @@ public class ViewportSetter : MonoBehaviour
     // Start is called before the first frame update
 
     [SerializeField]
-    private int ledPanelWidth = 128;
+    public int ledPanelWidth = 128;
 
     [SerializeField]
-    private int ledPanelHeight = 128;
+    public int ledPanelHeight = 128;
 
     [SerializeField]
-    private int startRow = 0;
+    public int startRow = 0;
 
     [SerializeField]
-    private int startCol = 0;
+    public int startCol = 0;
 
     [SerializeField]
-    private bool horizontal = true;
+    public bool horizontal = true;
 
     [SerializeField]
     private bool interactive = false;
 
+    // VR identifier for config lookup
+    [SerializeField]
+    public string vrId = "VR1";
+
     void Start()
     {
-
         // set vsyn to true to avoid tearing and 60 fps
         QualitySettings.vSyncCount = 1;
-        
+
+        // Apply VR config at start
+        ApplyVRConfig();
+
         setViewport();
+    }
+
+    private void ApplyVRConfig()
+    {
+        // Find the MainController
+        MainController mainController = FindObjectOfType<MainController>();
+        if (mainController != null)
+        {
+            // Get config values based on vrId
+            VRConfig config = mainController.GetVRConfig(vrId);
+
+            // Apply config values directly
+            ledPanelWidth = config.ledPanelWidth;
+            ledPanelHeight = config.ledPanelHeight;
+            startRow = config.startRow;
+            startCol = config.startCol;
+            horizontal = config.horizontal;
+        }
     }
 
     void setViewport()
