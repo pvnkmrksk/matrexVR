@@ -13,11 +13,11 @@ public class SinusoidalGrating : MonoBehaviour
     [Header("Sinusoidal Settings")]
     [SerializeField]
     [Range(0f, 10f)]
-    public float frequency = 4f;
+    private float frequency = 4f;
 
     [SerializeField]
     [Range(0f, 1f)]
-    public float level = 0.5f;
+    private float contrast = 0.5f;
 
     [Header("Color Settings")]
     [SerializeField]
@@ -39,107 +39,160 @@ public class SinusoidalGrating : MonoBehaviour
     [SerializeField]
     private int cylinderStacks = 16;
 
-    [Header("Miscellaneous Settings")]
-    [SerializeField]
-    private Material material;
-
     private Texture2D texture;
     private Mesh mesh;
+    private Material material;
+    private bool textureNeedsUpdate = false;
+    private int updateCount = 0;
 
-    public DrumRotator drumRotator; // Reference to the DrumRotator script
-
-    // public DataLogger dataLogger; // Reference to the DataLogger script 
-
-
-    private void Start()
+    private void Awake()
     {
+        Debug.Log($"SinusoidalGrating.Awake() - {gameObject.name}");
+
+        // Create texture
         texture = new Texture2D(textureWidth, textureHeight);
+
+        // Create material
         material = new Material(Shader.Find("Unlit/Texture"));
         material.mainTexture = texture;
 
+        // Create mesh
         mesh = CreateCylinderMesh(cylinderRadius, cylinderHeight, cylinderSegments, cylinderStacks);
-        this.gameObject.AddComponent<MeshFilter>().mesh = mesh;
-        this.gameObject.AddComponent<MeshRenderer>().material = material;
 
-        drumRotator = this.gameObject.GetComponent<DrumRotator>();
-        // dataLogger = this.gameObject.GetComponent<DataLogger>();
-
-        // Subscribe to the ConfigurationChanged event
-        drumRotator.ConfigurationChanged += HandleConfigurationChanged;
-
-        // Apply the initial rotation config
-        ApplyRotationConfig();
-
-        // Delay the filling of the texture
-        StartCoroutine(DelayedFillTexture());
-    }
-    private IEnumerator DelayedFillTexture()
-    {
-        // Wait for one frame
-        yield return null;
-
-        // Fill the texture
-        FillTexture();
-
-        // Apply the texture to the material
-        material.mainTexture = texture;
-    }
-
-    // Event handler for the ConfigurationChanged event
-    private void HandleConfigurationChanged()
-    {
-        ApplyRotationConfig();
-    }
-
-    // Method to apply the rotation config to the sinusoidal grating
-    private void ApplyRotationConfig()
-    {
-        if (
-            drumRotator != null
-            && drumRotator.configs != null
-            && drumRotator.currentIndex < drumRotator.configs.Count
-        )
+        // Add or get components
+        MeshFilter meshFilter = GetComponent<MeshFilter>();
+        if (meshFilter == null)
         {
-            frequency = drumRotator.configs[drumRotator.currentIndex].frequency;
-            level = drumRotator.configs[drumRotator.currentIndex].level;
-            FillTexture();
+            meshFilter = gameObject.AddComponent<MeshFilter>();
+            Debug.Log("Added MeshFilter component");
+        }
+        meshFilter.mesh = mesh;
+
+        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        if (meshRenderer == null)
+        {
+            meshRenderer = gameObject.AddComponent<MeshRenderer>();
+            Debug.Log("Added MeshRenderer component");
+        }
+        meshRenderer.material = material;
+
+        Debug.Log("SinusoidalGrating initialization complete");
+    }
+
+    private void Start()
+    {
+        Debug.Log($"SinusoidalGrating.Start() - {gameObject.name}, Initial frequency: {frequency}, contrast: {contrast}");
+        // Generate the initial texture
+        UpdateTexture();
+    }
+
+    // Public method for OptomotorSceneController to update grating parameters
+    public void SetGratingParameters(float newFrequency, float newContrast, Color newColor1, Color newColor2)
+    {
+        Debug.Log($"SetGratingParameters() - Frequency: {newFrequency}, Contrast: {newContrast}, Color1: {newColor1}, Color2: {newColor2}");
+
+        // Check if parameters are actually changing
+        bool paramsChanged = false;
+
+        if (frequency != newFrequency)
+        {
+            Debug.Log($"Frequency changed from {frequency} to {newFrequency}");
+            frequency = newFrequency;
+            paramsChanged = true;
+        }
+
+        if (contrast != newContrast)
+        {
+            Debug.Log($"Contrast changed from {contrast} to {newContrast}");
+            contrast = newContrast;
+            paramsChanged = true;
+        }
+
+        if (color1 != newColor1)
+        {
+            Debug.Log($"Color1 changed from {color1} to {newColor1}");
+            color1 = newColor1;
+            paramsChanged = true;
+        }
+
+        if (color2 != newColor2)
+        {
+            Debug.Log($"Color2 changed from {color2} to {newColor2}");
+            color2 = newColor2;
+            paramsChanged = true;
+        }
+
+        // Mark texture for update if any parameter changed
+        if (paramsChanged)
+        {
+            textureNeedsUpdate = true;
+            Debug.Log("Parameters changed, texture will be updated");
+        }
+        else
+        {
+            Debug.Log("No parameters changed, no update needed");
         }
     }
+
     private void Update()
     {
-        // Handle input or any other logic here
-
-        // Call the UpdateLogger method of the DataLogger script
-        // dataLogger?.UpdateLogger();
-    }
-    private void FillTexture()
-    {
-        if (
-            drumRotator != null
-            && drumRotator.configs != null
-            && drumRotator.currentIndex < drumRotator.configs.Count
-        )
+        // Update texture if needed
+        if (textureNeedsUpdate)
         {
-            RotationConfig currentConfig = drumRotator.configs[drumRotator.currentIndex];
+            UpdateTexture();
+            textureNeedsUpdate = false;
+            updateCount++;
+            Debug.Log($"Updated texture (count: {updateCount}) - Current values: Frequency={frequency}, Contrast={contrast}");
+        }
+    }
 
-            frequency = currentConfig.frequency;
-            level = currentConfig.level;
+    private void UpdateTexture()
+    {
+        Debug.Log($"Updating texture with frequency={frequency}, contrast={contrast}");
 
-            for (int x = 0; x < textureWidth; x++)
+        for (int x = 0; x < textureWidth; x++)
+        {
+            for (int y = 0; y < textureHeight; y++)
             {
-                for (int y = 0; y < textureHeight; y++)
-                {
-                    float u = (float)x / (textureWidth - 1);
-                    float s = Mathf.Sin(u * frequency * 2 * Mathf.PI);
-                    float normalSine = s * level + 0.5f;
-                    float powerSine = Mathf.Pow(normalSine, 4f);
-                    float t = Mathf.Lerp(normalSine, powerSine, level * 2 - 1);
-                    Color c = Color.Lerp(color1, color2, t);
-                    texture.SetPixel(x, y, c);
-                }
-            }
+                float u = (float)x / (textureWidth - 1);
+                float s = Mathf.Sin(u * frequency * 2 * Mathf.PI);
 
-            texture.Apply(); // Apply the texture after all pixels have been set
+                // Apply contrast (previously called 'level')
+                float normalSine = s * 0.5f + 0.5f;
+
+                // Apply contrast function
+                float contrastValue = ApplyContrast(normalSine, contrast);
+
+                // Mix colors
+                Color c = Color.Lerp(color1, color2, contrastValue);
+                texture.SetPixel(x, y, c);
+            }
+        }
+
+        texture.Apply(); // Apply the texture after all pixels have been set
+        Debug.Log("Texture update completed");
+    }
+
+    private float ApplyContrast(float value, float contrastAmount)
+    {
+        // Apply a sigmoid contrast function
+        if (contrastAmount >= 0.99f)
+        {
+            // Binary contrast (black and white only)
+            return value >= 0.5f ? 1f : 0f;
+        }
+        else if (contrastAmount <= 0.01f)
+        {
+            // No contrast (mid-gray only)
+            return 0.5f;
+        }
+        else
+        {
+            // Sigmoid contrast function that preserves the midpoint at 0.5
+            float x = (value - 0.5f) * 2f; // Scale to [-1, 1]
+            float factor = (1f / (1f - contrastAmount)) - 1f;
+            float sigmoid = x / (Mathf.Sqrt(1f + factor * x * x));
+            return sigmoid * 0.5f + 0.5f; // Scale back to [0, 1]
         }
     }
 
@@ -151,6 +204,7 @@ public class SinusoidalGrating : MonoBehaviour
     // A helper method to create a cylinder mesh with a given radius, height, number of segments and stacks
     Mesh CreateCylinderMesh(float radius, float height, int segments, int stacks)
     {
+        Debug.Log($"Creating cylinder mesh: r={radius}, h={height}, segments={segments}, stacks={stacks}");
         Mesh mesh = new Mesh();
 
         // Calculate the number of vertices and triangles in the mesh
@@ -210,6 +264,14 @@ public class SinusoidalGrating : MonoBehaviour
         mesh.triangles = triangles;
         mesh.RecalculateBounds();
 
+        Debug.Log("Cylinder mesh created successfully");
         return mesh;
+    }
+
+    // For debugging - add a way to manually force update
+    public void ForceTextureUpdate()
+    {
+        Debug.Log("Forcing texture update");
+        textureNeedsUpdate = true;
     }
 }

@@ -1,9 +1,15 @@
 {
   "sequences": [
- {
-
+    {
+      "sceneName": "Optomotor",
+      "duration": 60,
+      "parameters": {
+        "configFile": "optomotor_config.json"
+      }
+    },
+    {
       "sceneName": "Choice",
-      "duration":60,
+      "duration": 60,
       "parameters": {
         "configFile": "BinaryChoice_Forest_Grass.json"
       }
