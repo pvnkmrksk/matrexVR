@@ -83,3 +83,5 @@ Assets/RunData/*
 
 *.csv.gz.meta
 Assets/RunData/
+
+Assets/Infinity*
