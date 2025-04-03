@@ -8,7 +8,8 @@
     "horizontal": true,
     "zmqAddress": "localhost",
     "zmqPort": 9871,
-    "vrId": "VR1"
+    "vrId": "VR1",
+    "displayOrder": "RBLFU"
   },
   {
     "sphereDiameter": 1.0,
@@ -19,7 +20,8 @@
     "horizontal": true,
     "zmqAddress": "localhost",
     "zmqPort": 9872,
-    "vrId": "VR2"
+    "vrId": "VR2",
+    "displayOrder": "RBLFU"
   },
   {
     "sphereDiameter": 1.0,
@@ -30,7 +32,8 @@
     "horizontal": true,
     "zmqAddress": "localhost",
     "zmqPort": 9873,
-    "vrId": "VR3"
+    "vrId": "VR3",
+    "displayOrder": "RBLFU"
   },
   {
     "sphereDiameter": 1.0,
@@ -41,6 +44,7 @@
     "horizontal": true,
     "zmqAddress": "localhost",
     "zmqPort": 9874,
-    "vrId": "VR4"
+    "vrId": "VR4",
+    "displayOrder": "RBLFU"
   }
 ]

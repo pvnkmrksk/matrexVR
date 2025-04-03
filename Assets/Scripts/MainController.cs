@@ -493,6 +493,7 @@ public class SystemConfig
     public string zmqAddress = "localhost";
     public int zmqPort = 9872;
     public string vrId = "VR1";
+    public string displayOrder = "DRBLFU"; // Default display order: Down, Right, Back, Left, Front, Up
 }
 
 [System.Serializable]

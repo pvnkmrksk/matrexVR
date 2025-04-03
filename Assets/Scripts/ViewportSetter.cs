@@ -24,6 +24,9 @@ public class ViewportSetter : MonoBehaviour
     [SerializeField]
     private bool interactive = false;
 
+    [SerializeField]
+    private string displayOrder = "DRBLFU"; // Default display order
+
     void Start()
     {
         // set vsyn to true to avoid tearing and 60 fps
@@ -50,14 +53,15 @@ public class ViewportSetter : MonoBehaviour
             startRow = config.startRow;
             startCol = config.startCol;
             horizontal = config.horizontal;
+            displayOrder = config.displayOrder;
 
-            Debug.Log($"Applied system config to {gameObject.name}: Panel={ledPanelWidth}x{ledPanelHeight}, Position={startCol},{startRow}, Horizontal={horizontal}");
+            Debug.Log($"Applied system config to {gameObject.name}: Panel={ledPanelWidth}x{ledPanelHeight}, Position={startCol},{startRow}, Horizontal={horizontal}, DisplayOrder={displayOrder}");
         }
     }
 
     void setViewport()
     {
-        // This method creates four viewports for four cameras that render a portion of the led panel.
+        // This method creates viewports for cameras that render a portion of the led panel.
         // The viewports have the same pixel size as the led panel and are aligned to the top left corner of the screen.
         // The viewports can be arranged horizontally or vertically depending on the horizontal flag.
         // The viewports can be updated every frame or only once depending on the interactive flag.
@@ -79,117 +83,51 @@ public class ViewportSetter : MonoBehaviour
         float viewport_x = (float)startCol * viewport_width;
         float viewport_y = 1.0f - viewport_height - (float)startRow * viewport_height;
 
-        // Set the viewport and fov for each camera in the scene by name
-        // The cameras are named Main Camera L, Main Camera F, Main Camera R, Main Camera B
-        // Camera camera = GameObject.Find("Main Camera L").GetComponent<Camera>();
-
-        // camera.rect = new Rect(viewport_x, viewport_y, viewport_width, viewport_height);
-
-
         // find all the cameras in the children of this script
         Camera[] cameras = GetComponentsInChildren<Camera>();
 
         if (horizontal)
         {
-            // find and set each camera by name
-            foreach (Camera cam in cameras)
+            // Set viewports based on display order
+            for (int i = 0; i < displayOrder.Length; i++)
             {
-                if (cam.name == "Main Camera D")
+                char cameraId = displayOrder[i];
+                foreach (Camera cam in cameras)
                 {
-                    cam.rect = new Rect(viewport_x, viewport_y, viewport_width, viewport_height);
+                    if (cam.name == $"Main Camera {cameraId}")
+                    {
+                        cam.rect = new Rect(
+                            viewport_x + i * viewport_width,
+                            viewport_y,
+                            viewport_width,
+                            viewport_height
+                        );
+                        cam.fieldOfView = 90; // set fov to 90 degrees
+                        break;
+                    }
                 }
-
-                if (cam.name == "Main Camera R")
-                {
-                    cam.rect = new Rect(
-                        viewport_x + viewport_width,
-                        viewport_y,
-                        viewport_width,
-                        viewport_height
-                    );
-                }
-
-                if (cam.name == "Main Camera B")
-                {
-                    cam.rect = new Rect(
-                        viewport_x + 2 * viewport_width,
-                        viewport_y,
-                        viewport_width,
-                        viewport_height
-                    );
-                }
-
-                if (cam.name == "Main Camera L")
-                {
-                    cam.rect = new Rect(
-                        viewport_x + 3 * viewport_width,
-                        viewport_y,
-                        viewport_width,
-                        viewport_height
-                    );
-                }
-
-                if (cam.name == "Main Camera F")
-                {
-                    cam.rect = new Rect(
-                        viewport_x + 4 * viewport_width,
-                        viewport_y,
-                        viewport_width,
-                        viewport_height
-                    );
-                }
-                if (cam.name == "Main Camera U")
-                {
-                    cam.rect = new Rect(
-                        viewport_x + 5 * viewport_width,
-                        viewport_y,
-                        viewport_width,
-                        viewport_height
-                    );
-                }
-                cam.fieldOfView = 90; // set fov to 90 degrees
             }
         }
         else
         {
-            // find and set each camera by name
-            foreach (Camera cam in cameras)
+            // Set viewports based on display order (vertical arrangement)
+            for (int i = 0; i < displayOrder.Length; i++)
             {
-                if (cam.name == "Main Camera L")
+                char cameraId = displayOrder[i];
+                foreach (Camera cam in cameras)
                 {
-                    cam.rect = new Rect(viewport_x, viewport_y, viewport_width, viewport_height);
+                    if (cam.name == $"Main Camera {cameraId}")
+                    {
+                        cam.rect = new Rect(
+                            viewport_x,
+                            viewport_y - i * viewport_height,
+                            viewport_width,
+                            viewport_height
+                        );
+                        cam.fieldOfView = 90; // set fov to 90 degrees
+                        break;
+                    }
                 }
-
-                if (cam.name == "Main Camera F")
-                {
-                    cam.rect = new Rect(
-                        viewport_x,
-                        viewport_y - viewport_height,
-                        viewport_width,
-                        viewport_height
-                    );
-                }
-
-                if (cam.name == "Main Camera R")
-                {
-                    cam.rect = new Rect(
-                        viewport_x,
-                        viewport_y - 2 * viewport_height,
-                        viewport_width,
-                        viewport_height
-                    );
-                }
-
-                if (cam.name == "Main Camera B")
-                {
-                    cam.rect = new Rect(
-                        viewport_x,
-                        viewport_y - 3 * viewport_height,
-                        viewport_width,
-                        viewport_height
-                    );
-                }
-                cam.fieldOfView = 90; // set fov to 90 degrees
             }
         }
     }
