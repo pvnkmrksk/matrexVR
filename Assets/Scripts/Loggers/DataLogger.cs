@@ -7,191 +7,256 @@ using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
 
-// Base class for all data loggers
+/// <summary>
+/// Base class for all data loggers in the system.
+/// 
+/// This class provides functionality to log data to CSV files, including:
+/// - Standard data columns like time, position, and rotation
+/// - Optional ZMQ data columns for sensor information
+/// - Support for additional custom columns defined by derived classes
+/// 
+/// To create a custom logger:
+/// 1. Create a new class that inherits from DataLogger
+/// 2. Call AddColumns() in Start() to define your custom columns
+/// 3. Override CollectAdditionalData() to populate your custom data
+/// </summary>
 public class DataLogger : MonoBehaviour
 {
     // Path to the directory where the log file will be saved
     protected string directoryPath;
 
-    // Path to the log file, with get method to allow access from derived classes
+    /// <summary>
+    /// Path to the log file, accessible by derived classes
+    /// </summary>
     protected string logPath { get; private set; }
 
-    protected string line; // Or 'public string line;'
+    /// <summary>
+    /// Current line of data being built before writing to log
+    /// </summary>
+    protected string line;
 
-    // StreamWriter used to write to the log file
+    /// <summary>
+    /// StreamWriter used to write to the log file
+    /// </summary>
     protected StreamWriter logFile;
 
-    // List of lines to be written to the log file
+    /// <summary>
+    /// Buffer for lines to be written to the log file
+    /// </summary>
     protected List<string> bufferedLines;
 
-    // Flags to indicate whether logging and buffering are enabled
+    /// <summary>
+    /// Flags controlling the logging behavior
+    /// </summary>
     protected bool isLogging;
     protected bool isBuffering;
-
-    // Flag to indicate whether the current line is the first line
     protected bool isFirstLine;
 
-    // ZMQ listener for receiving data
+    /// <summary>
+    /// ZMQ listener for receiving sensor data
+    /// </summary>
     protected ZmqListener zmq;
 
-    // Flag to indicate whether to include ZMQ data in the log
+    /// <summary>
+    /// Flag to include ZMQ sensor data in the log. Set to false to disable.
+    /// </summary>
     public bool includeZmqData = true;
 
-    //Maincontroller
-    private MainController mainController;
+    /// <summary>
+    /// Reference to the main controller for accessing scene information
+    /// </summary>
+    protected MainController mainController;
 
-    // List of additional headers to be added
+    /// <summary>
+    /// Lists of headers and values for additional data columns
+    /// </summary>
     protected List<string> additionalHeaders = new List<string>();
-
-    // Dictionary to store additional data to be logged
     protected Dictionary<string, object> additionalData = new Dictionary<string, object>();
 
-    // Method to add additional headers
-    protected void AddHeader(string header)
+    /// <summary>
+    /// Standard columns included in all log files
+    /// </summary>
+    private readonly string[] baseColumns = new string[] {
+        "Current Time", "VR", "Scene", "CurrentSequenceScene",
+        "ConfigFile", "CurrentTrial", "CurrentStep",
+        "GameObjectPosX", "GameObjectPosY", "GameObjectPosZ",
+        "GameObjectRotX", "GameObjectRotY", "GameObjectRotZ"
+    };
+
+    /// <summary>
+    /// ZMQ sensor data columns (only included if includeZmqData is true)
+    /// </summary>
+    private readonly string[] zmqColumns = new string[] {
+        "SensPosX", "SensPosY", "SensPosZ",
+        "SensRotX", "SensRotY", "SensRotZ"
+    };
+
+    /// <summary>
+    /// Adds one or more column headers to the log file.
+    /// Call this method in Start() before base.Start() to ensure headers are included.
+    /// </summary>
+    /// <param name="headers">One or more header names to add</param>
+    /// <example>
+    /// AddColumns("Temperature", "Humidity", "Pressure");
+    /// </example>
+    public void AddColumns(params string[] headers)
     {
-        additionalHeaders.Add(header);
+        foreach (string header in headers)
+        {
+            if (!additionalHeaders.Contains(header))
+            {
+                additionalHeaders.Add(header);
+            }
+        }
     }
 
-    // Method to set additional data
-    protected void SetAdditionalData(string key, object value)
+    /// <summary>
+    /// Sets a value for a column in the current log line.
+    /// Only works for columns that were previously added with AddColumns().
+    /// </summary>
+    /// <param name="key">The column header name</param>
+    /// <param name="value">The value to log in this column</param>
+    /// <example>
+    /// SetData("Temperature", 23.5f);
+    /// </example>
+    public void SetData(string key, object value)
     {
         additionalData[key] = value;
     }
 
-    // Called at the start of the scene
+    /// <summary>
+    /// Sets multiple column values at once from a dictionary.
+    /// Only values for columns previously added with AddColumns() will be used.
+    /// </summary>
+    /// <param name="data">Dictionary mapping column names to values</param>
+    /// <example>
+    /// var data = new Dictionary<string, object> {
+    ///     { "Temperature", 23.5f },
+    ///     { "Humidity", 60 }
+    /// };
+    /// SetData(data);
+    /// </example>
+    public void SetData(Dictionary<string, object> data)
+    {
+        foreach (var kvp in data)
+        {
+            additionalData[kvp.Key] = kvp.Value;
+        }
+    }
+
+    /// <summary>
+    /// Initializes the logger, finds dependencies, and sets up the log file.
+    /// When overriding in derived classes, call base.Start() after adding your columns.
+    /// </summary>
     protected virtual void Start()
     {
-        // find the MainController
+        // Find dependencies
         mainController = FindObjectOfType<MainController>();
+        zmq = GetComponent<ZmqListener>();
 
-        // Find the MasterDataLogger in the scene
+        // Find master logger to get directory path
         MasterDataLogger masterDataLogger = FindObjectOfType<MasterDataLogger>();
         if (masterDataLogger != null)
         {
-            // Set the directory path from the MasterDataLogger
             directoryPath = masterDataLogger.directoryPath;
-
-            // Initialize the list of buffered lines
             bufferedLines = new List<string>();
 
-            // Enable logging and buffering
+            // Enable logging
             isLogging = true;
             isBuffering = true;
-
-            // Set isFirstLine to true
             isFirstLine = true;
 
-            // Get the ZmqListener component attached to the same GameObject
-            zmq = GetComponent<ZmqListener>();
-            if (zmq == null)
-            {
-                Debugger.Log(
-                    "ZmqListener component not found in the GameObject. Please attach ZmqListener script to the GameObject.",
-                    1
-                );
-            }
-
-            // Initialize the log file and start the routine to flush buffered lines
+            // Initialize log file
             InitLog();
             StartCoroutine(FlushBufferedLinesRoutine());
         }
         else
         {
-            Debugger.Log("MasterDataLogger not found.");
+            Debug.LogError("MasterDataLogger not found, logging disabled");
         }
     }
 
-    // Initializes the log file
+    /// <summary>
+    /// Initializes the log file, creates the CSV file and writes the header row.
+    /// This is called automatically by Start(), but can be called manually to reset the log.
+    /// </summary>
     public virtual void InitLog()
     {
         // Get the timestamp from the MasterDataLogger
         string timestamp = FindObjectOfType<MasterDataLogger>().timestamp;
-
-        // Get the name of the GameObject the script is attached to
         string gameObjectName = this.gameObject.name;
-
-        // Get the scene name
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
-        // Set the path to the log file
+        // Set log path
         logPath = Path.Combine(directoryPath, $"{timestamp}_{sceneName}_{gameObjectName}_.csv");
 
-        // Create or open the log file in append mode
-        FileStream fileStream = new FileStream(
-            logPath,
-            FileMode.Append,
-            FileAccess.Write,
-            FileShare.Read
-        );
+        // Open/create log file
+        FileStream fileStream = new FileStream(logPath, FileMode.Append, FileAccess.Write, FileShare.Read);
         logFile = new StreamWriter(fileStream);
 
-        // Check if the file was just created or if it existed before
+        // Write headers if new file
         if (fileStream.Length == 0)
         {
-            // Write the header to the log file depending on whether ZMQ data is included
+            // Write base columns
+            string headerLine = string.Join(",", baseColumns);
+
+            // Add ZMQ columns if enabled
             if (includeZmqData)
             {
-                logFile.Write(
-                    "Current Time,VR,Scene,CurrentSequenceScene,ConfigFile,CurrentTrial,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ"
-                );
-            }
-            else
-            {
-                logFile.Write(
-                    "Current Time,VR,Scene,CurrentSequenceScene,ConfigFile,CurrentTrial,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
-                );
+                headerLine += "," + string.Join(",", zmqColumns);
             }
 
-            // Add any additional headers
-            foreach (string header in additionalHeaders)
+            // Add additional columns
+            if (additionalHeaders.Count > 0)
             {
-                logFile.Write($",{header}");
+                headerLine += "," + string.Join(",", additionalHeaders);
             }
+
+            logFile.Write(headerLine);
+            logFile.Flush();
         }
 
-        Debugger.Log("Writing data to: " + logPath, 3);
+        Debug.Log($"Logging to: {logPath}");
     }
 
+    /// <summary>
+    /// Public method to trigger a log update manually from outside this class.
+    /// </summary>
     public void UpdateLogger()
     {
-        /*
-            Making the Update() method public would indeed solve the immediate problem, but it's generally not a good practice. Here's why:
-
-            1. Encapsulation: In object-oriented programming, it's a good practice to hide the internal workings of a class and only expose what's necessary. This is known as encapsulation. The Update() method is part of Unity's MonoBehaviour lifecycle and is intended to be used internally by the class itself. By keeping it protected, you're adhering to the principle of encapsulation.
-
-            2. Preventing unintended usage: If you make the Update() method public, it can be called from anywhere. This could lead to unintended behavior if, for example, another script calls it at the wrong time or more often than expected.
-
-            3. Maintaining Unity's conventions: Unity's MonoBehaviour methods like Start(), Update(), Awake(), etc., are typically kept private or protected. This is a convention in Unity development, and following it makes your code easier to understand for other Unity developers.
-
-            By creating a separate public method (UpdateLogger()) that calls Update(), you're providing a clear interface for other scripts to interact with, while keeping the internal workings of your class hidden. This is a cleaner and more elegant solution that adheres to good programming practices.
-        */
         Update();
     }
 
-    // Called every frame
+    /// <summary>
+    /// Called every frame to log the current data.
+    /// </summary>
     protected virtual void Update()
     {
-        // Prepare and log the data
         PrepareLogData();
         LogData(line);
     }
 
-    // Prepares a line of data to be logged
+    /// <summary>
+    /// Prepares a line of data to be logged by gathering all information.
+    /// The standard flow is:
+    /// 1. Clear any previous additional data
+    /// 2. Build the base data (time, position, etc.)
+    /// 3. Call CollectAdditionalData() to let derived classes add their data
+    /// 4. Format everything into the line variable
+    /// </summary>
     protected virtual void PrepareLogData()
     {
-        // Clear any previous additional data
+        // Clear previous data
         additionalData.Clear();
 
-        // Get common data
-        string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"); // The current time
-        string vr = this.gameObject.name; // The name of the GameObject this script is attached to
-        string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name; // The name of the current scene
+        // Build base data
+        string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        string vr = this.gameObject.name;
+        string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        Vector3 position = this.transform.position;
+        Vector3 rotation = this.transform.rotation.eulerAngles;
 
-        // The current position and rotation of the GameObject this script is attached to
-        Vector3 gameObjectPosition = this.transform.position;
-        Quaternion gameObjectRotation = this.transform.rotation;
-
-        // Get current sequence step from mainController
+        // Get sequence data
         string currentSequenceScene = "Unknown";
         string configFileName = "";
         int currentTrial = 0;
@@ -199,34 +264,34 @@ public class DataLogger : MonoBehaviour
 
         if (mainController != null)
         {
-            SequenceStep currentSequenceStep = mainController.GetCurrentSequenceStep();
-            currentSequenceScene = currentSequenceStep != null ? currentSequenceStep.sceneName : "Unknown";
-            if (currentSequenceStep != null && currentSequenceStep.parameters != null && currentSequenceStep.parameters.ContainsKey("configFile"))
+            SequenceStep step = mainController.GetCurrentSequenceStep();
+            if (step != null)
             {
-                configFileName = currentSequenceStep.parameters["configFile"].ToString();
+                currentSequenceScene = step.sceneName;
+                if (step.parameters != null && step.parameters.ContainsKey("configFile"))
+                {
+                    configFileName = step.parameters["configFile"].ToString();
+                }
             }
             currentTrial = mainController.currentTrial;
             currentStep = mainController.currentStep;
         }
 
-        // Prepare the data, including currentSequenceScene and configFileName
-        line =
-            $"\n{currentTime},{vr},{scene},{currentSequenceScene},{configFileName},{currentTrial},{currentStep},{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
+        // Create base line
+        line = $"\n{currentTime},{vr},{scene},{currentSequenceScene},{configFileName},{currentTrial},{currentStep},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z}";
 
-        // Add ZMQ data if includeZmqData is true
+        // Add ZMQ data
         if (includeZmqData && zmq != null)
         {
-            Vector3 sensPosition = zmq.pose.position; // The position of the ZMQ pose
-            Quaternion sensRotation = zmq.pose.rotation; // The rotation of the ZMQ pose
-
-            line +=
-                $",{sensPosition.x},{sensPosition.y},{sensPosition.z},{sensRotation.eulerAngles.x},{sensRotation.eulerAngles.y},{sensRotation.eulerAngles.z}";
+            Vector3 sensPos = zmq.pose.position;
+            Vector3 sensRot = zmq.pose.rotation.eulerAngles;
+            line += $",{sensPos.x},{sensPos.y},{sensPos.z},{sensRot.x},{sensRot.y},{sensRot.z}";
         }
 
-        // Let derived classes populate additional data
+        // Allow subclasses to add additional data
         CollectAdditionalData();
 
-        // Add any additional data
+        // Add additional column data
         foreach (var header in additionalHeaders)
         {
             if (additionalData.TryGetValue(header, out object value))
@@ -240,76 +305,85 @@ public class DataLogger : MonoBehaviour
         }
     }
 
-    // Virtual method for derived classes to populate additionalData 
+    /// <summary>
+    /// Override this method in derived classes to add custom data to the log.
+    /// Use SetData() to add values for columns that were added with AddColumns().
+    /// This method is called automatically by PrepareLogData().
+    /// </summary>
+    /// <example>
+    /// protected override void CollectAdditionalData()
+    /// {
+    ///     // Add custom data
+    ///     SetData("Temperature", GetComponent<TemperatureSensor>().temperature);
+    ///     SetData("Humidity", GetComponent<HumiditySensor>().humidity);
+    /// }
+    /// </example>
     protected virtual void CollectAdditionalData()
     {
-        // Base implementation does nothing, derived classes override this
+        // Base implementation does nothing
     }
 
-    // Logs a line of data
+    /// <summary>
+    /// Logs a line of data to the file or buffer.
+    /// </summary>
+    /// <param name="line">The line to log</param>
     protected virtual void LogData(string line)
     {
-        // If buffering is enabled...
         if (isBuffering)
         {
-            // If this is the first line, set isFirstLine to false
             if (isFirstLine)
             {
                 isFirstLine = false;
             }
-            // Otherwise, add the line to the list of buffered lines
             else
             {
                 bufferedLines.Add(line);
             }
         }
-        // If buffering is not enabled, write the line to the log file
         else
         {
             WriteLogLine(line);
         }
     }
 
-    // Called when the GameObject is destroyed
+    /// <summary>
+    /// Called when the GameObject is destroyed.
+    /// Cleans up resources and flushes remaining data.
+    /// </summary>
     protected virtual void OnDestroy()
     {
-        // Disable logging and buffering
         isLogging = false;
         isBuffering = false;
-
-        // Dispose of the StreamWriter
         logFile?.Dispose();
     }
 
-    // Flushes the buffered lines to the log file
+    /// <summary>
+    /// Asynchronously flushes buffered lines to the log file.
+    /// </summary>
     async Task FlushBufferedLines()
     {
-        // Copy the buffered lines to a new list and clear the buffer
         var linesToWrite = new List<string>(bufferedLines);
         bufferedLines.Clear();
 
-        // Write each line to the log file
         foreach (var line in linesToWrite)
         {
             await logFile.WriteLineAsync(line);
         }
 
-        // Flush the StreamWriter
         await logFile.FlushAsync();
     }
 
-    // Coroutine to flush the buffered lines to the log file
+    /// <summary>
+    /// Coroutine that periodically flushes buffered lines to the log file.
+    /// </summary>
     IEnumerator FlushBufferedLinesRoutine()
     {
-        // While logging is enabled...
         while (isLogging)
         {
-            // If there are buffered lines, flush them to the log file
             if (bufferedLines.Count > 0)
             {
                 yield return FlushBufferedLines();
             }
-            // Otherwise, yield null
             else
             {
                 yield return null;
@@ -317,16 +391,13 @@ public class DataLogger : MonoBehaviour
         }
     }
 
-    // Writes a line to the log file
+    /// <summary>
+    /// Writes a line to the log file.
+    /// </summary>
+    /// <param name="line">The line to write</param>
     void WriteLogLine(string line)
     {
-        // Convert the line to bytes
         byte[] lineBytes = Encoding.UTF8.GetBytes(line);
-
-        // Write the bytes to the log file
         logFile.BaseStream.Write(lineBytes, 0, lineBytes.Length);
-
-        // Write a newline character to the log file
-        // logFile.BaseStream.WriteByte((byte)'\n');
     }
 }
