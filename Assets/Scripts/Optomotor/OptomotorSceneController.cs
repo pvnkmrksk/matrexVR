@@ -250,43 +250,51 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         // Update the SinusoidalGrating for visual appearance
         if (sinusoidalGrating != null)
         {
-            // Convert hex string to Color
             Color color1 = HexToColor(stimulus.color1);
             Color color2 = HexToColor(stimulus.color2);
 
             sinusoidalGrating.SetGratingParameters(
                 stimulus.frequency,
                 stimulus.contrast,
+                stimulus.dutyCycle,
                 color1,
                 color2
             );
-            Debug.Log($"Applied grating parameters: Freq={stimulus.frequency}, Contrast={stimulus.contrast}");
+            Debug.Log($"Applied grating parameters");
         }
         else
         {
             Debug.LogError("sinusoidalGrating is null when trying to apply configuration");
         }
 
-        // Update all ClosedLoop components in the scene (camera prefabs)
-        foreach (ClosedLoop closedLoop in closedLoopComponents)
-        {
-            if (closedLoop != null)
-            {
-                closedLoop.SetClosedLoopOrientation(stimulus.closedLoopOrientation);
-                closedLoop.SetClosedLoopPosition(stimulus.closedLoopPosition);
-                Debug.Log($"Updated ClosedLoop component on {closedLoop.gameObject.name}");
-            }
-        }
-
         // Update logging data
+        loggingData.Clear();
         loggingData["CurrentStimulusIndex"] = stimulusIndex;
         loggingData["Frequency"] = stimulus.frequency;
         loggingData["Contrast"] = stimulus.contrast;
+        loggingData["DutyCycle"] = stimulus.dutyCycle;
         loggingData["Speed"] = stimulus.speed;
         loggingData["RotationAxis"] = stimulus.rotationAxis;
         loggingData["ClockwiseRotation"] = stimulus.clockwise;
         loggingData["ClosedLoopOrientation"] = stimulus.closedLoopOrientation;
         loggingData["ClosedLoopPosition"] = stimulus.closedLoopPosition;
+
+        // Force data logger to write current state
+        if (dataLogger != null)
+        {
+            if (dataLogger is OptomotorDataLogger optomotorLogger)
+            {
+                optomotorLogger.TriggerLogging();
+            }
+            else
+            {
+                Debug.LogError("dataLogger is not an OptomotorDataLogger");
+            }
+        }
+        else
+        {
+            Debug.LogError("dataLogger is null when trying to log data");
+        }
     }
 
     private Color HexToColor(string hex)
@@ -326,19 +334,36 @@ public class OptomotorConfig
 [System.Serializable]
 public class OptomotorStimulus
 {
-    // Rotation parameters
+    [Tooltip("Duration of the stimulus in seconds")]
     public float duration = 10.0f;
+
+    [Tooltip("Rotation speed in degrees per second")]
     public float speed = 20.0f;
+
+    [Tooltip("Whether the rotation is clockwise")]
     public bool clockwise = true;
+
+    [Tooltip("Axis of rotation (Yaw, Pitch, or Roll)")]
     public string rotationAxis = "Yaw";
 
-    // Grating parameters
+    [Tooltip("Spatial frequency of the grating in cycles per revolution")]
     public float frequency = 4.0f;
+
+    [Tooltip("Contrast of the grating (0 = no contrast, 1 = maximum contrast)")]
     public float contrast = 0.5f;
+
+    [Tooltip("Duty cycle of the grating (0 = all dark, 1 = all light, 0.5 = equal dark/light)")]
+    public float dutyCycle = 0.5f;
+
+    [Tooltip("First color of the grating in hex format (e.g. #000000)")]
     public string color1 = "#000000";
+
+    [Tooltip("Second color of the grating in hex format (e.g. #FFFFFF)")]
     public string color2 = "#FFFFFF";
 
-    // Closed loop parameters
+    [Tooltip("Whether to use closed-loop orientation control")]
     public bool closedLoopOrientation = false;
+
+    [Tooltip("Whether to use closed-loop position control")]
     public bool closedLoopPosition = false;
 }

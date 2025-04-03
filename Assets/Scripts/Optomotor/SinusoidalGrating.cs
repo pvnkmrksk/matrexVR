@@ -5,38 +5,53 @@ public class SinusoidalGrating : MonoBehaviour
 {
     [Header("Texture Settings")]
     [SerializeField]
+    [Tooltip("Width of the texture in pixels")]
     private int textureWidth = 256;
 
     [SerializeField]
+    [Tooltip("Height of the texture in pixels")]
     private int textureHeight = 256;
 
     [Header("Sinusoidal Settings")]
     [SerializeField]
     [Range(0f, 10f)]
+    [Tooltip("Spatial frequency of the grating in cycles per revolution")]
     private float frequency = 4f;
 
     [SerializeField]
     [Range(0f, 1f)]
+    [Tooltip("Contrast of the grating (0 = no contrast, 1 = maximum contrast)")]
     private float contrast = 0.5f;
+
+    [SerializeField]
+    [Range(0f, 1f)]
+    [Tooltip("Duty cycle of the grating (0 = all dark, 1 = all light, 0.5 = equal dark/light)")]
+    private float dutyCycle = 0.5f;
 
     [Header("Color Settings")]
     [SerializeField]
+    [Tooltip("First color of the grating (typically dark color)")]
     private Color color1 = Color.black;
 
     [SerializeField]
+    [Tooltip("Second color of the grating (typically light color)")]
     private Color color2 = Color.white;
 
     [Header("Cylinder Settings")]
     [SerializeField]
+    [Tooltip("Radius of the cylinder in meters")]
     private float cylinderRadius = 1f;
 
     [SerializeField]
+    [Tooltip("Height of the cylinder in meters")]
     private float cylinderHeight = 2f;
 
     [SerializeField]
+    [Tooltip("Number of segments around the cylinder")]
     private int cylinderSegments = 32;
 
     [SerializeField]
+    [Tooltip("Number of stacks along the height of the cylinder")]
     private int cylinderStacks = 16;
 
     private Texture2D texture;
@@ -87,9 +102,9 @@ public class SinusoidalGrating : MonoBehaviour
     }
 
     // Public method for OptomotorSceneController to update grating parameters
-    public void SetGratingParameters(float newFrequency, float newContrast, Color newColor1, Color newColor2)
+    public void SetGratingParameters(float newFrequency, float newContrast, float newDutyCycle, Color newColor1, Color newColor2)
     {
-        Debug.Log($"SetGratingParameters() - Frequency: {newFrequency}, Contrast: {newContrast}, Color1: {newColor1}, Color2: {newColor2}");
+        Debug.Log($"SetGratingParameters() - Frequency: {newFrequency}, Contrast: {newContrast}, DutyCycle: {newDutyCycle}, Color1: {newColor1}, Color2: {newColor2}");
 
         // Check if parameters are actually changing
         bool paramsChanged = false;
@@ -105,6 +120,13 @@ public class SinusoidalGrating : MonoBehaviour
         {
             Debug.Log($"Contrast changed from {contrast} to {newContrast}");
             contrast = newContrast;
+            paramsChanged = true;
+        }
+
+        if (dutyCycle != newDutyCycle)
+        {
+            Debug.Log($"DutyCycle changed from {dutyCycle} to {newDutyCycle}");
+            dutyCycle = newDutyCycle;
             paramsChanged = true;
         }
 
@@ -148,7 +170,7 @@ public class SinusoidalGrating : MonoBehaviour
 
     private void UpdateTexture()
     {
-        Debug.Log($"Updating texture with frequency={frequency}, contrast={contrast}");
+        Debug.Log($"Updating texture with frequency={frequency}, contrast={contrast}, dutyCycle={dutyCycle}");
 
         for (int x = 0; x < textureWidth; x++)
         {
@@ -162,6 +184,21 @@ public class SinusoidalGrating : MonoBehaviour
 
                 // Apply contrast function
                 float contrastValue = ApplyContrast(normalSine, contrast);
+
+                // Apply duty cycle for discrete case (high contrast)
+                if (contrast >= 0.99f)
+                {
+                    // For each cycle, we want:
+                    // - dutyCycle portion to be white (1)
+                    // - (1-dutyCycle) portion to be black (0)
+
+                    // Calculate position within current cycle (0 to 1)
+                    float cyclePosition = (u * frequency) % 1f;
+
+                    // If we're in the first 'dutyCycle' portion of the cycle, make it white
+                    // Otherwise make it black
+                    contrastValue = cyclePosition < dutyCycle ? 1f : 0f;
+                }
 
                 // Mix colors
                 Color c = Color.Lerp(color1, color2, contrastValue);

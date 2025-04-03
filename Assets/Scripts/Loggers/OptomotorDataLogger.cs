@@ -20,6 +20,15 @@ public class OptomotorDataLogger : DataLogger
         }
     }
 
+    // Public method to trigger logging from the scene controller
+    public void TriggerLogging()
+    {
+        // Prepare the log data first
+        PrepareLogData();
+        // Then call the base LogData with the prepared line
+        LogData(line);
+    }
+
     // Override the PrepareLogData method to include optomotor-specific data
     protected override void PrepareLogData()
     {
@@ -47,6 +56,11 @@ public class OptomotorDataLogger : DataLogger
 
                 if (optomotorData.TryGetValue("Contrast", out object contrast))
                     line += $",{contrast}";
+                else
+                    line += ",";
+
+                if (optomotorData.TryGetValue("DutyCycle", out object dutyCycle))
+                    line += $",{dutyCycle}";
                 else
                     line += ",";
 
@@ -106,7 +120,7 @@ public class OptomotorDataLogger : DataLogger
                 // Open the file for appending and add the headers
                 using (StreamWriter writer = File.AppendText(base.logPath))
                 {
-                    writer.Write(",StimulusIndex,Frequency,Contrast,Speed,RotationAxis,ClockwiseRotation,ClosedLoopOrientation,ClosedLoopPosition");
+                    writer.Write(",StimulusIndex,Frequency,Contrast,DutyCycle,Speed,RotationAxis,ClockwiseRotation,ClosedLoopOrientation,ClosedLoopPosition");
                 }
 
                 // Reopen the log file
