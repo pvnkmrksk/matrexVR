@@ -587,6 +587,7 @@ MonoBehaviour:
   drumPrefab: {fileID: 1565923041521379133, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
   drumObjectName: OptomotorDrum
   drumRadius: 1
+  drumObject: {fileID: 0}
 --- !u!4 &1643545297
 Transform:
   m_ObjectHideFlags: 0
@@ -609,7 +610,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1643545295}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b02d0e6819ba48488252b31ccd532d8, type: 3}
   m_Name: 

@@ -8,100 +8,43 @@ using System;
 public class OptomotorSceneController : MonoBehaviour, ISceneController
 {
     [SerializeField] private GameObject drumPrefab;
-    [SerializeField] private string drumObjectName = "OptomotorDrum";
-    [SerializeField] private float drumRadius = 1.0f; // Default drum radius if creating from scratch
 
     private GameObject drumObject;
     private DrumRotator drumRotator;
     private SinusoidalGrating sinusoidalGrating;
-    private DataLogger dataLogger;
-
-    // Reference to camera objects that handle response/feedback
     private List<ClosedLoop> closedLoopComponents = new List<ClosedLoop>();
-
     private OptomotorConfig optomotorConfig;
     private int currentStimulusIndex = 0;
     private bool isRunning = false;
-
-    // Dictionary to store the timestamp for logging
     private Dictionary<string, object> loggingData = new Dictionary<string, object>();
 
     void Awake()
     {
-        Debug.Log($"OptomotorSceneController.Awake() - {gameObject.name}");
-
-        // Create the drum object - per user comment, we don't search but create it
         CreateDrumObject();
-
-        // Find all ClosedLoop components in the scene (these are on camera prefabs)
         FindClosedLoopComponents();
     }
 
     private void CreateDrumObject()
     {
-        // Create drum from prefab if available
-        if (drumPrefab != null)
+        if (drumPrefab == null)
         {
-            drumObject = Instantiate(drumPrefab);
-            drumObject.name = drumObjectName;
-            Debug.Log($"Created drum object from prefab: {drumObjectName}");
-        }
-        else
-        {
-            // Create a basic drum object from scratch
-            drumObject = new GameObject(drumObjectName);
-            Debug.Log($"Created basic drum object: {drumObjectName}");
+            Debug.LogError("Drum prefab not assigned");
+            return;
         }
 
-        if (drumObject != null)
-        {
-            // Set drum position to center of scene
-            drumObject.transform.position = Vector3.zero;
-
-            // Get or add required components for stimulus generation
-            drumRotator = drumObject.GetComponent<DrumRotator>();
-            if (drumRotator == null)
-            {
-                drumRotator = drumObject.AddComponent<DrumRotator>();
-                Debug.Log("Added DrumRotator component");
-            }
-
-            sinusoidalGrating = drumObject.GetComponent<SinusoidalGrating>();
-            if (sinusoidalGrating == null)
-            {
-                sinusoidalGrating = drumObject.AddComponent<SinusoidalGrating>();
-                Debug.Log("Added SinusoidalGrating component");
-            }
-
-            // Add data logger if needed
-            dataLogger = drumObject.GetComponent<DataLogger>();
-            if (dataLogger == null)
-            {
-                dataLogger = drumObject.AddComponent<OptomotorDataLogger>();
-                Debug.Log("Added OptomotorDataLogger component");
-            }
-        }
-        else
-        {
-            Debug.LogError("Failed to create drum object.");
-        }
+        drumObject = Instantiate(drumPrefab);
+        drumRotator = drumObject.GetComponent<DrumRotator>();
+        sinusoidalGrating = drumObject.GetComponent<SinusoidalGrating>();
+        // drumObject.AddComponent<OptomotorDataLogger>();
     }
 
     private void FindClosedLoopComponents()
     {
-        // Clear previous references
         closedLoopComponents.Clear();
-
-        // Find all ClosedLoop components in the scene
         ClosedLoop[] foundComponents = FindObjectsOfType<ClosedLoop>();
         if (foundComponents != null && foundComponents.Length > 0)
         {
             closedLoopComponents.AddRange(foundComponents);
-            Debug.Log($"Found {closedLoopComponents.Count} ClosedLoop components in the scene");
-        }
-        else
-        {
-            Debug.LogWarning("No ClosedLoop components found in the scene. Closed-loop functionality will be disabled.");
         }
     }
 
@@ -232,7 +175,7 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         OptomotorStimulus stimulus = optomotorConfig.stimuli[stimulusIndex];
         Debug.Log($"Applying stimulus {stimulusIndex}: Speed={stimulus.speed}, Clockwise={stimulus.clockwise}, Axis={stimulus.rotationAxis}");
 
-        // Update the DrumRotator for visual stimulus
+        // Update the DrumRotator
         if (drumRotator != null)
         {
             drumRotator.SetRotationParameters(
@@ -240,14 +183,9 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
                 stimulus.clockwise,
                 stimulus.rotationAxis
             );
-            Debug.Log($"Applied rotation parameters to drum");
-        }
-        else
-        {
-            Debug.LogError("drumRotator is null when trying to apply configuration");
         }
 
-        // Update the SinusoidalGrating for visual appearance
+        // Update the SinusoidalGrating
         if (sinusoidalGrating != null)
         {
             Color color1 = HexToColor(stimulus.color1);
@@ -260,11 +198,6 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
                 color1,
                 color2
             );
-            Debug.Log($"Applied grating parameters");
-        }
-        else
-        {
-            Debug.LogError("sinusoidalGrating is null when trying to apply configuration");
         }
 
         // Update logging data
@@ -278,23 +211,6 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         loggingData["ClockwiseRotation"] = stimulus.clockwise;
         loggingData["ClosedLoopOrientation"] = stimulus.closedLoopOrientation;
         loggingData["ClosedLoopPosition"] = stimulus.closedLoopPosition;
-
-        // Force data logger to write current state
-        if (dataLogger != null)
-        {
-            if (dataLogger is OptomotorDataLogger optomotorLogger)
-            {
-                optomotorLogger.TriggerLogging();
-            }
-            else
-            {
-                Debug.LogError("dataLogger is not an OptomotorDataLogger");
-            }
-        }
-        else
-        {
-            Debug.LogError("dataLogger is null when trying to log data");
-        }
     }
 
     private Color HexToColor(string hex)
@@ -316,6 +232,11 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
     public Dictionary<string, object> GetLoggingData()
     {
         return loggingData;
+    }
+
+    public Transform GetDrumTransform()
+    {
+        return drumObject?.transform;
     }
 
     void OnDestroy()
