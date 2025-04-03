@@ -14,7 +14,6 @@ public class DataLogger : MonoBehaviour
     protected string directoryPath;
 
     // Path to the log file, with get method to allow access from derived classes
-
     protected string logPath { get; private set; }
 
     protected string line; // Or 'public string line;'
@@ -40,6 +39,24 @@ public class DataLogger : MonoBehaviour
 
     //Maincontroller
     private MainController mainController;
+
+    // List of additional headers to be added
+    protected List<string> additionalHeaders = new List<string>();
+
+    // Dictionary to store additional data to be logged
+    protected Dictionary<string, object> additionalData = new Dictionary<string, object>();
+
+    // Method to add additional headers
+    protected void AddHeader(string header)
+    {
+        additionalHeaders.Add(header);
+    }
+
+    // Method to set additional data
+    protected void SetAdditionalData(string key, object value)
+    {
+        additionalData[key] = value;
+    }
 
     // Called at the start of the scene
     protected virtual void Start()
@@ -124,6 +141,12 @@ public class DataLogger : MonoBehaviour
                     "Current Time,VR,Scene,CurrentSequenceScene,ConfigFile,CurrentTrial,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
                 );
             }
+
+            // Add any additional headers
+            foreach (string header in additionalHeaders)
+            {
+                logFile.Write($",{header}");
+            }
         }
 
         Debugger.Log("Writing data to: " + logPath, 3);
@@ -156,7 +179,10 @@ public class DataLogger : MonoBehaviour
     // Prepares a line of data to be logged
     protected virtual void PrepareLogData()
     {
-        // Collect the necessary information
+        // Clear any previous additional data
+        additionalData.Clear();
+
+        // Get common data
         string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"); // The current time
         string vr = this.gameObject.name; // The name of the GameObject this script is attached to
         string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name; // The name of the current scene
@@ -166,20 +192,29 @@ public class DataLogger : MonoBehaviour
         Quaternion gameObjectRotation = this.transform.rotation;
 
         // Get current sequence step from mainController
-        SequenceStep currentSequenceStep = mainController.GetCurrentSequenceStep();
-        string currentSequenceScene = currentSequenceStep != null ? currentSequenceStep.sceneName : "Unknown";
+        string currentSequenceScene = "Unknown";
         string configFileName = "";
-        if (currentSequenceStep != null && currentSequenceStep.parameters != null && currentSequenceStep.parameters.ContainsKey("configFile"))
+        int currentTrial = 0;
+        int currentStep = 0;
+
+        if (mainController != null)
         {
-            configFileName = currentSequenceStep.parameters["configFile"].ToString();
+            SequenceStep currentSequenceStep = mainController.GetCurrentSequenceStep();
+            currentSequenceScene = currentSequenceStep != null ? currentSequenceStep.sceneName : "Unknown";
+            if (currentSequenceStep != null && currentSequenceStep.parameters != null && currentSequenceStep.parameters.ContainsKey("configFile"))
+            {
+                configFileName = currentSequenceStep.parameters["configFile"].ToString();
+            }
+            currentTrial = mainController.currentTrial;
+            currentStep = mainController.currentStep;
         }
 
         // Prepare the data, including currentSequenceScene and configFileName
         line =
-            $"\n{currentTime},{vr},{scene},{currentSequenceScene},{configFileName},{mainController.currentTrial},{mainController.currentStep},{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
+            $"\n{currentTime},{vr},{scene},{currentSequenceScene},{configFileName},{currentTrial},{currentStep},{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
 
         // Add ZMQ data if includeZmqData is true
-        if (includeZmqData)
+        if (includeZmqData && zmq != null)
         {
             Vector3 sensPosition = zmq.pose.position; // The position of the ZMQ pose
             Quaternion sensRotation = zmq.pose.rotation; // The rotation of the ZMQ pose
@@ -187,6 +222,28 @@ public class DataLogger : MonoBehaviour
             line +=
                 $",{sensPosition.x},{sensPosition.y},{sensPosition.z},{sensRotation.eulerAngles.x},{sensRotation.eulerAngles.y},{sensRotation.eulerAngles.z}";
         }
+
+        // Let derived classes populate additional data
+        CollectAdditionalData();
+
+        // Add any additional data
+        foreach (var header in additionalHeaders)
+        {
+            if (additionalData.TryGetValue(header, out object value))
+            {
+                line += $",{value}";
+            }
+            else
+            {
+                line += ",";
+            }
+        }
+    }
+
+    // Virtual method for derived classes to populate additionalData 
+    protected virtual void CollectAdditionalData()
+    {
+        // Base implementation does nothing, derived classes override this
     }
 
     // Logs a line of data

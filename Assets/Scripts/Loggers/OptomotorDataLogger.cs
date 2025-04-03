@@ -9,48 +9,47 @@ public class OptomotorDataLogger : DataLogger
 
     protected override void Start()
     {
+        // Disable ZMQ data for this logger
+        includeZmqData = false;
+
+        // Add our headers before calling base.Start() so they're included in the header row
+        AddHeader("StimulusIndex");
+        AddHeader("Frequency");
+        AddHeader("Contrast");
+        AddHeader("DutyCycle");
+        AddHeader("Speed");
+        AddHeader("RotationAxis");
+        AddHeader("ClockwiseRotation");
+        AddHeader("ClosedLoopOrientation");
+        AddHeader("ClosedLoopPosition");
+
         base.Start();
         controller = FindObjectOfType<OptomotorSceneController>();
-    }
 
-    public override void InitLog()
-    {
-        base.InitLog();
-
-        // Add only the optomotor-specific headers
-        logFile.Write(",StimulusIndex,Frequency,Contrast,DutyCycle,Speed,RotationAxis,ClockwiseRotation,ClosedLoopOrientation,ClosedLoopPosition");
-    }
-
-    protected override void PrepareLogData()
-    {
-        base.PrepareLogData();
-
+        // Make sure we found the controller
         if (controller == null)
         {
-            Debugger.Log("OptomotorSceneController not found in the scene", 1);
-            return;
+            Debug.LogError("OptomotorSceneController not found in scene");
         }
-
-        // Get the current stimulus data
-        Dictionary<string, object> stimulusData = controller.GetLoggingData();
-
-        // Add stimulus parameters
-        AppendData(stimulusData, "CurrentStimulusIndex");
-        AppendData(stimulusData, "Frequency");
-        AppendData(stimulusData, "Contrast");
-        AppendData(stimulusData, "DutyCycle");
-        AppendData(stimulusData, "Speed");
-        AppendData(stimulusData, "RotationAxis");
-        AppendData(stimulusData, "ClockwiseRotation");
-        AppendData(stimulusData, "ClosedLoopOrientation");
-        AppendData(stimulusData, "ClosedLoopPosition");
     }
 
-    private void AppendData(Dictionary<string, object> data, string key)
+    // Override the new method instead of PrepareLogData
+    protected override void CollectAdditionalData()
     {
-        if (data.TryGetValue(key, out object value))
-            line += $",{value}";
-        else
-            line += ",";
+        // Get the stimulus data and add it to additionalData
+        if (controller != null)
+        {
+            Dictionary<string, object> stimulusData = controller.GetLoggingData();
+            if (stimulusData != null)
+            {
+                foreach (string header in additionalHeaders)
+                {
+                    if (stimulusData.TryGetValue(header, out object value))
+                    {
+                        SetAdditionalData(header, value);
+                    }
+                }
+            }
+        }
     }
 }

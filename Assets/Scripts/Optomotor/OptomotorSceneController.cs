@@ -35,7 +35,7 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         drumObject = Instantiate(drumPrefab);
         drumRotator = drumObject.GetComponent<DrumRotator>();
         sinusoidalGrating = drumObject.GetComponent<SinusoidalGrating>();
-        // drumObject.AddComponent<OptomotorDataLogger>();
+        drumObject.AddComponent<OptomotorDataLogger>();
     }
 
     private void FindClosedLoopComponents()
@@ -202,7 +202,7 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
 
         // Update logging data
         loggingData.Clear();
-        loggingData["CurrentStimulusIndex"] = stimulusIndex;
+        loggingData["StimulusIndex"] = stimulusIndex;
         loggingData["Frequency"] = stimulus.frequency;
         loggingData["Contrast"] = stimulus.contrast;
         loggingData["DutyCycle"] = stimulus.dutyCycle;
@@ -211,6 +211,12 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         loggingData["ClockwiseRotation"] = stimulus.clockwise;
         loggingData["ClosedLoopOrientation"] = stimulus.closedLoopOrientation;
         loggingData["ClosedLoopPosition"] = stimulus.closedLoopPosition;
+
+        Debug.Log($"Updated logging data with {loggingData.Count} entries");
+        foreach (var kvp in loggingData)
+        {
+            Debug.Log($"Logging data: {kvp.Key} = {kvp.Value}");
+        }
     }
 
     private Color HexToColor(string hex)
