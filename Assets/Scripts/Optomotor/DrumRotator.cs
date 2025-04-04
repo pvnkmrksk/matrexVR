@@ -160,10 +160,10 @@ public class DrumRotator : MonoBehaviour
                 // Log progress occasionally
                 frameCount++;
                 elapsedTime += Time.deltaTime;
-                if (frameCount % 60 == 0) // Log every ~60 frames
-                {
-                    Debug.Log($"Drum rotating: Speed={rotationSpeed}, LastAmount={lastRotationAmount}, TotalRotation={totalRotation}, ElapsedTime={elapsedTime}");
-                }
+                // if (frameCount % 60 == 0) // Log every ~60 frames
+                // {
+                //     Debug.Log($"Drum rotating: Speed={rotationSpeed}, LastAmount={lastRotationAmount}, TotalRotation={totalRotation}, ElapsedTime={elapsedTime}");
+                // }
             }
 
             yield return null;

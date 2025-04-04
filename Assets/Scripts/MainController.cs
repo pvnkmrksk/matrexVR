@@ -303,6 +303,7 @@ public class MainController : MonoBehaviour
                 if (config != null)
                 {
                     randomise = config.randomise; // Get the randomise parameter
+                    loopSequence = config.loop; // Set looping based on config
 
                     foreach (SequenceItem item in config.sequences)
                     {
@@ -411,9 +412,9 @@ public class MainController : MonoBehaviour
                 }
                 else
                 {
-                    // End the sequence and return to the ControlScene
-                    SceneManager.LoadScene("ControlScene"); // Transition back to ControlScene
-                    Destroy(this.gameObject); // Destroy the MainController GameObject
+                    // End the sequence and exit the application
+                    Debugger.Log("Sequence completed and looping disabled. Exiting application.", 3);
+                    Application.Quit();
                 }
             }
             else
@@ -470,6 +471,7 @@ public class SequenceStep
 public class SequenceConfig
 {
     public bool randomise = false; // Added field
+    public bool loop = true; // Added field for controlling whether the sequence should loop
     public SequenceItem[] sequences;
 }
 
