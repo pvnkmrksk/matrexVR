@@ -90,8 +90,7 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
 
                 Debug.Log($"Loaded optomotor config with {optomotorConfig.stimuli.Count} stimuli");
 
-                // Copy config file to log directory for reference
-                CopyConfigToLogDirectory(configPath, configFileName);
+                // Config copying is already handled by MainController
             }
             catch (Exception e)
             {
@@ -101,30 +100,6 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         else
         {
             Debug.LogError($"Optomotor config file not found: {configPath}");
-        }
-    }
-
-    private void CopyConfigToLogDirectory(string sourcePath, string configFileName)
-    {
-        MasterDataLogger masterLogger = MasterDataLogger.Instance;
-        if (masterLogger != null)
-        {
-            string timestamp = masterLogger.timestamp;
-            string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-            string destPath = Path.Combine(
-                masterLogger.directoryPath,
-                $"{timestamp}_{sceneName}_{configFileName}"
-            );
-
-            try
-            {
-                File.Copy(sourcePath, destPath);
-                Debug.Log($"Copied optomotor config to: {destPath}");
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Failed to copy config file: {e.Message}");
-            }
         }
     }
 
