@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 public interface ISceneController
 {
@@ -137,32 +138,40 @@ public class MainController : MonoBehaviour
         {
             string jsonText = File.ReadAllText(configPath);
 
-            // First parse the JSON as a dynamic object to get global settings
-            dynamic fullConfig = JsonConvert.DeserializeObject<dynamic>(jsonText);
+            // Parse the JSON using JObject instead of dynamic
+            JObject fullConfig = JObject.Parse(jsonText);
 
             // Extract global target display if it exists
-            if (fullConfig.targetDisplay != null)
+            if (fullConfig["targetDisplay"] != null)
             {
-                globalTargetDisplay = (int)fullConfig.targetDisplay;
+                globalTargetDisplay = fullConfig["targetDisplay"].Value<int>();
                 Debugger.Log($"Found global targetDisplay: {globalTargetDisplay}", 3);
             }
 
             // Parse the configs array
-            SystemConfig[] loadedConfigs = JsonConvert.DeserializeObject<SystemConfig[]>(fullConfig.configs.ToString());
-
-            // Clear existing configs
-            systemConfigs.Clear();
-
-            // Add each config to dictionary with VR ID as key
-            foreach (SystemConfig config in loadedConfigs)
+            JArray configsArray = (JArray)fullConfig["configs"];
+            if (configsArray != null)
             {
-                // Set target display from global setting
-                config.targetDisplay = globalTargetDisplay;
-                systemConfigs[config.vrId] = config;
-                Debugger.Log($"Loaded system config for: {config.vrId} with targetDisplay: {config.targetDisplay}", 3);
-            }
+                SystemConfig[] loadedConfigs = configsArray.ToObject<SystemConfig[]>();
 
-            Debugger.Log($"Successfully loaded system config file: {systemConfigFileName}", 3);
+                // Clear existing configs
+                systemConfigs.Clear();
+
+                // Add each config to dictionary with VR ID as key
+                foreach (SystemConfig config in loadedConfigs)
+                {
+                    // Set target display from global setting
+                    config.targetDisplay = globalTargetDisplay;
+                    systemConfigs[config.vrId] = config;
+                    Debugger.Log($"Loaded system config for: {config.vrId} with targetDisplay: {config.targetDisplay}", 3);
+                }
+
+                Debugger.Log($"Successfully loaded system config file: {systemConfigFileName}", 3);
+            }
+            else
+            {
+                Debugger.Log("No configs array found in system config file", 1);
+            }
 
             // Copy the system config file to the log directory
             if (masterDataLogger != null)
