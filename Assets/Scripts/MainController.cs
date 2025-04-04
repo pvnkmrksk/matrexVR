@@ -33,6 +33,13 @@ public class MainController : MonoBehaviour
     [Range(0, 4)]
     private int logLevel = 0; // 0: All, 1: Error, 2: Warning, 3: Info, 4: Debug
 
+    // Add this flag to control single window mode
+    [SerializeField]
+    private bool preventMultipleWindows = true;
+
+    // Add global display target property
+    private int globalTargetDisplay = 1; // Default value
+
     // In MainController class
     public SequenceStep GetCurrentSequenceStep()
     {
@@ -44,11 +51,11 @@ public class MainController : MonoBehaviour
         return null;
     }
 
-    void Start()
+    void Awake()
     {
-        // Set the log level
+        // Set the log level first
         Debugger.CurrentLogLevel = logLevel;
-        Debugger.Log("MainController.Start()", 3);
+        Debugger.Log("MainController.Awake()", 3);
 
         // Make sure the MainController persists across scene changes
         DontDestroyOnLoad(this.gameObject);
@@ -69,6 +76,48 @@ public class MainController : MonoBehaviour
         // Load system configurations first
         LoadSystemConfigurations();
 
+        // Setup display handling if enabled
+        if (preventMultipleWindows)
+        {
+            HandleDisplaySetup();
+        }
+    }
+
+    // Handle display setup - simplified to use a single display for all VR setups
+    private void HandleDisplaySetup()
+    {
+        // Check if a display argument was provided via command line
+        string[] args = System.Environment.GetCommandLineArgs();
+        for (int i = 0; i < args.Length - 1; i++)
+        {
+            if (args[i].ToLower() == "-display" && int.TryParse(args[i + 1], out int display))
+            {
+                globalTargetDisplay = display;
+                Debugger.Log($"Using command line specified display: {globalTargetDisplay}", 3);
+                break;
+            }
+        }
+
+        // Activate the target display if it exists
+        if (globalTargetDisplay > 0 && Display.displays.Length > globalTargetDisplay)
+        {
+            Display.displays[globalTargetDisplay].Activate();
+            Debugger.Log($"Activated display {globalTargetDisplay}", 3);
+
+            // Apply this display to all cameras in the scene
+            Camera[] allCameras = FindObjectsOfType<Camera>();
+            foreach (Camera cam in allCameras)
+            {
+                cam.targetDisplay = globalTargetDisplay;
+            }
+        }
+    }
+
+    void Start()
+    {
+        // Log that we're starting
+        Debugger.Log("MainController.Start()", 3);
+
         // Load the sequence configuration
         LoadSequenceConfiguration();
     }
@@ -87,8 +136,19 @@ public class MainController : MonoBehaviour
         try
         {
             string jsonText = File.ReadAllText(configPath);
-            // Parse the JSON array directly with Newtonsoft.Json
-            SystemConfig[] loadedConfigs = JsonConvert.DeserializeObject<SystemConfig[]>(jsonText);
+
+            // First parse the JSON as a dynamic object to get global settings
+            dynamic fullConfig = JsonConvert.DeserializeObject<dynamic>(jsonText);
+
+            // Extract global target display if it exists
+            if (fullConfig.targetDisplay != null)
+            {
+                globalTargetDisplay = (int)fullConfig.targetDisplay;
+                Debugger.Log($"Found global targetDisplay: {globalTargetDisplay}", 3);
+            }
+
+            // Parse the configs array
+            SystemConfig[] loadedConfigs = JsonConvert.DeserializeObject<SystemConfig[]>(fullConfig.configs.ToString());
 
             // Clear existing configs
             systemConfigs.Clear();
@@ -96,8 +156,10 @@ public class MainController : MonoBehaviour
             // Add each config to dictionary with VR ID as key
             foreach (SystemConfig config in loadedConfigs)
             {
+                // Set target display from global setting
+                config.targetDisplay = globalTargetDisplay;
                 systemConfigs[config.vrId] = config;
-                Debugger.Log($"Loaded system config for: {config.vrId}", 3);
+                Debugger.Log($"Loaded system config for: {config.vrId} with targetDisplay: {config.targetDisplay}", 3);
             }
 
             Debugger.Log($"Successfully loaded system config file: {systemConfigFileName}", 3);
@@ -226,6 +288,10 @@ public class MainController : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debugger.Log("MainController.OnSceneLoaded()", 3);
+
+        // Clear screen to black immediately after loading
+        ClearScreenToBlack();
+
         SequenceStep currentStepData = sequenceSteps[executionOrder[currentStep]];
 
         // Note: Components will load their own configs based on vrId
@@ -275,6 +341,10 @@ public class MainController : MonoBehaviour
     {
         Debugger.Log("MainController.LoadScene()", 3);
         SyncTimestamp();
+
+        // Clear the screen to black before loading the new scene
+        ClearScreenToBlack();
+
         SceneManager.LoadScene(step.sceneName);
     }
 
@@ -450,6 +520,22 @@ public class MainController : MonoBehaviour
             }
         }
     }
+
+    // Add method to clear screen to black
+    void ClearScreenToBlack()
+    {
+        // This creates a temporary camera to clear the screen to black
+        // It's cheaper than keeping an extra camera around all the time
+        Camera clearCamera = new GameObject("TempClearCamera").AddComponent<Camera>();
+        clearCamera.clearFlags = CameraClearFlags.SolidColor;
+        clearCamera.backgroundColor = Color.black;
+        clearCamera.cullingMask = 0; // Render nothing
+        clearCamera.Render(); // Force a render
+        Destroy(clearCamera.gameObject); // Clean up
+
+        // Also force a GL clear to ensure everything is black
+        GL.Clear(true, true, Color.black);
+    }
 }
 
 [System.Serializable]
@@ -496,6 +582,7 @@ public class SystemConfig
     public int zmqPort = 9872;
     public string vrId = "VR1";
     public string displayOrder = "DRBLFU"; // Default display order: Down, Right, Back, Left, Front, Up
+    public int targetDisplay = 1; // 0 for primary, 1 for secondary display
 }
 
 [System.Serializable]

@@ -27,6 +27,9 @@ public class ViewportSetter : MonoBehaviour
     [SerializeField]
     private string displayOrder = "DRBLFU"; // Default display order
 
+    [SerializeField]
+    private int targetDisplay = 1; // 0 for primary, 1 for secondary display
+
     void Start()
     {
         // set vsyn to true to avoid tearing and 60 fps
@@ -35,6 +38,7 @@ public class ViewportSetter : MonoBehaviour
         // Apply system config at start
         ApplySystemConfig();
 
+        // Apply camera settings
         setViewport();
     }
 
@@ -55,20 +59,15 @@ public class ViewportSetter : MonoBehaviour
             horizontal = config.horizontal;
             displayOrder = config.displayOrder;
 
-            Debug.Log($"Applied system config to {gameObject.name}: Panel={ledPanelWidth}x{ledPanelHeight}, Position={startCol},{startRow}, Horizontal={horizontal}, DisplayOrder={displayOrder}");
+            // Apply target display - this value may have been set from command line by MainController
+            targetDisplay = config.targetDisplay;
+
+            Debug.Log($"Applied system config to {gameObject.name}: Panel={ledPanelWidth}x{ledPanelHeight}, Position={startCol},{startRow}, Horizontal={horizontal}, DisplayOrder={displayOrder}, TargetDisplay={targetDisplay}");
         }
     }
 
     void setViewport()
     {
-        // This method creates viewports for cameras that render a portion of the led panel.
-        // The viewports have the same pixel size as the led panel and are aligned to the top left corner of the screen.
-        // The viewports can be arranged horizontally or vertically depending on the horizontal flag.
-        // The viewports can be updated every frame or only once depending on the interactive flag.
-
-        // Clear the previous frame from the screen with a black color
-        GL.Clear(true, true, Color.black);
-
         // Get the current screen resolution in pixels
         int screen_width = Screen.width;
         int screen_height = Screen.height;
@@ -78,13 +77,17 @@ public class ViewportSetter : MonoBehaviour
         float viewport_height = (float)ledPanelHeight / (float)screen_height;
 
         // Calculate the viewport position as a fraction of the screen size
-        // The position is based on the start row and start column parameters
-        // The position is inverted on the y-axis because the screen origin is at the top left corner
         float viewport_x = (float)startCol * viewport_width;
         float viewport_y = 1.0f - viewport_height - (float)startRow * viewport_height;
 
-        // find all the cameras in the children of this script
+        // Find all the cameras in the children of this script
         Camera[] cameras = GetComponentsInChildren<Camera>();
+
+        // Set all cameras to target the specified display
+        foreach (Camera cam in cameras)
+        {
+            cam.targetDisplay = targetDisplay;
+        }
 
         if (horizontal)
         {
