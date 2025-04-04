@@ -200,6 +200,14 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
             );
         }
 
+        // Apply closed loop settings to all ClosedLoop components
+        foreach (ClosedLoop cl in closedLoopComponents)
+        {
+            Debug.Log($"Setting closed loop values for {cl.gameObject.name}: Orientation={stimulus.closedLoopOrientation}, Position={stimulus.closedLoopPosition}");
+            cl.SetClosedLoopOrientation(stimulus.closedLoopOrientation);
+            cl.SetClosedLoopPosition(stimulus.closedLoopPosition);
+        }
+
         // Update logging data
         loggingData.Clear();
         loggingData["StimulusIndex"] = stimulusIndex;
