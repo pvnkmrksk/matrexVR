@@ -44,7 +44,19 @@ chmod +x install_ubuntu.sh
 ./install_ubuntu.sh
 ```
 
-### Step 2: Install Unity Hub
+
+
+### Step 2: Install MatrexVR
+
+```bash
+# Go back to source folder
+cd ~/src
+
+# Clone MatrexVR repository
+git clone https://github.com/pvnkmrksk/matrexVR.git
+```
+
+### Step 3: Install Unity Hub
 
 ```bash
 # Add Unity's Public Key
@@ -58,7 +70,7 @@ sudo apt update
 sudo apt-get install unityhub
 ```
 
-### Step 3: Launch Unity Hub
+### Step 4: Launch Unity Hub
 
 1. Run Unity Hub from terminal or applications:
    ```bash
@@ -66,24 +78,10 @@ sudo apt-get install unityhub
    ```
 2. Login or create a Unity account
 3. Do not install Unity yet
-
-### Step 4: Install MatrexVR
-
-```bash
-# Go back to source folder
-cd ~/src
-
-# Clone MatrexVR repository
-git clone https://github.com/pvnkmrksk/matrexVR.git
-```
-
-### Step 5: Open MatrexVR in Unity Hub
-
-1. Open Unity Hub
-2. Click Add or Open
-3. Navigate to: `~/src/matrexVR`
-4. Click Open
-5. Accept the recommended LTS version (e.g., 2024.x LTS)
+4. Click Add or Open
+5. Navigate to: `~/src/matrexVR`
+6. Click Open
+7. Accept the recommended LTS version (e.g., 2024.x LTS)
    - Do NOT install Unity 6000 or other non-recommended versions
 
 ### Step 6: Run the Project
