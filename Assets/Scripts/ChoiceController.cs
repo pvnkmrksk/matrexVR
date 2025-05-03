@@ -205,15 +205,26 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 // Load the image bytes
                 byte[] imageBytes = File.ReadAllBytes(fullPath);
                 
-                // Create and load the texture
-                Texture2D skyboxTexture = new Texture2D(2, 2);
+                // Create texture with explicit settings:
+                // - RGBA32 format for full color support
+                // - mipmapChain: false to prevent mipmap generation which can cause seams in panoramic skyboxes
+                // - linear: true for proper color space handling
+                Texture2D skyboxTexture = new Texture2D(
+                    width: 2,
+                    height: 2,
+                    textureFormat: TextureFormat.RGBA32,
+                    mipChain: false,
+                    linear: true
+                );
+                
+                // Load the image data into the texture
                 if (skyboxTexture.LoadImage(imageBytes))
                 {
                     // Create a new material using the skybox shader
                     Material skyboxMaterial = new Material(Shader.Find("Skybox/Panoramic"));
                     skyboxMaterial.mainTexture = skyboxTexture;
                     
-                    // Apply the skybox material
+                    // Apply the skybox material to the scene
                     RenderSettings.skybox = skyboxMaterial;
                 }
                 else
