@@ -4,10 +4,10 @@
       "type": "ScalingCylinder",
       "position": {
         "radius": 60,
-        "angle": -90.0,
+        "angle": -65.0,
         "height": 0
       },
-      "material": "Blue",
+      "material": "BlueGreen",
       "scale": {
         "x": 7,
         "y": 100,
@@ -19,10 +19,10 @@
       "type": "ScalingCylinder",
       "position": {
         "radius": 60,
-        "angle": 90.0,
+        "angle": 65.0,
         "height": 0
       },
-      "material": "BlueGreen",
+      "material": "Blue",
       "scale": {
         "x": 7,
         "y": 100,
