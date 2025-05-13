@@ -10,6 +10,7 @@ TagManager:
   - ChoiceVR2
   - ChoiceVR3
   - ChoiceVR4
+  - intertrial
   layers:
   - Default
   - TransparentFX
