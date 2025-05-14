@@ -54,7 +54,21 @@ public class ZmqListener : MonoBehaviour
                 }
                 catch (NetMQException ex)
                 {
-                    Debugger.Log("NetMQException: " + ex.ToString());
+                    // Change error level from 1 (error) to 3 (info) for socket exceptions
+                    string errorMessage = ex.ToString();
+
+                    // Handle common socket messages that shouldn't be treated as errors
+                    if (errorMessage.Contains("connection reset by peer") ||
+                        errorMessage.Contains("non-blocking socket would block"))
+                    {
+                        Debugger.Log("NetMQ socket info: " + errorMessage, 3);
+                    }
+                    else
+                    {
+                        // For other NetMQ exceptions, still log as warnings
+                        Debugger.Log("NetMQException: " + errorMessage, 2);
+                    }
+
                     Thread.Sleep(100);
                     continue;
                 }

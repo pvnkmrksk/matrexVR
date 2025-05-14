@@ -1,11 +1,11 @@
 {
+  "loop": true,
   "sequences": [
- {
-
-      "sceneName": "Choice",
-      "duration":60,
+    {
+      "sceneName": "Optomotor",
+      "duration": 2,
       "parameters": {
-        "configFile": "BinaryChoice_Forest_Grass.json"
+        "configFile": "optomotor_config.json"
       }
     }
   ]

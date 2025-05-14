@@ -3180,7 +3180,7 @@ MonoBehaviour:
   currentTrial: 0
   loopSequence: 1
   systemConfigFileName: system_config.json
-  logLevel: 4
+  logLevel: 2
 --- !u!4 &484890815
 Transform:
   m_ObjectHideFlags: 0
