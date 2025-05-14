@@ -115,13 +115,13 @@ public class DataLogger : MonoBehaviour
             if (includeZmqData)
             {
                 logFile.Write(
-                    "Current Time,VR,Scene,CurrentTrial,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ"
+                    "Current Time,VR,Scene,CurrentSequenceScene,ConfigFile,CurrentTrial,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ,SensPosX,SensPosY,SensPosZ,SensRotX,SensRotY,SensRotZ"
                 );
             }
             else
             {
                 logFile.Write(
-                    "Current Time,VR,Scene,CurrentTrial,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
+                    "Current Time,VR,Scene,CurrentSequenceScene,ConfigFile,CurrentTrial,CurrentStep,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ"
                 );
             }
         }
@@ -165,9 +165,18 @@ public class DataLogger : MonoBehaviour
         Vector3 gameObjectPosition = this.transform.position;
         Quaternion gameObjectRotation = this.transform.rotation;
 
-        // Prepare the data
+        // Get current sequence step from mainController
+        SequenceStep currentSequenceStep = mainController.GetCurrentSequenceStep();
+        string currentSequenceScene = currentSequenceStep != null ? currentSequenceStep.sceneName : "Unknown";
+        string configFileName = "";
+        if (currentSequenceStep != null && currentSequenceStep.parameters != null && currentSequenceStep.parameters.ContainsKey("configFile"))
+        {
+            configFileName = currentSequenceStep.parameters["configFile"].ToString();
+        }
+
+        // Prepare the data, including currentSequenceScene and configFileName
         line =
-            $"\n{currentTime},{vr},{scene},{mainController.currentTrial},{mainController.currentStep},{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
+            $"\n{currentTime},{vr},{scene},{currentSequenceScene},{configFileName},{mainController.currentTrial},{mainController.currentStep},{gameObjectPosition.x},{gameObjectPosition.y},{gameObjectPosition.z},{gameObjectRotation.eulerAngles.x},{gameObjectRotation.eulerAngles.y},{gameObjectRotation.eulerAngles.z}";
 
         // Add ZMQ data if includeZmqData is true
         if (includeZmqData)

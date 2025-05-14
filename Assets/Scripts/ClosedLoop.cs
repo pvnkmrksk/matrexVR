@@ -4,11 +4,11 @@ public class ClosedLoop : MonoBehaviour
 {
 
 
-    [SerializeField] [Tooltip("The diameter of the sphere in cm")] private float sphereDiameter = 1f;
+    [SerializeField][Tooltip("The diameter of the sphere in cm")] private float sphereDiameter = 1f;
 
     private float sphereRadius;
-    [SerializeField] [Tooltip("The key to reset the position and rotation")] private KeyCode resetKey = KeyCode.R;
-    [SerializeField] [Tooltip("The delay in seconds before starting to use FicTrac data after reset.")] private float initializationDelay = 0.1f;
+    [SerializeField][Tooltip("The key to reset the position and rotation")] private KeyCode resetKey = KeyCode.R;
+    [SerializeField][Tooltip("The delay in seconds before starting to use FicTrac data after reset.")] private float initializationDelay = 0.1f;
 
     private ZmqListener _zmqListener;
     private Vector3 _initialPosition;
@@ -19,8 +19,11 @@ public class ClosedLoop : MonoBehaviour
     private float _initializationTimer;
 
     // Add these new variables
-    [SerializeField] [Tooltip("Whether to apply the FicTrac position in closed loop")] private bool closedLoopPosition = true;
-    [SerializeField] [Tooltip("Whether to apply the FicTrac rotation in closed loop")] private bool closedLoopOrientation = true;
+    [SerializeField][Tooltip("Whether to apply the FicTrac position in closed loop")] private bool closedLoopPosition = true;
+    [SerializeField][Tooltip("Whether to apply the FicTrac rotation in closed loop")] private bool closedLoopOrientation = true;
+
+    // Stores the initial world rotation, including any random rotation applied at start
+    private Quaternion _initialWorldRotation;
 
     private void Start()
     {
@@ -63,7 +66,11 @@ public class ClosedLoop : MonoBehaviour
     {
         _lastFicTracData = GetCurrentFicTracData();
         float initialYaw = _lastFicTracData.z;
-        _ficTracRotationOffset = Quaternion.Euler(0, -initialYaw * Mathf.Rad2Deg, 0);
+
+        // Combine the initial world rotation with the FicTrac offset
+        // This ensures that any random initial rotation is accounted for
+        // when calculating position changes in UpdateTransform
+        _ficTracRotationOffset = _initialWorldRotation * Quaternion.Euler(0, -initialYaw * Mathf.Rad2Deg, 0);
         _isInitialized = true;
         Debug.Log($"Initialized with FicTrac data: ({_lastFicTracData.x}, {_lastFicTracData.y}, {_lastFicTracData.z})");
     }
@@ -76,6 +83,8 @@ public class ClosedLoop : MonoBehaviour
         // Apply position change only if closedLoopPosition is true
         if (closedLoopPosition)
         {
+            // Use _ficTracRotationOffset to correctly transform the position delta
+            // This accounts for both the initial FicTrac orientation and any random initial rotation
             Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius;
             transform.Translate(positionDelta, Space.World);
         }
@@ -84,7 +93,9 @@ public class ClosedLoop : MonoBehaviour
         if (closedLoopOrientation)
         {
             float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg;
-            transform.Rotate(0, rotationDelta, 0, Space.World);
+            // Use Space.Self instead of Space.World to ensure rotation is applied
+            // relative to the object's current orientation. This works better with random initial rotations.
+            transform.Rotate(0, rotationDelta, 0, Space.Self);
         }
 
         _lastFicTracData = currentFicTracData;
@@ -128,6 +139,17 @@ public class ClosedLoop : MonoBehaviour
     public void SetClosedLoopPosition(bool value)
     {
         closedLoopPosition = value;
+    }
+
+    public void SetPositionAndRotation(Vector3 initialPosition, Quaternion initialRotation)
+    {
+        _initialPosition = initialPosition;
+        _initialRotation = initialRotation;
+        // Store the initial world rotation to account for random rotations
+        _initialWorldRotation = initialRotation;
+
+        transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+        ResetPositionAndRotation();
     }
 
     private void HandleInput()
