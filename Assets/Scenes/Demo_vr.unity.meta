@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scenes/Demo_vr.unity.meta
 guid: 2d7da9b9a012341f4ba9a1e781bf048d
+========
+guid: fcfbc8bcf61acdad6b83d0b71f5504c2
+>>>>>>>> origin/locust:Assets/Scenes/Choice_noBG.unity.meta
 DefaultImporter:
   externalObjects: {}
   userData: 

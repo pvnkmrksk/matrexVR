@@ -344,6 +344,32 @@ public class MainController : MonoBehaviour
             }
         }
     }
+
+    // void SaveReferencedChoiceConfigs(SequenceConfig config, string timestamp, string sceneName)
+    // {
+    //     foreach (SequenceItem item in config.sequences)
+    //     {
+    //         if (item.parameters != null && item.parameters.ContainsKey("configFile"))
+    //         {
+    //             string configFileName = item.parameters["configFile"].ToString();
+    //             string sourcePath = Path.Combine(Application.streamingAssetsPath, configFileName);
+                
+    //             if (File.Exists(sourcePath))
+    //             {
+    //                 string destinationPath = Path.Combine(
+    //                     masterDataLogger.directoryPath,
+    //                     $"{timestamp}_{sceneName}_{configFileName}"
+    //                 );
+    //                 File.Copy(sourcePath, destinationPath);
+    //                 Debugger.Log($"Copied choice config: {configFileName}", 3);
+    //             }
+    //             else
+    //             {
+    //                 Debugger.Log($"Choice config file not found: {configFileName}", 2);
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 [System.Serializable]

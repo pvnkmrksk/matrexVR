@@ -15,6 +15,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Swarm.unity
     guid: ee3c77b2ae528404ea7981ceb78bd856
   - enabled: 0
+  - enabled: 0
     path: Assets/Scenes/Matrix.unity
     guid: ae866fd6e891642e4b6b6f687c19e9a9
   - enabled: 1

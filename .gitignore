@@ -83,3 +83,6 @@ Assets/RunData/*
 
 *.csv.gz.meta
 Assets/RunData/
+
+
+*.json.meta
