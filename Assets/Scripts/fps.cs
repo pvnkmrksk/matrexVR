@@ -26,15 +26,26 @@ public class fps : MonoBehaviour
 
         GUIStyle style = new GUIStyle();
 
-        // place the fps at the top left corner of the screen, 128 px below the top
-        Rect rect = new Rect(300, 12, w, h * 2 / 100);
-        style.alignment = TextAnchor.UpperLeft;
+        // Position the FPS counter in the top right corner
+        // Use a fixed size box that's big enough for the text
+        int boxWidth = 150;
+        int boxHeight = h * 2 / 100;
+        Rect backgroundRect = new Rect(w / 2, boxHeight + 10, boxWidth, boxHeight);
+
+        // Draw a background box to clear previous frames
+        GUI.color = new Color(0, 0, 0, 0.5f);
+        GUI.Box(backgroundRect, "");
+
+        // Reset color for the text
+        GUI.color = Color.white;
+
+        // Use the same rect for the label
+        style.alignment = TextAnchor.MiddleLeft;
         style.fontSize = h * 2 / 100;
-        style.normal.textColor = new Color(0.0f, 0.0f, 0.5f, 1.0f);
+        style.normal.textColor = new Color(1.0f, 1.0f, 0.0f, 1.0f); // Yellow for visibility
         float msec = deltaTime * 1000.0f;
         float fps = 1.0f / deltaTime;
-        string text = string.Format("  {0:0.} fps", fps);
-        // string text = string.Format("{0:0.0} ms ({1:0.} fps)", msec, fps);
-        GUI.Label(rect, text, style);
+        string text = string.Format("{0:0.} fps", fps);
+        GUI.Label(backgroundRect, text, style);
     }
 }

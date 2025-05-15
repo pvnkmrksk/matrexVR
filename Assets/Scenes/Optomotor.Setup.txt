@@ -1,0 +1,86 @@
+# Optomotor Scene Setup
+
+## Problem Diagnosis
+
+If the drum does not rotate or visual patterns don't change based on configuration, check for these common issues:
+
+1. **Scene Controller Not Found**: The OptomotorSceneController must be on a GameObject in the scene root, not nested.
+2. **Parameters Not Passed**: Make sure the sequenceConfig.json correctly references the optomotor_config.json file.
+3. **Missing Components**: Check the debug logs to verify all components are attached correctly.
+
+## Required Scene Setup
+
+1. Create a new GameObject in the scene root named "OptomotorController"
+   - Add the OptomotorSceneController script to this GameObject
+   - The GameObject MUST be at the root level of the scene hierarchy
+   - Don't nest it under any other objects
+
+2. Position the OptomotorController GameObject at (0,0,0)
+
+3. Set the inspector properties:
+   - drumPrefab: Leave empty (the controller will create the drum at runtime)
+   - drumObjectName: "OptomotorDrum" (default)
+   - drumRadius: 1.0 (or desired size)
+
+4. Make sure the optomotor_config.json file exists in the StreamingAssets folder
+   - Default path: Assets/StreamingAssets/optomotor_config.json
+   - Verify the file has valid JSON (no syntax errors)
+
+5. Update the sequenceConfig.json to include:
+```json
+{
+  "sequences": [
+    {
+      "sceneName": "Optomotor",
+      "duration": 60,
+      "parameters": {
+        "configFile": "optomotor_config.json"
+      }
+    }
+  ]
+}
+```
+
+6. Verify the camera prefabs (VR1, VR2, etc.) exist in the scene with ClosedLoop components
+
+## Debugging Steps
+
+If issues persist:
+
+1. Check the debug logs for error messages
+2. Verify the OptomotorSceneController.InitializeScene() method is being called
+3. Confirm that the optomotor_config.json file is being loaded properly
+4. Make sure all components (DrumRotator, SinusoidalGrating) are created correctly
+
+Add a test GameObject with this code to force parameter updates:
+
+```csharp
+using UnityEngine;
+
+public class ForceParametersUpdate : MonoBehaviour
+{
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            var drum = GameObject.Find("OptomotorDrum");
+            if (drum != null)
+            {
+                var grating = drum.GetComponent<SinusoidalGrating>();
+                if (grating != null)
+                {
+                    grating.ForceTextureUpdate();
+                    Debug.Log("Forced texture update");
+                }
+                
+                var rotator = drum.GetComponent<DrumRotator>();
+                if (rotator != null)
+                {
+                    rotator.SetRotationParameters(20f, true, "Yaw");
+                    Debug.Log("Forced rotation parameters update");
+                }
+            }
+        }
+    }
+}
+``` 
