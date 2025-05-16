@@ -51,10 +51,6 @@ public class DataLogger : MonoBehaviour
     protected bool isLogging;
     protected bool isBuffering;
     protected bool isFirstLine;
-
-    /// <summary>
-    /// ZMQ listener for receiving sensor data
-    /// </summary>
     protected ZmqListener zmq;
 
     /// <summary>
@@ -72,6 +68,18 @@ public class DataLogger : MonoBehaviour
     /// </summary>
     protected List<string> additionalHeaders = new List<string>();
     protected Dictionary<string, object> additionalData = new Dictionary<string, object>();
+    private int    stepIndex = -1;
+    private string stepName  = "";
+
+    public void SetStep(int index, string name)
+    {
+        stepIndex = index;
+        stepName  = name;
+
+        // push into the per-frame dictionary so PrepareLogData() writes them
+        SetData("stepIndex", index);
+        SetData("stepName",  name);
+    }
 
     /// <summary>
     /// Standard columns included in all log files
@@ -82,6 +90,7 @@ public class DataLogger : MonoBehaviour
         "GameObjectPosX", "GameObjectPosY", "GameObjectPosZ",
         "GameObjectRotX", "GameObjectRotY", "GameObjectRotZ"
     };
+
 
     /// <summary>
     /// ZMQ sensor data columns (only included if includeZmqData is true)
@@ -99,6 +108,7 @@ public class DataLogger : MonoBehaviour
     /// <example>
     /// AddColumns("Temperature", "Humidity", "Pressure");
     /// </example>
+
     public void AddColumns(params string[] headers)
     {
         foreach (string header in headers)
@@ -160,6 +170,7 @@ public class DataLogger : MonoBehaviour
         {
             directoryPath = masterDataLogger.directoryPath;
             bufferedLines = new List<string>();
+            AddColumns("stepIndex", "stepName"); 
 
             // Enable logging
             isLogging = true;

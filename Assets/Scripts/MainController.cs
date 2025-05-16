@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using InSceneSequence;
 
 public interface ISceneController
 {
@@ -40,6 +41,7 @@ public class MainController : MonoBehaviour
 
     // Add global display target property
     private int globalTargetDisplay = 1; // Default value
+    private ISceneController activeSceneController;   // <— NEW
 
     // In MainController class
     public SequenceStep GetCurrentSequenceStep()
@@ -306,19 +308,19 @@ public class MainController : MonoBehaviour
         // Note: Components will load their own configs based on vrId
         // No need to scan for them here
 
-        ISceneController currentSceneController = null;
+        activeSceneController = null;
         foreach (var obj in FindObjectsOfType<MonoBehaviour>()) // MonoBehaviour is the base class for all Unity Behaviours
         {
             if (obj is ISceneController)
             {
-                currentSceneController = (ISceneController)obj;
+                activeSceneController = (ISceneController)obj;
                 break;
             }
         }
 
-        if (currentSceneController != null && currentStepData.parameters != null)
+        if (activeSceneController != null && currentStepData.parameters != null)
         {
-            currentSceneController.InitializeScene(currentStepData.parameters);
+            activeSceneController.InitializeScene(currentStepData.parameters);
             timer = currentStepData.duration;
         }
         else
@@ -389,7 +391,8 @@ public class MainController : MonoBehaviour
                         SequenceStep newStep = new SequenceStep(
                             item.sceneName,
                             item.duration,
-                            item.parameters
+                            item.parameters,
+                            item.reloadScene
                         );
                         sequenceSteps.Add(newStep);
                         Debugger.Log("Added sequence step: " + JsonUtility.ToJson(newStep), 3);
@@ -458,51 +461,62 @@ public class MainController : MonoBehaviour
         Debug.Log("MainController was disabled.");
     }
 
-    void ManageTimerAndTransitions()
+void ManageTimerAndTransitions()
+{
+    timer -= Time.deltaTime;
+
+    if (timer > 0) return;   // still running this step
+
+    // ----------------------------------------------------------
+    // TIME’S UP → decide how to move to the next SequenceStep
+    // ----------------------------------------------------------
+    currentStep++;
+
+    // end-of-list logic (loop / quit) stays exactly as before
+    if (currentStep >= sequenceSteps.Count)
     {
-        // Decrease the timer
-        timer -= Time.deltaTime;
-
-        // Check if time is up
-        if (timer <= 0)
+        if (loopSequence)
         {
-            // Move to the next step
-            currentStep++;
+            currentStep = 0;
+            currentTrial++;
 
-            // If at the end of the sequence
-            if (currentStep >= sequenceSteps.Count)
-            {
-                // Check if looping is enabled
-                if (loopSequence)
-                {
-                    // Restart the sequence from the first step
-                    currentStep = 0;
-
-                    // Increment the trial counter
-                    currentTrial++;
-
-                    // Re-initialize execution order if randomise is true
-                    if (randomise)
-                    {
-                        InitializeExecutionOrder();
-                    }
-
-                    LoadScene(sequenceSteps[executionOrder[currentStep]]);
-                }
-                else
-                {
-                    // End the sequence and exit the application
-                    Debugger.Log("Sequence completed and looping disabled. Exiting application.", 3);
-                    Application.Quit();
-                }
-            }
-            else
-            {
-                // Load the next scene
-                LoadScene(sequenceSteps[executionOrder[currentStep]]);
-            }
+            if (randomise) InitializeExecutionOrder();
+        }
+        else
+        {
+            Debugger.Log("Sequence completed and looping disabled. Exiting application.", 3);
+            Application.Quit();
+            return;
         }
     }
+
+    // ----------------------------------------------------------
+    // examine the *next* step
+    // ----------------------------------------------------------
+    SequenceStep next = sequenceSteps[executionOrder[currentStep]];
+    // ❶ cast once, store the reference (null if the active controller
+    //    does NOT implement IInSceneSequencer)
+    var sequencer = activeSceneController as IInSceneSequencer;
+
+    // ❷ build the condition
+    bool canMutateInPlace =
+            !next.reloadScene &&
+            SceneManager.GetActiveScene().name == next.sceneName &&
+            sequencer != null;
+
+    if (canMutateInPlace)
+    {
+        // ★ NEW PATH: keep scene, just tell it to advance
+        sequencer.AdvanceStep(next.parameters);
+        timer = next.duration;      // restart timer for the new sub-step
+    }
+    else
+    {
+        // LEGACY PATH: load another scene (old behaviour)
+        LoadScene(next);
+    }
+}
+
 
     void SaveReferencedChoiceConfigs(SequenceConfig config, string timestamp, string sceneName)
     {
@@ -553,12 +567,13 @@ public class SequenceStep
     public string sceneName;
     public float duration;
     public Dictionary<string, object> parameters;
-
-    public SequenceStep(string sceneName, float duration, Dictionary<string, object> parameters)
+    public bool   reloadScene = true;
+    public SequenceStep(string sceneName, float duration, Dictionary<string, object> parameters, bool reloadScene = true)
     {
         this.sceneName = sceneName;
         this.duration = duration;
         this.parameters = parameters;
+        this.reloadScene = reloadScene;
     }
 }
 
@@ -576,6 +591,9 @@ public class SequenceItem
     public string sceneName;
     public float duration;
     public Dictionary<string, object> parameters;
+
+    // NEW —— defaults to true, so legacy JSON stays valid
+    public bool reloadScene = true;
 }
 
 [System.Serializable]
