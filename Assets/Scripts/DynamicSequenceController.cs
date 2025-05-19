@@ -10,35 +10,49 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     [System.Serializable]
     private class DesignFile
     {
-        public int    seed       = -1;
-        public int    repetitions= 1;
-        public bool   sync       = true;
+        public int seed = -1;
+        public int repetitions = 1;
+        public bool sync = true;
         public Step[] steps;
     }
     [System.Serializable]
     private class Step
     {
-        public string                name       = "";
-        public Trigger               trigger;
-        public SceneObjectSpec[]     objects;
-        public CameraSpec[]          camera;
-        public string[]              resetVR;
+        public string name = "";
+        public Trigger trigger;
+        public SceneObjectSpec[] objects;
+        public CameraSpec[] camera;
+        public string[] resetVR;
     }
-    [System.Serializable] public class Trigger
+    [System.Serializable]
+    public class Trigger
     {
         public string type;          // "time" | "area"
-        public float  seconds;       // if time
+        public float seconds;       // if time
         public string areaTag;       // if area
         public string vrId;          // "any" or "VR1", …
     }
-    [System.Serializable] public class SceneObjectSpec
+    [System.Serializable]
+    public class SceneObjectSpec
     {
-        public string prefab;
+        public string type;                // prefab name (new)
+        public Polar polar;               // radius/angle/height (new)
+        public Scale scale;               // object scale   (new)
+        public string material;            // material name  (new)
+        public bool flip;                // mirror on X    (new)
+        public float visualAngleDegrees;  // for ScaleWithDistance (new)
+
+        // legacy fields still accepted
+         public string prefab;
         public float[] pos;
         public float[] rot;
-        public string  mat;
+        public string mat;                // ← legacy material alias
     }
-    [System.Serializable] public class CameraSpec
+    [System.Serializable] public class Polar { public float radius, angle, height; }
+    [System.Serializable] public class Scale { public float x, y, z; }
+
+    [System.Serializable]
+    public class CameraSpec
     {
         public string vrId;
         public CameraClearFlags clearFlags = CameraClearFlags.SolidColor;
@@ -53,17 +67,17 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     [Header("Drag every prefab that can appear in a step")]
     public GameObject[] prefabs;
     [Header("Drag every material that can appear in a step")]
-    public Material[]   materials;
+    public Material[] materials;
 
     // internal lookup maps
-    private readonly Dictionary<string, GameObject> prefabDict   = new();
-    private readonly Dictionary<string, Material>   materialDict = new();
+    private readonly Dictionary<string, GameObject> prefabDict = new();
+    private readonly Dictionary<string, Material> materialDict = new();
 
     // ───────────────────────────── ISceneController ───────────────────────────
     private void Awake()
     {
-        foreach (var p in prefabs)   prefabDict[p.name]  = p;
-        foreach (var m in materials) materialDict[m.name]= m;
+        foreach (var p in prefabs) prefabDict[p.name] = p;
+        foreach (var m in materials) materialDict[m.name] = m;
     }
 
     public void InitializeScene(Dictionary<string, object> parameters)
@@ -78,6 +92,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         StartCoroutine(RunNextStep());
     }
 
+
     // not used here
     public void CleanupScene() { }
 
@@ -91,7 +106,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     private void LoadDesign(string file)
     {
         string path = Path.Combine(Application.streamingAssetsPath, file);
-        var design  = JsonConvert.DeserializeObject<DesignFile>(File.ReadAllText(path));
+        var design = JsonConvert.DeserializeObject<DesignFile>(File.ReadAllText(path));
 
         // shuffle etc. (reuse SequenceConfigGenerator logic)
         orderedSteps = BuildOrdered(design);
@@ -99,20 +114,20 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
     private List<Step> BuildOrdered(DesignFile design)
     {
-        var rng   = new System.Random(design.seed < 0 ? System.Environment.TickCount
+        var rng = new System.Random(design.seed < 0 ? System.Environment.TickCount
                                                       : design.seed);
-        var list  = new List<Step>();
+        var list = new List<Step>();
 
-        for (int r=0; r < design.repetitions; r++)
+        for (int r = 0; r < design.repetitions; r++)
         {
             var shuffled = new List<Step>(design.steps);
             // Fischer-Yates shuffle
-            for (int n=shuffled.Count; n>1; --n)
+            for (int n = shuffled.Count; n > 1; --n)
             {
-                int k   = rng.Next(n);
+                int k = rng.Next(n);
                 var tmp = shuffled[k];
-                shuffled[k]      = shuffled[n-1];
-                shuffled[n-1]    = tmp;
+                shuffled[k] = shuffled[n - 1];
+                shuffled[n - 1] = tmp;
             }
             list.AddRange(shuffled);
         }
@@ -164,76 +179,86 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         StartCoroutine(RunNextStep());
     }
 
-private void SpawnObjects(SceneObjectSpec[] specs)
-{
-    if (specs == null) return;
-
-    foreach (var obj in specs)
+    private void SpawnObjects(SceneObjectSpec[] specs)
     {
-        var prefab = Resources.Load<GameObject>(obj.prefab);
-        if (!prefab)
+        if (specs == null) return;
+
+        foreach (var obj in specs)
         {
-            Debug.LogWarning($"Prefab {obj.prefab} missing");
-            continue;
+            // decide prefab name
+            string prefabName = string.IsNullOrEmpty(obj.type) ? obj.prefab : obj.type;
+            if (!prefabDict.TryGetValue(prefabName, out var prefab))
+            {
+                Debug.LogWarning($"Prefab '{prefabName}' missing"); continue;
+            }
+
+            foreach (var (vrId, rig) in players)
+            {
+                int vrIndex = int.Parse(vrId.Substring(2)); // "VR1" -> 1
+                string layerName = $"ChoiceVR{vrIndex}";
+                int    layerId   = LayerMask.NameToLayer(layerName);
+
+                // position
+                Vector3 local  = obj.polar != null ? PolarToXZ(obj.polar) : ToVector3(obj.pos);
+                Vector3 world  = rig.TransformPoint(local);
+                Quaternion rot = obj.rot != null
+                                ? rig.rotation * Quaternion.Euler(ToVector3(obj.rot))
+                                : rig.rotation;
+
+                var go = Instantiate(prefab, world, rot, transform);
+
+                // layer / tag
+                if (layerId != -1) SetLayerRecursively(go, layerId);
+                go.tag = layerName;
+
+                // scale / flip
+                Vector3 scl = obj.scale != null ? new Vector3(obj.scale.x, obj.scale.y, obj.scale.z)
+                                                : go.transform.localScale;
+                if (obj.flip) scl.x *= -1;
+                go.transform.localScale = scl;
+
+                // material
+                string matName = !string.IsNullOrEmpty(obj.material) ? obj.material : obj.mat;
+                if (!string.IsNullOrEmpty(matName) &&
+                    materialDict.TryGetValue(matName, out var mat) &&
+                    go.TryGetComponent<Renderer>(out var rend))
+                    rend.material = mat;
+
+                // visual angle
+                if (go.TryGetComponent<ScaleWithDistance>(out var swd))
+                    swd.visualAngleDegrees = obj.visualAngleDegrees;
+            }
         }
 
-        // ── NEW: create one copy per VR rig ─────────────────────────────
-        int vrIndex = 0;
-        foreach (var kv in players)          // kv.Key == "VR1", "VR2", …
+    }
+
+    private static void SetLayerRecursively(GameObject root, int layer)
+    {
+        root.layer = layer;
+        foreach (Transform child in root.transform)
+            SetLayerRecursively(child.gameObject, layer);
+    }
+
+
+    private void ApplyCameraSettings(CameraSpec[] specs)
+    {
+        if (specs == null) return;
+
+        foreach (var spec in specs)
         {
-            vrIndex++;
-            Transform rig = kv.Value;
+            if (!players.TryGetValue(spec.vrId, out var rig)) continue;
 
-            GameObject go = Instantiate(prefab, transform);
-
-            // position relative to rig so every VR sees its own copy
-            go.transform.position = rig.TransformPoint(ToVector3(obj.pos));
-            go.transform.rotation = rig.rotation * Quaternion.Euler(ToVector3(obj.rot));
-
-            // layer / tag like ChoiceController
-            string layerName = $"ChoiceVR{vrIndex}";
-            int layerId = LayerMask.NameToLayer(layerName);
-            if (layerId != -1)  SetLayerRecursively(go, layerId);
-            go.tag = layerName;      // optional
-
-            // material override
-            if (!string.IsNullOrEmpty(obj.mat))
+            // ✅ get *all* cameras under that VR rig
+            Camera[] cams = rig.GetComponentsInChildren<Camera>(true);
+            foreach (var cam in cams)
             {
-                var mat = Resources.Load<Material>(obj.mat);
-                if (mat && go.TryGetComponent<Renderer>(out var r))
-                    r.material = mat;
+                cam.clearFlags = spec.clearFlags;
+
+                if (spec.bgColor != null && spec.bgColor.Length >= 3)
+                    cam.backgroundColor = ToColor(spec.bgColor);
             }
         }
     }
-}
-
-private static void SetLayerRecursively(GameObject root, int layer)
-{
-    root.layer = layer;
-    foreach (Transform child in root.transform)
-        SetLayerRecursively(child.gameObject, layer);
-}
-
-
-private void ApplyCameraSettings(CameraSpec[] specs)
-{
-    if (specs == null) return;
-
-    foreach (var spec in specs)
-    {
-        if (!players.TryGetValue(spec.vrId, out var rig)) continue;
-
-        // ✅ get *all* cameras under that VR rig
-        Camera[] cams = rig.GetComponentsInChildren<Camera>(true);
-        foreach (var cam in cams)
-        {
-            cam.clearFlags = spec.clearFlags;
-
-            if (spec.bgColor != null && spec.bgColor.Length >= 3)
-                cam.backgroundColor = ToColor(spec.bgColor);
-        }
-    }
-}
 
     private void ResetVRs(string[] ids)
     {
@@ -253,10 +278,10 @@ private void ApplyCameraSettings(CameraSpec[] specs)
         }
 
         var go = new GameObject($"Trigger_{currentStep}");
-        var box= go.AddComponent<BoxCollider>();
+        var box = go.AddComponent<BoxCollider>();
         box.isTrigger = true;
-        box.size      = new Vector3(2,2,2); // temp – in practice read from design
-        go.tag        = t.areaTag;
+        box.size = new Vector3(2, 2, 2); // temp – in practice read from design
+        go.tag = t.areaTag;
         go.transform.parent = transform;
         go.AddComponent<TriggerRelay>().Init(Handler);
 
@@ -265,10 +290,18 @@ private void ApplyCameraSettings(CameraSpec[] specs)
 
     // helpers
     private static Vector3 ToVector3(float[] arr) =>
-        arr != null && arr.Length >= 3 ? new Vector3(arr[0],arr[1],arr[2]) : Vector3.zero;
-    private static Color   ToColor  (float[] arr) =>
+        arr != null && arr.Length >= 3 ? new Vector3(arr[0], arr[1], arr[2]) : Vector3.zero;
+    private static Color ToColor(float[] arr) =>
         arr != null && arr.Length >= 3 ?
-            new Color(arr[0], arr[1], arr[2], arr.Length>3?arr[3]:1) : Color.black;
+            new Color(arr[0], arr[1], arr[2], arr.Length > 3 ? arr[3] : 1) : Color.black;
+    private static Vector3 PolarToXZ(Polar p)
+{
+    if (p == null) return Vector3.zero;
+    float x = p.radius * Mathf.Sin(p.angle * Mathf.Deg2Rad);
+    float z = p.radius * Mathf.Cos(p.angle * Mathf.Deg2Rad);
+    return new Vector3(x, p.height, z);
+}
+
 }
 
 public class TriggerRelay : MonoBehaviour
