@@ -4,6 +4,7 @@ using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
 using InSceneSequence;
+using System;
 
 public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 {
@@ -13,6 +14,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public int seed = -1;
         public int repetitions = 1;
         public bool sync = true;
+        public Step   intertrial; 
         public Step[] steps;
     }
     [System.Serializable]
@@ -117,22 +119,28 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
     private List<Step> BuildOrdered(DesignFile design)
     {
-        var rng = new System.Random(design.seed < 0 ? System.Environment.TickCount
-                                                      : design.seed);
+        var rng  = new System.Random(design.seed < 0 ? Environment.TickCount
+                                                    : design.seed);
         var list = new List<Step>();
 
-        for (int r = 0; r < design.repetitions; r++)
+        for (int rep = 0; rep < design.repetitions; ++rep)
         {
-            var shuffled = new List<Step>(design.steps);
-            // Fischer-Yates shuffle
-            for (int n = shuffled.Count; n > 1; --n)
+            // 1) copy & shuffle the trials
+            var trials = new List<Step>(design.steps);
+            for (int n = trials.Count; n > 1; --n)
             {
                 int k = rng.Next(n);
-                var tmp = shuffled[k];
-                shuffled[k] = shuffled[n - 1];
-                shuffled[n - 1] = tmp;
+                (trials[k], trials[n-1]) = (trials[n-1], trials[k]);
             }
-            list.AddRange(shuffled);
+
+            // 2) interleave inter-trial
+            foreach (var t in trials)
+            {
+                if (design.intertrial != null)     // ← add skybox
+                    list.Add(design.intertrial);
+
+                list.Add(t);                       // then real trial
+            }
         }
         return list;
     }
@@ -172,7 +180,6 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             if (sky) RenderSettings.skybox = sky;
             else Debug.LogWarning($"Skybox '{step.skybox}' not found in Resources");
         }
-        Debug.Log($"Skybox after = {RenderSettings.skybox.name}");
 
         ApplyClosedLoopFlags(step);
 
@@ -272,7 +279,6 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                     cam.backgroundColor = ToColor(spec.bgColor);
             }
         }
-        Debug.Log($"Skybox now = {RenderSettings.skybox.name}");
     }
     private void ApplyClosedLoopFlags(Step s)
 {

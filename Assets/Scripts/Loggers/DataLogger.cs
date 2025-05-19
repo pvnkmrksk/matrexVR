@@ -259,7 +259,8 @@ public class DataLogger : MonoBehaviour
     {
         // Clear previous data
         additionalData.Clear();
-
+        SetData("stepIndex", stepIndex);
+        SetData("stepName",  stepName);
         // Build base data
         string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
         string vr = this.gameObject.name;

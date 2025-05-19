@@ -1,14 +1,12 @@
 {
   "randomise": false,
-  "loop": true,
+  "loop": false,
   "sequences": [
-        {
+    {
       "sceneName": "Choice_desync",
-      "duration": 100,                         
-      "parameters": {
-        "design": "dynamicSequenceDesign.json" 
-      },
-      "reloadScene": false                   
+      "duration": 999,
+      "parameters": { "design":"sequenceDesign_choice.json" },
+      "reloadScene": false
     }
   ]
 }
