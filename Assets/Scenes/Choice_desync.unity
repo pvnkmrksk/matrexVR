@@ -528,7 +528,7 @@ MonoBehaviour:
   prefabs:
   - {fileID: 613882636469030215, guid: 640fd9f1faa774ed08f8a945c42d4ecf, type: 3}
   - {fileID: 2847650824615190857, guid: b1de23ca45fde9afb9402d7563db3786, type: 3}
-  - {fileID: 1929330326152280779, guid: dabb72c3a1dd34cbe9eba19ba1007a74, type: 3}
+  - {fileID: 3992630106712533386, guid: 04435266c2d514eadb44a0a719de2605, type: 3}
   materials:
   - {fileID: 2100000, guid: b1fd2acbabaa55140b6e85bd1c98bf58, type: 2}
   - {fileID: 2100000, guid: 04a0ce8100d744a8eab46dbe477643a8, type: 2}
@@ -540,6 +540,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5524192649268551072, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
     - target: {fileID: 5665556470671942764, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
       propertyPath: m_Name
       value: VR2
@@ -648,6 +652,10 @@ PrefabInstance:
       propertyPath: m_CullingMask.m_Bits
       value: 67639
       objectReference: {fileID: 0}
+    - target: {fileID: 6108188817721360436, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
     - target: {fileID: 6427121423757256516, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -656,6 +664,14 @@ PrefabInstance:
       propertyPath: m_CullingMask.m_Bits
       value: 67639
       objectReference: {fileID: 0}
+    - target: {fileID: 9202312446073815082, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
+    - target: {fileID: 9207131755239253476, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 6427121423757256516, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
@@ -670,6 +686,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1562998944865632137, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
+    - target: {fileID: 1568238551985117767, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
     - target: {fileID: 2335870298023230039, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -786,10 +810,18 @@ PrefabInstance:
       propertyPath: m_CullingMask.m_Bits
       value: 133175
       objectReference: {fileID: 0}
+    - target: {fileID: 2786622994852454915, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
     - target: {fileID: 3689703506748299514, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: m_CullingMask.m_Bits
       value: 133175
       objectReference: {fileID: 0}
+    - target: {fileID: 4522010358150332311, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 3689703506748299495, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
@@ -804,6 +836,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1598207767106756752, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
+    - target: {fileID: 1611895703675127134, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
+    - target: {fileID: 2684825983908042964, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
     - target: {fileID: 2831547435824584404, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_ClearFlags
       value: 2
@@ -956,9 +1000,13 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4408761999805220160, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
     - target: {fileID: 5183854044039769096, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -1086,6 +1134,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 814644835086404459, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
+    - target: {fileID: 1379026752967071487, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
     - target: {fileID: 2222056076659782034, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: m_ClearFlags
       value: 2
@@ -1094,6 +1150,14 @@ PrefabInstance:
       propertyPath: m_CullingMask.m_Bits
       value: 264247
       objectReference: {fileID: 0}
+    - target: {fileID: 4044691338482316079, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
+    - target: {fileID: 4058520286448162529, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
+      propertyPath: m_CustomSkybox
+      value: 
+      objectReference: {fileID: 2100000, guid: 4077063df2cb94721b138ead691b9052, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 2222056076659782031, guid: 2edbded3f559821ac8007eb32448730b, type: 3}

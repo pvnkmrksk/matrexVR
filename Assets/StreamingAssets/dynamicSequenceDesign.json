@@ -4,26 +4,7 @@
   "sync": true,
   "steps": [
     {
-  "name": "Intertrial",
-  "trigger": { "type": "time", "seconds": 10 },
-  "closedLoopOrientation": true,
-  "closedLoopPosition":   true,
-
-  "objects": [
-    {
-      "type": "Landscape", 
-      "polar": { "radius": 0, "angle": 0, "height": 0 }
-    }
-  ],
-
-  "camera": [
-    { "vrId":"VR1", "clearFlags":"SolidColor", "bgColor":[0.8,0.8,0.8,1] },
-    { "vrId":"VR2", "clearFlags":"SolidColor", "bgColor":[0.8,0.8,0.8,1] },
-    { "vrId":"VR3", "clearFlags":"SolidColor", "bgColor":[0.8,0.8,0.8,1] },
-    { "vrId":"VR4", "clearFlags":"SolidColor", "bgColor":[0.8,0.8,0.8,1] }
-  ]
-},{
-  "name": "ScalingChoice",
+  "name": "ScalingChoice_Blue_BlueGreen_30deg",
   "trigger": { "type": "time", "seconds": 10 },
   "closedLoopOrientation": true,
   "closedLoopPosition":   true,
@@ -50,6 +31,23 @@
     { "vrId":"VR2", "clearFlags":"SolidColor", "bgColor":[0.8,0.8,0.8,1] },
     { "vrId":"VR3", "clearFlags":"SolidColor", "bgColor":[0.8,0.8,0.8,1] },
     { "vrId":"VR4", "clearFlags":"SolidColor", "bgColor":[0.8,0.8,0.8,1] }
+  ]
+},
+{
+  "name": "skybox",
+  "trigger": { "type": "time", "seconds": 10 },
+  "closedLoopOrientation": true,
+  "closedLoopPosition":   true,
+  "objects": [
+    {
+      "type": "glassplane"
+    }
+  ],
+   "camera": [
+    { "vrId":"VR1", "clearFlags":"Skybox" },
+    { "vrId":"VR2", "clearFlags":"Skybox" },
+    { "vrId":"VR3", "clearFlags":"Skybox" },
+    { "vrId":"VR4", "clearFlags":"Skybox" }
   ]
 }
   ]

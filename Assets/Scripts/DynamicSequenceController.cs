@@ -22,6 +22,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public Trigger trigger;
         public SceneObjectSpec[] objects;
         public CameraSpec[] camera;
+        public string skybox; 
         public string[] resetVR;
         public bool closedLoopOrientation;
         public bool closedLoopPosition;
@@ -163,6 +164,15 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
         // 3) camera tweaks
         ApplyCameraSettings(step.camera);
+        
+        if (!string.IsNullOrEmpty(step.skybox))
+        {
+            // skybox materials live in Resources/SunnySkyMat.mat  (for example)
+            Material sky = Resources.Load<Material>(step.skybox);
+            if (sky) RenderSettings.skybox = sky;
+            else Debug.LogWarning($"Skybox '{step.skybox}' not found in Resources");
+        }
+        Debug.Log($"Skybox after = {RenderSettings.skybox.name}");
 
         ApplyClosedLoopFlags(step);
 
@@ -262,6 +272,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                     cam.backgroundColor = ToColor(spec.bgColor);
             }
         }
+        Debug.Log($"Skybox now = {RenderSettings.skybox.name}");
     }
     private void ApplyClosedLoopFlags(Step s)
 {
