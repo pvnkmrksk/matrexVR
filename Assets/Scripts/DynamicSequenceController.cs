@@ -23,6 +23,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public SceneObjectSpec[] objects;
         public CameraSpec[] camera;
         public string[] resetVR;
+        public bool closedLoopOrientation;
+        public bool closedLoopPosition;
     }
     [System.Serializable]
     public class Trigger
@@ -162,6 +164,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         // 3) camera tweaks
         ApplyCameraSettings(step.camera);
 
+        ApplyClosedLoopFlags(step);
+
         // 4) reset VRs
         ResetVRs(step.resetVR);
 
@@ -259,6 +263,17 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             }
         }
     }
+    private void ApplyClosedLoopFlags(Step s)
+{
+    if (!s.closedLoopOrientation && !s.closedLoopPosition) return;
+
+    foreach (var cl in FindObjectsOfType<ClosedLoop>())
+    {
+        cl.SetClosedLoopOrientation(s.closedLoopOrientation);
+        cl.SetClosedLoopPosition  (s.closedLoopPosition);
+    }
+}
+
 
     private void ResetVRs(string[] ids)
     {
