@@ -1,11 +1,11 @@
 {
   "seed": -1,
-  "repetitions": 1,
+  "repetitions": 10,
   "sync": true,
   "steps": [
     {
       "name": "BlackScreen",
-      "trigger": { "type": "time", "seconds": 5 },
+      "trigger": { "type": "time", "seconds": 2 },
       "objects": [{ "prefab": "Cube", "pos": [0,1,3], "rot": [0,45,0], "mat": "BlueGreen" }],
       "camera": [
         { "vrId": "VR1", "clearFlags": "SolidColor", "bgColor": [0,0,0,1] },
@@ -18,10 +18,47 @@
 
     {
       "name": "SpawnCube",
-      "trigger": { "type": "time", "seconds": 10 },
+      "trigger": { "type": "time", "seconds": 2 },
       "objects": [
         { "prefab": "Cube", "pos": [0,1,3], "rot": [0,45,0], "mat": "BlueGreen" }
+      ],
+       "camera": [
+        { "vrId": "VR1", "clearFlags": "SolidColor", "bgColor": [1,0,0,0.5] },
+        { "vrId": "VR2", "clearFlags": "SolidColor", "bgColor": [1,0,0,0.5] },
+        { "vrId": "VR3", "clearFlags": "SolidColor", "bgColor": [1,0,0,0.5] },
+        { "vrId": "VR4", "clearFlags": "SolidColor", "bgColor": [1,0,0,0.5] }
       ]
+    },
+
+    {
+  "name": "ScalingChoice",
+  "trigger": { "type": "time", "seconds": 10 },
+  "closedLoopOrientation": true,
+  "closedLoopPosition":   true,
+
+  "objects": [
+    {
+      "type": "ScalingCylinder", 
+      "polar": { "radius": 60, "angle": -15, "height": 0 },
+      "material": "Blue",
+      "scale": { "x": 7, "y": 100, "z": 7 },
+      "visualAngleDegrees": 10
+    },
+    {
+      "type": "ScalingCylinder",
+      "polar": { "radius": 60, "angle": 15, "height": 0 },
+      "material": "BlueGreen",
+      "scale": { "x": 7, "y": 100, "z": 7 },
+      "visualAngleDegrees": 10
     }
+  ],
+
+  "camera": [
+    { "vrId":"VR1", "clearFlags":"SolidColor", "bgColor":[0.8,0.8,0.8,1] },
+    { "vrId":"VR2", "clearFlags":"SolidColor", "bgColor":[0.8,0.8,0.8,1] },
+    { "vrId":"VR3", "clearFlags":"SolidColor", "bgColor":[0.8,0.8,0.8,1] },
+    { "vrId":"VR4", "clearFlags":"SolidColor", "bgColor":[0.8,0.8,0.8,1] }
+  ]
+}
   ]
 }

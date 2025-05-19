@@ -49,7 +49,23 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     private int currentStep = -1;
     private Dictionary<string, Transform> players = new();
 
+    // ───────── inspector convenience ─────────
+    [Header("Drag every prefab that can appear in a step")]
+    public GameObject[] prefabs;
+    [Header("Drag every material that can appear in a step")]
+    public Material[]   materials;
+
+    // internal lookup maps
+    private readonly Dictionary<string, GameObject> prefabDict   = new();
+    private readonly Dictionary<string, Material>   materialDict = new();
+
     // ───────────────────────────── ISceneController ───────────────────────────
+    private void Awake()
+    {
+        foreach (var p in prefabs)   prefabDict[p.name]  = p;
+        foreach (var m in materials) materialDict[m.name]= m;
+    }
+
     public void InitializeScene(Dictionary<string, object> parameters)
     {
         string designFile = parameters != null && parameters.TryGetValue("design", out var p)
@@ -148,42 +164,76 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         StartCoroutine(RunNextStep());
     }
 
-    private void SpawnObjects(SceneObjectSpec[] specs)
+private void SpawnObjects(SceneObjectSpec[] specs)
+{
+    if (specs == null) return;
+
+    foreach (var obj in specs)
     {
-        if (specs == null) return;
-
-        foreach (var s in specs)
+        var prefab = Resources.Load<GameObject>(obj.prefab);
+        if (!prefab)
         {
-            var prefab = Resources.Load<GameObject>(s.prefab);
-            if (!prefab) { Debug.LogWarning($"Prefab {s.prefab} missing"); continue; }
+            Debug.LogWarning($"Prefab {obj.prefab} missing");
+            continue;
+        }
 
-            var go = Instantiate(prefab, transform);
-            go.transform.localPosition = ToVector3(s.pos);
-            go.transform.localEulerAngles = ToVector3(s.rot);
+        // ── NEW: create one copy per VR rig ─────────────────────────────
+        int vrIndex = 0;
+        foreach (var kv in players)          // kv.Key == "VR1", "VR2", …
+        {
+            vrIndex++;
+            Transform rig = kv.Value;
 
-            if (!string.IsNullOrEmpty(s.mat))
+            GameObject go = Instantiate(prefab, transform);
+
+            // position relative to rig so every VR sees its own copy
+            go.transform.position = rig.TransformPoint(ToVector3(obj.pos));
+            go.transform.rotation = rig.rotation * Quaternion.Euler(ToVector3(obj.rot));
+
+            // layer / tag like ChoiceController
+            string layerName = $"ChoiceVR{vrIndex}";
+            int layerId = LayerMask.NameToLayer(layerName);
+            if (layerId != -1)  SetLayerRecursively(go, layerId);
+            go.tag = layerName;      // optional
+
+            // material override
+            if (!string.IsNullOrEmpty(obj.mat))
             {
-                var mat = Resources.Load<Material>(s.mat);
+                var mat = Resources.Load<Material>(obj.mat);
                 if (mat && go.TryGetComponent<Renderer>(out var r))
                     r.material = mat;
             }
         }
     }
+}
 
-    private void ApplyCameraSettings(CameraSpec[] specs)
+private static void SetLayerRecursively(GameObject root, int layer)
+{
+    root.layer = layer;
+    foreach (Transform child in root.transform)
+        SetLayerRecursively(child.gameObject, layer);
+}
+
+
+private void ApplyCameraSettings(CameraSpec[] specs)
+{
+    if (specs == null) return;
+
+    foreach (var spec in specs)
     {
-        if (specs == null) return;
-        foreach (var spec in specs)
-        {
-            if (!players.TryGetValue(spec.vrId, out var rig)) continue;
-            var cam = rig.GetComponentInChildren<Camera>(true);
-            if (!cam) continue;
+        if (!players.TryGetValue(spec.vrId, out var rig)) continue;
 
+        // ✅ get *all* cameras under that VR rig
+        Camera[] cams = rig.GetComponentsInChildren<Camera>(true);
+        foreach (var cam in cams)
+        {
             cam.clearFlags = spec.clearFlags;
+
             if (spec.bgColor != null && spec.bgColor.Length >= 3)
                 cam.backgroundColor = ToColor(spec.bgColor);
         }
     }
+}
 
     private void ResetVRs(string[] ids)
     {
