@@ -7,6 +7,12 @@
       "duration": 999,
       "parameters": { "design":"sequenceDesign_choice.json" },
       "reloadScene": false
+    },
+    {
+      "sceneName": "Choice_desync",
+      "duration": 999,
+      "parameters": { "design":"sequenceDesign_choice.json" },
+      "reloadScene": false
     }
   ]
 }

@@ -26,7 +26,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Demo_asset.unity
     guid: 2b02c29601fc84e49a18fde7fed33f95
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Forrest_choice.unity
     guid: 6ac85b5260ce74c4fa0843946844a788
   - enabled: 0
