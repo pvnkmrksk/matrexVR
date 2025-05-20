@@ -5,16 +5,16 @@ using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
 
-public class BuildChoiceDesign
+public class BuildstaticChoiceDesign
 {
-    [MenuItem("Tools/Generate Choice SequenceDesign.json")]
+    [MenuItem("Tools/Generate static Choice SequenceDesign.json")]
     private static void Build()
     {
         // 1) the fixed inter-trial skybox step
         var skyStep = new
         {
             name = "skybox",
-            trigger = new { type = "time", seconds = 15 },
+            trigger = new { type = "time", seconds = 5 },
             camera = new[]
             {
                 new { vrId = "VR1", clearFlags = "Skybox" },
@@ -25,18 +25,38 @@ public class BuildChoiceDesign
         };
 
         // 2) generate all angle × colour-order combinations
-        int[] angles = { 20, 30, 50, 70, 90, 110, 130, 150, 180 };
-        var colours = new[] { ("Blue", "BlueGreen"), ("BlueGreen", "Blue") };
+        int[] angles =
+        {
+            10,
+            20,
+            30,
+            40,
+            50,
+            60,
+            70,
+            80,
+            90,
+            100,
+            110,
+            120,
+            130,
+            140,
+            150,
+            160,
+            170,
+            180
+        };
+        var colours = new[] { ("Black", "Black") };
 
         var steps = (
             from a in angles
             from c in colours
             select new
             {
-                name = $"ScalingChoice_{c.Item1}_{c.Item2}_{a}deg",
+                name = $"StaticChoice_{c.Item1}_{c.Item2}_{a}deg",
                 trigger = new { type = "time", seconds = 45 },
                 closedLoopOrientation = true,
-                closedLoopPosition = true,
+                closedLoopPosition = false,
                 objects = new[]
                 {
                     new
@@ -117,7 +137,10 @@ public class BuildChoiceDesign
         };
 
         // 4) write to StreamingAssets
-        string path = Path.Combine(Application.streamingAssetsPath, "sequenceDesign_choice.json");
+        string path = Path.Combine(
+            Application.streamingAssetsPath,
+            "sequenceDesign_staticChoice.json"
+        );
         Directory.CreateDirectory(Application.streamingAssetsPath);
         File.WriteAllText(path, JsonConvert.SerializeObject(design, Formatting.Indented));
 

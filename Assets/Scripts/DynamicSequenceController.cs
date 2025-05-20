@@ -14,9 +14,10 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public int seed = -1;
         public int repetitions = 1;
         public bool sync = true;
-        public Step   intertrial; 
+        public Step intertrial;
         public Step[] steps;
     }
+
     [System.Serializable]
     private class Step
     {
@@ -24,37 +25,59 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public Trigger trigger;
         public SceneObjectSpec[] objects;
         public CameraSpec[] camera;
-        public string skybox; 
+        public string skybox;
         public string[] resetVR;
         public bool closedLoopOrientation;
         public bool closedLoopPosition;
+        public Vector3 initialPosition = Vector3.zero;
+        public Vector3 initialRotation = Vector3.zero;
+        public bool randomInitialRotation = false;
     }
+
     [System.Serializable]
     public class Trigger
     {
-        public string type;          // "time" | "area"
-        public float seconds;       // if time
-        public string areaTag;       // if area
-        public string vrId;          // "any" or "VR1", …
+        public string type; // "time" | "area"
+        public float seconds; // if time
+        public string areaTag; // if area
+        public string vrId; // "any" or "VR1", …
     }
+
     [System.Serializable]
     public class SceneObjectSpec
     {
-        public string type;                // prefab name (new)
-        public Polar polar;               // radius/angle/height (new)
-        public Scale scale;               // object scale   (new)
-        public string material;            // material name  (new)
-        public bool flip;                // mirror on X    (new)
-        public float visualAngleDegrees;  // for ScaleWithDistance (new)
+        public string type; // prefab name (new)
+        public Polar polar; // radius/angle/height (new)
+        public Scale scale; // object scale   (new)
+        public string material; // material name  (new)
+        public bool flip; // mirror on X    (new)
+        public float visualAngleDegrees; // for ScaleWithDistance (new)
+
+        public bool randomInitialRotation = false;
+        public float mu = 0f; 
 
         // legacy fields still accepted
-         public string prefab;
+        public string prefab;
         public float[] pos;
         public float[] rot;
-        public string mat;                // ← legacy material alias
+        public string mat; // ← legacy material alias
     }
-    [System.Serializable] public class Polar { public float radius, angle, height; }
-    [System.Serializable] public class Scale { public float x, y, z; }
+
+    [System.Serializable]
+    public class Polar
+    {
+        public float radius,
+            angle,
+            height;
+    }
+
+    [System.Serializable]
+    public class Scale
+    {
+        public float x,
+            y,
+            z;
+    }
 
     [System.Serializable]
     public class CameraSpec
@@ -71,6 +94,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     // ───────── inspector convenience ─────────
     [Header("Drag every prefab that can appear in a step")]
     public GameObject[] prefabs;
+
     [Header("Drag every material that can appear in a step")]
     public Material[] materials;
 
@@ -81,22 +105,24 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     // ───────────────────────────── ISceneController ───────────────────────────
     private void Awake()
     {
-        foreach (var p in prefabs) prefabDict[p.name] = p;
-        foreach (var m in materials) materialDict[m.name] = m;
+        foreach (var p in prefabs)
+            prefabDict[p.name] = p;
+        foreach (var m in materials)
+            materialDict[m.name] = m;
     }
 
     public void InitializeScene(Dictionary<string, object> parameters)
     {
-        string designFile = parameters != null && parameters.TryGetValue("design", out var p)
-                          ? p.ToString()
-                          : "dynamicSequenceDesign.json";
+        string designFile =
+            parameters != null && parameters.TryGetValue("design", out var p)
+                ? p.ToString()
+                : "dynamicSequenceDesign.json";
 
         LoadDesign(designFile);
         CachePlayers();
 
         StartCoroutine(RunNextStep());
     }
-
 
     // not used here
     public void CleanupScene() { }
@@ -119,8 +145,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
     private List<Step> BuildOrdered(DesignFile design)
     {
-        var rng  = new System.Random(design.seed < 0 ? Environment.TickCount
-                                                    : design.seed);
+        var rng = new System.Random(design.seed < 0 ? Environment.TickCount : design.seed);
         var list = new List<Step>();
 
         for (int rep = 0; rep < design.repetitions; ++rep)
@@ -130,16 +155,16 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             for (int n = trials.Count; n > 1; --n)
             {
                 int k = rng.Next(n);
-                (trials[k], trials[n-1]) = (trials[n-1], trials[k]);
+                (trials[k], trials[n - 1]) = (trials[n - 1], trials[k]);
             }
 
             // 2) interleave inter-trial
             foreach (var t in trials)
             {
-                if (design.intertrial != null)     // ← add skybox
+                if (design.intertrial != null) // ← add skybox
                     list.Add(design.intertrial);
 
-                list.Add(t);                       // then real trial
+                list.Add(t); // then real trial
             }
         }
         return list;
@@ -148,7 +173,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     private void CachePlayers()
     {
         foreach (var dl in FindObjectsOfType<DataLogger>())
-            players[dl.name] = dl.transform;           // assumes each VR root is named “VR1” …
+            players[dl.name] = dl.transform; // assumes each VR root is named “VR1” …
     }
 
     private IEnumerator RunNextStep()
@@ -167,24 +192,26 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         foreach (Transform child in transform)
             Destroy(child.gameObject);
 
-        // 2) instantiate new
+        // Defer reset and spawn by one frame
+        yield return null; // ✅ wait for end of current frame
+
+        ResetVRs(step.resetVR, step);
         SpawnObjects(step.objects);
 
         // 3) camera tweaks
         ApplyCameraSettings(step.camera);
-        
+
         if (!string.IsNullOrEmpty(step.skybox))
         {
             // skybox materials live in Resources/SunnySkyMat.mat  (for example)
             Material sky = Resources.Load<Material>(step.skybox);
-            if (sky) RenderSettings.skybox = sky;
-            else Debug.LogWarning($"Skybox '{step.skybox}' not found in Resources");
+            if (sky)
+                RenderSettings.skybox = sky;
+            else
+                Debug.LogWarning($"Skybox '{step.skybox}' not found in Resources");
         }
 
         ApplyClosedLoopFlags(step);
-
-        // 4) reset VRs
-        ResetVRs(step.resetVR);
 
         // 5) tell DataLoggers
         foreach (var kv in players)
@@ -206,52 +233,62 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
         foreach (var obj in specs)
         {
-            // decide prefab name
             string prefabName = string.IsNullOrEmpty(obj.type) ? obj.prefab : obj.type;
             if (!prefabDict.TryGetValue(prefabName, out var prefab))
             {
-                Debug.LogWarning($"Prefab '{prefabName}' missing"); continue;
+                Debug.LogWarning($"Prefab '{prefabName}' missing");
+                continue;
             }
 
             foreach (var (vrId, rig) in players)
             {
-                int vrIndex = int.Parse(vrId.Substring(2)); // "VR1" -> 1
+                int vrIndex = int.Parse(vrId.Substring(2)); // "VR1" → 1
                 string layerName = $"ChoiceVR{vrIndex}";
-                int    layerId   = LayerMask.NameToLayer(layerName);
+                int layerId = LayerMask.NameToLayer(layerName);
 
-                // position
-                Vector3 local  = obj.polar != null ? PolarToXZ(obj.polar) : ToVector3(obj.pos);
-                Vector3 world  = rig.TransformPoint(local);
-                Quaternion rot = obj.rot != null
-                                ? rig.rotation * Quaternion.Euler(ToVector3(obj.rot))
-                                : rig.rotation;
+                Vector3 position = obj.polar != null
+                    ? PolarToXZ(obj.polar)
+                    : ToVector3(obj.pos);
 
-                var go = Instantiate(prefab, world, rot, transform);
+                // Rotation
+                Quaternion rotation;
+                if (obj.randomInitialRotation)
+                    rotation = Quaternion.Euler(0, UnityEngine.Random.Range(0f, 360f), 0);
+                else
+                    rotation = Quaternion.Euler(0, obj.mu, 0);
 
-                // layer / tag
-                if (layerId != -1) SetLayerRecursively(go, layerId);
-                go.tag = layerName;
+                // Instantiate
+                GameObject instance = Instantiate(prefab, position, rotation, transform);
+                instance.tag = layerName;
+                if (layerId != -1)
+                    SetLayerRecursively(instance, layerId);
 
-                // scale / flip
-                Vector3 scl = obj.scale != null ? new Vector3(obj.scale.x, obj.scale.y, obj.scale.z)
-                                                : go.transform.localScale;
-                if (obj.flip) scl.x *= -1;
-                go.transform.localScale = scl;
+                // Scale + Flip
+                Vector3 scale = obj.scale != null
+                    ? new Vector3(obj.scale.x, obj.scale.y, obj.scale.z)
+                    : instance.transform.localScale;
 
-                // material
+                if (obj.flip)
+                    scale.x *= -1;
+
+                instance.transform.localScale = scale;
+
+                // Material
                 string matName = !string.IsNullOrEmpty(obj.material) ? obj.material : obj.mat;
                 if (!string.IsNullOrEmpty(matName) &&
                     materialDict.TryGetValue(matName, out var mat) &&
-                    go.TryGetComponent<Renderer>(out var rend))
+                    instance.TryGetComponent<Renderer>(out var rend))
+                {
                     rend.material = mat;
+                }
 
-                // visual angle
-                if (go.TryGetComponent<ScaleWithDistance>(out var swd))
+                // Visual Angle
+                if (instance.TryGetComponent<ScaleWithDistance>(out var swd))
                     swd.visualAngleDegrees = obj.visualAngleDegrees;
             }
         }
-
     }
+
 
     private static void SetLayerRecursively(GameObject root, int layer)
     {
@@ -260,14 +297,15 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             SetLayerRecursively(child.gameObject, layer);
     }
 
-
     private void ApplyCameraSettings(CameraSpec[] specs)
     {
-        if (specs == null) return;
+        if (specs == null)
+            return;
 
         foreach (var spec in specs)
         {
-            if (!players.TryGetValue(spec.vrId, out var rig)) continue;
+            if (!players.TryGetValue(spec.vrId, out var rig))
+                continue;
 
             // ✅ get *all* cameras under that VR rig
             Camera[] cams = rig.GetComponentsInChildren<Camera>(true);
@@ -280,25 +318,55 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             }
         }
     }
+
     private void ApplyClosedLoopFlags(Step s)
-{
-    if (!s.closedLoopOrientation && !s.closedLoopPosition) return;
-
-    foreach (var cl in FindObjectsOfType<ClosedLoop>())
     {
-        cl.SetClosedLoopOrientation(s.closedLoopOrientation);
-        cl.SetClosedLoopPosition  (s.closedLoopPosition);
+        if (!s.closedLoopOrientation && !s.closedLoopPosition)
+            return;
+
+        foreach (var cl in FindObjectsOfType<ClosedLoop>())
+        {
+            cl.SetClosedLoopOrientation(s.closedLoopOrientation);
+            cl.SetClosedLoopPosition(s.closedLoopPosition);
+        }
     }
-}
-
-
-    private void ResetVRs(string[] ids)
+    private void ResetVRs(string[] ids, Step step)
     {
-        if (ids == null) return;
+        // Fallback to all known rigs if none specified
+        if (ids == null || ids.Length == 0)
+        {
+            ids = new string[players.Keys.Count];
+            players.Keys.CopyTo(ids, 0);
+        }
+
+        Quaternion initialRotation = step.randomInitialRotation
+            ? Quaternion.Euler(step.initialRotation.x, UnityEngine.Random.Range(0f, 360f), step.initialRotation.z)
+            : Quaternion.Euler(step.initialRotation);
+
         foreach (var id in ids)
+        {
             if (players.TryGetValue(id, out var rig))
-                rig.localPosition = Vector3.zero; // or whatever “origin” rule you prefer
+            {
+                ClosedLoop cl = rig.GetComponent<ClosedLoop>();
+                if (cl != null)
+                {
+                    Debug.Log($"[ResetVRs] Calling SetPositionAndRotation on '{id}' with pos={step.initialPosition}, rot={initialRotation.eulerAngles}");
+                    cl.SetPositionAndRotation(step.initialPosition, initialRotation);
+                    cl.ResetPositionAndRotation();
+                }
+                else
+                {
+                    Debug.LogWarning($"[ResetVRs] No ClosedLoop component on {id}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[ResetVRs] No rig found for id {id}");
+            }
+        }
     }
+
+
 
     private IEnumerator WaitForArea(Trigger t)
     {
@@ -317,28 +385,34 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         go.transform.parent = transform;
         go.AddComponent<TriggerRelay>().Init(Handler);
 
-        while (!done) yield return null;
+        while (!done)
+            yield return null;
     }
 
     // helpers
     private static Vector3 ToVector3(float[] arr) =>
         arr != null && arr.Length >= 3 ? new Vector3(arr[0], arr[1], arr[2]) : Vector3.zero;
-    private static Color ToColor(float[] arr) =>
-        arr != null && arr.Length >= 3 ?
-            new Color(arr[0], arr[1], arr[2], arr.Length > 3 ? arr[3] : 1) : Color.black;
-    private static Vector3 PolarToXZ(Polar p)
-{
-    if (p == null) return Vector3.zero;
-    float x = p.radius * Mathf.Sin(p.angle * Mathf.Deg2Rad);
-    float z = p.radius * Mathf.Cos(p.angle * Mathf.Deg2Rad);
-    return new Vector3(x, p.height, z);
-}
 
+    private static Color ToColor(float[] arr) =>
+        arr != null && arr.Length >= 3
+            ? new Color(arr[0], arr[1], arr[2], arr.Length > 3 ? arr[3] : 1)
+            : Color.black;
+
+    private static Vector3 PolarToXZ(Polar p)
+    {
+        if (p == null)
+            return Vector3.zero;
+        float x = p.radius * Mathf.Sin(p.angle * Mathf.Deg2Rad);
+        float z = p.radius * Mathf.Cos(p.angle * Mathf.Deg2Rad);
+        return new Vector3(x, p.height, z);
+    }
 }
 
 public class TriggerRelay : MonoBehaviour
 {
     private System.Action<Collider> onEnter;
+
     public void Init(System.Action<Collider> enter) => onEnter = enter;
+
     private void OnTriggerEnter(Collider other) => onEnter?.Invoke(other);
 }

@@ -1073,7 +1073,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318583, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: sphereDiameter
-      value: 26
+      value: 2.6
       objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318583, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: closedLoopOrientation
@@ -3615,7 +3615,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 668772779780633183, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: sphereDiameter
-      value: 26
+      value: 2.6
       objectReference: {fileID: 0}
     - target: {fileID: 668772779780633183, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: closedLoopOrientation
@@ -4346,7 +4346,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: sphereDiameter
-      value: 26
+      value: 2.6
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: closedLoopOrientation
@@ -8676,7 +8676,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5665556470671942804, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
       propertyPath: sphereDiameter
-      value: 26
+      value: 2.6
       objectReference: {fileID: 0}
     - target: {fileID: 5665556470671942804, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
       propertyPath: closedLoopOrientation
