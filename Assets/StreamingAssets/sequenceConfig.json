@@ -5,7 +5,7 @@
     {
       "sceneName": "Choice_desync",
       "duration": 999,
-      "parameters": { "design":"sequenceDesign_choice.json" },
+      "parameters": { "design":"sequenceDesign_staticChoice.json" },
       "reloadScene": false
     }
   ]

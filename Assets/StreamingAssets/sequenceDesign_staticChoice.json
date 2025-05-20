@@ -6,8 +6,20 @@
     "name": "skybox",
     "trigger": {
       "type": "time",
-      "seconds": 5
+      "seconds": 2
     },
+    "closedLoopOrientation": true,
+    "closedLoopPosition": true,
+    "objects": [
+      {
+        "type": "glassplane",
+        "polar": {
+          "radius": 0,
+          "angle": 0,
+          "height": -1
+        }
+      }
+    ],
     "camera": [
       {
         "vrId": "VR1",
@@ -32,10 +44,11 @@
       "name": "StaticChoice_Black_Black_10deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -115,10 +128,11 @@
       "name": "StaticChoice_Black_Black_20deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -198,10 +212,11 @@
       "name": "StaticChoice_Black_Black_30deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -281,10 +296,11 @@
       "name": "StaticChoice_Black_Black_40deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -364,10 +380,11 @@
       "name": "StaticChoice_Black_Black_50deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -447,10 +464,11 @@
       "name": "StaticChoice_Black_Black_60deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -530,10 +548,11 @@
       "name": "StaticChoice_Black_Black_70deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -613,10 +632,11 @@
       "name": "StaticChoice_Black_Black_80deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -696,10 +716,11 @@
       "name": "StaticChoice_Black_Black_90deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -779,10 +800,11 @@
       "name": "StaticChoice_Black_Black_100deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -862,10 +884,11 @@
       "name": "StaticChoice_Black_Black_110deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -945,10 +968,11 @@
       "name": "StaticChoice_Black_Black_120deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -1028,10 +1052,11 @@
       "name": "StaticChoice_Black_Black_130deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -1111,10 +1136,11 @@
       "name": "StaticChoice_Black_Black_140deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -1194,10 +1220,11 @@
       "name": "StaticChoice_Black_Black_150deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -1277,10 +1304,11 @@
       "name": "StaticChoice_Black_Black_160deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -1360,10 +1388,11 @@
       "name": "StaticChoice_Black_Black_170deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",
@@ -1443,10 +1472,11 @@
       "name": "StaticChoice_Black_Black_180deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 5
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": false,
+      "randomInitialRotation": true,
       "objects": [
         {
           "type": "ScalingCylinder",

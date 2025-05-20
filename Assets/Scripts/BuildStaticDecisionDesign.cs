@@ -14,7 +14,22 @@ public class BuildstaticChoiceDesign
         var skyStep = new
         {
             name = "skybox",
-            trigger = new { type = "time", seconds = 5 },
+            trigger = new { type = "time", seconds = 2 },
+            closedLoopOrientation = true,
+            closedLoopPosition = true,
+            objects = new[]
+                {
+                    new
+                    {
+                        type = "glassplane",
+                        polar = new
+                        {
+                            radius = 0,
+                            angle = 0,
+                            height = -1
+                        }
+                    }
+                    },
             camera = new[]
             {
                 new { vrId = "VR1", clearFlags = "Skybox" },
@@ -54,9 +69,10 @@ public class BuildstaticChoiceDesign
             select new
             {
                 name = $"StaticChoice_{c.Item1}_{c.Item2}_{a}deg",
-                trigger = new { type = "time", seconds = 45 },
+                trigger = new { type = "time", seconds = 5 },
                 closedLoopOrientation = true,
                 closedLoopPosition = false,
+                randomInitialRotation = true,
                 objects = new[]
                 {
                     new
