@@ -14,7 +14,7 @@ public class BuildstaticChoiceDesign
         var skyStep = new
         {
             name = "skybox",
-            trigger = new { type = "time", seconds = 2 },
+            trigger = new { type = "time", seconds = 5 },
             closedLoopOrientation = true,
             closedLoopPosition = true,
             objects = new[]
@@ -42,6 +42,7 @@ public class BuildstaticChoiceDesign
         // 2) generate all angle × colour-order combinations
         int[] angles =
         {
+            0,
             10,
             20,
             30,
@@ -69,9 +70,9 @@ public class BuildstaticChoiceDesign
             select new
             {
                 name = $"StaticChoice_{c.Item1}_{c.Item2}_{a}deg",
-                trigger = new { type = "time", seconds = 5 },
+                trigger = new { type = "time", seconds = 10 },
                 closedLoopOrientation = true,
-                closedLoopPosition = false,
+                closedLoopPosition = true,
                 randomInitialRotation = true,
                 objects = new[]
                 {
@@ -80,7 +81,7 @@ public class BuildstaticChoiceDesign
                         type = "ScalingCylinder",
                         polar = new
                         {
-                            radius = 60,
+                            radius = 50000,
                             angle = -a / 2f,
                             height = 0
                         },
@@ -98,7 +99,7 @@ public class BuildstaticChoiceDesign
                         type = "ScalingCylinder",
                         polar = new
                         {
-                            radius = 60,
+                            radius = 50000,
                             angle = a / 2f,
                             height = 0
                         },
@@ -146,7 +147,7 @@ public class BuildstaticChoiceDesign
         var design = new
         {
             seed = -1, // negative → re-shuffle each session
-            repetitions = 10,
+            repetitions = 40,
             sync = true,
             intertrial = skyStep,
             steps = steps
