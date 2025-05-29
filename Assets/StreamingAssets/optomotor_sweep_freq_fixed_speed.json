@@ -1,0 +1,117 @@
+{
+  "loop": true,
+  "stimuli": [
+    {
+      "speed": 36.0,
+      "frequency": 2.0,
+      "clockwise": true,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 2.0,
+      "clockwise": false,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 4.0,
+      "clockwise": true,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 4.0,
+      "clockwise": false,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 8.0,
+      "clockwise": true,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 8.0,
+      "clockwise": false,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 16.0,
+      "clockwise": true,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 16.0,
+      "clockwise": false,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 32.0,
+      "clockwise": true,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 32.0,
+      "clockwise": false,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 64.0,
+      "clockwise": true,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 64.0,
+      "clockwise": false,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 128.0,
+      "clockwise": true,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    },
+    {
+      "speed": 36.0,
+      "frequency": 128.0,
+      "clockwise": false,
+      "duration": 15.0,
+      "rotationAxis": "Yaw",
+      "contrast": 1.0
+    }
+  ]
+}
