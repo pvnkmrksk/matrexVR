@@ -1,14 +1,45 @@
 {
-  "randomise": false,
   "loop": true,
   "sequences": [
     {
-      "sceneName": "Choice_desync",
-      "duration": 3600,
+      "sceneName": "Optomotor",
+      "duration": 1,
       "parameters": {
-        "design": "sequenceDesign_choice_desync_boundary.json"
-      },
-      "reloadScene": false
+        "configFile": "optomotor_config.json"
+      }
+    }
+    ,
+    {
+      "sceneName": "Optomotor",
+      "duration": 1,
+      "parameters": {
+        "configFile": "optomotor_config.json"
+      }
+    },
+
+
+    {
+      "sceneName": "Optomotor",
+      "duration": 1,
+      "parameters": {
+        "configFile": "optomotor_config.json"
+      }
+    },
+
+
+    {
+      "sceneName": "Optomotor",
+      "duration": 1,
+      "parameters": {
+        "configFile": "optomotor_config.json"
+      }
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 3000,
+      "parameters": {
+        "configFile": "optomotor_config.json"
+      }
     }
   ]
 }
