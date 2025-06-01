@@ -3,7 +3,40 @@
   "sequences": [
     {
       "sceneName": "Optomotor",
-      "duration": 2,
+      "duration": 1,
+      "parameters": {
+        "configFile": "optomotor_config.json"
+      }
+    }
+    ,
+    {
+      "sceneName": "Optomotor",
+      "duration": 1,
+      "parameters": {
+        "configFile": "optomotor_config.json"
+      }
+    },
+
+
+    {
+      "sceneName": "Optomotor",
+      "duration": 1,
+      "parameters": {
+        "configFile": "optomotor_config.json"
+      }
+    },
+
+
+    {
+      "sceneName": "Optomotor",
+      "duration": 1,
+      "parameters": {
+        "configFile": "optomotor_config.json"
+      }
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 3000,
       "parameters": {
         "configFile": "optomotor_config.json"
       }
