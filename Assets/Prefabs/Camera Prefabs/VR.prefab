@@ -60,6 +60,8 @@ MonoBehaviour:
   startCol: 4
   horizontal: 1
   interactive: 0
+  displayOrder: DRBLFU
+  targetDisplay: 1
 --- !u!114 &2386836546770343663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -91,6 +93,11 @@ MonoBehaviour:
   initializationDelay: 0.1
   closedLoopPosition: 1
   closedLoopOrientation: 1
+  useYawMode: 0
+  yawGain: 1
+  yawDCOffset: 0
+  gainStep: 0.1
+  dcOffsetStep: 0.1
 --- !u!114 &4886124528207133730
 MonoBehaviour:
   m_ObjectHideFlags: 0

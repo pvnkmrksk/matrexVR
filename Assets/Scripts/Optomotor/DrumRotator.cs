@@ -43,11 +43,11 @@ public class DrumRotator : MonoBehaviour
         Debug.Log($"DrumRotator.Start() - {gameObject.name}");
 
         // Activate all monitors for multi-monitor setup
-        Display.displays[0].Activate(); // Main display always activated by default
-        for (int i = 1; i < Display.displays.Length; i++)
-        {
-            Display.displays[i].Activate();
-        }
+        // Display.displays[0].Activate(); // Main display always activated by default
+        // for (int i = 1; i < Display.displays.Length; i++)
+        // {
+        //     Display.displays[i].Activate();
+        // }
     }
 
     // Public method to set rotation parameters from OptomotorSceneController

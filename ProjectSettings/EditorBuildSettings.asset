@@ -17,7 +17,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Matrix.unity
     guid: ae866fd6e891642e4b6b6f687c19e9a9
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Choice.unity
     guid: 7397d1b569aa64b27ab919a5ed55c5e6
   - enabled: 0
@@ -26,7 +26,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Demo_asset.unity
     guid: 2b02c29601fc84e49a18fde7fed33f95
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Choice_Forrest.unity
     guid: 0b5651547a64f3a46b220dc72cdfffe4
   - enabled: 0

@@ -22,8 +22,19 @@ public class ClosedLoop : MonoBehaviour
     [SerializeField][Tooltip("Whether to apply the FicTrac position in closed loop")] private bool closedLoopPosition = true;
     [SerializeField][Tooltip("Whether to apply the FicTrac rotation in closed loop")] private bool closedLoopOrientation = true;
 
+    // New yaw-based orientation mode variables
+    [SerializeField][Tooltip("Whether to use yaw-based orientation mode instead of standard orientation")] private bool useYawMode = false;
+    [SerializeField][Tooltip("Gain factor for yaw-based orientation scaling")] private float yawGain = 1.0f;
+    [SerializeField][Tooltip("DC offset for yaw-based orientation (in degrees)")] private float yawDCOffset = 0.0f;
+    [SerializeField][Tooltip("Step size for gain adjustments")] private float gainStep = 0.1f;
+    [SerializeField][Tooltip("Step size for DC offset adjustments (in degrees)")] private float dcOffsetStep = 0.1f;
+
     // Stores the initial world rotation, including any random rotation applied at start
     private Quaternion _initialWorldRotation;
+
+    // Add these for logging support
+    private float _lastYawInput = 0f;
+    private float _lastYawOutput = 0f;
 
     private void Start()
     {
@@ -89,13 +100,54 @@ public class ClosedLoop : MonoBehaviour
             transform.Translate(positionDelta, Space.World);
         }
 
-        // Apply rotation change only if closedLoopOrientation is true
-        if (closedLoopOrientation)
+        // Apply rotation change based on yaw mode setting
+        if (useYawMode)
         {
-            float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg;
-            // Use Space.Self instead of Space.World to ensure rotation is applied
-            // relative to the object's current orientation. This works better with random initial rotations.
-            transform.Rotate(0, rotationDelta, 0, Space.Self);
+            // Yaw mode: closedLoopOrientation acts as on/off flag for yaw mode
+            if (closedLoopOrientation)
+            {
+                // Yaw-based orientation mode: (gain * yaw) - DC offset
+                // Use the absolute yaw value directly from ZMQ
+                float absoluteYaw = currentFicTracData.z * Mathf.Rad2Deg;
+                _lastYawInput = absoluteYaw;
+                
+                // Apply gain and DC offset with correct formula: (gain * yaw) - dcoffset
+                float rotationDelta = (yawGain * absoluteYaw) - yawDCOffset;
+                
+                // Store the processed output for logging
+                _lastYawOutput = rotationDelta;
+                
+                // Apply the rotation
+                transform.Rotate(0, rotationDelta, 0, Space.Self);
+                
+                Debug.Log($"Yaw Mode: Input={_lastYawInput:F2}°, Gain={yawGain:F2}, DCOffset={yawDCOffset:F2}°, Output={_lastYawOutput:F2}°");
+            }
+            else
+            {
+                // Yaw mode is enabled but orientation is off - no rotation applied
+                _lastYawInput = currentFicTracData.z * Mathf.Rad2Deg;
+                _lastYawOutput = 0f;
+            }
+        }
+        else
+        {
+            // Standard mode: use original delta-based closed loop orientation
+            if (closedLoopOrientation)
+            {
+                // Standard orientation mode uses delta
+                float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg;
+                _lastYawInput = rotationDelta;
+                _lastYawOutput = rotationDelta;
+                
+                // Apply the rotation
+                transform.Rotate(0, rotationDelta, 0, Space.Self);
+            }
+            else
+            {
+                // Standard mode with orientation off - no rotation applied
+                _lastYawInput = 0f;
+                _lastYawOutput = 0f;
+            }
         }
 
         _lastFicTracData = currentFicTracData;
@@ -108,6 +160,8 @@ public class ClosedLoop : MonoBehaviour
         _ficTracRotationOffset = Quaternion.identity;
         _initializationTimer = 0f;
         _lastFicTracData = Vector3.zero;
+        _lastYawInput = 0f;
+        _lastYawOutput = 0f;
         Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
     }
 
@@ -122,12 +176,52 @@ public class ClosedLoop : MonoBehaviour
     {
         closedLoopPosition = !closedLoopPosition;
         Debug.Log($"Closed Loop Position: {(closedLoopPosition ? "ON" : "OFF")}");
+        Debugger.Log($"Closed Loop Position toggled to: {(closedLoopPosition ? "ON" : "OFF")}", 3);
     }
 
     public void ToggleClosedLoopOrientation()
     {
         closedLoopOrientation = !closedLoopOrientation;
         Debug.Log($"Closed Loop Orientation: {(closedLoopOrientation ? "ON" : "OFF")}");
+        Debugger.Log($"Closed Loop Orientation toggled to: {(closedLoopOrientation ? "ON" : "OFF")}", 3);
+    }
+
+    // New method to toggle yaw mode
+    public void ToggleYawMode()
+    {
+        useYawMode = !useYawMode;
+        Debug.Log($"Yaw Mode: {(useYawMode ? "ON" : "OFF")} (Gain={yawGain:F2}, DCOffset={yawDCOffset:F2}°)");
+        Debugger.Log($"Yaw Mode toggled to: {(useYawMode ? "ON" : "OFF")} (Gain={yawGain:F2}, DCOffset={yawDCOffset:F2}°)", 3);
+    }
+
+    // Methods to adjust gain
+    public void IncreaseGain()
+    {
+        yawGain += gainStep;
+        Debug.Log($"Yaw Gain increased to: {yawGain:F2}");
+        Debugger.Log($"Yaw Gain increased to: {yawGain:F2} (step: +{gainStep:F2})", 3);
+    }
+
+    public void DecreaseGain()
+    {
+        yawGain -= gainStep;
+        Debug.Log($"Yaw Gain decreased to: {yawGain:F2}");
+        Debugger.Log($"Yaw Gain decreased to: {yawGain:F2} (step: -{gainStep:F2})", 3);
+    }
+
+    // Methods to adjust DC offset
+    public void IncreaseDCOffset()
+    {
+        yawDCOffset += dcOffsetStep;
+        Debug.Log($"Yaw DC Offset increased to: {yawDCOffset:F2}°");
+        Debugger.Log($"Yaw DC Offset increased to: {yawDCOffset:F2}° (step: +{dcOffsetStep:F2}°)", 3);
+    }
+
+    public void DecreaseDCOffset()
+    {
+        yawDCOffset -= dcOffsetStep;
+        Debug.Log($"Yaw DC Offset decreased to: {yawDCOffset:F2}°");
+        Debugger.Log($"Yaw DC Offset decreased to: {yawDCOffset:F2}° (step: -{dcOffsetStep:F2}°)", 3);
     }
 
     // Public methods for external scripts to control the behaviors
@@ -141,6 +235,21 @@ public class ClosedLoop : MonoBehaviour
         closedLoopPosition = value;
     }
 
+    public void SetYawMode(bool value)
+    {
+        useYawMode = value;
+    }
+
+    public void SetYawGain(float value)
+    {
+        yawGain = value;
+    }
+
+    public void SetYawDCOffset(float value)
+    {
+        yawDCOffset = value;
+    }
+
     public void SetPositionAndRotation(Vector3 initialPosition, Quaternion initialRotation)
     {
         _initialPosition = initialPosition;
@@ -152,12 +261,38 @@ public class ClosedLoop : MonoBehaviour
         ResetPositionAndRotation();
     }
 
+    // Public getters for logging
+    public bool GetUseYawMode() { return useYawMode; }
+    public float GetYawGain() { return yawGain; }
+    public float GetYawDCOffset() { return yawDCOffset; }
+    public float GetLastYawInput() { return _lastYawInput; }
+    public float GetLastYawOutput() { return _lastYawOutput; }
+    public bool GetClosedLoopOrientation() { return closedLoopOrientation; }
+    public bool GetClosedLoopPosition() { return closedLoopPosition; }
+    public float GetSphereDiameter() { return sphereDiameter; }
+
     private void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.O))
             ToggleClosedLoopOrientation();
         if (Input.GetKeyDown(KeyCode.P))
             ToggleClosedLoopPosition();
+
+        // Yaw mode toggle using Ctrl+Y
+        if (Input.GetKeyDown(KeyCode.Y) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            ToggleYawMode();
+        
+        // Gain adjustments using + and - keys
+        if (Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus))
+            IncreaseGain();
+        if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus))
+            DecreaseGain();
+        
+        // DC offset adjustments using [ and ] keys
+        if (Input.GetKeyDown(KeyCode.RightBracket))
+            IncreaseDCOffset();
+        if (Input.GetKeyDown(KeyCode.LeftBracket))
+            DecreaseDCOffset();
 
         if (Input.GetKeyUp(KeyCode.Escape))
         {

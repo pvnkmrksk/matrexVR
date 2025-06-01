@@ -42,7 +42,13 @@ public class OptomotorDataLogger : DataLogger
             "RotationAxis",
             "ClockwiseRotation",
             "ClosedLoopOrientation",
-            "ClosedLoopPosition"
+            "ClosedLoopPosition",
+            "UseYawMode",
+            "YawGain",
+            "YawDCOffset",
+            "YawInput",
+            "YawOutput",
+            "SphereDiameter"
         );
 
         base.Start();
