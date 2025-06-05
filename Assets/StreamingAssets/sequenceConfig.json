@@ -19,5 +19,55 @@
         "configFile":"optomotor_sweep_freq_fixed_speed.json"
       }
     },
+    {
+      "sceneName": "Choice_desync",
+      "duration": 3600,
+      "parameters": { "design":"sequenceDesign_staticChoice.json" },
+      "reloadScene": false
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 210,
+      "parameters":{
+
+        "configFile":"optomotor_sweep_speed_fixed_freq.json"
+      }
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 210,
+      "parameters":{
+
+        "configFile":"optomotor_sweep_freq_fixed_speed.json"
+      }
+    },
+    {
+      "sceneName": "Choice_desync",
+      "duration": 3600,
+      "parameters": { "design":"sequenceDesign_staticChoice.json" },
+      "reloadScene": false
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 210,
+      "parameters":{
+
+        "configFile":"optomotor_sweep_speed_fixed_freq.json"
+      }
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 210,
+      "parameters":{
+
+        "configFile":"optomotor_sweep_freq_fixed_speed.json"
+      }
+    },
+    {
+      "sceneName": "Choice_desync",
+      "duration": 3600,
+      "parameters": { "design":"sequenceDesign_staticChoice.json" },
+      "reloadScene": false
+    }
   ]
 }
