@@ -96,3 +96,6 @@ Assets/Terrain/Forest floor.glb
 
 
 *.json.meta
+
+#system config
+Assets/StreamingAssets/system_config.json
