@@ -36,7 +36,9 @@ public class BuildOptomotorSweepDesign
                 clockwise = cw,
                 duration = duration,
                 rotationAxis = rotationAxis,
-                contrast = contrast
+                contrast = contrast,
+                closedLoopOrientation = true,
+                closedLoopPosition = false
             }).ToArray();
 
         // Sweep frequencies, fixed speed
@@ -50,7 +52,10 @@ public class BuildOptomotorSweepDesign
                 clockwise = cw,
                 duration = duration,
                 rotationAxis = rotationAxis,
-                contrast = contrast
+                contrast = contrast,
+                closedLoopOrientation = true,
+                closedLoopPosition = false
+
             }).ToArray();
 
         // Design wrapper

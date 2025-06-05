@@ -7,7 +7,9 @@
       "clockwise": true,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -15,7 +17,9 @@
       "clockwise": false,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -23,7 +27,9 @@
       "clockwise": true,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -31,7 +37,9 @@
       "clockwise": false,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -39,7 +47,9 @@
       "clockwise": true,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -47,7 +57,9 @@
       "clockwise": false,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -55,7 +67,9 @@
       "clockwise": true,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -63,7 +77,9 @@
       "clockwise": false,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -71,7 +87,9 @@
       "clockwise": true,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -79,7 +97,9 @@
       "clockwise": false,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -87,7 +107,9 @@
       "clockwise": true,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -95,7 +117,9 @@
       "clockwise": false,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -103,7 +127,9 @@
       "clockwise": true,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     },
     {
       "speed": 36.0,
@@ -111,7 +137,9 @@
       "clockwise": false,
       "duration": 15.0,
       "rotationAxis": "Yaw",
-      "contrast": 1.0
+      "contrast": 1.0,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
     }
   ]
 }
