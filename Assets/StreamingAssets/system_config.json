@@ -2,52 +2,52 @@
   "targetDisplay": 0,
   "configs": [
     {
-      "sphereDiameter": 26,
-      "ledPanelWidth": 128,
-      "ledPanelHeight": 128,
-      "startRow": 1,
-      "startCol": 4,
+      "sphereDiameter": 2.7,
+      "ledPanelWidth": 64,
+      "ledPanelHeight": 64,
+      "startRow": 0,
+      "startCol": 0,
       "horizontal": true,
-      "zmqAddress": "10.126.17.125",
+      "zmqAddress": "localhost",
       "zmqPort": 9871,
       "vrId": "VR1",
-      "displayOrder": "RBLF"
+      "displayOrder": "DRBLFU"
     },
     {
-      "sphereDiameter": 26,
-      "ledPanelWidth": 128,
-      "ledPanelHeight": 128,
+      "sphereDiameter": 2.7,
+      "ledPanelWidth": 64,
+      "ledPanelHeight": 64,
       "startRow": 1,
       "startCol": 0,
       "horizontal": true,
-      "zmqAddress": "10.126.17.125",
+      "zmqAddress": "localhost",
       "zmqPort": 9872,
       "vrId": "VR2",
-      "displayOrder": "RBLF"
+      "displayOrder": "DRBLFU"
     },
     {
-      "sphereDiameter": 26,
-      "ledPanelWidth": 128,
-      "ledPanelHeight": 128,
-      "startRow": 3,
-      "startCol": 4,
+      "sphereDiameter": 2.7,
+      "ledPanelWidth": 64,
+      "ledPanelHeight": 64,
+      "startRow": 2,
+      "startCol": 0,
       "horizontal": true,
-      "zmqAddress": "10.126.17.125",
+      "zmqAddress": "localhost",
       "zmqPort": 9873,
       "vrId": "VR3",
-      "displayOrder": "RBLF"
+      "displayOrder": "DRBLFU"
     },
     {
-      "sphereDiameter": 26,
-      "ledPanelWidth": 128,
-      "ledPanelHeight": 128,
+      "sphereDiameter": 2.7,
+      "ledPanelWidth": 64,
+      "ledPanelHeight": 64,
       "startRow": 3,
       "startCol": 0,
       "horizontal": true,
-      "zmqAddress": "10.126.17.125",
+      "zmqAddress": "localhost",
       "zmqPort": 9874,
       "vrId": "VR4",
-      "displayOrder": "RBLF"
+      "displayOrder": "DRBLFU"
     }
   ]
 }

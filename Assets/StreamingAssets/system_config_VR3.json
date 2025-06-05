@@ -14,7 +14,7 @@
       "displayOrder": "DRBLFU"
     },
     {
-      "sphereDiameter": 1.0,
+      "sphereDiameter": 2.7,
       "ledPanelWidth": 64,
       "ledPanelHeight": 64,
       "startRow": 1,
@@ -26,7 +26,7 @@
       "displayOrder": "DRBLFU"
     },
     {
-      "sphereDiameter": 1.0,
+      "sphereDiameter": 2.7,
       "ledPanelWidth": 64,
       "ledPanelHeight": 64,
       "startRow": 2,
@@ -38,7 +38,7 @@
       "displayOrder": "DRBLFU"
     },
     {
-      "sphereDiameter": 1.0,
+      "sphereDiameter": 2.7,
       "ledPanelWidth": 64,
       "ledPanelHeight": 64,
       "startRow": 3,
