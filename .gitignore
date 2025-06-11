@@ -89,18 +89,16 @@ Assets/MTT_Results/*
 Assets/Terrain/forest_floor_tile_path.glb
 Assets/Terrain/Forest floor.glb
 
-Assets/Infinity*
-Assets/MTT_Results/*
-Assets/Terrain/forest_floor_tile_path.glb
-Assets/Terrain/Forest floor.glb
-
-
 *.json.meta
 
 # Local experiment / run exports (not source assets)
 Assets/data/
 
-#system config
+# system config (keep local system_config.json ignored)
 Assets/StreamingAssets/system_config.json
+
+# but allow the example template to be committed
+!Assets/StreamingAssets/system_config_example.json
+
 RWT_Cache/*
 Assets/RWT_Result/*
