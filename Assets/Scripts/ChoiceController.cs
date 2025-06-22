@@ -12,7 +12,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
     public Material[] materials;
     private Dictionary<string, Material> materialDict = new Dictionary<string, Material>();
-    string[] tags = new string[] { "ChoiceVR1", "ChoiceVR2", "ChoiceVR3", "ChoiceVR4" };
+    string[] tags = new string[] { "SimulatedLocustsVR1", "SimulatedLocustsVR2" };
 
     private void Awake()
     {
@@ -53,83 +53,93 @@ public class ChoiceController : MonoBehaviour, ISceneController
                         obj.position.angle,
                         obj.position.height
                     );
-                    GameObject instance = Instantiate(prefab, position, Quaternion.identity);
 
-                    // Set the tag
-                    instance.tag = tags[i];
-
-                    // **Assign the layer based on the tag**
-                    string layerName = "ChoiceVR" + (i + 1); // "Choice1", "Choice2", etc.
-                    int layer = LayerMask.NameToLayer(layerName);
-                    if (layer == -1)
+                    // Check if this is a band object
+                    if (obj.type.ToLower().Contains("band"))
                     {
-                        Debug.LogError(
-                            "Layer '"
-                                + layerName
-                                + "' not found. Please add it in the Tags and Layers manager."
-                        );
-                    }
-                    else
-                    {
-                        SetLayerRecursively(instance, layer);
-                    }
-
-                    // Rest of your instance initialization code
-                    // Set scale
-                    if (obj.flip)
-                    {
-                        if (obj.type.ToLower().Contains("band"))
+                        // For band objects, only instantiate through InstantiateBand method
+                        if (obj.flip)
                         {
                             InstantiateBand(obj, i + 1);
                         }
-                        else
-                        {
-                            InstantiateRegularObject(obj);
-                        }
                     }
                     else
                     {
-                        instance.transform.localScale = new Vector3(
-                            obj.scale.x,
-                            obj.scale.y,
-                            obj.scale.z
-                        );
-                    }
+                        // For regular objects, instantiate normally
+                        GameObject instance = Instantiate(prefab, position, Quaternion.identity);
 
-                    // Set speed
-                    if (obj.speed != 0)
-                    {
-                        instance.GetComponent<LocustMover>().speed = obj.speed;
-                    }
+                        // Set the tag
+                        instance.tag = tags[i];
 
-                    // Set rotation
-                    if (obj.mu != 0)
-                    {
-                        instance.transform.localRotation = Quaternion.Euler(0, obj.mu, 0);
-                    }
+                        // **Assign the layer based on the tag**
+                        string layerName = "SimulatedLocustsVR" + (i + 1); // "SimulatedLocustsVR1", "SimulatedLocustsVR2", etc.
+                        int layer = LayerMask.NameToLayer(layerName);
+                        if (layer == -1)
+                        {
+                            Debug.LogError(
+                                "Layer '"
+                                    + layerName
+                                    + "' not found. Please add it in the Tags and Layers manager."
+                            );
+                        }
+                        else
+                        {
+                            SetLayerRecursively(instance, layer);
+                        }
 
-                    // Apply material if specified
-                    if (
-                        !string.IsNullOrEmpty(obj.material)
-                        && materialDict.TryGetValue(obj.material, out Material material)
-                    )
-                    {
-                        instance.GetComponent<Renderer>().material = material;
-                    }
+                        // Set scale
+                        if (obj.flip)
+                        {
+                            instance.transform.localScale = new Vector3(
+                                obj.scale.x * -1,
+                                obj.scale.y,
+                                obj.scale.z
+                            );
+                        }
+                        else
+                        {
+                            instance.transform.localScale = new Vector3(
+                                obj.scale.x,
+                                obj.scale.y,
+                                obj.scale.z
+                            );
+                        }
 
-                    // **Apply the visual angle setting if the ScaleWithDistance component is present**
-                    ScaleWithDistance scaleScript = instance.GetComponent<ScaleWithDistance>();
-                    if (scaleScript != null)
-                    {
-                        scaleScript.visualAngleDegrees = obj.visualAngleDegrees;
-                    }
-                    ColorDrift colorDrift = instance.GetComponent<ColorDrift>();
-                    if (colorDrift != null)
-                    {
-                        // If using typed fields in `SceneObject`:
-                        colorDrift.meanBlueA = obj.meanBlueA;
-                        colorDrift.meanBlueB = obj.meanBlueB;
-                        colorDrift.switchInterval = obj.switchInterval;
+                        // Set speed
+                        if (obj.speed != 0)
+                        {
+                            instance.GetComponent<LocustMover>().speed = obj.speed;
+                        }
+
+                        // Set rotation
+                        if (obj.mu != 0)
+                        {
+                            instance.transform.localRotation = Quaternion.Euler(0, obj.mu, 0);
+                        }
+
+                        // Apply material if specified
+                        if (
+                            !string.IsNullOrEmpty(obj.material)
+                            && materialDict.TryGetValue(obj.material, out Material material)
+                        )
+                        {
+                            instance.GetComponent<Renderer>().material = material;
+                        }
+
+                        // **Apply the visual angle setting if the ScaleWithDistance component is present**
+                        ScaleWithDistance scaleScript = instance.GetComponent<ScaleWithDistance>();
+                        if (scaleScript != null)
+                        {
+                            scaleScript.visualAngleDegrees = obj.visualAngleDegrees;
+                        }
+                        ColorDrift colorDrift = instance.GetComponent<ColorDrift>();
+                        if (colorDrift != null)
+                        {
+                            // If using typed fields in `SceneObject`:
+                            colorDrift.meanBlueA = obj.meanBlueA;
+                            colorDrift.meanBlueB = obj.meanBlueB;
+                            colorDrift.switchInterval = obj.switchInterval;
+                        }
                     }
                 }
             }
@@ -254,6 +264,8 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
     private void InstantiateBand(SceneObject obj, int vrIndex)
     {
+        Debug.Log($"InstantiateBand called for VR{vrIndex} with numberOfInstances: {obj.numberOfInstances}");
+        
         if (prefabDict.TryGetValue(obj.type, out GameObject bandPrefab))
         {
             Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
@@ -261,8 +273,9 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
             // Set a proper name for the band instance
             bandInstance.name = $"{bandPrefab.name}_{vrIndex}";
+            Debug.Log($"Created band instance: {bandInstance.name}");
 
-            // Set layer
+            // Set layer - use consistent naming with the main loop
             string layerName = $"SimulatedLocustsVR{vrIndex}";
             int layerIndex = LayerMask.NameToLayer(layerName);
             if (layerIndex == -1)
@@ -277,6 +290,12 @@ public class ChoiceController : MonoBehaviour, ISceneController
             BandSpawner spawner = bandInstance.GetComponent<BandSpawner>();
             if (spawner != null)
             {
+                Debug.Log($"Configuring BandSpawner for VR{vrIndex}");
+                
+                // Disable the BandSpawner temporarily to prevent automatic spawning with default values
+                spawner.enabled = false;
+                
+                // Configure the spawner with JSON values
                 spawner.vrIndex = vrIndex;
                 spawner.numberOfInstances = obj.numberOfInstances;
                 spawner.spawnLengthX = obj.spawnLengthX;
@@ -318,6 +337,21 @@ public class ChoiceController : MonoBehaviour, ISceneController
                     spawner.sectionLengthZ = obj.sectionLengthZ;
                     spawner.sectionLengthX = obj.sectionLengthX;
                 }
+
+                Debug.Log($"About to spawn {spawner.numberOfInstances} instances for VR{vrIndex}");
+                
+                // Manually call the spawning methods in the correct order WITHOUT re-enabling the component
+                spawner.SendMessage("SetupInitialTransform", SendMessageOptions.DontRequireReceiver);
+                spawner.SendMessage("GenerateSpawnPositions", SendMessageOptions.DontRequireReceiver);
+                spawner.SendMessage("SpawnInstances", SendMessageOptions.DontRequireReceiver);
+                
+                // Mark as manually initialized to prevent Start() from running
+                spawner.SendMessage("SetManuallyInitialized", true, SendMessageOptions.DontRequireReceiver);
+                
+                // Now re-enable the spawner for updates, but prevent Start() from running
+                spawner.enabled = true;
+                
+                Debug.Log($"Finished spawning for VR{vrIndex}");
             }
 
             // Set BandLogger properties

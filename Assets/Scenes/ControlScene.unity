@@ -3181,6 +3181,7 @@ MonoBehaviour:
   loopSequence: 1
   systemConfigFileName: system_config.json
   logLevel: 2
+  preventMultipleWindows: 1
 --- !u!4 &484890815
 Transform:
   m_ObjectHideFlags: 0

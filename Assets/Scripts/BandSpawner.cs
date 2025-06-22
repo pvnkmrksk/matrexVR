@@ -73,11 +73,20 @@ public class BandSpawner : MonoBehaviour
     private PeriodicBoundary boundaryComponent;
     private static int globalInstanceCounter = 0;
     private int localInstanceCounter = 0;
+    private bool manuallyInitialized = false; // Flag to prevent double initialization
+
     /// <summary>
     /// Initializes the spawner, sets up the initial transform, and spawns instances.
     /// </summary>
     void Start()
     {
+        // Prevent double initialization if already manually configured
+        if (manuallyInitialized)
+        {
+            Debug.Log($"Skipping Start() for {gameObject.name} - already manually initialized");
+            return;
+        }
+        
         SetupInitialTransform();
         areaRotation = Quaternion.Euler(0, rotationAngle, 0);
         GenerateSpawnPositions();
@@ -244,7 +253,13 @@ public class BandSpawner : MonoBehaviour
     {
         int instancesToSpawn;
         int parentLayer = gameObject.layer;
-        if (prioritizeNumbers)
+        
+        // For random grid type, always respect numberOfInstances
+        if (gridType == SpawnGridType.Random)
+        {
+            instancesToSpawn = numberOfInstances;
+        }
+        else if (prioritizeNumbers)
         {
             instancesToSpawn = numberOfInstances;
         }
@@ -252,6 +267,8 @@ public class BandSpawner : MonoBehaviour
         {
             instancesToSpawn = spawnPositions.Count;
         }
+
+        Debug.Log($"SpawnInstances called for {gameObject.name}. GridType: {gridType}, numberOfInstances: {numberOfInstances}, prioritizeNumbers: {prioritizeNumbers}, instancesToSpawn: {instancesToSpawn}, spawnPositions.Count: {spawnPositions.Count}");
 
         for (int i = 0; i < instancesToSpawn; i++)
         {
@@ -268,6 +285,8 @@ public class BandSpawner : MonoBehaviour
             globalInstanceCounter++;
             localInstanceCounter++;
 
+            Debug.Log($"Created locust instance {i+1}/{instancesToSpawn}: {instance.name} at position {position}");
+
             // Set orientation using von Mises distribution
             float orientation = GenerateVanMisesRotation(mu, kappa);
             // Add 90 degrees to rotate the reference direction from x-axis to z-axis
@@ -277,6 +296,7 @@ public class BandSpawner : MonoBehaviour
             SetupInstanceComponents(instance, orientation + 90f);
         }
 
+        Debug.Log($"Finished spawning {instancesToSpawn} instances for {gameObject.name}. Total global counter: {globalInstanceCounter}");
         UpdateBoundaryCenter();
     }
 
@@ -332,5 +352,11 @@ public class BandSpawner : MonoBehaviour
         {
             SetLayerRecursively(child.gameObject, layer);
         }
+    }
+    
+    // Method to mark this spawner as manually initialized
+    public void SetManuallyInitialized(bool initialized)
+    {
+        manuallyInitialized = initialized;
     }
 }
