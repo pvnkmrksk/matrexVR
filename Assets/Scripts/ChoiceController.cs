@@ -13,7 +13,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
     public Material[] materials;
     private Dictionary<string, Material> materialDict = new Dictionary<string, Material>();
 
-    private int numberOfVR = 4;
+    private int numberOfVR = 2;
 
     private void Awake()
     {
@@ -156,6 +156,8 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
     private void InstantiateBand(SceneObject obj, int vrIndex)
     {
+        Debug.Log($"InstantiateBand called for VR{vrIndex} with numberOfInstances: {obj.numberOfInstances}");
+        
         if (prefabDict.TryGetValue(obj.type, out GameObject bandPrefab))
         {
             Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
@@ -163,8 +165,9 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
             // Set a proper name for the band instance
             bandInstance.name = $"{bandPrefab.name}_{vrIndex}";
+            Debug.Log($"Created band instance: {bandInstance.name}");
 
-            // Set layer
+            // Set layer - use consistent naming with the main loop
             string layerName = $"SimulatedLocustsVR{vrIndex}";
             int layerIndex = LayerMask.NameToLayer(layerName);
             if (layerIndex == -1)
@@ -216,6 +219,21 @@ public class ChoiceController : MonoBehaviour, ISceneController
                     spawner.sectionLengthZ = obj.sectionLengthZ;
                     spawner.sectionLengthX = obj.sectionLengthX;
                 }
+
+                Debug.Log($"About to spawn {spawner.numberOfInstances} instances for VR{vrIndex}");
+                
+                // Manually call the spawning methods in the correct order WITHOUT re-enabling the component
+                spawner.SendMessage("SetupInitialTransform", SendMessageOptions.DontRequireReceiver);
+                spawner.SendMessage("GenerateSpawnPositions", SendMessageOptions.DontRequireReceiver);
+                spawner.SendMessage("SpawnInstances", SendMessageOptions.DontRequireReceiver);
+                
+                // Mark as manually initialized to prevent Start() from running
+                spawner.SendMessage("SetManuallyInitialized", true, SendMessageOptions.DontRequireReceiver);
+                
+                // Now re-enable the spawner for updates, but prevent Start() from running
+                spawner.enabled = true;
+                
+                Debug.Log($"Finished spawning for VR{vrIndex}");
             }
 
             // Set BandLogger properties

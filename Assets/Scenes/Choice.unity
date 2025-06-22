@@ -280,7 +280,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 402538950}
-  - component: {fileID: 402538949}
+  - component: {fileID: 143658774}
   m_Layer: 0
   m_Name: SceneController
   m_TagString: Untagged

@@ -1,67 +1,48 @@
 {
   "objects": [
-    
     {
-      "type": "LocustBand",
+      "type": "MormonBand",
       "position": {
-        "radius": 32,
-        "angle": 90
+        "radius": 0,
+        "angle": 0
       },
       "scale": {
         "x": 1,
         "y": 1,
         "z": 1
       },
-      "flip": false,
+      "flip": true,
       "speed": 4,
       "mu": 0,
-      "numberOfInstances": 32,
-      "spawnLengthX": 48,
-      "spawnLengthZ": 28,
-      "gridType": "Manhattan",
+      "numberOfInstances": 10,
+      "spawnLengthX": 100,
+      "spawnLengthZ": 100,
+      "gridType": "Random",
       "kappa": 10000,
-      "visibleOffDuration": 0.3,
-      "visibleOnDuration": 0.1,
-      "boundaryLengthX": 48,
-      "boundaryLengthZ": 28,
+      "visibleOffDuration": 0,
+      "visibleOnDuration": 1,
+      "boundaryLengthX": 100,
+      "boundaryLengthZ": 100,
       "rotationAngle": 0,
       "sectionLengthX": 6,
       "sectionLengthZ": 7,
-      "moveWithTransform": true,
-      "prioritizeNumbers": false
-    },
-    {
-      "type": "LocustBand",
-      "position": {
-        "radius": 32,
-        "angle": 270
-      },
-      "scale": {
-        "x": 1,
-        "y": 1,
-        "z": 1
-      },
-      "flip": false,
-      "speed": 4,
-      "mu": 0,
-      "numberOfInstances": 32,
-      "spawnLengthX": 48,
-      "spawnLengthZ": 28,
-      "gridType": "Manhattan",
-      "kappa": 10000,
-      "visibleOffDuration": 0.3,
-      "visibleOnDuration": 0.1,
-      "boundaryLengthX": 48,
-      "boundaryLengthZ": 28,
-      "rotationAngle": 0,
-      "sectionLengthX": 6,
-      "sectionLengthZ": 7,
-      "moveWithTransform": true,
-      "prioritizeNumbers": false
+      "lockBoundaryWithAnimalPosition": true,
+      "lockAgentWithAnimalPosition": false,
+      "prioritizeNumbers": true
     }
   ],
   "closedLoopOrientation": true,
   "closedLoopPosition": true,
+  "initialPosition": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
   "backgroundColor": {
     "r": 0,
     "g": 0,

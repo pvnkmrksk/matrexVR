@@ -49,7 +49,8 @@ MonoBehaviour:
   mu: 0
   kappa: 10000
   speed: 2
-  moveWithCustomTransform: 1
+  lockBoundaryWithAnimalPosition: 0
+  lockAgentWithAnimalPosition: 0
   customParentTransform: {fileID: 0}
   visibleOffDuration: 1
   visibleOnDuration: 1
@@ -74,9 +75,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 4006871233168333227}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5985dec972e79909bc7420282e9af2a, type: 3}
+  m_Script: {fileID: 11500000, guid: 4e70685f7abae4fe598f6bfcc79ae164, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
+  boundaryManager: {fileID: 0}
+  speed: 4
