@@ -102,6 +102,11 @@ public class ChoiceController : MonoBehaviour, ISceneController
         // TODO: Set sky and grass textures
         // Start the coroutine from here
         StartCoroutine(DelayedOnLoaded(0.05f));
+
+        if (!string.IsNullOrEmpty(config.skyboxPath))
+        {
+            SetSkybox(config.skyboxPath);
+        }
     }
 
     private void InstantiateRegularObject(SceneObject obj)
@@ -130,7 +135,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
                     obj.scale.z
                 );
             }
-            
+
             if (obj.speed != 0)
             {
                 instance.GetComponent<LocustMover>().speed = obj.speed;
@@ -142,7 +147,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
             }
 
             //todo. add individual datalogger to each instance. 
-            
+
             // Optionally apply material
             if (
                 !string.IsNullOrEmpty(obj.material)
@@ -157,7 +162,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
     private void InstantiateBand(SceneObject obj, int vrIndex)
     {
         Debug.Log($"InstantiateBand called for VR{vrIndex} with numberOfInstances: {obj.numberOfInstances}");
-        
+
         if (prefabDict.TryGetValue(obj.type, out GameObject bandPrefab))
         {
             Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
@@ -221,18 +226,18 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 }
 
                 Debug.Log($"About to spawn {spawner.numberOfInstances} instances for VR{vrIndex}");
-                
+
                 // Manually call the spawning methods in the correct order WITHOUT re-enabling the component
                 spawner.SendMessage("SetupInitialTransform", SendMessageOptions.DontRequireReceiver);
                 spawner.SendMessage("GenerateSpawnPositions", SendMessageOptions.DontRequireReceiver);
                 spawner.SendMessage("SpawnInstances", SendMessageOptions.DontRequireReceiver);
-                
+
                 // Mark as manually initialized to prevent Start() from running
                 spawner.SendMessage("SetManuallyInitialized", true, SendMessageOptions.DontRequireReceiver);
-                
+
                 // Now re-enable the spawner for updates, but prevent Start() from running
                 spawner.enabled = true;
-                
+
                 Debug.Log($"Finished spawning for VR{vrIndex}");
             }
 
@@ -294,6 +299,62 @@ public class ChoiceController : MonoBehaviour, ISceneController
         return new Vector3(x, 0, z); // Assuming y is always 0
     }
 
+    private void SetSkybox(string skyboxPath)
+    {
+        // If skyboxPath is empty, retain existing skybox
+        if (string.IsNullOrEmpty(skyboxPath))
+        {
+            return;
+        }
+
+        // Construct full path in StreamingAssets
+        string fullPath = Path.Combine(Application.streamingAssetsPath, skyboxPath);
+
+        if (File.Exists(fullPath))
+        {
+            try
+            {
+                // Load the image bytes
+                byte[] imageBytes = File.ReadAllBytes(fullPath);
+
+                // Create texture with explicit settings:
+                // - RGBA32 format for full color support
+                // - mipmapChain: false to prevent mipmap generation which can cause seams in panoramic skyboxes
+                // - linear: true for proper color space handling
+                Texture2D skyboxTexture = new Texture2D(
+                    width: 2,
+                    height: 2,
+                    textureFormat: TextureFormat.RGBA32,
+                    mipChain: false,
+                    linear: true
+                );
+
+                // Load the image data into the texture
+                if (skyboxTexture.LoadImage(imageBytes))
+                {
+                    // Create a new material using the skybox shader
+                    Material skyboxMaterial = new Material(Shader.Find("Skybox/Panoramic"));
+                    skyboxMaterial.mainTexture = skyboxTexture;
+
+                    // Apply the skybox material to the scene
+                    RenderSettings.skybox = skyboxMaterial;
+                }
+                else
+                {
+                    Debug.LogWarning($"Failed to load skybox texture from: {fullPath}");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Error loading skybox: {e.Message}");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"Skybox file not found at: {fullPath}");
+        }
+    }
+
     // Update SceneConfig and other classes as needed to reflect JSON changes
 }
 
@@ -304,6 +365,7 @@ public class SceneConfig
     public bool closedLoopOrientation;
     public bool closedLoopPosition;
     public ColorConfig backgroundColor;
+    public string skyboxPath;
 }
 
 [System.Serializable]
