@@ -344,23 +344,12 @@ public class ChoiceController : MonoBehaviour, ISceneController
                     Debug.Log("Successfully loaded skybox texture");
 
                     // Create a new material using the skybox shader
-                    Shader skyboxShader = Shader.Find("Skybox/Panoramic");
-                    if (skyboxShader == null)
-                    {
-                        Debug.LogError("Could not find Skybox/Panoramic shader!");
-                        return;
-                    }
-
-                    Material skyboxMaterial = new Material(skyboxShader);
+                    Material skyboxMaterial = new Material(Shader.Find("Skybox/Panoramic"));
                     skyboxMaterial.mainTexture = skyboxTexture;
-                    Debug.Log($"Created skybox material with texture size: {skyboxTexture.width}x{skyboxTexture.height}");
 
                     // Apply the skybox material to the scene
                     RenderSettings.skybox = skyboxMaterial;
                     Debug.Log("Skybox material applied to RenderSettings");
-
-                    // Set all cameras to use Skybox clear flags
-                    SetCameraClearFlagsToSkybox();
                 }
                 else
                 {
@@ -376,23 +365,6 @@ public class ChoiceController : MonoBehaviour, ISceneController
         {
             Debug.LogWarning($"Skybox file not found at: {fullPath}");
         }
-    }
-
-    private void SetCameraClearFlagsToSkybox()
-    {
-        // Find all cameras in the scene, including those with MainCamera tag
-        Camera[] allCameras = FindObjectsOfType<Camera>();
-
-        foreach (Camera cam in allCameras)
-        {
-            if (cam != null)
-            {
-                cam.clearFlags = CameraClearFlags.Skybox;
-                Debug.Log($"Set camera '{cam.name}' clear flags to Skybox");
-            }
-        }
-
-        Debug.Log($"Updated {allCameras.Length} cameras to use Skybox clear flags");
     }
 
     // Update SceneConfig and other classes as needed to reflect JSON changes
