@@ -1,0 +1,40 @@
+{
+  "objects": [
+    {
+      "type": "LocustBand",
+      "position": {
+        "radius": 35,
+        "angle": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "flip": false,
+      "speed": 4,
+      "mu": 0,
+      "numberOfInstances": 21,
+      "spawnLengthX": 140,
+      "spawnLengthZ": 60,
+      "gridType": "Manhattan",
+      "kappa": 10000,
+      "visibleOffDuration": 0,
+      "visibleOnDuration": 0.1,
+      "boundaryLengthX": 140,
+      "boundaryLengthZ": 60,
+      "rotationAngle": 0,
+      "sectionLengthX": 20,
+      "sectionLengthZ": 20,
+      "moveWithTransform": true,
+      "prioritizeNumbers": false
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0,
+    "g": 0,
+    "b": 0
+  }
+}
