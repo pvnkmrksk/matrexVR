@@ -1,7 +1,7 @@
 {
   "objects": [
     {
-      "type": "LocustBand",
+      "type": "MormonBand",
       "position": {
         "radius": 35,
         "angle": 0

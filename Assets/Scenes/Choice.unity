@@ -208,7 +208,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318735, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2640750661679286890, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: m_Layer
@@ -280,7 +280,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 402538950}
-  - component: {fileID: 143658774}
+  - component: {fileID: 402538949}
   m_Layer: 0
   m_Name: SceneController
   m_TagString: Untagged
@@ -324,6 +324,7 @@ MonoBehaviour:
   - {fileID: 6839372128103566480, guid: d71ce1858a8f65f508c25fdcbf61e254, type: 3}
   - {fileID: 7652047199309307485, guid: 775a4a8ff9fb74b03b243bbf1163a3c1, type: 3}
   - {fileID: 5359356435596721786, guid: 3da0b96ed66f8d0a0802b986e41f213c, type: 3}
+  - {fileID: 5359356435596721786, guid: 247c9ec90afe243959d4906d4f6a005c, type: 3}
   materials:
   - {fileID: 2100000, guid: 30698065bf4d05413851dbea62a8c3b6, type: 2}
   - {fileID: 2100000, guid: cc1b699790543fbe9b646ada19484422, type: 2}
@@ -715,7 +716,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 668772779780633255, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2222056076659782031, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: m_Layer
