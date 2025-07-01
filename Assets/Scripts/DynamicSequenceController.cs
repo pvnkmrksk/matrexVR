@@ -50,6 +50,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public Polar polar; // radius/angle/height (new)
         public Scale scale; // object scale   (new)
         public string material; // material name  (new)
+        public float[] color; // [r, g, b, a] (optional)
         public bool flip; // mirror on X    (new)
         public float visualAngleDegrees; // for ScaleWithDistance (new)
 
@@ -274,13 +275,24 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                 instance.transform.localScale = scale;
 
                 // Material
-                string matName = !string.IsNullOrEmpty(obj.material) ? obj.material : obj.mat;
-                if (!string.IsNullOrEmpty(matName) &&
-                    materialDict.TryGetValue(matName, out var mat) &&
-                    instance.TryGetComponent<Renderer>(out var rend))
+                if (instance.TryGetComponent<Renderer>(out var rend))
                 {
-                    rend.material = mat;
+                    // Assign material (if specified)
+                    string matName = !string.IsNullOrEmpty(obj.material) ? obj.material : obj.mat;
+                    if (!string.IsNullOrEmpty(matName) && materialDict.TryGetValue(matName, out var mat))
+                    {
+                        rend.material = new Material(mat); // Clone it so we can modify it without affecting others
+                    }
+
+                    // Apply direct color override
+                    if (obj.color != null && obj.color.Length >= 3)
+                    {
+                        Color col = ToColor(obj.color);
+                        if (rend.material != null)
+                            rend.material.color = col;
+                    }
                 }
+
 
                 // Visual Angle
                 if (instance.TryGetComponent<ScaleWithDistance>(out var swd))
