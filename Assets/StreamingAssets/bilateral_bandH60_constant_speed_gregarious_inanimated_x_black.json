@@ -1,0 +1,68 @@
+{
+  "objects": [
+  
+    {
+      "type": "InanimatedBand",
+      "position": {
+        "radius": 33.6,
+        "angle": 60
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "flip": false,
+      "speed": 2,
+      "mu": 0,
+      "numberOfInstances": 32,
+      "spawnLengthX": 43.2,
+      "spawnLengthZ": 28.1,
+      "gridType": "Hexagonal",
+      "kappa": 10000,
+      "visibleOffDuration": 0,
+      "visibleOnDuration": 0.1,
+      "boundaryLengthX": 430.2,
+      "boundaryLengthZ": 280.1,
+      "rotationAngle": 0,
+      "hexRadius": 2.7,
+      "moveWithTransform": false,
+      "prioritizeNumbers": false
+    },
+    {
+      "type": "LocustBand_black",
+      "position": {
+        "radius": 33.6,
+        "angle": 300
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "flip": false,
+      "speed": 2,
+      "mu": 0,
+      "numberOfInstances": 32,
+      "spawnLengthX": 43.2,
+      "spawnLengthZ": 28.1,
+      "gridType": "Hexagonal",
+      "kappa": 10000,
+      "visibleOffDuration": 0,
+      "visibleOnDuration": 0.1,
+      "boundaryLengthX": 430.2,
+      "boundaryLengthZ": 280.1,
+      "rotationAngle": 0,
+      "hexRadius": 2.7,
+      "moveWithTransform": false,
+      "prioritizeNumbers": false
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0,
+    "g": 0,
+    "b": 0
+  }
+}

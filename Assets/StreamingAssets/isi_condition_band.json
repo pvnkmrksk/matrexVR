@@ -4,14 +4,7 @@
         "sceneName": "Choice_noBG",
         "duration": 60,
         "parameters": {
-          "configFile": "bilateral_bandM_empty.json"
-        }
-      },
-      {
-        "sceneName": "Choice_noBG",
-        "duration": 60,
-        "parameters": {
-          "configFile": "bilateral_bandM_empty.json"
+          "configFile": "band_empty.json"
         }
       }
     ]

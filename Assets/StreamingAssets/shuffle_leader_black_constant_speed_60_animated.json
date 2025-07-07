@@ -1,0 +1,760 @@
+{
+    "sequences": [
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated_x_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated_x_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_x_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_speed_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated_x_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_speed_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated_x_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_x_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated_x_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated_x_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_x_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_speed_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_speed_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_x_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated_x_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated_x_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated_x_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_speed_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_x_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated_x_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_x_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated_x_gregarious.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_inanimated_x_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH60_constant_speed_gregarious_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_speed_gregarious.json"
+            }
+        }
+    ]
+}

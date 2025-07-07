@@ -10,7 +10,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1009607757081374556, guid: c6fe967b1fbec1f578586b4dc90a44fe, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1009607757081374556, guid: c6fe967b1fbec1f578586b4dc90a44fe, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7213716345219618523, guid: c6fe967b1fbec1f578586b4dc90a44fe, type: 3}
       propertyPath: m_Name
@@ -98,4 +102,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7177fac88d7075dda8e803d594f71ad9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  includeZmqData: 1
+  includeZmqData: 0

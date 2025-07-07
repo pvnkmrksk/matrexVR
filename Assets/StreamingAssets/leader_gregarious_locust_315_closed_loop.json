@@ -1,0 +1,38 @@
+{
+  "objects": [
+    {
+      "type": "LocustBand",
+      "position": {
+        "radius": 8,
+        "angle": 315
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "flip": false,
+      "speed": 0,
+      "mu": 315,
+      "numberOfInstances": 1,
+      "spawnLengthX": 300,
+      "spawnLengthZ": 300,
+      "gridType": "Random",
+      "kappa": 10000,
+      "visibleOffDuration": 0,
+      "visibleOnDuration": 1,
+      "boundaryLengthX": 300,
+      "boundaryLengthZ": 300,
+      "rotationAngle": 315,
+      "moveWithTransform": true,
+      "prioritizeNumbers": true
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0.4,
+    "g": 0.4,
+    "b": 0.4
+  }
+}

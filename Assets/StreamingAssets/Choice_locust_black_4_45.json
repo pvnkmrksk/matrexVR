@@ -1,0 +1,27 @@
+{
+  "objects": [
+    {
+      "type": "InanimatedLeaderLocust_black",
+      "position": {
+        "radius": 4,
+        "angle": 45
+      },
+      "scale": {
+        "x": 100,
+        "y": 100,
+        "z": 100
+      },
+      "flip": false,
+
+      "speed": 2,
+      "mu": 45
+    }
+      ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0.474,
+    "g": 0.580,
+    "b": 0.721
+  }
+}

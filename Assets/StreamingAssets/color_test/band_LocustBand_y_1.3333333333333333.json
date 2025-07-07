@@ -1,0 +1,69 @@
+{
+    "objects": [
+        {
+            "type": "LocustBand_y",
+            "position": {
+                "radius": 0,
+                "angle": 180
+            },
+            "scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+            },
+            "flip": false,
+            "speed": 4,
+            "mu": 90,
+            "numberOfInstances": 32,
+            "spawnLengthX": 48,
+            "spawnLengthZ": 28,
+            "gridType": "Manhattan",
+            "kappa": 10000,
+            "visibleOffDuration": 0,
+            "visibleOnDuration": 0.1,
+            "boundaryLengthX": 48,
+            "boundaryLengthZ": 28,
+            "rotationAngle": 90,
+            "sectionLengthX": 6,
+            "sectionLengthZ": 7,
+            "moveWithTransform": true,
+            "prioritizeNumbers": false
+        },
+        {
+            "type": "LocustBand_y",
+            "position": {
+                "radius": 0,
+                "angle": 0
+            },
+            "scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+            },
+            "flip": false,
+            "speed": 4,
+            "mu": 90,
+            "numberOfInstances": 32,
+            "spawnLengthX": 48,
+            "spawnLengthZ": 28,
+            "gridType": "Manhattan",
+            "kappa": 10000,
+            "visibleOffDuration": 0,
+            "visibleOnDuration": 0.1,
+            "boundaryLengthX": 48,
+            "boundaryLengthZ": 28,
+            "rotationAngle": 90,
+            "sectionLengthX": 6,
+            "sectionLengthZ": 7,
+            "moveWithTransform": true,
+            "prioritizeNumbers": false
+        }
+    ],
+    "closedLoopOrientation": true,
+    "closedLoopPosition": true,
+    "backgroundColor": {
+        "r": 0.13333333333333333,
+        "g": 0.13333333333333333,
+        "b": 0.13333333333333333
+    }
+}

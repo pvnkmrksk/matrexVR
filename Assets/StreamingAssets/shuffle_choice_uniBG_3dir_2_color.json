@@ -1,0 +1,844 @@
+{
+    "sequences": [
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_uniBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "Choice_locust_uniBG_black_0.json"
+            }
+        }
+    ]
+}

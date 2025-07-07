@@ -18,5 +18,10 @@
     }
       ],
   "closedLoopOrientation": true,
-  "closedLoopPosition": true
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0.474,
+    "g": 0.580,
+    "b": 0.721
+  }
 }

@@ -1,0 +1,65 @@
+{
+  "objects": [
+    {
+      "type": "LocustBand",
+      "position": {
+        "radius": 8,
+        "angle": 60
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "flip": false,
+      "speed": -1,
+      "mu": 60,
+      "numberOfInstances": 1,
+      "spawnLengthX": 300,
+      "spawnLengthZ": 300,
+      "gridType": "Random",
+      "kappa": 10000,
+      "visibleOffDuration": 0,
+      "visibleOnDuration": 1,
+      "boundaryLengthX": 300,
+      "boundaryLengthZ": 300,
+      "rotationAngle": 60,
+      "moveWithTransform": true,
+      "prioritizeNumbers": true
+    },
+    {
+      "type": "LocustBand",
+      "position": {
+        "radius": 8,
+        "angle": 300
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "flip": false,
+      "speed": 2,
+      "mu": 300,
+      "numberOfInstances": 1,
+      "spawnLengthX": 300,
+      "spawnLengthZ": 300,
+      "gridType": "Random",
+      "kappa": 10000,
+      "visibleOffDuration": 0,
+      "visibleOnDuration": 1,
+      "boundaryLengthX": 300,
+      "boundaryLengthZ": 300,
+      "rotationAngle": 300,
+      "moveWithTransform": false,
+      "prioritizeNumbers": true
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0.474,
+    "g": 0.580,
+    "b": 0.721
+  }
+}

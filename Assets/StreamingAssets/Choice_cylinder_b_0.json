@@ -1,7 +1,7 @@
 {
   "objects": [
     {
-      "type": "LeaderCylinder_black",
+      "type": "Cylinder_b",
       "position": {
         "radius": 8,
         "angle": 0

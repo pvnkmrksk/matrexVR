@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 168781855370994105, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
       propertyPath: m_Name
-      value: LeaderLocust Variant
+      value: LeaderLocust
       objectReference: {fileID: 0}
     - target: {fileID: 656525645523401475, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -51,6 +51,10 @@ PrefabInstance:
     - target: {fileID: 656525645523401475, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7514605726674032702, guid: 87af0590a96c14e5ba5ce499eb8de0d4, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -1,0 +1,844 @@
+{
+    "sequences": [
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_60_distance8_speed4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_noTextureBG_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_gregarious_locust_300_distance8_speed4.json"
+            }
+        }
+    ]
+}

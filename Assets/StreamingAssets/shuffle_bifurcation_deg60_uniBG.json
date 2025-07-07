@@ -1,0 +1,676 @@
+{
+    "sequences": [
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_blacklocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_glocust_glocust_dir_loc60.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_empty_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bifurcation_blacklocust_glocust_dir_loc60.json"
+            }
+        }
+    ]
+}

@@ -1,0 +1,26 @@
+{
+    "objects": [
+        {
+            "type": "LeaderLocust_3Dwhite",
+            "position": {
+                "radius": 8,
+                "angle": 0
+            },
+            "scale": {
+                "x": 100,
+                "y": 100,
+                "z": 100
+            },
+            "flip": false,
+            "speed": 0.01,
+            "mu": 0
+        }
+    ],
+    "closedLoopOrientation": true,
+    "closedLoopPosition": true,
+    "backgroundColor": {
+        "r": 0.6666666666666666,
+        "g": 0.6666666666666666,
+        "b": 0.6666666666666666
+    }
+}

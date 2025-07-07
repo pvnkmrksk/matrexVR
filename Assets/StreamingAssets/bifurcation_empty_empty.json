@@ -1,0 +1,43 @@
+{
+  "objects": [
+    {
+      "type": "",
+      "position": {
+        "radius": 8,
+        "angle": 45
+      },
+      "scale": {
+        "x": 100,
+        "y": 100,
+        "z": 100
+      },
+      "flip": false,
+
+      "speed": 2,
+      "mu": 0
+    },
+    {
+      "type": "",
+      "position": {
+        "radius": 8,
+        "angle": 315
+      },
+      "scale": {
+        "x": 100,
+        "y": 100,
+        "z": 100
+      },
+      "flip": false,
+
+      "speed": 2,
+      "mu": 0
+    }
+      ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+    "backgroundColor": {
+    "r": 0.4,
+    "g": 0.4,
+    "b": 0.4
+}
+}

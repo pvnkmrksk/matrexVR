@@ -54,7 +54,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5327096242482123269, guid: 0b3000d24cb0d3218940e53bbc8f42e5, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5327096242482123269, guid: 0b3000d24cb0d3218940e53bbc8f42e5, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -98,4 +102,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7177fac88d7075dda8e803d594f71ad9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  includeZmqData: 1
+  includeZmqData: 0

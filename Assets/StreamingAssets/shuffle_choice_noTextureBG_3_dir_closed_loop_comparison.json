@@ -1,0 +1,844 @@
+{
+    "sequences": [
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_315_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_45_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0_closed_loop.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "band_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noTextureBG",
+            "duration": 60,
+            "parameters": {
+                "configFile": "leader_black_locust_0.json"
+            }
+        }
+    ]
+}

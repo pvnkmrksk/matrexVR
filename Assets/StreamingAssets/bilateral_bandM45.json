@@ -13,14 +13,14 @@
         "z": 1
       },
       "flip": false,
-      "speed": 4,
+      "speed": 2,
       "mu": 45,
       "numberOfInstances": 32,
       "spawnLengthX": 48,
       "spawnLengthZ": 28,
       "gridType": "Manhattan",
       "kappa": 10000,
-      "visibleOffDuration": 0.3,
+      "visibleOffDuration": 0,
       "visibleOnDuration": 0.1,
       "boundaryLengthX": 48,
       "boundaryLengthZ": 28,
@@ -42,14 +42,14 @@
         "z": 1
       },
       "flip": false,
-      "speed": 4,
+      "speed": 2,
       "mu": 45,
       "numberOfInstances": 32,
       "spawnLengthX": 48,
       "spawnLengthZ": 28,
       "gridType": "Manhattan",
       "kappa": 10000,
-      "visibleOffDuration": 0.3,
+      "visibleOffDuration": 0,
       "visibleOnDuration": 0.1,
       "boundaryLengthX": 48,
       "boundaryLengthZ": 28,
@@ -63,8 +63,8 @@
   "closedLoopOrientation": true,
   "closedLoopPosition": true,
   "backgroundColor": {
-    "r": 0,
-    "g": 0,
-    "b": 0
+    "r": 0.2,
+    "g": 0.2,
+    "b": 0.2
   }
 }

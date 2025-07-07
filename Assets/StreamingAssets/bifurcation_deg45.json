@@ -1,0 +1,32 @@
+{
+  "sequences": [
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "bifurcation_blackcylinder_blackcylinder_dir.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "bifurcation_glocust_glocust_dir.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "bifurcation_glocust_blackcylinder_dir.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "bifurcation_blackcylinder_glocust_dir.json"
+      }
+    }
+  ]
+}

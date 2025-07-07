@@ -1,0 +1,1124 @@
+{
+    "sequences": [
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__0.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__0.6666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__1.3333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__2.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__2.6666666666666665.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__3.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__4.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__4.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__5.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__6.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__6.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__7.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__8.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__8.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__9.333333333333332.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5__10.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_0.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_0.6666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_1.3333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_2.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_2.6666666666666665.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_3.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_4.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_4.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_5.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_6.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_6.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_7.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_8.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_8.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_9.333333333333332.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_10.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_0.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_0.6666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_1.3333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_2.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_2.6666666666666665.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_3.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_4.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_4.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_5.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_6.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_6.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_7.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_8.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_8.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_9.333333333333332.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow1_10.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_0.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_0.6666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_1.3333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_2.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_2.6666666666666665.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_3.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_4.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_4.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_5.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_6.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_6.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_7.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_8.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_8.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_9.333333333333332.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_yellow2_10.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_0.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_0.6666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_1.3333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_2.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_2.6666666666666665.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_3.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_4.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_4.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_5.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_6.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_6.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_7.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_8.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_8.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_9.333333333333332.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_5_LeaderLocust_green_10.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__0.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__0.6666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__1.3333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__2.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__2.6666666666666665.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__3.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__4.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__4.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__5.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__6.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__6.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__7.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__8.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__8.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__9.333333333333332.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8__10.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_0.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_0.6666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_1.3333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_2.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_2.6666666666666665.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_3.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_4.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_4.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_5.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_6.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_6.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_7.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_8.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_8.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_9.333333333333332.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_10.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_0.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_0.6666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_1.3333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_2.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_2.6666666666666665.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_3.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_4.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_4.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_5.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_6.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_6.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_7.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_8.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_8.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_9.333333333333332.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow1_10.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_0.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_0.6666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_1.3333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_2.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_2.6666666666666665.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_3.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_4.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_4.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_5.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_6.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_6.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_7.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_8.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_8.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_9.333333333333332.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_yellow2_10.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_0.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_0.6666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_1.3333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_2.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_2.6666666666666665.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_3.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_4.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_4.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_5.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_6.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_6.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_7.333333333333333.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_8.0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_8.666666666666666.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_9.333333333333332.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 3,
+            "parameters": {
+                "configFile": "choice_8_LeaderLocust_green_10.0.json"
+            }
+        }
+    ]
+}

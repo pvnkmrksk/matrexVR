@@ -1,0 +1,46 @@
+{
+  "sequences": [
+	  {
+      "sceneName": "Choice_noTextureBG",
+      "duration": 60,
+      "parameters": {
+        "configFile": "leader_black_locust_4_45.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noTextureBG",
+      "duration": 60,
+      "parameters": {
+        "configFile": "leader_black_locust_8_45.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noTextureBG",
+      "duration": 60,
+      "parameters": {
+        "configFile": "leader_black_locust_12_45.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noTextureBG",
+      "duration": 60,
+      "parameters": {
+        "configFile": "leader_black_locust_4_315.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noTextureBG",
+      "duration": 60,
+      "parameters": {
+        "configFile": "leader_black_locust_8_315.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noTextureBG",
+      "duration": 60,
+      "parameters": {
+        "configFile": "leader_black_locust_12_315.json"
+      }
+    }
+  ]
+}

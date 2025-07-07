@@ -1,0 +1,35 @@
+{
+  "sequences": [
+	  {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "bilateral_bandH60_constant_speed_black_x_gregarious.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "bilateral_bandH60_constant_speed_black.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "bilateral_bandH60_constant_speed_gregarious_x_black.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "bilateral_bandH60_constant_speed_gregarious.json"
+      }
+    }
+    
+
+    
+  ]
+}

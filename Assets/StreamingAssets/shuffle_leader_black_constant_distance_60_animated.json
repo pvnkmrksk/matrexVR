@@ -1,0 +1,788 @@
+{
+    "sequences": [
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_inanimated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_inanimated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_inanimated_x_black_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_black_animated_x_gregarious_animated.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandM_empty.json"
+            }
+        },
+        {
+            "sceneName": "Choice",
+            "duration": 60,
+            "parameters": {
+                "configFile": "bilateral_bandH0_constant_distance_gregarious_animated_x_black_animated.json"
+            }
+        }
+    ]
+}

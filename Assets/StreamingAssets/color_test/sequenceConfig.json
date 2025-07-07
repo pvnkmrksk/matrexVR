@@ -1,0 +1,130 @@
+{
+    "sequences": [
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_0_.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_0_LocustBand.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_0_LocustBand_yellow1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_0_LocustBand_yellow2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_0_LocustBand_green.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_0_LocustBand_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_0_LocustBand_3Dblack.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_0_LocustBand_white.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_0_LocustBand_3Dwhite.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_32_.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_32_LocustBand.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_32_LocustBand_yellow1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_32_LocustBand_yellow2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_32_LocustBand_green.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_32_LocustBand_black.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_32_LocustBand_3Dblack.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_32_LocustBand_white.json"
+            }
+        },
+        {
+            "sceneName": "Choice_uniBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "band_32_LocustBand_3Dwhite.json"
+            }
+        }
+    ]
+}
