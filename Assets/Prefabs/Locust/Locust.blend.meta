@@ -3,7 +3,12 @@ guid: a29e68e8cc66f4897bf387c161d4aede
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Locust.001
+    second: {fileID: 2100000, guid: 41e5ac6b7af224f8484fe9fc474997ae, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -69,6 +74,7 @@ ModelImporter:
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
+    importPhysicalCameras: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1

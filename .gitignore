@@ -83,3 +83,19 @@ Assets/RunData/*
 
 *.csv.gz.meta
 Assets/RunData/
+
+Assets/Infinity*
+Assets/MTT_Results/*
+Assets/Terrain/forest_floor_tile_path.glb
+Assets/Terrain/Forest floor.glb
+
+Assets/Infinity*
+Assets/MTT_Results/*
+Assets/Terrain/forest_floor_tile_path.glb
+Assets/Terrain/Forest floor.glb
+
+
+*.json.meta
+
+#system config
+Assets/StreamingAssets/system_config.json

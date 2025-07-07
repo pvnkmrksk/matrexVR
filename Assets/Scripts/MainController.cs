@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using InSceneSequence;
 
 public interface ISceneController
 {
@@ -21,10 +23,26 @@ public class MainController : MonoBehaviour
     public bool loopSequence = false;
     private bool randomise = false; // Added field
 
+    // System Config properties
+    [SerializeField]
+    private string systemConfigFileName = "system_config.json";
+
+    // Dictionary to store loaded system configs
+    private Dictionary<string, SystemConfig> systemConfigs = new Dictionary<string, SystemConfig>();
+
     [Tooltip("0: Off, ,1: Error, 2: Warning, 3: Info, 4: Debug")]
     [SerializeField]
     [Range(0, 4)]
     private int logLevel = 0; // 0: All, 1: Error, 2: Warning, 3: Info, 4: Debug
+
+    // Add this flag to control single window mode
+    [SerializeField]
+    private bool preventMultipleWindows = true;
+
+    // Add global display target property
+    private int globalTargetDisplay = 1; // Default value
+    private ISceneController activeSceneController;   // <— NEW
+
     // In MainController class
     public SequenceStep GetCurrentSequenceStep()
     {
@@ -36,11 +54,11 @@ public class MainController : MonoBehaviour
         return null;
     }
 
-    void Start()
+    void Awake()
     {
-        // Set the log level
+        // Set the log level first
         Debugger.CurrentLogLevel = logLevel;
-        Debugger.Log("MainController.Start()", 3);
+        Debugger.Log("MainController.Awake()", 3);
 
         // Make sure the MainController persists across scene changes
         DontDestroyOnLoad(this.gameObject);
@@ -58,8 +76,165 @@ public class MainController : MonoBehaviour
             Debugger.Log("MasterDataLogger.directoryPath: " + masterDataLogger.directoryPath, 4);
         }
 
+        // Load system configurations first
+        LoadSystemConfigurations();
+
+        // Setup display handling if enabled
+        if (preventMultipleWindows)
+        {
+            HandleDisplaySetup();
+        }
+    }
+
+    // Handle display setup - simplified to use a single display for all VR setups
+    private void HandleDisplaySetup()
+    {
+        // Check if a display argument was provided via command line
+        string[] args = System.Environment.GetCommandLineArgs();
+        for (int i = 0; i < args.Length - 1; i++)
+        {
+            if (args[i].ToLower() == "-display" && int.TryParse(args[i + 1], out int display))
+            {
+                globalTargetDisplay = display;
+                Debugger.Log($"Using command line specified display: {globalTargetDisplay}", 3);
+                break;
+            }
+        }
+
+        // Activate the target display if it exists
+        if (globalTargetDisplay > 0 && Display.displays.Length > globalTargetDisplay)
+        {
+            Display.displays[globalTargetDisplay].Activate();
+            Debugger.Log($"Activated display {globalTargetDisplay}", 3);
+
+            // Apply this display to all cameras in the scene
+            Camera[] allCameras = FindObjectsOfType<Camera>();
+            foreach (Camera cam in allCameras)
+            {
+                cam.targetDisplay = globalTargetDisplay;
+            }
+        }
+    }
+
+    void Start()
+    {
+        // Log that we're starting
+        Debugger.Log("MainController.Start()", 3);
+
         // Load the sequence configuration
         LoadSequenceConfiguration();
+    }
+
+    // Load system configurations from the specified file
+    private void LoadSystemConfigurations()
+    {
+        string configPath = Path.Combine(Application.streamingAssetsPath, systemConfigFileName);
+
+        if (!File.Exists(configPath))
+        {
+            Debugger.Log($"System config file not found: {configPath}", 1);
+            return;
+        }
+
+        try
+        {
+            string jsonText = File.ReadAllText(configPath);
+
+            // Parse the JSON using JObject instead of dynamic
+            JObject fullConfig = JObject.Parse(jsonText);
+
+            // Extract global target display if it exists
+            if (fullConfig["targetDisplay"] != null)
+            {
+                globalTargetDisplay = fullConfig["targetDisplay"].Value<int>();
+                Debugger.Log($"Found global targetDisplay: {globalTargetDisplay}", 3);
+            }
+
+            // Parse the configs array
+            JArray configsArray = (JArray)fullConfig["configs"];
+            if (configsArray != null)
+            {
+                SystemConfig[] loadedConfigs = configsArray.ToObject<SystemConfig[]>();
+
+                // Clear existing configs
+                systemConfigs.Clear();
+
+                // Add each config to dictionary with VR ID as key
+                foreach (SystemConfig config in loadedConfigs)
+                {
+                    // Set target display from global setting
+                    config.targetDisplay = globalTargetDisplay;
+                    systemConfigs[config.vrId] = config;
+                    Debugger.Log($"Loaded system config for: {config.vrId} with targetDisplay: {config.targetDisplay}", 3);
+                }
+
+                Debugger.Log($"Successfully loaded system config file: {systemConfigFileName}", 3);
+            }
+            else
+            {
+                Debugger.Log("No configs array found in system config file", 1);
+            }
+
+            // Copy the system config file to the log directory
+            if (masterDataLogger != null)
+            {
+                string timestamp = masterDataLogger.timestamp;
+                string sceneName = SceneManager.GetActiveScene().name;
+                string destPath = Path.Combine(
+                    masterDataLogger.directoryPath,
+                    $"{timestamp}_{sceneName}_{systemConfigFileName}"
+                );
+                File.Copy(configPath, destPath);
+                Debugger.Log($"Copied system config file to: {destPath}", 3);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debugger.Log($"Error loading system config file: {e.Message}", 1);
+        }
+    }
+
+    // Get system config based on GameObject name
+    public SystemConfig GetSystemConfigForGameObject(GameObject gameObject)
+    {
+        // Check if the GameObject name contains any of our known VR IDs
+        foreach (var kvp in systemConfigs)
+        {
+            if (gameObject.name.Contains(kvp.Key))
+            {
+                return kvp.Value;
+            }
+        }
+
+        // If no match, try to get config for "VR1" as default
+        if (systemConfigs.ContainsKey("VR1"))
+        {
+            Debugger.Log($"No matching config for {gameObject.name}, using VR1 config", 2);
+            return systemConfigs["VR1"];
+        }
+
+        Debugger.Log($"No config found for {gameObject.name}", 1);
+        return new SystemConfig { vrId = "VR1" };
+    }
+
+    // Get system config for a specific VR ID
+    public SystemConfig GetSystemConfig(string vrId)
+    {
+        if (systemConfigs.ContainsKey(vrId))
+        {
+            return systemConfigs[vrId];
+        }
+
+        Debugger.Log($"System config for {vrId} not found, returning default", 2);
+        return new SystemConfig { vrId = vrId };
+    }
+
+    // Method to set a different system config file
+    public void SetSystemConfigFile(string fileName)
+    {
+        systemConfigFileName = fileName;
+        LoadSystemConfigurations();
+        Debugger.Log($"Loaded new system config file: {fileName}", 3);
     }
 
     public void StopSequence()
@@ -124,21 +299,28 @@ public class MainController : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debugger.Log("MainController.OnSceneLoaded()", 3);
+
+        // Clear screen to black immediately after loading
+        ClearScreenToBlack();
+
         SequenceStep currentStepData = sequenceSteps[executionOrder[currentStep]];
 
-        ISceneController currentSceneController = null;
+        // Note: Components will load their own configs based on vrId
+        // No need to scan for them here
+
+        activeSceneController = null;
         foreach (var obj in FindObjectsOfType<MonoBehaviour>()) // MonoBehaviour is the base class for all Unity Behaviours
         {
             if (obj is ISceneController)
             {
-                currentSceneController = (ISceneController)obj;
+                activeSceneController = (ISceneController)obj;
                 break;
             }
         }
 
-        if (currentSceneController != null && currentStepData.parameters != null)
+        if (activeSceneController != null && currentStepData.parameters != null)
         {
-            currentSceneController.InitializeScene(currentStepData.parameters);
+            activeSceneController.InitializeScene(currentStepData.parameters);
             timer = currentStepData.duration;
         }
         else
@@ -170,6 +352,10 @@ public class MainController : MonoBehaviour
     {
         Debugger.Log("MainController.LoadScene()", 3);
         SyncTimestamp();
+
+        // Clear the screen to black before loading the new scene
+        ClearScreenToBlack();
+
         SceneManager.LoadScene(step.sceneName);
     }
 
@@ -198,13 +384,15 @@ public class MainController : MonoBehaviour
                 if (config != null)
                 {
                     randomise = config.randomise; // Get the randomise parameter
+                    loopSequence = config.loop; // Set looping based on config
 
                     foreach (SequenceItem item in config.sequences)
                     {
                         SequenceStep newStep = new SequenceStep(
                             item.sceneName,
                             item.duration,
-                            item.parameters
+                            item.parameters,
+                            item.reloadScene
                         );
                         sequenceSteps.Add(newStep);
                         Debugger.Log("Added sequence step: " + JsonUtility.ToJson(newStep), 3);
@@ -273,51 +461,62 @@ public class MainController : MonoBehaviour
         Debug.Log("MainController was disabled.");
     }
 
-    void ManageTimerAndTransitions()
+void ManageTimerAndTransitions()
+{
+    timer -= Time.deltaTime;
+
+    if (timer > 0) return;   // still running this step
+
+    // ----------------------------------------------------------
+    // TIME’S UP → decide how to move to the next SequenceStep
+    // ----------------------------------------------------------
+    currentStep++;
+
+    // end-of-list logic (loop / quit) stays exactly as before
+    if (currentStep >= sequenceSteps.Count)
     {
-        // Decrease the timer
-        timer -= Time.deltaTime;
-
-        // Check if time is up
-        if (timer <= 0)
+        if (loopSequence)
         {
-            // Move to the next step
-            currentStep++;
+            currentStep = 0;
+            currentTrial++;
 
-            // If at the end of the sequence
-            if (currentStep >= sequenceSteps.Count)
-            {
-                // Check if looping is enabled
-                if (loopSequence)
-                {
-                    // Restart the sequence from the first step
-                    currentStep = 0;
-
-                    // Increment the trial counter
-                    currentTrial++;
-
-                    // Re-initialize execution order if randomise is true
-                    if (randomise)
-                    {
-                        InitializeExecutionOrder();
-                    }
-
-                    LoadScene(sequenceSteps[executionOrder[currentStep]]);
-                }
-                else
-                {
-                    // End the sequence and return to the ControlScene
-                    SceneManager.LoadScene("ControlScene"); // Transition back to ControlScene
-                    Destroy(this.gameObject); // Destroy the MainController GameObject
-                }
-            }
-            else
-            {
-                // Load the next scene
-                LoadScene(sequenceSteps[executionOrder[currentStep]]);
-            }
+            if (randomise) InitializeExecutionOrder();
+        }
+        else
+        {
+            Debugger.Log("Sequence completed and looping disabled. Exiting application.", 3);
+            Application.Quit();
+            return;
         }
     }
+
+    // ----------------------------------------------------------
+    // examine the *next* step
+    // ----------------------------------------------------------
+    SequenceStep next = sequenceSteps[executionOrder[currentStep]];
+    // ❶ cast once, store the reference (null if the active controller
+    //    does NOT implement IInSceneSequencer)
+    var sequencer = activeSceneController as IInSceneSequencer;
+
+    // ❷ build the condition
+    bool canMutateInPlace =
+            !next.reloadScene &&
+            SceneManager.GetActiveScene().name == next.sceneName &&
+            sequencer != null;
+
+    if (canMutateInPlace)
+    {
+        // ★ NEW PATH: keep scene, just tell it to advance
+        sequencer.AdvanceStep(next.parameters);
+        timer = next.duration;      // restart timer for the new sub-step
+    }
+    else
+    {
+        // LEGACY PATH: load another scene (old behaviour)
+        LoadScene(next);
+    }
+}
+
 
     void SaveReferencedChoiceConfigs(SequenceConfig config, string timestamp, string sceneName)
     {
@@ -344,6 +543,22 @@ public class MainController : MonoBehaviour
             }
         }
     }
+
+    // Add method to clear screen to black
+    void ClearScreenToBlack()
+    {
+        // This creates a temporary camera to clear the screen to black
+        // It's cheaper than keeping an extra camera around all the time
+        Camera clearCamera = new GameObject("TempClearCamera").AddComponent<Camera>();
+        clearCamera.clearFlags = CameraClearFlags.SolidColor;
+        clearCamera.backgroundColor = Color.black;
+        clearCamera.cullingMask = 0; // Render nothing
+        clearCamera.Render(); // Force a render
+        Destroy(clearCamera.gameObject); // Clean up
+
+        // Also force a GL clear to ensure everything is black
+        GL.Clear(true, true, Color.black);
+    }
 }
 
 [System.Serializable]
@@ -352,12 +567,13 @@ public class SequenceStep
     public string sceneName;
     public float duration;
     public Dictionary<string, object> parameters;
-
-    public SequenceStep(string sceneName, float duration, Dictionary<string, object> parameters)
+    public bool   reloadScene = true;
+    public SequenceStep(string sceneName, float duration, Dictionary<string, object> parameters, bool reloadScene = true)
     {
         this.sceneName = sceneName;
         this.duration = duration;
         this.parameters = parameters;
+        this.reloadScene = reloadScene;
     }
 }
 
@@ -365,6 +581,7 @@ public class SequenceStep
 public class SequenceConfig
 {
     public bool randomise = false; // Added field
+    public bool loop = true; // Added field for controlling whether the sequence should loop
     public SequenceItem[] sequences;
 }
 
@@ -374,4 +591,29 @@ public class SequenceItem
     public string sceneName;
     public float duration;
     public Dictionary<string, object> parameters;
+
+    // NEW —— defaults to true, so legacy JSON stays valid
+    public bool reloadScene = true;
+}
+
+[System.Serializable]
+public class SystemConfig
+{
+    public float sphereDiameter = 1.0f;
+    public int ledPanelWidth = 128;
+    public int ledPanelHeight = 128;
+    public int startRow = 0;
+    public int startCol = 0;
+    public bool horizontal = true;
+    public string zmqAddress = "localhost";
+    public int zmqPort = 9872;
+    public string vrId = "VR1";
+    public string displayOrder = "DRBLFU"; // Default display order: Down, Right, Back, Left, Front, Up
+    public int targetDisplay = 1; // 0 for primary, 1 for secondary display
+}
+
+[System.Serializable]
+public class SystemConfigArray
+{
+    public SystemConfig[] configs;
 }

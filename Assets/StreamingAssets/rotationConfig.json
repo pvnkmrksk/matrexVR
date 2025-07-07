@@ -1,247 +1,84 @@
-{
-  "rotationConfigs": [
+{ "loop":true,
+  "stimuli": [
+    {
+      "speed": 36,
+      "clockwise": true,
+      "duration": 20,
+      "rotationAxis": "Yaw",
+      "frequency": 16,
+      "contrast": 1
+    },
+    {
+      "speed": 10,
+      "clockwise": false,
+      "duration": 2,
+      "rotationAxis": "Yaw",
+      "frequency": 1,
+      "contrast": 1
+    },
     {
       "speed": 10,
       "clockwise": true,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
+      "duration": 2,
+      "rotationAxis": "Yaw",
+      "frequency": 2,
+      "contrast": 1
     },
     {
       "speed": 10,
       "clockwise": false,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
+      "duration": 2,
+      "rotationAxis": "Yaw",
+      "frequency": 8,
+      "contrast": 1
     },
     {
-      "speed": 20,
+      "speed": 10,
       "clockwise": true,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
+      "duration": 2,
+      "rotationAxis": "Yaw",
+      "frequency": 16,
+      "contrast": 1
     },
     {
-      "speed": 20,
-      "clockwise": false,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
-    },
-    {
-      "speed": 40,
-      "clockwise": true,{
-        "rotationConfigs": [
-            {
-                "speed": 2,
-                "clockwise": true,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 1
-            },
-            {
-                "speed": 0.1,
-                "clockwise": true,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 0
-            },
-            {
-                "speed": 8,
-                "clockwise": false,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 1
-            },
-            {
-                "speed": 0.1,
-                "clockwise": true,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 0
-            },
-            {
-                "speed": 16,
-                "clockwise": false,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 1
-            },
-            {
-                "speed": 0.1,
-                "clockwise": true,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 0
-            },
-            {
-                "speed": 4,
-                "clockwise": false,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 1
-            },
-            {
-                "speed": 0.1,
-                "clockwise": true,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 0
-            },
-            {
-                "speed": 16,
-                "clockwise": true,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 1
-            },
-            {
-                "speed": 0.1,
-                "clockwise": true,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 0
-            },
-            {
-                "speed": 8,
-                "clockwise": true,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 1
-            },
-            {
-                "speed": 0.1,
-                "clockwise": true,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 0
-            },
-            {
-                "speed": 2,
-                "clockwise": false,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 1
-            },
-            {
-                "speed": 0.1,
-                "clockwise": true,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 0
-            },
-            {
-                "speed": 4,
-                "clockwise": true,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 1
-            },
-            {
-                "speed": 0.1,
-                "clockwise": true,
-                "duration": 20,
-                "externalRotationAxis": "Yaw",
-                "frequency": 10,
-                "level": 0
-            }
-        ]
-    }
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
-    },
-    {
-      "speed": 40,
-      "clockwise": false,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
-    },
-    {
-      "speed": 80,
+      "speed": 10,
       "clockwise": true,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
+      "duration": 2,
+      "rotationAxis": "Yaw",
+      "frequency": 32,
+      "contrast": 1
     },
     {
-      "speed": 80,
+      "speed": 10,
       "clockwise": false,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
+      "duration": 2,
+      "rotationAxis": "Yaw",
+      "frequency": 64,
+      "contrast": 1
     },
     {
-      "speed": 160,
+      "speed": 10,
       "clockwise": true,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
+      "duration": 2,
+      "rotationAxis": "Yaw",
+      "frequency": 128,
+      "contrast": 1
     },
     {
-      "speed": 160,
+      "speed": 10,
       "clockwise": false,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
+      "duration": 2,
+      "rotationAxis": "Yaw",
+      "frequency": 256,
+      "contrast": 1
     },
     {
-      "speed": 320,
+      "speed": 10,
       "clockwise": true,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
-    },
-    {
-      "speed": 320,
-      "clockwise": false,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
-    },
-    {
-      "speed": 640,
-      "clockwise": true,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
-    },
-    {
-      "speed": 640,
-      "clockwise": false,
-      "duration": 15,
-      "externalRotationAxis": "Yaw",
-      "frequency": 10,
-      "level": 1
+      "duration": 2,
+      "rotationAxis": "Yaw",
+      "frequency": 512,
+      "contrast": 1
     }
   ]
 }

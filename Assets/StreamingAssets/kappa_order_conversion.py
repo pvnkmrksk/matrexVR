@@ -3,7 +3,7 @@ import random
 
 Marchpop = 64
 mu = 1
-ordr = 0.49
+ordr = 0.001
 
 def Rgenerator():
     while True:

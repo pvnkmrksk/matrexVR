@@ -4,8 +4,10 @@ from pathlib import Path
 import numpy as np
 from itertools import cycle
 # Read the JSON file
-random_seed=1
+random_seed=2
 rep=12
+#scene_name='Choice_uniBG'
+scene_name='Choice'
 seed_range=np.arange(100)
 seed_list=seed_range.tolist()
 random.Random(random_seed).shuffle(seed_list)
@@ -14,24 +16,27 @@ random.Random(random_seed).shuffle(seed_list)
 seed_list=seed_list[:rep]
 insert_isi=True
 varying_isi_length=True
-choice_assay=True
 #config_file_name='swarm_4kappa_condition.json'
 #config_file_name='swarm_8dir_condition.json'
 #config_file_name='swarm_4spe_condition.json'
 config_file_name='choice_3dire_condition.json'
+#config_file_name='choice_4dire_2_color.json'
+#config_file_name='choice_3dir_2_color.json'
+#config_file_name='choice_uniBG_3dir_2_color.json'
+#config_file_name='bifurcation_deg45.json'
 shuffle_file_name=f'shuffle_{config_file_name}'
-pre_stim_interval=240 #unit is sec
+pre_stim_interval=60 #unit is sec
 with open(Path(config_file_name),'r') as file:
     data = json.load(file)
 
 # Shuffle the sequences
 # random.Random(random_seed).shuffle(data['sequences'])
-
+# ISI sequence includes "Choice_empty.json"; "Choice_uniBG_empty.json"; "bifurcation_empty_empty.json"; 
 # Define the dictionary to be inserted
 if insert_isi==True:
     if varying_isi_length:
-        if choice_assay:
-            isi_file_name='isi_condition_choice_assay.json'
+        if scene_name.startswith('Choice'):
+            isi_file_name='isi_condition_choice.json'
         else:
             isi_file_name='isi_condition.json'
         with open(Path(isi_file_name),'r') as file:
@@ -39,18 +44,18 @@ if insert_isi==True:
             print(isi_list)
 
     else:
-        if choice_assay:
+        if scene_name.startswith('Choice'):
             insert_dict = {
-            "sceneName": "Choice",
-            "duration": 240,
+            "sceneName": scene_name,
+            "duration": 60,
             "parameters": {
-                "configFile": "Choice_empty.json"
+                "configFile": "bifurcation_empty_empty.json"
             }
             }
         else:
             insert_dict = {
-            "sceneName": "Swarm",
-            "duration": 240,
+            "sceneName": scene_name,
+            "duration": 30,
             "parameters": {
                 "numberOfLocusts": 0,
                 "mu": 0,

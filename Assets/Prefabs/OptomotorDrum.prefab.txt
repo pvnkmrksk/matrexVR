@@ -1,0 +1,67 @@
+## Optomotor System Setup
+
+### Option 1: Using a Drum Prefab
+
+1. Create a drum prefab (optional):
+   - In Unity, create a new empty GameObject
+   - Rename it to "OptomotorDrum"
+   - Add the following components to the GameObject:
+     - SinusoidalGrating
+     - DrumRotator
+   - Set appropriate initial values for these components
+   - Create a prefab from this GameObject by dragging it into the Prefabs folder
+
+### Option 2: Runtime Creation (Recommended)
+
+The OptomotorSceneController can create the drum object from scratch at runtime:
+- No prefab required 
+- Set the drumRadius parameter in the OptomotorSceneController
+- All required components will be automatically added
+
+## Optomotor Scene Setup
+
+1. Create a new scene or open the existing Optomotor scene
+2. Add an empty GameObject and name it "OptomotorController"
+3. Add the OptomotorSceneController component to it
+4. (Optional) Assign a drum prefab to the "Drum Prefab" field if you want to use a custom prefab
+5. Make sure your MainController is set up to load the Optomotor scene with optomotor_config.json
+
+## Architecture Overview
+
+This system follows a separation of concerns:
+- The OptomotorDrum (created at runtime) handles only stimulus generation (rotation and visual appearance)
+- The existing camera prefabs handle sensing (ZmqListener) and response (ClosedLoop)
+- The OptomotorSceneController coordinates between these components
+
+When a closed-loop experiment is run:
+1. The OptomotorSceneController loads the config file
+2. It creates the OptomotorDrum object for visual stimulus
+3. It finds all ClosedLoop components in the scene (on camera prefabs)
+4. During execution, it updates both the drum and the ClosedLoop components
+
+The system is designed to work with the sequenceConfig.json already set up, which contains:
+```json
+{
+  "sequences": [
+    {
+      "sceneName": "Optomotor",
+      "duration": 60,
+      "parameters": {
+        "configFile": "optomotor_config.json"
+      }
+    }
+  ]
+}
+```
+
+## Runtime Process
+
+When running the scene, the OptomotorSceneController will:
+1. Load optomotor_config.json
+2. Create the drum object with all necessary components
+3. Find all ClosedLoop components in the scene (on camera prefabs)
+4. Apply stimulus parameters from the config
+5. Cycle through all stimuli defined in the config
+6. Record data using the OptomotorDataLogger
+
+Note: For closed-loop experiments, make sure your camera prefabs with ZmqListener and ClosedLoop components are properly set up in the scene. The OptomotorSceneController will automatically find them and update their settings based on the optomotor_config.json file. 
