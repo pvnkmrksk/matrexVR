@@ -3,11 +3,11 @@ public class ClosedLoop : MonoBehaviour
 {
 
 
-    [SerializeField] [Tooltip("The diameter of the sphere in cm")] private float sphereDiameter = 1f;
+    [SerializeField][Tooltip("The diameter of the sphere in cm")] private float sphereDiameter = 1f;
 
     private float sphereRadius;
-    [SerializeField] [Tooltip("The key to reset the position and rotation")] private KeyCode resetKey = KeyCode.R;
-    [SerializeField] [Tooltip("The delay in seconds before starting to use FicTrac data after reset.")] private float initializationDelay = 0.1f;
+    [SerializeField][Tooltip("The key to reset the position and rotation")] private KeyCode resetKey = KeyCode.R;
+    [SerializeField][Tooltip("The delay in seconds before starting to use FicTrac data after reset.")] private float initializationDelay = 0.1f;
 
     private ZmqListener _zmqListener;
     private Vector3 _initialPosition;
@@ -18,8 +18,8 @@ public class ClosedLoop : MonoBehaviour
     private float _initializationTimer;
 
     // Add these new variables
-    [SerializeField] [Tooltip("Whether to apply the FicTrac position in closed loop")] private float closedLoopPosition = 1.0f;
-    [SerializeField] [Tooltip("Whether to apply the FicTrac rotation in closed loop")] private float closedLoopOrientation = 1.0f;
+    [SerializeField][Tooltip("Whether to apply the FicTrac position in closed loop")] private float closedLoopPosition = 1.0f;
+    [SerializeField][Tooltip("Whether to apply the FicTrac rotation in closed loop")] private float closedLoopOrientation = 1.0f;
 
     private void Start()
     {
@@ -72,18 +72,26 @@ public class ClosedLoop : MonoBehaviour
         Vector3 currentFicTracData = GetCurrentFicTracData();
         Vector3 ficTracDelta = currentFicTracData - _lastFicTracData;
 
+        // Compute the absolute desired rotation (yaw angle)
+        float targetYaw = currentFicTracData.z * Mathf.Rad2Deg;
+        Quaternion desiredRotation = Quaternion.Euler(0, targetYaw, 0);
+
+        // Apply the rotation offset from initialization
+        desiredRotation = _ficTracRotationOffset * desiredRotation;
+
+
         // Apply position change only if closedLoopPosition is true
         if (closedLoopPosition != 0.0f)
         {
-            Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius * Mathf.Sqrt(closedLoopPosition);
+            Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius * closedLoopPosition;
             transform.Translate(positionDelta, Space.World);
         }
 
-        // Apply rotation change only if closedLoopOrientation is true
-        if (closedLoopOrientation != 0.0f)
+        // Control the convergence behavior based on closedLoopOrientation
+        if (closedLoopOrientation > 0.0f)
         {
-            float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg * closedLoopOrientation;
-            transform.Rotate(0, rotationDelta, 0, Space.World);
+            float step = closedLoopOrientation * 360f * Time.deltaTime; // scale up/down
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, desiredRotation, step);
         }
 
         _lastFicTracData = currentFicTracData;
@@ -161,4 +169,5 @@ public class ClosedLoop : MonoBehaviour
             Application.Quit();
         }
     }
+
 }
