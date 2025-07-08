@@ -44,10 +44,10 @@ public class DrumRotator : MonoBehaviour
     public bool isStepping = false;
 
     [SerializeField]
-    bool closedLoopOrientation = true;
+    float closedLoopOrientation = 1.0f;
 
     [SerializeField]
-    bool closedLoopPosition = false;
+    float closedLoopPosition = 0.0f;
 
     private Vector3 StringToAxis(string axisName)
     {
