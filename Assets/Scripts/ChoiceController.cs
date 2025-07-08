@@ -283,8 +283,8 @@ public class ChoiceController : MonoBehaviour, ISceneController
 public class SceneConfig
 {
     public SceneObject[] objects;
-    public bool closedLoopOrientation;
-    public bool closedLoopPosition;
+    public float closedLoopOrientation;
+    public float closedLoopPosition;
     public ColorConfig backgroundColor;
 }
 

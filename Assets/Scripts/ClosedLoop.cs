@@ -1,5 +1,4 @@
 using UnityEngine;
-
 public class ClosedLoop : MonoBehaviour
 {
 
@@ -19,8 +18,8 @@ public class ClosedLoop : MonoBehaviour
     private float _initializationTimer;
 
     // Add these new variables
-    [SerializeField] [Tooltip("Whether to apply the FicTrac position in closed loop")] private bool closedLoopPosition = true;
-    [SerializeField] [Tooltip("Whether to apply the FicTrac rotation in closed loop")] private bool closedLoopOrientation = true;
+    [SerializeField] [Tooltip("Whether to apply the FicTrac position in closed loop")] private float closedLoopPosition = 1.0f;
+    [SerializeField] [Tooltip("Whether to apply the FicTrac rotation in closed loop")] private float closedLoopOrientation = 1.0f;
 
     private void Start()
     {
@@ -74,16 +73,16 @@ public class ClosedLoop : MonoBehaviour
         Vector3 ficTracDelta = currentFicTracData - _lastFicTracData;
 
         // Apply position change only if closedLoopPosition is true
-        if (closedLoopPosition)
+        if (closedLoopPosition != 0.0f)
         {
-            Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius;
+            Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius * Mathf.Sqrt(closedLoopPosition);
             transform.Translate(positionDelta, Space.World);
         }
 
         // Apply rotation change only if closedLoopOrientation is true
-        if (closedLoopOrientation)
+        if (closedLoopOrientation != 0.0f)
         {
-            float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg;
+            float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg * closedLoopOrientation;
             transform.Rotate(0, rotationDelta, 0, Space.World);
         }
 
@@ -109,23 +108,43 @@ public class ClosedLoop : MonoBehaviour
     // New methods
     public void ToggleClosedLoopPosition()
     {
-        closedLoopPosition = !closedLoopPosition;
-        Debug.Log($"Closed Loop Position: {(closedLoopPosition ? "ON" : "OFF")}");
+        if (closedLoopPosition != 0.0f)
+        {
+            closedLoopPosition = 0.0f;
+            Debug.Log("Closed Loop Position: OFF");
+            return;
+        }
+        else
+        {
+            closedLoopPosition = 1.0f;
+            Debug.Log("Closed Loop Position: ON");
+            return;
+        }
     }
 
     public void ToggleClosedLoopOrientation()
     {
-        closedLoopOrientation = !closedLoopOrientation;
-        Debug.Log($"Closed Loop Orientation: {(closedLoopOrientation ? "ON" : "OFF")}");
+        if (closedLoopOrientation != 0.0f)
+        {
+            closedLoopOrientation = 0.0f;
+            Debug.Log("Closed Loop Position: OFF");
+            return;
+        }
+        else
+        {
+            closedLoopOrientation = 1.0f;
+            Debug.Log("Closed Loop Position: ON");
+            return;
+        }
     }
 
     // Public methods for external scripts to control the behaviors
-    public void SetClosedLoopOrientation(bool value)
+    public void SetClosedLoopOrientation(float value)
     {
         closedLoopOrientation = value;
     }
 
-    public void SetClosedLoopPosition(bool value)
+    public void SetClosedLoopPosition(float value)
     {
         closedLoopPosition = value;
     }
