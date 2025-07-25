@@ -20,6 +20,10 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
 
     void Awake()
     {
+        // Set frame rate to 60 FPS with vsync
+        Application.targetFrameRate = 60;
+        QualitySettings.vSyncCount = 1;
+        
         CreateDrumObject();
         FindClosedLoopComponents();
     }

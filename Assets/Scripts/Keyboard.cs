@@ -16,6 +16,9 @@ public class Keyboard : MonoBehaviour
     [SerializeField]
     private float maxRotateSpeed = 300.0f;
 
+    [SerializeField]
+    private bool autopilotMode = false;
+
     private MainController mainController;
 
     // Start is called before the first frame update
@@ -28,8 +31,21 @@ public class Keyboard : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //use the keyboard to move, add a translateSpeed factor
-        if (Input.GetKey(KeyCode.UpArrow))
+        // Toggle autopilot mode with Ctrl+Space
+        if (Input.GetKeyDown(KeyCode.Space) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+        {
+            autopilotMode = !autopilotMode;
+            Debug.Log($"Autopilot mode: {(autopilotMode ? "ON" : "OFF")} - Speed: {translateSpeed}");
+        }
+
+        // Autopilot forward movement
+        if (autopilotMode)
+        {
+            transform.Translate(Vector3.forward * Time.deltaTime * translateSpeed);
+        }
+
+        // Manual movement controls (work in both modes, but autopilot overrides forward)
+        if (!autopilotMode && Input.GetKey(KeyCode.UpArrow))
         {
             transform.Translate(Vector3.forward * Time.deltaTime * translateSpeed);
         }
