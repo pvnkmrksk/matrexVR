@@ -34,6 +34,11 @@ public class DrumRotator : MonoBehaviour
     void Awake()
     {
         Debug.Log($"DrumRotator.Awake() - {gameObject.name}");
+        
+        // Set frame rate to 60 FPS with vsync
+        Application.targetFrameRate = 60;
+        QualitySettings.vSyncCount = 1;
+        
         drum = this.gameObject;
         initialRotation = drum.transform.rotation;
     }
