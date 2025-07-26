@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 
 public interface ISceneController
 {
@@ -160,10 +161,13 @@ public class MainController : MonoBehaviour
                 // Add each config to dictionary with VR ID as key
                 foreach (SystemConfig config in loadedConfigs)
                 {
+                    // Validate and handle closedLoopMode
+                    ValidateClosedLoopMode(config);
+                    
                     // Set target display from global setting
                     config.targetDisplay = globalTargetDisplay;
                     systemConfigs[config.vrId] = config;
-                    Debugger.Log($"Loaded system config for: {config.vrId} with targetDisplay: {config.targetDisplay}", 3);
+                    Debugger.Log($"Loaded system config for: {config.vrId} with targetDisplay: {config.targetDisplay}, closedLoopMode: {config.closedLoopMode}", 3);
                 }
 
                 Debugger.Log($"Successfully loaded system config file: {systemConfigFileName}", 3);
@@ -545,6 +549,20 @@ public class MainController : MonoBehaviour
         // Also force a GL clear to ensure everything is black
         GL.Clear(true, true, Color.black);
     }
+
+    private void ValidateClosedLoopMode(SystemConfig config)
+    {
+        // Check if the closedLoopMode is valid
+        if (!Enum.IsDefined(typeof(ClosedLoopMode), config.closedLoopMode))
+        {
+            Debugger.Log($"Invalid closedLoopMode value '{config.closedLoopMode}' for system config '{config.vrId}'. Valid values are: {string.Join(", ", Enum.GetNames(typeof(ClosedLoopMode)))}. Defaulting to FicTrac.", 1);
+            config.closedLoopMode = ClosedLoopMode.FicTrac;
+        }
+        else
+        {
+            Debugger.Log($"Valid closedLoopMode '{config.closedLoopMode}' loaded for system config '{config.vrId}'", 4);
+        }
+    }
 }
 
 [System.Serializable]
@@ -579,6 +597,14 @@ public class SequenceItem
 }
 
 [System.Serializable]
+public enum ClosedLoopMode
+{
+    FicTrac,    // Walking mode - yaw mode off, force mode off
+    Kinefly,    // Yaw mode on, force mode off
+    Tirbala     // Force/torque accumulation mode - yaw mode off, force mode on
+}
+
+[System.Serializable]
 public class SystemConfig
 {
     public float sphereDiameter = 1.0f;
@@ -592,6 +618,7 @@ public class SystemConfig
     public string vrId = "VR1";
     public string displayOrder = "DRBLFU"; // Default display order: Down, Right, Back, Left, Front, Up
     public int targetDisplay = 1; // 0 for primary, 1 for secondary display
+    public ClosedLoopMode closedLoopMode = ClosedLoopMode.FicTrac; // Default to FicTrac mode
 }
 
 [System.Serializable]

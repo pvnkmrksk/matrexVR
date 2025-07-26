@@ -3,7 +3,7 @@
   "sequences": [
     {
       "sceneName": "Optomotor",
-      "duration": 1,
+      "duration": 100,
       "parameters": {
         "configFile": "optomotor_config.json"
       }
