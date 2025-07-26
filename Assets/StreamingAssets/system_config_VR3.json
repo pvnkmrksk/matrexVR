@@ -11,7 +11,8 @@
       "zmqAddress": "localhost",
       "zmqPort": 9871,
       "vrId": "VR1",
-      "displayOrder": "DRBLFU"
+      "displayOrder": "RBLFU",
+      "closedLoopMode": "Kinefly"
     },
     {
       "sphereDiameter": 2.6,
@@ -23,7 +24,8 @@
       "zmqAddress": "localhost",
       "zmqPort": 9872,
       "vrId": "VR2",
-      "displayOrder": "DRBLFU"
+      "displayOrder": "RBLFU",
+      "closedLoopMode": "Kinefly"
     },
     {
       "sphereDiameter": 2.6,
@@ -35,7 +37,8 @@
       "zmqAddress": "localhost",
       "zmqPort": 9873,
       "vrId": "VR3",
-      "displayOrder": "DRBLFU"
+      "displayOrder": "RBLFU",
+      "closedLoopMode": "Tirbala"
     },
     {
       "sphereDiameter": 2.6,
@@ -47,7 +50,8 @@
       "zmqAddress": "localhost",
       "zmqPort": 9874,
       "vrId": "VR4",
-      "displayOrder": "DRBLFU"
+      "displayOrder": "RBLFU",
+      "closedLoopMode": "FicTrac"
     }
   ]
 }

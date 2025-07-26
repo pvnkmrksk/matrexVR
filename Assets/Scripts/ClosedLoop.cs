@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class ClosedLoop : MonoBehaviour
 {
@@ -26,8 +27,15 @@ public class ClosedLoop : MonoBehaviour
     [SerializeField][Tooltip("Whether to use yaw-based orientation mode instead of standard orientation")] private bool useYawMode = false;
     [SerializeField][Tooltip("Gain factor for yaw-based orientation scaling")] private float yawGain = 1.0f;
     [SerializeField][Tooltip("DC offset for yaw-based orientation (in degrees)")] private float yawDCOffset = 0.0f;
-    [SerializeField][Tooltip("Step size for gain adjustments")] private float gainStep = 0.1f;
+    [SerializeField][Tooltip("Step size for gain adjustments")] private float gainStep = 1.0f;
     [SerializeField][Tooltip("Step size for DC offset adjustments (in degrees)")] private float dcOffsetStep = 0.1f;
+
+    // Force/torque accumulation mode variables (placeholder for Tirbala)
+    [SerializeField][Tooltip("Whether to use force/torque accumulation mode")] private bool useForceMode = false;
+    [SerializeField][Tooltip("Force accumulation gain factor")] private float forceGain = 1.0f;
+    [SerializeField][Tooltip("Torque accumulation gain factor")] private float torqueGain = 1.0f;
+    [SerializeField][Tooltip("Step size for force gain adjustments")] private float forceGainStep = 0.1f;
+    [SerializeField][Tooltip("Step size for torque gain adjustments")] private float torqueGainStep = 0.1f;
 
     // Stores the initial world rotation, including any random rotation applied at start
     private Quaternion _initialWorldRotation;
@@ -35,6 +43,13 @@ public class ClosedLoop : MonoBehaviour
     // Add these for logging support
     private float _lastYawInput = 0f;
     private float _lastYawOutput = 0f;
+    private float _lastForceInput = 0f;
+    private float _lastForceOutput = 0f;
+    private float _lastTorqueInput = 0f;
+    private float _lastTorqueOutput = 0f;
+
+    // Closed loop mode configuration
+    private ClosedLoopMode _currentMode = ClosedLoopMode.FicTrac;
 
     private void Start()
     {
@@ -45,7 +60,70 @@ public class ClosedLoop : MonoBehaviour
             Debug.LogError("ZmqListener component not found!");
         _initialPosition = transform.position;
         _initialRotation = transform.rotation;
+        
+        // Load and apply closed loop mode configuration
+        LoadClosedLoopConfiguration();
+        
         ResetPositionAndRotation();
+    }
+
+    private void LoadClosedLoopConfiguration()
+    {
+        // Find the MainController to get system config
+        MainController mainController = FindObjectOfType<MainController>();
+        if (mainController != null)
+        {
+            SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
+            
+            // Validate the closed loop mode
+            if (!Enum.IsDefined(typeof(ClosedLoopMode), config.closedLoopMode))
+            {
+                Debug.LogError($"Invalid closedLoopMode '{config.closedLoopMode}' for {gameObject.name}. Valid values are: {string.Join(", ", Enum.GetNames(typeof(ClosedLoopMode)))}. Defaulting to FicTrac.");
+                _currentMode = ClosedLoopMode.FicTrac;
+            }
+            else
+            {
+                _currentMode = config.closedLoopMode;
+            }
+            
+            // Apply mode-specific default settings
+            ApplyModeConfiguration(_currentMode);
+            
+            Debug.Log($"Applied closed loop mode configuration: {_currentMode} for {gameObject.name}");
+        }
+        else
+        {
+            Debug.LogWarning("MainController not found, using default FicTrac mode");
+            _currentMode = ClosedLoopMode.FicTrac;
+            ApplyModeConfiguration(_currentMode);
+        }
+    }
+
+    private void ApplyModeConfiguration(ClosedLoopMode mode)
+    {
+        switch (mode)
+        {
+            case ClosedLoopMode.FicTrac:
+                // FicTrac: Walking mode - yaw mode off, force mode off
+                useYawMode = false;
+                useForceMode = false;
+                Debug.Log("Applied FicTrac mode: yaw mode OFF, force mode OFF");
+                break;
+                
+            case ClosedLoopMode.Kinefly:
+                // Kinefly: Yaw mode on, force mode off
+                useYawMode = true;
+                useForceMode = false;
+                Debug.Log("Applied Kinefly mode: yaw mode ON, force mode OFF");
+                break;
+                
+            case ClosedLoopMode.Tirbala:
+                // Tirbala: Force/torque accumulation mode - yaw mode off, force mode on
+                useYawMode = false;
+                useForceMode = true;
+                Debug.Log("Applied Tirbala mode: yaw mode OFF, force mode ON");
+                break;
+        }
     }
 
     private void Update()
@@ -101,8 +179,51 @@ public class ClosedLoop : MonoBehaviour
             transform.Translate(positionDelta, Space.World);
         }
 
-        // Apply rotation change based on yaw mode setting
-        if (useYawMode)
+        // Handle different rotation modes based on configuration
+        if (useForceMode)
+        {
+            // Force/torque accumulation mode (Tirbala)
+            if (closedLoopOrientation)
+            {
+                // Placeholder for force/torque accumulation
+                // This will be implemented based on the specific requirements for Tirbala
+                // For now, we'll use a simple implementation that can be expanded
+                
+                // Extract force and torque data from the incoming data
+                // Assuming the data structure includes force/torque information
+                float forceInput = currentFicTracData.x; // Placeholder - adjust based on actual data structure
+                float torqueInput = currentFicTracData.z; // Placeholder - adjust based on actual data structure
+                
+                _lastForceInput = forceInput;
+                _lastTorqueInput = torqueInput;
+                
+                // Apply force and torque gains
+                float forceOutput = forceInput * forceGain;
+                float torqueOutput = torqueInput * torqueGain;
+                
+                _lastForceOutput = forceOutput;
+                _lastTorqueOutput = torqueOutput;
+                
+                // Apply the accumulated force/torque effects
+                // This is a placeholder implementation - adjust based on actual requirements
+                Vector3 forceEffect = new Vector3(forceOutput, 0, 0) * sphereRadius;
+                transform.Translate(forceEffect, Space.World);
+                
+                // Apply torque as rotation
+                transform.Rotate(0, torqueOutput, 0, Space.Self);
+                
+                Debug.Log($"Force Mode: Force Input={_lastForceInput:F2}, Force Output={_lastForceOutput:F2}, Torque Input={_lastTorqueInput:F2}, Torque Output={_lastTorqueOutput:F2}");
+            }
+            else
+            {
+                // Force mode is enabled but orientation is off - no effects applied
+                _lastForceInput = 0f;
+                _lastForceOutput = 0f;
+                _lastTorqueInput = 0f;
+                _lastTorqueOutput = 0f;
+            }
+        }
+        else if (useYawMode)
         {
             // Yaw mode: closedLoopOrientation acts as on/off flag for yaw mode
             if (closedLoopOrientation)
@@ -163,6 +284,10 @@ public class ClosedLoop : MonoBehaviour
         _lastFicTracData = Vector3.zero;
         _lastYawInput = 0f;
         _lastYawOutput = 0f;
+        _lastForceInput = 0f;
+        _lastForceOutput = 0f;
+        _lastTorqueInput = 0f;
+        _lastTorqueOutput = 0f;
         Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
     }
 
@@ -242,6 +367,42 @@ public class ClosedLoop : MonoBehaviour
         Debugger.Log($"Yaw DC Offset decreased to: {yawDCOffset:F2}° (step: -{dcOffsetStep:F2}°)", 3);
     }
 
+    // Methods for force/torque mode
+    public void ToggleForceMode()
+    {
+        useForceMode = !useForceMode;
+        Debug.Log($"Force Mode: {(useForceMode ? "ON" : "OFF")} (ForceGain={forceGain:F2}, TorqueGain={torqueGain:F2})");
+        Debugger.Log($"Force Mode toggled to: {(useForceMode ? "ON" : "OFF")} (ForceGain={forceGain:F2}, TorqueGain={torqueGain:F2})", 3);
+    }
+
+    public void IncreaseForceGain()
+    {
+        forceGain += forceGainStep;
+        Debug.Log($"Force Gain increased to: {forceGain:F2}");
+        Debugger.Log($"Force Gain increased to: {forceGain:F2} (step: +{forceGainStep:F2})", 3);
+    }
+
+    public void DecreaseForceGain()
+    {
+        forceGain -= forceGainStep;
+        Debug.Log($"Force Gain decreased to: {forceGain:F2}");
+        Debugger.Log($"Force Gain decreased to: {forceGain:F2} (step: -{forceGainStep:F2})", 3);
+    }
+
+    public void IncreaseTorqueGain()
+    {
+        torqueGain += torqueGainStep;
+        Debug.Log($"Torque Gain increased to: {torqueGain:F2}");
+        Debugger.Log($"Torque Gain increased to: {torqueGain:F2} (step: +{torqueGainStep:F2})", 3);
+    }
+
+    public void DecreaseTorqueGain()
+    {
+        torqueGain -= torqueGainStep;
+        Debug.Log($"Torque Gain decreased to: {torqueGain:F2}");
+        Debugger.Log($"Torque Gain decreased to: {torqueGain:F2} (step: -{torqueGainStep:F2})", 3);
+    }
+
     // Public methods for external scripts to control the behaviors
     public void SetClosedLoopOrientation(bool value)
     {
@@ -268,6 +429,21 @@ public class ClosedLoop : MonoBehaviour
         yawDCOffset = value;
     }
 
+    public void SetForceMode(bool value)
+    {
+        useForceMode = value;
+    }
+
+    public void SetForceGain(float value)
+    {
+        forceGain = value;
+    }
+
+    public void SetTorqueGain(float value)
+    {
+        torqueGain = value;
+    }
+
     public void SetPositionAndRotation(Vector3 initialPosition, Quaternion initialRotation)
     {
         _initialPosition = initialPosition;
@@ -288,6 +464,16 @@ public class ClosedLoop : MonoBehaviour
     public bool GetClosedLoopOrientation() { return closedLoopOrientation; }
     public bool GetClosedLoopPosition() { return closedLoopPosition; }
     public float GetSphereDiameter() { return sphereDiameter; }
+    
+    // New getters for force/torque mode
+    public bool GetUseForceMode() { return useForceMode; }
+    public float GetForceGain() { return forceGain; }
+    public float GetTorqueGain() { return torqueGain; }
+    public float GetLastForceInput() { return _lastForceInput; }
+    public float GetLastForceOutput() { return _lastForceOutput; }
+    public float GetLastTorqueInput() { return _lastTorqueInput; }
+    public float GetLastTorqueOutput() { return _lastTorqueOutput; }
+    public ClosedLoopMode GetCurrentMode() { return _currentMode; }
 
     private void HandleInput()
     {
@@ -300,6 +486,10 @@ public class ClosedLoop : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Y) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
             ToggleYawMode();
         
+        // Force mode toggle using Ctrl+F
+        if (Input.GetKeyDown(KeyCode.F) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            ToggleForceMode();
+        
         // Gain adjustments using + and - keys
         if (Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus))
             IncreaseGain();
@@ -311,6 +501,20 @@ public class ClosedLoop : MonoBehaviour
             IncreaseDCOffset();
         if (Input.GetKeyDown(KeyCode.LeftBracket))
             DecreaseDCOffset();
+
+        // Force gain adjustments using Ctrl+Plus and Ctrl+Minus
+        if ((Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus)) && 
+            (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            IncreaseForceGain();
+        if ((Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus)) && 
+            (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            DecreaseForceGain();
+        
+        // Torque gain adjustments using Ctrl+[ and Ctrl+]
+        if (Input.GetKeyDown(KeyCode.RightBracket) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            IncreaseTorqueGain();
+        if (Input.GetKeyDown(KeyCode.LeftBracket) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            DecreaseTorqueGain();
 
         if (Input.GetKeyUp(KeyCode.Escape))
         {
