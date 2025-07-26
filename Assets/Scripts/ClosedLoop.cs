@@ -16,6 +16,10 @@ public class ClosedLoop : MonoBehaviour
     private Quaternion _initialRotation;
     private Vector3 _lastFicTracData;
     private bool _isInitialized = false;
+
+
+
+
     private Quaternion _ficTracRotationOffset;
     private float _initializationTimer;
 
@@ -130,7 +134,7 @@ public class ClosedLoop : MonoBehaviour
     {
         HandleInput();
 
-        if (_zmqListener.pose == null) return;
+        if (_zmqListener.quaternion == null) return;
 
         if (Input.GetKeyDown(resetKey))
         {
@@ -310,8 +314,13 @@ public class ClosedLoop : MonoBehaviour
 
     private Vector3 GetCurrentFicTracData()
     {
-        Pose pose = _zmqListener.pose;
-        return new Vector3(pose.position.y, pose.position.x, pose.rotation.eulerAngles.y * Mathf.Deg2Rad);
+        // Use the new ZmqListener data structure
+        Vector3 pos = _zmqListener.position;
+        Vector3 rawRot = _zmqListener.rawRotation;
+        
+        // Return: (r, theta, yaw) where r and theta are in radians for sphere calculations
+        // yaw is in radians for consistency with original FicTrac calculations
+        return new Vector3(pos.y, pos.x, rawRot.y);
     }
 
     // New methods
