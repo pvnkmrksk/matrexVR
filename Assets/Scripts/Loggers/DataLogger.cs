@@ -88,7 +88,8 @@ public class DataLogger : MonoBehaviour
     /// </summary>
     private readonly string[] zmqColumns = new string[] {
         "SensPosX", "SensPosY", "SensPosZ",
-        "SensRotX", "SensRotY", "SensRotZ"
+        "SensRotX", "SensRotY", "SensRotZ",
+        "SensRotXRad", "SensRotYRad", "SensRotZRad"
     };
 
     /// <summary>
@@ -283,9 +284,16 @@ public class DataLogger : MonoBehaviour
         // Add ZMQ data
         if (includeZmqData && zmq != null)
         {
-            Vector3 sensPos = zmq.pose.position;
-            Vector3 sensRot = zmq.pose.rotation.eulerAngles;
-            line += $",{sensPos.x},{sensPos.y},{sensPos.z},{sensRot.x},{sensRot.y},{sensRot.z}";
+            // Log position data (invariant units)
+            Vector3 pos = zmq.position;
+            
+            // Log raw rotation data (in radians)
+            Vector3 rawRot = zmq.rawRotation;
+            
+            // Log Unity quaternion data (converted to euler angles in degrees)
+            Vector3 unityRot = zmq.quaternion.eulerAngles;
+            
+            line += $",{pos.x},{pos.y},{pos.z},{unityRot.x},{unityRot.y},{unityRot.z}, {rawRot.x},{rawRot.y},{rawRot.z}";
         }
 
         // Allow subclasses to add additional data
