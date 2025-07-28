@@ -7,9 +7,9 @@ using Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
 
-public class BuildGrayShadeChoiceDesign
+public class BuildGrayShadeAngleSweepChoiceDesign
 {
-    [MenuItem("Tools/Generate Gray Shade Choice SequenceDesign.json")]
+    [MenuItem("Tools/Generate Gray Shade Choice AngleSweep SequenceDesign.json")]
     private static void Build()
     {
         // 1) fixed inter-trial skybox step
@@ -45,14 +45,10 @@ public class BuildGrayShadeChoiceDesign
         float[][] shades =
         {
             new[] { 0.0f, 0.0f, 0.0f, 1f }, // black
-            new[] { 0.2f, 0.2f, 0.2f, 1f },
-            new[] { 0.4f, 0.4f, 0.4f, 1f },
-            new[] { 0.6f, 0.6f, 0.6f, 1f },
-            new[] { 0.8f, 0.8f, 0.8f, 1f }
         };
 
         float[] reference = new[] { 0.4f, 0.4f, 0.4f, 1f };
-        int[] angles = { 90, 180 };
+        int[] angles = { 0, 40, 50, 60, 70, 80, 90, 100, 140, 180 };
 
         IEnumerable<dynamic> steps = (
             from shade in shades
@@ -139,71 +135,6 @@ public class BuildGrayShadeChoiceDesign
             }
         ).ToArray();
 
-        // 2b) Add single-object steps for each shade at angle 0
-        IEnumerable<dynamic> soloSteps =
-            from shade in shades
-            let name = $"StaticSolo_{ColorName(shade)}_0deg"
-            select new
-            {
-                name = name,
-                trigger = new { type = "time", seconds = 10 },
-                closedLoopOrientation = true,
-                closedLoopPosition = true,
-                randomInitialRotation = false,
-                objects = new[]
-                {
-                    new
-                    {
-                        type = "ScalingCylinder",
-                        polar = new
-                        {
-                            radius = 50000,
-                            angle = 0,
-                            height = 0
-                        },
-                        material = "Blue",
-                        color = shade,
-                        scale = new
-                        {
-                            x = 7,
-                            y = 100,
-                            z = 7
-                        },
-                        visualAngleDegrees = 10
-                    }
-                },
-                camera = new[]
-                {
-                    new
-                    {
-                        vrId = "VR1",
-                        clearFlags = "SolidColor",
-                        bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f }
-                    },
-                    new
-                    {
-                        vrId = "VR2",
-                        clearFlags = "SolidColor",
-                        bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f }
-                    },
-                    new
-                    {
-                        vrId = "VR3",
-                        clearFlags = "SolidColor",
-                        bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f }
-                    },
-                    new
-                    {
-                        vrId = "VR4",
-                        clearFlags = "SolidColor",
-                        bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f }
-                    }
-                }
-            };
-
-        // Combine both sets of steps
-        var allSteps = ((IEnumerable<dynamic>)steps).Concat(soloSteps).ToArray();
-
         // 3) assemble the design root
         var design = new
         {
@@ -211,13 +142,13 @@ public class BuildGrayShadeChoiceDesign
             repetitions = 40,
             sync = true,
             intertrial = skyStep,
-            steps = allSteps
+            steps = steps
         };
 
         // 4) write to StreamingAssets
         string path = Path.Combine(
             Application.streamingAssetsPath,
-            "sequenceDesign_grayShades.json"
+            "sequenceDesign_grayShades_angleSweep.json"
         );
         Directory.CreateDirectory(Application.streamingAssetsPath);
         File.WriteAllText(path, JsonConvert.SerializeObject(design, Formatting.Indented));

@@ -6,19 +6,19 @@
     {
       "sceneName": "Choice_desync",
       "duration": 3600,
-      "parameters": { "design":"sequenceDesign_grayShades.json" },
+      "parameters": { "design":"sequenceDesign_grayShades_angleSweep.json" },
       "reloadScene": false
     },
     {
       "sceneName": "Choice_desync",
       "duration": 3600,
-      "parameters": { "design":"sequenceDesign_staticChoice.json" },
+      "parameters": { "design":"sequenceDesign_grayShades_angleSweep.json" },
       "reloadScene": false
     },
     {
       "sceneName": "Choice_desync",
       "duration": 3600,
-      "parameters": { "design":"sequenceDesign_staticChoice.json" },
+      "parameters": { "design":"sequenceDesign_grayShades_angleSweep.json" },
       "reloadScene": false
     }
   ]
