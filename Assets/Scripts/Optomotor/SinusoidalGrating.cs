@@ -64,9 +64,7 @@ public class SinusoidalGrating : MonoBehaviour
     {
         Debug.Log($"SinusoidalGrating.Awake() - {gameObject.name}");
 
-        // Set frame rate to 60 FPS with vsync
-        Application.targetFrameRate = 60;
-        QualitySettings.vSyncCount = 1;
+        // FPS and VSync settings removed - now handled centrally by MainController
 
         // Create texture
         texture = new Texture2D(textureWidth, textureHeight);

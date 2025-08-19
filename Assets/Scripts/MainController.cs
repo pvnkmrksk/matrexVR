@@ -44,6 +44,16 @@ public class MainController : MonoBehaviour
     private int globalTargetDisplay = 1; // Default value
     private ISceneController activeSceneController;   // <— NEW
 
+    // Centralized FPS/VSync settings
+    [Header("Frame Rate Settings")]
+    [SerializeField][Tooltip("Target frame rate (60 recommended for VSync, -1 for unlimited)")] 
+    private int targetFrameRate = 60;
+    [SerializeField][Tooltip("VSync count (0=off, 1=60fps, 2=30fps)")] 
+    private int vSyncCount = 1;
+
+    // Persistent black background camera
+    private Camera backgroundCamera;
+
     // In MainController class
     public SequenceStep GetCurrentSequenceStep()
     {
@@ -85,6 +95,14 @@ public class MainController : MonoBehaviour
         {
             HandleDisplaySetup();
         }
+
+        // Set FPS and VSync
+        QualitySettings.vSyncCount = vSyncCount;
+        Application.targetFrameRate = targetFrameRate;
+        Debugger.Log($"FPS set to: {Application.targetFrameRate}, VSync: {QualitySettings.vSyncCount}", 3);
+
+        // Create persistent black background camera
+        CreatePersistentBackgroundCamera();
     }
 
     // Handle display setup - simplified to use a single display for all VR setups
@@ -113,6 +131,12 @@ public class MainController : MonoBehaviour
             foreach (Camera cam in allCameras)
             {
                 cam.targetDisplay = globalTargetDisplay;
+            }
+            
+            // Update background camera display as well
+            if (backgroundCamera != null)
+            {
+                backgroundCamera.targetDisplay = globalTargetDisplay;
             }
         }
     }
@@ -348,6 +372,12 @@ public class MainController : MonoBehaviour
     void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        
+        // Clean up background camera
+        if (backgroundCamera != null)
+        {
+            DestroyImmediate(backgroundCamera.gameObject);
+        }
     }
 
     void Update()
@@ -563,16 +593,15 @@ void ManageTimerAndTransitions()
     // Add method to clear screen to black
     void ClearScreenToBlack()
     {
-        // This creates a temporary camera to clear the screen to black
-        // It's cheaper than keeping an extra camera around all the time
-        Camera clearCamera = new GameObject("TempClearCamera").AddComponent<Camera>();
-        clearCamera.clearFlags = CameraClearFlags.SolidColor;
-        clearCamera.backgroundColor = Color.black;
-        clearCamera.cullingMask = 0; // Render nothing
-        clearCamera.Render(); // Force a render
-        Destroy(clearCamera.gameObject); // Clean up
-
-        // Also force a GL clear to ensure everything is black
+        // Since we have a persistent background camera, we just need to ensure it's active
+        // and has the correct target display
+        if (backgroundCamera != null)
+        {
+            backgroundCamera.targetDisplay = globalTargetDisplay;
+            backgroundCamera.enabled = true;
+        }
+        
+        // Force a GL clear to ensure everything is black immediately
         GL.Clear(true, true, Color.black);
     }
 
@@ -588,6 +617,30 @@ void ManageTimerAndTransitions()
         {
             Debugger.Log($"Valid closedLoopMode '{config.closedLoopMode}' loaded for system config '{config.vrId}'", 4);
         }
+    }
+
+    private void CreatePersistentBackgroundCamera()
+    {
+        // Create a new GameObject for the background camera
+        GameObject backgroundCameraObject = new GameObject("BackgroundCamera");
+        backgroundCameraObject.hideFlags = HideFlags.HideAndDontSave; // Hide and don't save to scene
+
+        // Add a Camera component
+        backgroundCamera = backgroundCameraObject.AddComponent<Camera>();
+        backgroundCamera.clearFlags = CameraClearFlags.SolidColor;
+        backgroundCamera.backgroundColor = Color.black;
+        backgroundCamera.cullingMask = 0; // Render nothing
+        backgroundCamera.depth = -100; // Ensure it's behind all other cameras
+        backgroundCamera.orthographic = true; // Use orthographic projection for 2D
+        backgroundCamera.orthographicSize = 100f; // Large orthographic size to cover the screen
+        backgroundCamera.nearClipPlane = -100f;
+        backgroundCamera.farClipPlane = 100f;
+
+        // Set the camera to render to the main display
+        backgroundCamera.targetDisplay = globalTargetDisplay;
+
+        // Ensure the camera is not affected by scene changes
+        DontDestroyOnLoad(backgroundCameraObject);
     }
 }
 

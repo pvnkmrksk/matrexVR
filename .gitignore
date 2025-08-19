@@ -99,3 +99,5 @@ Assets/Terrain/Forest floor.glb
 
 #system config
 Assets/StreamingAssets/system_config.json
+RWT_Cache/*
+Assets/RWT_Result/*

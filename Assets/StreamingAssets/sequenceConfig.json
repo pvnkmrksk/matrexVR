@@ -1,45 +1,33 @@
 {
   "loop": true,
   "sequences": [
-    {
-      "sceneName": "Optomotor",
-      "duration": 100,
-      "parameters": {
-        "configFile": "optomotor_config.json"
-      }
-    }
-    ,
-    {
-      "sceneName": "Optomotor",
-      "duration": 1,
-      "parameters": {
-        "configFile": "optomotor_config.json"
-      }
-    },
+
 
 
     {
-      "sceneName": "Optomotor",
-      "duration": 1,
-      "parameters": {
-        "configFile": "optomotor_config.json"
-      }
-    },
-
-
-    {
-      "sceneName": "Optomotor",
-      "duration": 1,
-      "parameters": {
-        "configFile": "optomotor_config.json"
-      }
-    },
-    {
-      "sceneName": "Optomotor",
+      "sceneName": "Choice",
       "duration": 3000,
       "parameters": {
+        "configFile": "choice_config.json"
+      }
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 300,
+      "parameters": {
         "configFile": "optomotor_config.json"
       }
+    },
+
+
+    {
+      "sceneName": "Choice_Forrest",
+      "duration": 3000,
+      "parameters": {
+        "configFile": "choice_config.json"
+      }
     }
+
+
   ]
 }

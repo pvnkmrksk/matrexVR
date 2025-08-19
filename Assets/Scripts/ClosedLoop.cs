@@ -238,13 +238,14 @@ public class ClosedLoop : MonoBehaviour
                 _lastYawInput = absoluteYaw;
                 
                 // Apply gain and DC offset with correct formula: (gain * yaw) - dcoffset
-                float rotationDelta = (yawGain * absoluteYaw) - yawDCOffset;
+                float rotationDelta = yawGain * (absoluteYaw - yawDCOffset);
+                // float rotationDelta = (yawGain * absoluteYaw) - yawDCOffset;
                 
                 // Store the processed output for logging
                 _lastYawOutput = rotationDelta;
                 
-                // Apply the rotation
-                transform.Rotate(0, rotationDelta, 0, Space.Self);
+                // Apply the rotation (frame rate independent - rotation rate per second)
+                transform.Rotate(0, rotationDelta * Time.deltaTime, 0, Space.Self);
                 
                 Debug.Log($"Yaw Mode: Input={_lastYawInput:F2}°, Gain={yawGain:F2}, DCOffset={yawDCOffset:F2}°, Output={_lastYawOutput:F2}°");
             }
