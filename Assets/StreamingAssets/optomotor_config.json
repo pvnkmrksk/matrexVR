@@ -1,54 +1,54 @@
 {
   "loop": true,
   "stimuli": [
-    { "duration": 2.0, "speed": 60.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 2.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 2.0, "speed": 60.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 2.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 1.0, "speed": 0.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 0.0,  "contrast": 0, "color1": "#000000", "color2": "#000000", "dutyCycle": 0.0, "closedLoopOrientation": false, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 2.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 2.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 2.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
 
-    { "duration": 2.0, "speed": 60.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 4.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 2.0, "speed": 60.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 4.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 1.0, "speed": 0.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 0.0,  "contrast": 0, "color1": "#000000", "color2": "#000000", "dutyCycle": 0.0, "closedLoopOrientation": false, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 4.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 4.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 4.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
 
-    { "duration": 2.0, "speed": 60.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 2.0, "speed": 60.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 1.0, "speed": 0.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 0.0,  "contrast": 0, "color1": "#000000", "color2": "#000000", "dutyCycle": 0.0, "closedLoopOrientation": false, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0,  "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
 
-    { "duration": 2.0, "speed": 60.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 16.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 2.0, "speed": 60.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 16.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 1.0, "speed": 0.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 0.0,  "contrast": 0, "color1": "#000000", "color2": "#000000", "dutyCycle": 0.0, "closedLoopOrientation": false, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 16.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 16.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 16.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
 
-    { "duration": 2.0, "speed": 60.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 32.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 2.0, "speed": 60.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 32.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 1.0, "speed": 0.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 0.0,  "contrast": 0, "color1": "#000000", "color2": "#000000", "dutyCycle": 0.0, "closedLoopOrientation": false, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 32.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 32.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 32.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
 
-    { "duration": 2.0, "speed": 60.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 64.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 2.0, "speed": 60.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 64.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 1.0, "speed": 0.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 0.0,  "contrast": 0, "color1": "#000000", "color2": "#000000", "dutyCycle": 0.0, "closedLoopOrientation": false, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 64.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 64.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 64.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
 
 
-    { "duration": 2.0, "speed": 30.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 2.0, "speed": 30.0,  "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 1.0, "speed": 0.0,   "clockwise": true,  "rotationAxis": "Yaw", "frequency": 0.0, "contrast": 0, "color1": "#000000", "color2": "#000000", "dutyCycle": 0.0, "closedLoopOrientation": false, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 30.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 30.0,  "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0,  "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
 
-    { "duration": 2.0, "speed": 60.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 2.0, "speed": 60.0,  "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 1.0, "speed": 0.0,   "clockwise": true,  "rotationAxis": "Yaw", "frequency": 0.0, "contrast": 0, "color1": "#000000", "color2": "#000000", "dutyCycle": 0.0, "closedLoopOrientation": false, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 60.0,  "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0,  "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
 
-    { "duration": 2.0, "speed": 120.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 2.0, "speed": 120.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 1.0, "speed": 0.0,   "clockwise": true,  "rotationAxis": "Yaw", "frequency": 0.0, "contrast": 0, "color1": "#000000", "color2": "#000000", "dutyCycle": 0.0, "closedLoopOrientation": false, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 120.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 120.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
 
-    { "duration": 2.0, "speed": 240.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 2.0, "speed": 240.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 1.0, "speed": 0.0,   "clockwise": true,  "rotationAxis": "Yaw", "frequency": 0.0, "contrast": 0, "color1": "#000000", "color2": "#000000", "dutyCycle": 0.0, "closedLoopOrientation": false, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 240.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 240.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
 
-    { "duration": 2.0, "speed": 480.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 2.0, "speed": 480.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 1.0, "speed": 0.0,   "clockwise": true,  "rotationAxis": "Yaw", "frequency": 0.0, "contrast": 0, "color1": "#000000", "color2": "#000000", "dutyCycle": 0.0, "closedLoopOrientation": false, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 480.0, "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 480.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0, "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
 
-    { "duration": 2.0, "speed": 960.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 2.0, "speed": 960.0,  "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": false, "closedLoopPosition": false },
-    { "duration": 1.0, "speed": 0.0,   "clockwise": true,  "rotationAxis": "Yaw", "frequency": 0.0, "contrast": 0, "color1": "#000000", "color2": "#000000", "dutyCycle": 0.0, "closedLoopOrientation": false, "closedLoopPosition": false }
+    { "duration": 6.0, "speed": 960.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 960.0,  "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0,  "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#FFFFFF", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
 
 
   ]
