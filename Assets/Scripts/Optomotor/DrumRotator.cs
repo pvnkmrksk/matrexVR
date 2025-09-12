@@ -208,6 +208,18 @@ public class DrumRotator : MonoBehaviour
         SetRotationParameters(testSpeed, true, "Yaw");
     }
 
+    // Public getter for current rotation speed
+    public float GetRotationSpeed()
+    {
+        return rotationSpeed;
+    }
+
+    // Public getter for rotation direction
+    public bool IsClockwise()
+    {
+        return rotateClockwise;
+    }
+
     void OnDestroy()
     {
         Debug.Log("DrumRotator being destroyed");

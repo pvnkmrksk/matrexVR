@@ -211,7 +211,7 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         else
         {
             // Provide default values if no ClosedLoop components
-            loggingData["UseYawMode"] = false;
+            loggingData["UseYawMode"] = true;
             loggingData["YawGain"] = 0.0f;
             loggingData["YawDCOffset"] = 0.0f;
             loggingData["YawInput"] = 0.0f;
@@ -265,7 +265,7 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         else
         {
             // Provide default values if no ClosedLoop components
-            loggingData["UseYawMode"] = false;
+            loggingData["UseYawMode"] = true;
             loggingData["YawGain"] = 0.0f;
             loggingData["YawDCOffset"] = 0.0f;
             loggingData["YawInput"] = 0.0f;

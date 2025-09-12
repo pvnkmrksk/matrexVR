@@ -52,6 +52,9 @@ public class MainController : MonoBehaviour
     // Persistent black background camera
     private Camera backgroundCamera;
 
+    // Status UI component
+    private StatusUI statusUI;
+
     // In MainController class
     public SequenceStep GetCurrentSequenceStep()
     {
@@ -101,6 +104,9 @@ public class MainController : MonoBehaviour
 
         // Create persistent black background camera
         CreatePersistentBackgroundCamera();
+
+        // Create status UI
+        CreateStatusUI();
     }
 
     // Handle display setup - simplified to use a single display for all VR setups
@@ -373,6 +379,12 @@ public class MainController : MonoBehaviour
         {
             DestroyImmediate(backgroundCamera.gameObject);
         }
+
+        // Clean up status UI
+        if (statusUI != null)
+        {
+            DestroyImmediate(statusUI.gameObject);
+        }
     }
 
     void Update()
@@ -386,6 +398,15 @@ public class MainController : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Escape))
         {
             Application.Quit();
+        }
+
+        // Toggle status UI with Tab key
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (statusUI != null)
+            {
+                statusUI.ToggleStatusUI();
+            }
         }
     }
 
@@ -626,6 +647,21 @@ public class MainController : MonoBehaviour
 
         // Ensure the camera is not affected by scene changes
         DontDestroyOnLoad(backgroundCameraObject);
+    }
+
+    private void CreateStatusUI()
+    {
+        // Create a new GameObject for the status UI
+        GameObject statusUIObject = new GameObject("StatusUI");
+        statusUIObject.hideFlags = HideFlags.HideAndDontSave; // Hide and don't save to scene
+
+        // Add the StatusUI component
+        statusUI = statusUIObject.AddComponent<StatusUI>();
+
+        // Ensure the status UI is not affected by scene changes
+        DontDestroyOnLoad(statusUIObject);
+
+        Debugger.Log("Status UI created and will persist across scenes", 3);
     }
 
     private void ApplyGainToClosedLoopComponents(float gain)
