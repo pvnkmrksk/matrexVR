@@ -5,12 +5,25 @@
       "sphereDiameter": 1.0,
       "ledPanelWidth": 128,
       "ledPanelHeight": 128,
-      "startRow": 1,
+      "startRow": 0,
       "startCol": 0,
       "horizontal": true,
       "zmqAddress": "localhost",
       "zmqPort": 9871,
       "vrId": "VR1",
+      "displayOrder": "RBLFDU"
+    },
+
+    {
+      "sphereDiameter": 1.0,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 1,
+      "startCol": 0,
+      "horizontal": true,
+      "zmqAddress": "localhost",
+      "zmqPort": 9872,
+      "vrId": "VR2",
       "displayOrder": "RBLFDU"
     }
   ]
