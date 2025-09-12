@@ -28,7 +28,7 @@ public class ClosedLoop : MonoBehaviour
     [SerializeField][Tooltip("Whether to apply the FicTrac rotation in closed loop")] private bool closedLoopOrientation = true;
 
     // New yaw-based orientation mode variables
-    [SerializeField][Tooltip("Whether to use yaw-based orientation mode instead of standard orientation")] private bool useYawMode = false;
+    [SerializeField][Tooltip("Whether to use yaw-based orientation mode instead of standard orientation")] private bool useYawMode = true;
     [SerializeField][Tooltip("Gain factor for yaw-based orientation scaling")] private float yawGain = 1.0f;
     [SerializeField][Tooltip("DC offset for yaw-based orientation (in degrees)")] private float yawDCOffset = 0.0f;
     [SerializeField][Tooltip("Step size for gain adjustments")] private float gainStep = 1.0f;
@@ -53,7 +53,7 @@ public class ClosedLoop : MonoBehaviour
     private float _lastTorqueOutput = 0f;
 
     // Closed loop mode configuration
-    private ClosedLoopMode _currentMode = ClosedLoopMode.FicTrac;
+    private ClosedLoopMode _currentMode = ClosedLoopMode.Kinefly;
 
     private void Start()
     {
@@ -97,8 +97,8 @@ public class ClosedLoop : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("MainController not found, using default FicTrac mode");
-            _currentMode = ClosedLoopMode.FicTrac;
+            Debug.LogWarning("MainController not found, using default Kinefly mode");
+            _currentMode = ClosedLoopMode.Kinefly;
             ApplyModeConfiguration(_currentMode);
         }
     }
@@ -109,7 +109,7 @@ public class ClosedLoop : MonoBehaviour
         {
             case ClosedLoopMode.FicTrac:
                 // FicTrac: Walking mode - yaw mode off, force mode off
-                useYawMode = false;
+                useYawMode = true;
                 useForceMode = false;
                 Debug.Log("Applied FicTrac mode: yaw mode OFF, force mode OFF");
                 break;
@@ -123,7 +123,7 @@ public class ClosedLoop : MonoBehaviour
                 
             case ClosedLoopMode.Tirbala:
                 // Tirbala: Force/torque accumulation mode - yaw mode off, force mode on
-                useYawMode = false;
+                useYawMode = true;
                 useForceMode = true;
                 Debug.Log("Applied Tirbala mode: yaw mode OFF, force mode ON");
                 break;

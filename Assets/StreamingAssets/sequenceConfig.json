@@ -5,31 +5,24 @@
 
 
     {
+      "sceneName": "Choice_Chamonix",
+      "duration": 30,
+      "gain":10,
+      "parameters": {
+        "configFile": "choice_chamonix.json"
+      }
+    },
+
+    {
       "sceneName": "Choice",
-      "duration": 10,
-      "gain": 10.0,
-      "parameters": {
-        "configFile": "choice_config.json"
-      }
-    },
-    {
-      "sceneName": "Optomotor",
-      "duration": 10,
-      "gain": 20.2,
-      "parameters": {
-        "configFile": "optomotor_config.json"
-      }
-    },
+      "duration": 30,
+      "gain":10,
 
-
-    {
-      "sceneName": "Choice_Forrest",
-      "duration": 10,
-      "gain": 0.0,
       "parameters": {
         "configFile": "choice_config.json"
       }
     }
+
 
 
   ]
