@@ -6,14 +6,16 @@
 
     {
       "sceneName": "Choice",
-      "duration": 3000,
+      "duration": 10,
+      "gain": 10.0,
       "parameters": {
         "configFile": "choice_config.json"
       }
     },
     {
       "sceneName": "Optomotor",
-      "duration": 300,
+      "duration": 10,
+      "gain": 20.2,
       "parameters": {
         "configFile": "optomotor_config.json"
       }
@@ -22,7 +24,8 @@
 
     {
       "sceneName": "Choice_Forrest",
-      "duration": 3000,
+      "duration": 10,
+      "gain": 0.0,
       "parameters": {
         "configFile": "choice_config.json"
       }

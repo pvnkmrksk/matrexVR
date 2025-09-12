@@ -346,6 +346,12 @@ public class MainController : MonoBehaviour
 
         if (currentSceneController != null && currentStepData.parameters != null)
         {
+            // Add gain to parameters if not already present
+            if (!currentStepData.parameters.ContainsKey("gain"))
+            {
+                currentStepData.parameters["gain"] = currentStepData.gain;
+            }
+            
             currentSceneController.InitializeScene(currentStepData.parameters);
             timer = currentStepData.duration;
         }
@@ -353,6 +359,9 @@ public class MainController : MonoBehaviour
         {
             Debugger.Log("Either the scene controller or the parameters are null.", 2);
         }
+        
+        // Apply gain to all ClosedLoop components in the scene
+        ApplyGainToClosedLoopComponents(currentStepData.gain);
     }
 
     void OnDestroy()
@@ -423,6 +432,7 @@ public class MainController : MonoBehaviour
                         SequenceStep newStep = new SequenceStep(
                             item.sceneName,
                             item.duration,
+                            item.gain, // Pass gain
                             item.parameters
                         );
                         sequenceSteps.Add(newStep);
@@ -436,6 +446,7 @@ public class MainController : MonoBehaviour
                     {
                         Debugger.Log("Scene Name: " + step.sceneName, 4);
                         Debugger.Log("Duration: " + step.duration, 4);
+                        Debugger.Log("Gain: " + step.gain, 4); // Log gain
 
                         // Log each key in the parameters dictionary for the current SequenceStep
                         if (step.parameters != null)
@@ -616,6 +627,28 @@ public class MainController : MonoBehaviour
         // Ensure the camera is not affected by scene changes
         DontDestroyOnLoad(backgroundCameraObject);
     }
+
+    private void ApplyGainToClosedLoopComponents(float gain)
+    {
+        // Find all GameObjects with the ClosedLoop component
+        ClosedLoop[] closedLoops = FindObjectsOfType<ClosedLoop>();
+
+        foreach (ClosedLoop loop in closedLoops)
+        {
+            // Apply the gain to the ClosedLoop component using the existing SetYawGain method
+            loop.SetYawGain(gain);
+            Debugger.Log($"Applied yaw gain {gain} to ClosedLoop component on GameObject: {loop.gameObject.name}", 3);
+        }
+        
+        if (closedLoops.Length > 0)
+        {
+            Debugger.Log($"Applied gain {gain} to {closedLoops.Length} ClosedLoop components", 3);
+        }
+        else
+        {
+            Debugger.Log("No ClosedLoop components found to apply gain to", 3);
+        }
+    }
 }
 
 [System.Serializable]
@@ -623,12 +656,14 @@ public class SequenceStep
 {
     public string sceneName;
     public float duration;
+    public float gain; // Gain value for yaw control
     public Dictionary<string, object> parameters;
 
-    public SequenceStep(string sceneName, float duration, Dictionary<string, object> parameters)
+    public SequenceStep(string sceneName, float duration, float gain, Dictionary<string, object> parameters)
     {
         this.sceneName = sceneName;
         this.duration = duration;
+        this.gain = gain;
         this.parameters = parameters;
     }
 }
@@ -646,6 +681,8 @@ public class SequenceItem
 {
     public string sceneName;
     public float duration;
+    [Tooltip("Gain value for yaw control in ClosedLoop components. Default is 1.0 if not specified in JSON.")]
+    public float gain = 1.0f; // Default gain value for yaw control
     public Dictionary<string, object> parameters;
 }
 
