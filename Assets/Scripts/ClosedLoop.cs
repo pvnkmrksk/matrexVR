@@ -41,6 +41,10 @@ public class ClosedLoop : MonoBehaviour
     [SerializeField][Tooltip("Step size for force gain adjustments")] private float forceGainStep = 0.1f;
     [SerializeField][Tooltip("Step size for torque gain adjustments")] private float torqueGainStep = 0.1f;
 
+    // Wind simulation variables
+    [SerializeField][Tooltip("Wind speed for slip simulation")] private float windSpeed = 0f;
+    [SerializeField][Tooltip("Wind direction in degrees - where wind is coming FROM (0° = from North, 90° = from East)")] private float windDirection = 0f;
+
     // Stores the initial world rotation, including any random rotation applied at start
     private Quaternion _initialWorldRotation;
 
@@ -181,6 +185,21 @@ public class ClosedLoop : MonoBehaviour
             // This accounts for both the initial FicTrac orientation and any random initial rotation
             Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius;
             transform.Translate(positionDelta, Space.World);
+            
+            // Apply wind slip as additional movement if wind is enabled
+            if (windSpeed > 0f)
+            {
+                // Convert wind direction angle to vector
+                // Wind direction is where wind is coming FROM, so add 180° to get where it's blowing TO
+                float windAngleRad = (windDirection + 180f) * Mathf.Deg2Rad;
+                Vector3 windVector = new Vector3(
+                    Mathf.Sin(windAngleRad),
+                    0f,
+                    Mathf.Cos(windAngleRad)
+                ) * windSpeed * Time.deltaTime;
+                
+                transform.Translate(windVector, Space.World);
+            }
         }
 
         // Handle different rotation modes based on configuration
@@ -452,6 +471,12 @@ public class ClosedLoop : MonoBehaviour
     public void SetTorqueGain(float value)
     {
         torqueGain = value;
+    }
+
+    public void SetWindParameters(float speed, float direction)
+    {
+        windSpeed = speed;
+        windDirection = direction;
     }
 
     public void SetPositionAndRotation(Vector3 initialPosition, Quaternion initialRotation)
