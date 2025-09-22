@@ -113,6 +113,9 @@ public class ChoiceController : MonoBehaviour, ISceneController
             cl.SetClosedLoopOrientation(config.closedLoopOrientation);
             cl.SetClosedLoopPosition(config.closedLoopPosition);
 
+            // Set wind parameters
+            cl.SetWindParameters(config.windSpeed, config.windDirection);
+
             // Set the initial position and rotation in one go, convert the rotation to a quaternion
             //if randomInitialRotation is true, then set the rotation to a random value
             Quaternion initialRotation;
@@ -243,6 +246,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
         }
     }
 
+
     // Update SceneConfig and other classes as needed to reflect JSON changes
 }
 
@@ -260,6 +264,9 @@ public class SceneConfig
     public ColorConfig backgroundColor;
 
     public string skyboxPath;
+    
+    public float windSpeed;
+    public float windDirection;
 }
 
 [System.Serializable]
