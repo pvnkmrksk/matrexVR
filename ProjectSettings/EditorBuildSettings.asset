@@ -38,4 +38,22 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Choice_TVM_skybox.unity
     guid: 2400622221133c0bcb48b15caf62ccfc
+  - enabled: 1
+    path: Assets/Scenes/Milkyway.unity
+    guid: e34b1f211ac299e66bb79f63ffab15be
+  - enabled: 1
+    path: Assets/Scenes/Choice_Jaman.unity
+    guid: dc1cf2e8d05ba1f52b3daf4dcca5c6e2
+  - enabled: 1
+    path: Assets/Scenes/Choice_Grenoble.unity
+    guid: 747e65bcb2e69fce4ad4b58870a89e54
+  - enabled: 1
+    path: Assets/Scenes/Choice_SBend.unity
+    guid: f85d0317a6b00cbac8650d2850714882
+  - enabled: 1
+    path: Assets/Scenes/Choice_Amriswil.unity
+    guid: 8ed94ba26bf34a404b2c9123bcd8eaae
+  - enabled: 1
+    path: Assets/Scenes/Choice_Chamonix.unity
+    guid: bd787b7d611a117f5a7c3c027b3a8a27
   m_configObjects: {}
