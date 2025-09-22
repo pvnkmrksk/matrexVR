@@ -1,0 +1,19 @@
+{
+  "objects": [
+
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "initialPosition": {
+    "x": 0,
+    "y": 1250,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0.1,
+    "y": 0.1,
+    "z": 0.1
+  },
+  "randomInitialRotation": true,
+
+}

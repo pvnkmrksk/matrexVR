@@ -1,0 +1,32 @@
+{
+  "objects": [
+    {
+      "type": "tree01",
+      "position": {
+        "radius": 30,
+        "angle": 0,
+        "height": 0
+      },
+      "scale": {
+        "x": 3,
+        "y": 3,
+        "z": 3
+      },
+      "flip": true
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "initialPosition": {
+    "x": 0,
+    "y": 10.7,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0.1,
+    "y": 0.1,
+    "z": 0.1
+  },
+  "randomInitialRotation": true
+
+}
