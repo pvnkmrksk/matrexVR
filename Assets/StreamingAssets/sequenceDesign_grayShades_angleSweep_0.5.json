@@ -41,7 +41,7 @@
   },
   "steps": [
     {
-      "name": "StaticChoice_00_40_10deg",
+      "name": "StaticChoice_00_50_10deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -80,9 +80,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -137,7 +137,7 @@
       ]
     },
     {
-      "name": "StaticChoice_00_40_40deg",
+      "name": "StaticChoice_00_50_40deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -176,9 +176,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -233,7 +233,7 @@
       ]
     },
     {
-      "name": "StaticChoice_00_40_50deg",
+      "name": "StaticChoice_00_50_50deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -272,9 +272,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -329,7 +329,7 @@
       ]
     },
     {
-      "name": "StaticChoice_00_40_60deg",
+      "name": "StaticChoice_00_50_60deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -368,9 +368,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -425,7 +425,7 @@
       ]
     },
     {
-      "name": "StaticChoice_00_40_70deg",
+      "name": "StaticChoice_00_50_70deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -464,9 +464,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -521,7 +521,7 @@
       ]
     },
     {
-      "name": "StaticChoice_00_40_80deg",
+      "name": "StaticChoice_00_50_80deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -560,9 +560,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -617,7 +617,7 @@
       ]
     },
     {
-      "name": "StaticChoice_00_40_90deg",
+      "name": "StaticChoice_00_50_90deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -656,9 +656,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -713,7 +713,7 @@
       ]
     },
     {
-      "name": "StaticChoice_00_40_100deg",
+      "name": "StaticChoice_00_50_100deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -752,9 +752,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -809,7 +809,7 @@
       ]
     },
     {
-      "name": "StaticChoice_00_40_140deg",
+      "name": "StaticChoice_00_50_140deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -848,9 +848,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -905,7 +905,7 @@
       ]
     },
     {
-      "name": "StaticChoice_00_40_180deg",
+      "name": "StaticChoice_00_50_180deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -944,9 +944,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -1001,7 +1001,7 @@
       ]
     },
     {
-      "name": "StaticChoice_40_00_10deg",
+      "name": "StaticChoice_50_00_10deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -1019,9 +1019,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -1097,7 +1097,7 @@
       ]
     },
     {
-      "name": "StaticChoice_40_00_40deg",
+      "name": "StaticChoice_50_00_40deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -1115,9 +1115,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -1193,7 +1193,7 @@
       ]
     },
     {
-      "name": "StaticChoice_40_00_50deg",
+      "name": "StaticChoice_50_00_50deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -1211,9 +1211,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -1289,7 +1289,7 @@
       ]
     },
     {
-      "name": "StaticChoice_40_00_60deg",
+      "name": "StaticChoice_50_00_60deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -1307,9 +1307,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -1385,7 +1385,7 @@
       ]
     },
     {
-      "name": "StaticChoice_40_00_70deg",
+      "name": "StaticChoice_50_00_70deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -1403,9 +1403,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -1481,7 +1481,7 @@
       ]
     },
     {
-      "name": "StaticChoice_40_00_80deg",
+      "name": "StaticChoice_50_00_80deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -1499,9 +1499,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -1577,7 +1577,7 @@
       ]
     },
     {
-      "name": "StaticChoice_40_00_90deg",
+      "name": "StaticChoice_50_00_90deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -1595,9 +1595,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -1673,7 +1673,7 @@
       ]
     },
     {
-      "name": "StaticChoice_40_00_100deg",
+      "name": "StaticChoice_50_00_100deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -1691,9 +1691,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -1769,7 +1769,7 @@
       ]
     },
     {
-      "name": "StaticChoice_40_00_140deg",
+      "name": "StaticChoice_50_00_140deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -1787,9 +1787,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -1865,7 +1865,7 @@
       ]
     },
     {
-      "name": "StaticChoice_40_00_180deg",
+      "name": "StaticChoice_50_00_180deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -1883,9 +1883,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {
@@ -2132,7 +2132,7 @@
       ]
     },
     {
-      "name": "StaticSolo_40_0deg",
+      "name": "StaticSolo_50_0deg",
       "trigger": {
         "type": "time",
         "seconds": 10
@@ -2150,9 +2150,9 @@
           },
           "material": "Blue",
           "color": [
-            0.4,
-            0.4,
-            0.4,
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {

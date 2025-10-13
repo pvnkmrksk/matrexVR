@@ -47,7 +47,7 @@ public class BuildGrayShadeAngleSweepChoiceDesign
             new[] { 0.0f, 0.0f, 0.0f, 1f }, // black
         };
 
-        float[] reference = new[] { 0.4f, 0.4f, 0.4f, 1f };
+        float[] reference = new[] { 0.5f, 0.5f, 0.5f, 1f };
         int[] angles = { 10, 40, 50, 60, 70, 80, 90, 100, 140, 180 };
 
         IEnumerable<dynamic> steps = (
@@ -220,7 +220,7 @@ public class BuildGrayShadeAngleSweepChoiceDesign
         float[][] value =
         {
             new[] { 0.0f, 0.0f, 0.0f, 1f }, // black
-            new[] { 0.4f, 0.4f, 0.4f, 1f }, // gray
+            new[] { 0.5f, 0.5f, 0.5f, 1f }, // gray
         };
         float[][] shades2 = value;
 
@@ -301,7 +301,7 @@ public class BuildGrayShadeAngleSweepChoiceDesign
         // 4) write to StreamingAssets
         string path = Path.Combine(
             Application.streamingAssetsPath,
-            "sequenceDesign_grayShades_angleSweep.json"
+            "sequenceDesign_grayShades_angleSweep_0.5.json"
         );
         Directory.CreateDirectory(Application.streamingAssetsPath);
         File.WriteAllText(path, JsonConvert.SerializeObject(design, Formatting.Indented));
