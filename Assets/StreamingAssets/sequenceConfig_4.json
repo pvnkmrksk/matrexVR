@@ -1,0 +1,1057 @@
+{
+  "loop": true,
+  "sequences": [
+
+
+
+
+
+
+
+
+
+
+
+
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L__.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L__.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L__.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L__.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L__.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L__.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L__.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L__.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L__.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L__.json"
+      }},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L_M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L_M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L_M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L_M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L_M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L_M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L_M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L_M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L_M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_L_M.json"
+      }
+    },
+
+
+
+
+
+
+
+   {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LSM.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LSM.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LSM.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LSM.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LSM.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LSM.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LSM.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LSM.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LSM.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LSM.json"
+      }
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice___M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice___M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice___M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice___M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice___M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice___M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice___M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice___M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice___M.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice___M.json"
+      }
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice____.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice____.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice____.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice____.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice____.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice____.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice____.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice____.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice____.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice____.json"
+      }
+    },
+
+
+
+
+
+
+
+
+
+
+
+     {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LS_.json"
+      }
+    },
+     {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LS_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LS_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LS_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LS_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LS_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LS_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LS_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LS_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LS_.json"
+      }
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__S_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__S_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__S_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__S_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__S_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__S_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__S_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__S_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__S_.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__S_.json"
+      }
+    },
+
+
+
+
+
+
+
+
+
+
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__SM.json"
+      }
+    },
+     {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__SM.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__SM.json"
+      }
+    },
+     {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__SM.json"
+      }
+    },
+     {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__SM.json"
+      }
+    },
+     {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__SM.json"
+      }
+    },
+     {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__SM.json"
+      }
+    },
+     {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__SM.json"
+      }
+    },
+     {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__SM.json"
+      }
+    },
+     {
+      "sceneName": "Choice",
+      "duration": 30,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice__SM.json"
+      }
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ]
+}
