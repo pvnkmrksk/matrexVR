@@ -164,6 +164,10 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
             // Set wind parameters
             cl.SetWindParameters(config.windSpeed, config.windDirection);
+            
+            // Set AGL parameters
+            cl.SetAGLParameters(config.aglHeight);
+            Debug.Log($"AGL: Set AGL height to {config.aglHeight} for {cl.gameObject.name}");
 
             // Set the initial position and rotation in one go, convert the rotation to a quaternion
             //if randomInitialRotation is true, then set the rotation to a random value
@@ -480,6 +484,8 @@ public class SceneConfig
     
     public float windSpeed;
     public float windDirection;
+    
+    public float aglHeight;
 }
 
 [System.Serializable]

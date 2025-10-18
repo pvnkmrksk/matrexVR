@@ -44,6 +44,9 @@ public class ClosedLoop : MonoBehaviour
     // Wind simulation variables
     [SerializeField][Tooltip("Wind speed for slip simulation")] private float windSpeed = 0f;
     [SerializeField][Tooltip("Wind direction in degrees - where wind is coming FROM (0° = from North, 90° = from East)")] private float windDirection = 0f;
+    
+    // AGL (Above Ground Level) variables
+    [SerializeField][Tooltip("Fixed height above terrain to maintain")] private float aglHeight = 0f;
 
     // Stores the initial world rotation, including any random rotation applied at start
     private Quaternion _initialWorldRotation;
@@ -186,21 +189,38 @@ public class ClosedLoop : MonoBehaviour
             Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius;
             transform.Translate(positionDelta, Space.World);
             
-            // Apply wind slip as additional movement if wind is enabled
-            if (windSpeed > 0f)
-            {
-                // Convert wind direction angle to vector
-                // Wind direction is where wind is coming FROM, so add 180° to get where it's blowing TO
-                float windAngleRad = (windDirection + 180f) * Mathf.Deg2Rad;
-                Vector3 windVector = new Vector3(
-                    Mathf.Sin(windAngleRad),
-                    0f,
-                    Mathf.Cos(windAngleRad)
-                ) * windSpeed * Time.deltaTime;
-                
-                transform.Translate(windVector, Space.World);
-            }
+           
         }
+        
+        
+        
+         // Apply wind slip as additional movement if wind is enabled
+         if (windSpeed > 0f)
+         {
+             // Convert wind direction angle to vector
+             // Wind direction is where wind is coming FROM, so add 180° to get where it's blowing TO
+             float windAngleRad = (windDirection + 180f) * Mathf.Deg2Rad;
+             Vector3 windVector = new Vector3(
+                 Mathf.Sin(windAngleRad),
+                 0f,
+                 Mathf.Cos(windAngleRad)
+             ) * windSpeed * Time.deltaTime;
+
+             transform.Translate(windVector, Space.World);
+         }
+         
+         // Apply AGL height adjustment if enabled
+         if (aglHeight > 0f)
+         {
+             // Get current terrain height at this position
+             float terrainHeight = GetTerrainHeight(transform.position);
+             float targetHeight = terrainHeight + aglHeight;
+             
+             // Adjust Y position to maintain AGL height
+             Vector3 currentPos = transform.position;
+             currentPos.y = targetHeight;
+             transform.position = currentPos;
+         }
 
         // Handle different rotation modes based on configuration
         if (useForceMode)
@@ -211,30 +231,30 @@ public class ClosedLoop : MonoBehaviour
                 // Placeholder for force/torque accumulation
                 // This will be implemented based on the specific requirements for Tirbala
                 // For now, we'll use a simple implementation that can be expanded
-                
+
                 // Extract force and torque data from the incoming data
                 // Assuming the data structure includes force/torque information
                 float forceInput = currentFicTracData.x; // Placeholder - adjust based on actual data structure
                 float torqueInput = currentFicTracData.z; // Placeholder - adjust based on actual data structure
-                
+
                 _lastForceInput = forceInput;
                 _lastTorqueInput = torqueInput;
-                
+
                 // Apply force and torque gains
                 float forceOutput = forceInput * forceGain;
                 float torqueOutput = torqueInput * torqueGain;
-                
+
                 _lastForceOutput = forceOutput;
                 _lastTorqueOutput = torqueOutput;
-                
+
                 // Apply the accumulated force/torque effects
                 // This is a placeholder implementation - adjust based on actual requirements
                 Vector3 forceEffect = new Vector3(forceOutput, 0, 0) * sphereRadius;
                 transform.Translate(forceEffect, Space.World);
-                
+
                 // Apply torque as rotation
                 transform.Rotate(0, torqueOutput, 0, Space.Self);
-                
+
                 Debug.Log($"Force Mode: Force Input={_lastForceInput:F2}, Force Output={_lastForceOutput:F2}, Torque Input={_lastTorqueInput:F2}, Torque Output={_lastTorqueOutput:F2}");
             }
             else
@@ -255,17 +275,17 @@ public class ClosedLoop : MonoBehaviour
                 // Use the absolute yaw value directly from ZMQ
                 float absoluteYaw = currentFicTracData.z * Mathf.Rad2Deg;
                 _lastYawInput = absoluteYaw;
-                
+
                 // Apply gain and DC offset with correct formula: (gain * yaw) - dcoffset
                 float rotationDelta = yawGain * (absoluteYaw - yawDCOffset);
                 // float rotationDelta = (yawGain * absoluteYaw) - yawDCOffset;
-                
+
                 // Store the processed output for logging
                 _lastYawOutput = rotationDelta;
-                
+
                 // Apply the rotation (frame rate independent - rotation rate per second)
                 transform.Rotate(0, rotationDelta * Time.deltaTime, 0, Space.Self);
-                
+
                 Debug.Log($"Yaw Mode: Input={_lastYawInput:F2}°, Gain={yawGain:F2}, DCOffset={yawDCOffset:F2}°, Output={_lastYawOutput:F2}°");
             }
             else
@@ -284,7 +304,7 @@ public class ClosedLoop : MonoBehaviour
                 float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg;
                 _lastYawInput = rotationDelta;
                 _lastYawOutput = rotationDelta;
-                
+
                 // Apply the rotation
                 transform.Rotate(0, rotationDelta, 0, Space.Self);
             }
@@ -477,6 +497,30 @@ public class ClosedLoop : MonoBehaviour
     {
         windSpeed = speed;
         windDirection = direction;
+    }
+
+    public void SetAGLParameters(float height)
+    {
+        aglHeight = height;
+        Debug.Log($"AGL: SetAGLParameters called with height {height}, aglHeight is now {aglHeight}");
+    }
+
+    /// <summary>
+    /// Gets the terrain height at the given world position
+    /// </summary>
+    /// <param name="worldPosition">World position to check</param>
+    /// <returns>Terrain height at that position</returns>
+    private float GetTerrainHeight(Vector3 worldPosition)
+    {
+        // Cast a ray downward to find terrain
+        RaycastHit hit;
+        if (Physics.Raycast(worldPosition + Vector3.up * 1000f, Vector3.down, out hit, Mathf.Infinity))
+        {
+            return hit.point.y;
+        }
+        
+        // If no terrain found, return 0 (ground level)
+        return 0f;
     }
 
     public void SetPositionAndRotation(Vector3 initialPosition, Quaternion initialRotation)
