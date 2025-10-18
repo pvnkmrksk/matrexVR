@@ -1,0 +1,22 @@
+{
+  "objects": [
+
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": false,
+  "initialPosition": {
+    "x": 0,
+    "y": 300.7,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0.1,
+    "y": 0.1,
+    "z": 0.1
+  },
+  "randomInitialRotation": true,
+  "skyboxPath":"Photosphere/LSM.png",
+  "windSpeed": 0,
+  "windDirection": 0.0,
+  "aglHeight": 100.0
+}

@@ -1,0 +1,53 @@
+{
+  "loop": true,
+  "sequences": [
+
+
+
+
+   {
+      "sceneName": "Choice_SBend",
+      "duration": 100,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LSM_agl10.json"
+      }
+    },
+
+
+
+    {
+      "sceneName": "Choice_SBend",
+      "duration": 100,
+
+
+      "gain":10,
+
+      "parameters": {
+        "configFile": "choice_LSM_agl100.json"
+      }
+    },
+
+
+   {
+    "sceneName": "Choice_SBend",
+    "duration": 100,
+
+
+    "gain":10,
+
+    "parameters": {
+      "configFile": "choice_LSM_agl1000.json"
+    }
+  }
+
+
+
+
+
+
+  ]
+}
