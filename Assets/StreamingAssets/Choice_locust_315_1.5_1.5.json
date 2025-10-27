@@ -1,0 +1,27 @@
+{
+  "objects": [
+    {
+      "type": "LeaderLocust",
+      "position": {
+        "radius": 8,
+        "angle": 315
+      },
+      "scale": {
+        "x": 100,
+        "y": 100,
+        "z": 100
+      },
+      "flip": false,
+
+      "speed": 2,
+      "mu": 315
+    }
+      ],
+  "closedLoopOrientation": 1.5,
+  "closedLoopPosition": 1.5,
+  "backgroundColor": {
+    "r": 0.474,
+    "g": 0.580,
+    "b": 0.721
+  }
+}

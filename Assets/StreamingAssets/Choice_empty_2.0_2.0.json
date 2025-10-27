@@ -1,0 +1,27 @@
+{
+  "objects": [
+    {
+      "type": "",
+      "position": {
+        "radius": 0,
+        "angle": 0
+      },
+      "scale": {
+        "x": 120,
+        "y": 120,
+        "z": 120
+      },
+      "flip": false,
+
+      "speed": 2,
+      "mu": 0
+    }
+      ],
+  "closedLoopOrientation": 2.0,
+  "closedLoopPosition": 2.0,
+  "backgroundColor": {
+    "r": 0.474,
+    "g": 0.580,
+    "b": 0.721
+  }
+}

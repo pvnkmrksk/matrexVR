@@ -1,0 +1,81 @@
+{
+    "sequences": [
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "bilateral_band_locust_y2_M90_0.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "bilateral_band_locust_y2_M90_1.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "bilateral_band_locust_y2_M90_2.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "bilateral_band_locust_y2_M90_3.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "bilateral_band_locust_y2_M90_4.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "bilateral_band_locust_y2_M90_5.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "bilateral_band_locust_y2_M90_6.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "bilateral_band_locust_y2_M90_7.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "bilateral_band_locust_y2_M90_8.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "bilateral_band_locust_y2_M90_9.json"
+            }
+        },
+        {
+            "sceneName": "Choice_noBG",
+            "duration": 9,
+            "parameters": {
+                "configFile": "bilateral_band_locust_y2_M90_10.json"
+            }
+        }
+    ]
+}

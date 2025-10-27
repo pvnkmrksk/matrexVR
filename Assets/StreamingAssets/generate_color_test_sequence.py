@@ -20,7 +20,7 @@ for this_file_number in range(files_number):
     this_dict=f'{this_json}{this_file_number}.json'
     insert_dict = {
         "sceneName": "Choice_noBG",
-        "duration": 3,
+        "duration": 9,
         "parameters": {
             "configFile": this_dict
         }

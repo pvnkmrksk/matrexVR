@@ -25,9 +25,9 @@ after the shuffled JSON file is generated, please move the file to the folder wh
 '''
 
 # Read the JSON file
-random_seed=2
+random_seed=11
 # Specify the number of repetitions
-rep=4
+rep=5
 ## Specify the name of background scene
 scene_name='Choice'
 #scene_name='Choice_noTextureBG'
@@ -53,7 +53,7 @@ ISI_template='choice'
 #config_file_name='choice_noTextureBG_3_dir_closed_loop_comparison.json'
 #config_file_name='choice_noTextureBG_dir_3_initial_position.json'
 #config_file_name='choice_uniBG_3_dir_closed_loop_comparison.json'
-config_file_name='choice_2dir_5gain.json'
+config_file_name='choice_2dir_4gain.json'
 
 seed_range=np.arange(100)
 seed_list=seed_range.tolist()

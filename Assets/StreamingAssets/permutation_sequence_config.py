@@ -14,9 +14,9 @@ after the shuffled JSON file is generated, please move the file to the folder wh
 '''
 
 # Read the JSON file
-random_seed=2
+random_seed=10
 # Specify the number of repetitions
-rep=6
+rep=5
 ## Specify the name of background scene
 scene_name='Choice'
 #scene_name='Choice_noTextureBG'
