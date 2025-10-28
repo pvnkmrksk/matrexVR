@@ -41,22 +41,23 @@ public class BuildGrayShadeAngleSweepChoiceDesign
             }
         };
 
-        // 2) generate all shade × reference order × angle combinations
+        // 2) generate symmetric black–black comparisons (optionally labeled by 'flip') 
         float[][] shades =
         {
             new[] { 0.0f, 0.0f, 0.0f, 1f }, // black
         };
 
-        float[] reference = new[] { 0.5f, 0.5f, 0.5f, 1f };
+        float[] reference = new[] { 0.0f, 0.0f, 0.0f, 1f };
         int[] angles = { 10, 40, 50, 60, 70, 80, 90, 100, 140, 180 };
 
         IEnumerable<dynamic> steps = (
             from shade in shades
             from flip in new[] { false, true }
             from angle in angles
-            let c1 = flip ? reference : shade
-            let c2 = flip ? shade : reference
-            let name = $"StaticChoice_{ColorName(c1)}_{ColorName(c2)}_{angle}deg"
+            let c1 = shade                         // force symmetric: both black
+            let c2 = shade
+            let side = flip ? "flip" : "noflip"    // label for analysis symmetry
+            let name = $"StaticChoice_{side}_{ColorName(c1)}_{ColorName(c2)}_{angle}deg"
             select new
             {
                 name = name,
@@ -135,92 +136,10 @@ public class BuildGrayShadeAngleSweepChoiceDesign
             }
         ).ToArray();
 
-        // 2a) Add symmetric black-black 90° case
-        var symmetricStep = new[]
-        {
-            new
-            {
-                name = "StaticChoice_00_00_90deg",
-                trigger = new { type = "time", seconds = 10 },
-                closedLoopOrientation = true,
-                closedLoopPosition = true,
-                randomInitialRotation = false,
-                objects = new[]
-                {
-                    new
-                    {
-                        type = "ScalingCylinder",
-                        polar = new
-                        {
-                            radius = 50000,
-                            angle = -45f,
-                            height = 0
-                        },
-                        material = "Blue",
-                        color = shades[0],
-                        scale = new
-                        {
-                            x = 7,
-                            y = 100,
-                            z = 7
-                        },
-                        visualAngleDegrees = 10
-                    },
-                    new
-                    {
-                        type = "ScalingCylinder",
-                        polar = new
-                        {
-                            radius = 50000,
-                            angle = 45f,
-                            height = 0
-                        },
-                        material = "Blue",
-                        color = shades[0],
-                        scale = new
-                        {
-                            x = 7,
-                            y = 100,
-                            z = 7
-                        },
-                        visualAngleDegrees = 10
-                    }
-                },
-                camera = new[]
-                {
-                    new
-                    {
-                        vrId = "VR1",
-                        clearFlags = "SolidColor",
-                        bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f }
-                    },
-                    new
-                    {
-                        vrId = "VR2",
-                        clearFlags = "SolidColor",
-                        bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f }
-                    },
-                    new
-                    {
-                        vrId = "VR3",
-                        clearFlags = "SolidColor",
-                        bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f }
-                    },
-                    new
-                    {
-                        vrId = "VR4",
-                        clearFlags = "SolidColor",
-                        bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f }
-                    }
-                }
-            }
-        };
-
         // 2b) Add single-object steps for each shade at angle 0
         float[][] value =
         {
             new[] { 0.0f, 0.0f, 0.0f, 1f }, // black
-            new[] { 0.5f, 0.5f, 0.5f, 1f }, // gray
         };
         float[][] shades2 = value;
 
@@ -286,7 +205,7 @@ public class BuildGrayShadeAngleSweepChoiceDesign
             };
 
         // Combine all sets of steps
-        var allSteps = steps.Concat(symmetricStep).Concat(soloSteps).ToArray();
+        var allSteps = steps.Concat(soloSteps).ToArray();
 
         // 3) Assemble the design root
         var design = new
@@ -301,7 +220,7 @@ public class BuildGrayShadeAngleSweepChoiceDesign
         // 4) write to StreamingAssets
         string path = Path.Combine(
             Application.streamingAssetsPath,
-            "sequenceDesign_grayShades_angleSweep_0.5.json"
+            "sequenceDesign_grayShades_angleSweep_0.0.json"
         );
         Directory.CreateDirectory(Application.streamingAssetsPath);
         File.WriteAllText(path, JsonConvert.SerializeObject(design, Formatting.Indented));
