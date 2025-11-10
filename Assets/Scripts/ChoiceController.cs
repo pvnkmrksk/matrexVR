@@ -38,12 +38,24 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
         // Load and parse JSON
         string jsonPath = Path.Combine(Application.streamingAssetsPath, configFile);
+
+        if (!File.Exists(jsonPath))
+        {
+            Debug.LogError($"Config file not found at: {jsonPath}");
+            return;
+        }
+
         string jsonString = File.ReadAllText(jsonPath);
         SceneConfig config = JsonConvert.DeserializeObject<SceneConfig>(jsonString);
         //instantiate objects
 
         foreach (var obj in config.objects)
         {
+            if (string.IsNullOrEmpty(obj.type))
+            {
+                continue; // Skip objects with no type specified
+            }
+
             if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
             {
                 for (int i = 0; i < tags.Length; i++)
@@ -380,7 +392,6 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
     private void SetSkybox(string skyboxPath)
     {
-        // If skyboxPath is empty, retain existing skybox
         if (string.IsNullOrEmpty(skyboxPath))
         {
             return;
@@ -396,10 +407,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 // Load the image bytes
                 byte[] imageBytes = File.ReadAllBytes(fullPath);
 
-                // Create texture with explicit settings:
-                // - RGBA32 format for full color support
-                // - mipmapChain: false to prevent mipmap generation which can cause seams in panoramic skyboxes
-                // - linear: true for proper color space handling
+                // Create texture with explicit settings for panoramic skyboxes
                 Texture2D skyboxTexture = new Texture2D(
                     width: 2,
                     height: 2,
@@ -412,11 +420,23 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 if (skyboxTexture.LoadImage(imageBytes))
                 {
                     // Create a new material using the skybox shader
-                    Material skyboxMaterial = new Material(Shader.Find("Skybox/Panoramic"));
+                    Shader skyboxShader = Shader.Find("Skybox/Panoramic");
+                    if (skyboxShader == null)
+                    {
+                        Debug.LogError("Could not find Skybox/Panoramic shader!");
+                        return;
+                    }
+
+                    Material skyboxMaterial = new Material(skyboxShader);
                     skyboxMaterial.mainTexture = skyboxTexture;
 
                     // Apply the skybox material to the scene
                     RenderSettings.skybox = skyboxMaterial;
+
+                    // Force refresh the skybox
+                    DynamicGI.UpdateEnvironment();
+
+                    Debug.Log($"Skybox loaded successfully: {skyboxPath}");
                 }
                 else
                 {
@@ -520,3 +540,5 @@ public class ColorConfig
     public float b;
     public float a;
 }
+
+
