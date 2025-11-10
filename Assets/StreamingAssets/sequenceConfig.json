@@ -1,25 +1,12 @@
-{
-  "randomise": false,
-  "loop": true,
-  "sequences": [
 
+{
+  "sequences": [
     {
-      "sceneName": "Choice_desync",
-      "duration": 3600,
-      "parameters": { "design":"sequenceDesign_grayShades_angleSweep_0.0.json" },
-      "reloadScene": false
-    },
-    {
-      "sceneName": "Choice_desync",
-      "duration": 3600,
-      "parameters": { "design":"sequenceDesign_grayShades_angleSweep_0.0.json" },
-      "reloadScene": false
-    },
-    {
-      "sceneName": "Choice_desync",
-      "duration": 3600,
-      "parameters": { "design":"sequenceDesign_grayShades_angleSweep_0.0.json" },
-      "reloadScene": false
+      "sceneName": "Choice",
+      "duration": 1200,
+      "parameters": {
+        "configFile": "bilateral_bandM0.json"
+      }
     }
   ]
 }
