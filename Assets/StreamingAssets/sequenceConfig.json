@@ -2,7 +2,7 @@
     "sequences": [
         {
             "sceneName": "Swarm",
-            "duration": 10,
+            "duration": 1,
             "parameters": {
                 "numberOfLocusts": 128,
                 "mu": 0,
@@ -12,7 +12,7 @@
         },
         {
             "sceneName": "Kannadi",
-            "duration": 10,
+            "duration": 1000,
             "parameters": {
                 "configFile": "Choice_test_cardinal.json"
             }
