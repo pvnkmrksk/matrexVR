@@ -1,0 +1,66 @@
+{
+    "objects": [],
+    "closedLoopOrientation": 1.0,
+    "closedLoopPosition": 1.0,
+    "backgroundColor": {
+        "r": 0.7830189,
+        "g": 0.7830189,
+        "b": 0.7830189,
+        "a": 0.0
+    },
+    "vrConfigs": [
+        {
+            "vrIndex": 1,
+            "initialPosition": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 5.0
+            },
+            "initialRotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        {
+            "vrIndex": 2,
+            "initialPosition": {
+                "x": 5.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "initialRotation": {
+                "x": 0.0,
+                "y": 90.0,
+                "z": 0.0
+            }
+        },
+        {
+            "vrIndex": 3,
+            "initialPosition": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": -5.0
+            },
+            "initialRotation": {
+                "x": 0.0,
+                "y": 180.0,
+                "z": 0.0
+            }
+        },
+        {
+            "vrIndex": 4,
+            "initialPosition": {
+                "x": -5.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "initialRotation": {
+                "x": 0.0,
+                "y": 270.0,
+                "z": 0.0
+            }
+        }
+    ]
+}
+

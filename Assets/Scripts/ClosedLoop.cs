@@ -16,6 +16,8 @@ public class ClosedLoop : MonoBehaviour
     private bool _isInitialized = false;
     private Quaternion _ficTracRotationOffset;
     private float _initializationTimer;
+    private bool _baseRotationSet = false; // Track if base rotation has been properly set
+    private Quaternion _baseRotation; // rotation defined by scene/config at startup
 
     // Add these new variables
     [SerializeField][Tooltip("Whether to apply the FicTrac position in closed loop")] private float closedLoopPosition = 1.0f;
@@ -27,9 +29,17 @@ public class ClosedLoop : MonoBehaviour
         _zmqListener = GetComponent<ZmqListener>();
         if (_zmqListener == null)
             Debug.LogError("ZmqListener component not found!");
+        
+        // Store current transform as initial, and set base rotation as fallback
         _initialPosition = transform.position;
         _initialRotation = transform.rotation;
-        ResetPositionAndRotation();
+        _baseRotation = _initialRotation; // Set fallback base rotation
+        
+        // Wait for proper initialization from scene controller
+        _isInitialized = false;
+        _ficTracRotationOffset = Quaternion.identity;
+        _initializationTimer = 0f;
+        _lastFicTracData = Vector3.zero;
     }
 
     private void Update()
@@ -47,7 +57,7 @@ public class ClosedLoop : MonoBehaviour
         if (!_isInitialized)
         {
             _initializationTimer += Time.deltaTime;
-            if (_initializationTimer >= initializationDelay)
+            if (_initializationTimer >= initializationDelay && _baseRotationSet)
             {
                 InitializeFicTracData();
             }
@@ -62,9 +72,12 @@ public class ClosedLoop : MonoBehaviour
     {
         _lastFicTracData = GetCurrentFicTracData();
         float initialYaw = _lastFicTracData.z;
-        _ficTracRotationOffset = Quaternion.Euler(0, -initialYaw * Mathf.Rad2Deg, 0);
+        // Compute offset so that desiredRotation starts from the current base rotation
+        Quaternion fictracYaw = Quaternion.Euler(0, initialYaw * Mathf.Rad2Deg, 0);
+        _ficTracRotationOffset = _baseRotation * Quaternion.Inverse(fictracYaw);
         _isInitialized = true;
         Debug.Log($"Initialized with FicTrac data: ({_lastFicTracData.x}, {_lastFicTracData.y}, {_lastFicTracData.z})");
+        Debug.Log($"Base rotation: {_baseRotation.eulerAngles}, FicTrac offset: {_ficTracRotationOffset.eulerAngles}");
     }
 
     private void UpdateTransform()
@@ -105,6 +118,28 @@ public class ClosedLoop : MonoBehaviour
         _initializationTimer = 0f;
         _lastFicTracData = Vector3.zero;
         Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
+    }
+
+    // Set a new base pose that FicTrac should align to, without resetting to zero
+    public void SetBasePose(Vector3 position, Quaternion rotation)
+    {
+        _initialPosition = position;
+        _initialRotation = rotation;
+        _baseRotation = rotation; // This is the key - set the base rotation for FicTrac alignment
+        _baseRotationSet = true; // Mark that base rotation has been properly set
+        transform.SetPositionAndRotation(position, rotation);
+        // Recompute alignment on next InitializeFicTracData
+        _isInitialized = false;
+        _ficTracRotationOffset = Quaternion.identity;
+        _initializationTimer = 0f;
+        _lastFicTracData = Vector3.zero;
+        Debug.Log($"SetBasePose: position={position}, rotation={rotation.eulerAngles}");
+    }
+
+    // Convenience to set only rotation as base
+    public void SetBaseRotation(Quaternion rotation)
+    {
+        SetBasePose(transform.position, rotation);
     }
 
     private Vector3 GetCurrentFicTracData()

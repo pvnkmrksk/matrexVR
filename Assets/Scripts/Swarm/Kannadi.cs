@@ -5,9 +5,21 @@ using Newtonsoft.Json;
 using System.IO;
 
 /// <summary>
-/// Generates a vishwaroopa of hexagonal grid of tiles around the center cloning all of them.
+/// Generates a kannadi (mirror) of hexagonal grid of tiles around the center cloning all of them.
+/// 
+/// KANNADI (ಕನ್ನಡಿ in Kannada script, transliteration: kannadi):
+/// - Meaning: "mirror" in Kannada (Dravidian language of Karnataka, India)
+/// - Etymology: The instrument that lets you see your own eye i.e. Mirror
+/// - Pronunciation: [kɑːnːɑːɖi] - roughly "KAHN-nah-dee" with stress on the first syllable
+/// - What it does in VR: Reflects and mirrors the insects in the virtual environment, 
+///   creating a vishwaroopa (manifestation of infinite forms) where the insect sees itself
+///   and its environment duplicated in a hexagonal grid pattern.
+/// 
+/// The name is chosen because this class creates a mirrored/reflected environment where
+/// the insect sees multiple copies of itself and the scene arranged in hexagonal symmetry,
+/// much like looking into a mirror or seeing infinite reflections.
 /// </summary>
-public class Vishwaroopa : MonoBehaviour, ISceneController
+public class Kannadi : MonoBehaviour, ISceneController
 {
     public GameObject tilePrefab; // Prefab for the tile. Locust prefab
     public int numberOfRings = 3; // Number of rings outward from the center
@@ -21,7 +33,7 @@ public class Vishwaroopa : MonoBehaviour, ISceneController
     {
         GenerateHexGrid();
     }
-
+    
     public void InitializeScene(Dictionary<string, object> parameters)
     {
         if (parameters == null)
@@ -69,21 +81,21 @@ public class Vishwaroopa : MonoBehaviour, ISceneController
             }
         }
 
-        Vishwaroopa[] Vishwaroopas = FindObjectsOfType<Vishwaroopa>();
+        Kannadi[] Kannadis = FindObjectsOfType<Kannadi>();
 
-        if (Vishwaroopas == null || Vishwaroopas.Length == 0)
+        if (Kannadis == null || Kannadis.Length == 0)
         {
-            Debugger.Log("No Vishwaroopas found.", 2);
+            Debugger.Log("No Kannadis found.", 2);
             return;
         }
 
-        foreach (Vishwaroopa roopa in Vishwaroopas)
+        foreach (Kannadi kannadi in Kannadis)
 {
 
         if (parameters.TryGetValue("numberOfRings", out object numberOfRings))
         {
-            roopa.numberOfRings = Convert.ToInt32(numberOfRings);
-            Debug.Log("numberOfRings: test " + roopa.numberOfRings);
+            kannadi.numberOfRings = Convert.ToInt32(numberOfRings);
+            Debug.Log("numberOfRings: test " + kannadi.numberOfRings);
         }
         else
         {
@@ -92,7 +104,7 @@ public class Vishwaroopa : MonoBehaviour, ISceneController
 
         if (parameters.TryGetValue("spacing", out object spacing))
         {
-            roopa.spacing = Convert.ToSingle(spacing);
+            kannadi.spacing = Convert.ToSingle(spacing);
         }
         else
         {
@@ -101,6 +113,69 @@ public class Vishwaroopa : MonoBehaviour, ISceneController
 
         Debugger.Log("Initializingf Swarm scene with parameters: " + parameters.ToString());
 }
+    }
+
+    private void ApplyVRConfigurations(SceneConfig config)
+    {
+        if (config.vrConfigs == null || config.vrConfigs.Length == 0)
+        {
+            Debugger.Log("No VR-specific configurations provided. Using defaults.", 3);
+            return;
+        }
+
+        Debugger.Log($"Found {config.vrConfigs.Length} VR configs to apply", 3);
+        foreach (var vrConfig in config.vrConfigs)
+        {
+            Debugger.Log($"Applying config for VR{vrConfig.vrIndex}", 3);
+            ApplyVRConfiguration(vrConfig);
+        }
+    }
+
+    private void ApplyVRConfiguration(VRConfig vrConfig)
+    {
+        // Try to find VR object with multiple possible names
+        GameObject vrObject = GameObject.Find($"VR{vrConfig.vrIndex}");
+        if (vrObject == null)
+        {
+            vrObject = GameObject.Find($"VR{vrConfig.vrIndex} Kannadi");
+        }
+        if (vrObject == null)
+        {
+            Debugger.Log($"VR{vrConfig.vrIndex} object not found in the scene.", 2);
+            return;
+        }
+
+        // Apply initial rotation if provided
+        if (vrConfig.initialRotation != null)
+        {
+            Quaternion rotation = Quaternion.Euler(
+                vrConfig.initialRotation.x,
+                vrConfig.initialRotation.y,
+                vrConfig.initialRotation.z
+            );
+            vrObject.transform.rotation = rotation;
+            Debugger.Log($"Set VR{vrConfig.vrIndex} rotation to {rotation.eulerAngles}", 3);
+        }
+
+        // Apply initial position if provided
+        if (vrConfig.initialPosition != null)
+        {
+            Vector3 position = new Vector3(
+                vrConfig.initialPosition.x,
+                vrConfig.initialPosition.y,
+                vrConfig.initialPosition.z
+            );
+            vrObject.transform.position = position;
+            Debugger.Log($"Set VR{vrConfig.vrIndex} position to {position}", 3);
+        }
+
+        // Sync ClosedLoop base pose to the new transform values
+        ClosedLoop closedLoop = vrObject.GetComponent<ClosedLoop>();
+        if (closedLoop != null)
+        {
+            Debugger.Log($"Setting base pose for VR{vrConfig.vrIndex}: pos={vrObject.transform.position}, rot={vrObject.transform.rotation.eulerAngles}", 3);
+            closedLoop.SetBasePose(vrObject.transform.position, vrObject.transform.rotation);
+        }
     }
 
 
@@ -187,70 +262,6 @@ public class Vishwaroopa : MonoBehaviour, ISceneController
                 // Apply the parent's rotation to each clone individually
                 clones[i].transform.rotation = transform.rotation * initialLocalRotations[i];
             }
-        }
-    }
-
-    private void ApplyVRConfigurations(SceneConfig config)
-    {
-        if (config.vrConfigs == null || config.vrConfigs.Length == 0)
-        {
-            Debugger.Log("No VR-specific configurations provided. Using defaults.", 3);
-            return;
-        }
-
-        Debugger.Log($"Found {config.vrConfigs.Length} VR configs to apply", 3);
-
-        foreach (var vrConfig in config.vrConfigs)
-        {
-            Debugger.Log($"Applying config for VR{vrConfig.vrIndex}", 3);
-            ApplyVRConfiguration(vrConfig);
-        }
-    }
-
-    private void ApplyVRConfiguration(VRConfig vrConfig)
-    {
-        // Try to find VR object with multiple possible names
-        GameObject vrObject = GameObject.Find($"VR{vrConfig.vrIndex}");
-        if (vrObject == null)
-        {
-            vrObject = GameObject.Find($"VR{vrConfig.vrIndex} Kannadi");
-        }
-        if (vrObject == null)
-        {
-            Debugger.Log($"VR{vrConfig.vrIndex} object not found in the scene.", 2);
-            return;
-        }
-
-        // Apply initial rotation if provided
-        if (vrConfig.initialRotation != null)
-        {
-            Quaternion rotation = Quaternion.Euler(
-                vrConfig.initialRotation.x,
-                vrConfig.initialRotation.y,
-                vrConfig.initialRotation.z
-            );
-            vrObject.transform.rotation = rotation;
-            Debugger.Log($"Set VR{vrConfig.vrIndex} rotation to {rotation.eulerAngles}", 3);
-        }
-
-        // Apply initial position if provided
-        if (vrConfig.initialPosition != null)
-        {
-            Vector3 position = new Vector3(
-                vrConfig.initialPosition.x,
-                vrConfig.initialPosition.y,
-                vrConfig.initialPosition.z
-            );
-            vrObject.transform.position = position;
-            Debugger.Log($"Set VR{vrConfig.vrIndex} position to {position}", 3);
-        }
-
-        // Sync ClosedLoop base pose to the new transform values
-        ClosedLoop closedLoop = vrObject.GetComponent<ClosedLoop>();
-        if (closedLoop != null)
-        {
-            Debugger.Log($"Setting base pose for VR{vrConfig.vrIndex}: pos={vrObject.transform.position}, rot={vrObject.transform.rotation.eulerAngles}", 3);
-            closedLoop.SetBasePose(vrObject.transform.position, vrObject.transform.rotation);
         }
     }
 }

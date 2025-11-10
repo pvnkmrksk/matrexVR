@@ -1,10 +1,10 @@
 {
     "sequences": [
         {
-            "sceneName": "Matrix",
+            "sceneName": "Kannadi",
             "duration": 6000,
             "parameters": {
-                "configFile": "Choice_empty_0.5_0.5.json"
+                "configFile": "Choice_test_cardinal.json"
             }
         }
     ]

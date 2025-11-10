@@ -286,6 +286,23 @@ public class SceneConfig
     public float closedLoopOrientation;
     public float closedLoopPosition;
     public ColorConfig backgroundColor;
+    public VRConfig[] vrConfigs; // Optional per-VR configuration for initial position/orientation
+}
+
+[System.Serializable]
+public class VRConfig
+{
+    public int vrIndex; // 1-4
+    public Vector3Config initialPosition;
+    public Vector3Config initialRotation;
+}
+
+[System.Serializable]
+public class Vector3Config
+{
+    public float x;
+    public float y;
+    public float z;
 }
 
 [System.Serializable]
