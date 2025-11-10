@@ -6,7 +6,7 @@
   "closedLoopPosition": true,
   "initialPosition": {
     "x": 0,
-    "y": 0.1,
+    "y": 100.1,
     "z": 0
   },
   "initialRotation": {
