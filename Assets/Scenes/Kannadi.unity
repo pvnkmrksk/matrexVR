@@ -157,6 +157,7 @@ MonoBehaviour:
   renderTextureResolution: 256
   vrMarkerSize: 5
   vrMarkerHeight: 2
+  enableOnStart: 1
 --- !u!4 &35819838
 Transform:
   m_ObjectHideFlags: 0
@@ -390,6 +391,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6842254200380285656, guid: b50b70a6cbb13e4698d82adc128c898c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6842254200529944166, guid: b50b70a6cbb13e4698d82adc128c898c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6842254200747668412, guid: b50b70a6cbb13e4698d82adc128c898c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6842254201289496008, guid: b50b70a6cbb13e4698d82adc128c898c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6842254202370524270, guid: b50b70a6cbb13e4698d82adc128c898c, type: 3}
       propertyPath: m_Name
       value: VR3 Kannadi
@@ -471,6 +488,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3275452215133571873, guid: c4d7aaaf42da35e578e856bae2f97c8e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3275452215664864597, guid: c4d7aaaf42da35e578e856bae2f97c8e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3275452216018182287, guid: c4d7aaaf42da35e578e856bae2f97c8e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3275452216169872433, guid: c4d7aaaf42da35e578e856bae2f97c8e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3275452216181086854, guid: c4d7aaaf42da35e578e856bae2f97c8e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -554,6 +587,22 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2199504554372699630, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
       propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2936118819463428526, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2936118819711537664, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2936118819827699390, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2936118820005289946, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
+      propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2936118820554942472, guid: c03a4dd560535f5b6aad2edb4c7914e3, type: 3}
@@ -697,6 +746,22 @@ PrefabInstance:
     - target: {fileID: 6521467020865543445, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}
       propertyPath: m_Name
       value: VR4 Kannadi
+      objectReference: {fileID: 0}
+    - target: {fileID: 6521467021936118963, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6521467022463249095, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6521467022704049059, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6521467022854285085, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5488086756459238749, guid: c982f46e68cd6afd3abd054e803254d5, type: 3}

@@ -20,7 +20,7 @@
             "vrIndex": 1,
             "initialPosition": {
                 "x": 0.0,
-                "y": 0.0,
+                "y": 1.0,
                 "z": 5.0
             },
             "initialRotation": {
@@ -33,7 +33,7 @@
             "vrIndex": 2,
             "initialPosition": {
                 "x": 5.0,
-                "y": 0.0,
+                "y": 1.0,
                 "z": 0.0
             },
             "initialRotation": {
@@ -46,7 +46,7 @@
             "vrIndex": 3,
             "initialPosition": {
                 "x": 0.0,
-                "y": 0.0,
+                "y": 1.0,
                 "z": -5.0
             },
             "initialRotation": {
@@ -59,7 +59,7 @@
             "vrIndex": 4,
             "initialPosition": {
                 "x": -5.0,
-                "y": 0.0,
+                "y": 1.0,
                 "z": 0.0
             },
             "initialRotation": {

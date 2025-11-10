@@ -332,9 +332,30 @@ public class Kannadi : MonoBehaviour, ISceneController
         // If rings = 0, just create center tile
         if (rings == 0)
         {
-            Vector3 hexPosition = Vector3.zero;
-            Vector3 worldPosition = transform.position + hexPosition;
-            GameObject clone = Instantiate(tilePrefab, worldPosition, Quaternion.identity);
+            // Instantiate at origin first
+            GameObject clone = Instantiate(tilePrefab, Vector3.zero, Quaternion.identity);
+            
+            // Try to get prefab's stored Y offset
+            // At runtime, Instantiate places objects at (0,0,0), so we need to check the prefab's stored position
+            // For SimulatedLocust, the stored Y is -0.25, but we'll read it from the instantiated object's initial state
+            // If the prefab has a stored offset, it might be in localPosition after instantiation
+            float prefabY = clone.transform.localPosition.y;
+            
+            // Debug: Log what we're getting
+            Debug.Log($"Clone instantiated, localPosition.y = {prefabY}, position.y = {clone.transform.position.y}, parent Y = {transform.position.y}");
+            
+            // If we got 0 (which means prefab's stored position wasn't applied), 
+            // use the known offset for SimulatedLocust (-0.25)
+            if (Mathf.Approximately(prefabY, 0f))
+            {
+                prefabY = -0.25f; // Default offset for SimulatedLocust prefab
+                Debug.Log($"Using default prefab Y offset: {prefabY}");
+            }
+            
+            // Preserve prefab's Y offset: use the prefab's Y offset directly, not relative to parent's Y
+            // This ensures the prefab's stored Y position (-0.25) is preserved
+            Vector3 worldPosition = new Vector3(transform.position.x, prefabY, transform.position.z);
+            clone.transform.position = worldPosition;
             
             // Disable movement components
             LocustMover mover = clone.GetComponent<LocustMover>();
@@ -350,6 +371,8 @@ public class Kannadi : MonoBehaviour, ISceneController
             }
             
             SetLayerAndTagRecursively(clone, gameObject.layer, gameObject.tag);
+            // Store relative position (X and Z relative to parent, Y is prefab's Y)
+            Vector3 hexPosition = new Vector3(0f, prefabY, 0f);
             initialWorldPositions[0] = hexPosition;
             initialLocalRotations[0] = clone.transform.rotation;
             clones[0] = clone;
@@ -363,11 +386,32 @@ public class Kannadi : MonoBehaviour, ISceneController
             int r2 = Mathf.Min(rings, -q + rings);
             for (int r = r1; r <= r2; r++)
             {
+                // Instantiate at origin first
+                GameObject clone = Instantiate(tilePrefab, Vector3.zero, Quaternion.identity);
+                
+                // Try to get prefab's stored Y offset
+                // At runtime, Instantiate places objects at (0,0,0), so we need to check the prefab's stored position
+                float prefabY = clone.transform.localPosition.y;
+                
+                // If we got 0 (which means prefab's stored position wasn't applied), 
+                // use the known offset for SimulatedLocust (-0.25)
+                if (Mathf.Approximately(prefabY, 0f))
+                {
+                    prefabY = -0.25f; // Default offset for SimulatedLocust prefab
+                }
+                
                 // Proper hexagonal close packing: x = spacing*sqrt(3)*(q + r/2), z = spacing*1.5*r
-                Vector3 hexPosition = new Vector3(hexWidth * (q + r / 2f), 0f, hexHeight * r);
-
-                Vector3 worldPosition = transform.position + hexPosition;
-                GameObject clone = Instantiate(tilePrefab, worldPosition, Quaternion.identity); // No parent transform
+                // Preserve prefab's Y position (e.g., -0.25) instead of hardcoding 0f
+                float hexX = hexWidth * (q + r / 2f);
+                float hexZ = hexHeight * r;
+                Vector3 worldPosition = new Vector3(
+                    transform.position.x + hexX,
+                    prefabY, // Use prefab's Y offset directly (e.g., -0.25), not relative to parent
+                    transform.position.z + hexZ
+                );
+                
+                // Set position preserving the prefab's Y
+                clone.transform.position = worldPosition;
                 
                 // Disable movement components to prevent clones from walking away
                 LocustMover mover = clone.GetComponent<LocustMover>();
@@ -387,6 +431,8 @@ public class Kannadi : MonoBehaviour, ISceneController
                 }
                 
                 SetLayerAndTagRecursively(clone, gameObject.layer, gameObject.tag); // Set layer and tag recursively
+                // Store relative position (X and Z relative to parent, Y is prefab's Y)
+                Vector3 hexPosition = new Vector3(hexX, prefabY, hexZ);
                 initialWorldPositions[index] = hexPosition; // Store local position relative to the parent
                 initialLocalRotations[index] = clone.transform.rotation; // Store initial rotation
                 clones[index] = clone;
@@ -462,8 +508,12 @@ public class Kannadi : MonoBehaviour, ISceneController
         {
             if (clones[i] != null)
             {
-                // Calculate new position relative to parent (preserve original relative positions)
-                Vector3 newPosition = transform.position + initialWorldPositions[i];
+                // Calculate new position: X and Z relative to parent, Y is absolute (prefab's stored Y)
+                Vector3 newPosition = new Vector3(
+                    transform.position.x + initialWorldPositions[i].x,
+                    initialWorldPositions[i].y,  // Use prefab's absolute Y (-0.25), not relative to parent
+                    transform.position.z + initialWorldPositions[i].z
+                );
                 
                 // Wrap immediately (no sticky edges, uses >= and <=)
                 WrapPosition(ref newPosition, center, halfSize, globalBoundaryBuffer);

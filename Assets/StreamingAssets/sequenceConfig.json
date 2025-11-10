@@ -2,7 +2,7 @@
     "sequences": [
         {
             "sceneName": "Swarm",
-            "duration": 1,
+            "duration": 10,
             "parameters": {
                 "numberOfLocusts": 128,
                 "mu": 0,
