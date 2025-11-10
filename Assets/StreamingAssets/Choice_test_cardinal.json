@@ -10,10 +10,11 @@
     },
     "numberOfRings": 3,
     "spacing": 10.0,
-    "boundaryLengthX": 200.0,
-    "boundaryLengthZ": 200.0,
+    "kannadiTilePrefab": "SimulatedLocust",
+    "boundaryLengthX": 2000.0,
+    "boundaryLengthZ": 2000.0,
     "animateOnMove": true,
-    "animationNoiseThreshold": 0.1,
+    "animationNoiseThreshold": 5,
     "vrConfigs": [
         {
             "vrIndex": 1,

@@ -170,31 +170,24 @@ public class Kannadi : MonoBehaviour, ISceneController
                     }
                 }
                 
+                // Set boundary size from config (simple, no components needed)
+                float boundarySize = config.boundaryLengthX > 0 ? config.boundaryLengthX : 200f;
+                if (config.boundaryLengthZ > 0 && config.boundaryLengthZ != config.boundaryLengthX)
+                {
+                    boundarySize = Mathf.Max(config.boundaryLengthX, config.boundaryLengthZ);
+                }
+                kannadi.globalBoundarySize = boundarySize;
+                kannadi.globalBoundaryBuffer = 0.1f;
+                
                 // Regenerate grid with new parameters
                 kannadi.GenerateHexGrid();
                 
-                // Create or update global BoundaryManager (using existing system, same as LocustMover)
-                float boundarySize = config.boundaryLengthX > 0 ? config.boundaryLengthX : 200f;
-                // Use square boundary (boundarySize for both X and Z, matching BoundaryManager design)
-                if (config.boundaryLengthZ > 0 && config.boundaryLengthZ != config.boundaryLengthX)
+                // Add KannadiLogger to track clone positions and orientations
+                KannadiLogger logger = kannadi.GetComponent<KannadiLogger>();
+                if (logger == null)
                 {
-                    // If different, use average or max - BoundaryManager uses single boundarySize
-                    boundarySize = Mathf.Max(config.boundaryLengthX, config.boundaryLengthZ);
+                    logger = kannadi.gameObject.AddComponent<KannadiLogger>();
                 }
-                
-                GameObject boundaryObj = GameObject.Find("GlobalBoundaryManager");
-                if (boundaryObj == null)
-                {
-                    boundaryObj = new GameObject("GlobalBoundaryManager");
-                    boundaryObj.transform.position = Vector3.zero;
-                }
-                BoundaryManager globalBoundary = boundaryObj.GetComponent<BoundaryManager>();
-                if (globalBoundary == null)
-                {
-                    globalBoundary = boundaryObj.AddComponent<BoundaryManager>();
-                }
-                globalBoundary.boundarySize = boundarySize;
-                globalBoundary.boundaryBuffer = 0.1f;
                 
                 // Apply animation settings to all clones
                 if (kannadi.Clones != null)
@@ -320,22 +313,58 @@ public class Kannadi : MonoBehaviour, ISceneController
     /// </summary>
     public void GenerateHexGrid()
     {
-        int numberOfTiles = CalculateNumberOfTiles(numberOfRings);
+        // Handle numberOfRings = 0 (just center tile) or negative (treat as 0)
+        int rings = Mathf.Max(0, numberOfRings);
+        
+        int numberOfTiles = CalculateNumberOfTiles(rings);
         clones = new GameObject[numberOfTiles];
         initialWorldPositions = new Vector3[numberOfTiles];
         initialLocalRotations = new Quaternion[numberOfTiles];
 
-        float hexWidth = spacing * Mathf.Sqrt(3);
-        float hexHeight = spacing * 2;
+        // Proper hexagonal close packing coordinates
+        // Horizontal spacing: spacing * sqrt(3)
+        // Vertical spacing: spacing * 1.5 (for close packing)
+        float hexWidth = spacing * Mathf.Sqrt(3f);
+        float hexHeight = spacing * 1.5f;
 
         int index = 0;
-        for (int q = -numberOfRings; q <= numberOfRings; q++)
+        
+        // If rings = 0, just create center tile
+        if (rings == 0)
         {
-            int r1 = Mathf.Max(-numberOfRings, -q - numberOfRings);
-            int r2 = Mathf.Min(numberOfRings, -q + numberOfRings);
+            Vector3 hexPosition = Vector3.zero;
+            Vector3 worldPosition = transform.position + hexPosition;
+            GameObject clone = Instantiate(tilePrefab, worldPosition, Quaternion.identity);
+            
+            // Disable movement components
+            LocustMover mover = clone.GetComponent<LocustMover>();
+            if (mover != null) mover.enabled = false;
+            
+            var allComponents = clone.GetComponents<MonoBehaviour>();
+            foreach (var comp in allComponents)
+            {
+                if (comp != null && (comp.GetType().Name.Contains("Mover") || comp.GetType().Name.Contains("Movement")))
+                {
+                    comp.enabled = false;
+                }
+            }
+            
+            SetLayerAndTagRecursively(clone, gameObject.layer, gameObject.tag);
+            initialWorldPositions[0] = hexPosition;
+            initialLocalRotations[0] = clone.transform.rotation;
+            clones[0] = clone;
+            return;
+        }
+        
+        // Generate hexagonal grid for rings > 0 (proper close packing)
+        for (int q = -rings; q <= rings; q++)
+        {
+            int r1 = Mathf.Max(-rings, -q - rings);
+            int r2 = Mathf.Min(rings, -q + rings);
             for (int r = r1; r <= r2; r++)
             {
-                Vector3 hexPosition = new Vector3(hexWidth * (q + r / 2f), 0f, hexHeight * r / 2f);
+                // Proper hexagonal close packing: x = spacing*sqrt(3)*(q + r/2), z = spacing*1.5*r
+                Vector3 hexPosition = new Vector3(hexWidth * (q + r / 2f), 0f, hexHeight * r);
 
                 Vector3 worldPosition = transform.position + hexPosition;
                 GameObject clone = Instantiate(tilePrefab, worldPosition, Quaternion.identity); // No parent transform
@@ -369,11 +398,14 @@ public class Kannadi : MonoBehaviour, ISceneController
     /// <summary>
     /// Calculates the total number of tiles in the hexagonal grid.
     /// </summary>
-    /// <param name="rings">The number of rings outward from the center.</param>
+    /// <param name="rings">The number of rings outward from the center. 0 = just center tile (1 tile).</param>
     /// <returns>The total number of tiles.</returns>
     int CalculateNumberOfTiles(int rings)
     {
-        int tiles = 1;
+        if (rings <= 0)
+            return 1; // Just the center tile
+        
+        int tiles = 1; // Center tile
         for (int i = 1; i <= rings; i++)
         {
             tiles += 6 * i;
@@ -397,29 +429,34 @@ public class Kannadi : MonoBehaviour, ISceneController
         }
     }
 
-    private BoundaryManager globalBoundaryManager;
+    private float globalBoundarySize = 200f;
+    private float globalBoundaryBuffer = 0.1f;
+    
+    /// <summary>
+    /// Simple boundary wrap function (inline, no components needed).
+    /// </summary>
+    void WrapPosition(ref Vector3 pos, Vector3 center, float halfSize, float buffer)
+    {
+        // Use >= and <= for immediate wrapping (no sticky edges)
+        if (pos.x >= center.x + halfSize)
+            pos.x = center.x - halfSize + buffer;
+        else if (pos.x <= center.x - halfSize)
+            pos.x = center.x + halfSize - buffer;
+        
+        if (pos.z >= center.z + halfSize)
+            pos.z = center.z - halfSize + buffer;
+        else if (pos.z <= center.z - halfSize)
+            pos.z = center.z + halfSize - buffer;
+    }
     
     /// <summary>
     /// Updates the position and rotation of the clones based on the parent's position and rotation.
-    /// Uses the existing BoundaryManager system for wrapping (same as LocustMover).
+    /// Uses simple inline boundary wrapping (same logic as LocustMover, but simplified).
     /// </summary>
     void UpdateClonesPositionAndRotation()
     {
-        // Get or create global boundary manager
-        if (globalBoundaryManager == null)
-        {
-            GameObject boundaryObj = GameObject.Find("GlobalBoundaryManager");
-            if (boundaryObj == null)
-            {
-                boundaryObj = new GameObject("GlobalBoundaryManager");
-                boundaryObj.transform.position = Vector3.zero;
-                globalBoundaryManager = boundaryObj.AddComponent<BoundaryManager>();
-            }
-            else
-            {
-                globalBoundaryManager = boundaryObj.GetComponent<BoundaryManager>();
-            }
-        }
+        Vector3 center = Vector3.zero;
+        float halfSize = globalBoundarySize / 2f;
         
         for (int i = 0; i < clones.Length; i++)
         {
@@ -428,28 +465,8 @@ public class Kannadi : MonoBehaviour, ISceneController
                 // Calculate new position relative to parent (preserve original relative positions)
                 Vector3 newPosition = transform.position + initialWorldPositions[i];
                 
-                // Apply boundary wrapping using the same logic as LocustMover (no glitches)
-                // DO NOT update initialWorldPositions - keep original relative positions intact
-                if (globalBoundaryManager != null)
-                {
-                    Vector3 pos = newPosition;
-                    float halfSize = globalBoundaryManager.boundarySize / 2f;
-                    Vector3 center = globalBoundaryManager.transform.position;
-                    
-                    // Wrap X-axis (same logic as LocustMover)
-                    if (pos.x > center.x + halfSize)
-                        pos.x = center.x - halfSize + globalBoundaryManager.boundaryBuffer;
-                    else if (pos.x < center.x - halfSize)
-                        pos.x = center.x + halfSize - globalBoundaryManager.boundaryBuffer;
-                    
-                    // Wrap Z-axis (same logic as LocustMover)
-                    if (pos.z > center.z + halfSize)
-                        pos.z = center.z - halfSize + globalBoundaryManager.boundaryBuffer;
-                    else if (pos.z < center.z - halfSize)
-                        pos.z = center.z + halfSize - globalBoundaryManager.boundaryBuffer;
-                    
-                    newPosition = pos;
-                }
+                // Wrap immediately (no sticky edges, uses >= and <=)
+                WrapPosition(ref newPosition, center, halfSize, globalBoundaryBuffer);
                 
                 // Set position (already wrapped, no glitches, relative positions preserved)
                 clones[i].transform.position = newPosition;
@@ -461,38 +478,15 @@ public class Kannadi : MonoBehaviour, ISceneController
     }
     
     /// <summary>
-    /// Wraps the parent (VR object) position using BoundaryManager logic.
+    /// Wraps the parent (VR object) position.
     /// </summary>
     void WrapParentPosition()
     {
-        if (globalBoundaryManager == null)
-        {
-            GameObject boundaryObj = GameObject.Find("GlobalBoundaryManager");
-            if (boundaryObj != null)
-            {
-                globalBoundaryManager = boundaryObj.GetComponent<BoundaryManager>();
-            }
-        }
+        Vector3 pos = transform.position;
+        Vector3 center = Vector3.zero;
+        float halfSize = globalBoundarySize / 2f;
         
-        if (globalBoundaryManager != null)
-        {
-            Vector3 pos = transform.position;
-            float halfSize = globalBoundaryManager.boundarySize / 2f;
-            Vector3 center = globalBoundaryManager.transform.position;
-            
-            // Wrap X-axis (same logic as LocustMover)
-            if (pos.x > center.x + halfSize)
-                pos.x = center.x - halfSize + globalBoundaryManager.boundaryBuffer;
-            else if (pos.x < center.x - halfSize)
-                pos.x = center.x + halfSize - globalBoundaryManager.boundaryBuffer;
-            
-            // Wrap Z-axis (same logic as LocustMover)
-            if (pos.z > center.z + halfSize)
-                pos.z = center.z - halfSize + globalBoundaryManager.boundaryBuffer;
-            else if (pos.z < center.z - halfSize)
-                pos.z = center.z + halfSize - globalBoundaryManager.boundaryBuffer;
-            
-            transform.position = pos;
-        }
+        WrapPosition(ref pos, center, halfSize, globalBoundaryBuffer);
+        transform.position = pos;
     }
 }
