@@ -287,6 +287,14 @@ public class SceneConfig
     public float closedLoopPosition;
     public ColorConfig backgroundColor;
     public VRConfig[] vrConfigs; // Optional per-VR configuration for initial position/orientation
+    // Optional swarm-specific configuration (for Kannadi scenes)
+    public int numberOfRings; // Number of rings outward from the center
+    public float spacing; // Spacing between tiles in the hexagonal grid in cm
+    public string kannadiTilePrefab; // Prefab type to use for kannadi tiles (default: "SimulatedLocust" if unstated)
+    public float boundarySize; // Boundary size for periodic boundary (default: 200 if unstated)
+    public float boundaryBuffer; // Boundary buffer for periodic boundary (default: 0.1 if unstated)
+    public bool animateOnMove; // Enable animation only when animal moves (default: false)
+    public float animationNoiseThreshold; // Minimum movement speed to trigger animation (default: 0.1)
 }
 
 [System.Serializable]

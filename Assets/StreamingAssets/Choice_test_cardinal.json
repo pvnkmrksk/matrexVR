@@ -8,6 +8,12 @@
         "b": 0.7830189,
         "a": 0.0
     },
+    "numberOfRings": 3,
+    "spacing": 10.0,
+    "boundarySize": 10.0,
+    "boundaryBuffer": 0.1,
+    "animateOnMove": true,
+    "animationNoiseThreshold": 0.1,
     "vrConfigs": [
         {
             "vrIndex": 1,
