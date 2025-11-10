@@ -10,8 +10,8 @@
     },
     "numberOfRings": 3,
     "spacing": 10.0,
-    "boundarySize": 10.0,
-    "boundaryBuffer": 0.1,
+    "boundaryLengthX": 200.0,
+    "boundaryLengthZ": 200.0,
     "animateOnMove": true,
     "animationNoiseThreshold": 0.1,
     "vrConfigs": [

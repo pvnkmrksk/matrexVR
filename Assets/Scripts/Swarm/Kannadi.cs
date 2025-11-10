@@ -173,28 +173,36 @@ public class Kannadi : MonoBehaviour, ISceneController
                 // Regenerate grid with new parameters
                 kannadi.GenerateHexGrid();
                 
-                // Apply boundary and animation settings to all clones
+                // Create or update global BoundaryManager (using existing system, same as LocustMover)
+                float boundarySize = config.boundaryLengthX > 0 ? config.boundaryLengthX : 200f;
+                // Use square boundary (boundarySize for both X and Z, matching BoundaryManager design)
+                if (config.boundaryLengthZ > 0 && config.boundaryLengthZ != config.boundaryLengthX)
+                {
+                    // If different, use average or max - BoundaryManager uses single boundarySize
+                    boundarySize = Mathf.Max(config.boundaryLengthX, config.boundaryLengthZ);
+                }
+                
+                GameObject boundaryObj = GameObject.Find("GlobalBoundaryManager");
+                if (boundaryObj == null)
+                {
+                    boundaryObj = new GameObject("GlobalBoundaryManager");
+                    boundaryObj.transform.position = Vector3.zero;
+                }
+                BoundaryManager globalBoundary = boundaryObj.GetComponent<BoundaryManager>();
+                if (globalBoundary == null)
+                {
+                    globalBoundary = boundaryObj.AddComponent<BoundaryManager>();
+                }
+                globalBoundary.boundarySize = boundarySize;
+                globalBoundary.boundaryBuffer = 0.1f;
+                
+                // Apply animation settings to all clones
                 if (kannadi.Clones != null)
                 {
                     foreach (GameObject clone in kannadi.Clones)
                     {
                         if (clone != null)
                         {
-                            // Apply boundary settings
-                            BoundaryManager boundaryManager = clone.GetComponent<BoundaryManager>();
-                            if (boundaryManager == null)
-                            {
-                                boundaryManager = clone.AddComponent<BoundaryManager>();
-                            }
-                            if (config.boundarySize > 0)
-                            {
-                                boundaryManager.boundarySize = config.boundarySize;
-                            }
-                            if (config.boundaryBuffer > 0)
-                            {
-                                boundaryManager.boundaryBuffer = config.boundaryBuffer;
-                            }
-                            
                             // Apply animate-on-move settings
                             if (config.animateOnMove)
                             {
@@ -300,6 +308,10 @@ public class Kannadi : MonoBehaviour, ISceneController
 
     void Update()
     {
+        // Wrap parent position first (if parent moves, clones follow)
+        WrapParentPosition();
+        
+        // Update clones (they will also be wrapped)
         UpdateClonesPositionAndRotation();
     }
 
@@ -385,20 +397,102 @@ public class Kannadi : MonoBehaviour, ISceneController
         }
     }
 
+    private BoundaryManager globalBoundaryManager;
+    
     /// <summary>
     /// Updates the position and rotation of the clones based on the parent's position and rotation.
+    /// Uses the existing BoundaryManager system for wrapping (same as LocustMover).
     /// </summary>
     void UpdateClonesPositionAndRotation()
     {
+        // Get or create global boundary manager
+        if (globalBoundaryManager == null)
+        {
+            GameObject boundaryObj = GameObject.Find("GlobalBoundaryManager");
+            if (boundaryObj == null)
+            {
+                boundaryObj = new GameObject("GlobalBoundaryManager");
+                boundaryObj.transform.position = Vector3.zero;
+                globalBoundaryManager = boundaryObj.AddComponent<BoundaryManager>();
+            }
+            else
+            {
+                globalBoundaryManager = boundaryObj.GetComponent<BoundaryManager>();
+            }
+        }
+        
         for (int i = 0; i < clones.Length; i++)
         {
             if (clones[i] != null)
             {
-                // Maintain the initial local position relative to the parent
-                clones[i].transform.position = transform.position + initialWorldPositions[i];
-                // Apply the parent's rotation to each clone individually
+                // Calculate new position relative to parent (preserve original relative positions)
+                Vector3 newPosition = transform.position + initialWorldPositions[i];
+                
+                // Apply boundary wrapping using the same logic as LocustMover (no glitches)
+                // DO NOT update initialWorldPositions - keep original relative positions intact
+                if (globalBoundaryManager != null)
+                {
+                    Vector3 pos = newPosition;
+                    float halfSize = globalBoundaryManager.boundarySize / 2f;
+                    Vector3 center = globalBoundaryManager.transform.position;
+                    
+                    // Wrap X-axis (same logic as LocustMover)
+                    if (pos.x > center.x + halfSize)
+                        pos.x = center.x - halfSize + globalBoundaryManager.boundaryBuffer;
+                    else if (pos.x < center.x - halfSize)
+                        pos.x = center.x + halfSize - globalBoundaryManager.boundaryBuffer;
+                    
+                    // Wrap Z-axis (same logic as LocustMover)
+                    if (pos.z > center.z + halfSize)
+                        pos.z = center.z - halfSize + globalBoundaryManager.boundaryBuffer;
+                    else if (pos.z < center.z - halfSize)
+                        pos.z = center.z + halfSize - globalBoundaryManager.boundaryBuffer;
+                    
+                    newPosition = pos;
+                }
+                
+                // Set position (already wrapped, no glitches, relative positions preserved)
+                clones[i].transform.position = newPosition;
+                
+                // Always update rotation
                 clones[i].transform.rotation = transform.rotation * initialLocalRotations[i];
             }
+        }
+    }
+    
+    /// <summary>
+    /// Wraps the parent (VR object) position using BoundaryManager logic.
+    /// </summary>
+    void WrapParentPosition()
+    {
+        if (globalBoundaryManager == null)
+        {
+            GameObject boundaryObj = GameObject.Find("GlobalBoundaryManager");
+            if (boundaryObj != null)
+            {
+                globalBoundaryManager = boundaryObj.GetComponent<BoundaryManager>();
+            }
+        }
+        
+        if (globalBoundaryManager != null)
+        {
+            Vector3 pos = transform.position;
+            float halfSize = globalBoundaryManager.boundarySize / 2f;
+            Vector3 center = globalBoundaryManager.transform.position;
+            
+            // Wrap X-axis (same logic as LocustMover)
+            if (pos.x > center.x + halfSize)
+                pos.x = center.x - halfSize + globalBoundaryManager.boundaryBuffer;
+            else if (pos.x < center.x - halfSize)
+                pos.x = center.x + halfSize - globalBoundaryManager.boundaryBuffer;
+            
+            // Wrap Z-axis (same logic as LocustMover)
+            if (pos.z > center.z + halfSize)
+                pos.z = center.z - halfSize + globalBoundaryManager.boundaryBuffer;
+            else if (pos.z < center.z - halfSize)
+                pos.z = center.z + halfSize - globalBoundaryManager.boundaryBuffer;
+            
+            transform.position = pos;
         }
     }
 }

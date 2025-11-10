@@ -291,10 +291,11 @@ public class SceneConfig
     public int numberOfRings; // Number of rings outward from the center
     public float spacing; // Spacing between tiles in the hexagonal grid in cm
     public string kannadiTilePrefab; // Prefab type to use for kannadi tiles (default: "SimulatedLocust" if unstated)
-    public float boundarySize; // Boundary size for periodic boundary (default: 200 if unstated)
-    public float boundaryBuffer; // Boundary buffer for periodic boundary (default: 0.1 if unstated)
+    public float boundaryLengthX; // Boundary width (X-axis) for periodic boundary in cm (default: 200 if unstated)
+    public float boundaryLengthZ; // Boundary length (Z-axis) for periodic boundary in cm (default: 200 if unstated)
+    // Note: BoundaryManager uses single boundarySize (square boundary), uses max of X/Z if both specified
     public bool animateOnMove; // Enable animation only when animal moves (default: false)
-    public float animationNoiseThreshold; // Minimum movement speed to trigger animation (default: 0.1)
+    public float animationNoiseThreshold; // Minimum movement speed (units per second) to trigger animation (default: 0.1)
 }
 
 [System.Serializable]

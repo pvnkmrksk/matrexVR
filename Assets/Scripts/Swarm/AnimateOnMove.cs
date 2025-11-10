@@ -11,7 +11,7 @@ public class AnimateOnMove : MonoBehaviour
     private bool isAnimating = false;
     
     [SerializeField]
-    private float noiseThreshold = 0.1f; // Minimum speed to start animation
+    private float noiseThreshold = 0.1f; // Minimum speed (units per second) to start animation
     [SerializeField]
     private float stopThreshold = 0.05f; // Lower threshold to stop (hysteresis to prevent glitching)
     [SerializeField]
@@ -64,8 +64,9 @@ public class AnimateOnMove : MonoBehaviour
     
     public void SetNoiseThreshold(float threshold)
     {
+        // Threshold is in units per second (speed)
         noiseThreshold = threshold;
-        stopThreshold = threshold * 0.5f; // Stop threshold is half of start threshold
+        stopThreshold = threshold * 0.5f; // Stop threshold is half of start threshold (hysteresis)
     }
     
     public void SetEnabled(bool enabled)
