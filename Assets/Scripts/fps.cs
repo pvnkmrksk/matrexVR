@@ -7,11 +7,11 @@ public class fps : MonoBehaviour
     // add fps to the top left corner of the screen to monitor the frame rate
     float deltaTime = 0.0f;
 
-    // make the game run at max speed witth no frame rate limit
+    // VSync and frame rate are now controlled by SimpleOverheadCamera
+    // This script only displays FPS
     void Awake()
     {
-        Application.targetFrameRate = 1000;
-        QualitySettings.vSyncCount = 0;
+        // VSync and frame rate settings removed - controlled elsewhere
     }
 
     void Update()
