@@ -119,9 +119,10 @@ public class Kannadi : MonoBehaviour, ISceneController
             foreach (Kannadi kannadi in Kannadis)
             {
                 // Read from config JSON (inherited from SceneConfig)
-                if (config.numberOfRings > 0)
+                // Apply value if explicitly set in config (allows 0 and negative values)
+                if (config.numberOfRings.HasValue)
                 {
-                    kannadi.numberOfRings = config.numberOfRings;
+                    kannadi.numberOfRings = config.numberOfRings.Value;
                     Debugger.Log($"Set numberOfRings from config: {kannadi.numberOfRings}", 3);
                 }
                 else
@@ -313,8 +314,18 @@ public class Kannadi : MonoBehaviour, ISceneController
     /// </summary>
     public void GenerateHexGrid()
     {
-        // Handle numberOfRings = 0 (just center tile) or negative (treat as 0)
-        int rings = Mathf.Max(0, numberOfRings);
+        // If rings is negative, skip instantiating any clones
+        if (numberOfRings < 0)
+        {
+            clones = new GameObject[0];
+            initialWorldPositions = new Vector3[0];
+            initialLocalRotations = new Quaternion[0];
+            Debug.Log($"numberOfRings is negative ({numberOfRings}), skipping clone instantiation.");
+            return;
+        }
+        
+        // Handle numberOfRings = 0 (just center tile)
+        int rings = numberOfRings;
         
         int numberOfTiles = CalculateNumberOfTiles(rings);
         clones = new GameObject[numberOfTiles];
@@ -444,11 +455,13 @@ public class Kannadi : MonoBehaviour, ISceneController
     /// <summary>
     /// Calculates the total number of tiles in the hexagonal grid.
     /// </summary>
-    /// <param name="rings">The number of rings outward from the center. 0 = just center tile (1 tile).</param>
+    /// <param name="rings">The number of rings outward from the center. 0 = just center tile (1 tile), negative = 0 tiles.</param>
     /// <returns>The total number of tiles.</returns>
     int CalculateNumberOfTiles(int rings)
     {
-        if (rings <= 0)
+        if (rings < 0)
+            return 0; // Negative rings means no tiles
+        if (rings == 0)
             return 1; // Just the center tile
         
         int tiles = 1; // Center tile
@@ -501,6 +514,10 @@ public class Kannadi : MonoBehaviour, ISceneController
     /// </summary>
     void UpdateClonesPositionAndRotation()
     {
+        // Skip if no clones exist (e.g., when rings is negative)
+        if (clones == null || clones.Length == 0)
+            return;
+        
         Vector3 center = Vector3.zero;
         float halfSize = globalBoundarySize / 2f;
         
