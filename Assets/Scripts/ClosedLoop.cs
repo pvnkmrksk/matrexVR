@@ -18,6 +18,7 @@ public class ClosedLoop : MonoBehaviour
     private float _initializationTimer;
     private bool _baseRotationSet = false; // Track if base rotation has been properly set
     private Quaternion _baseRotation; // rotation defined by scene/config at startup
+    private int _frameCount = 0; // Track frame count to ensure SetBaseRotation is called within first 5 frames
 
     // Add these new variables
     [SerializeField][Tooltip("Whether to apply the FicTrac position in closed loop")] private float closedLoopPosition = 1.0f;
@@ -40,10 +41,20 @@ public class ClosedLoop : MonoBehaviour
         _ficTracRotationOffset = Quaternion.identity;
         _initializationTimer = 0f;
         _lastFicTracData = Vector3.zero;
+        _frameCount = 0;
     }
 
     private void Update()
     {
+        _frameCount++;
+        
+        // If SetBaseRotation hasn't been called within first 5 frames, set _baseRotationSet to true as fallback
+        if (_frameCount > 10 && !_baseRotationSet)
+        {
+            _baseRotationSet = true;
+            Debug.Log("SetBaseRotation not called within first 5 frames. Setting _baseRotationSet to true as fallback.");
+        }
+        
         HandleInput();
 
         if (_zmqListener.pose == null) return;
@@ -57,6 +68,7 @@ public class ClosedLoop : MonoBehaviour
         if (!_isInitialized)
         {
             _initializationTimer += Time.deltaTime;
+            //if (_initializationTimer >= initializationDelay)
             if (_initializationTimer >= initializationDelay && _baseRotationSet)
             {
                 InitializeFicTracData();
@@ -117,6 +129,7 @@ public class ClosedLoop : MonoBehaviour
         _ficTracRotationOffset = Quaternion.identity;
         _initializationTimer = 0f;
         _lastFicTracData = Vector3.zero;
+        _frameCount = 0; // Reset frame count on reset
         Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
     }
 
@@ -133,6 +146,7 @@ public class ClosedLoop : MonoBehaviour
         _ficTracRotationOffset = Quaternion.identity;
         _initializationTimer = 0f;
         _lastFicTracData = Vector3.zero;
+        _frameCount = 0; // Reset frame count when base pose is set
         Debug.Log($"SetBasePose: position={position}, rotation={rotation.eulerAngles}");
     }
 
