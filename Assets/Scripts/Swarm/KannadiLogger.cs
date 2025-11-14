@@ -66,7 +66,7 @@ public class KannadiLogger : MonoBehaviour
 
         // Write header
         logFile.WriteLine(
-            "Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,Spacing"
+            "Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius"
         );
     }
 
@@ -91,7 +91,7 @@ public class KannadiLogger : MonoBehaviour
                 string data = $"{timestamp},{vrIndex},{i},{clones[i].name}," +
                              $"{position.x},{position.y},{position.z}," +
                              $"{rotation.x},{rotation.y},{rotation.z}," +
-                             $"{kannadi.numberOfRings},{kannadi.spacing}";
+                             $"{kannadi.numberOfRings},{kannadi.hexRadius}";
 
                 logFile.WriteLine(data);
             }

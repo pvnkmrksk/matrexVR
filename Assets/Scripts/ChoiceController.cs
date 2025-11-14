@@ -289,7 +289,7 @@ public class SceneConfig
     public VRConfig[] vrConfigs; // Optional per-VR configuration for initial position/orientation
     // Optional swarm-specific configuration (for Kannadi scenes)
     public int? numberOfRings; // Number of rings outward from the center (null = not specified, use default)
-    public float spacing; // Spacing between tiles in the hexagonal grid in cm
+    public float hexRadius; // hexRadius between tiles in the hexagonal grid in cm
     public string kannadiTilePrefab; // Prefab type to use for kannadi tiles (default: "SimulatedLocust" if unstated)
     public float boundaryLengthX; // Boundary width (X-axis) for periodic boundary in cm (default: 200 if unstated)
     public float boundaryLengthZ; // Boundary length (Z-axis) for periodic boundary in cm (default: 200 if unstated)
@@ -304,6 +304,7 @@ public class VRConfig
     public int vrIndex; // 1-4
     public Vector3Config initialPosition;
     public Vector3Config initialRotation;
+    public int? watchIndex; // Optional: 1-4, determines which layer this VR renders
 }
 
 [System.Serializable]

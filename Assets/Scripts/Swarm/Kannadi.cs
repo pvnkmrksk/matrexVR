@@ -24,7 +24,7 @@ public class Kannadi : MonoBehaviour, ISceneController
 {
     public GameObject tilePrefab; // Prefab for the tile. Locust prefab (fallback if not in JSON)
     public int numberOfRings = 3; // Number of rings outward from the center
-    public float spacing = 10f; // Spacing between tiles in the hexagonal grid in cm
+    public float hexRadius = 10f; // hexRadius between tiles in the hexagonal grid in cm
 
     private GameObject[] clones; // Array to store clones
     public GameObject[] Clones { get { return clones; } } // Public accessor for cleanup
@@ -130,14 +130,14 @@ public class Kannadi : MonoBehaviour, ISceneController
                     Debugger.Log("numberOfRings not specified in config, using default.", 3);
                 }
 
-                if (config.spacing > 0)
+                if (config.hexRadius > 0)
                 {
-                    kannadi.spacing = config.spacing;
-                    Debugger.Log($"Set spacing from config: {kannadi.spacing}", 3);
+                    kannadi.hexRadius = config.hexRadius;
+                    Debugger.Log($"Set hexRadius from config: {kannadi.hexRadius}", 3);
                 }
                 else
                 {
-                    Debugger.Log("spacing not specified in config, using default.", 3);
+                    Debugger.Log("hexRadius not specified in config, using default.", 3);
                 }
 
                 // Set tile prefab from config (default to SimulatedLocust if unstated)
@@ -297,6 +297,12 @@ public class Kannadi : MonoBehaviour, ISceneController
             Debugger.Log($"Setting base pose for VR{vrConfig.vrIndex}: pos={vrObject.transform.position}, rot={vrObject.transform.rotation.eulerAngles}", 3);
             closedLoop.SetBasePose(vrObject.transform.position, vrObject.transform.rotation);
         }
+
+        // Apply watchIndex camera culling mask if provided
+        if (vrConfig.watchIndex.HasValue)
+        {
+            SetVRCameraCullingMask(vrConfig.vrIndex, vrConfig.watchIndex.Value);
+        }
     }
 
 
@@ -333,10 +339,10 @@ public class Kannadi : MonoBehaviour, ISceneController
         initialLocalRotations = new Quaternion[numberOfTiles];
 
         // Proper hexagonal close packing coordinates
-        // Horizontal spacing: spacing * sqrt(3)
-        // Vertical spacing: spacing * 1.5 (for close packing)
-        float hexWidth = spacing * Mathf.Sqrt(3f);
-        float hexHeight = spacing * 1.5f;
+        // Horizontal hexRadius: hexRadius * sqrt(3)
+        // Vertical hexRadius: hexRadius * 1.5 (for close packing)
+        float hexWidth = hexRadius * Mathf.Sqrt(3f);
+        float hexHeight = hexRadius * 2f;
 
         int index = 0;
         
@@ -411,7 +417,7 @@ public class Kannadi : MonoBehaviour, ISceneController
                     prefabY = -0.25f; // Default offset for SimulatedLocust prefab
                 }
                 
-                // Proper hexagonal close packing: x = spacing*sqrt(3)*(q + r/2), z = spacing*1.5*r
+                // Proper hexagonal close packing: x = hexRadius*sqrt(3)*(q + r/2), z = hexRadius*1.5*r
                 // Preserve prefab's Y position (e.g., -0.25) instead of hardcoding 0f
                 float hexX = hexWidth * (q + r / 2f);
                 float hexZ = hexHeight * r;
@@ -555,5 +561,66 @@ public class Kannadi : MonoBehaviour, ISceneController
         
         WrapPosition(ref pos, center, halfSize, globalBoundaryBuffer);
         transform.position = pos;
+    }
+
+    /// <summary>
+    /// Sets the VR camera culling mask to only render the specified watchIndex layer.
+    /// This allows a VR headset to render objects from a different VR's layer.
+    /// For example, if vrIndex=1 and watchIndex=2, VR1 will render objects in layer SimulatedLocustsVR2.
+    /// </summary>
+    /// <param name="vrIndex">The VR index (1-4) whose cameras to configure</param>
+    /// <param name="watchIndex">The layer index (1-4) to render. Objects in SimulatedLocustsVR{watchIndex} will be visible.</param>
+    public void SetVRCameraCullingMask(int vrIndex, int watchIndex)
+    {
+        // Validate watchIndex range
+        // if (watchIndex < 1 || watchIndex > 4)
+        // {
+        //     Debugger.Log($"WatchIndex {watchIndex} is out of range. Must be 1-4.", 1);
+        //     return;
+        // }
+
+        // Find the VR object with multiple possible names
+        GameObject vrObject = GameObject.Find($"VR{vrIndex} Kannadi");
+        
+        // if (vrObject == null)
+        // {
+        //     vrObject = GameObject.Find($"VR{vrIndex} Kannadi");
+        // }
+        // if (vrObject == null)
+        // {
+        //     Debugger.Log($"VR{vrIndex} object not found in the scene.", 2);
+        //     return;
+        // }
+
+        // Get the layer name for the watchIndex
+        string watchLayerName = $"SimulatedLocustsVR{watchIndex}";
+        int watchLayerIndex = LayerMask.NameToLayer(watchLayerName);
+        
+        if (watchLayerIndex == -1)
+        {
+            Debugger.Log($"Layer {watchLayerName} does not exist. Please create it in the Unity Layer settings.", 1);
+            return;
+        }
+
+        // Create a LayerMask that only includes the watchIndex layer
+        LayerMask watchLayerMask = 1 << watchLayerIndex;
+
+        // Find all cameras in the VR object and its children
+        Camera[] cameras = vrObject.GetComponentsInChildren<Camera>(true);
+        
+        // if (cameras.Length == 0)
+        // {
+        //     Debugger.Log($"No cameras found in VR{vrIndex} object.", 2);
+        //     return;
+        // }
+
+        // Set culling mask for all cameras to only render the watchIndex layer
+        foreach (Camera cam in cameras)
+        {
+            cam.cullingMask = watchLayerMask;
+            // Debugger.Log($"Set VR{vrIndex} camera '{cam.name}' culling mask to layer {watchLayerName} (index {watchLayerIndex})", 3);
+        }
+
+        // Debugger.Log($"Configured VR{vrIndex} to render layer {watchLayerName} (watchIndex={watchIndex})", 3);
     }
 }
