@@ -16,14 +16,16 @@ after the shuffled JSON file is generated, please move the file to the folder wh
 # Read the JSON file
 random_seed=10
 # Specify the number of repetitions
-rep=5
+rep=4
 ## Specify the name of background scene
-scene_name='Choice'
+#scene_name='Choice'
+#scene_name='kannadi'
 #scene_name='Choice_noTextureBG'
-#scene_name='Choice_uniBG'
+scene_name='Choice_uniBG'
 ## Specify the name of the template of Inter-trial Interval (ITI) or Inter-stimulus Interval (ISI)
 #ISI_template='band'
-ISI_template='bilateral_band'
+#ISI_template='bilateral_band'
+ISI_template='Kannadi'
 #ISI_template='bifuration'
 #ISI_template='choice'
 ## Specify the name of config file to use
@@ -42,8 +44,8 @@ ISI_template='bilateral_band'
 #config_file_name='choice_noTextureBG_3_dir_closed_loop_comparison.json'
 #config_file_name='choice_noTextureBG_dir_3_initial_position.json'
 #config_file_name='choice_uniBG_3_dir_closed_loop_comparison.json'
-config_file_name='leader_black_constant_speed_60_animated.json'
-
+#config_file_name='leader_black_constant_speed_60_animated.json'
+config_file_name='kannadi_3conditions.json'
 seed_range=np.arange(100)
 seed_list=seed_range.tolist()
 random.Random(random_seed).shuffle(seed_list)
@@ -55,10 +57,10 @@ insert_isi=True
 ## Boolean option, whether to use a fixed ISI or a varying lengh of ISI. Note: to vary the length of ITI, an additional JSON file that notes the length of interest is needed.
 varying_isi_length=False
 ## If varying_isi_length is False, then ISI_duration is used in the rest of the code to set that duration for each ITI.
-ISI_duration=60
+ISI_duration=300
 
 shuffle_file_name=f'shuffle_{config_file_name}'
-pre_stim_interval=60 #unit is sec
+pre_stim_interval=300 #unit is sec
 with open(Path(config_file_name),'r') as file:
     data = json.load(file)
 
@@ -129,6 +131,19 @@ if insert_isi==True:
                 "configFile": ISI_file_name
             }
             }
+        elif scene_name.startswith('Choice_uniBG') and ISI_template=='Kannadi':
+            if scene_name=='Choice_uniBG':
+                ISI_file_name='bandH0_constant_distance_gregarious_animated.json'
+            else:
+                ISI_file_name='kannadi.json'
+            insert_dict = {
+            "sceneName": scene_name,
+            "duration": ISI_duration,
+            "parameters": {
+                "configFile": ISI_file_name
+            }
+            }
+
         else:
             insert_dict = {
             "sceneName": scene_name,
