@@ -48,11 +48,11 @@ public class ClosedLoop : MonoBehaviour
     {
         _frameCount++;
         
-        // If SetBaseRotation hasn't been called within first 5 frames, set _baseRotationSet to true as fallback
-        if (_frameCount > 10 && !_baseRotationSet)
+        // If SetBaseRotation hasn't been called within first 3 frames, set _baseRotationSet to true as fallback
+        if (_frameCount > 3 && !_baseRotationSet)
         {
             _baseRotationSet = true;
-            Debug.Log("SetBaseRotation not called within first 5 frames. Setting _baseRotationSet to true as fallback.");
+            Debug.Log("SetBaseRotation not called within first 3 frames. Setting _baseRotationSet to true as fallback.");
         }
         
         HandleInput();

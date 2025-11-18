@@ -31,6 +31,8 @@ public class Kannadi : MonoBehaviour, ISceneController
     private Vector3[] initialWorldPositions; // Array to store initial world positions
     private Quaternion[] initialLocalRotations; // Array to store initial local rotations
     private Dictionary<string, GameObject> prefabDict = new Dictionary<string, GameObject>(); // Dictionary for prefab lookup from JSON
+    private int vrIndex = 0; // VR index extracted from GameObject name (1-4)
+    private int? watchIndex = null; // Watch index from VRConfig (1-4, null if not set)
 
     void Start()
     {
@@ -118,6 +120,32 @@ public class Kannadi : MonoBehaviour, ISceneController
 
             foreach (Kannadi kannadi in Kannadis)
             {
+                // Extract vrIndex from GameObject name (e.g., "VR1 Kannadi" -> 1)
+                string objName = kannadi.gameObject.name;
+                kannadi.vrIndex = 0;
+                if (objName.StartsWith("VR"))
+                {
+                    string indexStr = objName.Substring(2).Split(' ')[0];
+                    if (int.TryParse(indexStr, out int parsedIndex))
+                    {
+                        kannadi.vrIndex = parsedIndex;
+                    }
+                }
+                
+                // Find matching VRConfig and store watchIndex
+                kannadi.watchIndex = null;
+                if (config.vrConfigs != null)
+                {
+                    foreach (var vrConfig in config.vrConfigs)
+                    {
+                        if (vrConfig.vrIndex == kannadi.vrIndex && vrConfig.watchIndex.HasValue)
+                        {
+                            kannadi.watchIndex = vrConfig.watchIndex.Value;
+                            break;
+                        }
+                    }
+                }
+                
                 // Read from config JSON (inherited from SceneConfig)
                 // Apply value if explicitly set in config (allows 0 and negative values)
                 if (config.numberOfRings.HasValue)
@@ -333,7 +361,15 @@ public class Kannadi : MonoBehaviour, ISceneController
         // Handle numberOfRings = 0 (just center tile)
         int rings = numberOfRings;
         
+        // Check if we should skip the center tile (when watchIndex == vrIndex)
+        bool skipCenterTile = (watchIndex.HasValue && watchIndex.Value == vrIndex && vrIndex > 0);
+        
         int numberOfTiles = CalculateNumberOfTiles(rings);
+        // Reduce count by 1 if we're skipping the center tile
+        if (skipCenterTile && numberOfTiles > 0)
+        {
+            numberOfTiles--;
+        }
         clones = new GameObject[numberOfTiles];
         initialWorldPositions = new Vector3[numberOfTiles];
         initialLocalRotations = new Quaternion[numberOfTiles];
@@ -346,9 +382,16 @@ public class Kannadi : MonoBehaviour, ISceneController
 
         int index = 0;
         
-        // If rings = 0, just create center tile
+        // If rings = 0, just create center tile (unless we're skipping it)
         if (rings == 0)
         {
+            if (skipCenterTile)
+            {
+                // Skip center tile when watchIndex == vrIndex
+                Debug.Log($"Skipping center tile for VR{vrIndex} (watchIndex == vrIndex)");
+                return;
+            }
+            
             // Instantiate at origin first
             GameObject clone = Instantiate(tilePrefab, Vector3.zero, Quaternion.identity);
             
@@ -403,6 +446,12 @@ public class Kannadi : MonoBehaviour, ISceneController
             int r2 = Mathf.Min(rings, -q + rings);
             for (int r = r1; r <= r2; r++)
             {
+                // Skip center tile (q=0, r=0) if watchIndex == vrIndex
+                if (skipCenterTile && q == 0 && r == 0)
+                {
+                    continue;
+                }
+                
                 // Instantiate at origin first
                 GameObject clone = Instantiate(tilePrefab, Vector3.zero, Quaternion.identity);
                 
