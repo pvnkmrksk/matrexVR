@@ -3,8 +3,8 @@
   "configs": [
     {
       "sphereDiameter": 1.0,
-      "ledPanelWidth": 128,
-      "ledPanelHeight": 128,
+      "ledPanelWidth": 64,
+      "ledPanelHeight": 64,
       "startRow": 0,
       "startCol": 0,
       "horizontal": true,
@@ -16,14 +16,40 @@
 
     {
       "sphereDiameter": 1.0,
-      "ledPanelWidth": 128,
-      "ledPanelHeight": 128,
+      "ledPanelWidth": 64,
+      "ledPanelHeight": 64,
       "startRow": 1,
       "startCol": 0,
       "horizontal": true,
       "zmqAddress": "localhost",
       "zmqPort": 9872,
       "vrId": "VR2",
+      "displayOrder": "RBLFDU"
+    },
+
+        {
+      "sphereDiameter": 1.0,
+      "ledPanelWidth": 64,
+      "ledPanelHeight": 64,
+      "startRow": 2,
+      "startCol": 0,
+      "horizontal": true,
+      "zmqAddress": "localhost",
+      "zmqPort": 9873,
+      "vrId": "VR3",
+      "displayOrder": "RBLFDU"
+    },
+
+    {
+      "sphereDiameter": 1.0,
+      "ledPanelWidth": 64,
+      "ledPanelHeight": 64,
+      "startRow": 3,
+      "startCol": 0,
+      "horizontal": true,
+      "zmqAddress": "localhost",
+      "zmqPort": 9874,
+      "vrId": "VR4",
       "displayOrder": "RBLFDU"
     }
   ]

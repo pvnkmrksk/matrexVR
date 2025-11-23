@@ -24,6 +24,19 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         
         CreateDrumObject();
         FindClosedLoopComponents();
+        DisableAutopilot();
+    }
+
+    private void DisableAutopilot()
+    {
+        // Disable autopilot mode for all Keyboard components in the scene
+        // This is important for optomotor scenes where autopilot should be off
+        Keyboard[] keyboardComponents = FindObjectsOfType<Keyboard>();
+        foreach (Keyboard kb in keyboardComponents)
+        {
+            kb.SetAutopilotMode(false);
+            Debug.Log($"Disabled autopilot mode for {kb.gameObject.name} in Optomotor scene");
+        }
     }
 
     private void CreateDrumObject()

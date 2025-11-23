@@ -1,6 +1,8 @@
 {
   "loop": true,
   "sequences": [
+    {"sceneName": "Optomotor", "duration": 100, "parameters": {"configFile": "optomotor_config.json"}
+  },
 
     {
       "sceneName": "Choice_Migration",
