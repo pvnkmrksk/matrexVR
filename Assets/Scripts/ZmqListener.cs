@@ -104,13 +104,17 @@ public class ZmqListener : MonoBehaviour
 
     private void UpdatePose(ZmqMessage zmqMessage)
     {
-        // 1. Position data (invariant units)
+        // 1. Position data (invariant units) - log raw values as they come in, no fudging
+        //    For kinefly mode: x = left_angle (radians), y = right_angle (radians), z = 0
+        //    For FicTrac mode: x, y, z are actual position coordinates
         position = new Vector3(zmqMessage.x, zmqMessage.y, zmqMessage.z);
         
-        // 2. Raw rotation data (in radians)
+        // 2. Raw rotation data (in radians) - preserve raw values, no conversion
+        //    For kinefly mode: yaw = left_angle - right_angle (radians)
         rawRotation = new Vector3(zmqMessage.pitch, zmqMessage.yaw, zmqMessage.roll);
         
         // 3. Unity quaternion (converted from radians to degrees for Quaternion.Euler)
+        //    This is only for Unity's internal use, raw radians are preserved above
         quaternion = Quaternion.Euler(
             zmqMessage.pitch * Mathf.Rad2Deg, 
             zmqMessage.yaw * Mathf.Rad2Deg, 

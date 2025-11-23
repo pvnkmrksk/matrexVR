@@ -342,6 +342,8 @@ public class ClosedLoop : MonoBehaviour
         
         // Return: (r, theta, yaw) where r and theta are in radians for sphere calculations
         // yaw is in radians for consistency with original FicTrac calculations
+        // For kinefly mode: pos.x = left_angle (radians), pos.y = right_angle (radians), rawRot.y = yaw (left-right in radians)
+        // For FicTrac mode: pos.x/y are position coordinates, rawRot.y is yaw in radians
         return new Vector3(pos.y, pos.x, rawRot.y);
     }
 

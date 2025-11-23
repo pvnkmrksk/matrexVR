@@ -97,10 +97,11 @@ public class MainController : MonoBehaviour
             HandleDisplaySetup();
         }
 
-        // Set FPS and VSync
+        // Set FPS and VSync - locked to 60fps with VSync=1
+        // This ensures consistent frame timing like a clock
         QualitySettings.vSyncCount = vSyncCount;
         Application.targetFrameRate = targetFrameRate;
-        Debugger.Log($"FPS set to: {Application.targetFrameRate}, VSync: {QualitySettings.vSyncCount}", 3);
+        Debugger.Log($"FPS locked to: {Application.targetFrameRate}, VSync: {QualitySettings.vSyncCount}", 3);
 
         // Create persistent black background camera
         CreatePersistentBackgroundCamera();
@@ -331,6 +332,10 @@ public class MainController : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debugger.Log("MainController.OnSceneLoaded()", 3);
+
+        // Re-apply FPS/VSync settings to ensure they remain locked (like a clock)
+        QualitySettings.vSyncCount = vSyncCount;
+        Application.targetFrameRate = targetFrameRate;
 
         // Clear screen to black immediately after loading
         ClearScreenToBlack();

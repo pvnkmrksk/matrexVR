@@ -18,6 +18,13 @@ public class Keyboard : MonoBehaviour
 
     [SerializeField]
     private bool autopilotMode = false;
+    
+    // Public method to set autopilot mode (for scene-specific control)
+    public void SetAutopilotMode(bool enabled)
+    {
+        autopilotMode = enabled;
+        Debug.Log($"Autopilot mode set to: {(autopilotMode ? "ON" : "OFF")} for {gameObject.name}");
+    }
 
     private MainController mainController;
 
