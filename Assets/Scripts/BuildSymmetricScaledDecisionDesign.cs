@@ -34,16 +34,27 @@ public class BuildSymmetricScaledDecisionDesign
             }
         };
 
-        // Radius-duration pairs (seconds map respectively to radii)
+        // Radius sweep; collision-based trigger when player reaches either object
         int[] radii = { 20, 40, 60, 80, 100 };
-        int[] durations = { 15, 30, 45, 60, 75 };
         var black = new[] { 0f, 0f, 0f, 1f };
 
+        const float triggerSize = 5f; // meters
+        const float triggerHeight = 5f;
+
         var steps = radii
-            .Zip(durations, (radius, seconds) => new
+            .Select(radius => new
             {
-                name = $"SymmetricScaledDecision_{radius}_20deg_{seconds}s",
-                trigger = new { type = "time", seconds },
+                name = $"SymmetricScaledDecision_{radius}_20deg_collision",
+                trigger = new
+                {
+                    type = "area",
+                    areaTag = "Goal",
+                    vrId = "any",
+                    shape = "cylinder",
+                    size = triggerSize,
+                    radius = triggerSize * 0.5f,
+                    height = triggerHeight
+                },
                 closedLoopOrientation = true,
                 closedLoopPosition = true,
                 randomInitialRotation = false,

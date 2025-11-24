@@ -41,10 +41,15 @@
   },
   "steps": [
     {
-      "name": "SymmetricScaledDecision_20_20deg_15s",
+      "name": "SymmetricScaledDecision_20_20deg_collision",
       "trigger": {
-        "type": "time",
-        "seconds": 15
+        "type": "area",
+        "areaTag": "Goal",
+        "vrId": "any",
+        "shape": "cylinder",
+        "size": 5.0,
+        "radius": 2.5,
+        "height": 5.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
@@ -57,7 +62,7 @@
             "angle": -20,
             "height": 0
           },
-          "material": "SetColor",
+          "material": "Blue",
           "color": [
             0.0,
             0.0,
@@ -78,7 +83,7 @@
             "angle": 20,
             "height": 0
           },
-          "material": "SetColor",
+          "material": "Blue",
           "color": [
             0.0,
             0.0,
@@ -137,10 +142,15 @@
       ]
     },
     {
-      "name": "SymmetricScaledDecision_40_20deg_30s",
+      "name": "SymmetricScaledDecision_40_20deg_collision",
       "trigger": {
-        "type": "time",
-        "seconds": 30
+        "type": "area",
+        "areaTag": "Goal",
+        "vrId": "any",
+        "shape": "cylinder",
+        "size": 5.0,
+        "radius": 2.5,
+        "height": 5.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
@@ -153,7 +163,7 @@
             "angle": -20,
             "height": 0
           },
-          "material": "SetColor",
+          "material": "Blue",
           "color": [
             0.0,
             0.0,
@@ -174,7 +184,7 @@
             "angle": 20,
             "height": 0
           },
-          "material": "SetColor",
+          "material": "Blue",
           "color": [
             0.0,
             0.0,
@@ -233,10 +243,15 @@
       ]
     },
     {
-      "name": "SymmetricScaledDecision_60_20deg_45s",
+      "name": "SymmetricScaledDecision_60_20deg_collision",
       "trigger": {
-        "type": "time",
-        "seconds": 45
+        "type": "area",
+        "areaTag": "Goal",
+        "vrId": "any",
+        "shape": "cylinder",
+        "size": 5.0,
+        "radius": 2.5,
+        "height": 5.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
@@ -249,7 +264,7 @@
             "angle": -20,
             "height": 0
           },
-          "material": "SetColor",
+          "material": "Blue",
           "color": [
             0.0,
             0.0,
@@ -270,7 +285,7 @@
             "angle": 20,
             "height": 0
           },
-          "material": "SetColor",
+          "material": "Blue",
           "color": [
             0.0,
             0.0,
@@ -329,10 +344,15 @@
       ]
     },
     {
-      "name": "SymmetricScaledDecision_80_20deg_60s",
+      "name": "SymmetricScaledDecision_80_20deg_collision",
       "trigger": {
-        "type": "time",
-        "seconds": 60
+        "type": "area",
+        "areaTag": "Goal",
+        "vrId": "any",
+        "shape": "cylinder",
+        "size": 5.0,
+        "radius": 2.5,
+        "height": 5.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
@@ -345,7 +365,7 @@
             "angle": -20,
             "height": 0
           },
-          "material": "SetColor",
+          "material": "Blue",
           "color": [
             0.0,
             0.0,
@@ -366,7 +386,7 @@
             "angle": 20,
             "height": 0
           },
-          "material": "SetColor",
+          "material": "Blue",
           "color": [
             0.0,
             0.0,
@@ -425,10 +445,15 @@
       ]
     },
     {
-      "name": "SymmetricScaledDecision_100_20deg_75s",
+      "name": "SymmetricScaledDecision_100_20deg_collision",
       "trigger": {
-        "type": "time",
-        "seconds": 75
+        "type": "area",
+        "areaTag": "Goal",
+        "vrId": "any",
+        "shape": "cylinder",
+        "size": 5.0,
+        "radius": 2.5,
+        "height": 5.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
@@ -441,7 +466,7 @@
             "angle": -20,
             "height": 0
           },
-          "material": "SetColor",
+          "material": "Blue",
           "color": [
             0.0,
             0.0,
@@ -462,7 +487,7 @@
             "angle": 20,
             "height": 0
           },
-          "material": "SetColor",
+          "material": "Blue",
           "color": [
             0.0,
             0.0,

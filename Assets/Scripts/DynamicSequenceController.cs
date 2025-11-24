@@ -16,6 +16,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public bool sync = true;
         public Step intertrial;
         public Step[] steps;
+        public float size = 1.5f; // fallback uniform trigger size (meters)
+        public float[] boxSize; // optional explicit box dimensions [x,y,z]
     }
 
     [System.Serializable]
@@ -41,6 +43,11 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public float seconds; // if time
         public string areaTag; // if area
         public string vrId; // "any" or "VR1", …
+        public string shape = "box"; // "box" (default) | "cylinder"
+        public float size = 1.5f; // fallback uniform trigger size (meters)
+        public float[] boxSize; // optional explicit box dimensions [x,y,z]
+        public float radius; // optional, for cylinder
+        public float height; // optional, for cylinder
     }
 
     [System.Serializable]
@@ -222,7 +229,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         if (step.trigger.type == "time")
             yield return new WaitForSeconds(step.trigger.seconds);
         else
-            yield return WaitForArea(step.trigger);
+            yield return WaitForArea(step);
 
         // 7) recurse
         StartCoroutine(RunNextStep());
@@ -380,25 +387,86 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
 
 
-    private IEnumerator WaitForArea(Trigger t)
+    private IEnumerator WaitForArea(Step step)
     {
         bool done = false;
         void Handler(Collider c)
         {
-            if (t.vrId == "any" || c.transform.root.name == t.vrId)
+            if (step.trigger.vrId == "any" || c.transform.root.name == step.trigger.vrId)
                 done = true;
         }
 
-        var go = new GameObject($"Trigger_{currentStep}");
-        var box = go.AddComponent<BoxCollider>();
-        box.isTrigger = true;
-        box.size = new Vector3(2, 2, 2); // temp – in practice read from design
-        go.tag = t.areaTag;
-        go.transform.parent = transform;
-        go.AddComponent<TriggerRelay>().Init(Handler);
+        var triggers = new List<GameObject>();
+        var specs = step.objects ?? Array.Empty<SceneObjectSpec>();
+
+        if (specs.Length == 0)
+        {
+            // fallback: single trigger at origin
+            specs = new[] { new SceneObjectSpec { polar = new Polar { radius = 0, angle = 0, height = 0 } } };
+        }
+
+        int i = 0;
+        foreach (var obj in specs)
+        {
+            var go = new GameObject($"Trigger_{currentStep}_{i++}");
+            go.transform.parent = transform;
+            go.tag = string.IsNullOrEmpty(step.trigger.areaTag) ? "Untagged" : step.trigger.areaTag;
+            go.transform.position = obj.polar != null ? PolarToXZ(obj.polar) : ToVector3(obj.pos);
+
+            Collider triggerCollider;
+            bool useCylinder = string.Equals(step.trigger.shape, "cylinder", StringComparison.OrdinalIgnoreCase);
+            if (useCylinder)
+            {
+                var cap = go.AddComponent<CapsuleCollider>();
+                cap.isTrigger = true;
+                cap.direction = 1; // Y-axis
+
+                // radius/height from trigger or derived from object scale/size
+                float baseSize = Mathf.Max(0.5f, step.trigger.size);
+                float radius = step.trigger.radius > 0 ? step.trigger.radius : baseSize * 0.5f;
+                float height = step.trigger.height > 0 ? step.trigger.height : baseSize;
+
+                if (obj.scale != null)
+                {
+                    radius = Mathf.Max(radius, Mathf.Max(obj.scale.x, obj.scale.z) * 0.5f);
+                    height = Mathf.Max(height, obj.scale.y);
+                }
+
+                cap.radius = radius;
+                cap.height = Mathf.Max(cap.radius * 2f, height);
+                triggerCollider = cap;
+            }
+            else
+            {
+                var box = go.AddComponent<BoxCollider>();
+                box.isTrigger = true;
+
+                Vector3 size = Vector3.one * Mathf.Max(0.5f, step.trigger.size);
+                if (step.trigger.boxSize != null && step.trigger.boxSize.Length >= 3)
+                {
+                    size = new Vector3(step.trigger.boxSize[0], step.trigger.boxSize[1], step.trigger.boxSize[2]);
+                }
+                else if (obj.scale != null)
+                {
+                    size = new Vector3(
+                        Mathf.Max(size.x, obj.scale.x),
+                        Mathf.Max(size.y, obj.scale.y),
+                        Mathf.Max(size.z, obj.scale.z)
+                    );
+                }
+                box.size = size;
+                triggerCollider = box;
+            }
+
+            go.AddComponent<TriggerRelay>().Init(Handler);
+            triggers.Add(go);
+        }
 
         while (!done)
             yield return null;
+
+        foreach (var go in triggers)
+            Destroy(go);
     }
 
     // helpers
