@@ -2,10 +2,11 @@
 {
   "sequences": [
     {
-      "sceneName": "Choice",
+      "sceneName": "Choice_desync",
       "duration": 1200,
       "parameters": {
-        "configFile": "bilateral_bandM0.json"
+        "design": "sequenceDesign_symmetricScaledDecision.json",
+        "reloadScene": false
       }
     }
   ]
