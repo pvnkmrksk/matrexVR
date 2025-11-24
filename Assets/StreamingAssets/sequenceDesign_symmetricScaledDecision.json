@@ -6,7 +6,7 @@
     "name": "skybox",
     "trigger": {
       "type": "time",
-      "seconds": 15
+      "seconds": 5
     },
     "closedLoopOrientation": true,
     "closedLoopPosition": true,
@@ -49,7 +49,8 @@
         "shape": "cylinder",
         "size": 5.0,
         "radius": 2.5,
-        "height": 5.0
+        "height": 5.0,
+        "timeoutSeconds": 180.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
@@ -62,7 +63,7 @@
             "angle": -20,
             "height": 0
           },
-          "material": "Blue",
+          "material": "SetColor",
           "color": [
             0.0,
             0.0,
@@ -83,7 +84,7 @@
             "angle": 20,
             "height": 0
           },
-          "material": "Blue",
+          "material": "SetColor",
           "color": [
             0.0,
             0.0,
@@ -150,7 +151,8 @@
         "shape": "cylinder",
         "size": 5.0,
         "radius": 2.5,
-        "height": 5.0
+        "height": 5.0,
+        "timeoutSeconds": 180.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
@@ -163,7 +165,7 @@
             "angle": -20,
             "height": 0
           },
-          "material": "Blue",
+          "material": "SetColor",
           "color": [
             0.0,
             0.0,
@@ -184,7 +186,7 @@
             "angle": 20,
             "height": 0
           },
-          "material": "Blue",
+          "material": "SetColor",
           "color": [
             0.0,
             0.0,
@@ -251,7 +253,8 @@
         "shape": "cylinder",
         "size": 5.0,
         "radius": 2.5,
-        "height": 5.0
+        "height": 5.0,
+        "timeoutSeconds": 180.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
@@ -264,7 +267,7 @@
             "angle": -20,
             "height": 0
           },
-          "material": "Blue",
+          "material": "SetColor",
           "color": [
             0.0,
             0.0,
@@ -285,7 +288,7 @@
             "angle": 20,
             "height": 0
           },
-          "material": "Blue",
+          "material": "SetColor",
           "color": [
             0.0,
             0.0,
@@ -352,7 +355,8 @@
         "shape": "cylinder",
         "size": 5.0,
         "radius": 2.5,
-        "height": 5.0
+        "height": 5.0,
+        "timeoutSeconds": 180.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
@@ -365,7 +369,7 @@
             "angle": -20,
             "height": 0
           },
-          "material": "Blue",
+          "material": "SetColor",
           "color": [
             0.0,
             0.0,
@@ -386,7 +390,7 @@
             "angle": 20,
             "height": 0
           },
-          "material": "Blue",
+          "material": "SetColor",
           "color": [
             0.0,
             0.0,
@@ -453,7 +457,8 @@
         "shape": "cylinder",
         "size": 5.0,
         "radius": 2.5,
-        "height": 5.0
+        "height": 5.0,
+        "timeoutSeconds": 180.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
@@ -466,7 +471,7 @@
             "angle": -20,
             "height": 0
           },
-          "material": "Blue",
+          "material": "SetColor",
           "color": [
             0.0,
             0.0,
@@ -487,11 +492,113 @@
             "angle": 20,
             "height": 0
           },
-          "material": "Blue",
+          "material": "SetColor",
           "color": [
             0.0,
             0.0,
             0.0,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SymmetricScaledDecision_gray_40cm_40deg_collision",
+      "trigger": {
+        "type": "area",
+        "areaTag": "Goal",
+        "vrId": "any",
+        "shape": "cylinder",
+        "size": 5.0,
+        "radius": 2.5,
+        "height": 5.0,
+        "timeoutSeconds": 180.0
+      },
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "objects": [
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 40,
+            "angle": -20,
+            "height": 0
+          },
+          "material": "SetColor",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        },
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 40,
+            "angle": 20,
+            "height": 0
+          },
+          "material": "SetColor",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
             1.0
           ],
           "scale": {

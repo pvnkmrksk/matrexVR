@@ -14,7 +14,7 @@ public class BuildSymmetricScaledDecisionDesign
         var skyStep = new
         {
             name = "skybox",
-            trigger = new { type = "time", seconds = 15 },
+            trigger = new { type = "time", seconds = 5 },
             closedLoopOrientation = true,
             closedLoopPosition = true,
             objects = new[]
@@ -40,6 +40,7 @@ public class BuildSymmetricScaledDecisionDesign
 
         const float triggerSize = 5f; // meters
         const float triggerHeight = 5f;
+        const float timeoutSeconds = 180f;
 
         var steps = radii
             .Select(radius => new
@@ -53,7 +54,8 @@ public class BuildSymmetricScaledDecisionDesign
                     shape = "cylinder",
                     size = triggerSize,
                     radius = triggerSize * 0.5f,
-                    height = triggerHeight
+                    height = triggerHeight,
+                    timeoutSeconds = timeoutSeconds
                 },
                 closedLoopOrientation = true,
                 closedLoopPosition = true,
@@ -104,6 +106,55 @@ public class BuildSymmetricScaledDecisionDesign
                         vrId = "VR4",
                         clearFlags = "SolidColor",
                         bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f }
+                    }
+                }
+            })
+            .Concat(new[]
+            {
+                new
+                {
+                    name = "SymmetricScaledDecision_gray_40cm_40deg_collision",
+                    trigger = new
+                    {
+                        type = "area",
+                        areaTag = "Goal",
+                        vrId = "any",
+                        shape = "cylinder",
+                        size = triggerSize,
+                        radius = triggerSize * 0.5f,
+                        height = triggerHeight,
+                        timeoutSeconds = timeoutSeconds
+                    },
+                    closedLoopOrientation = true,
+                    closedLoopPosition = true,
+                    randomInitialRotation = false,
+                    objects = new[]
+                    {
+                        new
+                        {
+                            type = "ScalingCylinder",
+                            polar = new { radius = 40, angle = -20, height = 0 },
+                            material = "SetColor",
+                            color = new[] { 0.5f, 0.5f, 0.5f, 1f },
+                            scale = new { x = 7, y = 100, z = 7 },
+                            visualAngleDegrees = 10
+                        },
+                        new
+                        {
+                            type = "ScalingCylinder",
+                            polar = new { radius = 40, angle = 20, height = 0 },
+                            material = "SetColor",
+                            color = new[] { 0.5f, 0.5f, 0.5f, 1f },
+                            scale = new { x = 7, y = 100, z = 7 },
+                            visualAngleDegrees = 10
+                        }
+                    },
+                    camera = new[]
+                    {
+                        new { vrId = "VR1", clearFlags = "SolidColor", bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f } },
+                        new { vrId = "VR2", clearFlags = "SolidColor", bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f } },
+                        new { vrId = "VR3", clearFlags = "SolidColor", bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f } },
+                        new { vrId = "VR4", clearFlags = "SolidColor", bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f } }
                     }
                 }
             })
