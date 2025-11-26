@@ -33,7 +33,7 @@ RenderSettings:
   m_HaloTexture: {fileID: 0}
   m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
   m_DefaultReflectionMode: 0
-  m_DefaultReflectionResolution: 128
+  m_DefaultReflectionResolution: 64
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
@@ -3155,6 +3155,7 @@ GameObject:
   - component: {fileID: 484890815}
   - component: {fileID: 484890814}
   - component: {fileID: 484890816}
+  - component: {fileID: 484890817}
   m_Layer: 0
   m_Name: MainController
   m_TagString: Untagged
@@ -3181,6 +3182,9 @@ MonoBehaviour:
   loopSequence: 1
   systemConfigFileName: system_config.json
   logLevel: 2
+  preventMultipleWindows: 1
+  targetFrameRate: 60
+  vSyncCount: 1
 --- !u!4 &484890815
 Transform:
   m_ObjectHideFlags: 0
@@ -3208,6 +3212,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 092bc645a91d2462aa864d59cb6d95a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &484890817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484890813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85a366dfb77faa272a54273875df86a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bindAddress: localhost
+  port: 9881
+  isEnabled: 1
 --- !u!1 &516079055
 GameObject:
   m_ObjectHideFlags: 0

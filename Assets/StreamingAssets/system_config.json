@@ -11,7 +11,7 @@
       "zmqAddress": "localhost",
       "zmqPort": 9871,
       "vrId": "VR1",
-      "displayOrder": "RBLFDU"
+      "displayOrder": "DFRBLU"
     },
 
     {
@@ -24,7 +24,7 @@
       "zmqAddress": "localhost",
       "zmqPort": 9872,
       "vrId": "VR2",
-      "displayOrder": "RBLFDU"
+      "displayOrder": "DFRBLU"
     },
 
         {
@@ -37,7 +37,7 @@
       "zmqAddress": "localhost",
       "zmqPort": 9873,
       "vrId": "VR3",
-      "displayOrder": "RBLFDU"
+      "displayOrder": "DFRBLU"
     },
 
     {
@@ -50,7 +50,7 @@
       "zmqAddress": "localhost",
       "zmqPort": 9874,
       "vrId": "VR4",
-      "displayOrder": "RBLFDU"
+      "displayOrder": "DFRBLU"
     }
   ]
 }

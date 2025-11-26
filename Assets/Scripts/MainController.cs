@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -54,6 +55,11 @@ public class MainController : MonoBehaviour
 
     // Status UI component
     private StatusUI statusUI;
+
+    // VR DC Offset Management
+    private Dictionary<string, ClosedLoop> vrClosedLoops = new Dictionary<string, ClosedLoop>();
+    private int selectedVRIndex = 1; // 1-4, default to VR1
+    private float dcOffsetStep = 0.1f; // Step size for DC offset adjustments
 
     // In MainController class
     public SequenceStep GetCurrentSequenceStep()
@@ -158,6 +164,20 @@ public class MainController : MonoBehaviour
     // Load system configurations from the specified file
     private void LoadSystemConfigurations()
     {
+        // Check if systemConfigFileName is set
+        if (string.IsNullOrEmpty(systemConfigFileName))
+        {
+            Debugger.Log("System config file name is not set, skipping load", 2);
+            return;
+        }
+        
+        // Check if StreamingAssets path is available
+        if (string.IsNullOrEmpty(Application.streamingAssetsPath))
+        {
+            Debugger.Log("StreamingAssets path is not available, skipping system config load", 2);
+            return;
+        }
+        
         string configPath = Path.Combine(Application.streamingAssetsPath, systemConfigFileName);
 
         if (!File.Exists(configPath))
@@ -342,6 +362,10 @@ public class MainController : MonoBehaviour
 
         SequenceStep currentStepData = sequenceSteps[executionOrder[currentStep]];
 
+        // Refresh VR ClosedLoop registrations when scene loads
+        // This ensures all VR components in the new scene are registered
+        RefreshVRRegistrations();
+
         // Note: Components will load their own configs based on vrId
         // No need to scan for them here
 
@@ -413,6 +437,147 @@ public class MainController : MonoBehaviour
                 statusUI.ToggleStatusUI();
             }
         }
+
+        // Handle VR selection (1-4 keys)
+        HandleVRSelectionInput();
+
+        // Handle DC offset adjustments for selected VR
+        HandleDCOffsetInput();
+    }
+
+    private void HandleVRSelectionInput()
+    {
+        // Select VR1-4 with number keys 1-4
+        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+        {
+            selectedVRIndex = 1;
+            Debug.Log($"Selected VR1");
+            Debugger.Log($"Selected VR1 for DC offset adjustment", 3);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
+        {
+            selectedVRIndex = 2;
+            Debug.Log($"Selected VR2");
+            Debugger.Log($"Selected VR2 for DC offset adjustment", 3);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
+        {
+            selectedVRIndex = 3;
+            Debug.Log($"Selected VR3");
+            Debugger.Log($"Selected VR3 for DC offset adjustment", 3);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))
+        {
+            selectedVRIndex = 4;
+            Debug.Log($"Selected VR4");
+            Debugger.Log($"Selected VR4 for DC offset adjustment", 3);
+        }
+    }
+
+    private void HandleDCOffsetInput()
+    {
+        // DC offset adjustments using [ and ] keys for selected VR
+        if (Input.GetKeyDown(KeyCode.RightBracket))
+        {
+            IncreaseSelectedVRDCOffset();
+        }
+        if (Input.GetKeyDown(KeyCode.LeftBracket))
+        {
+            DecreaseSelectedVRDCOffset();
+        }
+    }
+
+    private void IncreaseSelectedVRDCOffset()
+    {
+        string vrId = $"VR{selectedVRIndex}";
+        if (vrClosedLoops.ContainsKey(vrId))
+        {
+            ClosedLoop closedLoop = vrClosedLoops[vrId];
+            float currentOffset = closedLoop.GetYawDCOffset();
+            float newOffset = currentOffset + dcOffsetStep;
+            closedLoop.SetYawDCOffset(newOffset);
+            Debug.Log($"VR{selectedVRIndex} DC Offset increased to: {newOffset:F2}°");
+            Debugger.Log($"VR{selectedVRIndex} DC Offset increased to: {newOffset:F2}° (step: +{dcOffsetStep:F2}°)", 3);
+        }
+        else
+        {
+            Debug.LogWarning($"VR{selectedVRIndex} not found for DC offset adjustment");
+        }
+    }
+
+    private void DecreaseSelectedVRDCOffset()
+    {
+        string vrId = $"VR{selectedVRIndex}";
+        if (vrClosedLoops.ContainsKey(vrId))
+        {
+            ClosedLoop closedLoop = vrClosedLoops[vrId];
+            float currentOffset = closedLoop.GetYawDCOffset();
+            float newOffset = currentOffset - dcOffsetStep;
+            closedLoop.SetYawDCOffset(newOffset);
+            Debug.Log($"VR{selectedVRIndex} DC Offset decreased to: {newOffset:F2}°");
+            Debugger.Log($"VR{selectedVRIndex} DC Offset decreased to: {newOffset:F2}° (step: -{dcOffsetStep:F2}°)", 3);
+        }
+        else
+        {
+            Debug.LogWarning($"VR{selectedVRIndex} not found for DC offset adjustment");
+        }
+    }
+
+    // Public methods for VR DC offset management
+    public void RegisterVRClosedLoop(string vrId, ClosedLoop closedLoop)
+    {
+        if (!string.IsNullOrEmpty(vrId) && closedLoop != null)
+        {
+            vrClosedLoops[vrId] = closedLoop;
+            Debugger.Log($"Registered {vrId} ClosedLoop component", 3);
+        }
+    }
+
+    public void UnregisterVRClosedLoop(string vrId)
+    {
+        if (vrClosedLoops.ContainsKey(vrId))
+        {
+            vrClosedLoops.Remove(vrId);
+            Debugger.Log($"Unregistered {vrId} ClosedLoop component", 3);
+        }
+    }
+
+    public Dictionary<string, float> GetAllVRDCOffsets()
+    {
+        Dictionary<string, float> offsets = new Dictionary<string, float>();
+        for (int i = 1; i <= 4; i++)
+        {
+            string vrId = $"VR{i}";
+            if (vrClosedLoops.ContainsKey(vrId))
+            {
+                offsets[vrId] = vrClosedLoops[vrId].GetYawDCOffset();
+            }
+            else
+            {
+                offsets[vrId] = 0.0f; // Default if not found
+            }
+        }
+        return offsets;
+    }
+
+    public int GetSelectedVRIndex()
+    {
+        return selectedVRIndex;
+    }
+
+    private void RefreshVRRegistrations()
+    {
+        // Find all ClosedLoop components in the scene and register/update them
+        // This ensures all VR components in the new scene are registered
+        // Note: ClosedLoop.Start() will also register, but using Dictionary ensures no duplicates
+        ClosedLoop[] allClosedLoops = FindObjectsOfType<ClosedLoop>();
+        foreach (ClosedLoop closedLoop in allClosedLoops)
+        {
+            SystemConfig config = GetSystemConfigForGameObject(closedLoop.gameObject);
+            RegisterVRClosedLoop(config.vrId, closedLoop);
+        }
+        
+        Debugger.Log($"Refreshed VR registrations: {vrClosedLoops.Count} VRs registered", 3);
     }
 
     void LoadScene(SequenceStep step)

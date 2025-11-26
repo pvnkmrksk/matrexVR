@@ -17,10 +17,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Matrix.unity
     guid: ae866fd6e891642e4b6b6f687c19e9a9
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Choice.unity
     guid: 7397d1b569aa64b27ab919a5ed55c5e6
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Choice_Migration_Long.unity
     guid: dd4670227372e428f8088f66b5267da5
   - enabled: 0
@@ -41,7 +41,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Choice_TVM_skybox.unity
     guid: 2400622221133c0bcb48b15caf62ccfc
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Milkyway.unity
     guid: e34b1f211ac299e66bb79f63ffab15be
   - enabled: 0
@@ -59,7 +59,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Choice_Chamonix.unity
     guid: bd787b7d611a117f5a7c3c027b3a8a27
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Choice_Migration.unity
     guid: 8040bf811ba089257a2a8c991c58f417
+  - enabled: 1
+    path: Assets/Scenes/Choice_Bogong.unity
+    guid: 5273684af6250c2c58343709e0d8b4b8
   m_configObjects: {}
