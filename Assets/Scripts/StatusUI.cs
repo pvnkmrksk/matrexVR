@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class StatusUI : MonoBehaviour
 {
@@ -34,7 +35,9 @@ public class StatusUI : MonoBehaviour
     private int sequenceNumber = 0;
     private string sceneName = "";
     private float gain = 1.0f;
-    private float dcOffset = 0.0f;
+    private float dcOffset = 0.0f; // Legacy - kept for backward compatibility
+    private Dictionary<string, float> vrDCOffsets = new Dictionary<string, float>(); // All 4 VR DC offsets
+    private int selectedVRIndex = 1; // Currently selected VR (1-4)
     private float translationSpeed = 0.0f; // Speed of movement (translation)
     private float rotationSpeed = 0.0f;    // Speed of rotation (deg/s)
 
@@ -86,10 +89,17 @@ public class StatusUI : MonoBehaviour
         if (closedLoop != null)
         {
             gain = closedLoop.GetYawGain();
-            dcOffset = closedLoop.GetYawDCOffset();
+            dcOffset = closedLoop.GetYawDCOffset(); // Legacy - keep for backward compatibility
             
             // Calculate translational speed
             CalculateTranslationalSpeed();
+        }
+
+        // Get all VR DC offsets from MainController
+        if (mainController != null)
+        {
+            vrDCOffsets = mainController.GetAllVRDCOffsets();
+            selectedVRIndex = mainController.GetSelectedVRIndex();
         }
 
         // Get speed from scene-specific sources
@@ -158,12 +168,21 @@ public class StatusUI : MonoBehaviour
         int screenWidth = Screen.width;
         int screenHeight = Screen.height;
         
-        // Prepare status text
+        // Prepare status text with all 4 VR DC offsets
+        string vrOffsetText = "";
+        for (int i = 1; i <= 4; i++)
+        {
+            string vrId = $"VR{i}";
+            float offset = vrDCOffsets.ContainsKey(vrId) ? vrDCOffsets[vrId] : 0.0f;
+            string marker = (i == selectedVRIndex) ? ">" : " ";
+            vrOffsetText += $"{marker}VR{i} DC: {offset:F2}°\n";
+        }
+        
         string statusText = $"Trial: {trialNumber}\n" +
                            $"Sequence: {sequenceNumber}\n" +
                            $"Scene: {sceneName}\n" +
                            $"Gain: {gain:F2}\n" +
-                           $"DC Offset: {dcOffset:F2}°\n" +
+                           $"VR DC Offsets:\n{vrOffsetText}" +
                            $"Translation: {translationSpeed:F2} u/s\n" +
                            $"Rotation: {rotationSpeed:F1}°/s";
 

@@ -75,7 +75,32 @@ public class ClosedLoop : MonoBehaviour
         // Load and apply closed loop mode configuration
         LoadClosedLoopConfiguration();
         
+        // Register with MainController for VR DC offset management
+        RegisterWithMainController();
+        
         ResetPositionAndRotation();
+    }
+
+    private void RegisterWithMainController()
+    {
+        MainController mainController = FindObjectOfType<MainController>();
+        if (mainController != null)
+        {
+            SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
+            mainController.RegisterVRClosedLoop(config.vrId, this);
+            Debug.Log($"Registered {config.vrId} ClosedLoop with MainController");
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Unregister from MainController when destroyed
+        MainController mainController = FindObjectOfType<MainController>();
+        if (mainController != null)
+        {
+            SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
+            mainController.UnregisterVRClosedLoop(config.vrId);
+        }
     }
 
     private void LoadClosedLoopConfiguration()
@@ -577,11 +602,8 @@ public class ClosedLoop : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus))
             DecreaseGain();
         
-        // DC offset adjustments using [ and ] keys
-        if (Input.GetKeyDown(KeyCode.RightBracket))
-            IncreaseDCOffset();
-        if (Input.GetKeyDown(KeyCode.LeftBracket))
-            DecreaseDCOffset();
+        // DC offset adjustments using [ and ] keys are now handled by MainController
+        // for per-VR control. Individual ClosedLoop components no longer handle these keys.
 
         // Force gain adjustments using Ctrl+Plus and Ctrl+Minus
         if ((Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus)) && 
