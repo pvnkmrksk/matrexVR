@@ -58,8 +58,9 @@ public class MainController : MonoBehaviour
 
     // VR DC Offset Management
     private Dictionary<string, ClosedLoop> vrClosedLoops = new Dictionary<string, ClosedLoop>();
+    private Dictionary<string, float> persistentDCOffsets = new Dictionary<string, float>(); // Persist DC offsets across trials/scenes
     private int selectedVRIndex = 1; // 1-4, default to VR1
-    private float dcOffsetStep = 0.1f; // Step size for DC offset adjustments
+    private float dcOffsetStep = 0.005f; // Step size for DC offset adjustments (in radians, ~0.1 degrees)
 
     // In MainController class
     public SequenceStep GetCurrentSequenceStep()
@@ -103,11 +104,13 @@ public class MainController : MonoBehaviour
             HandleDisplaySetup();
         }
 
-        // Set FPS and VSync - locked to 60fps with VSync=1
-        // This ensures consistent frame timing like a clock
-        QualitySettings.vSyncCount = vSyncCount;
+        // Set FPS and VSync - locked to 60fps
+        // IMPORTANT: VSync=1 locks to monitor refresh rate (60Hz=60fps, 120Hz=120fps)
+        // To force 60fps regardless of monitor, use VSync=0 and targetFrameRate=60
+        // For builds, we enforce both to ensure 60fps even on 120Hz monitors
+        QualitySettings.vSyncCount = 0; // Disable VSync to force targetFrameRate
         Application.targetFrameRate = targetFrameRate;
-        Debugger.Log($"FPS locked to: {Application.targetFrameRate}, VSync: {QualitySettings.vSyncCount}", 3);
+        Debugger.Log($"FPS locked to: {Application.targetFrameRate}, VSync: {QualitySettings.vSyncCount} (forced via targetFrameRate)", 3);
 
         // Create persistent black background camera
         CreatePersistentBackgroundCamera();
@@ -354,8 +357,13 @@ public class MainController : MonoBehaviour
         Debugger.Log("MainController.OnSceneLoaded()", 3);
 
         // Re-apply FPS/VSync settings to ensure they remain locked (like a clock)
-        QualitySettings.vSyncCount = vSyncCount;
+        // Critical for builds - ensure frame rate is locked every scene load
+        // Use VSync=0 to force targetFrameRate (VSync=1 locks to monitor refresh rate)
+        QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = targetFrameRate;
+        
+        // Force apply again after a frame to ensure it sticks in builds
+        StartCoroutine(ReapplyFrameRateSettings());
 
         // Clear screen to black immediately after loading
         ClearScreenToBlack();
@@ -399,6 +407,15 @@ public class MainController : MonoBehaviour
         ApplyGainToClosedLoopComponents(currentStepData.gain);
     }
 
+    private IEnumerator ReapplyFrameRateSettings()
+    {
+        // Wait one frame then re-apply to ensure settings stick in builds
+        yield return null;
+        QualitySettings.vSyncCount = 0; // Disable VSync to force targetFrameRate
+        Application.targetFrameRate = targetFrameRate;
+        Debugger.Log($"Re-applied FPS settings: {Application.targetFrameRate} fps, VSync: {QualitySettings.vSyncCount} (forced via targetFrameRate)", 3);
+    }
+
     void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -418,6 +435,18 @@ public class MainController : MonoBehaviour
 
     void Update()
     {
+        // Aggressively enforce FPS settings every frame in builds
+        // This is critical because builds can have different behavior than editor
+        // Use VSync=0 to force targetFrameRate (VSync=1 locks to monitor refresh rate)
+        if (QualitySettings.vSyncCount != 0)
+        {
+            QualitySettings.vSyncCount = 0;
+        }
+        if (Application.targetFrameRate != targetFrameRate)
+        {
+            Application.targetFrameRate = targetFrameRate;
+        }
+
         if (sequenceStarted)
         {
             ManageTimerAndTransitions();
@@ -477,11 +506,12 @@ public class MainController : MonoBehaviour
     private void HandleDCOffsetInput()
     {
         // DC offset adjustments using [ and ] keys for selected VR
-        if (Input.GetKeyDown(KeyCode.RightBracket))
+        // Continuous adjustment while key is held (not just on key down)
+        if (Input.GetKey(KeyCode.RightBracket))
         {
             IncreaseSelectedVRDCOffset();
         }
-        if (Input.GetKeyDown(KeyCode.LeftBracket))
+        if (Input.GetKey(KeyCode.LeftBracket))
         {
             DecreaseSelectedVRDCOffset();
         }
@@ -494,10 +524,18 @@ public class MainController : MonoBehaviour
         {
             ClosedLoop closedLoop = vrClosedLoops[vrId];
             float currentOffset = closedLoop.GetYawDCOffset();
-            float newOffset = currentOffset + dcOffsetStep;
+            // Use frame-rate independent step (adjust per second, not per frame)
+            // Much faster adjustment - 100x the base step per second
+            float stepPerSecond = dcOffsetStep * 100f; // 100x faster for continuous adjustment
+            float newOffset = currentOffset + (stepPerSecond * Time.deltaTime);
             closedLoop.SetYawDCOffset(newOffset);
-            Debug.Log($"VR{selectedVRIndex} DC Offset increased to: {newOffset:F2}°");
-            Debugger.Log($"VR{selectedVRIndex} DC Offset increased to: {newOffset:F2}° (step: +{dcOffsetStep:F2}°)", 3);
+            // Store persistently so it survives scene changes
+            persistentDCOffsets[vrId] = newOffset;
+            // Only log occasionally to avoid spam
+            if (Time.frameCount % 30 == 0) // Log every ~0.5 seconds at 60fps
+            {
+                Debug.Log($"VR{selectedVRIndex} DC Offset: {newOffset:F4} rad ({newOffset * Mathf.Rad2Deg:F2}°)");
+            }
         }
         else
         {
@@ -512,10 +550,18 @@ public class MainController : MonoBehaviour
         {
             ClosedLoop closedLoop = vrClosedLoops[vrId];
             float currentOffset = closedLoop.GetYawDCOffset();
-            float newOffset = currentOffset - dcOffsetStep;
+            // Use frame-rate independent step (adjust per second, not per frame)
+            // Much faster adjustment - 100x the base step per second
+            float stepPerSecond = dcOffsetStep * 100f; // 100x faster for continuous adjustment
+            float newOffset = currentOffset - (stepPerSecond * Time.deltaTime);
             closedLoop.SetYawDCOffset(newOffset);
-            Debug.Log($"VR{selectedVRIndex} DC Offset decreased to: {newOffset:F2}°");
-            Debugger.Log($"VR{selectedVRIndex} DC Offset decreased to: {newOffset:F2}° (step: -{dcOffsetStep:F2}°)", 3);
+            // Store persistently so it survives scene changes
+            persistentDCOffsets[vrId] = newOffset;
+            // Only log occasionally to avoid spam
+            if (Time.frameCount % 30 == 0) // Log every ~0.5 seconds at 60fps
+            {
+                Debug.Log($"VR{selectedVRIndex} DC Offset: {newOffset:F4} rad ({newOffset * Mathf.Rad2Deg:F2}°)");
+            }
         }
         else
         {
@@ -529,6 +575,20 @@ public class MainController : MonoBehaviour
         if (!string.IsNullOrEmpty(vrId) && closedLoop != null)
         {
             vrClosedLoops[vrId] = closedLoop;
+            
+            // Restore persistent DC offset if it exists
+            if (persistentDCOffsets.ContainsKey(vrId))
+            {
+                float savedOffset = persistentDCOffsets[vrId];
+                closedLoop.SetYawDCOffset(savedOffset);
+                Debugger.Log($"Restored persistent DC offset for {vrId}: {savedOffset:F4} rad ({savedOffset * Mathf.Rad2Deg:F2}°)", 3);
+            }
+            else
+            {
+                // Initialize with current value for persistence
+                persistentDCOffsets[vrId] = closedLoop.GetYawDCOffset();
+            }
+            
             Debugger.Log($"Registered {vrId} ClosedLoop component", 3);
         }
     }

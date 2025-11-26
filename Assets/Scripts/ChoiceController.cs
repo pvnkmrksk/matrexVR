@@ -196,14 +196,18 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
     private void SetSkybox(string skyboxPath)
     {
+        Debug.Log($"SetSkybox called with path: {skyboxPath}");
+        
         // If skyboxPath is empty, retain existing skybox
         if (string.IsNullOrEmpty(skyboxPath))
         {
+            Debug.Log("Skybox path is empty, retaining existing skybox");
             return;
         }
 
         // Construct full path in StreamingAssets
         string fullPath = Path.Combine(Application.streamingAssetsPath, skyboxPath);
+        Debug.Log($"Loading skybox from: {fullPath}");
         
         if (File.Exists(fullPath))
         {
@@ -227,12 +231,75 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 // Load the image data into the texture
                 if (skyboxTexture.LoadImage(imageBytes))
                 {
+                    Debug.Log($"Loaded skybox texture: {skyboxTexture.width}x{skyboxTexture.height}");
+                    
+                    // Get cubemap size from system config (use ledPanelWidth, which is 64)
+                    // Find MainController to get system config
+                    MainController mainController = FindObjectOfType<MainController>();
+                    int targetSize = 64; // Default fallback
+                    if (mainController != null)
+                    {
+                        // Get system config for the first VR (or use VR1 as default)
+                        SystemConfig config = mainController.GetSystemConfig("VR1");
+                        targetSize = config.ledPanelWidth; // Use ledPanelWidth (64) to match system config
+                        Debug.Log($"Got target size from system config: {targetSize}");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("MainController not found, using default size 64");
+                    }
+                    
+                    // Resize the texture to match the target cubemap size to prevent artifacts
+                    // For equirectangular panoramas that generate cubemaps:
+                    // - Each cubemap face should be targetSize x targetSize (e.g., 64x64)
+                    // - Equirectangular format: width = 4 * face_size, height = 2 * face_size
+                    // - So for 64x64 faces: panorama should be 256x128 (maintains 2:1 ratio)
+                    int targetWidth = targetSize * 4;  // 4 faces horizontally
+                    int targetHeight = targetSize * 2; // 2 faces vertically
+                    
+                    // Only resize if the current size doesn't match
+                    if (skyboxTexture.width != targetWidth || skyboxTexture.height != targetHeight)
+                    {
+                        Debug.Log($"Resizing skybox texture from {skyboxTexture.width}x{skyboxTexture.height} to {targetWidth}x{targetHeight} to match system config size {targetSize}");
+                        
+                        // Create a new texture with the target size
+                        Texture2D resizedTexture = new Texture2D(
+                            width: targetWidth,
+                            height: targetHeight,
+                            textureFormat: TextureFormat.RGBA32,
+                            mipChain: false,
+                            linear: true
+                        );
+                        
+                        // Use Graphics.CopyTexture with bilinear filtering for resizing
+                        // Or use RenderTexture for better quality resizing
+                        RenderTexture rt = RenderTexture.GetTemporary(targetWidth, targetHeight, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+                        Graphics.Blit(skyboxTexture, rt);
+                        RenderTexture previous = RenderTexture.active;
+                        RenderTexture.active = rt;
+                        resizedTexture.ReadPixels(new Rect(0, 0, targetWidth, targetHeight), 0, 0);
+                        resizedTexture.Apply();
+                        RenderTexture.active = previous;
+                        RenderTexture.ReleaseTemporary(rt);
+                        
+                        // Destroy the original texture and use the resized one
+                        Destroy(skyboxTexture);
+                        skyboxTexture = resizedTexture;
+                        
+                        Debug.Log($"Skybox texture resized to {skyboxTexture.width}x{skyboxTexture.height}");
+                    }
+                    else
+                    {
+                        Debug.Log($"Skybox texture already matches target size: {skyboxTexture.width}x{skyboxTexture.height}");
+                    }
+                    
                     // Create a new material using the skybox shader
                     Material skyboxMaterial = new Material(Shader.Find("Skybox/Panoramic"));
                     skyboxMaterial.mainTexture = skyboxTexture;
                     
                     // Apply the skybox material to the scene
                     RenderSettings.skybox = skyboxMaterial;
+                    Debug.Log($"Skybox material applied to RenderSettings with texture size {skyboxTexture.width}x{skyboxTexture.height} (matching system config size {targetSize})");
                 }
                 else
                 {
@@ -241,7 +308,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"Error loading skybox: {e.Message}");
+                Debug.LogError($"Error loading skybox: {e.Message}\n{e.StackTrace}");
             }
         }
         else
