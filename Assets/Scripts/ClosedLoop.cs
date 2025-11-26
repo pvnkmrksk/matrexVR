@@ -30,9 +30,9 @@ public class ClosedLoop : MonoBehaviour
     // New yaw-based orientation mode variables
     [SerializeField][Tooltip("Whether to use yaw-based orientation mode instead of standard orientation")] private bool useYawMode = true;
     [SerializeField][Tooltip("Gain factor for yaw-based orientation scaling")] private float yawGain = 1.0f;
-    [SerializeField][Tooltip("DC offset for yaw-based orientation (in degrees)")] private float yawDCOffset = 0.0f;
+    [SerializeField][Tooltip("DC offset for yaw-based orientation (in radians)")] private float yawDCOffset = 0.0f;
     [SerializeField][Tooltip("Step size for gain adjustments")] private float gainStep = 1.0f;
-    [SerializeField][Tooltip("Step size for DC offset adjustments (in degrees)")] private float dcOffsetStep = 0.1f;
+    [SerializeField][Tooltip("Step size for DC offset adjustments (in radians)")] private float dcOffsetStep = 1; // ~0.1 degrees in radians
 
     // Force/torque accumulation mode variables (placeholder for Tirbala)
     [SerializeField][Tooltip("Whether to use force/torque accumulation mode")] private bool useForceMode = false;
@@ -296,22 +296,24 @@ public class ClosedLoop : MonoBehaviour
             // Yaw mode: closedLoopOrientation acts as on/off flag for yaw mode
             if (closedLoopOrientation)
             {
-                // Yaw-based orientation mode: (gain * yaw) - DC offset
-                // Use the absolute yaw value directly from ZMQ
-                float absoluteYaw = currentFicTracData.z * Mathf.Rad2Deg;
-                _lastYawInput = absoluteYaw;
+                // Yaw-based orientation mode: gain * (yaw_radians - dcOffset_radians)
+                // currentFicTracData.z is l-r in radians from ZMQ
+                float yawRadians = currentFicTracData.z;
+                _lastYawInput = yawRadians * Mathf.Rad2Deg; // Store in degrees for logging
 
-                // Apply gain and DC offset with correct formula: (gain * yaw) - dcoffset
-                float rotationDelta = yawGain * (absoluteYaw - yawDCOffset);
-                // float rotationDelta = (yawGain * absoluteYaw) - yawDCOffset;
+                // Formula: gain * (yaw_radians - dcOffset_radians)
+                float rotationDeltaRadians = yawGain * (yawRadians - yawDCOffset);
+                
+                // Convert to degrees for rotation (Unity Rotate uses degrees)
+                float rotationDeltaDegrees = rotationDeltaRadians * Mathf.Rad2Deg;
 
-                // Store the processed output for logging
-                _lastYawOutput = rotationDelta;
+                // Store the processed output for logging (in degrees)
+                _lastYawOutput = rotationDeltaDegrees;
 
                 // Apply the rotation (frame rate independent - rotation rate per second)
-                transform.Rotate(0, rotationDelta * Time.deltaTime, 0, Space.Self);
+                transform.Rotate(0, rotationDeltaDegrees * Time.deltaTime, 0, Space.Self);
 
-                Debug.Log($"Yaw Mode: Input={_lastYawInput:F2}°, Gain={yawGain:F2}, DCOffset={yawDCOffset:F2}°, Output={_lastYawOutput:F2}°");
+                Debug.Log($"Yaw Mode: Input={_lastYawInput:F2}° ({yawRadians:F4} rad), Gain={yawGain:F2}, DCOffset={yawDCOffset:F4} rad ({yawDCOffset * Mathf.Rad2Deg:F2}°), Output={_lastYawOutput:F2}°");
             }
             else
             {
@@ -432,15 +434,15 @@ public class ClosedLoop : MonoBehaviour
     public void IncreaseDCOffset()
     {
         yawDCOffset += dcOffsetStep;
-        Debug.Log($"Yaw DC Offset increased to: {yawDCOffset:F2}°");
-        Debugger.Log($"Yaw DC Offset increased to: {yawDCOffset:F2}° (step: +{dcOffsetStep:F2}°)", 3);
+        Debug.Log($"Yaw DC Offset increased to: {yawDCOffset:F4} rad ({yawDCOffset * Mathf.Rad2Deg:F2}°)");
+        Debugger.Log($"Yaw DC Offset increased to: {yawDCOffset:F4} rad ({yawDCOffset * Mathf.Rad2Deg:F2}°) (step: +{dcOffsetStep:F4} rad)", 3);
     }
 
     public void DecreaseDCOffset()
     {
         yawDCOffset -= dcOffsetStep;
-        Debug.Log($"Yaw DC Offset decreased to: {yawDCOffset:F2}°");
-        Debugger.Log($"Yaw DC Offset decreased to: {yawDCOffset:F2}° (step: -{dcOffsetStep:F2}°)", 3);
+        Debug.Log($"Yaw DC Offset decreased to: {yawDCOffset:F4} rad ({yawDCOffset * Mathf.Rad2Deg:F2}°)");
+        Debugger.Log($"Yaw DC Offset decreased to: {yawDCOffset:F4} rad ({yawDCOffset * Mathf.Rad2Deg:F2}°) (step: -{dcOffsetStep:F4} rad)", 3);
     }
 
     // Methods for force/torque mode
