@@ -1,16 +1,15 @@
 {
   "loop": true,
   "sequences": [
-
+   
+    {"sceneName": "Optomotor", "duration": 100, "parameters": {"configFile": "optomotor_config.json"}
+  },
     {
       "sceneName": "Choice_Bogong",
       "duration": 2500,
       "gain": 10,
       "parameters": { "configFile": "choice_LSM_agl1000.json" }
-    },
-
-    {"sceneName": "Optomotor", "duration": 100, "parameters": {"configFile": "optomotor_config.json"}
-  }
+    }
 
   ]
 }

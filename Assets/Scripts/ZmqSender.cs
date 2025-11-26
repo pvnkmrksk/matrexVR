@@ -57,6 +57,8 @@ public class ZmqSender : MonoBehaviour
         public float[] rotationDelta = new float[3];
         public float gain;
         public float dcOffset;
+        public float rotationCallRate; // The exact rotation rate (deg/s) sent to Unity Rotate() - gain * (yaw_rad - dcOffset_rad) * Rad2Deg
+        public float rotationCallThisFrame; // The exact rotation (degrees) applied this frame - rotationCallRate * Time.deltaTime
     }
 
     [Serializable]
@@ -139,6 +141,10 @@ public class ZmqSender : MonoBehaviour
                 if (rotDelta.z > 180f) rotDelta.z -= 360f;
             }
 
+            // Get the exact rotation call values from ClosedLoop
+            float rotationCallRate = cl.GetLastYawOutput(); // Rotation rate in deg/s (gain * (yaw_rad - dcOffset_rad) * Rad2Deg)
+            float rotationCallThisFrame = rotationCallRate * Time.deltaTime; // Actual rotation applied this frame in degrees
+
             msg.vrData.Add(new VRData
             {
                 vrName = vr.name,
@@ -149,7 +155,9 @@ public class ZmqSender : MonoBehaviour
                 positionDelta = Vec3ToArray(posDelta),
                 rotationDelta = Vec3ToArray(rotDelta),
                 gain = cl.GetYawGain(),
-                dcOffset = cl.GetYawDCOffset()
+                dcOffset = cl.GetYawDCOffset(),
+                rotationCallRate = rotationCallRate,
+                rotationCallThisFrame = rotationCallThisFrame
             });
 
             previousPose[vr] = new PoseData
