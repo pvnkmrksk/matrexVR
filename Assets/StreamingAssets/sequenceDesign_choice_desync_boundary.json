@@ -1,0 +1,85 @@
+{
+  "seed": -1,
+  "repetitions": 1,
+  "sync": true,
+  "steps": [
+    {
+      "name": "ChoiceDesyncBoundaryReset",
+      "trigger": {
+        "type": "area",
+        "vrId": "any",
+        "shape": "cylinder",
+        "radius": 250.0,
+        "height": 3.0,
+        "timeoutSeconds": 0,
+        "triggerOnExit": true,
+        "advanceOnTrigger": false
+      },
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "initialPosition": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "randomInitialRotation": true,
+      "objects": [
+        {
+          "type": "3dHangar",
+          "pos": [
+            8.0,
+            0.0,
+            36.0
+          ],
+          "scale": {
+            "x": 100.0,
+            "y": 100.0,
+            "z": 100.0
+          }
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.3765,
+            0.3882,
+            0.3373,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.3765,
+            0.3882,
+            0.3373,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.3765,
+            0.3882,
+            0.3373,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.3765,
+            0.3882,
+            0.3373,
+            1.0
+          ]
+        }
+      ]
+    }
+  ]
+}

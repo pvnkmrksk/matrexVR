@@ -70,15 +70,21 @@ public class DataLogger : MonoBehaviour
     protected Dictionary<string, object> additionalData = new Dictionary<string, object>();
     private int    stepIndex = -1;
     private string stepName  = "";
+    private int    loopIndex = 0;
+    private int    cumulativeStep = 0;
 
-    public void SetStep(int index, string name)
+    public void SetStep(int index, string name, int loop = 0, int cumulative = 0)
     {
         stepIndex = index;
         stepName  = name;
+        loopIndex = loop;
+        cumulativeStep = cumulative;
 
         // push into the per-frame dictionary so PrepareLogData() writes them
         SetData("stepIndex", index);
         SetData("stepName",  name);
+        SetData("loopIndex", loop);
+        SetData("cumulativeStep", cumulative);
     }
 
     /// <summary>
@@ -170,7 +176,7 @@ public class DataLogger : MonoBehaviour
         {
             directoryPath = masterDataLogger.directoryPath;
             bufferedLines = new List<string>();
-            AddColumns("stepIndex", "stepName"); 
+            AddColumns("stepIndex", "stepName", "loopIndex", "cumulativeStep"); 
 
             // Enable logging
             isLogging = true;
@@ -261,6 +267,8 @@ public class DataLogger : MonoBehaviour
         additionalData.Clear();
         SetData("stepIndex", stepIndex);
         SetData("stepName",  stepName);
+        SetData("loopIndex", loopIndex);
+        SetData("cumulativeStep", cumulativeStep);
         // Build base data
         string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
         string vr = this.gameObject.name;

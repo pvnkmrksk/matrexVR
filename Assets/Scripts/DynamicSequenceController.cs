@@ -49,6 +49,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public float radius; // optional, for cylinder
         public float height; // optional, for cylinder
         public float timeoutSeconds = 0f; // optional: fallback timer for area trigger
+        public bool triggerOnExit = false; // if true, fire when exiting the trigger volume
+        public bool advanceOnTrigger = true; // if false, stay on step and just reset
     }
 
     [System.Serializable]
@@ -102,6 +104,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public Transform rig;
         public List<Step> steps;
         public int index = -1;
+        public int loopCount = 0;
+        public int cumulativeStep = 0;
         public Transform container;
         public Coroutine routine;
     }
@@ -233,6 +237,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                     // reshuffle for next loop
                     if (designFile != null)
                         state.steps = BuildOrdered(designFile, Environment.TickCount);
+                    state.loopCount++;
                     state.index = -1;
                     continue;
                 }
@@ -258,7 +263,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             ApplyClosedLoopFlags(state.id, step);
 
             // tell DataLogger
-            state.rig.GetComponent<DataLogger>()?.SetStep(state.index, step.name);
+            state.rig.GetComponent<DataLogger>()?.SetStep(state.index, step.name, state.loopCount, state.cumulativeStep);
 
             // arm trigger
             if (step.trigger == null)
@@ -269,6 +274,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                 yield return new WaitForSeconds(step.trigger.seconds);
             else
                 yield return WaitForArea(state, step);
+            state.cumulativeStep++;
         }
     }
 
@@ -426,7 +432,14 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             if (c && c.transform.root && c.transform.root.name == targetVr)
             {
                 Debug.Log($"[DynamicSequence] Trigger hit by {c.transform.root.name} at {c.transform.position} for {state.id}");
-                done = true;
+                if (!step.trigger.advanceOnTrigger)
+                {
+                    ResetVR(targetVr, step);
+                }
+                else
+                {
+                    done = true;
+                }
             }
         }
 
@@ -503,7 +516,11 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
             Debug.Log($"[DynamicSequence] Created trigger {go.name} ({step.trigger.shape}) pos={go.transform.position} size={DescribeCollider(triggerCollider)} for {state.id}");
 
-            go.AddComponent<TriggerRelay>().Init(Handler);
+            bool useExit = step.trigger != null && step.trigger.triggerOnExit;
+            go.AddComponent<TriggerRelay>().Init(
+                useExit ? null : Handler,
+                useExit ? Handler : null
+            );
             triggers.Add(go);
         }
 
@@ -556,8 +573,15 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 public class TriggerRelay : MonoBehaviour
 {
     private System.Action<Collider> onEnter;
+    private System.Action<Collider> onExit;
 
-    public void Init(System.Action<Collider> enter) => onEnter = enter;
+    public void Init(System.Action<Collider> enter, System.Action<Collider> exit = null)
+    {
+        onEnter = enter;
+        onExit = exit;
+    }
 
     private void OnTriggerEnter(Collider other) => onEnter?.Invoke(other);
+
+    private void OnTriggerExit(Collider other) => onExit?.Invoke(other);
 }
