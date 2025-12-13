@@ -27,6 +27,7 @@ public class ClosedLoop : MonoBehaviour
 
     private void Start()
     {
+        ApplySphereDiameterFromSystemConfig();
         sphereRadius = sphereDiameter / 2f;
         _zmqListener = GetComponent<ZmqListener>();
         if (_zmqListener == null)
@@ -109,6 +110,23 @@ public class ClosedLoop : MonoBehaviour
         _initializationTimer = 0f;
         _lastFicTracData = Vector3.zero;
         Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
+    }
+
+    public void SetSphereDiameter(float diameterCm)
+    {
+        sphereDiameter = diameterCm;
+        sphereRadius = sphereDiameter / 2f;
+    }
+
+    private void ApplySphereDiameterFromSystemConfig()
+    {
+        MainController main = FindObjectOfType<MainController>();
+        if (main == null)
+            return;
+
+        SystemConfig config = main.GetSystemConfigForGameObject(gameObject);
+        SetSphereDiameter(config.sphereDiameter);
+        Debug.Log($"[ClosedLoop] {gameObject.name} sphere diameter set to {config.sphereDiameter} cm from system_config");
     }
 
     private Vector3 GetCurrentFicTracData()
