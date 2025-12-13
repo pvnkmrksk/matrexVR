@@ -1,19 +1,65 @@
 {
-  "seed": -1,
+  "seed": 0,
   "repetitions": 1,
   "sync": true,
+  "intertrial": {
+    "name": "Empty World",
+    "trigger": {
+      "type": "time",
+      "seconds": 2
+    },
+    "closedLoopOrientation": true,
+    "closedLoopPosition": true,
+    "objects": [],
+    "camera": [
+      {
+        "vrId": "VR1",
+        "clearFlags": "SolidColor",
+        "bgColor": [
+          0.8,
+          0.8,
+          0.8,
+          1.0
+        ]
+      },
+      {
+        "vrId": "VR2",
+        "clearFlags": "SolidColor",
+        "bgColor": [
+          0.8,
+          0.8,
+          0.8,
+          1.0
+        ]
+      },
+      {
+        "vrId": "VR3",
+        "clearFlags": "SolidColor",
+        "bgColor": [
+          0.8,
+          0.8,
+          0.8,
+          1.0
+        ]
+      },
+      {
+        "vrId": "VR4",
+        "clearFlags": "SolidColor",
+        "bgColor": [
+          0.8,
+          0.8,
+          0.8,
+          1.0
+        ]
+      }
+    ]
+  },
   "steps": [
     {
       "name": "ChoiceDesyncBoundaryReset",
       "trigger": {
-        "type": "area",
-        "vrId": "any",
-        "shape": "cylinder",
-        "radius": 250.0,
-        "height": 3.0,
-        "timeoutSeconds": 0,
-        "triggerOnExit": true,
-        "advanceOnTrigger": false
+        "type": "time",
+        "seconds": 2
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
