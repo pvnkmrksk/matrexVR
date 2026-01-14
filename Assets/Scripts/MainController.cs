@@ -128,6 +128,18 @@ public class MainController : MonoBehaviour
     // Load system configurations from the specified file
     private void LoadSystemConfigurations()
     {
+        if (string.IsNullOrEmpty(Application.streamingAssetsPath))
+        {
+            Debugger.Log("StreamingAssetsPath is null/empty; skipping system config load", 1);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(systemConfigFileName))
+        {
+            Debugger.Log("systemConfigFileName is null/empty; skipping system config load", 1);
+            return;
+        }
+
         string configPath = Path.Combine(Application.streamingAssetsPath, systemConfigFileName);
 
         if (!File.Exists(configPath))
