@@ -177,6 +177,7 @@ public class DataLogger : MonoBehaviour
             directoryPath = masterDataLogger.directoryPath;
             bufferedLines = new List<string>();
             AddColumns("stepIndex", "stepName", "loopIndex", "cumulativeStep"); 
+            AddColumns("swapElapsedSec", "swapWallClock");
 
             // Enable logging
             isLogging = true;

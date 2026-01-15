@@ -1,13 +1,25 @@
 {
   "seed": -1,
-  "repetitions": 10,
+  "repetitions": 40,
   "sync": true,
   "intertrial": {
     "name": "skybox",
     "trigger": {
       "type": "time",
-      "seconds": 15
+      "seconds": 5
     },
+    "closedLoopOrientation": true,
+    "closedLoopPosition": true,
+    "objects": [
+      {
+        "type": "glassplane",
+        "polar": {
+          "radius": 0,
+          "angle": 0,
+          "height": -1
+        }
+      }
+    ],
     "camera": [
       {
         "vrId": "VR1",
@@ -29,354 +41,36 @@
   },
   "steps": [
     {
-      "name": "ScalingChoice_Blue_BlueGreen_20deg",
+      "name": "StaticChoiceSwap_noflip_00_50_50deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 20.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
       "objects": [
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
-            "angle": -10.0,
-            "height": 0
-          },
-          "material": "Blue",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        },
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": 10.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        }
-      ],
-      "camera": [
-        {
-          "vrId": "VR1",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR2",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR3",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR4",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        }
-      ]
-    },
-    {
-      "name": "ScalingChoice_BlueGreen_Blue_20deg",
-      "trigger": {
-        "type": "time",
-        "seconds": 45
-      },
-      "closedLoopOrientation": true,
-      "closedLoopPosition": true,
-      "objects": [
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": -10.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        },
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": 10.0,
-            "height": 0
-          },
-          "material": "Blue",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        }
-      ],
-      "camera": [
-        {
-          "vrId": "VR1",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR2",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR3",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR4",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        }
-      ]
-    },
-    {
-      "name": "ScalingChoice_Blue_BlueGreen_30deg",
-      "trigger": {
-        "type": "time",
-        "seconds": 45
-      },
-      "closedLoopOrientation": true,
-      "closedLoopPosition": true,
-      "objects": [
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": -15.0,
-            "height": 0
-          },
-          "material": "Blue",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        },
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": 15.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        }
-      ],
-      "camera": [
-        {
-          "vrId": "VR1",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR2",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR3",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR4",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        }
-      ]
-    },
-    {
-      "name": "ScalingChoice_BlueGreen_Blue_30deg",
-      "trigger": {
-        "type": "time",
-        "seconds": 45
-      },
-      "closedLoopOrientation": true,
-      "closedLoopPosition": true,
-      "objects": [
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": -15.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        },
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": 15.0,
-            "height": 0
-          },
-          "material": "Blue",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        }
-      ],
-      "camera": [
-        {
-          "vrId": "VR1",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR2",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR3",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR4",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        }
-      ]
-    },
-    {
-      "name": "ScalingChoice_Blue_BlueGreen_50deg",
-      "trigger": {
-        "type": "time",
-        "seconds": 45
-      },
-      "closedLoopOrientation": true,
-      "closedLoopPosition": true,
-      "objects": [
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
+            "radius": 50000,
             "angle": -25.0,
             "height": 0
           },
           "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -387,11 +81,23 @@
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
+            "radius": 50000,
             "angle": 25.0,
             "height": 0
           },
-          "material": "BlueGreen",
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -444,22 +150,690 @@
       ]
     },
     {
-      "name": "ScalingChoice_BlueGreen_Blue_50deg",
+      "name": "StaticChoiceSwap_noflip_00_50_60deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 20.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
       "objects": [
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
+            "radius": 50000,
+            "angle": -30.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        },
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": 30.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StaticChoiceSwap_noflip_00_50_70deg",
+      "trigger": {
+        "type": "time",
+        "seconds": 20.0
+      },
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
+      "objects": [
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": -35.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        },
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": 35.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StaticChoiceSwap_noflip_00_50_75deg",
+      "trigger": {
+        "type": "time",
+        "seconds": 20.0
+      },
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
+      "objects": [
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": -37.5,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        },
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": 37.5,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StaticChoiceSwap_noflip_00_50_80deg",
+      "trigger": {
+        "type": "time",
+        "seconds": 20.0
+      },
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
+      "objects": [
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": -40.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        },
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": 40.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StaticChoiceSwap_noflip_00_50_90deg",
+      "trigger": {
+        "type": "time",
+        "seconds": 20.0
+      },
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
+      "objects": [
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": -45.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        },
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": 45.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StaticChoiceSwap_noflip_00_50_100deg",
+      "trigger": {
+        "type": "time",
+        "seconds": 20.0
+      },
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
+      "objects": [
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": -50.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        },
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": 50.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StaticChoiceSwap_flip_50_00_50deg",
+      "trigger": {
+        "type": "time",
+        "seconds": 20.0
+      },
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
+      "objects": [
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
             "angle": -25.0,
             "height": 0
           },
-          "material": "BlueGreen",
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -470,11 +844,23 @@
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
+            "radius": 50000,
             "angle": 25.0,
             "height": 0
           },
           "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -527,22 +913,145 @@
       ]
     },
     {
-      "name": "ScalingChoice_Blue_BlueGreen_70deg",
+      "name": "StaticChoiceSwap_flip_50_00_60deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 20.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
       "objects": [
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
+            "radius": 50000,
+            "angle": -30.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        },
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": 30.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StaticChoiceSwap_flip_50_00_70deg",
+      "trigger": {
+        "type": "time",
+        "seconds": 20.0
+      },
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
+      "objects": [
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
             "angle": -35.0,
             "height": 0
           },
           "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -553,94 +1062,23 @@
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
-            "angle": 35.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        }
-      ],
-      "camera": [
-        {
-          "vrId": "VR1",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR2",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR3",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR4",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        }
-      ]
-    },
-    {
-      "name": "ScalingChoice_BlueGreen_Blue_70deg",
-      "trigger": {
-        "type": "time",
-        "seconds": 45
-      },
-      "closedLoopOrientation": true,
-      "closedLoopPosition": true,
-      "objects": [
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": -35.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        },
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
+            "radius": 50000,
             "angle": 35.0,
             "height": 0
           },
           "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -693,22 +1131,254 @@
       ]
     },
     {
-      "name": "ScalingChoice_Blue_BlueGreen_90deg",
+      "name": "StaticChoiceSwap_flip_50_00_75deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 20.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
       "objects": [
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
+            "radius": 50000,
+            "angle": -37.5,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        },
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": 37.5,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StaticChoiceSwap_flip_50_00_80deg",
+      "trigger": {
+        "type": "time",
+        "seconds": 20.0
+      },
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
+      "objects": [
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": -40.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        },
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": 40.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StaticChoiceSwap_flip_50_00_90deg",
+      "trigger": {
+        "type": "time",
+        "seconds": 20.0
+      },
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
+      "objects": [
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
             "angle": -45.0,
             "height": 0
           },
           "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -719,11 +1389,23 @@
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
+            "radius": 50000,
             "angle": 45.0,
             "height": 0
           },
-          "material": "BlueGreen",
+          "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -776,22 +1458,145 @@
       ]
     },
     {
-      "name": "ScalingChoice_BlueGreen_Blue_90deg",
+      "name": "StaticChoiceSwap_flip_50_00_100deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 20.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 10.0,
       "objects": [
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
+            "radius": 50000,
+            "angle": -50.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        },
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
+            "angle": 50.0,
+            "height": 0
+          },
+          "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "visualAngleDegrees": 10
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.8,
+            0.8,
+            0.8,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StaticChoiceSym_00_00_90deg",
+      "trigger": {
+        "type": "time",
+        "seconds": 20.0
+      },
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 0.0,
+      "objects": [
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 50000,
             "angle": -45.0,
             "height": 0
           },
-          "material": "BlueGreen",
+          "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -802,11 +1607,23 @@
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
+            "radius": 50000,
             "angle": 45.0,
             "height": 0
           },
           "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "swapColor": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -859,22 +1676,36 @@
       ]
     },
     {
-      "name": "ScalingChoice_Blue_BlueGreen_110deg",
+      "name": "StaticChoiceSym_50_50_90deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 20.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 0.0,
       "objects": [
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
-            "angle": -55.0,
+            "radius": 50000,
+            "angle": -45.0,
             "height": 0
           },
           "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -885,11 +1716,23 @@
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
-            "angle": 55.0,
+            "radius": 50000,
+            "angle": 45.0,
             "height": 0
           },
-          "material": "BlueGreen",
+          "material": "Blue",
+          "color": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
+          "swapColor": [
+            0.5,
+            0.5,
+            0.5,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -942,37 +1785,30 @@
       ]
     },
     {
-      "name": "ScalingChoice_BlueGreen_Blue_110deg",
+      "name": "StaticSolo_00_0deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 20.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 0.0,
       "objects": [
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
-            "angle": -55.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        },
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": 55.0,
+            "radius": 50000,
+            "angle": 0,
             "height": 0
           },
           "material": "Blue",
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
           "scale": {
             "x": 7,
             "y": 100,
@@ -1025,452 +1861,30 @@
       ]
     },
     {
-      "name": "ScalingChoice_Blue_BlueGreen_130deg",
+      "name": "StaticSolo_50_0deg",
       "trigger": {
         "type": "time",
-        "seconds": 45
+        "seconds": 20.0
       },
       "closedLoopOrientation": true,
       "closedLoopPosition": true,
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 0.0,
       "objects": [
         {
           "type": "ScalingCylinder",
           "polar": {
-            "radius": 60,
-            "angle": -65.0,
+            "radius": 50000,
+            "angle": 0,
             "height": 0
           },
           "material": "Blue",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        },
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": 65.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        }
-      ],
-      "camera": [
-        {
-          "vrId": "VR1",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
+          "color": [
+            0.5,
+            0.5,
+            0.5,
             1.0
-          ]
-        },
-        {
-          "vrId": "VR2",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR3",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR4",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        }
-      ]
-    },
-    {
-      "name": "ScalingChoice_BlueGreen_Blue_130deg",
-      "trigger": {
-        "type": "time",
-        "seconds": 45
-      },
-      "closedLoopOrientation": true,
-      "closedLoopPosition": true,
-      "objects": [
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": -65.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        },
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": 65.0,
-            "height": 0
-          },
-          "material": "Blue",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        }
-      ],
-      "camera": [
-        {
-          "vrId": "VR1",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR2",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR3",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR4",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        }
-      ]
-    },
-    {
-      "name": "ScalingChoice_Blue_BlueGreen_150deg",
-      "trigger": {
-        "type": "time",
-        "seconds": 45
-      },
-      "closedLoopOrientation": true,
-      "closedLoopPosition": true,
-      "objects": [
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": -75.0,
-            "height": 0
-          },
-          "material": "Blue",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        },
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": 75.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        }
-      ],
-      "camera": [
-        {
-          "vrId": "VR1",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR2",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR3",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR4",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        }
-      ]
-    },
-    {
-      "name": "ScalingChoice_BlueGreen_Blue_150deg",
-      "trigger": {
-        "type": "time",
-        "seconds": 45
-      },
-      "closedLoopOrientation": true,
-      "closedLoopPosition": true,
-      "objects": [
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": -75.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        },
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": 75.0,
-            "height": 0
-          },
-          "material": "Blue",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        }
-      ],
-      "camera": [
-        {
-          "vrId": "VR1",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR2",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR3",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR4",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        }
-      ]
-    },
-    {
-      "name": "ScalingChoice_Blue_BlueGreen_180deg",
-      "trigger": {
-        "type": "time",
-        "seconds": 45
-      },
-      "closedLoopOrientation": true,
-      "closedLoopPosition": true,
-      "objects": [
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": -90.0,
-            "height": 0
-          },
-          "material": "Blue",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        },
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": 90.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        }
-      ],
-      "camera": [
-        {
-          "vrId": "VR1",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR2",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR3",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        },
-        {
-          "vrId": "VR4",
-          "clearFlags": "SolidColor",
-          "bgColor": [
-            0.8,
-            0.8,
-            0.8,
-            1.0
-          ]
-        }
-      ]
-    },
-    {
-      "name": "ScalingChoice_BlueGreen_Blue_180deg",
-      "trigger": {
-        "type": "time",
-        "seconds": 45
-      },
-      "closedLoopOrientation": true,
-      "closedLoopPosition": true,
-      "objects": [
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": -90.0,
-            "height": 0
-          },
-          "material": "BlueGreen",
-          "scale": {
-            "x": 7,
-            "y": 100,
-            "z": 7
-          },
-          "visualAngleDegrees": 10
-        },
-        {
-          "type": "ScalingCylinder",
-          "polar": {
-            "radius": 60,
-            "angle": 90.0,
-            "height": 0
-          },
-          "material": "Blue",
+          ],
           "scale": {
             "x": 7,
             "y": 100,

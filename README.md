@@ -124,6 +124,13 @@ Once the correct Unity version is installed, open the project and you're ready t
 - `P` - Toggle Closed Loop Position Control
 - `M` - Toggle Closed Loop Momentum Control
 
+## Running Experiments
+
+- The sequence of scenes is defined in `Assets/StreamingAssets/sequenceConfig.json`. Each entry lists a `sceneName`, a `duration`, optional `parameters`, and whether to reload the scene between steps.
+- Scenes that implement `IInSceneSequencer` (e.g., `Choice_desync`) can run their own internal step list when `reloadScene` is `false`, using parameters such as `design` to pick a sequence design JSON.
+- Editor menu items under `Tools/…` generate the design JSONs into `Assets/StreamingAssets`. After generating, point `sequenceConfig.json` to the desired design filename for the scene you want to run.
+- See `docs/experiment-workflow.md` for a concise walkthrough of the scene/sequence pipeline and how to add new experiments.
+
 ## Dependencies
 
 - Unity Engine (version X.X.X)

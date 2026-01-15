@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using InSceneSequence;
 using System;
+using System.Linq;
 
 public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 {
@@ -34,6 +35,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public Vector3 initialPosition = Vector3.zero;
         public Vector3 initialRotation = Vector3.zero;
         public bool randomInitialRotation = false;
+        public float swapAfterSeconds = 0f; // optional: swap colors mid-step
     }
 
     [System.Serializable]
@@ -61,6 +63,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public Scale scale; // object scale   (new)
         public string material; // material name  (new)
         public float[] color; // [r, g, b, a] (optional)
+        public float[] swapColor; // optional color to apply after swap
         public bool flip; // mirror on X    (new)
         public float visualAngleDegrees; // for ScaleWithDistance (new)
 
@@ -256,7 +259,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             yield return null;
 
             ResetVR(state.id, step);
-            SpawnObjects(state.id, step.objects, state.container);
+            float stepStartTime = Time.time;
+            var spawned = SpawnObjects(state.id, step.objects, state.container);
 
             ApplyCameraSettings(state.id, step.camera);
             ApplySkybox(step.skybox);
@@ -264,6 +268,9 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
             // tell DataLogger
             state.rig.GetComponent<DataLogger>()?.SetStep(state.index, step.name, state.loopCount, state.cumulativeStep);
+
+            if (step.swapAfterSeconds > 0f && spawned.Count > 0)
+                StartCoroutine(SwapAfterDelay(state, step, spawned, stepStartTime));
 
             // arm trigger
             if (step.trigger == null)
@@ -278,9 +285,18 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         }
     }
 
-    private void SpawnObjects(string vrId, SceneObjectSpec[] specs, Transform parent)
+    private class SpawnedObject
     {
-        if (specs == null) return;
+        public SceneObjectSpec Spec;
+        public GameObject Instance;
+        public Renderer Renderer;
+        public Color OriginalColor;
+    }
+
+    private List<SpawnedObject> SpawnObjects(string vrId, SceneObjectSpec[] specs, Transform parent)
+    {
+        var spawned = new List<SpawnedObject>();
+        if (specs == null) return spawned;
 
         foreach (var obj in specs)
         {
@@ -317,7 +333,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
             instance.transform.localScale = scale;
 
-            if (instance.TryGetComponent<Renderer>(out var rend))
+            Renderer rend = null;
+            if (instance.TryGetComponent<Renderer>(out rend))
             {
                 string matName = !string.IsNullOrEmpty(obj.material) ? obj.material : obj.mat;
                 if (!string.IsNullOrEmpty(matName) && materialDict.TryGetValue(matName, out var mat))
@@ -329,7 +346,17 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
             if (instance.TryGetComponent<ScaleWithDistance>(out var swd))
                 swd.visualAngleDegrees = obj.visualAngleDegrees;
+
+            spawned.Add(new SpawnedObject
+            {
+                Spec = obj,
+                Instance = instance,
+                Renderer = rend,
+                OriginalColor = rend != null ? rend.material.color : Color.black
+            });
         }
+
+        return spawned;
     }
 
 
@@ -549,6 +576,53 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         if (col is BoxCollider box)
             return $"box {box.size}";
         return col ? col.GetType().Name : "none";
+    }
+
+    private IEnumerator SwapAfterDelay(RigState state, Step step, List<SpawnedObject> spawned, float stepStartTime)
+    {
+        yield return new WaitForSeconds(step.swapAfterSeconds);
+
+        ApplySwapColors(spawned, step);
+        float elapsed = Time.time - stepStartTime;
+        LogSwapEvent(state, elapsed);
+    }
+
+    private void ApplySwapColors(List<SpawnedObject> spawned, Step step)
+    {
+        if (spawned == null || spawned.Count == 0)
+            return;
+
+        // If explicit swapColor is provided, use it; otherwise swap colors between first two objects
+        bool hasExplicit = spawned.Any(s => s.Spec.swapColor != null && s.Spec.swapColor.Length >= 3);
+
+        if (hasExplicit)
+        {
+            foreach (var so in spawned)
+            {
+                if (so.Renderer == null || so.Spec.swapColor == null || so.Spec.swapColor.Length < 3)
+                    continue;
+                so.Renderer.material.color = ToColor(so.Spec.swapColor);
+            }
+        }
+        else if (spawned.Count >= 2)
+        {
+            Color c0 = spawned[0].Renderer ? spawned[0].Renderer.material.color : Color.black;
+            Color c1 = spawned[1].Renderer ? spawned[1].Renderer.material.color : Color.black;
+
+            if (spawned[0].Renderer) spawned[0].Renderer.material.color = c1;
+            if (spawned[1].Renderer) spawned[1].Renderer.material.color = c0;
+        }
+    }
+
+    private void LogSwapEvent(RigState state, float elapsedSeconds)
+    {
+        var logger = state.rig.GetComponent<DataLogger>();
+        if (logger == null)
+            return;
+
+        logger.SetData("swapElapsedSec", elapsedSeconds);
+        logger.SetData("swapWallClock", DateTime.Now.ToString("HH:mm:ss.fff"));
+        logger.UpdateLogger();
     }
 
     // helpers
