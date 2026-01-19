@@ -41,7 +41,7 @@ public class BuildGrayShadeAngleSweepSwapDesign
         float[] black = { 0.0f, 0.0f, 0.0f, 1f };
         float[] gray = { 0.5f, 0.5f, 0.5f, 1f };
         float[][] shades = { black, gray };
-        int[] angles = { 50, 60, 70, 75, 80, 90, 100 };
+        int[] angles = { 30, 50, 60, 70, 75, 80, 90, 100, 120, 150, 180 };
         int[] symmetricAngles = { 90 }; // only run symmetric at 90°
         float swapAtSeconds = 10f;
         float stepSeconds = 20f;
