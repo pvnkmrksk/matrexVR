@@ -6,7 +6,7 @@
       "sceneName": "Choice_desync",
       "duration": 3600,
       "parameters": {
-        "design": "sequenceDesign_grayShades_angleSweep_swap.json"
+        "design": "sequenceDesign_grayShades_angleSweep_swap_0.4.json"
       },
       "reloadScene": false
     }
