@@ -4,7 +4,7 @@
   "sequences": [
     {
       "sceneName": "Choice_desync",
-      "duration": 36000,
+      "duration": 1200,
       "parameters": {
         "design": "sequenceDesign_symmetricScaledDecision_adaptive.json"
       },

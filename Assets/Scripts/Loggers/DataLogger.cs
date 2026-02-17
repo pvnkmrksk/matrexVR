@@ -68,6 +68,7 @@ public class DataLogger : MonoBehaviour
     /// </summary>
     protected List<string> additionalHeaders = new List<string>();
     protected Dictionary<string, object> additionalData = new Dictionary<string, object>();
+    private readonly Dictionary<string, object> queuedOneShotData = new Dictionary<string, object>();
     private int    stepIndex = -1;
     private string stepName  = "";
     private int    loopIndex = 0;
@@ -138,6 +139,7 @@ public class DataLogger : MonoBehaviour
     public void SetData(string key, object value)
     {
         additionalData[key] = value;
+        queuedOneShotData[key] = value;
     }
 
     /// <summary>
@@ -157,6 +159,7 @@ public class DataLogger : MonoBehaviour
         foreach (var kvp in data)
         {
             additionalData[kvp.Key] = kvp.Value;
+            queuedOneShotData[kvp.Key] = kvp.Value;
         }
     }
 
@@ -178,6 +181,7 @@ public class DataLogger : MonoBehaviour
             bufferedLines = new List<string>();
             AddColumns("stepIndex", "stepName", "loopIndex", "cumulativeStep"); 
             AddColumns("swapElapsedSec", "swapWallClock");
+            AddColumns("grayAtTrialStart", "blackSideAtTrialStart");
 
             // Enable logging
             isLogging = true;
@@ -311,6 +315,17 @@ public class DataLogger : MonoBehaviour
 
         // Allow subclasses to add additional data
         CollectAdditionalData();
+
+        // Merge one-shot values queued before Update()/UpdateLogger() so they are not lost
+        // when additionalData was cleared at the beginning of PrepareLogData().
+        if (queuedOneShotData.Count > 0)
+        {
+            foreach (var kvp in queuedOneShotData)
+            {
+                additionalData[kvp.Key] = kvp.Value;
+            }
+            queuedOneShotData.Clear();
+        }
 
         // Add additional column data
         foreach (var header in additionalHeaders)

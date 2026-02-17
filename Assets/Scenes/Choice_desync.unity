@@ -698,6 +698,7 @@ MonoBehaviour:
   materials:
   - {fileID: 2100000, guid: b1fd2acbabaa55140b6e85bd1c98bf58, type: 2}
   - {fileID: 2100000, guid: 04a0ce8100d744a8eab46dbe477643a8, type: 2}
+  - {fileID: 2100000, guid: 3db9848e69f71fcbe85a18aa53cabd02, type: 2}
   loopSequence: 1
 --- !u!1001 &604776878787064245
 PrefabInstance:

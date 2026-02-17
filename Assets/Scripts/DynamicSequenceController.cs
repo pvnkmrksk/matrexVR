@@ -1,15 +1,15 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using InSceneSequence;
 using Newtonsoft.Json;
 using UnityEngine;
-using InSceneSequence;
-using System;
-using System.Linq;
 
 public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 {
-    [System.Serializable]
+    [Serializable]
     private class DesignFile
     {
         public int seed = -1;
@@ -17,11 +17,22 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public bool sync = true;
         public Step intertrial;
         public Step[] steps;
-        public float size = 1.5f; // fallback uniform trigger size (meters)
-        public float[] boxSize; // optional explicit box dimensions [x,y,z]
+        public float size = 1.5f;
+        public float[] boxSize;
+        public AdaptiveDecisionConfig adaptiveDecision;
     }
 
-    [System.Serializable]
+    [Serializable]
+    private class AdaptiveDecisionConfig
+    {
+        public bool enabled = false;
+        public float startGray = 0.5f;
+        public float grayStep = 0.05f;
+        public int controlEvery = 5;
+        public float noBarControlSeconds = 20f;
+    }
+
+    [Serializable]
     private class Step
     {
         public string name = "";
@@ -35,70 +46,66 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public Vector3 initialPosition = Vector3.zero;
         public Vector3 initialRotation = Vector3.zero;
         public bool randomInitialRotation = false;
-        public float swapAfterSeconds = 0f; // optional: swap colors mid-step
+        public float swapAfterSeconds = 0f;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class Trigger
     {
-        public string type; // "time" | "area"
-        public float seconds; // if time
-        public string areaTag; // if area
-        public string vrId; // "any" or "VR1", …
-        public string shape = "box"; // "box" (default) | "cylinder"
-        public float size = 1.5f; // fallback uniform trigger size (meters)
-        public float[] boxSize; // optional explicit box dimensions [x,y,z]
-        public float radius; // optional, for cylinder
-        public float height; // optional, for cylinder
-        public float timeoutSeconds = 0f; // optional: fallback timer for area trigger
-        public bool triggerOnExit = false; // if true, fire when exiting the trigger volume
-        public bool advanceOnTrigger = true; // if false, stay on step and just reset
+        public string type;
+        public float seconds;
+        public string areaTag;
+        public string vrId;
+        public string shape = "box";
+        public float size = 1.5f;
+        public float[] boxSize;
+        public float radius;
+        public float height;
+        public float timeoutSeconds = 0f;
+        public bool triggerOnExit = false;
+        public bool advanceOnTrigger = true;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class SceneObjectSpec
     {
-        public string type; // prefab name (new)
-        public Polar polar; // radius/angle/height (new)
-        public Scale scale; // object scale   (new)
-        public string material; // material name  (new)
-        public float[] color; // [r, g, b, a] (optional)
-        public float[] swapColor; // optional color to apply after swap
-        public bool flip; // mirror on X    (new)
-        public float visualAngleDegrees; // for ScaleWithDistance (new)
+        public string type;
+        public Polar polar;
+        public Scale scale;
+        public string material;
+        public float[] color;
+        public float[] swapColor;
+        public bool flip;
+        public float visualAngleDegrees;
 
         public bool randomInitialRotation = false;
-        public float mu = 0f; 
+        public float mu = 0f;
 
-        // legacy fields still accepted
         public string prefab;
         public float[] pos;
         public float[] rot;
-        public string mat; // ← legacy material alias
+        public string mat;
+        public string role;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class Polar
     {
-        public float radius,
-            angle,
-            height;
+        public float radius, angle, height;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class Scale
     {
-        public float x,
-            y,
-            z;
+        public float x, y, z;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class CameraSpec
     {
         public string vrId;
         public CameraClearFlags clearFlags = CameraClearFlags.SolidColor;
-        public float[] bgColor; // r,g,b,a 0-1
+        public float[] bgColor;
     }
 
     private class RigState
@@ -111,6 +118,21 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public int cumulativeStep = 0;
         public Transform container;
         public Coroutine routine;
+        public float adaptiveGray;
+        public int adaptiveTrialCount = 0;
+    }
+
+    private class AreaWaitResult
+    {
+        public bool Triggered;
+        public int TriggeredObjectIndex = -1;
+        public bool TimedOut;
+    }
+
+    private class SpawnedObject
+    {
+        public SceneObjectSpec Spec;
+        public Renderer Renderer;
     }
 
     private DesignFile designFile;
@@ -118,7 +140,6 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     private readonly Dictionary<string, Transform> players = new();
     private readonly Dictionary<string, RigState> rigStates = new();
 
-    // ───────── inspector convenience ─────────
     [Header("Drag every prefab that can appear in a step")]
     public GameObject[] prefabs;
 
@@ -129,11 +150,9 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     [Tooltip("If true, when a rig reaches the end of its sequence it will loop from the start.")]
     public bool loopSequence = true;
 
-    // internal lookup maps
     private readonly Dictionary<string, GameObject> prefabDict = new();
     private readonly Dictionary<string, Material> materialDict = new();
 
-    // ───────────────────────────── ISceneController ───────────────────────────
     private void Awake()
     {
         foreach (var p in prefabs)
@@ -144,12 +163,11 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
     public void InitializeScene(Dictionary<string, object> parameters)
     {
-        string designFile =
-            parameters != null && parameters.TryGetValue("design", out var p)
-                ? p.ToString()
-                : "dynamicSequenceDesign.json";
+        string design = parameters != null && parameters.TryGetValue("design", out var p)
+            ? p.ToString()
+            : "dynamicSequenceDesign.json";
 
-        LoadDesign(designFile);
+        LoadDesign(design);
         CachePlayers();
         InitRigStates();
 
@@ -157,23 +175,23 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             state.routine = StartCoroutine(RunRigSequence(state));
     }
 
-    // not used here
     public void CleanupScene() { }
 
-    // ─────────────────────── IInSceneSequencer (from MainController) ──────────
     public void AdvanceStep(Dictionary<string, object> parameters)
     {
-        // we don’t rely on MainController to advance; use it only for legacy fall-backs
+        // not used; sequence advances internally
     }
 
-    // ───────────────────────────────── internal ───────────────────────────────
     private void LoadDesign(string file)
     {
         string path = Path.Combine(Application.streamingAssetsPath, file);
         designFile = JsonConvert.DeserializeObject<DesignFile>(File.ReadAllText(path));
+        orderedSteps = IsAdaptiveDecisionEnabled() ? new List<Step>() : BuildOrdered(designFile, null);
+    }
 
-        // shuffle etc. (reuse SequenceConfigGenerator logic)
-        orderedSteps = BuildOrdered(designFile, null);
+    private bool IsAdaptiveDecisionEnabled()
+    {
+        return designFile?.adaptiveDecision != null && designFile.adaptiveDecision.enabled;
     }
 
     private List<Step> BuildOrdered(DesignFile design, int? seedOverride)
@@ -184,21 +202,18 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
         for (int rep = 0; rep < design.repetitions; ++rep)
         {
-            // 1) copy & shuffle the trials
-            var trials = new List<Step>(design.steps);
+            var trials = new List<Step>(design.steps ?? Array.Empty<Step>());
             for (int n = trials.Count; n > 1; --n)
             {
                 int k = rng.Next(n);
                 (trials[k], trials[n - 1]) = (trials[n - 1], trials[k]);
             }
 
-            // 2) interleave inter-trial
             foreach (var t in trials)
             {
-                if (design.intertrial != null) // ← add skybox
+                if (design.intertrial != null)
                     list.Add(design.intertrial);
-
-                list.Add(t); // then real trial
+                list.Add(t);
             }
         }
         return list;
@@ -207,11 +222,13 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     private void CachePlayers()
     {
         foreach (var dl in FindObjectsOfType<DataLogger>())
-            players[dl.name] = dl.transform; // assumes each VR root is named “VR1” …
+            players[dl.name] = dl.transform;
     }
 
     private void InitRigStates()
     {
+        float startGray = designFile?.adaptiveDecision != null ? designFile.adaptiveDecision.startGray : 0.5f;
+
         foreach (var kv in players)
         {
             var container = new GameObject($"Rig_{kv.Key}_Objects").transform;
@@ -222,13 +239,20 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                 id = kv.Key,
                 rig = kv.Value,
                 steps = new List<Step>(orderedSteps),
-                container = container
+                container = container,
+                adaptiveGray = Mathf.Clamp01(startGray)
             };
         }
     }
 
     private IEnumerator RunRigSequence(RigState state)
     {
+        if (IsAdaptiveDecisionEnabled())
+        {
+            yield return RunAdaptiveSequence(state);
+            yield break;
+        }
+
         while (true)
         {
             state.index++;
@@ -236,67 +260,109 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             {
                 if (loopSequence)
                 {
-                    Debug.Log($"[DynamicSequence] {state.id} reached end; looping to start");
-                    // reshuffle for next loop
                     if (designFile != null)
                         state.steps = BuildOrdered(designFile, Environment.TickCount);
                     state.loopCount++;
                     state.index = -1;
                     continue;
                 }
-                Debug.Log($"[DynamicSequence] finished sequence for {state.id}");
                 yield break;
             }
 
             var step = state.steps[state.index];
-            Debug.Log($"[DynamicSequence] {state.id} Step {state.index} – {step.name}");
-
-            // cleanup previous
-            foreach (Transform child in state.container)
-                Destroy(child.gameObject);
-
-            // Defer reset and spawn by one frame
-            yield return null;
-
-            ResetVR(state.id, step);
-            float stepStartTime = Time.time;
-            var spawned = SpawnObjects(state.id, step.objects, state.container);
-
-            ApplyCameraSettings(state.id, step.camera);
-            ApplySkybox(step.skybox);
-            ApplyClosedLoopFlags(state.id, step);
-
-            // tell DataLogger
-            state.rig.GetComponent<DataLogger>()?.SetStep(state.index, step.name, state.loopCount, state.cumulativeStep);
-
-            if (step.swapAfterSeconds > 0f && spawned.Count > 0)
-                StartCoroutine(SwapAfterDelay(state, step, spawned, stepStartTime));
-
-            // arm trigger
-            if (step.trigger == null)
-            {
-                Debug.LogWarning($"[DynamicSequence] {state.id} step {step.name} missing trigger → advancing immediately");
-            }
-            else if (step.trigger.type == "time")
-                yield return new WaitForSeconds(step.trigger.seconds);
-            else
-                yield return WaitForArea(state, step);
-            state.cumulativeStep++;
+            yield return RunSingleStep(state, step, null, null);
         }
     }
 
-    private class SpawnedObject
+    private IEnumerator RunAdaptiveSequence(RigState state)
     {
-        public SceneObjectSpec Spec;
-        public GameObject Instance;
-        public Renderer Renderer;
-        public Color OriginalColor;
+        var cfg = designFile.adaptiveDecision;
+
+        while (true)
+        {
+            if (designFile.intertrial != null)
+            {
+                state.index++;
+                var intertrialStep = CloneStep(designFile.intertrial);
+                intertrialStep.name = $"{designFile.intertrial.name}_adaptive";
+                yield return RunSingleStep(state, intertrialStep, null, null);
+            }
+
+            state.adaptiveTrialCount++;
+            bool isControlTrial = cfg.controlEvery > 0 && state.adaptiveTrialCount % cfg.controlEvery == 0;
+
+            string blackSideAtTrialStart;
+            Step trialStep = isControlTrial
+                ? BuildAdaptiveControlStep(state, cfg, out blackSideAtTrialStart)
+                : BuildAdaptiveNormalStep(state, out blackSideAtTrialStart);
+
+            state.index++;
+            var areaResult = new AreaWaitResult();
+            yield return RunSingleStep(
+                state,
+                trialStep,
+                areaResult,
+                () => LogAdaptiveTrialStart(state, state.adaptiveGray, blackSideAtTrialStart)
+            );
+
+            if (isControlTrial || !areaResult.Triggered || areaResult.TriggeredObjectIndex < 0)
+                continue;
+
+            if (trialStep.objects == null || areaResult.TriggeredObjectIndex >= trialStep.objects.Length)
+                continue;
+
+            string role = trialStep.objects[areaResult.TriggeredObjectIndex].role ?? "";
+            if (string.Equals(role, "black", StringComparison.OrdinalIgnoreCase))
+                state.adaptiveGray = Mathf.Clamp01(state.adaptiveGray - cfg.grayStep);
+            else if (string.Equals(role, "gray", StringComparison.OrdinalIgnoreCase))
+                state.adaptiveGray = Mathf.Clamp01(state.adaptiveGray + cfg.grayStep);
+        }
+    }
+
+    private IEnumerator RunSingleStep(RigState state, Step step, AreaWaitResult areaResult, Action onStepStarted)
+    {
+        foreach (Transform child in state.container)
+            Destroy(child.gameObject);
+
+        yield return null;
+
+        ResetVR(state.id, step);
+        float stepStartTime = Time.time;
+        var spawned = SpawnObjects(state.id, step.objects, state.container);
+
+        ApplyCameraSettings(state.id, step.camera);
+        ApplySkybox(step.skybox);
+        ApplyClosedLoopFlags(state.id, step);
+
+        state.rig.GetComponent<DataLogger>()?.SetStep(state.index, step.name, state.loopCount, state.cumulativeStep);
+        onStepStarted?.Invoke();
+
+        if (step.swapAfterSeconds > 0f && spawned.Count > 0)
+            StartCoroutine(SwapAfterDelay(state, step, spawned, stepStartTime));
+
+        if (step.trigger == null)
+        {
+            Debug.LogWarning($"[DynamicSequence] {state.id} step {step.name} missing trigger -> advancing immediately");
+        }
+        else if (step.trigger.type == "time")
+        {
+            yield return new WaitForSeconds(step.trigger.seconds);
+        }
+        else
+        {
+            if (areaResult == null)
+                areaResult = new AreaWaitResult();
+            yield return WaitForArea(state, step, areaResult);
+        }
+
+        state.cumulativeStep++;
     }
 
     private List<SpawnedObject> SpawnObjects(string vrId, SceneObjectSpec[] specs, Transform parent)
     {
         var spawned = new List<SpawnedObject>();
-        if (specs == null) return spawned;
+        if (specs == null)
+            return spawned;
 
         foreach (var obj in specs)
         {
@@ -307,14 +373,11 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                 continue;
             }
 
-            int vrIndex = int.Parse(vrId.Substring(2)); // "VR1" → 1
+            int vrIndex = int.Parse(vrId.Substring(2));
             string layerName = $"ChoiceVR{vrIndex}";
             int layerId = LayerMask.NameToLayer(layerName);
 
-            Vector3 position = obj.polar != null
-                ? PolarToXZ(obj.polar)
-                : ToVector3(obj.pos);
-
+            Vector3 position = obj.polar != null ? PolarToXZ(obj.polar) : ToVector3(obj.pos);
             Quaternion rotation = obj.randomInitialRotation
                 ? Quaternion.Euler(0, UnityEngine.Random.Range(0f, 360f), 0)
                 : Quaternion.Euler(0, obj.mu, 0);
@@ -327,10 +390,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             Vector3 scale = obj.scale != null
                 ? new Vector3(obj.scale.x, obj.scale.y, obj.scale.z)
                 : instance.transform.localScale;
-
             if (obj.flip)
                 scale.x *= -1;
-
             instance.transform.localScale = scale;
 
             Renderer rend = null;
@@ -350,15 +411,12 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             spawned.Add(new SpawnedObject
             {
                 Spec = obj,
-                Instance = instance,
-                Renderer = rend,
-                OriginalColor = rend != null ? rend.material.color : Color.black
+                Renderer = rend
             });
         }
 
         return spawned;
     }
-
 
     private static void SetLayerRecursively(GameObject root, int layer)
     {
@@ -376,16 +434,13 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         {
             if (spec.vrId != vrId)
                 continue;
-
             if (!players.TryGetValue(spec.vrId, out var rig))
                 continue;
 
-            // ✅ get *all* cameras under that VR rig
             Camera[] cams = rig.GetComponentsInChildren<Camera>(true);
             foreach (var cam in cams)
             {
                 cam.clearFlags = spec.clearFlags;
-
                 if (spec.bgColor != null && spec.bgColor.Length >= 3)
                     cam.backgroundColor = ToColor(spec.bgColor);
             }
@@ -410,10 +465,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     private void ResetVR(string vrId, Step step)
     {
         if (!players.TryGetValue(vrId, out var rig))
-        {
-            Debug.LogWarning($"[ResetVR] No rig found for id {vrId}");
             return;
-        }
 
         Quaternion initialRotation = step.randomInitialRotation
             ? Quaternion.Euler(step.initialRotation.x, UnityEngine.Random.Range(0f, 360f), step.initialRotation.z)
@@ -422,17 +474,10 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         ClosedLoop cl = rig.GetComponent<ClosedLoop>();
         if (cl != null)
         {
-            Debug.Log($"[ResetVR] SetPositionAndRotation on '{vrId}' pos={step.initialPosition}, rot={initialRotation.eulerAngles}");
             cl.SetPositionAndRotation(step.initialPosition, initialRotation);
             cl.ResetPositionAndRotation();
         }
-        else
-        {
-            Debug.LogWarning($"[ResetVR] No ClosedLoop component on {vrId}");
-        }
     }
-
-
 
     private void ApplySkybox(string skyboxName)
     {
@@ -446,42 +491,21 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             Debug.LogWarning($"Skybox '{skyboxName}' not found in Resources");
     }
 
-
-    private IEnumerator WaitForArea(RigState state, Step step)
+    private IEnumerator WaitForArea(RigState state, Step step, AreaWaitResult result)
     {
         bool done = false;
-        void Handler(Collider c)
-        {
-            string targetVr = string.IsNullOrEmpty(step.trigger.vrId) || step.trigger.vrId == "any"
-                ? state.id
-                : step.trigger.vrId;
-
-            if (c && c.transform.root && c.transform.root.name == targetVr)
-            {
-                Debug.Log($"[DynamicSequence] Trigger hit by {c.transform.root.name} at {c.transform.position} for {state.id}");
-                if (!step.trigger.advanceOnTrigger)
-                {
-                    ResetVR(targetVr, step);
-                }
-                else
-                {
-                    done = true;
-                }
-            }
-        }
-
         var triggers = new List<GameObject>();
         var specs = step.objects ?? Array.Empty<SceneObjectSpec>();
 
         if (specs.Length == 0)
         {
-            // fallback: single trigger at origin
             specs = new[] { new SceneObjectSpec { polar = new Polar { radius = 0, angle = 0, height = 0 } } };
         }
 
         int i = 0;
         foreach (var obj in specs)
         {
+            int localIndex = i;
             var go = new GameObject($"Trigger_{state.id}_{state.index}_{i++}");
             go.transform.parent = state.container;
             string targetTag = string.IsNullOrEmpty(step.trigger.areaTag) ? "Untagged" : step.trigger.areaTag;
@@ -489,11 +513,11 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             {
                 go.tag = targetTag;
             }
-            catch (UnityException ex)
+            catch (UnityException)
             {
-                Debug.LogWarning($"[DynamicSequence] Tag '{targetTag}' not defined, defaulting to Untagged ({ex.Message})");
                 go.tag = "Untagged";
             }
+
             go.transform.position = obj.polar != null ? PolarToXZ(obj.polar) : ToVector3(obj.pos);
 
             Collider triggerCollider;
@@ -502,9 +526,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             {
                 var cap = go.AddComponent<CapsuleCollider>();
                 cap.isTrigger = true;
-                cap.direction = 1; // Y-axis
+                cap.direction = 1;
 
-                // radius/height from trigger or derived from object scale/size
                 float baseSize = Mathf.Max(0.5f, step.trigger.size);
                 float radius = step.trigger.radius > 0 ? step.trigger.radius : baseSize * 0.5f;
                 float height = step.trigger.height > 0 ? step.trigger.height : baseSize;
@@ -541,14 +564,32 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                 triggerCollider = box;
             }
 
-            Debug.Log($"[DynamicSequence] Created trigger {go.name} ({step.trigger.shape}) pos={go.transform.position} size={DescribeCollider(triggerCollider)} for {state.id}");
+            void Handler(Collider c)
+            {
+                string targetVr = string.IsNullOrEmpty(step.trigger.vrId) || step.trigger.vrId == "any"
+                    ? state.id
+                    : step.trigger.vrId;
+
+                if (c && c.transform.root && c.transform.root.name == targetVr)
+                {
+                    result.Triggered = true;
+                    result.TriggeredObjectIndex = localIndex;
+                    if (!step.trigger.advanceOnTrigger)
+                    {
+                        ResetVR(targetVr, step);
+                    }
+                    else
+                    {
+                        done = true;
+                    }
+                }
+            }
 
             bool useExit = step.trigger != null && step.trigger.triggerOnExit;
-            go.AddComponent<TriggerRelay>().Init(
-                useExit ? null : Handler,
-                useExit ? Handler : null
-            );
+            go.AddComponent<TriggerRelay>().Init(useExit ? null : Handler, useExit ? Handler : null);
             triggers.Add(go);
+
+            _ = triggerCollider;
         }
 
         float deadline = step.trigger.timeoutSeconds > 0
@@ -559,7 +600,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         {
             if (Time.time >= deadline)
             {
-                Debug.Log($"[DynamicSequence] Timeout reached ({step.trigger.timeoutSeconds}s) for {state.id} on step {step.name}, advancing.");
+                result.TimedOut = true;
                 break;
             }
             yield return null;
@@ -567,15 +608,6 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
         foreach (var go in triggers)
             Destroy(go);
-    }
-
-    private string DescribeCollider(Collider col)
-    {
-        if (col is CapsuleCollider cap)
-            return $"capsule r={cap.radius:F2} h={cap.height:F2}";
-        if (col is BoxCollider box)
-            return $"box {box.size}";
-        return col ? col.GetType().Name : "none";
     }
 
     private IEnumerator SwapAfterDelay(RigState state, Step step, List<SpawnedObject> spawned, float stepStartTime)
@@ -592,7 +624,6 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         if (spawned == null || spawned.Count == 0)
             return;
 
-        // If explicit swapColor is provided, use it; otherwise swap colors between first two objects
         bool hasExplicit = spawned.Any(s => s.Spec.swapColor != null && s.Spec.swapColor.Length >= 3);
 
         if (hasExplicit)
@@ -609,8 +640,10 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             Color c0 = spawned[0].Renderer ? spawned[0].Renderer.material.color : Color.black;
             Color c1 = spawned[1].Renderer ? spawned[1].Renderer.material.color : Color.black;
 
-            if (spawned[0].Renderer) spawned[0].Renderer.material.color = c1;
-            if (spawned[1].Renderer) spawned[1].Renderer.material.color = c0;
+            if (spawned[0].Renderer)
+                spawned[0].Renderer.material.color = c1;
+            if (spawned[1].Renderer)
+                spawned[1].Renderer.material.color = c0;
         }
     }
 
@@ -625,14 +658,256 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         logger.UpdateLogger();
     }
 
-    // helpers
-    private static Vector3 ToVector3(float[] arr) =>
-        arr != null && arr.Length >= 3 ? new Vector3(arr[0], arr[1], arr[2]) : Vector3.zero;
+    private void LogAdaptiveTrialStart(RigState state, float gray, string blackSide)
+    {
+        var logger = state.rig.GetComponent<DataLogger>();
+        if (logger == null)
+            return;
 
-    private static Color ToColor(float[] arr) =>
-        arr != null && arr.Length >= 3
+        logger.SetData("grayAtTrialStart", gray);
+        logger.SetData("blackSideAtTrialStart", blackSide);
+        logger.UpdateLogger();
+    }
+
+    private Step BuildAdaptiveNormalStep(RigState state, out string blackSide)
+    {
+        Step step = CloneStep(GetAdaptiveTemplateStep());
+        bool blackOnLeft = UnityEngine.Random.value < 0.5f;
+        blackSide = blackOnLeft ? "left" : "right";
+
+        step.name = $"AdaptiveDecision_Normal_{state.adaptiveTrialCount:D4}_{(blackOnLeft ? "blackL" : "blackR")}";
+
+        if (step.objects == null || step.objects.Length < 2)
+            step.objects = BuildDefaultPairObjects();
+
+        int leftIndex = GetLeftObjectIndex(step.objects);
+        int rightIndex = leftIndex == 0 ? 1 : 0;
+
+        float[] black = { 0f, 0f, 0f, 1f };
+        float g = Mathf.Clamp01(state.adaptiveGray);
+        float[] gray = { g, g, g, 1f };
+
+        if (blackOnLeft)
+        {
+            step.objects[leftIndex].color = black;
+            step.objects[leftIndex].role = "black";
+            step.objects[rightIndex].color = gray;
+            step.objects[rightIndex].role = "gray";
+        }
+        else
+        {
+            step.objects[leftIndex].color = gray;
+            step.objects[leftIndex].role = "gray";
+            step.objects[rightIndex].color = black;
+            step.objects[rightIndex].role = "black";
+        }
+
+        return step;
+    }
+
+    private Step BuildAdaptiveControlStep(RigState state, AdaptiveDecisionConfig cfg, out string blackSide)
+    {
+        blackSide = "control";
+        Step step = CloneStep(GetAdaptiveTemplateStep());
+        int controlType = UnityEngine.Random.Range(0, 3);
+        float[] black = { 0f, 0f, 0f, 1f };
+
+        switch (controlType)
+        {
+            case 0:
+                step.name = $"AdaptiveDecision_Control_twoBlack_{state.adaptiveTrialCount:D4}";
+                if (step.objects == null || step.objects.Length < 2)
+                    step.objects = BuildDefaultPairObjects();
+                foreach (var obj in step.objects.Take(2))
+                {
+                    obj.color = black;
+                    obj.role = "black";
+                }
+                break;
+
+            case 1:
+                step.name = $"AdaptiveDecision_Control_singleBlack0deg_{state.adaptiveTrialCount:D4}";
+                var source = step.objects != null && step.objects.Length > 0
+                    ? CloneObject(step.objects[0])
+                    : BuildDefaultObject(-20f);
+                source.polar.radius = ResolveTemplateRadius(step.objects);
+                source.polar.angle = 0f;
+                source.color = black;
+                source.role = "black";
+                step.objects = new[] { source };
+                break;
+
+            default:
+                step.name = $"AdaptiveDecision_Control_noBar_{state.adaptiveTrialCount:D4}";
+                step.objects = Array.Empty<SceneObjectSpec>();
+                step.trigger = new Trigger
+                {
+                    type = "time",
+                    seconds = Mathf.Max(0.1f, cfg.noBarControlSeconds)
+                };
+                break;
+        }
+
+        return step;
+    }
+
+    private Step GetAdaptiveTemplateStep()
+    {
+        if (designFile?.steps != null && designFile.steps.Length > 0 && designFile.steps[0] != null)
+            return designFile.steps[0];
+
+        return new Step
+        {
+            name = "AdaptiveDecisionTemplate",
+            trigger = new Trigger
+            {
+                type = "area",
+                areaTag = "Goal",
+                vrId = "any",
+                shape = "cylinder",
+                size = 5f,
+                radius = 2.5f,
+                height = 5f,
+                timeoutSeconds = 180f
+            },
+            closedLoopOrientation = true,
+            closedLoopPosition = true,
+            randomInitialRotation = false,
+            objects = BuildDefaultPairObjects(),
+            camera = BuildDefaultCameraSpecs()
+        };
+    }
+
+    private SceneObjectSpec[] BuildDefaultPairObjects()
+    {
+        return new[] { BuildDefaultObject(-20f), BuildDefaultObject(20f) };
+    }
+
+    private SceneObjectSpec BuildDefaultObject(float angleDeg)
+    {
+        return new SceneObjectSpec
+        {
+            type = "ScalingCylinder",
+            material = "SetColor",
+            polar = new Polar { radius = 60f, angle = angleDeg, height = 0f },
+            scale = new Scale { x = 7f, y = 100f, z = 7f },
+            visualAngleDegrees = 10f
+        };
+    }
+
+    private CameraSpec[] BuildDefaultCameraSpecs()
+    {
+        return new[]
+        {
+            new CameraSpec { vrId = "VR1", clearFlags = CameraClearFlags.SolidColor, bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f } },
+            new CameraSpec { vrId = "VR2", clearFlags = CameraClearFlags.SolidColor, bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f } },
+            new CameraSpec { vrId = "VR3", clearFlags = CameraClearFlags.SolidColor, bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f } },
+            new CameraSpec { vrId = "VR4", clearFlags = CameraClearFlags.SolidColor, bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f } }
+        };
+    }
+
+    private float ResolveTemplateRadius(SceneObjectSpec[] objects)
+    {
+        if (objects == null || objects.Length == 0)
+            return 60f;
+
+        foreach (var obj in objects)
+        {
+            if (obj?.polar != null && obj.polar.radius > 0f)
+                return obj.polar.radius;
+        }
+        return 60f;
+    }
+
+    private int GetLeftObjectIndex(SceneObjectSpec[] objects)
+    {
+        if (objects == null || objects.Length < 2)
+            return 0;
+
+        float a0 = objects[0]?.polar != null ? objects[0].polar.angle : 0f;
+        float a1 = objects[1]?.polar != null ? objects[1].polar.angle : 0f;
+        return a0 <= a1 ? 0 : 1;
+    }
+
+    private Step CloneStep(Step s)
+    {
+        if (s == null)
+            return null;
+
+        return new Step
+        {
+            name = s.name,
+            trigger = s.trigger == null
+                ? null
+                : new Trigger
+                {
+                    type = s.trigger.type,
+                    seconds = s.trigger.seconds,
+                    areaTag = s.trigger.areaTag,
+                    vrId = s.trigger.vrId,
+                    shape = s.trigger.shape,
+                    size = s.trigger.size,
+                    boxSize = s.trigger.boxSize != null ? (float[])s.trigger.boxSize.Clone() : null,
+                    radius = s.trigger.radius,
+                    height = s.trigger.height,
+                    timeoutSeconds = s.trigger.timeoutSeconds,
+                    triggerOnExit = s.trigger.triggerOnExit,
+                    advanceOnTrigger = s.trigger.advanceOnTrigger
+                },
+            objects = s.objects?.Select(CloneObject).ToArray(),
+            camera = s.camera?.Select(c => new CameraSpec
+            {
+                vrId = c.vrId,
+                clearFlags = c.clearFlags,
+                bgColor = c.bgColor != null ? (float[])c.bgColor.Clone() : null
+            }).ToArray(),
+            skybox = s.skybox,
+            resetVR = s.resetVR != null ? (string[])s.resetVR.Clone() : null,
+            closedLoopOrientation = s.closedLoopOrientation,
+            closedLoopPosition = s.closedLoopPosition,
+            initialPosition = s.initialPosition,
+            initialRotation = s.initialRotation,
+            randomInitialRotation = s.randomInitialRotation,
+            swapAfterSeconds = s.swapAfterSeconds
+        };
+    }
+
+    private SceneObjectSpec CloneObject(SceneObjectSpec obj)
+    {
+        if (obj == null)
+            return null;
+
+        return new SceneObjectSpec
+        {
+            type = obj.type,
+            polar = obj.polar == null ? null : new Polar { radius = obj.polar.radius, angle = obj.polar.angle, height = obj.polar.height },
+            scale = obj.scale == null ? null : new Scale { x = obj.scale.x, y = obj.scale.y, z = obj.scale.z },
+            material = obj.material,
+            color = obj.color != null ? (float[])obj.color.Clone() : null,
+            swapColor = obj.swapColor != null ? (float[])obj.swapColor.Clone() : null,
+            flip = obj.flip,
+            visualAngleDegrees = obj.visualAngleDegrees,
+            randomInitialRotation = obj.randomInitialRotation,
+            mu = obj.mu,
+            prefab = obj.prefab,
+            pos = obj.pos != null ? (float[])obj.pos.Clone() : null,
+            rot = obj.rot != null ? (float[])obj.rot.Clone() : null,
+            mat = obj.mat,
+            role = obj.role
+        };
+    }
+
+    private static Vector3 ToVector3(float[] arr)
+    {
+        return arr != null && arr.Length >= 3 ? new Vector3(arr[0], arr[1], arr[2]) : Vector3.zero;
+    }
+
+    private static Color ToColor(float[] arr)
+    {
+        return arr != null && arr.Length >= 3
             ? new Color(arr[0], arr[1], arr[2], arr.Length > 3 ? arr[3] : 1)
             : Color.black;
+    }
 
     private static Vector3 PolarToXZ(Polar p)
     {
@@ -646,10 +921,10 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
 public class TriggerRelay : MonoBehaviour
 {
-    private System.Action<Collider> onEnter;
-    private System.Action<Collider> onExit;
+    private Action<Collider> onEnter;
+    private Action<Collider> onExit;
 
-    public void Init(System.Action<Collider> enter, System.Action<Collider> exit = null)
+    public void Init(Action<Collider> enter, Action<Collider> exit = null)
     {
         onEnter = enter;
         onExit = exit;
