@@ -3175,6 +3175,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sequenceSteps: []
+  executionOrder: 
   currentStep: 0
   currentTrial: 0
   loopSequence: 1
@@ -8309,7 +8310,7 @@ Camera:
   m_GameObject: {fileID: 1658336769}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 1
   m_BackGroundColor: {r: 0.29803923, g: 0.29803923, b: 0.29803923, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2

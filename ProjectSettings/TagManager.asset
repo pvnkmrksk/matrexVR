@@ -6,6 +6,7 @@ TagManager:
   tags:
   - SimulatedLocust
   - ScaleReference
+  - pano
   layers:
   - Default
   - TransparentFX
