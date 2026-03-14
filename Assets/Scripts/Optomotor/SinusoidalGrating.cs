@@ -64,6 +64,8 @@ public class SinusoidalGrating : MonoBehaviour
     {
         Debug.Log($"SinusoidalGrating.Awake() - {gameObject.name}");
 
+        // FPS and VSync settings removed - now handled centrally by MainController
+
         // Create texture
         texture = new Texture2D(textureWidth, textureHeight);
 
@@ -172,6 +174,9 @@ public class SinusoidalGrating : MonoBehaviour
     {
         Debug.Log($"Updating texture with frequency={frequency}, contrast={contrast}, dutyCycle={dutyCycle}");
 
+        // Create a color array for all pixels
+        Color[] pixels = new Color[textureWidth * textureHeight];
+
         for (int x = 0; x < textureWidth; x++)
         {
             for (int y = 0; y < textureHeight; y++)
@@ -202,10 +207,15 @@ public class SinusoidalGrating : MonoBehaviour
 
                 // Mix colors
                 Color c = Color.Lerp(color1, color2, contrastValue);
-                texture.SetPixel(x, y, c);
+                
+                // Store in the pixels array (Unity textures are stored bottom-to-top)
+                int pixelIndex = y * textureWidth + x;
+                pixels[pixelIndex] = c;
             }
         }
 
+        // Set all pixels at once (much more efficient than SetPixel for each pixel)
+        texture.SetPixels(pixels);
         texture.Apply(); // Apply the texture after all pixels have been set
         Debug.Log("Texture update completed");
     }

@@ -20,8 +20,23 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
 
     void Awake()
     {
+        // FPS and VSync settings removed - now handled centrally by MainController
+        
         CreateDrumObject();
         FindClosedLoopComponents();
+        DisableAutopilot();
+    }
+
+    private void DisableAutopilot()
+    {
+        // Disable autopilot mode for all Keyboard components in the scene
+        // This is important for optomotor scenes where autopilot should be off
+        Keyboard[] keyboardComponents = FindObjectsOfType<Keyboard>();
+        foreach (Keyboard kb in keyboardComponents)
+        {
+            kb.SetAutopilotMode(false);
+            Debug.Log($"Disabled autopilot mode for {kb.gameObject.name} in Optomotor scene");
+        }
     }
 
     private void CreateDrumObject()
@@ -195,6 +210,28 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         loggingData["ClosedLoopOrientation"] = stimulus.closedLoopOrientation;
         loggingData["ClosedLoopPosition"] = stimulus.closedLoopPosition;
 
+        // Add yaw mode data from the first ClosedLoop component (if any)
+        if (closedLoopComponents.Count > 0)
+        {
+            ClosedLoop firstClosedLoop = closedLoopComponents[0];
+            loggingData["UseYawMode"] = firstClosedLoop.GetUseYawMode();
+            loggingData["YawGain"] = firstClosedLoop.GetYawGain();
+            loggingData["YawDCOffset"] = firstClosedLoop.GetYawDCOffset();
+            loggingData["YawInput"] = firstClosedLoop.GetLastYawInput();
+            loggingData["YawOutput"] = firstClosedLoop.GetLastYawOutput();
+            loggingData["SphereDiameter"] = firstClosedLoop.GetSphereDiameter();
+        }
+        else
+        {
+            // Provide default values if no ClosedLoop components
+            loggingData["UseYawMode"] = true;
+            loggingData["YawGain"] = 0.0f;
+            loggingData["YawDCOffset"] = 0.0f;
+            loggingData["YawInput"] = 0.0f;
+            loggingData["YawOutput"] = 0.0f;
+            loggingData["SphereDiameter"] = 1.0f;
+        }
+
         Debug.Log($"Updated logging data with {loggingData.Count} entries");
         foreach (var kvp in loggingData)
         {
@@ -220,7 +257,34 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
     // Provide data to loggers
     public Dictionary<string, object> GetLoggingData()
     {
+        // Update yaw mode data every time this is called (every frame for logging)
+        UpdateYawModeData();
         return loggingData;
+    }
+
+    private void UpdateYawModeData()
+    {
+        // Update yaw mode data from the first ClosedLoop component (if any)
+        if (closedLoopComponents.Count > 0)
+        {
+            ClosedLoop firstClosedLoop = closedLoopComponents[0];
+            loggingData["UseYawMode"] = firstClosedLoop.GetUseYawMode();
+            loggingData["YawGain"] = firstClosedLoop.GetYawGain();
+            loggingData["YawDCOffset"] = firstClosedLoop.GetYawDCOffset();
+            loggingData["YawInput"] = firstClosedLoop.GetLastYawInput();
+            loggingData["YawOutput"] = firstClosedLoop.GetLastYawOutput();
+            loggingData["SphereDiameter"] = firstClosedLoop.GetSphereDiameter();
+        }
+        else
+        {
+            // Provide default values if no ClosedLoop components
+            loggingData["UseYawMode"] = true;
+            loggingData["YawGain"] = 0.0f;
+            loggingData["YawDCOffset"] = 0.0f;
+            loggingData["YawInput"] = 0.0f;
+            loggingData["YawOutput"] = 0.0f;
+            loggingData["SphereDiameter"] = 1.0f;
+        }
     }
 
     public Transform GetDrumTransform()

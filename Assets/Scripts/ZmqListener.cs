@@ -17,7 +17,11 @@ public class ZmqListener : MonoBehaviour
 
     private SubscriberSocket subscriber;
     private string message; // The message received from the socket
-    public Pose pose { get; private set; }
+    
+    // Three data types: position (invariant), raw rotation (radians), quaternion (Unity)
+    public Vector3 position { get; private set; }  // Position data (invariant units)
+    public Vector3 rawRotation { get; private set; }  // Raw rotation in radians
+    public Quaternion quaternion { get; private set; }  // Unity quaternion (converted from radians)
 
     private class ZmqMessage
     {
@@ -100,13 +104,21 @@ public class ZmqListener : MonoBehaviour
 
     private void UpdatePose(ZmqMessage zmqMessage)
     {
-        // Transform the position
-        Vector3 position = new Vector3(zmqMessage.x, zmqMessage.y, zmqMessage.z);
-
-        // Transform the rotation
-        Quaternion rotation = Quaternion.Euler(zmqMessage.pitch, zmqMessage.yaw, zmqMessage.roll);
-
-        // Update the pose
-        pose = new Pose(position, rotation);
+        // 1. Position data (invariant units) - log raw values as they come in, no fudging
+        //    For kinefly mode: x = left_angle (radians), y = right_angle (radians), z = 0
+        //    For FicTrac mode: x, y, z are actual position coordinates
+        position = new Vector3(zmqMessage.x, zmqMessage.y, zmqMessage.z);
+        
+        // 2. Raw rotation data (in radians) - preserve raw values, no conversion
+        //    For kinefly mode: yaw = left_angle - right_angle (radians)
+        rawRotation = new Vector3(zmqMessage.pitch, zmqMessage.yaw, zmqMessage.roll);
+        
+        // 3. Unity quaternion (converted from radians to degrees for Quaternion.Euler)
+        //    This is only for Unity's internal use, raw radians are preserved above
+        quaternion = Quaternion.Euler(
+            zmqMessage.pitch * Mathf.Rad2Deg, 
+            zmqMessage.yaw * Mathf.Rad2Deg, 
+            zmqMessage.roll * Mathf.Rad2Deg
+        );
     }
 }

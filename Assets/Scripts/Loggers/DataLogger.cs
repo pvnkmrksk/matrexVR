@@ -88,7 +88,8 @@ public class DataLogger : MonoBehaviour
     /// </summary>
     private readonly string[] zmqColumns = new string[] {
         "SensPosX", "SensPosY", "SensPosZ",
-        "SensRotX", "SensRotY", "SensRotZ"
+        "SensRotX", "SensRotY", "SensRotZ",
+        "SensRotXRad", "SensRotYRad", "SensRotZRad"
     };
 
     /// <summary>
@@ -283,9 +284,20 @@ public class DataLogger : MonoBehaviour
         // Add ZMQ data
         if (includeZmqData && zmq != null)
         {
-            Vector3 sensPos = zmq.pose.position;
-            Vector3 sensRot = zmq.pose.rotation.eulerAngles;
-            line += $",{sensPos.x},{sensPos.y},{sensPos.z},{sensRot.x},{sensRot.y},{sensRot.z}";
+            // Log position data (invariant units) - raw values as they come in, no fudging
+            // For kinefly: pos.x = left_angle (radians), pos.y = right_angle (radians), pos.z = 0
+            // For FicTrac: pos.x, pos.y, pos.z are actual position coordinates
+            Vector3 pos = zmq.position;
+            
+            // Log raw rotation data (in radians) - preserve raw values, no conversion
+            // For kinefly: rawRot.y = yaw = left_angle - right_angle (radians)
+            Vector3 rawRot = zmq.rawRotation;
+            
+            // Log Unity quaternion data (converted to euler angles in degrees)
+            // This is separate from raw data - only for Unity display purposes
+            Vector3 unityRot = zmq.quaternion.eulerAngles;
+            
+            line += $",{pos.x},{pos.y},{pos.z},{unityRot.x},{unityRot.y},{unityRot.z},{rawRot.x},{rawRot.y},{rawRot.z}";
         }
 
         // Allow subclasses to add additional data
