@@ -4,7 +4,7 @@
 
 
     {"sceneName": "Optomotor", "duration": 144,       "gain": 2.5,
-"parameters": {"configFile": "speed_sweep.json"}
+"parameters": {"configFile": "axes_sweep.json"}
   },
 
 
