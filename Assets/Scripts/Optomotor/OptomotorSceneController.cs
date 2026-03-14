@@ -35,7 +35,6 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         foreach (Keyboard kb in keyboardComponents)
         {
             kb.SetAutopilotMode(false);
-            Debug.Log($"Disabled autopilot mode for {kb.gameObject.name} in Optomotor scene");
         }
     }
 
@@ -65,8 +64,6 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
 
     public void InitializeScene(Dictionary<string, object> parameters)
     {
-        Debug.Log($"OptomotorSceneController.InitializeScene() called with {parameters?.Count ?? 0} parameters");
-
         if (parameters == null)
         {
             Debug.LogError("Parameters are null in InitializeScene");
@@ -76,7 +73,6 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         if (parameters.ContainsKey("configFile"))
         {
             string configFileName = parameters["configFile"].ToString();
-            Debug.Log($"Loading optomotor config file: {configFileName}");
             LoadOptomotorConfig(configFileName);
             StartCoroutine(RunStimulusSequence());
         }
@@ -89,21 +85,13 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
     private void LoadOptomotorConfig(string configFileName)
     {
         string configPath = Path.Combine(Application.streamingAssetsPath, configFileName);
-        Debug.Log($"Looking for config file at: {configPath}");
-
         if (File.Exists(configPath))
         {
             try
             {
                 string jsonText = File.ReadAllText(configPath);
-                Debug.Log($"Read config file: {jsonText.Substring(0, Math.Min(100, jsonText.Length))}...");
-
                 optomotorConfig = JsonConvert.DeserializeObject<OptomotorConfig>(jsonText);
-
-                // Store config filename for logging
                 loggingData["OptomotorConfigFile"] = configFileName;
-
-                Debug.Log($"Loaded optomotor config with {optomotorConfig.stimuli.Count} stimuli");
 
                 // Config copying is already handled by MainController
             }
@@ -120,8 +108,6 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
 
     private IEnumerator RunStimulusSequence()
     {
-        Debug.Log("Starting stimulus sequence");
-
         if (optomotorConfig == null || optomotorConfig.stimuli.Count == 0)
         {
             Debug.LogError("No stimuli configured");
@@ -140,20 +126,12 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
             OptomotorStimulus currentStimulus = optomotorConfig.stimuli[currentStimulusIndex];
             float duration = currentStimulus.duration;
 
-            Debug.Log($"Running stimulus {currentStimulusIndex} for {duration} seconds - Speed: {currentStimulus.speed}, Freq: {currentStimulus.frequency}");
-
             yield return new WaitForSeconds(duration);
 
-            // Move to next stimulus
             currentStimulusIndex = (currentStimulusIndex + 1) % optomotorConfig.stimuli.Count;
-            Debug.Log($"Moving to next stimulus: {currentStimulusIndex}");
 
-            // If we've gone through all stimuli and not set to loop, stop
             if (currentStimulusIndex == 0 && !optomotorConfig.loop)
-            {
                 isRunning = false;
-                Debug.Log("Finished all stimuli, not looping");
-            }
         }
     }
 
@@ -163,7 +141,6 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
             return;
 
         OptomotorStimulus stimulus = optomotorConfig.stimuli[stimulusIndex];
-        Debug.Log($"Applying stimulus {stimulusIndex}: Speed={stimulus.speed}, Clockwise={stimulus.clockwise}, Axis={stimulus.rotationAxis}");
 
         // Update the DrumRotator
         if (drumRotator != null)
@@ -193,7 +170,6 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         // Apply closed loop settings to all ClosedLoop components
         foreach (ClosedLoop cl in closedLoopComponents)
         {
-            Debug.Log($"Setting closed loop values for {cl.gameObject.name}: Orientation={stimulus.closedLoopOrientation}, Position={stimulus.closedLoopPosition}");
             cl.SetClosedLoopOrientation(stimulus.closedLoopOrientation);
             cl.SetClosedLoopPosition(stimulus.closedLoopPosition);
         }
@@ -230,12 +206,6 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
             loggingData["YawInput"] = 0.0f;
             loggingData["YawOutput"] = 0.0f;
             loggingData["SphereDiameter"] = 1.0f;
-        }
-
-        Debug.Log($"Updated logging data with {loggingData.Count} entries");
-        foreach (var kvp in loggingData)
-        {
-            Debug.Log($"Logging data: {kvp.Key} = {kvp.Value}");
         }
     }
 

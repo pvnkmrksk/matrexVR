@@ -62,10 +62,6 @@ public class SinusoidalGrating : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log($"SinusoidalGrating.Awake() - {gameObject.name}");
-
-        // FPS and VSync settings removed - now handled centrally by MainController
-
         // Create texture
         texture = new Texture2D(textureWidth, textureHeight);
 
@@ -79,83 +75,31 @@ public class SinusoidalGrating : MonoBehaviour
         // Add or get components
         MeshFilter meshFilter = GetComponent<MeshFilter>();
         if (meshFilter == null)
-        {
             meshFilter = gameObject.AddComponent<MeshFilter>();
-            Debug.Log("Added MeshFilter component");
-        }
         meshFilter.mesh = mesh;
 
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         if (meshRenderer == null)
-        {
             meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            Debug.Log("Added MeshRenderer component");
-        }
         meshRenderer.material = material;
-
-        Debug.Log("SinusoidalGrating initialization complete");
     }
 
     private void Start()
     {
-        Debug.Log($"SinusoidalGrating.Start() - {gameObject.name}, Initial frequency: {frequency}, contrast: {contrast}");
-        // Generate the initial texture
         UpdateTexture();
     }
 
     // Public method for OptomotorSceneController to update grating parameters
     public void SetGratingParameters(float newFrequency, float newContrast, float newDutyCycle, Color newColor1, Color newColor2)
     {
-        Debug.Log($"SetGratingParameters() - Frequency: {newFrequency}, Contrast: {newContrast}, DutyCycle: {newDutyCycle}, Color1: {newColor1}, Color2: {newColor2}");
-
-        // Check if parameters are actually changing
         bool paramsChanged = false;
-
-        if (frequency != newFrequency)
-        {
-            Debug.Log($"Frequency changed from {frequency} to {newFrequency}");
-            frequency = newFrequency;
-            paramsChanged = true;
-        }
-
-        if (contrast != newContrast)
-        {
-            Debug.Log($"Contrast changed from {contrast} to {newContrast}");
-            contrast = newContrast;
-            paramsChanged = true;
-        }
-
-        if (dutyCycle != newDutyCycle)
-        {
-            Debug.Log($"DutyCycle changed from {dutyCycle} to {newDutyCycle}");
-            dutyCycle = newDutyCycle;
-            paramsChanged = true;
-        }
-
-        if (color1 != newColor1)
-        {
-            Debug.Log($"Color1 changed from {color1} to {newColor1}");
-            color1 = newColor1;
-            paramsChanged = true;
-        }
-
-        if (color2 != newColor2)
-        {
-            Debug.Log($"Color2 changed from {color2} to {newColor2}");
-            color2 = newColor2;
-            paramsChanged = true;
-        }
-
-        // Mark texture for update if any parameter changed
+        if (frequency != newFrequency) { frequency = newFrequency; paramsChanged = true; }
+        if (contrast != newContrast) { contrast = newContrast; paramsChanged = true; }
+        if (dutyCycle != newDutyCycle) { dutyCycle = newDutyCycle; paramsChanged = true; }
+        if (color1 != newColor1) { color1 = newColor1; paramsChanged = true; }
+        if (color2 != newColor2) { color2 = newColor2; paramsChanged = true; }
         if (paramsChanged)
-        {
             textureNeedsUpdate = true;
-            Debug.Log("Parameters changed, texture will be updated");
-        }
-        else
-        {
-            Debug.Log("No parameters changed, no update needed");
-        }
     }
 
     private void Update()
@@ -166,14 +110,11 @@ public class SinusoidalGrating : MonoBehaviour
             UpdateTexture();
             textureNeedsUpdate = false;
             updateCount++;
-            Debug.Log($"Updated texture (count: {updateCount}) - Current values: Frequency={frequency}, Contrast={contrast}");
         }
     }
 
     private void UpdateTexture()
     {
-        Debug.Log($"Updating texture with frequency={frequency}, contrast={contrast}, dutyCycle={dutyCycle}");
-
         // Create a color array for all pixels
         Color[] pixels = new Color[textureWidth * textureHeight];
 
@@ -217,7 +158,6 @@ public class SinusoidalGrating : MonoBehaviour
         // Set all pixels at once (much more efficient than SetPixel for each pixel)
         texture.SetPixels(pixels);
         texture.Apply(); // Apply the texture after all pixels have been set
-        Debug.Log("Texture update completed");
     }
 
     private float ApplyContrast(float value, float contrastAmount)
@@ -251,7 +191,6 @@ public class SinusoidalGrating : MonoBehaviour
     // A helper method to create a cylinder mesh with a given radius, height, number of segments and stacks
     Mesh CreateCylinderMesh(float radius, float height, int segments, int stacks)
     {
-        Debug.Log($"Creating cylinder mesh: r={radius}, h={height}, segments={segments}, stacks={stacks}");
         Mesh mesh = new Mesh();
 
         // Calculate the number of vertices and triangles in the mesh
@@ -311,14 +250,12 @@ public class SinusoidalGrating : MonoBehaviour
         mesh.triangles = triangles;
         mesh.RecalculateBounds();
 
-        Debug.Log("Cylinder mesh created successfully");
         return mesh;
     }
 
     // For debugging - add a way to manually force update
     public void ForceTextureUpdate()
     {
-        Debug.Log("Forcing texture update");
         textureNeedsUpdate = true;
     }
 }
