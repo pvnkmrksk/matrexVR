@@ -40,6 +40,7 @@ public class StatusUI : MonoBehaviour
     private int selectedVRIndex = 1; // Currently selected VR (1-4)
     private float translationSpeed = 0.0f; // Speed of movement (translation)
     private float rotationSpeed = 0.0f;    // Speed of rotation (deg/s)
+    private string rotationAxis = "";      // Optomotor drum axis (Yaw/Pitch/Roll) when in optomotor scene
 
     void Start()
     {
@@ -140,19 +141,18 @@ public class StatusUI : MonoBehaviour
         translationSpeed = 0.0f;
         rotationSpeed = 0.0f;
 
-        // Check for OptomotorSceneController (drum rotation speed)
         OptomotorSceneController optomotorController = FindObjectOfType<OptomotorSceneController>();
+        rotationAxis = "";
         if (optomotorController != null)
         {
-            // Try to get drum speed if available
             Transform drumTransform = optomotorController.GetDrumTransform();
             if (drumTransform != null)
             {
                 DrumRotator drumRotator = drumTransform.GetComponent<DrumRotator>();
                 if (drumRotator != null)
                 {
-                    // Get the actual rotation speed
                     rotationSpeed = drumRotator.GetRotationSpeed();
+                    rotationAxis = drumRotator.GetRotationAxis();
                 }
             }
         }
@@ -178,11 +178,13 @@ public class StatusUI : MonoBehaviour
             vrOffsetText += $"{marker}VR{i} DC: {offset:F2}°\n";
         }
         
+        string axisLine = string.IsNullOrEmpty(rotationAxis) ? "" : $"Axis: {rotationAxis}\n";
         string statusText = $"Trial: {trialNumber}\n" +
                            $"Sequence: {sequenceNumber}\n" +
                            $"Scene: {sceneName}\n" +
                            $"Gain: {gain:F2}\n" +
                            $"VR DC Offsets:\n{vrOffsetText}" +
+                           axisLine +
                            $"Translation: {translationSpeed:F2} u/s\n" +
                            $"Rotation: {rotationSpeed:F1}°/s";
 
