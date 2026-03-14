@@ -22,6 +22,7 @@ public class DrumRotator : MonoBehaviour
     // Tilt then spin: base orientation (tilt for Pitch/Roll), spin always around local yaw
     private Quaternion baseOrientation;
     private float spinAngle = 0f;
+    private string lastAxis = null; // same-axis continuity: only reset orientation when axis changes
 
     // Rotation state
     private bool isRotating = false;
@@ -66,10 +67,17 @@ public class DrumRotator : MonoBehaviour
         rotateClockwise = clockwise;
         rotationAxis = StringToAxis(axis);
 
-        // Base orientation: Yaw = no tilt, Pitch = 90° around X, Roll = 90° around Z; spin always around local yaw
-        baseOrientation = initialRotation * TiltQuaternionFromAxis(axis);
-        spinAngle = 0f;
-        drum.transform.rotation = baseOrientation;
+        bool axisChanged = (axis != lastAxis);
+        lastAxis = axis;
+
+        if (axisChanged)
+        {
+            // New axis: reset base and spin so drum jumps to clean orientation for this axis
+            baseOrientation = initialRotation * TiltQuaternionFromAxis(axis);
+            spinAngle = 0f;
+            drum.transform.rotation = baseOrientation;
+        }
+        // Same axis: keep current baseOrientation and spinAngle so drum continues from where it left off
 
         totalRotation = 0f;
         lastRotationAmount = 0f;
