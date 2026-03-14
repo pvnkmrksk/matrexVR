@@ -117,7 +117,7 @@ public class DrumRotator : MonoBehaviour
         return axis;
     }
 
-    // 90° tilt for Pitch/Roll so drum axis is horizontal; spin is then always around local yaw
+    // 90° tilt for Pitch/Roll so drum axis is horizontal; spin is then always around local yaw (Pitch=Z tilt, Roll=X tilt)
     private Quaternion TiltQuaternionFromAxis(string axisName)
     {
         switch (axisName)
@@ -125,9 +125,9 @@ public class DrumRotator : MonoBehaviour
             case "Yaw":
                 return Quaternion.identity;
             case "Pitch":
-                return Quaternion.Euler(90f, 0f, 0f);
-            case "Roll":
                 return Quaternion.Euler(0f, 0f, 90f);
+            case "Roll":
+                return Quaternion.Euler(90f, 0f, 0f);
             default:
                 return Quaternion.identity;
         }
