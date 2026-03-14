@@ -38,17 +38,12 @@ public class DrumRotator : MonoBehaviour
 
     void Awake()
     {
-        Debug.Log($"DrumRotator.Awake() - {gameObject.name}");
-        
-        // FPS and VSync settings removed - now handled centrally by MainController
-        
         drum = this.gameObject;
         initialRotation = drum.transform.rotation;
     }
 
     void Start()
     {
-        Debug.Log($"DrumRotator.Start() - {gameObject.name}");
 
         // Activate all monitors for multi-monitor setup
         // Display.displays[0].Activate(); // Main display always activated by default
@@ -61,8 +56,6 @@ public class DrumRotator : MonoBehaviour
     // Public method to set rotation parameters from OptomotorSceneController
     public void SetRotationParameters(float speed, bool clockwise, string axis)
     {
-        Debug.Log($"DrumRotator.SetRotationParameters() - Speed: {speed}, Clockwise: {clockwise}, Axis: {axis}");
-
         rotationSpeed = speed;
         rotateClockwise = clockwise;
         rotationAxis = StringToAxis(axis);
@@ -88,23 +81,16 @@ public class DrumRotator : MonoBehaviour
             StopCoroutine(rotationCoroutine);
             rotationCoroutine = null;
             isRotating = false;
-            Debug.Log("Stopped previous rotation coroutine");
         }
 
-        // Start new rotation if speed is not zero
         if (rotationSpeed != 0)
         {
-            // IMPORTANT: Set isRotating flag BEFORE starting the coroutine
             isRotating = true;
-            Debug.Log($"Set isRotating to {isRotating} BEFORE starting coroutine");
-
             rotationCoroutine = StartCoroutine(RotateDrum());
-            Debug.Log($"Started rotation coroutine with speed: {rotationSpeed}");
         }
         else
         {
             isRotating = false;
-            Debug.Log("Speed is zero, not starting rotation");
         }
     }
 
@@ -128,7 +114,6 @@ public class DrumRotator : MonoBehaviour
                 break;
         }
 
-        Debug.Log($"Converted axis '{axisName}' to {axis}");
         return axis;
     }
 
@@ -150,22 +135,12 @@ public class DrumRotator : MonoBehaviour
 
     public void ResetRotation()
     {
-        Debug.Log("Resetting drum rotation to initial state");
         drum.transform.rotation = initialRotation;
     }
 
     private IEnumerator RotateDrum()
     {
-        Debug.Log($"RotateDrum coroutine started. isRotating={isRotating}");
-
-        // Base orientation and spinAngle already set in SetRotationParameters; no ResetRotation here
-
-        // Wait one frame to ensure everything is initialized
         yield return new WaitForEndOfFrame();
-
-        // Rotation is now handled in Update() for frame-locked behavior
-        // This coroutine just sets up the state
-        Debug.Log($"Rotation setup complete. Speed={rotationSpeed}, isRotating={isRotating}");
     }
 
     void Update()
@@ -202,30 +177,27 @@ public class DrumRotator : MonoBehaviour
 
             // Pause/resume rotation
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Backslash))
-            {
                 isPaused = !isPaused;
-                Debug.Log($"Rotation paused: {isPaused}");
-            }
 
-            // Debug current rotation state
             if (Input.GetKeyDown(KeyCode.D))
-            {
-                Debug.Log($"Rotation debug: isRotating={isRotating}, isPaused={isPaused}, Speed={rotationSpeed}, TotalRotation={totalRotation}");
-            }
+                Debug.Log($"Drum: axis={lastAxis ?? "Yaw"} speed={rotationSpeed}°/s clockwise={rotateClockwise} paused={isPaused} spin={spinAngle:F0}°");
         }
     }
 
     // Add a public method to directly test rotation
     public void TestRotation(float testSpeed)
     {
-        Debug.Log($"Manual test rotation with speed {testSpeed}");
         SetRotationParameters(testSpeed, true, "Yaw");
     }
 
-    // Public getter for current rotation speed
     public float GetRotationSpeed()
     {
         return rotationSpeed;
+    }
+
+    public string GetRotationAxis()
+    {
+        return lastAxis ?? "Yaw";
     }
 
     // Public getter for rotation direction
@@ -236,7 +208,6 @@ public class DrumRotator : MonoBehaviour
 
     void OnDestroy()
     {
-        Debug.Log("DrumRotator being destroyed");
         if (rotationCoroutine != null)
         {
             StopCoroutine(rotationCoroutine);
