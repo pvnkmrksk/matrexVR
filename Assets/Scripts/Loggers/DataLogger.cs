@@ -213,7 +213,7 @@ public class DataLogger : MonoBehaviour
                 headerLine += "," + string.Join(",", additionalHeaders);
             }
 
-            logFile.Write(headerLine);
+            logFile.WriteLine(headerLine);
             logFile.Flush();
         }
 
@@ -278,8 +278,8 @@ public class DataLogger : MonoBehaviour
             currentStep = mainController.currentStep;
         }
 
-        // Create base line
-        line = $"\n{currentTime},{vr},{scene},{currentSequenceScene},{configFileName},{currentTrial},{currentStep},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z}";
+        // Create base line (no leading newline; WriteLogLine adds trailing newline)
+        line = $"{currentTime},{vr},{scene},{currentSequenceScene},{configFileName},{currentTrial},{currentStep},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z}";
 
         // Add ZMQ data
         if (includeZmqData && zmq != null)
@@ -409,7 +409,7 @@ public class DataLogger : MonoBehaviour
     /// <param name="line">The line to write</param>
     void WriteLogLine(string line)
     {
-        byte[] lineBytes = Encoding.UTF8.GetBytes(line);
+        byte[] lineBytes = Encoding.UTF8.GetBytes(line + "\n");
         logFile.BaseStream.Write(lineBytes, 0, lineBytes.Length);
     }
 }
