@@ -17,7 +17,11 @@ public class DrumRotator : MonoBehaviour
     // Rotation parameters
     private float rotationSpeed = 0f;
     private bool rotateClockwise = true;
-    private Vector3 rotationAxis = Vector3.up; // Default to Yaw (Y-axis)
+    private Vector3 rotationAxis = Vector3.up; // Kept for API; orientation now from baseOrientation
+
+    // Tilt then spin: base orientation (tilt for Pitch/Roll), spin always around local yaw
+    private Quaternion baseOrientation;
+    private float spinAngle = 0f;
 
     // Rotation state
     private bool isRotating = false;
@@ -62,8 +66,11 @@ public class DrumRotator : MonoBehaviour
         rotateClockwise = clockwise;
         rotationAxis = StringToAxis(axis);
 
-        // Reset rotation and tracking variables
-        ResetRotation();
+        // Base orientation: Yaw = no tilt, Pitch = 90° around X, Roll = 90° around Z; spin always around local yaw
+        baseOrientation = initialRotation * TiltQuaternionFromAxis(axis);
+        spinAngle = 0f;
+        drum.transform.rotation = baseOrientation;
+
         totalRotation = 0f;
         lastRotationAmount = 0f;
 
@@ -117,6 +124,22 @@ public class DrumRotator : MonoBehaviour
         return axis;
     }
 
+    // 90° tilt for Pitch/Roll so drum axis is horizontal; spin is then always around local yaw
+    private Quaternion TiltQuaternionFromAxis(string axisName)
+    {
+        switch (axisName)
+        {
+            case "Yaw":
+                return Quaternion.identity;
+            case "Pitch":
+                return Quaternion.Euler(90f, 0f, 0f);
+            case "Roll":
+                return Quaternion.Euler(0f, 0f, 90f);
+            default:
+                return Quaternion.identity;
+        }
+    }
+
     public void ResetRotation()
     {
         Debug.Log("Resetting drum rotation to initial state");
@@ -127,8 +150,7 @@ public class DrumRotator : MonoBehaviour
     {
         Debug.Log($"RotateDrum coroutine started. isRotating={isRotating}");
 
-        // Reset the rotation to initial state
-        ResetRotation();
+        // Base orientation and spinAngle already set in SetRotationParameters; no ResetRotation here
 
         // Wait one frame to ensure everything is initialized
         yield return new WaitForEndOfFrame();
@@ -152,8 +174,9 @@ public class DrumRotator : MonoBehaviour
                 rotationAmount *= -1;
             }
 
-            // Apply rotation
-            drum.transform.Rotate(rotationAxis, rotationAmount);
+            // Spin always around local yaw (drum's long axis)
+            spinAngle += rotationAmount;
+            drum.transform.rotation = baseOrientation * Quaternion.AngleAxis(spinAngle, Vector3.up);
 
             // Track rotation for debugging
             totalRotation += Mathf.Abs(rotationAmount);
