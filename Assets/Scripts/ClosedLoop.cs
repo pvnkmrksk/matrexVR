@@ -44,7 +44,7 @@ public class ClosedLoop : MonoBehaviour
     // Wind simulation variables
     [SerializeField][Tooltip("Wind speed for slip simulation")] private float windSpeed = 0f;
     [SerializeField][Tooltip("Wind direction in degrees - where wind is coming FROM (0° = from North, 90° = from East)")] private float windDirection = 0f;
-    
+
     // AGL (Above Ground Level) variables
     [SerializeField][Tooltip("Fixed height above terrain to maintain")] private float aglHeight = 0f;
 
@@ -71,13 +71,13 @@ public class ClosedLoop : MonoBehaviour
             Debug.LogError("ZmqListener component not found!");
         _initialPosition = transform.position;
         _initialRotation = transform.rotation;
-        
+
         // Load and apply closed loop mode configuration
         LoadClosedLoopConfiguration();
-        
+
         // Register with MainController for VR DC offset management
         RegisterWithMainController();
-        
+
         ResetPositionAndRotation();
     }
 
@@ -110,7 +110,7 @@ public class ClosedLoop : MonoBehaviour
         if (mainController != null)
         {
             SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
-            
+
             // Validate the closed loop mode
             if (!Enum.IsDefined(typeof(ClosedLoopMode), config.closedLoopMode))
             {
@@ -121,10 +121,10 @@ public class ClosedLoop : MonoBehaviour
             {
                 _currentMode = config.closedLoopMode;
             }
-            
+
             // Apply mode-specific default settings
             ApplyModeConfiguration(_currentMode);
-            
+
             Debug.Log($"Applied closed loop mode configuration: {_currentMode} for {gameObject.name}");
         }
         else
@@ -140,24 +140,24 @@ public class ClosedLoop : MonoBehaviour
         switch (mode)
         {
             case ClosedLoopMode.FicTrac:
-                // FicTrac: Walking mode - yaw mode off, force mode off
+                // FicTrac: walking mode; yaw path enabled, force mode disabled.
                 useYawMode = true;
                 useForceMode = false;
-                Debug.Log("Applied FicTrac mode: yaw mode OFF, force mode OFF");
+                Debug.Log("Applied FicTrac mode: yaw mode ON, force mode OFF");
                 break;
-                
+
             case ClosedLoopMode.Kinefly:
                 // Kinefly: Yaw mode on, force mode off
                 useYawMode = true;
                 useForceMode = false;
                 Debug.Log("Applied Kinefly mode: yaw mode ON, force mode OFF");
                 break;
-                
+
             case ClosedLoopMode.Tirbala:
-                // Tirbala: Force/torque accumulation mode - yaw mode off, force mode on
+                // Tirbala: force/torque mode enabled; yaw flag remains enabled.
                 useYawMode = true;
                 useForceMode = true;
-                Debug.Log("Applied Tirbala mode: yaw mode OFF, force mode ON");
+                Debug.Log("Applied Tirbala mode: yaw mode ON, force mode ON");
                 break;
         }
     }
@@ -213,39 +213,39 @@ public class ClosedLoop : MonoBehaviour
             // This accounts for both the initial FicTrac orientation and any random initial rotation
             Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius;
             transform.Translate(positionDelta, Space.World);
-            
-           
-        }
-        
-        
-        
-         // Apply wind slip as additional movement if wind is enabled
-         if (windSpeed > 0f)
-         {
-             // Convert wind direction angle to vector
-             // Wind direction is where wind is coming FROM, so add 180° to get where it's blowing TO
-             float windAngleRad = (windDirection + 180f) * Mathf.Deg2Rad;
-             Vector3 windVector = new Vector3(
-                 Mathf.Sin(windAngleRad),
-                 0f,
-                 Mathf.Cos(windAngleRad)
-             ) * windSpeed * Time.deltaTime;
 
-             transform.Translate(windVector, Space.World);
-         }
-         
-         // Apply AGL height adjustment if enabled
-         if (aglHeight > 0f)
-         {
-             // Get current terrain height at this position
-             float terrainHeight = GetTerrainHeight(transform.position);
-             float targetHeight = terrainHeight + aglHeight;
-             
-             // Adjust Y position to maintain AGL height
-             Vector3 currentPos = transform.position;
-             currentPos.y = targetHeight;
-             transform.position = currentPos;
-         }
+
+        }
+
+
+
+        // Apply wind slip as additional movement if wind is enabled
+        if (windSpeed > 0f)
+        {
+            // Convert wind direction angle to vector
+            // Wind direction is where wind is coming FROM, so add 180° to get where it's blowing TO
+            float windAngleRad = (windDirection + 180f) * Mathf.Deg2Rad;
+            Vector3 windVector = new Vector3(
+                Mathf.Sin(windAngleRad),
+                0f,
+                Mathf.Cos(windAngleRad)
+            ) * windSpeed * Time.deltaTime;
+
+            transform.Translate(windVector, Space.World);
+        }
+
+        // Apply AGL height adjustment if enabled
+        if (aglHeight > 0f)
+        {
+            // Get current terrain height at this position
+            float terrainHeight = GetTerrainHeight(transform.position);
+            float targetHeight = terrainHeight + aglHeight;
+
+            // Adjust Y position to maintain AGL height
+            Vector3 currentPos = transform.position;
+            currentPos.y = targetHeight;
+            transform.position = currentPos;
+        }
 
         // Handle different rotation modes based on configuration
         if (useForceMode)
@@ -303,7 +303,7 @@ public class ClosedLoop : MonoBehaviour
 
                 // Formula: gain * (yaw_radians - dcOffset_radians)
                 float rotationDeltaRadians = yawGain * (yawRadians - yawDCOffset);
-                
+
                 // Convert to degrees for rotation (Unity Rotate uses degrees)
                 float rotationDeltaDegrees = rotationDeltaRadians * Mathf.Rad2Deg;
 
@@ -384,7 +384,7 @@ public class ClosedLoop : MonoBehaviour
         // Use the new ZmqListener data structure
         Vector3 pos = _zmqListener.position;
         Vector3 rawRot = _zmqListener.rawRotation;
-        
+
         // Return: (r, theta, yaw) where r and theta are in radians for sphere calculations
         // yaw is in radians for consistency with original FicTrac calculations
         // For kinefly mode: pos.x = left_angle (radians), pos.y = right_angle (radians), rawRot.y = yaw (left-right in radians)
@@ -547,7 +547,7 @@ public class ClosedLoop : MonoBehaviour
         {
             return hit.point.y;
         }
-        
+
         // If no terrain found, return 0 (ground level)
         return 0f;
     }
@@ -572,7 +572,7 @@ public class ClosedLoop : MonoBehaviour
     public bool GetClosedLoopOrientation() { return closedLoopOrientation; }
     public bool GetClosedLoopPosition() { return closedLoopPosition; }
     public float GetSphereDiameter() { return sphereDiameter; }
-    
+
     // New getters for force/torque mode
     public bool GetUseForceMode() { return useForceMode; }
     public float GetForceGain() { return forceGain; }
@@ -593,28 +593,28 @@ public class ClosedLoop : MonoBehaviour
         // Yaw mode toggle using Ctrl+Y
         if (Input.GetKeyDown(KeyCode.Y) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
             ToggleYawMode();
-        
+
         // Force mode toggle using Ctrl+F
         if (Input.GetKeyDown(KeyCode.F) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
             ToggleForceMode();
-        
+
         // Gain adjustments using + and - keys
         if (Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus))
             IncreaseGain();
         if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus))
             DecreaseGain();
-        
+
         // DC offset adjustments using [ and ] keys are now handled by MainController
         // for per-VR control. Individual ClosedLoop components no longer handle these keys.
 
         // Force gain adjustments using Ctrl+Plus and Ctrl+Minus
-        if ((Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus)) && 
+        if ((Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus)) &&
             (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
             IncreaseForceGain();
-        if ((Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus)) && 
+        if ((Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus)) &&
             (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
             DecreaseForceGain();
-        
+
         // Torque gain adjustments using Ctrl+[ and Ctrl+]
         if (Input.GetKeyDown(KeyCode.RightBracket) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
             IncreaseTorqueGain();
