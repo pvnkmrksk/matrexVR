@@ -174,6 +174,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5665556470671942804, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
+      propertyPath: yawGain
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5665556470671942804, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
+      propertyPath: useYawMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5665556470671942804, guid: 42dda81a8f9f07436938ca556ce85952, type: 3}
+      propertyPath: dcOffsetStep
+      value: 0.1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -187,6 +199,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2640750660579318583, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
+      propertyPath: yawGain
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2640750660579318583, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
+      propertyPath: useYawMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2640750660579318583, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
+      propertyPath: dcOffsetStep
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 2640750660579318734, guid: 015b1e72883425e5c9526f77492fb8c2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -383,6 +407,18 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: yawGain
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: useYawMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
+      propertyPath: dcOffsetStep
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2831547437447586272, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: initialPosition.y
       value: 0
       objectReference: {fileID: 0}
@@ -505,6 +541,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 668772779780633183, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
+      propertyPath: yawGain
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 668772779780633183, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
+      propertyPath: useYawMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 668772779780633183, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
+      propertyPath: dcOffsetStep
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 668772779780633254, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -585,9 +633,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   drumPrefab: {fileID: 1565923041521379133, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
-  drumObjectName: OptomotorDrum
-  drumRadius: 1
-  drumObject: {fileID: 0}
 --- !u!4 &1643545297
 Transform:
   m_ObjectHideFlags: 0
