@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class PeriodicBoundary : MonoBehaviour
 {
+    // Wrap-around boundary helper:
+    // converts world positions to rotated local boundary space, applies
+    // periodic wrapping, then maps back to world coordinates.
     [Tooltip("Boundary Center coordinates")] public Vector3 boundaryCenter = Vector3.zero;
     [Tooltip("Boundary Width in centimeters.")] public float boundaryLengthX = 20f;
     [Tooltip("Boundary Length in centimeters.")] public float boundaryLengthZ = 20f;

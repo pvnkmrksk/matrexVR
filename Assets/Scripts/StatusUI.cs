@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class StatusUI : MonoBehaviour
 {
+    // Lightweight on-screen status panel for live runs:
+    // trial/step context, gain/DC calibration, and key movement metrics.
     [Header("UI Settings")]
     [SerializeField] private bool showStatusUI = true;
     [SerializeField] private Color textColor = Color.white;

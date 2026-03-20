@@ -15,6 +15,11 @@ public interface ISceneController
 
 public class MainController : MonoBehaviour
 {
+    // Main runtime coordinator:
+    // - Loads sequence + system configs
+    // - Drives scene transitions/timing
+    // - Applies global display/frame settings
+    // - Hosts per-VR calibration controls (DC offset selection/adjustment)
     public List<SequenceStep> sequenceSteps = new List<SequenceStep>();
     public List<int> executionOrder = new List<int>();
     public int currentStep = 0;
@@ -79,6 +84,7 @@ public class MainController : MonoBehaviour
 
     void Awake()
     {
+        // Boot order is important: logging/config first, then display/runtime controls.
         // Set the log level first
         Debugger.CurrentLogLevel = logLevel;
         Debugger.Log("MainController.Awake()", 3);
@@ -171,6 +177,8 @@ public class MainController : MonoBehaviour
     // Load system configurations from the specified file
     private void LoadSystemConfigurations()
     {
+        // Loads per-VR runtime parameters from StreamingAssets.
+        // This method is intentionally defensive because missing config should not hard-crash startup.
         if (string.IsNullOrEmpty(Application.streamingAssetsPath))
         {
             Debugger.Log("StreamingAssetsPath is null/empty; skipping system config load", 1);
@@ -355,6 +363,11 @@ public class MainController : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        // Scene-load hook:
+        // 1) Re-assert global runtime settings
+        // 2) Discover active scene controller
+        // 3) Inject step parameters/gain
+        // 4) Refresh VR registrations used by UI and calibration controls
         Debugger.Log("MainController.OnSceneLoaded()", 3);
 
         // Re-apply FPS/VSync settings to ensure they remain locked (like a clock)
@@ -758,6 +771,11 @@ public class MainController : MonoBehaviour
 
     void ManageTimerAndTransitions()
     {
+        // Sequence state machine:
+        // - Decrement current-step timer
+        // - Advance step when elapsed
+        // - Prefer in-scene mutation when controller supports it
+        // - Fallback to full scene load otherwise
         timer -= Time.deltaTime;
 
         // Still running the current step.

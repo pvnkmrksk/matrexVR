@@ -22,6 +22,8 @@ using System.Threading.Tasks;
 /// </summary>
 public class DataLogger : MonoBehaviour
 {
+    // Shared CSV logging backbone for experiment components.
+    // Derived loggers extend schema via AddColumns + CollectAdditionalData.
     // Path to the directory where the log file will be saved
     protected string directoryPath;
 

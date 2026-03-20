@@ -7,6 +7,9 @@ using System.Linq;
 
 public class ChoiceController : MonoBehaviour, ISceneController
 {
+    // Scene-specific controller for Choice paradigms.
+    // Reads config JSON, spawns/configures objects per VR tag, and applies
+    // optional scene-level settings such as background color and skybox.
     public GameObject[] prefabs;
     private Dictionary<string, GameObject> prefabDict = new Dictionary<string, GameObject>();
 
@@ -31,6 +34,8 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
     public void InitializeScene(Dictionary<string, object> parameters)
     {
+        // Sequence step entrypoint from MainController.
+        // Expected parameters include a configFile name in StreamingAssets.
         Debugger.Log("InitializeScene called.");
 
         // Path to scene configuration JSON
@@ -399,6 +404,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
     private void SetSkybox(string skyboxPath)
     {
+        // Runtime panoramic skybox loader from StreamingAssets.
         if (string.IsNullOrEmpty(skyboxPath))
         {
             return;

@@ -12,6 +12,8 @@ using Newtonsoft.Json;
 /// </summary>
 public class ZmqSender : MonoBehaviour
 {
+    // Broadcasts runtime VR and drum pose/state snapshots over ZMQ each frame.
+    // Intended for external monitoring/replay/instrumentation tools.
     [Header("ZMQ Settings")]
     [SerializeField] private string bindAddress = "127.0.0.1";
     [SerializeField] private int port = 9999;

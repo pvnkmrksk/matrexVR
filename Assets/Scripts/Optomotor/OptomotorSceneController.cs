@@ -7,6 +7,9 @@ using System;
 
 public class OptomotorSceneController : MonoBehaviour, ISceneController
 {
+    // Coordinates optomotor trial execution:
+    // loads config, applies each stimulus to drum/grating/closed-loop,
+    // and keeps a per-stimulus logging snapshot for data loggers.
     [SerializeField] private GameObject drumPrefab;
 
     private GameObject drumObject;
@@ -64,6 +67,7 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
 
     public void InitializeScene(Dictionary<string, object> parameters)
     {
+        // Sequence entrypoint from MainController.
         if (parameters == null)
         {
             Debug.LogError("Parameters are null in InitializeScene");
@@ -137,6 +141,7 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
 
     private void ApplyStimulusConfig(int stimulusIndex)
     {
+        // Applies one indexed stimulus consistently across all subsystems.
         if (optomotorConfig == null || stimulusIndex >= optomotorConfig.stimuli.Count)
             return;
 

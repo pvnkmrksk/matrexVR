@@ -11,6 +11,9 @@ public enum RotationAxis
 
 public class DrumRotator : MonoBehaviour
 {
+    // Rotates the optomotor drum with axis-aware behavior:
+    // for pitch/roll stimuli the drum is tilted first, then spin is applied
+    // around local yaw so visual motion remains consistent.
     private GameObject drum;
     private Quaternion initialRotation;
 
@@ -56,6 +59,7 @@ public class DrumRotator : MonoBehaviour
     // Public method to set rotation parameters from OptomotorSceneController
     public void SetRotationParameters(float speed, bool clockwise, string axis)
     {
+        // Called by OptomotorSceneController whenever a new stimulus starts.
         rotationSpeed = speed;
         rotateClockwise = clockwise;
         rotationAxis = StringToAxis(axis);

@@ -3,6 +3,9 @@ using System;
 
 public class ClosedLoop : MonoBehaviour
 {
+    // ClosedLoop is the movement/rotation adapter between incoming sensor data
+    // and Unity transforms. It supports multiple experiment modes (yaw-based,
+    // force/torque accumulation, and mode-specific gain/offset controls).
 
 
     [SerializeField][Tooltip("The diameter of the sphere in cm")] private float sphereDiameter = 1f;
@@ -105,6 +108,8 @@ public class ClosedLoop : MonoBehaviour
 
     private void LoadClosedLoopConfiguration()
     {
+        // Pull mode defaults from MainController/system config so per-VR behavior
+        // can be controlled from config rather than hardcoded in scenes.
         // Find the MainController to get system config
         MainController mainController = FindObjectOfType<MainController>();
         if (mainController != null)
@@ -203,6 +208,10 @@ public class ClosedLoop : MonoBehaviour
 
     private void UpdateTransform()
     {
+        // Core transform update path:
+        // - Apply position deltas when enabled
+        // - Apply optional wind/AGL adjustments
+        // - Apply selected orientation mode (force mode or yaw mode)
         Vector3 currentFicTracData = GetCurrentFicTracData();
         Vector3 ficTracDelta = currentFicTracData - _lastFicTracData;
 

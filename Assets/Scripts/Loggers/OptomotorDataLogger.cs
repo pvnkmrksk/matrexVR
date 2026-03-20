@@ -14,6 +14,8 @@ using System.Collections.Generic;
 /// </summary>
 public class OptomotorDataLogger : DataLogger
 {
+    // Optomotor-specific logger that mirrors controller stimulus state
+    // into explicit CSV columns for downstream analysis.
     /// <summary>
     /// Reference to the OptomotorSceneController that provides stimulus data
     /// </summary>

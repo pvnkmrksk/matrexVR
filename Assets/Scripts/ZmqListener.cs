@@ -7,6 +7,8 @@ using System.IO;
 
 public class ZmqListener : MonoBehaviour
 {
+    // Receives sensor data from ZMQ and exposes a normalized runtime view:
+    // position (raw units), raw rotation (radians), and Unity quaternion.
     [SerializeField]
     [Tooltip("The ip address of the socket to connect to")]
     public string address = "localhost"; // Replace with your socket address
