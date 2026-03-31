@@ -1,46 +1,5 @@
 {
-  "loop": true,
   "sequences": [
-    {
-      "sceneName": "Optomotor",
-      "duration": 144,
-      "gain": 2.5,
-      "parameters": {
-        "configFile": "axes_sweep.json"
-      }
-    },
-    {
-      "sceneName": "Optomotor",
-      "duration": 144,
-      "gain": 5,
-      "parameters": {
-        "configFile": "speed_sweep.json"
-      }
-    },
-    {
-      "sceneName": "Optomotor",
-      "duration": 144,
-      "gain": 10,
-      "parameters": {
-        "configFile": "speed_sweep.json"
-      }
-    },
-    {
-      "sceneName": "Optomotor",
-      "duration": 144,
-      "gain": 20,
-      "parameters": {
-        "configFile": "speed_sweep.json"
-      }
-    },
-    {
-      "sceneName": "Optomotor",
-      "duration": 144,
-      "gain": 40,
-      "parameters": {
-        "configFile": "speed_sweep.json"
-      }
-    },
     {
       "sceneName": "texrug_bg",
       "duration": 9,
