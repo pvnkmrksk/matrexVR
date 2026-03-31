@@ -1,0 +1,15 @@
+{
+  "loop": true,
+  "sequences": [
+
+
+      {"sceneName": "Optomotor", "duration": 144,       "gain": 10,
+"parameters": {"configFile": "freq_sweep.json"}
+  },
+    {"sceneName": "Optomotor", "duration": 144,       "gain": 10,
+"parameters": {"configFile": "speed_sweep.json"}
+  }
+
+
+  ]
+}

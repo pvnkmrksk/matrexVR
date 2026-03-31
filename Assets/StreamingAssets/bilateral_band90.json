@@ -1,0 +1,66 @@
+{
+  "objects": [
+    
+    {
+      "type": "LocustBand",
+      "position": {
+        "radius": 24,
+        "angle": 180
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "flip": false,
+      "speed": 2,
+      "mu": 90,
+      "numberOfInstances": 32,
+      "spawnWidth": 32,
+      "spawnLength": 55.5,
+      "gridType": "Hexagonal",
+      "kappa": 10000,
+      "visibleOffDuration": 0,
+      "visibleOnDuration": 1,
+      "boundaryWidth": 33,
+      "boundaryLength": 55.5,
+      "rotationAngle": 90,
+      "hexRadius": 4,
+      "moveWithTransform": true
+    },
+    {
+      "type": "LocustBand",
+      "position": {
+        "radius": 24,
+        "angle": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "flip": false,
+      "speed": 2,
+      "mu": 90,
+      "numberOfInstances": 32,
+      "spawnWidth": 32,
+      "spawnLength": 55.5,
+      "gridType": "Hexagonal",
+      "kappa": 10000,
+      "visibleOffDuration": 0,
+      "visibleOnDuration": 1,
+      "boundaryWidth": 33,
+      "boundaryLength": 55.5,
+      "rotationAngle": 90,
+      "hexRadius": 4,
+      "moveWithTransform": true
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0,
+    "g": 0,
+    "b": 0
+  }
+}

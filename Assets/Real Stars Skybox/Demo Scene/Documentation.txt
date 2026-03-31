@@ -1,0 +1,62 @@
+Real Stars Skybox Plus is a premium asset providing three skyboxes of the stars in the night sky, each in 2 different resolution. 
+
+It also comes with a demo scene enabling you to "walk" around the world to view the real night sky at any location and at any time you choose. With a straightforward, heavily commented C# script working a lot of mathematical magic, it's easy to drop into your own projects for games or educational purposes.
+
+
+Take giant leaps around the world with the Demo Scene:
+Play the Demo Scene, then hold down the right mouse button (or "Fire2") and move the mouse to look around. The map of the world is beneath your feet and the distant red walls mark the horizon.
+
+Use WASD or arrow keys to move North, South, East or West on the map (*not* in the direction you're facing). Your position and the direction you're facing are shown in the mini-map at bottom left.
+
+Use the GUI at bottom right to change the time and date to see the real night sky at that moment at your current location on the world map. Or use the speed buttons to set the rate at which time passes and watch the stars wheel overhead!
+
+Two different world maps are provided: the default rectangular projection or a polar azimuthal projection (as seen on the emblem of the UN). Press the "Switch Map" button above the mini-map to swap between the two. Your location on the world map will stay the same but the stars will seem to shift because you will be looking in a different direction. The direction keys will still move your N/S/E/W on the map, but N/S is now a radial distance from the North Pole and E/W moves you in circle.
+
+
+Easy to implement in your own projects:
+You can simply use the skyboxes in your own scenes in your preferred way. Each is stored in a named folder along with the base PNG images.
+
+To use the premium features, set up a new Skybox Camera in your project or drop the Skybox Camera prefab (in the Demo Scene folder) as a second camera into your existing scenes. The skybox is attached as a component to the Skybox Camera so you don't need a skybox in the project's Lighting Settings. Make sure to change the clear flag on your Main Camera to "depth only" so you can see the skybox, and that your Main Camera is tagged "MainCamera".
+
+In the example script attached to the Skybox Camera, the longitude and latitude are fetched from the Main Camera (default is 0N, 0E), as well as a Vector3 representing the direction of North on your game map (default is the +Z direction). It also grabs the viewing direction from your Main Camera's rotation so you can look around. 
+
+A time and date must be provided or it defaults to 22 March at Noon (GMT). In the demo scene, time is handled by a separate script and sent to the skybox script each frame. 
+
+With this information, the Skybox Camera is rotated to correctly angle the night sky. You can fix all these variables, or they can be updated every frame if you want. 
+
+The Skybox Camera script is heavily commented, with explanations of the astronomy and physics so you can easily adapt it to your own projects. Imagine being able to navigate your sailing ship by the real stars!
+
+
+Details of the skyboxes:
+Three skyboxes are provided in each of 2 different resolutions. Each is in its own named folder and is a 6-sided cube with each side at either 2048x2048 or 4096x4096 resolution.
+
+StarSkybox04 and StarSkybox04-4096 is a plain image of the night sky.
+StarSkybox04Named and StarSkybox04-4096Named has the names of some stars in white.
+StarSkybox04NamedConstell and StarSkybox04-4096NamedConstell additionally have the outlines and names of the constellations in red.
+
+The Rectangular Projections folder contains three rectangular projections of the whole sky at 8192x4096.
+
+
+Free version:
+The free version of Real Stars Skybox (https://assetstore.unity.com/packages/3d/environments/sci-fi/real-stars-skybox-116333) contains just the three skyboxes at 2048x2048 resulation. Try it out and upgrade if you need an even bigger resolution or want the advanced skybox orientation features.
+
+
+Astronomical details and credits:
+The skyboxes are generated using real astronomical data for the 5000 brightest stars in the sky. The size, brightness and colour of each star is based on its real magnitude and spectroscopic data. Polaris, the North Star is in the +Y direction and the 0 line of Right Ascension (passing through Pisces) is in the +Z direction.
+
+The data for the stars was taken from the HYG database (The Astronomy Nexus http://www.astronexus.com/hyg by David Nash) and licensed uynder Attribution-ShareAlike 2.5 Generic (CC BY-SA 2.5) (https://creativecommons.org/licenses/by-sa/2.5/)
+
+"Constellations" are 88 regions of the sky defined by the International Astronomical Union (IAU), each containing many stars. "Asterisms" are the shapes you can make by drawing lines between the stars. None of the skyboxes show any asterisms, though some constellations are named after asterisms they contain (or vice versa).
+
+The boundaries of the constellations should follow the curved lines of Right Ascension and Declination. The NamedConstell skyboxes use straight lines for simplicity. This is most noticeable near the poles.
+
+
+Bonus Planets:
+Real Stars Skybox Plus also comes with a spherical mesh carefully modelled and UV unwrapped to minimise distortions of any equirectangular map applied to it. In the "Planets" folder are several prefabs made from this mesh with high resolution textures of the Earth, the Moon, the Sun, Mars and Jupiter.
+
+All planet/sun textures except Earth maps downloaded from Solar System Scope https://www.solarsystemscope.com/textures/
+Distributed under CC Attribution 4.0 International (CC BY 4.0) https://creativecommons.org/licenses/by/4.0/
+
+Earth equirectangular maps from NASA Visible Earth, Blue Marble collection (https://visibleearth.nasa.gov/view_cat.php?categoryID=1484 and modified to add country borders)
+
+Earth azimuthal map by Wikimedia user Strebe, downloaded from https://commons.wikimedia.org/wiki/File:Azimuthal_equidistant_projection_SW.jpg, licensed under CC Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)  https://creativecommons.org/licenses/by-sa/3.0/deed.en

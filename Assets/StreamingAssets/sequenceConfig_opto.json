@@ -1,0 +1,9 @@
+{
+  "loop": true,
+  "sequences": [
+   
+    {"sceneName": "Optomotor", "duration": 960,       "gain": 10,
+"parameters": {"configFile": "optomotor_config.json"}
+  }
+  ]
+}

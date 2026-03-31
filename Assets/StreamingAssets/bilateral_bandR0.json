@@ -1,0 +1,68 @@
+{
+  "objects": [
+    
+    {
+      "type": "LocustBand",
+      "position": {
+        "radius": 31.1,
+        "angle": 90
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "flip": false,
+      "speed": 2,
+      "mu": 0,
+      "numberOfInstances": 32,
+      "spawnLengthX": 43.2,
+      "spawnLengthZ": 28.1,
+      "gridType": "Random",
+      "kappa": 10000,
+      "visibleOffDuration": 0.3,
+      "visibleOnDuration": 0.1,
+      "boundaryWidth": 43.2,
+      "boundaryLength": 28.1,
+      "rotationAngle": 0,
+      "hexRadius": 3.3,
+      "moveWithTransform": true,
+      "prioritizeNumbers": false
+    },
+    {
+      "type": "LocustBand",
+      "position": {
+        "radius": 31.1,
+        "angle": 270
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "flip": false,
+      "speed": 2,
+      "mu": 0,
+      "numberOfInstances": 32,
+      "spawnLengthX": 46.2,
+      "spawnLengthZ": 28.9,
+      "gridType": "Random",
+      "kappa": 10000,
+      "visibleOffDuration": 0.3,
+      "visibleOnDuration": 0.1,
+      "boundaryWidth": 46.2,
+      "boundaryLength": 28.9,
+      "rotationAngle": 0,
+      "hexRadius": 3.3,
+      "moveWithTransform": true,
+      "prioritizeNumbers": false
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0,
+    "g": 0,
+    "b": 0
+  }
+}

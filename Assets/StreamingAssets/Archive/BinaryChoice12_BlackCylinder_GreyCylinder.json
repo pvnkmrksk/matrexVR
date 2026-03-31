@@ -1,0 +1,42 @@
+{
+  "objects": [
+    {
+      "type": "Cylinder",
+      "position": {
+        "radius": 80,
+        "angle": -7.5,
+        "height": 0
+      },
+      "material": "Black",
+      "scale": {
+        "x": 7,
+        "y": 100,
+        "z": 7
+      },
+      "flip": true
+    },
+    {
+      "type": "Cylinder",
+      "position": {
+        "radius": 80,
+        "angle": 7.5,
+        "height": 0
+      },
+      "material": "Grey_696969",
+      "scale": {
+        "x": 7,
+        "y": 100,
+        "z": 7
+      },
+      "flip": true
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0.8,
+    "g": 0.8,
+    "b": 0.8,
+    "a": 1
+  }
+}

@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ControlScene.unity
     guid: 4af081ad6480f455f8bf0f8b4968e18a
   - enabled: 0
@@ -17,16 +17,25 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Matrix.unity
     guid: ae866fd6e891642e4b6b6f687c19e9a9
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Choice.unity
-    guid: 7397d1b569aa64b27ab919a5ed55c5e6
+    guid: 0094462a0c85490ae978b6f0ae21f1fc
   - enabled: 0
     path: Assets/Scenes/Choice_noBG.unity
-    guid: 1616987ac6e7fc2918e210fca39fb859
+    guid: d65bee420890d444ba3afd9d8041ba0f
   - enabled: 0
     path: Assets/Scenes/Demo_asset.unity
     guid: 2b02c29601fc84e49a18fde7fed33f95
   - enabled: 0
+    path: Assets/Scenes/Forrest_choice.unity
+    guid: 6ac85b5260ce74c4fa0843946844a788
+  - enabled: 0
+    path: Assets/Scenes/Choice_noBG.unity
+    guid: d65bee420890d444ba3afd9d8041ba0f
+  - enabled: 0
+    path: Assets/Scenes/Choice_desync.unity
+    guid: 9d9a60a4cf2b64e74bf8ea0a830dec53
+  - enabled: 1
     path: Assets/Scenes/Choice_Forrest.unity
     guid: 0b5651547a64f3a46b220dc72cdfffe4
   - enabled: 0
@@ -89,4 +98,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/texrug_bg.unity
     guid: d36514115649a4b04bc271e2dbdde0c8
+  - enabled: 1
+    path: Assets/Scenes/Choice_Hangar3d.unity
+    guid: a6c416f2fa81da1bfb5419aa4e43d51e
+  - enabled: 1
+    path: Assets/Scenes/ReplayScene.unity
+    guid: 9e700d6bcf040ef4f81695387b40e944
   m_configObjects: {}

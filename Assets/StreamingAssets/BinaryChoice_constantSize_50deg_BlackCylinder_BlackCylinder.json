@@ -1,0 +1,42 @@
+{
+  "objects": [
+    {
+      "type": "ScalingCylinder",
+      "position": {
+        "radius": 60,
+        "angle": -25,
+        "height": 0
+      },
+      "material": "Black",
+      "scale": {
+        "x": 7,
+        "y": 100,
+        "z": 7
+      },
+      "visualAngleDegrees": 10
+    },
+    {
+      "type": "ScalingCylinder",
+      "position": {
+        "radius": 60,
+        "angle": 25,
+        "height": 0
+      },
+      "material": "Black",
+      "scale": {
+        "x": 7,
+        "y": 100,
+        "z": 7
+      },
+      "visualAngleDegrees": 10
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0.8,
+    "g": 0.8,
+    "b": 0.8,
+    "a": 1
+  }
+}

@@ -26,7 +26,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_Name
-      value: VR1 Variant
+      value: VR1 Cube
       objectReference: {fileID: 0}
     - target: {fileID: 2831547437447586073, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       propertyPath: m_LocalPosition.x
@@ -126,47 +126,13 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2831547437447586073, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
       insertIndex: -1
       addedObject: {fileID: 701701339072071741}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8281569641674189120}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
 --- !u!4 &3566022865473237824 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2831547437447586073, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
   m_PrefabInstance: {fileID: 1600646502370824793}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &3566022865473237825 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2831547437447586072, guid: 28329b3c6ae29d0d78e0444feeae8001, type: 3}
-  m_PrefabInstance: {fileID: 1600646502370824793}
-  m_PrefabAsset: {fileID: 0}
---- !u!143 &8281569641674189120
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3566022865473237825}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1860953861125551091
 PrefabInstance:
   m_ObjectHideFlags: 0

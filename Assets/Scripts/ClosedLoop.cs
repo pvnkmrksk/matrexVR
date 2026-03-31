@@ -1,7 +1,11 @@
 using UnityEngine;
+using System;
 
 public class ClosedLoop : MonoBehaviour
 {
+    // ClosedLoop is the movement/rotation adapter between incoming sensor data
+    // and Unity transforms. It supports multiple experiment modes (yaw-based,
+    // force/torque accumulation, and mode-specific gain/offset controls).
 
 
     [SerializeField][Tooltip("The diameter of the sphere in cm")] private float sphereDiameter = 1f;
@@ -15,6 +19,10 @@ public class ClosedLoop : MonoBehaviour
     private Quaternion _initialRotation;
     private Vector3 _lastFicTracData;
     private bool _isInitialized = false;
+
+
+
+
     private Quaternion _ficTracRotationOffset;
     private float _initializationTimer;
 
@@ -22,25 +30,148 @@ public class ClosedLoop : MonoBehaviour
     [SerializeField][Tooltip("Whether to apply the FicTrac position in closed loop")] private bool closedLoopPosition = true;
     [SerializeField][Tooltip("Whether to apply the FicTrac rotation in closed loop")] private bool closedLoopOrientation = true;
 
+    // New yaw-based orientation mode variables
+    [SerializeField][Tooltip("Whether to use yaw-based orientation mode instead of standard orientation")] private bool useYawMode = true;
+    [SerializeField][Tooltip("Gain factor for yaw-based orientation scaling")] private float yawGain = 1.0f;
+    [SerializeField][Tooltip("DC offset for yaw-based orientation (in radians)")] private float yawDCOffset = 0.0f;
+    [SerializeField][Tooltip("Step size for gain adjustments")] private float gainStep = 1.0f;
+    [SerializeField][Tooltip("Step size for DC offset adjustments (in radians)")] private float dcOffsetStep = 1; // ~0.1 degrees in radians
+
+    // Force/torque accumulation mode variables (placeholder for Tirbala)
+    [SerializeField][Tooltip("Whether to use force/torque accumulation mode")] private bool useForceMode = false;
+    [SerializeField][Tooltip("Force accumulation gain factor")] private float forceGain = 1.0f;
+    [SerializeField][Tooltip("Torque accumulation gain factor")] private float torqueGain = 1.0f;
+    [SerializeField][Tooltip("Step size for force gain adjustments")] private float forceGainStep = 0.1f;
+    [SerializeField][Tooltip("Step size for torque gain adjustments")] private float torqueGainStep = 0.1f;
+
+    // Wind simulation variables
+    [SerializeField][Tooltip("Wind speed for slip simulation")] private float windSpeed = 0f;
+    [SerializeField][Tooltip("Wind direction in degrees - where wind is coming FROM (0° = from North, 90° = from East)")] private float windDirection = 0f;
+
+    // AGL (Above Ground Level) variables
+    [SerializeField][Tooltip("Fixed height above terrain to maintain")] private float aglHeight = 0f;
+
     // Stores the initial world rotation, including any random rotation applied at start
     private Quaternion _initialWorldRotation;
 
+    // Add these for logging support
+    private float _lastYawInput = 0f;
+    private float _lastYawOutput = 0f;
+    private float _lastForceInput = 0f;
+    private float _lastForceOutput = 0f;
+    private float _lastTorqueInput = 0f;
+    private float _lastTorqueOutput = 0f;
+
+    // Closed loop mode configuration
+    private ClosedLoopMode _currentMode = ClosedLoopMode.Kinefly;
+
     private void Start()
     {
+        ApplySphereDiameterFromSystemConfig();
         sphereRadius = sphereDiameter / 2f;
         _zmqListener = GetComponent<ZmqListener>();
         if (_zmqListener == null)
             Debug.LogError("ZmqListener component not found!");
         _initialPosition = transform.position;
         _initialRotation = transform.rotation;
+
+        // Load and apply closed loop mode configuration
+        LoadClosedLoopConfiguration();
+
+        // Register with MainController for VR DC offset management
+        RegisterWithMainController();
+
         ResetPositionAndRotation();
+    }
+
+    private void RegisterWithMainController()
+    {
+        MainController mainController = FindObjectOfType<MainController>();
+        if (mainController != null)
+        {
+            SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
+            mainController.RegisterVRClosedLoop(config.vrId, this);
+            Debug.Log($"Registered {config.vrId} ClosedLoop with MainController");
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Unregister from MainController when destroyed
+        MainController mainController = FindObjectOfType<MainController>();
+        if (mainController != null)
+        {
+            SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
+            mainController.UnregisterVRClosedLoop(config.vrId);
+        }
+    }
+
+    private void LoadClosedLoopConfiguration()
+    {
+        // Pull mode defaults from MainController/system config so per-VR behavior
+        // can be controlled from config rather than hardcoded in scenes.
+        // Find the MainController to get system config
+        MainController mainController = FindObjectOfType<MainController>();
+        if (mainController != null)
+        {
+            SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
+
+            // Validate the closed loop mode
+            if (!Enum.IsDefined(typeof(ClosedLoopMode), config.closedLoopMode))
+            {
+                Debug.LogError($"Invalid closedLoopMode '{config.closedLoopMode}' for {gameObject.name}. Valid values are: {string.Join(", ", Enum.GetNames(typeof(ClosedLoopMode)))}. Defaulting to FicTrac.");
+                _currentMode = ClosedLoopMode.FicTrac;
+            }
+            else
+            {
+                _currentMode = config.closedLoopMode;
+            }
+
+            // Apply mode-specific default settings
+            ApplyModeConfiguration(_currentMode);
+
+            Debug.Log($"Applied closed loop mode configuration: {_currentMode} for {gameObject.name}");
+        }
+        else
+        {
+            Debug.LogWarning("MainController not found, using default Kinefly mode");
+            _currentMode = ClosedLoopMode.Kinefly;
+            ApplyModeConfiguration(_currentMode);
+        }
+    }
+
+    private void ApplyModeConfiguration(ClosedLoopMode mode)
+    {
+        switch (mode)
+        {
+            case ClosedLoopMode.FicTrac:
+                // FicTrac: walking mode; yaw path enabled, force mode disabled.
+                useYawMode = true;
+                useForceMode = false;
+                Debug.Log("Applied FicTrac mode: yaw mode ON, force mode OFF");
+                break;
+
+            case ClosedLoopMode.Kinefly:
+                // Kinefly: Yaw mode on, force mode off
+                useYawMode = true;
+                useForceMode = false;
+                Debug.Log("Applied Kinefly mode: yaw mode ON, force mode OFF");
+                break;
+
+            case ClosedLoopMode.Tirbala:
+                // Tirbala: force/torque mode enabled; yaw flag remains enabled.
+                useYawMode = true;
+                useForceMode = true;
+                Debug.Log("Applied Tirbala mode: yaw mode ON, force mode ON");
+                break;
+        }
     }
 
     private void Update()
     {
         HandleInput();
 
-        if (_zmqListener.pose == null) return;
+        if (_zmqListener.quaternion == null) return;
 
         if (Input.GetKeyDown(resetKey))
         {
@@ -77,6 +208,10 @@ public class ClosedLoop : MonoBehaviour
 
     private void UpdateTransform()
     {
+        // Core transform update path:
+        // - Apply position deltas when enabled
+        // - Apply optional wind/AGL adjustments
+        // - Apply selected orientation mode (force mode or yaw mode)
         Vector3 currentFicTracData = GetCurrentFicTracData();
         Vector3 ficTracDelta = currentFicTracData - _lastFicTracData;
 
@@ -87,15 +222,134 @@ public class ClosedLoop : MonoBehaviour
             // This accounts for both the initial FicTrac orientation and any random initial rotation
             Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius;
             transform.Translate(positionDelta, Space.World);
+
+
         }
 
-        // Apply rotation change only if closedLoopOrientation is true
-        if (closedLoopOrientation)
+
+
+        // Apply wind slip as additional movement if wind is enabled
+        if (windSpeed > 0f)
         {
-            float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg;
-            // Use Space.Self instead of Space.World to ensure rotation is applied
-            // relative to the object's current orientation. This works better with random initial rotations.
-            transform.Rotate(0, rotationDelta, 0, Space.Self);
+            // Convert wind direction angle to vector
+            // Wind direction is where wind is coming FROM, so add 180° to get where it's blowing TO
+            float windAngleRad = (windDirection + 180f) * Mathf.Deg2Rad;
+            Vector3 windVector = new Vector3(
+                Mathf.Sin(windAngleRad),
+                0f,
+                Mathf.Cos(windAngleRad)
+            ) * windSpeed * Time.deltaTime;
+
+            transform.Translate(windVector, Space.World);
+        }
+
+        // Apply AGL height adjustment if enabled
+        if (aglHeight > 0f)
+        {
+            // Get current terrain height at this position
+            float terrainHeight = GetTerrainHeight(transform.position);
+            float targetHeight = terrainHeight + aglHeight;
+
+            // Adjust Y position to maintain AGL height
+            Vector3 currentPos = transform.position;
+            currentPos.y = targetHeight;
+            transform.position = currentPos;
+        }
+
+        // Handle different rotation modes based on configuration
+        if (useForceMode)
+        {
+            // Force/torque accumulation mode (Tirbala)
+            if (closedLoopOrientation)
+            {
+                // Placeholder for force/torque accumulation
+                // This will be implemented based on the specific requirements for Tirbala
+                // For now, we'll use a simple implementation that can be expanded
+
+                // Extract force and torque data from the incoming data
+                // Assuming the data structure includes force/torque information
+                float forceInput = currentFicTracData.x; // Placeholder - adjust based on actual data structure
+                float torqueInput = currentFicTracData.z; // Placeholder - adjust based on actual data structure
+
+                _lastForceInput = forceInput;
+                _lastTorqueInput = torqueInput;
+
+                // Apply force and torque gains
+                float forceOutput = forceInput * forceGain;
+                float torqueOutput = torqueInput * torqueGain;
+
+                _lastForceOutput = forceOutput;
+                _lastTorqueOutput = torqueOutput;
+
+                // Apply the accumulated force/torque effects
+                // This is a placeholder implementation - adjust based on actual requirements
+                Vector3 forceEffect = new Vector3(forceOutput, 0, 0) * sphereRadius;
+                transform.Translate(forceEffect, Space.World);
+
+                // Apply torque as rotation
+                transform.Rotate(0, torqueOutput, 0, Space.Self);
+
+                Debug.Log($"Force Mode: Force Input={_lastForceInput:F2}, Force Output={_lastForceOutput:F2}, Torque Input={_lastTorqueInput:F2}, Torque Output={_lastTorqueOutput:F2}");
+            }
+            else
+            {
+                // Force mode is enabled but orientation is off - no effects applied
+                _lastForceInput = 0f;
+                _lastForceOutput = 0f;
+                _lastTorqueInput = 0f;
+                _lastTorqueOutput = 0f;
+            }
+        }
+        else if (useYawMode)
+        {
+            // Yaw mode: closedLoopOrientation acts as on/off flag for yaw mode
+            if (closedLoopOrientation)
+            {
+                // Yaw-based orientation mode: gain * (yaw_radians - dcOffset_radians)
+                // currentFicTracData.z is l-r in radians from ZMQ
+                float yawRadians = currentFicTracData.z;
+                _lastYawInput = yawRadians * Mathf.Rad2Deg; // Store in degrees for logging
+
+                // Formula: gain * (yaw_radians - dcOffset_radians)
+                float rotationDeltaRadians = yawGain * (yawRadians - yawDCOffset);
+
+                // Convert to degrees for rotation (Unity Rotate uses degrees)
+                float rotationDeltaDegrees = rotationDeltaRadians * Mathf.Rad2Deg;
+
+                // Store the processed output for logging (in degrees)
+                _lastYawOutput = rotationDeltaDegrees;
+
+                // Apply the rotation (frame rate independent - rotation rate per second)
+                transform.Rotate(0, rotationDeltaDegrees * Time.deltaTime, 0, Space.Self);
+
+                Debug.Log($"Yaw Mode: Input={_lastYawInput:F2}° ({yawRadians:F4} rad), Gain={yawGain:F2}, DCOffset={yawDCOffset:F4} rad ({yawDCOffset * Mathf.Rad2Deg:F2}°), Output={_lastYawOutput:F2}°");
+            }
+            else
+            {
+                // Yaw mode is enabled but orientation is off - no rotation applied
+                _lastYawInput = currentFicTracData.z * Mathf.Rad2Deg;
+                _lastYawOutput = 0f;
+            }
+        }
+        else
+        {
+            // Standard mode: use original delta-based closed loop orientation
+            if (closedLoopOrientation)
+            {
+                // Standard orientation mode uses delta
+                float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg;
+                _lastYawInput = rotationDelta;
+                _lastYawOutput = rotationDelta;
+
+                // Apply the rotation
+                transform.Rotate(0, rotationDelta, 0, Space.Self);
+            }
+            else
+            {
+                // Standard mode with orientation off - no rotation applied
+                _lastYawInput = 0f;
+                _lastYawOutput = 0f;
+            }
         }
 
         _lastFicTracData = currentFicTracData;
@@ -108,13 +362,43 @@ public class ClosedLoop : MonoBehaviour
         _ficTracRotationOffset = Quaternion.identity;
         _initializationTimer = 0f;
         _lastFicTracData = Vector3.zero;
+        _lastYawInput = 0f;
+        _lastYawOutput = 0f;
+        _lastForceInput = 0f;
+        _lastForceOutput = 0f;
+        _lastTorqueInput = 0f;
+        _lastTorqueOutput = 0f;
         Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
+    }
+
+    public void SetSphereDiameter(float diameterCm)
+    {
+        sphereDiameter = diameterCm;
+        sphereRadius = sphereDiameter / 2f;
+    }
+
+    private void ApplySphereDiameterFromSystemConfig()
+    {
+        MainController main = FindObjectOfType<MainController>();
+        if (main == null)
+            return;
+
+        SystemConfig config = main.GetSystemConfigForGameObject(gameObject);
+        SetSphereDiameter(config.sphereDiameter);
+        Debug.Log($"[ClosedLoop] {gameObject.name} sphere diameter set to {config.sphereDiameter} cm from system_config");
     }
 
     private Vector3 GetCurrentFicTracData()
     {
-        Pose pose = _zmqListener.pose;
-        return new Vector3(pose.position.y, pose.position.x, pose.rotation.eulerAngles.y * Mathf.Deg2Rad);
+        // Use the new ZmqListener data structure
+        Vector3 pos = _zmqListener.position;
+        Vector3 rawRot = _zmqListener.rawRotation;
+
+        // Return: (r, theta, yaw) where r and theta are in radians for sphere calculations
+        // yaw is in radians for consistency with original FicTrac calculations
+        // For kinefly mode: pos.x = left_angle (radians), pos.y = right_angle (radians), rawRot.y = yaw (left-right in radians)
+        // For FicTrac mode: pos.x/y are position coordinates, rawRot.y is yaw in radians
+        return new Vector3(pos.y, pos.x, rawRot.y);
     }
 
     // New methods
@@ -122,12 +406,88 @@ public class ClosedLoop : MonoBehaviour
     {
         closedLoopPosition = !closedLoopPosition;
         Debug.Log($"Closed Loop Position: {(closedLoopPosition ? "ON" : "OFF")}");
+        Debugger.Log($"Closed Loop Position toggled to: {(closedLoopPosition ? "ON" : "OFF")}", 3);
     }
 
     public void ToggleClosedLoopOrientation()
     {
         closedLoopOrientation = !closedLoopOrientation;
         Debug.Log($"Closed Loop Orientation: {(closedLoopOrientation ? "ON" : "OFF")}");
+        Debugger.Log($"Closed Loop Orientation toggled to: {(closedLoopOrientation ? "ON" : "OFF")}", 3);
+    }
+
+    // New method to toggle yaw mode
+    public void ToggleYawMode()
+    {
+        useYawMode = !useYawMode;
+        Debug.Log($"Yaw Mode: {(useYawMode ? "ON" : "OFF")} (Gain={yawGain:F2}, DCOffset={yawDCOffset:F2}°)");
+        Debugger.Log($"Yaw Mode toggled to: {(useYawMode ? "ON" : "OFF")} (Gain={yawGain:F2}, DCOffset={yawDCOffset:F2}°)", 3);
+    }
+
+    // Methods to adjust gain
+    public void IncreaseGain()
+    {
+        yawGain += gainStep;
+        Debug.Log($"Yaw Gain increased to: {yawGain:F2}");
+        Debugger.Log($"Yaw Gain increased to: {yawGain:F2} (step: +{gainStep:F2})", 3);
+    }
+
+    public void DecreaseGain()
+    {
+        yawGain -= gainStep;
+        Debug.Log($"Yaw Gain decreased to: {yawGain:F2}");
+        Debugger.Log($"Yaw Gain decreased to: {yawGain:F2} (step: -{gainStep:F2})", 3);
+    }
+
+    // Methods to adjust DC offset
+    public void IncreaseDCOffset()
+    {
+        yawDCOffset += dcOffsetStep;
+        Debug.Log($"Yaw DC Offset increased to: {yawDCOffset:F4} rad ({yawDCOffset * Mathf.Rad2Deg:F2}°)");
+        Debugger.Log($"Yaw DC Offset increased to: {yawDCOffset:F4} rad ({yawDCOffset * Mathf.Rad2Deg:F2}°) (step: +{dcOffsetStep:F4} rad)", 3);
+    }
+
+    public void DecreaseDCOffset()
+    {
+        yawDCOffset -= dcOffsetStep;
+        Debug.Log($"Yaw DC Offset decreased to: {yawDCOffset:F4} rad ({yawDCOffset * Mathf.Rad2Deg:F2}°)");
+        Debugger.Log($"Yaw DC Offset decreased to: {yawDCOffset:F4} rad ({yawDCOffset * Mathf.Rad2Deg:F2}°) (step: -{dcOffsetStep:F4} rad)", 3);
+    }
+
+    // Methods for force/torque mode
+    public void ToggleForceMode()
+    {
+        useForceMode = !useForceMode;
+        Debug.Log($"Force Mode: {(useForceMode ? "ON" : "OFF")} (ForceGain={forceGain:F2}, TorqueGain={torqueGain:F2})");
+        Debugger.Log($"Force Mode toggled to: {(useForceMode ? "ON" : "OFF")} (ForceGain={forceGain:F2}, TorqueGain={torqueGain:F2})", 3);
+    }
+
+    public void IncreaseForceGain()
+    {
+        forceGain += forceGainStep;
+        Debug.Log($"Force Gain increased to: {forceGain:F2}");
+        Debugger.Log($"Force Gain increased to: {forceGain:F2} (step: +{forceGainStep:F2})", 3);
+    }
+
+    public void DecreaseForceGain()
+    {
+        forceGain -= forceGainStep;
+        Debug.Log($"Force Gain decreased to: {forceGain:F2}");
+        Debugger.Log($"Force Gain decreased to: {forceGain:F2} (step: -{forceGainStep:F2})", 3);
+    }
+
+    public void IncreaseTorqueGain()
+    {
+        torqueGain += torqueGainStep;
+        Debug.Log($"Torque Gain increased to: {torqueGain:F2}");
+        Debugger.Log($"Torque Gain increased to: {torqueGain:F2} (step: +{torqueGainStep:F2})", 3);
+    }
+
+    public void DecreaseTorqueGain()
+    {
+        torqueGain -= torqueGainStep;
+        Debug.Log($"Torque Gain decreased to: {torqueGain:F2}");
+        Debugger.Log($"Torque Gain decreased to: {torqueGain:F2} (step: -{torqueGainStep:F2})", 3);
     }
 
     // Public methods for external scripts to control the behaviors
@@ -141,6 +501,66 @@ public class ClosedLoop : MonoBehaviour
         closedLoopPosition = value;
     }
 
+    public void SetYawMode(bool value)
+    {
+        useYawMode = value;
+    }
+
+    public void SetYawGain(float value)
+    {
+        yawGain = value;
+    }
+
+    public void SetYawDCOffset(float value)
+    {
+        yawDCOffset = value;
+    }
+
+    public void SetForceMode(bool value)
+    {
+        useForceMode = value;
+    }
+
+    public void SetForceGain(float value)
+    {
+        forceGain = value;
+    }
+
+    public void SetTorqueGain(float value)
+    {
+        torqueGain = value;
+    }
+
+    public void SetWindParameters(float speed, float direction)
+    {
+        windSpeed = speed;
+        windDirection = direction;
+    }
+
+    public void SetAGLParameters(float height)
+    {
+        aglHeight = height;
+        Debug.Log($"AGL: SetAGLParameters called with height {height}, aglHeight is now {aglHeight}");
+    }
+
+    /// <summary>
+    /// Gets the terrain height at the given world position
+    /// </summary>
+    /// <param name="worldPosition">World position to check</param>
+    /// <returns>Terrain height at that position</returns>
+    private float GetTerrainHeight(Vector3 worldPosition)
+    {
+        // Cast a ray downward to find terrain
+        RaycastHit hit;
+        if (Physics.Raycast(worldPosition + Vector3.up * 1000f, Vector3.down, out hit, Mathf.Infinity))
+        {
+            return hit.point.y;
+        }
+
+        // If no terrain found, return 0 (ground level)
+        return 0f;
+    }
+
     public void SetPositionAndRotation(Vector3 initialPosition, Quaternion initialRotation)
     {
         _initialPosition = initialPosition;
@@ -152,12 +572,63 @@ public class ClosedLoop : MonoBehaviour
         ResetPositionAndRotation();
     }
 
+    // Public getters for logging
+    public bool GetUseYawMode() { return useYawMode; }
+    public float GetYawGain() { return yawGain; }
+    public float GetYawDCOffset() { return yawDCOffset; }
+    public float GetLastYawInput() { return _lastYawInput; }
+    public float GetLastYawOutput() { return _lastYawOutput; }
+    public bool GetClosedLoopOrientation() { return closedLoopOrientation; }
+    public bool GetClosedLoopPosition() { return closedLoopPosition; }
+    public float GetSphereDiameter() { return sphereDiameter; }
+
+    // New getters for force/torque mode
+    public bool GetUseForceMode() { return useForceMode; }
+    public float GetForceGain() { return forceGain; }
+    public float GetTorqueGain() { return torqueGain; }
+    public float GetLastForceInput() { return _lastForceInput; }
+    public float GetLastForceOutput() { return _lastForceOutput; }
+    public float GetLastTorqueInput() { return _lastTorqueInput; }
+    public float GetLastTorqueOutput() { return _lastTorqueOutput; }
+    public ClosedLoopMode GetCurrentMode() { return _currentMode; }
+
     private void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.O))
             ToggleClosedLoopOrientation();
         if (Input.GetKeyDown(KeyCode.P))
             ToggleClosedLoopPosition();
+
+        // Yaw mode toggle using Ctrl+Y
+        if (Input.GetKeyDown(KeyCode.Y) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            ToggleYawMode();
+
+        // Force mode toggle using Ctrl+F
+        if (Input.GetKeyDown(KeyCode.F) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            ToggleForceMode();
+
+        // Gain adjustments using + and - keys
+        if (Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus))
+            IncreaseGain();
+        if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus))
+            DecreaseGain();
+
+        // DC offset adjustments using [ and ] keys are now handled by MainController
+        // for per-VR control. Individual ClosedLoop components no longer handle these keys.
+
+        // Force gain adjustments using Ctrl+Plus and Ctrl+Minus
+        if ((Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus)) &&
+            (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            IncreaseForceGain();
+        if ((Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus)) &&
+            (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            DecreaseForceGain();
+
+        // Torque gain adjustments using Ctrl+[ and Ctrl+]
+        if (Input.GetKeyDown(KeyCode.RightBracket) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            IncreaseTorqueGain();
+        if (Input.GetKeyDown(KeyCode.LeftBracket) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            DecreaseTorqueGain();
 
         if (Input.GetKeyUp(KeyCode.Escape))
         {

@@ -1,0 +1,24 @@
+{
+  "loop": true,
+  "stimuli": [
+
+
+    { "duration": 6.0, "speed": 240.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0,  "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 240.0,  "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0,  "clockwise": false, "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 240.0,  "clockwise": true,  "rotationAxis": "Yaw", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+
+    { "duration": 6.0, "speed": 240.0,  "clockwise": true,  "rotationAxis": "Pitch", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0,  "clockwise": false, "rotationAxis": "Pitch", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 240.0,  "clockwise": false, "rotationAxis": "Pitch", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0,  "clockwise": false, "rotationAxis": "Pitch", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+
+    { "duration": 6.0, "speed": 240.0,  "clockwise": true,  "rotationAxis": "Roll", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0,  "clockwise": false, "rotationAxis": "Roll", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 240.0,  "clockwise": false, "rotationAxis": "Roll", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+    { "duration": 6.0, "speed": 0.0,  "clockwise": false, "rotationAxis": "Roll", "frequency": 8.0, "contrast": 1, "color1": "#000000", "color2": "#444444", "dutyCycle": 0.5, "closedLoopOrientation": true, "closedLoopPosition": false },
+
+
+  ]
+}

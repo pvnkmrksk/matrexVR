@@ -7,6 +7,11 @@ TagManager:
   - SimulatedLocust
   - ScaleReference
   - pano
+  - ChoiceVR1
+  - ChoiceVR2
+  - ChoiceVR3
+  - ChoiceVR4
+  - Goal
   layers:
   - Default
   - TransparentFX
@@ -23,10 +28,10 @@ TagManager:
   - SimulatedLocustsVR2
   - SimulatedLocustsVR3
   - SimulatedLocustsVR4
-  - 
-  - 
-  - 
-  - 
+  - ChoiceVR1
+  - ChoiceVR2
+  - ChoiceVR3
+  - ChoiceVR4
   - 
   - 
   - 

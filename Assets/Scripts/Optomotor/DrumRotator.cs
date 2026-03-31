@@ -1,8 +1,6 @@
 using UnityEngine;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 
 public enum RotationAxis
 {
@@ -11,240 +9,212 @@ public enum RotationAxis
     Roll
 }
 
-[System.Serializable]
-public class RotationConfig
-{
-    public float speed;
-    public bool clockwise;
-    public float duration;
-    public string externalRotationAxis;
-    public float frequency; // Remove the get and set methods
-    public float level; // Remove the get and set methods
-}
-
-[System.Serializable]
-public class RotationConfigList
-{
-    public List<RotationConfig> rotationConfigs;
-}
-
-//todo: rotation change is glitchy and reverses at times
 public class DrumRotator : MonoBehaviour
 {
-    public GameObject drum;
-    public Quaternion initialRotation;
+    // Rotates the optomotor drum with axis-aware behavior:
+    // for pitch/roll stimuli the drum is tilted first, then spin is applied
+    // around local yaw so visual motion remains consistent.
+    private GameObject drum;
+    private Quaternion initialRotation;
 
-    string configFilePath = Path.Combine(Application.streamingAssetsPath, "rotationConfig.json");
+    // Rotation parameters
+    private float rotationSpeed = 0f;
+    private bool rotateClockwise = true;
+    private Vector3 rotationAxis = Vector3.up; // Kept for API; orientation now from baseOrientation
 
-    // string jsonString = File.ReadAllText(jsonPath);
-    public int currentIndex = 0; // Change access modifier to public
-    public List<RotationConfig> configs; // Change access modifier to public
+    // Tilt then spin: base orientation (tilt for Pitch/Roll), spin always around local yaw
+    private Quaternion baseOrientation;
+    private float spinAngle = 0f;
+    private string lastAxis = null; // same-axis continuity: only reset orientation when axis changes
 
-    public bool isPaused = false;
-    public bool isStepping = false;
+    // Rotation state
+    private bool isRotating = false;
+    private bool isPaused = false;
+    private Coroutine rotationCoroutine;
 
-    [SerializeField]
-    bool closedLoopOrientation = true;
+    // For manual control in debug/development
+    private bool allowManualControl = true;
 
-    [SerializeField]
-    bool closedLoopPosition = false;
+    // For debugging
+    private float totalRotation = 0f;
+    private float lastRotationAmount = 0f;
 
-    private Vector3 StringToAxis(string axisName)
+    void Awake()
     {
-        switch (axisName)
-        {
-            case "Pitch":
-                return Vector3.right;
-            case "Yaw":
-                return Vector3.up;
-            case "Roll":
-                return Vector3.forward;
-            default:
-                return Vector3.zero;
-        }
+        drum = this.gameObject;
+        initialRotation = drum.transform.rotation;
     }
-
-    public int initialDelayFrames = 10; // Number of frames to delay before starting the rotation
-
-    //get the Cameras gameobject which holds all the cameras
-    GameObject camerasObject;
 
     void Start()
     {
-        GameObject camerasObject = GameObject.Find("Cameras");
 
-        drum = this.gameObject;
-        initialRotation = drum.transform.rotation;
+        // Activate all monitors for multi-monitor setup
+        // Display.displays[0].Activate(); // Main display always activated by default
+        // for (int i = 1; i < Display.displays.Length; i++)
+        // {
+        //     Display.displays[i].Activate();
+        // }
+    }
 
-        configs = LoadRotationConfigsFromJson(configFilePath);
+    // Public method to set rotation parameters from OptomotorSceneController
+    public void SetRotationParameters(float speed, bool clockwise, string axis)
+    {
+        // Called by OptomotorSceneController whenever a new stimulus starts.
+        rotationSpeed = speed;
+        rotateClockwise = clockwise;
+        rotationAxis = StringToAxis(axis);
 
-        if (configs != null)
+        bool axisChanged = (axis != lastAxis);
+        lastAxis = axis;
+
+        if (axisChanged)
         {
-            StartCoroutine(StartRotationWithDelay());
+            // New axis: reset base and spin so drum jumps to clean orientation for this axis
+            baseOrientation = initialRotation * TiltQuaternionFromAxis(axis);
+            spinAngle = 0f;
+            drum.transform.rotation = baseOrientation;
+        }
+        // Same axis: keep current baseOrientation and spinAngle so drum continues from where it left off
+
+        totalRotation = 0f;
+        lastRotationAmount = 0f;
+
+        // Stop existing coroutine if running
+        if (rotationCoroutine != null)
+        {
+            StopCoroutine(rotationCoroutine);
+            rotationCoroutine = null;
+            isRotating = false;
+        }
+
+        if (rotationSpeed != 0)
+        {
+            isRotating = true;
+            rotationCoroutine = StartCoroutine(RotateDrum());
         }
         else
         {
-            Debugger.Log("Failed to load rotation configs from " + configFilePath, 1);
-        }
-
-        ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
-        Debugger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length, 4);
-
-        foreach (ClosedLoop cl in closedLoopComponents)
-        {
-            Debugger.Log("Setting values for ClosedLoop script..." + closedLoopOrientation, 4);
-            cl.SetClosedLoopOrientation(closedLoopOrientation);
-            cl.SetClosedLoopPosition(closedLoopPosition);
-        }
-
-        // activate all the monitors connected to the pc for multi monitor setup
-        Display.displays[0].Activate(); // Main display always activated by default
-        for (int i = 1; i < Display.displays.Length; i++)
-        {
-            Display.displays[i].Activate();
+            isRotating = false;
         }
     }
 
-    //todo: move to sscene controller json handling system
-    private IEnumerator StartRotationWithDelay()
+    private Vector3 StringToAxis(string axisName)
     {
-        // Delay for the specified number of frames
-        for (int i = 0; i < initialDelayFrames; i++)
+        Vector3 axis;
+        switch (axisName)
         {
-            yield return null;
+            case "Pitch":
+                axis = Vector3.right;
+                break;
+            case "Yaw":
+                axis = Vector3.up;
+                break;
+            case "Roll":
+                axis = Vector3.forward;
+                break;
+            default:
+                Debug.LogWarning($"Unknown rotation axis: {axisName}, defaulting to Yaw");
+                axis = Vector3.up;
+                break;
         }
 
-        // Start the rotation
-        StartCoroutine(RotateDrum());
+        return axis;
     }
 
-    // Define a custom event for configuration change
-    public event Action ConfigurationChanged;
-
-    // Method to raise the configuration change event
-    private void RaiseConfigurationChanged()
+    // 90° tilt for Pitch/Roll so drum axis is horizontal; spin is then always around local yaw (Pitch=Z tilt, Roll=X tilt)
+    private Quaternion TiltQuaternionFromAxis(string axisName)
     {
-        ConfigurationChanged?.Invoke();
-        Debugger.Log(
-            "Configuration changed: Frequency = "
-                + configs[currentIndex].frequency
-                + ", Level = "
-                + configs[currentIndex].level
-                + ", Speed = "
-                + configs[currentIndex].speed,
-            3
-        );
-    }
-
-    private List<RotationConfig> LoadRotationConfigsFromJson(string path)
-    {
-        if (File.Exists(path))
+        switch (axisName)
         {
-            string jsonText = File.ReadAllText(path);
-            var configList = JsonUtility.FromJson<RotationConfigList>(jsonText);
-
-            if (configList != null)
-            {
-                return configList.rotationConfigs;
-            }
+            case "Yaw":
+                return Quaternion.identity;
+            case "Pitch":
+                return Quaternion.Euler(0f, 0f, 90f);
+            case "Roll":
+                return Quaternion.Euler(90f, 0f, 0f);
+            default:
+                return Quaternion.identity;
         }
+    }
 
-        return null;
+    public void ResetRotation()
+    {
+        drum.transform.rotation = initialRotation;
     }
 
     private IEnumerator RotateDrum()
     {
-        if (configs == null)
-        {
-            throw new Exception("Rotation configs list is null.");
-        }
-
-        while (true)
-        {
-            RotationConfig config = configs[currentIndex];
-
-            if (config == null)
-            {
-                throw new Exception("Rotation config is null.");
-            }
-
-            // Reset the rotation to the initial rotation
-            drum.transform.rotation = initialRotation;
-
-            Vector3 axis = StringToAxis(config.externalRotationAxis);
-            // Debugger.Log("Axis: " + axis);
-            // Assuming deltaTime represents the time elapsed since the last frame
-            float speedPerSecond = config.speed; // Speed in degrees/second
-            // float speedPerFrame = speedPerSecond * Time.deltaTime; // Speed in degrees/frame
-            // Assuming deltaTime represents the time elapsed since the last frame
-            float speedPerFrame = speedPerSecond * (1f / 60f); // Speed in degrees/frame at 60 fps
-
-            // Adjust speed for clockwise/counter-clockwise
-            if (!config.clockwise)
-            {
-                speedPerFrame *= -1;
-            }
-
-            // Calculate total rotation
-            float totalRotation = 0;
-            bool isRotationFinished = false;
-            while (!isRotationFinished)
-            {
-                if (!isPaused && !isStepping)
-                {
-                    //rotate the drum along the axis specified by the config
-                    drum.transform.Rotate(axis, speedPerFrame);
-                    totalRotation += Mathf.Abs(speedPerFrame);
-                }
-                yield return null;
-
-                if (isStepping || totalRotation >= (config.speed * config.duration))
-                {
-                    isRotationFinished = true;
-                }
-            }
-            Debugger.Log("Finished rotation " + currentIndex + " of " + configs.Count, 4);
-            RaiseConfigurationChanged(); // Raise the event when the configuration changes
-            // Increment index or reset to 0 if end of list
-            if (!isStepping)
-            {
-                currentIndex = (currentIndex + 1) % configs.Count;
-                isStepping = false;
-            }
-            else
-            {
-                isStepping = false;
-            }
-        }
+        yield return new WaitForEndOfFrame();
     }
 
     void Update()
     {
-        // Step forward or backward through the index using square brackets
-        if (Input.GetKeyDown(KeyCode.RightBracket))
+        // Frame-locked rotation in Update() instead of coroutine for consistent timing
+        if (isRotating && !isPaused && rotationSpeed != 0)
         {
-            currentIndex = (currentIndex + 1) % configs.Count;
-            isStepping = true;
-            RaiseConfigurationChanged(); // Raise the event when the configuration changes
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftBracket))
-        {
-            currentIndex = (currentIndex - 1 + configs.Count) % configs.Count;
-            isStepping = true;
-            RaiseConfigurationChanged(); // Raise the event when the configuration changes
+            // Calculate rotation amount for this frame (frame-locked via Time.deltaTime)
+            float rotationAmount = rotationSpeed * Time.deltaTime;
+
+            // Apply direction
+            if (!rotateClockwise)
+            {
+                rotationAmount *= -1;
+            }
+
+            // Spin always around local yaw (drum's long axis)
+            spinAngle += rotationAmount;
+            drum.transform.rotation = baseOrientation * Quaternion.AngleAxis(spinAngle, Vector3.up);
+
+            // Track rotation for debugging
+            totalRotation += Mathf.Abs(rotationAmount);
+            lastRotationAmount = rotationAmount;
         }
 
-        // Pause and play using backslash
-        if (Input.GetKeyDown(KeyCode.Backslash))
+        // Manual control for debugging/development
+        if (allowManualControl)
         {
-            isPaused = !isPaused;
-        }
+            // Reset rotation
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                ResetRotation();
+            }
 
-        // Use R to reset the drum to the initial rotation
-        if (Input.GetKeyDown(KeyCode.R))
+            // Pause/resume rotation
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Backslash))
+                isPaused = !isPaused;
+
+            if (Input.GetKeyDown(KeyCode.D))
+                Debug.Log($"Drum: axis={lastAxis ?? "Yaw"} speed={rotationSpeed}°/s clockwise={rotateClockwise} paused={isPaused} spin={spinAngle:F0}°");
+        }
+    }
+
+    // Add a public method to directly test rotation
+    public void TestRotation(float testSpeed)
+    {
+        SetRotationParameters(testSpeed, true, "Yaw");
+    }
+
+    public float GetRotationSpeed()
+    {
+        return rotationSpeed;
+    }
+
+    public string GetRotationAxis()
+    {
+        return lastAxis ?? "Yaw";
+    }
+
+    // Public getter for rotation direction
+    public bool IsClockwise()
+    {
+        return rotateClockwise;
+    }
+
+    void OnDestroy()
+    {
+        if (rotationCoroutine != null)
         {
-            Debugger.Log("Resetting drum rotation");
-            drum.transform.rotation = initialRotation;
+            StopCoroutine(rotationCoroutine);
         }
     }
 }
