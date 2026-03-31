@@ -1,31 +1,12 @@
 {
+  "loop": false,
   "sequences": [
     {
-      "sceneName": "texrug_bg",
-      "duration": 9,
+      "sceneName": "Choice_Hangar3d",
+      "duration": 90,
+      "gain": 10,
       "parameters": {
-        "configFile": "Homing_Sun_Tree.json"
-      }
-    },
-    {
-      "sceneName": "texrug_gb",
-      "duration": 9,
-      "parameters": {
-        "configFile": "Homing_Sun_Tree.json"
-      }
-    },
-    {
-      "sceneName": "texrug_bb",
-      "duration": 9,
-      "parameters": {
-        "configFile": "Homing_Sun_Tree.json"
-      }
-    },
-    {
-      "sceneName": "texrug_gg",
-      "duration": 9,
-      "parameters": {
-        "configFile": "Homing_Sun_Tree.json"
+        "configFile": "choice_L__.json"
       }
     }
   ]
