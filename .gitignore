@@ -97,6 +97,9 @@ Assets/Terrain/Forest floor.glb
 
 *.json.meta
 
+# Local experiment / run exports (not source assets)
+Assets/data/
+
 #system config
 Assets/StreamingAssets/system_config.json
 RWT_Cache/*
