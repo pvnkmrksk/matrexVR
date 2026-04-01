@@ -1,0 +1,32 @@
+{
+  "objects": [
+    {
+      "type": "tree01_crown",
+      "position": {
+        "radius": -225,
+        "angle": 65,
+        "height": 0
+      },
+      "scale": {
+        "x": 30,
+        "y": 30,
+        "z": 30
+      },
+      "flip": true
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "initialPosition": {
+    "x": 0,
+    "y": 1,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0,
+    "y": -90,
+    "z": 0
+  },
+  "randomInitialRotation": true,
+  "skyboxPath": "Photosphere/pvn_sun_2320.jpg"
+} 
