@@ -1,0 +1,34 @@
+{
+  "sequences": [
+
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "Homing_Sun_Tree.json"
+      }
+    },
+
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "Homing_Sun_Empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice_3d",
+      "duration": 180,
+      "parameters": {
+        "configFile": "Homing_Pano_Empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "Homing_Blank_Empty.json"
+      }
+    }
+  ]
+}
