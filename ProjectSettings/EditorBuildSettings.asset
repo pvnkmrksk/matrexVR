@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/ControlScene.unity
     guid: 4af081ad6480f455f8bf0f8b4968e18a
   - enabled: 0
@@ -47,18 +47,18 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Choice_TVM_skybox.unity
     guid: 2400622221133c0bcb48b15caf62ccfc
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/ff_flat.unity
-    guid: 796ead8326792a4e6a928a7d694039d6
+    guid: 87e886a19c777442bb54d403d4705385
   - enabled: 0
     path: Assets/Scenes/ff_path.unity
     guid: 998724b038f3141339cdaf8ccad28e62
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/grass_rugo.unity
-    guid: 817f80f71b57778de8831947f1d29199
-  - enabled: 0
+    guid: 3e0b24b771d4f4f0b80bb0158faab8e9
+  - enabled: 1
     path: Assets/Scenes/grass_flat.unity
-    guid: 41ee5e498a1db1411b2eee9a05909a2e
+    guid: 0c4280d42b91448e39622c130b8434e6
   - enabled: 0
     path: Assets/Scenes/two_tree_1.unity
     guid: 9af94eb1f67f5a75fb07ebbe0e6c8559
@@ -71,37 +71,37 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/two_tree_ss.unity
     guid: 89ee10ddd2374fb7097fa75fed2afdfd
-  - enabled: 0
-    path: Assets/Scenes/navrug_rr.unity
-    guid: 7b0014d00c0cb59a686d75f8ee155863
-  - enabled: 0
-    path: Assets/Scenes/navrug_rs.unity
-    guid: d18ebdb1445c7a17fa9feb25ff8bdb15
-  - enabled: 0
-    path: Assets/Scenes/navrug_ss.unity
-    guid: ea7f645c6ef4af14fb36b9fcdf4ade36
-  - enabled: 0
-    path: Assets/Scenes/navrug_sr.unity
-    guid: 3eebcbde75dabf9f8a0f5f9379bf2aff
-  - enabled: 0
-    path: Assets/Scenes/Choice_3d.unity
-    guid: af83beaf7c941e667b9358f6fe2fe77b
   - enabled: 1
+    path: Assets/Scenes/navrug_rr.unity
+    guid: 1f01fa25ab2214191bc188db336e38ca
+  - enabled: 1
+    path: Assets/Scenes/navrug_rs.unity
+    guid: c848a5c6f4d654cd4bcd23bdb4802c60
+  - enabled: 1
+    path: Assets/Scenes/navrug_ss.unity
+    guid: a7a79fc0c87dd44a194a4b1fae29bc2b
+  - enabled: 1
+    path: Assets/Scenes/navrug_sr.unity
+    guid: ba806609faef14405a097c2f728cb9bb
+  - enabled: 1
+    path: Assets/Scenes/Choice_3d.unity
+    guid: 140f4eeb362754a4b94923fbf39d4df2
+  - enabled: 0
     path: Assets/Scenes/texrug_gg.unity
     guid: caecba8de1293bc6fb3e155b5ca526f0
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/texrug_bb.unity
     guid: 7619a376c26fceed79d3daf653bb5aa9
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/texrug_gb.unity
     guid: 799be89eb52e6d35eb26ad188f2b071d
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/texrug_bg.unity
     guid: d36514115649a4b04bc271e2dbdde0c8
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Choice_Hangar3d.unity
     guid: a6c416f2fa81da1bfb5419aa4e43d51e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ReplayScene.unity
     guid: 9e700d6bcf040ef4f81695387b40e944
   m_configObjects: {}

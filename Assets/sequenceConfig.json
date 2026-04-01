@@ -1,33 +1,31 @@
 {
   "sequences": [
-
     {
-      "sceneName": "Choice",
-      "duration": 60,
+      "sceneName": "navrug_rs",
+      "duration": 90,
       "parameters": {
         "configFile": "Homing_Sun_Tree.json"
       }
     },
-
     {
-      "sceneName": "Choice",
-      "duration": 60,
+      "sceneName": "navrug_ss",
+      "duration": 90,
       "parameters": {
-        "configFile": "Homing_Sun_Empty.json"
+        "configFile": "Homing_Sun_Tree.json"
       }
     },
     {
-      "sceneName": "Choice_3d",
-      "duration": 180,
+      "sceneName": "navrug_rr",
+      "duration": 90,
       "parameters": {
-        "configFile": "Homing_Pano_Empty.json"
+        "configFile": "Homing_Sun_Tree.json"
       }
     },
     {
-      "sceneName": "Choice",
-      "duration": 60,
+      "sceneName": "navrug_sr",
+      "duration": 90,
       "parameters": {
-        "configFile": "Homing_Blank_Empty.json"
+        "configFile": "Homing_Sun_Tree.json"
       }
     }
   ]

@@ -2,11 +2,31 @@
   "loop": false,
   "sequences": [
     {
-      "sceneName": "Choice_Hangar3d",
+      "sceneName": "navrug_rs",
       "duration": 90,
-      "gain": 10,
       "parameters": {
-        "configFile": "choice_L__.json"
+        "configFile": "Homing_Sun_Tree.json"
+      }
+    },
+    {
+      "sceneName": "navrug_ss",
+      "duration": 90,
+      "parameters": {
+        "configFile": "Homing_Sun_Tree.json"
+      }
+    },
+    {
+      "sceneName": "navrug_rr",
+      "duration": 90,
+      "parameters": {
+        "configFile": "Homing_Sun_Tree.json"
+      }
+    },
+    {
+      "sceneName": "navrug_sr",
+      "duration": 90,
+      "parameters": {
+        "configFile": "Homing_Sun_Tree.json"
       }
     }
   ]
