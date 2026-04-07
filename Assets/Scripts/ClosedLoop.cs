@@ -63,7 +63,7 @@ public class ClosedLoop : MonoBehaviour
     private float _lastTorqueOutput = 0f;
 
     // Closed loop mode configuration
-    private ClosedLoopMode _currentMode = ClosedLoopMode.Kinefly;
+    private ClosedLoopMode _currentMode = ClosedLoopMode.FicTrac;
 
     private void Start()
     {
@@ -130,13 +130,14 @@ public class ClosedLoop : MonoBehaviour
             // Apply mode-specific default settings
             ApplyModeConfiguration(_currentMode);
 
-            Debug.Log($"Applied closed loop mode configuration: {_currentMode} for {gameObject.name}");
+            LogModeDiagnostics("from system config");
         }
         else
         {
-            Debug.LogWarning("MainController not found, using default Kinefly mode");
-            _currentMode = ClosedLoopMode.Kinefly;
+            Debug.LogWarning("MainController not found, using default FicTrac mode");
+            _currentMode = ClosedLoopMode.FicTrac;
             ApplyModeConfiguration(_currentMode);
+            LogModeDiagnostics("fallback without MainController");
         }
     }
 
@@ -145,10 +146,10 @@ public class ClosedLoop : MonoBehaviour
         switch (mode)
         {
             case ClosedLoopMode.FicTrac:
-                // FicTrac: walking mode; yaw path enabled, force mode disabled.
-                useYawMode = true;
+                // Historical FicTrac behavior: standard delta-based orientation path.
+                useYawMode = false;
                 useForceMode = false;
-                Debug.Log("Applied FicTrac mode: yaw mode ON, force mode OFF");
+                Debug.Log("Applied FicTrac mode: yaw mode OFF, force mode OFF");
                 break;
 
             case ClosedLoopMode.Kinefly:
@@ -159,12 +160,20 @@ public class ClosedLoop : MonoBehaviour
                 break;
 
             case ClosedLoopMode.Tirbala:
-                // Tirbala: force/torque mode enabled; yaw flag remains enabled.
-                useYawMode = true;
+                // Tirbala: force/torque path.
+                useYawMode = false;
                 useForceMode = true;
-                Debug.Log("Applied Tirbala mode: yaw mode ON, force mode ON");
+                Debug.Log($"Applied {mode} mode: yaw mode OFF, force mode ON");
                 break;
         }
+    }
+
+    private void LogModeDiagnostics(string source)
+    {
+        Debugger.Log(
+            $"ClosedLoop mode resolved for {gameObject.name}: mode={_currentMode}, useYawMode={useYawMode}, useForceMode={useForceMode}, source={source}",
+            3
+        );
     }
 
     private void Update()

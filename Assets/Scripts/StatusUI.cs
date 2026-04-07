@@ -43,6 +43,8 @@ public class StatusUI : MonoBehaviour
     private float translationSpeed = 0.0f; // Speed of movement (translation)
     private float rotationSpeed = 0.0f;    // Speed of rotation (deg/s)
     private string rotationAxis = "";      // Optomotor drum axis (Yaw/Pitch/Roll) when in optomotor scene
+    private string feedbackModeText = "Unknown";
+    private string feedbackFlagsText = "";
 
     void Start()
     {
@@ -93,9 +95,16 @@ public class StatusUI : MonoBehaviour
         {
             gain = closedLoop.GetYawGain();
             dcOffset = closedLoop.GetYawDCOffset(); // Legacy - keep for backward compatibility
+            feedbackModeText = closedLoop.GetCurrentMode().ToString();
+            feedbackFlagsText = $"Yaw:{(closedLoop.GetUseYawMode() ? "ON" : "OFF")} Force:{(closedLoop.GetUseForceMode() ? "ON" : "OFF")}";
             
             // Calculate translational speed
             CalculateTranslationalSpeed();
+        }
+        else
+        {
+            feedbackModeText = "None";
+            feedbackFlagsText = "Yaw:OFF Force:OFF";
         }
 
         // Get all VR DC offsets from MainController
@@ -184,6 +193,8 @@ public class StatusUI : MonoBehaviour
         string statusText = $"Trial: {trialNumber}\n" +
                            $"Sequence: {sequenceNumber}\n" +
                            $"Scene: {sceneName}\n" +
+                           $"FeedbackMode: {feedbackModeText}\n" +
+                           $"{feedbackFlagsText}\n" +
                            $"Gain: {gain:F2}\n" +
                            $"VR DC Offsets:\n{vrOffsetText}" +
                            axisLine +

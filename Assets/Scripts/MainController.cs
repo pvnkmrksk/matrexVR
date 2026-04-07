@@ -986,9 +986,9 @@ public class SequenceItem
 [System.Serializable]
 public enum ClosedLoopMode
 {
-    FicTrac,    // Walking mode - yaw mode off, force mode off
-    Kinefly,    // Yaw mode on, force mode off
-    Tirbala     // Force/torque accumulation mode - yaw mode off, force mode on
+    FicTrac, // Historical FicTrac behavior: delta-based orientation path
+    Kinefly, // Yaw mode on, force mode off
+    Tirbala // Force/torque mode
 }
 
 [System.Serializable]
