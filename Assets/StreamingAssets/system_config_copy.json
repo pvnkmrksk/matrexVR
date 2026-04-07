@@ -11,7 +11,8 @@
       "zmqAddress": "10.126.17.125",
       "zmqPort": 9871,
       "vrId": "VR1",
-      "displayOrder": "RBLF"
+      "displayOrder": "RBLF",
+      "closedLoopMode": "fictrac"
     },
     {
       "sphereDiameter": 26,
@@ -23,7 +24,8 @@
       "zmqAddress": "10.126.17.125",
       "zmqPort": 9872,
       "vrId": "VR2",
-      "displayOrder": "RBLF"
+      "displayOrder": "RBLF",
+      "closedLoopMode": "fictrac"
     },
     {
       "sphereDiameter": 26,
@@ -35,7 +37,8 @@
       "zmqAddress": "10.126.17.125",
       "zmqPort": 9873,
       "vrId": "VR3",
-      "displayOrder": "RBLF"
+      "displayOrder": "RBLF",
+      "closedLoopMode": "fictrac"
     },
     {
       "sphereDiameter": 26,
@@ -47,7 +50,8 @@
       "zmqAddress": "10.126.17.125",
       "zmqPort": 9874,
       "vrId": "VR4",
-      "displayOrder": "RBLF"
+      "displayOrder": "RBLF",
+      "closedLoopMode": "fictrac"
     }
   ]
 }
