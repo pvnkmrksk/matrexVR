@@ -35,7 +35,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Choice_desync.unity
     guid: 9d9a60a4cf2b64e74bf8ea0a830dec53
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Choice_Forrest.unity
     guid: 0b5651547a64f3a46b220dc72cdfffe4
   - enabled: 0
@@ -47,16 +47,16 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Choice_TVM_skybox.unity
     guid: 2400622221133c0bcb48b15caf62ccfc
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ff_flat.unity
     guid: 87e886a19c777442bb54d403d4705385
   - enabled: 0
     path: Assets/Scenes/ff_path.unity
     guid: 998724b038f3141339cdaf8ccad28e62
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/grass_rugo.unity
     guid: 3e0b24b771d4f4f0b80bb0158faab8e9
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/grass_flat.unity
     guid: 0c4280d42b91448e39622c130b8434e6
   - enabled: 0
@@ -71,16 +71,16 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/two_tree_ss.unity
     guid: 89ee10ddd2374fb7097fa75fed2afdfd
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/navrug_rr.unity
     guid: 1f01fa25ab2214191bc188db336e38ca
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/navrug_rs.unity
     guid: c848a5c6f4d654cd4bcd23bdb4802c60
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/navrug_ss.unity
     guid: a7a79fc0c87dd44a194a4b1fae29bc2b
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/navrug_sr.unity
     guid: ba806609faef14405a097c2f728cb9bb
   - enabled: 1

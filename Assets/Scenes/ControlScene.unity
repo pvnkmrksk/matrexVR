@@ -3377,6 +3377,8 @@ MonoBehaviour:
   systemConfigFileName: system_config.json
   logLevel: 2
   preventMultipleWindows: 1
+  targetFrameRate: 60
+  vSyncCount: 1
 --- !u!4 &484890815
 Transform:
   m_ObjectHideFlags: 0

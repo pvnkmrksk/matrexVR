@@ -4,27 +4,13 @@
       "type": "tree01",
       "position": {
         "radius": 300,
-        "angle": -115,
+        "angle": 45,
         "height": 0
       },
       "scale": {
         "x": 30,
         "y": 30,
         "z": 30
-      },
-      "flip": true
-    },
-   {
-      "type": "tree01",
-      "position": {
-        "radius": 300,
-        "angle": 295,
-        "height": 0
-      },
-      "scale": {
-        "x": 30,
-        "y": 30,
-        "z": -30
       },
       "flip": true
     }
@@ -38,9 +24,9 @@
   },
   "initialRotation": {
     "x": 0,
-    "y": -90,
+    "y": 0,
     "z": 0
   },
-  "randomInitialRotation": false,
-  "skyboxPath": "Photosphere/test_pano.jpg"
+  "randomInitialRotation": true,
+  "skyboxPath": "Photosphere/pvn_sun_2320.jpg"
 } 
