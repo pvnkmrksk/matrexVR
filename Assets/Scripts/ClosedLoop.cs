@@ -180,7 +180,7 @@ public class ClosedLoop : MonoBehaviour
     {
         HandleInput();
 
-        if (_zmqListener.quaternion == null) return;
+        if (_zmqListener == null || !_zmqListener.hasReceivedPose) return;
 
         if (Input.GetKeyDown(resetKey))
         {
@@ -399,15 +399,10 @@ public class ClosedLoop : MonoBehaviour
 
     private Vector3 GetCurrentFicTracData()
     {
-        // Use the new ZmqListener data structure
+        // Preserve historical FicTrac extraction used on origin/main:
+        // x/y from incoming position, yaw from Unity quaternion converted back to radians.
         Vector3 pos = _zmqListener.position;
-        Vector3 rawRot = _zmqListener.rawRotation;
-
-        // Return: (r, theta, yaw) where r and theta are in radians for sphere calculations
-        // yaw is in radians for consistency with original FicTrac calculations
-        // For kinefly mode: pos.x = left_angle (radians), pos.y = right_angle (radians), rawRot.y = yaw (left-right in radians)
-        // For FicTrac mode: pos.x/y are position coordinates, rawRot.y is yaw in radians
-        return new Vector3(pos.y, pos.x, rawRot.y);
+        return new Vector3(pos.y, pos.x, _zmqListener.quaternion.eulerAngles.y * Mathf.Deg2Rad);
     }
 
     // New methods
