@@ -2,6 +2,8 @@
 
 Panoramic LED-panel VR for naturalistic behavior experiments: multi-display rendering, closed-loop tracking (FicTrac / Kinefly / force-torque), scripted scene sequences, and CSV logging.
 
+**Developers:** system design, data flow, coordinates, and timing — [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 ## Quick start (built executable or Editor)
 
 1. Install **FicTrac** (or your tracker bridge) and ensure it publishes JSON pose messages on ZMQ (see [ZMQ input](#zmq-input)).

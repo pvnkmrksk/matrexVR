@@ -306,12 +306,13 @@ public class ReplayController : MonoBehaviour
                 marker.transform.localScale = Vector3.one * 0.25f;
                 marker.name = $"Replay_{rig}";
                 markerByRig[rig] = marker;
-                continue;
             }
-
-            GameObject go = Instantiate(rigMarkerPrefab);
-            go.name = $"Replay_{rig}";
-            markerByRig[rig] = go;
+            else
+            {
+                GameObject go = Instantiate(rigMarkerPrefab);
+                go.name = $"Replay_{rig}";
+                markerByRig[rig] = go;
+            }
 
             rigOrder.Add(rig);
         }
@@ -543,11 +544,17 @@ public class ReplayController : MonoBehaviour
 
             string json = File.ReadAllText(cfgs[0]);
             var config = JsonConvert.DeserializeObject<SequenceConfigCopy>(json);
-            if (config?.sequences != null && config.sequences.Length > 0)
+            if (config?.sequences != null)
             {
-                var seq = config.sequences[0];
-                if (seq.parameters != null && seq.parameters.TryGetValue("design", out var d))
-                    return d.ToString();
+                foreach (var seq in config.sequences)
+                {
+                    if (seq.parameters == null)
+                        continue;
+                    if (seq.parameters.TryGetValue("design", out var design))
+                        return design.ToString();
+                    if (seq.parameters.TryGetValue("configFile", out var configFile))
+                        return configFile.ToString();
+                }
             }
         }
         catch (Exception ex)
