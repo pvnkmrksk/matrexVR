@@ -1,0 +1,18 @@
+{
+  "loop": true,
+  "stimuli": [
+    {
+      "duration": 10.0,
+      "speed": 20.0,
+      "clockwise": true,
+      "rotationAxis": "Yaw",
+      "frequency": 4.0,
+      "contrast": 0.5,
+      "dutyCycle": 0.5,
+      "color1": "#000000",
+      "color2": "#FFFFFF",
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
+    }
+  ]
+}

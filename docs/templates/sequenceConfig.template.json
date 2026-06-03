@@ -1,0 +1,24 @@
+{
+  "randomise": false,
+  "loop": true,
+  "sequences": [
+    {
+      "sceneName": "Choice",
+      "duration": 90,
+      "gain": 1.0,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Homing_Pano_Empty.json"
+      }
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 120,
+      "gain": 1.0,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "optomotor_config_arc.json"
+      }
+    }
+  ]
+}

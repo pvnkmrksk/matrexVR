@@ -1,0 +1,31 @@
+{
+  "objects": [
+    {
+      "type": "tree01",
+      "position": {
+        "radius": 300,
+        "angle": 45,
+        "height": 0
+      },
+      "scale": {
+        "x": 30,
+        "y": 30,
+        "z": 30
+      },
+      "flip": false,
+      "speed": 0,
+      "mu": 0,
+      "visualAngleDegrees": 0
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "initialPosition": { "x": 0, "y": 1, "z": 0 },
+  "initialRotation": { "x": 0, "y": 0, "z": 0 },
+  "randomInitialRotation": true,
+  "backgroundColor": { "r": 0, "g": 0, "b": 0, "a": 1 },
+  "skyboxPath": "Photosphere/example_pano.jpg",
+  "windSpeed": 0,
+  "windDirection": 0,
+  "aglHeight": 0
+}
