@@ -38,10 +38,10 @@ public static class ReplayRigBinder
         if (exact != null)
             return exact;
 
-        foreach (Transform t in SceneManager.GetActiveScene().GetRootGameObjects())
+        foreach (GameObject go in SceneManager.GetActiveScene().GetRootGameObjects())
         {
-            if (t.name == rigId || t.name.Contains(rigId))
-                return t.gameObject;
+            if (go.name == rigId || go.name.Contains(rigId))
+                return go;
         }
         return null;
     }
