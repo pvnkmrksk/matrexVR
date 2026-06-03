@@ -79,11 +79,15 @@ public class ReplayController : MonoBehaviour
 
         frameRecorder.ClearCaptures();
 
-        string autoPath = ResolveSessionPathOptional();
-        if (!string.IsNullOrEmpty(autoPath))
-            LoadSessionFromPath(autoPath);
-        else
-            SetStatus("Pick a RunData folder (GUI) or set sessionFolder.");
+        // ControlSceneReplayPanel drives load/play; only auto-load when path preset (e.g. ReplayScene).
+        if (FindObjectOfType<ControlSceneReplayPanel>() == null)
+        {
+            string autoPath = ResolveSessionPathOptional();
+            if (!string.IsNullOrEmpty(autoPath))
+                LoadSessionFromPath(autoPath);
+            else
+                SetStatus("Pick a RunData folder (GUI) or set sessionFolder.");
+        }
     }
 
     /// <summary>Load all CSV + archived configs from a session directory.</summary>

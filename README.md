@@ -255,14 +255,16 @@ Logged columns preserve raw ZMQ position and radians in `SensRot*Rad`; Unity eul
 | `Space` or `\` | Pause / resume rotation |
 | `D` | Debug log drum state |
 
-### Replay (`ReplayScene`)
+### Replay (from ControlScene — recommended)
 
-1. Open **ReplayScene** and press Play.
-2. Use the **session picker** (dropdown of `Assets/RunData/*` folders, or paste a full path) → **Load session**.
-3. The loader reads archived `*_sequenceConfig.json`, `*_system_config.json`, copied scene JSONs, and all `*.csv` logs from that folder.
-4. **Full-scene replay** (default) loads the same Unity scenes from Build Settings, applies archived configs, and drives **logged poses only** (closed loop and ZMQ off). Use the **same build** that recorded the session for pixel-accurate visuals.
+1. Open **ControlScene** and press Play (same screen as live experiments).
+2. Use the **Replay panel** (bottom-left): pick a folder from the dropdown or paste a full path, e.g. `/path/to/ledpanelVR/Assets/RunData/20250101_123456`.
+3. Press **Replay** — loads archived configs + CSVs and starts playback (real scenes, logged poses only).
+4. **Play/Pause**, scrub slider, **Stop** returns to ControlScene. Keyboard shortcuts still work during replay (Space, arrows, N/M steps, etc.).
 
-Optional: set `sessionFolder` on `ReplayController` to auto-load on start.
+**ReplayScene** still works for replay-only testing; ControlScene is the main entry point.
+
+Requirements: same Unity build as recording; experiment scenes enabled in Build Settings.
 
 | Key | Action |
 |-----|--------|

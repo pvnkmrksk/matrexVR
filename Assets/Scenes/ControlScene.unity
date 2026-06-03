@@ -3350,6 +3350,7 @@ GameObject:
   - component: {fileID: 484890815}
   - component: {fileID: 484890814}
   - component: {fileID: 484890816}
+  - component: {fileID: 484890817}
   m_Layer: 0
   m_Name: MainController
   m_TagString: Untagged
@@ -3406,6 +3407,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 092bc645a91d2462aa864d59cb6d95a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &484890817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484890813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4e8a1f92b3d4e6f8a9b0c1d2e3f4a5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  replayController: {fileID: 0}
+  pathInput: {fileID: 0}
+  sessionDropdown: {fileID: 0}
+  replayButton: {fileID: 0}
+  stopReplayButton: {fileID: 0}
+  refreshButton: {fileID: 0}
+  playPauseButton: {fileID: 0}
+  scrubSlider: {fileID: 0}
+  statusText: {fileID: 0}
+  buildPanelAtRuntime: 1
+  panelAnchor:
+    serializedVersion: 2
+    x: 0.02
+    y: 0.02
+    width: 0.55
+    height: 0.22
 --- !u!1 &516079055
 GameObject:
   m_ObjectHideFlags: 0
