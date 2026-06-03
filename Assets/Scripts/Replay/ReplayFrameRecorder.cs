@@ -3,7 +3,7 @@ using System.IO;
 using UnityEngine;
 
 /// <summary>
-/// Records replay rig camera views to PNG sequences under RunData session/frames_replay/.
+/// Records VR LED-strip PNG sequences during replay under session/frames_replay/.
 /// </summary>
 public class ReplayFrameRecorder : MonoBehaviour
 {
@@ -17,12 +17,16 @@ public class ReplayFrameRecorder : MonoBehaviour
     private int _frameCounter;
     private string _sessionPath;
 
-    public void Initialize(ReplayController replay, string sessionPath, IReadOnlyDictionary<string, Camera> cameras)
+    public void Initialize(ReplayController replay, string sessionPath, IReadOnlyDictionary<string, Camera> legacyCameras)
     {
         _replay = replay;
         _sessionPath = sessionPath;
+        _captureByRig.Clear();
 
-        foreach (var kvp in cameras)
+        if (legacyCameras == null)
+            return;
+
+        foreach (var kvp in legacyCameras)
         {
             var go = new GameObject($"ReplayCapture_{kvp.Key}");
             go.transform.SetParent(transform);
@@ -34,6 +38,15 @@ public class ReplayFrameRecorder : MonoBehaviour
             _captureByRig[kvp.Key] = cap;
         }
     }
+
+    public void RegisterCapture(string rigId, VrPanelFrameCapture capture)
+    {
+        if (string.IsNullOrEmpty(rigId) || capture == null)
+            return;
+        _captureByRig[rigId] = capture;
+    }
+
+    public void ClearCaptures() => _captureByRig.Clear();
 
     public void BeginAll()
     {
@@ -47,7 +60,7 @@ public class ReplayFrameRecorder : MonoBehaviour
             kvp.Value.BeginRecording(dir);
         }
         _frameCounter = 0;
-        Debug.Log($"[ReplayFrameRecorder] Recording to {root}");
+        Debug.Log($"[ReplayFrameRecorder] Recording {_captureByRig.Count} rig(s) → {root}");
     }
 
     public void EndAll()
@@ -64,7 +77,7 @@ public class ReplayFrameRecorder : MonoBehaviour
         bool anyRecording = false;
         foreach (var cap in _captureByRig.Values)
         {
-            if (cap.IsRecording)
+            if (cap != null && cap.IsRecording)
             {
                 anyRecording = true;
                 break;
@@ -78,6 +91,9 @@ public class ReplayFrameRecorder : MonoBehaviour
             return;
 
         foreach (var cap in _captureByRig.Values)
-            cap.CaptureFrame();
+        {
+            if (cap != null)
+                cap.CaptureFrame();
+        }
     }
 }

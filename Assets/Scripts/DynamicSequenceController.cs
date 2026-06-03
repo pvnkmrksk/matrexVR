@@ -166,7 +166,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     // ───────────────────────────────── internal ───────────────────────────────
     private void LoadDesign(string file)
     {
-        string path = Path.Combine(Application.streamingAssetsPath, file);
+        string path = ReplayConfigPaths.ResolveJson(file);
         designFile = JsonConvert.DeserializeObject<DesignFile>(File.ReadAllText(path));
 
         // shuffle etc. (reuse SequenceConfigGenerator logic)

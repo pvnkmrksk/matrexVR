@@ -255,9 +255,14 @@ Logged columns preserve raw ZMQ position and radians in `SensRot*Rad`; Unity eul
 | `Space` or `\` | Pause / resume rotation |
 | `D` | Debug log drum state |
 
-### Replay (`ReplayController` in ReplayScene)
+### Replay (`ReplayScene`)
 
-Open **ReplayScene**, assign `sessionFolder` or leave empty for newest `RunData` session.
+1. Open **ReplayScene** and press Play.
+2. Use the **session picker** (dropdown of `Assets/RunData/*` folders, or paste a full path) → **Load session**.
+3. The loader reads archived `*_sequenceConfig.json`, `*_system_config.json`, copied scene JSONs, and all `*.csv` logs from that folder.
+4. **Full-scene replay** (default) loads the same Unity scenes from Build Settings, applies archived configs, and drives **logged poses only** (closed loop and ZMQ off). Use the **same build** that recorded the session for pixel-accurate visuals.
+
+Optional: set `sessionFolder` on `ReplayController` to auto-load on start.
 
 | Key | Action |
 |-----|--------|

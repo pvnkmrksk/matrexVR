@@ -231,7 +231,7 @@ Offline path (see [§7](#7-replay-subsystem)).
 
 ## 7. Replay subsystem
 
-**Purpose:** Visualize recorded `RunData/<session>/*.csv` without live ZMQ.
+**Purpose:** Relive a recorded session from a RunData folder — configs + CSV — without live ZMQ or closed loop.
 
 ```
 RunData/<session>/
@@ -243,10 +243,15 @@ RunData/<session>/
 
 | Component | Role |
 |-----------|------|
-| `ReplaySessionData` | Load CSVs, binary-search interpolation, step markers |
-| `ReplayController` | Transport controls, environment swaps, scrub UI |
-| `ReplayEnvironmentLoader` | Spawn design JSON per step name |
-| `VrPanelFrameCapture` | AsyncGPUReadback LED-strip / camera PNG capture |
+| `ReplaySessionUI` | Folder picker / dropdown → `LoadSessionFromPath` |
+| `ReplaySessionArchive` | Index session JSON + CSV; resolve archived config filenames |
+| `ReplaySessionData` | CSV interpolation (poses as logged) |
+| `ReplaySceneOrchestrator` | Load real scenes; `InitializeScene` with archived configs |
+| `ReplayPoseApplier` | Apply CSV pose; disables `ClosedLoop` / `ZmqListener` |
+| `ReplayExperimentHost` | System config stand-in for `MainController` during replay |
+| `ReplayConfigPaths` | JSON/skybox paths from session folder when replay active |
+| `ReplayController` | Transport controls + frame export |
+| `VrPanelFrameCapture` | AsyncGPUReadback LED-strip PNG capture |
 | `ExperimentFrameRecorder` | Live capture on VR prefab (with `ViewportSetter`) |
 
 **Replay controls (ReplayScene):**

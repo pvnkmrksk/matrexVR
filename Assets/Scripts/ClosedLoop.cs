@@ -67,6 +67,12 @@ public class ClosedLoop : MonoBehaviour
 
     private void Start()
     {
+        if (ReplaySessionContext.IsActive)
+        {
+            enabled = false;
+            return;
+        }
+
         ApplySphereDiameterFromSystemConfig();
         sphereRadius = sphereDiameter / 2f;
         _zmqListener = GetComponent<ZmqListener>();
@@ -388,11 +394,15 @@ public class ClosedLoop : MonoBehaviour
 
     private void ApplySphereDiameterFromSystemConfig()
     {
-        MainController main = FindObjectOfType<MainController>();
-        if (main == null)
-            return;
+        SystemConfig config = null;
+        if (ReplaySessionContext.IsActive && ReplayExperimentHost.Instance != null)
+            config = ReplayExperimentHost.Instance.GetSystemConfigForGameObject(gameObject);
 
-        SystemConfig config = main.GetSystemConfigForGameObject(gameObject);
+        MainController main = FindObjectOfType<MainController>();
+        if (config == null && main != null)
+            config = main.GetSystemConfigForGameObject(gameObject);
+        if (config == null)
+            return;
         SetSphereDiameter(config.sphereDiameter);
         Debug.Log($"[ClosedLoop] {gameObject.name} sphere diameter set to {config.sphereDiameter} cm from system_config");
     }

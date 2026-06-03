@@ -88,7 +88,7 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
 
     private void LoadOptomotorConfig(string configFileName)
     {
-        string configPath = Path.Combine(Application.streamingAssetsPath, configFileName);
+        string configPath = ReplayConfigPaths.ResolveJson(configFileName);
         if (File.Exists(configPath))
         {
             try

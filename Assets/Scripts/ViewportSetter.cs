@@ -44,11 +44,16 @@ public class ViewportSetter : MonoBehaviour
     private void ApplySystemConfig()
     {
         // Find the MainController
+        SystemConfig config = null;
+        if (ReplaySessionContext.IsActive && ReplayExperimentHost.Instance != null)
+            config = ReplayExperimentHost.Instance.GetSystemConfigForGameObject(gameObject);
+
         MainController mainController = FindObjectOfType<MainController>();
-        if (mainController != null)
+        if (config == null && mainController != null)
+            config = mainController.GetSystemConfigForGameObject(gameObject);
+
+        if (config != null)
         {
-            // Get config values based on GameObject name
-            SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
 
             // Apply config values directly
             ledPanelWidth = config.ledPanelWidth;
@@ -62,6 +67,10 @@ public class ViewportSetter : MonoBehaviour
             targetDisplay = config.targetDisplay;
 
             Debug.Log($"Applied system config to {gameObject.name}: Panel={ledPanelWidth}x{ledPanelHeight}, Position={startCol},{startRow}, Horizontal={horizontal}, DisplayOrder={displayOrder}, TargetDisplay={targetDisplay}");
+        }
+        else
+        {
+            Debug.LogWarning($"ViewportSetter: no system config for {gameObject.name}");
         }
     }
 

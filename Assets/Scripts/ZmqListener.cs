@@ -38,6 +38,12 @@ public class ZmqListener : MonoBehaviour
 
     void Start()
     {
+        if (ReplaySessionContext.IsActive)
+        {
+            enabled = false;
+            return;
+        }
+
         // Apply system config at start
         ApplySystemConfig();
 
@@ -86,11 +92,16 @@ public class ZmqListener : MonoBehaviour
     private void ApplySystemConfig()
     {
         // Find the MainController
+        SystemConfig config = null;
+        if (ReplaySessionContext.IsActive && ReplayExperimentHost.Instance != null)
+            config = ReplayExperimentHost.Instance.GetSystemConfigForGameObject(gameObject);
+
         MainController mainController = FindObjectOfType<MainController>();
-        if (mainController != null)
+        if (config == null && mainController != null)
+            config = mainController.GetSystemConfigForGameObject(gameObject);
+
+        if (config != null)
         {
-            // Get config values based on GameObject name
-            SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
 
             // Apply config values directly
             address = config.zmqAddress;
@@ -102,7 +113,7 @@ public class ZmqListener : MonoBehaviour
 
     void OnDestroy()
     {
-        subscriber.Dispose();
+        subscriber?.Dispose();
     }
 
     private void UpdatePose(ZmqMessage zmqMessage)

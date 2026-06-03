@@ -42,7 +42,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
         string configFile = parameters["configFile"].ToString();
 
         // Load and parse JSON
-        string jsonPath = Path.Combine(Application.streamingAssetsPath, configFile);
+        string jsonPath = ReplayConfigPaths.ResolveJson(configFile);
 
         if (!File.Exists(jsonPath))
         {
@@ -411,7 +411,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
         }
 
         // Construct full path in StreamingAssets
-        string fullPath = Path.Combine(Application.streamingAssetsPath, skyboxPath);
+        string fullPath = ReplayConfigPaths.ResolveAsset(skyboxPath);
 
         if (File.Exists(fullPath))
         {
