@@ -235,23 +235,36 @@ Offline path (see [§7](#7-replay-subsystem)).
 
 ```
 RunData/<session>/
-  *.csv                    → ReplayController.LoadCsv (per rig = VR column)
-  *_sequenceConfig.json    → ResolveDesignFile → environment JSON name
-  *_<scene>_<config>.json  → copied scene configs (optional)
+  *.csv                    → ReplaySessionData (per rig = VR column)
+  *_sequenceConfig.json    → planned steps + design/config file names
+  frames/<VRn>/            → live experiment PNG strips (ExperimentFrameRecorder)
+  frames_replay/<VRn>/     → replay export PNGs (ReplayFrameRecorder)
 ```
 
 | Component | Role |
 |-----------|------|
-| `ReplayController` | Parse CSV, interpolate pose vs `replayTime`, scrub UI, optional rig cameras |
-| `ReplayEnvironmentLoader` | Load design JSON; spawn objects per `stepName` on layer `ChoiceVR{n}` |
+| `ReplaySessionData` | Load CSVs, binary-search interpolation, step markers |
+| `ReplayController` | Transport controls, environment swaps, scrub UI |
+| `ReplayEnvironmentLoader` | Spawn design JSON per step name |
+| `VrPanelFrameCapture` | AsyncGPUReadback LED-strip / camera PNG capture |
+| `ExperimentFrameRecorder` | Live capture on VR prefab (with `ViewportSetter`) |
 
-**Build status:** `ReplayScene` exists but is **disabled** in `EditorBuildSettings` by default — enable to ship replay builds.
+**Replay controls (ReplayScene):**
 
-**Known integration points (feature branch fixes):**
+| Input | Action |
+|-------|--------|
+| Space | Play / pause |
+| ← / → | ±1 s seek (Shift: ±10 s) |
+| , / . (hold) | Rewind / fast-forward |
+| [ / ] | Halve / double playback speed |
+| 1–5 | Speed presets 0.25× … 4× |
+| N / M | Previous / next sequence step |
+| J / K | Previous / next logged frame |
+| Home / End | Start / end |
+| R | Start frame export to `frames_replay/` |
+| Slider drag | Scrub time (`ReplayScrubSlider`) |
 
-- `rigOrder` must include all rigs even when using default sphere markers (for split viewports).
-- Design resolution checks both `parameters.design` and `parameters.configFile`.
-- Environment loader camera path: prefer `ReplayController.ApplyCameraSpecs` (loader’s private `ApplyCamera` unused).
+**Build status:** `ReplayScene` is **enabled** in `EditorBuildSettings`.
 
 **Layer naming:** rig `VR1` → layer `ChoiceVR1` for culling.
 

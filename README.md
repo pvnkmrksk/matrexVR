@@ -257,12 +257,22 @@ Logged columns preserve raw ZMQ position and radians in `SensRot*Rad`; Unity eul
 
 ### Replay (`ReplayController` in ReplayScene)
 
+Open **ReplayScene**, assign `sessionFolder` or leave empty for newest `RunData` session.
+
 | Key | Action |
 |-----|--------|
 | `Space` | Play / pause |
-| `←` / `→` | Step back / forward |
-| `Shift+←` / `Shift+→` | Faster seek |
+| `←` / `→` | Seek ±1 s (`Shift`: ±10 s) |
+| `,` / `.` (hold) | Rewind / fast-forward |
+| `[` / `]` | Halve / double speed |
+| `1`–`5` | Speed 0.25×, 0.5×, 1×, 2×, 4× |
 | `N` / `M` | Previous / next sequence step |
+| `J` / `K` | Previous / next logged frame |
+| `Home` / `End` | Jump to start / end |
+| `R` | Start PNG export to `frames_replay/<VR>/` |
+| Scrub slider | Drag to any time (`ReplayScrubSlider`) |
+
+**Live frame capture:** add `ExperimentFrameRecorder` to each VR prefab (same object as `ViewportSetter`). PNG strips land in `RunData/<timestamp>/frames/<VRn>/` using `AsyncGPUReadback` (non-blocking GPU read, queued PNG encode).
 
 More detail on yaw closed loop: [`YAW_MODE_README.md`](YAW_MODE_README.md).
 

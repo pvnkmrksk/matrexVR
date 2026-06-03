@@ -411,6 +411,7 @@ public class MainController : MonoBehaviour
             
             activeSceneController.InitializeScene(currentStepData.parameters);
             timer = currentStepData.duration;
+            NotifyDataLoggersOfStep(currentStepData);
         }
         else
         {
@@ -819,6 +820,7 @@ public class MainController : MonoBehaviour
         {
             sequencer.AdvanceStep(next.parameters);
             timer = next.duration;
+            NotifyDataLoggersOfStep(next);
         }
         else
         {
@@ -826,6 +828,29 @@ public class MainController : MonoBehaviour
         }
     }
 
+    private void NotifyDataLoggersOfStep(SequenceStep step)
+    {
+        if (step == null)
+            return;
+
+        string stepLabel = step.sceneName;
+        if (step.parameters != null && step.parameters.TryGetValue("configFile", out object cfg))
+            stepLabel = cfg?.ToString() ?? stepLabel;
+        else if (step.parameters != null && step.parameters.TryGetValue("design", out object design))
+            stepLabel = design?.ToString() ?? stepLabel;
+
+        int orderIndex = executionOrder.Count > currentStep ? executionOrder[currentStep] : currentStep;
+        int cumulative = currentTrial * Mathf.Max(1, sequenceSteps.Count) + orderIndex;
+
+#if UNITY_2023_1_OR_NEWER
+        foreach (DataLogger logger in FindObjectsByType<DataLogger>(FindObjectsSortMode.None))
+#else
+        foreach (DataLogger logger in FindObjectsOfType<DataLogger>())
+#endif
+        {
+            logger.SetStep(orderIndex, stepLabel, currentTrial, cumulative);
+        }
+    }
 
     void SaveReferencedChoiceConfigs(SequenceConfig config, string timestamp, string sceneName)
     {
