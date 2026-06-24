@@ -67,11 +67,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
             }
             else if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
             {
-                Vector3 position = CalculatePosition(
-                    obj.position.radius,
-                    obj.position.angle,
-                    obj.position.height
-                );
+                Vector3 position = ResolvePosition(obj.position);
                 GameObject instance = Instantiate(prefab, position, Quaternion.identity);
                 ConfigureRegularObjectInstance(instance, obj);
             }
@@ -198,7 +194,7 @@ public class ChoiceController : MonoBehaviour, ISceneController
     {
         if (prefabDict.TryGetValue(obj.type, out GameObject bandPrefab))
         {
-            Vector3 position = CalculatePosition(obj.position.radius, obj.position.angle);
+            Vector3 position = ResolvePosition(obj.position);
             GameObject bandInstance = Instantiate(bandPrefab, position, Quaternion.identity);
 
             // Set a proper name for the band instance
@@ -319,6 +315,21 @@ public class ChoiceController : MonoBehaviour, ISceneController
         float x = (float)(radius * System.Math.Sin(angleRadians));
         float z = (float)(radius * System.Math.Cos(angleRadians));
         return new Vector3(x, height, z); // Assuming y is always 0
+    }
+
+    private Vector3 ResolvePosition(Position position)
+    {
+        if (position == null)
+        {
+            return Vector3.zero;
+        }
+
+        if (position.HasExplicitCoordinates())
+        {
+            return new Vector3(position.x.Value, position.y.Value, position.z.Value);
+        }
+
+        return CalculatePosition(position.radius, position.angle, position.height);
     }
 
     private void SetSkybox(string skyboxPath)
@@ -453,6 +464,14 @@ public class Position
     public float radius;
     public float angle;
     public float height;
+    public float? x;
+    public float? y;
+    public float? z;
+
+    public bool HasExplicitCoordinates()
+    {
+        return x.HasValue && y.HasValue && z.HasValue;
+    }
 }
 
 [System.Serializable]

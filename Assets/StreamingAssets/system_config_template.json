@@ -1,0 +1,31 @@
+{
+  "targetDisplay": 0,
+  "configs": [
+    {
+      "sphereDiameter": 2.6,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 0,
+      "startCol": 0,
+      "horizontal": true,
+      "zmqAddress": "127.0.0.1",
+      "zmqPort": 9871,
+      "vrId": "VR1",
+      "displayOrder": "RBLF",
+      "targetDisplay": 0
+    },
+    {
+      "sphereDiameter": 2.6,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 0,
+      "startCol": 4,
+      "horizontal": true,
+      "zmqAddress": "127.0.0.1",
+      "zmqPort": 9872,
+      "vrId": "VR2",
+      "displayOrder": "RBLF",
+      "targetDisplay": 0
+    }
+  ]
+}

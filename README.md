@@ -130,6 +130,7 @@ Once the correct Unity version is installed, open the project and you're ready t
 - Scenes that implement `IInSceneSequencer` (e.g., `Choice_desync`) can run their own internal step list when `reloadScene` is `false`, using parameters such as `design` to pick a sequence design JSON.
 - Editor menu items under `Tools/…` generate the design JSONs into `Assets/StreamingAssets`. After generating, point `sequenceConfig.json` to the desired design filename for the scene you want to run.
 - See `docs/experiment-workflow.md` for a concise walkthrough of the scene/sequence pipeline and how to add new experiments.
+- See [docs/json-config-schema.md](/home/flyvr01/src/matrexVR/docs/json-config-schema.md) for the JSON schema used by sequence, system, choice, and optomotor configs, plus template files in `Assets/StreamingAssets`.
 
 ## Dependencies
 

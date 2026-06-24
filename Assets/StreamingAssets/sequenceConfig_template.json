@@ -1,0 +1,22 @@
+{
+  "randomise": false,
+  "loop": true,
+  "sequences": [
+    {
+      "sceneName": "Choice",
+      "duration": 10.0,
+      "parameters": {
+        "configFile": "Choice_template_full.json"
+      },
+      "reloadScene": true
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 30.0,
+      "parameters": {
+        "configFile": "optomotor_config_template.json"
+      },
+      "reloadScene": true
+    }
+  ]
+}
