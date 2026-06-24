@@ -2,10 +2,7 @@ using UnityEngine;
 
 public class ClosedLoop : MonoBehaviour
 {
-
-
     [SerializeField][Tooltip("The diameter of the sphere in cm")] private float sphereDiameter = 1f;
-
     private float sphereRadius;
     [SerializeField][Tooltip("The key to reset the position and rotation")] private KeyCode resetKey = KeyCode.R;
     [SerializeField][Tooltip("The delay in seconds before starting to use FicTrac data after reset.")] private float initializationDelay = 0.1f;
@@ -101,7 +98,6 @@ public class ClosedLoop : MonoBehaviour
 
         _lastFicTracData = currentFicTracData;
     }
-
     public void ResetPositionAndRotation()
     {
         transform.SetPositionAndRotation(_initialPosition, _initialRotation);

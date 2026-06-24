@@ -1,14 +1,13 @@
-{
-  "randomise": false,
+{ "randomise" : false,
   "loop": true,
   "sequences": [
-    {
-      "sceneName": "Choice_desync",
-      "duration": 3600,
+  
+      {
+      "sceneName": "Choice",
+      "duration": 200,
       "parameters": {
-        "design": "sequenceDesign_3targets.json"
-      },
-      "reloadScene": false
+        "configFile": "BinaryChoice_flip_noflip0.json"
+      }
     }
   ]
 }

@@ -107,6 +107,8 @@ MonoBehaviour:
   rotateSpeed: 50
   maxTranslateSpeed: 100
   maxRotateSpeed: 300
+  allowVerticalTranslation: 0
+  allowPitchAndRoll: 0
 --- !u!114 &633135531330507614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,11 +135,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useGravity: 1
-  verticalOffset: 1
-  antSize: 1
-  raycastOriginHeight: 5
-  sampleCount: 9
-  alignSpeed: 10
+  conformanceMode: 0
+  verticalOffset: 0.01
+  antSize: 0.015
+  raycastOriginHeight: 1
+  raycastDistance: 5
+  sampleCount: 5
+  alignSpeed: 12
 --- !u!1001 &124890606341847571
 PrefabInstance:
   m_ObjectHideFlags: 0

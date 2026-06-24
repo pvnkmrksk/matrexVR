@@ -49,5 +49,4 @@ public class AntCharacter : MonoBehaviour {
         antAnimator.SetFloat("Forward", forwardSpeed);
         antAnimator.SetFloat("Turn", turnSpeed);
     }
-
 }

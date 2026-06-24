@@ -7,16 +7,22 @@
         "angle": 0
       },
       "scale": {
-        "x": 100,
-        "y": 100,
-        "z": 100
+        "x": 1,
+        "y": 1,
+        "z": 1
       },
       "flip": false,
 
       "speed": 2,
       "mu": 0
     }
-      ],
+  ],
+  "initialPosition": {
+    "x": 0,
+    "y": 0.5,
+    "z": 0
+  },
+  "randomInitialRotation": true,
   "closedLoopOrientation": true,
   "closedLoopPosition": true
 }

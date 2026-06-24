@@ -1,0 +1,9 @@
+{
+  "randomise": false,
+  "loop": true,
+  "sequences": [
+    {
+      "sceneName": "Choice_Forrest",
+      "duration": 3600    }
+  ]
+}

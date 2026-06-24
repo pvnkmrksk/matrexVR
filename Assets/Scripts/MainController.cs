@@ -532,11 +532,20 @@ void ManageTimerAndTransitions()
 
     void SaveReferencedChoiceConfigs(SequenceConfig config, string timestamp, string sceneName)
     {
+        HashSet<string> copiedConfigFiles = new HashSet<string>();
+
         foreach (SequenceItem item in config.sequences)
         {
             if (item.parameters != null && item.parameters.ContainsKey("configFile"))
             {
                 string configFileName = item.parameters["configFile"].ToString();
+
+                if (!copiedConfigFiles.Add(configFileName))
+                {
+                    Debugger.Log($"Skipping duplicate choice config copy: {configFileName}", 4);
+                    continue;
+                }
+
                 string sourcePath = Path.Combine(Application.streamingAssetsPath, configFileName);
 
                 if (File.Exists(sourcePath))
@@ -545,7 +554,7 @@ void ManageTimerAndTransitions()
                         masterDataLogger.directoryPath,
                         $"{timestamp}_{sceneName}_{configFileName}"
                     );
-                    File.Copy(sourcePath, destinationPath);
+                    File.Copy(sourcePath, destinationPath, true);
                     Debugger.Log($"Copied choice config: {configFileName}", 3);
                 }
                 else
