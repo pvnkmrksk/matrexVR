@@ -314,9 +314,10 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
     private Vector3 CalculatePosition(float radius, float angle, float height = 0)
     {
-        //todo.add initial position for the object postions
-        float x = radius * Mathf.Sin(angle * Mathf.Deg2Rad);
-        float z = radius * Mathf.Cos(angle * Mathf.Deg2Rad);
+        // Use double-precision trig so mirrored angles stay symmetric when cast back to float.
+        double angleRadians = angle * Mathf.Deg2Rad;
+        float x = (float)(radius * System.Math.Sin(angleRadians));
+        float z = (float)(radius * System.Math.Cos(angleRadians));
         return new Vector3(x, height, z); // Assuming y is always 0
     }
 
@@ -470,4 +471,3 @@ public class ColorConfig
     public float b;
     public float a;
 }
-
