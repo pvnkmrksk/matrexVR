@@ -21,6 +21,7 @@ public class ClosedLoop : MonoBehaviour
 
     // Stores the initial world rotation, including any random rotation applied at start
     private Quaternion _initialWorldRotation;
+    private float _nextStalePoseWarningTime;
 
     private void Start()
     {
@@ -38,7 +39,20 @@ public class ClosedLoop : MonoBehaviour
     {
         HandleInput();
 
-        if (_zmqListener.pose == null) return;
+        if (_zmqListener == null || !_zmqListener.HasPose)
+            return;
+
+        if (!_zmqListener.HasFreshPose())
+        {
+            if (Time.unscaledTime >= _nextStalePoseWarningTime)
+            {
+                Debug.LogWarning(
+                    $"[{gameObject.name}] FicTrac/ZMQ pose is stale ({_zmqListener.SecondsSinceLastPose:F2}s since last update)."
+                );
+                _nextStalePoseWarningTime = Time.unscaledTime + 5f;
+            }
+            return;
+        }
 
         if (Input.GetKeyDown(resetKey))
         {
@@ -105,6 +119,7 @@ public class ClosedLoop : MonoBehaviour
         _ficTracRotationOffset = Quaternion.identity;
         _initializationTimer = 0f;
         _lastFicTracData = Vector3.zero;
+        _nextStalePoseWarningTime = 0f;
         Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
     }
 

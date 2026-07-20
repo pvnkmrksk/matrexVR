@@ -4,8 +4,9 @@ using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
 using System;
+using InSceneSequence;
 
-public class OptomotorSceneController : MonoBehaviour, ISceneController
+public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
 {
     [SerializeField] private GameObject drumPrefab;
 
@@ -17,6 +18,7 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
     private int currentStimulusIndex = 0;
     private bool isRunning = false;
     private Dictionary<string, object> loggingData = new Dictionary<string, object>();
+    private Coroutine stimulusRoutine;
 
     void Awake()
     {
@@ -52,6 +54,18 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
     {
         Debug.Log($"OptomotorSceneController.InitializeScene() called with {parameters?.Count ?? 0} parameters");
 
+        ApplySceneParameters(parameters);
+    }
+
+    public void AdvanceStep(Dictionary<string, object> parameters)
+    {
+        ApplySceneParameters(parameters);
+    }
+
+    private void ApplySceneParameters(Dictionary<string, object> parameters)
+    {
+        FindClosedLoopComponents();
+
         if (parameters == null)
         {
             Debug.LogError("Parameters are null in InitializeScene");
@@ -62,8 +76,12 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
         {
             string configFileName = parameters["configFile"].ToString();
             Debug.Log($"Loading optomotor config file: {configFileName}");
+            StopStimulusSequence();
             LoadOptomotorConfig(configFileName);
-            StartCoroutine(RunStimulusSequence());
+            if (optomotorConfig != null)
+            {
+                stimulusRoutine = StartCoroutine(RunStimulusSequence());
+            }
         }
         else
         {
@@ -140,6 +158,8 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
                 Debug.Log("Finished all stimuli, not looping");
             }
         }
+
+        stimulusRoutine = null;
     }
 
     private void ApplyStimulusConfig(int stimulusIndex)
@@ -230,7 +250,18 @@ public class OptomotorSceneController : MonoBehaviour, ISceneController
 
     void OnDestroy()
     {
+        StopStimulusSequence();
+    }
+
+    private void StopStimulusSequence()
+    {
         isRunning = false;
+
+        if (stimulusRoutine != null)
+        {
+            StopCoroutine(stimulusRoutine);
+            stimulusRoutine = null;
+        }
     }
 }
 

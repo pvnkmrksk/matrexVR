@@ -4,8 +4,9 @@ using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
 using System.Linq;
+using InSceneSequence;
 
-public class ChoiceController : MonoBehaviour, ISceneController
+public class ChoiceController : MonoBehaviour, IInSceneSequencer
 {
     public GameObject[] prefabs;
     private Dictionary<string, GameObject> prefabDict = new Dictionary<string, GameObject>();
@@ -13,6 +14,10 @@ public class ChoiceController : MonoBehaviour, ISceneController
     public Material[] materials;
     private Dictionary<string, Material> materialDict = new Dictionary<string, Material>();
     string[] tags = new string[] { "ChoiceVR1", "ChoiceVR2", "ChoiceVR3", "ChoiceVR4" };
+    private Transform spawnedObjectsRoot;
+    private Material defaultSkyboxMaterial;
+    private Material runtimeSkyboxMaterial;
+    private Texture2D runtimeSkyboxTexture;
 
     private void Awake()
     {
@@ -27,27 +32,65 @@ public class ChoiceController : MonoBehaviour, ISceneController
         {
             materialDict[material.name] = material;
         }
+
+        defaultSkyboxMaterial = RenderSettings.skybox;
+        spawnedObjectsRoot = new GameObject("ChoiceSpawnedObjects").transform;
+        spawnedObjectsRoot.position = Vector3.zero;
+        spawnedObjectsRoot.rotation = Quaternion.identity;
+        spawnedObjectsRoot.localScale = Vector3.one;
     }
 
     public void InitializeScene(Dictionary<string, object> parameters)
     {
+        ApplySceneParameters(parameters);
+    }
+
+    public void AdvanceStep(Dictionary<string, object> parameters)
+    {
+        ApplySceneParameters(parameters);
+    }
+
+    private void ApplySceneParameters(Dictionary<string, object> parameters)
+    {
         Debugger.Log("InitializeScene called.");
 
-        // Path to scene configuration JSON
-        string configFile = parameters["configFile"].ToString();
+        if (parameters == null || !parameters.ContainsKey("configFile"))
+        {
+            Debug.LogError("ChoiceController requires a configFile parameter.");
+            return;
+        }
 
-        // Load and parse JSON
+        SceneConfig config = LoadSceneConfig(parameters["configFile"].ToString());
+        if (config == null)
+        {
+            return;
+        }
+
+        CleanupSpawnedObjects();
+        ApplyConfig(config);
+    }
+
+    private SceneConfig LoadSceneConfig(string configFile)
+    {
         string jsonPath = Path.Combine(Application.streamingAssetsPath, configFile);
 
         if (!File.Exists(jsonPath))
         {
             Debug.LogError($"Config file not found at: {jsonPath}");
-            return;
+            return null;
         }
 
         string jsonString = File.ReadAllText(jsonPath);
-        SceneConfig config = JsonConvert.DeserializeObject<SceneConfig>(jsonString);
-        //instantiate objects
+        return JsonConvert.DeserializeObject<SceneConfig>(jsonString);
+    }
+
+    private void ApplyConfig(SceneConfig config)
+    {
+        if (config == null || config.objects == null)
+        {
+            Debug.LogWarning("Choice scene config is empty.");
+            return;
+        }
 
         foreach (var obj in config.objects)
         {
@@ -67,8 +110,8 @@ public class ChoiceController : MonoBehaviour, ISceneController
             }
             else if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
             {
-                Vector3 position = ResolvePosition(obj.position);
-                GameObject instance = Instantiate(prefab, position, Quaternion.identity);
+                GameObject instance = Instantiate(prefab, spawnedObjectsRoot);
+                ApplyResolvedTransform(instance.transform, obj);
                 ConfigureRegularObjectInstance(instance, obj);
             }
         }
@@ -133,6 +176,25 @@ public class ChoiceController : MonoBehaviour, ISceneController
         {
             SetSkybox(config.skyboxPath);
         }
+        else
+        {
+            ClearRuntimeSkybox();
+        }
+    }
+
+    private void CleanupSpawnedObjects()
+    {
+        if (spawnedObjectsRoot == null)
+        {
+            return;
+        }
+
+        for (int i = spawnedObjectsRoot.childCount - 1; i >= 0; i--)
+        {
+            Destroy(spawnedObjectsRoot.GetChild(i).gameObject);
+        }
+
+        ClearRuntimeSkybox();
     }
 
     private void SetLayerRecursively(GameObject obj, int layer)
@@ -148,23 +210,9 @@ public class ChoiceController : MonoBehaviour, ISceneController
     {
         Debug.Log("Instance position: " + instance.transform.position);
 
-        if (obj.flip)
-        {
-            instance.transform.localScale = new Vector3(obj.scale.x * -1, obj.scale.y, obj.scale.z);
-        }
-        else
-        {
-            instance.transform.localScale = new Vector3(obj.scale.x, obj.scale.y, obj.scale.z);
-        }
-
         if (obj.speed != 0)
         {
             instance.GetComponent<LocustMover>().speed = obj.speed;
-        }
-
-        if (obj.mu != 0)
-        {
-            instance.transform.localRotation = Quaternion.Euler(0, obj.mu, 0);
         }
 
         if (
@@ -194,8 +242,8 @@ public class ChoiceController : MonoBehaviour, ISceneController
     {
         if (prefabDict.TryGetValue(obj.type, out GameObject bandPrefab))
         {
-            Vector3 position = ResolvePosition(obj.position);
-            GameObject bandInstance = Instantiate(bandPrefab, position, Quaternion.identity);
+            GameObject bandInstance = Instantiate(bandPrefab, spawnedObjectsRoot);
+            ApplyResolvedTransform(bandInstance.transform, obj);
 
             // Set a proper name for the band instance
             bandInstance.name = $"{bandPrefab.name}_{vrIndex}";
@@ -266,22 +314,6 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 logger.enabled = true; // Ensure logger is enabled
             }
 
-            // Set scale
-            bandInstance.transform.localScale = new Vector3(obj.scale.x, obj.scale.y, obj.scale.z);
-
-            // Apply flip if needed
-            if (obj.flip)
-            {
-                bandInstance.transform.localScale = new Vector3(
-                    bandInstance.transform.localScale.x * -1,
-                    bandInstance.transform.localScale.y,
-                    bandInstance.transform.localScale.z
-                );
-            }
-
-            // Apply rotation
-            bandInstance.transform.localRotation = Quaternion.Euler(0, obj.mu, 0);
-
             // TODO: Add individual datalogger to the band instance if needed
         }
         else
@@ -332,6 +364,45 @@ public class ChoiceController : MonoBehaviour, ISceneController
         return CalculatePosition(position.radius, position.angle, position.height);
     }
 
+    private Vector3 ResolveScale(SceneObject obj)
+    {
+        if (obj?.scale == null)
+        {
+            return Vector3.one;
+        }
+
+        float x = obj.flip ? -obj.scale.x : obj.scale.x;
+        return new Vector3(x, obj.scale.y, obj.scale.z);
+    }
+
+    private Quaternion ResolveRotation(SceneObject obj)
+    {
+        if (obj?.rotation != null && obj.rotation.HasExplicitRotation())
+        {
+            return Quaternion.Euler(obj.rotation.x.Value, obj.rotation.y.Value, obj.rotation.z.Value);
+        }
+
+        if (obj != null && obj.mu != 0)
+        {
+            return Quaternion.Euler(0, obj.mu, 0);
+        }
+
+        return Quaternion.identity;
+    }
+
+    private void ApplyResolvedTransform(Transform target, SceneObject obj)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        // Apply the final transform values directly so the spawned object's own Transform matches JSON.
+        target.position = ResolvePosition(obj.position);
+        target.rotation = ResolveRotation(obj);
+        target.localScale = ResolveScale(obj);
+    }
+
     private void SetSkybox(string skyboxPath)
     {
         if (string.IsNullOrEmpty(skyboxPath))
@@ -361,6 +432,8 @@ public class ChoiceController : MonoBehaviour, ISceneController
                 // Load the image data into the texture
                 if (skyboxTexture.LoadImage(imageBytes))
                 {
+                    ClearRuntimeSkybox();
+
                     // Create a new material using the skybox shader
                     Shader skyboxShader = Shader.Find("Skybox/Panoramic");
                     if (skyboxShader == null)
@@ -371,6 +444,8 @@ public class ChoiceController : MonoBehaviour, ISceneController
 
                     Material skyboxMaterial = new Material(skyboxShader);
                     skyboxMaterial.mainTexture = skyboxTexture;
+                    runtimeSkyboxMaterial = skyboxMaterial;
+                    runtimeSkyboxTexture = skyboxTexture;
 
                     // Apply the skybox material to the scene
                     RenderSettings.skybox = skyboxMaterial;
@@ -393,6 +468,26 @@ public class ChoiceController : MonoBehaviour, ISceneController
         else
         {
             Debug.LogWarning($"Skybox file not found at: {fullPath}");
+        }
+    }
+
+    private void ClearRuntimeSkybox()
+    {
+        if (RenderSettings.skybox == runtimeSkyboxMaterial)
+        {
+            RenderSettings.skybox = defaultSkyboxMaterial;
+        }
+
+        if (runtimeSkyboxMaterial != null)
+        {
+            Destroy(runtimeSkyboxMaterial);
+            runtimeSkyboxMaterial = null;
+        }
+
+        if (runtimeSkyboxTexture != null)
+        {
+            Destroy(runtimeSkyboxTexture);
+            runtimeSkyboxTexture = null;
         }
     }
 
@@ -424,6 +519,7 @@ public class SceneObject
     public Position position;
     public string material;
     public ScaleConfig scale;
+    public RotationConfig rotation;
     public bool flip;
 
     public float speed;
@@ -480,6 +576,19 @@ public class ScaleConfig
     public float x;
     public float y;
     public float z;
+}
+
+[System.Serializable]
+public class RotationConfig
+{
+    public float? x;
+    public float? y;
+    public float? z;
+
+    public bool HasExplicitRotation()
+    {
+        return x.HasValue && y.HasValue && z.HasValue;
+    }
 }
 
 [System.Serializable]

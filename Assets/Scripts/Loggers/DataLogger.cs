@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-using System.Threading.Tasks;
 
 /// <summary>
 /// Base class for all data loggers in the system.
@@ -39,6 +38,7 @@ public class DataLogger : MonoBehaviour
     /// StreamWriter used to write to the log file
     /// </summary>
     protected StreamWriter logFile;
+    protected bool logInitialized;
 
     /// <summary>
     /// Buffer for lines to be written to the log file
@@ -204,8 +204,20 @@ public class DataLogger : MonoBehaviour
     /// </summary>
     public virtual void InitLog()
     {
+        if (logInitialized && logFile != null)
+        {
+            return;
+        }
+
         // Get the timestamp from the MasterDataLogger
-        string timestamp = FindObjectOfType<MasterDataLogger>().timestamp;
+        MasterDataLogger masterDataLogger = FindObjectOfType<MasterDataLogger>();
+        if (masterDataLogger == null)
+        {
+            Debug.LogError("MasterDataLogger not found during InitLog.");
+            return;
+        }
+
+        string timestamp = masterDataLogger.timestamp;
         string gameObjectName = this.gameObject.name;
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
@@ -238,6 +250,8 @@ public class DataLogger : MonoBehaviour
             logFile.Flush();
         }
 
+        logInitialized = true;
+
         Debug.Log($"Logging to: {logPath}");
     }
 
@@ -254,6 +268,11 @@ public class DataLogger : MonoBehaviour
     /// </summary>
     protected virtual void Update()
     {
+        if (!isLogging || logFile == null)
+        {
+            return;
+        }
+
         PrepareLogData();
         LogData(line);
     }
@@ -390,23 +409,11 @@ public class DataLogger : MonoBehaviour
     {
         isLogging = false;
         isBuffering = false;
+        FlushBufferedLinesImmediate();
+        logFile?.Flush();
         logFile?.Dispose();
-    }
-
-    /// <summary>
-    /// Asynchronously flushes buffered lines to the log file.
-    /// </summary>
-    async Task FlushBufferedLines()
-    {
-        var linesToWrite = new List<string>(bufferedLines);
-        bufferedLines.Clear();
-
-        foreach (var line in linesToWrite)
-        {
-            await logFile.WriteLineAsync(line);
-        }
-
-        await logFile.FlushAsync();
+        logFile = null;
+        logInitialized = false;
     }
 
     /// <summary>
@@ -416,14 +423,12 @@ public class DataLogger : MonoBehaviour
     {
         while (isLogging)
         {
-            if (bufferedLines.Count > 0)
+            if (bufferedLines != null && bufferedLines.Count > 0)
             {
-                yield return FlushBufferedLines();
+                FlushBufferedLinesImmediate();
             }
-            else
-            {
-                yield return null;
-            }
+
+            yield return new WaitForSecondsRealtime(0.5f);
         }
     }
 
@@ -435,5 +440,20 @@ public class DataLogger : MonoBehaviour
     {
         byte[] lineBytes = Encoding.UTF8.GetBytes(line);
         logFile.BaseStream.Write(lineBytes, 0, lineBytes.Length);
+    }
+
+    void FlushBufferedLinesImmediate()
+    {
+        if (bufferedLines == null || bufferedLines.Count == 0 || logFile == null)
+        {
+            return;
+        }
+
+        foreach (var bufferedLine in bufferedLines)
+        {
+            logFile.Write(bufferedLine);
+        }
+
+        bufferedLines.Clear();
     }
 }

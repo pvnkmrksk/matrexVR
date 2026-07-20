@@ -13,6 +13,8 @@ public interface ISceneController
 
 public class MainController : MonoBehaviour
 {
+    public static MainController Instance { get; private set; }
+
     public List<SequenceStep> sequenceSteps = new List<SequenceStep>();
     public List<int> executionOrder = new List<int>();
     public int currentStep = 0;
@@ -56,6 +58,15 @@ public class MainController : MonoBehaviour
 
     void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("Duplicate MainController detected, destroying the newer instance.");
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+
         // Set the log level first
         Debugger.CurrentLogLevel = logLevel;
         Debugger.Log("MainController.Awake()", 3);
@@ -84,6 +95,9 @@ public class MainController : MonoBehaviour
         {
             HandleDisplaySetup();
         }
+
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     // Handle display setup - simplified to use a single display for all VR setups
@@ -258,6 +272,13 @@ public class MainController : MonoBehaviour
     public void StartSequence()
     {
         Debugger.Log("MainController.StartSequence()", 3);
+
+        if (sequenceSteps.Count == 0)
+        {
+            Debug.LogError("Cannot start sequence because no sequence steps were loaded.");
+            return;
+        }
+
         sequenceStarted = true;
 
         // Initialize execution order
@@ -278,7 +299,6 @@ public class MainController : MonoBehaviour
         currentStep = 0;
         timer = sequenceSteps[executionOrder[currentStep]].duration; // Initialize timer for the first scene
         LoadScene(sequenceSteps[executionOrder[currentStep]]);
-        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     void InitializeExecutionOrder()
@@ -312,6 +332,12 @@ public class MainController : MonoBehaviour
     {
         Debugger.Log("MainController.OnSceneLoaded()", 3);
 
+        if (!sequenceStarted || executionOrder.Count == 0 || currentStep >= executionOrder.Count)
+        {
+            Debugger.Log("Ignoring sceneLoaded callback because sequence execution is not active yet.", 4);
+            return;
+        }
+
         // Clear screen to black immediately after loading
         ClearScreenToBlack();
 
@@ -344,6 +370,10 @@ public class MainController : MonoBehaviour
     void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     void Update()
@@ -378,6 +408,9 @@ public class MainController : MonoBehaviour
 
     void LoadSequenceConfiguration()
     {
+        sequenceSteps.Clear();
+        executionOrder.Clear();
+
         // Get the path to the sequence configuration JSON file
         string jsonPath = Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json");
 
@@ -429,10 +462,10 @@ public class MainController : MonoBehaviour
                     }
 
                     // Get the timestamp from the MasterDataLogger component
-                    string timestamp = masterDataLogger.timestamp;
-                    Debugger.Log("Timestamp: " + timestamp, 4);
                     if (masterDataLogger != null)
                     {
+                        string timestamp = masterDataLogger.timestamp;
+                        Debugger.Log("Timestamp: " + timestamp, 4);
                         Debug.Log("MasterDataLogger is not null");
                         Debug.Log("Timestamp: " + timestamp);
 

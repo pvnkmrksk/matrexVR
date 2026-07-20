@@ -15,6 +15,8 @@ public class MasterDataLogger : MonoBehaviour
 
     // List of all DataLogger instances in the scene
     private List<DataLogger> dataLoggers;
+    private StreamWriter runtimeTraceWriter;
+    private readonly object runtimeTraceLock = new object();
 
     // Create timestamp variable that can be publicly accessed but not changed with get methods only
     public string timestamp { get; private set; }
@@ -33,35 +35,20 @@ public class MasterDataLogger : MonoBehaviour
         else if (Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+
+        timestamp = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        directoryPath = Application.dataPath + "/RunData/" + timestamp;
+        Directory.CreateDirectory(directoryPath);
+
+        Application.logMessageReceivedThreaded -= HandleLogMessage;
+        Application.logMessageReceivedThreaded += HandleLogMessage;
     }
     // d at the start of the scene
     void Start()
     {
-        // Get the current timestamp
-        timestamp = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
-
-        // Set the directory path
-        directoryPath = Application.dataPath + "/RunData/" + timestamp;
-
-        // Create the directory
-        Directory.CreateDirectory(directoryPath);
-
-        // Find all DataLogger instances in the scene
         dataLoggers = new List<DataLogger>();
-        foreach (var logger in FindObjectsOfType<DataLogger>())
-        {
-            if (logger.gameObject.scene == gameObject.scene)
-            {
-                dataLoggers.Add(logger);
-            }
-        }
-
-        // Initialize all DataLogger instances
-        foreach (var logger in dataLoggers)
-        {
-            logger.InitLog();
-        }
     }
 
 
@@ -76,6 +63,49 @@ public class MasterDataLogger : MonoBehaviour
 
     void OnDestroy()
     {
-        ZipDataFolder();
+        Application.logMessageReceivedThreaded -= HandleLogMessage;
+
+        lock (runtimeTraceLock)
+        {
+            runtimeTraceWriter?.Flush();
+            runtimeTraceWriter?.Dispose();
+            runtimeTraceWriter = null;
+        }
+
+        if (Instance == this)
+        {
+            ZipDataFolder();
+            Instance = null;
+        }
+    }
+
+    private void HandleLogMessage(string condition, string stackTrace, LogType type)
+    {
+        if (string.IsNullOrEmpty(directoryPath))
+        {
+            return;
+        }
+
+        lock (runtimeTraceLock)
+        {
+            if (runtimeTraceWriter == null)
+            {
+                string tracePath = Path.Combine(directoryPath, "runtime_trace.log");
+                runtimeTraceWriter = new StreamWriter(
+                    new FileStream(tracePath, FileMode.Append, FileAccess.Write, FileShare.Read)
+                );
+            }
+
+            runtimeTraceWriter.WriteLine(
+                $"[{System.DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [{type}] {condition}"
+            );
+
+            if (!string.IsNullOrEmpty(stackTrace))
+            {
+                runtimeTraceWriter.WriteLine(stackTrace);
+            }
+
+            runtimeTraceWriter.Flush();
+        }
     }
 }
