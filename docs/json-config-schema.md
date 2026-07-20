@@ -78,6 +78,7 @@ Per-object fields:
 - `position`: object position settings
 - `material`: optional material name
 - `scale`: `{ x, y, z }`
+- `rotation`: optional explicit Euler rotation `{ x, y, z }`
 - `flip`: mirror by negative X scale
 - `speed`: optional `LocustMover.speed`
 - `mu`: Y rotation in degrees
@@ -115,9 +116,12 @@ Position fields:
 Precedence:
 - If `x`, `y`, and `z` are all provided, `ChoiceController` uses them directly
 - Otherwise it falls back to polar conversion from `radius`, `angle`, and `height`
+- If `rotation.x`, `rotation.y`, and `rotation.z` are all provided, `ChoiceController` uses that explicit Euler rotation
+- Otherwise it falls back to `mu` as a Y-axis rotation in degrees
 
 Notes:
 - Use `null` for `x`, `y`, and `z` when you want polar positioning
+- Use `null` for `rotation.x`, `rotation.y`, and `rotation.z` when you want `mu` to control rotation
 - Band objects still use the same resolved position, but are instantiated once per VR rig
 
 ## Optomotor Config

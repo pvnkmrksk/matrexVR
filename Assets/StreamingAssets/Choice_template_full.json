@@ -16,6 +16,11 @@
         "y": 2.0,
         "z": 2.0
       },
+      "rotation": {
+        "x": null,
+        "y": null,
+        "z": null
+      },
       "flip": false,
       "speed": 0.0,
       "mu": 0.0,

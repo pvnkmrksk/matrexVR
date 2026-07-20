@@ -1,13 +1,50 @@
 { "randomise" : false,
   "loop": true,
   "sequences": [
-  
-      {
-      "sceneName": "Choice",
-      "duration": 200,
-      "parameters": {
-        "configFile": "BinaryChoice_flip_noflip0.json"
-      }
+
+
+     {
+        "sceneName": "Choice",
+        "duration": 15,
+        "parameters": {
+            "configFile": "BinaryChoice_BrownCylinder_BrownCylinder.json"
+        }
+    },
+    {
+        "sceneName": "Choice",
+        "duration": 15,
+        "parameters": {
+            "configFile": "BinaryChoice_BrownCylinder_Tree01flip.json"
+        }
+    },
+    {
+        "sceneName": "Choice",
+        "duration": 15,
+        "parameters": {
+            "configFile": "BinaryChoice_Tree01noflip_BrownCylinder.json"
+        }
+    },
+     {
+        "sceneName": "Choice",
+        "duration": 15,
+        "parameters": {
+            "configFile": "BinaryChoice_none_BrownCylinder.json"
+        }
+    },
+     {
+        "sceneName": "Choice",
+        "duration": 15,
+        "parameters": {
+            "configFile": "BinaryChoice_BrownCylinder_none.json"
+        }
+    },
+    {
+        "sceneName": "Choice",
+        "duration": 15,
+        "parameters": {
+            "configFile": "BinaryChoice_noflip_flip.json"
+        }
     }
+
   ]
 }

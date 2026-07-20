@@ -3,9 +3,9 @@
     {
       "type": "tree01",
       "position": {
-        "radius": 20,
-        "angle": 345,
-        "height": -1
+        "x": -5.176382,
+        "y": -1,
+        "z": 14.31852
       },
       "scale": {
         "x": 2,
@@ -17,9 +17,9 @@
     {
       "type": "tree01",
       "position": {
-        "radius": 20,
-        "angle": 15,
-        "height": -1
+        "x": 5.176382,
+        "y": -1,
+        "z": 14.31852
       },
       "scale": {
         "x": 2,
