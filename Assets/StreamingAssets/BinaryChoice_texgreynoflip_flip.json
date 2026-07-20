@@ -1,25 +1,11 @@
 {
   "objects": [
     {
-      "type": "tree01",
+      "type": "tree01_texturedgrey",
       "position": {
-        "radius": 20,
-        "angle": 345,
-        "height": -1
-      },
-      "scale": {
-        "x": 2,
-        "y": 2,
-        "z": 2
-      },
-      "flip": true
-    },
-    {
-      "type": "tree01",
-      "position": {
-        "radius": 20,
-        "angle": 15,
-        "height": -1
+        "x": -5.176382,
+        "y": -1,
+        "z": 14.31852
       },
       "scale": {
         "x": 2,
@@ -27,6 +13,20 @@
         "z": 2
       },
       "flip": false
+    },
+    {
+      "type": "tree01",
+      "position": {
+        "x": 5.176382,
+        "y": -1,
+        "z": 14.31852
+      },
+      "scale": {
+        "x": 2,
+        "y": 2,
+        "z": 2
+      },
+      "flip": true
     }
   ],
   "closedLoopOrientation": true,
@@ -34,7 +34,7 @@
   "initialPosition": {
     "x": 0,
     "y": 1.7,
-    "z": 10
+    "z": 0
   },
   "initialRotation": {
     "x": 0,
