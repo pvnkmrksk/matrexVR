@@ -27,5 +27,33 @@ This project runs experiments by chaining Unity scenes and, within some scenes, 
 
 1) Create or modify a generator script under `Assets/Scripts` to emit the desired design JSON into `Assets/StreamingAssets/`.  
 2) Add/update a `sequences` entry in `sequenceConfig.json` with the target `sceneName`, `duration`, and any parameters the scene expects (e.g., `design`).  
+
+## Embodied integration experiment
+
+The write–erase–read experiment uses
+`sequenceConfig_embodiedIntegration.json` and
+`sequenceDesign_embodiedIntegration.json`. It is implemented as an internal
+per-VR state machine in `DynamicSequenceController`; do not expand its phases
+into ordinary sequence steps.
+
+Before animal 1:
+
+1. Run **Tools → Validate Embodied Integration Protocol**.
+2. Complete the hardware/render checks listed in
+   `StreamingAssets/Validation/embodied_integration_simulation_validation.md`.
+3. Replace the pending controller calibration ID and freeze the verified
+   `rotYPlusZDegrees`, `yawSign`, display color-space setting, and exact
+   resolved design.
+4. Point the active outer `sequenceConfig.json` to the embodied-integration
+   sequence config (or launch with that config through the existing operator
+   workflow).
+
+The controller starts randomized experimental trials immediately, archives
+the resolved design, and writes one attempt JSONL file per VR in addition to
+the normal per-frame CSV logs.
+
+Goal contact uses the reference experiment's effective 3.5 cm horizontal
+radius around either goal center. There is no forward-position shortcut.
+Contact ends the read phase; otherwise it times out after 20 seconds.
 3) Ensure the scene controller implements `IInSceneSequencer` if you plan to stay in-scene (`reloadScene: false`), or leave `reloadScene` at `true` to force a reload between steps.  
 4) Play the scene; `MainController` will load the config, copy it to the log folder, and step through scenes/steps according to your settings.

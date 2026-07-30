@@ -20,6 +20,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public float size = 1.5f;
         public float[] boxSize;
         public AdaptiveDecisionConfig adaptiveDecision;
+        public EmbodiedIntegrationConfig embodiedIntegration;
     }
 
     [Serializable]
@@ -120,6 +121,17 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public Coroutine routine;
         public float adaptiveGray;
         public int adaptiveTrialCount = 0;
+        public System.Random embodiedRandom;
+        public List<string> embodiedCellPool;
+        public int embodiedBlock = 0;
+        public int embodiedCompletedBlocks = 0;
+        public int embodiedAttemptNumber = 0;
+        public float embodiedSessionStart;
+        public string symmetricPairFirstSide;
+        public string symmetricSideForBlock;
+        public bool embodiedStopped;
+        public string embodiedStopReason;
+        public int embodiedSeed;
     }
 
     private class AreaWaitResult
@@ -135,7 +147,14 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         public Renderer Renderer;
     }
 
+    private class EmbodiedWaitResult
+    {
+        public bool Triggered;
+        public float LatencySeconds;
+    }
+
     private DesignFile designFile;
+    private string loadedDesignPath;
     private List<Step> orderedSteps;
     private readonly Dictionary<string, Transform> players = new();
     private readonly Dictionary<string, RigState> rigStates = new();
@@ -185,13 +204,21 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     private void LoadDesign(string file)
     {
         string path = Path.Combine(Application.streamingAssetsPath, file);
+        loadedDesignPath = path;
         designFile = JsonConvert.DeserializeObject<DesignFile>(File.ReadAllText(path));
-        orderedSteps = IsAdaptiveDecisionEnabled() ? new List<Step>() : BuildOrdered(designFile, null);
+        orderedSteps = IsAdaptiveDecisionEnabled() || IsEmbodiedIntegrationEnabled()
+            ? new List<Step>()
+            : BuildOrdered(designFile, null);
     }
 
     private bool IsAdaptiveDecisionEnabled()
     {
         return designFile?.adaptiveDecision != null && designFile.adaptiveDecision.enabled;
+    }
+
+    private bool IsEmbodiedIntegrationEnabled()
+    {
+        return designFile?.embodiedIntegration != null && designFile.embodiedIntegration.enabled;
     }
 
     private List<Step> BuildOrdered(DesignFile design, int? seedOverride)
@@ -242,11 +269,26 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                 container = container,
                 adaptiveGray = Mathf.Clamp01(startGray)
             };
+
+            if (IsEmbodiedIntegrationEnabled())
+            {
+                int seed = designFile.seed < 0
+                    ? Guid.NewGuid().GetHashCode() ^ kv.Key.GetHashCode()
+                    : designFile.seed ^ kv.Key.GetHashCode();
+                rigStates[kv.Key].embodiedSeed = seed;
+                rigStates[kv.Key].embodiedRandom = new System.Random(seed);
+            }
         }
     }
 
     private IEnumerator RunRigSequence(RigState state)
     {
+        if (IsEmbodiedIntegrationEnabled())
+        {
+            yield return RunEmbodiedIntegrationSequence(state);
+            yield break;
+        }
+
         if (IsAdaptiveDecisionEnabled())
         {
             yield return RunAdaptiveSequence(state);
@@ -316,6 +358,707 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                 state.adaptiveGray = Mathf.Clamp01(state.adaptiveGray - cfg.grayStep);
             else if (string.Equals(role, "gray", StringComparison.OrdinalIgnoreCase))
                 state.adaptiveGray = Mathf.Clamp01(state.adaptiveGray + cfg.grayStep);
+        }
+    }
+
+    private IEnumerator RunEmbodiedIntegrationSequence(RigState state)
+    {
+        // Let logger/master Start methods create their output directory first.
+        yield return null;
+        ArchiveEmbodiedConfiguration();
+
+        var cfg = designFile.embodiedIntegration;
+        state.embodiedSessionStart = RealtimeNow();
+        LogEmbodiedEvent(state, new Dictionary<string, object>
+        {
+            ["recordType"] = "session_start",
+            ["vrId"] = state.id,
+            ["protocolVersion"] = cfg.protocolVersion,
+            ["randomizationMethod"] = "System.Random uniform over current uncompleted pool",
+            ["seed"] = state.embodiedSeed,
+            ["expectedFrameRateHz"] = cfg.expectedFrameRateHz,
+            ["displayColorSpace"] = cfg.displayColorSpace,
+            ["controllerCalibrationId"] = cfg.controllerCalibrationId,
+            ["codeCommit"] = cfg.codeCommit
+        });
+
+        while (!state.embodiedStopped)
+        {
+            float remaining = cfg.sessionLimitSeconds - SessionElapsed(state);
+            if (remaining < cfg.minimumAttemptBudgetSeconds)
+            {
+                StopEmbodiedRig(state, "session_time_limit");
+                break;
+            }
+
+            if (state.embodiedCellPool == null || state.embodiedCellPool.Count == 0)
+                StartEmbodiedBlock(state);
+
+            int selectedIndex = state.embodiedRandom.Next(state.embodiedCellPool.Count);
+            string selectedCell = state.embodiedCellPool[selectedIndex];
+            string pseudoSide = selectedCell == "S_P0_H0"
+                ? state.symmetricSideForBlock
+                : null;
+            EmbodiedCondition condition = EmbodiedIntegrationProtocol.Resolve(selectedCell, pseudoSide);
+
+            bool consumed = false;
+            yield return RunEmbodiedExperimentalAttempt(
+                state,
+                condition,
+                value => consumed = value
+            );
+
+            if (consumed)
+            {
+                state.embodiedCellPool.RemoveAt(selectedIndex);
+                if (state.embodiedCellPool.Count == 0)
+                    state.embodiedCompletedBlocks++;
+            }
+
+            yield return RunEmbodiedIntertrial(state);
+        }
+    }
+
+    private IEnumerator RunEmbodiedExperimentalAttempt(
+        RigState state,
+        EmbodiedCondition condition,
+        Action<bool> completed)
+    {
+        var cfg = designFile.embodiedIntegration;
+        state.embodiedAttemptNumber++;
+        string attemptId = Guid.NewGuid().ToString("N");
+
+        EmbodiedIntegrationProtocol.ResolveCueValues(
+            condition, cfg, false, out float cueLeftPre, out float cueRightPre);
+
+        List<SpawnedObject> goals = null;
+        yield return PrepareEmbodiedAttempt(
+            state,
+            condition.Cell,
+            cueLeftPre,
+            cueRightPre,
+            value => goals = value
+        );
+
+        float cueOnset = RealtimeNow();
+        SetEmbodiedFrameState(
+            state, "write", attemptId, state.embodiedBlock, condition.Cell,
+            condition.CueSequence, condition.AssignedSide,
+            TreatmentName(condition.Position), TreatmentName(condition.Heading),
+            cueLeftPre, cueRightPre, cueOnset, false, false
+        );
+
+        var crossing = new EmbodiedWaitResult();
+        yield return WaitForForwardCrossing(state, cueOnset, cfg.writeDeadlineSeconds, crossing);
+
+        if (!crossing.Triggered)
+        {
+            LogEmbodiedEvent(state, new Dictionary<string, object>
+            {
+                ["recordType"] = "attempt",
+                ["attemptId"] = attemptId,
+                ["vrId"] = state.id,
+                ["attemptNumber"] = state.embodiedAttemptNumber,
+                ["phase"] = "experiment",
+                ["targetBlock"] = state.embodiedBlock,
+                ["cell"] = condition.Cell,
+                ["cueSequence"] = condition.CueSequence,
+                ["assignedSide"] = condition.AssignedSide,
+                ["triggerReached"] = false,
+                ["timeoutReason"] = "pretrigger_timeout",
+                ["cueOnsetRealtime"] = cueOnset,
+                ["writeDeadlineSeconds"] = cfg.writeDeadlineSeconds,
+                ["cellConsumed"] = false
+            });
+            completed(false);
+            yield break;
+        }
+
+        Transform rig = state.rig;
+        ClosedLoop closedLoop = rig.GetComponent<ClosedLoop>();
+        Vector3 prePosition = rig.position;
+        float rawEngineYawPre = rig.eulerAngles.y;
+        float yawPre = EmbodiedIntegrationProtocol.EngineToMathYaw(rawEngineYawPre, cfg);
+        float bisectorPre = EmbodiedIntegrationProtocol.BisectorDegrees(prePosition.x, prePosition.z, cfg);
+        float psiPre = EmbodiedIntegrationProtocol.WrapDegrees(yawPre - bisectorPre);
+        float conflictPre = EmbodiedIntegrationProtocol.ConflictAngleDegrees(prePosition.x, prePosition.z, cfg);
+        Vector3 rawSensorPosition = Vector3.zero;
+        Vector3 rawSensorRotation = Vector3.zero;
+        bool sensorPresent = closedLoop != null &&
+            closedLoop.TryGetSensorPose(out rawSensorPosition, out rawSensorRotation);
+
+        int requestFrame = Time.frameCount;
+        float requestTime = RealtimeNow();
+
+        EmbodiedIntegrationProtocol.ResolveCueValues(
+            condition, cfg, true, out float cueLeftPost, out float cueRightPost);
+        ApplyEmbodiedCueValues(goals, cueLeftPost, cueRightPost);
+
+        float targetX = condition.Position == EmbodiedPositionTreatment.Reset
+            ? 0f
+            : prePosition.x;
+        float targetZ = prePosition.z;
+        float bisectorPost = EmbodiedIntegrationProtocol.BisectorDegrees(targetX, targetZ, cfg);
+        float targetYaw = condition.Heading == EmbodiedHeadingTreatment.Reset
+            ? bisectorPost
+            : EmbodiedIntegrationProtocol.WrapDegrees(bisectorPost + psiPre);
+        float targetEngineYaw = EmbodiedIntegrationProtocol.MathToEngineYaw(targetYaw, cfg);
+        Vector3 targetPosition = new Vector3(targetX, prePosition.y, targetZ);
+
+        Vector3 discardedSensorDelta = Vector3.zero;
+        Vector3 sensorBaseline = Vector3.zero;
+        bool sensorBaselineReset = closedLoop != null &&
+            closedLoop.SetVirtualPoseAndRebaseline(
+                targetPosition,
+                Quaternion.Euler(0f, targetEngineYaw, 0f),
+                out discardedSensorDelta,
+                out sensorBaseline
+            );
+
+        int commitFrame = Time.frameCount;
+        float releaseTime = RealtimeNow();
+        Vector3 achievedPosition = rig.position;
+        float achievedYaw = EmbodiedIntegrationProtocol.EngineToMathYaw(rig.eulerAngles.y, cfg);
+        float achievedBisector = EmbodiedIntegrationProtocol.BisectorDegrees(
+            achievedPosition.x, achievedPosition.z, cfg);
+        float achievedPsi = EmbodiedIntegrationProtocol.WrapDegrees(achievedYaw - achievedBisector);
+        float targetPsi = condition.Heading == EmbodiedHeadingTreatment.Reset ? 0f : psiPre;
+
+        float xError = Mathf.Abs(achievedPosition.x - targetX);
+        float zError = Mathf.Abs(achievedPosition.z - targetZ);
+        float psiError = Mathf.Abs(
+            EmbodiedIntegrationProtocol.WrapDegrees(achievedPsi - targetPsi));
+        bool cueStateCorrect = EmbodiedCueMatches(goals, cueLeftPost, cueRightPost);
+        bool technicalFailure =
+            !sensorPresent ||
+            !sensorBaselineReset ||
+            xError > cfg.positionToleranceCm ||
+            zError > cfg.zToleranceCm ||
+            psiError > cfg.headingToleranceDegrees ||
+            !cueStateCorrect ||
+            commitFrame - requestFrame > 1;
+
+        SetEmbodiedFrameState(
+            state, "read", attemptId, state.embodiedBlock, condition.Cell,
+            condition.CueSequence, condition.AssignedSide,
+            TreatmentName(condition.Position), TreatmentName(condition.Heading),
+            cueLeftPost, cueRightPost, cueOnset, true, technicalFailure
+        );
+        SetEmbodiedEventFlags(state, true, true, false, false);
+
+        string firstContactSide = "";
+        float? firstContactSeconds = null;
+        while (RealtimeNow() - releaseTime < cfg.readSeconds)
+        {
+            bool contactedThisFrame = false;
+            if (string.IsNullOrEmpty(firstContactSide))
+            {
+                firstContactSide = EmbodiedIntegrationProtocol.GoalContactSide(
+                    rig.position.x,
+                    rig.position.z,
+                    cfg
+                );
+                if (!string.IsNullOrEmpty(firstContactSide))
+                {
+                    firstContactSeconds = RealtimeNow() - releaseTime;
+                    SetEmbodiedEventFlags(state, false, false, true, false);
+                    contactedThisFrame = true;
+                }
+            }
+
+            UpdateEmbodiedKinematics(state, releaseTime);
+            yield return null;
+
+            if (contactedThisFrame)
+                break;
+
+            SetEmbodiedEventFlags(state, false, false, false, false);
+        }
+
+        float readEndTime = RealtimeNow();
+        SetEmbodiedEventFlags(state, false, false, false, true);
+        yield return null;
+        string readOutcome = string.IsNullOrEmpty(firstContactSide)
+            ? "read_nonchoice"
+            : firstContactSide;
+        bool cellConsumed = !technicalFailure;
+
+        LogEmbodiedEvent(state, new Dictionary<string, object>
+        {
+            ["recordType"] = "attempt",
+            ["attemptId"] = attemptId,
+            ["vrId"] = state.id,
+            ["attemptNumber"] = state.embodiedAttemptNumber,
+            ["phase"] = "experiment",
+            ["targetBlock"] = state.embodiedBlock,
+            ["cell"] = condition.Cell,
+            ["cueSequence"] = condition.CueSequence,
+            ["assignedSide"] = condition.AssignedSide,
+            ["positionTreatment"] = TreatmentName(condition.Position),
+            ["headingTreatment"] = TreatmentName(condition.Heading),
+            ["qWrite"] = cfg.qWrite,
+            ["qEqual"] = cfg.qEqual,
+            ["cueLeftPre"] = cueLeftPre,
+            ["cueRightPre"] = cueRightPre,
+            ["cueLeftPost"] = cueLeftPost,
+            ["cueRightPost"] = cueRightPost,
+            ["cueOnsetRealtime"] = cueOnset,
+            ["triggerReached"] = true,
+            ["triggerLatencySeconds"] = crossing.LatencySeconds,
+            ["triggerFrame"] = requestFrame,
+            ["transactionRequestFrame"] = requestFrame,
+            ["transactionCommitFrame"] = commitFrame,
+            ["firstCompletePostStateFrame"] = commitFrame,
+            ["transitionFrames"] = commitFrame - requestFrame,
+            ["transitionMilliseconds"] = (releaseTime - requestTime) * 1000f,
+            ["releaseRealtime"] = releaseTime,
+            ["readStartRealtime"] = releaseTime,
+            ["readEndRealtime"] = readEndTime,
+            ["readDurationSeconds"] = readEndTime - releaseTime,
+            ["readMaximumSeconds"] = cfg.readSeconds,
+            ["readEndReason"] = string.IsNullOrEmpty(firstContactSide)
+                ? "read_timeout"
+                : "goal_contact",
+            ["xPre"] = prePosition.x,
+            ["zPre"] = prePosition.z,
+            ["engineYawPre"] = rawEngineYawPre,
+            ["yawPre"] = yawPre,
+            ["bisectorPre"] = bisectorPre,
+            ["psiPre"] = psiPre,
+            ["conflictAnglePre"] = conflictPre,
+            ["xTarget"] = targetX,
+            ["zTarget"] = targetZ,
+            ["yawTarget"] = targetYaw,
+            ["bisectorPost"] = bisectorPost,
+            ["psiTarget"] = targetPsi,
+            ["xAchieved"] = achievedPosition.x,
+            ["zAchieved"] = achievedPosition.z,
+            ["yawAchieved"] = achievedYaw,
+            ["bisectorAchieved"] = achievedBisector,
+            ["psiAchieved"] = achievedPsi,
+            ["conflictAnglePost"] = EmbodiedIntegrationProtocol.ConflictAngleDegrees(
+                achievedPosition.x, achievedPosition.z, cfg),
+            ["xErrorCm"] = xError,
+            ["zErrorCm"] = zError,
+            ["psiErrorDegrees"] = psiError,
+            ["rawSensorPosition"] = Vector3Values(rawSensorPosition),
+            ["rawSensorRotation"] = Vector3Values(rawSensorRotation),
+            ["discardedSensorDelta"] = Vector3Values(discardedSensorDelta),
+            ["sensorBaseline"] = Vector3Values(sensorBaseline),
+            ["sensorBaselineReset"] = sensorBaselineReset,
+            ["cueStateCorrect"] = cueStateCorrect,
+            ["technicalManipulationFailure"] = technicalFailure,
+            ["cellConsumed"] = cellConsumed,
+            ["firstGoalContactSide"] = string.IsNullOrEmpty(firstContactSide) ? null : firstContactSide,
+            ["firstGoalContactSeconds"] = firstContactSeconds,
+            ["readOutcome"] = readOutcome,
+            ["remainingCellsAfterAttempt"] = state.embodiedCellPool.Count - (cellConsumed ? 1 : 0),
+            ["blockCompletedByAttempt"] = cellConsumed && state.embodiedCellPool.Count == 1
+        });
+
+        completed(cellConsumed);
+    }
+
+    private IEnumerator PrepareEmbodiedAttempt(
+        RigState state,
+        string stepName,
+        float cueLeft,
+        float cueRight,
+        Action<List<SpawnedObject>> result)
+    {
+        ClearEmbodiedObjects(state);
+        yield return null;
+
+        var cfg = designFile.embodiedIntegration;
+        ClosedLoop closedLoop = state.rig.GetComponent<ClosedLoop>();
+        if (closedLoop != null)
+        {
+            float engineYaw = EmbodiedIntegrationProtocol.MathToEngineYaw(0f, cfg);
+            closedLoop.SetSphereDiameter(cfg.sphereDiameterCm);
+            closedLoop.SetClosedLoopOrientation(true);
+            closedLoop.SetClosedLoopPosition(true);
+            closedLoop.SetVirtualPoseAndRebaseline(
+                new Vector3(0f, cfg.standardStartHeightCm, 0f),
+                Quaternion.Euler(0f, engineYaw, 0f),
+                out _,
+                out _
+            );
+        }
+
+        var specs = BuildEmbodiedGoalObjects(cueLeft, cueRight);
+        var spawned = SpawnObjects(state.id, specs, state.container);
+        ApplyCameraSettings(state.id, BuildEmbodiedCameraSpecs());
+        state.rig.GetComponent<DataLogger>()?.SetStep(
+            state.embodiedAttemptNumber, stepName, state.embodiedBlock, state.embodiedAttemptNumber);
+        result(spawned);
+    }
+
+    private IEnumerator WaitForForwardCrossing(
+        RigState state,
+        float cueOnset,
+        float deadlineSeconds,
+        EmbodiedWaitResult result)
+    {
+        float previousZ = state.rig.position.z;
+        float deadline = cueOnset + deadlineSeconds;
+        while (RealtimeNow() < deadline)
+        {
+            float currentZ = state.rig.position.z;
+            if (EmbodiedIntegrationProtocol.FirstForwardCrossing(
+                previousZ, currentZ, designFile.embodiedIntegration.triggerZCm))
+            {
+                result.Triggered = true;
+                result.LatencySeconds = RealtimeNow() - cueOnset;
+                yield break;
+            }
+            previousZ = currentZ;
+            UpdateEmbodiedKinematics(state, -1f);
+            yield return null;
+        }
+    }
+
+    private IEnumerator RunEmbodiedIntertrial(RigState state)
+    {
+        ClearEmbodiedObjects(state);
+        SpawnObjects(
+            state.id,
+            BuildEmbodiedIntertrialObjects(),
+            state.container
+        );
+        ApplyCameraSettings(state.id, BuildEmbodiedNeutralCameraSpecs());
+        SetEmbodiedFrameState(
+            state, "intertrial", "", null, "", "", "", "", "",
+            0f, 0f, RealtimeNow(), false, false
+        );
+
+        float end = RealtimeNow() + designFile.embodiedIntegration.intertrialSeconds;
+        while (RealtimeNow() < end)
+        {
+            UpdateEmbodiedKinematics(state, -1f);
+            yield return null;
+        }
+    }
+
+    private void StartEmbodiedBlock(RigState state)
+    {
+        state.embodiedBlock++;
+        state.embodiedCellPool = EmbodiedIntegrationProtocol.NewCellPool();
+        if (state.embodiedBlock % 2 == 1)
+        {
+            state.symmetricPairFirstSide = state.embodiedRandom.Next(2) == 0 ? "left" : "right";
+            state.symmetricSideForBlock = state.symmetricPairFirstSide;
+        }
+        else
+        {
+            state.symmetricSideForBlock =
+                EmbodiedIntegrationProtocol.OppositeSide(state.symmetricPairFirstSide);
+        }
+    }
+
+    private void StopEmbodiedRig(RigState state, string reason)
+    {
+        state.embodiedStopped = true;
+        state.embodiedStopReason = reason;
+        ClearEmbodiedObjects(state);
+        SpawnObjects(
+            state.id,
+            BuildEmbodiedIntertrialObjects(),
+            state.container
+        );
+        ApplyCameraSettings(state.id, BuildEmbodiedNeutralCameraSpecs());
+        SetEmbodiedFrameState(
+            state, "stopped", "", null, "", "", "", "", "",
+            0f, 0f, RealtimeNow(), false, false
+        );
+        LogEmbodiedEvent(state, new Dictionary<string, object>
+        {
+            ["recordType"] = "session_stop",
+            ["vrId"] = state.id,
+            ["stopReason"] = reason,
+            ["sessionElapsedSeconds"] = SessionElapsed(state),
+            ["completedBlocks"] = state.embodiedCompletedBlocks,
+            ["partialBlock"] = state.embodiedBlock,
+            ["remainingCells"] = state.embodiedCellPool?.Count ?? 0
+        });
+    }
+
+    private SceneObjectSpec[] BuildEmbodiedGoalObjects(float cueLeft, float cueRight)
+    {
+        var cfg = designFile.embodiedIntegration;
+        return new[]
+        {
+            new SceneObjectSpec
+            {
+                type = "ScalingCylinder",
+                material = "SetColor",
+                pos = new[] { cfg.goalLeftX, cfg.goalHeight, cfg.goalZ },
+                color = new[] { cueLeft, cueLeft, cueLeft, 1f },
+                scale = new Scale
+                {
+                    x = cfg.goalScaleX,
+                    y = cfg.goalScaleY,
+                    z = cfg.goalScaleZ
+                },
+                visualAngleDegrees = cfg.goalVisualAngleDegrees,
+                role = "left"
+            },
+            new SceneObjectSpec
+            {
+                type = "ScalingCylinder",
+                material = "SetColor",
+                pos = new[] { cfg.goalRightX, cfg.goalHeight, cfg.goalZ },
+                color = new[] { cueRight, cueRight, cueRight, 1f },
+                scale = new Scale
+                {
+                    x = cfg.goalScaleX,
+                    y = cfg.goalScaleY,
+                    z = cfg.goalScaleZ
+                },
+                visualAngleDegrees = cfg.goalVisualAngleDegrees,
+                role = "right"
+            }
+        };
+    }
+
+    private static SceneObjectSpec[] BuildEmbodiedIntertrialObjects()
+    {
+        // Matches sequenceDesign_directednessVSDecisionAccuracy.json exactly.
+        return new[]
+        {
+            new SceneObjectSpec
+            {
+                type = "glassplane",
+                polar = new Polar { radius = 0f, angle = 0f, height = -1f }
+            }
+        };
+    }
+
+    private CameraSpec[] BuildEmbodiedCameraSpecs()
+    {
+        float bg = designFile.embodiedIntegration.backgroundGray;
+        var specs = new List<CameraSpec>();
+        foreach (string vrId in players.Keys)
+        {
+            specs.Add(new CameraSpec
+            {
+                vrId = vrId,
+                clearFlags = CameraClearFlags.SolidColor,
+                bgColor = new[] { bg, bg, bg, 1f }
+            });
+        }
+        return specs.ToArray();
+    }
+
+    private CameraSpec[] BuildEmbodiedNeutralCameraSpecs()
+    {
+        var specs = new List<CameraSpec>();
+        foreach (string vrId in players.Keys)
+        {
+            specs.Add(new CameraSpec
+            {
+                vrId = vrId,
+                clearFlags = CameraClearFlags.Skybox
+            });
+        }
+        return specs.ToArray();
+    }
+
+    private static void ApplyEmbodiedCueValues(
+        List<SpawnedObject> goals,
+        float cueLeft,
+        float cueRight)
+    {
+        if (goals == null || goals.Count < 2)
+            return;
+
+        // This setter is intentionally called for unchanged A/S controls too.
+        if (goals[0].Renderer != null)
+            goals[0].Renderer.material.color = new Color(cueLeft, cueLeft, cueLeft, 1f);
+        if (goals[1].Renderer != null)
+            goals[1].Renderer.material.color = new Color(cueRight, cueRight, cueRight, 1f);
+    }
+
+    private static bool EmbodiedCueMatches(
+        List<SpawnedObject> goals,
+        float cueLeft,
+        float cueRight)
+    {
+        if (goals == null || goals.Count < 2 ||
+            goals[0].Renderer == null || goals[1].Renderer == null)
+            return false;
+
+        const float tolerance = 0.001f;
+        return Mathf.Abs(goals[0].Renderer.material.color.r - cueLeft) <= tolerance &&
+               Mathf.Abs(goals[1].Renderer.material.color.r - cueRight) <= tolerance;
+    }
+
+    private void SetEmbodiedFrameState(
+        RigState state,
+        string phase,
+        string attemptId,
+        int? targetBlock,
+        string cell,
+        string cueSequence,
+        string assignedSide,
+        string positionTreatment,
+        string headingTreatment,
+        float cueLeft,
+        float cueRight,
+        float cueOnset,
+        bool triggerReached,
+        bool technicalFailure)
+    {
+        DataLogger logger = state.rig.GetComponent<DataLogger>();
+        if (logger == null)
+            return;
+
+        logger.SetPersistentData(new Dictionary<string, object>
+        {
+            ["embodiedPhase"] = phase,
+            ["embodiedAttemptId"] = attemptId,
+            ["embodiedAttemptNumber"] = state.embodiedAttemptNumber,
+            ["embodiedTargetBlock"] = targetBlock.HasValue
+                ? (object)targetBlock.Value
+                : "",
+            ["embodiedCell"] = cell,
+            ["embodiedCueSequence"] = cueSequence,
+            ["embodiedAssignedSide"] = assignedSide,
+            ["embodiedPositionTreatment"] = positionTreatment,
+            ["embodiedHeadingTreatment"] = headingTreatment,
+            ["embodiedCueLeft"] = cueLeft,
+            ["embodiedCueRight"] = cueRight,
+            ["embodiedCueOnsetElapsedSec"] = cueOnset - state.embodiedSessionStart,
+            ["embodiedTriggerReached"] = triggerReached,
+            ["embodiedTechnicalFailure"] = technicalFailure,
+            ["embodiedTriggerEvent"] = false,
+            ["embodiedReleaseEvent"] = false,
+            ["embodiedGoalContactEvent"] = false,
+            ["embodiedReadEndEvent"] = false
+        });
+        UpdateEmbodiedKinematics(state, -1f);
+    }
+
+    private void SetEmbodiedEventFlags(
+        RigState state,
+        bool trigger,
+        bool release,
+        bool goalContact,
+        bool readEnd)
+    {
+        state.rig.GetComponent<DataLogger>()?.SetPersistentData(
+            new Dictionary<string, object>
+            {
+                ["embodiedTriggerEvent"] = trigger,
+                ["embodiedReleaseEvent"] = release,
+                ["embodiedGoalContactEvent"] = goalContact,
+                ["embodiedReadEndEvent"] = readEnd
+            });
+    }
+
+    private void UpdateEmbodiedKinematics(RigState state, float releaseTime)
+    {
+        var cfg = designFile.embodiedIntegration;
+        Vector3 position = state.rig.position;
+        float yaw = EmbodiedIntegrationProtocol.EngineToMathYaw(state.rig.eulerAngles.y, cfg);
+        float bisector = EmbodiedIntegrationProtocol.BisectorDegrees(position.x, position.z, cfg);
+        state.rig.GetComponent<DataLogger>()?.SetPersistentData(
+            new Dictionary<string, object>
+            {
+                ["embodiedX"] = position.x,
+                ["embodiedZ"] = position.z,
+                ["embodiedMathYaw"] = yaw,
+                ["embodiedBisector"] = bisector,
+                ["embodiedPsi"] = EmbodiedIntegrationProtocol.WrapDegrees(yaw - bisector),
+                ["embodiedConflictAngle"] =
+                    EmbodiedIntegrationProtocol.ConflictAngleDegrees(position.x, position.z, cfg),
+                ["embodiedReleaseElapsedSec"] =
+                    releaseTime >= 0f ? RealtimeNow() - releaseTime : -1f
+            });
+    }
+
+    private static string TreatmentName(EmbodiedPositionTreatment treatment)
+    {
+        return treatment == EmbodiedPositionTreatment.Preserve ? "preserve" : "reset";
+    }
+
+    private static string TreatmentName(EmbodiedHeadingTreatment treatment)
+    {
+        return treatment == EmbodiedHeadingTreatment.Preserve ? "preserve" : "reset";
+    }
+
+    private static float RealtimeNow()
+    {
+        return Time.realtimeSinceStartup;
+    }
+
+    private static float SessionElapsed(RigState state)
+    {
+        return RealtimeNow() - state.embodiedSessionStart;
+    }
+
+    private void ArchiveEmbodiedConfiguration()
+    {
+        MasterDataLogger master = FindObjectOfType<MasterDataLogger>();
+        if (master == null || string.IsNullOrEmpty(master.directoryPath))
+            return;
+
+        string resolvedPath = Path.Combine(
+            master.directoryPath,
+            "embodied_integration_resolved_design.json");
+        if (!File.Exists(resolvedPath))
+            File.WriteAllText(resolvedPath, JsonConvert.SerializeObject(designFile, Formatting.Indented));
+
+        if (!string.IsNullOrEmpty(loadedDesignPath) && File.Exists(loadedDesignPath))
+        {
+            string sourceCopy = Path.Combine(
+                master.directoryPath,
+                Path.GetFileName(loadedDesignPath));
+            if (!File.Exists(sourceCopy))
+                File.Copy(loadedDesignPath, sourceCopy);
+        }
+    }
+
+    private void LogEmbodiedEvent(RigState state, Dictionary<string, object> record)
+    {
+        MasterDataLogger master = FindObjectOfType<MasterDataLogger>();
+        if (master == null || string.IsNullOrEmpty(master.directoryPath))
+        {
+            Debug.LogError("[EmbodiedIntegration] MasterDataLogger output directory is unavailable.");
+            return;
+        }
+
+        record["loggedAt"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        record["sessionElapsedSeconds"] = SessionElapsed(state);
+        string path = Path.Combine(
+            master.directoryPath,
+            $"embodied_integration_{state.id}_attempts.jsonl");
+        try
+        {
+            File.AppendAllText(
+                path,
+                JsonConvert.SerializeObject(record) + Environment.NewLine
+            );
+        }
+        catch (Exception exception)
+        {
+            // Logging must never strand a VR in its current controller phase.
+            Debug.LogError(
+                $"[EmbodiedIntegration] Failed to write {state.id} event log: {exception}"
+            );
+        }
+    }
+
+    private static float[] Vector3Values(Vector3 value)
+    {
+        return new[] { value.x, value.y, value.z };
+    }
+
+    private static void ClearEmbodiedObjects(RigState state)
+    {
+        foreach (Transform child in state.container)
+        {
+            child.gameObject.SetActive(false);
+            Destroy(child.gameObject);
         }
     }
 

@@ -69,6 +69,7 @@ public class DataLogger : MonoBehaviour
     protected List<string> additionalHeaders = new List<string>();
     protected Dictionary<string, object> additionalData = new Dictionary<string, object>();
     private readonly Dictionary<string, object> queuedOneShotData = new Dictionary<string, object>();
+    private readonly Dictionary<string, object> persistentData = new Dictionary<string, object>();
     private int    stepIndex = -1;
     private string stepName  = "";
     private int    loopIndex = 0;
@@ -164,6 +165,21 @@ public class DataLogger : MonoBehaviour
     }
 
     /// <summary>
+    /// Sets values that are repeated on every frame until replaced or cleared.
+    /// This is intended for per-VR experiment state, not instantaneous events.
+    /// </summary>
+    public void SetPersistentData(Dictionary<string, object> data)
+    {
+        foreach (var kvp in data)
+            persistentData[kvp.Key] = kvp.Value;
+    }
+
+    public void ClearPersistentData()
+    {
+        persistentData.Clear();
+    }
+
+    /// <summary>
     /// Initializes the logger, finds dependencies, and sets up the log file.
     /// When overriding in derived classes, call base.Start() after adding your columns.
     /// </summary>
@@ -179,9 +195,7 @@ public class DataLogger : MonoBehaviour
         {
             directoryPath = masterDataLogger.directoryPath;
             bufferedLines = new List<string>();
-            AddColumns("stepIndex", "stepName", "loopIndex", "cumulativeStep"); 
-            AddColumns("swapElapsedSec", "swapWallClock");
-            AddColumns("grayAtTrialStart", "blackSideAtTrialStart");
+            EnsureStandardAdditionalColumns();
 
             // Enable logging
             isLogging = true;
@@ -204,8 +218,22 @@ public class DataLogger : MonoBehaviour
     /// </summary>
     public virtual void InitLog()
     {
+        EnsureStandardAdditionalColumns();
+
+        MasterDataLogger master = FindObjectOfType<MasterDataLogger>();
+        if (master == null || string.IsNullOrEmpty(master.directoryPath))
+        {
+            Debug.LogWarning("MasterDataLogger output directory is not ready; deferring logger initialization.");
+            return;
+        }
+
+        directoryPath = master.directoryPath;
+        bufferedLines ??= new List<string>();
+        if (logFile != null)
+            return;
+
         // Get the timestamp from the MasterDataLogger
-        string timestamp = FindObjectOfType<MasterDataLogger>().timestamp;
+        string timestamp = master.timestamp;
         string gameObjectName = this.gameObject.name;
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
@@ -239,6 +267,24 @@ public class DataLogger : MonoBehaviour
         }
 
         Debug.Log($"Logging to: {logPath}");
+    }
+
+    private void EnsureStandardAdditionalColumns()
+    {
+        AddColumns("stepIndex", "stepName", "loopIndex", "cumulativeStep");
+        AddColumns("swapElapsedSec", "swapWallClock");
+        AddColumns("grayAtTrialStart", "blackSideAtTrialStart");
+        AddColumns(
+            "embodiedPhase", "embodiedAttemptId", "embodiedAttemptNumber",
+            "embodiedTargetBlock", "embodiedCell", "embodiedCueSequence",
+            "embodiedAssignedSide", "embodiedPositionTreatment",
+            "embodiedHeadingTreatment", "embodiedCueLeft", "embodiedCueRight",
+            "embodiedCueOnsetElapsedSec", "embodiedTriggerReached",
+            "embodiedTriggerEvent", "embodiedReleaseEvent", "embodiedGoalContactEvent",
+            "embodiedReadEndEvent", "embodiedTechnicalFailure",
+            "embodiedX", "embodiedZ", "embodiedMathYaw", "embodiedBisector",
+            "embodiedPsi", "embodiedConflictAngle", "embodiedReleaseElapsedSec"
+        );
     }
 
     /// <summary>
@@ -315,6 +361,9 @@ public class DataLogger : MonoBehaviour
 
         // Allow subclasses to add additional data
         CollectAdditionalData();
+
+        foreach (var kvp in persistentData)
+            additionalData[kvp.Key] = kvp.Value;
 
         // Merge one-shot values queued before Update()/UpdateLogger() so they are not lost
         // when additionalData was cleared at the beginning of PrepareLogData().

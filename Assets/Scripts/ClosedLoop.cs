@@ -24,6 +24,7 @@ public class ClosedLoop : MonoBehaviour
 
     // Stores the initial world rotation, including any random rotation applied at start
     private Quaternion _initialWorldRotation;
+    private bool _manipulationInProgress;
 
     private void Start()
     {
@@ -78,6 +79,9 @@ public class ClosedLoop : MonoBehaviour
 
     private void UpdateTransform()
     {
+        if (_manipulationInProgress)
+            return;
+
         Vector3 currentFicTracData = GetCurrentFicTracData();
         Vector3 ficTracDelta = currentFicTracData - _lastFicTracData;
 
@@ -168,6 +172,66 @@ public class ClosedLoop : MonoBehaviour
 
         transform.SetPositionAndRotation(_initialPosition, _initialRotation);
         ResetPositionAndRotation();
+    }
+
+    /// <summary>
+    /// Atomically changes the virtual pose and makes the current sensor sample the
+    /// new closed-loop baseline. Sensor motion accumulated before this call is
+    /// returned for logging, but is neither applied nor replayed.
+    /// </summary>
+    public bool SetVirtualPoseAndRebaseline(
+        Vector3 position,
+        Quaternion rotation,
+        out Vector3 discardedSensorDelta,
+        out Vector3 sensorBaseline)
+    {
+        discardedSensorDelta = Vector3.zero;
+        sensorBaseline = Vector3.zero;
+
+        _manipulationInProgress = true;
+        try
+        {
+            transform.SetPositionAndRotation(position, rotation);
+            _initialWorldRotation = rotation;
+
+            if (_zmqListener == null || _zmqListener.pose == null)
+            {
+                _isInitialized = false;
+                _initializationTimer = 0f;
+                _lastFicTracData = Vector3.zero;
+                return false;
+            }
+
+            sensorBaseline = GetCurrentFicTracData();
+            if (_isInitialized)
+                discardedSensorDelta = sensorBaseline - _lastFicTracData;
+
+            // The physical heading represented by this sensor sample now maps to
+            // the assigned virtual heading. This also makes subsequent translation
+            // use the post-intervention virtual frame.
+            _ficTracRotationOffset =
+                rotation * Quaternion.Euler(0f, -sensorBaseline.z * Mathf.Rad2Deg, 0f);
+            _lastFicTracData = sensorBaseline;
+            _isInitialized = true;
+            _initializationTimer = initializationDelay;
+            return true;
+        }
+        finally
+        {
+            _manipulationInProgress = false;
+        }
+    }
+
+    public bool TryGetSensorPose(out Vector3 sensorPosition, out Vector3 sensorRotation)
+    {
+        sensorPosition = Vector3.zero;
+        sensorRotation = Vector3.zero;
+        if (_zmqListener == null || _zmqListener.pose == null)
+            return false;
+
+        sensorPosition = _zmqListener.pose.position;
+        sensorRotation = _zmqListener.pose.rotation.eulerAngles;
+        return true;
     }
 
     private void HandleInput()
