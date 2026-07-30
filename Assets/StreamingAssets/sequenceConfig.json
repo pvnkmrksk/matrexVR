@@ -5,44 +5,30 @@
 
      {
         "sceneName": "Choice",
-        "duration": 15,
+        "duration": 90,
         "parameters": {
-            "configFile": "BinaryChoice_BrownCylinder_BrownCylinder.json"
+            "configFile": "BinaryChoiceIndia_flip_noflip.json"
         }
     },
     {
         "sceneName": "Choice",
-        "duration": 15,
+        "duration": 90,
         "parameters": {
-            "configFile": "BinaryChoice_BrownCylinder_Tree01flip.json"
+            "configFile": "BinaryChoiceIndia_flip_none.json"
         }
     },
     {
         "sceneName": "Choice",
-        "duration": 15,
+        "duration": 90,
         "parameters": {
-            "configFile": "BinaryChoice_Tree01noflip_BrownCylinder.json"
-        }
-    },
-     {
-        "sceneName": "Choice",
-        "duration": 15,
-        "parameters": {
-            "configFile": "BinaryChoice_none_BrownCylinder.json"
-        }
-    },
-     {
-        "sceneName": "Choice",
-        "duration": 15,
-        "parameters": {
-            "configFile": "BinaryChoice_BrownCylinder_none.json"
+            "configFile": "BinaryChoiceIndia_none_noflip.json"
         }
     },
     {
         "sceneName": "Choice",
-        "duration": 15,
+        "duration": 90,
         "parameters": {
-            "configFile": "BinaryChoice_noflip_flip.json"
+            "configFile": "BinaryChoice_none.json"
         }
     }
 
