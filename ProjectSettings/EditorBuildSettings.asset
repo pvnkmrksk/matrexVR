@@ -71,16 +71,16 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/two_tree_ss.unity
     guid: 89ee10ddd2374fb7097fa75fed2afdfd
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/navrug_rr.unity
     guid: 1f01fa25ab2214191bc188db336e38ca
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/navrug_rs.unity
     guid: c848a5c6f4d654cd4bcd23bdb4802c60
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/navrug_ss.unity
     guid: a7a79fc0c87dd44a194a4b1fae29bc2b
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/navrug_sr.unity
     guid: ba806609faef14405a097c2f728cb9bb
   - enabled: 1
