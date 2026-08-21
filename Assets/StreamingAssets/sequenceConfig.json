@@ -1,36 +1,33 @@
-{ "randomise" : false,
+{ "randomise" : true,
   "loop": true,
   "sequences": [
-
-
      {
-        "sceneName": "Choice",
-        "duration": 90,
+     "sceneName": "Choice_TwoTreeIndia_path_path",
+        "duration": 180,
         "parameters": {
-            "configFile": "BinaryChoiceIndia_flip_noflip.json"
+            "configFile": "Homing_Sun_Tree.json"
         }
-    },
-    {
-        "sceneName": "Choice",
-        "duration": 90,
+     },
+     {
+     "sceneName": "Choice_TwoTreeIndia_path_nopath",
+        "duration": 180,
         "parameters": {
-            "configFile": "BinaryChoiceIndia_flip_none.json"
+            "configFile": "Homing_Sun_Tree.json"
         }
-    },
-    {
-        "sceneName": "Choice",
-        "duration": 90,
+     },
+     {
+     "sceneName": "Choice_TwoTreeIndia_nopath_path",
+        "duration": 180,
         "parameters": {
-            "configFile": "BinaryChoiceIndia_none_noflip.json"
+            "configFile": "Homing_Sun_Tree.json"
         }
-    },
-    {
-        "sceneName": "Choice",
-        "duration": 90,
+     },
+     {
+     "sceneName": "Choice_TwoTreeIndia_nopath_nopath",
+        "duration": 180,
         "parameters": {
-            "configFile": "BinaryChoice_none.json"
-        }
+            "configFile": "Homing_Sun_Tree.json"
+       }
     }
-
   ]
 }

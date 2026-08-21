@@ -99,3 +99,13 @@ Assets/Terrain/Forest floor.glb
 
 #system config
 Assets/StreamingAssets/system_config.json
+
+# Oversized source textures (exceed GitHub's 100 MB file limit)
+Assets/Materials/grass04mapped_highres.png
+Assets/Materials/grass04mapped_highres.png.meta
+Assets/Materials/PaintedBothv2.png
+Assets/Materials/PaintedBothv2.png.meta
+Assets/Materials/PaintedLeftv2.png
+Assets/Materials/PaintedLeftv2.png.meta
+Assets/Materials/PaintedRightv2.png
+Assets/Materials/PaintedRightv2.png.meta

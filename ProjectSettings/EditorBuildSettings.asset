@@ -44,16 +44,28 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ReplayScene.unity
     guid: 9e700d6bcf040ef4f81695387b40e944
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Landscape_Tree.unity
     guid: 6cd14ee86fd07bf5c852bdf64e61a717
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Landscape_None.unity
     guid: 493b018c897897417902521b041f710a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Landscape_Bush.unity
     guid: 44861da01ecb0d832bfa2ebd253785d7
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Landscape_All.unity
     guid: af4b78840f38bed4ca71e6fdd2c6b3f7
+  - enabled: 1
+    path: Assets/Scenes/Choice_TwoTreeIndia_nopath_nopath.unity
+    guid: 9fbad19c7b4c6b643aa47fa557794471
+  - enabled: 1
+    path: Assets/Scenes/Choice_TwoTreeIndia_nopath_path.unity
+    guid: 2e1e8de5ca26d8e41a35b02278d00362
+  - enabled: 1
+    path: Assets/Scenes/Choice_TwoTreeIndia_path_nopath.unity
+    guid: 091acd8d4ca4b7f289c3f1c57b301fac
+  - enabled: 1
+    path: Assets/Scenes/Choice_TwoTreeIndia_path_path.unity
+    guid: 968c832c89ea0fa7a95914cc034a8c51
   m_configObjects: {}
