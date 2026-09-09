@@ -226,7 +226,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 668772778731021063, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: far clip plane
-      value: 300
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 668772778731021063, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: near clip plane
@@ -234,7 +234,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 668772779256137067, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: far clip plane
-      value: 300
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 668772779256137067, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: near clip plane
@@ -242,7 +242,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 668772779423467688, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: far clip plane
-      value: 300
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 668772779423467688, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: near clip plane
@@ -250,7 +250,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 668772779573187607, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: far clip plane
-      value: 300
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 668772779573187607, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
       propertyPath: near clip plane
