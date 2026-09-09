@@ -1,0 +1,60 @@
+{
+  "targetDisplay": 0,
+  "initialCube": 3,
+  "initialShade": 0,
+  "labelX": 400,
+  "labelY": 10,
+  "cubes": [
+    {
+      "vrId": "VR1",
+      "ledPanelWidth": 64,
+      "ledPanelHeight": 64,
+      "startRow": 0,
+      "startCol": 0,
+      "horizontal": true,
+      "displayOrder": "DRBLFU",
+      "alwaysBlackPanels": "DU"
+    },
+    {
+      "vrId": "VR2",
+      "ledPanelWidth": 64,
+      "ledPanelHeight": 64,
+      "startRow": 1,
+      "startCol": 0,
+      "horizontal": true,
+      "displayOrder": "DRBLFU",
+      "alwaysBlackPanels": "DU"
+    },
+    {
+      "vrId": "VR3",
+      "ledPanelWidth": 64,
+      "ledPanelHeight": 64,
+      "startRow": 2,
+      "startCol": 0,
+      "horizontal": true,
+      "displayOrder": "DRBLFU",
+      "alwaysBlackPanels": "DU"
+    },
+    {
+      "vrId": "VR4",
+      "ledPanelWidth": 64,
+      "ledPanelHeight": 64,
+      "startRow": 3,
+      "startCol": 0,
+      "horizontal": true,
+      "displayOrder": "DRBLFU",
+      "alwaysBlackPanels": "DU"
+    }
+  ],
+  "shades": [
+    { "name": "Cylinder 0.8", "hex": "#B5B7B7", "r": 181, "g": 183, "b": 183 },
+    { "name": "Cylinder 0.6", "hex": "#8E8F8F", "r": 142, "g": 143, "b": 143 },
+    { "name": "Cylinder 0.5", "hex": "#787978", "r": 120, "g": 121, "b": 120 },
+    { "name": "Cylinder 0.4", "hex": "#656664", "r": 101, "g": 102, "b": 100 },
+    { "name": "Cylinder 0.3", "hex": "#505150", "r": 80, "g": 81, "b": 80 },
+    { "name": "Cylinder 0.2", "hex": "#3C3D3D", "r": 60, "g": 61, "b": 61 },
+    { "name": "Cylinder 0.0", "hex": "#151716", "r": 21, "g": 23, "b": 22 },
+    { "name": "background", "hex": "#CCCCCC", "r": 204, "g": 204, "b": 204 },
+    { "name": "control black", "hex": "#000000", "r": 0, "g": 0, "b": 0 }
+  ]
+}

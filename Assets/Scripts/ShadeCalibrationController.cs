@@ -33,6 +33,7 @@ public sealed class ShadeCalibrationController : MonoBehaviour
         public int startCol;
         public bool horizontal = true;
         public string displayOrder = "RBLF";
+        public string alwaysBlackPanels = "";
     }
 
     [Serializable]
@@ -49,6 +50,7 @@ public sealed class ShadeCalibrationController : MonoBehaviour
     {
         public string name;
         public readonly List<Camera> cameras = new List<Camera>();
+        public readonly List<bool> alwaysBlack = new List<bool>();
     }
 
     private CalibrationConfig config;
@@ -133,6 +135,12 @@ public sealed class ShadeCalibrationController : MonoBehaviour
             {
                 Camera camera = NewCamera(cube.vrId + " panel " + (panelIndex + 1), panelIndex);
                 group.cameras.Add(camera);
+                char panelId = string.IsNullOrEmpty(cube.displayOrder)
+                    ? '\0'
+                    : cube.displayOrder[panelIndex];
+                group.alwaysBlack.Add(
+                    !string.IsNullOrEmpty(cube.alwaysBlackPanels) &&
+                    cube.alwaysBlackPanels.IndexOf(panelId) >= 0);
             }
 
             cubeCameras.Add(group);
@@ -274,10 +282,14 @@ public sealed class ShadeCalibrationController : MonoBehaviour
 
         for (int cubeIndex = 0; cubeIndex < cubeCameras.Count; cubeIndex++)
         {
-            Color colour = cubeIndex == activeCube ? selected : Color.black;
-            foreach (Camera camera in cubeCameras[cubeIndex].cameras)
+            for (int panelIndex = 0;
+                 panelIndex < cubeCameras[cubeIndex].cameras.Count;
+                 panelIndex++)
             {
-                camera.backgroundColor = colour;
+                bool showShade = cubeIndex == activeCube &&
+                    !cubeCameras[cubeIndex].alwaysBlack[panelIndex];
+                cubeCameras[cubeIndex].cameras[panelIndex].backgroundColor =
+                    showShade ? selected : Color.black;
             }
         }
     }

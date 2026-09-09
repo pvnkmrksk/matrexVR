@@ -11,6 +11,9 @@ public static class ShadeCalibrationBuild
     private const string ScenePath = "Assets/Scenes/ShadeCalibration.unity";
     private const string BuildDirectory = "Builds/ShadeCalibration";
     private const string ExecutablePath = BuildDirectory + "/ShadeCalibration.x86_64";
+    private const string Vr3BuildDirectory = "Builds/ShadeCalibrationVR3";
+    private const string Vr3ExecutablePath = Vr3BuildDirectory + "/ShadeCalibrationVR3.x86_64";
+    private const string Vr3ConfigPath = "Assets/StreamingAssets/shade_calibration_VR3.json";
 
     [MenuItem("Tools/Shade Calibration/Create Scene")]
     public static void CreateScene()
@@ -25,13 +28,24 @@ public static class ShadeCalibrationBuild
     [MenuItem("Tools/Shade Calibration/Build Linux")]
     public static void BuildLinux()
     {
+        BuildLinuxPlayer(ExecutablePath, null);
+    }
+
+    [MenuItem("Tools/Shade Calibration/Build Linux VR3")]
+    public static void BuildLinuxVR3()
+    {
+        BuildLinuxPlayer(Vr3ExecutablePath, Vr3ConfigPath);
+    }
+
+    private static void BuildLinuxPlayer(string executablePath, string replacementConfigPath)
+    {
         CreateScene();
-        Directory.CreateDirectory(BuildDirectory);
+        Directory.CreateDirectory(Path.GetDirectoryName(executablePath));
 
         BuildPlayerOptions options = new BuildPlayerOptions
         {
             scenes = new[] { ScenePath },
-            locationPathName = ExecutablePath,
+            locationPathName = executablePath,
             target = BuildTarget.StandaloneLinux64,
             options = BuildOptions.None
         };
@@ -42,6 +56,15 @@ public static class ShadeCalibrationBuild
             throw new BuildFailedException("Shade calibration build failed: " + report.summary.result);
         }
 
-        Debug.Log("Shade calibration build complete: " + ExecutablePath);
+        if (!string.IsNullOrEmpty(replacementConfigPath))
+        {
+            string executableName = Path.GetFileNameWithoutExtension(executablePath);
+            string builtConfigPath = Path.Combine(
+                Path.GetDirectoryName(executablePath),
+                executableName + "_Data/StreamingAssets/shade_calibration.json");
+            File.Copy(replacementConfigPath, builtConfigPath, true);
+        }
+
+        Debug.Log("Shade calibration build complete: " + executablePath);
     }
 }

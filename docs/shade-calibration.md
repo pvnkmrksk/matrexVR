@@ -32,3 +32,13 @@ Run:
 ```bash
 ./Builds/ShadeCalibration/ShadeCalibration.x86_64
 ```
+
+The dedicated VR3 variant uses the 64×64 `DRBLFU` layout from
+`Assets/StreamingAssets/system_config_VR3.json`, starts with VR3 selected, and places
+the operator label to the right of the panel area. Its `D` and `U` panels are always
+pure black; only the four side panels display the selected shade. Build it with **Tools > Shade
+Calibration > Build Linux VR3**, or run the completed build with:
+
+```bash
+./Builds/ShadeCalibrationVR3/ShadeCalibrationVR3.x86_64
+```
