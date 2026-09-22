@@ -81,8 +81,7 @@ sudo apt-get install unityhub
 4. Click Add or Open
 5. Navigate to: `~/src/matrexVR`
 6. Click Open
-7. Accept the recommended LTS version (e.g., 2024.x LTS)
-   - Do NOT install Unity 6000 or other non-recommended versions
+7. Install the editor version recorded in `ProjectSettings/ProjectVersion.txt`. The terrain work was validated locally with **Unity 6000.3.16f1 (Unity 6.3 LTS)**; the local editor/package upgrade is separate from the terrain commits.
 
 ### Step 6: Run the Project
 
@@ -124,6 +123,25 @@ Once the correct Unity version is installed, open the project and you're ready t
 - `P` - Toggle Closed Loop Position Control
 - `M` - Toggle Closed Loop Momentum Control
 
+## Terrain appearance and navigation experiments
+
+The existing `navrug` scenes support JSON-controlled terrain conditions, with **1 Unity unit = 1 cm** and a default **1 cm** ground clearance. The first scene suffix letter is appearance; the second is navigation.
+
+| Condition | Scene | Choice config (`Assets/StreamingAssets/`) |
+| --- | --- | --- |
+| Looks rough, feels rough | `navrug_rr` | `choice_navrug_looks_rough_feels_rough.json` |
+| Looks rough, feels smooth | `navrug_rs` | `choice_navrug_looks_rough_feels_smooth.json` |
+| Looks smooth, feels rough | `navrug_sr` | `choice_navrug_looks_smooth_feels_rough.json` |
+| Looks smooth, feels smooth | `navrug_ss` | `choice_navrug_looks_smooth_feels_smooth.json` |
+
+The active `Assets/StreamingAssets/sequenceConfig.json` already runs all **16 combinations**, 30 seconds each, looping every eight minutes. Open `ControlScene` and press **Play**: top-level `autoStart: true` starts the sequence automatically. Conditions are selected by JSON, with no terrain GUI controls.
+
+For the shorter four-condition experiment, back up the active sequence and replace it with `sequenceConfig_terrainNavigation.json`. That example uses manual startup; add `"autoStart": true` at the top level if desired.
+
+Use `sequenceConfig_terrainNavigation_allModes.json` to compare all 16 combinations of appearance, navigation surface, AGL/absolute height and level/normal-following orientation. Choice configs define condition defaults; sequence parameters can override individual fields.
+
+See [Terrain navigation README](docs/terrain-navigation.md) for complete JSON examples, configuration precedence, boundary behavior and Unity CLI tests on all four actual scenes.
+
 ## Running Experiments
 
 - The sequence of scenes is defined in `Assets/StreamingAssets/sequenceConfig.json`. Each entry lists a `sceneName`, a `duration`, optional `parameters`, and whether to reload the scene between steps.
@@ -134,8 +152,8 @@ Once the correct Unity version is installed, open the project and you're ready t
 
 ## Dependencies
 
-- Unity Engine (version X.X.X)
-- NetMQ (version X.X.X)
+- Unity Engine: see `ProjectSettings/ProjectVersion.txt`
+- NetMQ: bundled in `Assets/Plugins/NetMQ.dll`
 
 ## Contributing
 

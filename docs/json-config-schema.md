@@ -14,6 +14,7 @@ Path used at runtime:
 - `Assets/StreamingAssets/sequenceConfig.json`
 
 Top-level fields:
+- `autoStart`: `bool`, default `false`; start the sequence automatically when `ControlScene` enters Play mode
 - `randomise`: `bool`
 - `loop`: `bool`
 - `sequences`: array of sequence items
@@ -26,6 +27,8 @@ Sequence item fields:
 
 Typical parameters:
 - `configFile`: JSON file in `StreamingAssets` used by the scene controller
+- `terrainWorld`: optional partial override of the choice config's visible/navigation terrain settings
+- `terrainNavigation`: optional partial override of height and orientation settings
 
 Notes:
 - `ChoiceController` expects `parameters.configFile`
@@ -42,6 +45,7 @@ Top-level fields:
 - `configs`: array of per-VR configs
 
 Per-VR config fields:
+- `terrainNavigation`: optional per-rig height/orientation defaults (see [terrain navigation](terrain-navigation.md))
 - `sphereDiameter`: FicTrac sphere diameter in cm
 - `ledPanelWidth`: panel width in pixels
 - `ledPanelHeight`: panel height in pixels
@@ -72,6 +76,10 @@ Top-level fields:
 - `randomInitialRotation`: `bool`
 - `backgroundColor`: `{ r, g, b, a }`
 - `skyboxPath`: relative path inside `StreamingAssets`
+- `terrainWorld`: optional `{ flatAppearance, flatNavigation, flatHeightCm }`
+- `terrainNavigation`: optional `{ heightMode, orientationMode, heightAboveGroundCm, absoluteHeightCm, normalSampleRadiusCm, alignmentSpeed }`
+
+Terrain navigation uses centimeters. Height modes are `AboveGround` and `Absolute`; orientation modes are `HeightOnly` (level) and `PerpendicularToNormal`. Field precedence is scene defaults → per-rig system config → choice config → sequence parameters. World settings omit the per-rig system layer. See [the terrain navigation README](terrain-navigation.md) for runnable examples and the four `navrug` conditions.
 
 Per-object fields:
 - `type`: prefab name
