@@ -148,7 +148,7 @@ Transform:
   m_GameObject: {fileID: 104171254}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -200, y: -24.70336, z: -284.2775}
+  m_LocalPosition: {x: -125, y: 0, z: -125}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1361,6 +1361,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
+  - component: {fileID: 922000001}
   - component: {fileID: 1870994687}
   - component: {fileID: 1870994689}
   - component: {fileID: 1870994688}
@@ -1404,7 +1405,7 @@ TerrainCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_TerrainData: {fileID: 15600000, guid: b55e1e13e50ad1ab2828761b2f106113, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: 4da7e2d05ba6f9c02934633ff087e7df, type: 2}
   m_EnableTreeColliders: 1
 --- !u!218 &1870994689
 Terrain:
@@ -1415,7 +1416,7 @@ Terrain:
   m_GameObject: {fileID: 1870994686}
   m_Enabled: 1
   serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: b55e1e13e50ad1ab2828761b2f106113, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: 4da7e2d05ba6f9c02934633ff087e7df, type: 2}
   m_TreeDistance: 5000
   m_TreeBillboardDistance: 50
   m_TreeCrossFadeLength: 5
@@ -1512,6 +1513,23 @@ MonoBehaviour:
   - {fileID: 2100000, guid: fd28db8498f04a02890e57c80d65f409, type: 2}
   - {fileID: 2100000, guid: d091fce5a3194e5c88b3534915c4434b, type: 2}
   - {fileID: 2100000, guid: 71c72cc387cb16944bd05350c3967849, type: 2}
+--- !u!114 &922000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1870994686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b62463966146269f92787c8ed1200d, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  terrain: {fileID: 1870994689}
+  ruggedData: {fileID: 15600000, guid: 4da7e2d05ba6f9c02934633ff087e7df, type: 2}
+  flatAppearance: 1
+  flatNavigation: 1
+  flatHeightCm: 0.16480498
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

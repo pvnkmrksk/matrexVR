@@ -21,6 +21,7 @@ public class MainController : MonoBehaviour
     public int currentTrial = 0;
     private float timer;
     private bool sequenceStarted = false;
+    private bool autoStartSequence;
     private MasterDataLogger masterDataLogger;
     public bool loopSequence = false;
     private bool randomise = false; // Added field
@@ -137,6 +138,7 @@ public class MainController : MonoBehaviour
 
         // Load the sequence configuration
         LoadSequenceConfiguration();
+        if (autoStartSequence) StartSequence();
     }
 
     // Load system configurations from the specified file
@@ -359,11 +361,22 @@ public class MainController : MonoBehaviour
         if (activeSceneController != null && currentStepData.parameters != null)
         {
             activeSceneController.InitializeScene(currentStepData.parameters);
+            if (!(activeSceneController is ChoiceController)) ApplyTerrainConfiguration(currentStepData.parameters);
             timer = currentStepData.duration;
         }
         else
         {
             Debugger.Log("Either the scene controller or the parameters are null.", 2);
+        }
+    }
+
+    public static void ApplyTerrainConfiguration(Dictionary<string, object> parameters)
+    {
+        foreach (var setup in FindObjectsOfType<NavrugSceneSetup>()) setup.ApplyConfiguration(parameters);
+        foreach (var follower in FindObjectsOfType<TerrainOrientationUpdater>())
+        {
+            follower.ApplyConfiguration(parameters);
+            follower.Conform(0f, true);
         }
     }
 
@@ -406,13 +419,13 @@ public class MainController : MonoBehaviour
         string timestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
     }
 
-    void LoadSequenceConfiguration()
+    public void LoadSequenceConfiguration(string fileName = "sequenceConfig.json")
     {
         sequenceSteps.Clear();
         executionOrder.Clear();
 
         // Get the path to the sequence configuration JSON file
-        string jsonPath = Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json");
+        string jsonPath = Path.Combine(Application.streamingAssetsPath, fileName);
 
         // Check if the streamingAssetsPath directory exists
         if (Directory.Exists(Application.streamingAssetsPath))
@@ -428,6 +441,7 @@ public class MainController : MonoBehaviour
 
                 if (config != null)
                 {
+                    autoStartSequence = config.autoStart;
                     randomise = config.randomise; // Get the randomise parameter
                     loopSequence = config.loop; // Set looping based on config
 
@@ -473,7 +487,7 @@ public class MainController : MonoBehaviour
                         string sceneName = SceneManager.GetActiveScene().name;
                         string destinationPath = Path.Combine(
                             masterDataLogger.directoryPath,
-                            $"{timestamp}_{sceneName}_sequenceConfig.json"
+                            $"{timestamp}_{sceneName}_{Path.GetFileName(fileName)}"
                         );
                         File.Copy(jsonPath, destinationPath);
 
@@ -553,6 +567,7 @@ void ManageTimerAndTransitions()
     {
         // ★ NEW PATH: keep scene, just tell it to advance
         sequencer.AdvanceStep(next.parameters);
+        if (!(activeSceneController is ChoiceController)) ApplyTerrainConfiguration(next.parameters);
         timer = next.duration;      // restart timer for the new sub-step
     }
     else
@@ -634,6 +649,7 @@ public class SequenceStep
 [System.Serializable]
 public class SequenceConfig
 {
+    public bool autoStart = false;
     public bool randomise = false; // Added field
     public bool loop = true; // Added field for controlling whether the sequence should loop
     public SequenceItem[] sequences;
@@ -653,6 +669,7 @@ public class SequenceItem
 [System.Serializable]
 public class SystemConfig
 {
+    public JObject terrainNavigation; // Optional per-rig defaults; sequence fields override these.
     public float sphereDiameter = 1.0f;
     public int ledPanelWidth = 128;
     public int ledPanelHeight = 128;

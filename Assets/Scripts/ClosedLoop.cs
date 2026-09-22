@@ -32,6 +32,7 @@ public class ClosedLoop : MonoBehaviour
             Debug.LogError("ZmqListener component not found!");
         _initialPosition = transform.position;
         _initialRotation = transform.rotation;
+        _initialWorldRotation = _initialRotation;
         ResetPositionAndRotation();
     }
 
@@ -82,7 +83,7 @@ public class ClosedLoop : MonoBehaviour
         // Combine the initial world rotation with the FicTrac offset
         // This ensures that any random initial rotation is accounted for
         // when calculating position changes in UpdateTransform
-        _ficTracRotationOffset = _initialWorldRotation * Quaternion.Euler(0, -initialYaw * Mathf.Rad2Deg, 0);
+        _ficTracRotationOffset = Quaternion.Euler(0, _initialWorldRotation.eulerAngles.y, 0) * Quaternion.Euler(0, -initialYaw * Mathf.Rad2Deg, 0);
         _isInitialized = true;
         Debug.Log($"Initialized with FicTrac data: ({_lastFicTracData.x}, {_lastFicTracData.y}, {_lastFicTracData.z})");
     }
@@ -105,9 +106,8 @@ public class ClosedLoop : MonoBehaviour
         if (closedLoopOrientation)
         {
             float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg;
-            // Use Space.Self instead of Space.World to ensure rotation is applied
-            // relative to the object's current orientation. This works better with random initial rotations.
-            transform.Rotate(0, rotationDelta, 0, Space.Self);
+            // Heading is around world up, independently of terrain pitch/roll.
+            transform.Rotate(0, rotationDelta, 0, Space.World);
         }
 
         _lastFicTracData = currentFicTracData;

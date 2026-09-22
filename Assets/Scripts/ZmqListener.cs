@@ -15,10 +15,8 @@ public class ZmqListener : MonoBehaviour
     [SerializeField]
     public int port = 9872; // Replace with your port number
 
-    private SubscriberSocket subscriber;
     private Thread listenerThread;
     private volatile bool isRunning;
-    private string message; // The message received from the socket
     public Pose pose { get; private set; }
     public bool HasPose { get; private set; }
     public double SecondsSinceLastPose
@@ -51,69 +49,89 @@ public class ZmqListener : MonoBehaviour
         // Apply system config at start
         ApplySystemConfig();
 
-        subscriber = new SubscriberSocket();
-        subscriber.Connect($"tcp://{address}:{port}");
-        subscriber.SubscribeToAnyTopic(); // Subscribe to all topics
+        string endpoint = $"tcp://{address}:{port}";
 
         // Start listening for messages on a separate thread
         isRunning = true;
         listenerThread = new Thread(() =>
         {
-            while (isRunning)
+            // NetMQ sockets must be created, read and disposed on the same thread.
+            // A bounded receive lets scene unload stop the listener without disposing
+            // a socket concurrently with its blocking receive.
+            try
             {
-                try
+                using (var subscriber = new SubscriberSocket())
                 {
-                    string topic = subscriber.ReceiveFrameString();
-                    message = subscriber.ReceiveFrameString();
-
-                    if (!isRunning)
+                    subscriber.Options.Linger = TimeSpan.Zero;
+                    subscriber.Connect(endpoint);
+                    subscriber.SubscribeToAnyTopic();
+                    bool waitingForPayload = false;
+                    while (isRunning)
                     {
-                        break;
-                    }
+                        try
+                        {
+                            if (!subscriber.TryReceiveFrameString(TimeSpan.FromMilliseconds(50), out string message)) continue;
+                            if (!waitingForPayload)
+                            {
+                                waitingForPayload = true; // Preserve the existing topic + JSON frame protocol.
+                                continue;
+                            }
+                            waitingForPayload = false;
 
-                    // Update the pose based on the received values
-                    ZmqMessage zmqMessage = JsonUtility.FromJson<ZmqMessage>(message);
-                    UpdatePose(zmqMessage);
+                            if (!isRunning)
+                            {
+                                break;
+                            }
+
+                            // Update the pose based on the received values
+                            ZmqMessage zmqMessage = JsonUtility.FromJson<ZmqMessage>(message);
+                            UpdatePose(zmqMessage);
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            break;
+                        }
+                        catch (NetMQException ex)
+                        {
+                            if (!isRunning)
+                            {
+                                break;
+                            }
+
+                            // Change error level from 1 (error) to 3 (info) for socket exceptions
+                            string errorMessage = ex.ToString();
+
+                            // Handle common socket messages that shouldn't be treated as errors
+                            if (errorMessage.Contains("connection reset by peer") ||
+                                errorMessage.Contains("non-blocking socket would block"))
+                            {
+                                Debugger.Log("NetMQ socket info: " + errorMessage, 3);
+                            }
+                            else
+                            {
+                                // For other NetMQ exceptions, still log as warnings
+                                Debugger.Log("NetMQException: " + errorMessage, 2);
+                            }
+
+                            Thread.Sleep(100);
+                            continue;
+                        }
+                        catch (Exception ex)
+                        {
+                            if (!isRunning)
+                            {
+                                break;
+                            }
+
+                            Debugger.Log("Unhandled ZMQ listener exception: " + ex, 1);
+                            Thread.Sleep(100);
+                        }
+                    }
                 }
-                catch (ObjectDisposedException)
-                {
-                    break;
-                }
-                catch (NetMQException ex)
-                {
-                    if (!isRunning)
-                    {
-                        break;
-                    }
-
-                    // Change error level from 1 (error) to 3 (info) for socket exceptions
-                    string errorMessage = ex.ToString();
-
-                    // Handle common socket messages that shouldn't be treated as errors
-                    if (errorMessage.Contains("connection reset by peer") ||
-                        errorMessage.Contains("non-blocking socket would block"))
-                    {
-                        Debugger.Log("NetMQ socket info: " + errorMessage, 3);
-                    }
-                    else
-                    {
-                        // For other NetMQ exceptions, still log as warnings
-                        Debugger.Log("NetMQException: " + errorMessage, 2);
-                    }
-
-                    Thread.Sleep(100);
-                    continue;
-                }
-                catch (Exception ex)
-                {
-                    if (!isRunning)
-                    {
-                        break;
-                    }
-
-                    Debugger.Log("Unhandled ZMQ listener exception: " + ex, 1);
-                    Thread.Sleep(100);
-                }
+            }
+            catch (Exception ex)
+            {
+                if (isRunning) Debug.LogError("ZMQ listener failed: " + ex);
             }
         })
         {
@@ -167,19 +185,6 @@ public class ZmqListener : MonoBehaviour
     private void StopListener()
     {
         isRunning = false;
-
-        try
-        {
-            subscriber?.Dispose();
-        }
-        catch (Exception ex)
-        {
-            Debugger.Log("Error disposing ZMQ subscriber: " + ex, 2);
-        }
-        finally
-        {
-            subscriber = null;
-        }
 
         if (listenerThread != null && listenerThread.IsAlive)
         {

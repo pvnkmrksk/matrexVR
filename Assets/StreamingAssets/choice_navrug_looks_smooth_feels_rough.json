@@ -1,0 +1,35 @@
+{
+  "objects": [],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "initialPosition": {
+    "x": 0,
+    "y": 1,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "randomInitialRotation": false,
+  "backgroundColor": {
+    "r": 0.8,
+    "g": 0.8,
+    "b": 0.8,
+    "a": 1
+  },
+  "terrainWorld": {
+    "flatAppearance": true,
+    "flatNavigation": false,
+    "flatHeightCm": 0.16480498
+  },
+  "terrainNavigation": {
+    "heightMode": "AboveGround",
+    "orientationMode": "PerpendicularToNormal",
+    "heightAboveGroundCm": 1,
+    "absoluteHeightCm": 1.16480498,
+    "normalSampleRadiusCm": 0.5,
+    "alignmentSpeed": 12
+  }
+}

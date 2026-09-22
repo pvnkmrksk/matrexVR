@@ -23,12 +23,20 @@ public class Keyboard : MonoBehaviour
     private bool allowPitchAndRoll = false;
 
     private MainController mainController;
+    private TerrainOrientationUpdater terrainFollower;
+    private void Move(Vector3 direction)
+    {
+        if (terrainFollower != null && terrainFollower.enabled)
+            transform.position += Quaternion.Euler(0, transform.eulerAngles.y, 0) * direction * Time.deltaTime * translateSpeed;
+        else transform.Translate(direction * Time.deltaTime * translateSpeed);
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         // find the MainController
         mainController = FindObjectOfType<MainController>();
+        terrainFollower = GetComponent<TerrainOrientationUpdater>();
     }
 
     // Update is called once per frame
@@ -37,19 +45,19 @@ public class Keyboard : MonoBehaviour
         //use the keyboard to move, add a translateSpeed factor
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            transform.Translate(Vector3.forward * Time.deltaTime * translateSpeed);
+            Move(Vector3.forward);
         }
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            transform.Translate(Vector3.back * Time.deltaTime * translateSpeed);
+            Move(Vector3.back);
         }
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            transform.Translate(Vector3.left * Time.deltaTime * translateSpeed);
+            Move(Vector3.left);
         }
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            transform.Translate(Vector3.right * Time.deltaTime * translateSpeed);
+            Move(Vector3.right);
         }
 
         //use the keyboard to go up and down using c and z
@@ -65,11 +73,11 @@ public class Keyboard : MonoBehaviour
         //use the keyboard to yaw left right
         if (Input.GetKey(KeyCode.A))
         {
-            transform.Rotate(Vector3.up * Time.deltaTime * rotateSpeed);
+            transform.Rotate(Vector3.up * Time.deltaTime * rotateSpeed, Space.World);
         }
         if (Input.GetKey(KeyCode.D))
         {
-            transform.Rotate(Vector3.down * Time.deltaTime * rotateSpeed);
+            transform.Rotate(Vector3.down * Time.deltaTime * rotateSpeed, Space.World);
         }
         //use the keyboard to roll left right
         if (allowPitchAndRoll && Input.GetKey(KeyCode.Q))
@@ -131,7 +139,7 @@ public class Keyboard : MonoBehaviour
         // if esc is pressed, return to control scene
         if (Input.GetKeyUp(KeyCode.Escape))
         {
-            mainController.StopSequence();
+            if (mainController != null) mainController.StopSequence();
             UnityEngine.SceneManagement.SceneManager.LoadScene("ControlScene");
         }
     }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Linq;
 using InSceneSequence;
@@ -24,13 +25,18 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         // Initialize prefab dictionary
         foreach (var prefab in prefabs)
         {
+            if (prefab == null)
+            {
+                Debug.LogWarning("ChoiceController: skipping a missing prefab reference.", this);
+                continue;
+            }
             prefabDict[prefab.name] = prefab;
         }
 
         // Initialize material dictionary
         foreach (var material in materials)
         {
-            materialDict[material.name] = material;
+            if (material != null) materialDict[material.name] = material;
         }
 
         defaultSkyboxMaterial = RenderSettings.skybox;
@@ -68,6 +74,17 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
         CleanupSpawnedObjects();
         ApplyConfig(config);
+        // Resolve per-condition defaults before sequence overrides. Deep merging keeps
+        // partial overrides from discarding unrelated fields in a choice config.
+        var terrainParameters = new Dictionary<string, object>();
+        foreach (string key in new[] { "terrainWorld", "terrainNavigation" })
+        {
+            JObject resolved = (JObject)(key == "terrainWorld" ? config.terrainWorld : config.terrainNavigation)?.DeepClone() ?? new JObject();
+            if (parameters.TryGetValue(key, out var value) && value != null)
+                resolved.Merge(value as JObject ?? JObject.FromObject(value));
+            if (resolved.HasValues) terrainParameters[key] = resolved;
+        }
+        MainController.ApplyTerrainConfiguration(terrainParameters);
     }
 
     private SceneConfig LoadSceneConfig(string configFile)
@@ -499,6 +516,8 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 [System.Serializable]
 public class SceneConfig
 {
+    public JObject terrainWorld;
+    public JObject terrainNavigation;
     public SceneObject[] objects;
     public bool closedLoopOrientation;
     public bool closedLoopPosition;

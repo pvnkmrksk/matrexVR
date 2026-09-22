@@ -1,0 +1,38 @@
+{
+  "randomise": false,
+  "loop": true,
+  "sequences": [
+    {
+      "sceneName": "navrug_rr",
+      "duration": 30,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "choice_navrug_looks_rough_feels_rough.json"
+      }
+    },
+    {
+      "sceneName": "navrug_rs",
+      "duration": 30,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "choice_navrug_looks_rough_feels_smooth.json"
+      }
+    },
+    {
+      "sceneName": "navrug_sr",
+      "duration": 30,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "choice_navrug_looks_smooth_feels_rough.json"
+      }
+    },
+    {
+      "sceneName": "navrug_ss",
+      "duration": 30,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "choice_navrug_looks_smooth_feels_smooth.json"
+      }
+    }
+  ]
+}
