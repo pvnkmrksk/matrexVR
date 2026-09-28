@@ -26,6 +26,8 @@ public class LocustSpawner : MonoBehaviour
     public string layerName = "LocustLayer"; // Default value
     public BoundaryManager boundaryManager;
 
+    public bool animateOnMove;
+    public float animationSpeedThreshold = 0.5f;
     public bool loadConfigFromJsonFile = true; // If true, load config from json file, else use default values
 
     private readonly System.Collections.Generic.List<GameObject> spawned = new System.Collections.Generic.List<GameObject>();
@@ -114,6 +116,8 @@ public class LocustSpawner : MonoBehaviour
             if (locust.GetComponent<LocustMover>() != null) locust.GetComponent<LocustMover>().speed = locustSpeed; // Set the speed of the locust
             locust.name = layerName + "_Locust_" + i; // Set the name
             locust.tag = "SimulatedLocust"; // Set the tag for the locust
+            float wrap = boundaryManager != null ? boundaryManager.boundarySize : 0;
+            AnimateOnMove.ConfigureHierarchy(locust, locust.transform, animateOnMove, animationSpeedThreshold, new Vector2(wrap, wrap));
             // Get the Animator component
             Animator locustAnimator = locust.GetComponent<Animator>();
 

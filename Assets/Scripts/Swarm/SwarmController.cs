@@ -33,6 +33,8 @@ public class SwarmController : MonoBehaviour, IInSceneSequencer
                     closedLoop.SetPositionAndRotation(vr.initialPosition?.ToVector3() ?? spawner.transform.position,
                         vr.initialRotation != null ? Quaternion.Euler(vr.initialRotation.ToVector3()) : spawner.transform.rotation);
             }
+            spawner.animateOnMove = movement.animateOnMove;
+            spawner.animationSpeedThreshold = movement.animationSpeedThreshold;
             spawner.Rebuild();
         }
         SimpleOverheadCamera.EnsureInScene();

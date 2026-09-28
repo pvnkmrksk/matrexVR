@@ -4,12 +4,15 @@
   "sequences": [
     {
       "sceneName": "Swarm",
-      "duration": 10,
+      "duration": 20,
       "parameters": {
-        "numberOfLocusts": 128,
+        "numberOfLocusts": 256,
         "mu": 0,
         "kappa": 100000,
-        "locustSpeed": 2
+        "locustSpeed": 2,
+        "spawnAreaSize": 200,
+        "animateOnMove": true,
+        "animationSpeedThreshold": 0.5
       }
     },
     {

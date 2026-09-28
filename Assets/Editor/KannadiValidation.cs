@@ -9,6 +9,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 // Run on a disposable project copy: Unity -batchmode -projectPath ... -executeMethod KannadiValidation.Run
@@ -25,6 +26,9 @@ public static class KannadiValidation
     private static Vector3 expectedPosition;
     private static int rigInstance;
     private static string logDirectory;
+    private static Camera hiddenCamera;
+    private static int hiddenRenders;
+    private static void CountHiddenRender(Camera camera) { if (camera == hiddenCamera) hiddenRenders++; }
     static KannadiValidation()
     {
         EditorApplication.playModeStateChanged += state => {
@@ -65,7 +69,7 @@ public static class KannadiValidation
         if (!condition) throw new Exception("Validation failed: " + message);
     }
     private static object Call(object target, string method, params object[] args) => target.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Invoke(target, args);
-    private static T Field<T>(object target, string name) => (T)target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
+    private static T Field<T>(object target, string name) => (T)target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(target);
     private static Dictionary<string, object> Params(string json) => JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
     private static void Later() { phase++; nextFrame = Time.frameCount + 8; }
     private static void NextSequenceStep()
@@ -150,6 +154,192 @@ public static class KannadiValidation
         unknown.SetActive(false);
         Object.Destroy(unknown);
     }
+    private static Vector2 Heading(OverheadTrackOverlay overlay, object track)
+    {
+        object[] args = { track, Vector2.zero, Vector2.zero };
+        overlay.GetType().GetMethod("MarkerPose", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(overlay, args);
+        return (Vector2)args[2];
+    }
+    private static Vector3[] ArrowVertices(OverheadTrackOverlay overlay)
+    {
+        using (var vh = new VertexHelper())
+        {
+            overlay.GetType().GetMethod("OnPopulateMesh", BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(VertexHelper) }, null).Invoke(overlay, new object[] { vh });
+            var result = new Vector3[vh.currentVertCount];
+            for (int i = 0; i < result.Length; i++) { var vertex = new UIVertex(); vh.PopulateUIVertex(ref vertex, i); result[i] = vertex.position; }
+            return result;
+        }
+    }
+    private static void CheckOverviewTracking()
+    {
+        var overlay = Object.FindObjectOfType<OverheadTrackOverlay>();
+        Check(overlay != null && overlay.TrackedRigCount == 4, "one heading per scene rig");
+        Check(overlay.GetComponentsInChildren<Text>().Select(t => t.text).OrderBy(t => t).SequenceEqual(new[] { "1", "2", "3", "4" }), "numeric labels without VR prefix");
+        Check(!GameObject.FindObjectsOfType<Renderer>().Any(r => r.name.StartsWith("Tracked VR")), "old sphere markers removed");
+        Check(overlay.GetComponentInParent<RectMask2D>() != null && !overlay.raycastTarget, "markers clipped to overview and do not block mouse input");
+        OverheadCameraConfig settings = Field<OverheadCameraConfig>(overlay, "settings");
+        Check(settings.trailDurationSeconds == 60, "one-minute trajectory history by default");
+        var tracks = Field<System.Collections.IList>(overlay, "tracks");
+        foreach (object t in tracks) Field<System.Collections.IList>(t, "samples").Clear();
+        object track = tracks[0];
+        ClosedLoop rig = Field<ClosedLoop>(track, "rig");
+        Vector3 originalPosition = rig.transform.position;
+        Quaternion originalRotation = rig.transform.rotation;
+        rig.transform.rotation = Quaternion.identity;
+        Check(Vector2.Dot(Heading(overlay, track), Vector2.up) > 0.999f, "north-facing animal arrow points up in nadir view");
+        rig.transform.rotation = Quaternion.Euler(0, 90, 0);
+        Check(Vector2.Dot(Heading(overlay, track), Vector2.right) > 0.999f, "heading arrow follows animal yaw");
+        var orbit = Object.FindObjectOfType<OverheadCameraController>();
+        float originalDistance = orbit.distance;
+        orbit.distance = 50; Call(orbit, "UpdateCameraPosition");
+        Vector3[] near = ArrowVertices(overlay);
+        orbit.distance = 500; Call(orbit, "UpdateCameraPosition");
+        Vector3[] far = ArrowVertices(overlay);
+        Check(near.Length >= 96 && far.Length >= 96, "four arrows contain no sphere geometry");
+        Check(Mathf.Abs(Vector3.Distance(near[near.Length - 24], near[near.Length - 22]) - Vector3.Distance(far[far.Length - 24], far[far.Length - 22])) < 0.01f, "arrow remains same size over tenfold zoom-out");
+        var labelPositions = tracks.Cast<object>().Select(t => Field<Vector2>(t, "markerPosition")).ToArray();
+        Check(tracks.Cast<object>().All(t => Field<Vector2>(t, "actualPosition") == Field<Vector2>(t, "markerPosition")), "markers stay at exact rig positions even when crowded");
+        var second = tracks[1];
+        var secondRig = Field<ClosedLoop>(second, "rig");
+        Vector3 secondPosition = secondRig.transform.position;
+        secondRig.transform.position = rig.transform.position;
+        Call(overlay, "UpdateLabels");
+        Check(Field<Vector2>(track, "markerPosition") == Field<Vector2>(second, "markerPosition"), "overlapping animals keep overlapping markers without rearrangement");
+        secondRig.transform.position = secondPosition;
+        orbit.distance = originalDistance; Call(orbit, "UpdateCameraPosition");
+        float now = Time.unscaledTime;
+        rig.transform.position = Vector3.zero; Call(overlay, "SampleTrajectories", now - 61);
+        rig.transform.position = Vector3.right; Call(overlay, "SampleTrajectories", now - 59);
+        rig.transform.position = Vector3.right * 2; Call(overlay, "SampleTrajectories", now - 30);
+        rig.transform.position = Vector3.right * 3; Call(overlay, "SampleTrajectories", now);
+        var samples = Field<System.Collections.IList>(track, "samples");
+        Check(samples.Count == 3 && Mathf.Approximately(Field<float>(samples[0], "time"), now - 59), "expired trajectory samples removed and recent minute retained");
+        var opacity = typeof(OverheadTrackOverlay).GetMethod("TrailOpacity", BindingFlags.Static | BindingFlags.NonPublic);
+        float recent = (float)opacity.Invoke(null, new object[] { 0f, 60f });
+        float old = (float)opacity.Invoke(null, new object[] { 30f, 60f });
+        float expired = (float)opacity.Invoke(null, new object[] { 61f, 60f });
+        Check(recent > old && old > 0 && recent < 0.5f && expired == 0, "faint trajectory fades with age to zero");
+        rig.transform.position = Vector3.right * 100; Call(overlay, "SampleTrajectories", now + 0.1f);
+        Check(Field<bool>(samples[samples.Count - 1], "breakBefore"), "periodic wrap / teleport does not draw a long false path");
+        var extra = new GameObject("VR12 test rig"); extra.AddComponent<ClosedLoop>();
+        Call(overlay, "RefreshRigs");
+        Check(overlay.TrackedRigCount == 5 && overlay.GetComponentsInChildren<Text>().Any(t => t.text == "12"), "additional scene rigs get markers beyond four");
+        extra.SetActive(false); Call(overlay, "RefreshRigs"); Object.Destroy(extra);
+        Check(overlay.TrackedRigCount == 4, "inactive or removed rigs lose markers");
+        foreach (object t in tracks) Field<System.Collections.IList>(t, "samples").Clear();
+        var setup = Object.FindObjectOfType<SimpleOverheadCamera>();
+        setup.ToggleCamera();
+        Check(ArrowVertices(overlay).Length == 0 && overlay.GetComponentsInChildren<Text>().All(t => !t.enabled), "hide overview hides arrows and labels");
+        Call(overlay, "LateUpdate");
+        Check(!overlay.enabled && Field<System.Collections.IList>(track, "samples").Count == 0, "hidden overview stops tracking updates");
+        Check(!Field<Camera>(setup, "overheadCam").enabled && !Field<GameObject>(setup, "cameraObject").activeSelf && !Field<GameObject>(setup, "backgroundObject").activeSelf, "hide disables both overview cameras");
+        Check(!Field<RenderTexture>(setup, "renderTexture").IsCreated(), "hidden overview releases its render target");
+        Check(GameObject.Find("FPS Label").GetComponent<Text>().enabled, "FPS remains visible when overview is hidden");
+        setup.ToggleCamera();
+        Check(overlay.enabled && Field<Camera>(setup, "overheadCam").enabled && Field<RenderTexture>(setup, "renderTexture").IsCreated(), "show restores rendering and tracking");
+        rig.transform.SetPositionAndRotation(originalPosition, originalRotation);
+        foreach (object t in tracks) Field<System.Collections.IList>(t, "samples").Clear();
+        // Illustrative synthetic paths for the saved operator-panel screenshot.
+        var positions = new Dictionary<ClosedLoop, Vector3>();
+        foreach (object t in tracks) { var r = Field<ClosedLoop>(t, "rig"); positions[r] = r.transform.position; }
+        for (int i = 0; i <= 120; i++)
+        {
+            foreach (object t in tracks)
+            {
+                var r = Field<ClosedLoop>(t, "rig");
+                float fraction = i / 120f, side = r.name.Contains("VR1") || r.name.Contains("VR3") ? 1 : -1;
+                r.transform.position = positions[r] + new Vector3(side * 30 * (1 - fraction), 0, 12 * Mathf.Sin(fraction * Mathf.PI * 2));
+            }
+            Call(overlay, "SampleTrajectories", now - 60 + i * 0.5f);
+        }
+        foreach (var pair in positions) pair.Key.transform.position = pair.Value;
+        Call(overlay, "UpdateLabels");
+    }
+    private static void CaptureOverviewPanel()
+    {
+        Canvas canvas = GameObject.Find("Overhead Camera Canvas").GetComponent<Canvas>();
+        RectTransform panel = GameObject.Find("Overview Panel").GetComponent<RectTransform>();
+        Vector2 anchorMin = panel.anchorMin, anchorMax = panel.anchorMax;
+        var previewObject = new GameObject("Overview validation capture");
+        Camera preview = previewObject.AddComponent<Camera>();
+        preview.transform.position = new Vector3(0, 0, -100000);
+        preview.clearFlags = CameraClearFlags.SolidColor;
+        preview.backgroundColor = Color.black;
+        var target = new RenderTexture(640, 640, 24); target.Create(); preview.targetTexture = target;
+        canvas.renderMode = RenderMode.ScreenSpaceCamera; canvas.worldCamera = preview; canvas.planeDistance = 1;
+        panel.anchorMin = Vector2.zero; panel.anchorMax = Vector2.one;
+        Canvas.ForceUpdateCanvases();
+        Call(Object.FindObjectOfType<SimpleOverheadCamera>(), "LateUpdate");
+        Call(Object.FindObjectOfType<OverheadTrackOverlay>(), "LateUpdate");
+        Canvas.ForceUpdateCanvases();
+        GameObject.Find("Simple Overhead Camera").GetComponent<Camera>().Render();
+        preview.Render();
+        RenderTexture.active = target;
+        var pixels = new Texture2D(640, 640, TextureFormat.RGB24, false);
+        pixels.ReadPixels(new Rect(0, 0, 640, 640), 0, 0); pixels.Apply();
+        File.WriteAllBytes(Path.Combine(Application.dataPath, "../kannadi-overview.png"), pixels.EncodeToPNG());
+        Object.Destroy(pixels); RenderTexture.active = null;
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.worldCamera = null;
+        panel.anchorMin = anchorMin; panel.anchorMax = anchorMax;
+        preview.targetTexture = null; target.Release(); Object.Destroy(target); Object.Destroy(previewObject);
+        Canvas.ForceUpdateCanvases();
+    }
+    private static void CheckTextResources()
+    {
+        var settings = TMPro.TMP_Settings.instance;
+        Check(settings != null, "TMP settings resource resolves");
+        var required = typeof(TMPro.TMP_Settings).GetField("s_CurrentAssetVersion", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+        Check((string)Field<string>(settings, "assetVersion") == (string)required, "TMP essential resources match Unity 6 importer version");
+        Check(TMPro.TMP_Settings.defaultFontAsset != null && TMPro.TMP_Settings.defaultFontAsset.material.shader.isSupported, "TMP default font and shader resolve");
+        GameObject root = new GameObject("TMP validation canvas", typeof(Canvas));
+        var text = new GameObject("TMP test", typeof(RectTransform), typeof(TMPro.TextMeshProUGUI)).GetComponent<TMPro.TextMeshProUGUI>();
+        text.transform.SetParent(root.transform, false);
+        text.font = TMPro.TMP_Settings.defaultFontAsset;
+        text.text = "1234"; text.ForceMeshUpdate();
+        Check(text.textInfo.characterCount == 4 && text.textInfo.meshInfo[0].vertexCount > 0, "TMP renders with imported resources");
+        Object.Destroy(root);
+    }
+    private static void CheckSceneOverview()
+    {
+        Check(Object.FindObjectsOfType<fps>().Length == 1, "one FPS display across scenes");
+        RectTransform fpsBox = GameObject.Find("FPS").GetComponent<RectTransform>();
+        Check(fpsBox.anchorMin == Vector2.one && fpsBox.anchorMax == Vector2.one && fpsBox.anchoredPosition.x < 0 && fpsBox.anchoredPosition.y < 0, "FPS anchored inside top-right corner");
+        var floor = GameObject.Find("Plane").GetComponent<Renderer>();
+        Check(floor.sharedMaterial.name == "LocustDryGrass" && floor.sharedMaterial.mainTexture != null && floor.sharedMaterial.shader.isSupported, "dry grass ground material available in scene");
+        Check(Mathf.Approximately(floor.bounds.size.x / floor.sharedMaterial.mainTextureScale.x, 20), "grass tile spans 20 world centimeters for optic flow");
+        Vector2 extent = GameObject.Find("Overview Panel").GetComponent<RectTransform>().anchorMax - GameObject.Find("Overview Panel").GetComponent<RectTransform>().anchorMin;
+        Check(Vector2.Distance(extent, new Vector2(0.4f, 0.4f)) < 0.001f, "larger forty-percent overview panel");
+    }
+    private static void CheckAnimationGate()
+    {
+        var gate = rigs[0].Clones[0].GetComponentInChildren<AnimateOnMove>();
+        Check(gate != null && gate.enabled, "Kannadi animation gate enabled from experiment config");
+        Animator animator = gate.GetComponent<Animator>();
+        Transform root = rigs[0].transform;
+        Vector3 originalPosition = root.position;
+        Quaternion originalRotation = root.rotation;
+        gate.Configure(root, true, 0.5f, new Vector2(200, 200));
+        root.position += Vector3.right * 0.049f; Call(gate, "MeasureTranslation", 0.1f);
+        Check(Mathf.Abs(gate.CurrentSpeed - 0.49f) < 0.001f && animator.speed == 0, "translation below 0.5 cm/s stops legs");
+        root.position += Vector3.right * 0.051f; Call(gate, "MeasureTranslation", 0.1f);
+        Check(Mathf.Abs(gate.CurrentSpeed - 0.51f) < 0.001f && animator.speed > 0, "translation above 0.5 cm/s animates legs");
+        root.rotation *= Quaternion.Euler(0, 90, 0); Call(gate, "MeasureTranslation", 0.1f);
+        Check(gate.CurrentSpeed == 0 && animator.speed == 0, "rotation in place cannot animate legs");
+        root.position = new Vector3(99.98f, 1, 0); gate.Configure(root, true, 0.5f, new Vector2(200, 200));
+        root.position = new Vector3(-99.98f, 1, 0); Call(gate, "MeasureTranslation", 0.1f);
+        Check(Mathf.Abs(gate.CurrentSpeed - 0.4f) < 0.001f && animator.speed == 0, "periodic wrap does not create false high walking speed");
+        gate.Configure(root, false, 0.5f, Vector2.zero);
+        Check(!gate.enabled && animator.speed > 0, "boolean disables speed gating and restores animation");
+        gate.Configure(root, true, 2f, Vector2.zero);
+        root.position += Vector3.right * 0.1f; Call(gate, "MeasureTranslation", 0.1f);
+        Check(animator.speed == 0, "custom speed threshold is respected in world units");
+        root.SetPositionAndRotation(originalPosition, originalRotation);
+        gate.Configure(root, true, 0.5f, new Vector2(200, 200));
+        Check(KannadiConfig.Load(Params("{\"animationNoiseThreshold\":0.25}")).animationSpeedThreshold == 0.25f, "legacy animation threshold remains compatible");
+        bool rejected = false;
+        try { KannadiConfig.Load(Params("{\"animationSpeedThreshold\":-1}")); } catch (ArgumentException) { rejected = true; }
+        Check(rejected, "negative animation thresholds rejected");
+    }
     private static void Tick()
     {
         if (!EditorApplication.isPlaying || Time.frameCount < nextFrame) return;
@@ -159,6 +349,7 @@ public static class KannadiValidation
             switch (phase)
             {
                 case 0:
+                    CheckTextResources();
                     var parsed = KannadiConfig.Load(Params("{\"closedLoopPosition\":true,\"closedLoopOrientation\":0.5,\"numberOfRings\":0,\"spacing\":7}"));
                     Check(parsed.closedLoopPosition == 1 && parsed.closedLoopOrientation == 0.5f && parsed.numberOfRings == 0, "legacy boolean/numeric gains and zero rings");
                     Check(Mathf.Approximately(Kannadi.Wrap(351, 100), -49) && Mathf.Approximately(Kannadi.Wrap(-251, 100), 49), "overshoot wrapping");
@@ -174,6 +365,7 @@ public static class KannadiValidation
                     Later(); break;
                 case 1:
                     Check(main.GetSystemConfig("VR4").zmqPort == 9874, "four VR1 hardware configurations loaded");
+                    Check(main.sequenceSteps[0].sceneName == "Swarm" && main.sequenceSteps[0].duration == 20 && main.sequenceSteps[1].sceneName == "Kannadi", "20-second Swarm entrainment precedes Kannadi");
                     main.sequenceSteps[0].duration = 1000;
                     main.sequenceSteps.Insert(1, new SequenceStep("Swarm", 1000, Params("{\"numberOfLocusts\":3}"), false));
                     main.StartSequence(); Later(); break;
@@ -181,8 +373,13 @@ public static class KannadiValidation
                     Check(SceneManager.GetActiveScene().name == "Swarm", "Swarm sequence dispatch");
                     var spawners = Object.FindObjectsOfType<LocustSpawner>();
                     Check(spawners.Length == 4, "four swarm rigs");
-                    Check(GameObject.FindGameObjectsWithTag("SimulatedLocust").Length == 512, "128 swarm agents per rig, no duplicate Start spawn");
+                    Check(GameObject.FindGameObjectsWithTag("SimulatedLocust").Length == 1024, "256 swarm agents per rig, no duplicate Start spawn");
                     foreach (ClosedLoop cl in Object.FindObjectsOfType<ClosedLoop>()) Check(Field<float>(cl, "sphereDiameter") == 2.6f, "system sphere diameter applies to Swarm");
+                    Check(spawners.All(p => p.kappa >= 10000 && p.mu == 0 && p.spawnAreaSize == 200), "dense aligned swarm config applied to every rig");
+                    Check(Object.FindObjectsOfType<LocustMover>().All(m => Vector3.Dot(m.transform.forward, Vector3.forward) > 0.999f), "entrainment locusts share configured direction");
+                    CheckSceneOverview();
+                    Check(Object.FindObjectsOfType<AnimateOnMove>().Length >= 1024 && Object.FindObjectsOfType<AnimateOnMove>().All(a => a.GetComponent<Animator>().speed > 0), "moving Swarm locusts animate above configured threshold");
+                    CheckOverviewTracking();
                     CheckViewports("Swarm");
                     Check(Object.FindObjectsOfType<Kannadi>().Length == 0, "Swarm contains no mirror controller");
                     int swarmInstance = Object.FindObjectOfType<SwarmController>().GetInstanceID();
@@ -222,15 +419,22 @@ public static class KannadiValidation
                     }
                     Check(Object.FindObjectsOfType<SimpleOverheadCamera>().Length == 1, "single overview");
                     Check(GameObject.Find("Overhead Camera Display") != null && Object.FindObjectOfType<OverheadCameraController>().inputRect != null, "overview panel input binding");
-                    var rt = GameObject.Find("Simple Overhead Camera").GetComponent<Camera>().targetTexture;
-                    RenderTexture.active = rt; var image = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
-                    image.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0); image.Apply();
-                    File.WriteAllBytes(Path.Combine(Application.dataPath, "../kannadi-overview.png"), image.EncodeToPNG()); Object.Destroy(image); RenderTexture.active = null;
+                    CheckSceneOverview();
+                    CheckAnimationGate();
+                    CheckOverviewTracking();
+                    CaptureOverviewPanel();
+                    hiddenCamera = Field<Camera>(Object.FindObjectOfType<SimpleOverheadCamera>(), "overheadCam");
+                    hiddenRenders = 0;
+                    Object.FindObjectOfType<SimpleOverheadCamera>().ToggleCamera();
+                    Camera.onPostRender += CountHiddenRender;
                     rigs[0].AdvanceStep(Params("{\"numberOfRings\":1,\"hexRadius\":5,\"boundaryLengthX\":200,\"boundaryLengthZ\":120,\"vrConfigs\":[{\"vrIndex\":1,\"watchIndex\":1}]}"));
                     Check(rigs[0].Clones.Length == 6 && rigs[1].Clones.Length == 7, "self-view omits only its own center");
                     rigs[0].transform.SetPositionAndRotation(new Vector3(301, 1, 183), Quaternion.Euler(0, 95, 0));
                     Later(); break;
                 case 4:
+                    Check(hiddenRenders == 0, "hidden overview submits no camera renders over multiple frames");
+                    Camera.onPostRender -= CountHiddenRender;
+                    Object.FindObjectOfType<SimpleOverheadCamera>().ToggleCamera();
                     Check(Mathf.Approximately(rigs[0].transform.position.x, -99) && Mathf.Approximately(rigs[0].transform.position.z, -57), "rectangular arena preserves overshoot");
                     foreach (var clone in rigs[0].Clones)
                     {
@@ -245,11 +449,12 @@ public static class KannadiValidation
                     Check((peer.cullingMask & 1) != 0, "watchIndex preserves the shared environment");
                     rigs[0].AdvanceStep(Params("{\"numberOfRings\":-1}"));
                     Check(rigs.All(r => r.Clones.Length == 0), "negative rings remove all replicas");
-                    rigs[0].AdvanceStep(Params("{\"numberOfRings\":0,\"kannadiTilePrefab\":\"LocustBand_black\"}"));
+                    rigs[0].AdvanceStep(Params("{\"numberOfRings\":0,\"kannadiTilePrefab\":\"LocustBand_black\",\"animateOnMove\":true,\"animationSpeedThreshold\":0.5}"));
                     Later(); break;
                 case 5:
                     Check(rigs.All(r => r.Clones.Length == 1 && r.Clones[0].GetComponentsInChildren<Renderer>().Length > 0), "band prefabs spawn visible members");
                     Check(rigs.SelectMany(r => r.Clones[0].GetComponentsInChildren<DirectionalMovement>()).All(m => !m.enabled), "mirrored bands have no independent movement");
+                    Check(rigs.SelectMany(r => r.Clones[0].GetComponentsInChildren<Animator>()).All(a => a.GetComponent<AnimateOnMove>() != null && a.GetComponent<AnimateOnMove>().enabled), "delayed band members inherit animation speed gating");
                     expectedPosition = rigs[0].Clones[0].transform.GetChild(0).position + new Vector3(3, 0, 4);
                     rigs[0].transform.position += new Vector3(3, 0, 4);
                     Later(); break;
@@ -303,6 +508,8 @@ public static class KannadiValidation
                 case 11:
                     Check(Object.FindObjectsOfType<SimpleOverheadCamera>().Length == 0 && GameObject.Find("Overhead Camera Canvas") == null, "overview resources cleaned up on exit");
                     Check(Directory.GetFiles(logDirectory, "*Kannadi*Clones.csv.gz").Length >= 8, "Kannadi clone logging across reloads");
+                    Check(!Resources.FindObjectsOfTypeAll<EditorWindow>().Any(w => w.GetType().Name == "TMP_PackageResourceImporterWindow"), "TMP import prompt does not reopen");
+                    Check(Object.FindObjectsOfType<fps>().Length == 1, "FPS display survives sequence exit");
                     Finish(); break;
             }
         }
@@ -314,6 +521,7 @@ public static class KannadiValidation
         EditorApplication.update -= Tick;
         Application.logMessageReceived -= OnLog;
         SceneManager.sceneLoaded -= DisableLiveInputs;
+        Camera.onPostRender -= CountHiddenRender;
         File.WriteAllText(Path.Combine(Application.dataPath, "../kannadi-validation.json"), JsonConvert.SerializeObject(new { checks, failures, editorMessages }, Formatting.Indented));
         Debug.Log($"KANNADI VALIDATION: {checks} checks, {failures.Count} failures");
         EditorApplication.Exit(failures.Count == 0 ? 0 : 1);

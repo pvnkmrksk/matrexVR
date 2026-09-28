@@ -81,8 +81,7 @@ sudo apt-get install unityhub
 4. Click Add or Open
 5. Navigate to: `~/src/matrexVR`
 6. Click Open
-7. Accept the recommended LTS version (e.g., 2024.x LTS)
-   - Do NOT install Unity 6000 or other non-recommended versions
+7. Install Unity 6 (`6000.3.16f1`), matching `ProjectSettings/ProjectVersion.txt`.
 
 ### Step 6: Run the Project
 

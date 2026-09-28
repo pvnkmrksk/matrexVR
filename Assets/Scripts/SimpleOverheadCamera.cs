@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -10,26 +9,28 @@ public class OverheadCameraConfig
 {
     public bool enabled = true;
     public int targetDisplay = -1; // Follow system_config's stimulus display by default.
-    public float x = 0.68f, y = 0.02f, width = 0.3f, height = 0.3f;
+    public float x = 0.58f, y = 0.02f, width = 0.4f, height = 0.4f;
     public int resolution = 512;
+    public float markerSizePixels = 14f;
+    public float trailDurationSeconds = 60f;
+    public float trailSampleInterval = 0.1f;
+    public float trailWidthPixels = 1.5f;
+    public float trailBreakDistance = 50f;
 }
 
-/// <summary>Operator overview; world markers are excluded from the animal cameras.</summary>
+/// <summary>Operator overview with screen-sized heading arrows and fading trajectory history.</summary>
 public class SimpleOverheadCamera : MonoBehaviour
 {
     public float cameraHeight = 150f;
-    public float viewportSize = 0.3f;
+    public float viewportSize = 0.4f;
     public Vector2 viewportOffset = new Vector2(0.02f, 0.02f);
     public int renderTextureResolution = 512;
-    public float vrMarkerSize = 2f;
-    public float vrMarkerHeight = 2f;
     public bool enableOnStart = true;
     private Camera overheadCam;
     private RenderTexture renderTexture;
     private GameObject uiCanvas, cameraObject, backgroundObject;
     private RawImage displayImage;
-    private readonly List<GameObject> markers = new List<GameObject>();
-    private readonly List<Material> markerMaterials = new List<Material>();
+    private OverheadTrackOverlay trackOverlay;
     private OverheadCameraController controller;
     private bool visible;
 
@@ -93,13 +94,19 @@ public class SimpleOverheadCamera : MonoBehaviour
         imageRect.offsetMin = new Vector2(2, 2); imageRect.offsetMax = new Vector2(-2, -30);
         displayImage = imageRect.GetComponent<RawImage>();
         displayImage.texture = renderTexture;
+        imageRect.gameObject.AddComponent<RectMask2D>();
+        RectTransform overlayRect = new GameObject("Animal Headings and Trails", typeof(RectTransform), typeof(CanvasRenderer), typeof(OverheadTrackOverlay)).GetComponent<RectTransform>();
+        overlayRect.SetParent(imageRect, false);
+        overlayRect.anchorMin = Vector2.zero; overlayRect.anchorMax = Vector2.one;
+        overlayRect.offsetMin = overlayRect.offsetMax = Vector2.zero;
+        trackOverlay = overlayRect.GetComponent<OverheadTrackOverlay>();
+        trackOverlay.Initialize(overheadCam, settings);
         controller.inputRect = imageRect;
         controller.inputDisplay = display;
         AddButton(panel, "Reset view", 0, () => controller.ResetToSkyView());
         AddButton(panel, "Show / hide", 108, ToggleCamera);
         visible = true;
         yield return null; // Rigs and band members have now completed Start.
-        CreateMarkers();
         controller.CalculateTargetFromLocusts();
     }
 
@@ -122,39 +129,21 @@ public class SimpleOverheadCamera : MonoBehaviour
     public void ToggleCamera()
     {
         visible = !visible;
+        if (visible && renderTexture != null && !renderTexture.IsCreated()) renderTexture.Create();
+        if (overheadCam != null) overheadCam.enabled = visible;
         if (cameraObject != null) cameraObject.SetActive(visible);
+        if (backgroundObject != null) backgroundObject.SetActive(visible);
         if (displayImage != null) displayImage.enabled = visible;
-    }
-    private void CreateMarkers()
-    {
-        int layer = LayerMask.NameToLayer("OverheadCameraMarkers");
-        if (layer < 0) { Debug.LogError("Missing OverheadCameraMarkers layer."); return; }
-        Color[] colors = { Color.red, Color.green, Color.cyan, Color.yellow };
-        foreach (ClosedLoop rig in FindObjectsOfType<ClosedLoop>())
-        {
-            int index = Kannadi.ParseVRIndex(rig.name);
-            if (index == 0) continue;
-            foreach (Camera camera in rig.GetComponentsInChildren<Camera>(true)) camera.cullingMask &= ~(1 << layer);
-            GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            marker.name = "Tracked VR" + index;
-            Destroy(marker.GetComponent<Collider>());
-            marker.layer = layer; marker.transform.SetParent(rig.transform, false);
-            marker.transform.localPosition = Vector3.up * vrMarkerHeight;
-            marker.transform.localScale = Vector3.one * vrMarkerSize;
-            Material material = new Material(Shader.Find("Unlit/Color")); material.color = colors[index - 1];
-            marker.GetComponent<Renderer>().sharedMaterial = material;
-            markerMaterials.Add(material); markers.Add(marker);
-        }
+        if (trackOverlay != null) trackOverlay.SetVisible(visible);
+        if (!visible && renderTexture != null) renderTexture.Release();
     }
     private void LateUpdate()
     {
-        if (overheadCam != null && displayImage != null && displayImage.rectTransform.rect.height > 0)
+        if (visible && overheadCam != null && displayImage != null && displayImage.rectTransform.rect.height > 0)
             overheadCam.aspect = displayImage.rectTransform.rect.width / displayImage.rectTransform.rect.height;
     }
     private void OnDestroy()
     {
-        foreach (GameObject marker in markers) if (marker != null) Destroy(marker);
-        foreach (Material material in markerMaterials) if (material != null) Destroy(material);
         if (cameraObject != null) Destroy(cameraObject);
         if (backgroundObject != null) Destroy(backgroundObject);
         if (uiCanvas != null) Destroy(uiCanvas);

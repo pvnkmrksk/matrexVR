@@ -152,11 +152,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraHeight: 150
-  viewportSize: 0.3
+  viewportSize: 0.4
   viewportOffset: {x: 0.02, y: 0.02}
   renderTextureResolution: 256
-  vrMarkerSize: 5
-  vrMarkerHeight: 2
   enableOnStart: 1
 --- !u!4 &35819838
 Transform:
@@ -338,7 +336,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b7664e6b7fdbd2440b78353efab7d30f, type: 2}
+  - {fileID: 2100000, guid: b4e9fdc429624190828bae8c8447fd14, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

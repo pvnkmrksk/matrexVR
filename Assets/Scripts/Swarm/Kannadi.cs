@@ -151,13 +151,9 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
                     band.customParentTransform = null;
                     band.gameObject.layer = layer;
                 }
-                if (config.animateOnMove)
-                    foreach (Animator animator in clone.GetComponentsInChildren<Animator>(true))
-                    {
-                        AnimateOnMove animation = animator.GetComponent<AnimateOnMove>() ?? animator.gameObject.AddComponent<AnimateOnMove>();
-                        animation.SetNoiseThreshold(config.animationNoiseThreshold);
-                    }
-                clone.AddComponent<KannadiMirrorTile>();
+                Vector2 wrapSize = config.periodicBoundary ? new Vector2(config.boundaryLengthX, config.boundaryLengthZ) : Vector2.zero;
+                AnimateOnMove.ConfigureHierarchy(clone, transform, config.animateOnMove, config.animationSpeedThreshold, wrapSize);
+                clone.AddComponent<KannadiMirrorTile>().ConfigureAnimation(transform, config.animateOnMove, config.animationSpeedThreshold, wrapSize);
                 copies.Add(clone); positions.Add(offset);
             }
         }

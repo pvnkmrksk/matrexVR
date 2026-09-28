@@ -12,8 +12,7 @@
   "kannadiTilePrefab": "SimulatedLocust",
   "boundaryLengthX": 200.0,
   "boundaryLengthZ": 200.0,
-  "animateOnMove": false,
-  "animationNoiseThreshold": 1,
+  "animateOnMove": true,
   "vrConfigs": [
     {
       "vrIndex": 1,
@@ -68,5 +67,6 @@
       }
     }
   ],
-  "hexRadius": 10.0
+  "hexRadius": 10.0,
+  "animationSpeedThreshold": 0.5
 }

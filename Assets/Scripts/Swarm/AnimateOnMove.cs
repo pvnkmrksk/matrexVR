@@ -1,80 +1,68 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
-/// <summary>
-/// Controls animation based on movement speed with noise threshold to prevent glitchy start/stop.
-/// </summary>
+/// <summary>Translation-only animation gate, measured in world units per second (cm/s in this project).</summary>
+[DefaultExecutionOrder(150)]
 public class AnimateOnMove : MonoBehaviour
 {
+    [SerializeField, FormerlySerializedAs("noiseThreshold")] private float speedThreshold = 0.5f;
     private Animator animator;
+    private Transform movementSource;
     private Vector3 lastPosition;
-    private float currentSpeed = 0f;
-    private bool isAnimating = false;
+    private Vector2 periodicSize;
+    private float playbackSpeed = 1f;
+    private bool configured;
+    public float CurrentSpeed { get; private set; }
 
-    [SerializeField]
-    private float noiseThreshold = 0.1f; // Minimum speed (units per second) to start animation
-    [SerializeField]
-    private float stopThreshold = 0.05f; // Lower threshold to stop (hysteresis to prevent glitching)
-    [SerializeField]
-    private float smoothingFactor = 0.1f; // Smoothing factor for speed calculation
-
-    void Start()
+    public static void ConfigureHierarchy(GameObject root, Transform source, bool gate, float threshold, Vector2 wrapSize)
     {
-        animator = GetComponent<Animator>();
+        foreach (Animator target in root.GetComponentsInChildren<Animator>(true))
+        {
+            AnimateOnMove control = target.GetComponent<AnimateOnMove>();
+            if (control == null && !gate) continue;
+            if (control == null) control = target.gameObject.AddComponent<AnimateOnMove>();
+            control.Configure(source, gate, threshold, wrapSize);
+        }
+    }
+    public void Configure(Transform source, bool gate, float threshold, Vector2 wrapSize)
+    {
         if (animator == null)
         {
-            Debug.LogWarning($"AnimateOnMove: No Animator found on {gameObject.name}");
-            enabled = false;
-            return;
+            animator = GetComponent<Animator>();
+            if (animator != null && animator.speed > 0) playbackSpeed = animator.speed;
         }
-
-        lastPosition = transform.position;
-
-        // Start with animation disabled if animateOnMove is enabled
-        if (animator != null)
-        {
-            animator.speed = 0f; // Stop animation initially
-        }
+        movementSource = source != null ? source : transform;
+        speedThreshold = Mathf.Max(0, threshold);
+        periodicSize = wrapSize;
+        lastPosition = movementSource.position;
+        CurrentSpeed = 0;
+        configured = true;
+        enabled = gate;
+        if (animator != null) animator.speed = gate ? 0 : playbackSpeed;
     }
-
-    void Update()
+    private void Start()
     {
-        if (animator == null) return;
-
-        // Calculate smoothed speed
-        Vector3 positionDelta = transform.position - lastPosition;
-        float frameSpeed = positionDelta.magnitude / Time.deltaTime;
-        currentSpeed = Mathf.Lerp(currentSpeed, frameSpeed, smoothingFactor);
-
-        // Hysteresis: different thresholds for start and stop to prevent glitching
-        if (!isAnimating && currentSpeed > noiseThreshold)
-        {
-            // Start animation
-            isAnimating = true;
-            animator.speed = 1f;
-        }
-        else if (isAnimating && currentSpeed < stopThreshold)
-        {
-            // Stop animation (using lower threshold for smooth stop)
-            isAnimating = false;
-            animator.speed = 0f;
-        }
-
-        lastPosition = transform.position;
+        if (!configured) Configure(transform, true, speedThreshold, Vector2.zero);
     }
+    private void LateUpdate() => MeasureTranslation(Time.deltaTime);
 
-    public void SetNoiseThreshold(float threshold)
+    private void MeasureTranslation(float deltaTime)
     {
-        // Threshold is in units per second (speed)
-        noiseThreshold = threshold;
-        stopThreshold = threshold * 0.5f; // Stop threshold is half of start threshold (hysteresis)
+        if (!enabled || animator == null || movementSource == null) return;
+        Vector3 position = movementSource.position;
+        Vector3 delta = position - lastPosition;
+        lastPosition = position;
+        // Use the tracked root, never an animated bone. Yaw alone cannot trigger walking.
+        if (periodicSize.x > 0) delta.x = Kannadi.Wrap(delta.x, periodicSize.x);
+        if (periodicSize.y > 0) delta.z = Kannadi.Wrap(delta.z, periodicSize.y);
+        CurrentSpeed = deltaTime > 0 ? new Vector2(delta.x, delta.z).magnitude / deltaTime : 0;
+        animator.speed = CurrentSpeed > speedThreshold ? playbackSpeed : 0;
     }
-
-    public void SetEnabled(bool enabled)
+    private void OnDisable()
     {
-        this.enabled = enabled;
-        if (animator != null)
-        {
-            animator.speed = enabled ? (isAnimating ? 1f : 0f) : 1f; // If disabled, always animate
-        }
+        if (animator != null) animator.speed = playbackSpeed;
     }
+    // Legacy public setters retained for existing callers.
+    public void SetNoiseThreshold(float threshold) => speedThreshold = Mathf.Max(0, threshold);
+    public void SetEnabled(bool value) => Configure(movementSource, value, speedThreshold, periodicSize);
 }

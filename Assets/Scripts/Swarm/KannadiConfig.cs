@@ -17,7 +17,7 @@ public class KannadiConfig
     public float boundaryLengthZ = 200f;
     public bool periodicBoundary = true;
     public bool animateOnMove;
-    public float animationNoiseThreshold = 0.1f;
+    public float animationSpeedThreshold = 0.5f;
     public ColorConfig backgroundColor;
     public VRConfig[] vrConfigs;
     [JsonConverter(typeof(LocustGainConverter))] public float? closedLoopPosition;
@@ -31,6 +31,8 @@ public class KannadiConfig
         // Inline sequence parameters override the referenced experiment file.
         if (parameters != null)
             json.Merge(JObject.FromObject(parameters), new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace });
+        if (json["animationSpeedThreshold"] == null && json["animationNoiseThreshold"] != null)
+            json["animationSpeedThreshold"] = json["animationNoiseThreshold"];
         KannadiConfig config = json.ToObject<KannadiConfig>();
         config.Validate();
         return config;
@@ -43,6 +45,8 @@ public class KannadiConfig
         if (numberOfRings > 100) throw new ArgumentException("Kannadi numberOfRings exceeds the supported limit of 100.");
         if (!Finite(boundaryLengthX) || !Finite(boundaryLengthZ) || boundaryLengthX <= 0 || boundaryLengthZ <= 0)
             throw new ArgumentException("Kannadi boundary dimensions must be positive and finite.");
+        if (!Finite(animationSpeedThreshold) || animationSpeedThreshold < 0)
+            throw new ArgumentException("animationSpeedThreshold must be finite and nonnegative (world units per second).");
         ValidateGain(closedLoopPosition); ValidateGain(closedLoopOrientation);
         var ids = new HashSet<int>();
         if (vrConfigs == null) return;

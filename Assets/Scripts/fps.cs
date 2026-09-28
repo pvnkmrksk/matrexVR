@@ -1,51 +1,68 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
+/// <summary>Persistent operator FPS readout. Observes timing without changing frame limits or VSync.</summary>
 public class fps : MonoBehaviour
 {
-    // add fps to the top left corner of the screen to monitor the frame rate
-    float deltaTime = 0.0f;
+    private static fps instance;
+    private Text label;
+    private Canvas displayCanvas;
+    private float elapsed;
+    private int frames;
 
-    // make the game run at max speed witth no frame rate limit
-    void Awake()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void EnsureVisible()
     {
-        Application.targetFrameRate = 1000;
-        QualitySettings.vSyncCount = 0;
+        if (instance == null) new GameObject("Frame Rate Display").AddComponent<fps>();
     }
-
-    void Update()
+    private void Awake()
     {
-        deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.1f;
+        if (instance != null && instance != this) { Destroy(this); return; }
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+        GameObject canvasObject = new GameObject("FPS Canvas", typeof(RectTransform), typeof(Canvas));
+        canvasObject.transform.SetParent(transform, false);
+        displayCanvas = canvasObject.GetComponent<Canvas>();
+        displayCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        displayCanvas.sortingOrder = 2000;
+        RectTransform box = new GameObject("FPS", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
+        box.SetParent(canvasObject.transform, false);
+        box.anchorMin = box.anchorMax = box.pivot = Vector2.one;
+        box.anchoredPosition = new Vector2(-12, -12);
+        box.sizeDelta = new Vector2(132, 30);
+        box.GetComponent<Image>().color = new Color(0, 0, 0, 0.65f);
+        box.GetComponent<Image>().raycastTarget = false;
+        label = new GameObject("FPS Label", typeof(RectTransform), typeof(Text)).GetComponent<Text>();
+        label.transform.SetParent(box, false);
+        label.rectTransform.anchorMin = Vector2.zero; label.rectTransform.anchorMax = Vector2.one;
+        label.rectTransform.offsetMin = label.rectTransform.offsetMax = Vector2.zero;
+        label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        label.fontSize = 18;
+        label.color = Color.yellow;
+        label.alignment = TextAnchor.MiddleCenter;
+        label.raycastTarget = false;
+        label.text = "— FPS";
+        MainController.SystemConfigurationChanged += ApplyDisplay;
+        ApplyDisplay();
     }
-
-    void OnGUI()
+    private void ApplyDisplay()
     {
-        int w = Screen.width,
-            h = Screen.height;
-
-        GUIStyle style = new GUIStyle();
-
-        // Position the FPS counter in the top right corner
-        // Use a fixed size box that's big enough for the text
-        int boxWidth = 150;
-        int boxHeight = h * 2 / 100;
-        Rect backgroundRect = new Rect(w / 2, boxHeight + 10, boxWidth, boxHeight);
-
-        // Draw a background box to clear previous frames
-        GUI.color = new Color(0, 0, 0, 0.5f);
-        GUI.Box(backgroundRect, "");
-
-        // Reset color for the text
-        GUI.color = Color.white;
-
-        // Use the same rect for the label
-        style.alignment = TextAnchor.MiddleLeft;
-        style.fontSize = h * 2 / 100;
-        style.normal.textColor = new Color(1.0f, 1.0f, 0.0f, 1.0f); // Yellow for visibility
-        float msec = deltaTime * 1000.0f;
-        float fps = 1.0f / deltaTime;
-        string text = string.Format("{0:0.} fps", fps);
-        GUI.Label(backgroundRect, text, style);
+        if (displayCanvas == null) return;
+        int display = MainController.Instance != null ? MainController.Instance.GetSystemConfig("VR1").targetDisplay : 0;
+        displayCanvas.targetDisplay = display >= 0 && display < Display.displays.Length ? display : 0;
+    }
+    private void Update()
+    {
+        if (instance != this) return;
+        elapsed += Time.unscaledDeltaTime;
+        frames++;
+        if (elapsed < 0.25f) return;
+        label.text = $"{frames / elapsed:0} FPS";
+        elapsed = 0; frames = 0;
+    }
+    private void OnDestroy()
+    {
+        MainController.SystemConfigurationChanged -= ApplyDisplay;
+        if (instance == this) instance = null;
     }
 }
