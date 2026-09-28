@@ -384,9 +384,32 @@ public static class KannadiValidation
             UpdateTestInput();
             Call(tracking, "Update");
             Check(tracking.transform.position == Vector3.zero, "gamepad Select resets the tracked rig");
-            UnityEngine.InputSystem.InputSystem.QueueStateEvent(mouse, new UnityEngine.InputSystem.LowLevel.MouseState { position = new Vector2(123, 234), scroll = new Vector2(0, 120) });
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(mouse, new UnityEngine.InputSystem.LowLevel.MouseState { position = new Vector2(123, 234), scroll = new Vector2(0, 1) });
             UpdateTestInput();
             Check(ExperimentInput.MousePosition == new Vector3(123,234,0) && Mathf.Approximately(ExperimentInput.Scroll, 0.1f), "pointer and wheel retain overview zoom units");
+            var zoomObject = new GameObject("Zoom input regression", typeof(Camera));
+            zoomObject.GetComponent<Camera>().enabled = false;
+            try
+            {
+                var zoom = zoomObject.AddComponent<OverheadCameraController>();
+                zoom.distance = 150f;
+                Call(zoom, "Start");
+                Call(zoom, "HandleMouseInput");
+                Check(Mathf.Approximately(zoom.distance, 130f), "normalized wheel tick zooms 20 world units, not 1/6 unit");
+                UnityEngine.InputSystem.InputSystem.QueueStateEvent(mouse, new UnityEngine.InputSystem.LowLevel.MouseState { position = new Vector2(123,234), scroll = new Vector2(0, -1) });
+                UpdateTestInput();
+                Call(zoom, "HandleMouseInput");
+                Check(Mathf.Approximately(zoom.distance, 150f), "reverse wheel tick restores zoom distance");
+                UnityEngine.InputSystem.InputSystem.QueueStateEvent(mouse, new UnityEngine.InputSystem.LowLevel.MouseState { position = new Vector2(123,234), scroll = new Vector2(0, 0.25f) });
+                UpdateTestInput();
+                Call(zoom, "HandleMouseInput");
+                Check(Mathf.Approximately(zoom.distance, 145f), "fractional trackpad scroll retains proportional zoom");
+                UnityEngine.InputSystem.InputSystem.QueueStateEvent(mouse, new UnityEngine.InputSystem.LowLevel.MouseState { position = new Vector2(123,234) });
+                UpdateTestInput();
+                Call(zoom, "HandleMouseInput");
+                Check(Mathf.Approximately(zoom.distance, 145f), "no scroll produces no residual zoom");
+            }
+            finally { Object.Destroy(zoomObject); }
             Check(Vector3.Distance(Quaternion.Euler(0,90,0) * Vector3.forward, Vector3.right) < 0.001f, "positive yaw turns forward toward right");
         }
         finally

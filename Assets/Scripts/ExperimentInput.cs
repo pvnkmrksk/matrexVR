@@ -22,6 +22,8 @@ public static class ExperimentInput
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Install()
     {
+        // Keep mouse wheel units consistent across desktop platforms.
+        InputSystem.settings.scrollDeltaBehavior = InputSettings.ScrollDeltaBehavior.UniformAcrossAllPlatforms;
         EnsureActions();
         SceneManager.sceneLoaded += SceneLoaded;
     }
@@ -58,8 +60,9 @@ public static class ExperimentInput
     public static float Axis(string name) => IsEditingText ? 0 : Action(name).ReadValue<float>();
     public static Vector2 Move => IsEditingText ? Vector2.zero : Action("Move").ReadValue<Vector2>();
     public static Vector3 MousePosition => Action("Pointer").ReadValue<Vector2>();
-    // Input System wheel ticks are 120 units; legacy zoom tuning expected ~0.1 per tick.
-    public static float Scroll => Action("Scroll").ReadValue<Vector2>().y / 1200f;
+    // Unity 6 normalizes a wheel tick to 1; legacy zoom tuning expects 0.1 per tick.
+    // Fractional trackpad deltas stay proportional. Do not apply the old Windows /120 scale.
+    public static float Scroll => Action("Scroll").ReadValue<Vector2>().y * 0.1f;
 
     public static bool Pressed(KeyCode configured, KeyCode original, string action)
     {
