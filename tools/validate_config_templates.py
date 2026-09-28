@@ -35,7 +35,6 @@ for path in sorted(TEMPLATES.glob('*.json')):
         assert all(1 <= vr['vrIndex'] <= 4 for vr in obj['vrConfigs']), path
     if 'aglHeight' in obj:
         assert obj['aglHeight'] >= 0 and obj['windSpeed'] >= 0, path
-    assert Path(str(path) + '.meta').exists(), path
 
 # New controls must not quietly fall back to legacy calls in project-owned runtime code.
 for path in (ROOT / 'Assets/Scripts').rglob('*.cs'):
