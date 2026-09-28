@@ -1,23 +1,7 @@
 {
-  "checks": 768,
+  "checks": 773,
   "failures": [],
   "editorMessages": [
     "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.\nParameter name: index"
-  ],
-  "unityValidationVersion": "6000.3.16f1",
-  "projectVersion": "6000.3.16f1",
-  "modernSource": "1205fe3",
-  "locustSource": "60a7121",
-  "hardwareConfiguration": "system_config_VR1.json: four rigs, RBLF, 2.6 cm spheres, display 0",
-  "assetDependencyCheck": "PASS: 84 Swarm/Kannadi scene/catalog dependency files; no missing or duplicate GUIDs; target scenes enabled",
-  "overview": "40% screen width/height; exact-position heading arrows; numeric labels; dynamic rigs; 60-second fading history; cameras and tracking disabled and render texture released while hidden",
-  "animation": "animateOnMove=true; animationSpeedThreshold=0.5 world units/s; root planar translation only; periodic-wrap correction; bands and autonomous Swarm locusts covered",
-  "textResources": "Official Unity 6 TMP essential resource version 2; settings, font and shader resolved; text rendered; importer prompt did not reopen",
-  "ground": "Existing grass_05 texture; unlit; 20 cm per tile in both locust scenes",
-  "sequence": "Swarm: 20 seconds, 256 locusts per rig, mu 0, kappa 100000, speed 2; then Kannadi: 1000 seconds",
-  "limitations": [
-    "Live ZMQ listeners were disabled; tracking and screenshot paths are synthetic.",
-    "Physical LED mapping, calibration and multiplayer network timing were not tested.",
-    "Batch Game View is 640x480; viewport assertions verify configured pixel placement before clipping to its bounds."
   ]
 }

@@ -380,11 +380,19 @@ public class MainController : MonoBehaviour
             ManageTimerAndTransitions();
         }
 
-        // if esc is pressed, quit
-        if (Input.GetKeyUp(KeyCode.Escape))
+        // One owner for Escape: stop the experiment; Escape in Control exits the player.
+        if (Input.GetKeyUp(KeyCode.Escape)) HandleEscape();
+    }
+
+    public void HandleEscape()
+    {
+        if (SceneManager.GetActiveScene().name == "ControlScene")
         {
             Application.Quit();
+            return;
         }
+        StopSequence();
+        SceneManager.LoadScene("ControlScene");
     }
 
     void LoadScene(SequenceStep step)

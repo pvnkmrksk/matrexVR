@@ -104,3 +104,7 @@ It covers heading orientation, constant arrow size across tenfold zoom-out, nume
 The recorded run passed **768 runtime assertions** with zero runtime failures. The static check passed all **84 Swarm/Kannadi scene/catalog dependency files**. See `kannadi-validation-results.json` and `kannadi-overview.png` alongside this document.
 
 Validation uses a disposable Unity 6000.3.16f1 copy with the upgraded project's package files. Unity's unrelated editor search-cache exception is recorded separately in the test report. The overview screenshot includes synthetic trajectories to demonstrate the markers and fading; it is not experimental data. Physical LED/FicTrac calibration, network timing, and actual monitor mapping remain untested.
+
+### Reset controls (Unity 6)
+
+The rig prefabs have both `ClosedLoop` and `Keyboard` enabled. `R` resets position and heading to the current experiment's initial pose, including when FicTrac is absent or stale. `P` toggles tracked translation and `O` toggles tracked orientation; these are toggles, not separate resets. Resuming orientation uses the current visible heading as its baseline. Escape stops the sequence and returns to Control; Escape from Control quits the player. MainController owns Escape so rig components cannot quit during a scene transition. Validation: 773 checks passed with synthetic tracking, including missing/stale reset and sequence exit; physical keys and tracking hardware still need a bench check.

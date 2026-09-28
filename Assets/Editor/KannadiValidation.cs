@@ -486,6 +486,20 @@ public static class KannadiValidation
                     typeof(ZmqListener).GetField("lastPoseTicksUtc", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(listener, DateTime.UtcNow.AddSeconds(-30).Ticks);
                     Call(tracking, "Update");
                     Check(tracking.transform.position == expectedPosition, "stale tracking pose cannot move animal");
+                    tracking.ResetPositionAndRotation();
+                    Check(tracking.transform.position == Vector3.zero && Quaternion.Angle(tracking.transform.rotation, Quaternion.Euler(0, 90, 0)) < 0.01f, "reset works with stale tracking");
+                    typeof(ZmqListener).GetProperty("HasPose").SetValue(listener, false);
+                    tracking.transform.position = Vector3.one;
+                    tracking.ResetPositionAndRotation();
+                    Check(tracking.transform.position == Vector3.zero, "reset works with absent tracking");
+                    tracking.ToggleClosedLoopPosition();
+                    Check(!Field<bool>(tracking, "closedLoopPosition"), "position toggle is enabled");
+                    tracking.ToggleClosedLoopPosition();
+                    tracking.ToggleClosedLoopOrientation();
+                    Check(!Field<bool>(tracking, "closedLoopOrientation"), "orientation toggle is enabled");
+                    tracking.transform.rotation = Quaternion.Euler(0, 45, 0);
+                    tracking.ToggleClosedLoopOrientation();
+                    Check(!Field<bool>(tracking, "_isInitialized"), "resuming orientation without tracking waits for a new baseline");
                     rigInstance = rigs[0].GetInstanceID();
                     NextSequenceStep();
                     Check(rigs[0].GetInstanceID() == rigInstance && rigs.All(r => r.Clones.Length == 1), "Kannadi sequence advances without reload");
@@ -503,8 +517,7 @@ public static class KannadiValidation
                 case 10:
                     Check(SceneManager.GetActiveScene().name == "Choice_desync" && Object.FindObjectOfType<DynamicSequenceController>() != null, "dynamic sequence dispatch");
                     CheckViewports("JuliusTree dynamic sequence");
-                    main.StopSequence();
-                    SceneManager.LoadScene("ControlScene"); Later(); break;
+                    main.HandleEscape(); Later(); break;
                 case 11:
                     Check(Object.FindObjectsOfType<SimpleOverheadCamera>().Length == 0 && GameObject.Find("Overhead Camera Canvas") == null, "overview resources cleaned up on exit");
                     Check(Directory.GetFiles(logDirectory, "*Kannadi*Clones.csv.gz").Length >= 8, "Kannadi clone logging across reloads");

@@ -41,7 +41,7 @@ public class ClosedLoop : MonoBehaviour
 
     private void Update()
     {
-        HandleInput();
+        if (HandleInput()) return;
 
         if (_zmqListener == null || !_zmqListener.HasPose)
             return;
@@ -55,12 +55,6 @@ public class ClosedLoop : MonoBehaviour
                 );
                 _nextStalePoseWarningTime = Time.unscaledTime + 5f;
             }
-            return;
-        }
-
-        if (Input.GetKeyDown(resetKey))
-        {
-            ResetPositionAndRotation();
             return;
         }
 
@@ -115,7 +109,7 @@ public class ClosedLoop : MonoBehaviour
             }
             else
             {
-                float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg;
+                float rotationDelta = Mathf.DeltaAngle(_lastFicTracData.z * Mathf.Rad2Deg, currentFicTracData.z * Mathf.Rad2Deg);
                 // Preserve the modern boolean mode used by the other experiments.
                 transform.Rotate(0, rotationDelta, 0, Space.Self);
             }
@@ -126,6 +120,7 @@ public class ClosedLoop : MonoBehaviour
     public void ResetPositionAndRotation()
     {
         transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+        _initialWorldRotation = _initialRotation;
         _isInitialized = false;
         _ficTracRotationOffset = Quaternion.identity;
         _initializationTimer = 0f;
@@ -176,7 +171,7 @@ public class ClosedLoop : MonoBehaviour
 
     public void ToggleClosedLoopOrientation()
     {
-        closedLoopOrientation = !closedLoopOrientation;
+        SetClosedLoopOrientation(!closedLoopOrientation);
         if (closedLoopOrientation && locustOrientationGain == 0) locustOrientationGain = 1f;
         Debug.Log($"Closed Loop Orientation: {(closedLoopOrientation ? "ON" : "OFF")}");
     }
@@ -184,6 +179,13 @@ public class ClosedLoop : MonoBehaviour
     // Public methods for external scripts to control the behaviors
     public void SetClosedLoopOrientation(bool value)
     {
+        if (value && !closedLoopOrientation)
+        {
+            // Resume from the visible heading, without catching up on yaw while disabled.
+            _initialWorldRotation = transform.rotation;
+            if (_zmqListener != null && _zmqListener.HasFreshPose()) InitializeFicTracData();
+            else { _isInitialized = false; _initializationTimer = 0f; }
+        }
         closedLoopOrientation = value;
     }
 
@@ -203,16 +205,18 @@ public class ClosedLoop : MonoBehaviour
         ResetPositionAndRotation();
     }
 
-    private void HandleInput()
+    private bool HandleInput()
     {
+        if (Input.GetKeyDown(resetKey))
+        {
+            ResetPositionAndRotation();
+            return true;
+        }
         if (Input.GetKeyDown(KeyCode.O))
             ToggleClosedLoopOrientation();
         if (Input.GetKeyDown(KeyCode.P))
             ToggleClosedLoopPosition();
 
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
+        return false;
     }
 }
