@@ -1,5 +1,5 @@
 {
-  "checks": 214,
+  "checks": 693,
   "failures": [],
   "editorMessages": [
     "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.\nParameter name: index"
@@ -8,11 +8,13 @@
   "projectVersion": "2022.3.58f1",
   "modernSource": "1205fe3",
   "locustSource": "60a7121",
-  "assetDependencyCheck": "PASS: 90 scene/catalog dependency files; no missing or duplicate GUIDs; target scenes enabled",
+  "hardwareConfiguration": "system_config_VR1.json: four rigs, RBLF, 2.6 cm spheres, display 0",
+  "assetDependencyCheck": "PASS: 84 Swarm/Kannadi scene/catalog dependency files; no missing or duplicate GUIDs; target scenes enabled",
   "limitations": [
     "Unity 2022.3 is not installed and was not executed.",
     "Live ZMQ listeners were disabled; tracking tests used synthetic poses.",
     "Physical LED mapping, calibration and multiplayer network timing were not tested.",
-    "Disposable Unity 6 harness uses installed package versions and compatibility edits to old TextMesh Pro example scripts."
+    "Disposable Unity 6 harness uses installed package versions; repository package and project versions remain those of JuliusTree.",
+    "Batch Game View is 640x480; viewport assertions verify configured pixel placement before clipping to its bounds."
   ]
 }

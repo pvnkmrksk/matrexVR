@@ -23,7 +23,7 @@ public static class KannadiValidation
     private static readonly List<string> editorMessages = new List<string>();
     private static Kannadi[] rigs;
     private static Vector3 expectedPosition;
-    private static Quaternion expectedRotation;
+    private static int rigInstance;
     private static string logDirectory;
     static KannadiValidation()
     {
@@ -68,6 +68,88 @@ public static class KannadiValidation
     private static T Field<T>(object target, string name) => (T)target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).GetValue(target);
     private static Dictionary<string, object> Params(string json) => JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
     private static void Later() { phase++; nextFrame = Time.frameCount + 8; }
+    private static void NextSequenceStep()
+    {
+        typeof(MainController).GetField("timer", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(main, 0f);
+        Call(main, "ManageTimerAndTransitions");
+    }
+    private static void CheckViewports(string scene)
+    {
+        ViewportSetter[] setters = Object.FindObjectsOfType<ViewportSetter>();
+        Check(setters.Length == 4, scene + " has four configured rigs");
+        foreach (ViewportSetter setter in setters)
+        {
+            bool found = main.TryGetSystemConfigForGameObject(setter.gameObject, out SystemConfig config);
+            string order = found ? ViewportSetter.NormalizeDisplayOrder(config.displayOrder) : "";
+            Camera[] cameras = setter.GetComponentsInChildren<Camera>(true);
+            foreach (Camera camera in cameras)
+            {
+                int slot = camera.name.StartsWith("Main Camera ") && camera.name.Length == 13 ? order.IndexOf(camera.name[12]) : -1;
+                Check(camera.enabled == (slot >= 0), scene + "/" + setter.name + "/" + camera.name + " enabled only by configured letter");
+                if (slot < 0) continue;
+                Check(camera.gameObject.activeInHierarchy && camera.targetDisplay == config.targetDisplay, scene + " listed camera active on configured display");
+                float x = (config.startCol + (config.horizontal ? slot : 0)) * config.ledPanelWidth;
+                float y = Screen.height - (config.startRow + 1 + (config.horizontal ? 0 : slot)) * config.ledPanelHeight;
+                // Batch Game View clips pixelRect at its 640x480 edge; verify the configured rectangle before clipping.
+                Rect rect = new Rect(camera.rect.x * Screen.width, camera.rect.y * Screen.height, camera.rect.width * Screen.width, camera.rect.height * Screen.height);
+                Check(Mathf.Abs(rect.x - x) < 0.1f && Mathf.Abs(rect.y - y) < 0.1f &&
+                    Mathf.Abs(rect.width - config.ledPanelWidth) < 0.1f && Mathf.Abs(rect.height - config.ledPanelHeight) < 0.1f,
+                    scene + "/" + setter.name + "/" + camera.name + " expected pixels " + new Rect(x, y, config.ledPanelWidth, config.ledPanelHeight) + " got " + rect + " normalized " + camera.rect + " screen " + Screen.width + "x" + Screen.height);
+            }
+            Check(cameras.Count(c => c.enabled) == order.Count(letter => cameras.Any(c => c.name == "Main Camera " + letter)), scene + " each available configured camera enabled once");
+        }
+    }
+    private static void CheckCameraReconfiguration()
+    {
+        var all = Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "system_config.json")));
+        var configs = (Newtonsoft.Json.Linq.JArray)all["configs"];
+        string[] orders = { "UL", "FDRBLU", "", "B" };
+        for (int i = 0; i < configs.Count; i++)
+        {
+            configs[i]["displayOrder"] = orders[i];
+            configs[i]["horizontal"] = i % 2 == 1;
+            configs[i]["startRow"] = i;
+            configs[i]["startCol"] = i + 1;
+            configs[i]["ledPanelWidth"] = 64;
+            configs[i]["ledPanelHeight"] = 96;
+        }
+        string file = "Kannadi/validation-system.json";
+        File.WriteAllText(Path.Combine(Application.streamingAssetsPath, file), all.ToString());
+        main.SetSystemConfigFile(file);
+        CheckViewports("Kannadi reordered system config");
+        configs.RemoveAt(3);
+        ((Newtonsoft.Json.Linq.JObject)configs[1]).Remove("displayOrder");
+        configs[0]["displayOrder"] = null;
+        File.WriteAllText(Path.Combine(Application.streamingAssetsPath, file), all.ToString());
+        main.SetSystemConfigFile(file);
+        CheckViewports("Kannadi missing rig / missing or null displayOrder");
+        main.SetSystemConfigFile("system_config.json");
+        CheckViewports("Kannadi restored VR1 config");
+
+        var unknown = new GameObject("VR10 validation");
+        Camera camera = new GameObject("Main Camera R").AddComponent<Camera>();
+        camera.transform.SetParent(unknown.transform);
+        ViewportSetter setter = unknown.AddComponent<ViewportSetter>();
+        Check(!main.TryGetSystemConfigForGameObject(unknown, out _) && !camera.enabled, "VR10 cannot borrow VR1 config");
+        unknown.name = "VR1 validation";
+        setter.RefreshSystemConfig();
+        Check(camera.enabled, "known rig re-enables its listed camera");
+        Check(main.TryGetSystemConfigForGameObject(camera.gameObject, out var inherited) && inherited.vrId == "VR1", "child resolves parent rig configuration");
+        Camera up = new GameObject("Main Camera U").AddComponent<Camera>();
+        up.transform.SetParent(unknown.transform); up.gameObject.SetActive(false);
+        Camera unlisted = new GameObject("Diagnostic camera").AddComponent<Camera>();
+        unlisted.transform.SetParent(unknown.transform);
+        setter.ApplyConfiguration(new SystemConfig { targetDisplay = 0, displayOrder = "uUr?R", ledPanelWidth = 64, ledPanelHeight = 96 });
+        Check(camera.enabled && up.enabled && up.gameObject.activeSelf && !unlisted.enabled, "inactive listed cameras enabled; unknown and duplicate letters ignored");
+        Check(Mathf.Abs(up.pixelRect.x) < 0.1f && Mathf.Abs(camera.pixelRect.x - 64) < 0.1f, "duplicate/invalid letters do not shift camera slots");
+        setter.ApplyConfiguration(new SystemConfig { targetDisplay = Display.displays.Length, displayOrder = "RU" });
+        Check(!camera.enabled && !up.enabled && !unlisted.enabled, "unavailable display cannot render cameras elsewhere");
+        setter.ApplyConfiguration(new SystemConfig { targetDisplay = 0, displayOrder = "R" });
+        setter.enabled = false;
+        Check(!camera.enabled, "disabled layout cannot leave stimulus camera rendering");
+        unknown.SetActive(false);
+        Object.Destroy(unknown);
+    }
     private static void Tick()
     {
         if (!EditorApplication.isPlaying || Time.frameCount < nextFrame) return;
@@ -91,18 +173,25 @@ public static class KannadiValidation
                     logDirectory = MasterDataLogger.Instance.directoryPath;
                     Later(); break;
                 case 1:
-                    Check(main.GetSystemConfig("VR4").zmqPort == 9875, "four hardware configurations loaded");
+                    Check(main.GetSystemConfig("VR4").zmqPort == 9874, "four VR1 hardware configurations loaded");
+                    main.sequenceSteps[0].duration = 1000;
+                    main.sequenceSteps.Insert(1, new SequenceStep("Swarm", 1000, Params("{\"numberOfLocusts\":3}"), false));
                     main.StartSequence(); Later(); break;
                 case 2:
                     Check(SceneManager.GetActiveScene().name == "Swarm", "Swarm sequence dispatch");
                     var spawners = Object.FindObjectsOfType<LocustSpawner>();
                     Check(spawners.Length == 4, "four swarm rigs");
                     Check(GameObject.FindGameObjectsWithTag("SimulatedLocust").Length == 512, "128 swarm agents per rig, no duplicate Start spawn");
-                    foreach (ClosedLoop cl in Object.FindObjectsOfType<ClosedLoop>()) Check(Field<float>(cl, "sphereDiameter") == 5f, "system sphere diameter applies to Swarm");
-                    Object.FindObjectOfType<SwarmController>().AdvanceStep(Params("{\"numberOfLocusts\":3}"));
+                    foreach (ClosedLoop cl in Object.FindObjectsOfType<ClosedLoop>()) Check(Field<float>(cl, "sphereDiameter") == 2.6f, "system sphere diameter applies to Swarm");
+                    CheckViewports("Swarm");
+                    Check(Object.FindObjectsOfType<Kannadi>().Length == 0, "Swarm contains no mirror controller");
+                    int swarmInstance = Object.FindObjectOfType<SwarmController>().GetInstanceID();
+                    NextSequenceStep();
+                    Check(Object.FindObjectOfType<SwarmController>().GetInstanceID() == swarmInstance, "Swarm sequence advances without reload");
                     Check(GameObject.FindGameObjectsWithTag("SimulatedLocust").Length == 12, "Swarm replaces population on in-scene step");
-                    main.currentStep = 1; SceneManager.LoadScene("Kannadi"); Later(); break;
+                    NextSequenceStep(); Later(); break;
                 case 3:
+                    CheckViewports("Kannadi");
                     rigs = Object.FindObjectsOfType<Kannadi>().OrderBy(r => r.VRIndex).ToArray();
                     Check(rigs.Length == 4 && rigs.All(r => r.Clones.Length == 37), "four Kannadi grids with 37 clones each");
                     Check(GameObject.FindGameObjectsWithTag("SimulatedLocust").Length == 148, "Swarm agents cleaned up at Kannadi transition");
@@ -121,8 +210,8 @@ public static class KannadiValidation
                     foreach (Kannadi rig in rigs)
                     {
                         var cl = rig.GetComponent<ClosedLoop>();
-                        Check(Field<float>(cl, "sphereDiameter") == 5f, "system sphere diameter applies to Kannadi");
-                        Check(rig.GetComponent<ZmqListener>().port == 9871 + rig.VRIndex, "per-rig ZMQ config");
+                        Check(Field<float>(cl, "sphereDiameter") == 2.6f, "system sphere diameter applies to Kannadi");
+                        Check(rig.GetComponent<ZmqListener>().port == 9870 + rig.VRIndex, "per-rig ZMQ config");
                         foreach (Camera camera in rig.GetComponentsInChildren<Camera>())
                         {
                             int own = LayerMask.GetMask("SimulatedLocustsVR" + rig.VRIndex);
@@ -166,12 +255,17 @@ public static class KannadiValidation
                     Later(); break;
                 case 6:
                     Check(Vector3.Distance(expectedPosition, rigs[0].Clones[0].transform.GetChild(0).position) < 0.01f, "band members follow tracked translation");
-                    main.sequenceSteps.Clear(); main.executionOrder.Clear(); main.sequenceSteps.Add(new SequenceStep("Matrix", 1000, Params("{\"numberOfRings\":1,\"spacing\":9}"), true));
+                    main.sequenceSteps.Clear(); main.executionOrder.Clear(); main.sequenceSteps.Add(new SequenceStep("Kannadi", 1000, Params("{\"numberOfRings\":1,\"spacing\":9}"), true));
+                    main.sequenceSteps.Add(new SequenceStep("Kannadi", 1000, Params("{\"numberOfRings\":0}"), false));
+                    main.sequenceSteps.Add(new SequenceStep("Choice", 1000, Params("{\"configFile\":\"Choice_empty.json\"}"), true));
+                    main.sequenceSteps.Add(new SequenceStep("Choice_TwoTreeIndia_nopath_path", 1000, Params("{\"configFile\":\"BinaryChoiceIndia_flip_noflip.json\"}"), true));
+                    main.sequenceSteps.Add(new SequenceStep("Choice_desync", 1000, Params("{\"design\":\"dynamicSequenceDesign.json\"}"), true));
                     main.StartSequence(); Later(); break;
                 case 7:
                     rigs = Object.FindObjectsOfType<Kannadi>();
-                    Check(rigs.Length == 4 && rigs.All(r => r is Vishwaroopa && r.Clones.Length == 7), "legacy Matrix dispatch and grid");
-                    Check(Object.FindObjectsOfType<SimpleOverheadCamera>().Length == 1, "Matrix gets one overview");
+                    Check(rigs.Length == 4 && rigs.All(r => r.Clones.Length == 7), "Kannadi reload through sequence config");
+                    CheckCameraReconfiguration();
+                    Check(Object.FindObjectsOfType<SimpleOverheadCamera>().Length == 1, "Kannadi reload gets one overview");
                     var tracking = rigs[0].GetComponent<ClosedLoop>();
                     var listener = rigs[0].GetComponent<ZmqListener>();
                     tracking.SetLocustGains(0.5f, 1f); tracking.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 90, 0));
@@ -179,7 +273,7 @@ public static class KannadiValidation
                     Call(tracking, "InitializeFicTracData");
                     typeof(ZmqListener).GetProperty("pose").SetValue(listener, new Pose(new Vector3(0, 2, 0), Quaternion.identity));
                     Call(tracking, "UpdateTransform");
-                    Check(Vector3.Distance(tracking.transform.position, new Vector3(0, 0, -2.5f)) < 0.01f, "numeric translation gain and sphere diameter respect base rotation");
+                    Check(Vector3.Distance(tracking.transform.position, new Vector3(0, 0, -1.3f)) < 0.01f, "numeric translation gain and sphere diameter respect base rotation");
                     expectedPosition = tracking.transform.position;
                     Call(tracking, "Update");
                     Check(tracking.transform.position == expectedPosition, "missing tracking pose cannot move animal");
@@ -187,10 +281,28 @@ public static class KannadiValidation
                     typeof(ZmqListener).GetField("lastPoseTicksUtc", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(listener, DateTime.UtcNow.AddSeconds(-30).Ticks);
                     Call(tracking, "Update");
                     Check(tracking.transform.position == expectedPosition, "stale tracking pose cannot move animal");
-                    SceneManager.LoadScene("ControlScene"); Later(); break;
+                    rigInstance = rigs[0].GetInstanceID();
+                    NextSequenceStep();
+                    Check(rigs[0].GetInstanceID() == rigInstance && rigs.All(r => r.Clones.Length == 1), "Kannadi sequence advances without reload");
+                    CheckViewports("Kannadi in-scene sequence step");
+                    NextSequenceStep(); Later(); break;
                 case 8:
+                    Check(SceneManager.GetActiveScene().name == "Choice" && Object.FindObjectOfType<ChoiceController>() != null, "Choice sequence dispatch");
+                    CheckViewports("Choice");
+                    Check(Object.FindObjectsOfType<Kannadi>().Length == 0, "Choice has no mirror components");
+                    NextSequenceStep(); Later(); break;
+                case 9:
+                    Check(SceneManager.GetActiveScene().name == "Choice_TwoTreeIndia_nopath_path", "JuliusTree experiment sequence dispatch");
+                    CheckViewports("JuliusTree two-tree scene");
+                    NextSequenceStep(); Later(); break;
+                case 10:
+                    Check(SceneManager.GetActiveScene().name == "Choice_desync" && Object.FindObjectOfType<DynamicSequenceController>() != null, "dynamic sequence dispatch");
+                    CheckViewports("JuliusTree dynamic sequence");
+                    main.StopSequence();
+                    SceneManager.LoadScene("ControlScene"); Later(); break;
+                case 11:
                     Check(Object.FindObjectsOfType<SimpleOverheadCamera>().Length == 0 && GameObject.Find("Overhead Camera Canvas") == null, "overview resources cleaned up on exit");
-                    Check(Directory.GetFiles(logDirectory, "*Kannadi*Clones.csv.gz").Length >= 8, "Kannadi and Matrix clone logging");
+                    Check(Directory.GetFiles(logDirectory, "*Kannadi*Clones.csv.gz").Length >= 8, "Kannadi clone logging across reloads");
                     Finish(); break;
             }
         }

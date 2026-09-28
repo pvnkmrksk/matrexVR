@@ -150,6 +150,6 @@ The project is licensed under the [MIT License](LICENSE).
 - [Unity Engine](https://unity.com/)
 - [NetMQ](https://github.com/zeromq/netmq)
 
-## Kannadi, Matrix, and Swarm
+## Kannadi and Swarm
 
 See [Kannadi modernization and setup](docs/kannadi-modernization.md) for the four-rig multiplayer configuration, operator overview, provenance, and validation commands.

@@ -14,6 +14,7 @@ public interface ISceneController
 public class MainController : MonoBehaviour
 {
     public static MainController Instance { get; private set; }
+    public static event System.Action SystemConfigurationChanged;
     public OverheadCameraConfig OverheadCameraSettings { get; private set; } = new OverheadCameraConfig();
 
     public List<SequenceStep> sequenceSteps = new List<SequenceStep>();
@@ -143,28 +144,16 @@ public class MainController : MonoBehaviour
     // Load system configurations from the specified file
     private void LoadSystemConfigurations()
     {
-        if (string.IsNullOrEmpty(Application.streamingAssetsPath))
-        {
-            Debugger.Log("StreamingAssetsPath is null/empty; skipping system config load", 1);
-            return;
-        }
-
-        if (string.IsNullOrEmpty(systemConfigFileName))
-        {
-            Debugger.Log("systemConfigFileName is null/empty; skipping system config load", 1);
-            return;
-        }
-
-        string configPath = Path.Combine(Application.streamingAssetsPath, systemConfigFileName);
-
-        if (!File.Exists(configPath))
-        {
-            Debugger.Log($"System config file not found: {configPath}", 1);
-            return;
-        }
-
+        // A removed/invalid configuration must not leave the previous layout rendering.
+        systemConfigs.Clear();
         try
         {
+            if (string.IsNullOrEmpty(Application.streamingAssetsPath) || string.IsNullOrEmpty(systemConfigFileName))
+                throw new System.ArgumentException("System configuration path is empty.");
+            string configPath = Path.Combine(Application.streamingAssetsPath, systemConfigFileName);
+            if (!File.Exists(configPath))
+                throw new FileNotFoundException("System config file not found", configPath);
+
             string jsonText = File.ReadAllText(configPath);
 
             // Parse the JSON using JObject instead of dynamic
@@ -212,37 +201,40 @@ public class MainController : MonoBehaviour
                     masterDataLogger.directoryPath,
                     $"{timestamp}_{sceneName}_{systemConfigFileName}"
                 );
-                File.Copy(configPath, destPath);
+                Directory.CreateDirectory(Path.GetDirectoryName(destPath));
+                File.Copy(configPath, destPath, true);
                 Debugger.Log($"Copied system config file to: {destPath}", 3);
             }
         }
         catch (System.Exception e)
         {
+            systemConfigs.Clear();
             Debugger.Log($"Error loading system config file: {e.Message}", 1);
+        }
+        finally
+        {
+            SystemConfigurationChanged?.Invoke();
         }
     }
 
-    // Get system config based on GameObject name
+    // Match a complete rig ID, including parent rigs, without confusing VR1 and VR10.
+    // Rendering callers use TryGet so a missing rig cannot borrow VR1's physical viewports.
+    public bool TryGetSystemConfigForGameObject(GameObject target, out SystemConfig config)
+    {
+        for (Transform item = target.transform; item != null; item = item.parent)
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(item.name, @"(?<![A-Za-z0-9])VR[0-9]+(?![A-Za-z0-9])");
+            if (match.Success) return systemConfigs.TryGetValue(match.Value, out config);
+        }
+        config = null;
+        return false;
+    }
+
     public SystemConfig GetSystemConfigForGameObject(GameObject gameObject)
     {
-        // Check if the GameObject name contains any of our known VR IDs
-        foreach (var kvp in systemConfigs)
-        {
-            if (gameObject.name.Contains(kvp.Key))
-            {
-                return kvp.Value;
-            }
-        }
-
-        // If no match, try to get config for "VR1" as default
-        if (systemConfigs.ContainsKey("VR1"))
-        {
-            Debugger.Log($"No matching config for {gameObject.name}, using VR1 config", 2);
-            return systemConfigs["VR1"];
-        }
-
-        Debugger.Log($"No config found for {gameObject.name}", 1);
-        return new SystemConfig { vrId = "VR1" };
+        if (TryGetSystemConfigForGameObject(gameObject, out SystemConfig config)) return config;
+        Debugger.Log($"No system config found for {gameObject.name}", 1);
+        return new SystemConfig { displayOrder = "" };
     }
 
     // Get system config for a specific VR ID
@@ -668,7 +660,7 @@ public class SystemConfig
     public string zmqAddress = "localhost";
     public int zmqPort = 9872;
     public string vrId = "VR1";
-    public string displayOrder = "DRBLFU"; // Default display order: Down, Right, Back, Left, Front, Up
+    public string displayOrder = ""; // Explicit rendering allow-list: Down, Right, Back, Left, Front, Up.
     public int targetDisplay = 1; // 0 for primary, 1 for secondary display
 }
 

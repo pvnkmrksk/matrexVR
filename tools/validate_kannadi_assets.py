@@ -21,11 +21,16 @@ for names in paths.values():
         errors.append(f"Case collision: {names}")
 settings = (ROOT / "ProjectSettings/EditorBuildSettings.asset").read_text()
 pending = [ROOT / "Assets/Resources/KannadiPrefabCatalog.asset"]
-for scene in ("Kannadi", "Matrix", "Swarm"):
+for scene in ("Kannadi", "Swarm"):
     path = ROOT / f"Assets/Scenes/{scene}.unity"
     if f"enabled: 1\n    path: Assets/Scenes/{scene}.unity" not in settings:
         errors.append(f"{scene} is not enabled in build settings")
     pending.append(path)
+for removed in ("Assets/Scenes/Matrix.unity", "Assets/Scripts/Swarm/Vishwaroopa.cs"):
+    if (ROOT / removed).exists():
+        errors.append(f"Removed legacy mode still present: {removed}")
+if "Assets/Scenes/Matrix.unity" in settings:
+    errors.append("Removed legacy mode remains in build settings")
 seen = set()
 while pending:
     asset = pending.pop()

@@ -1,146 +1,147 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>Owns the stimulus cameras for one rig; system_config is the rendering allow-list.</summary>
 public class ViewportSetter : MonoBehaviour
 {
-    // Start is called before the first frame update
-
-    [SerializeField]
     public int ledPanelWidth = 128;
-
-    [SerializeField]
     public int ledPanelHeight = 128;
-
-    [SerializeField]
-    public int startRow = 0;
-
-    [SerializeField]
-    public int startCol = 0;
-
-    [SerializeField]
+    public int startRow;
+    public int startCol;
     public bool horizontal = true;
+    [SerializeField] private bool interactive;
+    [SerializeField] private string displayOrder = "DRBLFU";
+    [SerializeField] private int targetDisplay = 1;
+    private int lastWidth, lastHeight;
+    private bool configured;
+    private bool applying;
 
-    [SerializeField]
-    private bool interactive = false;
+    private void Awake() => DisableCameras();
 
-    [SerializeField]
-    private string displayOrder = "DRBLFU"; // Default display order
-
-    [SerializeField]
-    private int targetDisplay = 1; // 0 for primary, 1 for secondary display
-
-    void Start()
+    private void OnEnable()
     {
-        // set vsyn to true to avoid tearing and 60 fps
+        MainController.SystemConfigurationChanged += RefreshSystemConfig;
+        RefreshSystemConfig();
+    }
+
+    private void Start()
+    {
         QualitySettings.vSyncCount = 1;
-
-        // Apply system config at start
-        ApplySystemConfig();
-
-        // Apply camera settings
-        setViewport();
+        RefreshSystemConfig();
     }
 
-    private void ApplySystemConfig()
+    private void OnDisable()
     {
-        // Find the MainController
-        MainController mainController = FindObjectOfType<MainController>();
-        if (mainController != null)
-        {
-            // Get config values based on GameObject name
-            SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
-
-            // Apply config values directly
-            ledPanelWidth = config.ledPanelWidth;
-            ledPanelHeight = config.ledPanelHeight;
-            startRow = config.startRow;
-            startCol = config.startCol;
-            horizontal = config.horizontal;
-            displayOrder = config.displayOrder;
-
-            // Apply target display - this value may have been set from command line by MainController
-            targetDisplay = config.targetDisplay;
-
-            Debug.Log($"Applied system config to {gameObject.name}: Panel={ledPanelWidth}x{ledPanelHeight}, Position={startCol},{startRow}, Horizontal={horizontal}, DisplayOrder={displayOrder}, TargetDisplay={targetDisplay}");
-        }
+        MainController.SystemConfigurationChanged -= RefreshSystemConfig;
+        DisableCameras();
     }
 
-    void setViewport()
+    public void RefreshSystemConfig()
     {
-        // Get the current screen resolution in pixels
-        int screen_width = Screen.width;
-        int screen_height = Screen.height;
-
-        // Calculate the viewport size as a fraction of the screen size
-        float viewport_width = (float)ledPanelWidth / (float)screen_width;
-        float viewport_height = (float)ledPanelHeight / (float)screen_height;
-
-        // Calculate the viewport position as a fraction of the screen size
-        float viewport_x = (float)startCol * viewport_width;
-        float viewport_y = 1.0f - viewport_height - (float)startRow * viewport_height;
-
-        // Find all the cameras in the children of this script
-        Camera[] cameras = GetComponentsInChildren<Camera>();
-
-        // Set all cameras to target the specified display
-        foreach (Camera cam in cameras)
+        MainController main = MainController.Instance;
+        if (main == null || !main.TryGetSystemConfigForGameObject(gameObject, out SystemConfig config))
         {
-            cam.targetDisplay = targetDisplay;
+            configured = false;
+            DisableCameras();
+            return;
         }
+        ApplyConfiguration(config);
+    }
 
-        if (horizontal)
+    public void ApplyConfiguration(SystemConfig config)
+    {
+        configured = config != null;
+        if (!configured) { DisableCameras(); return; }
+        ledPanelWidth = config.ledPanelWidth;
+        ledPanelHeight = config.ledPanelHeight;
+        startRow = config.startRow;
+        startCol = config.startCol;
+        horizontal = config.horizontal;
+        displayOrder = config.displayOrder;
+        targetDisplay = config.targetDisplay;
+        ApplyViewports();
+    }
+
+    private Camera[] RigCameras() => GetComponentsInChildren<Camera>(true);
+    private bool Owns(Camera camera) => camera.GetComponentInParent<ViewportSetter>(true) == this;
+
+    private void DisableCameras()
+    {
+        foreach (Camera camera in RigCameras())
+            if (Owns(camera)) camera.enabled = false;
+    }
+
+    // Unknown/duplicate letters never create extra views or shift the remaining valid slots.
+    public static string NormalizeDisplayOrder(string order)
+    {
+        var letters = new List<char>();
+        foreach (char letter in (order ?? "").ToUpperInvariant())
+            if ("DRBLFU".IndexOf(letter) >= 0 && !letters.Contains(letter)) letters.Add(letter);
+        return new string(letters.ToArray());
+    }
+
+    public static Rect PanelRect(int slot, SystemConfig config, int width, int height)
+    {
+        float w = (float)config.ledPanelWidth / width;
+        float h = (float)config.ledPanelHeight / height;
+        return new Rect((config.startCol + (config.horizontal ? slot : 0)) * w,
+            1f - (config.startRow + 1 + (config.horizontal ? 0 : slot)) * h, w, h);
+    }
+
+    private void ApplyViewports()
+    {
+        if (applying) return;
+        applying = true;
+        try
         {
-            // Set viewports based on display order
-            for (int i = 0; i < displayOrder.Length; i++)
+            // Include inactive children so serialized camera state can never override the config.
+            Camera[] cameras = RigCameras();
+            foreach (Camera camera in cameras)
+                if (Owns(camera)) camera.enabled = false;
+
+            if (!configured || !isActiveAndEnabled || targetDisplay < 0 || targetDisplay >= Display.displays.Length ||
+                ledPanelWidth <= 0 || ledPanelHeight <= 0) return;
+
+            if (targetDisplay > 0 && !Display.displays[targetDisplay].active) Display.displays[targetDisplay].Activate();
+            int width = targetDisplay == 0 ? Screen.width : Display.displays[targetDisplay].renderingWidth;
+            int height = targetDisplay == 0 ? Screen.height : Display.displays[targetDisplay].renderingHeight;
+            if (width <= 0 || height <= 0) return;
+            lastWidth = width; lastHeight = height;
+            string order = NormalizeDisplayOrder(displayOrder);
+            var layout = new SystemConfig {
+                ledPanelWidth = ledPanelWidth, ledPanelHeight = ledPanelHeight,
+                startRow = startRow, startCol = startCol, horizontal = horizontal
+            };
+            for (int slot = 0; slot < order.Length; slot++)
             {
-                char cameraId = displayOrder[i];
-                foreach (Camera cam in cameras)
+                foreach (Camera camera in cameras)
                 {
-                    if (cam.name == $"Main Camera {cameraId}")
-                    {
-                        cam.rect = new Rect(
-                            viewport_x + i * viewport_width,
-                            viewport_y,
-                            viewport_width,
-                            viewport_height
-                        );
-                        cam.fieldOfView = 90; // set fov to 90 degrees
-                        break;
-                    }
+                    if (!Owns(camera) || camera.name != "Main Camera " + order[slot]) continue;
+                    camera.targetDisplay = targetDisplay;
+                    camera.rect = PanelRect(slot, layout, width, height);
+                    camera.fieldOfView = 90f;
+                    // Listed cameras may be inactive in an older prefab (especially Up/Down).
+                    camera.gameObject.SetActive(true);
+                    camera.enabled = true;
+                    break;
                 }
             }
         }
-        else
-        {
-            // Set viewports based on display order (vertical arrangement)
-            for (int i = 0; i < displayOrder.Length; i++)
-            {
-                char cameraId = displayOrder[i];
-                foreach (Camera cam in cameras)
-                {
-                    if (cam.name == $"Main Camera {cameraId}")
-                    {
-                        cam.rect = new Rect(
-                            viewport_x,
-                            viewport_y - i * viewport_height,
-                            viewport_width,
-                            viewport_height
-                        );
-                        cam.fieldOfView = 90; // set fov to 90 degrees
-                        break;
-                    }
-                }
-            }
-        }
+        finally { applying = false; }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnTransformChildrenChanged()
     {
-        if (interactive)
-        {
-            setViewport();
-        }
+        if (configured) ApplyViewports();
+    }
+
+    private void Update()
+    {
+        if (!configured) return;
+        int width = targetDisplay == 0 ? Screen.width :
+            (targetDisplay >= 0 && targetDisplay < Display.displays.Length ? Display.displays[targetDisplay].renderingWidth : 0);
+        int height = targetDisplay == 0 ? Screen.height :
+            (targetDisplay >= 0 && targetDisplay < Display.displays.Length ? Display.displays[targetDisplay].renderingHeight : 0);
+        if (interactive || width != lastWidth || height != lastHeight) ApplyViewports();
     }
 }
