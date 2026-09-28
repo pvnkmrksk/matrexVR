@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>Persistent operator FPS readout. Observes timing without changing frame limits or VSync.</summary>
+/// <summary>Persistent operator FPS readout. Shows measured FPS and the system-config frame pacing mode.</summary>
 public class fps : MonoBehaviour
 {
     private static fps instance;
@@ -29,7 +29,7 @@ public class fps : MonoBehaviour
         box.SetParent(canvasObject.transform, false);
         box.anchorMin = box.anchorMax = box.pivot = Vector2.one;
         box.anchoredPosition = new Vector2(-12, -12);
-        box.sizeDelta = new Vector2(132, 30);
+        box.sizeDelta = new Vector2(250, 30);
         box.GetComponent<Image>().color = new Color(0, 0, 0, 0.65f);
         box.GetComponent<Image>().raycastTarget = false;
         label = new GameObject("FPS Label", typeof(RectTransform), typeof(Text)).GetComponent<Text>();
@@ -57,7 +57,9 @@ public class fps : MonoBehaviour
         elapsed += Time.unscaledDeltaTime;
         frames++;
         if (elapsed < 0.25f) return;
-        label.text = $"{frames / elapsed:0} FPS";
+        string target = QualitySettings.vSyncCount > 0 ? $"VSync /{QualitySettings.vSyncCount}"
+            : Application.targetFrameRate > 0 ? $"target {Application.targetFrameRate}" : "uncapped";
+        label.text = $"{frames / elapsed:0} FPS | {target}";
         elapsed = 0; frames = 0;
     }
     private void OnDestroy()

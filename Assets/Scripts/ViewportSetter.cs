@@ -26,7 +26,6 @@ public class ViewportSetter : MonoBehaviour
 
     private void Start()
     {
-        QualitySettings.vSyncCount = 1;
         RefreshSystemConfig();
     }
 

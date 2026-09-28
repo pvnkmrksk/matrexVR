@@ -27,5 +27,7 @@
       "displayOrder": "RBLF",
       "targetDisplay": 0
     }
-  ]
+  ],
+  "targetFrameRate": 120,
+  "vSyncCount": 0
 }

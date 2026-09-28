@@ -20,6 +20,9 @@ for path in sorted(TEMPLATES.glob('*.json')):
                 if key in step['parameters']:
                     assert (SA / step['parameters'][key]).is_file(), (path, key)
     if 'configs' in obj:
+        target = obj.get('targetFrameRate', 120)
+        assert target == -1 or target > 0, path
+        assert 0 <= obj.get('vSyncCount', 0) <= 4, path
         ids = [rig['vrId'] for rig in obj['configs']]
         assert len(ids) == len(set(ids)), path
         for rig in obj['configs']:

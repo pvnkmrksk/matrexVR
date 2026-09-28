@@ -27,6 +27,8 @@ Template: `system_config.template.json`.
 
 | Field | Omitted default | Meaning / useful example |
 |---|---|---|
+| `targetFrameRate` | 120 | Positive desired FPS, or -1 for uncapped desktop rendering. Effective when vSyncCount=0. This is a target, not a guaranteed achieved rate. |
+| `vSyncCount` | 0 | 0 uses the FPS target; 1–4 synchronize to every Nth display refresh and override the target on desktop. |
 | `targetDisplay` | 1 | Zero-based physical display; template uses 0. Applies globally to every rig. Per-rig `targetDisplay` is overwritten. The legacy `-display N` startup flag affects initial activation; use JSON targetDisplay for reliable experiment camera mapping. |
 | `configs` | none | Array of per-rig entries. Use one entry for every rig that should render. |
 | `overheadCamera` | defaults below | Operator overview in Swarm/Kannadi; independent of animal camera letter order. |
@@ -42,6 +44,8 @@ Template: `system_config.template.json`.
 | `manualControls` | null | Optional per-rig operator movement settings below. Omission preserves prefab tuning. |
 
 Viewport slot `i`: x=(startCol + i if horizontal)×width; y=screenHeight−(startRow+1 + i if vertical)×height. Ensure these rectangles fit the physical display. An unavailable display disables its cameras. Configuring VR10 does not accidentally match VR1. Configured letters do not create a camera absent from the prefab. Camera disabling does not delete the rig or stop its sensor logging.
+
+The top-right HUD shows measured FPS and either the requested target or VSync mode. No viewport component changes frame timing. For refresh-synchronized pacing use `vSyncCount:1`; for a numeric software cap use `vSyncCount:0`. Desktop software caps can still have uneven frame pacing; [Unity explains the target/VSync interaction](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/QualitySettings-vSyncCount.html).
 
 ### Manual controls (inside each rig)
 
@@ -151,11 +155,13 @@ Templates: `swarm.template.json`, `kannadi.template.json`, `kinematic.template.j
 | Shared movement field | Default | Meaning |
 |---|---|---|
 | `closedLoopPosition` | null → 1 | Nonnegative translation multiplier. Booleans remain accepted: true=1, false=0. |
-| `closedLoopOrientation` | null → 1 | 0 disables tracking; positive values cap turning toward sensor heading at gain×360 degrees/s. This is a turn-rate limit, **not** an angular multiplier. |
+| `closedLoopOrientation` | null → 1 | Nonnegative **angular multiplier**: 1 means one world degree per sensor degree; 0 disables turning, 0.5 halves yaw, 2 doubles it. No turn-speed cap or smoothing. |
 | `animateOnMove` | false | Enable leg-animation gating; templates set true. |
 | `animationSpeedThreshold` | 0.5 | cm/s planar translation; animate only strictly above threshold. Rotation alone does not animate. |
 | `vrConfigs` | null | Optional per-rig pose/gain overrides below. |
 | `animationNoiseThreshold` | legacy alias | Used only when `animationSpeedThreshold` is absent. Prefer the canonical name. |
+
+Walking uses **unit gain by default for both translation and yaw**. Ordinary Choice's enabled tracking also uses unit gain. In Swarm/Kannadi, explicit numeric fields override it; per-rig values take precedence over global values. Gain operates on displacement/angle, independent of render FPS. The former locust turn-speed interpretation has been removed. Yaw differences use the shortest signed angle across 0/360; the input must not turn more than 180 degrees between consumed samples to avoid angular aliasing.
 
 `vrConfigs[]`: `vrIndex` is required (1–4, unique); `initialPosition` and `initialRotation` are optional `{x,y,z}` world position/Euler degrees and otherwise keep current pose. Nullable `closedLoopPosition`/`closedLoopOrientation` override global gains. `watchIndex` is optional 1–4: in Kannadi it selects that animal's replica layer; omit/null to see the other animals. Self-view excludes its own central tile. Swarm does not use `watchIndex`.
 

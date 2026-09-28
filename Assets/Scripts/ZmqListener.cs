@@ -19,18 +19,30 @@ public class ZmqListener : MonoBehaviour
     private Thread listenerThread;
     private volatile bool isRunning;
     private string message; // The message received from the socket
-    public Pose pose { get; private set; }
-    public bool HasPose { get; private set; }
+    // Pose is a multi-word struct. Publish/copy it under one lock so a render frame
+    // cannot combine position or quaternion components from different network packets.
+    private readonly object poseLock = new object();
+    private Pose latestPose;
+    private bool hasPose;
+    public Pose pose
+    {
+        get { lock (poseLock) return latestPose; }
+        private set { lock (poseLock) latestPose = value; }
+    }
+    public bool HasPose
+    {
+        get { lock (poseLock) return hasPose; }
+        private set { lock (poseLock) hasPose = value; }
+    }
     public double SecondsSinceLastPose
     {
         get
         {
-            if (!HasPose || lastPoseTicksUtc == 0)
+            lock (poseLock)
             {
-                return double.PositiveInfinity;
+                if (!hasPose || lastPoseTicksUtc == 0) return double.PositiveInfinity;
+                return TimeSpan.FromTicks(DateTime.UtcNow.Ticks - lastPoseTicksUtc).TotalSeconds;
             }
-
-            return TimeSpan.FromTicks(DateTime.UtcNow.Ticks - lastPoseTicksUtc).TotalSeconds;
         }
     }
 
@@ -154,9 +166,17 @@ public class ZmqListener : MonoBehaviour
         Quaternion rotation = Quaternion.Euler(zmqMessage.pitch, zmqMessage.yaw, zmqMessage.roll);
 
         // Update the pose
-        pose = new Pose(position, rotation);
-        HasPose = true;
-        lastPoseTicksUtc = DateTime.UtcNow.Ticks;
+        PublishPose(new Pose(position, rotation));
+    }
+
+    private void PublishPose(Pose value)
+    {
+        lock (poseLock)
+        {
+            latestPose = value;
+            hasPose = true;
+            lastPoseTicksUtc = DateTime.UtcNow.Ticks;
+        }
     }
 
     public bool HasFreshPose(double maxAgeSeconds = 1.0)

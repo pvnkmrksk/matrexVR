@@ -15,6 +15,8 @@ public class MainController : MonoBehaviour
 {
     public static MainController Instance { get; private set; }
     public static event System.Action SystemConfigurationChanged;
+    public int TargetFrameRate { get; private set; } = 120;
+    public int VSyncCount { get; private set; } = 0;
     public OverheadCameraConfig OverheadCameraSettings { get; private set; } = new OverheadCameraConfig();
 
     public List<SequenceStep> sequenceSteps = new List<SequenceStep>();
@@ -158,6 +160,7 @@ public class MainController : MonoBehaviour
 
             // Parse the JSON using JObject instead of dynamic
             JObject fullConfig = JObject.Parse(jsonText);
+            ApplyFrameTiming(fullConfig);
             OverheadCameraSettings = fullConfig["overheadCamera"]?.ToObject<OverheadCameraConfig>() ?? new OverheadCameraConfig();
 
             // Extract global target display if it exists
@@ -215,6 +218,20 @@ public class MainController : MonoBehaviour
         {
             SystemConfigurationChanged?.Invoke();
         }
+    }
+
+    private void ApplyFrameTiming(JObject config)
+    {
+        int target = config.Value<int?>("targetFrameRate") ?? 120;
+        int sync = config.Value<int?>("vSyncCount") ?? 0;
+        if (target != -1 && target <= 0)
+            throw new System.ArgumentException("targetFrameRate must be positive, or -1 for uncapped desktop rendering.");
+        if (sync < 0 || sync > 4)
+            throw new System.ArgumentException("vSyncCount must be from 0 to 4.");
+        TargetFrameRate = target;
+        VSyncCount = sync;
+        QualitySettings.vSyncCount = sync;
+        Application.targetFrameRate = target;
     }
 
     // Match a complete rig ID, including parent rigs, without confusing VR1 and VR10.

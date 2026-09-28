@@ -79,6 +79,7 @@ public static class KannadiValidation
     }
     private static void CheckViewports(string scene)
     {
+        Check(QualitySettings.vSyncCount == main.VSyncCount && Application.targetFrameRate == main.TargetFrameRate, scene + " preserves configured FPS instead of forcing VSync");
         ViewportSetter[] setters = Object.FindObjectsOfType<ViewportSetter>();
         Check(setters.Length == 4, scene + " has four configured rigs");
         foreach (ViewportSetter setter in setters)
@@ -440,6 +441,74 @@ public static class KannadiValidation
         }
     }
 
+    private static void CheckWalkingGains()
+    {
+        var root = new GameObject("Walking gain regression");
+        var listener = root.AddComponent<ZmqListener>(); listener.enabled = false;
+        var tracking = root.AddComponent<ClosedLoop>(); tracking.enabled = false;
+        Call(tracking, "Start");
+        tracking.SetSphereDiameter(2.6f);
+        var publish = (Action<Pose>)typeof(ZmqListener).GetMethod("PublishPose", BindingFlags.Instance | BindingFlags.NonPublic).CreateDelegate(typeof(Action<Pose>), listener);
+        try
+        {
+            Check(Field<float>(tracking, "locustPositionGain") == 1f && Field<float>(tracking, "locustOrientationGain") == 1f, "walking component defaults to unit translation and angular gains");
+            foreach (float gain in new[] { 1f, 0.5f, 2f, 0f })
+            {
+                tracking.SetLocustGains(gain, gain);
+                tracking.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+                publish(new Pose(Vector3.zero, Quaternion.identity));
+                Call(tracking, "InitializeFicTracData");
+                publish(new Pose(new Vector3(0, 2, 0), Quaternion.Euler(0, 90, 0)));
+                Call(tracking, "UpdateTransform");
+                Check(Vector3.Distance(root.transform.position, new Vector3(2.6f * gain,0,0)) < 0.0001f, "calibrated displacement multiplied exactly by gain " + gain);
+                Check(Quaternion.Angle(root.transform.rotation, Quaternion.Euler(0,90 * gain,0)) < 0.03f, "90-degree packet gets exact angular gain without a frame-rate cap: " + gain);
+                var position = root.transform.position; var rotation = root.transform.rotation;
+                for (int i = 0; i < 8; i++) Call(tracking, "UpdateTransform");
+                Check(root.transform.position == position && Quaternion.Angle(root.transform.rotation, rotation) < 0.03f, "repeated render frames cannot keep turning toward an old packet");
+            }
+            tracking.SetLocustGains(1, 1);
+            tracking.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0,45,0));
+            publish(new Pose(Vector3.zero, Quaternion.Euler(0,359,0)));
+            Call(tracking, "InitializeFicTracData");
+            float previous = 359, expected = 45;
+            foreach (float yaw in new[] { 1f, 3f, 355f, 10f, 100f, 170f, 181f, 270f, 359f, 1f })
+            {
+                publish(new Pose(Vector3.zero, Quaternion.Euler(0,yaw,0)));
+                Call(tracking, "UpdateTransform");
+                expected += Mathf.DeltaAngle(previous, yaw); previous = yaw;
+                Check(Quaternion.Angle(root.transform.rotation, Quaternion.Euler(0,expected,0)) < 0.03f, "unit yaw follows wraps/reversals immediately at " + yaw);
+            }
+            // Emulate simultaneous publisher/render threads with disjoint, recognizable snapshots.
+            Pose a = new Pose(new Vector3(1,2,3), Quaternion.Euler(0,10,0));
+            Pose b = new Pose(new Vector3(4,5,6), Quaternion.Euler(0,80,0));
+            publish(a);
+            var worker = new System.Threading.Thread(() => { for (int i = 0; i < 50000; i++) publish((i & 1) == 0 ? a : b); });
+            worker.Start();
+            bool coherent = true;
+            for (int i = 0; i < 10000; i++)
+            {
+                Pose snapshot = listener.pose;
+                coherent &= (snapshot.position == a.position && snapshot.rotation.Equals(a.rotation)) ||
+                    (snapshot.position == b.position && snapshot.rotation.Equals(b.rotation));
+            }
+            worker.Join();
+            Check(coherent, "network pose reads never mix position/quaternion from different packets");
+        }
+        finally { Object.Destroy(root); }
+    }
+
+    private static void CheckFrameTiming()
+    {
+        Call(main, "ApplyFrameTiming", Newtonsoft.Json.Linq.JObject.Parse("{\"targetFrameRate\":75,\"vSyncCount\":0}"));
+        Check(Application.targetFrameRate == 75 && QualitySettings.vSyncCount == 0, "explicit FPS target controls software cap");
+        Call(main, "ApplyFrameTiming", Newtonsoft.Json.Linq.JObject.Parse("{\"targetFrameRate\":120,\"vSyncCount\":2}"));
+        Check(Application.targetFrameRate == 120 && QualitySettings.vSyncCount == 2, "explicit VSync mode is honored");
+        Call(main, "ApplyFrameTiming", Newtonsoft.Json.Linq.JObject.Parse("{\"targetFrameRate\":-1}"));
+        Check(Application.targetFrameRate == -1 && QualitySettings.vSyncCount == 0, "uncapped mode is explicit");
+        Call(main, "ApplyFrameTiming", new Newtonsoft.Json.Linq.JObject());
+        Check(Application.targetFrameRate == 120 && QualitySettings.vSyncCount == 0, "missing timing fields use 120 FPS with no VSync override");
+    }
+
     private static void CheckMigration()
     {
         var ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -474,6 +543,7 @@ public static class KannadiValidation
                 case 0:
                     CheckTextResources();
                     CheckMigration();
+                    CheckWalkingGains();
                     CheckTemplateSchemas();
                     var parsed = KannadiConfig.Load(Params("{\"closedLoopPosition\":true,\"closedLoopOrientation\":0.5,\"numberOfRings\":0,\"spacing\":7}"));
                     Check(parsed.closedLoopPosition == 1 && parsed.closedLoopOrientation == 0.5f && parsed.numberOfRings == 0, "legacy boolean/numeric gains and zero rings");
@@ -489,6 +559,7 @@ public static class KannadiValidation
                     logDirectory = MasterDataLogger.Instance.directoryPath;
                     Later(); break;
                 case 1:
+                    CheckFrameTiming();
                     Check(main.GetSystemConfig("VR4").zmqPort == 9874, "four VR1 hardware configurations loaded");
                     Check(main.sequenceSteps[0].sceneName == "Swarm" && main.sequenceSteps[0].duration == 20 && main.sequenceSteps[1].sceneName == "Kannadi", "20-second Swarm entrainment precedes Kannadi");
                     main.sequenceSteps[0].duration = 1000;

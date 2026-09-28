@@ -63,5 +63,7 @@
       "horizontal": true,
       "displayOrder": "DRBLFU"
     }
-  ]
+  ],
+  "targetFrameRate": 120,
+  "vSyncCount": 0
 }

@@ -99,5 +99,7 @@
     "trailSampleInterval": 0.1,
     "trailWidthPixels": 1.5,
     "trailBreakDistance": 50
-  }
+  },
+  "targetFrameRate": 120,
+  "vSyncCount": 0
 }

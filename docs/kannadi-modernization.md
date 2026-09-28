@@ -39,7 +39,7 @@ Panel size, row, column, horizontal/vertical direction, and target display come 
 | `boundaryLengthX`, `boundaryLengthZ` | Independent rectangular periodic dimensions, centered at world origin. Wrapping preserves overshoot. |
 | `periodicBoundary` | Default `true`; set `false` for unbounded movement. |
 | `closedLoopPosition` | Boolean or nonnegative numeric gain; translation is scaled by this and the calibrated sphere radius. |
-| `closedLoopOrientation` | Boolean or nonnegative numeric value. In locust scenes this preserves the old convergence behavior: maximum turn rate is value × 360 degrees/second toward the aligned FicTrac heading. Zero disables turning. It is not an angular multiplier. |
+| `closedLoopOrientation` | Boolean or nonnegative angular gain. Default 1 maps each sensor yaw delta 1:1 to world yaw; zero disables turning. Explicit 0.5 or 2 scales the measured angle. The previous turn-speed convergence behavior has been removed. |
 | `vrConfigs` | Entries with `vrIndex` 1–4, optional `initialPosition`, `initialRotation` in degrees, `watchIndex`, and per-rig gain overrides. |
 | `watchIndex` | Omitted: see the other tracked animals' layers. 1–4: see only that animal's replicas, while retaining the shared floor/background. Own index: see own replicas except the center. |
 | `animateOnMove` | Boolean animation gate, enabled in the supplied Swarm and Kannadi configs. `false` restores continuous animation. |
@@ -116,3 +116,11 @@ The Unity 6 Input System migration uses package 1.20.0, a shared editable action
 The final regression run passed **876 checks with zero runtime failures**. This includes simulated keyboard/mouse/gamepad events, actual rig movement, reset without a live pose, scene camera allow-lists, overview lifecycle, Optomotor, the full dynamic template, Choice bands and per-rig band visibility, strict configuration deserialization, and migration wind/AGL transitions. The report separately records Unity Editor's pre-existing SearchDatabase cache exception. Physical LED/FicTrac timing and controller hardware were not exercised.
 
 Sixteen JSON templates/examples and full manuals now live under `Assets/StreamingAssets/Templates` and `docs/configuration-reference.md`, `docs/unity6-controls.md`, `docs/data-formats.md`. Bogong/SmrMah wind and AGL settings now work in Choice; exact historical inputs and source commit IDs are retained in `docs/config-history`. Dynamic Choice respects both tracking flags false, saved runs include referenced dynamic design files, and the Choice scene registers the band example's prefab.
+
+### Walking gains and frame timing
+
+Walking yaw now uses the same incremental angle model as JuliusTree, with a true dimensionless gain. Default translation and orientation gain are both 1; explicit numeric Swarm/Kannadi values override them. The former gain×360 degrees/second convergence cap depended on render timing and could continue turning on repeated packets. It has been removed. Signed yaw differences handle 0/360 crossings, and the ZMQ handoff copies each complete pose under a lock so components cannot be mixed between packets.
+
+Top-level system config fields `targetFrameRate` (default 120; -1 uncapped) and `vSyncCount` (default 0) own frame pacing. ViewportSetter no longer forces VSync on. The FPS HUD shows measured rate and target or VSync mode. The local hardware file is set to 120 FPS and VSync 0.
+
+Validation: 918 checks passed, including exact 0/0.5/1/2 gains, a 90-degree input without a frame-dependent cap, wrapped yaw/reversals, repeated render frames, concurrent pose publication, and FPS persistence across scenes. These establish the software behavior; they do not replace a live-stream comparison against the user's stable older build.

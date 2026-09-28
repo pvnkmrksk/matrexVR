@@ -22,7 +22,6 @@ public class ClosedLoop : MonoBehaviour
     // Stores the initial world rotation, including any random rotation applied at start
     private Quaternion _initialWorldRotation;
     private float _nextStalePoseWarningTime;
-    private bool useLocustGains;
     private float locustPositionGain = 1f;
     private float locustOrientationGain = 1f;
 
@@ -95,24 +94,17 @@ public class ClosedLoop : MonoBehaviour
         {
             // Use _ficTracRotationOffset to correctly transform the position delta
             // This accounts for both the initial FicTrac orientation and any random initial rotation
-            Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius * (useLocustGains ? locustPositionGain : 1f);
+            Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius * locustPositionGain;
             transform.Translate(positionDelta, Space.World);
         }
 
         // Apply rotation change only if closedLoopOrientation is true
         if (closedLoopOrientation)
         {
-            if (useLocustGains)
-            {
-                Quaternion desired = _ficTracRotationOffset * Quaternion.Euler(0, currentFicTracData.z * Mathf.Rad2Deg, 0);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, desired, locustOrientationGain * 360f * Time.deltaTime);
-            }
-            else
-            {
-                float rotationDelta = Mathf.DeltaAngle(_lastFicTracData.z * Mathf.Rad2Deg, currentFicTracData.z * Mathf.Rad2Deg);
-                // Preserve the modern boolean mode used by the other experiments.
-                transform.Rotate(0, rotationDelta, 0, Space.Self);
-            }
+            // True angular gain: one sensor degree produces one world degree at gain 1.
+            // No dt-based convergence, smoothing, or turn-speed clamp in walking mode.
+            float rotationDelta = Mathf.DeltaAngle(_lastFicTracData.z * Mathf.Rad2Deg, currentFicTracData.z * Mathf.Rad2Deg);
+            transform.Rotate(0, rotationDelta * locustOrientationGain, 0, Space.Self);
         }
 
         _lastFicTracData = currentFicTracData;
@@ -129,7 +121,7 @@ public class ClosedLoop : MonoBehaviour
         Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
     }
 
-    // Manual yaw adjusts the tracking reference so locust absolute-heading mode cannot undo it.
+    // Manual yaw rotates the displacement reference; measured yaw deltas remain additive.
     public void ApplyManualRotation(Quaternion worldDelta)
     {
         _ficTracRotationOffset = worldDelta * _ficTracRotationOffset;
@@ -138,7 +130,9 @@ public class ClosedLoop : MonoBehaviour
 
     public void SetLocustGains(float positionGain, float orientationGain)
     {
-        useLocustGains = true;
+        if (float.IsNaN(positionGain) || float.IsInfinity(positionGain) || positionGain < 0 ||
+            float.IsNaN(orientationGain) || float.IsInfinity(orientationGain) || orientationGain < 0)
+            throw new System.ArgumentOutOfRangeException("Walking gains must be finite and nonnegative.");
         locustPositionGain = positionGain;
         locustOrientationGain = orientationGain;
         closedLoopPosition = positionGain != 0;
