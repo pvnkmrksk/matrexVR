@@ -338,26 +338,12 @@ public class ReplayController : MonoBehaviour
 
     private void HandleInput()
     {
-        if (Input.GetKeyDown(togglePlayKey))
-            isPlaying = !isPlaying;
-
-        if (Input.GetKeyDown(backKey))
-            Seek(-smallStepSeconds);
-        if (Input.GetKeyDown(forwardKey))
-            Seek(smallStepSeconds);
-
-        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-        {
-            if (Input.GetKeyDown(backKey))
-                Seek(-largeStepSeconds);
-            if (Input.GetKeyDown(forwardKey))
-                Seek(largeStepSeconds);
-        }
-
-        if (Input.GetKeyDown(prevStepKey))
-            JumpToStep(-1);
-        if (Input.GetKeyDown(nextStepKey))
-            JumpToStep(1);
+        if (ExperimentInput.Pressed(togglePlayKey, KeyCode.Space, "Pause")) isPlaying = !isPlaying;
+        float step = ExperimentInput.Held("SpeedModifier") ? largeStepSeconds : smallStepSeconds;
+        if (ExperimentInput.Pressed(backKey, KeyCode.LeftArrow, "Back")) Seek(-step);
+        if (ExperimentInput.Pressed(forwardKey, KeyCode.RightArrow, "Forward")) Seek(step);
+        if (ExperimentInput.Pressed(prevStepKey, KeyCode.N, "PreviousStep")) JumpToStep(-1);
+        if (ExperimentInput.Pressed(nextStepKey, KeyCode.M, "NextStep")) JumpToStep(1);
     }
 
     private void Seek(float deltaSeconds)

@@ -109,7 +109,7 @@ public class OverheadCameraController : MonoBehaviour
         // Scroll = Zoom
 
         // Handle mouse wheel for zooming
-        Vector3 mouse = Input.mousePosition;
+        Vector3 mouse = ExperimentInput.MousePosition;
         Vector3 relative = Display.RelativeMouseAt(mouse);
         bool onDisplay = true;
         if (relative != Vector3.zero)
@@ -120,7 +120,7 @@ public class OverheadCameraController : MonoBehaviour
         bool overPanel = onDisplay && (inputRect != null
             ? RectTransformUtility.RectangleContainsScreenPoint(inputRect, mouse)
             : cam.pixelRect.Contains(mouse));
-        float scroll = overPanel ? Input.GetAxis("Mouse ScrollWheel") : 0f;
+        float scroll = overPanel ? ExperimentInput.Scroll : 0f;
         if (scroll != 0f)
         {
             distance -= scroll * zoomSpeed;
@@ -129,14 +129,14 @@ public class OverheadCameraController : MonoBehaviour
         }
 
         // Handle mouse button down
-        if (overPanel && (Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2)))
+        if (overPanel && (ExperimentInput.Pressed("Orbit") || ExperimentInput.Pressed("Pan")))
         {
             isDragging = true;
-            lastMousePosition = Input.mousePosition;
+            lastMousePosition = ExperimentInput.MousePosition;
         }
 
         // Handle mouse button up
-        if (!Input.GetMouseButton(1) && !Input.GetMouseButton(2))
+        if (!ExperimentInput.Held("Orbit") && !ExperimentInput.Held("Pan"))
         {
             isDragging = false;
         }
@@ -144,10 +144,10 @@ public class OverheadCameraController : MonoBehaviour
         // Handle mouse drag
         if (isDragging)
         {
-            Vector3 mouseDelta = Input.mousePosition - lastMousePosition;
+            Vector3 mouseDelta = ExperimentInput.MousePosition - lastMousePosition;
 
             // Right mouse button: Orbit around target
-            if (Input.GetMouseButton(1))
+            if (ExperimentInput.Held("Orbit"))
             {
                 horizontalAngle += mouseDelta.x * rotationSpeed * 0.1f;
                 verticalAngle -= mouseDelta.y * rotationSpeed * 0.1f; // Unity style: drag down = look down (increase angle)
@@ -156,7 +156,7 @@ public class OverheadCameraController : MonoBehaviour
                 UpdateCameraPosition();
             }
             // Middle mouse button: Pan
-            else if (Input.GetMouseButton(2))
+            else if (ExperimentInput.Held("Pan"))
             {
                 Vector3 right = transform.right;
                 Vector3 up = transform.up;
@@ -168,7 +168,7 @@ public class OverheadCameraController : MonoBehaviour
                 UpdateCameraPosition();
             }
 
-            lastMousePosition = Input.mousePosition;
+            lastMousePosition = ExperimentInput.MousePosition;
         }
     }
 

@@ -449,9 +449,6 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
     private void ApplyClosedLoopFlags(string vrId, Step s)
     {
-        if (!s.closedLoopOrientation && !s.closedLoopPosition)
-            return;
-
         if (players.TryGetValue(vrId, out var rig))
         {
             foreach (var cl in rig.GetComponentsInChildren<ClosedLoop>())

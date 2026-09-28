@@ -381,7 +381,7 @@ public class MainController : MonoBehaviour
         }
 
         // One owner for Escape: stop the experiment; Escape in Control exits the player.
-        if (Input.GetKeyUp(KeyCode.Escape)) HandleEscape();
+        if (ExperimentInput.Released("Cancel")) HandleEscape();
     }
 
     public void HandleEscape()
@@ -573,10 +573,11 @@ void ManageTimerAndTransitions()
         HashSet<string> copiedConfigFiles = new HashSet<string>();
 
         foreach (SequenceItem item in config.sequences)
+        foreach (string referenceKey in new[] { "configFile", "design" })
         {
-            if (item.parameters != null && item.parameters.ContainsKey("configFile"))
+            if (item.parameters != null && item.parameters.TryGetValue(referenceKey, out object reference) && reference != null)
             {
-                string configFileName = item.parameters["configFile"].ToString();
+                string configFileName = reference.ToString();
 
                 if (!copiedConfigFiles.Add(configFileName))
                 {
@@ -659,6 +660,7 @@ public class SequenceItem
 [System.Serializable]
 public class SystemConfig
 {
+    public ManualControlConfig manualControls;
     public float sphereDiameter = 1.0f;
     public int ledPanelWidth = 128;
     public int ledPanelHeight = 128;

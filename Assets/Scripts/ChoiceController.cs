@@ -130,6 +130,10 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             );
             cl.SetClosedLoopOrientation(config.closedLoopOrientation);
             cl.SetClosedLoopPosition(config.closedLoopPosition);
+            var migration = cl.GetComponent<MigrationMotion>();
+            if (migration == null && (config.windSpeed > 0 || config.aglHeight > 0))
+                migration = cl.gameObject.AddComponent<MigrationMotion>();
+            if (migration != null) migration.Configure(config.windSpeed, config.windDirection, config.aglHeight, config.groundLayerMask);
 
             // Set the initial position and rotation in one go, convert the rotation to a quaternion
             //if randomInitialRotation is true, then set the rotation to a random value
@@ -259,6 +263,13 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
                 return;
             }
             bandInstance.layer = layerIndex;
+            // Older Choice scenes serialized every rig with VR1's band layer.
+            // Select the matching band without altering system-config camera enablement.
+            GameObject rig = GameObject.Find("VR" + vrIndex);
+            int bandLayers = LayerMask.GetMask("SimulatedLocustsVR1", "SimulatedLocustsVR2", "SimulatedLocustsVR3", "SimulatedLocustsVR4");
+            if (rig != null)
+                foreach (Camera camera in rig.GetComponentsInChildren<Camera>(true))
+                    camera.cullingMask = (camera.cullingMask & ~bandLayers) | (1 << layerIndex);
 
             BandSpawner spawner = bandInstance.GetComponent<BandSpawner>();
             if (spawner != null)
@@ -510,6 +521,10 @@ public class SceneConfig
     public ColorConfig backgroundColor;
 
     public string skyboxPath;
+    public float windSpeed = 0f;
+    public float windDirection = 0f;
+    public float aglHeight = 0f;
+    public int groundLayerMask = 1;
 }
 
 [System.Serializable]

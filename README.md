@@ -1,28 +1,40 @@
-# MATREX VR: Bridging Virtual Reality and Naturalistic Behaviors in Neuroscience
+# MATREX VR
 
-## Overview
+Unity experiments for tracked animals and LED-panel virtual environments. This branch combines the JuliusTree experiment infrastructure with Swarm and **Kannadi** (ಕನ್ನಡಿ, mirror) multiplayer scenes. There is no separate Matrix scene.
 
-This repository hosts the code and resources for MATREX VR (MATREX Architecture Terraforming Realistic Environments in X), a groundbreaking project at the intersection of behavioral neuroscience, virtual reality, and ecological studies. Our system, inspired by the concept of 'Prakruti Maye', blends tangible reality with carefully crafted illusion, challenging traditional boundaries between actuality and artifice.
+Use **Unity 6000.3.16f1**, matching ProjectVersion.txt. Packages are pinned in `Packages/manifest.json` and `packages-lock.json`; the operator controls now use Unity Input System 1.20.0. Restart an already open Editor after pulling the input-backend change.
 
-## Project Aim
+## Start here
 
-The MATREX VR project aims to revolutionize our understanding of collective foraging behaviors, particularly in locusts and other species. We focus on creating simulated yet highly realistic environments that replicate the complexity of natural settings. This approach seeks to overcome the limitations of reductionist models historically used in neuroscience and behavioral studies.
+1. Open `Assets/Scenes/ControlScene.unity`.
+2. Create `Assets/StreamingAssets/system_config.json` from [the system template](Assets/StreamingAssets/Templates/system_config.template.json). Configure each rig's ZMQ endpoint, ball diameter, physical display and camera order. This machine's selected setup is four rigs, RBLF cameras, 2.6 cm spheres.
+3. Choose [an experiment template](Assets/StreamingAssets/Templates/README.md), copy it under a new filename, and reference it in `sequenceConfig.json`. The active sequence is a dense aligned **Swarm for 20 s**, then **Kannadi for 1000 s**.
+4. Enter Play mode from Control, fill the experiment metadata, and start the sequence. Focus Game for hotkeys. R resets; P toggles tracked position; O toggles tracked orientation. Escape returns to Control.
+5. Find recordings under `Assets/RunData/<session>/`. Preserve the saved config files with the data.
 
-## Key Features
+## Reference manuals
 
-- **Immersive Virtual Reality Environments:** Utilizes high refresh rate, commercial LED panels, and off-the-shelf components to create panoramic, naturalistic visual stimuli.
-- **Parametric 3D Printable Modules:** Designed to accommodate a range of organisms, enabling scalable and cost-effective study of both walking and flying behaviors.
-- **Advanced Sensory System:** Features a fully 3D printable, 6-axis force-torque sensor capturing nuanced dynamics like pitch, yaw, roll, and translational forces.
-- **Open Source Contribution:** Simplifies the data capture process in VR research and democratizes access, promoting an inclusive approach in behavioral neuroscience.
+| Document | Contents |
+|---|---|
+| [Configuration reference](docs/configuration-reference.md) | Every current system, sequence, Choice, Swarm, Kannadi/kinematic, optomotor, migration and dynamic-design parameter; defaults, units, precedence and legacy no-op fields. |
+| [Editable templates](Assets/StreamingAssets/Templates/README.md) | Complete JSON files and runnable example sequences, including migration AGL 10/100/1000. |
+| [Unity 6 controls](docs/unity6-controls.md) | Action map, keyboard/mouse/gamepad bindings, UI migration, tracking/reset behavior and bench checks. |
+| [Data formats](docs/data-formats.md) | CSV/gzip/metadata columns, clocks, sensor-to-world conversion, coordinate conventions, replay and analysis limitations. |
+| [Kannadi integration](docs/kannadi-modernization.md) | Scene integration, camera allow-list, overview, trails, animation and validation history. |
+| [Experiment workflow](docs/experiment-workflow.md) | Controller lifecycle and adding experiments. |
 
-## Applications and Impact
+## Coordinates and visual behavior
 
-MATREX VR is not just a technological advancement but a paradigm shift in how we approach naturalistic behavior studies. By integrating complex, real-world stimuli into virtual environments, we open new avenues for understanding the neural basis of individual and collective decision-making. This repository serves as a resource for researchers and academicians interested in exploring similar paths or expanding upon our work.
+Current walking scenes use **one world unit = one centimeter**. Speeds are cm/s. Unity is **left-handed**: X right, Y up, Z forward. Positive yaw turns +Z toward +X, clockwise when viewed from above with +Z at the top. Rotations use degrees; log Euler angles wrap at 360. Imported flight terrain may have a different authored scale: check before interpreting world units as physical centimeters.
 
-## Installation Guide
+The system `displayOrder` is authoritative. A camera whose letter is missing is disabled even if it exists and is enabled in a scene. A rig absent from system config renders none of its stimulus cameras. The operator overview shows numbered heading arrows at actual rig positions with 60 s fading trajectories. It works in Swarm and Kannadi; Hide stops overview rendering and tracking work. FPS stays visible at the top right.
+
+Locust animation gating uses planar translation: at or below the default 0.5 cm/s threshold, legs stop; above it they animate. Rotation alone does not trigger walking. Configure `animateOnMove` and `animationSpeedThreshold` per experiment.
+
+## Linux tracking workstation installation
 
 ### Prerequisites
-- Ubuntu operating system
+- Ubuntu for the setup commands below (the Unity project is also tested on macOS)
 - Terminal access
 - Unity account
 
@@ -87,54 +99,9 @@ sudo apt-get install unityhub
 
 Once the correct Unity version is installed, open the project and you're ready to go!
 
-## Scripts Overview
+## Validation
 
-| Script | Status | Description |
-|--------|--------|-------------|
-| ClosedLoop.cs | ✅ | Controls closed-loop position and orientation |
-| DrumLogger.cs | ✅ | Logs position, rotation, and parameters |
-| DrumRotator.cs | ✅ | Rotates drum object with configurations |
-| Keyboard.cs | ✅ | Enables keyboard controls |
-| SinusoidalGrating.cs | ✅ | Generates sinusoidal grating texture |
-| ViewportSetter.cs | ✅ | Sets up multiple viewports |
-| ZmqListener.cs | ✅ | Listens to ZeroMQ socket |
-| DataLogger.cs | ✅ | Logs data to CSV |
-| jsonLogger.cs | ❌ | Not implemented |
-| replayscript.cs | ❌ | Not implemented |
-
-## Keyboard Controls
-
-### Movement
-- `W` - Pitch down
-- `S` - Pitch up
-- `D` - Yaw right
-- `A` - Yaw left
-- `E` - Roll CW
-- `Q` - Roll CCW
-- `↑` - Move forward
-- `↓` - Move backward
-- `→` - Move right
-- `←` - Move left
-- `C` - Move up
-- `Z` - Move down
-
-### Control Toggles
-- `O` - Toggle Closed Loop Orientation Control
-- `P` - Toggle Closed Loop Position Control
-- `M` - Toggle Closed Loop Momentum Control
-
-## Running Experiments
-
-- The sequence of scenes is defined in `Assets/StreamingAssets/sequenceConfig.json`. Each entry lists a `sceneName`, a `duration`, optional `parameters`, and whether to reload the scene between steps.
-- Scenes that implement `IInSceneSequencer` (e.g., `Choice_desync`) can run their own internal step list when `reloadScene` is `false`, using parameters such as `design` to pick a sequence design JSON.
-- Editor menu items under `Tools/…` generate the design JSONs into `Assets/StreamingAssets`. After generating, point `sequenceConfig.json` to the desired design filename for the scene you want to run.
-- See `docs/experiment-workflow.md` for a concise walkthrough of the scene/sequence pipeline and how to add new experiments.
-- See [docs/json-config-schema.md](/home/flyvr01/src/matrexVR/docs/json-config-schema.md) for the JSON schema used by sequence, system, choice, and optomotor configs, plus template files in `Assets/StreamingAssets`.
-
-## Dependencies
-
-- Unity Engine (version X.X.X)
-- NetMQ (version X.X.X)
+Run `python3 tools/validate_kannadi_assets.py` and `python3 tools/validate_config_templates.py` for static checks. Unity regression testing uses `Assets/Editor/KannadiValidation.cs` on a disposable project copy; it refuses to run without the `KANNADI_VALIDATION_COPY` sentinel. See [the saved report](docs/kannadi-validation-results.json). Physical FicTrac, gamepad devices, LED timing and multi-monitor mapping still need a bench check.
 
 ## Contributing
 
@@ -142,13 +109,9 @@ Contributions to the project are welcome! If you find any issues or have suggest
 
 ## License
 
-The project is licensed under the [MIT License](LICENSE).
+The previous README identifies this project as MIT-licensed; this checkout has no root LICENSE file. Third-party assets retain their own license terms.
 
 ## Acknowledgements
 
 - [Unity Engine](https://unity.com/)
 - [NetMQ](https://github.com/zeromq/netmq)
-
-## Kannadi and Swarm
-
-See [Kannadi modernization and setup](docs/kannadi-modernization.md) for the four-rig multiplayer configuration, operator overview, provenance, and validation commands.

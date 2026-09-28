@@ -340,6 +340,106 @@ public static class KannadiValidation
         try { KannadiConfig.Load(Params("{\"animationSpeedThreshold\":-1}")); } catch (ArgumentException) { rejected = true; }
         Check(rejected, "negative animation thresholds rejected");
     }
+    // EditorApplication.update can run outside the player input phase; explicitly route synthetic events.
+    private static void UpdateTestInput() => typeof(UnityEngine.InputSystem.InputSystem)
+        .GetMethod("Update", BindingFlags.Static | BindingFlags.NonPublic, null, new[] { typeof(UnityEngine.InputSystem.LowLevel.InputUpdateType) }, null)
+        .Invoke(null, new object[] { UnityEngine.InputSystem.LowLevel.InputUpdateType.Dynamic });
+
+    private static void CheckModernInput(ClosedLoop tracking)
+    {
+        var inputSettings = UnityEngine.InputSystem.InputSystem.settings;
+        var oldEditorBehavior = inputSettings.editorInputBehaviorInPlayMode;
+        var oldBackgroundBehavior = inputSettings.backgroundBehavior;
+        inputSettings.editorInputBehaviorInPlayMode = UnityEngine.InputSystem.InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+        inputSettings.backgroundBehavior = UnityEngine.InputSystem.InputSettings.BackgroundBehavior.IgnoreFocus;
+        var keyboard = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>();
+        var pad = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Gamepad>();
+        var mouse = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Mouse>();
+        try
+        {
+            tracking.transform.position = Vector3.one * 20;
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard, new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.R));
+            UpdateTestInput();
+            Check(ExperimentInput.Pressed("Reset"), "Input System receives R action (key=" + keyboard.rKey.isPressed + ", editing=" + ExperimentInput.IsEditingText + ", focus=" + Application.isFocused + ")");
+            Call(tracking, "Update");
+            Check(tracking.transform.position == Vector3.zero, "R key resets a rig with missing tracking through Update");
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard, new UnityEngine.InputSystem.LowLevel.KeyboardState());
+            UpdateTestInput();
+            Check(!ExperimentInput.Pressed("Reset"), "released R does not repeatedly reset");
+            bool before = Field<bool>(tracking, "closedLoopPosition");
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard, new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.P));
+            UpdateTestInput();
+            Call(tracking, "Update");
+            Check(Field<bool>(tracking, "closedLoopPosition") != before, "P key toggles tracking through Update");
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(keyboard, new UnityEngine.InputSystem.LowLevel.KeyboardState());
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(pad, new UnityEngine.InputSystem.LowLevel.GamepadState { leftStick = Vector2.up, rightStick = Vector2.right });
+            UpdateTestInput();
+            Check(ExperimentInput.Move.y > 0.99f && ExperimentInput.Axis("Yaw") > 0.99f, "gamepad sticks drive translation and heading actions");
+            Vector3 manualStart = tracking.transform.position;
+            Quaternion manualHeading = tracking.transform.rotation;
+            tracking.GetComponent<Keyboard>().ApplyInput(0.1f);
+            Check(Vector3.Distance(manualStart, tracking.transform.position) > 0 && Quaternion.Angle(manualHeading, tracking.transform.rotation) > 0, "gamepad actions actually translate and rotate the rig (distance=" + Vector3.Distance(manualStart, tracking.transform.position) + ", angle=" + Quaternion.Angle(manualHeading, tracking.transform.rotation) + ")");
+            tracking.transform.position = Vector3.one * 10;
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(pad, new UnityEngine.InputSystem.LowLevel.GamepadState().WithButton(UnityEngine.InputSystem.LowLevel.GamepadButton.Select));
+            UpdateTestInput();
+            Call(tracking, "Update");
+            Check(tracking.transform.position == Vector3.zero, "gamepad Select resets the tracked rig");
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(mouse, new UnityEngine.InputSystem.LowLevel.MouseState { position = new Vector2(123, 234), scroll = new Vector2(0, 120) });
+            UpdateTestInput();
+            Check(ExperimentInput.MousePosition == new Vector3(123,234,0) && Mathf.Approximately(ExperimentInput.Scroll, 0.1f), "pointer and wheel retain overview zoom units");
+            Check(Vector3.Distance(Quaternion.Euler(0,90,0) * Vector3.forward, Vector3.right) < 0.001f, "positive yaw turns forward toward right");
+        }
+        finally
+        {
+            UnityEngine.InputSystem.InputSystem.RemoveDevice(keyboard);
+            UnityEngine.InputSystem.InputSystem.RemoveDevice(pad);
+            UnityEngine.InputSystem.InputSystem.RemoveDevice(mouse);
+            inputSettings.editorInputBehaviorInPlayMode = oldEditorBehavior;
+            inputSettings.backgroundBehavior = oldBackgroundBehavior;
+        }
+    }
+
+    private static void CheckTemplateSchemas()
+    {
+        var settings = new JsonSerializerSettings { MissingMemberHandling = MissingMemberHandling.Error };
+        foreach (string file in Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "Templates"), "*.json"))
+        {
+            string json = File.ReadAllText(file);
+            var obj = Newtonsoft.Json.Linq.JObject.Parse(json);
+            Type type = obj["sequences"] != null ? typeof(SequenceConfig) :
+                obj["stimuli"] != null ? typeof(OptomotorConfig) :
+                obj["objects"] != null ? typeof(SceneConfig) :
+                obj["steps"] != null ? typeof(DynamicSequenceController).GetNestedType("DesignFile", BindingFlags.NonPublic) :
+                obj["numberOfRings"] != null ? typeof(KannadiConfig) : null;
+            if (type != null) Check(JsonConvert.DeserializeObject(json, type, settings) != null, "strict template schema " + Path.GetFileName(file));
+            if (obj["configs"] != null)
+                foreach (var rig in obj["configs"]) Check(JsonConvert.DeserializeObject<SystemConfig>(rig.ToString(), settings) != null, "strict system rig schema");
+        }
+    }
+
+    private static void CheckMigration()
+    {
+        var ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        ground.layer = 31;
+        ground.transform.position = new Vector3(0,4,0);
+        ground.transform.localScale = new Vector3(100,2,100);
+        var animal = new GameObject("AGL test");
+        try
+        {
+            Physics.SyncTransforms();
+            var migration = animal.AddComponent<MigrationMotion>();
+            migration.Configure(2,0,10,1 << 31);
+            migration.Advance(1);
+            Check(Vector3.Distance(animal.transform.position, new Vector3(0,15,-2)) < 0.001f, "wind FROM north moves south; AGL includes raised ground height");
+            animal.transform.position = new Vector3(1000,15,0);
+            migration.Advance(1);
+            Check(animal.transform.position.y == 15, "missing ground preserves height");
+            migration.Configure(0,0,0);
+            Check(!migration.enabled, "zero wind and AGL disable migration work");
+        }
+        finally { Object.Destroy(ground); Object.Destroy(animal); }
+    }
+
     private static void Tick()
     {
         if (!EditorApplication.isPlaying || Time.frameCount < nextFrame) return;
@@ -350,6 +450,8 @@ public static class KannadiValidation
             {
                 case 0:
                     CheckTextResources();
+                    CheckMigration();
+                    CheckTemplateSchemas();
                     var parsed = KannadiConfig.Load(Params("{\"closedLoopPosition\":true,\"closedLoopOrientation\":0.5,\"numberOfRings\":0,\"spacing\":7}"));
                     Check(parsed.closedLoopPosition == 1 && parsed.closedLoopOrientation == 0.5f && parsed.numberOfRings == 0, "legacy boolean/numeric gains and zero rings");
                     Check(Mathf.Approximately(Kannadi.Wrap(351, 100), -49) && Mathf.Approximately(Kannadi.Wrap(-251, 100), 49), "overshoot wrapping");
@@ -500,6 +602,7 @@ public static class KannadiValidation
                     tracking.transform.rotation = Quaternion.Euler(0, 45, 0);
                     tracking.ToggleClosedLoopOrientation();
                     Check(!Field<bool>(tracking, "_isInitialized"), "resuming orientation without tracking waits for a new baseline");
+                    CheckModernInput(tracking);
                     rigInstance = rigs[0].GetInstanceID();
                     NextSequenceStep();
                     Check(rigs[0].GetInstanceID() == rigInstance && rigs.All(r => r.Clones.Length == 1), "Kannadi sequence advances without reload");
@@ -523,6 +626,48 @@ public static class KannadiValidation
                     Check(Directory.GetFiles(logDirectory, "*Kannadi*Clones.csv.gz").Length >= 8, "Kannadi clone logging across reloads");
                     Check(!Resources.FindObjectsOfTypeAll<EditorWindow>().Any(w => w.GetType().Name == "TMP_PackageResourceImporterWindow"), "TMP import prompt does not reopen");
                     Check(Object.FindObjectsOfType<fps>().Length == 1, "FPS display survives sequence exit");
+                    Check(Object.FindObjectsOfType<UnityEngine.EventSystems.StandaloneInputModule>().Length == 0, "Control uses the Input System UI module");
+                    Check(Object.FindObjectsOfType<UnityEngine.InputSystem.UI.InputSystemUIInputModule>().Length > 0, "Control UI has an active new input module");
+                    main.sequenceSteps = new List<SequenceStep> {
+                        new SequenceStep("Optomotor", 1000, Params("{\"configFile\":\"Templates/optomotor.template.json\"}")),
+                        new SequenceStep("Choice", 1000, Params("{\"configFile\":\"Templates/migration.template.json\"}")),
+                        new SequenceStep("Choice_desync", 1000, Params("{\"design\":\"Templates/dynamic-choice.template.json\"}"))
+                    };
+                    main.StartSequence(); Later(); break;
+                case 12:
+                    Check(SceneManager.GetActiveScene().name == "Optomotor", "Optomotor template dispatch");
+                    Check(Object.FindObjectOfType<DrumRotator>() != null && Field<bool>(Object.FindObjectOfType<DrumRotator>(), "isRotating"), "Optomotor template starts the drum");
+                    CheckViewports("Optomotor");
+                    NextSequenceStep(); Later(); break;
+                case 13:
+                    Check(Object.FindObjectsOfType<MigrationMotion>().Length == 4, "migration Choice template configures four rigs");
+                    Check(Object.FindObjectsOfType<MigrationMotion>().All(m => m.AglHeight == 100 && m.enabled), "AGL template values reach runtime");
+                    Object.FindObjectOfType<ChoiceController>().AdvanceStep(Params("{\"configFile\":\"Templates/choice.template.json\"}"));
+                    Check(Object.FindObjectsOfType<MigrationMotion>().All(m => !m.enabled), "normal Choice step turns off prior migration settings");
+                    var choices = Field<Dictionary<string, GameObject>>(Object.FindObjectOfType<ChoiceController>(), "prefabDict");
+                    Check(choices.ContainsKey("tree01") && choices.ContainsKey("LocustBand_black"), "Choice templates reference registered prefabs");
+                    Object.FindObjectOfType<ChoiceController>().AdvanceStep(Params("{\"configFile\":\"Templates/choice-band.template.json\"}"));
+                    Later(); break;
+                case 14:
+                    Check(Object.FindObjectsOfType<BandSpawner>().Length == 4, "band template spawns four registered bands");
+                    Check(Object.FindObjectsOfType<DirectionalMovement>().Length >= 128, "band template creates its moving individuals");
+                    int bandLayers = LayerMask.GetMask("SimulatedLocustsVR1", "SimulatedLocustsVR2", "SimulatedLocustsVR3", "SimulatedLocustsVR4");
+                    foreach (ClosedLoop rig in Object.FindObjectsOfType<ClosedLoop>())
+                    {
+                        int ownLayer = LayerMask.GetMask("SimulatedLocusts" + rig.name);
+                        Check(ownLayer != 0 && rig.GetComponentsInChildren<Camera>().All(c => (c.cullingMask & bandLayers) == ownLayer), "Choice band cameras see only their rig population");
+                    }
+                    NextSequenceStep(); Later(); break;
+                case 15:
+                    Check(SceneManager.GetActiveScene().name == "Choice_desync", "full dynamic template dispatch");
+                    var dynamicController = Object.FindObjectOfType<DynamicSequenceController>();
+                    Type stepType = typeof(DynamicSequenceController).GetNestedType("Step", BindingFlags.NonPublic);
+                    object disabledStep = JsonConvert.DeserializeObject("{\"closedLoopPosition\":false,\"closedLoopOrientation\":false}", stepType);
+                    Call(dynamicController, "ApplyClosedLoopFlags", "VR1", disabledStep);
+                    var disabledRig = Object.FindObjectsOfType<ClosedLoop>().First(c => c.name == "VR1");
+                    Check(!Field<bool>(disabledRig, "closedLoopPosition") && !Field<bool>(disabledRig, "closedLoopOrientation"), "dynamic step respects both tracking flags false");
+                    main.HandleEscape(); Later(); break;
+                case 16:
                     Finish(); break;
             }
         }

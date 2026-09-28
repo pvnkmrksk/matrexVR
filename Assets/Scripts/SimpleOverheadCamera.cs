@@ -79,7 +79,7 @@ public class SimpleOverheadCamera : MonoBehaviour
         canvas.targetDisplay = display;
         canvas.sortingOrder = 1000;
         if (FindObjectOfType<EventSystem>() == null)
-            new GameObject("Overview EventSystem", typeof(EventSystem), typeof(StandaloneInputModule)).transform.SetParent(uiCanvas.transform);
+            new GameObject("Overview EventSystem", typeof(EventSystem), typeof(UnityEngine.InputSystem.UI.InputSystemUIInputModule)).transform.SetParent(uiCanvas.transform);
 
         RectTransform panel = new GameObject("Overview Panel", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
         panel.SetParent(uiCanvas.transform, false);

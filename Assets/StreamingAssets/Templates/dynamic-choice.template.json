@@ -1,0 +1,142 @@
+{
+  "seed": 42,
+  "repetitions": 1,
+  "sync": true,
+  "intertrial": null,
+  "steps": [
+    {
+      "name": "choice-example",
+      "trigger": {
+        "type": "time",
+        "seconds": 10,
+        "areaTag": null,
+        "vrId": "any",
+        "shape": "box",
+        "size": 1.5,
+        "boxSize": [
+          3,
+          10,
+          3
+        ],
+        "radius": 1.5,
+        "height": 10,
+        "timeoutSeconds": 30,
+        "triggerOnExit": false,
+        "advanceOnTrigger": true
+      },
+      "objects": [
+        {
+          "type": "ScalingCylinder",
+          "polar": {
+            "radius": 60,
+            "angle": 15,
+            "height": 0
+          },
+          "scale": {
+            "x": 7,
+            "y": 100,
+            "z": 7
+          },
+          "material": "Blue",
+          "color": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "swapColor": [
+            0,
+            1,
+            1,
+            1
+          ],
+          "flip": false,
+          "visualAngleDegrees": 10,
+          "randomInitialRotation": false,
+          "mu": 0,
+          "prefab": null,
+          "pos": null,
+          "rot": null,
+          "mat": null,
+          "role": "gray"
+        }
+      ],
+      "camera": [
+        {
+          "vrId": "VR1",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.5,
+            0.5,
+            0.5,
+            1
+          ]
+        },
+        {
+          "vrId": "VR2",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.5,
+            0.5,
+            0.5,
+            1
+          ]
+        },
+        {
+          "vrId": "VR3",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.5,
+            0.5,
+            0.5,
+            1
+          ]
+        },
+        {
+          "vrId": "VR4",
+          "clearFlags": "SolidColor",
+          "bgColor": [
+            0.5,
+            0.5,
+            0.5,
+            1
+          ]
+        }
+      ],
+      "skybox": null,
+      "resetVR": [
+        "VR1",
+        "VR2",
+        "VR3",
+        "VR4"
+      ],
+      "closedLoopOrientation": true,
+      "closedLoopPosition": true,
+      "initialPosition": {
+        "x": 0,
+        "y": 0.5,
+        "z": 0
+      },
+      "initialRotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "randomInitialRotation": false,
+      "swapAfterSeconds": 0
+    }
+  ],
+  "size": 1.5,
+  "boxSize": [
+    3,
+    10,
+    3
+  ],
+  "adaptiveDecision": {
+    "enabled": false,
+    "startGray": 0.5,
+    "grayStep": 0.05,
+    "controlEvery": 5,
+    "noBarControlSeconds": 20
+  }
+}

@@ -179,20 +179,20 @@ public class DrumRotator : MonoBehaviour
         // Manual control for debugging/development
 
         // Reset rotation
-        if (Input.GetKeyDown(KeyCode.R))
+        if (ExperimentInput.Pressed("Reset"))
         {
             ResetRotation();
         }
 
         // Pause/resume rotation
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Backslash))
+        if (ExperimentInput.Pressed("Pause") || ExperimentInput.Pressed("DrumPause"))
         {
             isPaused = !isPaused;
             Debug.Log($"Rotation paused: {isPaused}");
         }
 
         // Debug current rotation state
-        if (Input.GetKeyDown(KeyCode.D))
+        if (ExperimentInput.Pressed("Debug"))
         {
             Debug.Log($"Rotation debug: isRotating={isRotating}, isPaused={isPaused}, Speed={rotationSpeed}, TotalRotation={totalRotation}");
         }

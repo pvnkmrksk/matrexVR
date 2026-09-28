@@ -108,3 +108,11 @@ Validation uses a disposable Unity 6000.3.16f1 copy with the upgraded project's 
 ### Reset controls (Unity 6)
 
 The rig prefabs have both `ClosedLoop` and `Keyboard` enabled. `R` resets position and heading to the current experiment's initial pose, including when FicTrac is absent or stale. `P` toggles tracked translation and `O` toggles tracked orientation; these are toggles, not separate resets. Resuming orientation uses the current visible heading as its baseline. Escape stops the sequence and returns to Control; Escape from Control quits the player. MainController owns Escape so rig components cannot quit during a scene transition. Validation: 773 checks passed with synthetic tracking, including missing/stale reset and sequence exit; physical keys and tracking hardware still need a bench check.
+
+### Unity 6 input and configuration reference
+
+The Unity 6 Input System migration uses package 1.20.0, a shared editable action map, gamepad movement/reset, and InputSystemUIInputModule for active UI. Active Input Handling remains Both to accommodate bundled third-party demo scripts; project-owned runtime controls use the new backend. Restart an already open Editor after pulling this change.
+
+The final regression run passed **876 checks with zero runtime failures**. This includes simulated keyboard/mouse/gamepad events, actual rig movement, reset without a live pose, scene camera allow-lists, overview lifecycle, Optomotor, the full dynamic template, Choice bands and per-rig band visibility, strict configuration deserialization, and migration wind/AGL transitions. The report separately records Unity Editor's pre-existing SearchDatabase cache exception. Physical LED/FicTrac timing and controller hardware were not exercised.
+
+Sixteen JSON templates/examples and full manuals now live under `Assets/StreamingAssets/Templates` and `docs/configuration-reference.md`, `docs/unity6-controls.md`, `docs/data-formats.md`. Bogong/SmrMah wind and AGL settings now work in Choice; exact historical inputs and source commit IDs are retained in `docs/config-history`. Dynamic Choice respects both tracking flags false, saved runs include referenced dynamic design files, and the Choice scene registers the band example's prefab.

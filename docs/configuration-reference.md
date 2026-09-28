@@ -1,0 +1,266 @@
+# Configuration reference
+
+This reference describes the code on `codex/kannadi-modernize`, tested with Unity **6000.3.16f1**. Start with the complete JSON files in [StreamingAssets/Templates](../Assets/StreamingAssets/Templates). They contain editable example values; the tables below distinguish these from values used when a field is omitted. JSON does not allow comments. Keep notes in a separate text file; do not invent JSON keys, because most loaders silently ignore unknown keys.
+
+## Files, precedence, and running an experiment
+
+1. Copy `Templates/system_config.template.json` to `system_config.json` in `Assets/StreamingAssets`. Edit addresses, sphere sizes, panel coordinates, and display index for the actual rig. This local hardware file is Git-ignored. The current workstation uses `system_config_VR1.json`: four rigs, RBLF, 2.6 cm spheres.
+2. Copy a scene template to your own file under StreamingAssets. Copy `Templates/sequence.template.json` to `sequenceConfig.json`, and point its `parameters.configFile` at your file. Paths are relative to StreamingAssets, including the `Templates/` prefix when running a template directly.
+3. Open `Assets/Scenes/ControlScene.unity`, enter Play mode, enter metadata, and start the sequence. Focus the **Game** view for operator hotkeys. Do not start from an experiment scene when you need the complete sequence, system configuration, and logging lifecycle.
+4. `sequence-all-modes.example.json` demonstrates Swarm → Kannadi → Choice → migration → Optomotor → dynamic Choice. `sequence-migration.example.json` demonstrates 10/100/1000 world-unit AGL. The normal active sequence remains 20 seconds Swarm followed by 1000 seconds Kannadi.
+
+System config owns physical camera layout and sphere calibration. Sequence config owns scene order and duration. Experiment configs own stimuli and tracked motion. Kannadi/Swarm merge inline `parameters` over `configFile` (arrays replace, rather than append). Choice/Optomotor read their referenced file without merging inline stimulus fields. Dynamic Choice uses `parameters.design`, not `configFile`.
+
+A default in a C# class is not necessarily a scene default: serialized prefab values override inspector defaults, and omitted fields on an in-scene step can retain state. Use explicit values for reproducibility. A template does not add rigs, scene assets, or hardware automatically.
+
+## Units and coordinate system
+
+Unity coordinates are **left-handed**: +X right, +Y up, +Z forward. In the current walking experiments, **one world unit is one centimeter**. Distances and translation speeds use world units and world units/second (cm, cm/s here); do not multiply by 100 in configs. Imported terrain, models, or flight branches may have a different authored scale; verify their scale before claiming physical centimeters.
+
+Euler angles are degrees: X pitch, Y yaw, Z roll. Positive yaw takes `(0,0,1)` to `(1,0,0)` at +90°. Viewed from above with +Z up on the page and +X right, this is clockwise. Euler log values wrap into 0–360°; unwrap yaw before differentiating. “Clockwise” for pitch/roll depends on viewing direction; use the axis and sign, not an unspecified viewpoint. See [Unity's rotation and orientation reference](https://docs.unity3d.com/6000.3/Documentation/Manual/QuaternionAndEulerRotationsInUnity.html).
+
+Polar positions use `x = radius × sin(angle)`, `z = radius × cos(angle)`, `y = height`, with angle in degrees. Thus 0° is +Z and +90° is +X. Colors are normalized 0–1 channels unless given as hex; they are stimulus values, not calibrated physical luminance. Time/duration fields use seconds, display indices are zero-based, rig numbers are one-based.
+
+## System configuration
+
+Template: `system_config.template.json`.
+
+| Field | Omitted default | Meaning / useful example |
+|---|---|---|
+| `targetDisplay` | 1 | Zero-based physical display; template uses 0. Applies globally to every rig. Per-rig `targetDisplay` is overwritten. The legacy `-display N` startup flag affects initial activation; use JSON targetDisplay for reliable experiment camera mapping. |
+| `configs` | none | Array of per-rig entries. Use one entry for every rig that should render. |
+| `overheadCamera` | defaults below | Operator overview in Swarm/Kannadi; independent of animal camera letter order. |
+| `configs[].vrId` | `VR1` | Exact rig identifier, e.g. VR1–VR4. Duplicate IDs overwrite earlier entries; use unique IDs. |
+| `sphereDiameter` | 1 | FicTrac ball diameter in cm; template 2.6. Translation multiplies sensor displacement by diameter/2. |
+| `ledPanelWidth`, `ledPanelHeight` | 128, 128 | Each camera viewport size in pixels. |
+| `startRow`, `startCol` | 0, 0 | Zero-based panel cells, measured from the top-left. |
+| `horizontal` | true | Advance through columns when true, rows when false. |
+| `displayOrder` | empty | Camera allow-list and order. `RBLF` means Right, Back, Left, Front. Other letters: U=Up, D=Down. Missing letters disable the corresponding cameras even if enabled in the scene. Empty order or missing rig config renders none of its stimulus cameras. |
+| `zmqAddress` | `localhost` | Host running the pose publisher; no `tcp://` prefix. |
+| `zmqPort` | 9872 | TCP port; template uses 9871–9874. |
+| `targetDisplay` inside rig | 1, then overwritten | Use the top-level value. |
+| `manualControls` | null | Optional per-rig operator movement settings below. Omission preserves prefab tuning. |
+
+Viewport slot `i`: x=(startCol + i if horizontal)×width; y=screenHeight−(startRow+1 + i if vertical)×height. Ensure these rectangles fit the physical display. An unavailable display disables its cameras. Configuring VR10 does not accidentally match VR1. Configured letters do not create a camera absent from the prefab. Camera disabling does not delete the rig or stop its sensor logging.
+
+### Manual controls (inside each rig)
+
+| Field | Block default | Unit / meaning |
+|---|---|---|
+| `enabled` | true | Enable keyboard/gamepad manual movement for this rig. Reset and tracking toggles still work. |
+| `translateSpeed` | 10 | cm/s for full arrow-key/stick input. |
+| `rotateSpeed` | 50 | degrees/s for full yaw input. |
+| `maxTranslateSpeed` | 100 | cm/s cap for operator speed adjustment. |
+| `maxRotateSpeed` | 300 | degrees/s cap. |
+| `allowVerticalTranslation` | false | Allow C/Z vertical motion. |
+| `allowPitchAndRoll` | false | Allow W/S pitch and Q/E roll. |
+
+### Overview
+
+| `overheadCamera` field | Default | Meaning / useful range |
+|---|---|---|
+| `enabled` | true | Create the overview. |
+| `targetDisplay` | -1 | Follow VR1's configured display; otherwise a zero-based display. |
+| `x`, `y` | 0.58, 0.02 | Normalized bottom-left of panel. |
+| `width`, `height` | 0.4, 0.4 | Fraction of display width/height. |
+| `resolution` | 512 | Square render texture pixels; 512 is a practical starting point. |
+| `markerSizePixels` | 14 | Fixed screen-size arrow, visible while zooming out. |
+| `trailDurationSeconds` | 60 | Fading history; use 30 for shorter trails. |
+| `trailSampleInterval` | 0.1 | Seconds between samples. |
+| `trailWidthPixels` | 1.5 | Screen-space trail width. |
+| `trailBreakDistance` | 50 | World-unit jump that breaks a trail at reset/wrap. |
+
+Numbered arrows track active `VR<number>` roots and their headings. Overlapping animals keep overlapping labels. Right drag orbits, middle drag pans, wheel zooms, Reset view returns overhead. Hide disables both overview cameras and tracking updates and releases the render texture; showing starts a fresh trail. FPS remains visible. The overview can discover additional numbered rigs, but Kannadi's mirror routing currently supports only VR1–VR4.
+
+## Sequence configuration
+
+Template: `sequence.template.json`.
+
+| Field | Default | Meaning |
+|---|---|---|
+| `randomise` | false | Shuffle outer scene execution order. |
+| `loop` | true | Repeat outer sequence; templates explicitly use false. |
+| `sequences` | none | Required nonempty array of scene steps. |
+| `sceneName` | none | Exact enabled scene name, e.g. Swarm, Kannadi, Choice, Optomotor, Choice_desync. No Matrix scene exists. |
+| `duration` | 0 | Outer step time, seconds; use a positive duration. |
+| `reloadScene` | true | When false and the scene stays the same, call its in-scene sequencer. Use true for Dynamic Choice: its AdvanceStep is intentionally empty. |
+| `parameters` | null | Controller-specific dictionary. |
+| `parameters.configFile` | none | Choice, Optomotor, Kannadi or Swarm file relative to StreamingAssets. |
+| `parameters.design` | `dynamicSequenceDesign.json` | Dynamic Choice design file. |
+
+Outer duration always limits time spent in a scene, including an inner looping optomotor/dynamic sequence. Old top-level step `gain` from Bogong is **not** a supported SequenceItem field here. It must not be used to infer current movement gain.
+
+## Choice and migration
+
+Templates: `choice.template.json`, `choice-band.template.json`, `migration.template.json`. Migration is a Choice configuration with wind/AGL settings, not a new scene or an alternate tracking protocol.
+
+| Top-level field | Omitted default | Meaning / example |
+|---|---|---|
+| `objects` | null | Required array; use `[]` for environment-only flight/migration. |
+| `closedLoopPosition`, `closedLoopOrientation` | false | Boolean FicTrac translation/yaw switches. Use true for walking. |
+| `initialPosition` | (0,0,0) | World x/y/z, cm. Template ground-eye height 0.5; migration example 100. |
+| `initialRotation` | (0,0,0) | Euler x/y/z degrees. |
+| `randomInitialRotation` | false | Random starting yaw; Choice shares that sampled yaw across its rigs. |
+| `backgroundColor` | null | `{r,g,b,a}` (0–1); null keeps existing camera background. |
+| `skyboxPath` | null | Panorama path under StreamingAssets; empty keeps the existing environment. |
+| `windSpeed` | 0 | Nonnegative world units/s, independent of FicTrac position gain. Zero disables drift. |
+| `windDirection` | 0 | Degrees wind comes **FROM**: 0 from +Z, 90 from +X. Motion is opposite. |
+| `aglHeight` | 0 | Height above ground in world units. Zero disables height regulation. Examples: 10, 100, 1000. |
+| `groundLayerMask` | 1 | Physics bit mask (1 = Default layer), not a layer index. Select only ground/terrain layers. |
+
+Wind/AGL support is adapted from `origin/BogongAustralia` and `origin/smrmah-optomotor-updated`. AGL samples a matching Unity Terrain at the current X/Z; otherwise it raycasts ground colliders. It includes the terrain's world offset. No ground hit preserves current Y. Wind/AGL continue without FicTrac packets, and turning both to zero disables this work. Use a ground-only mask to avoid sampling trees/animals. Each new Choice config resets these optional settings, including in-scene transitions.
+
+Exact historical inputs are in [config-history](config-history). They reference `Choice_Bogong` and `Photosphere/LSM.png`, which are not guaranteed here. The runnable examples use the existing Choice environment. SmrMah examples are provided with their branch identity; no remote branch actually named Deathhead was found. Force/torque and yaw-rate modes from those branches have **not** been substituted for this branch's FicTrac displacement protocol.
+
+### Choice object fields
+
+Each entry uses prefab/material names registered in that scene controller's Inspector arrays; an arbitrary filename does not automatically load a prefab. Unknown prefab names are skipped. For a given stimulus, irrelevant component-specific fields have no effect.
+
+| Field | Default if omitted | Meaning / reasonable example |
+|---|---|---|
+| `type` | null | Required prefab name, e.g. `tree01` or `LocustBand_black`. |
+| `position` | null | World zero if absent; position object described below. |
+| `scale` | null | Omitted object resolves to (1,1,1); scalar fields in a supplied object default to 0. Use `{x:1,y:1,z:1}` for unit scale. |
+| `rotation` | null | Nullable Euler x/y/z degrees; all three present overrides `mu`. |
+| `material` | null | Registered material name; empty keeps prefab material. |
+| `flip` | false | Negate X scale. |
+| `speed` | 0 | cm/s on LocustMover/band movement components; example 2. |
+| `mu` | 0 | Mean/explicit yaw in degrees. |
+| `visualAngleDegrees` | 0 | Angular size for prefabs with ScaleWithDistance; example 10. |
+| `meanBlueA`, `meanBlueB` | 0, 0 | Blue-channel means for supported color-drift stimuli; normalized 0–1. |
+| `switchInterval` | 0 | Color switching period, seconds; set positive for switching. |
+| `numberOfInstances` | 0 | Band population; example 32. |
+| `spawnLengthX`, `spawnLengthZ` | 0, 0 | Band spawn extent in world units; example 100 each. |
+| `gridType` | 0 | 0 Hexagonal, 1 Manhattan, 2 Random. |
+| `kappa` | 0 | Dimensionless heading concentration: 0 uniform, 10 concentrated, 100000 aligned. |
+| `visibleOffDuration`, `visibleOnDuration` | 0, 0 | Band invisibility/visibility durations in seconds; example 0/10. |
+| `boundaryLengthX`, `boundaryLengthZ` | 0, 0 | Periodic arena lengths in world units; example 200 each. |
+| `lockBoundaryWithAnimalPosition` | false | Translate band boundary with tracked animal. |
+| `lockAgentWithAnimalPosition` | false | Translate agents with their parent animal. |
+| `prioritizeNumbers` | false | Prefer requested count over geometric grid filling. |
+| `hexRadius` | 0 | Band grid spacing parameter in world units; example 10. |
+| `sectionLengthX`, `sectionLengthZ` | 0, 0 | Band grid section dimensions; example 100 each. |
+| `rotationAngle` | 0 | Band layout rotation in degrees. |
+
+`position.radius`, `.angle`, `.height` default to zero. Supply all Cartesian `position.x/y/z` to override polar positioning; these three default to null. Partial Cartesian coordinates fall back to the polar position. Explicit rotation likewise needs all three values. The full Choice template includes nullable alternatives for reference; don't set both conventions unless the override is intentional.
+
+## Swarm, Kannadi, and kinematics
+
+Templates: `swarm.template.json`, `kannadi.template.json`, `kinematic.template.json`. The kinematic template uses the **Kannadi parser** and a single tile per rig (`numberOfRings:0`); there is no separate Kinematic scene or magic kinematic filename.
+
+| Shared movement field | Default | Meaning |
+|---|---|---|
+| `closedLoopPosition` | null → 1 | Nonnegative translation multiplier. Booleans remain accepted: true=1, false=0. |
+| `closedLoopOrientation` | null → 1 | 0 disables tracking; positive values cap turning toward sensor heading at gain×360 degrees/s. This is a turn-rate limit, **not** an angular multiplier. |
+| `animateOnMove` | false | Enable leg-animation gating; templates set true. |
+| `animationSpeedThreshold` | 0.5 | cm/s planar translation; animate only strictly above threshold. Rotation alone does not animate. |
+| `vrConfigs` | null | Optional per-rig pose/gain overrides below. |
+| `animationNoiseThreshold` | legacy alias | Used only when `animationSpeedThreshold` is absent. Prefer the canonical name. |
+
+`vrConfigs[]`: `vrIndex` is required (1–4, unique); `initialPosition` and `initialRotation` are optional `{x,y,z}` world position/Euler degrees and otherwise keep current pose. Nullable `closedLoopPosition`/`closedLoopOrientation` override global gains. `watchIndex` is optional 1–4: in Kannadi it selects that animal's replica layer; omit/null to see the other animals. Self-view excludes its own central tile. Swarm does not use `watchIndex`.
+
+| Kannadi field | Omitted behavior | Meaning |
+|---|---|---|
+| `numberOfRings` | Keep scene/current value (3 initially) | Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 100. |
+| `hexRadius` | Keep scene/current value (10 initially) | Positive grid spacing in world units. |
+| `spacing` | null | Legacy alias, overridden by hexRadius. |
+| `kannadiTilePrefab` | Keep scene prefab | Catalog name, e.g. SimulatedLocust or LocustBand_black. Catalog is a build-safe Resources asset. |
+| `periodicBoundary` | true | Wrap animal and replicas in X/Z. |
+| `boundaryLengthX`, `boundaryLengthZ` | 200, 200 | Positive world-unit arena extents, centered at zero. |
+| `backgroundColor` | null | Optional normalized RGBA background. |
+
+Kannadi replicas use the tracked source's translation speed for animation. Wrapped displacement is measured across the short edge; teleport-sized trail jumps break rather than draw across the whole arena. Bands mirror their source and do not independently walk away.
+
+| Swarm field | Omitted behavior | Meaning / template |
+|---|---|---|
+| `numberOfLocusts` | Keep scene/current value (128 per rig in shipped scene) | Population **per rig**; template 256 means 1024 total. |
+| `spawnAreaSize` | Keep scene/current value (200) | Square spawn extent in world units. |
+| `mu` | Keep scene/current value (0) | Mean heading degrees; 0=+Z. |
+| `kappa` | Keep scene/current value (10000) | Von Mises concentration; >=10000 uses exactly mu, 0 is uniform. Template 100000. |
+| `locustSpeed` | Keep scene/current value (2) | cm/s; template 2. |
+
+Swarm uses scene-owned boundary managers and prefab assignments. Kannadi's ring/prefab/watch/boundary JSON fields do not configure Swarm geometry. Swarm parameters rebuild the population on each in-scene step. Density is count divided by spawn area squared, not a separate density parameter.
+
+## Optomotor
+
+Template: `optomotor.template.json`. `optomotor-arc.example.json` preserves the frequency/speed sweep from `origin/Optomotor`. The Optomotor scene is enabled in the build list.
+
+| Field | Default | Meaning |
+|---|---|---|
+| `loop` | false | Repeat stimulus list internally. |
+| `stimuli` | empty array | Required nonempty stimulus list. |
+| `stimuli[].duration` | 10 | Seconds per stimulus. |
+| `speed` | 20 | Drum angular speed, degrees/s. Use nonnegative values and `clockwise` for sign. |
+| `clockwise` | true | Positive rotation around the selected local axis when true; negative when false. |
+| `rotationAxis` | `Yaw` | Case-sensitive Yaw=Y, Pitch=X, Roll=Z; unknown values fall back to Yaw. |
+| `frequency` | 4 | Cycles per complete revolution, not Hz. A 20°/s, 4-cycle stimulus has temporal frequency 20×4/360 Hz. |
+| `contrast` | 0.5 | 0–1; at >=0.99 the texture becomes discrete rather than sinusoidal. |
+| `dutyCycle` | 0.5 | Fraction in color2 for discrete grating; used at contrast >=0.99. |
+| `color1`, `color2` | `#000000`, `#FFFFFF` | Hex grating endpoints. |
+| `closedLoopOrientation`, `closedLoopPosition` | false, false | Boolean tracking switches for the animal. |
+
+The outer sequence duration and internal sum of stimulus durations are distinct. Use enough outer time for the desired stimulus list. R also resets drum orientation; Space or backslash pauses/resumes drum rotation. These debug keys are not a replacement for logged experimental timing.
+
+## Dynamic Choice design (Choice_desync)
+
+Template: `dynamic-choice.template.json`, loaded via `parameters.design`. This schema is different from ordinary Choice. The controller maintains an internal sequence for each rig and shuffles each repetition. Outer sequence time ends the scene. Its Inspector `loopSequence` defaults true and controls repetition after exhausting the list; there is no JSON `loop` field here.
+
+| Design field | Default | Meaning |
+|---|---|---|
+| `seed` | -1 | Shuffle seed; negative uses time. Example 42 for initial reproducibility; later controller loops reseed using time. |
+| `repetitions` | 1 | Number of shuffled repetitions before reaching the end. |
+| `steps` | null | Array of steps. |
+| `intertrial` | null | Optional step inserted before each trial. Same schema as a step. |
+| `adaptiveDecision` | null | Optional adaptive staircase below. |
+| `sync` | true | Legacy serialized field; currently not consulted by execution. Do not infer rig synchronization from it. |
+| `size`, `boxSize` at design root | 1.5, null | Legacy fields not consulted by trigger construction; use trigger fields. |
+
+| Step field | Default | Meaning |
+|---|---|---|
+| `name` | empty | Logged step label; keep names unique and avoid CSV delimiters. |
+| `trigger` | null | Null advances immediately; explicit time or area trigger is recommended. |
+| `objects` | null | Array of dynamic objects below. |
+| `camera` | null | Array of `{vrId,clearFlags,bgColor}`. clearFlags defaults SolidColor; bgColor is [r,g,b,a] (alpha optional). Changes clear/background, never system camera order. |
+| `skybox` | null | Material name loaded by Resources.Load<Material>. This differs from Choice's panorama file path. |
+| `closedLoopPosition`, `closedLoopOrientation` | false | Per-step tracking switches. |
+| `initialPosition`, `initialRotation` | (0,0,0) | World position/Euler degrees applied on each rig's step entry. |
+| `randomInitialRotation` | false | Random yaw on reset. |
+| `swapAfterSeconds` | 0 | Positive delay before swapping object colors; 0 disables. |
+| `resetVR` | null | Legacy serialized list; currently resets the executing rig regardless of this list. |
+
+| Trigger field | Default | Meaning |
+|---|---|---|
+| `type` | null | `time` waits seconds; use `area` for collider-based trials. Other values take the area path. |
+| `seconds` | 0 | Time trigger duration. |
+| `areaTag` | null | Tag assigned to trigger objects (fallback Untagged). |
+| `vrId` | null | Rig allowed to trigger; null/`any` means the executing rig. |
+| `shape` | `box` | `box` or `cylinder` (capsule collider). |
+| `size` | 1.5 | Default box size in world units, with minimum 0.5. |
+| `boxSize` | null | Explicit [x,y,z] trigger dimensions overriding size. |
+| `radius`, `height` | 0, 0 | Cylinder dimensions in world units; controller applies fallback/minimum geometry. |
+| `timeoutSeconds` | 0 | Positive timeout, otherwise wait indefinitely for area event. |
+| `triggerOnExit` | false | Use exit instead of entry. |
+| `advanceOnTrigger` | true | false resets the rig on contact and keeps waiting for timeout. |
+
+| Dynamic object field | Default | Meaning |
+|---|---|---|
+| `type` | null | Registered prefab name (fallback alias `prefab`). |
+| `polar` | null | `{radius,angle,height}` as above, defaults zero for each scalar. Takes precedence over Cartesian `pos`. |
+| `pos` | null | Legacy [x,y,z], fallback zero. |
+| `scale` | null | `{x,y,z}` multipliers; null preserves prefab scale. |
+| `material` | null | Registered name (alias `mat`). |
+| `color`, `swapColor` | null | Normalized [r,g,b,a]; RGB allowed. Explicit swapColor sets swap target. Otherwise first two colors exchange. |
+| `flip` | false | Negate X scale. |
+| `visualAngleDegrees` | 0 | ScaleWithDistance angular width. |
+| `randomInitialRotation` | false | Random object yaw. |
+| `mu` | 0 | Object yaw in degrees when not random. |
+| `rot` | null | Legacy serialized array, currently ignored. Use mu for yaw. |
+| `role` | null | `black` or `gray` for adaptive decisions. |
+
+`adaptiveDecision`: `enabled=false`, `startGray=0.5` (normalized intensity), `grayStep=0.05` (intensity change), `controlEvery=5` (trial count), `noBarControlSeconds=20` (seconds). When enabled, the controller generates adaptive trial/control steps and logs the starting gray/side. The ordinary steps list is not used as the adaptive schedule.
+
+## Replay and historical configuration limits
+
+Replay uses the Control UI and ReplayController inspector fields, not a standalone JSON motion config. Select a run directory and its data files. The environment loader can use a saved dynamic design, including step names, object names, polar positions, scales, materials, and camera backgrounds. Operator bindings are in [Unity 6 controls](unity6-controls.md); data requirements are in [data formats](data-formats.md).
+
+Older files in StreamingAssets and `docs/legacy-locust-inputs` are retained research inputs, not the authoritative template library. Read the modern parser before reusing an old parameter: a silently ignored `gain`, `rot`, `sync`, or unsupported tracking mode will not produce the intended experiment.

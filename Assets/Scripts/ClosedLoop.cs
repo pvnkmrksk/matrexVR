@@ -129,6 +129,13 @@ public class ClosedLoop : MonoBehaviour
         Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
     }
 
+    // Manual yaw adjusts the tracking reference so locust absolute-heading mode cannot undo it.
+    public void ApplyManualRotation(Quaternion worldDelta)
+    {
+        _ficTracRotationOffset = worldDelta * _ficTracRotationOffset;
+        _initialWorldRotation = worldDelta * _initialWorldRotation;
+    }
+
     public void SetLocustGains(float positionGain, float orientationGain)
     {
         useLocustGains = true;
@@ -207,14 +214,14 @@ public class ClosedLoop : MonoBehaviour
 
     private bool HandleInput()
     {
-        if (Input.GetKeyDown(resetKey))
+        if (ExperimentInput.Pressed(resetKey, KeyCode.R, "Reset"))
         {
             ResetPositionAndRotation();
             return true;
         }
-        if (Input.GetKeyDown(KeyCode.O))
+        if (ExperimentInput.Pressed("ToggleOrientation"))
             ToggleClosedLoopOrientation();
-        if (Input.GetKeyDown(KeyCode.P))
+        if (ExperimentInput.Pressed("TogglePosition"))
             ToggleClosedLoopPosition();
 
         return false;

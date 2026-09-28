@@ -1,0 +1,54 @@
+{
+  "randomise": false,
+  "loop": false,
+  "sequences": [
+    {
+      "sceneName": "Swarm",
+      "duration": 20,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/swarm.template.json"
+      }
+    },
+    {
+      "sceneName": "Kannadi",
+      "duration": 60,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/kannadi.template.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 20,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/choice.template.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 20,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Templates/migration.template.json"
+      }
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 10,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/optomotor.template.json"
+      }
+    },
+    {
+      "sceneName": "Choice_desync",
+      "duration": 30,
+      "reloadScene": true,
+      "parameters": {
+        "design": "Templates/dynamic-choice.template.json"
+      }
+    }
+  ]
+}

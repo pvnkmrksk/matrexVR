@@ -1,0 +1,73 @@
+{
+  "objects": [
+    {
+      "type": "LocustBand_black",
+      "position": {
+        "radius": 20.0,
+        "angle": 15.0,
+        "height": -1.0,
+        "x": null,
+        "y": null,
+        "z": null
+      },
+      "material": "",
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "rotation": {
+        "x": null,
+        "y": null,
+        "z": null
+      },
+      "flip": false,
+      "speed": 2,
+      "mu": 0,
+      "visualAngleDegrees": 0.0,
+      "meanBlueA": 0.0,
+      "meanBlueB": 0.0,
+      "switchInterval": 0.0,
+      "numberOfInstances": 32,
+      "spawnLengthX": 100,
+      "spawnLengthZ": 100,
+      "gridType": 2,
+      "kappa": 10,
+      "visibleOffDuration": 0,
+      "visibleOnDuration": 10,
+      "boundaryLengthZ": 200,
+      "boundaryLengthX": 200,
+      "lockBoundaryWithAnimalPosition": false,
+      "lockAgentWithAnimalPosition": false,
+      "prioritizeNumbers": true,
+      "hexRadius": 10,
+      "sectionLengthZ": 100,
+      "sectionLengthX": 100,
+      "rotationAngle": 0.0
+    }
+  ],
+  "initialPosition": {
+    "x": 0.0,
+    "y": 0.5,
+    "z": 0.0
+  },
+  "initialRotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
+  "randomInitialRotation": false,
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0.5,
+    "g": 0.5,
+    "b": 0.5,
+    "a": 1.0
+  },
+  "skyboxPath": "",
+  "windSpeed": 0,
+  "windDirection": 0,
+  "aglHeight": 0,
+  "groundLayerMask": 1
+}
