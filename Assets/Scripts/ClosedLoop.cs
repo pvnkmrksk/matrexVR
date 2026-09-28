@@ -1,10 +1,8 @@
 using UnityEngine;
+
 public class ClosedLoop : MonoBehaviour
 {
-
-
     [SerializeField][Tooltip("The diameter of the sphere in cm")] private float sphereDiameter = 1f;
-
     private float sphereRadius;
     [SerializeField][Tooltip("The key to reset the position and rotation")] private KeyCode resetKey = KeyCode.R;
     [SerializeField][Tooltip("The delay in seconds before starting to use FicTrac data after reset.")] private float initializationDelay = 0.1f;
@@ -16,48 +14,49 @@ public class ClosedLoop : MonoBehaviour
     private bool _isInitialized = false;
     private Quaternion _ficTracRotationOffset;
     private float _initializationTimer;
-    private bool _baseRotationSet = false; // Track if base rotation has been properly set
-    private Quaternion _baseRotation; // rotation defined by scene/config at startup
-    private int _frameCount = 0; // Track frame count to ensure SetBaseRotation is called within first 5 frames
 
     // Add these new variables
-    [SerializeField][Tooltip("Whether to apply the FicTrac position in closed loop")] private float closedLoopPosition = 1.0f;
-    [SerializeField][Tooltip("Whether to apply the FicTrac rotation in closed loop")] private float closedLoopOrientation = 1.0f;
+    [SerializeField][Tooltip("Whether to apply the FicTrac position in closed loop")] private bool closedLoopPosition = true;
+    [SerializeField][Tooltip("Whether to apply the FicTrac rotation in closed loop")] private bool closedLoopOrientation = true;
+
+    // Stores the initial world rotation, including any random rotation applied at start
+    private Quaternion _initialWorldRotation;
+    private float _nextStalePoseWarningTime;
+    private bool useLocustGains;
+    private float locustPositionGain = 1f;
+    private float locustOrientationGain = 1f;
 
     private void Start()
     {
+        ApplySphereDiameterFromSystemConfig();
         sphereRadius = sphereDiameter / 2f;
         _zmqListener = GetComponent<ZmqListener>();
         if (_zmqListener == null)
             Debug.LogError("ZmqListener component not found!");
-        
-        // Store current transform as initial, and set base rotation as fallback
         _initialPosition = transform.position;
         _initialRotation = transform.rotation;
-        _baseRotation = _initialRotation; // Set fallback base rotation
-        
-        // Wait for proper initialization from scene controller
-        _isInitialized = false;
-        _ficTracRotationOffset = Quaternion.identity;
-        _initializationTimer = 0f;
-        _lastFicTracData = Vector3.zero;
-        _frameCount = 0;
+        _initialWorldRotation = _initialRotation;
+        ResetPositionAndRotation();
     }
 
     private void Update()
     {
-        _frameCount++;
-        
-        // If SetBaseRotation hasn't been called within first 3 frames, set _baseRotationSet to true as fallback
-        if (_frameCount > 3 && !_baseRotationSet)
-        {
-            _baseRotationSet = true;
-            Debug.Log("SetBaseRotation not called within first 3 frames. Setting _baseRotationSet to true as fallback.");
-        }
-        
         HandleInput();
 
-        if (_zmqListener.pose == null) return;
+        if (_zmqListener == null || !_zmqListener.HasPose)
+            return;
+
+        if (!_zmqListener.HasFreshPose())
+        {
+            if (Time.unscaledTime >= _nextStalePoseWarningTime)
+            {
+                Debug.LogWarning(
+                    $"[{gameObject.name}] FicTrac/ZMQ pose is stale ({_zmqListener.SecondsSinceLastPose:F2}s since last update)."
+                );
+                _nextStalePoseWarningTime = Time.unscaledTime + 5f;
+            }
+            return;
+        }
 
         if (Input.GetKeyDown(resetKey))
         {
@@ -68,8 +67,7 @@ public class ClosedLoop : MonoBehaviour
         if (!_isInitialized)
         {
             _initializationTimer += Time.deltaTime;
-            //if (_initializationTimer >= initializationDelay)
-            if (_initializationTimer >= initializationDelay && _baseRotationSet)
+            if (_initializationTimer >= initializationDelay)
             {
                 InitializeFicTracData();
             }
@@ -84,12 +82,13 @@ public class ClosedLoop : MonoBehaviour
     {
         _lastFicTracData = GetCurrentFicTracData();
         float initialYaw = _lastFicTracData.z;
-        // Compute offset so that desiredRotation starts from the current base rotation
-        Quaternion fictracYaw = Quaternion.Euler(0, initialYaw * Mathf.Rad2Deg, 0);
-        _ficTracRotationOffset = _baseRotation * Quaternion.Inverse(fictracYaw);
+
+        // Combine the initial world rotation with the FicTrac offset
+        // This ensures that any random initial rotation is accounted for
+        // when calculating position changes in UpdateTransform
+        _ficTracRotationOffset = _initialWorldRotation * Quaternion.Euler(0, -initialYaw * Mathf.Rad2Deg, 0);
         _isInitialized = true;
         Debug.Log($"Initialized with FicTrac data: ({_lastFicTracData.x}, {_lastFicTracData.y}, {_lastFicTracData.z})");
-        Debug.Log($"Base rotation: {_baseRotation.eulerAngles}, FicTrac offset: {_ficTracRotationOffset.eulerAngles}");
     }
 
     private void UpdateTransform()
@@ -97,31 +96,33 @@ public class ClosedLoop : MonoBehaviour
         Vector3 currentFicTracData = GetCurrentFicTracData();
         Vector3 ficTracDelta = currentFicTracData - _lastFicTracData;
 
-        // Compute the absolute desired rotation (yaw angle)
-        float targetYaw = currentFicTracData.z * Mathf.Rad2Deg;
-        Quaternion desiredRotation = Quaternion.Euler(0, targetYaw, 0);
-
-        // Apply the rotation offset from initialization
-        desiredRotation = _ficTracRotationOffset * desiredRotation;
-
-
         // Apply position change only if closedLoopPosition is true
-        if (closedLoopPosition != 0.0f)
+        if (closedLoopPosition)
         {
-            Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius * closedLoopPosition;
+            // Use _ficTracRotationOffset to correctly transform the position delta
+            // This accounts for both the initial FicTrac orientation and any random initial rotation
+            Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius * (useLocustGains ? locustPositionGain : 1f);
             transform.Translate(positionDelta, Space.World);
         }
 
-        // Control the convergence behavior based on closedLoopOrientation
-        if (closedLoopOrientation > 0.0f)
+        // Apply rotation change only if closedLoopOrientation is true
+        if (closedLoopOrientation)
         {
-            float step = closedLoopOrientation * 360f * Time.deltaTime; // scale up/down
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, desiredRotation, step);
+            if (useLocustGains)
+            {
+                Quaternion desired = _ficTracRotationOffset * Quaternion.Euler(0, currentFicTracData.z * Mathf.Rad2Deg, 0);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, desired, locustOrientationGain * 360f * Time.deltaTime);
+            }
+            else
+            {
+                float rotationDelta = ficTracDelta.z * Mathf.Rad2Deg;
+                // Preserve the modern boolean mode used by the other experiments.
+                transform.Rotate(0, rotationDelta, 0, Space.Self);
+            }
         }
 
         _lastFicTracData = currentFicTracData;
     }
-
     public void ResetPositionAndRotation()
     {
         transform.SetPositionAndRotation(_initialPosition, _initialRotation);
@@ -129,31 +130,34 @@ public class ClosedLoop : MonoBehaviour
         _ficTracRotationOffset = Quaternion.identity;
         _initializationTimer = 0f;
         _lastFicTracData = Vector3.zero;
-        _frameCount = 0; // Reset frame count on reset
+        _nextStalePoseWarningTime = 0f;
         Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
     }
 
-    // Set a new base pose that FicTrac should align to, without resetting to zero
-    public void SetBasePose(Vector3 position, Quaternion rotation)
+    public void SetLocustGains(float positionGain, float orientationGain)
     {
-        _initialPosition = position;
-        _initialRotation = rotation;
-        _baseRotation = rotation; // This is the key - set the base rotation for FicTrac alignment
-        _baseRotationSet = true; // Mark that base rotation has been properly set
-        transform.SetPositionAndRotation(position, rotation);
-        // Recompute alignment on next InitializeFicTracData
-        _isInitialized = false;
-        _ficTracRotationOffset = Quaternion.identity;
-        _initializationTimer = 0f;
-        _lastFicTracData = Vector3.zero;
-        _frameCount = 0; // Reset frame count when base pose is set
-        Debug.Log($"SetBasePose: position={position}, rotation={rotation.eulerAngles}");
+        useLocustGains = true;
+        locustPositionGain = positionGain;
+        locustOrientationGain = orientationGain;
+        closedLoopPosition = positionGain != 0;
+        closedLoopOrientation = orientationGain > 0;
     }
 
-    // Convenience to set only rotation as base
-    public void SetBaseRotation(Quaternion rotation)
+    public void SetSphereDiameter(float diameterCm)
     {
-        SetBasePose(transform.position, rotation);
+        sphereDiameter = diameterCm;
+        sphereRadius = sphereDiameter / 2f;
+    }
+
+    private void ApplySphereDiameterFromSystemConfig()
+    {
+        MainController main = FindObjectOfType<MainController>();
+        if (main == null)
+            return;
+
+        SystemConfig config = main.GetSystemConfigForGameObject(gameObject);
+        SetSphereDiameter(config.sphereDiameter);
+        Debug.Log($"[ClosedLoop] {gameObject.name} sphere diameter set to {config.sphereDiameter} cm from system_config");
     }
 
     private Vector3 GetCurrentFicTracData()
@@ -165,45 +169,38 @@ public class ClosedLoop : MonoBehaviour
     // New methods
     public void ToggleClosedLoopPosition()
     {
-        if (closedLoopPosition != 0.0f)
-        {
-            closedLoopPosition = 0.0f;
-            Debug.Log("Closed Loop Position: OFF");
-            return;
-        }
-        else
-        {
-            closedLoopPosition = 1.0f;
-            Debug.Log("Closed Loop Position: ON");
-            return;
-        }
+        closedLoopPosition = !closedLoopPosition;
+        if (closedLoopPosition && locustPositionGain == 0) locustPositionGain = 1f;
+        Debug.Log($"Closed Loop Position: {(closedLoopPosition ? "ON" : "OFF")}");
     }
 
     public void ToggleClosedLoopOrientation()
     {
-        if (closedLoopOrientation != 0.0f)
-        {
-            closedLoopOrientation = 0.0f;
-            Debug.Log("Closed Loop Position: OFF");
-            return;
-        }
-        else
-        {
-            closedLoopOrientation = 1.0f;
-            Debug.Log("Closed Loop Position: ON");
-            return;
-        }
+        closedLoopOrientation = !closedLoopOrientation;
+        if (closedLoopOrientation && locustOrientationGain == 0) locustOrientationGain = 1f;
+        Debug.Log($"Closed Loop Orientation: {(closedLoopOrientation ? "ON" : "OFF")}");
     }
 
     // Public methods for external scripts to control the behaviors
-    public void SetClosedLoopOrientation(float value)
+    public void SetClosedLoopOrientation(bool value)
     {
         closedLoopOrientation = value;
     }
 
-    public void SetClosedLoopPosition(float value)
+    public void SetClosedLoopPosition(bool value)
     {
         closedLoopPosition = value;
+    }
+
+    public void SetPositionAndRotation(Vector3 initialPosition, Quaternion initialRotation)
+    {
+        _initialPosition = initialPosition;
+        _initialRotation = initialRotation;
+        // Store the initial world rotation to account for random rotations
+        _initialWorldRotation = initialRotation;
+
+        transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+        ResetPositionAndRotation();
     }
 
     private void HandleInput()
@@ -218,5 +215,4 @@ public class ClosedLoop : MonoBehaviour
             Application.Quit();
         }
     }
-
 }

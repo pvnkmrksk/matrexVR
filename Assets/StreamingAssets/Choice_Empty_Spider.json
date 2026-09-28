@@ -1,0 +1,23 @@
+{
+  "objects": [
+    {
+     "type": ""
+    },
+    {
+      "type": "Spider",
+      "position": {
+        "radius": 15,
+        "angle": 30,
+        "height": 0
+      },
+      "scale": {
+        "y": 1,
+        "z": 1,
+        "x": 1,
+      },
+      "flip": false
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true
+}

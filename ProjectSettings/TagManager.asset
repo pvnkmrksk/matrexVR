@@ -5,6 +5,12 @@ TagManager:
   serializedVersion: 2
   tags:
   - SimulatedLocust
+  - ScaleReference
+  - ChoiceVR1
+  - ChoiceVR2
+  - ChoiceVR3
+  - ChoiceVR4
+  - Goal
   layers:
   - Default
   - TransparentFX
@@ -14,17 +20,17 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - OverheadCameraMarkers
   - 
   - 
   - SimulatedLocustsVR1
   - SimulatedLocustsVR2
   - SimulatedLocustsVR3
   - SimulatedLocustsVR4
-  - 
-  - 
-  - 
-  - 
+  - ChoiceVR1
+  - ChoiceVR2
+  - ChoiceVR3
+  - ChoiceVR4
   - 
   - 
   - 

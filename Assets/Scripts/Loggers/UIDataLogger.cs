@@ -11,7 +11,7 @@ public class FlyData
     public string ExperimenterName { get; set; }
     public List<Fly> Flies { get; set; }
     public string Comments { get; set; }
-    public List<int> UsedFlyIDs { get; set; } = new List<int>();  // Stores all used IDs
+    public List<string> UsedFlyIDs { get; set; } = new List<string>();  // Stores all used IDs
 }
 
 public class Fly
@@ -63,40 +63,10 @@ public class UIDataLogger : MonoBehaviour
             Directory.CreateDirectory(backupDirectoryPath);
             Debug.Log("Backup Directory created: " + backupDirectoryPath);
         }
-        newFliesButton.onClick.AddListener(GenerateNewFlyIDs);
         saveButton.onClick.AddListener(SaveData);
         reloadButton.onClick.AddListener(LoadLastSessionData);
 
         LoadLastSessionData(); // Call to load data from the last session
-    }
-
-
-    public void GenerateNewFlyIDs()
-    {
-        // Initialize the list from FliesData if it exists and has used IDs; otherwise, start fresh
-        List<int> usedIds = FliesData?.UsedFlyIDs ?? new List<int>();
-
-        int newID;
-        if (usedIds.Count > 0)
-        {
-            // Start with the next ID after the highest used ID
-            newID = usedIds.Max() + 1;
-        }
-        else
-        {
-            // Start from 1 if no IDs have been used yet
-            newID = 1;
-        }
-
-        for (int i = 0; i < flyIDInputs.Count; i++)
-        {
-            flyIDInputs[i].text = newID.ToString();
-            // Update the used ID list by adding new IDs
-            // This ensures the IDs will be added only if they will be saved later
-            //usedIds.Add(newID);
-            newID++;
-        }
-
     }
 
 
@@ -107,7 +77,7 @@ public class UIDataLogger : MonoBehaviour
             ExperimenterName = experimenterNameInput.text,
             Comments = commentsInput.text,
             Flies = new List<Fly>(),
-            UsedFlyIDs = FliesData != null ? new List<int>(FliesData.UsedFlyIDs) : new List<int>()
+            UsedFlyIDs = FliesData != null ? new List<string>(FliesData.UsedFlyIDs) : new List<string>()
         };
 
         for (int i = 0; i < flyIDInputs.Count; i++)
@@ -121,7 +91,12 @@ public class UIDataLogger : MonoBehaviour
                 FlyID = flyIDInputs[i].text
             };
             flyData.Flies.Add(newFly);
-            flyData.UsedFlyIDs.Add(int.Parse(flyIDInputs[i].text));
+            // Simply store the string ID
+            // This won't throw a format exception, even if the user typed letters
+            if (!string.IsNullOrEmpty(flyIDInputs[i].text))
+            {
+                flyData.UsedFlyIDs.Add(flyIDInputs[i].text);
+            }
         }
 
         string json = JsonConvert.SerializeObject(flyData, Formatting.Indented);

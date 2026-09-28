@@ -1,0 +1,1240 @@
+fileFormatVersion: 2
+guid: f21b5c427654b234c8c50e7f794e4517
+timeCreated: 1549172794
+licenseType: Store
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Abdomen
+    100002: Abdomen.001
+    100004: Abdomen.002
+    100006: Ant
+    100008: //RootNode
+    100010: Antenna_L.1
+    100012: Antenna_L.2
+    100014: Antenna_L.3
+    100016: Antenna_R.1
+    100018: Antenna_R.2
+    100020: Antenna_R.3
+    100022: Bone
+    100024: Head
+    100026: Leg11_L
+    100028: Leg11_R
+    100030: Leg12_L
+    100032: Leg12_R
+    100034: Leg13_L
+    100036: Leg13_R
+    100038: Leg14_L
+    100040: Leg14_R
+    100042: Leg21_L
+    100044: Leg21_R
+    100046: Leg22_L
+    100048: Leg22_R
+    100050: Leg23_L
+    100052: Leg23_R
+    100054: Leg24_L
+    100056: Leg24_R
+    100058: Leg31_L
+    100060: Leg31_R
+    100062: Leg32_L
+    100064: Leg32_R
+    100066: Leg33_L
+    100068: Leg33_R
+    100070: Leg34_L
+    100072: Leg34_R
+    100074: Mouth_L
+    100076: Mouth_R
+    100078: Root
+    100080: Thorax
+    400000: Abdomen
+    400002: Abdomen.001
+    400004: Abdomen.002
+    400006: //RootNode
+    400008: Ant
+    400010: Antenna_L.1
+    400012: Antenna_L.2
+    400014: Antenna_L.3
+    400016: Antenna_R.1
+    400018: Antenna_R.2
+    400020: Antenna_R.3
+    400022: Bone
+    400024: Head
+    400026: Leg11_L
+    400028: Leg11_R
+    400030: Leg12_L
+    400032: Leg12_R
+    400034: Leg13_L
+    400036: Leg13_R
+    400038: Leg14_L
+    400040: Leg14_R
+    400042: Leg21_L
+    400044: Leg21_R
+    400046: Leg22_L
+    400048: Leg22_R
+    400050: Leg23_L
+    400052: Leg23_R
+    400054: Leg24_L
+    400056: Leg24_R
+    400058: Leg31_L
+    400060: Leg31_R
+    400062: Leg32_L
+    400064: Leg32_R
+    400066: Leg33_L
+    400068: Leg33_R
+    400070: Leg34_L
+    400072: Leg34_R
+    400074: Mouth_L
+    400076: Mouth_R
+    400078: Root
+    400080: Thorax
+    4300000: Ant
+    7400000: WalkForward
+    7400002: TurnRight
+    7400004: TurnLeft
+    7400006: WalkBack
+    7400008: Eat
+    7400010: Attack
+    7400012: Hit
+    7400014: Death
+    7400016: Rebirth
+    7400018: Idle
+    9500000: //RootNode
+    13700000: Ant
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: WalkForward
+      takeName: Take 001
+      firstFrame: 10
+      lastFrame: 30
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Ant
+        weight: 1
+      - path: Root
+        weight: 1
+      - path: Root/Bone
+        weight: 1
+      - path: Root/Bone/Abdomen
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002/Abdomen.001
+        weight: 1
+      - path: Root/Bone/Thorax
+        weight: 1
+      - path: Root/Bone/Thorax/Head
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2/Antenna_L.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2/Antenna_R.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_L
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L/Leg14_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R/Leg14_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L/Leg24_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R/Leg24_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L/Leg34_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R/Leg34_R
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: TurnRight
+      takeName: Take 001
+      firstFrame: 40
+      lastFrame: 60
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Ant
+        weight: 1
+      - path: Root
+        weight: 1
+      - path: Root/Bone
+        weight: 1
+      - path: Root/Bone/Abdomen
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002/Abdomen.001
+        weight: 1
+      - path: Root/Bone/Thorax
+        weight: 1
+      - path: Root/Bone/Thorax/Head
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2/Antenna_L.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2/Antenna_R.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_L
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L/Leg14_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R/Leg14_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L/Leg24_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R/Leg24_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L/Leg34_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R/Leg34_R
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: TurnLeft
+      takeName: Take 001
+      firstFrame: 70
+      lastFrame: 90
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Ant
+        weight: 1
+      - path: Root
+        weight: 1
+      - path: Root/Bone
+        weight: 1
+      - path: Root/Bone/Abdomen
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002/Abdomen.001
+        weight: 1
+      - path: Root/Bone/Thorax
+        weight: 1
+      - path: Root/Bone/Thorax/Head
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2/Antenna_L.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2/Antenna_R.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_L
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L/Leg14_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R/Leg14_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L/Leg24_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R/Leg24_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L/Leg34_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R/Leg34_R
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: WalkBack
+      takeName: Take 001
+      firstFrame: 100
+      lastFrame: 120
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Ant
+        weight: 1
+      - path: Root
+        weight: 1
+      - path: Root/Bone
+        weight: 1
+      - path: Root/Bone/Abdomen
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002/Abdomen.001
+        weight: 1
+      - path: Root/Bone/Thorax
+        weight: 1
+      - path: Root/Bone/Thorax/Head
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2/Antenna_L.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2/Antenna_R.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_L
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L/Leg14_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R/Leg14_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L/Leg24_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R/Leg24_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L/Leg34_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R/Leg34_R
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Eat
+      takeName: Take 001
+      firstFrame: 130
+      lastFrame: 150
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Ant
+        weight: 1
+      - path: Root
+        weight: 1
+      - path: Root/Bone
+        weight: 1
+      - path: Root/Bone/Abdomen
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002/Abdomen.001
+        weight: 1
+      - path: Root/Bone/Thorax
+        weight: 1
+      - path: Root/Bone/Thorax/Head
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2/Antenna_L.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2/Antenna_R.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_L
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L/Leg14_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R/Leg14_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L/Leg24_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R/Leg24_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L/Leg34_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R/Leg34_R
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Attack
+      takeName: Take 001
+      firstFrame: 160
+      lastFrame: 180
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Ant
+        weight: 1
+      - path: Root
+        weight: 1
+      - path: Root/Bone
+        weight: 1
+      - path: Root/Bone/Abdomen
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002/Abdomen.001
+        weight: 1
+      - path: Root/Bone/Thorax
+        weight: 1
+      - path: Root/Bone/Thorax/Head
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2/Antenna_L.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2/Antenna_R.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_L
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L/Leg14_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R/Leg14_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L/Leg24_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R/Leg24_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L/Leg34_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R/Leg34_R
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Hit
+      takeName: Take 001
+      firstFrame: 190
+      lastFrame: 210
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Ant
+        weight: 1
+      - path: Root
+        weight: 1
+      - path: Root/Bone
+        weight: 1
+      - path: Root/Bone/Abdomen
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002/Abdomen.001
+        weight: 1
+      - path: Root/Bone/Thorax
+        weight: 1
+      - path: Root/Bone/Thorax/Head
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2/Antenna_L.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2/Antenna_R.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_L
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L/Leg14_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R/Leg14_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L/Leg24_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R/Leg24_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L/Leg34_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R/Leg34_R
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Death
+      takeName: Take 001
+      firstFrame: 220
+      lastFrame: 250
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Ant
+        weight: 1
+      - path: Root
+        weight: 1
+      - path: Root/Bone
+        weight: 1
+      - path: Root/Bone/Abdomen
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002/Abdomen.001
+        weight: 1
+      - path: Root/Bone/Thorax
+        weight: 1
+      - path: Root/Bone/Thorax/Head
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2/Antenna_L.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2/Antenna_R.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_L
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L/Leg14_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R/Leg14_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L/Leg24_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R/Leg24_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L/Leg34_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R/Leg34_R
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Rebirth
+      takeName: Take 001
+      firstFrame: 260
+      lastFrame: 290
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Ant
+        weight: 1
+      - path: Root
+        weight: 1
+      - path: Root/Bone
+        weight: 1
+      - path: Root/Bone/Abdomen
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002/Abdomen.001
+        weight: 1
+      - path: Root/Bone/Thorax
+        weight: 1
+      - path: Root/Bone/Thorax/Head
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2/Antenna_L.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2/Antenna_R.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_L
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L/Leg14_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R/Leg14_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L/Leg24_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R/Leg24_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L/Leg34_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R/Leg34_R
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Idle
+      takeName: Take 001
+      firstFrame: 300
+      lastFrame: 330
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Ant
+        weight: 1
+      - path: Root
+        weight: 1
+      - path: Root/Bone
+        weight: 1
+      - path: Root/Bone/Abdomen
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002
+        weight: 1
+      - path: Root/Bone/Abdomen/Abdomen.002/Abdomen.001
+        weight: 1
+      - path: Root/Bone/Thorax
+        weight: 1
+      - path: Root/Bone/Thorax/Head
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_L.1/Antenna_L.2/Antenna_L.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Antenna_R.1/Antenna_R.2/Antenna_R.3
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_L
+        weight: 1
+      - path: Root/Bone/Thorax/Head/Mouth_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_L/Leg12_L/Leg13_L/Leg14_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg11_R/Leg12_R/Leg13_R/Leg14_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_L/Leg22_L/Leg23_L/Leg24_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg21_R/Leg22_R/Leg23_R/Leg24_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_L/Leg32_L/Leg33_L/Leg34_L
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R
+        weight: 1
+      - path: Root/Bone/Thorax/Leg31_R/Leg32_R/Leg33_R/Leg34_R
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: Root
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

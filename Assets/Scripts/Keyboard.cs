@@ -16,6 +16,12 @@ public class Keyboard : MonoBehaviour
     [SerializeField]
     private float maxRotateSpeed = 300.0f;
 
+    [SerializeField]
+    private bool allowVerticalTranslation = false;
+
+    [SerializeField]
+    private bool allowPitchAndRoll = false;
+
     private MainController mainController;
 
     // Start is called before the first frame update
@@ -47,11 +53,11 @@ public class Keyboard : MonoBehaviour
         }
 
         //use the keyboard to go up and down using c and z
-        if (Input.GetKey(KeyCode.Z))
+        if (allowVerticalTranslation && Input.GetKey(KeyCode.Z))
         {
             transform.Translate(Vector3.down * Time.deltaTime * translateSpeed);
         }
-        if (Input.GetKey(KeyCode.C))
+        if (allowVerticalTranslation && Input.GetKey(KeyCode.C))
         {
             transform.Translate(Vector3.up * Time.deltaTime * translateSpeed);
         }
@@ -66,20 +72,20 @@ public class Keyboard : MonoBehaviour
             transform.Rotate(Vector3.down * Time.deltaTime * rotateSpeed);
         }
         //use the keyboard to roll left right
-        if (Input.GetKey(KeyCode.Q))
+        if (allowPitchAndRoll && Input.GetKey(KeyCode.Q))
         {
             transform.Rotate(Vector3.back * Time.deltaTime * rotateSpeed);
         }
-        if (Input.GetKey(KeyCode.E))
+        if (allowPitchAndRoll && Input.GetKey(KeyCode.E))
         {
             transform.Rotate(Vector3.forward * Time.deltaTime * rotateSpeed);
         }
         //use the keyboard to pitch up down
-        if (Input.GetKey(KeyCode.W))
+        if (allowPitchAndRoll && Input.GetKey(KeyCode.W))
         {
             transform.Rotate(Vector3.right * Time.deltaTime * rotateSpeed);
         }
-        if (Input.GetKey(KeyCode.S))
+        if (allowPitchAndRoll && Input.GetKey(KeyCode.S))
         {
             transform.Rotate(Vector3.left * Time.deltaTime * rotateSpeed);
         }
@@ -95,11 +101,11 @@ public class Keyboard : MonoBehaviour
             translateSpeed -= 1.0f;
         }
 
-        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.W))
+        if (allowPitchAndRoll && Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.W))
         {
             rotateSpeed += 1.0f;
         }
-        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.S))
+        if (allowPitchAndRoll && Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.S))
         {
             rotateSpeed -= 1.0f;
         }

@@ -9,6 +9,7 @@ using System.IO.Compression;
 /// <summary>
 /// Logs positions and orientations of Kannadi clones with VR index information.
 /// </summary>
+[DefaultExecutionOrder(200)]
 public class KannadiLogger : MonoBehaviour
 {
     private string directoryPath;
@@ -31,6 +32,8 @@ public class KannadiLogger : MonoBehaviour
             return;
         }
 
+        if (string.IsNullOrEmpty(directoryPath)) return;
+
         // Get Kannadi component
         kannadi = GetComponent<Kannadi>();
         if (kannadi == null)
@@ -52,7 +55,7 @@ public class KannadiLogger : MonoBehaviour
 
         // Initialize the log file
         string date = DateTime.Now.ToString("yyyy-MM-dd");
-        string time = DateTime.Now.ToString("HH-mm-ss");
+        string time = DateTime.Now.ToString("HH-mm-ss-fffffff");
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
         logPath = Path.Combine(
@@ -70,7 +73,7 @@ public class KannadiLogger : MonoBehaviour
         );
     }
 
-    void Update()
+    void LateUpdate()
     {
         if (kannadi == null || logFile == null)
             return;
@@ -88,10 +91,7 @@ public class KannadiLogger : MonoBehaviour
                 Vector3 position = clones[i].transform.position;
                 Vector3 rotation = clones[i].transform.rotation.eulerAngles;
 
-                string data = $"{timestamp},{vrIndex},{i},{clones[i].name}," +
-                             $"{position.x},{position.y},{position.z}," +
-                             $"{rotation.x},{rotation.y},{rotation.z}," +
-                             $"{kannadi.numberOfRings},{kannadi.hexRadius}";
+                string data = FormattableString.Invariant($"{timestamp},{vrIndex},{i},{clones[i].name},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z},{kannadi.numberOfRings},{kannadi.hexRadius}");
 
                 logFile.WriteLine(data);
             }
@@ -107,5 +107,3 @@ public class KannadiLogger : MonoBehaviour
         }
     }
 }
-
-

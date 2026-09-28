@@ -1,0 +1,25 @@
+{
+  "sequences": [
+      {
+      "sceneName": "Choice",
+      "duration": 30,
+      "parameters": {
+        "configFile": "Choice_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "Choice_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 240,
+      "parameters": {
+        "configFile": "Choice_empty.json"
+      }
+    }
+  ]
+}

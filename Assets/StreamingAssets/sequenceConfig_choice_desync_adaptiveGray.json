@@ -1,0 +1,14 @@
+{
+  "randomise": false,
+  "loop": true,
+  "sequences": [
+    {
+      "sceneName": "Choice_desync",
+      "duration": 1200,
+      "parameters": {
+        "design": "sequenceDesign_symmetricScaledDecision_adaptive.json"
+      },
+      "reloadScene": false
+    }
+  ]
+}

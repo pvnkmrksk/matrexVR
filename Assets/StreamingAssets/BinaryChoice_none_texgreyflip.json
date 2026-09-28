@@ -1,0 +1,46 @@
+{
+  "objects": [
+    {
+      "type": "",
+      "position": {
+        "x": -5.176382,
+        "y": -1,
+        "z": 14.31852
+      },
+      "scale": {
+        "x": 2,
+        "y": 2,
+        "z": 2
+      },
+      "flip": false
+    },
+    {
+      "type": "tree01_texturedgrey",
+      "position": {
+        "x": 5.176382,
+        "y": -1,
+        "z": 14.31852
+      },
+      "scale": {
+        "x": 2,
+        "y": 2,
+        "z": 2
+      },
+      "flip": true
+    }
+  ],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "initialPosition": {
+    "x": 0,
+    "y": 1.7,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "randomInitialRotation": false
+
+}

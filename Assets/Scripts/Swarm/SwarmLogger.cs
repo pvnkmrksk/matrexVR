@@ -37,7 +37,7 @@ public class SwarmLogger : MonoBehaviour
 
         // Initialize the log file
         string date = DateTime.Now.ToString("yyyy-MM-dd");
-        string time = DateTime.Now.ToString("HH-mm-ss");
+        string time = DateTime.Now.ToString("HH-mm-ss-fffffff");
         // Correctly extract layer names from the LayerMask
         string layerNames = "";
         int layerMaskValue = locustLayerMask.value;
@@ -73,6 +73,7 @@ public class SwarmLogger : MonoBehaviour
 
     void Update()
     {
+        if (logFile == null) return;
         GameObject[] locusts = GameObject.FindGameObjectsWithTag("SimulatedLocust");
         string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
 
@@ -82,7 +83,7 @@ public class SwarmLogger : MonoBehaviour
             {
                 Vector3 position = locust.transform.position;
                 string data =
-                    $"{timestamp},{locust.name},{LayerMask.LayerToName(locust.layer)},{position.x},{position.y},{position.z}";
+                    FormattableString.Invariant($"{timestamp},{locust.name},{LayerMask.LayerToName(locust.layer)},{position.x},{position.y},{position.z}");
                 logFile.WriteLine(data);
             }
         }

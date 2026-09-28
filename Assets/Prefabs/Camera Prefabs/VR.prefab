@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2386836546770343658}
   - component: {fileID: 4886124528207133730}
   - component: {fileID: 633135531330507614}
+  - component: {fileID: 4730096397140351746}
   m_Layer: 0
   m_Name: VR
   m_TagString: Untagged
@@ -85,7 +86,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c75a3f1e40cc87811bdffcc067133c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sphereDiameter: 9.9
+  sphereDiameter: 2.5
   resetKey: 114
   initializationDelay: 0.1
   closedLoopPosition: 1
@@ -106,6 +107,8 @@ MonoBehaviour:
   rotateSpeed: 50
   maxTranslateSpeed: 100
   maxRotateSpeed: 300
+  allowVerticalTranslation: 0
+  allowPitchAndRoll: 0
 --- !u!114 &633135531330507614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -119,6 +122,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   includeZmqData: 1
+--- !u!114 &4730096397140351746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2386836546770343442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8092646dc54cd4421a9006ccf2571a32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useGravity: 1
+  conformanceMode: 0
+  verticalOffset: 0.01
+  antSize: 0.015
+  raycastOriginHeight: 1
+  raycastDistance: 5
+  sampleCount: 5
+  alignSpeed: 12
 --- !u!1001 &124890606341847571
 PrefabInstance:
   m_ObjectHideFlags: 0

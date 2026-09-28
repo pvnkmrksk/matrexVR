@@ -1,0 +1,62 @@
+{
+  "targetDisplay": 0,
+  "overheadCamera": {
+    "enabled": true,
+    "targetDisplay": -1,
+    "x": 0.68,
+    "y": 0.02,
+    "width": 0.3,
+    "height": 0.3,
+    "resolution": 512
+  },
+  "configs": [
+    {
+      "vrId": "VR1",
+      "sphereDiameter": 5.0,
+      "zmqAddress": "localhost",
+      "zmqPort": 9872,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 0,
+      "startCol": 0,
+      "horizontal": true,
+      "displayOrder": "DRBLFU"
+    },
+    {
+      "vrId": "VR2",
+      "sphereDiameter": 5.0,
+      "zmqAddress": "localhost",
+      "zmqPort": 9873,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 1,
+      "startCol": 0,
+      "horizontal": true,
+      "displayOrder": "DRBLFU"
+    },
+    {
+      "vrId": "VR3",
+      "sphereDiameter": 5.0,
+      "zmqAddress": "localhost",
+      "zmqPort": 9874,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 2,
+      "startCol": 0,
+      "horizontal": true,
+      "displayOrder": "DRBLFU"
+    },
+    {
+      "vrId": "VR4",
+      "sphereDiameter": 5.0,
+      "zmqAddress": "localhost",
+      "zmqPort": 9875,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 3,
+      "startCol": 0,
+      "horizontal": true,
+      "displayOrder": "DRBLFU"
+    }
+  ]
+}

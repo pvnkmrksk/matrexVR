@@ -28,15 +28,19 @@ public class LocustSpawner : MonoBehaviour
 
     public bool loadConfigFromJsonFile = true; // If true, load config from json file, else use default values
 
+    private readonly System.Collections.Generic.List<GameObject> spawned = new System.Collections.Generic.List<GameObject>();
+    private bool initialized;
+
     void Start()
     {
+        if (initialized) return;
         // if load config from json file bool is true, load config from json file
         // else use default values
         if (loadConfigFromJsonFile)
         {
             LoadConfig();
         }
-        SpawnLocusts();
+        Rebuild();
     }
 
     void LoadConfig()
@@ -45,6 +49,7 @@ public class LocustSpawner : MonoBehaviour
         TextAsset jsonFile = Resources.Load<TextAsset>("LocustConfig");
 
         // Parse the JSON string
+        if (jsonFile == null) { Debug.LogWarning("LocustConfig was not found; using scene parameters."); return; }
         JObject config = JObject.Parse(jsonFile.text);
 
         // Update class variables
@@ -56,6 +61,21 @@ public class LocustSpawner : MonoBehaviour
         locustSpeed = (float)config["locustSpeed"];
         // layerName = (string)config["layerName"];
     }
+
+    public void Rebuild()
+    {
+        Cleanup();
+        initialized = true;
+        if (locustPrefab == null) { Debug.LogError("LocustSpawner requires a locust prefab."); return; }
+        SpawnLocusts();
+    }
+    private void Cleanup()
+    {
+        foreach (GameObject locust in spawned)
+            if (locust != null) { locust.SetActive(false); Destroy(locust); }
+        spawned.Clear();
+    }
+    private void OnDestroy() => Cleanup();
 
     void SpawnLocusts()
     {
@@ -86,11 +106,12 @@ public class LocustSpawner : MonoBehaviour
             );
 
             GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity); // Spawned independent of the game object
+            spawned.Add(locust);
             locust.layer = locustLayer; // Set the layer of the spawned locust
             SetLayerRecursively(locust.transform, locustLayer); // Set layer for all children
 
             locust.transform.localRotation = GenerateVanMisesRotation(mu, kappa); // Set the local rotation
-            locust.GetComponent<LocustMover>().speed = locustSpeed; // Set the speed of the locust
+            if (locust.GetComponent<LocustMover>() != null) locust.GetComponent<LocustMover>().speed = locustSpeed; // Set the speed of the locust
             locust.name = layerName + "_Locust_" + i; // Set the name
             locust.tag = "SimulatedLocust"; // Set the tag for the locust
             // Get the Animator component
@@ -134,7 +155,7 @@ public class LocustSpawner : MonoBehaviour
         {
 
             return Quaternion.Euler(0,mu,0);
-            
+
         }
 
 

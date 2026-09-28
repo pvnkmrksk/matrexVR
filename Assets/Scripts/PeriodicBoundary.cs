@@ -11,19 +11,15 @@ public class PeriodicBoundary : MonoBehaviour
     [Tooltip("Rotation angle in degrees around the Y-axis for the boundary area.")] public float boundaryRotation = 0f;
 
     private Quaternion rotationQuaternion;
+    private Vector3 initialOffset;
 
     private void Start()
     {
-        UpdateRotationQuaternion();
-    }
-    
-    /// <summary>
-    /// Updates the rotation quaternion based on boundaryRotation.
-    /// Call this if boundaryRotation is changed after Start().
-    /// </summary>
-    public void UpdateRotationQuaternion()
-    {
         rotationQuaternion = Quaternion.Euler(0, boundaryRotation, 0);
+        if (moveWithTransform && targetTransform != null)
+        {
+            initialOffset = boundaryCenter - targetTransform.position;
+        }
     }
 
     private void OnDrawGizmos()
@@ -42,63 +38,43 @@ public class PeriodicBoundary : MonoBehaviour
         Gizmos.DrawWireCube(Vector3.zero, size);
     }
 
-    public bool HandlePeriodicBoundaries(Transform objectTransform)
+    public void HandlePeriodicBoundaries(Transform objectTransform)
     {
         Vector3 center = moveWithTransform && targetTransform != null ? targetTransform.position : boundaryCenter;
         Vector3 position = objectTransform.position;
-        Vector3 originalPosition = position;
 
         // Convert position to local space relative to the rotated boundary
         Vector3 localPosition = Quaternion.Inverse(rotationQuaternion) * (position - center);
 
         float halfWidth = boundaryLengthX / 2f;
         float halfLength = boundaryLengthZ / 2f;
-        bool wasWrapped = false;
 
-        // Check X-axis boundaries (use >= and <= to catch positions exactly at boundary)
-        if (localPosition.x >= halfWidth)
-        {
+        // Check X-axis boundaries
+        if (localPosition.x > halfWidth)
             localPosition.x -= boundaryLengthX;
-            wasWrapped = true;
-        }
-        else if (localPosition.x <= -halfWidth)
-        {
+        else if (localPosition.x < -halfWidth)
             localPosition.x += boundaryLengthX;
-            wasWrapped = true;
-        }
 
-        // Check Z-axis boundaries (use >= and <= to catch positions exactly at boundary)
-        if (localPosition.z >= halfLength)
-        {
+        // Check Z-axis boundaries
+        if (localPosition.z > halfLength)
             localPosition.z -= boundaryLengthZ;
-            wasWrapped = true;
-        }
-        else if (localPosition.z <= -halfLength)
-        {
+        else if (localPosition.z < -halfLength)
             localPosition.z += boundaryLengthZ;
-            wasWrapped = true;
-        }
 
         // Convert back to world space
         position = center + (rotationQuaternion * localPosition);
         objectTransform.position = position;
-        
-        return wasWrapped;
     }
 
-    void LateUpdate()
+    private void Update()
     {
-        // Handle periodic boundaries and update the position of the GameObject this script is attached to.
-        // Use LateUpdate to ensure this runs AFTER other Update() methods that might set positions
-        // Note: For Kannadi clones, wrapping is done immediately in UpdateClonesPositionAndRotation()
-        // This LateUpdate is for objects that move independently (like VR parents or other moving objects)
-        if (targetTransform != null)
+        // Update boundary center if moving with transform
+        if (moveWithTransform && targetTransform != null)
         {
-            HandlePeriodicBoundaries(targetTransform);
+            boundaryCenter = targetTransform.position + initialOffset;
         }
-        else
-        {
-            HandlePeriodicBoundaries(transform);
-        }
+
+        // Always handle periodic boundaries for this object
+        HandlePeriodicBoundaries(transform);
     }
 }

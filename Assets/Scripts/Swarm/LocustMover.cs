@@ -16,13 +16,13 @@ public class LocustMover : MonoBehaviour
 
             if (pos.x > boundaryManager.transform.position.x + boundaryManager.boundarySize / 2)
                 pos.x = boundaryManager.transform.position.x - boundaryManager.boundarySize / 2 + boundaryManager.boundaryBuffer;
-            
+
             else if (pos.x < boundaryManager.transform.position.x - boundaryManager.boundarySize / 2)
                 pos.x = boundaryManager.transform.position.x + boundaryManager.boundarySize / 2 - boundaryManager.boundaryBuffer;
-            
+
             if (pos.z > boundaryManager.transform.position.z + boundaryManager.boundarySize / 2)
                 pos.z = boundaryManager.transform.position.z - boundaryManager.boundarySize / 2 + boundaryManager.boundaryBuffer;
-            
+
             else if (pos.z < boundaryManager.transform.position.z - boundaryManager.boundarySize / 2)
                 pos.z = boundaryManager.transform.position.z + boundaryManager.boundarySize / 2 - boundaryManager.boundaryBuffer;
 

@@ -1,0 +1,110 @@
+{
+  "loop": true,
+  "stimuli": [
+    {
+      "duration": 10.0,
+      "speed": 20.0,
+      "clockwise": true,
+      "rotationAxis": "Yaw",
+      "frequency": 4.0,
+      "contrast": 1,
+      "color1": "#000000",
+      "color2": "#FFFFFF",
+      "dutyCycle": 0.9,
+      "closedLoopOrientation": false,
+      "closedLoopPosition": false
+    },
+    {
+      "duration": 10.0,
+      "speed": 20.0,
+      "clockwise": true,
+      "rotationAxis": "Yaw",
+      "frequency": 4.0,
+      "contrast": 1,
+      "color1": "#000000",
+      "color2": "#FFFFFF",
+      "dutyCycle": 0.5,
+      "closedLoopOrientation": false,
+      "closedLoopPosition": false
+    },
+    {
+      "duration": 10.0,
+      "speed": 20.0,
+      "clockwise": true,
+      "rotationAxis": "Yaw",
+      "frequency": 4.0,
+      "contrast": 1,
+      "color1": "#000000",
+      "color2": "#FFFFFF",
+      "dutyCycle": 0.1,
+      "closedLoopOrientation": false,
+      "closedLoopPosition": false
+    },
+
+    {
+      "duration": 5.0,
+      "speed": 0.0,
+      "clockwise": true,
+      "rotationAxis": "Yaw",
+      "frequency": 4.0,
+      "contrast": 1,
+      "color1": "#000000",
+      "color2": "#FFFFFF",
+      "dutyCycle": 0.1,
+      "closedLoopOrientation": false,
+      "closedLoopPosition": false
+    },
+    {
+      "duration": 10.0,
+      "speed": 10.0,
+      "clockwise": false,
+      "rotationAxis": "Yaw",
+      "frequency": 8.0,
+      "contrast": 1,
+      "color1": "#222222",
+      "color2": "#DDDDDD",
+      "dutyCycle": 0.9,
+      "closedLoopOrientation": false,
+      "closedLoopPosition": false
+    },
+    {
+      "duration": 10.0,
+      "speed": 15.0,
+      "clockwise": true,
+      "rotationAxis": "Pitch",
+      "frequency": 2.0,
+      "contrast": 1,
+      "color1": "#000000",
+      "color2": "#FFFFFF",
+      "dutyCycle": 0.3,
+      "closedLoopOrientation": false,
+      "closedLoopPosition": false
+    },
+    {
+      "duration": 10.0,
+      "speed": 15.0,
+      "clockwise": true,
+      "rotationAxis": "Roll",
+      "frequency": 6.0,
+      "contrast": 0.8,
+      "color1": "#222222",
+      "color2": "#EEEEEE",
+      "dutyCycle": 0.7,
+      "closedLoopOrientation": false,
+      "closedLoopPosition": false
+    },
+    {
+      "duration": 15.0,
+      "speed": 30.0,
+      "clockwise": true,
+      "rotationAxis": "Yaw",
+      "frequency": 4.0,
+      "contrast": 1.0,
+      "color1": "#000000",
+      "color2": "#FFFFFF",
+      "dutyCycle": 0.5,
+      "closedLoopOrientation": true,
+      "closedLoopPosition": false
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "sequences": [
+	  {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "Choice_locust315.json"
+      }
+    },
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "Choice_locust0.json"
+      }
+    },
+	  {
+      "sceneName": "Choice",
+      "duration": 60,
+      "parameters": {
+        "configFile": "Choice_locust45.json"
+      }
+    }
+  ]
+}

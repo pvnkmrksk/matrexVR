@@ -1,92 +1,42 @@
-using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using InSceneSequence;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
-public class SwarmController : MonoBehaviour, ISceneController
+public class SwarmController : MonoBehaviour, IInSceneSequencer
 {
     public void InitializeScene(Dictionary<string, object> parameters)
     {
-        if (parameters == null)
+        JObject values = new JObject();
+        if (parameters != null && parameters.TryGetValue("configFile", out object file))
+            values = JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, file.ToString())));
+        if (parameters != null) values.Merge(JObject.FromObject(parameters), new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace });
+        KannadiConfig movement = KannadiConfig.Load(parameters);
+        foreach (LocustSpawner spawner in FindObjectsOfType<LocustSpawner>())
         {
-            Debugger.Log("Parameters is null.", 1);
-            return;
+            if (!spawner.isActiveAndEnabled || spawner.gameObject.scene != gameObject.scene) continue;
+            spawner.loadConfigFromJsonFile = false;
+            spawner.numberOfLocusts = values.Value<int?>("numberOfLocusts") ?? spawner.numberOfLocusts;
+            spawner.spawnAreaSize = values.Value<float?>("spawnAreaSize") ?? spawner.spawnAreaSize;
+            spawner.mu = values.Value<float?>("mu") ?? spawner.mu;
+            spawner.kappa = values.Value<float?>("kappa") ?? spawner.kappa;
+            spawner.locustSpeed = values.Value<float?>("locustSpeed") ?? spawner.locustSpeed;
+            ClosedLoop closedLoop = spawner.GetComponent<ClosedLoop>();
+            VRConfig vr = movement.vrConfigs?.FirstOrDefault(v => v.vrIndex == Kannadi.ParseVRIndex(spawner.name));
+            if (closedLoop != null)
+            {
+                closedLoop.SetLocustGains(vr?.closedLoopPosition ?? movement.closedLoopPosition ?? 1,
+                                          vr?.closedLoopOrientation ?? movement.closedLoopOrientation ?? 1);
+                if (vr != null)
+                    closedLoop.SetPositionAndRotation(vr.initialPosition?.ToVector3() ?? spawner.transform.position,
+                        vr.initialRotation != null ? Quaternion.Euler(vr.initialRotation.ToVector3()) : spawner.transform.rotation);
+            }
+            spawner.Rebuild();
         }
-
-        Debugger.Log("Initializing Scene with: " + parameters.ToString());
-
-        foreach (var entry in parameters)
-        {
-            Debugger.Log(
-                $"Parameter Key: {entry.Key}, Value: {entry.Value}, Type: {entry.Value?.GetType()}"
-            );
-        }
-
-        LocustSpawner[] locustSpawners = FindObjectsOfType<LocustSpawner>();
-
-        if (locustSpawners == null || locustSpawners.Length == 0)
-        {
-            Debugger.Log("No LocustSpawners found.", 2);
-            return;
-        }
-
-        foreach (LocustSpawner spawner in locustSpawners)
-        {
-            if (parameters.TryGetValue("numberOfLocusts", out object numberOfLocustsValue))
-            {
-                spawner.numberOfLocusts = Convert.ToInt32(numberOfLocustsValue);
-            }
-            else
-            {
-                Debugger.Log("Invalid or missing 'numberOfLocusts' parameter.", 2);
-            }
-
-            if (parameters.TryGetValue("spawnAreaSize", out object spawnAreaSizeValue))
-            {
-                spawner.spawnAreaSize = Convert.ToSingle(spawnAreaSizeValue);
-            }
-            else
-            {
-                Debugger.Log("Invalid or missing 'spawnAreaSize' parameter.", 2);
-            }
-
-            if (parameters.TryGetValue("mu", out object muValue))
-            {
-                spawner.mu = Convert.ToSingle(muValue);
-            }
-            else
-            {
-                Debugger.Log("Invalid or missing 'mu' parameter.", 2);
-            }
-
-            if (parameters.TryGetValue("kappa", out object kappaValue))
-            {
-                spawner.kappa = Convert.ToSingle(kappaValue);
-            }
-            else
-            {
-                Debugger.Log("Invalid or missing 'kappa' parameter.", 2);
-            }
-
-            if (parameters.TryGetValue("locustSpeed", out object locustSpeedValue))
-            {
-                spawner.locustSpeed = Convert.ToSingle(locustSpeedValue);
-            }
-            else
-            {
-                Debugger.Log("Invalid or missing 'locustSpeed' parameter.", 2);
-            }
-
-            Debugger.Log("Initializing Swarm scene with parameters: " + parameters.ToString());
-        }
+        SimpleOverheadCamera.EnsureInScene();
     }
-
-    public void StartDataLogging(string timestamp)
-    {
-        // Implement data logging here, if necessary
-    }
-
-    void Update()
-    {
-        // Implement scene-specific logic here, if any
-    }
+    public void AdvanceStep(Dictionary<string, object> parameters) => InitializeScene(parameters);
+    private void Start() => SimpleOverheadCamera.EnsureInScene();
 }

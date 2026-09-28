@@ -9,14 +9,14 @@ public class OverheadCameraUI : MonoBehaviour
     [Header("References")]
     [Tooltip("Reference to the OverheadCameraController")]
     public OverheadCameraController cameraController;
-    
+
     [Header("UI Settings")]
     [Tooltip("Button to reset camera view")]
     public Button resetButton;
-    
+
     [Tooltip("Button text (optional)")]
     public Text buttonText;
-    
+
     void Start()
     {
         // Find camera controller if not assigned
@@ -24,20 +24,20 @@ public class OverheadCameraUI : MonoBehaviour
         {
             cameraController = FindObjectOfType<OverheadCameraController>();
         }
-        
+
         // Setup button if assigned
         if (resetButton != null)
         {
             resetButton.onClick.AddListener(OnResetButtonClicked);
         }
-        
+
         // Set button text if assigned
         if (buttonText != null)
         {
             buttonText.text = "Reset View";
         }
     }
-    
+
     void OnResetButtonClicked()
     {
         if (cameraController != null)
@@ -49,7 +49,7 @@ public class OverheadCameraUI : MonoBehaviour
             Debug.LogWarning("OverheadCameraController not found!");
         }
     }
-    
+
     void OnDestroy()
     {
         // Clean up button listener
@@ -59,4 +59,3 @@ public class OverheadCameraUI : MonoBehaviour
         }
     }
 }
-

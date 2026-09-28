@@ -1,0 +1,22 @@
+{
+  "objects": [],
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0.3765,
+    "g": 0.3882,
+    "b": 0.3373,
+    "a": 1
+  },
+  "initialPosition": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "randomInitialRotation": true
+}

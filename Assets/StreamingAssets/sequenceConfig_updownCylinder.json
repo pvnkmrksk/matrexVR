@@ -1,0 +1,62 @@
+{
+  "sequences": [
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 10,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig_white_cylinder_down_-45.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 10,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 20,
+      "parameters": {
+        "configFile": "StripeFixationConfig_white_cylinder_up_45.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 10,
+      "parameters": {
+        "configFile": "StripeFixationConfig2_empty.json"
+      }
+    },
+      {
+        "sceneName": "Choice_noBG",
+        "duration": 20,
+        "parameters": {
+          "configFile": "StripeFixationConfig_white_cylinder_down_45.json"
+        }
+      },
+      {
+        "sceneName": "Choice_noBG",
+        "duration": 10,
+        "parameters": {
+          "configFile": "StripeFixationConfig2_empty.json"
+        }
+      },
+      {
+        "sceneName": "Choice_noBG",
+        "duration": 20,
+        "parameters": {
+          "configFile": "StripeFixationConfig_white_cylinder_up_-45.json"
+        }
+      }
+
+    
+  ]
+}

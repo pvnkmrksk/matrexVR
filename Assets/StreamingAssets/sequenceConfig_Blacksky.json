@@ -1,0 +1,39 @@
+{
+  "sequences": [
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 15,
+      "parameters": {
+        "configFile": "BlackSky.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 30,
+      "parameters": {
+        "configFile": "BlackSky_BlackStripe.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 15,
+      "parameters": {
+        "configFile": "BlackSky.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 30,
+      "parameters": {
+        "configFile": "BlackSky_BlackStripe.json"
+      }
+    },
+    {
+      "sceneName": "Choice_noBG",
+      "duration": 30,
+      "parameters": {
+        "configFile": "BlackSky_BlackStripe.json"
+      }
+    }
+  ]
+}

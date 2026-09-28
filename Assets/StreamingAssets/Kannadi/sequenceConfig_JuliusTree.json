@@ -1,0 +1,27 @@
+{ "randomise" : true,
+  "loop": true,
+  "sequences": [
+  
+     	{
+     	"sceneName": "Choice_TwoTreeIndia_nopath_path",
+        "duration": 180,
+        "parameters": {
+            "configFile": "BinaryChoiceIndia_flip_noflip.json"
+        }
+     },
+        {
+        "sceneName": "Choice_TwoTreeIndia_path_nopath",
+        "duration": 180,
+        "parameters": {
+            "configFile": "BinaryChoiceIndia_flip_noflip.json"
+        }
+      },
+        {
+        "sceneName": "Choice_TwoTreeIndia_path_path",
+        "duration": 180,
+        "parameters": {
+            "configFile": "BinaryChoiceIndia_flip_noflip.json"
+        }
+      }
+   ]
+}

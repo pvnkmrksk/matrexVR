@@ -554,6 +554,68 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2edbded3f559821ac8007eb32448730b, type: 3}
+--- !u!1 &1643545295
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1643545297}
+  - component: {fileID: 1643545296}
+  - component: {fileID: 1643545298}
+  m_Layer: 0
+  m_Name: OptomotorController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1643545296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1643545295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bed9ef60b0eb144c38cdecea095d11e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  drumPrefab: {fileID: 1565923041521379133, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+  drumObjectName: OptomotorDrum
+  drumRadius: 1
+  drumObject: {fileID: 0}
+--- !u!4 &1643545297
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1643545295}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1643545298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1643545295}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b02d0e6819ba48488252b31ccd532d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  includeZmqData: 0
 --- !u!850595691 &2049113845
 LightingSettings:
   m_ObjectHideFlags: 0
@@ -618,106 +680,76 @@ LightingSettings:
   m_PVRTiledBaking: 0
   m_NumRaysToShootPerTexel: -1
   m_RespectSceneVisibilityWhenBakingGI: 0
---- !u!1 &2072652015
-GameObject:
+--- !u!1001 &2885603987415665490
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2072652017}
-  - component: {fileID: 2072652016}
-  - component: {fileID: 2072652018}
-  - component: {fileID: 2072652019}
-  m_Layer: 0
-  m_Name: Grating Generator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2072652016
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2072652015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 185af63f38922830b94b589f47daa5f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  textureWidth: 4096
-  textureHeight: 10
-  frequency: 3.93
-  level: 0.991
-  color1: {r: 0, g: 0, b: 0, a: 1}
-  color2: {r: 1, g: 1, b: 1, a: 1}
-  cylinderRadius: 1
-  cylinderHeight: 4
-  cylinderSegments: 32
-  cylinderStacks: 16
-  material: {fileID: 0}
-  drumRotator: {fileID: 0}
---- !u!4 &2072652017
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2072652015}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2072652018
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2072652015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5a8bc4a0619fd6f9956e32f8f6b310d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  drum: {fileID: 0}
-  initialRotation: {x: 0, y: 0, z: 0, w: 0}
-  currentIndex: 0
-  configs: []
-  isPaused: 0
-  isStepping: 0
-  closedLoopOrientation: 1
-  closedLoopPosition: 0
-  initialDelayFrames: 10
---- !u!114 &2072652019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2072652015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7177fac88d7075dda8e803d594f71ad9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  includeZmqData: 0
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1565923041521379133, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+      propertyPath: m_Name
+      value: OptomotorDrum
+      objectReference: {fileID: 0}
+    - target: {fileID: 1565923041521379133, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793966091335045802, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793966091335045802, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793966091335045802, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793966091335045802, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793966091335045802, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793966091335045802, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793966091335045802, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793966091335045802, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793966091335045802, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6793966091335045802, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 45d2c08b0ec0c4c5e9ea3b0ab1be8352, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 705507995}
-  - {fileID: 2072652017}
+  - {fileID: 2885603987415665490}
   - {fileID: 1406940400}
   - {fileID: 1122209343}
   - {fileID: 128699508}
   - {fileID: 329347473}
   - {fileID: 1507549968}
+  - {fileID: 1643545297}
