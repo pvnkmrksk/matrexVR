@@ -68,5 +68,5 @@
     }
   ],
   "hexRadius": 10.0,
-  "animationSpeedThreshold": 0.5
+  "animationSpeedThreshold": 1
 }

@@ -1,10 +1,10 @@
 {
-  "loop": false,
+  "loop": true,
   "randomise": false,
   "sequences": [
     {
       "sceneName": "Swarm",
-      "duration": 20,
+      "duration": 300,
       "parameters": {
         "numberOfLocusts": 256,
         "mu": 0,
