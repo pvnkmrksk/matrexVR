@@ -13,6 +13,7 @@ After pulling, let Package Manager resolve the pinned package and **restart the 
 | ToggleOrientation | O | North face button | Toggle tracked yaw; resuming rebases to current visible heading. |
 | Move | Arrow keys | Left stick | Local X/Z translation. Diagonal keyboard motion is normalized. |
 | Yaw | A positive, D negative | Right stick horizontal | Historical A/D polarity is preserved: A turns +Z toward +X. Remap in the action asset if desired. |
+| Autopilot | Ctrl+Space | — | Toggle constant forward motion at the active individual config's `autopilotSpeed`; lateral, reverse and yaw input remain available for steering. |
 | Vertical | C up, Z down | — | Requires allowVerticalTranslation. |
 | Pitch | W positive, S negative | — | Requires allowPitchAndRoll. |
 | Roll | E positive, Q negative | — | Requires allowPitchAndRoll. |
@@ -26,6 +27,8 @@ After pulling, let Package Manager resolve the pinned package and **restart the 
 | Debug | D | — | Optomotor debug state in Console. Also retains D yaw when manual movement is enabled. |
 
 Reset does not change P/O's selected tracking mode. Re-enabling tracking does not replay accumulated disabled motion. A manual heading change updates the displacement reference. Tracked yaw deltas add to the visible heading; they do not pull it toward an absolute target. Missing/stale sensor poses freeze tracked updates but do not prevent operator controls.
+
+Each individual experiment config file can use the Mario Kart-style autopilot. Set `autopilotEnabled` and `autopilotSpeed` in the file referenced by the sequence step’s `parameters.configFile`. The runtime shortcut Ctrl+Space toggles the mode. Optomotor scenes explicitly disable autopilot so the stimulus controller remains the sole source of scene motion.
 
 Scroll uses Unity 6's uniform cross-platform wheel units: one tick maps to 0.1 legacy zoom units (20 world units with the default zoomSpeed=200). Fractional trackpad motion stays proportional.
 

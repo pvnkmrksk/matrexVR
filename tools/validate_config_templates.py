@@ -38,6 +38,43 @@ for path in sorted(TEMPLATES.glob('*.json')):
         assert all(1 <= vr['vrIndex'] <= 4 for vr in obj['vrConfigs']), path
     if 'aglHeight' in obj:
         assert obj['aglHeight'] >= 0 and obj['windSpeed'] >= 0, path
+    if 'autopilotSpeed' in obj:
+        assert isinstance(obj.get('autopilotEnabled', False), bool), path
+        assert obj['autopilotSpeed'] >= 0, path
+    if 'agentVisual' in obj:
+        assert obj['agentVisual'] in ['ScenePrefab', 'Bogong'], path
+    if 'dimension' in obj:
+        assert obj['dimension'] in ['2D', '3D'], path
+    if 'density' in obj and obj['density'] is not None:
+        assert obj['density'] >= 0, path
+    if 'spawnVolumeSize' in obj:
+        size = obj['spawnVolumeSize']
+        assert size is None or all(size[key] > 0 for key in ['x', 'y', 'z']), path
+    if 'bogongVisual' in obj:
+        visual = obj['bogongVisual']
+        assert visual['sizeMode'] in ['World', 'Angular'], path
+        assert visual['size'] > 0 and visual['angularSizeDegrees'] > 0, path
+        assert 0 <= visual['metallic'] <= 1 and 0 <= visual['smoothness'] <= 1, path
+        assert visual['flickerFrequencyHz'] >= 0 and 0 <= visual['flickerDutyCycle'] <= 1, path
+    if 'nightSky' in obj:
+        sky = obj['nightSky']
+        assert -90 <= sky.get('latitude', 47.6896) <= 90, path
+        assert -180 <= sky.get('longitude', 9.1881) <= 180, path
+        assert 1 <= sky.get('updateIntervalMinutes', 30) <= 60, path
+        assert sky.get('imageWidth', 4096) in [1024, 2048, 4096], path
+
+# The shipped runnable sequences use the experiment-file hierarchy for Swarm.
+for sequence_path in [SA / 'sequenceConfig.json', SA / 'Kannadi' / 'sequenceConfig.json']:
+    if not sequence_path.is_file():
+        continue
+    sequence = json.loads(sequence_path.read_text())
+    for step in sequence.get('sequences', []):
+        if step.get('sceneName') != 'Swarm':
+            continue
+        params = step.get('parameters', {})
+        assert params.get('configFile'), (sequence_path, 'Swarm configFile')
+        assert (SA / params['configFile']).is_file(), (sequence_path, params['configFile'])
+        assert not any(key in params for key in ['numberOfLocusts', 'spawnAreaSize', 'mu', 'kappa', 'locustSpeed']), (sequence_path, 'legacy inline Swarm setting')
 
 # New controls must not quietly fall back to legacy calls in project-owned runtime code.
 for path in (ROOT / 'Assets/Scripts').rglob('*.cs'):

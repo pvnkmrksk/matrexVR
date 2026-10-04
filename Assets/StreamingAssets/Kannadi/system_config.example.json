@@ -25,7 +25,16 @@
       "startRow": 0,
       "startCol": 0,
       "horizontal": true,
-      "displayOrder": "DRBLFU"
+      "displayOrder": "DRBLFU",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "maxRotateSpeed": 300,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      }
     },
     {
       "vrId": "VR2",
@@ -37,7 +46,15 @@
       "startRow": 1,
       "startCol": 0,
       "horizontal": true,
-      "displayOrder": "DRBLFU"
+      "displayOrder": "DRBLFU",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      }
     },
     {
       "vrId": "VR3",
@@ -49,7 +66,16 @@
       "startRow": 2,
       "startCol": 0,
       "horizontal": true,
-      "displayOrder": "DRBLFU"
+      "displayOrder": "DRBLFU",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "maxRotateSpeed": 300,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      }
     },
     {
       "vrId": "VR4",
@@ -61,7 +87,15 @@
       "startRow": 3,
       "startCol": 0,
       "horizontal": true,
-      "displayOrder": "DRBLFU"
+      "displayOrder": "DRBLFU",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      }
     }
   ],
   "targetFrameRate": 120,

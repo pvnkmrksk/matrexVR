@@ -69,7 +69,7 @@ public class KannadiLogger : MonoBehaviour
 
         // Write header
         logFile.WriteLine(
-            "Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius"
+            "Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius,skyboxId,skyboxSampleUtc"
         );
     }
 
@@ -91,7 +91,7 @@ public class KannadiLogger : MonoBehaviour
                 Vector3 position = clones[i].transform.position;
                 Vector3 rotation = clones[i].transform.rotation.eulerAngles;
 
-                string data = FormattableString.Invariant($"{timestamp},{vrIndex},{i},{clones[i].name},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z},{kannadi.numberOfRings},{kannadi.hexRadius}");
+                string data = FormattableString.Invariant($"{timestamp},{vrIndex},{i},{clones[i].name},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z},{kannadi.numberOfRings},{kannadi.hexRadius},{NightSkyController.CurrentId},{NightSkyController.CurrentSampleUtc}");
 
                 logFile.WriteLine(data);
             }

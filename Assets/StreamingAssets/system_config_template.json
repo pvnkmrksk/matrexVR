@@ -12,7 +12,16 @@
       "zmqPort": 9871,
       "vrId": "VR1",
       "displayOrder": "RBLF",
-      "targetDisplay": 0
+      "targetDisplay": 0,
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "maxRotateSpeed": 300,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      }
     },
     {
       "sphereDiameter": 2.6,
@@ -25,7 +34,16 @@
       "zmqPort": 9872,
       "vrId": "VR2",
       "displayOrder": "RBLF",
-      "targetDisplay": 0
+      "targetDisplay": 0,
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "maxRotateSpeed": 300,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      }
     }
   ],
   "targetFrameRate": 120,

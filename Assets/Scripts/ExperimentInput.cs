@@ -57,6 +57,10 @@ public static class ExperimentInput
     public static bool Pressed(string name) => !IsEditingText && Action(name).WasPressedThisFrame();
     public static bool Released(string name) => !IsEditingText && Action(name).WasReleasedThisFrame();
     public static bool Held(string name) => !IsEditingText && Action(name).IsPressed();
+    // The historical autopilot shortcut is Ctrl+Space. Read the modifier from
+    // the Input System so it remains compatible with Unity 6 input handling.
+    public static bool ControlHeld => !IsEditingText && UnityEngine.InputSystem.Keyboard.current != null &&
+        (UnityEngine.InputSystem.Keyboard.current.leftCtrlKey.isPressed || UnityEngine.InputSystem.Keyboard.current.rightCtrlKey.isPressed);
     public static float Axis(string name) => IsEditingText ? 0 : Action(name).ReadValue<float>();
     public static Vector2 Move => IsEditingText ? Vector2.zero : Action("Move").ReadValue<Vector2>();
     public static Vector3 MousePosition => Action("Pointer").ReadValue<Vector2>();

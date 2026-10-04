@@ -23,7 +23,7 @@ The hardware file is applied to the existing `ViewportSetter`, `ZmqListener`, an
 
 ### Camera allow-list
 
-`displayOrder` is authoritative in every scene using `ViewportSetter`, including Swarm, Kannadi, Choice, and DynamicSequence. `RBLF` enables only those four cameras, in that order; Up and Down remain disabled even when serialized as enabled. Listed inactive cameras are activated. Empty, missing, or null orders disable all cameras on that rig. A missing rig entry also disables its cameras; it never borrows VR1's settings. Unavailable target displays disable stimulus cameras rather than routing them elsewhere.
+`displayOrder` is authoritative in every scene using `ViewportSetter`, including Swarm, Kannadi, Choice, and DynamicSequence. `RBLF` enables only those four cameras, in that order; Up and Down remain disabled even when serialized as enabled. Listed inactive cameras are activated. The shared VR prefab now includes Down, all variants expose six faces, and Up/Down match Front's origin, clipping and visibility mask. `Templates/system-config-six-cameras.template.json` is the six-face layout. Empty, missing, or null orders disable all cameras on that rig. A missing rig entry also disables its cameras; it never borrows VR1's settings. Unavailable target displays disable stimulus cameras rather than routing them elsewhere.
 
 Panel size, row, column, horizontal/vertical direction, and target display come from system config. Layouts refresh on config reload and window resize. Invalid and duplicate letters are ignored without consuming panel slots. Camera visibility masks remain the experiment's responsibility; they do not override the hardware allow-list. The operator overview is separate from the stimulus cameras.
 
@@ -54,7 +54,7 @@ For animation gating, Kannadi replicas and band members follow the tracked rig's
 "animationSpeedThreshold": 0.5
 ```
 
-Both locust scenes use the existing `grass_05` dry green/brown grass texture through a dedicated unlit ground material. Its tile spans 20 world units (20 cm), providing ground optic flow independently of light placement.
+Both locust scenes use the existing `grass_05` dry green/brown grass texture through a dedicated unlit ground material. Its current tile spans 100 world units (100 cm; 200 repeats across the 20000-unit plane), providing ground optic flow independently of light placement. The earlier 20-cm setting changed in commit `8597c35`.
 
 ## Operator overview
 

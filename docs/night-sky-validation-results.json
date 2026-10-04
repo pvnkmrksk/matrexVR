@@ -1,0 +1,248 @@
+{
+  "validatedUtc": "2026-10-04T18:48:35.799273+00:00",
+  "branch": "codex/bogong-night-sky",
+  "baseCommit": "8597c35dfb938f470205cfebd8deaebbe106b109",
+  "unityVersion": "6000.3.16f1",
+  "nightSky": {
+    "checks": 314,
+    "failure": null,
+    "verified": [
+      "Now, missing and blank localTime use current instant",
+      "Exact supplied local clock time and optional date",
+      "UTC offsets in hours including negative and fractional offsets",
+      "Legacy timezone and minute-offset compatibility",
+      "GPU faint-detail cutoff preserves brighter source pixels",
+      "Orientation, archive, restart and update checks"
+    ]
+  },
+  "kannadiSwarmRegression": {
+    "checks": 999,
+    "failures": [],
+    "editorMessages": [
+      "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.\nParameter name: index"
+    ]
+  },
+  "staticChecks": [
+    "PASS: unique GUIDs, enabled scenes, 84 scene/catalog dependency files",
+    "PASS: 19 JSON templates/examples, references, ranges and Input System migration",
+    "PASS: NASA EXR SHA-256 matches bundled provenance"
+  ],
+  "notes": [
+    "Tests ran with Metal graphics in a disposable project copy.",
+    "The existing editor search-cache exception is recorded separately by the regression runner.",
+    "Fixed a missing Newtonsoft.Json.Linq import and a stale ground-tiling expectation in the existing validation runner; no ground material or scene was modified.",
+    "Physical LED brightness, north alignment and acquisition timing require a bench check."
+  ],
+  "astronomyEngineSha256": "07fcf7042afdf06a8d149ea8ab3d86daebae358448dc2dfe9d7c45e6ab55773a",
+  "controlSceneAdaminabyPreview": {
+    "checks": 5075,
+    "failure": null,
+    "verified": [
+      "Automatic Play from ControlScene",
+      "Exact current instant at Adaminaby, fixed UTC+11",
+      "256 aligned Bogong markers per rig, 120x60x120 volume",
+      "Actual forward movement over frames with flicker disabled",
+      "4096x2048 equirectangular PNG with faint-detail cutoff 0.15",
+      "Load history in local time and UTC with previous/new IDs",
+      "Simulated next 30-minute sample and load record",
+      "Escape returns to Control without restarting",
+      "Six-face DRBLFU local configuration (128-pixel panels, four non-overlapping rows)"
+    ]
+  },
+  "bogongDots": {
+    "checks": 334,
+    "failure": null,
+    "samples": [
+      {
+        "label": "angular",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 5.0,
+        "actualCount": 1,
+        "expectedCount": 1
+      },
+      {
+        "label": "angular",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 5.0,
+        "actualCount": 2,
+        "expectedCount": 2
+      },
+      {
+        "label": "angular",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 5.0,
+        "actualCount": 1,
+        "expectedCount": 1
+      },
+      {
+        "label": "angular",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 4.99999952,
+        "actualCount": 1,
+        "expectedCount": 1
+      },
+      {
+        "label": "angular",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 50.0000038,
+        "actualCount": 1,
+        "expectedCount": 1
+      },
+      {
+        "label": "angular",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 50.0,
+        "actualCount": 2,
+        "expectedCount": 2
+      },
+      {
+        "label": "angular",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 50.0,
+        "actualCount": 1,
+        "expectedCount": 1
+      },
+      {
+        "label": "angular",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 50.0,
+        "actualCount": 1,
+        "expectedCount": 1
+      },
+      {
+        "label": "angular",
+        "resolution": 128,
+        "msaa": 1,
+        "distance": 5.0,
+        "actualCount": 5,
+        "expectedCount": 5
+      },
+      {
+        "label": "angular",
+        "resolution": 128,
+        "msaa": 1,
+        "distance": 5.00000048,
+        "actualCount": 7,
+        "expectedCount": 7
+      },
+      {
+        "label": "angular",
+        "resolution": 128,
+        "msaa": 1,
+        "distance": 5.0,
+        "actualCount": 6,
+        "expectedCount": 6
+      },
+      {
+        "label": "angular",
+        "resolution": 128,
+        "msaa": 1,
+        "distance": 5.0,
+        "actualCount": 4,
+        "expectedCount": 4
+      },
+      {
+        "label": "angular",
+        "resolution": 128,
+        "msaa": 1,
+        "distance": 50.0,
+        "actualCount": 5,
+        "expectedCount": 5
+      },
+      {
+        "label": "angular",
+        "resolution": 128,
+        "msaa": 1,
+        "distance": 50.0000038,
+        "actualCount": 7,
+        "expectedCount": 7
+      },
+      {
+        "label": "angular",
+        "resolution": 128,
+        "msaa": 1,
+        "distance": 50.0,
+        "actualCount": 6,
+        "expectedCount": 6
+      },
+      {
+        "label": "angular",
+        "resolution": 128,
+        "msaa": 1,
+        "distance": 50.0,
+        "actualCount": 4,
+        "expectedCount": 4
+      },
+      {
+        "label": "other-camera",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 90.00007,
+        "actualCount": 0,
+        "expectedCount": 0
+      },
+      {
+        "label": "original-camera-again",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 10.00061,
+        "actualCount": 1,
+        "expectedCount": 1
+      },
+      {
+        "label": "msaa",
+        "resolution": 64,
+        "msaa": 4,
+        "distance": 10.00061,
+        "actualCount": 1,
+        "expectedCount": 1
+      },
+      {
+        "label": "world-near",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 5.0,
+        "actualCount": 124,
+        "expectedCount": 124
+      },
+      {
+        "label": "world-far",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 10.0,
+        "actualCount": 32,
+        "expectedCount": 32
+      },
+      {
+        "label": "large-solid-circle",
+        "resolution": 64,
+        "msaa": 1,
+        "distance": 10.0,
+        "actualCount": 96,
+        "expectedCount": 96
+      }
+    ],
+    "unity": "6000.3.16f1",
+    "verified": [
+      "Every filled pixel is the configured solid RGB under colored lighting and fog",
+      "2 degree angular diameter matches independent pixel-ray cone at 64 and 128 pixels",
+      "Per-camera size, including misleading MainCamera, different distances and face edges",
+      "World-size patch shrinks with distance; movement heading remains unchanged",
+      "Hard circular cutout, including MSAA target",
+      "Flicker can be disabled after being enabled"
+    ]
+  },
+  "sixCameraRigs": {
+    "checks": 1080,
+    "failure": null,
+    "unity": "6000.3.16f1"
+  }
+}

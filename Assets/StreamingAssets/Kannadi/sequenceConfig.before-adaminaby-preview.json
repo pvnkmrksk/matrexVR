@@ -1,0 +1,20 @@
+{
+  "loop": true,
+  "randomise": false,
+  "sequences": [
+    {
+      "sceneName": "Swarm",
+      "duration": 20,
+      "parameters": {
+        "configFile": "Templates/swarm.template.json"
+      }
+    },
+    {
+      "sceneName": "Kannadi",
+      "duration": 1000,
+      "parameters": {
+        "configFile": "Kannadi/multiplayer.json"
+      }
+    }
+  ]
+}

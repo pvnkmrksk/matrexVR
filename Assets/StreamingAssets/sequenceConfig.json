@@ -1,25 +1,14 @@
 {
+  "autoStart": true,
   "loop": true,
   "randomise": false,
   "sequences": [
     {
       "sceneName": "Swarm",
-      "duration": 300,
+      "duration": 86400,
+      "reloadScene": false,
       "parameters": {
-        "numberOfLocusts": 256,
-        "mu": 0,
-        "kappa": 100000,
-        "locustSpeed": 2,
-        "spawnAreaSize": 200,
-        "animateOnMove": true,
-        "animationSpeedThreshold": 0.5
-      }
-    },
-    {
-      "sceneName": "Kannadi",
-      "duration": 1000,
-      "parameters": {
-        "configFile": "Kannadi/multiplayer.json"
+        "configFile": "Kannadi/adaminaby-night-sky.json"
       }
     }
   ]

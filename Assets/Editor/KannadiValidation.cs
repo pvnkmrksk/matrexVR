@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -46,6 +47,9 @@ public static class KannadiValidation
     {
         if (!File.Exists(Path.Combine(Application.dataPath, "../KANNADI_VALIDATION_COPY")))
             throw new InvalidOperationException("Run KannadiValidation only on a disposable copy with KANNADI_VALIDATION_COPY at its root.");
+        // This suite has a known Swarm -> Kannadi fixture, independent of the operator's active preview.
+        File.Copy(Path.Combine(Application.streamingAssetsPath, "Kannadi/sequenceConfig.before-adaminaby-preview.json"),
+            Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json"), true);
         SessionState.SetBool(Key, true);
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         EditorApplication.isPlaying = true;
@@ -307,7 +311,8 @@ public static class KannadiValidation
         Check(fpsBox.anchorMin == Vector2.one && fpsBox.anchorMax == Vector2.one && fpsBox.anchoredPosition.x < 0 && fpsBox.anchoredPosition.y < 0, "FPS anchored inside top-right corner");
         var floor = GameObject.Find("Plane").GetComponent<Renderer>();
         Check(floor.sharedMaterial.name == "LocustDryGrass" && floor.sharedMaterial.mainTexture != null && floor.sharedMaterial.shader.isSupported, "dry grass ground material available in scene");
-        Check(Mathf.Approximately(floor.bounds.size.x / floor.sharedMaterial.mainTextureScale.x, 20), "grass tile spans 20 world centimeters for optic flow");
+        // Current scenes use a 2000x Unity plane (20000 cm) and 200 texture repeats.
+        Check(Mathf.Approximately(floor.bounds.size.x / floor.sharedMaterial.mainTextureScale.x, 100), "grass tile spans 100 world centimeters for optic flow");
         Vector2 extent = GameObject.Find("Overview Panel").GetComponent<RectTransform>().anchorMax - GameObject.Find("Overview Panel").GetComponent<RectTransform>().anchorMin;
         Check(Vector2.Distance(extent, new Vector2(0.4f, 0.4f)) < 0.001f, "larger forty-percent overview panel");
     }
@@ -380,6 +385,20 @@ public static class KannadiValidation
             Quaternion manualHeading = tracking.transform.rotation;
             tracking.GetComponent<Keyboard>().ApplyInput(0.1f);
             Check(Vector3.Distance(manualStart, tracking.transform.position) > 0 && Quaternion.Angle(manualHeading, tracking.transform.rotation) > 0, "gamepad actions actually translate and rotate the rig (distance=" + Vector3.Distance(manualStart, tracking.transform.position) + ", angle=" + Quaternion.Angle(manualHeading, tracking.transform.rotation) + ")");
+            var keyboardController = tracking.GetComponent<Keyboard>();
+            UnityEngine.InputSystem.InputSystem.QueueStateEvent(pad, new UnityEngine.InputSystem.LowLevel.GamepadState());
+            UpdateTestInput();
+            tracking.transform.position = Vector3.zero;
+            tracking.transform.rotation = Quaternion.identity;
+            keyboardController.SetAutopilotSpeed(4f);
+            keyboardController.SetAutopilotMode(true);
+            keyboardController.ApplyInput(0.5f);
+            Vector3 autopilotDelta = tracking.transform.position;
+            Check(Vector3.Distance(autopilotDelta, new Vector3(0, 0, 2)) < 0.001f, "autopilot advances at its configured constant forward speed");
+            keyboardController.SetAutopilotMode(false);
+            Vector3 stopped = tracking.transform.position;
+            keyboardController.ApplyInput(0.5f);
+            Check(tracking.transform.position == stopped, "autopilot off stops constant forward motion without input");
             tracking.transform.position = Vector3.one * 10;
             UnityEngine.InputSystem.InputSystem.QueueStateEvent(pad, new UnityEngine.InputSystem.LowLevel.GamepadState().WithButton(UnityEngine.InputSystem.LowLevel.GamepadButton.Select));
             UpdateTestInput();
@@ -509,6 +528,78 @@ public static class KannadiValidation
         Check(Application.targetFrameRate == 120 && QualitySettings.vSyncCount == 0, "missing timing fields use 120 FPS with no VSync override");
     }
 
+    private static void CheckIndividualConfigAutopilot()
+    {
+        var root = new GameObject("Individual config autopilot regression");
+        var keyboard = root.AddComponent<Keyboard>();
+        try
+        {
+            KannadiConfig config = JsonConvert.DeserializeObject<KannadiConfig>("{\"autopilotEnabled\":true,\"autopilotSpeed\":3.5}");
+            config.Validate();
+            Keyboard.ApplyAutopilotConfig(config.autopilotEnabled, config.autopilotSpeed);
+            Check(keyboard.AutopilotEnabled && Mathf.Approximately(keyboard.AutopilotSpeed, 3.5f), "individual config enables and configures autopilot");
+            KannadiConfig inline = KannadiConfig.Load(Params("{\"autopilotEnabled\":true,\"autopilotSpeed\":3.5}"));
+            Check(!inline.autopilotEnabled && Mathf.Approximately(inline.autopilotSpeed, 10f), "sequence-level autopilot fields cannot override individual config defaults");
+            Keyboard.ApplyAutopilotConfig(false, 10f);
+            Check(!keyboard.AutopilotEnabled && Mathf.Approximately(keyboard.AutopilotSpeed, 10f), "individual config can disable autopilot safely");
+        }
+        finally { Object.Destroy(root); }
+    }
+
+    private static void CheckModernSwarmConfig()
+    {
+        var rootSequence = Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json")));
+        var swarmStep = (Newtonsoft.Json.Linq.JObject)rootSequence["sequences"][0];
+        Check(swarmStep["sceneName"].Value<string>() == "Swarm" &&
+            swarmStep["parameters"]["configFile"] != null &&
+            swarmStep["parameters"]["numberOfLocusts"] == null,
+            "active Swarm sequence keeps population settings in its individual config file");
+        KannadiConfig config = KannadiConfig.Load(Params("{\"configFile\":\"Templates/swarm.template.json\"}"));
+        Check(config.numberOfLocusts == 256 && config.kappa >= 10000 && config.locustSpeed == 2,
+            "modern Swarm config preserves the historical aligned 256-agent behavior");
+        KannadiConfig bogong = KannadiConfig.Load(Params("{\"configFile\":\"Templates/bogong-swarm.template.json\"}"));
+        Check(bogong.agentVisual == "Bogong" && bogong.dimension == "3D" && bogong.spawnVolumeSize != null && bogong.wrapY,
+            "Bogong template exposes procedural 3D volume settings");
+        bogong.bogongVisual.Validate();
+        Check(bogong.bogongVisual.sizeMode == "World" && bogong.bogongVisual.flickerFrequencyHz == 0,
+            "Bogong defaults to a world-size circular patch with flicker disabled");
+    }
+
+    private static void CheckBogongSpawnerRuntime()
+    {
+        var root = new GameObject("Bogong spawner validation");
+        var boundary = root.AddComponent<BoundaryManager>();
+        var spawner = root.AddComponent<LocustSpawner>();
+        spawner.loadConfigFromJsonFile = false;
+        spawner.agentVisual = "Bogong";
+        spawner.dimension = "3D";
+        spawner.numberOfLocusts = 6;
+        spawner.useSpawnVolume = true;
+        spawner.spawnVolumeSize = new Vector3(4, 6, 8);
+        spawner.spawnCenter = Vector3.zero;
+        spawner.useSpawnCenter = true;
+        spawner.boundaryManager = boundary;
+        spawner.boundaryHeight = 6;
+        spawner.wrapY = true;
+        try
+        {
+            spawner.Rebuild();
+            Bogong[] agents = Object.FindObjectsOfType<Bogong>();
+            Check(agents.Length == 6, "Bogong mode creates the requested procedural population without a prefab");
+            Check(agents.All(a => Mathf.Abs(a.transform.position.x) <= 2 && Mathf.Abs(a.transform.position.y) <= 3 && Mathf.Abs(a.transform.position.z) <= 4),
+                "3D Bogong agents spawn inside the configured volume");
+            Check(agents.All(a => a.transform.localScale.x > 0), "Bogong markers have a visible positive world size");
+            Check(agents.All(a => a.GetComponent<LocustMover>() != null &&
+                a.GetComponent<LocustMover>().speed == spawner.locustSpeed &&
+                a.GetComponent<LocustMover>().boundaryManager == boundary), "Bogong markers move at configured speed and wrap with their rig");
+        }
+        finally
+        {
+            Call(spawner, "OnDestroy");
+            Object.Destroy(root);
+        }
+    }
+
     private static void CheckMigration()
     {
         var ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -544,6 +635,9 @@ public static class KannadiValidation
                     CheckTextResources();
                     CheckMigration();
                     CheckWalkingGains();
+                    CheckIndividualConfigAutopilot();
+                    CheckModernSwarmConfig();
+                    CheckBogongSpawnerRuntime();
                     CheckTemplateSchemas();
                     var parsed = KannadiConfig.Load(Params("{\"closedLoopPosition\":true,\"closedLoopOrientation\":0.5,\"numberOfRings\":0,\"spacing\":7}"));
                     Check(parsed.closedLoopPosition == 1 && parsed.closedLoopOrientation == 0.5f && parsed.numberOfRings == 0, "legacy boolean/numeric gains and zero rings");
@@ -563,7 +657,7 @@ public static class KannadiValidation
                     Check(main.GetSystemConfig("VR4").zmqPort == 9874, "four VR1 hardware configurations loaded");
                     Check(main.sequenceSteps[0].sceneName == "Swarm" && main.sequenceSteps[0].duration == 20 && main.sequenceSteps[1].sceneName == "Kannadi", "20-second Swarm entrainment precedes Kannadi");
                     main.sequenceSteps[0].duration = 1000;
-                    main.sequenceSteps.Insert(1, new SequenceStep("Swarm", 1000, Params("{\"numberOfLocusts\":3}"), false));
+                    main.sequenceSteps.Insert(1, new SequenceStep("Swarm", 1000, Params("{\"numberOfLocusts\":3,\"nightSky\":{\"imageWidth\":1024}}"), false));
                     main.StartSequence(); Later(); break;
                 case 2:
                     Check(SceneManager.GetActiveScene().name == "Swarm", "Swarm sequence dispatch");
@@ -582,8 +676,11 @@ public static class KannadiValidation
                     NextSequenceStep();
                     Check(Object.FindObjectOfType<SwarmController>().GetInstanceID() == swarmInstance, "Swarm sequence advances without reload");
                     Check(GameObject.FindGameObjectsWithTag("SimulatedLocust").Length == 12, "Swarm replaces population on in-scene step");
+                    Check(NightSkyController.CurrentId.Length == 64, "Swarm sequence applies and archives astronomical sky");
+                    Check(spawners.SelectMany(s => s.GetComponentsInChildren<Camera>(true)).All(c => c.clearFlags == CameraClearFlags.Skybox), "Swarm face cameras use configured sky");
                     NextSequenceStep(); Later(); break;
                 case 3:
+                    Check(NightSkyController.CurrentId == "", "Swarm sky ID clears across scene transition");
                     CheckViewports("Kannadi");
                     rigs = Object.FindObjectsOfType<Kannadi>().OrderBy(r => r.VRIndex).ToArray();
                     Check(rigs.Length == 4 && rigs.All(r => r.Clones.Length == 37), "four Kannadi grids with 37 clones each");

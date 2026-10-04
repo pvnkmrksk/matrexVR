@@ -11,7 +11,16 @@
       "zmqAddress": "10.126.17.125",
       "zmqPort": 9871,
       "vrId": "VR1",
-      "displayOrder": "RBLF"
+      "displayOrder": "RBLF",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "maxRotateSpeed": 300,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      }
     },
     {
       "sphereDiameter": 2.6,
@@ -23,7 +32,15 @@
       "zmqAddress": "10.126.17.125",
       "zmqPort": 9872,
       "vrId": "VR2",
-      "displayOrder": "RBLF"
+      "displayOrder": "RBLF",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      }
     },
     {
       "sphereDiameter": 2.6,
@@ -35,7 +52,15 @@
       "zmqAddress": "10.126.17.125",
       "zmqPort": 9873,
       "vrId": "VR3",
-      "displayOrder": "RBLF"
+      "displayOrder": "RBLF",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      }
     },
     {
       "sphereDiameter": 2.6,
@@ -47,7 +72,15 @@
       "zmqAddress": "10.126.17.125",
       "zmqPort": 9874,
       "vrId": "VR4",
-      "displayOrder": "RBLF"
+      "displayOrder": "RBLF",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      }
     }
   ]
 }

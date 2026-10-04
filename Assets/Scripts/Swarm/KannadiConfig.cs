@@ -18,6 +18,28 @@ public class KannadiConfig
     public bool periodicBoundary = true;
     public bool animateOnMove;
     public float animationSpeedThreshold = 0.5f;
+    // Swarm settings belong to the individual experiment file. Nullable values
+    // preserve scene defaults when an older config omits a setting.
+    public int? numberOfLocusts;
+    public float? density;
+    public float? spawnAreaSize;
+    public float? mu;
+    public float? kappa;
+    public float? locustSpeed;
+    // "2D" is the historical X/Z swarm. "3D" enables a sampled Y volume and Y wrapping.
+    public string dimension = "2D";
+    public Vector3Config spawnCenter;
+    public Vector3Config spawnVolumeSize;
+    public float? muElevation;
+    public float? kappaElevation;
+    public float? boundaryHeight;
+    public bool wrapY;
+    public string agentVisual = "ScenePrefab";
+    public BogongVisualConfig bogongVisual;
+    public string skyboxPath; // An explicit horizontal panorama takes precedence over nightSky.
+    public NightSkyConfig nightSky; // Omitted preserves the existing scene background.
+    public bool autopilotEnabled = false;
+    public float autopilotSpeed = 10f;
     public ColorConfig backgroundColor;
     public VRConfig[] vrConfigs;
     [JsonConverter(typeof(LocustGainConverter))] public float? closedLoopPosition;
@@ -30,7 +52,14 @@ public class KannadiConfig
             json = JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, file.ToString())));
         // Inline sequence parameters override the referenced experiment file.
         if (parameters != null)
-            json.Merge(JObject.FromObject(parameters), new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace });
+        {
+            JObject inline = JObject.FromObject(parameters);
+            // Autopilot belongs to the referenced individual config file;
+            // sequence-level duplicates cannot override it.
+            inline.Remove("autopilotEnabled");
+            inline.Remove("autopilotSpeed");
+            json.Merge(inline, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace });
+        }
         if (json["animationSpeedThreshold"] == null && json["animationNoiseThreshold"] != null)
             json["animationSpeedThreshold"] = json["animationNoiseThreshold"];
         KannadiConfig config = json.ToObject<KannadiConfig>();
@@ -47,6 +76,36 @@ public class KannadiConfig
             throw new ArgumentException("Kannadi boundary dimensions must be positive and finite.");
         if (!Finite(animationSpeedThreshold) || animationSpeedThreshold < 0)
             throw new ArgumentException("animationSpeedThreshold must be finite and nonnegative (world units per second).");
+        if (numberOfLocusts.HasValue && numberOfLocusts.Value < 0)
+            throw new ArgumentException("numberOfLocusts must be nonnegative.");
+        if (density.HasValue && (!Finite(density.Value) || density.Value < 0))
+            throw new ArgumentException("density must be finite and nonnegative agents per world-unit area/volume.");
+        if (spawnAreaSize.HasValue && (!Finite(spawnAreaSize.Value) || spawnAreaSize.Value <= 0))
+            throw new ArgumentException("spawnAreaSize must be positive and finite.");
+        if (mu.HasValue && !Finite(mu.Value))
+            throw new ArgumentException("mu must be finite degrees.");
+        if (kappa.HasValue && (!Finite(kappa.Value) || kappa.Value < 0))
+            throw new ArgumentException("kappa must be finite and nonnegative.");
+        if (locustSpeed.HasValue && (!Finite(locustSpeed.Value) || locustSpeed.Value < 0))
+            throw new ArgumentException("locustSpeed must be finite and nonnegative world units per second.");
+        if (!string.Equals(dimension, "2D", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(dimension, "3D", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("dimension must be 2D or 3D.");
+        ValidateVector(spawnCenter, "spawnCenter", false);
+        ValidateVector(spawnVolumeSize, "spawnVolumeSize", true);
+        if (muElevation.HasValue && !Finite(muElevation.Value))
+            throw new ArgumentException("muElevation must be finite degrees.");
+        if (kappaElevation.HasValue && (!Finite(kappaElevation.Value) || kappaElevation.Value < 0))
+            throw new ArgumentException("kappaElevation must be finite and nonnegative.");
+        if (boundaryHeight.HasValue && (!Finite(boundaryHeight.Value) || boundaryHeight.Value <= 0))
+            throw new ArgumentException("boundaryHeight must be positive and finite when supplied.");
+        if (!string.Equals(agentVisual, "ScenePrefab", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(agentVisual, "Bogong", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("agentVisual must be ScenePrefab or Bogong.");
+        bogongVisual?.Validate();
+        if (string.IsNullOrWhiteSpace(skyboxPath) && nightSky != null && nightSky.enabled) nightSky.Validate();
+        if (!Finite(autopilotSpeed) || autopilotSpeed < 0)
+            throw new ArgumentException("autopilotSpeed must be finite and nonnegative (world units per second).");
         ValidateGain(closedLoopPosition); ValidateGain(closedLoopOrientation);
         var ids = new HashSet<int>();
         if (vrConfigs == null) return;
@@ -64,6 +123,13 @@ public class KannadiConfig
     {
         if (gain.HasValue && (!Finite(gain.Value) || gain < 0))
             throw new ArgumentException("Closed-loop gains must be finite and nonnegative.");
+    }
+    private static void ValidateVector(Vector3Config value, string name, bool positive)
+    {
+        if (value == null) return;
+        if (!Finite(value.x) || !Finite(value.y) || !Finite(value.z) ||
+            (positive && (value.x <= 0 || value.y <= 0 || value.z <= 0)))
+            throw new ArgumentException(name + " must contain finite" + (positive ? " positive" : "") + " components.");
     }
 }
 
@@ -83,6 +149,35 @@ public class Vector3Config
 {
     public float x, y, z;
     public Vector3 ToVector3() => new Vector3(x, y, z);
+}
+
+[Serializable]
+public class BogongVisualConfig
+{
+    // World keeps normal perspective. Angular keeps the apparent diameter in degrees.
+    public string sizeMode = "World";
+    public float size = 0.5f;
+    public float angularSizeDegrees = 1f;
+    public ColorConfig color = new ColorConfig { r = 0.12f, g = 0.12f, b = 0.12f, a = 1f };
+    public float metallic; // Legacy input; flat Bogong patches ignore material lighting fields.
+    public float smoothness = 0.25f;
+    public float flickerFrequencyHz;
+    public float flickerDutyCycle = 0.5f;
+
+    public void Validate()
+    {
+        if (!string.Equals(sizeMode, "World", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(sizeMode, "Angular", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("Bogong sizeMode must be World or Angular.");
+        if (!Finite(size) || size <= 0 || !Finite(angularSizeDegrees) || angularSizeDegrees <= 0 || angularSizeDegrees >= 180)
+            throw new ArgumentException("Bogong size must be positive and finite; angularSizeDegrees must be in (0,180).");
+        if (!Finite(metallic) || metallic < 0 || metallic > 1 || !Finite(smoothness) || smoothness < 0 || smoothness > 1)
+            throw new ArgumentException("Bogong metallic and smoothness must be in [0,1].");
+        if (!Finite(flickerFrequencyHz) || flickerFrequencyHz < 0 || !Finite(flickerDutyCycle) || flickerDutyCycle < 0 || flickerDutyCycle > 1)
+            throw new ArgumentException("Bogong flicker settings are invalid.");
+        if (color == null) throw new ArgumentException("Bogong color must be supplied.");
+    }
+    private static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
 }
 
 public class LocustGainConverter : JsonConverter

@@ -1,0 +1,54 @@
+{
+  "agentVisual": "Bogong",
+  "dimension": "3D",
+  "numberOfLocusts": 256,
+  "autopilotEnabled": false,
+  "autopilotSpeed": 5,
+  "closedLoopPosition": 0,
+  "closedLoopOrientation": 0,
+  "nightSky": {
+    "enabled": true,
+    "latitude": -35.996113,
+    "longitude": 148.773895,
+    "updateIntervalMinutes": 30,
+    "roundToInterval": false,
+    "advanceWithRealTime": true,
+    "northYawDegrees": 0,
+    "maskBelowHorizon": true,
+    "exposure": 0.3,
+    "imageWidth": 4096,
+    "utcOffsetHours": 11,
+    "localTime": "now",
+    "faintDetailCutoff": 0.15
+  },
+  "spawnVolumeSize": {
+    "x": 120,
+    "y": 60,
+    "z": 120
+  },
+  "mu": 60,
+  "muElevation": -5,
+  "kappa": 10000,
+  "kappaElevation": 10000,
+  "locustSpeed": 2,
+  "boundaryLengthX": 120,
+  "boundaryLengthZ": 120,
+  "boundaryHeight": 60,
+  "wrapY": true,
+  "animateOnMove": false,
+  "bogongVisual": {
+    "sizeMode": "World",
+    "size": 0.2,
+    "angularSizeDegrees": 1,
+    "color": {
+      "r": 1,
+      "g": 0.5,
+      "b": 0.5,
+      "a": 1
+    },
+    "metallic": 0,
+    "smoothness": 0.25,
+    "flickerFrequencyHz": 0,
+    "flickerDutyCycle": 1
+  }
+}

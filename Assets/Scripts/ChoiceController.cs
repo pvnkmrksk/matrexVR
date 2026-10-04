@@ -66,6 +66,8 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             return;
         }
 
+        Keyboard.ApplyAutopilotConfig(config.autopilotEnabled, config.autopilotSpeed);
+
         CleanupSpawnedObjects();
         ApplyConfig(config);
     }
@@ -525,6 +527,8 @@ public class SceneConfig
     public float windDirection = 0f;
     public float aglHeight = 0f;
     public int groundLayerMask = 1;
+    public bool autopilotEnabled = false;
+    public float autopilotSpeed = 10f;
 }
 
 [System.Serializable]

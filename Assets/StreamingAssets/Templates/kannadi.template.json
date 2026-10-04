@@ -80,6 +80,8 @@
   ],
   "hexRadius": 10.0,
   "animationSpeedThreshold": 0.5,
+  "autopilotEnabled": false,
+  "autopilotSpeed": 10,
   "spacing": null,
   "periodicBoundary": true
 }

@@ -26,6 +26,20 @@ public class LocustSpawner : MonoBehaviour
     public string layerName = "LocustLayer"; // Default value
     public BoundaryManager boundaryManager;
 
+    [Tooltip("2D preserves the historical X/Z swarm. 3D samples a volume and wraps Y when enabled.")]
+    public string dimension = "2D";
+    public bool useSpawnCenter;
+    public Vector3 spawnCenter;
+    public bool useSpawnVolume;
+    public Vector3 spawnVolumeSize = new Vector3(200f, 200f, 200f);
+    public float muElevation;
+    public float kappaElevation = 10000f;
+    public float boundaryHeight;
+    public bool wrapY;
+    [Tooltip("ScenePrefab uses the existing prefab. Bogong creates an unlit circular patch at runtime.")]
+    public string agentVisual = "ScenePrefab";
+    public BogongVisualConfig bogongVisual = new BogongVisualConfig();
+
     public bool animateOnMove;
     public float animationSpeedThreshold = 0.5f;
     public bool loadConfigFromJsonFile = true; // If true, load config from json file, else use default values
@@ -68,7 +82,7 @@ public class LocustSpawner : MonoBehaviour
     {
         Cleanup();
         initialized = true;
-        if (locustPrefab == null) { Debug.LogError("LocustSpawner requires a locust prefab."); return; }
+        if (locustPrefab == null && !UsesBogongVisual()) { Debug.LogError("LocustSpawner requires a locust prefab unless agentVisual is Bogong."); return; }
         SpawnLocusts();
     }
     private void Cleanup()
@@ -94,25 +108,23 @@ public class LocustSpawner : MonoBehaviour
         }
         for (int i = 0; i < numberOfLocusts; i++)
         {
+            Vector3 center = useSpawnCenter
+                ? spawnCenter
+                : new Vector3(transform.position.x, Is3D() ? transform.position.y : -0.25f, transform.position.z);
+            Vector3 size = useSpawnVolume ? spawnVolumeSize : new Vector3(spawnAreaSize, Is3D() ? spawnAreaSize : 0f, spawnAreaSize);
             Vector3 spawnPosition = new Vector3(
-                Random.Range(
-                    transform.position.x - spawnAreaSize / 2,
-                    transform.position.x + spawnAreaSize / 2
-                ),
-                -0.25f,
-                Random.Range(
-                    transform.position.z - spawnAreaSize / 2,
-                    transform.position.z + spawnAreaSize / 2
-                )
-                //transform.position.x+initial_receding_distance*sin(mu),-0.25f,transform.position.z+initial_receding_distance*cos(mu)
-            );
+                Random.Range(center.x - size.x / 2f, center.x + size.x / 2f),
+                Is3D() ? Random.Range(center.y - size.y / 2f, center.y + size.y / 2f) : -0.25f,
+                Random.Range(center.z - size.z / 2f, center.z + size.z / 2f));
 
-            GameObject locust = Instantiate(locustPrefab, spawnPosition, Quaternion.identity); // Spawned independent of the game object
+            GameObject locust = UsesBogongVisual()
+                ? CreateBogongAgent(spawnPosition, i)
+                : Instantiate(locustPrefab, spawnPosition, Quaternion.identity); // Spawned independent of the game object
             spawned.Add(locust);
             locust.layer = locustLayer; // Set the layer of the spawned locust
             SetLayerRecursively(locust.transform, locustLayer); // Set layer for all children
 
-            locust.transform.localRotation = GenerateVanMisesRotation(mu, kappa); // Set the local rotation
+            locust.transform.localRotation = GenerateSwarmRotation(); // Set the local rotation
             if (locust.GetComponent<LocustMover>() != null) locust.GetComponent<LocustMover>().speed = locustSpeed; // Set the speed of the locust
             locust.name = layerName + "_Locust_" + i; // Set the name
             locust.tag = "SimulatedLocust"; // Set the tag for the locust
@@ -135,6 +147,24 @@ public class LocustSpawner : MonoBehaviour
                 locustMover.boundaryManager = boundaryManager;
             }
         }
+    }
+
+    private bool Is3D() => string.Equals(dimension, "3D", System.StringComparison.OrdinalIgnoreCase);
+    private bool UsesBogongVisual() => string.Equals(agentVisual, "Bogong", System.StringComparison.OrdinalIgnoreCase);
+
+    private GameObject CreateBogongAgent(Vector3 position, int index)
+    {
+        GameObject agent = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        // A visual stimulus must not participate in collisions or ground-height raycasts.
+        Collider collider = agent.GetComponent<Collider>();
+        collider.enabled = false;
+        Destroy(collider);
+        agent.AddComponent<LocustMover>();
+        agent.transform.position = position;
+        agent.name = layerName + "_Bogong_" + index;
+        Bogong bogong = agent.AddComponent<Bogong>();
+        bogong.Configure(bogongVisual ?? new BogongVisualConfig());
+        return agent;
     }
 
     private void SetLayerRecursively(Transform parent, int layer)
@@ -166,6 +196,17 @@ public class LocustSpawner : MonoBehaviour
         float angle = VanMisesDistribution.Generate(Mathf.Deg2Rad * mu, kappa); // Generate angles by converting from deg to radians for the function to work
         // Debugger.Log("Generated Angle (in degrees): " + angle * Mathf.Rad2Deg);
         return Quaternion.Euler(0, angle * Mathf.Rad2Deg, 0); // Convert radians to degrees for the Quaternion rotation
+    }
+
+    private Quaternion GenerateSwarmRotation()
+    {
+        Quaternion yaw = GenerateVanMisesRotation(mu, kappa);
+        if (!Is3D()) return yaw;
+        float elevation = muElevation;
+        if (kappaElevation <= 0) elevation = Random.Range(-90f, 90f);
+        else if (kappaElevation < 10000f)
+            elevation = VanMisesDistribution.Generate(Mathf.Deg2Rad * muElevation, kappaElevation) * Mathf.Rad2Deg;
+        return Quaternion.Euler(elevation, yaw.eulerAngles.y, 0f);
     }
 }
 

@@ -10,6 +10,8 @@ public class Keyboard : MonoBehaviour
     [SerializeField] private float maxRotateSpeed = 300f;
     [SerializeField] private bool allowVerticalTranslation = false;
     [SerializeField] private bool allowPitchAndRoll = false;
+    private bool autopilotEnabled;
+    private float autopilotSpeed = 10f;
 
     private void OnEnable() => MainController.SystemConfigurationChanged += ApplySystemConfig;
     private void OnDisable() => MainController.SystemConfigurationChanged -= ApplySystemConfig;
@@ -35,6 +37,8 @@ public class Keyboard : MonoBehaviour
     public void ApplyInput(float deltaTime)
     {
         if (!manualEnabled || ExperimentInput.IsEditingText) return;
+        if (ExperimentInput.ControlHeld && ExperimentInput.Pressed("Pause"))
+            autopilotEnabled = !autopilotEnabled;
         // One adjustment per press, independent of frame rate. No simultaneous movement.
         if (ExperimentInput.Held("SpeedModifier"))
         {
@@ -47,12 +51,33 @@ public class Keyboard : MonoBehaviour
             return;
         }
         Vector2 move = ExperimentInput.Move;
-        transform.Translate(new Vector3(move.x, allowVerticalTranslation ? ExperimentInput.Axis("Vertical") : 0, move.y) * (translateSpeed * deltaTime), Space.Self);
+        // Autopilot supplies a constant forward velocity while retaining lateral,
+        // reverse and yaw input for Mario Kart-style steering.
+        float manualForward = move.y * translateSpeed;
+        if (autopilotEnabled) manualForward = Mathf.Min(move.y, 0f) * translateSpeed;
+        float forward = (autopilotEnabled ? autopilotSpeed : 0f) + manualForward;
+        transform.Translate(new Vector3(move.x * translateSpeed,
+            allowVerticalTranslation ? ExperimentInput.Axis("Vertical") * translateSpeed : 0,
+            forward) * deltaTime, Space.Self);
         Quaternion before = transform.rotation;
         transform.Rotate(new Vector3(allowPitchAndRoll ? ExperimentInput.Axis("Pitch") : 0,
             ExperimentInput.Axis("Yaw"), allowPitchAndRoll ? ExperimentInput.Axis("Roll") : 0) * (rotateSpeed * deltaTime), Space.Self);
         if (Quaternion.Angle(before, transform.rotation) > 0.00001f)
             GetComponent<ClosedLoop>()?.ApplyManualRotation(transform.rotation * Quaternion.Inverse(before));
+    }
+
+    public bool AutopilotEnabled => autopilotEnabled;
+    public float AutopilotSpeed => autopilotSpeed;
+    public void SetAutopilotMode(bool enabled) => autopilotEnabled = enabled;
+    public void SetAutopilotSpeed(float speed) => autopilotSpeed = Mathf.Max(0, speed);
+
+    public static void ApplyAutopilotConfig(bool enabled, float speed)
+    {
+        foreach (Keyboard keyboard in FindObjectsOfType<Keyboard>(true))
+        {
+            keyboard.SetAutopilotSpeed(speed);
+            keyboard.SetAutopilotMode(enabled);
+        }
     }
 }
 

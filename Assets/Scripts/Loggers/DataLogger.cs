@@ -182,6 +182,7 @@ public class DataLogger : MonoBehaviour
             AddColumns("stepIndex", "stepName", "loopIndex", "cumulativeStep"); 
             AddColumns("swapElapsedSec", "swapWallClock");
             AddColumns("grayAtTrialStart", "blackSideAtTrialStart");
+            AddColumns("skyboxId", "skyboxSampleUtc");
 
             // Enable logging
             isLogging = true;
@@ -294,6 +295,8 @@ public class DataLogger : MonoBehaviour
         SetData("loopIndex", loopIndex);
         SetData("cumulativeStep", cumulativeStep);
         // Build base data
+        SetData("skyboxId", NightSkyController.CurrentId);
+        SetData("skyboxSampleUtc", NightSkyController.CurrentSampleUtc);
         string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
         string vr = this.gameObject.name;
         string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;

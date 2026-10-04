@@ -6,10 +6,7 @@
       "sceneName": "Swarm",
       "duration": 10,
       "parameters": {
-        "numberOfLocusts": 128,
-        "mu": 0,
-        "kappa": 100000,
-        "locustSpeed": 2
+        "configFile": "Kannadi/swarm.json"
       }
     },
     {

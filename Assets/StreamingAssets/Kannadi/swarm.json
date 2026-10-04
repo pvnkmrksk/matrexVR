@@ -1,0 +1,13 @@
+{
+  "numberOfLocusts": 128,
+  "spawnAreaSize": 200,
+  "mu": 0,
+  "kappa": 100000,
+  "locustSpeed": 2,
+  "animateOnMove": true,
+  "animationSpeedThreshold": 0.5,
+  "autopilotEnabled": false,
+  "autopilotSpeed": 10,
+  "closedLoopPosition": 1,
+  "closedLoopOrientation": 1
+}

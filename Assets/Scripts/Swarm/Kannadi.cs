@@ -38,11 +38,14 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     {
         try
         {
+            NightSkyController.Apply(gameObject, null, null);
             KannadiConfig next = KannadiConfig.Load(parameters);
+            Keyboard.ApplyAutopilotConfig(next.autopilotEnabled, next.autopilotSpeed);
             Kannadi[] rigs = FindObjectsOfType<Kannadi>().Where(r => r.isActiveAndEnabled && r.gameObject.scene == gameObject.scene).ToArray();
             // Validate all prefab selections before replacing any existing grid.
             var selected = rigs.Select(r => r.ResolvePrefab(next.kannadiTilePrefab)).ToArray();
             for (int i = 0; i < rigs.Length; i++) rigs[i].Apply(next, selected[i]);
+            NightSkyController.Apply(gameObject, next.nightSky, next.skyboxPath);
             SimpleOverheadCamera.EnsureInScene();
         }
         catch (Exception error)

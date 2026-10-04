@@ -68,5 +68,7 @@
     }
   ],
   "hexRadius": 10.0,
-  "animationSpeedThreshold": 1
+  "animationSpeedThreshold": 1,
+  "autopilotEnabled": false,
+  "autopilotSpeed": 10
 }

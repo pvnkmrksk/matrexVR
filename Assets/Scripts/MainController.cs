@@ -28,6 +28,7 @@ public class MainController : MonoBehaviour
     private MasterDataLogger masterDataLogger;
     public bool loopSequence = false;
     private bool randomise = false; // Added field
+    private bool autoStart;
 
     // System Config properties
     [SerializeField]
@@ -141,6 +142,9 @@ public class MainController : MonoBehaviour
 
         // Load the sequence configuration
         LoadSequenceConfiguration();
+        // Opt-in preview sequences can start with Play in ControlScene. Start only once:
+        // returning to Control with Escape must not immediately restart the experiment.
+        if (autoStart && SceneManager.GetActiveScene().name == "ControlScene") StartSequence();
     }
 
     // Load system configurations from the specified file
@@ -432,6 +436,7 @@ public class MainController : MonoBehaviour
     {
         sequenceSteps.Clear();
         executionOrder.Clear();
+        autoStart = false;
 
         // Get the path to the sequence configuration JSON file
         string jsonPath = Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json");
@@ -452,6 +457,7 @@ public class MainController : MonoBehaviour
                 {
                     randomise = config.randomise; // Get the randomise parameter
                     loopSequence = config.loop; // Set looping based on config
+                    autoStart = config.autoStart;
 
                     foreach (SequenceItem item in config.sequences)
                     {
@@ -658,6 +664,7 @@ public class SequenceStep
 [System.Serializable]
 public class SequenceConfig
 {
+    public bool autoStart = false;
     public bool randomise = false; // Added field
     public bool loop = true; // Added field for controlling whether the sequence should loop
     public SequenceItem[] sequences;

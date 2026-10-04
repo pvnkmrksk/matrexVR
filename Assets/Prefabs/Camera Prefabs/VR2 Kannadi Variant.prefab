@@ -18,7 +18,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 424584325385366458, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1330193872785025130, guid: b30b44d00d769a1bebf1e369a80ef43c, type: 3}
       propertyPath: initialRotation.y

@@ -119,6 +119,20 @@ public class ViewportSetter : MonoBehaviour
                     camera.targetDisplay = targetDisplay;
                     camera.rect = PanelRect(slot, layout, width, height);
                     camera.fieldOfView = 90f;
+                    if (order[slot] == 'U' || order[slot] == 'D')
+                    {
+                        // Vertical faces inherit the same rig population as Front. Older
+                        // prefabs left Up with VR1's mask, leaking the wrong swarm into VR2-4.
+                        foreach (Camera front in cameras)
+                            if (Owns(front) && front.name == "Main Camera F")
+                            {
+                                camera.cullingMask = front.cullingMask;
+                                camera.transform.position = front.transform.position;
+                                camera.nearClipPlane = front.nearClipPlane;
+                                camera.farClipPlane = front.farClipPlane;
+                                break;
+                            }
+                    }
                     // Listed cameras may be inactive in an older prefab (especially Up/Down).
                     camera.gameObject.SetActive(true);
                     camera.enabled = true;

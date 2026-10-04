@@ -22,8 +22,18 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
 
     void Awake()
     {
+        DisableAutopilot();
         CreateDrumObject();
         FindClosedLoopComponents();
+    }
+
+    // Optomotor trials own the stimulus motion. Preserve the historical
+    // safety behavior that prevents an operator autopilot from moving rigs
+    // while the drum is running.
+    private void DisableAutopilot()
+    {
+        foreach (Keyboard keyboard in FindObjectsOfType<Keyboard>())
+            keyboard.SetAutopilotMode(false);
     }
 
     private void CreateDrumObject()

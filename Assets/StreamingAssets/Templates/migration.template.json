@@ -23,5 +23,7 @@
   "windSpeed": 0,
   "windDirection": 0,
   "aglHeight": 100,
-  "groundLayerMask": 1
+  "groundLayerMask": 1,
+  "autopilotEnabled": true,
+  "autopilotSpeed": 10
 }

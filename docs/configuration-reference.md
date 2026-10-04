@@ -4,12 +4,14 @@ This reference describes the code on `codex/kannadi-modernize`, tested with Unit
 
 ## Files, precedence, and running an experiment
 
-1. Copy `Templates/system_config.template.json` to `system_config.json` in `Assets/StreamingAssets`. Edit addresses, sphere sizes, panel coordinates, and display index for the actual rig. This local hardware file is Git-ignored. The current workstation uses `system_config_VR1.json`: four rigs, RBLF, 2.6 cm spheres.
+1. Copy `Templates/system_config.template.json` to `system_config.json` in `Assets/StreamingAssets`. Edit addresses, sphere sizes, panel coordinates, and display index for the actual rig. This local hardware file is Git-ignored. `system_config_VR1.json` remains the four-face RBLF example. The current local preview uses all six directions; use `Templates/system-config-six-cameras.template.json` to reproduce that layout.
 2. Copy a scene template to your own file under StreamingAssets. Copy `Templates/sequence.template.json` to `sequenceConfig.json`, and point its `parameters.configFile` at your file. Paths are relative to StreamingAssets, including the `Templates/` prefix when running a template directly.
 3. Open `Assets/Scenes/ControlScene.unity`, enter Play mode, enter metadata, and start the sequence. Focus the **Game** view for operator hotkeys. Do not start from an experiment scene when you need the complete sequence, system configuration, and logging lifecycle.
-4. `sequence-all-modes.example.json` demonstrates Swarm → Kannadi → Choice → migration → Optomotor → dynamic Choice. `sequence-migration.example.json` demonstrates 10/100/1000 world-unit AGL. The normal active sequence remains 20 seconds Swarm followed by 1000 seconds Kannadi.
+4. `sequence-all-modes.example.json` demonstrates Swarm → Kannadi → Choice → migration → Optomotor → dynamic Choice. `sequence-migration.example.json` demonstrates 10/100/1000 world-unit AGL. The active sequence currently auto-starts the Adaminaby sky and aligned Bogong swarm on Play; see [night-sky.md](night-sky.md). The previous 20-second Swarm → 1000-second Kannadi sequence is saved as `Kannadi/sequenceConfig.before-adaminaby-preview.json`.
 
-System config owns physical camera layout and sphere calibration. Sequence config owns scene order and duration. Experiment configs own stimuli and tracked motion. Kannadi/Swarm merge inline `parameters` over `configFile` (arrays replace, rather than append). Choice/Optomotor read their referenced file without merging inline stimulus fields. Dynamic Choice uses `parameters.design`, not `configFile`.
+System config owns physical camera layout and sphere calibration. Sequence config owns scene order and duration. Experiment configs own stimuli and tracked motion. Kannadi/Swarm merge inline `parameters` over `configFile` (arrays replace, rather than append), while autopilot remains owned by the referenced file. Choice/Optomotor read their referenced file without merging inline stimulus fields. Dynamic Choice uses `parameters.design`, not `configFile`.
+
+Autopilot is controlled by the individual experiment file referenced by `parameters.configFile`, so the sequence selects a complete movement configuration without duplicating its fields.
 
 A default in a C# class is not necessarily a scene default: serialized prefab values override inspector defaults, and omitted fields on an in-scene step can retain state. Use explicit values for reproducibility. A template does not add rigs, scene assets, or hardware automatically.
 
@@ -42,6 +44,8 @@ Template: `system_config.template.json`.
 | `zmqPort` | 9872 | TCP port; template uses 9871–9874. |
 | `targetDisplay` inside rig | 1, then overwritten | Use the top-level value. |
 | `manualControls` | null | Optional per-rig operator movement settings below. Omission preserves prefab tuning. |
+
+The base VR prefab and its standard, Swarm, Kannadi and Cube variants now contain all six camera faces, including Down. Use `displayOrder: "DRBLFU"` for all six. `Templates/system-config-six-cameras.template.json` provides four non-overlapping rows of six 128×128 panels (768×512 total) on display 0. Copy it to the local `system_config.json` and edit tracker addresses for your hardware. Up/Down are reactivated when requested and use Front's origin, clip planes and visibility mask. Existing `RBLF` configurations still enable only four faces. See [six-camera-rig.md](six-camera-rig.md).
 
 Viewport slot `i`: x=(startCol + i if horizontal)×width; y=screenHeight−(startRow+1 + i if vertical)×height. Ensure these rectangles fit the physical display. An unavailable display disables its cameras. Configuring VR10 does not accidentally match VR1. Configured letters do not create a camera absent from the prefab. Camera disabling does not delete the rig or stop its sensor logging.
 
@@ -84,6 +88,7 @@ Template: `sequence.template.json`.
 |---|---|---|
 | `randomise` | false | Shuffle outer scene execution order. |
 | `loop` | true | Repeat outer sequence; templates explicitly use false. |
+| `autoStart` | false | Start the sequence when Play begins in ControlScene. Returning with Escape does not auto-start again. Used by the active Adaminaby sky preview. |
 | `sequences` | none | Required nonempty array of scene steps. |
 | `sceneName` | none | Exact enabled scene name, e.g. Swarm, Kannadi, Choice, Optomotor, Choice_desync. No Matrix scene exists. |
 | `duration` | 0 | Outer step time, seconds; use a positive duration. |
@@ -93,6 +98,15 @@ Template: `sequence.template.json`.
 | `parameters.design` | `dynamicSequenceDesign.json` | Dynamic Choice design file. |
 
 Outer duration always limits time spent in a scene, including an inner looping optomotor/dynamic sequence. Old top-level step `gain` from Bogong is **not** a supported SequenceItem field here. It must not be used to infer current movement gain.
+
+## Movement settings in individual experiment files
+
+Kannadi, Swarm, Choice, and migration config files accept these fields. The sequence only references the file through `parameters.configFile`.
+
+| Field | Omitted default | Meaning |
+|---|---|---|
+| `autopilotEnabled` | false | Keep moving forward while retaining lateral, reverse, and yaw steering. Ctrl+Space toggles the active mode. |
+| `autopilotSpeed` | 10 | Constant forward speed in world units/second (cm/s for the walking setup). |
 
 ## Choice and migration
 
@@ -111,6 +125,8 @@ Templates: `choice.template.json`, `choice-band.template.json`, `migration.templ
 | `windDirection` | 0 | Degrees wind comes **FROM**: 0 from +Z, 90 from +X. Motion is opposite. |
 | `aglHeight` | 0 | Height above ground in world units. Zero disables height regulation. Examples: 10, 100, 1000. |
 | `groundLayerMask` | 1 | Physics bit mask (1 = Default layer), not a layer index. Select only ground/terrain layers. |
+
+`groundLayerMask` tells the migration AGL raycast which Unity physics layers count as ground. It is a bit mask: layer `n` contributes `1 << n`, so `1` selects the built-in **Default** layer, while a custom layer number 8 would use `256`. In the Inspector, use the layer mask picker; in JSON, add the corresponding bit values together. The raycast goes downward at the animal's X/Z position. If the mask excludes the terrain or collider, no ground is found and the current Y position is preserved. Exclude locusts, trees, and other movable objects so AGL cannot lock onto an animal.
 
 Wind/AGL support is adapted from `origin/BogongAustralia` and `origin/smrmah-optomotor-updated`. AGL samples a matching Unity Terrain at the current X/Z; otherwise it raycasts ground colliders. It includes the terrain's world offset. No ground hit preserves current Y. Wind/AGL continue without FicTrac packets, and turning both to zero disables this work. Use a ground-only mask to avoid sampling trees/animals. Each new Choice config resets these optional settings, including in-scene transitions.
 
@@ -150,6 +166,8 @@ Each entry uses prefab/material names registered in that scene controller's Insp
 
 ## Swarm, Kannadi, and kinematics
 
+Swarm/Bogong and Kannadi accept optional `nightSky` settings and a top-level `skyboxPath` override. See [night-sky.md](night-sky.md) for location, local date/time, 30-minute updates, physical north alignment, and saved images/IDs. The Bogong template enables this feature; omission preserves the scene background.
+
 Templates: `swarm.template.json`, `kannadi.template.json`, `kinematic.template.json`. The kinematic template uses the **Kannadi parser** and a single tile per rig (`numberOfRings:0`); there is no separate Kinematic scene or magic kinematic filename.
 
 | Shared movement field | Default | Meaning |
@@ -158,6 +176,8 @@ Templates: `swarm.template.json`, `kannadi.template.json`, `kinematic.template.j
 | `closedLoopOrientation` | null → 1 | Nonnegative **angular multiplier**: 1 means one world degree per sensor degree; 0 disables turning, 0.5 halves yaw, 2 doubles it. No turn-speed cap or smoothing. |
 | `animateOnMove` | false | Enable leg-animation gating; templates set true. |
 | `animationSpeedThreshold` | 0.5 | cm/s planar translation; animate only strictly above threshold. Rotation alone does not animate. |
+| `autopilotEnabled` | false | Constant forward motion for walking/Swarm/Kannadi templates. Migration/flying templates set this to true. Ctrl+Space toggles it during a run. |
+| `autopilotSpeed` | 10 | Constant forward speed in world units/second; cm/s in the current walking scale. |
 | `vrConfigs` | null | Optional per-rig pose/gain overrides below. |
 | `animationNoiseThreshold` | legacy alias | Used only when `animationSpeedThreshold` is absent. Prefer the canonical name. |
 
@@ -180,12 +200,24 @@ Kannadi replicas use the tracked source's translation speed for animation. Wrapp
 | Swarm field | Omitted behavior | Meaning / template |
 |---|---|---|
 | `numberOfLocusts` | Keep scene/current value (128 per rig in shipped scene) | Population **per rig**; template 256 means 1024 total. |
+| `density` | null | Optional agents per world-unit area (2D) or volume (3D). Used only when `numberOfLocusts` is omitted; count is rounded to the nearest whole agent. |
 | `spawnAreaSize` | Keep scene/current value (200) | Square spawn extent in world units. |
 | `mu` | Keep scene/current value (0) | Mean heading degrees; 0=+Z. |
 | `kappa` | Keep scene/current value (10000) | Von Mises concentration; >=10000 uses exactly mu, 0 is uniform. Template 100000. |
 | `locustSpeed` | Keep scene/current value (2) | cm/s; template 2. |
+| `dimension` | `2D` | `2D` preserves the historical X/Z swarm. `3D` samples a volume and can wrap Y. |
+| `spawnCenter` | Spawner X/Z and legacy Y | Optional `{x,y,z}` center of the spawn volume. In 2D only X/Z are used. |
+| `spawnVolumeSize` | A square; 3D uses a cube | Positive `{x,y,z}` volume dimensions. Omit for `spawnAreaSize` in every dimension. |
+| `muElevation` | 0 | Unity X pitch in degrees: negative tilts upward, positive downward; ignored in 2D. |
+| `kappaElevation` | 10000 | 3D elevation concentration; 0 is uniform, >=10000 is fixed. |
+| `boundaryHeight` | 0 | 3D periodic Y extent. Required only when `wrapY` is true; otherwise Y is not wrapped. |
+| `wrapY` | false | Enable periodic Y wrapping for a 3D swarm. |
+| `agentVisual` | `ScenePrefab` | Existing prefab, or `Bogong` for an opaque, unlit circular patch. |
+| `bogongVisual` | World-size circle, 0.5 units, dark gray | `sizeMode` is `World` (diameter `size`) or `Angular` (diameter `angularSizeDegrees`, 0–180 exclusive). Both draw a camera-facing circular patch of solid `color` RGB; alpha, metallic and smoothness have no visual effect. No lighting, fog, shadows, textures or soft edges. `flickerFrequencyHz` 0 disables flicker; `flickerDutyCycle` is the visible fraction. |
 
-Swarm uses scene-owned boundary managers and prefab assignments. Kannadi's ring/prefab/watch/boundary JSON fields do not configure Swarm geometry. Swarm parameters rebuild the population on each in-scene step. Density is count divided by spawn area squared, not a separate density parameter.
+Bogong angular size is resolved separately for each rendering camera before culling, so an overhead view or another rig cannot change the panel stimulus size. Movement heading is unchanged by the camera-facing patch. For a 90° square perspective camera, center-screen diameter in pixels is `panelWidth × tan(angularSizeDegrees / 2)` (angle in degrees). A 2° dot is about **1.12 pixels across at 64×64**, or **2.23 pixels across at 128×128**; filled pixel area differs from diameter. The 64-pixel center has about 1.79° per pixel, with a finer angular pitch toward the edges. Filled-pixel counts depend on position and subpixel alignment; very small dots can fall between pixel centers. There is no minimum-pixel clamp or brightness blending. The active `system_config.json` currently requests 128×128 panels; changing the physical panel resolution requires matching that config.
+
+The historical 2D swarm keeps its scene-owned boundary manager and prefab assignments. A 3D swarm uses `boundaryLengthX`, `boundaryLengthZ`, and `boundaryHeight` from the individual file when `wrapY` is enabled. Kannadi's ring/prefab/watch fields do not configure Swarm geometry. Swarm parameters rebuild the population on each in-scene step. Density is count divided by spawn area squared in 2D, or by the volume in 3D. The active sequence files reference individual Swarm config files; older inline sequence fields remain accepted as a compatibility fallback.
 
 ## Optomotor
 

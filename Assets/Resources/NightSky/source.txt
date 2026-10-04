@@ -1,0 +1,10 @@
+{
+  "title": "NASA SVS Deep Star Maps 2020",
+  "url": "https://svs.gsfc.nasa.gov/4851/",
+  "assetUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a004800/a004851/starmap_2020_4k.exr",
+  "sha256": "69b841cd048c2ef35543eb1c5819b322530e78aa4b0cab97ec1de3ef56a4ddcd",
+  "credit": "NASA/Goddard Space Flight Center Scientific Visualization Studio; Ernie Wright (USRA); Gaia DR2: ESA/Gaia/DPAC",
+  "astronomyEngineCommit": "865d3da7d8112bbc7911238052c6af4aaf877181",
+  "coordinateSystem": "ICRF/J2000 geocentric RA/Dec; RA=0 at image centre increasing leftward",
+  "limitations": "Stars and Milky Way only. No atmosphere, refraction, extinction, Sun, Moon, planets or stellar proper motion."
+}
