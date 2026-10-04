@@ -68,4 +68,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Kannadi.unity
     guid: d6f097cfd98d4b41b8839361ff1b037e
+  - enabled: 1
+    path: Assets/Scenes/Choice_Selwyn.unity
+    guid: 64f2e691bf7034a68bfedc62e99e0b65
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0

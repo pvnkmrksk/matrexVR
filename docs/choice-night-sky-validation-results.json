@@ -1,0 +1,29 @@
+{
+  "checks": 70,
+  "failure": null,
+  "scene": "Choice_Selwyn",
+  "unity": "6000.3.16f1",
+  "validatedUtc": "2026-10-04T20:13:12.315021+00:00",
+  "runner": "ChoiceNightSkyValidation.RunSelwyn",
+  "renderedCameraViews": 24,
+  "verified": [
+    "Omitted objects permits sky-only Choice configuration",
+    "Selwyn coordinates, current time, UTC+11 and exposure 0.5",
+    "4096x2048 RunData panorama and 30-minute refresh/load records",
+    "Generated sky, legacy file precedence, null objects, disabled sky and controller destruction",
+    "Visible star detail in all four Up-camera renderings"
+  ],
+  "notes": [
+    "Validated the latest Selwyn scene/config in a disposable project copy, including aglHeight 100 and maskBelowHorizon false.",
+    "Unity SearchDatabase emitted its existing startup ArgumentOutOfRangeException; validation assertions passed.",
+    "The optional Real World Terrain authoring plugin was absent in the test copy. Unity reported three missing authoring scripts; terrain heights, textures, collisions and sky rendering remained available."
+  ],
+  "terrainChecks": {
+    "tiles": 2,
+    "heightmapResolution": 65,
+    "textures": "8192x4096 on both tiles",
+    "colliderDataMatchesTerrain": true,
+    "heightsAreNonflat": true,
+    "resolvedAssetDependenciesTracked": true
+  }
+}

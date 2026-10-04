@@ -116,13 +116,14 @@ Templates: `choice.template.json`, `choice-band.template.json`, `migration.templ
 
 | Top-level field | Omitted default | Meaning / example |
 |---|---|---|
-| `objects` | null | Required array; use `[]` for environment-only flight/migration. |
+| `objects` | empty array | Omitted, null or `[]` means environment-only flight/migration; sky and movement settings still apply. |
 | `closedLoopPosition`, `closedLoopOrientation` | false | Boolean FicTrac translation/yaw switches. Use true for walking. |
 | `initialPosition` | (0,0,0) | World x/y/z, cm. Template ground-eye height 0.5; migration example 100. |
 | `initialRotation` | (0,0,0) | Euler x/y/z degrees. |
 | `randomInitialRotation` | false | Random starting yaw; Choice shares that sampled yaw across its rigs. |
 | `backgroundColor` | null | `{r,g,b,a}` (0–1); null keeps existing camera background. |
-| `skyboxPath` | null | Panorama path under StreamingAssets; empty keeps the existing environment. |
+| `skyboxPath` | null | Panorama path under StreamingAssets; takes precedence over `nightSky`. Uses Choice's legacy image loader. |
+| `nightSky` | null | Generated astronomical sky and RunData archive, with the same location/time settings as Swarm. Used when `skyboxPath` is empty. Omitted/disabled restores the scene background. |
 | `windSpeed` | 0 | Nonnegative world units/s, independent of FicTrac position gain. Zero disables drift. |
 | `windDirection` | 0 | Degrees wind comes **FROM**: 0 from +Z, 90 from +X. Motion is opposite. |
 | `aglHeight` | 0 | Height above ground in world units. Zero disables height regulation. Examples: 10, 100, 1000. |
@@ -131,6 +132,8 @@ Templates: `choice.template.json`, `choice-band.template.json`, `migration.templ
 `groundLayerMask` tells the migration AGL raycast which Unity physics layers count as ground. It is a bit mask: layer `n` contributes `1 << n`, so `1` selects the built-in **Default** layer, while a custom layer number 8 would use `256`. In the Inspector, use the layer mask picker; in JSON, add the corresponding bit values together. The raycast goes downward at the animal's X/Z position. If the mask excludes the terrain or collider, no ground is found and the current Y position is preserved. Exclude locusts, trees, and other movable objects so AGL cannot lock onto an animal.
 
 Wind/AGL support is adapted from `origin/BogongAustralia` and `origin/smrmah-optomotor-updated`. AGL samples a matching Unity Terrain at the current X/Z; otherwise it raycasts ground colliders. It includes the terrain's world offset. No ground hit preserves current Y. Wind/AGL continue without FicTrac packets, and turning both to zero disables this work. Use a ground-only mask to avoid sampling trees/animals. Each new Choice config resets these optional settings, including in-scene transitions.
+
+A Choice terrain scene can use `nightSky` without spawning objects. Start it through ControlScene so the sequence's `parameters.configFile` is loaded; with `autoStart: false`, press Start after entering Play mode. Choice uses boolean tracking switches (`true`/`false`). Swarm fields such as `spawnVolumeSize`, `mu` and `bogongVisual` do not spawn agents in a Choice scene.
 
 Exact historical inputs are in [config-history](config-history). They reference `Choice_Bogong` and `Photosphere/LSM.png`, which are not guaranteed here. The runnable examples use the existing Choice environment. SmrMah examples are provided with their branch identity; no remote branch actually named Deathhead was found. Force/torque and yaw-rate modes from those branches have **not** been substituted for this branch's FicTrac displacement protocol.
 

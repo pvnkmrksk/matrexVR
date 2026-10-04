@@ -111,3 +111,8 @@ Assets/Materials/PaintedRightv2.png
 Assets/Materials/PaintedRightv2.png.meta
 *.png
 !Assets/StreamingAssets/Photosphere/adaminaby.png
+
+# Local download/authoring state; generated terrain under Assets/RWT_Result is versioned.
+/RWT_Cache/
+/RealWorldTerrainPrefs.xml
+.DS_Store

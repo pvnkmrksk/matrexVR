@@ -1,6 +1,6 @@
 # Bogong astronomical skyboxes
 
-Swarm (including Bogong) and Kannadi can generate a night-sky stimulus inside Unity. NASA's existing 4096 × 2048 **Deep Star Maps 2020** panorama supplies the stars and Milky Way. The C# **Astronomy Engine** library handles observer orientation, Earth's rotation, precession and nutation. A small GPU shader resamples the panorama. Both dependencies are bundled: no runtime internet, Stellarium process, Python, or pre-generated calendar is required.
+Swarm (including Bogong), Kannadi and Choice can generate a night-sky stimulus inside Unity. NASA's existing 4096 × 2048 **Deep Star Maps 2020** panorama supplies the stars and Milky Way. The C# **Astronomy Engine** library handles observer orientation, Earth's rotation, precession and nutation. A small GPU shader resamples the panorama. Both dependencies are bundled: no runtime internet, Stellarium process, Python, or pre-generated calendar is required.
 
 ## Run and configure
 
@@ -12,7 +12,7 @@ Escape returns to Control without immediately auto-starting again. To restore th
 
 Copy `Assets/StreamingAssets/Templates/bogong-night-sky-sequence.template.json` to `Assets/StreamingAssets/sequenceConfig.json` to run the one-hour Bogong example, or reference `Templates/bogong-swarm.template.json` in a Swarm sequence step. The same sky is shared by all rigs. Existing sequences retain their settings.
 
-Add `"nightSky": { "enabled": true }` to an individual Swarm/Kannadi experiment JSON for Konstanz and the current date/time. To set a local date and time elsewhere:
+Add `"nightSky": { "enabled": true }` to an individual Swarm, Kannadi or Choice experiment JSON for Konstanz and the current date/time. To set a local date and time elsewhere:
 
 ```json
 "nightSky": {
@@ -50,7 +50,7 @@ The first image is generated synchronously at initialization. Sampling boundarie
 
 ## Explicit image override
 
-A top-level `"skyboxPath": "Photosphere/my-sky.png"` takes precedence over `nightSky`. Use a 2:1, 360° equirectangular PNG/JPEG, relative to StreamingAssets or an absolute path. It uses Unity's `Skybox/Panoramic` convention: +X at u=0.5, +Z at u=0.25, zenith at v=1. The image stays fixed and is archived as PNG. Externally prepared Stellarium skies can use this after conversion to the same convention. Missing/invalid files never silently reuse the last trial's sky. Choice's separate loader does not participate in this audit system; the [restored historical Adaminaby preset](adaminaby-historical-scene.md) uses that loader.
+A top-level `"skyboxPath": "Photosphere/my-sky.png"` takes precedence over `nightSky`. Use a 2:1, 360° equirectangular PNG/JPEG, relative to StreamingAssets or an absolute path. It uses Unity's `Skybox/Panoramic` convention: +X at u=0.5, +Z at u=0.25, zenith at v=1. The image stays fixed and is archived as PNG. Externally prepared Stellarium skies can use this after conversion to the same convention. Missing/invalid files never silently reuse the last trial's sky. Choice supports generated `nightSky` settings and the same audit records, including 30-minute regeneration. Its explicit `skyboxPath` retains the separate legacy image loader and takes precedence over generation; that loader does not create skybox audit records and accepts historical non-equirectangular images. The [restored historical Adaminaby preset](adaminaby-historical-scene.md) uses the legacy loader. Choice accepts omitted or null `objects` for sky-only terrain experiments.
 
 ## Audit and data
 
@@ -85,3 +85,5 @@ Unity -batchmode -projectPath <copy> -executeMethod NightSkyValidation.Run -logF
 Do not add `-quit` or `-nographics`. This tests clock/offset/now/DST handling, coordinate conventions, GPU filtering/output, checksums, explicit-image precedence, restart/update/freeze behavior, camera restoration and CSV attribution. `KannadiValidation.Run` separately covers the existing experiment stack. Physical north alignment and LED acquisition timing still need a bench check.
 
 Use `NightSkyValidation.RunControlPreview` on a disposable copy with the active Adaminaby sequence to test the real Control-scene launch, current-time export, actual aligned Bogong movement and flicker-free visibility, simulated next half-hour image/load record, and Escape behavior. The general Kannadi suite installs the saved pre-preview sequence into the disposable copy before running.
+
+Use `ChoiceNightSkyValidation.Run` on a disposable copy for the Choice sky-only regression: omitted/null objects, generated-to-legacy image transitions, camera overrides, current-time panorama export, 30-minute refresh and cleanup. `RunSelwyn` additionally tests the local `Choice_Selwyn` terrain scene and `Kannadi/selwyn-night-sky.json` when those assets are present. Both runners install a temporary sequence and six-camera system config in the disposable copy.

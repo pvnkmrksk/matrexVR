@@ -1,0 +1,124 @@
+{
+  "scene": "Assets/Scenes/Choice_Selwyn.unity",
+  "terrainCount": 2,
+  "terrains": [
+    {
+      "name": "Terrain 0x0",
+      "data": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0.asset",
+      "heightmapResolution": 65,
+      "size": {
+        "x": 15685.0,
+        "y": 1821.0,
+        "z": 11764.0
+      },
+      "minHeight": 0.05511811,
+      "maxHeight": 0.936519563,
+      "layers": [
+        {
+          "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r8192x4096.terrainlayer",
+          "texture": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r8192x4096.jpg",
+          "width": 8192,
+          "height": 4096
+        }
+      ]
+    },
+    {
+      "name": "Terrain 0x1",
+      "data": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1.asset",
+      "heightmapResolution": 65,
+      "size": {
+        "x": 15685.0,
+        "y": 1821.0,
+        "z": 11764.0
+      },
+      "minHeight": 0.0532564223,
+      "maxHeight": 0.7553256,
+      "layers": [
+        {
+          "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r8192x4096.terrainlayer",
+          "texture": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r8192x4096.jpg",
+          "width": 8192,
+          "height": 4096
+        }
+      ]
+    }
+  ],
+  "totalBytes": 58221675,
+  "files": [
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0.asset",
+      "bytes": 1416684,
+      "sha256": "4111ec08b5655f5ab4c8e8b70dc2b9bad25ca9450899a3233754c250da7a0a3b"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0.asset.meta",
+      "bytes": 189,
+      "sha256": "ab30629335a01687c1ed1b2b7916ef2567d8604a8d1e69d7502142587ebe95a9"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r8192x4096.jpg",
+      "bytes": 19782305,
+      "sha256": "be81c281d1e21aa4a9c1d7eb1b4d437ddfd3230a0f08f227c77d4fd17ad955b6"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r8192x4096.jpg.meta",
+      "bytes": 2652,
+      "sha256": "0ff958a58bfb79dfc78b38774db148cfe9b8f8a016b03dbeb140756255472a75"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r8192x4096.terrainlayer",
+      "bytes": 770,
+      "sha256": "bc42a583e4500227ad488b23ba50eb1a256339c03f4b3f37f99bcf570f59d001"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r8192x4096.terrainlayer.meta",
+      "bytes": 200,
+      "sha256": "1b90ca8ada4fe91e919a17cda467f4026a26423cced00be3926ccb3f1c821fb7"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1.asset",
+      "bytes": 1416684,
+      "sha256": "e6be9e38c5f56209e4325939fc123858ca31edb8f23d2cf351284a94fa8cc290"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1.asset.meta",
+      "bytes": 189,
+      "sha256": "7d69cbf6dc3ba01f6be80dada968ed2b1c5e562c34b40ce1a0222ca495e8b295"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r8192x4096.jpg",
+      "bytes": 34181335,
+      "sha256": "2d570beb8e0a07881062b703d06591e03200e8c9f8962f80066da26252361a40"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r8192x4096.jpg.meta",
+      "bytes": 2652,
+      "sha256": "7b594d5ab61925425ec04b745356cbe490893c9b8b67cb4b86fbe5a178119dfd"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r8192x4096.terrainlayer",
+      "bytes": 770,
+      "sha256": "808dc86dfe1bf02611669b0a7fe3d03435c082fb06bc95a678ebb29a5df8bbba"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r8192x4096.terrainlayer.meta",
+      "bytes": 200,
+      "sha256": "6636b7ebbc734a8d4e00070f18c2628f4f61658f05ac655dd66f828a39e0173d"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/TerrainData_17376076-374b-4f0e-8ae0-24b8fbe6b718.asset",
+      "bytes": 1416684,
+      "sha256": "4de1ec956d8c02f138d266fb59a0cd5f7a033c9999bfdc45e049e14cb7201e92"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/TerrainData_17376076-374b-4f0e-8ae0-24b8fbe6b718.asset.meta",
+      "bytes": 189,
+      "sha256": "46e869f49c56af93ed56dc9b6047667134d5a72f19c64637cddebb00622d8aa5"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22.meta",
+      "bytes": 172,
+      "sha256": "4b30d6ff66f241ca862747f122f97302aa38b6a9b653cdfc83aaff9bc9a0d263"
+    }
+  ]
+}
