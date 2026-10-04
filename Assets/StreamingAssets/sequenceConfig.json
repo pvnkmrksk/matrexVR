@@ -1,14 +1,14 @@
 {
-  "autoStart": true,
+  "autoStart": false,
   "loop": true,
   "randomise": false,
   "sequences": [
     {
-      "sceneName": "Swarm",
+      "sceneName": "Choice_Selwyn",
       "duration": 86400,
       "reloadScene": false,
       "parameters": {
-        "configFile": "Kannadi/adaminaby-night-sky.json"
+        "configFile": "Kannadi/selwyn-night-sky.json"
       }
     }
   ]

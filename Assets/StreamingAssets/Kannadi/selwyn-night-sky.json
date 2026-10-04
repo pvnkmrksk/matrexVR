@@ -1,0 +1,53 @@
+{
+  "autopilotEnabled": true,
+  "autopilotSpeed": 7,
+  "closedLoopPosition": false,
+  "closedLoopOrientation": true,
+  "nightSky": {
+    "enabled": true,
+    "latitude": -35.894409,
+    "longitude": 148.453948,
+    "updateIntervalMinutes": 30,
+    "roundToInterval": false,
+    "advanceWithRealTime": true,
+    "northYawDegrees": 0,
+    "maskBelowHorizon": false,
+    "exposure": 0.5,
+    "imageWidth": 4096,
+    "utcOffsetHours": 11,
+    "localTime": "now",
+    "faintDetailCutoff": 0.15
+  },
+  "spawnVolumeSize": {
+    "x": 120,
+    "y": 60,
+    "z": 120
+  },
+  "mu": 60,
+  "muElevation": -5,
+  "kappa": 10000,
+  "kappaElevation": 10000,
+  "locustSpeed": 2,
+  "boundaryLengthX": 120,
+  "boundaryLengthZ": 120,
+  "boundaryHeight": 60,
+  "wrapY": true,
+  "animateOnMove": false,
+  "aglHeight": 100,
+
+  "bogongVisual": {
+    "sizeMode": "World",
+    "size": 0.2,
+    "angularSizeDegrees": 1,
+    "color": {
+      "r": 1,
+      "g": 0.5,
+      "b": 0.5,
+      "a": 1
+    },
+    "metallic": 0,
+    "smoothness": 0.25,
+    "flickerFrequencyHz": 0,
+    "flickerDutyCycle": 1
+  }
+}

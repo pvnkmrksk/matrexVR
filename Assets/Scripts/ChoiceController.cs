@@ -90,13 +90,13 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
     private void ApplyConfig(SceneConfig config)
     {
-        if (config == null || config.objects == null)
+        if (config == null)
         {
             Debug.LogWarning("Choice scene config is empty.");
             return;
         }
 
-        foreach (var obj in config.objects)
+        foreach (var obj in config.objects ?? System.Array.Empty<SceneObject>())
         {
             if (string.IsNullOrEmpty(obj.type))
             {
@@ -186,12 +186,15 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         }
         else
         {
-            ClearRuntimeSkybox();
+            NightSkyController.Apply(gameObject, config.nightSky, null);
         }
     }
 
     private void CleanupSpawnedObjects()
     {
+        NightSkyController.Apply(gameObject, null, null);
+        ClearRuntimeSkybox();
+
         if (spawnedObjectsRoot == null)
         {
             return;
@@ -201,8 +204,6 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         {
             Destroy(spawnedObjectsRoot.GetChild(i).gameObject);
         }
-
-        ClearRuntimeSkybox();
     }
 
     private void SetLayerRecursively(GameObject obj, int layer)
@@ -508,6 +509,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
     private void OnDestroy()
     {
+        NightSkyController.Apply(gameObject, null, null);
         ClearRuntimeSkybox();
     }
 
@@ -546,7 +548,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 [System.Serializable]
 public class SceneConfig
 {
-    public SceneObject[] objects;
+    public SceneObject[] objects = System.Array.Empty<SceneObject>();
     public bool closedLoopOrientation;
     public bool closedLoopPosition;
 
@@ -557,6 +559,7 @@ public class SceneConfig
     public ColorConfig backgroundColor;
 
     public string skyboxPath;
+    public NightSkyConfig nightSky;
     public float windSpeed = 0f;
     public float windDirection = 0f;
     public float aglHeight = 0f;
