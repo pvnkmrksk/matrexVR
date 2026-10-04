@@ -50,7 +50,7 @@ The first image is generated synchronously at initialization. Sampling boundarie
 
 ## Explicit image override
 
-A top-level `"skyboxPath": "Photosphere/my-sky.png"` takes precedence over `nightSky`. Use a 2:1, 360° equirectangular PNG/JPEG, relative to StreamingAssets or an absolute path. It uses Unity's `Skybox/Panoramic` convention: +X at u=0.5, +Z at u=0.25, zenith at v=1. The image stays fixed and is archived as PNG. Externally prepared Stellarium skies can use this after conversion to the same convention. Missing/invalid files never silently reuse the last trial's sky. Choice's separate existing loader is unchanged and does not participate in this audit system.
+A top-level `"skyboxPath": "Photosphere/my-sky.png"` takes precedence over `nightSky`. Use a 2:1, 360° equirectangular PNG/JPEG, relative to StreamingAssets or an absolute path. It uses Unity's `Skybox/Panoramic` convention: +X at u=0.5, +Z at u=0.25, zenith at v=1. The image stays fixed and is archived as PNG. Externally prepared Stellarium skies can use this after conversion to the same convention. Missing/invalid files never silently reuse the last trial's sky. Choice's separate loader does not participate in this audit system; the [restored historical Adaminaby preset](adaminaby-historical-scene.md) uses that loader.
 
 ## Audit and data
 

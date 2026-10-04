@@ -11,6 +11,8 @@ This reference describes the code on `codex/kannadi-modernize`, tested with Unit
 
 System config owns physical camera layout and sphere calibration. Sequence config owns scene order and duration. Experiment configs own stimuli and tracked motion. Kannadi/Swarm merge inline `parameters` over `configFile` (arrays replace, rather than append), while autopilot remains owned by the referenced file. Choice/Optomotor read their referenced file without merging inline stimulus fields. Dynamic Choice uses `parameters.design`, not `configFile`.
 
+The recovered historical Adaminaby image/config can also run through the current six-camera Choice scene: use `Templates/adaminaby-historical-sequence.template.json`. See [its provenance and run instructions](adaminaby-historical-scene.md), including the original screenshot's projection limitations.
+
 Autopilot is controlled by the individual experiment file referenced by `parameters.configFile`, so the sequence selects a complete movement configuration without duplicating its fields.
 
 A default in a C# class is not necessarily a scene default: serialized prefab values override inspector defaults, and omitted fields on an in-scene step can retain state. Use explicit values for reproducibility. A template does not add rigs, scene assets, or hardware automatically.

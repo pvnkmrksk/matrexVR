@@ -1,0 +1,14 @@
+{
+  "checks": 78,
+  "failure": null,
+  "unity": "6000.3.16f1",
+  "validatedUtc": "2026-10-04T19:18:08.302893+00:00",
+  "imageGitBlob": "92d7a4e0d0cfcd3bd297bf56d62905aee59aa3d3",
+  "renderedCameraViews": 24,
+  "templateValidation": "PASS: 20 JSON templates/examples, scene/file references, ranges and Input System migration",
+  "notes": [
+    "Ran AdaminabyValidation.Run with Metal graphics in a disposable project copy.",
+    "The original screenshot pixels are preserved; this is not a calibrated equirectangular panorama.",
+    "Unity Editor SearchDatabase emitted its existing ArgumentOutOfRangeException during startup. Choice also logs InitializeScene called at error level through its existing Debugger helper; neither is a validation failure."
+  ]
+}

@@ -18,6 +18,8 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
     private Material defaultSkyboxMaterial;
     private Material runtimeSkyboxMaterial;
     private Texture2D runtimeSkyboxTexture;
+    private readonly Dictionary<Camera, CameraClearFlags> skyboxCameraFlags = new Dictionary<Camera, CameraClearFlags>();
+    private readonly Dictionary<Skybox, bool> cameraSkyboxOverrides = new Dictionary<Skybox, bool>();
 
     private void Awake()
     {
@@ -462,6 +464,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
                     // Apply the skybox material to the scene
                     RenderSettings.skybox = skyboxMaterial;
+                    ApplySkyboxToRigCameras();
 
                     // Force refresh the skybox
                     DynamicGI.UpdateEnvironment();
@@ -484,12 +487,43 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         }
     }
 
+    private void ApplySkyboxToRigCameras()
+    {
+        // Legacy faces (especially Up) can override the scene skybox locally.
+        // Include inactive faces so later panel-layout changes use the same image.
+        foreach (ViewportSetter rig in FindObjectsByType<ViewportSetter>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (rig.gameObject.scene != gameObject.scene) continue;
+            foreach (Camera camera in rig.GetComponentsInChildren<Camera>(true))
+            {
+                skyboxCameraFlags[camera] = camera.clearFlags;
+                camera.clearFlags = CameraClearFlags.Skybox;
+                Skybox local = camera.GetComponent<Skybox>();
+                if (local == null) continue;
+                cameraSkyboxOverrides[local] = local.enabled;
+                local.enabled = false;
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        ClearRuntimeSkybox();
+    }
+
     private void ClearRuntimeSkybox()
     {
-        if (RenderSettings.skybox == runtimeSkyboxMaterial)
+        if (runtimeSkyboxMaterial != null && RenderSettings.skybox == runtimeSkyboxMaterial)
         {
             RenderSettings.skybox = defaultSkyboxMaterial;
         }
+
+        foreach (var entry in skyboxCameraFlags)
+            if (entry.Key != null) entry.Key.clearFlags = entry.Value;
+        foreach (var entry in cameraSkyboxOverrides)
+            if (entry.Key != null) entry.Key.enabled = entry.Value;
+        skyboxCameraFlags.Clear();
+        cameraSkyboxOverrides.Clear();
 
         if (runtimeSkyboxMaterial != null)
         {
