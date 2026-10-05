@@ -48,6 +48,8 @@ public class ClosedLoop : MonoBehaviour
     public float ForceGain => forceGain;
     public float TorqueGain => torqueGain;
     public bool UsesBogongInput => !useLocustGains;
+    public string MotionMode => useLocustGains ? "walking" : useForceMode ? "force/torque" : "flight";
+    public string InputInterpretation => useLocustGains ? "walking-pose" : useForceMode ? "force-torque" : useYawMode ? "yaw-rate-radians" : "yaw-delta-radians";
     public float GetYawGain() => yawGain;
     public float GetYawDCOffset() => yawDCOffset;
     public float GetLastYawInput() => lastYawInput;
@@ -72,6 +74,7 @@ public class ClosedLoop : MonoBehaviour
         // Preserve that historical behavior; SetLocustGains is the separate walking path.
         useYawMode = true;
         useForceMode = currentMode == ClosedLoopMode.Tirbala;
+        Debug.Log($"[ClosedLoop] {gameObject.name}: {currentMode} / {MotionMode} ({InputInterpretation})");
         if (useLocustGains) ApplySphereDiameterFromSystemConfig();
         sphereRadius = sphereDiameter / 2f;
         _zmqListener = GetComponent<ZmqListener>();

@@ -17,6 +17,12 @@ public class ZmqListener : MonoBehaviour
 
     private Thread listenerThread;
     private volatile bool isRunning;
+    private volatile string workerState = "not started";
+    private volatile string wireFormat;
+    public string Endpoint { get; private set; }
+    public string WireFormat => wireFormat;
+    public string State => workerState != "waiting for packets" ? workerState :
+        !HasPose ? "waiting for packets" : HasFreshPose() ? "receiving" : "stale";
     // Pose is a multi-word struct. Publish/copy it under one lock so a render frame
     // cannot combine position or quaternion components from different network packets.
     private readonly object poseLock = new object();
@@ -76,6 +82,8 @@ public class ZmqListener : MonoBehaviour
     {
         ApplySystemConfig();
         string endpoint = $"tcp://{address}:{port}";
+        Endpoint = endpoint;
+        workerState = "starting";
         isRunning = true;
         listenerThread = new Thread(() => Listen(endpoint)) { IsBackground = true, Name = name + "_ZmqListener" };
         listenerThread.Start();
@@ -91,6 +99,7 @@ public class ZmqListener : MonoBehaviour
                 socket.Options.Linger = TimeSpan.Zero;
                 socket.Connect(endpoint);
                 socket.SubscribeToAnyTopic();
+                workerState = "waiting for packets";
                 while (isRunning)
                 {
                     NetMQMessage frames = new NetMQMessage();
@@ -98,8 +107,26 @@ public class ZmqListener : MonoBehaviour
                     if (!isRunning) break;
                     try
                     {
-                        if (frames.FrameCount != 2) throw new FormatException("Expected topic + JSON pose frames.");
-                        UpdatePose(JsonConvert.DeserializeObject<ZmqMessage>(frames[1].ConvertToString()));
+                        string json;
+                        string format;
+                        if (frames.FrameCount == 1)
+                        {
+                            json = frames[0].ConvertToString().TrimStart();
+                            // Kinefly's ROS bridge sends a single JSON frame, with no topic.
+                            // Older publishers may send the topic as a separate message.
+                            // Do not discard alternate JSON samples as the old paired reads did.
+                            if (!json.StartsWith("{", StringComparison.Ordinal)) continue;
+                            format = "single JSON";
+                        }
+                        else if (frames.FrameCount == 2)
+                        {
+                            json = frames[1].ConvertToString();
+                            format = "topic + JSON";
+                        }
+                        else throw new FormatException("Expected a JSON pose frame or topic + JSON pose frames.");
+                        UpdatePose(JsonConvert.DeserializeObject<ZmqMessage>(json));
+                        if (wireFormat == null) Debug.Log("Tracking input received on " + endpoint + " (" + format + ").");
+                        wireFormat = format;
                     }
                     catch (Exception ex)
                     {
@@ -116,7 +143,11 @@ public class ZmqListener : MonoBehaviour
         }
         catch (Exception ex)
         {
-            if (isRunning) Debug.LogError("ZMQ listener failed on " + endpoint + ": " + ex);
+            if (isRunning)
+            {
+                workerState = "error";
+                Debug.LogError("ZMQ listener failed on " + endpoint + ": " + ex);
+            }
         }
     }
     private long lastPacketErrorTicks;
@@ -128,7 +159,11 @@ public class ZmqListener : MonoBehaviour
         if (mainController != null)
         {
             // Get config values based on GameObject name
-            SystemConfig config = mainController.GetSystemConfigForGameObject(gameObject);
+            if (!mainController.TryGetSystemConfigForGameObject(gameObject, out SystemConfig config))
+            {
+                Debug.LogError($"No tracking config found for {gameObject.name}; retaining component endpoint tcp://{address}:{port}. Check vrId in system_config.json.");
+                return;
+            }
 
             // Apply config values directly
             address = config.zmqAddress;
@@ -196,5 +231,6 @@ public class ZmqListener : MonoBehaviour
         }
 
         listenerThread = null;
+        workerState = "stopped";
     }
 }

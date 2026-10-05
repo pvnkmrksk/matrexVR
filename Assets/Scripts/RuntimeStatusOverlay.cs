@@ -123,14 +123,15 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
                 text.Append(entry.Key + ": ");
                 if (!main.VRClosedLoops.TryGetValue(entry.Key, out var rig) || rig == null) { text.AppendLine("inactive"); continue; }
                 var listener = rig.GetComponent<ZmqListener>();
-                text.Append($"gain P/O {rig.PositionGain:G4}/{rig.OrientationGain:G4} [{(rig.PositionTrackingEnabled ? "on" : "off")}/{(rig.OrientationTrackingEnabled ? "on" : "off")}]  DC {rig.GetYawDCOffset():F4} rad  ");
-                text.AppendLine(listener == null || !listener.HasPose ? "NO INPUT" : listener.HasFreshPose() ? "input OK" : $"STALE {listener.SecondsSinceLastPose:F1}s");
+                text.AppendLine($"{rig.GetCurrentMode()} / {rig.MotionMode} ({rig.InputInterpretation})");
+                text.AppendLine($"  Input SUB: {(listener == null ? "missing listener" : listener.Endpoint + " — " + listener.State)}");
+                text.AppendLine($"  gain P/O {rig.PositionGain:G4}/{rig.OrientationGain:G4} [{(rig.PositionTrackingEnabled ? "on" : "off")}/{(rig.OrientationTrackingEnabled ? "on" : "off")}]  DC {rig.GetYawDCOffset():F4} rad");
                 var reference = rig.GetComponent<StimulusHeadingReference>();
                 if (reference != null && reference.IsObserving) text.AppendLine($"  heading assessment: {reference.RemainingSeconds:F1}s");
                 else if (reference != null && reference.Result != null) text.AppendLine($"  zero {reference.Result.meanHeadingDegrees:F1} deg, r={reference.Result.resultantLength:F3} ({reference.Phase})");
             }
         }
-        text.AppendLine($"ZMQ: {(telemetry != null ? telemetry.State + " " + telemetry.Endpoint : "starting")}");
+        text.AppendLine($"Telemetry PUB (output): {(telemetry != null ? telemetry.State + " " + telemetry.Endpoint : "starting")}");
         ErrorEntry[] recent = RecentErrors();
         if (recent.Length > 0)
         {

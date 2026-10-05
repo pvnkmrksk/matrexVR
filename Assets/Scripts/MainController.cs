@@ -175,9 +175,7 @@ public class MainController : MonoBehaviour
             // Parse the JSON using JObject instead of dynamic
             JObject fullConfig = JObject.Parse(jsonText);
             ApplyFrameTiming(fullConfig);
-            TelemetrySettings = fullConfig["telemetry"]?.ToObject<TelemetryConfig>() ?? new TelemetryConfig();
-            StatusOverlaySettings = fullConfig["statusOverlay"]?.ToObject<StatusOverlayConfig>() ?? new StatusOverlayConfig();
-            TelemetrySettings.Validate();
+            LoadDiagnosticsConfigurations(fullConfig);
             OverheadCameraSettings = fullConfig["overheadCamera"]?.ToObject<OverheadCameraConfig>() ?? new OverheadCameraConfig();
 
             // Extract global target display if it exists
@@ -249,6 +247,24 @@ public class MainController : MonoBehaviour
         VSyncCount = sync;
         QualitySettings.vSyncCount = sync;
         Application.targetFrameRate = target;
+    }
+
+    private void LoadDiagnosticsConfigurations(JObject config)
+    {
+        // Optional monitoring must not erase the independently configured tracker ports.
+        // Value validation and bind failures belong to ExperimentTelemetry.Configure.
+        try { TelemetrySettings = config["telemetry"]?.ToObject<TelemetryConfig>() ?? new TelemetryConfig(); }
+        catch (System.Exception error)
+        {
+            TelemetrySettings = new TelemetryConfig { enabled = false };
+            Debug.LogError("Invalid telemetry configuration; output disabled: " + error.Message);
+        }
+        try { StatusOverlaySettings = config["statusOverlay"]?.ToObject<StatusOverlayConfig>() ?? new StatusOverlayConfig(); }
+        catch (System.Exception error)
+        {
+            StatusOverlaySettings = new StatusOverlayConfig();
+            Debug.LogError("Invalid status overlay configuration; using defaults: " + error.Message);
+        }
     }
 
     // Match a complete rig ID, including parent rigs, without confusing VR1 and VR10.
