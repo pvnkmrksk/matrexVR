@@ -42,6 +42,14 @@ public class UIDataLogger : MonoBehaviour
 
     private void Start()
     {
+        // Populate before loading saved metadata. A fresh or missing value is unspecified.
+        foreach (Dropdown dropdown in sexDropdowns)
+        {
+            dropdown.ClearOptions();
+            dropdown.AddOptions(new List<string> { "Unspecified", "Female", "Male" });
+            dropdown.SetValueWithoutNotify(0);
+            dropdown.RefreshShownValue();
+        }
         MasterDataLogger masterDataLogger = FindObjectOfType<MasterDataLogger>();
         if (masterDataLogger != null)
         {
@@ -169,7 +177,7 @@ public class UIDataLogger : MonoBehaviour
         }
         else
         {
-            Debug.LogError("No backup data file found.");
+            Debug.Log("No previous metadata found; using the form defaults.");
         }
     }
 
@@ -187,7 +195,9 @@ public class UIDataLogger : MonoBehaviour
             Fly fly = flyData.Flies[i];
             ageInputs[i].text = fly.AgeDays;
             starvedSinceInputs[i].text = fly.StarvedSinceHours;
-            sexDropdowns[i].value = sexDropdowns[i].options.FindIndex(option => option.text == fly.Sex);
+            int sexIndex = sexDropdowns[i].options.FindIndex(option => string.Equals(option.text, fly.Sex, StringComparison.OrdinalIgnoreCase));
+            sexDropdowns[i].SetValueWithoutNotify(Math.Max(0, sexIndex));
+            sexDropdowns[i].RefreshShownValue();
             flyIDInputs[i].text = fly.FlyID;
         }
     }    
