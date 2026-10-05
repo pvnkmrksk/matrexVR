@@ -4,6 +4,87 @@
   "terrains": [
     {
       "name": "Terrain 0x0",
+      "parent": "Selwyn",
+      "worldPosition": {
+        "x": -28246.0,
+        "y": -1929.0,
+        "z": -27082.0
+      },
+      "data": "Assets/RWT_Result/2026-10-05 16-26/Terrain 0x0.asset",
+      "heightmapResolution": 257,
+      "size": {
+        "x": 29684.0,
+        "y": 2074.0,
+        "z": 51453.0
+      },
+      "minHeight": 0.186382219,
+      "maxHeight": 0.948605239,
+      "layers": [
+        {
+          "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 0x0r4096x8192.terrainlayer",
+          "texture": "Assets/RWT_Result/2026-10-05 16-26/Terrain 0x0r4096x8192.jpg",
+          "width": 4096,
+          "height": 8192
+        }
+      ]
+    },
+    {
+      "name": "Terrain 1x0",
+      "parent": "Selwyn",
+      "worldPosition": {
+        "x": 1438.0,
+        "y": -1929.0,
+        "z": -27082.0
+      },
+      "data": "Assets/RWT_Result/2026-10-05 16-26/Terrain 1x0.asset",
+      "heightmapResolution": 257,
+      "size": {
+        "x": 29684.0,
+        "y": 2074.0,
+        "z": 51453.0
+      },
+      "minHeight": 0.455350041,
+      "maxHeight": 0.947933853,
+      "layers": [
+        {
+          "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 1x0r4096x8192.terrainlayer",
+          "texture": "Assets/RWT_Result/2026-10-05 16-26/Terrain 1x0r4096x8192.jpg",
+          "width": 4096,
+          "height": 8192
+        }
+      ]
+    }
+  ],
+  "inactiveTerrains": [
+    {
+      "name": "Terrain 0x0",
+      "parent": "Selwyn Old",
+      "worldPosition": {
+        "x": -7538.0,
+        "y": -1711.0,
+        "z": -6226.0
+      },
+      "data": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0.asset",
+      "heightmapResolution": 257,
+      "size": {
+        "x": 14845.0,
+        "y": 1879.0,
+        "z": 12865.0
+      },
+      "minHeight": 0.3566807,
+      "maxHeight": 0.948086441,
+      "layers": [
+        {
+          "path": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0r4096x4096.terrainlayer",
+          "texture": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0r4096x4096.jpg",
+          "width": 4096,
+          "height": 4096
+        }
+      ]
+    }
+  ],
+  "allTerrainData": [
+    {
       "data": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0.asset",
       "heightmapResolution": 65,
       "size": {
@@ -15,15 +96,14 @@
       "maxHeight": 0.936519563,
       "layers": [
         {
-          "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r8192x4096.terrainlayer",
-          "texture": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r8192x4096.jpg",
-          "width": 8192,
-          "height": 4096
+          "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r1024x512.terrainlayer",
+          "texture": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r1024x512.jpg",
+          "width": 1024,
+          "height": 512
         }
       ]
     },
     {
-      "name": "Terrain 0x1",
       "data": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1.asset",
       "heightmapResolution": 65,
       "size": {
@@ -35,25 +115,121 @@
       "maxHeight": 0.7553256,
       "layers": [
         {
-          "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r8192x4096.terrainlayer",
-          "texture": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r8192x4096.jpg",
-          "width": 8192,
+          "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r1024x512.terrainlayer",
+          "texture": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r1024x512.jpg",
+          "width": 1024,
+          "height": 512
+        }
+      ]
+    },
+    {
+      "data": "Assets/RWT_Result/2026-10-05 06-22/TerrainData_17376076-374b-4f0e-8ae0-24b8fbe6b718.asset",
+      "heightmapResolution": 65,
+      "size": {
+        "x": 15685.0,
+        "y": 1821.0,
+        "z": 11764.0
+      },
+      "minHeight": 0.0,
+      "maxHeight": 0.214032844,
+      "layers": [
+        {
+          "path": null,
+          "texture": null,
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    {
+      "data": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0.asset",
+      "heightmapResolution": 257,
+      "size": {
+        "x": 14845.0,
+        "y": 1879.0,
+        "z": 12865.0
+      },
+      "minHeight": 0.3566807,
+      "maxHeight": 0.948086441,
+      "layers": [
+        {
+          "path": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0r4096x4096.terrainlayer",
+          "texture": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0r4096x4096.jpg",
+          "width": 4096,
           "height": 4096
+        }
+      ]
+    },
+    {
+      "data": "Assets/RWT_Result/2026-10-05 16-26/Terrain 0x0.asset",
+      "heightmapResolution": 257,
+      "size": {
+        "x": 29684.0,
+        "y": 2074.0,
+        "z": 51453.0
+      },
+      "minHeight": 0.186382219,
+      "maxHeight": 0.948605239,
+      "layers": [
+        {
+          "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 0x0r4096x8192.terrainlayer",
+          "texture": "Assets/RWT_Result/2026-10-05 16-26/Terrain 0x0r4096x8192.jpg",
+          "width": 4096,
+          "height": 8192
+        }
+      ]
+    },
+    {
+      "data": "Assets/RWT_Result/2026-10-05 16-26/Terrain 1x0.asset",
+      "heightmapResolution": 257,
+      "size": {
+        "x": 29684.0,
+        "y": 2074.0,
+        "z": 51453.0
+      },
+      "minHeight": 0.455350041,
+      "maxHeight": 0.947933853,
+      "layers": [
+        {
+          "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 1x0r4096x8192.terrainlayer",
+          "texture": "Assets/RWT_Result/2026-10-05 16-26/Terrain 1x0r4096x8192.jpg",
+          "width": 4096,
+          "height": 8192
         }
       ]
     }
   ],
-  "totalBytes": 58221675,
+  "totalBytes": 150421499,
   "files": [
     {
       "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0.asset",
       "bytes": 1416684,
-      "sha256": "4111ec08b5655f5ab4c8e8b70dc2b9bad25ca9450899a3233754c250da7a0a3b"
+      "sha256": "7142db910ee7a80183cf9d82fe7564a9caf9659c375c0a9e9b71dafb26ca96f6"
     },
     {
       "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0.asset.meta",
       "bytes": 189,
       "sha256": "ab30629335a01687c1ed1b2b7916ef2567d8604a8d1e69d7502142587ebe95a9"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r1024x512.jpg",
+      "bytes": 8823,
+      "sha256": "df1833b077686cb6731604d4e44577ff9d522c9b20b2dda4ac11a8ee5dc39f5c"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r1024x512.jpg.meta",
+      "bytes": 2652,
+      "sha256": "1f8041a54f1dfe5b064080586061b28003f7d48219aff482816d62d388fe416d"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r1024x512.terrainlayer",
+      "bytes": 769,
+      "sha256": "5ffc219c8e70337a615619917469b6eab42699373423fb38b4437ed3bc2666c6"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r1024x512.terrainlayer.meta",
+      "bytes": 200,
+      "sha256": "827bb021ec88da9c201b267bdd11cff29b77d3c224c83160167df4464647bfd6"
     },
     {
       "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x0r8192x4096.jpg",
@@ -78,12 +254,32 @@
     {
       "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1.asset",
       "bytes": 1416684,
-      "sha256": "e6be9e38c5f56209e4325939fc123858ca31edb8f23d2cf351284a94fa8cc290"
+      "sha256": "eac34eeabf4c0bec9aa55bcf5e27f331c62b57f77b137fb75747042448e0708e"
     },
     {
       "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1.asset.meta",
       "bytes": 189,
       "sha256": "7d69cbf6dc3ba01f6be80dada968ed2b1c5e562c34b40ce1a0222ca495e8b295"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r1024x512.jpg",
+      "bytes": 8823,
+      "sha256": "df1833b077686cb6731604d4e44577ff9d522c9b20b2dda4ac11a8ee5dc39f5c"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r1024x512.jpg.meta",
+      "bytes": 2652,
+      "sha256": "0b3cd96371428ec5818638365321908cb1b228d51ae6f425e46c1b03a992a5d8"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r1024x512.terrainlayer",
+      "bytes": 769,
+      "sha256": "39175520fb660348d9a28fba9db2598cad4e46f2200eda68d0f81cbcc9bb93ae"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r1024x512.terrainlayer.meta",
+      "bytes": 200,
+      "sha256": "9fe6cf69fdf8648788c15aaa4ab3b3ef12478a7b17a797a60a49754522a3c3d8"
     },
     {
       "path": "Assets/RWT_Result/2026-10-05 06-22/Terrain 0x1r8192x4096.jpg",
@@ -119,6 +315,144 @@
       "path": "Assets/RWT_Result/2026-10-05 06-22.meta",
       "bytes": 172,
       "sha256": "4b30d6ff66f241ca862747f122f97302aa38b6a9b653cdfc83aaff9bc9a0d263"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0.asset",
+      "bytes": 1544168,
+      "sha256": "3f21ac5630b6191c7cf561a77f34b85f9dcc3885a0c788d1bd877b2c434ec866"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0.asset.meta",
+      "bytes": 189,
+      "sha256": "cd0f5b75a0b7b02611a4d393ad5c8c9a8063b184cd1c3021eb953e4159b2ebbe"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0r4096x4096.jpg",
+      "bytes": 15169460,
+      "sha256": "5c4fc077d20e43832a2e3ff3732862685a8cbfb186c35683b94d2628225421aa"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0r4096x4096.jpg.meta",
+      "bytes": 2652,
+      "sha256": "1117d268264fac020cf486d5c18b1138aa938749875cd9848da8eb509939bb89"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0r4096x4096.terrainlayer",
+      "bytes": 770,
+      "sha256": "888830512a43f56ba306e60573f38a71cc036739eace3730638313e5a39b2d4b"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0r4096x4096.terrainlayer.meta",
+      "bytes": 200,
+      "sha256": "a3aef4dd1da887eea61786191a3c1d3b8b3b5ea9003c17f5b139e1429249ace6"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0r512x512.jpg",
+      "bytes": 4727,
+      "sha256": "99036cb378e856905e5c7c51672fb2e77b8261667928d967c20cc04619a6a451"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0r512x512.jpg.meta",
+      "bytes": 2651,
+      "sha256": "3acc8cb18e433c3cc2220dd3a59677694cf2db0f3dc006f2b210b36fa52be575"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0r512x512.terrainlayer",
+      "bytes": 768,
+      "sha256": "e9609035380356e28b4d0e704294c9fb94472eb8b23b9e794032ba923fcf17ba"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 15-48/Terrain 0x0r512x512.terrainlayer.meta",
+      "bytes": 200,
+      "sha256": "b7e480500be136997fd29b36ae8911df31820bbea44094d60b4f3e57dc5d7b1b"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 15-48.meta",
+      "bytes": 172,
+      "sha256": "9a83659e8e72b4331c9bf50a6b3d68fe71655830d0361ee64011833694575c8a"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 0x0.asset",
+      "bytes": 5738472,
+      "sha256": "dab30f236743e8661ea6d5637cc885dfdf9eb39e34ca7649fd1135647ffbb7e9"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 0x0.asset.meta",
+      "bytes": 189,
+      "sha256": "19ae4ac4b6b821c8e0eec1d3573c032908841dba0294b894b36db4af4843cdc2"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 0x0r4096x8192.jpg",
+      "bytes": 32928474,
+      "sha256": "212ed252c66446c26ac87373d90e12de735dc5346f9295961cb13f892f09f63d"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 0x0r4096x8192.jpg.meta",
+      "bytes": 2652,
+      "sha256": "89014a82d16553571991b4a45b5d7a68ea58ff57af80016088055a2ede29c3b1"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 0x0r4096x8192.terrainlayer",
+      "bytes": 770,
+      "sha256": "6cd57c99ddcfd41b441c1c5a4afde71901a7fbac6a1af7308515954ddfbe3108"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 0x0r4096x8192.terrainlayer.meta",
+      "bytes": 200,
+      "sha256": "9e567518b790d2c8f922c3aa74e2992dfb382f57ae233f2686b48e2f17330afb"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 1x0.asset",
+      "bytes": 5738472,
+      "sha256": "515f125afa551bd10f2b326b945d6b25d709c7252d0934761b926724727df0c5"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 1x0.asset.meta",
+      "bytes": 189,
+      "sha256": "9a306e63683644fb3c66807712e80b1acf4398f545087b4c1aabfd28713f0ce2"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 1x0r4096x8192.jpg",
+      "bytes": 30960809,
+      "sha256": "e21eb7fe7471aa83dace55653846d8ea299673d3c075086bfc87b64ced5c16d6"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 1x0r4096x8192.jpg.meta",
+      "bytes": 2652,
+      "sha256": "9dc2af4b340e0f02fb2fd7014cdcc4384579b851b17acffd4827fe3e559c32eb"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 1x0r4096x8192.terrainlayer",
+      "bytes": 770,
+      "sha256": "c7da36cd339433fb29e920f1a5f900d38fa63eae0eee30d0d1c0c08f7e213103"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26/Terrain 1x0r4096x8192.terrainlayer.meta",
+      "bytes": 200,
+      "sha256": "63af52dc6ddaf33e90ef575c4142f1d1e08ff2e6bcab7f1017f96b54a4e010c0"
+    },
+    {
+      "path": "Assets/RWT_Result/2026-10-05 16-26.meta",
+      "bytes": 172,
+      "sha256": "9fd1dda26c930b3bb2fb09c4eac8fbeee7118dbab67f56d34e2f41e5c12002e4"
+    },
+    {
+      "path": "Assets/Scenes/Choice_Selwyn.unity",
+      "bytes": 74958,
+      "sha256": "67334494141e9e571ca0af6d0bc4f36697383abd3d2939e97686be26149d70cc"
     }
-  ]
+  ],
+  "validation": {
+    "date": "2026-10-05",
+    "unity": "6000.3.16f1",
+    "terrainDependencies": "Two active tiles and one inactive tile have non-flat heightmaps and valid Terrain/TerrainCollider/layer/texture references. Six exported TerrainData assets inspected.",
+    "sceneRuntime": {
+      "checks": 70,
+      "failure": null,
+      "scene": "Choice_Selwyn",
+      "unity": "6000.3.16f1"
+    },
+    "staticAssetValidator": "passed",
+    "configTemplates": 22
+  }
 }
