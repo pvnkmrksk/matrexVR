@@ -1,0 +1,22 @@
+{
+  "randomise": false,
+  "loop": false,
+  "sequences": [
+    {
+      "sceneName": "Swarm",
+      "duration": 20,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/swarm.template.json"
+      }
+    },
+    {
+      "sceneName": "Kannadi",
+      "duration": 1000,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/kannadi.template.json"
+      }
+    }
+  ]
+}

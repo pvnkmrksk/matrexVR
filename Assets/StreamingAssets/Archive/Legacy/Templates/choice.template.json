@@ -1,0 +1,76 @@
+{
+  "headingReference": { "enabled": false, "windowSeconds": 180 },
+  "objects": [
+    {
+      "type": "tree01",
+      "position": {
+        "radius": 20.0,
+        "angle": 15.0,
+        "height": -1.0,
+        "x": null,
+        "y": null,
+        "z": null
+      },
+      "material": "",
+      "scale": {
+        "x": 2.0,
+        "y": 2.0,
+        "z": 2.0
+      },
+      "rotation": {
+        "x": null,
+        "y": null,
+        "z": null
+      },
+      "flip": false,
+      "speed": 0.0,
+      "mu": 0.0,
+      "visualAngleDegrees": 0.0,
+      "meanBlueA": 0.0,
+      "meanBlueB": 0.0,
+      "switchInterval": 0.0,
+      "numberOfInstances": 0,
+      "spawnLengthX": 0.0,
+      "spawnLengthZ": 0.0,
+      "gridType": 0,
+      "kappa": 0.0,
+      "visibleOffDuration": 0.0,
+      "visibleOnDuration": 0.0,
+      "boundaryLengthZ": 0.0,
+      "boundaryLengthX": 0.0,
+      "lockBoundaryWithAnimalPosition": false,
+      "lockAgentWithAnimalPosition": false,
+      "prioritizeNumbers": false,
+      "hexRadius": 0.0,
+      "sectionLengthZ": 0.0,
+      "sectionLengthX": 0.0,
+      "rotationAngle": 0.0
+    }
+  ],
+  "initialPosition": {
+    "x": 0.0,
+    "y": 0.5,
+    "z": 0.0
+  },
+  "initialRotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
+  "randomInitialRotation": false,
+  "closedLoopOrientation": true,
+  "closedLoopPosition": true,
+  "backgroundColor": {
+    "r": 0.5,
+    "g": 0.5,
+    "b": 0.5,
+    "a": 1.0
+  },
+  "skyboxPath": "",
+  "windSpeed": 0,
+  "windDirection": 0,
+  "aglHeight": 0,
+  "groundLayerMask": 1,
+  "autopilotEnabled": false,
+  "autopilotSpeed": 10
+}

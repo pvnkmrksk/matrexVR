@@ -184,7 +184,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
     private void LoadDesign(string file)
     {
-        string path = Path.Combine(Application.streamingAssetsPath, file);
+        string path = ExperimentConfigFiles.Resolve(file);
         designFile = JsonConvert.DeserializeObject<DesignFile>(File.ReadAllText(path));
         orderedSteps = IsAdaptiveDecisionEnabled() ? new List<Step>() : BuildOrdered(designFile, null);
     }

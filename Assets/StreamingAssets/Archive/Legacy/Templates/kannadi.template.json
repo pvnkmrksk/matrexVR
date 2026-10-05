@@ -1,0 +1,87 @@
+{
+  "closedLoopOrientation": 1.0,
+  "closedLoopPosition": 1.0,
+  "backgroundColor": {
+    "r": 0.7830189,
+    "g": 0.7830189,
+    "b": 0.7830189,
+    "a": 1
+  },
+  "numberOfRings": 3,
+  "kannadiTilePrefab": "SimulatedLocust",
+  "boundaryLengthX": 200.0,
+  "boundaryLengthZ": 200.0,
+  "animateOnMove": true,
+  "vrConfigs": [
+    {
+      "vrIndex": 1,
+      "initialPosition": {
+        "x": 0.0,
+        "y": 1.0,
+        "z": 5.0
+      },
+      "initialRotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "watchIndex": null,
+      "closedLoopPosition": null,
+      "closedLoopOrientation": null
+    },
+    {
+      "vrIndex": 2,
+      "initialPosition": {
+        "x": 5.0,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "initialRotation": {
+        "x": 0.0,
+        "y": 90.0,
+        "z": 0.0
+      },
+      "watchIndex": null,
+      "closedLoopPosition": null,
+      "closedLoopOrientation": null
+    },
+    {
+      "vrIndex": 3,
+      "initialPosition": {
+        "x": 0.0,
+        "y": 1.0,
+        "z": -5.0
+      },
+      "initialRotation": {
+        "x": 0.0,
+        "y": 180.0,
+        "z": 0.0
+      },
+      "watchIndex": null,
+      "closedLoopPosition": null,
+      "closedLoopOrientation": null
+    },
+    {
+      "vrIndex": 4,
+      "initialPosition": {
+        "x": -5.0,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "initialRotation": {
+        "x": 0.0,
+        "y": 270.0,
+        "z": 0.0
+      },
+      "watchIndex": null,
+      "closedLoopPosition": null,
+      "closedLoopOrientation": null
+    }
+  ],
+  "hexRadius": 10.0,
+  "animationSpeedThreshold": 0.5,
+  "autopilotEnabled": false,
+  "autopilotSpeed": 10,
+  "spacing": null,
+  "periodicBoundary": true
+}

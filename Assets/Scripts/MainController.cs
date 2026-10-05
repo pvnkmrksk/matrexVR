@@ -409,7 +409,7 @@ public class MainController : MonoBehaviour
         if (activeSceneController != null && currentStepData.parameters != null)
         {
             if (!currentStepData.parameters.ContainsKey("gain")) currentStepData.parameters["gain"] = currentStepData.gain;
-            InitializeStep(() => activeSceneController.InitializeScene(currentStepData.parameters));
+            InitializeStep(() => activeSceneController.InitializeScene(ExperimentConfigFiles.ResolveReferences(currentStepData.parameters)));
             timer = currentStepData.duration;
         }
         else
@@ -693,7 +693,7 @@ void ManageTimerAndTransitions()
     {
         // ★ NEW PATH: keep scene, just tell it to advance
         if (next.parameters != null && !next.parameters.ContainsKey("gain")) next.parameters["gain"] = next.gain;
-        InitializeStep(() => sequencer.AdvanceStep(next.parameters));
+        InitializeStep(() => sequencer.AdvanceStep(ExperimentConfigFiles.ResolveReferences(next.parameters)));
         ApplyGainToClosedLoopComponents(next.gain);
         timer = next.duration;      // restart timer for the new sub-step
     }
@@ -722,7 +722,7 @@ void ManageTimerAndTransitions()
                     continue;
                 }
 
-                string sourcePath = Path.Combine(Application.streamingAssetsPath, configFileName);
+                string sourcePath = ExperimentConfigFiles.Resolve(configFileName);
 
                 if (File.Exists(sourcePath))
                 {

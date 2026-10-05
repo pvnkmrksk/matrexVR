@@ -79,7 +79,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
     private SceneConfig LoadSceneConfig(string configFile)
     {
-        string jsonPath = Path.Combine(Application.streamingAssetsPath, configFile);
+        string jsonPath = ExperimentConfigFiles.Resolve(configFile);
 
         if (!File.Exists(jsonPath))
         {

@@ -101,7 +101,7 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
 
     private void LoadOptomotorConfig(string configFileName)
     {
-        string configPath = Path.Combine(Application.streamingAssetsPath, configFileName);
+        string configPath = ExperimentConfigFiles.Resolve(configFileName);
         Debug.Log($"Looking for config file at: {configPath}");
 
         if (File.Exists(configPath))

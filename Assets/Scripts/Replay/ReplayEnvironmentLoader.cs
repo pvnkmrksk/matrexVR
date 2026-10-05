@@ -118,7 +118,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             return;
         }
 
-        string path = Path.Combine(Application.streamingAssetsPath, designFileName);
+        string path = ExperimentConfigFiles.Resolve(designFileName);
         if (!File.Exists(path))
         {
             Debug.LogWarning($"[ReplayEnv] Design file not found at {path}");
