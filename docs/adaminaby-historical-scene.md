@@ -8,7 +8,7 @@ The Adaminaby experiment was added on `BogongAustralia` in commit `ef8a68b2ad2ff
 ## Run from ControlScene
 
 1. Save your current `Assets/StreamingAssets/sequenceConfig.json` if you want to return to it later.
-2. Copy `Assets/StreamingAssets/Templates/adaminaby-historical-sequence.template.json` over `Assets/StreamingAssets/sequenceConfig.json`.
+2. Copy `Assets/StreamingAssets/Examples/Sequences/adaminaby-historical.example.json` over `Assets/StreamingAssets/sequenceConfig.json`.
 3. Use the local system configuration for your rig. To enable Front, Back, Left, Right, Up and Down, use the [six-camera setup](six-camera-rig.md).
 4. Open `Assets/Scenes/ControlScene.unity` and press Play. The template automatically starts the current `Choice` scene for one hour. Escape returns to ControlScene. Edit `duration` or set `autoStart` to `false` as needed.
 

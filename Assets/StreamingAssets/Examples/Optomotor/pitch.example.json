@@ -1,0 +1,18 @@
+{
+  "loop": false,
+  "stimuli": [
+    {
+      "duration": 10,
+      "speed": 20,
+      "clockwise": true,
+      "rotationAxis": "Pitch",
+      "frequency": 4,
+      "contrast": 0.5,
+      "dutyCycle": 0.5,
+      "color1": "#000000",
+      "color2": "#FFFFFF",
+      "closedLoopOrientation": false,
+      "closedLoopPosition": false
+    }
+  ]
+}

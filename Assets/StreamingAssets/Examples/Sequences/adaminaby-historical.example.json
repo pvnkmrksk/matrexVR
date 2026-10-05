@@ -1,14 +1,15 @@
 {
-  "autoStart": true,
+  "autoStart": false,
   "loop": false,
   "randomise": false,
   "sequences": [
     {
       "sceneName": "Choice",
       "duration": 3600,
+      "gain": 1,
       "reloadScene": true,
       "parameters": {
-        "configFile": "choice__SM_adaminaby.json"
+        "configFile": "Examples/Flight/adaminaby-panorama.example.json"
       }
     }
   ]

@@ -1,19 +1,28 @@
 {
-  "telemetry": { "enabled": true, "bindAddress": "127.0.0.1", "port": 9880, "rateHz": 20, "topic": "matrex.telemetry.v1" },
-  "statusOverlay": { "visible": true, "targetDisplay": 0 },
+  "telemetry": {
+    "enabled": true,
+    "bindAddress": "127.0.0.1",
+    "port": 9880,
+    "rateHz": 20,
+    "topic": "matrex.telemetry.v1"
+  },
+  "statusOverlay": {
+    "visible": true,
+    "targetDisplay": 0
+  },
   "targetDisplay": 0,
   "configs": [
     {
       "sphereDiameter": 2.6,
       "ledPanelWidth": 128,
       "ledPanelHeight": 128,
-      "startRow": 0,
-      "startCol": 0,
+      "startRow": 1,
+      "startCol": 4,
       "horizontal": true,
       "zmqAddress": "localhost",
       "zmqPort": 9871,
       "vrId": "VR1",
-      "displayOrder": "DRBLFU",
+      "displayOrder": "RBLF",
       "manualControls": {
         "enabled": true,
         "translateSpeed": 10,
@@ -23,7 +32,8 @@
         "allowVerticalTranslation": false,
         "allowPitchAndRoll": false
       },
-      "closedLoopMode": "Kinefly"
+      "closedLoopMode": "FicTrac",
+      "targetDisplay": 0
     },
     {
       "sphereDiameter": 2.6,
@@ -35,7 +45,7 @@
       "zmqAddress": "localhost",
       "zmqPort": 9872,
       "vrId": "VR2",
-      "displayOrder": "DRBLFU",
+      "displayOrder": "RBLF",
       "manualControls": {
         "enabled": true,
         "translateSpeed": 10,
@@ -45,19 +55,20 @@
         "allowVerticalTranslation": false,
         "allowPitchAndRoll": false
       },
-      "closedLoopMode": "Kinefly"
+      "closedLoopMode": "FicTrac",
+      "targetDisplay": 0
     },
     {
       "sphereDiameter": 2.6,
       "ledPanelWidth": 128,
       "ledPanelHeight": 128,
-      "startRow": 2,
-      "startCol": 0,
+      "startRow": 3,
+      "startCol": 4,
       "horizontal": true,
       "zmqAddress": "localhost",
       "zmqPort": 9873,
       "vrId": "VR3",
-      "displayOrder": "DRBLFU",
+      "displayOrder": "RBLF",
       "manualControls": {
         "enabled": true,
         "translateSpeed": 10,
@@ -67,7 +78,8 @@
         "allowVerticalTranslation": false,
         "allowPitchAndRoll": false
       },
-      "closedLoopMode": "Kinefly"
+      "closedLoopMode": "FicTrac",
+      "targetDisplay": 0
     },
     {
       "sphereDiameter": 2.6,
@@ -79,7 +91,7 @@
       "zmqAddress": "localhost",
       "zmqPort": 9874,
       "vrId": "VR4",
-      "displayOrder": "DRBLFU",
+      "displayOrder": "RBLF",
       "manualControls": {
         "enabled": true,
         "translateSpeed": 10,
@@ -89,7 +101,8 @@
         "allowVerticalTranslation": false,
         "allowPitchAndRoll": false
       },
-      "closedLoopMode": "Kinefly"
+      "closedLoopMode": "FicTrac",
+      "targetDisplay": 0
     }
   ],
   "overheadCamera": {

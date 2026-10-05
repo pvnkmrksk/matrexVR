@@ -1,21 +1,15 @@
 {
-  "randomise": false,
+  "autoStart": false,
   "loop": false,
+  "randomise": false,
   "sequences": [
     {
-      "sceneName": "Swarm",
-      "duration": 20,
+      "sceneName": "Choice_Selwyn",
+      "duration": 3600,
+      "gain": 1,
       "reloadScene": true,
       "parameters": {
-        "configFile": "Templates/swarm.template.json"
-      }
-    },
-    {
-      "sceneName": "Kannadi",
-      "duration": 1000,
-      "reloadScene": true,
-      "parameters": {
-        "configFile": "Templates/kannadi.template.json"
+        "configFile": "Templates/experiment.template.json"
       }
     }
   ]

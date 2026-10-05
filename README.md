@@ -7,10 +7,11 @@ Use **Unity 6000.3.16f1**, matching ProjectVersion.txt. Packages are pinned in `
 ## Start here
 
 1. Open `Assets/Scenes/ControlScene.unity`.
-2. Keep your existing `Assets/StreamingAssets/system_config.json`, or create it from [the Kinefly flight template](Assets/StreamingAssets/Templates/system-config-kinefly.template.json). Configure each rig's ZMQ endpoint and keep `"closedLoopMode": "Kinefly"` explicit. This machine uses four rigs, ports 9871–9874 and six cameras (`DRBLFU`). The [walking template](Assets/StreamingAssets/Templates/system_config.template.json) is a separate setup.
-3. Choose [an experiment template](Assets/StreamingAssets/Templates/README.md), copy it under a new filename, and reference it in `sequenceConfig.json`. The selected sequence runs **Choice_Selwyn** with `Kannadi/selwyn-night-sky.json`, started manually from Control.
+2. Keep your existing `Assets/StreamingAssets/system_config.json`, or copy the complete [system template](Assets/StreamingAssets/Templates/system_config.template.json). Set addresses/displays and retain explicit `"closedLoopMode": "Kinefly"` for flight. Walking alternatives live in [Examples/System](Assets/StreamingAssets/Examples/System).
+3. Use the complete [experiment](Assets/StreamingAssets/Templates/experiment.template.json) and [sequence](Assets/StreamingAssets/Templates/sequence.template.json) templates as a matched starting set. [Templates](Assets/StreamingAssets/Templates/README.md) covers every supported paradigm; [Examples](Assets/StreamingAssets/Examples/README.md) contains full variants. The active Choice_Selwyn sequence and all `Kannadi/` recipes are preserved. Old configs are in [Archive/Legacy](Assets/StreamingAssets/Archive/Legacy).
 4. Enter Play mode from Control, fill the experiment metadata, and start the sequence. Focus Game for hotkeys. R resets; P toggles tracked position; O toggles tracked orientation. Escape returns to Control. **Tab shows/hides the bottom-right status/error panel.**
-5. Find recordings under `Assets/RunData/<session>/`. Preserve the saved config files with the data.
+5. Each animal has a visible sex selector: **Unspecified** (fresh default), **Female**, **Male**. Reloading saved metadata restores the saved selection; old Unknown or missing values become Unspecified.
+6. Find recordings under `Assets/RunData/<session>/`. Preserve the saved config files with the data.
 
 Kinefly's existing single-frame JSON messages work without a publisher or config migration. The status panel identifies **Kinefly / flight**, each **Input SUB** address/port and reception state. **Telemetry PUB (output)** on port 9880 is a separate monitoring feed. See [Kinefly wire and gain compatibility](docs/bogong-gain-compatibility.md).
 

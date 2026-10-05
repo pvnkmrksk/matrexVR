@@ -1,0 +1,16 @@
+{
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "sequences": [
+    {
+      "sceneName": "Swarm",
+      "duration": 3600,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/bogong-swarm.template.json"
+      }
+    }
+  ]
+}

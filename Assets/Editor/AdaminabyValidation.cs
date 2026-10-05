@@ -33,9 +33,9 @@ public static class AdaminabyValidation
     public static void Run()
     {
         if(!File.Exists(Path.Combine(Application.dataPath,"../KANNADI_VALIDATION_COPY"))) throw new Exception("Disposable copy required");
-        File.Copy(Path.Combine(Application.streamingAssetsPath,"Templates/adaminaby-historical-sequence.template.json"),
+        File.Copy(Path.Combine(Application.streamingAssetsPath,"Examples/Sequences/adaminaby-historical.example.json"),
             Path.Combine(Application.streamingAssetsPath,"sequenceConfig.json"),true);
-        File.Copy(Path.Combine(Application.streamingAssetsPath,"Templates/system-config-six-cameras.template.json"),
+        File.Copy(Path.Combine(Application.streamingAssetsPath,"Examples/System/fictrac-six-cameras.example.json"),
             Path.Combine(Application.streamingAssetsPath,"system_config.json"),true);
         EditorSceneManager.OpenScene("Assets/Scenes/ControlScene.unity");
         SessionState.SetBool(Key,true);

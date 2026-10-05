@@ -55,7 +55,7 @@ public static class ChoiceNightSkyValidation
                 sceneName = scene, duration = 3600, parameters = new { configFile }
             } }
         }));
-        File.Copy(Path.Combine(Application.streamingAssetsPath, "Templates/system-config-six-cameras.template.json"),
+        File.Copy(Path.Combine(Application.streamingAssetsPath, "Examples/System/fictrac-six-cameras.example.json"),
             Path.Combine(Application.streamingAssetsPath, "system_config.json"), true);
         SessionState.SetString(Key + ".scene", scene);
         SessionState.SetString(Key + ".config", configFile);

@@ -1,0 +1,34 @@
+{
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "sequences": [
+    {
+      "sceneName": "Optomotor",
+      "duration": 10,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Optomotor/yaw.example.json"
+      }
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 10,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Optomotor/pitch.example.json"
+      }
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 10,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Optomotor/roll.example.json"
+      }
+    }
+  ]
+}

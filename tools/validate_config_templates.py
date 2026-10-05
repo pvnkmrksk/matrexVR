@@ -2,6 +2,7 @@
 """Check reference JSON, scene/file wiring and key safety constraints without Unity."""
 import json
 import re
+import hashlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -9,7 +10,7 @@ SA = ROOT / 'Assets/StreamingAssets'
 TEMPLATES = SA / 'Templates'
 scenes = set(re.findall(r'enabled: 1\s+path: Assets/Scenes/([^\n]+)\.unity', (ROOT / 'ProjectSettings/EditorBuildSettings.asset').read_text()))
 count = 0
-for path in sorted(TEMPLATES.glob('*.json')):
+for path in sorted(list(TEMPLATES.glob('*.json')) + list((SA / 'Examples').rglob('*.json'))):
     obj = json.loads(path.read_text())
     count += 1
     if 'sequences' in obj:
@@ -79,6 +80,10 @@ for sequence_path in [SA / 'sequenceConfig.json', SA / 'Kannadi' / 'sequenceConf
         continue
     sequence = json.loads(sequence_path.read_text())
     for step in sequence.get('sequences', []):
+        for key in ('configFile', 'design'):
+            reference = step.get('parameters', {}).get(key)
+            if reference:
+                assert (SA / reference).is_file() or (SA / 'Archive/Legacy' / reference).is_file(), (sequence_path, reference)
         if step.get('sceneName') != 'Swarm':
             continue
         params = step.get('parameters', {})
@@ -92,3 +97,26 @@ for path in (ROOT / 'Assets/Scripts').rglob('*.cs'):
     assert not re.search(r'(?<!\w)Input\.(GetKey|GetAxis|GetMouseButton|mousePosition)', code), path
 
 print(f'PASS: {count} JSON templates/examples, scene/file references, ranges and Input System migration')
+
+# The archive preserves original contents, including historical invalid/unsupported configs.
+manifest = json.loads((ROOT / 'docs/config-archive-manifest.json').read_text())
+for record in manifest['archived']:
+    archived = SA / record['archive']
+    assert archived.is_file(), archived
+    assert hashlib.sha256(archived.read_bytes()).hexdigest() == record['sha256'], archived
+    if record['operation'] == 'move':
+        assert not (SA / record['original']).exists(), record['original']
+for path, digest in manifest['preservedSha256'].items():
+    # The machine-specific hardware file is intentionally not required in another checkout.
+    if path.endswith('/system_config.json'):
+        continue
+    assert (ROOT / path).is_file(), path
+    assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest, path
+assert {p.name for p in SA.glob('*.json')} <= {'system_config.json', 'sequenceConfig.json'}
+print(f"PASS: {len(manifest['archived'])} archived file hashes and preserved Kannadi/active sequence")
+
+for record in manifest.get('otherArchives', []):
+    target = ROOT / record['archive']
+    assert target.is_file() and hashlib.sha256(target.read_bytes()).hexdigest() == record['sha256'], target
+    assert not (ROOT / record['original']).exists(), record['original']
+print(f"PASS: {len(manifest.get('otherArchives', []))} earlier locust inputs consolidated into archive")

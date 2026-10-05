@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-06",
+  "unity": "6000.3.16f1",
+  "branch": "codex/bogong-night-sky",
+  "catalog": {
+    "templates": 12,
+    "variantExamples": 33,
+    "legacyFilesWithVerifiedHashes": 1601,
+    "preserved": "All Kannadi configs, Kannadi and kinematic templates, active sequence, and local hardware config remain byte-identical."
+  },
+  "testedSourceSha256": {
+    "Assets/Editor/ConfigCatalogValidation.cs": "515ef0c9812a617cd13885dc69e8bc91c18c8bc8dd95b96a7448ad121891f0b0",
+    "Assets/Scripts/ExperimentConfigFiles.cs": "61e36a003e0a9e4267d7260766b8c400f739804caaad0b4aef03ae915248fc00",
+    "Assets/Scripts/Loggers/UIDataLogger.cs": "824bdf51e8848dc982d613a3972831276c1f7811ad9a9e3f19b9e1aeeb181b6c",
+    "Assets/Scripts/MainController.cs": "d4d0018089b4ae5fa4cbaeebe92b93e429f1df2196d7bc662239b408195d32ee",
+    "Assets/Scripts/ChoiceController.cs": "f67b9b191766a2b2b0f1f340f86aa1e59ef5cd552391786bf037a27c596db08b",
+    "Assets/Scripts/DynamicSequenceController.cs": "74d86dc81f1abb4b023b7782f059f1c1243ae4893c32d383b9b5c94527e18bde",
+    "Assets/Scripts/Optomotor/OptomotorSceneController.cs": "a9fe314e6a84685949ba299ed169b4eac6f2d4110cfe6dae92eb7db26393c513",
+    "Assets/Scripts/Replay/ReplayEnvironmentLoader.cs": "850b96113c46606b295908fe6175f691b90f22940b2d36a059a4cc72f4cd71f7",
+    "Assets/Scenes/ControlScene.unity": "d8c94cca411eab1a93983b3d57eda19d32f0e8cac92fd64eb061a06407a02f95"
+  },
+  "configAndSexUI": {
+    "checks": 3379,
+    "failure": null,
+    "errors": [],
+    "unity": "6000.3.16f1"
+  },
+  "walkingAndSceneRegression": {
+    "checks": 993,
+    "failures": [],
+    "editorMessages": [
+      "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.\nParameter name: index"
+    ]
+  },
+  "kineflyWireRegression": {
+    "checks": 96,
+    "failure": null,
+    "errors": [],
+    "unity": "6000.3.16f1",
+    "coverage": "Four configured ports, single JSON Kinefly bridge frames, multipart topic+JSON, independent topic/JSON messages, yaw-only fields, metadata, signed raw flight gains, malformed-packet recovery, separate telemetry, explicit HUD mode/endpoints, invalid monitoring config isolation, missing-rig endpoint retention, clean shutdown"
+  },
+  "headingAndTelemetryRegression": {
+    "checks": 77,
+    "failure": null,
+    "unexpectedErrors": [],
+    "unity": "6000.3.16f1",
+    "coverage": "Circular statistics, disabled/default/invalid/sequence config, generic and Choice adapters, real Swarm lifecycle, per-rig onset/no reset, repeat trial, PUB/SUB tracking and telemetry, raw units, player errors and HUD"
+  },
+  "visualReview": "Rendered the Control form at 1600x900. All four Unspecified selectors are visible beneath the animal IDs, with no overlap of the comments field. Opening the original dropdown produces the three options.",
+  "skyBehavior": "Verified in NightSkyController.Update/SampleAtElapsed: panorama is held between 30-minute samples. No continuous sky rotation was added.",
+  "limits": [
+    "Tests ran in a disposable Unity project. No physical VR hardware or LED timing was tested.",
+    "The preserved archive is a historical record; old experiments with unsupported schemas or missing assets were not revalidated.",
+    "Existing Unity Editor search indexing exception is recorded separately by the scene suite.",
+    "Original archived metadata whitespace is preserved with its checksum. Active changed source and templates pass whitespace checks."
+  ]
+}

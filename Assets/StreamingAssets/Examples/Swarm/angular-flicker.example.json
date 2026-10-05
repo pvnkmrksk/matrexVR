@@ -1,24 +1,28 @@
 {
   "headingReference": {
-    "enabled": true,
+    "enabled": false,
     "windowSeconds": 180
   },
-  "numberOfLocusts": 256,
+  "numberOfLocusts": 512,
   "density": null,
   "spawnAreaSize": 200,
-  "mu": 90,
+  "mu": 0,
   "kappa": 100000,
   "locustSpeed": 2,
-  "dimension": "2D",
+  "dimension": "3D",
   "spawnCenter": null,
-  "spawnVolumeSize": null,
+  "spawnVolumeSize": {
+    "x": 200,
+    "y": 100,
+    "z": 200
+  },
   "muElevation": 0,
-  "kappaElevation": 10000,
-  "boundaryHeight": null,
-  "wrapY": false,
-  "agentVisual": "ScenePrefab",
+  "kappaElevation": 100000,
+  "boundaryHeight": 100,
+  "wrapY": true,
+  "agentVisual": "Bogong",
   "bogongVisual": {
-    "sizeMode": "World",
+    "sizeMode": "Angular",
     "size": 0.5,
     "angularSizeDegrees": 1,
     "color": {
@@ -29,12 +33,12 @@
     },
     "metallic": 0,
     "smoothness": 0.25,
-    "flickerFrequencyHz": 0,
+    "flickerFrequencyHz": 2,
     "flickerDutyCycle": 0.5
   },
-  "animateOnMove": true,
+  "animateOnMove": false,
   "animationSpeedThreshold": 0.5,
-  "autopilotEnabled": false,
+  "autopilotEnabled": true,
   "autopilotSpeed": 10,
   "closedLoopPosition": 1,
   "closedLoopOrientation": 1,
@@ -103,5 +107,32 @@
       "closedLoopPosition": null,
       "closedLoopOrientation": null
     }
-  ]
+  ],
+  "backgroundColor": {
+    "r": 0.5,
+    "g": 0.5,
+    "b": 0.5,
+    "a": 1
+  },
+  "skyboxPath": "",
+  "nightSky": {
+    "enabled": true,
+    "latitude": 47.6896,
+    "longitude": 9.1881,
+    "timeZoneId": "Australia/Sydney",
+    "utcOffsetHours": 2,
+    "utcOffsetMinutes": null,
+    "date": null,
+    "localTime": "now",
+    "advanceWithRealTime": true,
+    "updateIntervalMinutes": 30,
+    "roundToInterval": false,
+    "northYawDegrees": 0,
+    "exposure": 1,
+    "faintDetailCutoff": 0,
+    "maskBelowHorizon": true,
+    "imageWidth": 4096
+  },
+  "boundaryLengthX": 200,
+  "boundaryLengthZ": 200
 }

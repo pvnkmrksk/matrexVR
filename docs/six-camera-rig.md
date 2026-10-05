@@ -6,7 +6,7 @@ The shared `Assets/Prefabs/Camera Prefabs/VR.prefab` now contains Front, Back, L
 
 ## Enable all six
 
-Copy `Assets/StreamingAssets/Templates/system-config-six-cameras.template.json` to `Assets/StreamingAssets/system_config.json`, then set tracker addresses and ports for the rig. The template uses display 0 and four rows of six 128×128 panels: **768×512 output pixels**. The order is **Down, Right, Back, Left, Front, Up** (`DRBLFU`). The local hardware config is ignored by Git; the template is versioned.
+Copy `Assets/StreamingAssets/Examples/System/fictrac-six-cameras.example.json` to `Assets/StreamingAssets/system_config.json`, then set tracker addresses and ports for the rig. The template uses display 0 and four rows of six 128×128 panels: **768×512 output pixels**. The order is **Down, Right, Back, Left, Front, Up** (`DRBLFU`). The local hardware config is ignored by Git; the template is versioned.
 
 For an existing config, set each required rig's `displayOrder` to `DRBLFU` and allocate six panel slots without overlap. The template uses `startCol: 0`, `startRow: 0/1/2/3`, and `horizontal: true`. Face letters select rendering; they do not change experiment movement or sensor logging.
 

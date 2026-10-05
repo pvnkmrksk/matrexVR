@@ -1,0 +1,61 @@
+{
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "sequences": [
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/choice.template.json"
+      }
+    },
+    {
+      "sceneName": "Choice_Forrest",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/choice.template.json"
+      }
+    },
+    {
+      "sceneName": "Choice_TwoTreeIndia_nopath_nopath",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/choice.template.json"
+      }
+    },
+    {
+      "sceneName": "Choice_TwoTreeIndia_nopath_path",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/choice.template.json"
+      }
+    },
+    {
+      "sceneName": "Choice_TwoTreeIndia_path_nopath",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/choice.template.json"
+      }
+    },
+    {
+      "sceneName": "Choice_TwoTreeIndia_path_path",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/choice.template.json"
+      }
+    }
+  ]
+}

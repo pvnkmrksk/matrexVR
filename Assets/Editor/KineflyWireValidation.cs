@@ -44,7 +44,7 @@ public static class KineflyWireValidation
     {
         if (!File.Exists(Path.Combine(Application.dataPath, "../KANNADI_VALIDATION_COPY")))
             throw new Exception("Use a disposable Unity validation copy.");
-        var system = JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "Templates/system-config-kinefly.template.json")));
+        var system = JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "Templates/system_config.template.json")));
         system["telemetry"] = JObject.FromObject(new { enabled = true, bindAddress = "127.0.0.1", port = 29880, rateHz = 30 });
         system["overheadCamera"]["enabled"] = false;
         foreach (JObject rig in system["configs"])

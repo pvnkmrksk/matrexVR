@@ -1,0 +1,34 @@
+{
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "sequences": [
+    {
+      "sceneName": "Choice_Selwyn",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Flight/migration-agl10.example.json"
+      }
+    },
+    {
+      "sceneName": "Choice_Selwyn",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Flight/migration-agl100.example.json"
+      }
+    },
+    {
+      "sceneName": "Choice_Selwyn",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Flight/migration-agl1000.example.json"
+      }
+    }
+  ]
+}

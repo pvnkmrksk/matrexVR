@@ -130,7 +130,7 @@ public static class BogongGainValidation
 
     private static void PrepareSequence()
     {
-        var system = JsonConvert.DeserializeObject<Newtonsoft.Json.Linq.JObject>(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "Templates/system-config-six-cameras.template.json")));
+        var system = JsonConvert.DeserializeObject<Newtonsoft.Json.Linq.JObject>(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "Examples/System/fictrac-six-cameras.example.json")));
         foreach (var rig in system["configs"]) rig["closedLoopMode"] = "Kinefly";
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "system_config.json"), system.ToString());
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "bogong-gain-validation.json"), "{\"closedLoopOrientation\":true,\"closedLoopPosition\":false}");

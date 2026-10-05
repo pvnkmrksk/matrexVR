@@ -4,14 +4,14 @@ This reference describes the experiment configuration code, tested with Unity **
 
 ## Files, precedence, and running an experiment
 
-1. Copy `Templates/system_config.template.json` to `system_config.json` in `Assets/StreamingAssets`. Edit addresses, sphere sizes, panel coordinates, and display index for the actual rig. This local hardware file is Git-ignored. `system_config_VR1.json` remains the four-face RBLF example. The current local preview uses all six directions; use `Templates/system-config-six-cameras.template.json` to reproduce that layout.
-2. Copy a scene template to your own file under StreamingAssets. Copy `Templates/sequence.template.json` to `sequenceConfig.json`, and point its `parameters.configFile` at your file. Paths are relative to StreamingAssets, including the `Templates/` prefix when running a template directly.
-3. Open `Assets/Scenes/ControlScene.unity`, enter Play mode, enter metadata, and start the sequence. Focus the **Game** view for operator hotkeys. Do not start from an experiment scene when you need the complete sequence, system configuration, and logging lifecycle.
-4. `sequence-all-modes.example.json` demonstrates Swarm → Kannadi → Choice → migration → Optomotor → dynamic Choice. `sequence-migration.example.json` demonstrates 10/100/1000 world-unit AGL. The active sequence currently auto-starts the Adaminaby sky and aligned Bogong swarm on Play; see [night-sky.md](night-sky.md). The previous 20-second Swarm → 1000-second Kannadi sequence is saved as `Kannadi/sequenceConfig.before-adaminaby-preview.json`.
+1. Use the complete `Templates/system_config.template.json`, `Templates/experiment.template.json` and `Templates/sequence.template.json` as a matched Kinefly flight starting set. Set actual hardware addresses and displays. The local `system_config.json` is Git-ignored and is not replaced by cleanup.
+2. For other paradigms, choose a complete file from [Templates](../Assets/StreamingAssets/Templates/README.md); use [Examples](../Assets/StreamingAssets/Examples/README.md) for variations. All references are relative to StreamingAssets. Dynamic Choice uses `parameters.design`; other experiment controllers use `parameters.configFile`.
+3. Open `Assets/Scenes/ControlScene.unity`, enter Play, enter metadata, and start the sequence. Sex is visible for each animal, with Unspecified as the fresh default. Saved Female/Male values are restored on reload. Focus Game for hotkeys.
+4. The active Selwyn sequence and all files in `Kannadi/` are preserved. The old collection is under `Archive/Legacy/`, with original bytes and a checksum manifest. If an experiment reference is missing at its current path, the loader checks that archive, so unchanged Kannadi sequences can still resolve their old Choice dependency.
 
 System config owns physical camera layout and sphere calibration. Sequence config owns scene order and duration. Experiment configs own stimuli and tracked motion. Kannadi/Swarm merge inline `parameters` over `configFile` (arrays replace, rather than append), while autopilot remains owned by the referenced file. Choice/Optomotor read their referenced file without merging inline stimulus fields. Dynamic Choice uses `parameters.design`, not `configFile`.
 
-The recovered historical Adaminaby image/config can also run through the current six-camera Choice scene: use `Templates/adaminaby-historical-sequence.template.json`. See [its provenance and run instructions](adaminaby-historical-scene.md), including the original screenshot's projection limitations.
+The recovered historical Adaminaby image/config can also run through the current six-camera Choice scene: use `Examples/Sequences/adaminaby-historical.example.json`. See [its provenance and run instructions](adaminaby-historical-scene.md), including the original screenshot's projection limitations.
 
 Autopilot is controlled by the individual experiment file referenced by `parameters.configFile`, so the sequence selects a complete movement configuration without duplicating its fields.
 
@@ -27,7 +27,7 @@ Polar positions use `x = radius × sin(angle)`, `z = radius × cos(angle)`, `y =
 
 ## System configuration
 
-Templates: `system-config-kinefly.template.json` for this branch’s Bogong flight setup; `system_config.template.json` for walking. Existing Kinefly configs and single-frame JSON publishers require no migration. Select `"closedLoopMode": "Kinefly"` per rig; **Tab** shows the effective mode and input endpoint.
+Templates: `Templates/system_config.template.json` for this branch’s Bogong flight setup; `Examples/System/fictrac-four-cameras.example.json` or `fictrac-six-cameras.example.json` for walking. Existing Kinefly configs and single-frame JSON publishers require no migration. Select `"closedLoopMode": "Kinefly"` per rig; **Tab** shows the effective mode and input endpoint.
 
 | Field | Omitted default | Meaning / useful example |
 |---|---|---|
@@ -48,7 +48,7 @@ Templates: `system-config-kinefly.template.json` for this branch’s Bogong flig
 | `targetDisplay` inside rig | 1, then overwritten | Use the top-level value. |
 | `manualControls` | null | Optional per-rig operator movement settings below. Omission preserves prefab tuning. |
 
-The base VR prefab and its standard, Swarm, Kannadi and Cube variants now contain all six camera faces, including Down. Use `displayOrder: "DRBLFU"` for all six. `Templates/system-config-six-cameras.template.json` provides four non-overlapping rows of six 128×128 panels (768×512 total) on display 0. Copy it to the local `system_config.json` and edit tracker addresses for your hardware. Up/Down are reactivated when requested and use Front's origin, clip planes and visibility mask. Existing `RBLF` configurations still enable only four faces. See [six-camera-rig.md](six-camera-rig.md).
+The base VR prefab and its standard, Swarm, Kannadi and Cube variants now contain all six camera faces, including Down. Use `displayOrder: "DRBLFU"` for all six. `Examples/System/fictrac-six-cameras.example.json` provides four non-overlapping rows of six 128×128 panels (768×512 total) on display 0. Copy it to the local `system_config.json` and edit tracker addresses for your hardware. Up/Down are reactivated when requested and use Front's origin, clip planes and visibility mask. Existing `RBLF` configurations still enable only four faces. See [six-camera-rig.md](six-camera-rig.md).
 
 Viewport slot `i`: x=(startCol + i if horizontal)×width; y=screenHeight−(startRow+1 + i if vertical)×height. Ensure these rectangles fit the physical display. An unavailable display disables its cameras. Configuring VR10 does not accidentally match VR1. Configured letters do not create a camera absent from the prefab. Camera disabling does not delete the rig or stop its sensor logging.
 
@@ -91,7 +91,7 @@ Template: `sequence.template.json`.
 |---|---|---|
 | `randomise` | false | Shuffle outer scene execution order. |
 | `loop` | true | Repeat outer sequence; templates explicitly use false. |
-| `autoStart` | false | Start the sequence when Play begins in ControlScene. Returning with Escape does not auto-start again. Used by the active Adaminaby sky preview. |
+| `autoStart` | false | Start the sequence when Play begins in ControlScene. Returning with Escape does not auto-start again. Canonical templates explicitly use false. |
 | `sequences` | none | Required nonempty array of scene steps. |
 | `sceneName` | none | Exact enabled scene name, e.g. Swarm, Kannadi, Choice, Optomotor, Choice_desync. No Matrix scene exists. |
 | `duration` | 0 | Outer step time, seconds; use a positive duration. |
@@ -230,7 +230,7 @@ The historical 2D swarm keeps its scene-owned boundary manager and prefab assign
 
 ## Optomotor
 
-Template: `optomotor.template.json`. `optomotor-arc.example.json` preserves the frequency/speed sweep from `origin/Optomotor`. The Optomotor scene is enabled in the build list.
+Template: `optomotor.template.json`. `Examples/Optomotor/frequency-speed-sweep.example.json` preserves the frequency/speed sweep from `origin/Optomotor`. The Optomotor scene is enabled in the build list.
 
 | Field | Default | Meaning |
 |---|---|---|
@@ -310,7 +310,7 @@ Template: `dynamic-choice.template.json`, loaded via `parameters.design`. This s
 
 Replay uses the Control UI and ReplayController inspector fields, not a standalone JSON motion config. Select a run directory and its data files. The environment loader can use a saved dynamic design, including step names, object names, polar positions, scales, materials, and camera backgrounds. Operator bindings are in [Unity 6 controls](unity6-controls.md); data requirements are in [data formats](data-formats.md).
 
-Older files in StreamingAssets and `docs/legacy-locust-inputs` are retained research inputs, not the authoritative template library. Read the modern parser before reusing an old parameter: a silently ignored `rot`, `sync`, or unsupported tracking setting will not produce the intended experiment.
+Older files in `StreamingAssets/Archive/Legacy` and `Assets/StreamingAssets/Archive/LegacyLocustInputs` are retained research inputs, not the authoritative template library. Read the modern parser before reusing an old parameter: a silently ignored `rot`, `sync`, or unsupported tracking setting will not produce the intended experiment.
 
 ## Heading-relative presentations, telemetry and status
 

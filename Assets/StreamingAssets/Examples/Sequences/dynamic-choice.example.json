@@ -1,0 +1,16 @@
+{
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "sequences": [
+    {
+      "sceneName": "Choice_desync",
+      "duration": 1000,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "design": "Templates/dynamic-choice.template.json"
+      }
+    }
+  ]
+}

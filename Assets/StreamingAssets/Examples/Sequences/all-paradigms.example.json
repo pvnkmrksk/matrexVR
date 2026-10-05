@@ -1,0 +1,70 @@
+{
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "sequences": [
+    {
+      "sceneName": "Choice",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/choice.template.json"
+      }
+    },
+    {
+      "sceneName": "Swarm",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/swarm.template.json"
+      }
+    },
+    {
+      "sceneName": "Kannadi",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/kannadi.template.json"
+      }
+    },
+    {
+      "sceneName": "Kannadi",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/kinematic.template.json"
+      }
+    },
+    {
+      "sceneName": "Optomotor",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/optomotor.template.json"
+      }
+    },
+    {
+      "sceneName": "Choice_Selwyn",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Templates/migration.template.json"
+      }
+    },
+    {
+      "sceneName": "Choice_desync",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "design": "Templates/dynamic-choice.template.json"
+      }
+    }
+  ]
+}

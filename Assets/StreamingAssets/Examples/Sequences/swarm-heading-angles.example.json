@@ -1,0 +1,34 @@
+{
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "sequences": [
+    {
+      "sceneName": "Swarm",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Swarm/heading-aligned.example.json"
+      }
+    },
+    {
+      "sceneName": "Swarm",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Swarm/heading-crossed.example.json"
+      }
+    },
+    {
+      "sceneName": "Swarm",
+      "duration": 60,
+      "gain": 1,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Swarm/heading-opposed.example.json"
+      }
+    }
+  ]
+}

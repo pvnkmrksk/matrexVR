@@ -21,7 +21,7 @@ The code retains signed, unwrapped raw radians and the historical arithmetic/ord
 
 ## Select Kinefly explicitly
 
-Set `"closedLoopMode": "Kinefly"` in each rig entry of `system_config.json`. The local setup has this value on all four rigs. `Templates/system-config-kinefly.template.json` reproduces the six-camera Kinefly layout; edit hardware addresses before use. Existing Bogong configs omitting the field retain the reference's `FicTrac` enum default and historical yaw-mode behavior in Choice.
+Set `"closedLoopMode": "Kinefly"` in each rig entry of `system_config.json`. The local setup has this value on all four rigs. `Templates/system_config.template.json` reproduces the six-camera Kinefly layout; edit hardware addresses before use. Existing Bogong configs omitting the field retain the reference's `FicTrac` enum default and historical yaw-mode behavior in Choice.
 
 Swarm/Kannadi's separate walking path, selected through their existing walking gain configuration with the default `FicTrac` system mode, retains its existing degree-based Pose input and delta-gain behavior. Explicit Kinefly mode prevents those controllers from replacing the historical wing-angle path. There is no automatic inference of units from sample size.
 

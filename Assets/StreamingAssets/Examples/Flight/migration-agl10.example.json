@@ -1,0 +1,51 @@
+{
+  "headingReference": {
+    "enabled": false,
+    "windowSeconds": 180
+  },
+  "objects": [],
+  "initialPosition": {
+    "x": 0,
+    "y": 10,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "randomInitialRotation": true,
+  "closedLoopOrientation": true,
+  "closedLoopPosition": false,
+  "backgroundColor": {
+    "r": 0.5,
+    "g": 0.5,
+    "b": 0.5,
+    "a": 1.0
+  },
+  "skyboxPath": "",
+  "windSpeed": 0,
+  "windDirection": 0,
+  "aglHeight": 10,
+  "groundLayerMask": 1,
+  "autopilotEnabled": true,
+  "autopilotSpeed": 10,
+  "nightSky": {
+    "enabled": false,
+    "latitude": -35.894409,
+    "longitude": 148.453948,
+    "timeZoneId": "Australia/Sydney",
+    "utcOffsetHours": null,
+    "utcOffsetMinutes": null,
+    "date": null,
+    "localTime": "now",
+    "advanceWithRealTime": true,
+    "updateIntervalMinutes": 30,
+    "roundToInterval": false,
+    "northYawDegrees": 0,
+    "exposure": 0.5,
+    "faintDetailCutoff": 0.15,
+    "maskBelowHorizon": false,
+    "imageWidth": 4096
+  }
+}
