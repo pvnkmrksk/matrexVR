@@ -1,6 +1,6 @@
 # Configuration reference
 
-This reference describes the code on `codex/kannadi-modernize`, tested with Unity **6000.3.16f1**. Start with the complete JSON files in [StreamingAssets/Templates](../Assets/StreamingAssets/Templates). They contain editable example values; the tables below distinguish these from values used when a field is omitted. JSON does not allow comments. Keep notes in a separate text file; do not invent JSON keys, because most loaders silently ignore unknown keys.
+This reference describes the experiment configuration code, tested with Unity **6000.3.16f1**. Start with the complete JSON files in [StreamingAssets/Templates](../Assets/StreamingAssets/Templates). They contain editable example values; the tables below distinguish these from values used when a field is omitted. JSON does not allow comments. Keep notes in a separate text file; do not invent JSON keys, because most loaders silently ignore unknown keys.
 
 ## Files, precedence, and running an experiment
 
@@ -27,7 +27,7 @@ Polar positions use `x = radius × sin(angle)`, `z = radius × cos(angle)`, `y =
 
 ## System configuration
 
-Template: `system_config.template.json`.
+Templates: `system-config-kinefly.template.json` for this branch’s Bogong flight setup; `system_config.template.json` for walking. Existing Kinefly configs and single-frame JSON publishers require no migration. Select `"closedLoopMode": "Kinefly"` per rig; **Tab** shows the effective mode and input endpoint.
 
 | Field | Omitted default | Meaning / useful example |
 |---|---|---|

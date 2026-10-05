@@ -1,0 +1,103 @@
+{
+  "date": "2026-10-05",
+  "branch": "codex/bogong-night-sky",
+  "runtimeFixCommit": "a31c4415c0d33a87912feadbca4e0dde921c8ad0",
+  "regressionIntroducedBy": "d4dadd88",
+  "unity": "6000.3.16f1",
+  "cause": "Tracking receiver required two multipart frames; the existing Kinefly ROS bridge sends a single JSON frame. Ports were loaded correctly, but valid payloads were rejected.",
+  "beforeFix": {
+    "checks": 8,
+    "failed": true,
+    "failurePhase": "single-frame Kinefly JSON on four configured ports",
+    "observedError": "Expected topic + JSON pose frames."
+  },
+  "testedFileSha256": {
+    "Assets/Scripts/ZmqListener.cs": "04791738b30b19eaf9ac2d990caa18c1801a3665923225179e96a4219ff6b162",
+    "Assets/Scripts/ClosedLoop.cs": "20210ffeef01b7ee9eea9c3f325dfc7e33486ed7bf657df0892121ba3df2e8c8",
+    "Assets/Scripts/MainController.cs": "4d5ddb8907fb84e8b3571b7f6cef2e043a6985fb86e71aead8d7c0b2ce781a63",
+    "Assets/Scripts/RuntimeStatusOverlay.cs": "5c9a8486b324a94035a23cb7d968fcc135e54d32a94648d65b4d4c49847c21e1",
+    "Assets/Scripts/ExperimentTelemetry.cs": "b5dab263a9f255fa6d33cff5e1fb3c386275ce7b30be66b49b95232e68405ed7",
+    "Assets/Editor/KineflyWireValidation.cs": "e66bedffaaf04182b94e049f04a1ef26bda46657d99075478b96f68c2d98a3bd",
+    "Assets/Editor/BogongGainValidation.cs": "d6b20902b6d4b72ee56ce5827b159a79fff2ca5c21a100f212030b51d4c59bda",
+    "Assets/Editor/HeadingTelemetryValidation.cs": "04d332ffc2989c55c0d03d6ea168a060bf286d7782c2fd5bf6bd68ecd28c7d29",
+    "Assets/Editor/KannadiValidation.cs": "8f8d7efaf45504e1dd3a60d4582f997b0964aaed21702956cf3af20d2accef1d"
+  },
+  "wireRegression": {
+    "checks": 96,
+    "failure": null,
+    "errors": [],
+    "unity": "6000.3.16f1",
+    "coverage": "Four configured ports, single JSON Kinefly bridge frames, multipart topic+JSON, independent topic/JSON messages, yaw-only fields, metadata, signed raw flight gains, malformed-packet recovery, separate telemetry, explicit HUD mode/endpoints, invalid monitoring config isolation, missing-rig endpoint retention, clean shutdown"
+  },
+  "historicalFlight": {
+    "checks": 73746,
+    "failure": null,
+    "referenceCommit": "ef8a68b2ad2ff690e803007511666296a31eda5a",
+    "comparison": "Exact Vector3 and Quaternion component equality on every simulated frame",
+    "unity": "6000.3.16f1"
+  },
+  "headingTelemetry": {
+    "checks": 77,
+    "failure": null,
+    "unexpectedErrors": [],
+    "unity": "6000.3.16f1",
+    "coverage": "Circular statistics, disabled/default/invalid/sequence config, generic and Choice adapters, real Swarm lifecycle, per-rig onset/no reset, repeat trial, PUB/SUB tracking and telemetry, raw units, player errors and HUD"
+  },
+  "walking": {
+    "checks": 1008,
+    "failures": [],
+    "editorMessages": [
+      "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.\nParameter name: index"
+    ]
+  },
+  "staticChecks": {
+    "configTemplates": 22,
+    "sceneAndCatalogDependencies": 84,
+    "gitDiffCheck": "passed"
+  },
+  "standalonePlayerBuild": {
+    "result": "Succeeded",
+    "errors": 0,
+    "warnings": 65,
+    "sizeBytes": 315080098,
+    "seconds": 29.491166,
+    "unity": "6000.3.16f1"
+  },
+  "standalonePlayerReplay": {
+    "failure": null,
+    "playerExitCode": 0,
+    "snapshots": 695,
+    "matchedNegativeThenPositiveFlightSnapshots": {
+      "VR1": [
+        135,
+        531
+      ],
+      "VR2": [
+        135,
+        531
+      ],
+      "VR3": [
+        135,
+        531
+      ],
+      "VR4": [
+        135,
+        531
+      ]
+    },
+    "errors": [],
+    "excludedExistingMessages": [
+      "No backup data file found."
+    ],
+    "publisher": "Unmodified process_ros_message function extracted from local Kinefly_Docker/_internal/ros_zmq_bridge.py; synthetic ROS wing angles",
+    "bridgeSha256": "d67b226b6f9d6bc5bda7cd91d98b86141a2d12c831266aeeb2e9a9e5246bffd3"
+  },
+  "notes": [
+    "Standalone macOS Development/Mono build included ControlScene and Swarm; headless player ran the production listener/controller/telemetry scripts and a disposable timed shutdown helper.",
+    "Synthetic ROS messages were passed to the existing unmodified process_ros_message function and sent using pyzmq over four localhost ports (29871-29874), with telemetry received separately on 29880.",
+    "Build succeeded with 65 warnings, including obsolete Unity APIs and the existing unsupported System.Windows.Forms assembly reference; no build errors.",
+    "Unity Editor search-index exception and existing No backup data file found startup message are recorded separately from regression failures.",
+    "A five-second read-only subscription received no packets from the configured physical Kinefly host. This does not verify the remote rig, network or LED timing.",
+    "Production hardware config and selected Selwyn experiment/terrain were not changed. No publisher update is required."
+  ]
+}

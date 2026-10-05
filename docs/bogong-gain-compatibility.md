@@ -27,6 +27,20 @@ Swarm/Kannadi's separate walking path, selected through their existing walking g
 
 Terrain, wind/AGL, autopilot and manual navigation remain their current implementations. This comparison establishes equivalence of the tracking/gain calculation, not every scene/environment behavior or physical tracker latency.
 
+## Kinefly wire compatibility and port diagnostics
+
+The existing Kinefly ROS bridge publishes **one UTF-8 JSON frame**, without a topic, using `send_string(json.dumps(kinefly_data))`. Its flat fields are `x` (left wing angle), `y` (right wing angle), `z`, `yaw` (left minus right), `pitch`, `roll`, plus optional `frame_number` and `timestamp_unix` metadata. For example:
+
+```json
+{"x":1.25,"y":1.6,"z":0.0,"yaw":-0.35,"pitch":0.0,"roll":0.0,"frame_number":42,"timestamp_unix":1791170000.125}
+```
+
+The telemetry implementation in commit `d4dadd88` inadvertently required two tracking frames and rejected this existing publisher with `Expected topic + JSON pose frames`. The receiver now accepts the original single JSON frame, a two-frame topic/JSON message, and a topic sent separately before JSON. It consumes every JSON sample. The historical listener read frames in pairs, which happened to accept every second single-frame sample. Missing pose fields still default to zero, additional metadata is accepted, and signed yaw remains raw radians. No new input schema, mode field or publisher change is required. Malformed/nonfinite poses are reported without terminating reception of subsequent valid samples.
+
+Press **Tab** to show the status panel. Every active rig displays `Kinefly / flight (yaw-rate-radians)`, its actual `Input SUB: tcp://...:port` and `waiting for packets`, `receiving`, `stale` or `error`. Waiting means no valid sample has arrived; it does not claim a successful network connection. The separate `Telemetry PUB (output)` line is outbound monitoring, normally on 9880. It does not replace input ports 9871–9874. Invalid optional telemetry settings cannot clear the rig input configurations. If a rig has no matching config, the listener reports that error and retains its component endpoint instead of silently switching to the default localhost:9872.
+
+`KineflyWireValidation.Run` replays these wire formats through four actual PUB/SUB socket pairs and checks the resulting flight steering, malformed-packet recovery, per-rig ports, monitoring isolation and HUD labels. Use the same disposable Unity validation copy as the suites below. The [wire regression report](kinefly-wire-validation-results.json) records the original failure and the corrected runs.
+
 ## Verification and audit
 
 `tools/prepare_bogong_gain_reference.py <disposable-project>` reads the exact historical ClosedLoop source from Git and checks SHA-256 `84312430379fd7ffa0cdbe56b19297a4999fd7d70198c75ae68f44cfc8b70286`. It wraps that source in a test namespace with input adapters and a controlled clock; the calculation is not rewritten into a new expected-value formula.

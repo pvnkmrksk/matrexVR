@@ -1,16 +1,18 @@
 # MATREX VR
 
-Unity experiments for tracked animals and LED-panel virtual environments. This branch combines the JuliusTree experiment infrastructure with Swarm and **Kannadi** (ಕನ್ನಡಿ, mirror) multiplayer scenes. There is no separate Matrix scene.
+Unity experiments for tracked animals and LED-panel virtual environments. This branch's current setup is **Bogong/Kinefly flight**, with Selwyn terrain and night sky. It also includes the JuliusTree infrastructure, Swarm and **Kannadi** (ಕನ್ನಡಿ, mirror) multiplayer scenes and their separate walking input path.
 
 Use **Unity 6000.3.16f1**, matching ProjectVersion.txt. Packages are pinned in `Packages/manifest.json` and `packages-lock.json`; the operator controls now use Unity Input System 1.20.0. Restart an already open Editor after pulling the input-backend change.
 
 ## Start here
 
 1. Open `Assets/Scenes/ControlScene.unity`.
-2. Create `Assets/StreamingAssets/system_config.json` from [the system template](Assets/StreamingAssets/Templates/system_config.template.json). Configure each rig's ZMQ endpoint, ball diameter, physical display and camera order. This machine's selected setup is four rigs, RBLF cameras, 2.6 cm spheres.
-3. Choose [an experiment template](Assets/StreamingAssets/Templates/README.md), copy it under a new filename, and reference it in `sequenceConfig.json`. The active sequence is a dense aligned **Swarm for 20 s**, then **Kannadi for 1000 s**.
+2. Keep your existing `Assets/StreamingAssets/system_config.json`, or create it from [the Kinefly flight template](Assets/StreamingAssets/Templates/system-config-kinefly.template.json). Configure each rig's ZMQ endpoint and keep `"closedLoopMode": "Kinefly"` explicit. This machine uses four rigs, ports 9871–9874 and six cameras (`DRBLFU`). The [walking template](Assets/StreamingAssets/Templates/system_config.template.json) is a separate setup.
+3. Choose [an experiment template](Assets/StreamingAssets/Templates/README.md), copy it under a new filename, and reference it in `sequenceConfig.json`. The selected sequence runs **Choice_Selwyn** with `Kannadi/selwyn-night-sky.json`, started manually from Control.
 4. Enter Play mode from Control, fill the experiment metadata, and start the sequence. Focus Game for hotkeys. R resets; P toggles tracked position; O toggles tracked orientation. Escape returns to Control. **Tab shows/hides the bottom-right status/error panel.**
 5. Find recordings under `Assets/RunData/<session>/`. Preserve the saved config files with the data.
+
+Kinefly's existing single-frame JSON messages work without a publisher or config migration. The status panel identifies **Kinefly / flight**, each **Input SUB** address/port and reception state. **Telemetry PUB (output)** on port 9880 is a separate monitoring feed. See [Kinefly wire and gain compatibility](docs/bogong-gain-compatibility.md).
 
 ## Reference manuals
 
