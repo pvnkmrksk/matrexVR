@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-05",
+  "baseCommit": "9751aff8a37a128255f5cadae47df519cb53e589",
+  "referenceCommit": "ef8a68b2ad2ff690e803007511666296a31eda5a",
+  "referenceClosedLoopSha256": "84312430379fd7ffa0cdbe56b19297a4999fd7d70198c75ae68f44cfc8b70286",
+  "testedFileSha256": {
+    "Assets/Scripts/ClosedLoop.cs": "09e672988eae249510052df8120018a668daa47b852bd8f00c005a12abe0d265",
+    "Assets/Scripts/MainController.cs": "d529ec1e477f500a9144ae40a99123a702552a3a25f8991cde0f6124508055fd",
+    "Assets/Scripts/ZmqListener.cs": "94d5d22b32235b82bcc38d3b978b38d097cb8cf7d66886b2a1b714366096915f",
+    "Assets/Scripts/Loggers/DataLogger.cs": "ee9c2c7a497779b69708677641df372d877e8648468c9f752b905eb911290574",
+    "Assets/Prefabs/Camera Prefabs/VR.prefab": "759db4e8ae6364a15478ae57065b18d27df1f6298eab3efbe74e2079738d95b1",
+    "Assets/Editor/BogongGainValidation.cs": "d6b20902b6d4b72ee56ce5827b159a79fff2ca5c21a100f212030b51d4c59bda"
+  },
+  "historicalComparison": {
+    "checks": 73746,
+    "failure": null,
+    "referenceCommit": "ef8a68b2ad2ff690e803007511666296a31eda5a",
+    "comparison": "Exact Vector3 and Quaternion component equality on every simulated frame",
+    "unity": "6000.3.16f1"
+  },
+  "walkingRegression": {
+    "checks": 1004,
+    "failures": [],
+    "editorMessages": [
+      "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.\nParameter name: index"
+    ]
+  },
+  "staticValidation": {
+    "jsonTemplates": 21,
+    "dependencyFiles": 84,
+    "uniqueGuids": true,
+    "diffWhitespace": "passed"
+  },
+  "coverage": [
+    "27,648 simulated frames compared against the original historical calculation, with exact position and quaternion component equality.",
+    "Eight signed/zero/positive gains, three DC offsets, 30/60/120 Hz plus frame-to-frame variable timing; yaw-rate, raw-delta, and force/torque branches.",
+    "Constant/changing/signed/unwrapped raw radians, held packets, actual Update with stale input, orientation/position toggles and reset.",
+    "ControlScene loads gain 10, advances in place to -2.5, then reloads to omitted default 1; all four Kinefly rigs and six-camera template.",
+    "Explicit Kinefly selection survives Swarm/Kannadi gain setup; raw-radian logging and per-rig DC offset persistence checked.",
+    "Existing walking regression uses its supported RBLF four-panel hardware fixture."
+  ],
+  "limitations": [
+    "No physical Kinefly hardware, network latency, LED display timing, or full historical terrain/wind/autopilot behavior comparison.",
+    "UnityEditor.Search.SearchDatabase emitted the recorded startup indexing exception; it did not fail either runtime suite.",
+    "The broad walking suite initially failed a JuliusTree Down-camera assertion with a six-camera fixture; its supported RBLF fixture passes. Six-camera Choice gain integration is checked by the historical suite."
+  ]
+}

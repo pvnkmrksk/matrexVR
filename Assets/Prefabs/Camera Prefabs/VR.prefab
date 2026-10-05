@@ -92,6 +92,10 @@ MonoBehaviour:
   initializationDelay: 0.1
   closedLoopPosition: 1
   closedLoopOrientation: 1
+  useYawMode: 0
+  yawGain: 10
+  yawDCOffset: 0
+  gainStep: 1
 --- !u!114 &4886124528207133730
 MonoBehaviour:
   m_ObjectHideFlags: 0

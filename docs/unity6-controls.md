@@ -1,6 +1,6 @@
 # Unity 6 input and movement
 
-The project uses Unity **6000.3.16f1** with `com.unity.inputsystem` **1.20.0**. Unity recommends the [Input System package](https://docs.unity3d.com/6000.3/Documentation/Manual/input-introduction.html) for new input work; [1.20.0 supports Unity 6000.3](https://docs.unity3d.com/6000.3/Documentation/Manual/com.unity.inputsystem.html). This replaces the project-owned runtime calls to legacy `UnityEngine.Input`. It does not replace FicTrac with a physics character controller: animal movement remains measured displacement, with the existing ball calibration and experimental gains.
+The project uses Unity **6000.3.16f1** with `com.unity.inputsystem` **1.20.0**. Unity recommends the [Input System package](https://docs.unity3d.com/6000.3/Documentation/Manual/input-introduction.html) for new input work; [1.20.0 supports Unity 6000.3](https://docs.unity3d.com/6000.3/Documentation/Manual/com.unity.inputsystem.html). This replaces the project-owned runtime calls to legacy `UnityEngine.Input`. It does not replace FicTrac with a physics character controller: the Swarm/Kannadi walking path uses measured displacement. Bogong/Kinefly uses the restored historical yaw-rate calculation; see [gain compatibility](bogong-gain-compatibility.md).
 
 After pulling, let Package Manager resolve the pinned package and **restart the Unity Editor** if it was already open when Active Input Handling changed. Open ControlScene and focus its Game view. Entering text in a Unity UI or TMP input field suppresses experiment hotkeys, so typing names/comments cannot move animals or trigger reset.
 
@@ -26,7 +26,7 @@ After pulling, let Package Manager resolve the pinned package and **restart the 
 | PreviousStep / NextStep | N / M | Left / right shoulder | Replay jump to adjacent step marker. |
 | Debug | D | — | Optomotor debug state in Console. Also retains D yaw when manual movement is enabled. |
 
-Reset does not change P/O's selected tracking mode. Re-enabling tracking does not replay accumulated disabled motion. A manual heading change updates the displacement reference. Tracked yaw deltas add to the visible heading; they do not pull it toward an absolute target. Missing/stale sensor poses freeze tracked updates but do not prevent operator controls.
+Reset does not change P/O's selected tracking mode. Re-enabling tracking does not replay accumulated disabled motion. A manual heading change updates the displacement reference. Tracked yaw deltas add to the visible heading; they do not pull it toward an absolute target. Missing/stale sensor poses freeze the walking path but do not prevent operator controls. The historical Bogong/Kinefly path continues integrating the last yaw value. In that path, +/- adjusts yaw gain by 1 per press, Ctrl+Y toggles yaw-rate mode, number keys 1–4 select a rig, and held brackets adjust that rig's DC offset by 0.5 rad/s. Offsets persist across trials and scene reloads. Negative gains remain allowed as before.
 
 Each individual experiment config file can use the Mario Kart-style autopilot. Set `autopilotEnabled` and `autopilotSpeed` in the file referenced by the sequence step’s `parameters.configFile`. The runtime shortcut Ctrl+Space toggles the mode. Optomotor scenes explicitly disable autopilot so the stimulus controller remains the sole source of scene motion.
 

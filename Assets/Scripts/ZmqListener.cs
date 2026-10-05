@@ -23,6 +23,17 @@ public class ZmqListener : MonoBehaviour
     // cannot combine position or quaternion components from different network packets.
     private readonly object poseLock = new object();
     private Pose latestPose;
+    private Vector3 latestRawRotation;
+    // Preserve wire values for Bogong/Kinefly. Do not recover signed radians from a quaternion.
+    public struct RawSample
+    {
+        public Vector3 position;
+        public Vector3 rotation;
+    }
+    public RawSample ReadRawSample()
+    {
+        lock (poseLock) return new RawSample { position = latestPose.position, rotation = latestRawRotation };
+    }
     private bool hasPose;
     public Pose pose
     {
@@ -166,7 +177,13 @@ public class ZmqListener : MonoBehaviour
         Quaternion rotation = Quaternion.Euler(zmqMessage.pitch, zmqMessage.yaw, zmqMessage.roll);
 
         // Update the pose
-        PublishPose(new Pose(position, rotation));
+        lock (poseLock)
+        {
+            latestRawRotation = new Vector3(zmqMessage.pitch, zmqMessage.yaw, zmqMessage.roll);
+            latestPose = new Pose(position, rotation);
+            hasPose = true;
+            lastPoseTicksUtc = DateTime.UtcNow.Ticks;
+        }
     }
 
     private void PublishPose(Pose value)

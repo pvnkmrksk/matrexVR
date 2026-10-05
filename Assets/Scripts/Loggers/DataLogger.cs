@@ -183,6 +183,8 @@ public class DataLogger : MonoBehaviour
             AddColumns("swapElapsedSec", "swapWallClock");
             AddColumns("grayAtTrialStart", "blackSideAtTrialStart");
             AddColumns("skyboxId", "skyboxSampleUtc");
+            AddColumns("SensRotXRad", "SensRotYRad", "SensRotZRad");
+            AddColumns("trackingImplementation", "trackingMode", "trackingInputUnits", "wireYaw", "yawGain", "yawDCOffsetRadians", "yawOutputDegPerSecond");
 
             // Enable logging
             isLogging = true;
@@ -296,6 +298,22 @@ public class DataLogger : MonoBehaviour
         SetData("cumulativeStep", cumulativeStep);
         // Build base data
         SetData("skyboxId", NightSkyController.CurrentId);
+        ClosedLoop tracking = GetComponent<ClosedLoop>();
+        if (tracking != null)
+        {
+            bool bogong = tracking.UsesBogongInput;
+            SetData("trackingImplementation", bogong ? "BogongAustralia/ef8a68b" : "walking-delta/11cba7d");
+            SetData("trackingMode", !bogong ? "WalkingDelta" : tracking.GetUseForceMode() ? "ForceTorque" : tracking.GetUseYawMode() ? "YawRate" : "RawYawDelta");
+            SetData("trackingInputUnits", bogong ? "radians" : "degrees");
+            if (zmq != null) SetData("wireYaw", zmq.ReadRawSample().rotation.y);
+            if (bogong)
+            {
+                SetData("yawGain", tracking.GetYawGain());
+                SetData("yawDCOffsetRadians", tracking.GetYawDCOffset());
+                if (tracking.GetUseYawMode() && !tracking.GetUseForceMode())
+                    SetData("yawOutputDegPerSecond", tracking.GetLastYawOutput());
+            }
+        }
         SetData("skyboxSampleUtc", NightSkyController.CurrentSampleUtc);
         string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
         string vr = this.gameObject.name;
@@ -330,8 +348,25 @@ public class DataLogger : MonoBehaviour
         // Add ZMQ data
         if (includeZmqData && zmq != null)
         {
-            Vector3 sensPos = zmq.pose.position;
-            Vector3 sensRot = zmq.pose.rotation.eulerAngles;
+            Vector3 sensPos, sensRot;
+            if (tracking != null && tracking.UsesBogongInput)
+            {
+                var sample = zmq.ReadRawSample();
+                sensPos = sample.position;
+                // Same display-angle and raw-radian columns as BogongAustralia's DataLogger.
+                sensRot = Quaternion.Euler(sample.rotation.x * Mathf.Rad2Deg, sample.rotation.y * Mathf.Rad2Deg,
+                    sample.rotation.z * Mathf.Rad2Deg).eulerAngles;
+                SetData("SensRotXRad", sample.rotation.x);
+                SetData("SensRotYRad", sample.rotation.y);
+                SetData("SensRotZRad", sample.rotation.z);
+                SetData("wireYaw", sample.rotation.y);
+            }
+            else
+            {
+                Pose sample = zmq.pose;
+                sensPos = sample.position;
+                sensRot = sample.rotation.eulerAngles;
+            }
             line += $",{sensPos.x},{sensPos.y},{sensPos.z},{sensRot.x},{sensRot.y},{sensRot.z}";
         }
 

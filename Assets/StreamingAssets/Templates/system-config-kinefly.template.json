@@ -1,0 +1,109 @@
+{
+  "targetDisplay": 0,
+  "configs": [
+    {
+      "sphereDiameter": 2.6,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 0,
+      "startCol": 0,
+      "horizontal": true,
+      "zmqAddress": "localhost",
+      "zmqPort": 9871,
+      "vrId": "VR1",
+      "displayOrder": "DRBLFU",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "maxRotateSpeed": 300,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      },
+      "closedLoopMode": "Kinefly"
+    },
+    {
+      "sphereDiameter": 2.6,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 1,
+      "startCol": 0,
+      "horizontal": true,
+      "zmqAddress": "localhost",
+      "zmqPort": 9872,
+      "vrId": "VR2",
+      "displayOrder": "DRBLFU",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "maxRotateSpeed": 300,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      },
+      "closedLoopMode": "Kinefly"
+    },
+    {
+      "sphereDiameter": 2.6,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 2,
+      "startCol": 0,
+      "horizontal": true,
+      "zmqAddress": "localhost",
+      "zmqPort": 9873,
+      "vrId": "VR3",
+      "displayOrder": "DRBLFU",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "maxRotateSpeed": 300,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      },
+      "closedLoopMode": "Kinefly"
+    },
+    {
+      "sphereDiameter": 2.6,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 3,
+      "startCol": 0,
+      "horizontal": true,
+      "zmqAddress": "localhost",
+      "zmqPort": 9874,
+      "vrId": "VR4",
+      "displayOrder": "DRBLFU",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "maxRotateSpeed": 300,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      },
+      "closedLoopMode": "Kinefly"
+    }
+  ],
+  "overheadCamera": {
+    "enabled": true,
+    "targetDisplay": -1,
+    "x": 0.58,
+    "y": 0.02,
+    "width": 0.4,
+    "height": 0.4,
+    "resolution": 512,
+    "markerSizePixels": 14,
+    "trailDurationSeconds": 60,
+    "trailSampleInterval": 0.1,
+    "trailWidthPixels": 1.5,
+    "trailBreakDistance": 50
+  },
+  "targetFrameRate": 120,
+  "vSyncCount": 0
+}

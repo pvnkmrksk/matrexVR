@@ -29,6 +29,9 @@ public class MainController : MonoBehaviour
     public bool loopSequence = false;
     private bool randomise = false; // Added field
     private bool autoStart;
+    private readonly Dictionary<string, ClosedLoop> vrClosedLoops = new Dictionary<string, ClosedLoop>();
+    private readonly Dictionary<string, float> persistentDCOffsets = new Dictionary<string, float>();
+    private int selectedVRIndex = 1;
 
     // System Config properties
     [SerializeField]
@@ -376,6 +379,7 @@ public class MainController : MonoBehaviour
 
         if (activeSceneController != null && currentStepData.parameters != null)
         {
+            if (!currentStepData.parameters.ContainsKey("gain")) currentStepData.parameters["gain"] = currentStepData.gain;
             activeSceneController.InitializeScene(currentStepData.parameters);
             timer = currentStepData.duration;
         }
@@ -383,6 +387,45 @@ public class MainController : MonoBehaviour
         {
             Debugger.Log("Either the scene controller or the parameters are null.", 2);
         }
+        ApplyGainToClosedLoopComponents(currentStepData.gain);
+    }
+
+    private void ApplyGainToClosedLoopComponents(float gain)
+    {
+        foreach (ClosedLoop tracking in FindObjectsByType<ClosedLoop>(FindObjectsSortMode.None))
+            tracking.SetYawGain(gain);
+    }
+
+    public void RegisterVRClosedLoop(string vrId, ClosedLoop tracking)
+    {
+        if (string.IsNullOrEmpty(vrId) || tracking == null) return;
+        vrClosedLoops[vrId] = tracking;
+        if (persistentDCOffsets.TryGetValue(vrId, out float offset)) tracking.SetYawDCOffset(offset);
+        else persistentDCOffsets[vrId] = tracking.GetYawDCOffset();
+    }
+
+    public void UnregisterVRClosedLoop(string vrId, ClosedLoop tracking)
+    {
+        if (vrClosedLoops.TryGetValue(vrId, out ClosedLoop current) && current == tracking) vrClosedLoops.Remove(vrId);
+    }
+
+    private void HandleBogongGainInput()
+    {
+        if (ExperimentInput.IsEditingText) return;
+        var keys = UnityEngine.InputSystem.Keyboard.current;
+        if (keys == null) return;
+        if (keys.digit1Key.wasPressedThisFrame || keys.numpad1Key.wasPressedThisFrame) selectedVRIndex = 1;
+        else if (keys.digit2Key.wasPressedThisFrame || keys.numpad2Key.wasPressedThisFrame) selectedVRIndex = 2;
+        else if (keys.digit3Key.wasPressedThisFrame || keys.numpad3Key.wasPressedThisFrame) selectedVRIndex = 3;
+        else if (keys.digit4Key.wasPressedThisFrame || keys.numpad4Key.wasPressedThisFrame) selectedVRIndex = 4;
+        string vrId = "VR" + selectedVRIndex;
+        if (!vrClosedLoops.TryGetValue(vrId, out ClosedLoop tracking) || tracking == null || !tracking.UsesBogongInput) return;
+        // BogongAustralia: dcOffsetStep (0.005) * 100 * dt; held brackets select the direction.
+        float offset = tracking.GetYawDCOffset();
+        if (keys.rightBracketKey.isPressed) offset += .005f * 100f * Time.deltaTime;
+        if (keys.leftBracketKey.isPressed) offset -= .005f * 100f * Time.deltaTime;
+        tracking.SetYawDCOffset(offset);
+        persistentDCOffsets[vrId] = offset;
     }
 
     void OnDestroy()
@@ -396,6 +439,7 @@ public class MainController : MonoBehaviour
 
     void Update()
     {
+        HandleBogongGainInput();
         if (sequenceStarted)
         {
             ManageTimerAndTransitions();
@@ -465,7 +509,8 @@ public class MainController : MonoBehaviour
                             item.sceneName,
                             item.duration,
                             item.parameters,
-                            item.reloadScene
+                            item.reloadScene,
+                            item.gain
                         );
                         sequenceSteps.Add(newStep);
                         Debugger.Log("Added sequence step: " + JsonUtility.ToJson(newStep), 3);
@@ -580,7 +625,9 @@ void ManageTimerAndTransitions()
     if (canMutateInPlace)
     {
         // ★ NEW PATH: keep scene, just tell it to advance
+        if (next.parameters != null && !next.parameters.ContainsKey("gain")) next.parameters["gain"] = next.gain;
         sequencer.AdvanceStep(next.parameters);
+        ApplyGainToClosedLoopComponents(next.gain);
         timer = next.duration;      // restart timer for the new sub-step
     }
     else
@@ -652,12 +699,14 @@ public class SequenceStep
     public float duration;
     public Dictionary<string, object> parameters;
     public bool   reloadScene = true;
-    public SequenceStep(string sceneName, float duration, Dictionary<string, object> parameters, bool reloadScene = true)
+    public float gain = 1f;
+    public SequenceStep(string sceneName, float duration, Dictionary<string, object> parameters, bool reloadScene = true, float gain = 1f)
     {
         this.sceneName = sceneName;
         this.duration = duration;
         this.parameters = parameters;
         this.reloadScene = reloadScene;
+        this.gain = gain;
     }
 }
 
@@ -675,6 +724,7 @@ public class SequenceItem
 {
     public string sceneName;
     public float duration;
+    public float gain = 1f;
     public Dictionary<string, object> parameters;
 
     // NEW —— defaults to true, so legacy JSON stays valid
@@ -682,8 +732,12 @@ public class SequenceItem
 }
 
 [System.Serializable]
+public enum ClosedLoopMode { FicTrac, Kinefly, Tirbala }
+
+[System.Serializable]
 public class SystemConfig
 {
+    public ClosedLoopMode closedLoopMode = ClosedLoopMode.FicTrac;
     public ManualControlConfig manualControls;
     public float sphereDiameter = 1.0f;
     public int ledPanelWidth = 128;

@@ -37,7 +37,8 @@ Template: `system_config.template.json`.
 | `configs` | none | Array of per-rig entries. Use one entry for every rig that should render. |
 | `overheadCamera` | defaults below | Operator overview in Swarm/Kannadi; independent of animal camera letter order. |
 | `configs[].vrId` | `VR1` | Exact rig identifier, e.g. VR1–VR4. Duplicate IDs overwrite earlier entries; use unique IDs. |
-| `sphereDiameter` | 1 | FicTrac ball diameter in cm; template 2.6. Translation multiplies sensor displacement by diameter/2. |
+| `sphereDiameter` | 1 | Walking path ball diameter in cm; template 2.6. Historical Bogong/Kinefly retains the rig prefab diameter, as in the reference branch. |
+| `closedLoopMode` | `FicTrac` | Historical enum (also accepts 0/1/2): `FicTrac`, `Kinefly`, `Tirbala`. Set `Kinefly` for wing-angle input. See [gain compatibility](bogong-gain-compatibility.md) for the reference branch's unusual FicTrac label and the separate walking path. |
 | `ledPanelWidth`, `ledPanelHeight` | 128, 128 | Each camera viewport size in pixels. |
 | `startRow`, `startCol` | 0, 0 | Zero-based panel cells, measured from the top-left. |
 | `horizontal` | true | Advance through columns when true, rows when false. |
@@ -94,12 +95,13 @@ Template: `sequence.template.json`.
 | `sequences` | none | Required nonempty array of scene steps. |
 | `sceneName` | none | Exact enabled scene name, e.g. Swarm, Kannadi, Choice, Optomotor, Choice_desync. No Matrix scene exists. |
 | `duration` | 0 | Outer step time, seconds; use a positive duration. |
+| `gain` | 1 | Historical Bogong/Kinefly signed yaw gain, applied on scene load and in-place trial transitions. Zero disables yaw response; negative reverses it. It does not replace the separate walking angular multiplier. |
 | `reloadScene` | true | When false and the scene stays the same, call its in-scene sequencer. Use true for Dynamic Choice: its AdvanceStep is intentionally empty. |
 | `parameters` | null | Controller-specific dictionary. |
 | `parameters.configFile` | none | Choice, Optomotor, Kannadi or Swarm file relative to StreamingAssets. |
 | `parameters.design` | `dynamicSequenceDesign.json` | Dynamic Choice design file. |
 
-Outer duration always limits time spent in a scene, including an inner looping optomotor/dynamic sequence. Old top-level step `gain` from Bogong is **not** a supported SequenceItem field here. It must not be used to infer current movement gain.
+Outer duration always limits time spent in a scene, including an inner looping optomotor/dynamic sequence. Top-level step `gain` from Bogong is restored and defaults to 1 exactly as in `BogongAustralia`; it is applied even when the same scene advances without reloading.
 
 ## Movement settings in individual experiment files
 
@@ -135,7 +137,7 @@ Wind/AGL support is adapted from `origin/BogongAustralia` and `origin/smrmah-opt
 
 A Choice terrain scene can use `nightSky` without spawning objects. Start it through ControlScene so the sequence's `parameters.configFile` is loaded; with `autoStart: false`, press Start after entering Play mode. Choice uses boolean tracking switches (`true`/`false`). Swarm fields such as `spawnVolumeSize`, `mu` and `bogongVisual` do not spawn agents in a Choice scene.
 
-Exact historical inputs are in [config-history](config-history). They reference `Choice_Bogong` and `Photosphere/LSM.png`, which are not guaranteed here. The runnable examples use the existing Choice environment. SmrMah examples are provided with their branch identity; no remote branch actually named Deathhead was found. Force/torque and yaw-rate modes from those branches have **not** been substituted for this branch's FicTrac displacement protocol.
+Exact historical inputs are in [config-history](config-history). They reference `Choice_Bogong` and `Photosphere/LSM.png`, which are not guaranteed here. The runnable examples use the existing Choice environment. SmrMah examples are provided with their branch identity; no remote branch actually named Deathhead was found. The Bogong Kinefly yaw-rate path and its sequence gain are restored; see [gain compatibility](bogong-gain-compatibility.md).
 
 ### Choice object fields
 
@@ -186,7 +188,9 @@ Templates: `swarm.template.json`, `kannadi.template.json`, `kinematic.template.j
 | `vrConfigs` | null | Optional per-rig pose/gain overrides below. |
 | `animationNoiseThreshold` | legacy alias | Used only when `animationSpeedThreshold` is absent. Prefer the canonical name. |
 
-Walking uses **unit gain by default for both translation and yaw**. Ordinary Choice's enabled tracking also uses unit gain. In Swarm/Kannadi, explicit numeric fields override it; per-rig values take precedence over global values. Gain operates on displacement/angle, independent of render FPS. The former locust turn-speed interpretation has been removed. Yaw differences use the shortest signed angle across 0/360; the input must not turn more than 180 degrees between consumed samples to avoid angular aliasing.
+The Swarm/Kannadi walking path uses **unit gain by default for both translation and yaw**. Explicit numeric fields override those defaults; per-rig values take precedence over global values. Walking gain operates on displacement/angle, independent of render FPS. The former locust turn-speed interpretation has been removed. Walking yaw differences use the shortest signed angle across 0/360; the input must not turn more than 180 degrees between consumed samples to avoid angular aliasing.
+
+Kinefly explicitly selected in the system config uses the historical raw-radian yaw-rate path instead. The numeric Swarm/Kannadi gains only act as enabled/disabled switches there, and the sequence's `gain` controls Kinefly yaw. Ordinary Choice follows the historical Bogong tracking path.
 
 `vrConfigs[]`: `vrIndex` is required (1–4, unique); `initialPosition` and `initialRotation` are optional `{x,y,z}` world position/Euler degrees and otherwise keep current pose. Nullable `closedLoopPosition`/`closedLoopOrientation` override global gains. `watchIndex` is optional 1–4: in Kannadi it selects that animal's replica layer; omit/null to see the other animals. Self-view excludes its own central tile. Swarm does not use `watchIndex`.
 
@@ -306,4 +310,4 @@ Template: `dynamic-choice.template.json`, loaded via `parameters.design`. This s
 
 Replay uses the Control UI and ReplayController inspector fields, not a standalone JSON motion config. Select a run directory and its data files. The environment loader can use a saved dynamic design, including step names, object names, polar positions, scales, materials, and camera backgrounds. Operator bindings are in [Unity 6 controls](unity6-controls.md); data requirements are in [data formats](data-formats.md).
 
-Older files in StreamingAssets and `docs/legacy-locust-inputs` are retained research inputs, not the authoritative template library. Read the modern parser before reusing an old parameter: a silently ignored `gain`, `rot`, `sync`, or unsupported tracking mode will not produce the intended experiment.
+Older files in StreamingAssets and `docs/legacy-locust-inputs` are retained research inputs, not the authoritative template library. Read the modern parser before reusing an old parameter: a silently ignored `rot`, `sync`, or unsupported tracking setting will not produce the intended experiment.

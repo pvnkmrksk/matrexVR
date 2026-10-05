@@ -6,6 +6,7 @@ Copy a JSON file, rename it, and change its values. All paths inside a sequence 
 |---|---|
 | system_config.template.json | Copy to StreamingAssets/system_config.json; four RBLF rigs, 2.6 cm balls, local test addresses, overview and manual controls. |
 | system-config-six-cameras.template.json | Six directions per rig (DRBLFU), four non-overlapping rows, 128×128 panels; copy to system_config.json. |
+| system-config-kinefly.template.json | Six-camera layout with explicit Kinefly wing-angle input on all four rigs; historical raw-radian yaw-rate calculation and sequence gain. |
 | sequence.template.json | Copy to StreamingAssets/sequenceConfig.json; 20 s Swarm then 1000 s Kannadi. |
 | sequence-all-modes.example.json | Example wiring for every supported experiment controller. |
 | choice.template.json | All ordinary Choice fields; tree example and optional migration settings disabled. |
