@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class SwarmController : MonoBehaviour, IInSceneSequencer
 {
+    private bool configured;
+
     public void InitializeScene(Dictionary<string, object> parameters)
     {
         NightSkyController.Apply(gameObject, null, null);
@@ -17,7 +19,9 @@ public class SwarmController : MonoBehaviour, IInSceneSequencer
             spawner.loadConfigFromJsonFile = false;
             spawner.numberOfLocusts = movement.numberOfLocusts ?? spawner.numberOfLocusts;
             spawner.spawnAreaSize = movement.spawnAreaSize ?? spawner.spawnAreaSize;
-            spawner.mu = movement.mu ?? spawner.mu;
+            var previousReference = spawner.GetComponent<StimulusHeadingReference>();
+            float priorZero = previousReference != null && previousReference.Result != null ? (float)previousReference.Result.meanHeadingDegrees : 0f;
+            spawner.mu = movement.mu ?? Mathf.Repeat(spawner.mu - priorZero, 360f);
             spawner.kappa = movement.kappa ?? spawner.kappa;
             spawner.locustSpeed = movement.locustSpeed ?? spawner.locustSpeed;
             spawner.dimension = movement.dimension ?? spawner.dimension;
@@ -57,14 +61,26 @@ public class SwarmController : MonoBehaviour, IInSceneSequencer
             {
                 closedLoop.SetLocustGains(vr?.closedLoopPosition ?? movement.closedLoopPosition ?? 1,
                                           vr?.closedLoopOrientation ?? movement.closedLoopOrientation ?? 1);
-                if (vr != null)
+                if (vr != null && !(configured && movement.headingReference?.enabled == true))
                     closedLoop.SetPositionAndRotation(vr.initialPosition?.ToVector3() ?? spawner.transform.position,
                         vr.initialRotation != null ? Quaternion.Euler(vr.initialRotation.ToVector3()) : spawner.transform.rotation);
             }
             spawner.animateOnMove = movement.animateOnMove;
             spawner.animationSpeedThreshold = movement.animationSpeedThreshold;
-            spawner.Rebuild();
+            if (closedLoop != null)
+            {
+                float relativeMu = spawner.mu;
+                spawner.PrepareObservation();
+                StimulusHeadingReference.For(closedLoop).Begin(movement.headingReference, reference => {
+                    spawner.mu = reference != null ? reference.Resolve(relativeMu) : relativeMu;
+                    spawner.Rebuild();
+                });
+            }
+            else if (movement.headingReference?.enabled == true)
+                throw new System.InvalidOperationException("Heading-relative swarm requires a ClosedLoop rig: " + spawner.name);
+            else spawner.Rebuild();
         }
+        configured = true;
         SimpleOverheadCamera.EnsureInScene();
     }
     public void AdvanceStep(Dictionary<string, object> parameters) => InitializeScene(parameters);

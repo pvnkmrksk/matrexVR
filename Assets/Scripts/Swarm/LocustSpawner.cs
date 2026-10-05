@@ -78,6 +78,12 @@ public class LocustSpawner : MonoBehaviour
         // layerName = (string)config["layerName"];
     }
 
+    public void PrepareObservation()
+    {
+        Cleanup();
+        initialized = true; // Start must not spawn during assessment.
+    }
+
     public void Rebuild()
     {
         Cleanup();

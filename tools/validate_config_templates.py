@@ -19,6 +19,16 @@ for path in sorted(TEMPLATES.glob('*.json')):
             for key in ['configFile', 'design']:
                 if key in step['parameters']:
                     assert (SA / step['parameters'][key]).is_file(), (path, key)
+    if 'headingReference' in obj:
+        reference = obj['headingReference']
+        assert isinstance(reference.get('enabled', False), bool), path
+        if reference.get('enabled', False):
+            assert reference.get('windowSeconds', 180) > 0, path
+    if 'telemetry' in obj and obj['telemetry'].get('enabled', True):
+        telemetry = obj['telemetry']
+        assert 1 <= telemetry.get('port', 9880) <= 65535, path
+        assert 0 < telemetry.get('rateHz', 20) <= 240, path
+        assert telemetry.get('port', 9880) not in [rig['zmqPort'] for rig in obj['configs']], path
     if 'configs' in obj:
         target = obj.get('targetFrameRate', 120)
         assert target == -1 or target > 0, path

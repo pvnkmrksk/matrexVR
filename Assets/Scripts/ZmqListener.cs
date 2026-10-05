@@ -3,7 +3,7 @@ using NetMQ;
 using NetMQ.Sockets;
 using System.Threading;
 using System;
-using System.IO;
+using Newtonsoft.Json;
 
 public class ZmqListener : MonoBehaviour
 {
@@ -15,10 +15,8 @@ public class ZmqListener : MonoBehaviour
     [SerializeField]
     public int port = 9872; // Replace with your port number
 
-    private SubscriberSocket subscriber;
     private Thread listenerThread;
     private volatile bool isRunning;
-    private string message; // The message received from the socket
     // Pose is a multi-word struct. Publish/copy it under one lock so a render frame
     // cannot combine position or quaternion components from different network packets.
     private readonly object poseLock = new object();
@@ -29,10 +27,14 @@ public class ZmqListener : MonoBehaviour
     {
         public Vector3 position;
         public Vector3 rotation;
+        public Quaternion convertedRotation;
+        public long sequence, receivedUtcTicks;
+        public bool hasPose;
     }
     public RawSample ReadRawSample()
     {
-        lock (poseLock) return new RawSample { position = latestPose.position, rotation = latestRawRotation };
+        lock (poseLock) return new RawSample { position = latestPose.position, rotation = latestRawRotation, convertedRotation = latestPose.rotation,
+            sequence = receivedSequence, receivedUtcTicks = lastPoseTicksUtc, hasPose = hasPose };
     }
     private bool hasPose;
     public Pose pose
@@ -57,8 +59,9 @@ public class ZmqListener : MonoBehaviour
         }
     }
 
-    private long lastPoseTicksUtc;
+    private long lastPoseTicksUtc, receivedSequence;
 
+    // Keep legacy missing-field defaults (zero) for trackers that only send yaw.
     private class ZmqMessage
     {
         public float x;
@@ -71,80 +74,52 @@ public class ZmqListener : MonoBehaviour
 
     void Start()
     {
-        // Apply system config at start
         ApplySystemConfig();
-
-        subscriber = new SubscriberSocket();
-        subscriber.Connect($"tcp://{address}:{port}");
-        subscriber.SubscribeToAnyTopic(); // Subscribe to all topics
-
-        // Start listening for messages on a separate thread
+        string endpoint = $"tcp://{address}:{port}";
         isRunning = true;
-        listenerThread = new Thread(() =>
-        {
-            while (isRunning)
-            {
-                try
-                {
-                    string topic = subscriber.ReceiveFrameString();
-                    message = subscriber.ReceiveFrameString();
-
-                    if (!isRunning)
-                    {
-                        break;
-                    }
-
-                    // Update the pose based on the received values
-                    ZmqMessage zmqMessage = JsonUtility.FromJson<ZmqMessage>(message);
-                    UpdatePose(zmqMessage);
-                }
-                catch (ObjectDisposedException)
-                {
-                    break;
-                }
-                catch (NetMQException ex)
-                {
-                    if (!isRunning)
-                    {
-                        break;
-                    }
-
-                    // Change error level from 1 (error) to 3 (info) for socket exceptions
-                    string errorMessage = ex.ToString();
-
-                    // Handle common socket messages that shouldn't be treated as errors
-                    if (errorMessage.Contains("connection reset by peer") ||
-                        errorMessage.Contains("non-blocking socket would block"))
-                    {
-                        Debugger.Log("NetMQ socket info: " + errorMessage, 3);
-                    }
-                    else
-                    {
-                        // For other NetMQ exceptions, still log as warnings
-                        Debugger.Log("NetMQException: " + errorMessage, 2);
-                    }
-
-                    Thread.Sleep(100);
-                    continue;
-                }
-                catch (Exception ex)
-                {
-                    if (!isRunning)
-                    {
-                        break;
-                    }
-
-                    Debugger.Log("Unhandled ZMQ listener exception: " + ex, 1);
-                    Thread.Sleep(100);
-                }
-            }
-        })
-        {
-            IsBackground = true,
-            Name = $"{gameObject.name}_ZmqListener"
-        };
+        listenerThread = new Thread(() => Listen(endpoint)) { IsBackground = true, Name = name + "_ZmqListener" };
         listenerThread.Start();
     }
+
+    private void Listen(string endpoint)
+    {
+        // Create, use and dispose on one thread. Main-thread shutdown only sets a flag.
+        try
+        {
+            using (var socket = new SubscriberSocket())
+            {
+                socket.Options.Linger = TimeSpan.Zero;
+                socket.Connect(endpoint);
+                socket.SubscribeToAnyTopic();
+                while (isRunning)
+                {
+                    NetMQMessage frames = new NetMQMessage();
+                    if (!socket.TryReceiveMultipartMessage(TimeSpan.FromMilliseconds(100), ref frames)) continue;
+                    if (!isRunning) break;
+                    try
+                    {
+                        if (frames.FrameCount != 2) throw new FormatException("Expected topic + JSON pose frames.");
+                        UpdatePose(JsonConvert.DeserializeObject<ZmqMessage>(frames[1].ConvertToString()));
+                    }
+                    catch (Exception ex)
+                    {
+                        // Limit repeated malformed-packet reports to once per second.
+                        long now = DateTime.UtcNow.Ticks;
+                        if (now - lastPacketErrorTicks >= TimeSpan.TicksPerSecond)
+                        {
+                            lastPacketErrorTicks = now;
+                            Debug.LogError("Invalid tracking packet on " + endpoint + ": " + ex.Message);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (isRunning) Debug.LogError("ZMQ listener failed on " + endpoint + ": " + ex);
+        }
+    }
+    private long lastPacketErrorTicks;
 
     private void ApplySystemConfig()
     {
@@ -170,6 +145,9 @@ public class ZmqListener : MonoBehaviour
 
     private void UpdatePose(ZmqMessage zmqMessage)
     {
+        if (zmqMessage == null || !Finite(zmqMessage.x) || !Finite(zmqMessage.y) || !Finite(zmqMessage.z) ||
+            !Finite(zmqMessage.pitch) || !Finite(zmqMessage.yaw) || !Finite(zmqMessage.roll))
+            throw new FormatException("Tracking pose must contain finite numbers.");
         // Transform the position
         Vector3 position = new Vector3(zmqMessage.x, zmqMessage.y, zmqMessage.z);
 
@@ -183,6 +161,7 @@ public class ZmqListener : MonoBehaviour
             latestPose = new Pose(position, rotation);
             hasPose = true;
             lastPoseTicksUtc = DateTime.UtcNow.Ticks;
+            receivedSequence++;
         }
     }
 
@@ -193,8 +172,11 @@ public class ZmqListener : MonoBehaviour
             latestPose = value;
             hasPose = true;
             lastPoseTicksUtc = DateTime.UtcNow.Ticks;
+            receivedSequence++;
         }
     }
+
+    private static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
 
     public bool HasFreshPose(double maxAgeSeconds = 1.0)
     {
@@ -204,19 +186,6 @@ public class ZmqListener : MonoBehaviour
     private void StopListener()
     {
         isRunning = false;
-
-        try
-        {
-            subscriber?.Dispose();
-        }
-        catch (Exception ex)
-        {
-            Debugger.Log("Error disposing ZMQ subscriber: " + ex, 2);
-        }
-        finally
-        {
-            subscriber = null;
-        }
 
         if (listenerThread != null && listenerThread.IsAlive)
         {

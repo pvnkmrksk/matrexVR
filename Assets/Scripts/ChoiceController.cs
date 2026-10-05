@@ -15,6 +15,8 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
     private Dictionary<string, Material> materialDict = new Dictionary<string, Material>();
     string[] tags = new string[] { "ChoiceVR1", "ChoiceVR2", "ChoiceVR3", "ChoiceVR4" };
     private Transform spawnedObjectsRoot;
+    private bool configured;
+    private readonly List<StimulusHeadingReference> headingReferences = new List<StimulusHeadingReference>();
     private Material defaultSkyboxMaterial;
     private Material runtimeSkyboxMaterial;
     private Texture2D runtimeSkyboxTexture;
@@ -54,7 +56,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
     private void ApplySceneParameters(Dictionary<string, object> parameters)
     {
-        Debugger.Log("InitializeScene called.");
+        Debugger.Log("InitializeScene called.", 3);
 
         if (parameters == null || !parameters.ContainsKey("configFile"))
         {
@@ -68,6 +70,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             return;
         }
 
+        config.headingReference?.Validate();
         Keyboard.ApplyAutopilotConfig(config.autopilotEnabled, config.autopilotSpeed);
 
         CleanupSpawnedObjects();
@@ -94,30 +97,6 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         {
             Debug.LogWarning("Choice scene config is empty.");
             return;
-        }
-
-        foreach (var obj in config.objects ?? System.Array.Empty<SceneObject>())
-        {
-            if (string.IsNullOrEmpty(obj.type))
-            {
-                continue; // Skip objects with no type specified
-            }
-
-            bool isBandObject = obj.type.ToLower().Contains("band");
-
-            if (isBandObject)
-            {
-                for (int i = 0; i < tags.Length; i++)
-                {
-                    InstantiateBand(obj, i + 1);
-                }
-            }
-            else if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
-            {
-                GameObject instance = Instantiate(prefab, spawnedObjectsRoot);
-                ApplyResolvedTransform(instance.transform, obj);
-                ConfigureRegularObjectInstance(instance, obj);
-            }
         }
 
         ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
@@ -152,7 +131,8 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             {
                 initialRotation = Quaternion.Euler(config.initialRotation);
             }
-            cl.SetPositionAndRotation(config.initialPosition, initialRotation);
+            if (!(configured && config.headingReference?.enabled == true))
+                cl.SetPositionAndRotation(config.initialPosition, initialRotation);
         }
         // Read and set the background color of cameras
         if (config.backgroundColor != null)
@@ -178,7 +158,21 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         }
         // TODO: Set sky and grass textures
         // Start the coroutine from here
-        StartCoroutine(DelayedOnLoaded(0.05f));
+        if (config.headingReference?.enabled == true)
+        {
+            foreach (ClosedLoop rig in closedLoopComponents)
+            {
+                var heading = StimulusHeadingReference.For(rig);
+                headingReferences.Add(heading);
+                heading.Begin(config.headingReference, reference => SpawnRelativeObjects(config, rig, reference));
+            }
+        }
+        else
+        {
+            SpawnAbsoluteObjects(config);
+            StartCoroutine(DelayedOnLoaded(0.05f));
+        }
+        configured = true;
 
         if (!string.IsNullOrEmpty(config.skyboxPath))
         {
@@ -190,8 +184,67 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         }
     }
 
+    private void SpawnAbsoluteObjects(SceneConfig config)
+    {
+        foreach (var obj in config.objects ?? System.Array.Empty<SceneObject>())
+        {
+            if (string.IsNullOrEmpty(obj.type))
+            {
+                continue; // Skip objects with no type specified
+            }
+
+            bool isBandObject = obj.type.ToLower().Contains("band");
+
+            if (isBandObject)
+            {
+                for (int i = 0; i < tags.Length; i++)
+                {
+                    InstantiateBand(obj, i + 1);
+                }
+            }
+            else if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
+            {
+                GameObject instance = Instantiate(prefab, spawnedObjectsRoot);
+                ApplyResolvedTransform(instance.transform, obj);
+                ConfigureRegularObjectInstance(instance, obj);
+            }
+        }
+
+    }
+
+    private void SpawnRelativeObjects(SceneConfig config, ClosedLoop rig, HeadingReferenceResult reference)
+    {
+        int vrIndex = Kannadi.ParseVRIndex(rig.name);
+        if (vrIndex < 1 || vrIndex > 4) throw new System.InvalidOperationException("Cannot identify Choice rig: " + rig.name);
+        int layer = LayerMask.NameToLayer("SimulatedLocustsVR" + vrIndex);
+        if (layer < 0) throw new System.InvalidOperationException("Missing per-rig Choice stimulus layer for VR" + vrIndex);
+        int layers = LayerMask.GetMask("SimulatedLocustsVR1", "SimulatedLocustsVR2", "SimulatedLocustsVR3", "SimulatedLocustsVR4");
+        foreach (Camera camera in rig.GetComponentsInChildren<Camera>(true))
+            camera.cullingMask = (camera.cullingMask & ~layers) | (1 << layer);
+        foreach (SceneObject obj in config.objects ?? System.Array.Empty<SceneObject>())
+        {
+            if (string.IsNullOrEmpty(obj.type)) continue;
+            if (obj.type.ToLowerInvariant().Contains("band"))
+                InstantiateBand(obj, vrIndex, reference, rig.transform.position);
+            else if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
+            {
+                GameObject instance = Instantiate(prefab, spawnedObjectsRoot);
+                ApplyResolvedTransform(instance.transform, obj);
+                // Authored coordinates are relative to the animal's location at onset.
+                instance.transform.position += rig.transform.position;
+                StimulusHeadingReference.RotateStimulus(instance.transform, rig.transform.position, reference);
+                SetLayerRecursively(instance, layer);
+                ConfigureRegularObjectInstance(instance, obj);
+            }
+        }
+    }
+
     private void CleanupSpawnedObjects()
     {
+        StopAllCoroutines();
+        foreach (StimulusHeadingReference heading in headingReferences)
+            if (heading != null) heading.Cancel();
+        headingReferences.Clear();
         NightSkyController.Apply(gameObject, null, null);
         ClearRuntimeSkybox();
 
@@ -202,7 +255,10 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
         for (int i = spawnedObjectsRoot.childCount - 1; i >= 0; i--)
         {
-            Destroy(spawnedObjectsRoot.GetChild(i).gameObject);
+            GameObject old = spawnedObjectsRoot.GetChild(i).gameObject;
+            old.GetComponent<BandSpawner>()?.ClearInstances();
+            old.SetActive(false);
+            Destroy(old);
         }
     }
 
@@ -247,12 +303,17 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         }
     }
 
-    private void InstantiateBand(SceneObject obj, int vrIndex)
+    private void InstantiateBand(SceneObject obj, int vrIndex, HeadingReferenceResult reference = null, Vector3 pivot = default)
     {
         if (prefabDict.TryGetValue(obj.type, out GameObject bandPrefab))
         {
             GameObject bandInstance = Instantiate(bandPrefab, spawnedObjectsRoot);
             ApplyResolvedTransform(bandInstance.transform, obj);
+            if (reference != null)
+            {
+                bandInstance.transform.position += pivot;
+                StimulusHeadingReference.RotateStimulus(bandInstance.transform, pivot, reference);
+            }
 
             // Set a proper name for the band instance
             bandInstance.name = $"{bandPrefab.name}_{vrIndex}";
@@ -284,14 +345,14 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
                 spawner.spawnLengthX = obj.spawnLengthX;
                 spawner.spawnLengthZ = obj.spawnLengthZ;
                 spawner.gridType = obj.gridType;
-                spawner.mu = obj.mu;
+                spawner.mu = reference == null ? obj.mu : 90f - reference.Resolve(obj.mu);
                 spawner.kappa = obj.kappa;
                 spawner.speed = obj.speed;
                 spawner.visibleOffDuration = obj.visibleOffDuration;
                 spawner.visibleOnDuration = obj.visibleOnDuration;
                 spawner.boundaryLengthX = obj.boundaryLengthX;
                 spawner.boundaryLengthZ = obj.boundaryLengthZ;
-                spawner.rotationAngle = obj.rotationAngle;
+                spawner.rotationAngle = reference == null ? obj.rotationAngle : reference.Resolve(obj.rotationAngle);
 
                 // Set the new locking properties
                 spawner.lockBoundaryWithAnimalPosition = obj.lockBoundaryWithAnimalPosition;
@@ -509,6 +570,10 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
     private void OnDestroy()
     {
+        StopAllCoroutines();
+        foreach (StimulusHeadingReference heading in headingReferences)
+            if (heading != null) heading.Cancel();
+        headingReferences.Clear();
         NightSkyController.Apply(gameObject, null, null);
         ClearRuntimeSkybox();
     }
@@ -548,6 +613,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 [System.Serializable]
 public class SceneConfig
 {
+    public HeadingReferenceConfig headingReference;
     public SceneObject[] objects = System.Array.Empty<SceneObject>();
     public bool closedLoopOrientation;
     public bool closedLoopPosition;

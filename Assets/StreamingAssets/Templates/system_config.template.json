@@ -1,4 +1,6 @@
 {
+  "telemetry": { "enabled": true, "bindAddress": "127.0.0.1", "port": 9880, "rateHz": 20, "topic": "matrex.telemetry.v1" },
+  "statusOverlay": { "visible": true, "targetDisplay": 0 },
   "targetDisplay": 0,
   "configs": [
     {

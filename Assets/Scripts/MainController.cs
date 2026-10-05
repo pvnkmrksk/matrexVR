@@ -15,6 +15,13 @@ public class MainController : MonoBehaviour
 {
     public static MainController Instance { get; private set; }
     public static event System.Action SystemConfigurationChanged;
+    public bool SequenceRunning => sequenceStarted;
+    public float RemainingStepSeconds => timer;
+    public string SequenceError { get; private set; }
+    public IReadOnlyDictionary<string, ClosedLoop> VRClosedLoops => vrClosedLoops;
+    public IReadOnlyDictionary<string, SystemConfig> SystemConfigs => systemConfigs;
+    public TelemetryConfig TelemetrySettings { get; private set; } = new TelemetryConfig();
+    public StatusOverlayConfig StatusOverlaySettings { get; private set; } = new StatusOverlayConfig();
     public int TargetFrameRate { get; private set; } = 120;
     public int VSyncCount { get; private set; } = 0;
     public OverheadCameraConfig OverheadCameraSettings { get; private set; } = new OverheadCameraConfig();
@@ -168,6 +175,9 @@ public class MainController : MonoBehaviour
             // Parse the JSON using JObject instead of dynamic
             JObject fullConfig = JObject.Parse(jsonText);
             ApplyFrameTiming(fullConfig);
+            TelemetrySettings = fullConfig["telemetry"]?.ToObject<TelemetryConfig>() ?? new TelemetryConfig();
+            StatusOverlaySettings = fullConfig["statusOverlay"]?.ToObject<StatusOverlayConfig>() ?? new StatusOverlayConfig();
+            TelemetrySettings.Validate();
             OverheadCameraSettings = fullConfig["overheadCamera"]?.ToObject<OverheadCameraConfig>() ?? new OverheadCameraConfig();
 
             // Extract global target display if it exists
@@ -285,6 +295,8 @@ public class MainController : MonoBehaviour
     {
         sequenceStarted = false;
         currentStep = 0;
+        foreach (ClosedLoop rig in vrClosedLoops.Values)
+            if (rig != null) rig.GetComponent<StimulusHeadingReference>()?.Cancel();
     }
 
     public void StartSequence()
@@ -298,6 +310,7 @@ public class MainController : MonoBehaviour
         }
 
         sequenceStarted = true;
+        SequenceError = null;
 
         // Initialize execution order
         if (randomise)
@@ -380,7 +393,7 @@ public class MainController : MonoBehaviour
         if (activeSceneController != null && currentStepData.parameters != null)
         {
             if (!currentStepData.parameters.ContainsKey("gain")) currentStepData.parameters["gain"] = currentStepData.gain;
-            activeSceneController.InitializeScene(currentStepData.parameters);
+            InitializeStep(() => activeSceneController.InitializeScene(currentStepData.parameters));
             timer = currentStepData.duration;
         }
         else
@@ -579,8 +592,46 @@ public class MainController : MonoBehaviour
         Debug.Log("MainController was disabled.");
     }
 
+private void InitializeStep(System.Action initialize)
+{
+    try { initialize(); }
+    catch (System.Exception error)
+    {
+        SequenceError = error.Message;
+        sequenceStarted = false;
+        Debug.LogException(error);
+    }
+}
+
+public bool AssessmentFailed
+{
+    get
+    {
+        foreach (ClosedLoop rig in vrClosedLoops.Values)
+            if (rig != null && rig.GetComponent<StimulusHeadingReference>()?.Phase == "error") return true;
+        return false;
+    }
+}
+
+public bool AssessmentPending
+{
+    get
+    {
+        foreach (ClosedLoop rig in vrClosedLoops.Values)
+        {
+            if (rig == null) continue;
+            var reference = rig.GetComponent<StimulusHeadingReference>();
+            if (reference != null && (reference.IsObserving || reference.Phase == "error")) return true;
+        }
+        return false;
+    }
+}
+
 void ManageTimerAndTransitions()
 {
+    // Sequence duration is presentation time. Assessment adds time without
+    // interrupting closed-loop movement or resetting a rig at stimulus onset.
+    if (AssessmentPending) return;
     timer -= Time.deltaTime;
 
     if (timer > 0) return;   // still running this step
@@ -626,7 +677,7 @@ void ManageTimerAndTransitions()
     {
         // ★ NEW PATH: keep scene, just tell it to advance
         if (next.parameters != null && !next.parameters.ContainsKey("gain")) next.parameters["gain"] = next.gain;
-        sequencer.AdvanceStep(next.parameters);
+        InitializeStep(() => sequencer.AdvanceStep(next.parameters));
         ApplyGainToClosedLoopComponents(next.gain);
         timer = next.duration;      // restart timer for the new sub-step
     }

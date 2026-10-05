@@ -11,6 +11,14 @@ public enum SpawnGridType
 
 public class BandSpawner : MonoBehaviour
 {
+    private readonly List<GameObject> ownedInstances = new List<GameObject>();
+    public void ClearInstances()
+    {
+        foreach (GameObject instance in ownedInstances)
+            if (instance != null) { instance.SetActive(false); Destroy(instance); }
+        ownedInstances.Clear();
+    }
+    private void OnDestroy() => ClearInstances();
     public GameObject instancePrefab;
     [Header("Instance Parameters")]
 
@@ -260,6 +268,7 @@ public class BandSpawner : MonoBehaviour
             GameObject instance = Instantiate(instancePrefab, position, Quaternion.identity,
                 lockAgentWithAnimalPosition ? transform : null);
 
+            ownedInstances.Add(instance);
             // Recursively set the layer for the instance and all its children
             SetLayerRecursively(instance, parentLayer);
 

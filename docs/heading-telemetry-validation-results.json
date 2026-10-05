@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-05",
+  "baseBranch": "codex/bogong-night-sky",
+  "baseCommit": "779926a80b02190d6dd0410f260e52bba105a04e",
+  "unity": "6000.3.16f1",
+  "testedFileSha256": {
+    "Assets/Scripts/StimulusHeadingReference.cs": "fde7da7299fac5e5b9c4d3efd11351ab614105190e5a1fd7a9b866e4154ed8ae",
+    "Assets/Scripts/ExperimentTelemetry.cs": "e5a7d7be01cc243ceb46724fc0dc09a589977728dc14fedccf2dc8fe8cb40e64",
+    "Assets/Scripts/RuntimeStatusOverlay.cs": "ef60c0b377eaf815e8ceb26399301663c6a84ec0c8a96b724ccd11a964b45cdd",
+    "Assets/Scripts/ZmqListener.cs": "cd733b541215c73d7ecd126cabd956da467d40960250dbafda4523c0ad852e19",
+    "Assets/Scripts/ClosedLoop.cs": "8a17a6412074106a952f46375859f006c3b1089338ac9eea4763e6523b68722c",
+    "Assets/Scripts/MainController.cs": "f4e7313a2aea78baa18d599bc1a63df3f59d316d66062d4f486904cd3167b116",
+    "Assets/Scripts/Swarm/SwarmController.cs": "8e98d6c396e92eaf347653143337856aa9599ad5b445b8f8b057316a8378d779",
+    "Assets/Scripts/Swarm/LocustSpawner.cs": "70f9d7d49a023dc6c76a8c2d8cc0b194931e9a3dda4eef47bed9f77425faafeb",
+    "Assets/Scripts/Swarm/KannadiConfig.cs": "2ee4613eb1983a465d45f6166ce3e80559d997992aee31388f44cee0fb142d7b",
+    "Assets/Scripts/ChoiceController.cs": "e7950e5f8c9bf340d7acde88895cf980741d3bf7c2f611063ee203b2ce9238c4",
+    "Assets/Scripts/BandSpawner.cs": "96666417c866e3b058804a5f561167bef6532db37a49a95cea930e4aea77c4a4",
+    "Assets/Scripts/Debugger.cs": "d31aa86d44735da913cebb9fd635847e750b124af24a2b473fee0022f05d123e",
+    "Assets/Editor/HeadingTelemetryValidation.cs": "04d332ffc2989c55c0d03d6ea168a060bf286d7782c2fd5bf6bd68ecd28c7d29"
+  },
+  "headingTelemetry": {
+    "checks": 76,
+    "failure": null,
+    "unexpectedErrors": [],
+    "unity": "6000.3.16f1",
+    "coverage": "Circular statistics, disabled/default/invalid/sequence config, generic and Choice adapters, real Swarm lifecycle, per-rig onset/no reset, repeat trial, PUB/SUB tracking and telemetry, raw units, player errors and HUD"
+  },
+  "historicalKinefly": {
+    "checks": 73746,
+    "failure": null,
+    "referenceCommit": "ef8a68b2ad2ff690e803007511666296a31eda5a",
+    "comparison": "Exact Vector3 and Quaternion component equality on every simulated frame",
+    "unity": "6000.3.16f1"
+  },
+  "walkingRegression": {
+    "checks": 1008,
+    "failures": [],
+    "editorMessages": [
+      "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.\nParameter name: index"
+    ]
+  },
+  "externalSubscriber": {
+    "tool": "tools/listen_telemetry.py",
+    "library": "pyzmq 27.2.0",
+    "receivedSnapshots": 5,
+    "rigsPerSnapshot": 4,
+    "increasingSequence": true
+  },
+  "staticValidation": {
+    "templates": 22,
+    "sceneCatalogDependencyFiles": 84,
+    "uniqueAssetGuids": true,
+    "featureDiffWhitespace": "passed"
+  },
+  "visualValidation": "Rendered persistent bottom-right HUD inspected; trial, scene, per-rig gains/DC, heading references, input status, PUB endpoint and error message visible.",
+  "limitations": [
+    "Physical tracker latency, LED timing, multi-monitor mapping and a packaged standalone player were not bench-tested.",
+    "UnityEditor.Search.SearchDatabase emitted its existing indexing exception; recorded separately by the walking suite.",
+    "PUB telemetry is sampled and can drop snapshots under backpressure; it is not a lossless sensor recorder."
+  ]
+}

@@ -9,6 +9,7 @@ using UnityEngine;
 [Serializable]
 public class KannadiConfig
 {
+    public HeadingReferenceConfig headingReference;
     public int? numberOfRings;
     public float? hexRadius;
     public float? spacing; // Legacy name; hexRadius takes precedence.
@@ -58,6 +59,7 @@ public class KannadiConfig
             // sequence-level duplicates cannot override it.
             inline.Remove("autopilotEnabled");
             inline.Remove("autopilotSpeed");
+            inline.Remove("headingReference"); // Experiment-file only; never a sequence override.
             json.Merge(inline, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace });
         }
         if (json["animationSpeedThreshold"] == null && json["animationNoiseThreshold"] != null)
@@ -69,6 +71,7 @@ public class KannadiConfig
 
     public void Validate()
     {
+        headingReference?.Validate();
         float radius = hexRadius ?? spacing ?? 10f;
         if (!Finite(radius) || radius <= 0) throw new ArgumentException("Kannadi hexRadius/spacing must be positive and finite.");
         if (numberOfRings > 100) throw new ArgumentException("Kannadi numberOfRings exceeds the supported limit of 100.");

@@ -1,9 +1,12 @@
 {
-  "headingReference": { "enabled": false, "windowSeconds": 180 },
+  "headingReference": {
+    "enabled": true,
+    "windowSeconds": 180
+  },
   "numberOfLocusts": 256,
   "density": null,
   "spawnAreaSize": 200,
-  "mu": 0,
+  "mu": 90,
   "kappa": 100000,
   "locustSpeed": 2,
   "dimension": "2D",
@@ -18,7 +21,12 @@
     "sizeMode": "World",
     "size": 0.5,
     "angularSizeDegrees": 1,
-    "color": { "r": 0.12, "g": 0.12, "b": 0.12, "a": 1 },
+    "color": {
+      "r": 0.12,
+      "g": 0.12,
+      "b": 0.12,
+      "a": 1
+    },
     "metallic": 0,
     "smoothness": 0.25,
     "flickerFrequencyHz": 0,

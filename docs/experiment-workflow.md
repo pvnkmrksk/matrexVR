@@ -29,3 +29,7 @@ This project runs experiments by chaining Unity scenes and, within some scenes, 
 2) Add/update a `sequences` entry in `sequenceConfig.json` with the target `sceneName`, `duration`, and any parameters the scene expects (e.g., `design`).  
 3) Ensure the scene controller implements `IInSceneSequencer` if you plan to stay in-scene (`reloadScene: false`), or leave `reloadScene` at `true` to force a reload between steps.  
 4) Play the scene; `MainController` will load the config, copy it to the log folder, and step through scenes/steps according to your settings.
+
+## Continuous heading assessment
+
+For Swarm or ordinary Choice, enable `headingReference` in the individual experiment config. The rig continues tracking through assessment and stimulus onset, with no onset reset. The sequence duration starts counting down when all rigs have presented their stimuli. See [heading-relative presentation](heading-reference-telemetry.md) for a reusable component API and the required stimulus adapter when adding new controllers.

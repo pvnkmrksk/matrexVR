@@ -37,6 +37,16 @@ public class ClosedLoop : MonoBehaviour
     [SerializeField] private float torqueGainStep = .1f;
     private float lastYawInput, lastYawOutput;
     private string registeredVrId;
+    public ZmqListener.RawSample LastConsumedSample { get; private set; }
+    public Vector3 LastAppliedPositionDelta { get; private set; }
+    public float LastAppliedYawDeltaDegrees { get; private set; }
+    public bool AppliedTrackingThisFrame { get; private set; }
+    public bool PositionTrackingEnabled => closedLoopPosition;
+    public bool OrientationTrackingEnabled => closedLoopOrientation;
+    public float PositionGain => useLocustGains ? locustPositionGain : 1f;
+    public float OrientationGain => useLocustGains ? locustOrientationGain : useForceMode ? torqueGain : useYawMode ? yawGain : 1f;
+    public float ForceGain => forceGain;
+    public float TorqueGain => torqueGain;
     public bool UsesBogongInput => !useLocustGains;
     public float GetYawGain() => yawGain;
     public float GetYawDCOffset() => yawDCOffset;
@@ -80,6 +90,9 @@ public class ClosedLoop : MonoBehaviour
 
     private void Update()
     {
+        AppliedTrackingThisFrame = false;
+        LastAppliedPositionDelta = Vector3.zero;
+        LastAppliedYawDeltaDegrees = 0;
         if (HandleInput()) return;
 
         if (_zmqListener == null || (useLocustGains && !_zmqListener.HasPose))
@@ -131,6 +144,8 @@ public class ClosedLoop : MonoBehaviour
 
     private void AdvanceTracking(float seconds)
     {
+        Vector3 beforePosition = transform.position;
+        float beforeYaw = transform.eulerAngles.y;
         Vector3 currentFicTracData = GetCurrentFicTracData();
         Vector3 ficTracDelta = currentFicTracData - _lastFicTracData;
 
@@ -158,6 +173,9 @@ public class ClosedLoop : MonoBehaviour
         }
 
         _lastFicTracData = currentFicTracData;
+        LastAppliedPositionDelta = transform.position - beforePosition;
+        LastAppliedYawDeltaDegrees = Mathf.DeltaAngle(beforeYaw, transform.eulerAngles.y);
+        AppliedTrackingThisFrame = true;
     }
 
     private void ApplyBogongOrientation(Vector3 current, Vector3 delta, float seconds)
@@ -249,13 +267,9 @@ public class ClosedLoop : MonoBehaviour
 
     private Vector3 GetCurrentFicTracData()
     {
-        if (!useLocustGains)
-        {
-            ZmqListener.RawSample sample = _zmqListener.ReadRawSample();
-            return new Vector3(sample.position.y, sample.position.x, sample.rotation.y);
-        }
-        Pose pose = _zmqListener.pose;
-        return new Vector3(pose.position.y, pose.position.x, pose.rotation.eulerAngles.y * Mathf.Deg2Rad);
+        LastConsumedSample = _zmqListener.ReadRawSample();
+        return new Vector3(LastConsumedSample.position.y, LastConsumedSample.position.x,
+            !useLocustGains ? LastConsumedSample.rotation.y : LastConsumedSample.convertedRotation.eulerAngles.y * Mathf.Deg2Rad);
     }
 
     // New methods

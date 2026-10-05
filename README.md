@@ -9,7 +9,7 @@ Use **Unity 6000.3.16f1**, matching ProjectVersion.txt. Packages are pinned in `
 1. Open `Assets/Scenes/ControlScene.unity`.
 2. Create `Assets/StreamingAssets/system_config.json` from [the system template](Assets/StreamingAssets/Templates/system_config.template.json). Configure each rig's ZMQ endpoint, ball diameter, physical display and camera order. This machine's selected setup is four rigs, RBLF cameras, 2.6 cm spheres.
 3. Choose [an experiment template](Assets/StreamingAssets/Templates/README.md), copy it under a new filename, and reference it in `sequenceConfig.json`. The active sequence is a dense aligned **Swarm for 20 s**, then **Kannadi for 1000 s**.
-4. Enter Play mode from Control, fill the experiment metadata, and start the sequence. Focus Game for hotkeys. R resets; P toggles tracked position; O toggles tracked orientation. Escape returns to Control.
+4. Enter Play mode from Control, fill the experiment metadata, and start the sequence. Focus Game for hotkeys. R resets; P toggles tracked position; O toggles tracked orientation. Escape returns to Control. **Tab shows/hides the bottom-right status/error panel.**
 5. Find recordings under `Assets/RunData/<session>/`. Preserve the saved config files with the data.
 
 ## Reference manuals
@@ -19,6 +19,7 @@ Use **Unity 6000.3.16f1**, matching ProjectVersion.txt. Packages are pinned in `
 | [Configuration reference](docs/configuration-reference.md) | Every current system, sequence, Choice, Swarm, Kannadi/kinematic, optomotor, migration and dynamic-design parameter; defaults, units, precedence and legacy no-op fields. |
 | [Editable templates](Assets/StreamingAssets/Templates/README.md) | Complete JSON files and runnable example sequences, including migration AGL 10/100/1000. |
 | [Unity 6 controls](docs/unity6-controls.md) | Action map, keyboard/mouse/gamepad bindings, UI migration, tracking/reset behavior and bench checks. |
+| [Heading reference and telemetry](docs/heading-reference-telemetry.md) | Per-animal circular heading assessment, stimulus-relative angles, outbound ZMQ, and the restored Tab status/error panel. |
 | [Data formats](docs/data-formats.md) | CSV/gzip/metadata columns, clocks, sensor-to-world conversion, coordinate conventions, replay and analysis limitations. |
 | [Kannadi integration](docs/kannadi-modernization.md) | Scene integration, camera allow-list, overview, trails, animation and validation history. |
 | [Experiment workflow](docs/experiment-workflow.md) | Controller lifecycle and adding experiments. |

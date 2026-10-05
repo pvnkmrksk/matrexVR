@@ -1,4 +1,5 @@
 {
+  "headingReference": { "enabled": false, "windowSeconds": 180 },
   "objects": [
     {
       "type": "tree01",

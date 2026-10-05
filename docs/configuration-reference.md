@@ -311,3 +311,9 @@ Template: `dynamic-choice.template.json`, loaded via `parameters.design`. This s
 Replay uses the Control UI and ReplayController inspector fields, not a standalone JSON motion config. Select a run directory and its data files. The environment loader can use a saved dynamic design, including step names, object names, polar positions, scales, materials, and camera backgrounds. Operator bindings are in [Unity 6 controls](unity6-controls.md); data requirements are in [data formats](data-formats.md).
 
 Older files in StreamingAssets and `docs/legacy-locust-inputs` are retained research inputs, not the authoritative template library. Read the modern parser before reusing an old parameter: a silently ignored `rot`, `sync`, or unsupported tracking setting will not produce the intended experiment.
+
+## Heading-relative presentations, telemetry and status
+
+Swarm and ordinary Choice experiment files accept `headingReference: { "enabled": false, "windowSeconds": 180 }`. Enabling it adds continuous pre-stimulus assessment per rig, freezes the circular mean at onset, and interprets stimulus angles relative to it. It belongs only in the experiment file. See [the complete reference](heading-reference-telemetry.md) for defaults, timing, angle conventions, data schema and examples.
+
+System config accepts `telemetry` (defaults: enabled, loopback port 9880, 20 Hz, topic `matrex.telemetry.v1`) and `statusOverlay` (visible on display 0). The same reference documents every field. **Tab** restores the bottom-right panel; errors reopen it automatically.

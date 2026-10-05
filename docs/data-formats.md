@@ -69,3 +69,7 @@ Unwrap yaw before angular-velocity calculations. Use wall-clock differences for 
 The older general rig/Band CSV writers use the machine's numeric culture and do not quote string delimiters. Use a decimal-point locale for collection, and keep commas/newlines out of object/step/config names. Kannadi/Swarm numeric row writers explicitly use invariant culture. Historical files can differ; inspect headers before concatenating runs. ReplayController expects the named base rig columns, parses numbers with invariant culture, and uses a simple comma split. It does not ingest clone/swarm gzip logs as rig trajectories.
 
 Replay settings are inspector/UI fields: sessionFolder (newest when empty), absoluteSessionPath (optional override), playbackSpeed=1 seconds/second, loop=true, smallStepSeconds=1, largeStepSeconds=10, pauseOnSeek=true, autoResumeAfterSeek=true, createRigCameras=true, targetHorizontalFov=110 degrees. Replay split-screen cameras are analysis views, not LED panel viewport calibration. Keep the saved dynamic design/prefab catalog if reconstructing the stimulus environment.
+
+## Live monitoring and heading-onset records
+
+The dedicated `matrex.telemetry.v1` PUB stream provides all rigs on port 9880, separately from tracking inputs. Heading-relative presentations append per-rig onset context to `heading_reference.jsonl`. See [the versioned telemetry and onset schema](heading-reference-telemetry.md) for clocks, coordinate units, raw/consumed inputs, gains, sample freshness, circular mean and resultant length.

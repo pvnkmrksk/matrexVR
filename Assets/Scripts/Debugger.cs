@@ -24,7 +24,7 @@ public static class Debugger
     ebugger class is designed to be easy to use and can be integrated into any Unity project. */
     public static void Log(string message, int level)
     {
-        if (level <= CurrentLogLevel)
+        if (level == 1 || level <= CurrentLogLevel) // Errors must remain visible in standalone players.
         {
             switch (level)
             {
