@@ -1,7 +1,8 @@
 {
   "headingReference": {
     "enabled": false,
-    "windowSeconds": 180
+    "windowSeconds": 180,
+    "startOffsetSeconds": 0
   },
   "objects": [
     {
@@ -47,7 +48,8 @@
       "hexRadius": 0.0,
       "sectionLengthZ": 0.0,
       "sectionLengthX": 0.0,
-      "rotationAngle": 0.0
+      "rotationAngle": 0.0,
+      "useHeadingReference": false
     },
     {
       "type": "ScalingCylinder",
@@ -92,7 +94,8 @@
       "hexRadius": 0.0,
       "sectionLengthZ": 0.0,
       "sectionLengthX": 0.0,
-      "rotationAngle": 0.0
+      "rotationAngle": 0.0,
+      "useHeadingReference": false
     }
   ],
   "initialPosition": {
@@ -138,5 +141,9 @@
     "faintDetailCutoff": 0.15,
     "maskBelowHorizon": false,
     "imageWidth": 4096
-  }
+  },
+  "resetPositionOnStart": true,
+  "resetRotationOnStart": true,
+  "uniformSkyColor": null,
+  "swarm": null
 }

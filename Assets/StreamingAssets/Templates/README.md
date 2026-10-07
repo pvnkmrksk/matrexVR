@@ -3,10 +3,10 @@
 Start a new **Kinefly flight** experiment with these three files:
 
 1. `system_config.template.json` → `StreamingAssets/system_config.json`. Set the real tracking addresses, ports and displays. All four rigs explicitly select Kinefly; the template uses six cameras per rig.
-2. `experiment.template.json` → your own experiment file. This is a complete Choice/Selwyn flight configuration, including disabled heading assessment and an enabled Selwyn night sky.
+2. `experiment.template.json` → your own experiment file. This contains a complete Choice/Selwyn flight configuration under `stimulus`, with pre/post disabled by default.
 3. `sequence.template.json` → `StreamingAssets/sequenceConfig.json`. Change its `parameters.configFile` to your experiment file. Every sequence option is explicit; start is manual, gain is 1, and the example presentation lasts one hour.
 
-The currently selected system/sequence files are kept in place. Copy templates when intentionally creating a new setup. JSON `null` explicitly leaves an optional alternative/inherited value unset; it is not a numeric zero. Fields that do not apply to a controller are not invented or shared across schemas. Scene names and paths are case-sensitive.
+The active sequence selects the repeating Selwyn stars-to-left-swarm experiment. The hardware file is unchanged. Copy templates when intentionally creating a new setup. JSON `null` explicitly leaves an optional alternative/inherited value unset; it is not a numeric zero. Fields that do not apply to a controller are not invented or shared across schemas. Scene names and paths are case-sensitive.
 
 | Template | Scene / paradigm | Notes |
 |---|---|---|
@@ -29,7 +29,7 @@ The currently selected system/sequence files are kept in place. Copy templates w
 
 [Examples/README.md](../Examples/README.md) indexes complete, independent JSON variants and sequences. Examples are not partial overrides. Walking/FicTrac layouts are under `Examples/System`; the canonical system template explicitly selects Kinefly flight. Select the correct system setup before running walking or flight variants.
 
-Put heading assessment inside the experiment's `headingReference` block, never in sequence parameters. `enabled: false` means no assessment delay. **Tab** restores the status/error panel. The sky is held between its configured image updates; `advanceWithRealTime` does not enable continuous interpolation.
+For phased experiments, put heading assessment inside `preStimulus.headingReference`, never in sequence parameters. Spawners must separately opt in with `useHeadingReference: true`. Both pose reset switches default true; turn them off for continuity. See [experiment-phases.md](../../../docs/experiment-phases.md). `enabled: false` means no assessment delay. **Tab** restores the status/error panel. The sky is held between its configured image updates; `advanceWithRealTime` does not enable continuous interpolation.
 
 The entire `Kannadi/` directory remains unchanged. Historical configurations and their original template versions are in [Archive/Legacy](../Archive/Legacy). References from preserved sequences can still resolve there when no current file exists at the requested path.
 

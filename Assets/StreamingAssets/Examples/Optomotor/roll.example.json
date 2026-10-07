@@ -14,5 +14,10 @@
       "closedLoopOrientation": false,
       "closedLoopPosition": false
     }
-  ]
+  ],
+  "resetPositionOnStart": true,
+  "resetRotationOnStart": true,
+  "initialPosition": null,
+  "initialRotation": null,
+  "randomInitialRotation": false
 }

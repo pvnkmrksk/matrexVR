@@ -85,7 +85,9 @@
       "z": 0
     },
     "randomInitialRotation": false,
-    "swapAfterSeconds": 0
+    "swapAfterSeconds": 0,
+    "resetPositionOnStart": true,
+    "resetRotationOnStart": true
   },
   "steps": [
     {
@@ -142,7 +144,8 @@
           "pos": null,
           "rot": null,
           "mat": null,
-          "role": "gray"
+          "role": "gray",
+          "useHeadingReference": false
         }
       ],
       "camera": [
@@ -207,7 +210,9 @@
         "z": 0
       },
       "randomInitialRotation": false,
-      "swapAfterSeconds": 0
+      "swapAfterSeconds": 0,
+      "resetPositionOnStart": true,
+      "resetRotationOnStart": true
     }
   ],
   "size": 1.5,

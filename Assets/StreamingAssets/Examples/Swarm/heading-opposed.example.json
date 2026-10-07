@@ -1,7 +1,8 @@
 {
   "headingReference": {
     "enabled": true,
-    "windowSeconds": 180
+    "windowSeconds": 180,
+    "startOffsetSeconds": 0
   },
   "numberOfLocusts": 512,
   "density": null,
@@ -134,5 +135,12 @@
     "imageWidth": 4096
   },
   "boundaryLengthX": 200,
-  "boundaryLengthZ": 200
+  "boundaryLengthZ": 200,
+  "resetPositionOnStart": true,
+  "resetRotationOnStart": true,
+  "uniformSkyColor": null,
+  "useHeadingReference": true,
+  "spawnRelativeToAnimal": false,
+  "followAnimalPosition": false,
+  "randomInitialRotation": false
 }

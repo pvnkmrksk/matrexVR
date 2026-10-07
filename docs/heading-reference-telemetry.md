@@ -2,36 +2,13 @@
 
 ## Experiment configuration
 
-Put this block in the **individual experiment JSON** referenced by `parameters.configFile`, alongside fields such as `mu` and `closedLoopOrientation`:
+Use [pre-stimulus / stimulus / post-stimulus](experiment-phases.md) in one experimental file. Heading measurement belongs to `preStimulus.headingReference`, with `enabled` (default false), `startOffsetSeconds` (default 0) and `windowSeconds` (default 180). The configured pre-stimulus world remains visible and controllable while each rig measures its circular mean and resultant length. An overlong observation extends pre-stimulus. Each spawner separately opts into the frozen zero with `useHeadingReference: true`; computing the reference alone changes no stimulus direction.
 
-```json
-"headingReference": {
-  "enabled": true,
-  "windowSeconds": 180
-}
-```
+Old flat experiments still work. Their sequence presentation timer begins after an enabled flat heading observation, and their configured objects remain visible during observation. The default pose reset switches are true; set both false for continuity between conditions. The phase reference documents supported spawners, angle conventions, independent reset switches, examples and audit fields.
 
-Omitted `headingReference`, omitted `enabled`, or `enabled: false` keeps the existing immediate, absolute-angle behavior. Extra settings do not enable it. When enabled, an omitted window is 180 seconds; any positive finite number of seconds is accepted, including fractions (3 minutes = 180 seconds). Invalid enabled windows report an error. Sequence-level `headingReference` fields are not used and cannot override the experiment file.
+The mean is `atan2(mean(sin(yaw)), mean(cos(yaw)))`; resultant length is `sqrt(mean(sin(yaw))² + mean(cos(yaw))²)`. One current virtual yaw sample is taken per rendered frame during the requested window. Samples are equally weighted, with no invented catch-up samples. There is no stability threshold; circling animals still get a finite angle with low resultant length. Kinefly input is control input, not the heading being averaged. Zero is +Z, +90° is right, and −90° is left of the frozen mean when opted in. Subsequent turns do not move that reference.
 
-Every presentation starts an assessment lasting `windowSeconds`. Tracking, manual control, autopilot and the background continue. The stimulus is absent during assessment. Each rig independently samples its **current virtual animal heading**, Unity world yaw, in LateUpdate after movement. These are heading samples, not velocity bearings or Kinefly wing angles. The latter represent control input, not an absolute orientation. Stationary animals contribute their current heading, and missing/stale tracking is identified in the HUD and telemetry.
-
-At onset, the component takes the trailing window's samples and calculates:
-
-- `S = mean(sin(yaw))`, `C = mean(cos(yaw))`
-- local zero = `atan2(S, C)`, wrapped into `[0,360)` degrees
-- mean resultant length `r = sqrt(S*S + C*C)`, from 0 to 1
-
-This is the [standard circular mean](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.circmean.html). One sample is taken per rendered frame; samples are equally weighted, with no invented samples during stalls. Thus sustained frame-rate changes affect sample weighting. The recorded sample count makes this explicit. No Rayleigh significance threshold or stability condition gates presentation. A circling animal still gets the `atan2` result, even with near-zero `r`; that direction can be arbitrary. `r` is a concentration measure, not a p-value.
-
-The reference freezes once, at stimulus onset. The animal is neither rotated nor reset at onset, and subsequent turns do not move the reference. Sequence `duration` counts **stimulus presentation time**, so assessment adds to total step time. The sequence timer waits for every rig to finish assessment. For consecutive steps with `reloadScene: false`, enabled heading assessment preserves current rig position and orientation. An explicit scene reload or the operator's R shortcut retains its normal reset behavior.
-
-### Supported stimuli and angle conventions
-
-- **Swarm:** both normal scene prefabs and Bogong dots, in 2D or 3D. `mu: 0` aligns with that rig's average heading; `mu: 90` is clockwise across it. Resolved world heading is `meanHeading + mu`. Elevation remains independently configured. No agents spawn until onset.
-- **Choice:** regular objects are instantiated separately for each rig, on its stimulus layer. Polar `position.angle` and object yaw are relative to the frozen heading; positions are relative to the rig's position at onset. Explicit X/Y/Z offsets also rotate around this pivot. Bands use `mu` as relative Unity yaw when enabled (0 aligned, +90 clockwise); their boundary `rotationAngle` is offset too. Disabled bands retain their historical `90 - mu` convention.
-- **New controllers:** `StimulusHeadingReference.For(rig).Begin(config, result => ...)` defers a presentation callback. Use `result.Resolve(relativeDegrees)` for directional parameters or `RotateStimulus(transform, pivot, result)` for a transform. A disabled reference calls the callback immediately with `null`. The component works with any animal/tracker; each stimulus controller must bind its own presentation and visibility. Kannadi mirror layouts, optomotor drums and dynamic Choice designs do not currently bind this field.
-
-The ready-to-edit [swarm example](../Assets/StreamingAssets/Examples/Swarm/heading-crossed.example.json) uses a three-minute window and `mu: 90`. Reference settings are copied with the experiment config into session data. Each onset is also appended to `heading_reference.jsonl` and `runtime_trace.log`: rig ID, scene, zero-based trial/step indices, circular mean/vector, `r`, sample count, window, observation start and onset times. `presentedAt` and `observationStartedAt` use Unity scaled experiment seconds; `presentedUtc` is UTC wall time. The live stream repeats the frozen result for late subscribers.
+`heading_reference.jsonl` records per-rig measurement completion; `experiment_phases.jsonl` records actual phase onsets and the references used then. Telemetry repeats the frozen results for late subscribers. The active [Selwyn recipe](../Assets/StreamingAssets/Examples/Flight/selwyn-stars-left-swarm.example.json) runs four minutes of stars then four minutes of gray sky and a leftward dorsal swarm.
 
 ## Dedicated outbound ZMQ channel
 
@@ -67,7 +44,7 @@ python3 tools/listen_telemetry.py --endpoint tcp://UNITY_HOST:9880 > live.jsonl
 |---|---|
 | `schemaVersion`, `sequence` | Version 1; increasing publisher snapshot number, useful for detecting gaps. |
 | `timestampUtc`, `realtimeSeconds`, `experimentSeconds`, `frame` | UTC timestamp; Unity unscaled uptime, scaled experiment time and frame. |
-| `system` | Running flag; one-based trial and scene-sequence numbers; actual scene name/build index; remaining presentation time; phase; publisher state and local dropped-send count. Scene number is 0 while idle. Trial counts passes through the sequence, matching MainController. |
+| `system` | Running flag; one-based trial and scene-sequence numbers; actual scene name/build index; remaining cycle and phase time; phase (`preStimulus`, `stimulus`, `postStimulus`); publisher state and local dropped-send count. Scene number is 0 while idle. Trial counts passes through the sequence, matching MainController. |
 | `rigs` | All configured/registered VR IDs. A rig absent from the current scene has `active: false`, without fabricated pose/input. |
 | `rigs[].pose` | `x,y,z,pitch,yaw,roll`: Unity world coordinates and Euler degrees. Heading is yaw; +Z is zero, +X is +90°. Units are the scene's authored world units (current walking scenes use cm). |
 | `input.source`, `interpretation`, `endpoint` | Configured tracker type, active calculation path and tracking endpoint. |

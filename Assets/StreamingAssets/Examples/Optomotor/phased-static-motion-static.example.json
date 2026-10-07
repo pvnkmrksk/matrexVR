@@ -1,0 +1,77 @@
+{
+  "preStimulus": {
+    "loop": false,
+    "stimuli": [
+      {
+        "duration": 10,
+        "speed": 0,
+        "clockwise": true,
+        "rotationAxis": "Yaw",
+        "frequency": 4,
+        "contrast": 0.5,
+        "dutyCycle": 0.5,
+        "color1": "#000000",
+        "color2": "#FFFFFF",
+        "closedLoopOrientation": false,
+        "closedLoopPosition": false
+      }
+    ],
+    "resetPositionOnStart": true,
+    "resetRotationOnStart": true,
+    "initialPosition": null,
+    "initialRotation": null,
+    "randomInitialRotation": false,
+    "enabled": true,
+    "durationSeconds": 5
+  },
+  "stimulus": {
+    "loop": false,
+    "stimuli": [
+      {
+        "duration": 10,
+        "speed": 20,
+        "clockwise": true,
+        "rotationAxis": "Yaw",
+        "frequency": 4,
+        "contrast": 0.5,
+        "dutyCycle": 0.5,
+        "color1": "#000000",
+        "color2": "#FFFFFF",
+        "closedLoopOrientation": false,
+        "closedLoopPosition": false
+      }
+    ],
+    "resetPositionOnStart": true,
+    "resetRotationOnStart": true,
+    "initialPosition": null,
+    "initialRotation": null,
+    "randomInitialRotation": false,
+    "enabled": true,
+    "durationSeconds": 20
+  },
+  "postStimulus": {
+    "loop": false,
+    "stimuli": [
+      {
+        "duration": 10,
+        "speed": 0,
+        "clockwise": true,
+        "rotationAxis": "Yaw",
+        "frequency": 4,
+        "contrast": 0.5,
+        "dutyCycle": 0.5,
+        "color1": "#000000",
+        "color2": "#FFFFFF",
+        "closedLoopOrientation": false,
+        "closedLoopPosition": false
+      }
+    ],
+    "resetPositionOnStart": true,
+    "resetRotationOnStart": true,
+    "initialPosition": null,
+    "initialRotation": null,
+    "randomInitialRotation": false,
+    "enabled": true,
+    "durationSeconds": 5
+  }
+}

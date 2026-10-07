@@ -1,0 +1,446 @@
+{
+  "preStimulus": {
+    "headingReference": {
+      "enabled": true,
+      "startOffsetSeconds": 10,
+      "windowSeconds": 30
+    },
+    "numberOfLocusts": 0,
+    "density": null,
+    "spawnAreaSize": 200,
+    "mu": 0,
+    "kappa": 100000,
+    "locustSpeed": 2,
+    "dimension": "3D",
+    "spawnCenter": null,
+    "spawnVolumeSize": {
+      "x": 200,
+      "y": 100,
+      "z": 200
+    },
+    "muElevation": 0,
+    "kappaElevation": 100000,
+    "boundaryHeight": 100,
+    "wrapY": true,
+    "agentVisual": "Bogong",
+    "bogongVisual": {
+      "sizeMode": "World",
+      "size": 0.5,
+      "angularSizeDegrees": 1,
+      "color": {
+        "r": 0.12,
+        "g": 0.12,
+        "b": 0.12,
+        "a": 1
+      },
+      "metallic": 0,
+      "smoothness": 0.25,
+      "flickerFrequencyHz": 0,
+      "flickerDutyCycle": 0.5
+    },
+    "animateOnMove": false,
+    "animationSpeedThreshold": 0.5,
+    "autopilotEnabled": true,
+    "autopilotSpeed": 10,
+    "closedLoopPosition": 1,
+    "closedLoopOrientation": 1,
+    "vrConfigs": [
+      {
+        "vrIndex": 1,
+        "initialPosition": {
+          "x": 0.0,
+          "y": 1.0,
+          "z": 5.0
+        },
+        "initialRotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "watchIndex": null,
+        "closedLoopPosition": null,
+        "closedLoopOrientation": null
+      },
+      {
+        "vrIndex": 2,
+        "initialPosition": {
+          "x": 5.0,
+          "y": 1.0,
+          "z": 0.0
+        },
+        "initialRotation": {
+          "x": 0.0,
+          "y": 90.0,
+          "z": 0.0
+        },
+        "watchIndex": null,
+        "closedLoopPosition": null,
+        "closedLoopOrientation": null
+      },
+      {
+        "vrIndex": 3,
+        "initialPosition": {
+          "x": 0.0,
+          "y": 1.0,
+          "z": -5.0
+        },
+        "initialRotation": {
+          "x": 0.0,
+          "y": 180.0,
+          "z": 0.0
+        },
+        "watchIndex": null,
+        "closedLoopPosition": null,
+        "closedLoopOrientation": null
+      },
+      {
+        "vrIndex": 4,
+        "initialPosition": {
+          "x": -5.0,
+          "y": 1.0,
+          "z": 0.0
+        },
+        "initialRotation": {
+          "x": 0.0,
+          "y": 270.0,
+          "z": 0.0
+        },
+        "watchIndex": null,
+        "closedLoopPosition": null,
+        "closedLoopOrientation": null
+      }
+    ],
+    "backgroundColor": {
+      "r": 0.5,
+      "g": 0.5,
+      "b": 0.5,
+      "a": 1
+    },
+    "skyboxPath": "",
+    "nightSky": {
+      "enabled": true,
+      "latitude": 47.6896,
+      "longitude": 9.1881,
+      "timeZoneId": "Australia/Sydney",
+      "utcOffsetHours": 2,
+      "utcOffsetMinutes": null,
+      "date": null,
+      "localTime": "now",
+      "advanceWithRealTime": true,
+      "updateIntervalMinutes": 30,
+      "roundToInterval": false,
+      "northYawDegrees": 0,
+      "exposure": 1,
+      "faintDetailCutoff": 0,
+      "maskBelowHorizon": true,
+      "imageWidth": 4096
+    },
+    "boundaryLengthX": 200,
+    "boundaryLengthZ": 200,
+    "resetPositionOnStart": true,
+    "resetRotationOnStart": true,
+    "uniformSkyColor": null,
+    "useHeadingReference": false,
+    "spawnRelativeToAnimal": false,
+    "followAnimalPosition": false,
+    "randomInitialRotation": false,
+    "enabled": true,
+    "durationSeconds": 30
+  },
+  "stimulus": {
+    "headingReference": {
+      "enabled": false,
+      "windowSeconds": 180,
+      "startOffsetSeconds": 0
+    },
+    "numberOfLocusts": 512,
+    "density": null,
+    "spawnAreaSize": 200,
+    "mu": 90,
+    "kappa": 100000,
+    "locustSpeed": 2,
+    "dimension": "3D",
+    "spawnCenter": null,
+    "spawnVolumeSize": {
+      "x": 200,
+      "y": 100,
+      "z": 200
+    },
+    "muElevation": 0,
+    "kappaElevation": 100000,
+    "boundaryHeight": 100,
+    "wrapY": true,
+    "agentVisual": "Bogong",
+    "bogongVisual": {
+      "sizeMode": "World",
+      "size": 0.5,
+      "angularSizeDegrees": 1,
+      "color": {
+        "r": 0.12,
+        "g": 0.12,
+        "b": 0.12,
+        "a": 1
+      },
+      "metallic": 0,
+      "smoothness": 0.25,
+      "flickerFrequencyHz": 0,
+      "flickerDutyCycle": 0.5
+    },
+    "animateOnMove": false,
+    "animationSpeedThreshold": 0.5,
+    "autopilotEnabled": true,
+    "autopilotSpeed": 10,
+    "closedLoopPosition": 1,
+    "closedLoopOrientation": 1,
+    "vrConfigs": [
+      {
+        "vrIndex": 1,
+        "initialPosition": {
+          "x": 0.0,
+          "y": 1.0,
+          "z": 5.0
+        },
+        "initialRotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "watchIndex": null,
+        "closedLoopPosition": null,
+        "closedLoopOrientation": null
+      },
+      {
+        "vrIndex": 2,
+        "initialPosition": {
+          "x": 5.0,
+          "y": 1.0,
+          "z": 0.0
+        },
+        "initialRotation": {
+          "x": 0.0,
+          "y": 90.0,
+          "z": 0.0
+        },
+        "watchIndex": null,
+        "closedLoopPosition": null,
+        "closedLoopOrientation": null
+      },
+      {
+        "vrIndex": 3,
+        "initialPosition": {
+          "x": 0.0,
+          "y": 1.0,
+          "z": -5.0
+        },
+        "initialRotation": {
+          "x": 0.0,
+          "y": 180.0,
+          "z": 0.0
+        },
+        "watchIndex": null,
+        "closedLoopPosition": null,
+        "closedLoopOrientation": null
+      },
+      {
+        "vrIndex": 4,
+        "initialPosition": {
+          "x": -5.0,
+          "y": 1.0,
+          "z": 0.0
+        },
+        "initialRotation": {
+          "x": 0.0,
+          "y": 270.0,
+          "z": 0.0
+        },
+        "watchIndex": null,
+        "closedLoopPosition": null,
+        "closedLoopOrientation": null
+      }
+    ],
+    "backgroundColor": {
+      "r": 0.5,
+      "g": 0.5,
+      "b": 0.5,
+      "a": 1
+    },
+    "skyboxPath": "",
+    "nightSky": {
+      "enabled": true,
+      "latitude": 47.6896,
+      "longitude": 9.1881,
+      "timeZoneId": "Australia/Sydney",
+      "utcOffsetHours": 2,
+      "utcOffsetMinutes": null,
+      "date": null,
+      "localTime": "now",
+      "advanceWithRealTime": true,
+      "updateIntervalMinutes": 30,
+      "roundToInterval": false,
+      "northYawDegrees": 0,
+      "exposure": 1,
+      "faintDetailCutoff": 0,
+      "maskBelowHorizon": true,
+      "imageWidth": 4096
+    },
+    "boundaryLengthX": 200,
+    "boundaryLengthZ": 200,
+    "resetPositionOnStart": false,
+    "resetRotationOnStart": false,
+    "uniformSkyColor": null,
+    "useHeadingReference": true,
+    "spawnRelativeToAnimal": false,
+    "followAnimalPosition": false,
+    "randomInitialRotation": false,
+    "enabled": true,
+    "durationSeconds": 60
+  },
+  "postStimulus": {
+    "headingReference": {
+      "enabled": false,
+      "windowSeconds": 180,
+      "startOffsetSeconds": 0
+    },
+    "numberOfLocusts": 0,
+    "density": null,
+    "spawnAreaSize": 200,
+    "mu": 90,
+    "kappa": 100000,
+    "locustSpeed": 2,
+    "dimension": "3D",
+    "spawnCenter": null,
+    "spawnVolumeSize": {
+      "x": 200,
+      "y": 100,
+      "z": 200
+    },
+    "muElevation": 0,
+    "kappaElevation": 100000,
+    "boundaryHeight": 100,
+    "wrapY": true,
+    "agentVisual": "Bogong",
+    "bogongVisual": {
+      "sizeMode": "World",
+      "size": 0.5,
+      "angularSizeDegrees": 1,
+      "color": {
+        "r": 0.12,
+        "g": 0.12,
+        "b": 0.12,
+        "a": 1
+      },
+      "metallic": 0,
+      "smoothness": 0.25,
+      "flickerFrequencyHz": 0,
+      "flickerDutyCycle": 0.5
+    },
+    "animateOnMove": false,
+    "animationSpeedThreshold": 0.5,
+    "autopilotEnabled": true,
+    "autopilotSpeed": 10,
+    "closedLoopPosition": 1,
+    "closedLoopOrientation": 1,
+    "vrConfigs": [
+      {
+        "vrIndex": 1,
+        "initialPosition": {
+          "x": 0.0,
+          "y": 1.0,
+          "z": 5.0
+        },
+        "initialRotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "watchIndex": null,
+        "closedLoopPosition": null,
+        "closedLoopOrientation": null
+      },
+      {
+        "vrIndex": 2,
+        "initialPosition": {
+          "x": 5.0,
+          "y": 1.0,
+          "z": 0.0
+        },
+        "initialRotation": {
+          "x": 0.0,
+          "y": 90.0,
+          "z": 0.0
+        },
+        "watchIndex": null,
+        "closedLoopPosition": null,
+        "closedLoopOrientation": null
+      },
+      {
+        "vrIndex": 3,
+        "initialPosition": {
+          "x": 0.0,
+          "y": 1.0,
+          "z": -5.0
+        },
+        "initialRotation": {
+          "x": 0.0,
+          "y": 180.0,
+          "z": 0.0
+        },
+        "watchIndex": null,
+        "closedLoopPosition": null,
+        "closedLoopOrientation": null
+      },
+      {
+        "vrIndex": 4,
+        "initialPosition": {
+          "x": -5.0,
+          "y": 1.0,
+          "z": 0.0
+        },
+        "initialRotation": {
+          "x": 0.0,
+          "y": 270.0,
+          "z": 0.0
+        },
+        "watchIndex": null,
+        "closedLoopPosition": null,
+        "closedLoopOrientation": null
+      }
+    ],
+    "backgroundColor": {
+      "r": 0.5,
+      "g": 0.5,
+      "b": 0.5,
+      "a": 1
+    },
+    "skyboxPath": "",
+    "nightSky": {
+      "enabled": true,
+      "latitude": 47.6896,
+      "longitude": 9.1881,
+      "timeZoneId": "Australia/Sydney",
+      "utcOffsetHours": 2,
+      "utcOffsetMinutes": null,
+      "date": null,
+      "localTime": "now",
+      "advanceWithRealTime": true,
+      "updateIntervalMinutes": 30,
+      "roundToInterval": false,
+      "northYawDegrees": 0,
+      "exposure": 1,
+      "faintDetailCutoff": 0,
+      "maskBelowHorizon": true,
+      "imageWidth": 4096
+    },
+    "boundaryLengthX": 200,
+    "boundaryLengthZ": 200,
+    "resetPositionOnStart": false,
+    "resetRotationOnStart": false,
+    "uniformSkyColor": null,
+    "useHeadingReference": false,
+    "spawnRelativeToAnimal": false,
+    "followAnimalPosition": false,
+    "randomInitialRotation": false,
+    "enabled": true,
+    "durationSeconds": 20
+  }
+}

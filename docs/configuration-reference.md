@@ -314,6 +314,6 @@ Older files in `StreamingAssets/Archive/Legacy` and `Assets/StreamingAssets/Arch
 
 ## Heading-relative presentations, telemetry and status
 
-Swarm and ordinary Choice experiment files accept `headingReference: { "enabled": false, "windowSeconds": 180 }`. Enabling it adds continuous pre-stimulus assessment per rig, freezes the circular mean at onset, and interprets stimulus angles relative to it. It belongs only in the experiment file. See [the complete reference](heading-reference-telemetry.md) for defaults, timing, angle conventions, data schema and examples.
+Experiment files can contain `preStimulus`, `stimulus` and `postStimulus`, each using its scene schema plus `enabled` and `durationSeconds`. Flat files remain compatible. Heading reference is measured during visible pre-stimulus conditions, with an optional start offset; spawners opt into it separately with `useHeadingReference` (default false). Position and rotation resets are independently configurable, both default true. Choice also accepts an embedded `swarm` and `uniformSkyColor`. See [experiment phases](experiment-phases.md) for timing, schema, supported controllers and the active eight-minute Selwyn example, and [telemetry](heading-reference-telemetry.md) for wire fields.
 
 System config accepts `telemetry` (defaults: enabled, loopback port 9880, 20 Hz, topic `matrex.telemetry.v1`) and `statusOverlay` (visible on display 0). The same reference documents every field. **Tab** restores the bottom-right panel; errors reopen it automatically.

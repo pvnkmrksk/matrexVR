@@ -1,0 +1,171 @@
+{
+  "preStimulus": {
+    "headingReference": {
+      "enabled": true,
+      "windowSeconds": 240,
+      "startOffsetSeconds": 0
+    },
+    "objects": [],
+    "initialPosition": {
+      "x": 0,
+      "y": 100,
+      "z": 0
+    },
+    "initialRotation": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "randomInitialRotation": true,
+    "closedLoopOrientation": true,
+    "closedLoopPosition": false,
+    "backgroundColor": {
+      "r": 0.5,
+      "g": 0.5,
+      "b": 0.5,
+      "a": 1.0
+    },
+    "skyboxPath": "",
+    "windSpeed": 0,
+    "windDirection": 0,
+    "aglHeight": 100,
+    "groundLayerMask": 1,
+    "autopilotEnabled": true,
+    "autopilotSpeed": 7,
+    "nightSky": {
+      "enabled": true,
+      "latitude": -35.894409,
+      "longitude": 148.453948,
+      "timeZoneId": "Australia/Sydney",
+      "utcOffsetHours": 11,
+      "utcOffsetMinutes": null,
+      "date": null,
+      "localTime": "now",
+      "advanceWithRealTime": true,
+      "updateIntervalMinutes": 30,
+      "roundToInterval": false,
+      "northYawDegrees": 0,
+      "exposure": 0.5,
+      "faintDetailCutoff": 0.15,
+      "maskBelowHorizon": false,
+      "imageWidth": 4096
+    },
+    "resetPositionOnStart": true,
+    "resetRotationOnStart": true,
+    "uniformSkyColor": null,
+    "swarm": null,
+    "enabled": true,
+    "durationSeconds": 240
+  },
+  "stimulus": {
+    "headingReference": {
+      "enabled": false,
+      "windowSeconds": 240,
+      "startOffsetSeconds": 0
+    },
+    "objects": [],
+    "initialPosition": {
+      "x": 0,
+      "y": 100,
+      "z": 0
+    },
+    "initialRotation": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "randomInitialRotation": false,
+    "closedLoopOrientation": true,
+    "closedLoopPosition": false,
+    "backgroundColor": {
+      "r": 0.5,
+      "g": 0.5,
+      "b": 0.5,
+      "a": 1.0
+    },
+    "skyboxPath": "",
+    "windSpeed": 0,
+    "windDirection": 0,
+    "aglHeight": 100,
+    "groundLayerMask": 1,
+    "autopilotEnabled": true,
+    "autopilotSpeed": 7,
+    "nightSky": {
+      "enabled": false,
+      "latitude": -35.894409,
+      "longitude": 148.453948,
+      "timeZoneId": "Australia/Sydney",
+      "utcOffsetHours": 11,
+      "utcOffsetMinutes": null,
+      "date": null,
+      "localTime": "now",
+      "advanceWithRealTime": true,
+      "updateIntervalMinutes": 30,
+      "roundToInterval": false,
+      "northYawDegrees": 0,
+      "exposure": 0.5,
+      "faintDetailCutoff": 0.15,
+      "maskBelowHorizon": false,
+      "imageWidth": 4096
+    },
+    "resetPositionOnStart": false,
+    "resetRotationOnStart": false,
+    "uniformSkyColor": {
+      "r": 0.12,
+      "g": 0.12,
+      "b": 0.12,
+      "a": 1
+    },
+    "swarm": {
+      "useHeadingReference": true,
+      "spawnRelativeToAnimal": true,
+      "followAnimalPosition": true,
+      "numberOfLocusts": 256,
+      "density": null,
+      "spawnAreaSize": 120,
+      "mu": -90,
+      "kappa": 10000,
+      "locustSpeed": 2,
+      "dimension": "3D",
+      "spawnCenter": {
+        "x": 0,
+        "y": 50,
+        "z": 0
+      },
+      "spawnVolumeSize": {
+        "x": 120,
+        "y": 40,
+        "z": 120
+      },
+      "muElevation": 0,
+      "kappaElevation": 10000,
+      "boundaryHeight": 40,
+      "wrapY": true,
+      "agentVisual": "Bogong",
+      "bogongVisual": {
+        "sizeMode": "Angular",
+        "size": 0.5,
+        "angularSizeDegrees": 2,
+        "color": {
+          "r": 0.01,
+          "g": 0.01,
+          "b": 0.01,
+          "a": 1
+        },
+        "metallic": 0,
+        "smoothness": 0.25,
+        "flickerFrequencyHz": 0,
+        "flickerDutyCycle": 1
+      },
+      "boundaryLengthX": 120,
+      "boundaryLengthZ": 120,
+      "animateOnMove": false,
+      "animationSpeedThreshold": 0.5
+    },
+    "enabled": true,
+    "durationSeconds": 240
+  },
+  "postStimulus": {
+    "enabled": false
+  }
+}
