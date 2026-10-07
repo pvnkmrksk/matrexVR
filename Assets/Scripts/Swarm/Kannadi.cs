@@ -44,13 +44,22 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             Kannadi[] rigs = FindObjectsOfType<Kannadi>().Where(r => r.isActiveAndEnabled && r.gameObject.scene == gameObject.scene).ToArray();
             // Validate all prefab selections before replacing any existing grid.
             var selected = rigs.Select(r => r.ResolvePrefab(next.kannadiTilePrefab)).ToArray();
-            for (int i = 0; i < rigs.Length; i++) rigs[i].Apply(next, selected[i]);
-            NightSkyController.Apply(gameObject, next.nightSky, next.skyboxPath);
+            for (int i = 0; i < rigs.Length; i++)
+            {
+                var rig = rigs[i];
+                var tracking = rig.GetComponent<ClosedLoop>();
+                if (!ExperimentPhases.IsPhase(parameters) && tracking != null)
+                    StimulusHeadingReference.For(tracking).Begin(next.headingReference, result => {
+                        if (result != null && next.useHeadingReference) rig.GenerateHexGrid();
+                    });
+                rig.Apply(next, selected[i]);
+            }
+            NightSkyController.Apply(gameObject, next.nightSky, next.skyboxPath, next.uniformSkyColor);
             SimpleOverheadCamera.EnsureInScene();
         }
         catch (Exception error)
         {
-            Debug.LogError("Cannot initialize Kannadi: " + error.Message);
+            throw new InvalidOperationException("Cannot initialize Kannadi: " + error.Message, error);
         }
     }
     public void AdvanceStep(Dictionary<string, object> parameters) => InitializeScene(parameters);
@@ -79,14 +88,16 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
         watchIndex = vr?.watchIndex;
         Vector3 position = vr?.initialPosition != null ? vr.initialPosition.ToVector3() : transform.position;
         Quaternion rotation = vr?.initialRotation != null ? Quaternion.Euler(vr.initialRotation.ToVector3()) : transform.rotation;
+        if (next.randomInitialRotation && next.resetRotationOnStart)
+            rotation = Quaternion.Euler(rotation.eulerAngles.x, UnityEngine.Random.Range(0f, 360f), rotation.eulerAngles.z);
         ClosedLoop closedLoop = GetComponent<ClosedLoop>();
         if (closedLoop != null)
         {
-            closedLoop.SetPositionAndRotation(position, rotation);
+            closedLoop.ApplyStartPose(position, rotation, next.resetPositionOnStart, next.resetRotationOnStart);
             closedLoop.SetLocustGains(vr?.closedLoopPosition ?? next.closedLoopPosition ?? 1f,
                                       vr?.closedLoopOrientation ?? next.closedLoopOrientation ?? 1f);
         }
-        else transform.SetPositionAndRotation(position, rotation);
+        else transform.SetPositionAndRotation(next.resetPositionOnStart ? position : transform.position, next.resetRotationOnStart ? rotation : transform.rotation);
         ConfigureCameras();
         GenerateHexGrid();
         initialized = true;
@@ -138,6 +149,8 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             {
                 if (skipCenter && q == 0 && r == 0) continue;
                 Vector3 offset = new Vector3(hexRadius * Mathf.Sqrt(3f) * (q + r / 2f), tilePrefab.transform.position.y, RowSpacing * r);
+                var reference = config.useHeadingReference ? GetComponent<StimulusHeadingReference>()?.Result : null;
+                if (reference != null) offset = Quaternion.Euler(0, (float)reference.meanHeadingDegrees, 0) * offset;
                 GameObject clone = Instantiate(tilePrefab, Vector3.zero, prefabRotation);
                 clone.name = $"VR{VRIndex}_Kannadi_{copies.Count}";
                 SetLayerRecursively(clone.transform, layer);

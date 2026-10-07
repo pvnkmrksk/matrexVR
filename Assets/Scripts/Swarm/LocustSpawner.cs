@@ -14,6 +14,8 @@ public class LocustSpawner : MonoBehaviour
     //add tooltip
     [Tooltip("The mu value for the Van Mises distribution in degrees (0 to 360)")]
     [Range(0.0f, 360.0f)]
+    [System.NonSerialized] public float? authoredMu;
+    [System.NonSerialized] public Quaternion spawnRotation = Quaternion.identity;
     public float mu = 0.0f; // mu value for Van Mises in degrees (0 to 360)
 
     [Tooltip(
@@ -123,6 +125,7 @@ public class LocustSpawner : MonoBehaviour
                 Is3D() ? Random.Range(center.y - size.y / 2f, center.y + size.y / 2f) : -0.25f,
                 Random.Range(center.z - size.z / 2f, center.z + size.z / 2f));
 
+            spawnPosition = center + spawnRotation * (spawnPosition - center);
             GameObject locust = UsesBogongVisual()
                 ? CreateBogongAgent(spawnPosition, i)
                 : Instantiate(locustPrefab, spawnPosition, Quaternion.identity); // Spawned independent of the game object

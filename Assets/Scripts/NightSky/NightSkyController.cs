@@ -31,22 +31,22 @@ public sealed class NightSkyController : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics() { owner = null; }
 
-    public static void Apply(GameObject host, NightSkyConfig settings, string skyboxPath)
+    public static void Apply(GameObject host, NightSkyConfig settings, string skyboxPath, ColorConfig uniformSkyColor = null)
     {
         NightSkyController controller = host.GetComponent<NightSkyController>();
-        bool requested = !string.IsNullOrWhiteSpace(skyboxPath) || (settings != null && settings.enabled);
+        bool requested = uniformSkyColor != null || !string.IsNullOrWhiteSpace(skyboxPath) || (settings != null && settings.enabled);
         if (!requested && owner != null && owner.gameObject.scene == host.scene) owner.Release();
         if (controller == null && !requested) return;
         if (controller == null) controller = host.AddComponent<NightSkyController>();
         if (requested) controller.enabled = true;
-        controller.Configure(settings, skyboxPath);
+        controller.Configure(settings, skyboxPath, uniformSkyColor);
     }
 
-    public void Configure(NightSkyConfig settings, string skyboxPath)
+    public void Configure(NightSkyConfig settings, string skyboxPath, ColorConfig uniformSkyColor = null)
     {
         Release();
         bool fromFile = !string.IsNullOrWhiteSpace(skyboxPath);
-        if (!fromFile && (settings == null || !settings.enabled)) return;
+        if (uniformSkyColor == null && !fromFile && (settings == null || !settings.enabled)) return;
         if (owner != null && owner != this) owner.Release();
         owner = this;
         previousMaterial = RenderSettings.skybox;
@@ -59,7 +59,18 @@ public sealed class NightSkyController : MonoBehaviour
             DateTimeOffset now = DateTimeOffset.UtcNow;
             startRealtime = Time.realtimeSinceStartupAsDouble;
             archiveDirectory = ResolveArchiveDirectory();
-            if (fromFile)
+            if (uniformSkyColor != null)
+            {
+                Color color = new Color(uniformSkyColor.r, uniformSkyColor.g, uniformSkyColor.b, 1);
+                foreach (float channel in new[] { color.r, color.g, color.b })
+                    if (float.IsNaN(channel) || float.IsInfinity(channel) || channel < 0 || channel > 1)
+                        throw new ArgumentException("uniformSkyColor RGB channels must be finite and in [0,1].");
+                var solid = new Texture2D(2, 1, TextureFormat.RGBA32, false, false);
+                solid.SetPixels(new[] { color, color }); solid.Apply();
+                try { Commit(solid, null, new { mode = "uniform", color = uniformSkyColor, renderer = RendererVersion }); }
+                catch { Destroy(solid); throw; }
+            }
+            else if (fromFile)
             {
                 string path = Path.IsPathRooted(skyboxPath) ? skyboxPath : Path.Combine(Application.streamingAssetsPath, skyboxPath);
                 byte[] bytes = File.ReadAllBytes(path);

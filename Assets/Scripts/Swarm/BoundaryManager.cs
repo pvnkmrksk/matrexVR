@@ -2,6 +2,11 @@ using UnityEngine;
 
 public class BoundaryManager : MonoBehaviour
 {
+    [System.NonSerialized] public bool useCenterOverride;
+    [System.NonSerialized] public Vector3 centerOverride, followOffset;
+    [System.NonSerialized] public Transform followTarget;
+    [System.NonSerialized] public Quaternion referenceRotation = Quaternion.identity;
+    public Vector3 Center => followTarget != null ? followTarget.position + followOffset : useCenterOverride ? centerOverride : transform.position;
     public float boundarySize = 200;
     // Zero means use the historical boundarySize field, preserving old scenes.
     public float boundaryLengthX;

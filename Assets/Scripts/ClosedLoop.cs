@@ -308,6 +308,21 @@ public class ClosedLoop : MonoBehaviour
         closedLoopPosition = value;
     }
 
+    // Leaving both switches off preserves tracking integration as well as the transform.
+    public void ApplyStartPose(Vector3 position, Quaternion rotation, bool resetPosition, bool resetRotation)
+    {
+        if (!resetPosition && !resetRotation) return;
+        if (resetPosition && resetRotation) { SetPositionAndRotation(position, rotation); return; }
+        if (resetPosition) { _initialPosition = position; transform.position = position; }
+        if (resetRotation)
+        {
+            Quaternion delta = rotation * Quaternion.Inverse(transform.rotation);
+            ApplyManualRotation(delta);
+            _initialRotation = rotation;
+            transform.rotation = rotation;
+        }
+    }
+
     public void SetPositionAndRotation(Vector3 initialPosition, Quaternion initialRotation)
     {
         _initialPosition = initialPosition;

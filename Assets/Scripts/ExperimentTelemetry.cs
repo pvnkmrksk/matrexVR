@@ -135,7 +135,8 @@ public sealed class ExperimentTelemetry : MonoBehaviour
                 sceneNumber = main != null && main.SequenceRunning ? main.currentStep + 1 : 0,
                 sceneName = scene.name, sceneBuildIndex = scene.buildIndex,
                 remainingStepSeconds = main != null ? main.RemainingStepSeconds : 0,
-                phase = main == null ? "idle" : (main.SequenceError != null || main.AssessmentFailed) ? "error" : !main.SequenceRunning ? "idle" : main.AssessmentPending ? "assessment" : "stimulus",
+                remainingPhaseSeconds = main != null ? main.RemainingPhaseSeconds : 0,
+                phase = main == null ? "idle" : (main.SequenceError != null || main.AssessmentFailed) ? "error" : !main.SequenceRunning ? "idle" : main.ExperimentPhase,
                 error = main != null ? main.SequenceError : null,
                 telemetry = State, droppedSnapshots = DroppedSnapshots },
             rigs, errors = RuntimeStatusOverlay.RecentErrors()

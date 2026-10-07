@@ -16,7 +16,10 @@ public class MainController : MonoBehaviour
     public static MainController Instance { get; private set; }
     public static event System.Action SystemConfigurationChanged;
     public bool SequenceRunning => sequenceStarted;
-    public float RemainingStepSeconds => timer;
+    public float RemainingStepSeconds => phaseRunner != null && phaseRunner.Active ? (float)phaseRunner.RemainingSeconds : timer;
+    private ExperimentPhases phaseRunner;
+    public string ExperimentPhase => phaseRunner != null && phaseRunner.Active ? phaseRunner.CurrentPhase : AssessmentPending ? "assessment" : "stimulus";
+    public double RemainingPhaseSeconds => phaseRunner != null && phaseRunner.Active ? phaseRunner.RemainingPhaseSeconds : timer;
     public string SequenceError { get; private set; }
     public IReadOnlyDictionary<string, ClosedLoop> VRClosedLoops => vrClosedLoops;
     public IReadOnlyDictionary<string, SystemConfig> SystemConfigs => systemConfigs;
@@ -310,6 +313,7 @@ public class MainController : MonoBehaviour
     public void StopSequence()
     {
         sequenceStarted = false;
+        phaseRunner?.Cancel();
         currentStep = 0;
         foreach (ClosedLoop rig in vrClosedLoops.Values)
             if (rig != null) rig.GetComponent<StimulusHeadingReference>()?.Cancel();
@@ -409,7 +413,7 @@ public class MainController : MonoBehaviour
         if (activeSceneController != null && currentStepData.parameters != null)
         {
             if (!currentStepData.parameters.ContainsKey("gain")) currentStepData.parameters["gain"] = currentStepData.gain;
-            InitializeStep(() => activeSceneController.InitializeScene(ExperimentConfigFiles.ResolveReferences(currentStepData.parameters)));
+            InitializeStep(() => ApplyExperiment(currentStepData.parameters, activeSceneController.InitializeScene));
             timer = currentStepData.duration;
         }
         else
@@ -491,6 +495,7 @@ public class MainController : MonoBehaviour
 
     void LoadScene(SequenceStep step)
     {
+        phaseRunner?.Cancel();
         Debugger.Log("MainController.LoadScene()", 3);
         SyncTimestamp();
 
@@ -608,14 +613,27 @@ public class MainController : MonoBehaviour
         Debug.Log("MainController was disabled.");
     }
 
+private void ApplyExperiment(Dictionary<string, object> parameters, System.Action<Dictionary<string, object>> apply)
+{
+    if (phaseRunner == null) phaseRunner = gameObject.AddComponent<ExperimentPhases>();
+    var resolved = ExperimentConfigFiles.ResolveReferences(parameters);
+    if (!phaseRunner.TryBegin(resolved, apply, FailExperiment)) apply(resolved);
+}
+
+private void FailExperiment(System.Exception error)
+{
+    SequenceError = error.Message;
+    sequenceStarted = false;
+    phaseRunner?.Cancel();
+    Debug.LogException(error);
+}
+
 private void InitializeStep(System.Action initialize)
 {
     try { initialize(); }
     catch (System.Exception error)
     {
-        SequenceError = error.Message;
-        sequenceStarted = false;
-        Debug.LogException(error);
+        FailExperiment(error);
     }
 }
 
@@ -645,10 +663,18 @@ public bool AssessmentPending
 
 void ManageTimerAndTransitions()
 {
-    // Sequence duration is presentation time. Assessment adds time without
-    // interrupting closed-loop movement or resetting a rig at stimulus onset.
-    if (AssessmentPending) return;
-    timer -= Time.deltaTime;
+    // Phased files own their complete schedule. Flat files retain a presentation
+    // timer that waits for any legacy heading observation.
+    if (phaseRunner != null && phaseRunner.Active)
+    {
+        timer = (float)phaseRunner.RemainingSeconds;
+        if (!phaseRunner.Finished) return;
+    }
+    else
+    {
+        if (AssessmentPending) return;
+        timer -= Time.deltaTime;
+    }
 
     if (timer > 0) return;   // still running this step
 
@@ -693,7 +719,7 @@ void ManageTimerAndTransitions()
     {
         // ★ NEW PATH: keep scene, just tell it to advance
         if (next.parameters != null && !next.parameters.ContainsKey("gain")) next.parameters["gain"] = next.gain;
-        InitializeStep(() => sequencer.AdvanceStep(ExperimentConfigFiles.ResolveReferences(next.parameters)));
+        InitializeStep(() => ApplyExperiment(next.parameters, sequencer.AdvanceStep));
         ApplyGainToClosedLoopComponents(next.gain);
         timer = next.duration;      // restart timer for the new sub-step
     }

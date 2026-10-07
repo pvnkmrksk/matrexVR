@@ -9,9 +9,12 @@ public sealed class HeadingReferenceConfig
 {
     public bool enabled = false;
     public double windowSeconds = 180;
+    public double startOffsetSeconds = 0;
 
     public void Validate()
     {
+        if (enabled && (double.IsNaN(startOffsetSeconds) || double.IsInfinity(startOffsetSeconds) || startOffsetSeconds < 0))
+            throw new ArgumentException("headingReference.startOffsetSeconds must be finite and nonnegative when enabled.");
         if (enabled && (double.IsNaN(windowSeconds) || double.IsInfinity(windowSeconds) || windowSeconds <= 0))
             throw new ArgumentException("headingReference.windowSeconds must be positive and finite when enabled.");
     }
@@ -95,7 +98,7 @@ public sealed class StimulusHeadingReference : MonoBehaviour
         config.Validate();
         if (!config.enabled) { onPresent?.Invoke(null); return; }
         present = onPresent;
-        startedAt = Time.timeAsDouble;
+        startedAt = Time.timeAsDouble + config.startOffsetSeconds;
         deadline = startedAt + config.windowSeconds;
         Phase = "observing";
     }
@@ -103,6 +106,7 @@ public sealed class StimulusHeadingReference : MonoBehaviour
     public void Cancel()
     {
         present = null; Result = null; Phase = "disabled";
+        history = new CircularHeadingWindow();
     }
 
     private void LateUpdate() => Tick(Time.timeAsDouble);
@@ -111,8 +115,10 @@ public sealed class StimulusHeadingReference : MonoBehaviour
     // No fabricated catch-up samples if rendering stalls.
     public void Tick(double now)
     {
-        history.Add(now, transform.eulerAngles.y, config.windowSeconds);
-        if (!IsObserving || now < deadline) return;
+        if (!IsObserving || now < startedAt) return;
+        if (now <= deadline) history.Add(now, transform.eulerAngles.y, config.windowSeconds);
+        if (now < deadline) return;
+        history.Prune(deadline, config.windowSeconds);
         try
         {
             Result = history.Read();

@@ -35,6 +35,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     [Serializable]
     private class Step
     {
+        public bool resetPositionOnStart = true;
+        public bool resetRotationOnStart = true;
         public string name = "";
         public Trigger trigger;
         public SceneObjectSpec[] objects;
@@ -69,6 +71,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     [Serializable]
     public class SceneObjectSpec
     {
+        public bool useHeadingReference = false;
         public string type;
         public Polar polar;
         public Scale scale;
@@ -167,7 +170,13 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             ? p.ToString()
             : "dynamicSequenceDesign.json";
 
-        LoadDesign(design);
+        CleanupScene();
+        if (ExperimentPhases.IsPhase(parameters))
+        {
+            designFile = ExperimentPhases.Read(parameters).ToObject<DesignFile>();
+            orderedSteps = IsAdaptiveDecisionEnabled() ? new List<Step>() : BuildOrdered(designFile, null);
+        }
+        else LoadDesign(design);
         CachePlayers();
         InitRigStates();
 
@@ -175,11 +184,18 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             state.routine = StartCoroutine(RunRigSequence(state));
     }
 
-    public void CleanupScene() { }
+    public void CleanupScene()
+    {
+        StopAllCoroutines();
+        foreach (var state in rigStates.Values)
+            if (state.container != null) { state.container.gameObject.SetActive(false); Destroy(state.container.gameObject); }
+        rigStates.Clear();
+    }
 
     public void AdvanceStep(Dictionary<string, object> parameters)
     {
-        // not used; sequence advances internally
+        if (ExperimentPhases.IsPhase(parameters)) InitializeScene(parameters);
+        // Legacy flat sequences continue to advance internally.
     }
 
     private void LoadDesign(string file)
@@ -383,6 +399,15 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                 : Quaternion.Euler(0, obj.mu, 0);
 
             GameObject instance = Instantiate(prefab, position, rotation, parent);
+            if (obj.useHeadingReference && players.TryGetValue(vrId, out var observer))
+            {
+                var reference = observer.GetComponent<StimulusHeadingReference>()?.Result;
+                if (reference != null)
+                {
+                    instance.transform.position += observer.position;
+                    StimulusHeadingReference.RotateStimulus(instance.transform, observer.position, reference);
+                }
+            }
             instance.tag = layerName;
             if (layerId != -1)
                 SetLayerRecursively(instance, layerId);
@@ -471,8 +496,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         ClosedLoop cl = rig.GetComponent<ClosedLoop>();
         if (cl != null)
         {
-            cl.SetPositionAndRotation(step.initialPosition, initialRotation);
-            cl.ResetPositionAndRotation();
+            cl.ApplyStartPose(step.initialPosition, initialRotation, step.resetPositionOnStart, step.resetRotationOnStart);
         }
     }
 
@@ -862,6 +886,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             resetVR = s.resetVR != null ? (string[])s.resetVR.Clone() : null,
             closedLoopOrientation = s.closedLoopOrientation,
             closedLoopPosition = s.closedLoopPosition,
+            resetPositionOnStart = s.resetPositionOnStart,
+            resetRotationOnStart = s.resetRotationOnStart,
             initialPosition = s.initialPosition,
             initialRotation = s.initialRotation,
             randomInitialRotation = s.randomInitialRotation,
@@ -876,6 +902,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
         return new SceneObjectSpec
         {
+            useHeadingReference = obj.useHeadingReference,
             type = obj.type,
             polar = obj.polar == null ? null : new Polar { radius = obj.polar.radius, angle = obj.polar.angle, height = obj.polar.height },
             scale = obj.scale == null ? null : new Scale { x = obj.scale.x, y = obj.scale.y, z = obj.scale.z },

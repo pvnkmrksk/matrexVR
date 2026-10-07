@@ -87,9 +87,22 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
             string configFileName = parameters["configFile"].ToString();
             Debug.Log($"Loading optomotor config file: {configFileName}");
             StopStimulusSequence();
-            LoadOptomotorConfig(configFileName);
+            if (ExperimentPhases.IsPhase(parameters))
+            {
+                optomotorConfig = ExperimentPhases.Read(parameters).ToObject<OptomotorConfig>();
+                loggingData["OptomotorConfigFile"] = configFileName;
+            }
+            else LoadOptomotorConfig(configFileName);
             if (optomotorConfig != null)
             {
+                foreach (var rig in closedLoopComponents)
+                {
+                    Vector3 rotation = optomotorConfig.initialRotation?.ToVector3() ?? rig.transform.eulerAngles;
+                    if (optomotorConfig.randomInitialRotation && optomotorConfig.resetRotationOnStart) rotation.y = UnityEngine.Random.Range(0f, 360f);
+                    rig.ApplyStartPose(optomotorConfig.initialPosition?.ToVector3() ?? rig.transform.position, Quaternion.Euler(rotation),
+                        optomotorConfig.resetPositionOnStart && optomotorConfig.initialPosition != null,
+                        optomotorConfig.resetRotationOnStart && (optomotorConfig.initialRotation != null || optomotorConfig.randomInitialRotation));
+                }
                 stimulusRoutine = StartCoroutine(RunStimulusSequence());
             }
         }
@@ -278,6 +291,11 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
 [System.Serializable]
 public class OptomotorConfig
 {
+    public bool resetPositionOnStart = true;
+    public bool resetRotationOnStart = true;
+    public Vector3Config initialPosition;
+    public Vector3Config initialRotation;
+    public bool randomInitialRotation;
     public bool loop = false;
     public List<OptomotorStimulus> stimuli = new List<OptomotorStimulus>();
 }

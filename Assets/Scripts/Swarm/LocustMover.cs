@@ -12,32 +12,33 @@ public class LocustMover : MonoBehaviour
         // Check boundaries and reposition if out of bounds
         if (boundaryManager)
         {
-            Vector3 pos = transform.position;
+            Vector3 center = boundaryManager.Center;
+            Vector3 pos = Quaternion.Inverse(boundaryManager.referenceRotation) * (transform.position - center);
 
             float lengthX = boundaryManager.boundaryLengthX > 0 ? boundaryManager.boundaryLengthX : boundaryManager.boundarySize;
             float lengthZ = boundaryManager.boundaryLengthZ > 0 ? boundaryManager.boundaryLengthZ : boundaryManager.boundarySize;
-            if (pos.x > boundaryManager.transform.position.x + lengthX / 2)
-                pos.x = boundaryManager.transform.position.x - lengthX / 2 + boundaryManager.boundaryBuffer;
+            if (pos.x > lengthX / 2)
+                pos.x = -lengthX / 2 + boundaryManager.boundaryBuffer;
 
-            else if (pos.x < boundaryManager.transform.position.x - lengthX / 2)
-                pos.x = boundaryManager.transform.position.x + lengthX / 2 - boundaryManager.boundaryBuffer;
+            else if (pos.x < -lengthX / 2)
+                pos.x = lengthX / 2 - boundaryManager.boundaryBuffer;
 
-            if (pos.z > boundaryManager.transform.position.z + lengthZ / 2)
-                pos.z = boundaryManager.transform.position.z - lengthZ / 2 + boundaryManager.boundaryBuffer;
+            if (pos.z > lengthZ / 2)
+                pos.z = -lengthZ / 2 + boundaryManager.boundaryBuffer;
 
-            else if (pos.z < boundaryManager.transform.position.z - lengthZ / 2)
-                pos.z = boundaryManager.transform.position.z + lengthZ / 2 - boundaryManager.boundaryBuffer;
+            else if (pos.z < -lengthZ / 2)
+                pos.z = lengthZ / 2 - boundaryManager.boundaryBuffer;
 
             if (boundaryManager.wrapY && boundaryManager.boundaryHeight > 0)
             {
                 float halfHeight = boundaryManager.boundaryHeight / 2;
-                if (pos.y > boundaryManager.transform.position.y + halfHeight)
-                    pos.y = boundaryManager.transform.position.y - halfHeight + boundaryManager.boundaryBuffer;
-                else if (pos.y < boundaryManager.transform.position.y - halfHeight)
-                    pos.y = boundaryManager.transform.position.y + halfHeight - boundaryManager.boundaryBuffer;
+                if (pos.y > halfHeight)
+                    pos.y = -halfHeight + boundaryManager.boundaryBuffer;
+                else if (pos.y < -halfHeight)
+                    pos.y = halfHeight - boundaryManager.boundaryBuffer;
             }
 
-            transform.position = pos;
+            transform.position = center + boundaryManager.referenceRotation * pos;
         }
     }
 }

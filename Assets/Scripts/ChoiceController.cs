@@ -15,7 +15,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
     private Dictionary<string, Material> materialDict = new Dictionary<string, Material>();
     string[] tags = new string[] { "ChoiceVR1", "ChoiceVR2", "ChoiceVR3", "ChoiceVR4" };
     private Transform spawnedObjectsRoot;
-    private bool configured;
+    private bool phased;
     private readonly List<StimulusHeadingReference> headingReferences = new List<StimulusHeadingReference>();
     private Material defaultSkyboxMaterial;
     private Material runtimeSkyboxMaterial;
@@ -64,7 +64,8 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             return;
         }
 
-        SceneConfig config = LoadSceneConfig(parameters["configFile"].ToString());
+        phased = ExperimentPhases.IsPhase(parameters);
+        SceneConfig config = phased ? ExperimentPhases.Read(parameters).ToObject<SceneConfig>() : LoadSceneConfig(parameters["configFile"].ToString());
         if (config == null)
         {
             return;
@@ -131,8 +132,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             {
                 initialRotation = Quaternion.Euler(config.initialRotation);
             }
-            if (!(configured && config.headingReference?.enabled == true))
-                cl.SetPositionAndRotation(config.initialPosition, initialRotation);
+            cl.ApplyStartPose(config.initialPosition, initialRotation, config.resetPositionOnStart, config.resetRotationOnStart);
         }
         // Read and set the background color of cameras
         if (config.backgroundColor != null)
@@ -156,31 +156,50 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
                 }
             }
         }
-        // TODO: Set sky and grass textures
-        // Start the coroutine from here
-        if (config.headingReference?.enabled == true)
+        if (!phased && config.headingReference?.enabled == true)
         {
             foreach (ClosedLoop rig in closedLoopComponents)
             {
                 var heading = StimulusHeadingReference.For(rig);
                 headingReferences.Add(heading);
-                heading.Begin(config.headingReference, reference => SpawnRelativeObjects(config, rig, reference));
+                heading.Begin(config.headingReference, reference => {
+                    if (headingReferences.Any(h => h != null && h.IsObserving)) return;
+                    ClearObjects(); SpawnConfiguredObjects(config, closedLoopComponents);
+                });
             }
         }
-        else
-        {
-            SpawnAbsoluteObjects(config);
+        SpawnConfiguredObjects(config, closedLoopComponents);
+        // Retain the legacy delayed initialization only for old full-reset configs.
+        if (!phased && config.headingReference?.enabled != true && config.resetPositionOnStart && config.resetRotationOnStart)
             StartCoroutine(DelayedOnLoaded(0.05f));
-        }
-        configured = true;
+        if (config.uniformSkyColor != null)
+            NightSkyController.Apply(gameObject, null, null, config.uniformSkyColor);
+        else if (!string.IsNullOrEmpty(config.skyboxPath)) SetSkybox(config.skyboxPath);
+        else NightSkyController.Apply(gameObject, config.nightSky, null);
+    }
 
-        if (!string.IsNullOrEmpty(config.skyboxPath))
+    private void SpawnConfiguredObjects(SceneConfig config, ClosedLoop[] rigs)
+    {
+        SpawnAbsoluteObjects(config);
+        foreach (ClosedLoop rig in rigs)
         {
-            SetSkybox(config.skyboxPath);
-        }
-        else
-        {
-            NightSkyController.Apply(gameObject, config.nightSky, null);
+            var reference = rig.GetComponent<StimulusHeadingReference>()?.Result;
+            if ((config.objects ?? System.Array.Empty<SceneObject>()).Any(o => o.useHeadingReference))
+                SpawnRelativeObjects(config, rig, reference);
+            if (config.swarm == null) continue;
+            int vrIndex = Kannadi.ParseVRIndex(rig.name);
+            var host = new GameObject("VR" + vrIndex + "_EmbeddedSwarm");
+            host.transform.SetParent(spawnedObjectsRoot, false);
+            host.transform.position = rig.transform.position;
+            var spawner = host.AddComponent<LocustSpawner>();
+            spawner.boundaryManager = host.AddComponent<BoundaryManager>();
+            spawner.layerName = "SimulatedLocustsVR" + vrIndex;
+            var catalog = Resources.Load<KannadiPrefabCatalog>("KannadiPrefabCatalog");
+            spawner.locustPrefab = catalog != null ? catalog.Find("SimulatedLocust") : null;
+            int layers = LayerMask.GetMask("SimulatedLocustsVR1", "SimulatedLocustsVR2", "SimulatedLocustsVR3", "SimulatedLocustsVR4");
+            foreach (Camera camera in rig.GetComponentsInChildren<Camera>(true))
+                camera.cullingMask = (camera.cullingMask & ~layers) | LayerMask.GetMask(spawner.layerName);
+            SwarmConfiguration.Apply(spawner, config.swarm, rig);
         }
     }
 
@@ -188,7 +207,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
     {
         foreach (var obj in config.objects ?? System.Array.Empty<SceneObject>())
         {
-            if (string.IsNullOrEmpty(obj.type))
+            if (obj.useHeadingReference || string.IsNullOrEmpty(obj.type))
             {
                 continue; // Skip objects with no type specified
             }
@@ -223,7 +242,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             camera.cullingMask = (camera.cullingMask & ~layers) | (1 << layer);
         foreach (SceneObject obj in config.objects ?? System.Array.Empty<SceneObject>())
         {
-            if (string.IsNullOrEmpty(obj.type)) continue;
+            if (!obj.useHeadingReference || string.IsNullOrEmpty(obj.type)) continue;
             if (obj.type.ToLowerInvariant().Contains("band"))
                 InstantiateBand(obj, vrIndex, reference, rig.transform.position);
             else if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
@@ -231,8 +250,11 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
                 GameObject instance = Instantiate(prefab, spawnedObjectsRoot);
                 ApplyResolvedTransform(instance.transform, obj);
                 // Authored coordinates are relative to the animal's location at onset.
-                instance.transform.position += rig.transform.position;
-                StimulusHeadingReference.RotateStimulus(instance.transform, rig.transform.position, reference);
+                if (reference != null)
+                {
+                    instance.transform.position += rig.transform.position;
+                    StimulusHeadingReference.RotateStimulus(instance.transform, rig.transform.position, reference);
+                }
                 SetLayerRecursively(instance, layer);
                 ConfigureRegularObjectInstance(instance, obj);
             }
@@ -247,7 +269,11 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         headingReferences.Clear();
         NightSkyController.Apply(gameObject, null, null);
         ClearRuntimeSkybox();
+        ClearObjects();
+    }
 
+    private void ClearObjects()
+    {
         if (spawnedObjectsRoot == null)
         {
             return;
@@ -257,6 +283,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         {
             GameObject old = spawnedObjectsRoot.GetChild(i).gameObject;
             old.GetComponent<BandSpawner>()?.ClearInstances();
+            old.GetComponent<LocustSpawner>()?.PrepareObservation();
             old.SetActive(false);
             Destroy(old);
         }
@@ -613,6 +640,10 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 [System.Serializable]
 public class SceneConfig
 {
+    public bool resetPositionOnStart = true;
+    public bool resetRotationOnStart = true;
+    public ColorConfig uniformSkyColor;
+    public SwarmConfig swarm;
     public HeadingReferenceConfig headingReference;
     public SceneObject[] objects = System.Array.Empty<SceneObject>();
     public bool closedLoopOrientation;
@@ -637,6 +668,7 @@ public class SceneConfig
 [System.Serializable]
 public class SceneObject
 {
+    public bool useHeadingReference = false;
     public string type;
     public Position position;
     public string material;

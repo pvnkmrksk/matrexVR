@@ -116,7 +116,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         {
             text.Append($" | Trial {main.currentTrial + 1} | Scene {main.currentStep + 1}\n");
             text.Append(main.SequenceError != null ? "ERROR: " + main.SequenceError :
-                main.AssessmentFailed ? "ERROR: stimulus presentation failed (timer held)" : !main.SequenceRunning ? "Idle" : main.AssessmentPending ? "Assessing heading (stimulus timer held)" : $"Stimulus: {main.RemainingStepSeconds:F1}s remaining");
+                main.AssessmentFailed ? "ERROR: heading measurement failed" : !main.SequenceRunning ? "Idle" : $"{main.ExperimentPhase}: {main.RemainingPhaseSeconds:F1}s (cycle {main.RemainingStepSeconds:F1}s)");
             text.AppendLine();
             foreach (var entry in main.SystemConfigs)
             {
