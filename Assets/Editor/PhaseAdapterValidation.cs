@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.IO.Compression;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
@@ -15,8 +17,8 @@ using Object = UnityEngine.Object;
 public static class PhaseAdapterValidation
 {
     private const string Key = "PhaseAdapterValidation.Active";
-    private static readonly string[] scenes = { "Swarm", "Kannadi", "Optomotor", "Choice_desync" };
-    private static readonly string[] templates = { "swarm", "kannadi", "optomotor", "dynamic-choice" };
+    private static readonly string[] scenes = { "Swarm", "Kannadi", "Optomotor", "Choice_desync", "Choice" };
+    private static readonly string[] templates = { "swarm", "kannadi", "optomotor", "dynamic-choice", "choice-band" };
     private static readonly List<string> errors = new List<string>();
     private static int checks, index, stage, nextFrame, handle;
     private static double deadline;
@@ -66,6 +68,11 @@ public static class PhaseAdapterValidation
             else p["numberOfRings"] = 1;
             foreach (JObject vr in p["vrConfigs"] ?? new JArray()) { vr["closedLoopPosition"] = 0; vr["closedLoopOrientation"] = 0; }
         }
+        if (template == "choice-band")
+        {
+            p["resetPositionOnStart"] = false; p["resetRotationOnStart"] = false;
+            p["closedLoopPosition"] = false; p["closedLoopOrientation"] = false;
+        }
         if (template == "optomotor")
         {
             p["resetPositionOnStart"] = false; p["resetRotationOnStart"] = false;
@@ -97,6 +104,17 @@ public static class PhaseAdapterValidation
                 ids = rigs.Select(r => r.GetInstanceID()).ToArray(); handle = SceneManager.GetActiveScene().handle;
                 Check(rigs.Length == 4, scenes[index] + " loads four rigs");
                 for (int i = 0; i < rigs.Length; i++) rigs[i].transform.SetPositionAndRotation(new Vector3(i,1,i), Quaternion.Euler(0, 20 + i * 30, 0));
+                if (index == 4)
+                {
+                    // Exercise the optional compact writer without adding a fake VR to
+                    // DynamicSequenceController, which discovers players through DataLogger.
+                    var probe = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    probe.name = "Color logging probe";
+                    var drift = probe.AddComponent<ColorDrift>(); drift.enabled = false;
+                    new GameObject("Color CSV validation").AddComponent<ColorDriftLogger>();
+                    foreach (var logger in Object.FindObjectsByType<ColorDriftLogger>(FindObjectsSortMode.None))
+                        typeof(ColorDriftLogger).GetField("colorDrifts", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(logger, new List<ColorDrift> { drift });
+                }
                 var pre = Payload(templates[index]);
                 pre["headingReference"] = JObject.FromObject(new { enabled = true, windowSeconds = .4, startOffsetSeconds = .1 });
                 var stimulus = Payload(templates[index]);
@@ -106,7 +124,11 @@ public static class PhaseAdapterValidation
                 string file = "adapter-validation.json";
                 File.WriteAllText(Path.Combine(Application.streamingAssetsPath, file), new JObject { ["preStimulus"] = pre, ["stimulus"] = stimulus, ["postStimulus"] = post }.ToString());
                 var controller = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<InSceneSequence.IInSceneSequencer>().First();
-                runner = MainController.Instance.gameObject.AddComponent<ExperimentPhases>();
+                var main = MainController.Instance;
+                main.enabled = false; // The fixture advances the phases directly, not an outer sequence.
+                runner = main.gameObject.AddComponent<ExperimentPhases>();
+                typeof(MainController).GetField("phaseRunner", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(main, runner);
+                typeof(MainController).GetField("sequenceStarted", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(main, true);
                 Check(runner.TryBegin(new Dictionary<string,object> { [index == 3 ? "design" : "configFile"] = file }, controller.AdvanceStep, e => errors.Add(e.ToString())), scenes[index] + " accepts nested payload");
                 Check(runner.CurrentPhase == "preStimulus", scenes[index] + " enters pre-stimulus");
                 stage = 3; return;
@@ -139,9 +161,45 @@ public static class PhaseAdapterValidation
                 else stage = 1;
                 return;
             }
-            if (stage == 6) { Check(errors.Count == 0, "Clean shutdown"); Finish(null); }
+            if (stage == 6) { ValidateRecordedRows(); Check(errors.Count == 0, "Clean shutdown"); Finish(null); }
         }
         catch (Exception error) { Finish(error.ToString()); }
+    }
+    private static void ValidateRecordedRows()
+    {
+        var phasesByKind = new Dictionary<string, HashSet<string>>();
+        string directory = MasterDataLogger.Instance.directoryPath;
+        foreach (string file in Directory.GetFiles(directory, "*.csv*").Where(f => f.EndsWith(".csv") || f.EndsWith(".csv.gz")))
+        {
+            string text;
+            if (file.EndsWith(".gz"))
+            {
+                using (var stream = new StreamReader(new GZipStream(File.OpenRead(file), CompressionMode.Decompress))) text = stream.ReadToEnd();
+            }
+            else text = File.ReadAllText(file);
+            string[] lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            Check(lines.Length > 0, "Recorded file contains a header");
+            // Swarm and band retain historical Key:Value metadata after the data columns.
+            string[] header = lines[0].Split(',').TakeWhile(h => !h.Contains(":")).ToArray();
+            int phaseIndex = Array.IndexOf(header, "experimentPhase");
+            Check(phaseIndex >= 0, "Phase column exists in " + Path.GetFileName(file));
+            string kind = header.Contains("CloneIndex") ? "Kannadi" : header.Contains("VisibilityPhase") ? "Band" :
+                header.Contains("StimulusIndex") ? "Optomotor" : header.Contains("CylinderName") ? "ColorDrift" :
+                header.Contains("CurrentTrial") ? "Rig" : "Swarm";
+            if (!phasesByKind.ContainsKey(kind)) phasesByKind[kind] = new HashSet<string>();
+            foreach (string line in lines.Skip(1))
+            {
+                string[] cells = line.Split(',');
+                Check(cells.Length == header.Length, "Column alignment in " + Path.GetFileName(file));
+                Check(new[] { "preStimulus", "stimulus", "postStimulus", "idle", "assessment", "error" }.Contains(cells[phaseIndex]), "Recognized phase on every recorded row");
+                phasesByKind[kind].Add(cells[phaseIndex]);
+            }
+        }
+        foreach (string kind in new[] { "Rig", "Swarm", "Kannadi", "Optomotor", "Band", "ColorDrift" })
+            Check(phasesByKind.ContainsKey(kind) && new[] { "preStimulus", "stimulus", "postStimulus" }.All(phasesByKind[kind].Contains), "All three phases survive disk buffering in " + kind);
+        Check(phasesByKind.ContainsKey("ColorDrift"), "Compact color-drift header contains the phase column");
+        MainController.Instance.StopSequence();
+        Check(MainController.RecordedExperimentPhase == "idle", "Stopped experiments are labeled idle");
     }
     private static void Finish(string failure)
     {

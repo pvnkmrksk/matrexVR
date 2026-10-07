@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-07",
+  "branch": "codex/bogong-night-sky",
+  "baseCommit": "b3e2c5354b828a6a44e24b411bc2c10420c194b4",
+  "unity": "6000.3.16f1",
+  "sourceSha256": {
+    "Assets/ColorDriftLogger.cs": "bc4541a91103877d1098230e2aa9711470aae3998f905c76e6555426129d61fe",
+    "Assets/Editor/ExperimentPhaseValidation.cs": "a27af744b7151647fc3322f8e46affe793deb250e9802edc7fe10f40d9ca5d99",
+    "Assets/Editor/PhaseAdapterValidation.cs": "c5e3e2c6e421c6ad4ffa983b4295bb44558c6a32cdafb9be280fc17f776c78f4",
+    "Assets/Scripts/BandLogger.cs": "a045edb1eb7700f060b99a016c1307c2ad8ec4007060d2a186b3821dc565684f",
+    "Assets/Scripts/BandSpawner.cs": "164b29812e94e58d8d0d3a3a1546a885862b7073ec969fd0e8017852647748ed",
+    "Assets/Scripts/ExperimentTelemetry.cs": "2cb3791617e72c7143fcfe51debc8877fda46e981b8fc743a71dad7a8c85a07a",
+    "Assets/Scripts/Loggers/DataLogger.cs": "d87b5bb27f38d962eee7c5a7878e2776bdc775de970abc965a93689372eedda9",
+    "Assets/Scripts/MainController.cs": "5bf0dad8f22dc9afbd9227af887d46cd08b78ad02de89883476be8bf7b2c89c5",
+    "Assets/Scripts/Swarm/KannadiLogger.cs": "15584df80016945e9df386cafdc79819686c967f80b0556bede5e7e07534cac8",
+    "Assets/Scripts/Swarm/SwarmLogger.cs": "5caccfbe0b91d69c49feea8d6a5ffd13aa8cef25710f122052531cca01a1d007"
+  },
+  "suites": {
+    "phase-adapter-validation": {
+      "checks": 85715,
+      "failure": null,
+      "errors": [],
+      "unity": "6000.3.16f1"
+    },
+    "experiment-phase-validation": {
+      "checks": 6033,
+      "failure": null,
+      "errors": [],
+      "observations": [
+        "preStimulus \u2192 stimulus in same scene at 2.59989835600907",
+        "repeat \u2192 preStimulus at 5.61659848356009"
+      ],
+      "fullDuration": false,
+      "unity": "6000.3.16f1"
+    },
+    "heading-telemetry-validation": {
+      "checks": 78,
+      "failure": null,
+      "unexpectedErrors": [],
+      "unity": "6000.3.16f1",
+      "coverage": "Circular statistics, disabled/default/invalid/sequence config, generic and Choice adapters, real Swarm lifecycle, per-rig onset/no reset, repeat trial, PUB/SUB tracking and telemetry, raw units, player errors and HUD"
+    }
+  },
+  "coverage": [
+    "Actual CSV and gzip rows retain preStimulus, stimulus and postStimulus after buffering and scene shutdown for rig, Optomotor, Swarm, Kannadi, Band and compact ColorDrift loggers.",
+    "Every saved row has a recognized phase and matches its data-column header; legacy Swarm/Band header metadata is parsed separately.",
+    "Selwyn in-scene transitions and repetition preserve all four rig CSVs with the phase column appended after existing columns.",
+    "Heading and telemetry regression suite passes; stopped experiments report idle.",
+    "Unlocked BandSpawner agents produce populated logs; compact ColorDrift header matches its rows.",
+    "49 configuration templates/examples pass validation; 622 archived hashes and 979 older locust inputs remain preserved."
+  ],
+  "scope": "Unity Editor Play Mode in a disposable project copy; synthetic input, no live animal or hardware session. Local user edits to Selwyn timing/speed are excluded."
+}

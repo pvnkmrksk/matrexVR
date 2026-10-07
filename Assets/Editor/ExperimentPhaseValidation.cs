@@ -235,11 +235,33 @@ public static class ExperimentPhaseValidation
             }
             if (stage == 5)
             {
+                CheckRecordedPhases();
                 Check(errors.Count == 0, "Clean phase run and shutdown: " + string.Join("; ", errors));
                 Finish(null);
             }
         }
         catch (Exception error) { Finish(error.ToString()); }
+    }
+    private static void CheckRecordedPhases()
+    {
+        string[] files = Directory.GetFiles(MasterDataLogger.Instance.directoryPath, "*_Choice_Selwyn_VR*_.csv");
+        Check(files.Length == 4, "Four rig CSVs exist after phase cycle");
+        foreach (string file in files)
+        {
+            string[] lines = File.ReadAllLines(file);
+            string[] header = lines[0].Split(',');
+            int phaseIndex = Array.IndexOf(header, "experimentPhase");
+            Check(phaseIndex == header.Length - 1, "Phase column appended after existing rig columns");
+            var phases = new HashSet<string>();
+            foreach (string line in lines.Skip(1).Where(l => !string.IsNullOrWhiteSpace(l)))
+            {
+                string[] cells = line.Split(',');
+                Check(cells.Length == header.Length, "Rig row retains header/column alignment");
+                Check(!string.IsNullOrEmpty(cells[phaseIndex]), "Each persisted row carries a phase");
+                phases.Add(cells[phaseIndex]);
+            }
+            Check(phases.Contains("preStimulus") && phases.Contains("stimulus") && (full || phases.Contains("postStimulus")), "Buffered CSV preserves each phase after transitions and shutdown");
+        }
     }
     private static void VerifyRepeat()
     {
