@@ -9,10 +9,21 @@ ROOT = Path(__file__).resolve().parents[1]
 SA = ROOT / 'Assets/StreamingAssets'
 TEMPLATES = SA / 'Templates'
 scenes = set(re.findall(r'enabled: 1\s+path: Assets/Scenes/([^\n]+)\.unity', (ROOT / 'ProjectSettings/EditorBuildSettings.asset').read_text()))
-count = 0
-for path in sorted(list(TEMPLATES.glob('*.json')) + list((SA / 'Examples').rglob('*.json'))):
-    obj = json.loads(path.read_text())
-    count += 1
+def validate(obj, path):
+    if any(name in obj for name in ('preStimulus', 'stimulus', 'postStimulus')):
+        assert set(obj) <= {'preStimulus', 'stimulus', 'postStimulus'}, path
+        assert obj.get('stimulus', {}).get('enabled', True), path
+        for name in ('preStimulus', 'stimulus', 'postStimulus'):
+            phase = obj.get(name)
+            if not phase or not phase.get('enabled', name == 'stimulus'):
+                continue
+            assert phase.get('durationSeconds', 0) > 0, (path, name)
+            if phase.get('headingReference', {}).get('enabled'):
+                assert name == 'preStimulus', (path, name)
+            validate(phase, str(path) + ':' + name)
+        return
+    if obj.get('swarm') is not None:
+        validate(obj['swarm'], str(path) + ':swarm')
     if 'sequences' in obj:
         for step in obj['sequences']:
             assert step['sceneName'] in scenes, (path, step['sceneName'])
@@ -23,6 +34,8 @@ for path in sorted(list(TEMPLATES.glob('*.json')) + list((SA / 'Examples').rglob
     if 'headingReference' in obj:
         reference = obj['headingReference']
         assert isinstance(reference.get('enabled', False), bool), path
+        if reference.get('enabled', False):
+            assert reference.get('startOffsetSeconds', 0) >= 0, path
         if reference.get('enabled', False):
             assert reference.get('windowSeconds', 180) > 0, path
     if 'telemetry' in obj and obj['telemetry'].get('enabled', True):
@@ -74,6 +87,11 @@ for path in sorted(list(TEMPLATES.glob('*.json')) + list((SA / 'Examples').rglob
         assert 1 <= sky.get('updateIntervalMinutes', 30) <= 60, path
         assert sky.get('imageWidth', 4096) in [1024, 2048, 4096], path
 
+paths = sorted(list(TEMPLATES.glob('*.json')) + list((SA / 'Examples').rglob('*.json')))
+count = len(paths)
+for path in paths:
+    validate(json.loads(path.read_text()), path)
+
 # The shipped runnable sequences use the experiment-file hierarchy for Swarm.
 for sequence_path in [SA / 'sequenceConfig.json', SA / 'Kannadi' / 'sequenceConfig.json']:
     if not sequence_path.is_file():
@@ -107,13 +125,14 @@ for record in manifest['archived']:
     if record['operation'] == 'move':
         assert not (SA / record['original']).exists(), record['original']
 for path, digest in manifest['preservedSha256'].items():
-    # The machine-specific hardware file is intentionally not required in another checkout.
-    if path.endswith('/system_config.json'):
+    # Active hardware and selected experiments can change; the manifest records their historical snapshot.
+    # Keep the explicitly preserved Kannadi recipes byte-for-byte.
+    if path in ('Assets/StreamingAssets/system_config.json', 'Assets/StreamingAssets/sequenceConfig.json'):
         continue
     assert (ROOT / path).is_file(), path
     assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == digest, path
 assert {p.name for p in SA.glob('*.json')} <= {'system_config.json', 'sequenceConfig.json'}
-print(f"PASS: {len(manifest['archived'])} archived file hashes and preserved Kannadi/active sequence")
+print(f"PASS: {len(manifest['archived'])} archived file hashes and preserved Kannadi recipes")
 
 for record in manifest.get('otherArchives', []):
     target = ROOT / record['archive']

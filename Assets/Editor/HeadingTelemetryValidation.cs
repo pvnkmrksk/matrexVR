@@ -78,7 +78,7 @@ public static class HeadingTelemetryValidation
         }
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "system_config.json"), system.ToString());
         var config = new { numberOfLocusts = 2, mu = 90, kappa = 100000, locustSpeed = 0,
-            closedLoopPosition = 0, closedLoopOrientation = 0, autopilotEnabled = false,
+            closedLoopPosition = 0, closedLoopOrientation = 0, autopilotEnabled = false, useHeadingReference = true,
             headingReference = new { enabled = true, windowSeconds = 1.0 },
             vrConfigs = Enumerable.Range(1, 4).Select(i => new { vrIndex = i,
                 initialPosition = new { x = i * 3, y = 1, z = 0 }, initialRotation = new { x = 0, y = (i - 1) * 90, z = 0 } }) };
@@ -147,7 +147,7 @@ public static class HeadingTelemetryValidation
                     originalRigId = rigs[0].GetInstanceID();
                     Check(main.AssessmentPending, "MainController holds duration during assessment");
                     Check(Math.Abs(main.RemainingStepSeconds - 1000) < .01, "presentation duration not spent on assessment");
-                    Check(Object.FindObjectsByType<LocustMover>(FindObjectsSortMode.None).Length == 0, "no swarm flashes during observation");
+                    Check(Object.FindObjectsByType<LocustMover>(FindObjectsSortMode.None).Length == 8, "configured world remains visible during observation");
                     subscriber = new SubscriberSocket(); subscriber.Options.Linger = TimeSpan.Zero;
                     subscriber.Connect("tcp://127.0.0.1:19880"); subscriber.Subscribe("matrex.telemetry.v1");
                     sensor = new PublisherSocket(); sensor.Options.Linger = TimeSpan.Zero; sensor.Bind("tcp://127.0.0.1:19871");
@@ -170,7 +170,7 @@ public static class HeadingTelemetryValidation
                         Check(Angle(rigs[i].GetComponent<LocustSpawner>().mu, i * 90 + 90), "relative swarm mu " + i);
                         Check(rigs[i].transform.position == new Vector3((i + 1) * 3, 1, 0) && Angle(rigs[i].transform.eulerAngles.y, i * 90), "onset preserves rig pose " + i);
                     }
-                    Check(Object.FindObjectsByType<LocustMover>(FindObjectsSortMode.None).Length == 8, "stimuli spawn only after complete assessment");
+                    Check(Object.FindObjectsByType<LocustMover>(FindObjectsSortMode.None).Length == 8, "reference application replaces the swarm without duplicates");
                     var telemetry = Object.FindFirstObjectByType<ExperimentTelemetry>();
                     var snapshot = JObject.FromObject(telemetry.Capture(999));
                     var first = snapshot["rigs"][0];
@@ -181,10 +181,13 @@ public static class HeadingTelemetryValidation
                     File.WriteAllText(Path.Combine(Application.dataPath, "../telemetry-example.json"), snapshot.ToString());
                     Check(File.ReadAllLines(Path.Combine(MasterDataLogger.Instance.directoryPath, "heading_reference.jsonl")).Length == 4, "onset context saved separately for every rig");
                     rigs[0].transform.position = new Vector3(17, 2, 23); rigs[0].transform.rotation = Quaternion.Euler(0, 45, 0);
+                    var continuation = JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "heading-validation.json")));
+                    continuation["resetPositionOnStart"] = false; continuation["resetRotationOnStart"] = false;
+                    File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "heading-validation.json"), continuation.ToString());
                     Set(main, "timer", 0f); Call(main, "ManageTimerAndTransitions");
                     Check(main.currentStep == 1 && rigs[0].GetInstanceID() == originalRigId, "in-place trial retains rig instance");
                     Check(rigs[0].transform.position == new Vector3(17, 2, 23) && Angle(rigs[0].transform.eulerAngles.y, 45), "next assessment does not reset pose");
-                    Check(Object.FindObjectsByType<LocustMover>(FindObjectsSortMode.None).Length == 0, "previous stimulus hidden during next assessment");
+                    Check(Object.FindObjectsByType<LocustMover>(FindObjectsSortMode.None).Length == 8, "configured swarm is visible during next assessment");
                     Later(3); break;
                 case 3:
                     if (main.AssessmentPending) return;
@@ -273,13 +276,16 @@ public static class HeadingTelemetryValidation
         var prefab = GameObject.CreatePrimitive(PrimitiveType.Cube); prefab.name = "ReferenceCube";
         controller.prefabs = new[] { prefab }; controller.materials = Array.Empty<Material>();
         host.SetActive(true);
-        var config = new SceneConfig { objects = new[] { new SceneObject { type = "ReferenceCube", position = new Position { radius = 10, angle = 90 } } } };
+        var config = new SceneConfig { objects = new[] { new SceneObject { useHeadingReference = true, type = "ReferenceCube", position = new Position { radius = 10, angle = 90 } } } };
         var result = new HeadingReferenceResult { meanHeadingDegrees = 45 };
         Call(controller, "SpawnRelativeObjects", config, rigs[0], result);
         Transform spawned = Get<Transform>(controller, "spawnedObjectsRoot").GetChild(0);
         Vector3 delta = spawned.position - rigs[0].transform.position;
         Check(Angle(Mathf.Atan2(delta.x, delta.z) * Mathf.Rad2Deg, 135), "Choice polar angle uses frozen per-rig zero");
         Check(spawned.gameObject.layer == LayerMask.NameToLayer("SimulatedLocustsVR1"), "Choice stimulus isolated to its rig");
+        Call(controller, "SpawnRelativeObjects", config, rigs[0], null);
+        Transform fallback = Get<Transform>(controller, "spawnedObjectsRoot").GetChild(1);
+        Check(Vector3.Distance(fallback.position, new Vector3(10,0,0)) < .001f, "Enabled spawner without a measured reference keeps authored world position");
         Object.DestroyImmediate(Get<Transform>(controller, "spawnedObjectsRoot").gameObject);
         Object.DestroyImmediate(host); Object.DestroyImmediate(prefab);
     }

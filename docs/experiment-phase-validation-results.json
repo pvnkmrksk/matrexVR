@@ -1,0 +1,191 @@
+{
+  "date": "2026-10-07",
+  "branch": "codex/bogong-night-sky",
+  "baseCommit": "ec69034e",
+  "unity": "6000.3.16f1",
+  "sourceSha256AtReport": {
+    "Assets/Editor/ConfigCatalogValidation.cs": "4aad55ee82f5d5f7da7916031c2309867e59843068ffbf217b34463cfd4a9ef4",
+    "Assets/Editor/HeadingTelemetryValidation.cs": "69196e2f8f82f04bb1f0458d912ab925d043ba54b58c43e176a35c19a5791cb9",
+    "Assets/Scripts/ChoiceController.cs": "85765f6e66719e8f8af88113bb3fc89f0d554bf685930286fc32e3019dc2fd9c",
+    "Assets/Scripts/ClosedLoop.cs": "fe540d6d8604d458a06f8e08bd22100e2dc8e7920586498a2336a44fe2007f68",
+    "Assets/Scripts/DynamicSequenceController.cs": "ead5352ea22b04efa7fe63dde083846d2e8e52c8041481c87875672823f33702",
+    "Assets/Scripts/ExperimentTelemetry.cs": "a1e5b3aa5c3c65002fa7b1cae735a04b75a99e83b9cf29063e0a1535c2114d4e",
+    "Assets/Scripts/MainController.cs": "bf19c505dc399080e433bc866304a8c447c25b4648704da42f8822bb18575f57",
+    "Assets/Scripts/NightSky/NightSkyController.cs": "f8a86ea19281b95a55e6d0e7e30bf35189cefab3d9ff894b515df6f139e328de",
+    "Assets/Scripts/Optomotor/OptomotorSceneController.cs": "3f5cdc1ead59fad6e16a7ba6c9f0ff00e049810c5290590f5d66eb811d939028",
+    "Assets/Scripts/RuntimeStatusOverlay.cs": "6a1c6ee3af00f10d172f3efe91635d23bb3750c1a3af0b3af5d4d81081d410cc",
+    "Assets/Scripts/StimulusHeadingReference.cs": "e679981a640ccd867854ef72bbf7f1603a64e182f6d4134afce49f08a2be5ed5",
+    "Assets/Scripts/Swarm/BoundaryManager.cs": "1547cb87fcf040f2d7731734840fde66f13fefc623fea5c0ca85053a491da5e4",
+    "Assets/Scripts/Swarm/Kannadi.cs": "b9416f92bc5f1d5e00bfdb9e3f5fdcc1aefe226fae88f763b5eb9c08d85d37ca",
+    "Assets/Scripts/Swarm/KannadiConfig.cs": "0c2492948be0831ba0480ff39daf4c7cf663e9655106705a43b83f3d30e325f0",
+    "Assets/Scripts/Swarm/LocustMover.cs": "ff973f09cf5af97a20dcfdbdc0ca3cf3ea5a894ecc141e67a2bb19c99f625fdf",
+    "Assets/Scripts/Swarm/LocustSpawner.cs": "9af618b26eff712b836bec9a0387457d860d56987bc44cb71fc39c1199291ec0",
+    "Assets/Scripts/Swarm/SwarmController.cs": "117b48150f9fb23bfe21c96ecbc6472f23391c7a6049ebc9841345a2166a0f4e",
+    "Assets/StreamingAssets/Examples/Choice/binary-cylinders.example.json": "0a3912a30a059197cca11242b75bc7c5185c16afce87fc22e633aeab336b1309",
+    "Assets/StreamingAssets/Examples/Choice/empty-control.example.json": "1815e39940beef92cbb95ffec89e0fcda85f9968c282427a75c5d738ac980386",
+    "Assets/StreamingAssets/Examples/Choice/moving-band.example.json": "5592bba2dc49cf71f88b71bac3111cd375dcb04fcc70e43d954d0eae32cd35de",
+    "Assets/StreamingAssets/Examples/DynamicChoice/adaptive.example.json": "dc9053883518cb78af872ca9f3ef4989a4b82740725fd3719702eac33bd3c1c3",
+    "Assets/StreamingAssets/Examples/DynamicChoice/area.example.json": "c583092a10fa3fe357d0716f36d0801dab1f18ab9b7133a4a09af1acab4e5475",
+    "Assets/StreamingAssets/Examples/DynamicChoice/independent.example.json": "9986b90ef469fffdb31b86744d3ce1749f9e0da49d92de6ce4dcd1ac5c0ef72f",
+    "Assets/StreamingAssets/Examples/DynamicChoice/time.example.json": "c6a8906d233068ee57bdd7f517184cf455ee16ac72625335b7bdb2f56964afe9",
+    "Assets/StreamingAssets/Examples/Flight/adaminaby-panorama.example.json": "faeba99f7deb1d6ff7fb2b04db86c95f25c3774b796bc26783241bfe029e7210",
+    "Assets/StreamingAssets/Examples/Flight/migration-agl10.example.json": "8afa7df385283e18926422133252ae356603e835cbdaa770908c595a37130bb4",
+    "Assets/StreamingAssets/Examples/Flight/migration-agl100.example.json": "2ff054f987a9aecb25ff7256ec2b3686c29624a86e9fbec35063f2d34b2e1753",
+    "Assets/StreamingAssets/Examples/Flight/migration-agl1000.example.json": "c00de8ae0b1e54860ba40a3ba2723703cb7004a9a2c6b4c918538a7e79c260d4",
+    "Assets/StreamingAssets/Examples/Flight/selwyn-fixed-sky.example.json": "6ffb057989b7364461d4f5d06b896f296df4bbadefc649974f9b3599ba6a5159",
+    "Assets/StreamingAssets/Examples/Flight/selwyn-live-sky.example.json": "95faaf488f1ae1bf2a0dabf56ca576966bf03460f6b6402326f5f4c2d84e043f",
+    "Assets/StreamingAssets/Examples/Optomotor/frequency-speed-sweep.example.json": "189fd8452305a9c5c81269da3e166d991c70008162f5c724ed1fc1b799a36579",
+    "Assets/StreamingAssets/Examples/Optomotor/pitch.example.json": "1a188d6263486d2a76032a1b8c9d092971b87d47a4ad4378bb220abd0990ca08",
+    "Assets/StreamingAssets/Examples/Optomotor/roll.example.json": "2d9ce11b43d56364316dff51ed5ff27a7630539f620fe1e59ae96ebd7cb72224",
+    "Assets/StreamingAssets/Examples/Optomotor/yaw.example.json": "bd92b7dbd15e955b232b70790b8564795f2dd286df932918b5dc89152864a4a6",
+    "Assets/StreamingAssets/Examples/Swarm/angular-flicker.example.json": "5fba1b28e3a4022a7e89d2b6d166ea7932bbb7db8c3b5b5eefe7a47d7368d148",
+    "Assets/StreamingAssets/Examples/Swarm/dispersed.example.json": "3e07954b4c17ea2d178c0db1c0cb3510969dd006b01425a896072c10562ef4fa",
+    "Assets/StreamingAssets/Examples/Swarm/heading-aligned.example.json": "2c1320be8832cbc3c2366019628a9d342b4469f7dae31f10b2c3574f8acd4402",
+    "Assets/StreamingAssets/Examples/Swarm/heading-crossed.example.json": "09e1dddfdc6176384db17730cf1a8488c621fa05ba1101003eb0a5238ac64c20",
+    "Assets/StreamingAssets/Examples/Swarm/heading-opposed.example.json": "648d5ddc11ccddbf65436a39462e1967310c070020d4fae6d7f2c45185097348",
+    "Assets/StreamingAssets/Templates/bogong-swarm.template.json": "7c41e6874b213f30be1d9ad81ff5993a7d2f7deecc060f549d0645fa64294710",
+    "Assets/StreamingAssets/Templates/choice-band.template.json": "5592bba2dc49cf71f88b71bac3111cd375dcb04fcc70e43d954d0eae32cd35de",
+    "Assets/StreamingAssets/Templates/choice.template.json": "6c519315c3a5c2fe0ff7b03d10b21700e196029b7d24c8d21d97199a5f276473",
+    "Assets/StreamingAssets/Templates/dynamic-choice.template.json": "c6a8906d233068ee57bdd7f517184cf455ee16ac72625335b7bdb2f56964afe9",
+    "Assets/StreamingAssets/Templates/experiment.template.json": "d5f5f4c95724ec52cd9ee24ac8c2b835e8b8b0b8a34328b5e615c3fe1e3122a9",
+    "Assets/StreamingAssets/Templates/migration.template.json": "2ff054f987a9aecb25ff7256ec2b3686c29624a86e9fbec35063f2d34b2e1753",
+    "Assets/StreamingAssets/Templates/optomotor.template.json": "bd92b7dbd15e955b232b70790b8564795f2dd286df932918b5dc89152864a4a6",
+    "Assets/StreamingAssets/Templates/swarm.template.json": "616fe5981e948eb5906da1b4a6e9c11d96a7d4993d5ba9cf07a83d0f3ad66666",
+    "Assets/StreamingAssets/sequenceConfig.json": "bff3209a8919527ff186929fcf5237a05ff549d7c4a462e0ca4fc741f4d7563f",
+    "tools/validate_config_templates.py": "aecde287eb24ef698be2147e51ab0a0103b243e9acfd8c45f2403f65b9a9f278",
+    "Assets/Scripts/ExperimentPhases.cs": "21c7852ffcc54d6c98b58ddb892789ea50e1d3f118687d8a4f34934f1a7c1279",
+    "Assets/Scripts/Swarm/SwarmConfiguration.cs": "27037a7844fe0ccdc0973dd4118f7b2f5429060afbfffbbd57bd00075a36e949",
+    "Assets/Editor/ExperimentPhaseValidation.cs": "a77966fac9a20c8fcc1bb6525eedcdf31e63f58770852cbfdfaad6236a863259",
+    "Assets/Editor/PhaseAdapterValidation.cs": "04868d91cdc6a19df553aa67e7440a1781db9285591bb4ea110b0dbc3eb992f9",
+    "Assets/StreamingAssets/Examples/Flight/selwyn-stars-left-swarm.example.json": "58b798bcd4128a49c31a2e00d4a2861773c7d8c1482ed0c654b18f2e671190d2"
+  },
+  "suites": {
+    "experiment-phase-validation": {
+      "checks": 824,
+      "failure": null,
+      "errors": [],
+      "observations": [
+        "preStimulus \u2192 stimulus in same scene at 2.59657069160998",
+        "repeat \u2192 preStimulus at 5.6079754393424"
+      ],
+      "fullDuration": false,
+      "unity": "6000.3.16f1"
+    },
+    "experiment-full-cycle-validation": {
+      "checks": 86438,
+      "failure": null,
+      "errors": [],
+      "observations": [
+        "preStimulus \u2192 stimulus in same scene at 240.092691695011",
+        "repeat \u2192 preStimulus at 480.107608985261"
+      ],
+      "fullDuration": true,
+      "unity": "6000.3.16f1"
+    },
+    "phase-adapter-validation": {
+      "checks": 62,
+      "failure": null,
+      "errors": [],
+      "unity": "6000.3.16f1"
+    },
+    "heading-telemetry-validation": {
+      "checks": 77,
+      "failure": null,
+      "unexpectedErrors": [],
+      "unity": "6000.3.16f1",
+      "coverage": "Circular statistics, disabled/default/invalid/sequence config, generic and Choice adapters, real Swarm lifecycle, per-rig onset/no reset, repeat trial, PUB/SUB tracking and telemetry, raw units, player errors and HUD"
+    },
+    "kinefly-wire-validation": {
+      "checks": 96,
+      "failure": null,
+      "errors": [],
+      "unity": "6000.3.16f1",
+      "coverage": "Four configured ports, single JSON Kinefly bridge frames, multipart topic+JSON, independent topic/JSON messages, yaw-only fields, metadata, signed raw flight gains, malformed-packet recovery, separate telemetry, explicit HUD mode/endpoints, invalid monitoring config isolation, missing-rig endpoint retention, clean shutdown"
+    },
+    "bogong-gain-validation": {
+      "checks": 73746,
+      "failure": null,
+      "referenceCommit": "ef8a68b2ad2ff690e803007511666296a31eda5a",
+      "comparison": "Exact Vector3 and Quaternion component equality on every simulated frame",
+      "unity": "6000.3.16f1"
+    },
+    "kannadi-validation": {
+      "checks": 992,
+      "failures": [],
+      "editorMessages": [
+        "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.\nParameter name: index"
+      ]
+    },
+    "config-catalog-validation": {
+      "checks": 4108,
+      "failure": null,
+      "errors": [],
+      "unity": "6000.3.16f1"
+    },
+    "bogong-dot-validation": {
+      "checks": 334,
+      "failure": null,
+      "unity": "6000.3.16f1"
+    }
+  },
+  "standaloneBuild": {
+    "result": "Succeeded",
+    "errors": 0,
+    "warnings": 56,
+    "sizeBytes": 469369269,
+    "seconds": 20.446232,
+    "unity": "6000.3.16f1"
+  },
+  "standaloneSmoke": {
+    "failure": null,
+    "playerExitCode": 0,
+    "snapshots": 452,
+    "observedPhases": [
+      "preStimulus",
+      "stimulus"
+    ],
+    "observedTrials": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "continuousPoseTransitions": 4,
+    "validFlightSnapshotsByRigAndPhase": {
+      "VR1": {
+        "preStimulus": 206,
+        "stimulus": 224
+      },
+      "VR2": {
+        "preStimulus": 206,
+        "stimulus": 224
+      },
+      "VR3": {
+        "preStimulus": 206,
+        "stimulus": 224
+      },
+      "VR4": {
+        "preStimulus": 206,
+        "stimulus": 224
+      }
+    },
+    "frozenReferences": 16,
+    "errors": [],
+    "excludedExistingMessages": [],
+    "fixture": "Actual Selwyn recipe, shortened to 3s pre (1s offset + 2s measurement) / 3s stimulus; synthetic legacy single-frame Kinefly publishers on four ports; GPU sky rendering enabled"
+  },
+  "staticChecks": {
+    "completeTemplatesAndExamples": 49,
+    "archivedFilesUnchanged": 622,
+    "olderLocustInputsUnchanged": 979,
+    "sceneAndCatalogDependencyFiles": 84,
+    "gitDiffCheck": "passed"
+  },
+  "notes": [
+    "All Unity executions used a disposable project copy. Original hardware configuration and Kannadi recipes were unchanged.",
+    "Full-duration run completed a 240 + 240 second cycle and entered the next pre-stimulus at 480.108 experiment seconds.",
+    "Final-source shortened tests additionally cover unavailable-reference fallback and rotated periodic boundaries. The final-source standalone player covers four repeated cycles with live synthetic Kinefly inputs.",
+    "Frame-level invariant assertion counts vary with frame rate. Tests used simulated inputs; physical tracker hardware and LED photometry were not measured.",
+    "The existing UnityEditor.Search.SearchDatabase startup exception is listed separately by legacy validation and is not a player/runtime error. Player build succeeded with 56 compiler warnings and zero errors."
+  ]
+}

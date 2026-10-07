@@ -100,12 +100,13 @@ public static class ConfigCatalogValidation
                 Complete((JObject)obj["overheadCamera"], typeof(OverheadCameraConfig), file);
                 continue;
             }
-            Type type = obj["sequences"] != null ? typeof(SequenceConfig) : obj["objects"] != null ? typeof(SceneConfig) :
-                obj["stimuli"] != null ? typeof(OptomotorConfig) : obj["steps"] != null ? typeof(DynamicSequenceController).GetNestedType("DesignFile", BindingFlags.NonPublic) : typeof(KannadiConfig);
-            Check(JsonConvert.DeserializeObject(obj.ToString(), type, strict) != null, "Strict schema " + file);
-            bool preservedKannadi = file.EndsWith("kannadi.template.json") || file.EndsWith("kinematic.template.json");
-            if (!preservedKannadi) Complete(obj, type, file, type == typeof(KannadiConfig) ? swarmOnly : null);
+            if (obj["stimulus"] != null || obj["preStimulus"] != null || obj["postStimulus"] != null)
+            {
+                foreach (var phase in ExperimentPhase.Parse(obj)) CheckExperiment(phase.Config, file + ":" + phase.Name, strict, swarmOnly, true);
+            }
+            else CheckExperiment(obj, file, strict, swarmOnly, false);
         }
+
         string oldName = "BinaryChoiceIndia_flip_noflip.json";
         string archived = ExperimentConfigFiles.Resolve(oldName);
         Check(archived == Path.Combine(root, "Archive/Legacy", oldName) && File.Exists(archived), "Untouched Kannadi reference resolves archived Choice config");
@@ -122,6 +123,16 @@ public static class ConfigCatalogValidation
         finally { File.Delete(current); }
         Check(ExperimentConfigFiles.Resolve("does-not-exist.json") == Path.Combine(root, "does-not-exist.json"), "Missing config remains missing");
         Check(ExperimentConfigFiles.Resolve(archived) == archived, "Absolute config path preserved");
+    }
+    private static void CheckExperiment(JObject obj, string file, JsonSerializerSettings strict, HashSet<string> swarmOnly, bool phased)
+    {
+        Type type = obj["sequences"] != null ? typeof(SequenceConfig) : obj["objects"] != null ? typeof(SceneConfig) :
+            obj["stimuli"] != null ? typeof(OptomotorConfig) : obj["steps"] != null ? typeof(DynamicSequenceController).GetNestedType("DesignFile", BindingFlags.NonPublic) : typeof(KannadiConfig);
+        Check(JsonConvert.DeserializeObject(obj.ToString(), type, strict) != null, "Strict schema " + file);
+        bool preservedKannadi = file.EndsWith("kannadi.template.json") || file.EndsWith("kinematic.template.json");
+        var excluded = type == typeof(KannadiConfig) ? new HashSet<string>(swarmOnly) : new HashSet<string>();
+        if (phased) excluded.Add("headingReference");
+        if (!preservedKannadi) Complete(obj, type, file, excluded);
     }
     private static void Tick()
     {
