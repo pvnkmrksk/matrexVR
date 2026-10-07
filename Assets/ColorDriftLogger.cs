@@ -13,12 +13,10 @@ public class ColorDriftLogger : DataLogger
 
         // Gather all ColorDrift components in the scene:
         colorDrifts = new List<ColorDrift>(FindObjectsOfType<ColorDrift>());
-
-        // Optionally, write a dedicated header if you like
-        // Because DataLogger already writes a default header, you can just append columns below.
-        // Or you can do it in InitLog() or after the file is first created.
-        logFile.WriteLine(",CylinderName,CurrentBlue");
     }
+
+    // This logger writes one compact row per cylinder, not the base rig-pose schema.
+    protected override string BuildHeader() => "Current Time,CylinderName,CurrentBlue,TargetMean,experimentPhase";
 
     // We won’t rely on DataLogger’s default single-line approach here.
     // Instead, we’ll manually iterate over each cylinder and write one line per cylinder per frame.
@@ -33,12 +31,13 @@ public class ColorDriftLogger : DataLogger
             // Build the line:
             // We already know DataLogger has a 'line' member, so reuse or just declare a new local string.
 
+            if (drift == null) continue;
             float myBlue = drift.CurrentBlue;       // was drift.currentBlue
             bool isUsingA = drift.IsUsingMeanA;     // was drift.IsUsingMeanA
 
             float targetMean = isUsingA ? drift.meanBlueA : drift.meanBlueB;
 
-            line = $"\n{currentTime},{drift.gameObject.name},{myBlue:F2},{targetMean:F2}";
+            line = $"\n{currentTime},{drift.gameObject.name},{myBlue:F2},{targetMean:F2},{MainController.RecordedExperimentPhase}";
 
             
             // Call LogData() to either buffer or write the line directly (depending on the DataLogger settings)

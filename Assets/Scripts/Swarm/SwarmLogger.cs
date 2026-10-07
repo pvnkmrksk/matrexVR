@@ -67,7 +67,7 @@ public class SwarmLogger : MonoBehaviour
 
         // Write header with parameters from LocustSpawner
         logFile.WriteLine(
-            $"Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,NumberOfLocusts:{locustSpawner.numberOfLocusts},SpawnAreaSize:{locustSpawner.spawnAreaSize},Mu:{locustSpawner.mu},Kappa:{locustSpawner.kappa},LocustSpeed:{locustSpawner.locustSpeed}"
+            $"Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase,NumberOfLocusts:{locustSpawner.numberOfLocusts},SpawnAreaSize:{locustSpawner.spawnAreaSize},Mu:{locustSpawner.mu},Kappa:{locustSpawner.kappa},LocustSpeed:{locustSpawner.locustSpeed}"
         );
     }
 
@@ -83,7 +83,7 @@ public class SwarmLogger : MonoBehaviour
             {
                 Vector3 position = locust.transform.position;
                 string data =
-                    FormattableString.Invariant($"{timestamp},{locust.name},{LayerMask.LayerToName(locust.layer)},{position.x},{position.y},{position.z},{NightSkyController.CurrentId},{NightSkyController.CurrentSampleUtc}");
+                    FormattableString.Invariant($"{timestamp},{locust.name},{LayerMask.LayerToName(locust.layer)},{position.x},{position.y},{position.z},{NightSkyController.CurrentId},{NightSkyController.CurrentSampleUtc},{MainController.RecordedExperimentPhase}");
                 logFile.WriteLine(data);
             }
         }

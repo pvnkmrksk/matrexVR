@@ -97,6 +97,8 @@ The sky remains **static between 30-minute image updates**; there is no continuo
 
 ## Records and monitoring
 
+**`experimentPhase` is recorded on every rig CSV row** (also Optomotor, Swarm, Kannadi, Band and color-drift CSVs). Filter directly on `preStimulus`, `stimulus` or `postStimulus`; no event-log join is required. It is appended without repurposing existing step/blinking fields. See [recorded data formats](data-formats.md) for idle/error/legacy values and a pandas example.
+
 `heading_reference.jsonl` records each frozen mean, resultant, sample count and observation timestamps. For compatibility the completion fields remain named `presentedAt` / `presentedUtc`; these refer to **measurement completion**, which can precede stimulus onset. `experiment_phases.jsonl` records actual phase onsets, effective durations, trial/step, sky ID and each rig's frozen reference. Sky images/colors and usage remain in `Skyboxes/`.
 
 Outbound telemetry retains topic `matrex.telemetry.v1` and the six-component pose, input, gain/DC and error fields. `system.phase` reports `preStimulus`, `stimulus` or `postStimulus` for phased files (flat observations retain `assessment`); `remainingPhaseSeconds` gives the current phase countdown and `remainingStepSeconds` includes all remaining phases. The bottom-right panel shows both. **Tab** restores or hides the panel; a new error reopens it.

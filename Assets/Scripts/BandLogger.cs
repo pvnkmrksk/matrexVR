@@ -56,7 +56,7 @@ public class BandLogger : MonoBehaviour
 
         // Write header
         logFile.WriteLine(
-            "Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase," +
+            "Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase,experimentPhase," +
             $"SpawnLengthX:{bandSpawner.spawnLengthX}," +
             $"SpawnLengthZ:{bandSpawner.spawnLengthZ}," +
             $"GridType:{bandSpawner.gridType}," +
@@ -80,10 +80,12 @@ public class BandLogger : MonoBehaviour
 
     void LogAllInstances()
     {
+        if (bandSpawner == null || logFile == null) return;
         string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
-        foreach (Transform child in bandSpawner.transform)
+        // Unlocked agents are spawned without a parent, so transform children omit them.
+        foreach (GameObject instance in bandSpawner.Instances)
         {
-            GameObject instance = child.gameObject;
+            if (instance == null || !instance.activeInHierarchy) continue;
             if (targetLayerMask == (targetLayerMask | (1 << instance.layer)))
             {
                 LogInstanceData(timestamp, instance);
@@ -105,7 +107,7 @@ public class BandLogger : MonoBehaviour
         string data = $"{timestamp},{instance.name},{LayerMask.LayerToName(instance.layer)}," +
                       $"{position.x},{position.y},{position.z}," +
                       $"{rotation.x},{rotation.y},{rotation.z}," +
-                      $"{speed},{visibilityPhase}";
+                      $"{speed},{visibilityPhase},{MainController.RecordedExperimentPhase}";
         logFile.WriteLine(data);
     }
 

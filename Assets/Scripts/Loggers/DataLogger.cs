@@ -185,6 +185,7 @@ public class DataLogger : MonoBehaviour
             AddColumns("skyboxId", "skyboxSampleUtc");
             AddColumns("SensRotXRad", "SensRotYRad", "SensRotZRad");
             AddColumns("trackingImplementation", "trackingMode", "trackingInputUnits", "wireYaw", "yawGain", "yawDCOffsetRadians", "yawOutputDegPerSecond");
+            AddColumns("experimentPhase");
 
             // Enable logging
             isLogging = true;
@@ -234,28 +235,21 @@ public class DataLogger : MonoBehaviour
         // Write headers if new file
         if (fileStream.Length == 0)
         {
-            // Write base columns
-            string headerLine = string.Join(",", baseColumns);
-
-            // Add ZMQ columns if enabled
-            if (includeZmqData)
-            {
-                headerLine += "," + string.Join(",", zmqColumns);
-            }
-
-            // Add additional columns
-            if (additionalHeaders.Count > 0)
-            {
-                headerLine += "," + string.Join(",", additionalHeaders);
-            }
-
-            logFile.Write(headerLine);
+            logFile.Write(BuildHeader());
             logFile.Flush();
         }
 
         logInitialized = true;
 
         Debug.Log($"Logging to: {logPath}");
+    }
+
+    protected virtual string BuildHeader()
+    {
+        string header = string.Join(",", baseColumns);
+        if (includeZmqData) header += "," + string.Join(",", zmqColumns);
+        if (additionalHeaders.Count > 0) header += "," + string.Join(",", additionalHeaders);
+        return header;
     }
 
     /// <summary>
@@ -383,6 +377,9 @@ public class DataLogger : MonoBehaviour
             }
             queuedOneShotData.Clear();
         }
+
+        // Capture at sampling time, before buffering; never derive phase during disk flush.
+        additionalData["experimentPhase"] = MainController.RecordedExperimentPhase;
 
         // Add additional column data
         foreach (var header in additionalHeaders)

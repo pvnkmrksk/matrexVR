@@ -19,6 +19,10 @@ public class MainController : MonoBehaviour
     public float RemainingStepSeconds => phaseRunner != null && phaseRunner.Active ? (float)phaseRunner.RemainingSeconds : timer;
     private ExperimentPhases phaseRunner;
     public string ExperimentPhase => phaseRunner != null && phaseRunner.Active ? phaseRunner.CurrentPhase : AssessmentPending ? "assessment" : "stimulus";
+    // Shared by recorded rows and live telemetry; do not label idle/error rows as stimulus.
+    public static string RecordedExperimentPhase => Instance == null ? "idle" :
+        Instance.SequenceError != null || Instance.AssessmentFailed ? "error" :
+        !Instance.SequenceRunning ? "idle" : Instance.ExperimentPhase;
     public double RemainingPhaseSeconds => phaseRunner != null && phaseRunner.Active ? phaseRunner.RemainingPhaseSeconds : timer;
     public string SequenceError { get; private set; }
     public IReadOnlyDictionary<string, ClosedLoop> VRClosedLoops => vrClosedLoops;

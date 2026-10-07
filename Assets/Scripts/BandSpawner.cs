@@ -12,6 +12,7 @@ public enum SpawnGridType
 public class BandSpawner : MonoBehaviour
 {
     private readonly List<GameObject> ownedInstances = new List<GameObject>();
+    public IReadOnlyList<GameObject> Instances => ownedInstances;
     public void ClearInstances()
     {
         foreach (GameObject instance in ownedInstances)

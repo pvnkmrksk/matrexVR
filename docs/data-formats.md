@@ -29,6 +29,20 @@ DataLogger emits a header and comma-separated rows. The rig's transform is the w
 | `blackSideAtTrialStart` | Adaptive trial side label. |
 | `skyboxId` | SHA-256 ID of the active managed Swarm/Kannadi sky. Join to `Skyboxes/<id>.json` and `.png`; otherwise blank. |
 | `skyboxSampleUtc` | Astronomical sample time as ISO-8601 UTC; blank for an explicit image or no managed sky. |
+| `experimentPhase` | Experiment state at row sampling: `preStimulus`, `stimulus`, or `postStimulus`. Flat experiments use `stimulus`; legacy flat heading observation uses `assessment`. Outside a running experiment: `idle`; failed experiment: `error`. |
+
+`experimentPhase` is appended after the existing rig columns, including on Optomotor/other loggers using the base schema. It is recorded on **every row**, before disk buffering, so no event-log join is needed. Existing `CurrentStep`, `stepIndex`, `stepName` and band `VisibilityPhase` retain their original meanings. For example:
+
+```python
+import pandas as pd
+
+rows = pd.read_csv("your_VR1_.csv")
+pre = rows[rows["experimentPhase"] == "preStimulus"]
+stim = rows[rows["experimentPhase"] == "stimulus"]
+post = rows[rows["experimentPhase"] == "postStimulus"]
+```
+
+The value uses the same state source as live telemetry's `system.phase`. It describes the state at the logger's sampling callback; phase transitions occur in LateUpdate. Historical CSVs collected before this column was added remain unchanged.
 
 Sensor columns are present only when includeZmqData is enabled on the logger. A stale packet holds the last pose, and the CSV does not currently include a freshness/validity column. A stationary logged pose alone cannot distinguish stationary behavior from packet loss; use runtime_trace.log and the original tracker stream.
 
@@ -44,21 +58,27 @@ Kinefly instead integrates `gain * (rawYawRadians - yawDCOffsetRadians) * Rad2De
 
 Gzip CSV with columns:
 
-`Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius,skyboxId,skyboxSampleUtc`
+`Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius,skyboxId,skyboxSampleUtc,experimentPhase`
 
 Each row is one visible-model root per frame. VRIndex is 1–4; CloneIndex is zero-based and can change when a grid is rebuilt. Positions are world cm, rotations are Euler degrees, hexRadius is world cm, NumberOfRings is an integer. A clone root can contain a whole mirrored band; it is not necessarily a single mesh/animal. Numeric clone values use invariant decimal points.
 
 ## Swarm and band logs
 
-Swarm gzip CSV uses eight row columns: `Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc`. Its header then appends `NumberOfLocusts:...`, `SpawnAreaSize:...`, `Mu:...`, `Kappa:...`, `LocustSpeed:...` as **header metadata**, not per-row columns. Read eight data columns and parse the appended metadata separately (older files have six data columns). Units: X/Y/Z and area size in cm, mu in degrees, kappa dimensionless, speed cm/s. These logs have positions but no heading column; use experiment settings or extend the logger if individual heading histories are required.
+Swarm gzip CSV uses nine row columns: `Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase`. Its header then appends `NumberOfLocusts:...`, `SpawnAreaSize:...`, `Mu:...`, `Kappa:...`, `LocustSpeed:...` as **header metadata**, not per-row columns. Read nine data columns and parse the appended metadata separately (older files have six or eight data columns). Units: X/Y/Z and area size in cm, mu in degrees, kappa dimensionless, speed cm/s. These logs have positions but no heading column; use experiment settings or extend the logger if individual heading histories are required.
 
 See [night-sky.md](night-sky.md) for the `Skyboxes/` image/manifest files, `usage.jsonl` activation audit, and `loads.csv` load history. Each load records the previous/new IDs, panorama filename, actual load time and represented sky time in UTC and observer-local time with an explicit offset. These are included in the normal run directory/ZIP. The sky ID identifies a scene stimulus, including when scene geometry occludes it; it does not identify a camera screenshot.
 
-Band gzip CSV has eleven row columns: `Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase`, followed by extra `Key:Value` header metadata for spawn/boundary/grid parameters. Speed is cm/s; VisibilityPhase is elapsed phase in seconds modulo the total on+off cycle, not a normalized fraction. Read only eleven data columns, then parse header metadata separately. Layer indicates the rig-specific stimulus population, not a physical display number.
+Band gzip CSV has twelve row columns: `Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase,experimentPhase`, followed by extra `Key:Value` header metadata for spawn/boundary/grid parameters. Speed is cm/s; VisibilityPhase is elapsed phase in seconds modulo the total on+off cycle, not a normalized fraction. Read twelve data columns, then parse header metadata separately (older files have eleven). Layer indicates the rig-specific stimulus population, not a physical display number.
+
+Band logging follows the spawner's owned instances, including unlocked agents without a transform parent (these previously produced empty band logs).
+
+Kannadi, Swarm and Band rows use the same `experimentPhase` values as rig rows. `VisibilityPhase` remains the band blinking timer; it is not the experiment phase.
 
 ## Optomotor and metadata
 
 OptomotorDataLogger extends the rig/base schema with `StimulusIndex` (zero-based), `Frequency` (cycles/revolution), `Contrast` and `DutyCycle` (0–1), `Speed` (degrees/s), `RotationAxis`, `ClockwiseRotation`, `ClosedLoopOrientation`, `ClosedLoopPosition`. An instance on the drum records the drum transform; do not interpret it as animal pose. The world-pose logs on rig objects describe animal motion.
+
+The compact ColorDriftLogger CSV now has a matching five-column header: `Current Time,CylinderName,CurrentBlue,TargetMean,experimentPhase`. Its first four data values retain their previous meaning; the old mismatched rig-style header is corrected.
 
 Fly metadata JSON stores `ExperimenterName`, `Comments`, `UsedFlyIDs`, and `Flies`, whose entries have `VR`, `AgeDays`, `StarvedSinceHours`, `Sex`, and `FlyID`. Age and starvation are text fields supplied through the UI; validate them in analysis instead of assuming a numeric JSON type.
 
