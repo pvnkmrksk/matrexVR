@@ -97,7 +97,7 @@ Template: `sequence.template.json`.
 | `duration` | 0 | Outer step time, seconds; use a positive duration. |
 | `gain` | 1 | Historical Bogong/Kinefly signed yaw gain, applied on scene load and in-place trial transitions. Zero disables yaw response; negative reverses it. It does not replace the separate walking angular multiplier. |
 | `autoTrim` | false | Opt-in per-row Kinefly median centering; pauses outside flight/closed-loop yaw. Learned DC offsets persist when false. |
-| `autoTrimSettings` | default object | Flight variance threshold/window, trim window, aggressiveness, step limit, settling and effective-output tolerance. See [auto trim](kinefly-auto-trim.md) for fields, defaults and units. |
+| Experiment `autoTrimSettings` | defaults when omitted | Put tuning in the referenced experiment JSON, inside a phase for phased files. Default flight threshold 0.01 rad², step cap 0.1 rad, absolute cap 2 rad; `flightCheckEnabled: false` bypasses the flight gate. Legacy row settings remain readable. See [auto trim](kinefly-auto-trim.md). |
 | `reloadScene` | true | When false and the scene stays the same, call its in-scene sequencer. Use true for Dynamic Choice: its AdvanceStep is intentionally empty. |
 | `parameters` | null | Controller-specific dictionary. |
 | `parameters.configFile` | none | Choice, Optomotor, Kannadi or Swarm file relative to StreamingAssets. |

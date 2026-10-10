@@ -58,7 +58,21 @@
     "resetPositionOnStart": true,
     "resetRotationOnStart": true,
     "uniformSkyColor": null,
-    "swarm": null
+    "swarm": null,
+    "autoTrimSettings": {
+      "windowSeconds": 15,
+      "flightCheckEnabled": true,
+      "flightWindowSeconds": 2,
+      "flightVarianceThreshold": 0.01,
+      "flightConfirmationSeconds": 1,
+      "flightVarianceHysteresis": 0.5,
+      "updateIntervalSeconds": 0.5,
+      "aggressiveness": 0.65,
+      "maxStepRadians": 0.1,
+      "maxOffsetRadians": 2,
+      "settleSeconds": 3,
+      "toleranceDegPerSecond": 1
+    }
   },
   "postStimulus": {
     "enabled": false

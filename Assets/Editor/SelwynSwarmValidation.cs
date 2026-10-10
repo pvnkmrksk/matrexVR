@@ -53,11 +53,23 @@ public static class SelwynSwarmValidation
         EditorApplication.Exit(0);
     }
 
+    public static void RunReplay()
+    {
+        if (!File.Exists(Path.Combine(Application.dataPath, "../KANNADI_VALIDATION_COPY"))) throw new Exception("Use a disposable project.");
+        string failure = null;
+        try { Replay(); } catch (Exception error) { failure = error.ToString(); Debug.LogError(failure); }
+        File.WriteAllText(Path.Combine(Application.dataPath, "../auto-trim-recording-replay.json"),
+            JsonConvert.SerializeObject(new { checks, failure, replays, unity = Application.unityVersion,
+                note = "Recorded input replay validates mechanics, not biological flight labels or animal adaptation." }, Formatting.Indented));
+        EditorApplication.Exit(failure == null ? 0 : 1);
+    }
+
     private static void Replay(AutoTrimConfig overrideSettings = null)
     {
         var sequence = JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "Examples/Sequences/kinefly-auto-trim.example.json")));
         var row = sequence["sequences"][0];
-        var settings = overrideSettings ?? row["autoTrimSettings"].ToObject<AutoTrimConfig>();
+        var experiment = JObject.Parse(File.ReadAllText(ExperimentConfigFiles.Resolve(row["parameters"]["configFile"].ToString())));
+        var settings = overrideSettings ?? experiment["autoTrimSettings"].ToObject<AutoTrimConfig>();
         float gain = (float)row["gain"];
         foreach (string file in Directory.GetFiles(Path.Combine(Application.dataPath, "../recording-replay"), "*.csv"))
         {

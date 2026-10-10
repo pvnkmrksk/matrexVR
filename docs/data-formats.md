@@ -34,6 +34,7 @@ DataLogger emits a header and comma-separated rows. The rig's transform is the w
 | `autoTrimEnabled`, `autoTrimState` | Kinefly automatic centering flag/state. Blank for unsupported tracking modes. |
 | `flightDetected`, `flightVarianceRadiansSquared` | Flight decision and population variance of raw L−R before gain/offset; blank until the flight window is ready. |
 | `autoTrimMedianDegPerSecond`, `autoTrimPasses` | Last evaluated effective median before correction, and correction count in the current row/configuration. Median is blank while no complete qualified window is available. |
+| `flightCheckEnabled`, `flightThresholdRadiansSquared`, `flightSamples` | Actual flight gate flag, entry threshold in rad² and distinct samples in the rolling flight window; measured flight remains independent of a bypass. |
 | `experimentPhase` | Experiment state at row sampling: `preStimulus`, `stimulus`, or `postStimulus`. Flat experiments use `stimulus`; legacy flat heading observation uses `assessment`. Outside a running experiment: `idle`; failed experiment: `error`. |
 
 `experimentPhase` is appended after the existing rig columns, including on Optomotor/other loggers using the base schema. It is recorded on **every row**, before disk buffering, so no event-log join is needed. Existing `CurrentStep`, `stepIndex`, `stepName` and band `VisibilityPhase` retain their original meanings. For example:

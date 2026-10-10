@@ -1,5 +1,5 @@
 {
-  "checks": 798507,
+  "checks": 798525,
   "failure": null,
   "renders": [
     {
@@ -7,10 +7,10 @@
       "rigs": 4,
       "cameras": 24,
       "comparedPixels": 393216,
-      "legacyMedianMs": 4.1562,
-      "batchedMedianMs": 1.8048000000000002,
-      "legacyP95Ms": 4.9038,
-      "batchedP95Ms": 1.9511,
+      "legacyMedianMs": 3.8880500000000002,
+      "batchedMedianMs": 1.8343,
+      "legacyP95Ms": 4.415500000000001,
+      "batchedP95Ms": 1.971,
       "legacyMaterials": 256,
       "batchedMaterials": 4,
       "legacyCameraCallbacks": 256,
@@ -21,10 +21,10 @@
       "rigs": 4,
       "cameras": 24,
       "comparedPixels": 393216,
-      "legacyMedianMs": 10.64745,
-      "batchedMedianMs": 1.8279,
-      "legacyP95Ms": 10.8224,
-      "batchedP95Ms": 1.8605,
+      "legacyMedianMs": 10.5981,
+      "batchedMedianMs": 1.9209500000000002,
+      "legacyP95Ms": 11.6295,
+      "batchedP95Ms": 2.3541000000000003,
       "legacyMaterials": 1024,
       "batchedMaterials": 4,
       "legacyCameraCallbacks": 1024,
@@ -35,70 +35,88 @@
     {
       "source": "20261007_225146_VR1.csv",
       "duration": 239.67500000000007,
-      "offset": -0.1309024,
-      "passes": 10,
+      "offset": -0.125185773,
+      "passes": 13,
       "flyingSeconds": 236.68800000000005,
-      "final20SecondEffectiveMedianDegPerSecond": 4.084631159514051,
+      "final20SecondEffectiveMedianDegPerSecond": 3.2657853835723825,
       "corrections": [
         {
-          "time": 23.052999999999997,
+          "time": 18.022000000000048,
           "from": 0.0,
-          "to": -0.04,
-          "median": -16.29527779214257
+          "to": -0.0838050842,
+          "median": -18.467991047058163
         },
         {
-          "time": 46.08800000000008,
-          "from": -0.04,
-          "to": -0.08,
-          "median": -17.083811085757414
+          "time": 36.08699999999999,
+          "from": -0.0838050842,
+          "to": -0.122996256,
+          "median": -8.63649590794807
         },
         {
-          "time": 69.11500000000001,
-          "from": -0.08,
-          "to": -0.085505,
-          "median": -1.5770680196241729
+          "time": 54.101,
+          "from": -0.122996256,
+          "to": -0.109599777,
+          "median": 2.9521601342374475
         },
         {
-          "time": 92.12700000000007,
-          "from": -0.085505,
-          "to": -0.09963375,
-          "median": -4.047588545367862
+          "time": 72.15499999999997,
+          "from": -0.109599777,
+          "to": -0.097516425,
+          "median": 2.6627879159171095
         },
         {
-          "time": 115.154,
-          "from": -0.09963375,
-          "to": -0.09342584,
-          "median": 1.778435685634385
+          "time": 90.18100000000004,
+          "from": -0.097516425,
+          "to": -0.08342784,
+          "median": 3.104678519707747
         },
         {
-          "time": 138.192,
-          "from": -0.09342584,
-          "to": -0.111178368,
-          "median": -5.0857252034308855
+          "time": 108.22000000000003,
+          "from": -0.08342784,
+          "to": -0.07356712,
+          "median": 2.1729895611124603
         },
         {
-          "time": 161.22199999999998,
-          "from": -0.111178368,
-          "to": -0.129534841,
-          "median": -5.258740095607681
+          "time": 126.23900000000003,
+          "from": -0.07356712,
+          "to": -0.1243427,
+          "median": -11.189332570021687
         },
         {
-          "time": 184.24200000000008,
-          "from": -0.129534841,
-          "to": -0.114064507,
-          "median": 4.431923166996485
+          "time": 144.779,
+          "from": -0.1243427,
+          "to": -0.147043824,
+          "median": -5.002608767218825
         },
         {
-          "time": 207.26099999999997,
-          "from": -0.114064507,
-          "to": -0.136666,
-          "median": -6.474851773946842
+          "time": 162.82900000000006,
+          "from": -0.147043824,
+          "to": -0.137735263,
+          "median": 2.051314125901721
         },
         {
-          "time": 230.303,
-          "from": -0.136666,
-          "to": -0.1309024,
-          "median": 1.6511497581619683
+          "time": 180.88599999999997,
+          "from": -0.137735263,
+          "to": -0.112293556,
+          "median": 5.6065470839435445
+        },
+        {
+          "time": 198.914,
+          "from": -0.112293556,
+          "to": -0.152686074,
+          "median": -8.901235052985536
+        },
+        {
+          "time": 216.94600000000003,
+          "from": -0.152686074,
+          "to": -0.132315487,
+          "median": 4.4890347108283155
+        },
+        {
+          "time": 235.471,
+          "from": -0.132315487,
+          "to": -0.125185773,
+          "median": 1.5711629563600589
         }
       ],
       "state": "COLLECTING"
@@ -106,70 +124,88 @@
     {
       "source": "20261007_225146_VR4.csv",
       "duration": 239.67600000000004,
-      "offset": 0.124340177,
-      "passes": 10,
+      "offset": 0.117858432,
+      "passes": 13,
       "flyingSeconds": 236.67200000000003,
-      "final20SecondEffectiveMedianDegPerSecond": -0.02338764792599219,
+      "final20SecondEffectiveMedianDegPerSecond": 0.9050538506131087,
       "corrections": [
         {
-          "time": 23.069000000000017,
+          "time": 18.038999999999987,
           "from": 0.0,
-          "to": 0.04,
-          "median": 24.62820407718672
+          "to": 0.1,
+          "median": 28.048790762007496
         },
         {
-          "time": 46.12099999999998,
-          "from": 0.04,
-          "to": 0.08,
-          "median": 21.635101331379104
+          "time": 36.08699999999999,
+          "from": 0.1,
+          "to": 0.134341583,
+          "median": 7.5677982319830415
         },
         {
-          "time": 69.149,
-          "from": 0.08,
-          "to": 0.09731245,
-          "median": 4.959651846288405
+          "time": 54.101,
+          "from": 0.134341583,
+          "to": 0.121525742,
+          "median": -2.824206755455608
         },
         {
-          "time": 92.15999999999997,
-          "from": 0.09731245,
-          "to": 0.125072822,
-          "median": 7.952761567426712
+          "time": 72.12099999999998,
+          "from": 0.121525742,
+          "to": 0.129457861,
+          "median": 1.7479879330025396
         },
         {
-          "time": 115.18799999999999,
-          "from": 0.125072822,
-          "to": 0.138953015,
-          "median": 3.9763812463357286
+          "time": 90.16399999999999,
+          "from": 0.129457861,
+          "to": 0.14465183,
+          "median": 3.3482706469590093
         },
         {
-          "time": 138.192,
-          "from": 0.138953015,
-          "to": 0.164997265,
-          "median": 7.461125849497437
+          "time": 108.22000000000003,
+          "from": 0.14465183,
+          "to": 0.149969727,
+          "median": 1.1718949009579152
         },
         {
-          "time": 161.20500000000004,
-          "from": 0.164997265,
-          "to": 0.135035038,
-          "median": -8.583547298364705
+          "time": 126.23900000000003,
+          "from": 0.149969727,
+          "to": 0.164248645,
+          "median": 3.146623076130162
         },
         {
-          "time": 184.24199999999996,
-          "from": 0.135035038,
-          "to": 0.105725817,
-          "median": -8.39647417921338
+          "time": 144.27800000000002,
+          "from": 0.164248645,
+          "to": 0.144410878,
+          "median": -4.371617170622645
         },
         {
-          "time": 207.27700000000004,
-          "from": 0.105725817,
-          "to": 0.114951357,
-          "median": 2.642922903598405
+          "time": 162.32799999999997,
+          "from": 0.144410878,
+          "to": 0.106423438,
+          "median": -8.371231152101547
         },
         {
-          "time": 230.303,
-          "from": 0.114951357,
-          "to": 0.124340177,
-          "median": 2.68969919760099
+          "time": 180.385,
+          "from": 0.106423438,
+          "to": 0.0807101354,
+          "median": -5.666398983195401
+        },
+        {
+          "time": 198.413,
+          "from": 0.0807101354,
+          "to": 0.09033702,
+          "median": 2.1214614066058264
+        },
+        {
+          "time": 216.44500000000005,
+          "from": 0.09033702,
+          "to": 0.10612414,
+          "median": 3.478982093671884
+        },
+        {
+          "time": 234.47000000000003,
+          "from": 0.10612414,
+          "to": 0.117858432,
+          "median": 2.5858673452535266
         }
       ],
       "state": "COLLECTING"
@@ -177,70 +213,82 @@
     {
       "source": "20261010_023123_VR1.csv",
       "duration": 239.663,
-      "offset": -0.170022845,
-      "passes": 10,
+      "offset": -0.167375445,
+      "passes": 12,
       "flyingSeconds": 236.673,
-      "final20SecondEffectiveMedianDegPerSecond": -0.39976049807487046,
+      "final20SecondEffectiveMedianDegPerSecond": -0.7789726052204472,
       "corrections": [
         {
-          "time": 23.053999999999974,
+          "time": 18.038999999999987,
           "from": 0.0,
-          "to": -0.04,
-          "median": -21.04067181480971
+          "to": -0.1,
+          "median": -22.278360919906433
         },
         {
-          "time": 46.079999999999984,
-          "from": -0.04,
-          "to": -0.0718441,
-          "median": -9.122662790028771
+          "time": 45.105999999999995,
+          "from": -0.1,
+          "to": -0.108013786,
+          "median": -1.7659846266536894
         },
         {
-          "time": 69.113,
-          "from": -0.0718441,
-          "to": -0.08344582,
-          "median": -3.3236463866828827
+          "time": 63.63099999999997,
+          "from": -0.108013786,
+          "to": -0.09958572,
+          "median": 1.8572794160051034
         },
         {
-          "time": 92.14800000000002,
-          "from": -0.08344582,
-          "to": -0.09356701,
-          "median": -2.89950774971796
+          "time": 82.14499999999998,
+          "from": -0.09958572,
+          "to": -0.105060562,
+          "median": -1.2064816113880432
         },
         {
-          "time": 115.156,
-          "from": -0.09356701,
-          "to": -0.118069127,
-          "median": -7.019340857039659
+          "time": 100.15499999999997,
+          "from": -0.105060562,
+          "to": -0.115401439,
+          "median": -2.2788017633928295
         },
         {
-          "time": 140.18900000000002,
-          "from": -0.118069127,
-          "to": -0.110878661,
-          "median": 2.0599160854035703
+          "time": 118.16899999999998,
+          "from": -0.115401439,
+          "to": -0.135870039,
+          "median": -4.510633250902721
         },
         {
-          "time": 163.235,
-          "from": -0.110878661,
-          "to": -0.124564782,
-          "median": -3.920784386930531
+          "time": 136.178,
+          "from": -0.135870039,
+          "to": -0.112143628,
+          "median": 5.22855134945647
         },
         {
-          "time": 186.27100000000002,
-          "from": -0.124564782,
-          "to": -0.1530096,
-          "median": -8.14883755457356
+          "time": 154.188,
+          "from": -0.112143628,
+          "to": -0.117880508,
+          "median": -1.2642273213891526
         },
         {
-          "time": 209.27800000000002,
-          "from": -0.1530096,
-          "to": -0.1585913,
-          "median": -1.599040195490059
+          "time": 172.233,
+          "from": -0.117880508,
+          "to": -0.131121263,
+          "median": -2.9178436780740897
         },
         {
-          "time": 232.339,
-          "from": -0.1585913,
-          "to": -0.170022845,
-          "median": -3.274897805782971
+          "time": 190.25799999999998,
+          "from": -0.131121263,
+          "to": -0.158221349,
+          "median": -5.972001707468313
+        },
+        {
+          "time": 208.30900000000003,
+          "from": -0.158221349,
+          "to": -0.173322827,
+          "median": -3.3278894015716918
+        },
+        {
+          "time": 228.86399999999998,
+          "from": -0.173322827,
+          "to": -0.167375445,
+          "median": 1.3106161220671417
         }
       ],
       "state": "COLLECTING"
@@ -248,58 +296,82 @@
     {
       "source": "20261010_023123_VR2.csv",
       "duration": 239.67999999999998,
-      "offset": 0.006369453,
-      "passes": 8,
+      "offset": 0.0143428613,
+      "passes": 12,
       "flyingSeconds": 236.68899999999996,
-      "final20SecondEffectiveMedianDegPerSecond": 1.0628090881126429,
+      "final20SecondEffectiveMedianDegPerSecond": -0.07929753882718885,
       "corrections": [
         {
-          "time": 23.037999999999982,
+          "time": 18.061000000000007,
           "from": 0.0,
-          "to": 0.0155129228,
-          "median": 4.444124935817669
+          "to": 0.0224075541,
+          "median": 4.937916436198023
         },
         {
-          "time": 46.08099999999999,
-          "from": 0.0155129228,
-          "to": 0.00775646139,
-          "median": -2.222062507832862
+          "time": 36.09600000000003,
+          "from": 0.0224075541,
+          "to": 0.007842644,
+          "median": -3.209645696423088
         },
         {
-          "time": 70.70200000000003,
-          "from": 0.00775646139,
-          "to": 0.0142201753,
-          "median": 1.851717748365451
+          "time": 54.14900000000003,
+          "from": 0.007842644,
+          "to": -0.0017365854,
+          "median": -2.110959307668279
         },
         {
-          "time": 119.20399999999998,
-          "from": 0.0142201753,
-          "to": 0.0191756934,
-          "median": 1.419651142521375
+          "time": 72.16,
+          "from": -0.0017365854,
+          "to": 0.008355214,
+          "median": 2.2239135369911445
         },
         {
-          "time": 142.21900000000002,
-          "from": 0.0191756934,
-          "to": 0.009587847,
-          "median": -2.7467157516037224
+          "time": 90.20399999999998,
+          "from": 0.008355214,
+          "to": 0.0163688529,
+          "median": 1.7659527171440406
         },
         {
-          "time": 170.84600000000003,
-          "from": 0.009587847,
-          "to": 0.00479392335,
-          "median": -1.373357875801559
+          "time": 114.32000000000002,
+          "from": 0.0163688529,
+          "to": 0.0236551426,
+          "median": 1.6056679647851897
         },
         {
-          "time": 193.862,
-          "from": 0.00479392335,
-          "to": -0.00105035433,
-          "median": -1.6742622251406545
+          "time": 132.35100000000003,
+          "from": 0.0236551426,
+          "to": 0.0082793,
+          "median": -3.3883495919284745
         },
         {
-          "time": 216.88700000000003,
-          "from": -0.00105035433,
-          "to": 0.006369453,
-          "median": 2.1256181768918014
+          "time": 150.37800000000001,
+          "from": 0.0082793,
+          "to": 0.002897755,
+          "median": -1.1859224105354675
+        },
+        {
+          "time": 169.958,
+          "from": 0.002897755,
+          "to": 0.009977234,
+          "median": 1.560093171174024
+        },
+        {
+          "time": 187.994,
+          "from": 0.009977234,
+          "to": -0.00547098741,
+          "median": -3.4042994422096755
+        },
+        {
+          "time": 206.013,
+          "from": -0.00547098741,
+          "to": 0.00256666518,
+          "median": 1.7712445080524886
+        },
+        {
+          "time": 224.06199999999998,
+          "from": 0.00256666518,
+          "to": 0.0143428613,
+          "median": 2.5951012969520235
         }
       ],
       "state": "COLLECTING"
@@ -307,70 +379,82 @@
     {
       "source": "20261010_023123_VR3.csv",
       "duration": 239.66400000000002,
-      "offset": 0.09398117,
-      "passes": 10,
+      "offset": 0.07625143,
+      "passes": 12,
       "flyingSeconds": 236.69,
-      "final20SecondEffectiveMedianDegPerSecond": -1.5384789542260933,
+      "final20SecondEffectiveMedianDegPerSecond": 1.0011188109611027,
       "corrections": [
         {
-          "time": 23.02200000000002,
+          "time": 18.039999999999992,
           "from": 0.0,
-          "to": 0.04,
+          "to": 0.06312409,
           "median": 13.910552964294716
         },
         {
-          "time": 46.047,
-          "from": 0.04,
-          "to": 0.05121521,
-          "median": 3.212921124830627
+          "time": 36.08000000000001,
+          "from": 0.06312409,
+          "to": 0.0694365,
+          "median": 1.3910555208683952
         },
         {
-          "time": 69.08099999999999,
-          "from": 0.05121521,
-          "to": 0.06375953,
-          "median": 3.593683097969083
+          "time": 56.60900000000001,
+          "from": 0.0694365,
+          "to": 0.0784091353,
+          "median": 1.9772862338022874
         },
         {
-          "time": 92.09799999999998,
-          "from": 0.06375953,
-          "to": 0.0769684,
-          "median": 3.7840627877695225
+          "time": 74.63199999999998,
+          "from": 0.0784091353,
+          "to": 0.0725318342,
+          "median": -1.2951718610274092
         },
         {
-          "time": 115.107,
-          "from": 0.0769684,
-          "to": 0.0939779,
-          "median": 4.872862568863682
+          "time": 92.66600000000003,
+          "from": 0.0725318342,
+          "to": 0.08851023,
+          "median": 3.5211330078812804
         },
         {
-          "time": 139.121,
-          "from": 0.0939779,
-          "to": 0.088609226,
-          "median": -1.5380104279793487
+          "time": 110.696,
+          "from": 0.08851023,
+          "to": 0.1121381,
+          "median": 5.206835583438201
         },
         {
-          "time": 162.68500000000003,
-          "from": 0.088609226,
-          "to": 0.0928616,
-          "median": 1.218216268118064
+          "time": 128.72600000000003,
+          "from": 0.1121381,
+          "to": 0.08433697,
+          "median": -6.126490162180062
         },
         {
-          "time": 185.72100000000003,
-          "from": 0.0928616,
-          "to": 0.09845615,
-          "median": 1.6027204848327594
+          "time": 147.263,
+          "from": 0.08433697,
+          "to": 0.0926420242,
+          "median": 1.8301724028906454
         },
         {
-          "time": 208.74499999999998,
-          "from": 0.09845615,
-          "to": 0.08391164,
-          "median": -4.166695445891841
+          "time": 172.869,
+          "from": 0.0926420242,
+          "to": 0.100057662,
+          "median": 1.6341724387436103
         },
         {
-          "time": 235.855,
-          "from": 0.08391164,
-          "to": 0.09398117,
-          "median": 2.8847075050130138
+          "time": 190.91,
+          "from": 0.100057662,
+          "to": 0.107161991,
+          "median": 1.5655697133012638
+        },
+        {
+          "time": 208.946,
+          "from": 0.107161991,
+          "to": 0.08259533,
+          "median": -5.413715099172803
+        },
+        {
+          "time": 226.98,
+          "from": 0.08259533,
+          "to": 0.07625143,
+          "median": -1.3979945969851897
         }
       ],
       "state": "COLLECTING"
@@ -378,46 +462,70 @@
     {
       "source": "20261010_023123_VR4.csv",
       "duration": 239.67999999999998,
-      "offset": 0.07866633,
-      "passes": 6,
+      "offset": 0.08247261,
+      "passes": 10,
       "flyingSeconds": 213.34200000000007,
-      "final20SecondEffectiveMedianDegPerSecond": -3.2192019959138447,
+      "final20SecondEffectiveMedianDegPerSecond": -3.764411180603655,
       "corrections": [
         {
-          "time": 23.054000000000002,
+          "time": 18.061000000000007,
           "from": 0.0,
-          "to": 0.02809603,
-          "median": 8.048919700364731
+          "to": 0.0260891672,
+          "median": 5.749227538892244
         },
         {
-          "time": 46.08000000000001,
-          "from": 0.02809603,
-          "to": 0.0100342967,
-          "median": -5.174305291345297
+          "time": 36.11300000000003,
+          "from": 0.0260891672,
+          "to": 0.019566875,
+          "median": -1.4373072030556386
         },
         {
-          "time": 112.32899999999998,
-          "from": 0.0100342967,
-          "to": 0.0500342958,
-          "median": 12.360838684130556
+          "time": 54.64900000000003,
+          "from": 0.019566875,
+          "to": 0.027719738,
+          "median": 1.796633075756837
         },
         {
-          "time": 139.38899999999998,
-          "from": 0.0500342958,
-          "to": 0.04508574,
-          "median": -1.4176574070818722
+          "time": 85.06300000000002,
+          "from": 0.027719738,
+          "to": 0.0201375745,
+          "median": -1.6708692569839272
         },
         {
-          "time": 194.557,
-          "from": 0.04508574,
-          "to": 0.08508574,
-          "median": 14.239155812871882
+          "time": 107.321,
+          "from": 0.0201375745,
+          "to": 0.06966215,
+          "median": 10.91365073226885
         },
         {
-          "time": 220.638,
-          "from": 0.08508574,
-          "to": 0.07866633,
-          "median": -1.839025811449125
+          "time": 125.36499999999998,
+          "from": 0.06966215,
+          "to": 0.0556887574,
+          "median": -3.0792948803630034
+        },
+        {
+          "time": 143.42300000000003,
+          "from": 0.0556887574,
+          "to": 0.02992673,
+          "median": -5.677136191366212
+        },
+        {
+          "time": 189.56199999999998,
+          "from": 0.02992673,
+          "to": 0.093959704,
+          "median": 14.110843207316858
+        },
+        {
+          "time": 207.604,
+          "from": 0.093959704,
+          "to": 0.116371244,
+          "median": 4.938795347514034
+        },
+        {
+          "time": 225.638,
+          "from": 0.116371244,
+          "to": 0.08247261,
+          "median": -7.470188523530925
         }
       ],
       "state": "COLLECTING"
@@ -431,28 +539,18 @@
     "Assets/Scripts/Swarm/BogongSwarmRenderer.cs": "11b4c720cdf373a87faa2572be5eadaf7299dd43d421c76d2dd426c98a336f67",
     "Assets/Scripts/Swarm/LocustSpawner.cs": "5a1f24637771b1a2072b95c39c35d4309d1bf80ead8fdb9a81fb3aa0497c70df",
     "Assets/Resources/Bogong/BatchedDot.shader": "744efa64732cbfb7621ccac97ddfa396e8599a14d16717daab92bfacae184b99",
-    "Assets/Scripts/KineflyAutoTrim.cs": "6bd5198990827430aefa620ba3e2ab61aa0678e2d9edd16e842963f37b23ad40",
-    "Assets/StreamingAssets/Examples/Sequences/kinefly-auto-trim.example.json": "0ba60eaa5fcd78ba3dc8e13c51c6e96250f47aed6d70c817d019970d24176bc0",
-    "Assets/StreamingAssets/Examples/Flight/auto-trim-calibration.example.json": "95faaf488f1ae1bf2a0dabf56ca576966bf03460f6b6402326f5f4c2d84e043f",
-    "Assets/Editor/SelwynSwarmValidation.cs": "35eee4b9dbd3db112e21cfe022f754071fc8fe16b7458b6664075d16060ba522"
+    "Assets/Scripts/KineflyAutoTrim.cs": "28af17f20669efe5d3a0225d541f97e790ee7041556cef24ddf5032bd040dcb2",
+    "Assets/StreamingAssets/Examples/Sequences/kinefly-auto-trim.example.json": "376ab93c6d55110e9e1ccacdc428e3aa89f7d80cd98f8e4fe7770c001f875ec6",
+    "Assets/StreamingAssets/Examples/Flight/auto-trim-calibration.example.json": "b33ee69ac230b57cb56f4259540eb7f510e2152a95d97ee92fa12fc823fbfdd9",
+    "Assets/Editor/SelwynSwarmValidation.cs": "8314d863a5e906ce6f456ce1dada10ef99308da4cadc532253cf6c864753c8f8",
+    "Assets/Scripts/MainController.cs": "bd275715b72ca82c6c97ced4a7d2349d04da44bb82edeeba3b7dfb05be513592",
+    "Assets/Editor/ExperimentPhaseValidation.cs": "5e0e906f18c62249f1fc1d27f1e9ddf4ff4ef4d9e67970d538861506cc7383cb"
   },
   "settings": {
     "sceneName": "Choice_Selwyn",
     "duration": 240,
     "gain": 2.5,
     "autoTrim": true,
-    "autoTrimSettings": {
-      "windowSeconds": 20,
-      "flightWindowSeconds": 2,
-      "flightVarianceThreshold": 0.01,
-      "flightConfirmationSeconds": 1,
-      "flightVarianceHysteresis": 0.5,
-      "updateIntervalSeconds": 0.5,
-      "aggressiveness": 0.5,
-      "maxStepRadians": 0.04,
-      "settleSeconds": 3,
-      "toleranceDegPerSecond": 1
-    },
     "reloadScene": false,
     "parameters": {
       "configFile": "Examples/Flight/auto-trim-calibration.example.json"
@@ -507,13 +605,13 @@
       "unity": "6000.3.16f1"
     },
     "selwynPhaseLifecycle": {
-      "checks": 6045,
+      "checks": 6088,
       "failure": null,
       "errors": [],
       "unity": "6000.3.16f1"
     },
     "calibrationSceneAndSky": {
-      "checks": 73,
+      "checks": 74,
       "failure": null,
       "scene": "Choice_Selwyn",
       "unity": "6000.3.16f1"
@@ -523,5 +621,21 @@
       "failure": null,
       "unity": "6000.3.16f1"
     }
-  }
+  },
+  "recordingReplayChecks": 12091,
+  "experimentAutoTrimSettings": {
+    "windowSeconds": 15,
+    "flightCheckEnabled": true,
+    "flightWindowSeconds": 2,
+    "flightVarianceThreshold": 0.01,
+    "flightConfirmationSeconds": 1,
+    "flightVarianceHysteresis": 0.5,
+    "updateIntervalSeconds": 0.5,
+    "aggressiveness": 0.65,
+    "maxStepRadians": 0.1,
+    "maxOffsetRadians": 2,
+    "settleSeconds": 3,
+    "toleranceDegPerSecond": 1
+  },
+  "parameterComparisonNote": "Historical comparison used 20-second windows and a 0.04-rad step cap. Current defaults use 15 seconds, 0.65 correction fraction and a 0.1-rad step cap to support centering a 1-rad stable bias within 240 seconds; current recording replay is above."
 }

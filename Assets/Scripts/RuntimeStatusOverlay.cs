@@ -26,6 +26,8 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private Text label;
     private Button autoTrimButton;
     private Text autoTrimButtonText;
+    private Button flightCheckButton;
+    private Text flightCheckButtonText;
     private double nextRefresh;
     private bool visible = true;
     private ExperimentTelemetry telemetry;
@@ -100,6 +102,25 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         autoTrimButtonText = buttonLabel.GetComponent<Text>(); autoTrimButtonText.font = label.font;
         autoTrimButtonText.fontSize = 15; autoTrimButtonText.alignment = TextAnchor.MiddleCenter;
         autoTrimButtonText.color = Color.black; autoTrimButtonText.raycastTarget = false;
+        var flightButtonObject = new GameObject("Flight check toggle", typeof(RectTransform), typeof(Image), typeof(Button));
+        flightButtonObject.transform.SetParent(panel.transform, false);
+        rect = flightButtonObject.GetComponent<RectTransform>();
+        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(1, 0);
+        rect.anchoredPosition = new Vector2(-234, 10); rect.sizeDelta = new Vector2(300, 28);
+        flightCheckButton = flightButtonObject.GetComponent<Button>();
+        flightCheckButton.targetGraphic = flightButtonObject.GetComponent<Image>();
+        flightCheckButton.onClick.AddListener(() => {
+            var main = MainController.Instance;
+            if (main != null) main.SetCurrentFlightCheck(!main.CurrentFlightCheckEnabled);
+            nextRefresh = 0;
+        });
+        var flightLabelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
+        flightLabelObject.transform.SetParent(flightButtonObject.transform, false);
+        rect = flightLabelObject.GetComponent<RectTransform>(); rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
+        rect.offsetMin = rect.offsetMax = Vector2.zero;
+        flightCheckButtonText = flightLabelObject.GetComponent<Text>(); flightCheckButtonText.font = label.font;
+        flightCheckButtonText.fontSize = 15; flightCheckButtonText.alignment = TextAnchor.MiddleCenter;
+        flightCheckButtonText.color = Color.black; flightCheckButtonText.raycastTarget = false;
         Configure();
     }
 
@@ -133,6 +154,10 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         bool enabled = main != null && main.CurrentAutoTrimEnabled;
         autoTrimButtonText.text = enabled ? "AUTO TRIM ON  /  stop" : "AUTO TRIM OFF  /  start";
         autoTrimButton.targetGraphic.color = !available ? Color.gray : enabled ? new Color(.45f, .9f, .75f) : new Color(.7f, .75f, .8f);
+        flightCheckButton.interactable = available;
+        bool flightCheck = main == null || main.CurrentFlightCheckEnabled;
+        flightCheckButtonText.text = flightCheck ? "FLIGHT CHECK ON  /  bypass" : "FLIGHT BYPASSED  /  restore check";
+        flightCheckButton.targetGraphic.color = !available ? Color.gray : flightCheck ? new Color(.7f, .75f, .8f) : new Color(1, .8f, .4f);
         label.text = BuildText();
         var panelRect = panel.GetComponent<RectTransform>();
         panelRect.sizeDelta = new Vector2(720, Mathf.Clamp(label.preferredHeight + 62, 180, 820));
@@ -154,16 +179,19 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
                 text.Append($"\n<b>{entry.Key}</b> ");
                 if (!main.VRClosedLoops.TryGetValue(entry.Key, out var rig) || rig == null) { text.AppendLine("<color=#88929C>INACTIVE</color>"); continue; }
                 var listener = rig.GetComponent<ZmqListener>();
+                // Keep the actual offset at the front of every active rig, including unsupported/off modes.
+                text.Append($"<size=18><b><color=#{(rig.SupportsAutoTrim ? "FFFFFF" : "88929C")}>DC {Signed(rig.GetYawDCOffset())} rad</color></b></size> ");
                 text.Append(Badge(rig.OrientationTrackingEnabled ? "YAW CLOSED" : "YAW OPEN", rig.OrientationTrackingEnabled ? "70E1B0" : "88929C"));
                 text.Append(Badge(rig.PositionTrackingEnabled ? "POS CLOSED" : "POS OPEN", rig.PositionTrackingEnabled ? "70E1B0" : "88929C"));
-                text.AppendLine($" {rig.GetCurrentMode()} / {rig.MotionMode}" + (entry.Key == "VR" + main.SelectedVRIndex ? " <color=#FFD166>SELECTED</color>" : ""));
+                text.AppendLine(entry.Key == "VR" + main.SelectedVRIndex ? " <color=#FFD166>SELECTED</color>" : "");
                 if (rig.SupportsAutoTrim)
                 {
                     var trim = rig.AutoTrim;
                     text.AppendLine($"  {Badge($"GAIN {rig.GetYawGain():G4}", rig.OrientationTrackingEnabled && rig.GetYawGain() != 0 ? "FFFFFF" : "88929C")} " +
-                        $"<size=18><b>DC {Signed(rig.GetYawDCOffset())} rad</b></size>  " +
-                        Badge(trim.Flying ? "FLYING" : trim.FlightReady ? "NOT FLYING" : "FLIGHT ?", trim.Flying ? "70E1B0" : "FFD166") + $" var {trim.FlightVariance:F3}");
-                    bool working = trim.Enabled && trim.Flying && rig.OrientationTrackingEnabled && rig.GetYawGain() != 0;
+                        Badge(trim.Flying ? "FLYING" : trim.FlightReady ? "NOT FLYING" : "FLIGHT ?", trim.Flying ? "70E1B0" : "FFD166") +
+                        (trim.FlightCheckEnabled ? "" : Badge("FLIGHT BYPASSED", "FFD166")));
+                    text.AppendLine($"  <color=#9DA8B5>{rig.GetCurrentMode()} | L-R var {trim.FlightVariance:F4} / entry > {trim.FlightThreshold:G4} rad² | {trim.FlightSampleCount} samples</color>");
+                    bool working = trim.Enabled && trim.FlightAllowsTrim && rig.OrientationTrackingEnabled && rig.GetYawGain() != 0;
                     string state = !trim.Enabled ? "AUTO TRIM OFF / DC HELD" : "AUTO TRIM: " + (trim.State == "TRIMMING" ? "ADJUSTING" : trim.State);
                     text.Append("  " + Badge(state, !trim.Enabled ? "88929C" : trim.State == "CENTERED" ? "70E1B0" : working ? "FFD166" : "88929C"));
                     if (trim.State == "COLLECTING") text.Append($" {trim.WindowProgress:P0}");
@@ -181,8 +209,12 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
                     }
                     else text.AppendLine("  <color=#9DA8B5>DC HELD / no automatic adjustment yet</color>");
                 }
-                else text.AppendLine($"  {Badge($"P GAIN {rig.PositionGain:G4}", rig.PositionTrackingEnabled ? "FFFFFF" : "88929C")} " +
-                    Badge($"YAW GAIN {rig.OrientationGain:G4}", rig.OrientationTrackingEnabled ? "FFFFFF" : "88929C"));
+                else
+                {
+                    text.AppendLine($"  {rig.GetCurrentMode()} / {rig.MotionMode} " + Badge("AUTO TRIM UNAVAILABLE", "88929C"));
+                    text.AppendLine($"  {Badge($"P GAIN {rig.PositionGain:G4}", rig.PositionTrackingEnabled ? "FFFFFF" : "88929C")} " +
+                        Badge($"YAW GAIN {rig.OrientationGain:G4}", rig.OrientationTrackingEnabled ? "FFFFFF" : "88929C") + "<color=#9DA8B5>Requires Kinefly yaw-rate mode</color>");
+                }
                 text.AppendLine($"  <color=#9DA8B5>Input SUB: {(listener == null ? "missing listener" : EscapeRich(listener.Endpoint) + " / " + listener.State)}</color>");
                 var reference = rig.GetComponent<StimulusHeadingReference>();
                 if (reference != null && reference.IsObserving) text.AppendLine($"  heading assessment: {reference.RemainingSeconds:F1}s");

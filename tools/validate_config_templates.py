@@ -10,6 +10,16 @@ SA = ROOT / 'Assets/StreamingAssets'
 TEMPLATES = SA / 'Templates'
 scenes = set(re.findall(r'enabled: 1\s+path: Assets/Scenes/([^\n]+)\.unity', (ROOT / 'ProjectSettings/EditorBuildSettings.asset').read_text()))
 def validate(obj, path):
+    ranges = {'windowSeconds': (1, 300), 'flightWindowSeconds': (.2, 30),
+              'flightVarianceThreshold': (0, 1000000), 'flightConfirmationSeconds': (0, 30),
+              'flightVarianceHysteresis': (0, 1), 'updateIntervalSeconds': (.1, 60),
+              'aggressiveness': (.001, 1), 'maxStepRadians': (.000001, 10), 'maxOffsetRadians': (.000001, 10),
+              'settleSeconds': (0, 300), 'toleranceDegPerSecond': (0, 1000000)}
+    for key, value in (obj.get('autoTrimSettings') or {}).items():
+        if key == 'flightCheckEnabled':
+            assert isinstance(value, bool), (path, key)
+        else:
+            assert key in ranges and isinstance(value, (int, float)) and not isinstance(value, bool) and ranges[key][0] <= value <= ranges[key][1], (path, key)
     if any(name in obj for name in ('preStimulus', 'stimulus', 'postStimulus')):
         assert set(obj) <= {'preStimulus', 'stimulus', 'postStimulus'}, path
         assert obj.get('stimulus', {}).get('enabled', True), path
@@ -29,13 +39,7 @@ def validate(obj, path):
             assert step['sceneName'] in scenes, (path, step['sceneName'])
             assert step['duration'] > 0, path
             assert isinstance(step.get('autoTrim', False), bool), path
-            ranges = {'windowSeconds': (1, 300), 'flightWindowSeconds': (.2, 30),
-                      'flightVarianceThreshold': (0, 1000000), 'flightConfirmationSeconds': (0, 30),
-                      'flightVarianceHysteresis': (0, 1), 'updateIntervalSeconds': (.1, 60),
-                      'aggressiveness': (.001, 1), 'maxStepRadians': (.000001, 10),
-                      'settleSeconds': (0, 300), 'toleranceDegPerSecond': (0, 1000000)}
-            for key, value in (step.get('autoTrimSettings') or {}).items():
-                assert key in ranges and ranges[key][0] <= value <= ranges[key][1], (path, key)
+            validate(step, str(path) + ':sequence')
 
             for key in ['configFile', 'design']:
                 if key in step['parameters']:

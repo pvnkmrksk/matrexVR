@@ -72,6 +72,9 @@ public static class ExperimentPhaseValidation
             var post = (JObject)experiment["stimulus"].DeepClone();
             post["durationSeconds"] = 1; post["swarm"] = null;
             experiment["postStimulus"] = post;
+            experiment["preStimulus"]["autoTrimSettings"] = JObject.FromObject(new AutoTrimConfig { flightVarianceThreshold = .02 });
+            experiment["stimulus"]["autoTrimSettings"] = JObject.FromObject(new AutoTrimConfig { flightVarianceThreshold = .04 });
+            experiment["postStimulus"]["autoTrimSettings"] = JObject.FromObject(new AutoTrimConfig { flightCheckEnabled = false, flightVarianceThreshold = .005 });
         }
         File.WriteAllText(Path.Combine(root, "phase-validation.json"), experiment.ToString());
         var sequence = JObject.Parse(File.ReadAllText(Path.Combine(root, "Examples/Sequences/selwyn-stars-left-swarm.example.json")));
@@ -160,6 +163,11 @@ public static class ExperimentPhaseValidation
                 rigIds = rigs.Select(r => r.GetInstanceID()).ToArray(); terrainIds = Terrain.activeTerrains.Select(t => t.GetInstanceID()).ToArray();
                 sceneId = SceneManager.GetActiveScene().handle; trial = main.currentTrial;
                 Check(main.ExperimentPhase == "preStimulus" && main.AssessmentPending, "Pre-stimulus world and observation start together");
+                if (!full)
+                {
+                    Check(rigs.All(r => r.AutoTrim.FlightThreshold == .02 && r.AutoTrim.FlightCheckEnabled), "Pre-stimulus experiment trim settings reach every rig");
+                    main.SetCurrentFlightCheck(false);
+                }
                 Check(Object.FindObjectsByType<Bogong>(FindObjectsSortMode.None).Length == 0 && terrainIds.Length > 0, "Stars and terrain without conspecifics");
                 starId = NightSkyController.CurrentId; Check(!string.IsNullOrEmpty(starId), "Star image active and archived");
                 preAt = Time.timeAsDouble;
@@ -175,6 +183,7 @@ public static class ExperimentPhaseValidation
                     return;
                 }
                 Check(main.ExperimentPhase == "stimulus", "Pre transitions directly to stimulus");
+                if (!full) Check(rigs.All(r => r.AutoTrim.FlightThreshold == .04 && r.AutoTrim.FlightCheckEnabled), "New phase loads its settings and clears temporary flight bypass");
                 stimulusAt = Time.timeAsDouble;
                 Check(stimulusAt - preAt >= (full ? 238 : 2), "Pre-stimulus duration includes offset/window overrun");
                 Check(sceneId == SceneManager.GetActiveScene().handle && rigIds.SequenceEqual(rigs.Select(r => r.GetInstanceID())) && terrainIds.SequenceEqual(Terrain.activeTerrains.Select(t => t.GetInstanceID())), "Scene, rigs and terrain retained across phase change");
@@ -225,6 +234,7 @@ public static class ExperimentPhaseValidation
                 if (!full)
                 {
                     Check(main.ExperimentPhase == "postStimulus", "Optional post-stimulus reached");
+                    Check(rigs.All(r => r.AutoTrim.FlightThreshold == .005 && !r.AutoTrim.FlightCheckEnabled), "Post-stimulus reads the experiment's persistent flight-check bypass");
                     Check(Object.FindObjectsByType<Bogong>(FindObjectsSortMode.None).Length == 0, "Post-stimulus clears embedded swarm");
                     stage = 4; return;
                 }

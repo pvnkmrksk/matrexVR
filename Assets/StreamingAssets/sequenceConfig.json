@@ -8,18 +8,6 @@
       "duration": 240,
       "gain": 2.5,
       "autoTrim": true,
-      "autoTrimSettings": {
-        "windowSeconds": 20,
-        "flightWindowSeconds": 2,
-        "flightVarianceThreshold": 0.01,
-        "flightConfirmationSeconds": 1,
-        "flightVarianceHysteresis": 0.5,
-        "updateIntervalSeconds": 0.5,
-        "aggressiveness": 0.5,
-        "maxStepRadians": 0.04,
-        "settleSeconds": 3,
-        "toleranceDegPerSecond": 1
-      },
       "reloadScene": false,
       "parameters": {
         "configFile": "Examples/Flight/auto-trim-calibration.example.json"

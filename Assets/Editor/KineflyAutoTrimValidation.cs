@@ -33,7 +33,7 @@ public static class KineflyAutoTrimValidation
     private static T Get<T>(object obj, string field) => (T)obj.GetType().GetField(field, Flags).GetValue(obj);
     private static double Wave(int i) => i % 4 == 0 ? -1.2 : i % 4 == 2 ? 1.2 : 0;
     private static AutoTrimConfig Fast() => new AutoTrimConfig { windowSeconds = 1, flightWindowSeconds = .2,
-        settleSeconds = .2, aggressiveness = .5, maxStepRadians = .1, toleranceDegPerSecond = 1 };
+        flightVarianceThreshold = .3, settleSeconds = .2, aggressiveness = .5, maxStepRadians = .1, toleranceDegPerSecond = 1 };
 
     static KineflyAutoTrimValidation()
     {
@@ -107,6 +107,49 @@ public static class KineflyAutoTrimValidation
         signal(.7, 40); Check(!hysteresis.Flying, "Intermediate variance cannot re-enter flight");
         signal(1, 12); Check(!hysteresis.Flying, "Short above-threshold interval awaits confirmation");
         signal(1, 50); Check(hysteresis.Flying, "Sustained renewed variance confirms flight");
+        // Regression: real recorded variance is below the former .3 default, but well above .01.
+        foreach (int sign in new[] { -1, 1 })
+        {
+            var defaults = new KineflyAutoTrim(); defaults.Configure(true, null);
+            float defaultOffset = 0;
+            for (int i = 0; i < 6000; i++)
+                if (defaults.Tick(i * .04, i, sign + .2 * Wave(i), true, true, true, 2.5f, defaultOffset, out float next)) defaultOffset = next;
+            Check(defaults.Flying && defaults.Passes >= 8 && defaults.State == "CENTERED" && Math.Abs(2.5 * (sign - defaultOffset) * Mathf.Rad2Deg) <= 1,
+                "Set-and-forget defaults center a signed unit bias with variance below .3 within 240s");
+            Check(defaults.FlightThreshold == .01, "Omitted settings use the recording-informed threshold");
+        }
+        var rawVariance = new KineflyAutoTrim(); rawVariance.Configure(false, null);
+        for (int i = 0; i < 250; i++) rawVariance.Tick(i * .04, i, 1.4 + .2 * Wave(i), true, true, true, 50, -2, out _);
+        var trailing = Enumerable.Range(0, 250).Where(i => 249 * .04 - i * .04 <= 2).Select(i => 1.4 + .2 * Wave(i)).ToArray();
+        double mean = trailing.Average(), variance = trailing.Average(yaw => Math.Pow(yaw - mean, 2));
+        Check(rawVariance.FlightSampleCount == trailing.Length && Math.Abs(rawVariance.FlightVariance - variance) < 1e-10,
+            "Flight uses trailing population variance of raw radians, unaffected by gain or DC offset");
+        var bypass = new KineflyAutoTrim(); bypass.Configure(true, Fast());
+        for (int i = 0; i < 100; i++) Check(!bypass.Tick(i * .04, i, 1, true, true, true, 1, 0, out _), "Flight gate holds a constant biased input");
+        bypass.SetFlightCheckEnabled(false);
+        float bypassOffset = 0;
+        for (int i = 100; i < 200; i++) if (bypass.Tick(i * .04, i, 1, true, true, true, 1, bypassOffset, out float next)) bypassOffset = next;
+        Check(bypassOffset > 0 && !bypass.Flying && bypass.FlightReady && !bypass.FlightCheckEnabled, "Bypass trims without fabricating flying status");
+        foreach (string gate in new[] { "stale", "walking", "open", "zero", "duplicates" })
+        {
+            var guarded = new KineflyAutoTrim(); var config = Fast(); config.flightCheckEnabled = false; guarded.Configure(true, config);
+            for (int i = 0; i < 200; i++) Check(!guarded.Tick(i * .04, gate == "duplicates" ? 1 : i, 1,
+                gate != "stale", gate != "walking", gate != "open", gate == "zero" ? 0 : 1, 0, out _), "Bypass retains independent safety gate " + gate);
+        }
+        bypass.SetFlightCheckEnabled(true);
+        for (int i = 200; i < 250; i++) Check(!bypass.Tick(i * .04, i, 1, true, true, true, 1, bypassOffset, out _), "Restoring flight check holds learned offset");
+        bypass.SetFlightCheckEnabled(false); bypass.Disable();
+        Check(!bypass.Enabled && !bypass.FlightCheckEnabled && bypass.FlightThreshold == .3, "Disabling preserves the gate settings displayed on the idle dashboard");
+        for (int i = 250; i < 300; i++) Check(!bypass.Tick(i * .04, i, 1, true, true, true, 1, bypassOffset, out _), "Disabled bypass cannot change offsets");
+        foreach (int sign in new[] { -1, 1 })
+        {
+            var bounded = new KineflyAutoTrim(); var config = Fast(); config.flightCheckEnabled = false; bounded.Configure(true, config);
+            float offset = 0;
+            for (int i = 0; i < 2000; i++)
+                if (bounded.Tick(i * .04, i, sign * 3, true, true, true, 1, offset, out float next))
+                { Check(Math.Abs(next) <= 2 && Math.Abs(next - offset) <= .100001, "Absolute and per-pass limits both respected"); offset = next; }
+            Check(offset == sign * 2 && bounded.State == "OFFSET LIMIT", "Unreachable median is reported at the signed offset limit");
+        }
     }
     private static void WriterChecks()
     {
@@ -138,13 +181,14 @@ public static class KineflyAutoTrimValidation
         system["configs"][3]["closedLoopMode"] = "FicTrac";
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "system_config.json"), system.ToString());
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "auto-trim-test.json"), JsonConvert.SerializeObject(new {
-            numberOfLocusts = 64, agentVisual = "Bogong", locustSpeed = 3, closedLoopPosition = 0, closedLoopOrientation = 1, autopilotEnabled = false
+            numberOfLocusts = 64, agentVisual = "Bogong", locustSpeed = 3, closedLoopPosition = 0, closedLoopOrientation = 1, autopilotEnabled = false,
+            autoTrimSettings = Fast()
         }));
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json"), JsonConvert.SerializeObject(new {
             autoStart = true, loop = false, sequences = new[] {
-                new { sceneName = "Swarm", duration = 1000, gain = 10.0, autoTrim = true, autoTrimSettings = Fast(), reloadScene = true, parameters = new { configFile = "auto-trim-test.json" } },
-                new { sceneName = "Swarm", duration = 1000, gain = -2.5, autoTrim = false, autoTrimSettings = Fast(), reloadScene = false, parameters = new { configFile = "auto-trim-test.json" } },
-                new { sceneName = "Swarm", duration = 1000, gain = 1.0, autoTrim = false, autoTrimSettings = Fast(), reloadScene = true, parameters = new { configFile = "auto-trim-test.json" } }
+                new { sceneName = "Swarm", duration = 1000, gain = 10.0, autoTrim = true, reloadScene = true, parameters = new { configFile = "auto-trim-test.json" } },
+                new { sceneName = "Swarm", duration = 1000, gain = -2.5, autoTrim = false, reloadScene = false, parameters = new { configFile = "auto-trim-test.json" } },
+                new { sceneName = "Swarm", duration = 1000, gain = 1.0, autoTrim = false, reloadScene = true, parameters = new { configFile = "auto-trim-test.json" } }
             }
         }));
     }
@@ -165,11 +209,12 @@ public static class KineflyAutoTrimValidation
             if (main == null || main.VRClosedLoops.Count != 4 || SceneManager.GetActiveScene().name != "Swarm") return;
             var rigs = main.VRClosedLoops.OrderBy(kv => kv.Key).Select(kv => kv.Value).ToArray();
             int tick = (int)(Time.realtimeSinceStartupAsDouble * 25);
-            foreach (var rig in rigs) Feed(rig, tick, phase >= 4 ? (rig == rigs[2] ? -.9 : .9) : (rig == rigs[1] ? -.4 : .4), phase != 5);
+            foreach (var rig in rigs) Feed(rig, tick, phase >= 4 ? (rig == rigs[2] ? -.9 : .9) : (rig == rigs[1] ? -.4 : .4), phase < 5);
             if (phase == 1)
             {
                 if (rigs.Any(r => r.GetYawGain() != 10)) return;
                 Check(rigs.Take(3).All(r => r.AutoTrim.Enabled && r.SupportsAutoTrim), "Row enables flight rigs");
+                Check(rigs.Take(3).All(r => r.AutoTrim.FlightThreshold == .3), "Experiment tuning reaches every rig without sequence settings");
                 Check(!rigs[3].SupportsAutoTrim, "Walking rig ignores auto trim");
                 foreach (var rig in rigs.Take(3))
                 {
@@ -233,6 +278,20 @@ public static class KineflyAutoTrimValidation
                 if (EditorApplication.timeSinceStartup - phaseTime < 1) return;
                 foreach (var rig in rigs.Take(3)) Check(rig.GetYawDCOffset() == offsets[rig.name], "Live open-loop/zero-gain/nonflight gates hold offsets");
                 Check(!rigs[2].AutoTrim.Flying, "Live nonflight indicator");
+                var overlay = Object.FindFirstObjectByType<RuntimeStatusOverlay>();
+                Get<UnityEngine.UI.Button>(overlay, "flightCheckButton").onClick.Invoke();
+                Check(rigs.All(r => !r.AutoTrim.FlightCheckEnabled), "Actual dashboard button bypasses the flight gate");
+                Check(overlay.BuildText().Contains("NOT FLYING") && overlay.BuildText().Contains("FLIGHT BYPASSED"), "HUD distinguishes measured nonflight from a bypass");
+                phaseTime = EditorApplication.timeSinceStartup; phase = 6; return;
+            }
+            if (phase == 6)
+            {
+                if (EditorApplication.timeSinceStartup - phaseTime < 2) return;
+                Check(rigs[2].GetYawDCOffset() != offsets[rigs[2].name] && !rigs[2].AutoTrim.Flying, "Live Update adjusts constant biased input under bypass");
+                Check(rigs[0].GetYawDCOffset() == offsets[rigs[0].name] && rigs[1].GetYawDCOffset() == offsets[rigs[1].name], "Bypass keeps live open-loop and zero-gain offsets held");
+                CaptureDashboard();
+                Get<UnityEngine.UI.Button>(Object.FindFirstObjectByType<RuntimeStatusOverlay>(), "flightCheckButton").onClick.Invoke();
+                Check(rigs.All(r => r.AutoTrim.FlightCheckEnabled), "Dashboard restores flight checking");
                 Call(main, "FailExperiment", new InvalidOperationException("Expected validation failure"));
                 Check(rigs.All(r => !r.AutoTrim.Enabled), "Experiment failure disables trim");
                 main.StopSequence(); Check(rigs.All(r => !r.AutoTrim.Enabled), "Stopping disables automatic corrections");

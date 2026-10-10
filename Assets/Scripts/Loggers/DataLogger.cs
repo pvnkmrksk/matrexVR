@@ -186,6 +186,7 @@ public class DataLogger : MonoBehaviour
             AddColumns("SensRotXRad", "SensRotYRad", "SensRotZRad");
             AddColumns("trackingImplementation", "trackingMode", "trackingInputUnits", "wireYaw", "yawGain", "yawDCOffsetRadians", "yawOutputDegPerSecond");
             AddColumns("autoTrimEnabled", "autoTrimState", "flightDetected", "flightVarianceRadiansSquared", "autoTrimMedianDegPerSecond", "autoTrimPasses");
+            AddColumns("flightCheckEnabled", "flightThresholdRadiansSquared", "flightSamples");
             AddColumns("experimentPhase");
 
             // Enable logging
@@ -317,6 +318,9 @@ public class DataLogger : MonoBehaviour
                 SetData("flightVarianceRadiansSquared", trim.FlightReady ? (object)trim.FlightVariance : null);
                 SetData("autoTrimMedianDegPerSecond", trim.EffectiveMedianDegPerSecond);
                 SetData("autoTrimPasses", trim.Passes);
+                SetData("flightCheckEnabled", trim.FlightCheckEnabled);
+                SetData("flightThresholdRadiansSquared", trim.FlightThreshold);
+                SetData("flightSamples", trim.FlightSampleCount);
             }
         }
         SetData("skyboxSampleUtc", NightSkyController.CurrentSampleUtc);

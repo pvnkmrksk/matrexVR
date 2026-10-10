@@ -48,6 +48,9 @@ public class MainController : MonoBehaviour
     private int selectedVRIndex = 1;
     public int SelectedVRIndex => selectedVRIndex;
     public bool CurrentAutoTrimEnabled => sequenceStarted && GetCurrentSequenceStep()?.autoTrim == true;
+    private AutoTrimConfig currentAutoTrimSettings = new AutoTrimConfig();
+    private bool? flightCheckOverride;
+    public bool CurrentFlightCheckEnabled => flightCheckOverride ?? currentAutoTrimSettings.flightCheckEnabled;
 
     public void RememberDCOffset(string vrId, float offset) => persistentDCOffsets[vrId] = offset;
 
@@ -58,6 +61,14 @@ public class MainController : MonoBehaviour
         if (!sequenceStarted || step == null) return;
         step.autoTrim = enabled;
         ApplyAutoTrimToClosedLoopComponents(step);
+    }
+
+    public void SetCurrentFlightCheck(bool enabled)
+    {
+        if (!sequenceStarted) return;
+        flightCheckOverride = enabled;
+        foreach (ClosedLoop rig in vrClosedLoops.Values)
+            if (rig != null) rig.AutoTrim.SetFlightCheckEnabled(enabled);
     }
 
     // System Config properties
@@ -336,7 +347,7 @@ public class MainController : MonoBehaviour
             if (rig != null)
             {
                 rig.GetComponent<StimulusHeadingReference>()?.Cancel();
-                rig.ConfigureAutoTrim(false, null);
+                rig.AutoTrim.Disable();
             }
     }
 
@@ -455,13 +466,16 @@ public class MainController : MonoBehaviour
     {
         try
         {
-            (step.autoTrimSettings ?? new AutoTrimConfig()).Validate();
+            currentAutoTrimSettings.Validate();
             foreach (ClosedLoop tracking in FindObjectsByType<ClosedLoop>(FindObjectsSortMode.None))
-                tracking.ConfigureAutoTrim(sequenceStarted && SequenceError == null && step.autoTrim, step.autoTrimSettings);
+            {
+                tracking.ConfigureAutoTrim(sequenceStarted && SequenceError == null && step.autoTrim, currentAutoTrimSettings);
+                tracking.AutoTrim.SetFlightCheckEnabled(CurrentFlightCheckEnabled);
+            }
         }
         catch (System.Exception error)
         {
-            foreach (ClosedLoop tracking in FindObjectsByType<ClosedLoop>(FindObjectsSortMode.None)) tracking.ConfigureAutoTrim(false, null);
+            foreach (ClosedLoop tracking in FindObjectsByType<ClosedLoop>(FindObjectsSortMode.None)) tracking.AutoTrim.Disable();
             FailExperiment(error);
         }
     }
@@ -473,7 +487,11 @@ public class MainController : MonoBehaviour
         if (persistentDCOffsets.TryGetValue(vrId, out float offset)) tracking.SetYawDCOffset(offset);
         else persistentDCOffsets[vrId] = tracking.GetYawDCOffset();
         var step = GetCurrentSequenceStep();
-        if (sequenceStarted && SequenceError == null && step != null) tracking.ConfigureAutoTrim(step.autoTrim, step.autoTrimSettings);
+        if (sequenceStarted && SequenceError == null && step != null)
+        {
+            tracking.ConfigureAutoTrim(step.autoTrim, currentAutoTrimSettings);
+            tracking.AutoTrim.SetFlightCheckEnabled(CurrentFlightCheckEnabled);
+        }
     }
 
     public void UnregisterVRClosedLoop(string vrId, ClosedLoop tracking)
@@ -658,7 +676,19 @@ private void ApplyExperiment(Dictionary<string, object> parameters, System.Actio
 {
     if (phaseRunner == null) phaseRunner = gameObject.AddComponent<ExperimentPhases>();
     var resolved = ExperimentConfigFiles.ResolveReferences(parameters);
-    if (!phaseRunner.TryBegin(resolved, apply, FailExperiment)) apply(resolved);
+    System.Action<Dictionary<string, object>> applyConfigured = payload => {
+        var step = GetCurrentSequenceStep();
+        string key = payload != null && payload.ContainsKey("configFile") ? "configFile" : "design";
+        JObject document = payload != null && (ExperimentPhases.IsPhase(payload) || payload.ContainsKey(key)) ? ExperimentPhases.Read(payload, key) : null;
+        // Experiment/phase values take precedence; retain old sequence settings for existing recordings/configs.
+        var settings = document?["autoTrimSettings"]?.ToObject<AutoTrimConfig>() ?? step?.autoTrimSettings ?? new AutoTrimConfig();
+        settings.Validate();
+        currentAutoTrimSettings = settings;
+        flightCheckOverride = null;
+        apply(payload);
+        if (step != null) ApplyAutoTrimToClosedLoopComponents(step);
+    };
+    if (!phaseRunner.TryBegin(resolved, applyConfigured, FailExperiment)) applyConfigured(resolved);
 }
 
 private void FailExperiment(System.Exception error)
@@ -667,7 +697,7 @@ private void FailExperiment(System.Exception error)
     sequenceStarted = false;
     phaseRunner?.Cancel();
     foreach (ClosedLoop rig in vrClosedLoops.Values)
-        if (rig != null) rig.ConfigureAutoTrim(false, null);
+        if (rig != null) rig.AutoTrim.Disable();
     Debug.LogException(error);
 }
 
@@ -838,7 +868,7 @@ public class SequenceStep
     public bool   reloadScene = true;
     public float gain = 1f;
     public bool autoTrim = false;
-    public AutoTrimConfig autoTrimSettings = new AutoTrimConfig();
+    public AutoTrimConfig autoTrimSettings;
     public SequenceStep(string sceneName, float duration, Dictionary<string, object> parameters, bool reloadScene = true, float gain = 1f,
                         bool autoTrim = false, AutoTrimConfig autoTrimSettings = null)
     {
@@ -848,7 +878,7 @@ public class SequenceStep
         this.reloadScene = reloadScene;
         this.gain = gain;
         this.autoTrim = autoTrim;
-        this.autoTrimSettings = autoTrimSettings ?? new AutoTrimConfig();
+        this.autoTrimSettings = autoTrimSettings;
     }
 }
 
@@ -868,7 +898,7 @@ public class SequenceItem
     public float duration;
     public float gain = 1f;
     public bool autoTrim = false;
-    public AutoTrimConfig autoTrimSettings = new AutoTrimConfig();
+    public AutoTrimConfig autoTrimSettings;
     public Dictionary<string, object> parameters;
 
     // NEW —— defaults to true, so legacy JSON stays valid

@@ -6,13 +6,13 @@ Start a new **Kinefly flight** experiment with these three files:
 2. `experiment.template.json` → your own experiment file. This contains a complete Choice/Selwyn flight configuration under `stimulus`, with pre/post disabled by default.
 3. `sequence.template.json` → `StreamingAssets/sequenceConfig.json`. Change its `parameters.configFile` to your experiment file. Every sequence option is explicit; start is manual, gain is 1, and the example presentation lasts one hour.
 
-The active sequence selects the repeating Selwyn stars-to-left-swarm experiment. The hardware file is unchanged. Copy templates when intentionally creating a new setup. JSON `null` explicitly leaves an optional alternative/inherited value unset; it is not a numeric zero. Fields that do not apply to a controller are not invented or shared across schemas. Scene names and paths are case-sensitive.
+The active sequence selects a single 240-second Selwyn live-sky auto-trim calibration. The hardware file is unchanged. Copy templates when intentionally creating a new setup. JSON `null` explicitly leaves an optional alternative/inherited value unset; it is not a numeric zero. Fields that do not apply to a controller are not invented or shared across schemas. Scene names and paths are case-sensitive.
 
 | Template | Scene / paradigm | Notes |
 |---|---|---|
 | `system_config.template.json` | All scenes | Full per-rig hardware, Kinefly mode, manual control, frame timing, overview, telemetry and status settings. |
-| `sequence.template.json` | Outer experiment sequence | Complete `autoStart`, `loop`, `randomise`, `sceneName`, `duration`, `gain`, `autoTrim`, `autoTrimSettings`, `reloadScene` and file reference. |
-| `experiment.template.json` | `Choice_Selwyn` flight | Complete canonical experiment; autopilot 7 world units/s, 100-unit AGL, Selwyn sky. |
+| `sequence.template.json` | Outer experiment sequence | Complete `autoStart`, `loop`, `randomise`, `sceneName`, `duration`, `gain`, `autoTrim`, `reloadScene` and file reference. |
+| `experiment.template.json` | `Choice_Selwyn` flight | Complete canonical experiment with auto-trim tuning inside `stimulus`; autopilot 7 world units/s, 100-unit AGL, Selwyn sky. |
 | `choice.template.json` | `Choice`, `Choice_Forrest`, all four `Choice_TwoTreeIndia_*` scenes | Full Choice schema, including every object property. The scene supplies its authored environment. |
 | `choice-band.template.json` | `Choice` moving bands | Same Choice schema with active band geometry and motion. |
 | `migration.template.json` | `Choice_Selwyn` / terrain Choice flight | Full Choice schema with wind/AGL/autopilot controls; procedural sky disabled. |

@@ -4,16 +4,18 @@ using System.Collections.Generic;
 [Serializable]
 public sealed class AutoTrimConfig
 {
-    public double windowSeconds = 20;
+    public double windowSeconds = 15;
     public double flightWindowSeconds = 2;
     // Population variance of the raw L-R signal, in radians squared (before gain/offset).
-    public double flightVarianceThreshold = .3;
+    public bool flightCheckEnabled = true;
+    public double flightVarianceThreshold = .01;
     public double flightConfirmationSeconds = 1;
     public double flightVarianceHysteresis = .5;
     public double updateIntervalSeconds = .5;
-    public double aggressiveness = .25;
-    public double maxStepRadians = .02;
-    public double settleSeconds = 5;
+    public double aggressiveness = .65;
+    public double maxStepRadians = .1;
+    public double maxOffsetRadians = 2;
+    public double settleSeconds = 3;
     public double toleranceDegPerSecond = 1;
 
     public void Validate()
@@ -21,7 +23,7 @@ public sealed class AutoTrimConfig
         if (!InRange(windowSeconds, 1, 300) || !InRange(flightWindowSeconds, .2, 30) ||
             !InRange(flightVarianceThreshold, 0, 1000000) || !InRange(flightConfirmationSeconds, 0, 30) ||
             !InRange(flightVarianceHysteresis, 0, 1) || !InRange(updateIntervalSeconds, .1, 60) ||
-            !InRange(aggressiveness, .001, 1) || !InRange(maxStepRadians, .000001, 10) ||
+            !InRange(aggressiveness, .001, 1) || !InRange(maxStepRadians, .000001, 10) || !InRange(maxOffsetRadians, .000001, 10) ||
             !InRange(settleSeconds, 0, 300) || !InRange(toleranceDegPerSecond, 0, 1000000))
             throw new ArgumentException("Invalid autoTrimSettings: check the documented finite parameter ranges.");
     }
@@ -52,6 +54,10 @@ public sealed class KineflyAutoTrim
     public bool Enabled { get; private set; }
     public bool FlightReady { get; private set; }
     public bool Flying { get; private set; }
+    public bool FlightCheckEnabled { get; private set; } = true;
+    public bool FlightAllowsTrim => !FlightCheckEnabled || Flying;
+    public double FlightThreshold => settings.flightVarianceThreshold;
+    public int FlightSampleCount => flight.Count;
     public double FlightVariance { get; private set; }
     public double? EffectiveMedianDegPerSecond { get; private set; }
     public double WindowProgress { get; private set; }
@@ -65,6 +71,7 @@ public sealed class KineflyAutoTrim
         settings = config ?? new AutoTrimConfig();
         settings.Validate();
         Enabled = enabled;
+        FlightCheckEnabled = settings.flightCheckEnabled;
         flight.Clear(); sum = sumSquares = 0;
         FlightReady = Flying = false;
         flightCandidateSince = double.NaN;
@@ -75,6 +82,13 @@ public sealed class KineflyAutoTrim
     }
 
     private void ClearTrim() { trim.Clear(); WindowProgress = 0; EffectiveMedianDegPerSecond = null; }
+    public void Disable() { Enabled = false; ClearTrim(); State = "OFF"; }
+    public void SetFlightCheckEnabled(bool enabled)
+    {
+        if (FlightCheckEnabled == enabled) return;
+        FlightCheckEnabled = enabled;
+        ClearTrim(); // Never mix flight-qualified and bypassed evidence in a correction window.
+    }
     private static bool FullWindow(Queue<Sample> samples, double now, double seconds, double started) =>
         samples.Count >= Math.Max(5, (int)Math.Ceiling(seconds * 5)) && now - started >= seconds;
 
@@ -88,12 +102,14 @@ public sealed class KineflyAutoTrim
         if (!fresh || double.IsNaN(yaw) || double.IsInfinity(yaw))
         {
             flight.Clear(); sum = sumSquares = 0; FlightVariance = 0; FlightReady = Flying = false;
+            flightCandidateSince = double.NaN;
             ClearTrim(); State = Enabled ? "WAITING FOR INPUT" : "OFF"; return false;
         }
         // Discard evidence after a gap, a gain change or a manual offset adjustment.
         if (now - lastSampleTime > 1)
         {
             flight.Clear(); sum = sumSquares = 0; FlightReady = Flying = false;
+            flightCandidateSince = double.NaN;
             ClearTrim();
         }
         if (haveControlValues && (gain != previousGain || offset != previousOffset))
@@ -127,7 +143,7 @@ public sealed class KineflyAutoTrim
         if (!closedLoop) { ClearTrim(); State = "PAUSED / OPEN LOOP"; return false; }
         if (float.IsNaN(gain) || float.IsInfinity(gain) || gain == 0 || float.IsNaN(offset) || float.IsInfinity(offset))
         { ClearTrim(); State = "PAUSED / GAIN"; return false; }
-        if (!Flying) { ClearTrim(); State = FlightReady ? "PAUSED / NOT FLYING" : "MEASURING FLIGHT"; return false; }
+        if (!FlightAllowsTrim) { ClearTrim(); State = FlightReady ? "PAUSED / NOT FLYING" : "MEASURING FLIGHT"; return false; }
         if (now < settleUntil) { State = "SETTLING"; return false; }
 
         if (newSample)
@@ -149,8 +165,13 @@ public sealed class KineflyAutoTrim
         if (Math.Abs(EffectiveMedianDegPerSecond.Value) <= settings.toleranceDegPerSecond)
         { State = "CENTERED"; return false; }
         double correction = Math.Max(-settings.maxStepRadians, Math.Min(settings.maxStepRadians, settings.aggressiveness * residual));
+        // Respect both limits, even when a manually supplied starting offset exceeds the automatic range.
+        double lower = Math.Max(-settings.maxStepRadians, -settings.maxOffsetRadians - offset);
+        double upper = Math.Min(settings.maxStepRadians, settings.maxOffsetRadians - offset);
+        if (lower > upper) { State = "PAUSED / OFFSET LIMIT"; return false; }
+        correction = Math.Max(lower, Math.Min(upper, correction));
         newOffset = (float)(offset + correction);
-        if (newOffset == offset) { State = "CENTERED"; return false; }
+        if (newOffset == offset) { State = "OFFSET LIMIT"; return false; }
         LastAdjustment = new Adjustment(now, offset, newOffset);
         previousOffset = newOffset;
         Passes++; settleUntil = now + settings.settleSeconds;

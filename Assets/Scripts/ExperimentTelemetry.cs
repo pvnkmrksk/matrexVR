@@ -125,6 +125,8 @@ public sealed class ExperimentTelemetry : MonoBehaviour
                         appliedYawDeltaDegrees = rig.LastAppliedYawDeltaDegrees },
                     autoTrim = new { supported = rig.SupportsAutoTrim, enabled = rig.AutoTrim.Enabled,
                         state = rig.AutoTrim.State, flightReady = rig.AutoTrim.FlightReady, flying = rig.AutoTrim.Flying,
+                        flightCheckEnabled = rig.AutoTrim.FlightCheckEnabled, flightThresholdRadiansSquared = rig.AutoTrim.FlightThreshold,
+                        flightSamples = rig.AutoTrim.FlightSampleCount,
                         flightVarianceRadiansSquared = rig.AutoTrim.FlightVariance,
                         medianDegPerSecond = rig.AutoTrim.EffectiveMedianDegPerSecond,
                         windowProgress = rig.AutoTrim.WindowProgress, passes = rig.AutoTrim.Passes },

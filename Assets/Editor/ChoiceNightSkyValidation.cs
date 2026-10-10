@@ -110,6 +110,7 @@ public static class ChoiceNightSkyValidation
                 Check(main.CurrentAutoTrimEnabled && main.RemainingStepSeconds > 200 && main.RemainingStepSeconds <= 240, "240-second calibration row is running");
                 Check(rigs.All(r => { var loop = r.GetComponent<ClosedLoop>(); return loop.AutoTrim.Enabled && loop.SupportsAutoTrim &&
                     loop.GetYawGain() == 2.5f && loop.OrientationTrackingEnabled; }), "All four Kinefly rigs run the calibration gain and closed loop");
+                Check(rigs.All(r => r.GetComponent<ClosedLoop>().AutoTrim.FlightThreshold == .01), "Flight settings resolve from the experiment file");
                 Check(Object.FindObjectsByType<LocustMover>(FindObjectsSortMode.None).Length == 0, "Calibration sky has no swarm");
             }
             var sheet = new Texture2D(768, 512, TextureFormat.RGB24, false);
