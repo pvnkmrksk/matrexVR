@@ -1,0 +1,527 @@
+{
+  "checks": 798507,
+  "failure": null,
+  "renders": [
+    {
+      "agentsPerRig": 64,
+      "rigs": 4,
+      "cameras": 24,
+      "comparedPixels": 393216,
+      "legacyMedianMs": 4.1562,
+      "batchedMedianMs": 1.8048000000000002,
+      "legacyP95Ms": 4.9038,
+      "batchedP95Ms": 1.9511,
+      "legacyMaterials": 256,
+      "batchedMaterials": 4,
+      "legacyCameraCallbacks": 256,
+      "batchedCameraCallbacks": 4
+    },
+    {
+      "agentsPerRig": 256,
+      "rigs": 4,
+      "cameras": 24,
+      "comparedPixels": 393216,
+      "legacyMedianMs": 10.64745,
+      "batchedMedianMs": 1.8279,
+      "legacyP95Ms": 10.8224,
+      "batchedP95Ms": 1.8605,
+      "legacyMaterials": 1024,
+      "batchedMaterials": 4,
+      "legacyCameraCallbacks": 1024,
+      "batchedCameraCallbacks": 4
+    }
+  ],
+  "replays": [
+    {
+      "source": "20261007_225146_VR1.csv",
+      "duration": 239.67500000000007,
+      "offset": -0.1309024,
+      "passes": 10,
+      "flyingSeconds": 236.68800000000005,
+      "final20SecondEffectiveMedianDegPerSecond": 4.084631159514051,
+      "corrections": [
+        {
+          "time": 23.052999999999997,
+          "from": 0.0,
+          "to": -0.04,
+          "median": -16.29527779214257
+        },
+        {
+          "time": 46.08800000000008,
+          "from": -0.04,
+          "to": -0.08,
+          "median": -17.083811085757414
+        },
+        {
+          "time": 69.11500000000001,
+          "from": -0.08,
+          "to": -0.085505,
+          "median": -1.5770680196241729
+        },
+        {
+          "time": 92.12700000000007,
+          "from": -0.085505,
+          "to": -0.09963375,
+          "median": -4.047588545367862
+        },
+        {
+          "time": 115.154,
+          "from": -0.09963375,
+          "to": -0.09342584,
+          "median": 1.778435685634385
+        },
+        {
+          "time": 138.192,
+          "from": -0.09342584,
+          "to": -0.111178368,
+          "median": -5.0857252034308855
+        },
+        {
+          "time": 161.22199999999998,
+          "from": -0.111178368,
+          "to": -0.129534841,
+          "median": -5.258740095607681
+        },
+        {
+          "time": 184.24200000000008,
+          "from": -0.129534841,
+          "to": -0.114064507,
+          "median": 4.431923166996485
+        },
+        {
+          "time": 207.26099999999997,
+          "from": -0.114064507,
+          "to": -0.136666,
+          "median": -6.474851773946842
+        },
+        {
+          "time": 230.303,
+          "from": -0.136666,
+          "to": -0.1309024,
+          "median": 1.6511497581619683
+        }
+      ],
+      "state": "COLLECTING"
+    },
+    {
+      "source": "20261007_225146_VR4.csv",
+      "duration": 239.67600000000004,
+      "offset": 0.124340177,
+      "passes": 10,
+      "flyingSeconds": 236.67200000000003,
+      "final20SecondEffectiveMedianDegPerSecond": -0.02338764792599219,
+      "corrections": [
+        {
+          "time": 23.069000000000017,
+          "from": 0.0,
+          "to": 0.04,
+          "median": 24.62820407718672
+        },
+        {
+          "time": 46.12099999999998,
+          "from": 0.04,
+          "to": 0.08,
+          "median": 21.635101331379104
+        },
+        {
+          "time": 69.149,
+          "from": 0.08,
+          "to": 0.09731245,
+          "median": 4.959651846288405
+        },
+        {
+          "time": 92.15999999999997,
+          "from": 0.09731245,
+          "to": 0.125072822,
+          "median": 7.952761567426712
+        },
+        {
+          "time": 115.18799999999999,
+          "from": 0.125072822,
+          "to": 0.138953015,
+          "median": 3.9763812463357286
+        },
+        {
+          "time": 138.192,
+          "from": 0.138953015,
+          "to": 0.164997265,
+          "median": 7.461125849497437
+        },
+        {
+          "time": 161.20500000000004,
+          "from": 0.164997265,
+          "to": 0.135035038,
+          "median": -8.583547298364705
+        },
+        {
+          "time": 184.24199999999996,
+          "from": 0.135035038,
+          "to": 0.105725817,
+          "median": -8.39647417921338
+        },
+        {
+          "time": 207.27700000000004,
+          "from": 0.105725817,
+          "to": 0.114951357,
+          "median": 2.642922903598405
+        },
+        {
+          "time": 230.303,
+          "from": 0.114951357,
+          "to": 0.124340177,
+          "median": 2.68969919760099
+        }
+      ],
+      "state": "COLLECTING"
+    },
+    {
+      "source": "20261010_023123_VR1.csv",
+      "duration": 239.663,
+      "offset": -0.170022845,
+      "passes": 10,
+      "flyingSeconds": 236.673,
+      "final20SecondEffectiveMedianDegPerSecond": -0.39976049807487046,
+      "corrections": [
+        {
+          "time": 23.053999999999974,
+          "from": 0.0,
+          "to": -0.04,
+          "median": -21.04067181480971
+        },
+        {
+          "time": 46.079999999999984,
+          "from": -0.04,
+          "to": -0.0718441,
+          "median": -9.122662790028771
+        },
+        {
+          "time": 69.113,
+          "from": -0.0718441,
+          "to": -0.08344582,
+          "median": -3.3236463866828827
+        },
+        {
+          "time": 92.14800000000002,
+          "from": -0.08344582,
+          "to": -0.09356701,
+          "median": -2.89950774971796
+        },
+        {
+          "time": 115.156,
+          "from": -0.09356701,
+          "to": -0.118069127,
+          "median": -7.019340857039659
+        },
+        {
+          "time": 140.18900000000002,
+          "from": -0.118069127,
+          "to": -0.110878661,
+          "median": 2.0599160854035703
+        },
+        {
+          "time": 163.235,
+          "from": -0.110878661,
+          "to": -0.124564782,
+          "median": -3.920784386930531
+        },
+        {
+          "time": 186.27100000000002,
+          "from": -0.124564782,
+          "to": -0.1530096,
+          "median": -8.14883755457356
+        },
+        {
+          "time": 209.27800000000002,
+          "from": -0.1530096,
+          "to": -0.1585913,
+          "median": -1.599040195490059
+        },
+        {
+          "time": 232.339,
+          "from": -0.1585913,
+          "to": -0.170022845,
+          "median": -3.274897805782971
+        }
+      ],
+      "state": "COLLECTING"
+    },
+    {
+      "source": "20261010_023123_VR2.csv",
+      "duration": 239.67999999999998,
+      "offset": 0.006369453,
+      "passes": 8,
+      "flyingSeconds": 236.68899999999996,
+      "final20SecondEffectiveMedianDegPerSecond": 1.0628090881126429,
+      "corrections": [
+        {
+          "time": 23.037999999999982,
+          "from": 0.0,
+          "to": 0.0155129228,
+          "median": 4.444124935817669
+        },
+        {
+          "time": 46.08099999999999,
+          "from": 0.0155129228,
+          "to": 0.00775646139,
+          "median": -2.222062507832862
+        },
+        {
+          "time": 70.70200000000003,
+          "from": 0.00775646139,
+          "to": 0.0142201753,
+          "median": 1.851717748365451
+        },
+        {
+          "time": 119.20399999999998,
+          "from": 0.0142201753,
+          "to": 0.0191756934,
+          "median": 1.419651142521375
+        },
+        {
+          "time": 142.21900000000002,
+          "from": 0.0191756934,
+          "to": 0.009587847,
+          "median": -2.7467157516037224
+        },
+        {
+          "time": 170.84600000000003,
+          "from": 0.009587847,
+          "to": 0.00479392335,
+          "median": -1.373357875801559
+        },
+        {
+          "time": 193.862,
+          "from": 0.00479392335,
+          "to": -0.00105035433,
+          "median": -1.6742622251406545
+        },
+        {
+          "time": 216.88700000000003,
+          "from": -0.00105035433,
+          "to": 0.006369453,
+          "median": 2.1256181768918014
+        }
+      ],
+      "state": "COLLECTING"
+    },
+    {
+      "source": "20261010_023123_VR3.csv",
+      "duration": 239.66400000000002,
+      "offset": 0.09398117,
+      "passes": 10,
+      "flyingSeconds": 236.69,
+      "final20SecondEffectiveMedianDegPerSecond": -1.5384789542260933,
+      "corrections": [
+        {
+          "time": 23.02200000000002,
+          "from": 0.0,
+          "to": 0.04,
+          "median": 13.910552964294716
+        },
+        {
+          "time": 46.047,
+          "from": 0.04,
+          "to": 0.05121521,
+          "median": 3.212921124830627
+        },
+        {
+          "time": 69.08099999999999,
+          "from": 0.05121521,
+          "to": 0.06375953,
+          "median": 3.593683097969083
+        },
+        {
+          "time": 92.09799999999998,
+          "from": 0.06375953,
+          "to": 0.0769684,
+          "median": 3.7840627877695225
+        },
+        {
+          "time": 115.107,
+          "from": 0.0769684,
+          "to": 0.0939779,
+          "median": 4.872862568863682
+        },
+        {
+          "time": 139.121,
+          "from": 0.0939779,
+          "to": 0.088609226,
+          "median": -1.5380104279793487
+        },
+        {
+          "time": 162.68500000000003,
+          "from": 0.088609226,
+          "to": 0.0928616,
+          "median": 1.218216268118064
+        },
+        {
+          "time": 185.72100000000003,
+          "from": 0.0928616,
+          "to": 0.09845615,
+          "median": 1.6027204848327594
+        },
+        {
+          "time": 208.74499999999998,
+          "from": 0.09845615,
+          "to": 0.08391164,
+          "median": -4.166695445891841
+        },
+        {
+          "time": 235.855,
+          "from": 0.08391164,
+          "to": 0.09398117,
+          "median": 2.8847075050130138
+        }
+      ],
+      "state": "COLLECTING"
+    },
+    {
+      "source": "20261010_023123_VR4.csv",
+      "duration": 239.67999999999998,
+      "offset": 0.07866633,
+      "passes": 6,
+      "flyingSeconds": 213.34200000000007,
+      "final20SecondEffectiveMedianDegPerSecond": -3.2192019959138447,
+      "corrections": [
+        {
+          "time": 23.054000000000002,
+          "from": 0.0,
+          "to": 0.02809603,
+          "median": 8.048919700364731
+        },
+        {
+          "time": 46.08000000000001,
+          "from": 0.02809603,
+          "to": 0.0100342967,
+          "median": -5.174305291345297
+        },
+        {
+          "time": 112.32899999999998,
+          "from": 0.0100342967,
+          "to": 0.0500342958,
+          "median": 12.360838684130556
+        },
+        {
+          "time": 139.38899999999998,
+          "from": 0.0500342958,
+          "to": 0.04508574,
+          "median": -1.4176574070818722
+        },
+        {
+          "time": 194.557,
+          "from": 0.04508574,
+          "to": 0.08508574,
+          "median": 14.239155812871882
+        },
+        {
+          "time": 220.638,
+          "from": 0.08508574,
+          "to": 0.07866633,
+          "median": -1.839025811449125
+        }
+      ],
+      "state": "COLLECTING"
+    }
+  ],
+  "tuning": [],
+  "unity": "6000.3.16f1",
+  "graphics": "Apple M2 Pro",
+  "note": "Isolated Camera.Render CPU timings, four rigs/six 128px cameras each. Not LED workstation FPS. Recorded replay cannot model animal adaptation.",
+  "testedSources": {
+    "Assets/Scripts/Swarm/BogongSwarmRenderer.cs": "11b4c720cdf373a87faa2572be5eadaf7299dd43d421c76d2dd426c98a336f67",
+    "Assets/Scripts/Swarm/LocustSpawner.cs": "5a1f24637771b1a2072b95c39c35d4309d1bf80ead8fdb9a81fb3aa0497c70df",
+    "Assets/Resources/Bogong/BatchedDot.shader": "744efa64732cbfb7621ccac97ddfa396e8599a14d16717daab92bfacae184b99",
+    "Assets/Scripts/KineflyAutoTrim.cs": "6bd5198990827430aefa620ba3e2ab61aa0678e2d9edd16e842963f37b23ad40",
+    "Assets/StreamingAssets/Examples/Sequences/kinefly-auto-trim.example.json": "0ba60eaa5fcd78ba3dc8e13c51c6e96250f47aed6d70c817d019970d24176bc0",
+    "Assets/StreamingAssets/Examples/Flight/auto-trim-calibration.example.json": "95faaf488f1ae1bf2a0dabf56ca576966bf03460f6b6402326f5f4c2d84e043f",
+    "Assets/Editor/SelwynSwarmValidation.cs": "35eee4b9dbd3db112e21cfe022f754071fc8fe16b7458b6664075d16060ba522"
+  },
+  "settings": {
+    "sceneName": "Choice_Selwyn",
+    "duration": 240,
+    "gain": 2.5,
+    "autoTrim": true,
+    "autoTrimSettings": {
+      "windowSeconds": 20,
+      "flightWindowSeconds": 2,
+      "flightVarianceThreshold": 0.01,
+      "flightConfirmationSeconds": 1,
+      "flightVarianceHysteresis": 0.5,
+      "updateIntervalSeconds": 0.5,
+      "aggressiveness": 0.5,
+      "maxStepRadians": 0.04,
+      "settleSeconds": 3,
+      "toleranceDegPerSecond": 1
+    },
+    "reloadScene": false,
+    "parameters": {
+      "configFile": "Examples/Flight/auto-trim-calibration.example.json"
+    }
+  },
+  "parameterComparison": [
+    {
+      "aggressiveness": 0.25,
+      "settleSeconds": 3.0,
+      "meanAbsoluteFinalMedianDegPerSecond": 1.8745404311809066
+    },
+    {
+      "aggressiveness": 0.25,
+      "settleSeconds": 5.0,
+      "meanAbsoluteFinalMedianDegPerSecond": 2.236321347308782
+    },
+    {
+      "aggressiveness": 0.35,
+      "settleSeconds": 3.0,
+      "meanAbsoluteFinalMedianDegPerSecond": 2.075853444691332
+    },
+    {
+      "aggressiveness": 0.35,
+      "settleSeconds": 5.0,
+      "meanAbsoluteFinalMedianDegPerSecond": 2.1566544601268536
+    },
+    {
+      "aggressiveness": 0.5,
+      "settleSeconds": 3.0,
+      "meanAbsoluteFinalMedianDegPerSecond": 1.7213782239612492
+    },
+    {
+      "aggressiveness": 0.5,
+      "settleSeconds": 5.0,
+      "meanAbsoluteFinalMedianDegPerSecond": 2.0654788300278306
+    },
+    {
+      "aggressiveness": 0.65,
+      "settleSeconds": 3.0,
+      "meanAbsoluteFinalMedianDegPerSecond": 1.9162720279569472
+    },
+    {
+      "aggressiveness": 0.65,
+      "settleSeconds": 5.0,
+      "meanAbsoluteFinalMedianDegPerSecond": 2.2972744167508052
+    }
+  ],
+  "integrationChecks": {
+    "dotGeometry": {
+      "checks": 7866,
+      "failure": null,
+      "unity": "6000.3.16f1"
+    },
+    "selwynPhaseLifecycle": {
+      "checks": 6045,
+      "failure": null,
+      "errors": [],
+      "unity": "6000.3.16f1"
+    },
+    "calibrationSceneAndSky": {
+      "checks": 73,
+      "failure": null,
+      "scene": "Choice_Selwyn",
+      "unity": "6000.3.16f1"
+    },
+    "swarmMotionAndVisibility": {
+      "checks": 4026,
+      "failure": null,
+      "unity": "6000.3.16f1"
+    }
+  }
+}

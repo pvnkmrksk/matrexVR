@@ -46,6 +46,19 @@ public class MainController : MonoBehaviour
     private readonly Dictionary<string, ClosedLoop> vrClosedLoops = new Dictionary<string, ClosedLoop>();
     private readonly Dictionary<string, float> persistentDCOffsets = new Dictionary<string, float>();
     private int selectedVRIndex = 1;
+    public int SelectedVRIndex => selectedVRIndex;
+    public bool CurrentAutoTrimEnabled => sequenceStarted && GetCurrentSequenceStep()?.autoTrim == true;
+
+    public void RememberDCOffset(string vrId, float offset) => persistentDCOffsets[vrId] = offset;
+
+    // Dashboard button changes only the running row. Later rows keep their own configured flag.
+    public void SetCurrentAutoTrim(bool enabled)
+    {
+        var step = GetCurrentSequenceStep();
+        if (!sequenceStarted || step == null) return;
+        step.autoTrim = enabled;
+        ApplyAutoTrimToClosedLoopComponents(step);
+    }
 
     // System Config properties
     [SerializeField]
@@ -320,7 +333,11 @@ public class MainController : MonoBehaviour
         phaseRunner?.Cancel();
         currentStep = 0;
         foreach (ClosedLoop rig in vrClosedLoops.Values)
-            if (rig != null) rig.GetComponent<StimulusHeadingReference>()?.Cancel();
+            if (rig != null)
+            {
+                rig.GetComponent<StimulusHeadingReference>()?.Cancel();
+                rig.ConfigureAutoTrim(false, null);
+            }
     }
 
     public void StartSequence()
@@ -425,6 +442,7 @@ public class MainController : MonoBehaviour
             Debugger.Log("Either the scene controller or the parameters are null.", 2);
         }
         ApplyGainToClosedLoopComponents(currentStepData.gain);
+        ApplyAutoTrimToClosedLoopComponents(currentStepData);
     }
 
     private void ApplyGainToClosedLoopComponents(float gain)
@@ -433,12 +451,29 @@ public class MainController : MonoBehaviour
             tracking.SetYawGain(gain);
     }
 
+    private void ApplyAutoTrimToClosedLoopComponents(SequenceStep step)
+    {
+        try
+        {
+            (step.autoTrimSettings ?? new AutoTrimConfig()).Validate();
+            foreach (ClosedLoop tracking in FindObjectsByType<ClosedLoop>(FindObjectsSortMode.None))
+                tracking.ConfigureAutoTrim(sequenceStarted && SequenceError == null && step.autoTrim, step.autoTrimSettings);
+        }
+        catch (System.Exception error)
+        {
+            foreach (ClosedLoop tracking in FindObjectsByType<ClosedLoop>(FindObjectsSortMode.None)) tracking.ConfigureAutoTrim(false, null);
+            FailExperiment(error);
+        }
+    }
+
     public void RegisterVRClosedLoop(string vrId, ClosedLoop tracking)
     {
         if (string.IsNullOrEmpty(vrId) || tracking == null) return;
         vrClosedLoops[vrId] = tracking;
         if (persistentDCOffsets.TryGetValue(vrId, out float offset)) tracking.SetYawDCOffset(offset);
         else persistentDCOffsets[vrId] = tracking.GetYawDCOffset();
+        var step = GetCurrentSequenceStep();
+        if (sequenceStarted && SequenceError == null && step != null) tracking.ConfigureAutoTrim(step.autoTrim, step.autoTrimSettings);
     }
 
     public void UnregisterVRClosedLoop(string vrId, ClosedLoop tracking)
@@ -548,7 +583,9 @@ public class MainController : MonoBehaviour
                             item.duration,
                             item.parameters,
                             item.reloadScene,
-                            item.gain
+                            item.gain,
+                            item.autoTrim,
+                            item.autoTrimSettings
                         );
                         sequenceSteps.Add(newStep);
                         Debugger.Log("Added sequence step: " + JsonUtility.ToJson(newStep), 3);
@@ -629,6 +666,8 @@ private void FailExperiment(System.Exception error)
     SequenceError = error.Message;
     sequenceStarted = false;
     phaseRunner?.Cancel();
+    foreach (ClosedLoop rig in vrClosedLoops.Values)
+        if (rig != null) rig.ConfigureAutoTrim(false, null);
     Debug.LogException(error);
 }
 
@@ -725,6 +764,7 @@ void ManageTimerAndTransitions()
         if (next.parameters != null && !next.parameters.ContainsKey("gain")) next.parameters["gain"] = next.gain;
         InitializeStep(() => ApplyExperiment(next.parameters, sequencer.AdvanceStep));
         ApplyGainToClosedLoopComponents(next.gain);
+        ApplyAutoTrimToClosedLoopComponents(next);
         timer = next.duration;      // restart timer for the new sub-step
     }
     else
@@ -797,13 +837,18 @@ public class SequenceStep
     public Dictionary<string, object> parameters;
     public bool   reloadScene = true;
     public float gain = 1f;
-    public SequenceStep(string sceneName, float duration, Dictionary<string, object> parameters, bool reloadScene = true, float gain = 1f)
+    public bool autoTrim = false;
+    public AutoTrimConfig autoTrimSettings = new AutoTrimConfig();
+    public SequenceStep(string sceneName, float duration, Dictionary<string, object> parameters, bool reloadScene = true, float gain = 1f,
+                        bool autoTrim = false, AutoTrimConfig autoTrimSettings = null)
     {
         this.sceneName = sceneName;
         this.duration = duration;
         this.parameters = parameters;
         this.reloadScene = reloadScene;
         this.gain = gain;
+        this.autoTrim = autoTrim;
+        this.autoTrimSettings = autoTrimSettings ?? new AutoTrimConfig();
     }
 }
 
@@ -822,6 +867,8 @@ public class SequenceItem
     public string sceneName;
     public float duration;
     public float gain = 1f;
+    public bool autoTrim = false;
+    public AutoTrimConfig autoTrimSettings = new AutoTrimConfig();
     public Dictionary<string, object> parameters;
 
     // NEW —— defaults to true, so legacy JSON stays valid

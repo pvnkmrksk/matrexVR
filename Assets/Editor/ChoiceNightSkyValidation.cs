@@ -40,6 +40,17 @@ public static class ChoiceNightSkyValidation
     public static void Run() => Start("Choice", Fixture);
     // Optional smoke check for the local terrain scene; the generic regression needs no terrain assets.
     public static void RunSelwyn() => Start("Choice_Selwyn", "Kannadi/selwyn-night-sky.json");
+    public static void RunAutoTrim()
+    {
+        Start("Choice_Selwyn", "Examples/Flight/auto-trim-calibration.example.json");
+        SessionState.SetBool(Key + ".autoTrim", true);
+        var sequence = JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "Examples/Sequences/kinefly-auto-trim.example.json")));
+        sequence["autoStart"] = true;
+        File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json"), sequence.ToString());
+        var system = JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "Templates/system_config.template.json")));
+        system["telemetry"]["enabled"] = false; system["overheadCamera"]["enabled"] = false;
+        File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "system_config.json"), system.ToString());
+    }
 
     private static void Start(string scene, string configFile)
     {
@@ -60,6 +71,7 @@ public static class ChoiceNightSkyValidation
         SessionState.SetString(Key + ".scene", scene);
         SessionState.SetString(Key + ".config", configFile);
         SessionState.SetBool(Key, true);
+        SessionState.SetBool(Key + ".autoTrim", false);
         EditorSceneManager.OpenScene("Assets/Scenes/ControlScene.unity");
         EditorApplication.isPlaying = true;
     }
@@ -85,11 +97,21 @@ public static class ChoiceNightSkyValidation
             var manifest = JObject.Parse(File.ReadAllText(Path.Combine(archive, first + ".json")));
             var settings = manifest["description"]["settings"];
             Check((double)settings["latitude"] == config.nightSky.latitude && (double)settings["longitude"] == config.nightSky.longitude, "Observer coordinates are applied and archived.");
-            Check((double)settings["utcOffsetHours"] == 11 && (float)settings["exposure"] == .5f, "UTC offset and brightness survive Choice deserialization.");
+            bool autoTrim = SessionState.GetBool(Key + ".autoTrim", false);
+            Check((autoTrim ? (string)settings["timeZoneId"] == "Australia/Sydney" : (double)settings["utcOffsetHours"] == 11) &&
+                (float)settings["exposure"] == .5f, "Observer timezone and brightness survive Choice deserialization.");
             Check((int)manifest["width"] == 4096 && (int)manifest["height"] == 2048, "4K equirectangular image is archived.");
             Check(File.Exists(Path.Combine(archive, first + ".png")), "Panorama exists in RunData.");
             var rigs = Object.FindObjectsByType<ViewportSetter>(FindObjectsSortMode.None).OrderBy(r => r.name).ToArray();
             Check(rigs.Length == 4, "Four rigs load.");
+            if (autoTrim)
+            {
+                var main = MainController.Instance;
+                Check(main.CurrentAutoTrimEnabled && main.RemainingStepSeconds > 200 && main.RemainingStepSeconds <= 240, "240-second calibration row is running");
+                Check(rigs.All(r => { var loop = r.GetComponent<ClosedLoop>(); return loop.AutoTrim.Enabled && loop.SupportsAutoTrim &&
+                    loop.GetYawGain() == 2.5f && loop.OrientationTrackingEnabled; }), "All four Kinefly rigs run the calibration gain and closed loop");
+                Check(Object.FindObjectsByType<LocustMover>(FindObjectsSortMode.None).Length == 0, "Calibration sky has no swarm");
+            }
             var sheet = new Texture2D(768, 512, TextureFormat.RGB24, false);
             int row = 0;
             foreach (var rig in rigs)

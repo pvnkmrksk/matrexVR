@@ -2,7 +2,7 @@
   "preStimulus": {
     "headingReference": {
       "enabled": true,
-      "windowSeconds": 240,
+      "windowSeconds": 10,
       "startOffsetSeconds": 0
     },
     "objects": [],
@@ -55,7 +55,7 @@
     "uniformSkyColor": null,
     "swarm": null,
     "enabled": true,
-    "durationSeconds": 240
+    "durationSeconds": 10
   },
   "stimulus": {
     "headingReference": {
@@ -125,7 +125,7 @@
       "spawnAreaSize": 120,
       "mu": -90,
       "kappa": 10000,
-      "locustSpeed": 2,
+      "locustSpeed": 7,
       "dimension": "3D",
       "spawnCenter": {
         "x": 0,

@@ -24,6 +24,7 @@ Kinefly's existing single-frame JSON messages work without a publisher or config
 | [Unity 6 controls](docs/unity6-controls.md) | Action map, keyboard/mouse/gamepad bindings, UI migration, tracking/reset behavior and bench checks. |
 | [Experiment phases](docs/experiment-phases.md) | Continuous pre/stimulus/post conditions, opt-in frozen heading references, and the eight-minute Selwyn recipe. |
 | [Heading reference and telemetry](docs/heading-reference-telemetry.md) | Per-animal circular heading assessment, stimulus-relative angles, outbound ZMQ, and the restored Tab status/error panel. |
+| [Kinefly auto trim](docs/kinefly-auto-trim.md) | Sequence-row opt-in, flight variance gating, iterative median centering, dashboard controls and background swarm recording. |
 | [Data formats](docs/data-formats.md) | CSV/gzip/metadata columns, clocks, sensor-to-world conversion, coordinate conventions, replay and analysis limitations. |
 | [Kannadi integration](docs/kannadi-modernization.md) | Scene integration, camera allow-list, overview, trails, animation and validation history. |
 | [Experiment workflow](docs/experiment-workflow.md) | Controller lifecycle and adding experiments. |

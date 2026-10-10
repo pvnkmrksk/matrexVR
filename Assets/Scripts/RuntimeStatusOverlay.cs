@@ -24,6 +24,8 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private GameObject panel;
     private Canvas canvas;
     private Text label;
+    private Button autoTrimButton;
+    private Text autoTrimButtonText;
     private double nextRefresh;
     private bool visible = true;
     private ExperimentTelemetry telemetry;
@@ -53,7 +55,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private void Start()
     {
         telemetry = GetComponent<ExperimentTelemetry>();
-        GameObject ui = new GameObject("Status canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
+        GameObject ui = new GameObject("Status canvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         ui.transform.SetParent(transform, false);
         canvas = ui.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -67,18 +69,37 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         var rect = panel.GetComponent<RectTransform>();
         rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(1, 0);
         rect.anchoredPosition = new Vector2(-12, 12);
-        rect.sizeDelta = new Vector2(640, 340);
+        rect.sizeDelta = new Vector2(720, 340);
         var background = panel.GetComponent<Image>();
         background.color = new Color(0, 0, 0, .88f); background.raycastTarget = false;
         var textObject = new GameObject("Status text", typeof(RectTransform), typeof(Text));
         textObject.transform.SetParent(panel.transform, false);
         rect = textObject.GetComponent<RectTransform>();
         rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
-        rect.offsetMin = new Vector2(12, 10); rect.offsetMax = new Vector2(-12, -10);
+        rect.offsetMin = new Vector2(12, 48); rect.offsetMax = new Vector2(-12, -10);
         label = textObject.GetComponent<Text>();
         label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        label.fontSize = 16; label.color = Color.white; label.supportRichText = false;
+        label.fontSize = 16; label.color = Color.white; label.supportRichText = true;
         label.raycastTarget = false;
+        var buttonObject = new GameObject("Auto trim toggle", typeof(RectTransform), typeof(Image), typeof(Button));
+        buttonObject.transform.SetParent(panel.transform, false);
+        rect = buttonObject.GetComponent<RectTransform>();
+        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(1, 0);
+        rect.anchoredPosition = new Vector2(-12, 10); rect.sizeDelta = new Vector2(210, 28);
+        autoTrimButton = buttonObject.GetComponent<Button>();
+        autoTrimButton.targetGraphic = buttonObject.GetComponent<Image>();
+        autoTrimButton.onClick.AddListener(() => {
+            var main = MainController.Instance;
+            if (main != null) main.SetCurrentAutoTrim(!main.CurrentAutoTrimEnabled);
+            nextRefresh = 0;
+        });
+        var buttonLabel = new GameObject("Label", typeof(RectTransform), typeof(Text));
+        buttonLabel.transform.SetParent(buttonObject.transform, false);
+        rect = buttonLabel.GetComponent<RectTransform>(); rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
+        rect.offsetMin = rect.offsetMax = Vector2.zero;
+        autoTrimButtonText = buttonLabel.GetComponent<Text>(); autoTrimButtonText.font = label.font;
+        autoTrimButtonText.fontSize = 15; autoTrimButtonText.alignment = TextAnchor.MiddleCenter;
+        autoTrimButtonText.color = Color.black; autoTrimButtonText.raycastTarget = false;
         Configure();
     }
 
@@ -101,16 +122,26 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         var keyboard = UnityEngine.InputSystem.Keyboard.current;
         if (!ExperimentInput.IsEditingText && keyboard != null && keyboard.tabKey.wasPressedThisFrame) SetVisible(!visible);
         if (!visible || label == null || Time.realtimeSinceStartupAsDouble < nextRefresh) return;
-        nextRefresh = Time.realtimeSinceStartupAsDouble + .2;
+        nextRefresh = Time.realtimeSinceStartupAsDouble + .5;
+        if (UnityEngine.EventSystems.EventSystem.current == null)
+            new GameObject("Dashboard EventSystem", typeof(UnityEngine.EventSystems.EventSystem), typeof(UnityEngine.InputSystem.UI.InputSystemUIInputModule));
+        var main = MainController.Instance;
+        bool available = false;
+        if (main != null && main.SequenceRunning)
+            foreach (var rig in main.VRClosedLoops.Values) if (rig != null && rig.SupportsAutoTrim) { available = true; break; }
+        autoTrimButton.interactable = available;
+        bool enabled = main != null && main.CurrentAutoTrimEnabled;
+        autoTrimButtonText.text = enabled ? "AUTO TRIM ON  /  stop" : "AUTO TRIM OFF  /  start";
+        autoTrimButton.targetGraphic.color = !available ? Color.gray : enabled ? new Color(.45f, .9f, .75f) : new Color(.7f, .75f, .8f);
         label.text = BuildText();
         var panelRect = panel.GetComponent<RectTransform>();
-        panelRect.sizeDelta = new Vector2(640, Mathf.Clamp(label.preferredHeight + 24, 160, 700));
+        panelRect.sizeDelta = new Vector2(720, Mathf.Clamp(label.preferredHeight + 62, 180, 820));
     }
 
     public string BuildText()
     {
         var main = MainController.Instance;
-        var text = new StringBuilder("EXPERIMENT STATUS   [Tab: show/hide]\n");
+        var text = new StringBuilder("<size=19><b>FLIGHT DASHBOARD</b></size>   <color=#9DA8B5>[Tab]  [1-4] select  [ / ] DC</color>\n");
         text.Append(SceneManager.GetActiveScene().name);
         if (main != null)
         {
@@ -120,28 +151,51 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
             text.AppendLine();
             foreach (var entry in main.SystemConfigs)
             {
-                text.Append(entry.Key + ": ");
-                if (!main.VRClosedLoops.TryGetValue(entry.Key, out var rig) || rig == null) { text.AppendLine("inactive"); continue; }
+                text.Append($"\n<b>{entry.Key}</b> ");
+                if (!main.VRClosedLoops.TryGetValue(entry.Key, out var rig) || rig == null) { text.AppendLine("<color=#88929C>INACTIVE</color>"); continue; }
                 var listener = rig.GetComponent<ZmqListener>();
-                text.AppendLine($"{rig.GetCurrentMode()} / {rig.MotionMode} ({rig.InputInterpretation})");
-                text.AppendLine($"  Input SUB: {(listener == null ? "missing listener" : listener.Endpoint + " — " + listener.State)}");
-                text.AppendLine($"  gain P/O {rig.PositionGain:G4}/{rig.OrientationGain:G4} [{(rig.PositionTrackingEnabled ? "on" : "off")}/{(rig.OrientationTrackingEnabled ? "on" : "off")}]  DC {rig.GetYawDCOffset():F4} rad");
+                text.Append(Badge(rig.OrientationTrackingEnabled ? "YAW CLOSED" : "YAW OPEN", rig.OrientationTrackingEnabled ? "70E1B0" : "88929C"));
+                text.Append(Badge(rig.PositionTrackingEnabled ? "POS CLOSED" : "POS OPEN", rig.PositionTrackingEnabled ? "70E1B0" : "88929C"));
+                text.AppendLine($" {rig.GetCurrentMode()} / {rig.MotionMode}" + (entry.Key == "VR" + main.SelectedVRIndex ? " <color=#FFD166>SELECTED</color>" : ""));
+                if (rig.SupportsAutoTrim)
+                {
+                    var trim = rig.AutoTrim;
+                    text.AppendLine($"  {Badge($"GAIN {rig.GetYawGain():G4}", rig.OrientationTrackingEnabled && rig.GetYawGain() != 0 ? "FFFFFF" : "88929C")} DC {rig.GetYawDCOffset():F4} rad  " +
+                        Badge(trim.Flying ? "FLYING" : trim.FlightReady ? "NOT FLYING" : "FLIGHT ?", trim.Flying ? "70E1B0" : "FFD166") + $" var {trim.FlightVariance:F3}");
+                    bool working = trim.Enabled && trim.Flying && rig.OrientationTrackingEnabled && rig.GetYawGain() != 0;
+                    string state = !trim.Enabled ? "AUTO TRIM OFF" : working && trim.State != "CENTERED" ? "AUTO TRIMMING / " + trim.State : "AUTO TRIM / " + trim.State;
+                    text.Append("  " + Badge(state, !trim.Enabled ? "88929C" : trim.State == "CENTERED" ? "70E1B0" : working ? "FFD166" : "88929C"));
+                    if (trim.State == "COLLECTING") text.Append($" {trim.WindowProgress:P0}");
+                    if (trim.EffectiveMedianDegPerSecond.HasValue) text.Append($" last median {trim.EffectiveMedianDegPerSecond.Value:F2} deg/s");
+                    if (trim.Enabled) text.Append($"  pass {trim.Passes}");
+                    text.AppendLine();
+                }
+                else text.AppendLine($"  {Badge($"P GAIN {rig.PositionGain:G4}", rig.PositionTrackingEnabled ? "FFFFFF" : "88929C")} " +
+                    Badge($"YAW GAIN {rig.OrientationGain:G4}", rig.OrientationTrackingEnabled ? "FFFFFF" : "88929C"));
+                text.AppendLine($"  <color=#9DA8B5>Input SUB: {(listener == null ? "missing listener" : EscapeRich(listener.Endpoint) + " / " + listener.State)}</color>");
                 var reference = rig.GetComponent<StimulusHeadingReference>();
                 if (reference != null && reference.IsObserving) text.AppendLine($"  heading assessment: {reference.RemainingSeconds:F1}s");
                 else if (reference != null && reference.Result != null) text.AppendLine($"  zero {reference.Result.meanHeadingDegrees:F1} deg, r={reference.Result.resultantLength:F3} ({reference.Phase})");
             }
         }
         text.AppendLine($"Telemetry PUB (output): {(telemetry != null ? telemetry.State + " " + telemetry.Endpoint : "starting")}");
+        int pending = 0; long dropped = 0; double capture = 0; int loggers = 0;
+        foreach (var logger in FindObjectsByType<SwarmLogger>(FindObjectsSortMode.None))
+        { pending += logger.PendingFrames; dropped += logger.DroppedFrames; capture += logger.CaptureMilliseconds; loggers++; }
+        if (loggers > 0) text.AppendLine($"Swarm log: worker / capture {capture:F2} ms / queued {pending} / dropped {dropped}");
         ErrorEntry[] recent = RecentErrors();
         if (recent.Length > 0)
         {
             ErrorEntry latest = recent[recent.Length - 1];
             text.AppendLine($"{latest.type} {latest.timestampUtc} ({recent.Length} recent)");
-            text.Append(Shorten(latest.message, 420));
+            text.Append(EscapeRich(Shorten(latest.message, 420)));
             text.Append("\nFull details: runtime_trace.log / telemetry errors");
         }
         return text.ToString();
     }
+
+    private static string Badge(string value, string color) => $"<color=#{color}><b>[{value}]</b></color> ";
+    private static string EscapeRich(string value) => (value ?? "").Replace("<", "‹").Replace(">", "›");
 
     private static string Shorten(string value, int length) => value == null ? "" : value.Length <= length ? value : value.Substring(0, length) + "…";
     private static void CaptureError(string condition, string trace, LogType type)

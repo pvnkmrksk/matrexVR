@@ -4,6 +4,8 @@ MasterDataLogger creates `Assets/RunData/yyyyMMdd_HHmmss/` in the Editor (`Appli
 
 Sampling is once per rendered Update, not a fixed Hz acquisition clock. Disk buffering flushes about every 0.5 seconds; clean scene exit flushes remaining rows. Wall-clock timestamps are local machine time and contain milliseconds, without a timezone offset. Record the workstation timezone and synchronize machines for cross-device analysis. Do not assume rows are evenly spaced or use row number as elapsed time.
 
+Swarm position snapshots are captured in LateUpdate; CSV formatting, gzip and disk writes run on a worker. They retain sample-time metadata and drain on clean exit. The dashboard reports queue overflow/dropped frames. Embedded Choice/Selwyn swarms currently have no agent-position logger.
+
 ## Rig CSV (`*_VRn_.csv`)
 
 DataLogger emits a header and comma-separated rows. The rig's transform is the world pose, not raw tracker coordinates.
@@ -29,6 +31,9 @@ DataLogger emits a header and comma-separated rows. The rig's transform is the w
 | `blackSideAtTrialStart` | Adaptive trial side label. |
 | `skyboxId` | SHA-256 ID of the active managed Swarm/Kannadi sky. Join to `Skyboxes/<id>.json` and `.png`; otherwise blank. |
 | `skyboxSampleUtc` | Astronomical sample time as ISO-8601 UTC; blank for an explicit image or no managed sky. |
+| `autoTrimEnabled`, `autoTrimState` | Kinefly automatic centering flag/state. Blank for unsupported tracking modes. |
+| `flightDetected`, `flightVarianceRadiansSquared` | Flight decision and population variance of raw L−R before gain/offset; blank until the flight window is ready. |
+| `autoTrimMedianDegPerSecond`, `autoTrimPasses` | Last evaluated effective median before correction, and correction count in the current row/configuration. Median is blank while no complete qualified window is available. |
 | `experimentPhase` | Experiment state at row sampling: `preStimulus`, `stimulus`, or `postStimulus`. Flat experiments use `stimulus`; legacy flat heading observation uses `assessment`. Outside a running experiment: `idle`; failed experiment: `error`. |
 
 `experimentPhase` is appended after the existing rig columns, including on Optomotor/other loggers using the base schema. It is recorded on **every row**, before disk buffering, so no event-log join is needed. Existing `CurrentStep`, `stepIndex`, `stepName` and band `VisibilityPhase` retain their original meanings. For example:

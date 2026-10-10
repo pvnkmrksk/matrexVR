@@ -190,8 +190,10 @@ public static class ExperimentPhaseValidation
                     Check(Angle(spawner.mu, means[i] - 90), "Swarm travels left of this rig's frozen mean " + i);
                     Check(spawner.numberOfLocusts == 256 && spawner.bogongVisual.sizeMode == "Angular" && spawner.bogongVisual.angularSizeDegrees == 2 && spawner.bogongVisual.flickerFrequencyHz == 0, "256 steady two-degree dots per rig " + i);
                     Check(spawner.bogongVisual.color.r < .12f, "Dots darker than the uniform gray sky " + i);
-                    var own = Object.FindObjectsByType<Bogong>(FindObjectsSortMode.None).Where(b => b.gameObject.layer == LayerMask.NameToLayer(spawner.layerName)).ToArray();
+                    var own = spawner.Spawned.Where(b => b.gameObject.layer == LayerMask.NameToLayer(spawner.layerName)).ToArray();
                     Check(own.Length == 256 && own.All(b => b.transform.position.y > rigs[i].transform.position.y), "Only dorsal dots, isolated to rig " + i);
+                    Check(spawner.GetComponentsInChildren<BogongSwarmRenderer>().Length == 1 &&
+                          own.All(b => b.GetComponent<Renderer>() == null), "Embedded swarm uses one batch without per-agent renderers " + i);
                 }
                 Check(NightSkyController.CurrentId != starId && !string.IsNullOrEmpty(NightSkyController.CurrentId), "Uniform sky replaces stars with a new recorded identity");
                 string archive = Path.Combine(MasterDataLogger.Instance.directoryPath, "Skyboxes", NightSkyController.CurrentId + ".json");

@@ -19,3 +19,5 @@ Flat experiments retain their sequence presentation timer after heading measurem
 `Flight/selwyn-live-sky.example.json` samples a new image every 30 minutes. The image is static between samples. The fixed-sky example disables advancing time. The panorama example uses the existing image asset.
 
 The preserved Kannadi recipes remain under `Kannadi/`; this collection does not replace or rewrite them.
+
+`Sequences/kinefly-auto-trim.example.json` runs a 240-second Kinefly calibration over Selwyn terrain with the live Milky Way star sky. The active `sequenceConfig.json` uses this test. Its provisional flight threshold and bounded corrections are tuned from six past recordings. See [auto trim](../../../docs/kinefly-auto-trim.md) for controls, units, replay results and continuation with trimming off.

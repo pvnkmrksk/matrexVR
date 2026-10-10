@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using CosineKitty;
 using Newtonsoft.Json;
@@ -65,8 +66,10 @@ public static class NightSkyValidation
                 if (SceneManager.GetActiveScene().name != "Swarm" || NightSkyController.CurrentId == "") return;
                 Check(MainController.Instance != null, "ControlScene automatically started the preview sequence.");
                 var spawners = Object.FindObjectsByType<LocustSpawner>(FindObjectsSortMode.None);
-                var agents = Object.FindObjectsByType<Bogong>(FindObjectsSortMode.None);
+                var agents = spawners.SelectMany(s => s.Spawned).ToArray();
                 Check(agents.Length == spawners.Length * 256 && agents.Length > 0, "Preview spawns 256 Bogong markers per rig.");
+                Check(spawners.All(s => s.bogongVisual.flickerFrequencyHz == 0 &&
+                    s.GetComponentInChildren<BogongSwarmRenderer>().GetComponent<Renderer>().enabled), "Flicker is disabled and batched visuals are visible.");
                 foreach (var agent in agents)
                 {
                     var mover = agent.GetComponent<LocustMover>();
@@ -74,7 +77,6 @@ public static class NightSkyValidation
                     Vector3 relative = agent.transform.position - mover.boundaryManager.transform.position;
                     Check(Math.Abs(relative.x)<=60.1 && Math.Abs(relative.y)<=30.1 && Math.Abs(relative.z)<=60.1, "Agents stay in the 120 x 60 x 120 volume.");
                     Check(Vector3.Angle(agent.transform.forward, Quaternion.Euler(-5,60,0)*Vector3.forward)<.05, "Swarm is aligned at heading 60 degrees, 5 degrees upward.");
-                    Check(agent.GetComponent<Renderer>().enabled, "Flicker is disabled.");
                     if (Math.Abs(relative.x)<50 && Math.Abs(relative.y)<20 && Math.Abs(relative.z)<50)
                         motionStarts[mover]=agent.transform.position;
                 }
@@ -117,7 +119,8 @@ public static class NightSkyValidation
                     Vector3 delta=entry.Key.transform.position-entry.Value;
                     Check(Vector3.Dot(delta,entry.Key.transform.forward)>.1f &&
                         Vector3.Cross(delta,entry.Key.transform.forward).magnitude<.02f, "Bogong travels forward over actual frames without sideways jitter.");
-                    Check(entry.Key.GetComponent<Renderer>().enabled, "Bogong remains visible over time without flicker.");
+                    Check(entry.Key.boundaryManager.GetComponent<LocustSpawner>().GetComponentInChildren<BogongSwarmRenderer>().GetComponent<Renderer>().enabled,
+                        "Bogong batch remains visible over time without flicker.");
                 }
                 SaveSwarmPreview();
                 MainController.Instance.HandleEscape();

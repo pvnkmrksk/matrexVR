@@ -37,6 +37,8 @@ public class ClosedLoop : MonoBehaviour
     [SerializeField] private float torqueGainStep = .1f;
     private float lastYawInput, lastYawOutput;
     private string registeredVrId;
+    public KineflyAutoTrim AutoTrim { get; } = new KineflyAutoTrim();
+    public bool SupportsAutoTrim => currentMode == ClosedLoopMode.Kinefly && !useLocustGains && useYawMode && !useForceMode;
     public ZmqListener.RawSample LastConsumedSample { get; private set; }
     public Vector3 LastAppliedPositionDelta { get; private set; }
     public float LastAppliedYawDeltaDegrees { get; private set; }
@@ -58,7 +60,13 @@ public class ClosedLoop : MonoBehaviour
     public bool GetUseForceMode() => useForceMode;
     public ClosedLoopMode GetCurrentMode() => currentMode;
     public void SetYawGain(float value) => yawGain = value;
-    public void SetYawDCOffset(float value) => yawDCOffset = value;
+    public void SetYawDCOffset(float value)
+    {
+        yawDCOffset = value;
+        if (registeredVrId != null && MainController.Instance != null)
+            MainController.Instance.RememberDCOffset(registeredVrId, value);
+    }
+    public void ConfigureAutoTrim(bool enabled, AutoTrimConfig settings) => AutoTrim.Configure(enabled, settings);
     public void SetYawMode(bool value) => useYawMode = value;
     public void SetForceMode(bool value) => useForceMode = value;
     public void SetForceGain(float value) => forceGain = value;
@@ -97,6 +105,18 @@ public class ClosedLoop : MonoBehaviour
         LastAppliedPositionDelta = Vector3.zero;
         LastAppliedYawDeltaDegrees = 0;
         if (HandleInput()) return;
+
+        if (_zmqListener != null)
+        {
+            var sample = _zmqListener.ReadRawSample();
+            bool fresh = sample.hasPose && sample.receivedUtcTicks > 0 &&
+                System.TimeSpan.FromTicks(System.DateTime.UtcNow.Ticks - sample.receivedUtcTicks).TotalSeconds <= 1;
+            bool sessionActive = MainController.Instance == null ||
+                (MainController.Instance.SequenceRunning && MainController.Instance.SequenceError == null && !MainController.Instance.AssessmentFailed);
+            if (AutoTrim.Tick(Time.realtimeSinceStartupAsDouble, sample.sequence, sample.rotation.y, fresh,
+                SupportsAutoTrim, closedLoopOrientation && sessionActive && _isInitialized, yawGain, yawDCOffset, out float offset))
+                SetYawDCOffset(offset);
+        }
 
         if (_zmqListener == null || (useLocustGains && !_zmqListener.HasPose))
             return;

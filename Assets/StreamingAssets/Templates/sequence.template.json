@@ -10,6 +10,19 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/experiment.template.json"
+      },
+      "autoTrim": false,
+      "autoTrimSettings": {
+        "windowSeconds": 20,
+        "flightWindowSeconds": 2,
+        "flightVarianceThreshold": 0.3,
+        "flightConfirmationSeconds": 1,
+        "flightVarianceHysteresis": 0.5,
+        "updateIntervalSeconds": 0.5,
+        "aggressiveness": 0.25,
+        "maxStepRadians": 0.02,
+        "settleSeconds": 5,
+        "toleranceDegPerSecond": 1
       }
     }
   ]

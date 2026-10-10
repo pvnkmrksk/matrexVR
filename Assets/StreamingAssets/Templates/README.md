@@ -11,7 +11,7 @@ The active sequence selects the repeating Selwyn stars-to-left-swarm experiment.
 | Template | Scene / paradigm | Notes |
 |---|---|---|
 | `system_config.template.json` | All scenes | Full per-rig hardware, Kinefly mode, manual control, frame timing, overview, telemetry and status settings. |
-| `sequence.template.json` | Outer experiment sequence | Complete `autoStart`, `loop`, `randomise`, `sceneName`, `duration`, `gain`, `reloadScene` and file reference. |
+| `sequence.template.json` | Outer experiment sequence | Complete `autoStart`, `loop`, `randomise`, `sceneName`, `duration`, `gain`, `autoTrim`, `autoTrimSettings`, `reloadScene` and file reference. |
 | `experiment.template.json` | `Choice_Selwyn` flight | Complete canonical experiment; autopilot 7 world units/s, 100-unit AGL, Selwyn sky. |
 | `choice.template.json` | `Choice`, `Choice_Forrest`, all four `Choice_TwoTreeIndia_*` scenes | Full Choice schema, including every object property. The scene supplies its authored environment. |
 | `choice-band.template.json` | `Choice` moving bands | Same Choice schema with active band geometry and motion. |

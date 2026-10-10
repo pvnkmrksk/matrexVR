@@ -28,6 +28,15 @@ def validate(obj, path):
         for step in obj['sequences']:
             assert step['sceneName'] in scenes, (path, step['sceneName'])
             assert step['duration'] > 0, path
+            assert isinstance(step.get('autoTrim', False), bool), path
+            ranges = {'windowSeconds': (1, 300), 'flightWindowSeconds': (.2, 30),
+                      'flightVarianceThreshold': (0, 1000000), 'flightConfirmationSeconds': (0, 30),
+                      'flightVarianceHysteresis': (0, 1), 'updateIntervalSeconds': (.1, 60),
+                      'aggressiveness': (.001, 1), 'maxStepRadians': (.000001, 10),
+                      'settleSeconds': (0, 300), 'toleranceDegPerSecond': (0, 1000000)}
+            for key, value in (step.get('autoTrimSettings') or {}).items():
+                assert key in ranges and ranges[key][0] <= value <= ranges[key][1], (path, key)
+
             for key in ['configFile', 'design']:
                 if key in step['parameters']:
                     assert (SA / step['parameters'][key]).is_file(), (path, key)

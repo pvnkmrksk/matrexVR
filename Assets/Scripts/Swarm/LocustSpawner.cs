@@ -41,13 +41,18 @@ public class LocustSpawner : MonoBehaviour
     [Tooltip("ScenePrefab uses the existing prefab. Bogong creates an unlit circular patch at runtime.")]
     public string agentVisual = "ScenePrefab";
     public BogongVisualConfig bogongVisual = new BogongVisualConfig();
+    [Tooltip("Render Bogong dots in one draw per swarm/camera. Disable only for reference comparisons.")]
+    public bool useBatchedBogongRendering = true;
 
     public bool animateOnMove;
     public float animationSpeedThreshold = 0.5f;
     public bool loadConfigFromJsonFile = true; // If true, load config from json file, else use default values
 
     private readonly System.Collections.Generic.List<GameObject> spawned = new System.Collections.Generic.List<GameObject>();
+    public System.Collections.Generic.IReadOnlyList<GameObject> Spawned => spawned;
+    public int SpawnRevision { get; private set; }
     private bool initialized;
+    private GameObject batchedVisual;
 
     void Start()
     {
@@ -95,9 +100,11 @@ public class LocustSpawner : MonoBehaviour
     }
     private void Cleanup()
     {
+        if (batchedVisual != null) { batchedVisual.SetActive(false); Destroy(batchedVisual); batchedVisual = null; }
         foreach (GameObject locust in spawned)
             if (locust != null) { locust.SetActive(false); Destroy(locust); }
         spawned.Clear();
+        SpawnRevision++;
     }
     private void OnDestroy() => Cleanup();
 
@@ -156,6 +163,13 @@ public class LocustSpawner : MonoBehaviour
                 locustMover.boundaryManager = boundaryManager;
             }
         }
+        if (UsesBogongVisual() && useBatchedBogongRendering && spawned.Count > 0)
+        {
+            batchedVisual = new GameObject(layerName + "_BogongBatch");
+            batchedVisual.layer = locustLayer;
+            batchedVisual.transform.SetParent(transform, false);
+            batchedVisual.AddComponent<BogongSwarmRenderer>().Configure(spawned, bogongVisual);
+        }
     }
 
     private bool Is3D() => string.Equals(dimension, "3D", System.StringComparison.OrdinalIgnoreCase);
@@ -163,6 +177,13 @@ public class LocustSpawner : MonoBehaviour
 
     private GameObject CreateBogongAgent(Vector3 position, int index)
     {
+        if (useBatchedBogongRendering)
+        {
+            var root = new GameObject(layerName + "_Bogong_" + index);
+            root.transform.position = position;
+            root.AddComponent<LocustMover>();
+            return root;
+        }
         GameObject agent = GameObject.CreatePrimitive(PrimitiveType.Quad);
         // A visual stimulus must not participate in collisions or ground-height raycasts.
         Collider collider = agent.GetComponent<Collider>();

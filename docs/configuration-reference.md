@@ -96,6 +96,8 @@ Template: `sequence.template.json`.
 | `sceneName` | none | Exact enabled scene name, e.g. Swarm, Kannadi, Choice, Optomotor, Choice_desync. No Matrix scene exists. |
 | `duration` | 0 | Outer step time, seconds; use a positive duration. |
 | `gain` | 1 | Historical Bogong/Kinefly signed yaw gain, applied on scene load and in-place trial transitions. Zero disables yaw response; negative reverses it. It does not replace the separate walking angular multiplier. |
+| `autoTrim` | false | Opt-in per-row Kinefly median centering; pauses outside flight/closed-loop yaw. Learned DC offsets persist when false. |
+| `autoTrimSettings` | default object | Flight variance threshold/window, trim window, aggressiveness, step limit, settling and effective-output tolerance. See [auto trim](kinefly-auto-trim.md) for fields, defaults and units. |
 | `reloadScene` | true | When false and the scene stays the same, call its in-scene sequencer. Use true for Dynamic Choice: its AdvanceStep is intentionally empty. |
 | `parameters` | null | Controller-specific dictionary. |
 | `parameters.configFile` | none | Choice, Optomotor, Kannadi or Swarm file relative to StreamingAssets. |

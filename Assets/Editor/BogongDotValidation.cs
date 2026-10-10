@@ -77,6 +77,7 @@ public static class BogongDotValidation
             config.flickerFrequencyHz=0; dot.Configure(config);
             Check(renderer.enabled,"Disabling flicker restores solid visibility.");
             dot.SendMessage("OnDisable");
+            ValidateBatch(camera, marker);
             Object.DestroyImmediate(marker); Object.DestroyImmediate(camera.gameObject);
             Object.DestroyImmediate(other.gameObject); Object.DestroyImmediate(decoy.gameObject); Object.DestroyImmediate(light.gameObject);
         }
@@ -84,6 +85,29 @@ public static class BogongDotValidation
         File.WriteAllText(Path.Combine(Application.dataPath,"../bogong-dot-validation.json"),
             JsonConvert.SerializeObject(new {checks,failure,samples,unity=Application.unityVersion},Formatting.Indented));
         EditorApplication.Exit(failure==null?0:1);
+    }
+
+    private static void ValidateBatch(Camera camera, GameObject marker)
+    {
+        foreach (string sizeMode in new[] { "Angular", "World" })
+        foreach (float angle in new[] { 2f, 20f })
+        {
+            var root = new GameObject("Batched circle reference"); root.layer = marker.layer;
+            var config = new BogongVisualConfig { sizeMode = sizeMode, size = 2, angularSizeDegrees = angle,
+                color = new ColorConfig { r = 1, g = .5f, b = .5f, a = 1 } };
+            var batch = root.AddComponent<BogongSwarmRenderer>();
+            batch.Configure(new[] { marker }, config);
+            batch.SendMessage("OnDisable"); batch.SendMessage("OnEnable");
+            foreach (int resolution in new[] { 64, 128 })
+            foreach (float distance in new[] { 5f, 50f })
+            foreach (float x in new[] { .5f + .5f / resolution, .999f, 1.005f })
+            {
+                marker.transform.position = camera.transform.position + camera.ViewportPointToRay(new Vector3(x, .5f + .5f / resolution, 0)).direction * distance;
+                batch.RefreshCenters();
+                RenderAndCheck(camera, marker, config, resolution, 1, "batch-" + sizeMode);
+            }
+            batch.SendMessage("OnDisable"); Object.DestroyImmediate(root);
+        }
     }
 
     private static int RenderAndCheck(Camera camera, GameObject marker, BogongVisualConfig config, int resolution, int msaa, string label)

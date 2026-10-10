@@ -123,6 +123,11 @@ public sealed class ExperimentTelemetry : MonoBehaviour
                         appliedThisFrame = rig.AppliedTrackingThisFrame,
                         appliedPositionDelta = new { x = rig.LastAppliedPositionDelta.x, y = rig.LastAppliedPositionDelta.y, z = rig.LastAppliedPositionDelta.z },
                         appliedYawDeltaDegrees = rig.LastAppliedYawDeltaDegrees },
+                    autoTrim = new { supported = rig.SupportsAutoTrim, enabled = rig.AutoTrim.Enabled,
+                        state = rig.AutoTrim.State, flightReady = rig.AutoTrim.FlightReady, flying = rig.AutoTrim.Flying,
+                        flightVarianceRadiansSquared = rig.AutoTrim.FlightVariance,
+                        medianDegPerSecond = rig.AutoTrim.EffectiveMedianDegPerSecond,
+                        windowProgress = rig.AutoTrim.WindowProgress, passes = rig.AutoTrim.Passes },
                     headingReference = new { phase = reference != null ? reference.Phase : "disabled",
                         remainingSeconds = reference != null ? reference.RemainingSeconds : 0, result = reference != null ? reference.Result : null }
                 });

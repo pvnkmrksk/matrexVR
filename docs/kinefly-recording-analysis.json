@@ -1,0 +1,895 @@
+{
+  "method": "First 45,000 rows of six CSVs from two sessions; raw wireYaw=L-R in radians; population variance over trailing 2 seconds, sampled at at most 50 Hz. Render timestamps approximate input timing; recordings lack per-input sequence IDs. No flight labels exist, so variance gates cannot establish biological flight accuracy.",
+  "files": [
+    {
+      "source": "/Volumes/MISC/Swarm_v1/RunData/20261010_023123/20261010_023123_Choice_Selwyn_VR1_.csv",
+      "rowsRead": 45000,
+      "durationSeconds": 932.725,
+      "estimatorSamples": 29673,
+      "rawYawRadians": {
+        "p01": -0.9356132959999998,
+        "p05": -0.4406749,
+        "p25": -0.2505798,
+        "median": -0.1209696,
+        "p75": 0.06048479,
+        "p95": 0.9159125,
+        "p99": 1.43677319999999
+      },
+      "leftRadians": {
+        "p01": -1.405872,
+        "p05": -1.405872,
+        "p25": -1.198496,
+        "median": -0.6800545,
+        "p75": 0.04576289,
+        "p95": 0.451875,
+        "p99": 0.5814853
+      },
+      "rightRadians": {
+        "p01": -1.397231,
+        "p05": -1.328106,
+        "p25": -1.103448,
+        "median": -0.8010241,
+        "p75": 0.07168495,
+        "p95": 0.5814853,
+        "p99": 0.7283769
+      },
+      "variance2SecondsRadiansSquared": {
+        "p01": 0.03887677999075221,
+        "p05": 0.05032321104331464,
+        "p25": 0.08441236137242378,
+        "median": 0.1557606648609812,
+        "p75": 0.2237741083247696,
+        "p95": 0.3140730164796667,
+        "p99": 0.3713684043978801
+      },
+      "gain": [
+        2.5
+      ],
+      "recordedOffsetRadians": {
+        "p01": 0.0,
+        "p05": 0.0,
+        "p25": 0.0,
+        "median": 0.0,
+        "p75": 0.0,
+        "p95": 0.0,
+        "p99": 0.0
+      },
+      "trackingImplementationCounts": {
+        "BogongAustralia/ef8a68b": 45000
+      },
+      "nonfiniteRawRows": 0,
+      "gapsOver1Second": 1,
+      "varianceGates": {
+        "0.001": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 930.71
+        },
+        "0.003": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 930.71
+        },
+        "0.01": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 930.71
+        },
+        "0.03": {
+          "fractionAbove": 0.9992905884737517,
+          "longestContinuousSeconds": 410.038
+        },
+        "0.1": {
+          "fractionAbove": 0.6905276670495237,
+          "longestContinuousSeconds": 89.84000000000003
+        },
+        "0.3": {
+          "fractionAbove": 0.07141409364232146,
+          "longestContinuousSeconds": 3.0639999999999645
+        }
+      },
+      "phases": {
+        "postStimulus": {
+          "rows": 9961,
+          "medianFrameIntervalMs": 20.999999999958163,
+          "p95FrameIntervalMs": 25.999999999953616,
+          "rawYawRadians": {
+            "p01": -1.0798267700000002,
+            "p05": -0.4406749,
+            "p25": -0.2332985,
+            "median": -0.07776616,
+            "p75": 0.08640684,
+            "p95": 0.4825821949999953,
+            "p99": 0.9245532
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.033819683040133094,
+            "p05": 0.04051498621484331,
+            "p25": 0.057728662122875724,
+            "median": 0.07950567045086489,
+            "p75": 0.12656839585445132,
+            "p95": 0.23214456929958796,
+            "p99": 0.27855348035180605
+          }
+        },
+        "preStimulus": {
+          "rows": 14327,
+          "medianFrameIntervalMs": 16.999999999995907,
+          "p95FrameIntervalMs": 18.000000000000682,
+          "rawYawRadians": {
+            "p01": -0.985038,
+            "p05": -0.4320342,
+            "p25": -0.2505798,
+            "median": -0.1382509,
+            "p75": 0.05184411,
+            "p95": 1.12112875,
+            "p99": 1.408432
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.044902716403544346,
+            "p05": 0.07870294509716941,
+            "p25": 0.15312154685762644,
+            "median": 0.20161931513588874,
+            "p75": 0.2571168148221177,
+            "p95": 0.3389853634707674,
+            "p99": 0.40956286110725854
+          }
+        },
+        "stimulus": {
+          "rows": 20712,
+          "medianFrameIntervalMs": 21.999999999934516,
+          "p95FrameIntervalMs": 34.99999999996817,
+          "rawYawRadians": {
+            "p01": -0.7517395,
+            "p05": -0.4406749,
+            "p25": -0.2592205,
+            "median": -0.1296103,
+            "p75": 0.05184411,
+            "p95": 0.9677566,
+            "p99": 1.503479
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.04617745422219737,
+            "p05": 0.05485152990361889,
+            "p25": 0.09699334457227508,
+            "median": 0.16437838114181735,
+            "p75": 0.2307136904676997,
+            "p95": 0.31605942909700596,
+            "p99": 0.36683284339609423
+          }
+        }
+      }
+    },
+    {
+      "source": "/Volumes/MISC/Swarm_v1/RunData/20261010_023123/20261010_023123_Choice_Selwyn_VR2_.csv",
+      "rowsRead": 45000,
+      "durationSeconds": 932.724,
+      "estimatorSamples": 29781,
+      "rawYawRadians": {
+        "p01": -1.261718,
+        "p05": -0.9031968,
+        "p25": -0.1516819,
+        "median": 0.02068389,
+        "p75": 0.2206282,
+        "p95": 1.068668,
+        "p99": 1.296191
+      },
+      "leftRadians": {
+        "p01": -1.402618,
+        "p05": -1.395724,
+        "p25": -1.361251,
+        "median": -1.209569,
+        "p75": -0.7683123,
+        "p95": -0.1271116,
+        "p99": -0.07195454
+      },
+      "rightRadians": {
+        "p01": -1.395724,
+        "p05": -1.395724,
+        "p25": -1.354356,
+        "median": -1.202674,
+        "p75": -0.9337835,
+        "p95": -0.2374257,
+        "p99": -0.07884917
+      },
+      "variance2SecondsRadiansSquared": {
+        "p01": 0.06407503347125794,
+        "p05": 0.08863232574353316,
+        "p25": 0.16587725132967635,
+        "median": 0.2129991835118594,
+        "p75": 0.2545166111224958,
+        "p95": 0.31225617014071255,
+        "p99": 0.3486410037381408
+      },
+      "gain": [
+        2.5
+      ],
+      "recordedOffsetRadians": {
+        "p01": 0.0,
+        "p05": 0.0,
+        "p25": 0.0,
+        "median": 0.0,
+        "p75": 0.0,
+        "p95": 0.0,
+        "p99": 0.0
+      },
+      "trackingImplementationCounts": {
+        "BogongAustralia/ef8a68b": 45000
+      },
+      "nonfiniteRawRows": 0,
+      "gapsOver1Second": 1,
+      "varianceGates": {
+        "0.001": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 930.7090000000001
+        },
+        "0.003": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 930.7090000000001
+        },
+        "0.01": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 930.7090000000001
+        },
+        "0.03": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 930.7090000000001
+        },
+        "0.1": {
+          "fractionAbove": 0.9269245009929651,
+          "longestContinuousSeconds": 180.13400000000001
+        },
+        "0.3": {
+          "fractionAbove": 0.0777878757278939,
+          "longestContinuousSeconds": 3.0529999999999973
+        }
+      },
+      "phases": {
+        "postStimulus": {
+          "rows": 9961,
+          "medianFrameIntervalMs": 20.999999999958163,
+          "p95FrameIntervalMs": 25.999999999953616,
+          "rawYawRadians": {
+            "p01": -1.2116623,
+            "p05": -0.599833,
+            "p25": -0.03447316,
+            "median": 0.09652484,
+            "p75": 0.337837,
+            "p95": 0.9652484,
+            "p99": 1.165193
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.05713813318802172,
+            "p05": 0.06645390629770669,
+            "p25": 0.10284816149998319,
+            "median": 0.14171837941610674,
+            "p75": 0.2046461438838423,
+            "p95": 0.27522808287082096,
+            "p99": 0.3060223708857282
+          }
+        },
+        "preStimulus": {
+          "rows": 14327,
+          "medianFrameIntervalMs": 16.999999999995907,
+          "p95FrameIntervalMs": 19.000000000005457,
+          "rawYawRadians": {
+            "p01": -0.916986,
+            "p05": -0.6687793,
+            "p25": -0.1723658,
+            "median": 0.006894632,
+            "p75": 0.261996,
+            "p95": 1.089352,
+            "p99": 1.30998
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.0716951182770022,
+            "p05": 0.11353425153170757,
+            "p25": 0.18303860018738596,
+            "median": 0.22067291726235608,
+            "p75": 0.25697876867768976,
+            "p95": 0.3139762045090971,
+            "p99": 0.38319140168797045
+          }
+        },
+        "stimulus": {
+          "rows": 20712,
+          "medianFrameIntervalMs": 21.999999999934516,
+          "p95FrameIntervalMs": 34.99999999996817,
+          "rawYawRadians": {
+            "p01": -1.289296,
+            "p05": -1.096246,
+            "p25": -0.1930497,
+            "median": 0.006894632,
+            "p75": 0.1516819,
+            "p95": 1.103141,
+            "p99": 1.303085
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.08663460102228504,
+            "p05": 0.13082492273738475,
+            "p25": 0.19089601049390154,
+            "median": 0.22722856340217132,
+            "p75": 0.265823191295387,
+            "p95": 0.31973690916307823,
+            "p99": 0.3505019500604921
+          }
+        }
+      }
+    },
+    {
+      "source": "/Volumes/MISC/Swarm_v1/RunData/20261010_023123/20261010_023123_Choice_Selwyn_VR3_.csv",
+      "rowsRead": 45000,
+      "durationSeconds": 932.725,
+      "estimatorSamples": 29634,
+      "rawYawRadians": {
+        "p01": -0.5410636,
+        "p05": -0.3815192,
+        "p25": -0.1248608,
+        "median": 0.08324056,
+        "p75": 0.2566584,
+        "p95": 0.6451143,
+        "p99": 1.102937
+      },
+      "leftRadians": {
+        "p01": -1.403098,
+        "p05": -1.312921,
+        "p25": -0.9383384,
+        "median": -0.2169202,
+        "p75": 0.4836878,
+        "p95": 0.7056626,
+        "p99": 0.7056626
+      },
+      "rightRadians": {
+        "p01": -1.396161,
+        "p05": -1.361478,
+        "p25": -1.021579,
+        "median": -0.3903381,
+        "p75": 0.4004472,
+        "p95": 0.6987259,
+        "p99": 0.7125993
+      },
+      "variance2SecondsRadiansSquared": {
+        "p01": 0.039905564820471015,
+        "p05": 0.05060532248811186,
+        "p25": 0.07583734954745844,
+        "median": 0.10078281870753042,
+        "p75": 0.12719538679339176,
+        "p95": 0.1833576990993688,
+        "p99": 0.22436510399694443
+      },
+      "gain": [
+        2.5
+      ],
+      "recordedOffsetRadians": {
+        "p01": 0.0,
+        "p05": 0.0,
+        "p25": 0.0,
+        "median": 0.0,
+        "p75": 0.0,
+        "p95": 0.0,
+        "p99": 0.0
+      },
+      "trackingImplementationCounts": {
+        "BogongAustralia/ef8a68b": 45000
+      },
+      "nonfiniteRawRows": 0,
+      "gapsOver1Second": 1,
+      "varianceGates": {
+        "0.001": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 930.71
+        },
+        "0.003": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 930.71
+        },
+        "0.01": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 930.71
+        },
+        "0.03": {
+          "fractionAbove": 0.999357304739032,
+          "longestContinuousSeconds": 378.343
+        },
+        "0.1": {
+          "fractionAbove": 0.5088116902885363,
+          "longestContinuousSeconds": 10.09699999999998
+        },
+        "0.3": {
+          "fractionAbove": 3.382606636674221e-05,
+          "longestContinuousSeconds": 0.0
+        }
+      },
+      "phases": {
+        "postStimulus": {
+          "rows": 9961,
+          "medianFrameIntervalMs": 20.999999999958163,
+          "p95FrameIntervalMs": 25.999999999953616,
+          "rawYawRadians": {
+            "p01": -0.5410636,
+            "p05": -0.3953927,
+            "p25": -0.145671,
+            "median": 0.09017727,
+            "p75": 0.2705318,
+            "p95": 0.7283549,
+            "p99": 1.137621
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.038653717748679324,
+            "p05": 0.057794420935777434,
+            "p25": 0.09051084531062202,
+            "median": 0.11426497329602525,
+            "p75": 0.14242138458089393,
+            "p95": 0.19657046091493782,
+            "p99": 0.22639363819753505
+          }
+        },
+        "preStimulus": {
+          "rows": 14327,
+          "medianFrameIntervalMs": 16.999999999995907,
+          "p95FrameIntervalMs": 17.99999999997226,
+          "rawYawRadians": {
+            "p01": -0.5133168,
+            "p05": -0.3676458,
+            "p25": -0.09711398,
+            "median": 0.09017727,
+            "p75": 0.242785,
+            "p95": 0.5004839049999975,
+            "p99": 1.019697
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.03653680410123845,
+            "p05": 0.04347195035734575,
+            "p25": 0.06120958839691638,
+            "median": 0.08270324989793215,
+            "p75": 0.10875144168387986,
+            "p95": 0.15229665653179322,
+            "p99": 0.20167905369169542
+          }
+        },
+        "stimulus": {
+          "rows": 20712,
+          "medianFrameIntervalMs": 21.999999999934516,
+          "p95FrameIntervalMs": 34.99999999996817,
+          "rawYawRadians": {
+            "p01": -0.5480003,
+            "p05": -0.3815192,
+            "p25": -0.1248608,
+            "median": 0.08324056,
+            "p75": 0.2566584,
+            "p95": 0.6797979,
+            "p99": 1.116811
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.04624296309374825,
+            "p05": 0.05772787944585213,
+            "p25": 0.07951375877936495,
+            "median": 0.10288116110118392,
+            "p75": 0.12788280602800095,
+            "p95": 0.184410747808299,
+            "p99": 0.2264856572157215
+          }
+        }
+      }
+    },
+    {
+      "source": "/Volumes/MISC/Swarm_v1/RunData/20261010_023123/20261010_023123_Choice_Selwyn_VR4_.csv",
+      "rowsRead": 45000,
+      "durationSeconds": 932.724,
+      "estimatorSamples": 29729,
+      "rawYawRadians": {
+        "p01": -1.717871,
+        "p05": -1.139896,
+        "p25": -0.05619206,
+        "median": 0.03210974,
+        "p75": 0.09632923,
+        "p95": 0.256878,
+        "p99": 0.4093992
+      },
+      "leftRadians": {
+        "p01": -1.343648,
+        "p05": -1.279429,
+        "p25": -0.6292063,
+        "median": -0.5248496,
+        "p75": -0.2278345,
+        "p95": 0.3260586,
+        "p99": 0.4304153
+      },
+      "rightRadians": {
+        "p01": -0.9021391,
+        "p05": -0.7817276,
+        "p25": -0.6693435,
+        "median": -0.5087947,
+        "p75": 0.0531258,
+        "p95": 0.3421135,
+        "p99": 0.4223879
+      },
+      "variance2SecondsRadiansSquared": {
+        "p01": 0.0005463259666709352,
+        "p05": 0.03502892285551601,
+        "p25": 0.10909067187251502,
+        "median": 0.1689316535628195,
+        "p75": 0.24290940786277754,
+        "p95": 0.3690124167069128,
+        "p99": 0.46617868537075785
+      },
+      "gain": [
+        2.5
+      ],
+      "recordedOffsetRadians": {
+        "p01": 0.0,
+        "p05": 0.0,
+        "p25": 0.0,
+        "median": 0.0,
+        "p75": 0.0,
+        "p95": 0.0,
+        "p99": 0.0
+      },
+      "trackingImplementationCounts": {
+        "BogongAustralia/ef8a68b": 45000
+      },
+      "nonfiniteRawRows": 0,
+      "gapsOver1Second": 1,
+      "varianceGates": {
+        "0.001": {
+          "fractionAbove": 0.9810837239100381,
+          "longestContinuousSeconds": 518.051
+        },
+        "0.003": {
+          "fractionAbove": 0.9800384394915197,
+          "longestContinuousSeconds": 518.051
+        },
+        "0.01": {
+          "fractionAbove": 0.9749806116599791,
+          "longestContinuousSeconds": 305.80000000000007
+        },
+        "0.03": {
+          "fractionAbove": 0.955659709343494,
+          "longestContinuousSeconds": 151.84300000000007
+        },
+        "0.1": {
+          "fractionAbove": 0.7838958761843747,
+          "longestContinuousSeconds": 56.419
+        },
+        "0.3": {
+          "fractionAbove": 0.1242202515426375,
+          "longestContinuousSeconds": 7.010000000000005
+        }
+      },
+      "phases": {
+        "postStimulus": {
+          "rows": 9961,
+          "medianFrameIntervalMs": 20.999999999958163,
+          "p95FrameIntervalMs": 25.999999999953616,
+          "rawYawRadians": {
+            "p01": -1.661679,
+            "p05": -1.509158,
+            "p25": -0.1043567,
+            "median": 0.008027436,
+            "p75": 0.0883018,
+            "p95": 0.256878,
+            "p99": 0.4575639
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.027662020326258516,
+            "p05": 0.07176896742731775,
+            "p25": 0.12735816022610022,
+            "median": 0.17674597024017166,
+            "p75": 0.23579270021200957,
+            "p95": 0.32875747747029893,
+            "p99": 0.4165950677848525
+          }
+        },
+        "preStimulus": {
+          "rows": 14327,
+          "medianFrameIntervalMs": 16.999999999995907,
+          "p95FrameIntervalMs": 18.000000000029104,
+          "rawYawRadians": {
+            "p01": -1.677734,
+            "p05": -0.9231552,
+            "p25": -0.03210974,
+            "median": 0.04013718,
+            "p75": 0.1204115,
+            "p95": 0.2729328,
+            "p99": 0.441509
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.0003689146528933261,
+            "p05": 0.0005979992989270195,
+            "p25": 0.06745785036101147,
+            "median": 0.13148087529413174,
+            "p75": 0.19628834003424064,
+            "p95": 0.2943144614971087,
+            "p99": 0.38284531851389386
+          }
+        },
+        "stimulus": {
+          "rows": 20712,
+          "medianFrameIntervalMs": 21.999999999934516,
+          "p95FrameIntervalMs": 34.99999999996817,
+          "rawYawRadians": {
+            "p01": -1.749981,
+            "p05": -1.557323,
+            "p25": -0.04816462,
+            "median": 0.03210974,
+            "p75": 0.09632923,
+            "p95": 0.2408231,
+            "p99": 0.3772895
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.024136589329104056,
+            "p05": 0.051778000476026376,
+            "p25": 0.12158846353040415,
+            "median": 0.18734333984322607,
+            "p75": 0.2681017713528715,
+            "p95": 0.4071997134586355,
+            "p99": 0.4956263323779955
+          }
+        }
+      }
+    },
+    {
+      "source": "/Volumes/MISC/Swarm_v1/RunData/20261007_225146/20261007_225146_Choice_Selwyn_VR1_.csv",
+      "rowsRead": 45000,
+      "durationSeconds": 763.053,
+      "estimatorSamples": 22969,
+      "rawYawRadians": {
+        "p01": -1.258972,
+        "p05": -1.016279,
+        "p25": -0.2754231,
+        "median": 0.03792084,
+        "p75": 0.900708,
+        "p95": 1.645496399999999,
+        "p99": 1.880874
+      },
+      "leftRadians": {
+        "p01": -1.294272,
+        "p05": -1.233599,
+        "p25": -0.6496177,
+        "median": 0.1644455,
+        "p75": 0.51076,
+        "p95": 0.7155325,
+        "p99": 0.7989584
+      },
+      "rightRadians": {
+        "p01": -1.286688,
+        "p05": -1.248767,
+        "p25": -0.8619744,
+        "median": -0.3194059,
+        "p75": 0.2453141,
+        "p95": 0.7913742,
+        "p99": 0.829295
+      },
+      "variance2SecondsRadiansSquared": {
+        "p01": 0.17499113457937032,
+        "p05": 0.22872991009653734,
+        "p25": 0.4017170944884047,
+        "median": 0.5872339647010087,
+        "p75": 0.715224197955692,
+        "p95": 0.8470588482698721,
+        "p99": 0.9237222791253241
+      },
+      "gain": [
+        2.5
+      ],
+      "recordedOffsetRadians": {
+        "p01": 0.0,
+        "p05": 0.0,
+        "p25": 0.0,
+        "median": 0.0,
+        "p75": 0.0,
+        "p95": 0.0,
+        "p99": 0.0
+      },
+      "trackingImplementationCounts": {
+        "BogongAustralia/ef8a68b": 45000
+      },
+      "nonfiniteRawRows": 0,
+      "gapsOver1Second": 0,
+      "varianceGates": {
+        "0.001": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 761.052
+        },
+        "0.003": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 761.052
+        },
+        "0.01": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 761.052
+        },
+        "0.03": {
+          "fractionAbove": 1.0,
+          "longestContinuousSeconds": 761.052
+        },
+        "0.1": {
+          "fractionAbove": 0.9993015845300973,
+          "longestContinuousSeconds": 628.125
+        },
+        "0.3": {
+          "fractionAbove": 0.8611026234231088,
+          "longestContinuousSeconds": 230.74099999999999
+        }
+      },
+      "phases": {
+        "preStimulus": {
+          "rows": 14294,
+          "medianFrameIntervalMs": 16.999999999939064,
+          "p95FrameIntervalMs": 18.000000000029104,
+          "rawYawRadians": {
+            "p01": -1.30470452,
+            "p05": -1.130041,
+            "p25": -0.4019609,
+            "median": -0.1213467,
+            "p75": 0.6143176,
+            "p95": 1.676101,
+            "p99": 1.888458
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.18162063818144125,
+            "p05": 0.425455353764136,
+            "p25": 0.61242811270334,
+            "median": 0.6913147912392634,
+            "p75": 0.7742098663265772,
+            "p95": 0.8730994356167082,
+            "p99": 0.9258732566620601
+          }
+        },
+        "stimulus": {
+          "rows": 30706,
+          "medianFrameIntervalMs": 16.999999999995907,
+          "p95FrameIntervalMs": 19.99999999998181,
+          "rawYawRadians": {
+            "p01": -1.2163119999999998,
+            "p05": -0.857011,
+            "p25": -0.2199409,
+            "median": 0.1488774,
+            "p75": 0.9556051,
+            "p95": 1.630596,
+            "p99": 1.875855
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.17168392182348227,
+            "p05": 0.22045209328010687,
+            "p25": 0.33217792337929664,
+            "median": 0.5006485725752365,
+            "p75": 0.6615433892456057,
+            "p95": 0.8195185413058289,
+            "p99": 0.9188818060474784
+          }
+        }
+      }
+    },
+    {
+      "source": "/Volumes/MISC/Swarm_v1/RunData/20261007_225146/20261007_225146_Choice_Selwyn_VR4_.csv",
+      "rowsRead": 45000,
+      "durationSeconds": 763.052,
+      "estimatorSamples": 23080,
+      "rawYawRadians": {
+        "p01": -1.275439,
+        "p05": -0.651288,
+        "p25": -0.3534267,
+        "median": -0.009552074,
+        "p75": 0.2937149,
+        "p95": 0.8789083949999983,
+        "p99": 1.40434
+      },
+      "leftRadians": {
+        "p01": -1.262478,
+        "p05": -1.214989,
+        "p25": -1.187852,
+        "median": -0.7347834,
+        "p75": -0.1521069,
+        "p95": 0.5165382,
+        "p99": 0.5738506
+      },
+      "rightRadians": {
+        "p01": -1.411732,
+        "p05": -1.403429,
+        "p25": -1.018245,
+        "median": -0.6926015,
+        "p75": -0.1998673,
+        "p95": 0.4210175,
+        "p99": 0.5260903
+      },
+      "variance2SecondsRadiansSquared": {
+        "p01": 0.013487479069021216,
+        "p05": 0.06061462248180233,
+        "p25": 0.10801161865053621,
+        "median": 0.14801673038940677,
+        "p75": 0.20671338074106096,
+        "p95": 0.36172616425438076,
+        "p99": 0.4279619091645933
+      },
+      "gain": [
+        2.5
+      ],
+      "recordedOffsetRadians": {
+        "p01": 0.0,
+        "p05": 0.0,
+        "p25": 0.0,
+        "median": 0.0,
+        "p75": 0.0,
+        "p95": 0.0,
+        "p99": 0.0
+      },
+      "trackingImplementationCounts": {
+        "BogongAustralia/ef8a68b": 45000
+      },
+      "nonfiniteRawRows": 0,
+      "gapsOver1Second": 0,
+      "varianceGates": {
+        "0.001": {
+          "fractionAbove": 0.9988271068635969,
+          "longestContinuousSeconds": 467.533
+        },
+        "0.003": {
+          "fractionAbove": 0.9941355343179844,
+          "longestContinuousSeconds": 467.533
+        },
+        "0.01": {
+          "fractionAbove": 0.991789748045178,
+          "longestContinuousSeconds": 467.533
+        },
+        "0.03": {
+          "fractionAbove": 0.9853605560382276,
+          "longestContinuousSeconds": 423.882
+        },
+        "0.1": {
+          "fractionAbove": 0.7870547350130321,
+          "longestContinuousSeconds": 104.41299999999998
+        },
+        "0.3": {
+          "fractionAbove": 0.11129452649869678,
+          "longestContinuousSeconds": 9.956999999999994
+        }
+      },
+      "phases": {
+        "preStimulus": {
+          "rows": 14294,
+          "medianFrameIntervalMs": 16.999999999939064,
+          "p95FrameIntervalMs": 19.000000000005457,
+          "rawYawRadians": {
+            "p01": -0.649541,
+            "p05": -0.3820829,
+            "p25": -0.1623852,
+            "median": 0.133729,
+            "p75": 0.3629788,
+            "p95": 0.8405824,
+            "p99": 1.066966399999998
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.058279976012612665,
+            "p05": 0.07727951216199888,
+            "p25": 0.11701836716884595,
+            "median": 0.14270049584359856,
+            "p75": 0.16847274353537423,
+            "p95": 0.2138620187857876,
+            "p99": 0.2713304601447293
+          }
+        },
+        "stimulus": {
+          "rows": 30706,
+          "medianFrameIntervalMs": 16.999999999995907,
+          "p95FrameIntervalMs": 20.000000000010232,
+          "rawYawRadians": {
+            "p01": -1.282223,
+            "p05": -0.7734045,
+            "p25": -0.4477605,
+            "median": -0.1050728,
+            "p75": 0.2292498,
+            "p95": 0.9715184,
+            "p99": 1.431477
+          },
+          "variance2SecondsRadiansSquared": {
+            "p01": 0.007500401219720061,
+            "p05": 0.05395265302493162,
+            "p25": 0.10214247919977149,
+            "median": 0.15392548989992394,
+            "p75": 0.2416823770740057,
+            "p95": 0.3833502863854861,
+            "p99": 0.44021471509568166
+          }
+        }
+      }
+    }
+  ]
+}

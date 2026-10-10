@@ -55,6 +55,8 @@ public class MasterDataLogger : MonoBehaviour
     // Zips the data folder
     public void ZipDataFolder()
     {
+        // Finish gzip trailers before packaging the session, including when Play mode stops.
+        AsyncSwarmWriter.DrainAll();
         // Set the path to the zip file
         string zipPath = Application.dataPath + $"/RunData/{timestamp}.zip";
         // Create the zip file from the directory
