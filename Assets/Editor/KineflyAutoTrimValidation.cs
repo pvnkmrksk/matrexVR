@@ -72,9 +72,13 @@ public static class KineflyAutoTrimValidation
             Check(trim.Flying && trim.Passes > 1, "Flying and multiple adaptive passes");
             Check(Math.Abs(gain * (.4 - offset) * Mathf.Rad2Deg) <= 1.001, "Effective median converges with signed gain " + gain);
             Check(trim.State == "CENTERED", "Centered indicator");
+            var lastChange = trim.LastAdjustment;
+            Check(lastChange != null && lastChange.toRadians == offset && lastChange.deltaRadians == lastChange.toRadians - lastChange.fromRadians,
+                "Adjustment history matches the last offset actually returned");
             float held = offset; trim.Configure(false, config);
             for (int i = 0; i < 100; i++) Check(!trim.Tick(61 + i * .04, i, 2 + Wave(i), true, true, true, gain, held, out _), "Off keeps learned offset");
             Check(trim.Flying, "Flight indicator works when trim is off");
+            Check(ReferenceEquals(trim.LastAdjustment, lastChange), "Turning trim off retains the last adjustment for the dashboard");
         }
         foreach (string gate in new[] { "nonflight", "stale", "walking", "open", "zero", "duplicates" })
         {
@@ -161,7 +165,7 @@ public static class KineflyAutoTrimValidation
             if (main == null || main.VRClosedLoops.Count != 4 || SceneManager.GetActiveScene().name != "Swarm") return;
             var rigs = main.VRClosedLoops.OrderBy(kv => kv.Key).Select(kv => kv.Value).ToArray();
             int tick = (int)(Time.realtimeSinceStartupAsDouble * 25);
-            foreach (var rig in rigs) Feed(rig, tick, phase >= 4 ? .9 : .4, phase != 5);
+            foreach (var rig in rigs) Feed(rig, tick, phase >= 4 ? (rig == rigs[2] ? -.9 : .9) : (rig == rigs[1] ? -.4 : .4), phase != 5);
             if (phase == 1)
             {
                 if (rigs.Any(r => r.GetYawGain() != 10)) return;
@@ -171,14 +175,17 @@ public static class KineflyAutoTrimValidation
                 {
                     // Controlled time exercises production integration/persistence without wall-clock waits.
                     var trim = rig.AutoTrim; float offset = 0;
+                    double bias = rig == rigs[1] ? -.4 : .4;
                     for (int i = 0; i < 600; i++)
-                        if (trim.Tick(i * .04, i, .4 + Wave(i), true, true, true, 10, offset, out float next)) { offset = next; rig.SetYawDCOffset(offset); }
-                    Check(offset > .3 && trim.Passes > 1, "Each flight rig learns its own offset");
+                        if (trim.Tick(i * .04, i, bias + Wave(i), true, true, true, 10, offset, out float next)) { offset = next; rig.SetYawDCOffset(offset); }
+                    Check(Math.Abs(offset) > .3 && trim.Passes > 1, "Each flight rig learns its own offset");
                     offsets[rig.name] = offset;
                 }
                 offsets[rigs[3].name] = rigs[3].GetYawDCOffset();
                 var hud = Object.FindFirstObjectByType<RuntimeStatusOverlay>().BuildText();
                 Check(hud.Contains("FLIGHT DASHBOARD") && hud.Contains("YAW CLOSED") && hud.Contains("AUTO TRIM") && hud.Contains("FLYING"), "Compact dashboard status");
+                Check(hud.Contains("DC +") && hud.Contains("DC -") && hud.Contains("LAST AUTO: DC UP") && hud.Contains("LAST AUTO: DC DOWN"),
+                    "Dashboard shows signed DC offsets and each rig's actual adjustment direction");
                 phaseTime = EditorApplication.timeSinceStartup; phase = 2; return;
             }
             if (phase == 2)
@@ -194,6 +201,8 @@ public static class KineflyAutoTrimValidation
                 CaptureDashboard();
                 Get<UnityEngine.UI.Button>(Object.FindFirstObjectByType<RuntimeStatusOverlay>(), "autoTrimButton").onClick.Invoke();
                 Check(rigs.All(r => !r.AutoTrim.Enabled), "Dashboard toggle disables current row");
+                var pausedHud = Object.FindFirstObjectByType<RuntimeStatusOverlay>().BuildText();
+                Check(pausedHud.Contains("DC +") && pausedHud.Contains("DC -") && pausedHud.Contains("LAST AUTO:"), "Offsets and last automatic changes remain visible with trim off");
                 Set(main, "timer", -1f); Call(main, "ManageTimerAndTransitions");
                 Check(rigs.All(r => !r.AutoTrim.Enabled && r.GetYawGain() == -2.5f), "In-place row turns trim off and changes gain");
                 foreach (var rig in rigs) Check(rig.GetYawDCOffset() == offsets[rig.name], "In-place transition retains offsets");
@@ -211,9 +220,11 @@ public static class KineflyAutoTrimValidation
                 if (rigs.Take(3).Any(r => r.AutoTrim.Passes < 2)) return;
                 foreach (var rig in rigs.Take(3))
                 {
-                    Check(rig.GetYawDCOffset() > offsets[rig.name] + .1, "Production Update performs multiple live passes");
+                    Check(rig == rigs[2] ? rig.GetYawDCOffset() < offsets[rig.name] - .1 : rig.GetYawDCOffset() > offsets[rig.name] + .1,
+                        "Production Update performs multiple live passes in each direction");
                     offsets[rig.name] = rig.GetYawDCOffset();
                 }
+                CaptureDashboard();
                 rigs[0].SetClosedLoopOrientation(false); rigs[1].SetYawGain(0);
                 phaseTime = EditorApplication.timeSinceStartup; phase = 5; return;
             }

@@ -160,15 +160,26 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
                 if (rig.SupportsAutoTrim)
                 {
                     var trim = rig.AutoTrim;
-                    text.AppendLine($"  {Badge($"GAIN {rig.GetYawGain():G4}", rig.OrientationTrackingEnabled && rig.GetYawGain() != 0 ? "FFFFFF" : "88929C")} DC {rig.GetYawDCOffset():F4} rad  " +
+                    text.AppendLine($"  {Badge($"GAIN {rig.GetYawGain():G4}", rig.OrientationTrackingEnabled && rig.GetYawGain() != 0 ? "FFFFFF" : "88929C")} " +
+                        $"<size=18><b>DC {Signed(rig.GetYawDCOffset())} rad</b></size>  " +
                         Badge(trim.Flying ? "FLYING" : trim.FlightReady ? "NOT FLYING" : "FLIGHT ?", trim.Flying ? "70E1B0" : "FFD166") + $" var {trim.FlightVariance:F3}");
                     bool working = trim.Enabled && trim.Flying && rig.OrientationTrackingEnabled && rig.GetYawGain() != 0;
-                    string state = !trim.Enabled ? "AUTO TRIM OFF" : working && trim.State != "CENTERED" ? "AUTO TRIMMING / " + trim.State : "AUTO TRIM / " + trim.State;
+                    string state = !trim.Enabled ? "AUTO TRIM OFF / DC HELD" : "AUTO TRIM: " + (trim.State == "TRIMMING" ? "ADJUSTING" : trim.State);
                     text.Append("  " + Badge(state, !trim.Enabled ? "88929C" : trim.State == "CENTERED" ? "70E1B0" : working ? "FFD166" : "88929C"));
                     if (trim.State == "COLLECTING") text.Append($" {trim.WindowProgress:P0}");
-                    if (trim.EffectiveMedianDegPerSecond.HasValue) text.Append($" last median {trim.EffectiveMedianDegPerSecond.Value:F2} deg/s");
+                    if (trim.EffectiveMedianDegPerSecond.HasValue) text.Append($" last median {trim.EffectiveMedianDegPerSecond.Value:+0.00;-0.00;0.00} deg/s");
                     if (trim.Enabled) text.Append($"  pass {trim.Passes}");
                     text.AppendLine();
+                    var change = trim.LastAdjustment;
+                    if (change != null)
+                    {
+                        double age = Time.realtimeSinceStartupAsDouble - change.time;
+                        bool recentChange = working && age >= 0 && age <= 5 && rig.GetYawDCOffset() == change.toRadians;
+                        string direction = change.deltaRadians > 0 ? "DC UP" : "DC DOWN";
+                        text.AppendLine("  " + Badge($"LAST AUTO: {direction} {Signed(change.deltaRadians)} rad", recentChange ? "FFD166" : "9DA8B5") +
+                            $"{Signed(change.fromRadians)} -> {Signed(change.toRadians)} rad");
+                    }
+                    else text.AppendLine("  <color=#9DA8B5>DC HELD / no automatic adjustment yet</color>");
                 }
                 else text.AppendLine($"  {Badge($"P GAIN {rig.PositionGain:G4}", rig.PositionTrackingEnabled ? "FFFFFF" : "88929C")} " +
                     Badge($"YAW GAIN {rig.OrientationGain:G4}", rig.OrientationTrackingEnabled ? "FFFFFF" : "88929C"));
@@ -195,6 +206,8 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     }
 
     private static string Badge(string value, string color) => $"<color=#{color}><b>[{value}]</b></color> ";
+    private static string Signed(float value) => value.ToString(value != 0 && Math.Abs(value) < .0001f ?
+        "+0.000000;-0.000000;0.000000" : "+0.0000;-0.0000;0.0000", System.Globalization.CultureInfo.InvariantCulture);
     private static string EscapeRich(string value) => (value ?? "").Replace("<", "‹").Replace(">", "›");
 
     private static string Shorten(string value, int length) => value == null ? "" : value.Length <= length ? value : value.Substring(0, length) + "…";

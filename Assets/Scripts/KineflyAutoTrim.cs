@@ -31,6 +31,13 @@ public sealed class AutoTrimConfig
 /// <summary>Independent per-rig estimator. Only fresh, distinct input samples enter its windows.</summary>
 public sealed class KineflyAutoTrim
 {
+    public sealed class Adjustment
+    {
+        public readonly double time;
+        public readonly float fromRadians, toRadians, deltaRadians;
+        public Adjustment(double time, float from, float to)
+        { this.time = time; fromRadians = from; toRadians = to; deltaRadians = to - from; }
+    }
     private struct Sample { public double time, yaw; public Sample(double t, double y) { time = t; yaw = y; } }
     private readonly Queue<Sample> flight = new Queue<Sample>();
     private readonly Queue<Sample> trim = new Queue<Sample>();
@@ -49,6 +56,8 @@ public sealed class KineflyAutoTrim
     public double? EffectiveMedianDegPerSecond { get; private set; }
     public double WindowProgress { get; private set; }
     public int Passes { get; private set; }
+    // Keep the last applied automatic change visible when trimming is paused or switched off.
+    public Adjustment LastAdjustment { get; private set; }
     public string State { get; private set; } = "OFF";
 
     public void Configure(bool enabled, AutoTrimConfig config)
@@ -142,6 +151,7 @@ public sealed class KineflyAutoTrim
         double correction = Math.Max(-settings.maxStepRadians, Math.Min(settings.maxStepRadians, settings.aggressiveness * residual));
         newOffset = (float)(offset + correction);
         if (newOffset == offset) { State = "CENTERED"; return false; }
+        LastAdjustment = new Adjustment(now, offset, newOffset);
         previousOffset = newOffset;
         Passes++; settleUntil = now + settings.settleSeconds;
         // Each pass uses a complete new window after the animal has had time to adapt.

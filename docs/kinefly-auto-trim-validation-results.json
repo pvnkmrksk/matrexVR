@@ -1,29 +1,29 @@
 {
-  "checks": 15742,
+  "checks": 53670,
   "failure": null,
   "unity": "6000.3.16f1",
   "agentsPerRig": 64,
   "rigs": 4,
   "asyncCapture": {
-    "samples": 14044,
-    "medianMs": 0.0213,
-    "p95Ms": 0.0338
+    "samples": 51964,
+    "medianMs": 0.0356,
+    "p95Ms": 0.0641
   },
   "legacySynchronousLogging": {
     "samples": 240,
-    "medianMs": 0.3286,
-    "p95Ms": 0.3594
+    "medianMs": 0.3143,
+    "p95Ms": 0.3482
   },
-  "maxQueue": 41,
+  "maxQueue": 5,
   "testedSources": {
-    "Assets/Scripts/KineflyAutoTrim.cs": "6bd5198990827430aefa620ba3e2ab61aa0678e2d9edd16e842963f37b23ad40",
+    "Assets/Scripts/KineflyAutoTrim.cs": "7dbefaa1423f4f1d0e6592a51281303caadfa1a958d30a1fbead890f53683b93",
     "Assets/Scripts/ClosedLoop.cs": "5e5e5ec6a4f323fd623f5d6f70853b94022051fddaac3858ca890e8a5768c493",
     "Assets/Scripts/MainController.cs": "ca85961d154aed8d63835c132216f556c328862c6817c98af2fc598c8d49e884",
-    "Assets/Scripts/RuntimeStatusOverlay.cs": "c3a28f0f52034b3f36d277feb02c124973598e8ad4d64ef73d5f2556c802547e",
+    "Assets/Scripts/RuntimeStatusOverlay.cs": "707c7aeed1b5b8e2c04b74afff6ab4496e5c89ecfd931fb3cd64d36dc10f6109",
     "Assets/Scripts/Swarm/SwarmLogger.cs": "a302b5092aa712116333f076699851f9b1a46af7567faa6d0a5ee8d083406cc0",
     "Assets/Scripts/Swarm/AsyncSwarmWriter.cs": "af63d01e1941d01b3ef6382add5f15f000555fc6ab58388ec0a65c3d04276eb1",
     "Assets/Scripts/Loggers/MasterDataLogger.cs": "2f06f52d7ea193fc356297f02cf8cbb2fb0a5ffbd729b143f5befbaf5e3aeee2",
-    "Assets/Editor/KineflyAutoTrimValidation.cs": "e98071d39b0269274af24500cae25a36bfbbd87588af9c9f3255693dcafaaa7c"
+    "Assets/Editor/KineflyAutoTrimValidation.cs": "efa68d563d5a8645ec22b781d3b45df6df736b550779888779feafcefc1a1bcc"
   },
   "historicalGainCompatibility": {
     "checks": 73746,
@@ -32,5 +32,5 @@
     "comparison": "Exact Vector3 and Quaternion component equality on every simulated frame",
     "unity": "6000.3.16f1"
   },
-  "notes": "Unity 6000.3.16f1 in a disposable macOS project. Flight confirmation and hysteresis boundaries, live trim integration, four-rig batched swarm capture and persistence passed. Headless capture timings are diagnostic; animal adaptation and LED workstation FPS require a live run. Expected injected experiment failure and known Unity Editor Search indexing errors are excluded."
+  "notes": "Unity 6000.3.16f1 in a disposable macOS project. Graphical dashboard preview inspected at 1600x900: signed DC values, actual per-rig positive/negative step and before/after values, compact state labels and retained last change while off. Live trim, persistence, flight gates and four-rig batched swarm recording passed. Capture timings are diagnostic. Expected injected experiment failure and known Unity Editor Search indexing errors are excluded."
 }
