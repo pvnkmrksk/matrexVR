@@ -19,6 +19,8 @@ public sealed class SwarmTrajectoryPlayback : MonoBehaviour
     private long previousCycle = -1;
     private SwarmTrajectoryStream stream;
     public double PlaybackTime { get; private set; }
+    // Count since the last stream reset/seek; recorded-lifetime mode has no stream births.
+    public long TotalBirths => stream?.TotalBirths ?? 0;
     public int ActiveCount
     {
         get { if (stream != null) return stream.ActiveCount; int count = 0; if (visible != null) foreach (bool v in visible) if (v) count++; return count; }

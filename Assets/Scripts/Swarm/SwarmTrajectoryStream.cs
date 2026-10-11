@@ -52,6 +52,7 @@ public sealed class SwarmTrajectoryStream
     private readonly Queue<Flight> free = new Queue<Flight>();
     private double previous = double.NaN;
     public int ActiveCount => flying.Count;
+    public long TotalBirths { get; private set; }
 
     public SwarmTrajectoryStream(SwarmTrajectoryData source, SwarmPlaybackConfig settings,
         IReadOnlyList<GameObject> roots, Transform target, Vector3 centerOffset, Quaternion yaw,
@@ -79,6 +80,9 @@ public sealed class SwarmTrajectoryStream
                     while (terminalStart > first && track.samples[terminalStart].time > cutoff) terminalStart--;
                     double dt = segment.End - track.samples[terminalStart].time;
                     segment.terminalVelocity = (track.samples[segment.last].position - track.samples[terminalStart].position) / (float)dt;
+                    if (config.continuationSpeedMetresPerSecond.HasValue && segment.terminalVelocity.sqrMagnitude > 1e-12f)
+                        segment.terminalVelocity = segment.terminalVelocity.normalized *
+                            config.continuationSpeedMetresPerSecond.Value * config.dataUnitsPerMetre;
                 }
                 segments.Add(segment); first = i;
             }
@@ -116,7 +120,7 @@ public sealed class SwarmTrajectoryStream
     }
     private void Reset()
     {
-        flying.Clear(); free.Clear();
+        flying.Clear(); free.Clear(); TotalBirths = 0;
         foreach (var flight in pool) { flight.active = false; flight.root.SetActive(false); free.Enqueue(flight); }
     }
     private void Spawn(Segment segment, long cycle, double cycleStart, double rawTime)
@@ -137,6 +141,7 @@ public sealed class SwarmTrajectoryStream
         flight.root.name = prefix + "_ID_" + segment.track.id + (cycle == 0 && segment.ordinal == 0 ? "" : "_C" + cycle + "_S" + segment.ordinal);
         changed?.Invoke();
         flight.active = true; flying.Add(flight); flight.root.SetActive(true);
+        TotalBirths++;
         if (!Place(flight,rawTime)) Retire(flying.Count - 1);
     }
     private void UpdateFlights(double rawTime)

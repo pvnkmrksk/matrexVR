@@ -258,6 +258,8 @@ public class SwarmPlaybackConfig
     public bool continueAfterTrack = false;
     public float despawnDistanceMetres = 100f;
     public float terminalVelocityWindowSeconds = 0.1f;
+    // Null preserves measured terminal speed; an override affects extrapolated tails only.
+    public float? continuationSpeedMetresPerSecond;
     public void Validate()
     {
         if (float.IsNaN(dataUnitsPerMetre) || float.IsInfinity(dataUnitsPerMetre) || dataUnitsPerMetre <= 0 ||
@@ -268,6 +270,9 @@ public class SwarmPlaybackConfig
             float.IsNaN(despawnDistanceMetres) || float.IsInfinity(despawnDistanceMetres) || despawnDistanceMetres <= 0 ||
             float.IsNaN(terminalVelocityWindowSeconds) || float.IsInfinity(terminalVelocityWindowSeconds) || terminalVelocityWindowSeconds < 0)
             throw new ArgumentException("Invalid swarm playback timing/rotation.");
+        if (continuationSpeedMetresPerSecond.HasValue && (float.IsNaN(continuationSpeedMetresPerSecond.Value) ||
+            float.IsInfinity(continuationSpeedMetresPerSecond.Value) || continuationSpeedMetresPerSecond <= 0))
+            throw new ArgumentException("playback.continuationSpeedMetresPerSecond must be positive and finite, or null for measured speed.");
         if (continueAfterTrack && periodicBoundary)
             throw new ArgumentException("Continuing CSV tracks requires playback.periodicBoundary=false; moths must fly out rather than recycle through the mocap volume.");
     }

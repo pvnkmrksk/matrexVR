@@ -117,7 +117,8 @@
       "periodicBoundary": false,
       "continueAfterTrack": true,
       "despawnDistanceMetres": 100,
-      "terminalVelocityWindowSeconds": 0.1
+      "terminalVelocityWindowSeconds": 0.1,
+      "continuationSpeedMetresPerSecond": 6
     },
     "worldUnitsPerMetre": 1,
     "nearClipMetres": 0.001

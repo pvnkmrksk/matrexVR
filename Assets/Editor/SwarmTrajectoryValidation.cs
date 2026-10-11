@@ -89,6 +89,24 @@ public static class SwarmTrajectoryValidation
             settings.periodicBoundary=true; bool rejected=false;
             try { settings.Validate(); } catch(ArgumentException) { rejected=true; }
             Check(rejected,"Continuing tracks cannot silently recycle through a periodic volume.");
+
+            settings.periodicBoundary=false; settings.loop=false; settings.continuationSpeedMetresPerSecond=6;
+            settings.maxGapSeconds=2; animal.transform.position=Vector3.zero;
+            replay.Configure(data,settings,roots,animal.transform,null,Vector3.zero,Quaternion.identity,1,grow,()=>revisions++);
+            first=roots.Single(r=>r.activeSelf); start=first.transform.position; replay.Advance(.5);
+            Check(Vector3.Distance(first.transform.position-start,Vector3.right*.5f)<1e-5,"A tail-speed override preserves recorded positions and times.");
+            replay.Advance(1.5);
+            Check(Vector3.Distance(first.transform.position-start,Vector3.right*4)<1e-5,"Tail alone continues at 6m/s after the recorded endpoint.");
+            start=first.transform.position; replay.Advance(1.75);
+            Check(Vector3.Distance(first.transform.position-start,Vector3.right*1.5f)<1e-5,"Continuing velocity is exactly 6m/s in a metre scene.");
+            Check(replay.TotalBirths==1,"Birth counts describe arrivals, not the allocated root pool.");
+            settings.dataUnitsPerMetre=100;
+            replay.Configure(data,settings,roots,animal.transform,null,Vector3.zero,Quaternion.identity,100,grow,()=>revisions++);
+            first=roots.Single(r=>r.activeSelf); replay.Advance(1.5); start=first.transform.position; replay.Advance(1.75);
+            Check(Vector3.Distance(first.transform.position-start,Vector3.right*150)<.001,"6m/s becomes 600cm/s for centimetre CSV and scene units.");
+            settings.continuationSpeedMetresPerSecond=-1; rejected=false;
+            try { settings.Validate(); } catch(ArgumentException) { rejected=true; }
+            Check(rejected,"Invalid physical tail speeds are rejected.");
         }
         finally { Object.DestroyImmediate(host); foreach(var root in roots) Object.DestroyImmediate(root); Object.DestroyImmediate(animal); }
     }

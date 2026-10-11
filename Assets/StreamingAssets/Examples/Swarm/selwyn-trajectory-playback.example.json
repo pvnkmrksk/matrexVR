@@ -9,7 +9,7 @@
   "spawnAreaSize": 200,
   "mu": 0,
   "kappa": 100000,
-  "locustSpeed": 2,
+  "locustSpeed": 6,
   "dimension": "3D",
   "spawnCenter": {
     "x": 0,
@@ -167,7 +167,8 @@
     "periodicBoundary": false,
     "continueAfterTrack": true,
     "despawnDistanceMetres": 100,
-    "terminalVelocityWindowSeconds": 0.1
+    "terminalVelocityWindowSeconds": 0.1,
+    "continuationSpeedMetresPerSecond": 6
   },
   "worldUnitsPerMetre": 1,
   "nearClipMetres": 0.001
