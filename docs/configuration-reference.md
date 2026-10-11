@@ -54,7 +54,9 @@ The base VR prefab and its standard, Swarm, Kannadi and Cube variants now contai
 
 Viewport slot `i`: x=(startCol + i if horizontal)×width; y=screenHeight−(startRow+1 + i if vertical)×height. Ensure these rectangles fit the physical display. An unavailable display disables its cameras. Configuring VR10 does not accidentally match VR1. Configured letters do not create a camera absent from the prefab. Camera disabling does not delete the rig or stop its sensor logging.
 
-The top-right HUD shows measured FPS and either the requested target or VSync mode. No viewport component changes frame timing. For refresh-synchronized pacing use `vSyncCount:1`; for a numeric software cap use `vSyncCount:0`. Desktop software caps can still have uneven frame pacing; [Unity explains the target/VSync interaction](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/QualitySettings-vSyncCount.html).
+The top-right HUD refreshes at 2 Hz and shows measured FPS, frame mean/peak milliseconds, the software-cap budget, and CPU main/render, GPU and presentation/target-FPS wait times. A dash means unavailable, not zero work. It remains visible when Tab hides the flight dashboard. The same captured summary appears in telemetry as `frameTiming`; see [diagnostics](diagnostics-performance.md#workstation-frame-pacing).
+
+No viewport component changes frame timing. For a 60 Hz LED output, use top-level `"targetFrameRate":60, "vSyncCount":1`, or start from `Examples/System/kinefly-six-cameras-60hz.example.json` and retain your actual display mapping and tracker addresses. VSync follows the output's actual refresh rate: `/1` gives 120 FPS on a 120 Hz output; `/2` gives 60 FPS there. For a numeric software cap use `vSyncCount:0`. A 58–60 FPS readout under a 60 FPS software cap does not establish low compute headroom. Unity recommends hardware synchronization for smooth desktop pacing because [software targets can microstutter](https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Application-targetFrameRate.html).
 
 ### Manual controls (inside each rig)
 

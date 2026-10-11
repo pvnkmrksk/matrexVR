@@ -15,6 +15,7 @@ public sealed class StatusOverlayConfig
 /// <summary>Persistent operator HUD and bounded, thread-safe player error capture.</summary>
 public sealed class RuntimeStatusOverlay : MonoBehaviour
 {
+    private static RuntimeStatusOverlay instance;
     [Serializable]
     public sealed class ErrorEntry { public string timestampUtc, type, message, stackTrace; }
     private static readonly object errorLock = new object();
@@ -32,6 +33,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private int layoutLineCount = -1;
     private long layoutErrorRevision = -1;
     private bool visible = true;
+    private bool operatorVisibility;
     private ExperimentTelemetry telemetry;
     public bool Visible => visible;
 
@@ -44,6 +46,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Install()
     {
+        if (instance != null) return;
         var root = new GameObject("Experiment diagnostics");
         DontDestroyOnLoad(root);
         root.AddComponent<RuntimeStatusOverlay>();
@@ -52,6 +55,8 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
 
     private void Awake()
     {
+        if (instance != null && instance != this) { enabled = false; Destroy(this); return; }
+        instance = this;
         Application.logMessageReceivedThreaded += CaptureError;
         MainController.SystemConfigurationChanged += Configure;
     }
@@ -132,18 +137,23 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         var settings = MainController.Instance != null ? MainController.Instance.StatusOverlaySettings : new StatusOverlayConfig();
         canvas.targetDisplay = settings.targetDisplay >= 0 && settings.targetDisplay < Display.displays.Length ? settings.targetDisplay : 0;
         if (canvas.targetDisplay > 0) Display.displays[canvas.targetDisplay].Activate();
-        SetVisible(settings.visible);
+        if (!operatorVisibility) ApplyVisibility(settings.visible);
     }
 
-    public void SetVisible(bool value) { visible = value; if (panel != null) panel.SetActive(visible); }
+    public void SetVisible(bool value) { operatorVisibility = true; ApplyVisibility(value); }
+    private void ApplyVisibility(bool value) { visible = value; if (panel != null) panel.SetActive(visible); }
 
     private void Update()
     {
         long revision;
         lock (errorLock) revision = errorRevision;
-        if (revision != shownRevision) { shownRevision = revision; SetVisible(true); nextRefresh = 0; }
+        if (revision != shownRevision) { shownRevision = revision; ApplyVisibility(true); nextRefresh = 0; }
         var keyboard = UnityEngine.InputSystem.Keyboard.current;
-        if (!ExperimentInput.IsEditingText && keyboard != null && keyboard.tabKey.wasPressedThisFrame) SetVisible(!visible);
+        // Tab is a display-only operator control throughout a running experiment,
+        // even if the metadata UI retained focus. Idle metadata keeps Tab navigation.
+        if (keyboard != null && keyboard.tabKey.wasPressedThisFrame &&
+            ((MainController.Instance != null && MainController.Instance.SequenceRunning) || !ExperimentInput.IsEditingText))
+            SetVisible(!visible);
         if (!visible || label == null || Time.realtimeSinceStartupAsDouble < nextRefresh) return;
         nextRefresh = Time.realtimeSinceStartupAsDouble + .5;
         if (UnityEngine.EventSystems.EventSystem.current == null)
@@ -181,7 +191,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     public string BuildText()
     {
         var main = MainController.Instance;
-        var text = new StringBuilder("<size=19><b>FLIGHT DASHBOARD</b></size>   <color=#9DA8B5>[Tab]  [1-4] select  [ / ] DC</color>\n");
+        var text = new StringBuilder("<size=19><b>FLIGHT DASHBOARD</b></size>   <color=#9DA8B5>[Tab] hide  [1-4] select  [ / ] DC</color>\n");
         text.Append(SceneManager.GetActiveScene().name);
         if (main != null)
         {
@@ -274,7 +284,9 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     public static ErrorEntry[] RecentErrors() { lock (errorLock) return errors.ToArray(); }
     private void OnDestroy()
     {
+        if (instance != this) return;
         Application.logMessageReceivedThreaded -= CaptureError;
         MainController.SystemConfigurationChanged -= Configure;
+        instance = null;
     }
 }

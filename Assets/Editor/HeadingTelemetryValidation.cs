@@ -188,6 +188,12 @@ public static class HeadingTelemetryValidation
                     Check(!first["closedLoop"].Children<JProperty>().Any(p => p.Name.Contains("Radians")), "Schema 2 exposes no radian DC fields");
                     rigs[0].GetComponent<ClosedLoop>().SetYawDCOffset(0);
                     Check(snapshot["system"].Value<int>("trialNumber") == 1 && snapshot["system"].Value<string>("sceneName") == "Swarm", "trial and scene state");
+                    var timing = snapshot["frameTiming"];
+                    Check(timing != null && timing.Type == JTokenType.Object && timing.Value<double>("framesPerSecond") > 0,
+                        "Wire snapshot includes real frame timing summary");
+                    Check(Math.Abs(timing.Value<double>("framesPerSecond") * timing.Value<double>("frameMeanMs") - 1000) < 1e-7 &&
+                        timing.Value<double>("framePeakMs") >= timing.Value<double>("frameMeanMs"), "Frame interval mean, peak and FPS agree");
+                    Check(!string.IsNullOrEmpty(timing.Value<string>("graphicsApi")), "Graphics backend accompanies timing availability");
                     File.WriteAllText(Path.Combine(Application.dataPath, "../telemetry-example.json"), snapshot.ToString());
                     Check(File.ReadAllLines(Path.Combine(MasterDataLogger.Instance.directoryPath, "heading_reference.jsonl")).Length == 4, "onset context saved separately for every rig");
                     rigs[0].transform.position = new Vector3(17, 2, 23); rigs[0].transform.rotation = Quaternion.Euler(0, 45, 0);
@@ -215,9 +221,15 @@ public static class HeadingTelemetryValidation
                     Check(RuntimeStatusOverlay.RecentErrors().Any(e => e.message.Contains("player diagnostic")), "error enters outbound bounded history");
                     CheckTab(overlay);
                     RenderOverlay(overlay);
+                    var duplicate = new GameObject("Duplicate HUD validation").AddComponent<RuntimeStatusOverlay>();
+                    Check(!duplicate.enabled, "Duplicate dashboard cannot consume Tab or render another panel");
+                    Object.Destroy(duplicate.gameObject);
                     Later(5); break;
                 case 5:
                     if (Time.frameCount < nextFrame + 3) return;
+                    Check(Object.FindObjectsByType<RuntimeStatusOverlay>(FindObjectsSortMode.None).Length == 1, "Only one dashboard survives");
+                    Debugger.Log("[Validation expected] duplicate removal retains error capture", 1);
+                    Check(RuntimeStatusOverlay.RecentErrors().Any(e => e.message.Contains("duplicate removal")), "Duplicate removal preserves live error capture");
                     Check(failures.Count == 0, "Unexpected runtime errors: " + string.Join("\n", failures));
                     var output = Object.FindFirstObjectByType<ExperimentTelemetry>();
                     var queued = new NetMQMessage();
@@ -253,19 +265,58 @@ public static class HeadingTelemetryValidation
         settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
         settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
         var keyboard = InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>();
+        var focusRoot = new GameObject("Metadata focus validation", typeof(Canvas));
+        var focusField = new GameObject("Selected metadata", typeof(RectTransform), typeof(InputField));
+        focusField.transform.SetParent(focusRoot.transform, false);
+        var input = focusField.GetComponent<InputField>();
+        var events = UnityEngine.EventSystems.EventSystem.current;
+        var previousSelection = events.currentSelectedGameObject;
+        bool wasRunning = main.SequenceRunning;
         try
         {
+            events.SetSelectedGameObject(focusField);
+            Set(input, "m_AllowInput", true);
+            Check(ExperimentInput.IsEditingText, "Visible focused metadata still protects motion hotkeys");
+            focusRoot.GetComponent<Canvas>().enabled = false;
+            Check(!ExperimentInput.IsEditingText, "Hidden canvas cannot retain a blocking metadata focus");
+            focusRoot.GetComponent<Canvas>().enabled = true;
+            input.interactable = false;
+            Check(!ExperimentInput.IsEditingText, "Non-interactable metadata cannot block operator keys");
+            input.interactable = true;
+            events.SetSelectedGameObject(focusField);
+            Set(input, "m_AllowInput", true);
+            Check(main.SequenceRunning && ExperimentInput.IsEditingText, "Running experiment with lingering metadata selection fixture");
             InputSystem.QueueStateEvent(keyboard, new KeyboardState(UnityEngine.InputSystem.Key.Tab));
             UpdateTestInput();
             Call(overlay, "Update");
             Check(!overlay.Visible, "Tab hides visible overlay via Input System");
+            Check(!overlay.GetComponentInChildren<Canvas>().GetComponentInChildren<Text>(true).gameObject.activeInHierarchy,
+                "Tab deactivates actual dashboard graphics");
+            Call(overlay, "Configure");
+            Check(!overlay.Visible, "Configuration refresh retains operator hide choice");
             InputSystem.QueueStateEvent(keyboard, new KeyboardState()); UpdateTestInput();
             InputSystem.QueueStateEvent(keyboard, new KeyboardState(UnityEngine.InputSystem.Key.Tab)); UpdateTestInput();
             Call(overlay, "Update");
             Check(overlay.Visible, "Tab restores hidden overlay via Input System");
+            Set(main, "sequenceStarted", false);
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState()); UpdateTestInput();
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(UnityEngine.InputSystem.Key.Tab)); UpdateTestInput();
+            Call(overlay, "Update");
+            Check(overlay.Visible && ExperimentInput.IsEditingText, "Idle metadata retains Tab navigation and hotkey protection");
+            var tmpObject = new GameObject("TMP metadata", typeof(RectTransform), typeof(TMPro.TMP_InputField));
+            tmpObject.transform.SetParent(focusRoot.transform, false);
+            var tmp = tmpObject.GetComponent<TMPro.TMP_InputField>();
+            events.SetSelectedGameObject(tmpObject); Set(tmp, "m_AllowInput", true);
+            Check(ExperimentInput.IsEditingText, "Focused TMP metadata protects motion hotkeys");
+            focusRoot.GetComponent<Canvas>().enabled = false;
+            Check(!ExperimentInput.IsEditingText, "Hidden TMP canvas cannot block operator keys");
         }
         finally
         {
+            Set(main, "sequenceStarted", wasRunning);
+            events.SetSelectedGameObject(previousSelection);
+            Set(input, "m_AllowInput", false);
+            Object.DestroyImmediate(focusRoot);
             InputSystem.RemoveDevice(keyboard);
             settings.editorInputBehaviorInPlayMode = oldEditor;
             settings.backgroundBehavior = oldBackground;
@@ -274,21 +325,27 @@ public static class HeadingTelemetryValidation
     private static void RenderOverlay(RuntimeStatusOverlay overlay)
     {
         Canvas canvas = overlay.GetComponentInChildren<Canvas>();
+        Canvas fpsCanvas = Object.FindFirstObjectByType<fps>().GetComponentInChildren<Canvas>();
         var root = new GameObject("HUD validation camera");
         var camera = root.AddComponent<Camera>(); camera.enabled = false;
         camera.clearFlags = CameraClearFlags.SolidColor; camera.backgroundColor = new Color(.08f, .12f, .18f);
         camera.cullingMask = 1 << 5;
-        foreach (Transform child in canvas.GetComponentsInChildren<Transform>(true)) child.gameObject.layer = 5;
+        foreach (Canvas item in new[] { canvas, fpsCanvas })
+            foreach (Transform child in item.GetComponentsInChildren<Transform>(true)) child.gameObject.layer = 5;
         var target = new RenderTexture(1600, 900, 24); target.Create(); camera.targetTexture = target;
         var previous = RenderTexture.active;
-        canvas.renderMode = RenderMode.ScreenSpaceCamera; canvas.worldCamera = camera; canvas.planeDistance = 1;
+        foreach (Canvas item in new[] { canvas, fpsCanvas })
+        { item.renderMode = RenderMode.ScreenSpaceCamera; item.worldCamera = camera; item.planeDistance = 1; }
         Canvas.ForceUpdateCanvases(); camera.Render(); RenderTexture.active = target;
         var capture = new Texture2D(1600, 900, TextureFormat.RGB24, false);
         capture.ReadPixels(new Rect(0, 0, 1600, 900), 0, 0); capture.Apply();
         File.WriteAllBytes(Path.Combine(Application.dataPath, "../heading-status-overlay.png"), capture.EncodeToPNG());
         Check(overlay.GetComponentInChildren<Text>().preferredHeight < 676, "full status and latest error fit within panel");
+        var fpsText = fpsCanvas.GetComponentInChildren<Text>();
+        Check(fpsText.preferredHeight <= 72 && fpsText.preferredWidth <= 520, "Three-line FPS and timing readout fits without wrapping or clipping");
         RenderTexture.active = previous; camera.targetTexture = null;
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.worldCamera = null;
+        foreach (Canvas item in new[] { canvas, fpsCanvas })
+        { item.renderMode = RenderMode.ScreenSpaceOverlay; item.worldCamera = null; }
         Object.DestroyImmediate(capture); Object.DestroyImmediate(target); Object.DestroyImmediate(root);
     }
     private static void ChoiceChecks()

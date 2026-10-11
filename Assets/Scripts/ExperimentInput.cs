@@ -47,10 +47,15 @@ public static class ExperimentInput
         get
         {
             var selected = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
-            if (selected == null) return false;
+            if (selected == null || !selected.activeInHierarchy) return false;
+            // A selected metadata field can outlive the canvas that displayed it.
+            // Hidden/disabled UI must not suppress the experiment controls.
+            var canvas = selected.GetComponentInParent<Canvas>();
+            if (canvas != null && !canvas.isActiveAndEnabled) return false;
             var input = selected.GetComponent<InputField>();
             var tmp = selected.GetComponent<TMPro.TMP_InputField>();
-            return (input != null && input.isFocused) || (tmp != null && tmp.isFocused);
+            return (input != null && input.isActiveAndEnabled && input.IsInteractable() && input.isFocused) ||
+                (tmp != null && tmp.isActiveAndEnabled && tmp.IsInteractable() && tmp.isFocused);
         }
     }
 

@@ -217,7 +217,7 @@ public sealed class ExperimentTelemetry : MonoBehaviour
                 phase = MainController.RecordedExperimentPhase,
                 error = main != null ? main.SequenceError : null,
                 telemetry = State, droppedSnapshots = DroppedSnapshots },
-            rigs, errors = RuntimeStatusOverlay.RecentErrors()
+            frameTiming = fps.Latest, rigs, errors = RuntimeStatusOverlay.RecentErrors()
         };
     }
 
