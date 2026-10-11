@@ -254,13 +254,21 @@ public class SwarmPlaybackConfig
     public float yawOffsetDegrees;
     public bool centerOnAnimal = true;
     public bool periodicBoundary = true;
+    // Opt-in stream mode preserves historical recorded-lifetime/periodic playback by default.
+    public bool continueAfterTrack = false;
+    public float despawnDistanceMetres = 100f;
+    public float terminalVelocityWindowSeconds = 0.1f;
     public void Validate()
     {
         if (float.IsNaN(dataUnitsPerMetre) || float.IsInfinity(dataUnitsPerMetre) || dataUnitsPerMetre <= 0 ||
             float.IsNaN(speed) || float.IsInfinity(speed) || speed <= 0 ||
             float.IsNaN(startTimeSeconds) || float.IsInfinity(startTimeSeconds) || startTimeSeconds < 0 ||
             float.IsNaN(maxGapSeconds) || float.IsInfinity(maxGapSeconds) || maxGapSeconds <= 0 ||
-            float.IsNaN(yawOffsetDegrees) || float.IsInfinity(yawOffsetDegrees))
+            float.IsNaN(yawOffsetDegrees) || float.IsInfinity(yawOffsetDegrees) ||
+            float.IsNaN(despawnDistanceMetres) || float.IsInfinity(despawnDistanceMetres) || despawnDistanceMetres <= 0 ||
+            float.IsNaN(terminalVelocityWindowSeconds) || float.IsInfinity(terminalVelocityWindowSeconds) || terminalVelocityWindowSeconds < 0)
             throw new ArgumentException("Invalid swarm playback timing/rotation.");
+        if (continueAfterTrack && periodicBoundary)
+            throw new ArgumentException("Continuing CSV tracks requires playback.periodicBoundary=false; moths must fly out rather than recycle through the mocap volume.");
     }
 }

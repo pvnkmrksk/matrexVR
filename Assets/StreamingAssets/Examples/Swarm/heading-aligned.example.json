@@ -159,7 +159,10 @@
     "maxGapSeconds": 0.1,
     "yawOffsetDegrees": 0,
     "centerOnAnimal": true,
-    "periodicBoundary": true
+    "periodicBoundary": true,
+    "continueAfterTrack": false,
+    "despawnDistanceMetres": 100,
+    "terminalVelocityWindowSeconds": 0.1
   },
   "worldUnitsPerMetre": null,
   "nearClipMetres": null

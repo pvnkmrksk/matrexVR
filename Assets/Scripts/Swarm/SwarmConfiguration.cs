@@ -13,6 +13,9 @@ public static class SwarmConfiguration
     public static void Apply(LocustSpawner spawner, SwarmConfig config, ClosedLoop rig, float sceneUnitsPerMetre = 0f)
     {
         config.ValidateSwarm();
+        // Births at t=0 must use the settled flight height, before the first LateUpdate.
+        if (rig != null && !string.IsNullOrWhiteSpace(config.trajectoryFile))
+            rig.GetComponent<MigrationMotion>()?.Advance(0);
         spawner.worldUnitsPerMetre = config.worldUnitsPerMetre ?? (sceneUnitsPerMetre > 0 ? sceneUnitsPerMetre : SceneUnitsPerMetre(spawner.gameObject));
         spawner.trajectoryFile = config.trajectoryFile;
         spawner.playbackSettings = config.playback ?? new SwarmPlaybackConfig();

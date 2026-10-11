@@ -200,6 +200,17 @@ public class LocustSpawner : MonoBehaviour
         }
     }
 
+    private GameObject GrowPlaybackPool()
+    {
+        GameObject agent = UsesBogongVisual() ? CreateBogongAgent(Vector3.zero, spawned.Count) : Instantiate(locustPrefab);
+        agent.name = layerName + "_ID_pool"; agent.tag = "SimulatedLocust";
+        int layer = LayerMask.NameToLayer(layerName); if (layer < 0) layer = gameObject.layer;
+        SetLayerRecursively(agent.transform,layer);
+        foreach (LocustMover mover in agent.GetComponentsInChildren<LocustMover>(true)) mover.enabled = false;
+        agent.SetActive(false); spawned.Add(agent);
+        return agent;
+    }
+
     private void SpawnPlayback()
     {
         SwarmTrajectoryData data = SwarmTrajectoryData.Load(ExperimentConfigFiles.Resolve(trajectoryFile));
@@ -230,7 +241,8 @@ public class LocustSpawner : MonoBehaviour
             boundaryManager.referenceRotation = spawnRotation * Quaternion.Euler(0, playbackSettings?.yawOffsetDegrees ?? 0, 0);
         }
         playback = gameObject.AddComponent<SwarmTrajectoryPlayback>();
-        playback.Configure(data, playbackSettings, spawned, playbackTarget, boundaryManager, playbackOffset, spawnRotation, worldUnitsPerMetre);
+        playback.Configure(data, playbackSettings, spawned, playbackTarget, boundaryManager, playbackOffset, spawnRotation, worldUnitsPerMetre,
+            GrowPlaybackPool, () => SpawnRevision++);
         BuildBatch(layer);
     }
 

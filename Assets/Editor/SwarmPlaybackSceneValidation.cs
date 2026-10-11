@@ -100,7 +100,7 @@ public static class SwarmPlaybackSceneValidation
                 var data=SwarmTrajectoryData.Load(Path.Combine(Application.streamingAssetsPath,"SwarmData/selwyn-oct7-unity.csv"));
                 var track=data.Tracks.Single(t=>agent.name.EndsWith("_ID_"+t.id));
                 track.TrySample(0,.1,out Vector3 p0,out _); Check(track.TrySample(.01,.1,out Vector3 p1,out _),"First track interpolates at 10ms.");
-                spawners[0].playbackTarget.position+=Vector3.right*100; replay.Advance(.01);
+                spawners[0].playbackTarget.position+=Vector3.right*10; replay.Advance(.01);
                 Check(Vector3.Distance(agent.transform.position-before,Quaternion.Euler(0,-90,0)*(p1-p0))<.0001 ||
                     Vector3.Distance(agent.transform.position,SwarmTrajectoryPlayback.Wrap(before+Quaternion.Euler(0,-90,0)*(p1-p0),spawners[0].boundaryManager))<.0001,
                     "Movement stays anchored except for deliberate moving-volume wrapping.");

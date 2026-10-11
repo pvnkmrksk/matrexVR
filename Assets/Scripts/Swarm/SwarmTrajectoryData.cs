@@ -44,7 +44,7 @@ public sealed class SwarmTrajectoryData
     public static SwarmTrajectoryData Parse(IEnumerable<string> lines)
     {
         var groups = new Dictionary<string, List<Sample>>();
-        bool first = true; int row = 0, count = 0; Vector3 sum = Vector3.zero; Bounds bounds = default;
+        bool first = true; int row = 0, count = 0; double sumX = 0, sumY = 0, sumZ = 0; Bounds bounds = default;
         double duration = 0;
         foreach (string line in lines)
         {
@@ -64,7 +64,7 @@ public sealed class SwarmTrajectoryData
             if (!groups.TryGetValue(f[0], out var list)) groups[f[0]] = list = new List<Sample>();
             list.Add(new Sample { time = time, position = p });
             if (count++ == 0) bounds = new Bounds(p, Vector3.zero); else bounds.Encapsulate(p);
-            sum += p; duration = Math.Max(duration, time);
+            sumX += p.x; sumY += p.y; sumZ += p.z; duration = Math.Max(duration, time);
         }
         if (count == 0 || duration <= 0) throw new FormatException("Trajectory needs samples and a positive duration.");
         var tracks = new List<Track>();
@@ -75,7 +75,8 @@ public sealed class SwarmTrajectoryData
                 if (pair.Value[i].time == pair.Value[i - 1].time) throw new FormatException("Duplicate ID/time: " + pair.Key);
             tracks.Add(new Track { id = pair.Key, samples = pair.Value.ToArray() });
         }
-        return new SwarmTrajectoryData { Tracks = tracks.ToArray(), Bounds = bounds, Centroid = sum / count, Duration = duration };
+        return new SwarmTrajectoryData { Tracks = tracks.ToArray(), Bounds = bounds,
+            Centroid = new Vector3((float)(sumX / count), (float)(sumY / count), (float)(sumZ / count)), Duration = duration };
     }
     private static float ParseFloat(string text)
     {

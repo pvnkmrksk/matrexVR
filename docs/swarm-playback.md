@@ -1,6 +1,8 @@
 # Bogong moths and recorded swarm playback
 
-Use `Examples/Sequences/selwyn-trajectory-playback.example.json` to run `Choice_Selwyn` for 1200 seconds, looping the 599.46-second recording. It references an individual experiment file; settings belong to that file's `swarm` object. The active sequence selects playback for its second step, preserving your calibration step, duration, gain and auto-trim settings. A standalone Swarm recipe is under `Examples/Swarm`. `Templates/swarm-playback.template.json` has a blank data path and produces a generated swarm until one is supplied.
+Open `Assets/Scenes/ControlScene.unity` and press Play. The active `Assets/StreamingAssets/sequenceConfig.json` auto-starts **Swarm** immediately for 1200 seconds, with a uniform gray sky, the recorded swarm's aggregate direction set to **north (0°)**, and each animal starting at yaw 0°, height 5 m. This standalone experiment explicitly uses metres, flight autopilot 5 m/s and gain 1. Auto-trim is off for this direct playback recipe. The 599.46-second recording repeats its **birth schedule**, while previously spawned moths keep flying. Set `autoStart: false` to restore the manual Start button.
+
+The individual experiment is `Examples/Swarm/selwyn-trajectory-playback.example.json`; edit its `playback` and `bogongVisual` settings. The terrain alternative `Examples/Sequences/selwyn-trajectory-playback.example.json` uses Choice_Selwyn and an embedded `swarm` object, with southeast presentation. `Templates/swarm-playback.template.json` has a blank data path and produces a generated swarm until one is supplied. Hardware settings remain in your existing `system_config.json`; these edits preserve camera order and tracker endpoints.
 
 ## Coordinates and units
 
@@ -15,7 +17,7 @@ time = TimeExact - earliest TimeExact (seconds)
 
 Naive timestamps are Australia/Sydney local time (UTC+11 on October 7, 2026). The shared relative clock preserves gaps between sightings. The converted file retains all 14,429 rows and 430 IDs, local 19:44:35.283–19:54:34.743. The raw source is untouched. Finite outliers, including heights below the stated ground origin, are reported in bounds and retained.
 
-With the stated axes, aggregate heading is **225.64° (southwest)**. The canonical file preserves those axes. Examples explicitly use `playback.yawOffsetDegrees: -90` to present it at **135.64° (southeast)**. Set 0 to retain the measured cardinal direction. Flight direction cannot independently establish geographical calibration. Positive yaw is clockwise from above: N=0°, E=90°, S=180°, W=270°.
+With the stated axes, aggregate heading is **225.64° (southwest)**. The canonical file preserves those axes. The active standalone Swarm recipe uses `playback.yawOffsetDegrees: -225.64127709737375` to present its aggregate displacement at **0° (north)**. The terrain/flight examples use `-90` for **135.64° (southeast)**. Generated motion uses `mu`; recorded motion uses this explicit yaw offset, preserving each measured trajectory and its spread. Set 0 to retain the measured cardinal direction. Flight direction cannot independently establish geographical calibration. Positive yaw is clockwise from above: N=0°, E=90°, S=180°, W=270°.
 
 Terrain/migration uses metres (`worldUnitsPerMetre: 1`); older walking scenes use centimetres (100). Omitted scale defaults to 1 in a scene with active Terrain, otherwise 100. Prefer explicit values. `playback.dataUnitsPerMetre` describes CSV units, default 1. Positions are multiplied by `worldUnitsPerMetre / dataUnitsPerMetre`. Boundary sizes, offsets, generated swarm speed and autopilot speed remain in existing scene units. For terrain, speed 5 means 5 m/s. Moth dimensions and near clip are physical metres, so the body stays one inch long in either scale. The camera's original near plane is restored when the swarm is cleared.
 
@@ -48,10 +50,29 @@ Options: `--source-units mm|cm|m` (mm), `--output-units m|cm` (m), `--height-ori
 | `playback.yawOffsetDegrees` | 0 | Clockwise presentation yaw independent of steering. |
 | `playback.centerOnAnimal` | true | Align the full dataset's sample centroid with the animal at each track appearance. |
 | `playback.periodicBoundary` | true | Recycle positions through the moving 3D boundary with overshoot preserved. |
+| `playback.continueAfterTrack` | false; true in Selwyn examples | Continue each uninterrupted recorded segment at its terminal velocity. Requires `periodicBoundary: false`. |
+| `playback.despawnDistanceMetres` | 100 | In continuation mode, retire a moth when its 3D distance from the current animal exceeds this many physical metres. Scaled correctly in centimetre scenes. |
+| `playback.terminalVelocityWindowSeconds` | 0.1 | Estimate tail velocity from displacement over approximately the final 0.1 seconds of that segment; short segments use their available samples. Zero uses the last sample pair. Does not smooth or alter recorded positions. |
 | `spawnCenter` | zero in examples | World-unit presentation offset. |
 | `spawnVolumeSize` | dataset bounds in playback | Explicit positive X/Y/Z periodic volume if supplied; does not rescale or retime tracks. |
 
-IDs are pooled at startup and visible only during their recorded lifetimes. Position is interpolated, heading follows trajectory velocity/elevation, and constant-speed movers are disabled. Data is parsed once and shared across rigs. Tracks receive world anchors at appearance, loop, or gap reappearance. Existing agents do not translate with the animal or rotate with steering; only the boundary follows it and recycles crossings. New appearances use the current animal position. Empty recording intervals remain empty; count/density do not invent observations. Each rig retains its stimulus layer.
+With `continueAfterTrack: false`, IDs are pooled at startup and visible only during their recorded lifetimes, retaining the earlier playback behavior. Position is interpolated, heading follows trajectory velocity/elevation, and constant-speed movers are disabled. Data is parsed once and shared across rigs. Tracks receive world anchors at appearance, loop, or gap reappearance. Existing agents do not translate with the animal or rotate with steering; only an enabled periodic boundary recycles crossings. Each rig retains its stimulus layer.
+
+### Spawn-centred continuation (active Selwyn recipe)
+
+The animal is at the **full recording's sample centroid** of the new spawn volume, not necessarily at the centroid of the moths currently visible. The measured centroid is (-0.2697495303, 5.7251529268, 0.1078053752) metres before presentation yaw. At each birth:
+
+```
+anchor = animalPositionAtSpawn + spawnCenter - yaw * (recordingCentroid * unitsScale)
+worldPosition(t) = anchor + yaw * (recordedPosition(t) * unitsScale)
+after the final sample: recordedPosition(t) = lastPosition + finalVelocity * (t - lastTime)
+```
+
+This is a translation of the recorded volume, with an explicit SE yaw; it does not rescale, randomize or retime measured observations. The anchor is frozen at spawn. Turning or moving the animal later changes its view of that moth but cannot drag or steer the moth. New births centre a new copy of the same sampled volume on the animal's current position. The old births then fly outside the small mocap volume without any teleportation or periodic wrapping. Following the same direction and speed can keep a moth alongside the animal beyond the original track's endpoint. It is retired only when it exceeds the 100m distance cutoff or the experiment stops. Matched velocities can retain moths across multiple recording loops; the pool grows only when all existing slots are busy, preserves wing phases and continues to use one batch renderer per rig.
+
+Birth times, entry positions, recorded trajectories and inter-arrival intervals are measured; **positions after each recorded segment ends are extrapolated**, so infinite continuation does not establish unmeasured motion or density beyond the capture volume. Empty CSV intervals create no new moths, but earlier tails can remain visible. The median recorded track length is 0.15 seconds (range 0.02–1.83 seconds). Seven gaps exceed 0.1 seconds; they split into separate recorded segments, each with its own birth and continuation, rather than drawing a false connecting trajectory. A segment with only one sample has no measured velocity and remains stationary until the animal leaves the cutoff. Backward seeking clears tails and starts only tracks observed at the seek time, since the animal's past movement is unavailable. Forward frame steps emit every crossed birth, anchoring them at the current frame's animal position.
+
+The recording's row-weighted centroid centres its sampled cloud. It is not a survey of the geometric mocap boundary or an instantaneous population centre. With zero `spawnCenter`, `SwarmTrajectoryPlayback.SpawnVolumeCentroid` tracks the animal; the world centroid of existing moths is free to move away. With `centerOnAnimal: false`, canonical absolute data is retained, without the spawn-centred translation.
 
 ## Moth visual
 
@@ -76,9 +97,15 @@ Set `agentVisual: "Bogong"`, `bogongVisual.shape: "Moth"`. Dot is still the old 
 
 Near animals use actual low-poly bodies and rudimentary wings. Far animals use an area-weighted Gaussian proxy, fading toward the background rather than failing subpixel triangle rasterization. Extreme distances still reach finite 8-bit display precision. No Animator runs per insect. For 30 Hz flapping, 120 FPS is preferable; 60 FPS shows two phases, and 30 FPS can alias. Panel refresh limits available temporal detail.
 
-Existing pooled asynchronous gzip logging is retained. Swarm-scene logs identify agents by `_ID_<source ID>` names and record presented world positions; terrain Choice retains its rig logging. Loading a CSV adds no duplicate raw-data writes. Converted data and metadata retain provenance.
+Flight AGL is settled before the first CSV birth is anchored, preventing first-frame moths from being left behind at the terrain scene’s authored height.
+
+Existing pooled asynchronous gzip logging is retained. Swarm-scene logs identify agents by `_ID_<source ID>` names and record presented world positions; repeated births add `_C<recording-cycle>_S<segment>` so simultaneous instances are distinguishable. Pool reuse refreshes logger identity caches. Terrain Choice retains its rig logging. Loading a CSV adds no duplicate raw-data writes. Converted data and metadata retain provenance.
 
 ## Verification
+
+[Source verification](swarm-source-verification.json) independently compares every ID, position and relative TimeExact value against the supplied raw CSV: all 14,429 rows match. Reproduce that audit with `python3 tools/verify_swarm_source.py /path/to/Selwyn_Oct_7_2026_LongFormat.csv Assets/StreamingAssets/SwarmData/selwyn-oct7-unity.csv`.
+
+The local 18-second preview at `Builds/BogongSwarm-preview/swarm-playback-and-close-pass.mp4` is captured from Unity Play Mode at deterministic 120fps. It shows the asset at real time and 0.25x, six recorded-swarm camera faces, then ID 158's measured 17.7cm close pass and its extrapolated tail. Slow motion and the direction-following diagnostic camera are labelled. An 8×8 centre crop enlarges pixels without changing contrast; MP4 decoding was checked to retain the faint 248/255 and 254/255 pixels. Capture background/observer settings are diagnostic only; the video uses the earlier southeast presentation. The active main experiment now uses a gray standalone Swarm sky, north presentation and 5m/s flight autopilot.
 
 Converter tests: `python3 -m unittest discover -s tools -p test_convert_swarm_trajectories.py`. `SwarmTrajectoryValidation.Run` on a disposable Unity copy checks 64×64 renders, 1 cm visibility, subpixel fading, flap poses, interpolation, lifetimes, world anchors, loops and metre/centimetre scale. Existing `BogongDotValidation.Run` and `SelwynSwarmValidation.Run` retain reference raster/timing checks. Timing results describe the test machine, not guaranteed LED workstation FPS.
 

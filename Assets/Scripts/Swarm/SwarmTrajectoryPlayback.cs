@@ -17,10 +17,19 @@ public sealed class SwarmTrajectoryPlayback : MonoBehaviour
     private bool[] visible;
     private double start, previousTime = -1;
     private long previousCycle = -1;
+    private SwarmTrajectoryStream stream;
     public double PlaybackTime { get; private set; }
+    public int ActiveCount
+    {
+        get { if (stream != null) return stream.ActiveCount; int count = 0; if (visible != null) foreach (bool v in visible) if (v) count++; return count; }
+    }
+    public Vector3 SpawnVolumeCentroid => config != null && !config.centerOnAnimal
+        ? offset + rotation * (data.Centroid * positionScale)
+        : (target != null ? target.position : fixedOrigin) + offset;
 
     public void Configure(SwarmTrajectoryData source, SwarmPlaybackConfig settings, IReadOnlyList<GameObject> roots,
-        Transform animal, BoundaryManager bounds, Vector3 centerOffset, Quaternion yaw, float worldUnitsPerMetre = 100f)
+        Transform animal, BoundaryManager bounds, Vector3 centerOffset, Quaternion yaw, float worldUnitsPerMetre = 100f,
+        Func<GameObject> createAgent = null, Action populationChanged = null)
     {
         data = source; config = settings ?? new SwarmPlaybackConfig(); config.Validate(); agents = roots;
         target = animal; boundary = bounds; offset = centerOffset;
@@ -28,6 +37,8 @@ public sealed class SwarmTrajectoryPlayback : MonoBehaviour
         rotation = yaw * Quaternion.Euler(0, config.yawOffsetDegrees, 0);
         positionScale = worldUnitsPerMetre / config.dataUnitsPerMetre;
         anchors = new Vector3[agents.Count]; visible = new bool[agents.Count];
+        previousTime = -1; previousCycle = -1;
+        stream = config.continueAfterTrack ? new SwarmTrajectoryStream(data,config,agents,target,offset,rotation,worldUnitsPerMetre,fixedOrigin,createAgent,populationChanged) : null;
         start = Time.timeAsDouble;
         Advance(0);
     }
@@ -38,6 +49,7 @@ public sealed class SwarmTrajectoryPlayback : MonoBehaviour
         double raw = config.startTimeSeconds + Math.Max(0, elapsed) * config.speed;
         double time = config.loop ? raw % data.Duration : raw;
         long cycle = config.loop ? (long)Math.Floor(raw / data.Duration) : 0;
+        if (stream != null) { PlaybackTime = time; stream.Advance(raw); return; }
         bool looped = cycle != previousCycle || time < previousTime;
         previousCycle = cycle;
         if (looped) Array.Clear(visible, 0, visible.Length);

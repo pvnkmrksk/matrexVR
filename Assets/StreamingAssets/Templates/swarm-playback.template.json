@@ -7,7 +7,7 @@
   "numberOfLocusts": 256,
   "density": null,
   "spawnAreaSize": 10,
-  "mu": 135,
+  "mu": 0,
   "kappa": 10000,
   "locustSpeed": 5,
   "dimension": "3D",
@@ -98,7 +98,10 @@
     "maxGapSeconds": 0.1,
     "yawOffsetDegrees": 0,
     "centerOnAnimal": true,
-    "periodicBoundary": true
+    "periodicBoundary": false,
+    "continueAfterTrack": true,
+    "despawnDistanceMetres": 100,
+    "terminalVelocityWindowSeconds": 0.1
   },
   "worldUnitsPerMetre": 1,
   "nearClipMetres": 0.001

@@ -50,7 +50,72 @@
   "autopilotSpeed": 5,
   "closedLoopPosition": 1,
   "closedLoopOrientation": 1,
-  "vrConfigs": null,
+  "vrConfigs": [
+    {
+      "vrIndex": 1,
+      "initialPosition": {
+        "x": 0,
+        "y": 5,
+        "z": 0
+      },
+      "initialRotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "watchIndex": null,
+      "closedLoopPosition": null,
+      "closedLoopOrientation": null
+    },
+    {
+      "vrIndex": 2,
+      "initialPosition": {
+        "x": 0,
+        "y": 5,
+        "z": 0
+      },
+      "initialRotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "watchIndex": null,
+      "closedLoopPosition": null,
+      "closedLoopOrientation": null
+    },
+    {
+      "vrIndex": 3,
+      "initialPosition": {
+        "x": 0,
+        "y": 5,
+        "z": 0
+      },
+      "initialRotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "watchIndex": null,
+      "closedLoopPosition": null,
+      "closedLoopOrientation": null
+    },
+    {
+      "vrIndex": 4,
+      "initialPosition": {
+        "x": 0,
+        "y": 5,
+        "z": 0
+      },
+      "initialRotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "watchIndex": null,
+      "closedLoopPosition": null,
+      "closedLoopOrientation": null
+    }
+  ],
   "backgroundColor": {
     "r": 0.5,
     "g": 0.5,
@@ -78,8 +143,8 @@
   },
   "boundaryLengthX": 200,
   "boundaryLengthZ": 200,
-  "resetPositionOnStart": false,
-  "resetRotationOnStart": false,
+  "resetPositionOnStart": true,
+  "resetRotationOnStart": true,
   "uniformSkyColor": {
     "r": 0.5,
     "g": 0.5,
@@ -97,9 +162,12 @@
     "speed": 1,
     "startTimeSeconds": 0,
     "maxGapSeconds": 0.1,
-    "yawOffsetDegrees": -90,
+    "yawOffsetDegrees": -225.64127709737375,
     "centerOnAnimal": true,
-    "periodicBoundary": true
+    "periodicBoundary": false,
+    "continueAfterTrack": true,
+    "despawnDistanceMetres": 100,
+    "terminalVelocityWindowSeconds": 0.1
   },
   "worldUnitsPerMetre": 1,
   "nearClipMetres": 0.001

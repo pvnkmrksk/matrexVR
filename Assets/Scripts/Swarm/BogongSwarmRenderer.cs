@@ -48,7 +48,21 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
             material.SetFloat("_Subpixel", config.subpixelVisibility ? 1 : 0);
             worldRadius = Mathf.Max(config.bodyLengthMetres, config.wingSpanMetres) * worldUnitsPerMetre / 2f;
         }
-        int count = agents.Count;
+        Resize(agents.Count);
+        gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
+        meshRenderer = gameObject.AddComponent<MeshRenderer>();
+        meshRenderer.sharedMaterial = material;
+        meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
+        meshRenderer.receiveShadows = false;
+        meshRenderer.lightProbeUsage = LightProbeUsage.Off;
+        meshRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+        RefreshCenters();
+    }
+
+    private void Resize(int count)
+    {
+        Mesh previous = mesh;
+        Vector2[] previousPhases = phases;
         mesh = moth ? BogongMothMesh.Create(count) : new Mesh { name = "Bogong swarm centers", indexFormat = IndexFormat.UInt32 };
         mesh.MarkDynamic();
         stride = moth ? BogongMothMesh.VerticesPerAgent : 4;
@@ -62,21 +76,18 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
             int v = i * 4, t = i * 6;
             uv[v] = new Vector2(0, 0); uv[v + 1] = new Vector2(1, 0);
             uv[v + 2] = new Vector2(1, 1); uv[v + 3] = new Vector2(0, 1);
-            float phase = Random.value;
-            for (int j = 0; j < stride; j++) phases[i * stride + j] = new Vector2(phase, 1);
+            float phase = previousPhases != null && i * stride < previousPhases.Length ? previousPhases[i * stride].x : Random.value;
+            for (int j = 0; j < stride; j++) phases[i * stride + j] = new Vector2(phase, 0);
             triangles[t] = v; triangles[t + 1] = v + 1; triangles[t + 2] = v + 2;
             triangles[t + 3] = v; triangles[t + 4] = v + 2; triangles[t + 5] = v + 3;
         }
         if (!moth) { mesh.vertices = centers; mesh.uv = uv; mesh.triangles = triangles; }
         mesh.uv2 = phases;
-        gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
-        meshRenderer = gameObject.AddComponent<MeshRenderer>();
-        meshRenderer.sharedMaterial = material;
-        meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
-        meshRenderer.receiveShadows = false;
-        meshRenderer.lightProbeUsage = LightProbeUsage.Off;
-        meshRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
-        RefreshCenters();
+        if (previous != null)
+        {
+            GetComponent<MeshFilter>().sharedMesh = mesh;
+            if (Application.isPlaying) Destroy(previous); else DestroyImmediate(previous);
+        }
     }
 
     private void OnEnable() => Camera.onPreCull += PrepareForCamera;
@@ -86,6 +97,7 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
     public void RefreshCenters()
     {
         if (mesh == null || agents.Count == 0) return;
+        if (agents.Count * stride > centers.Length) Resize(Mathf.Max(agents.Count, centers.Length / stride * 2));
         bool any = false;
         for (int i = 0; i < agents.Count; i++)
         {

@@ -22,12 +22,75 @@ public static class SwarmTrajectoryValidation
         if (!File.Exists(Path.Combine(Application.dataPath, "../KANNADI_VALIDATION_COPY"))) throw new Exception("Disposable project only.");
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         string failure = null;
-        try { DataAndPlayback(); AuthoringAndUnits(); Rendering(); Performance(); }
+        try { DataAndPlayback(); ContinuingTracks(); AuthoringAndUnits(); Rendering(); Performance(); }
         catch (Exception error) { failure = error.ToString(); Debug.LogError(failure); }
         File.WriteAllText(Path.Combine(Application.dataPath, "../swarm-trajectory-validation.json"),
             JsonConvert.SerializeObject(new { checks, failure, captures, timings, unity = Application.unityVersion,
                 timingNote = "Isolated CPU timings: four rigs, six 64px cameras each, 256 agents per rig. Not hardware-display FPS." }, Formatting.Indented));
         EditorApplication.Exit(failure == null ? 0 : 1);
+    }
+    private static void ContinuingTracks()
+    {
+        var data = SwarmTrajectoryData.Parse(new[] { "ID,X,Y,Z,time", "A,0,5,0,0", "A,1,5,0,1", "B,0,5,0,2", "B,1,5,0,3" });
+        var animal = new GameObject("Stream animal"); animal.transform.position = new Vector3(10,5,20);
+        var host = new GameObject("Stream host");
+        var roots = new List<GameObject> { new GameObject("Stream_ID_A"), new GameObject("Stream_ID_B") };
+        var settings = new SwarmPlaybackConfig { continueAfterTrack = true, periodicBoundary = false,
+            loop = false, maxGapSeconds = 2, terminalVelocityWindowSeconds = .1f, despawnDistanceMetres = 100 };
+        var replay = host.AddComponent<SwarmTrajectoryPlayback>();
+        int revisions = 0;
+        Func<GameObject> grow = () => { var root = new GameObject("Stream_ID_pool"); roots.Add(root); return root; };
+        try
+        {
+            replay.Configure(data,settings,roots,animal.transform,null,Vector3.zero,Quaternion.identity,1,grow,()=>revisions++);
+            var a = roots.Single(r=>r.activeSelf); Vector3 anchor = a.transform.position - data.Tracks[0].samples[0].position;
+            Check(Vector3.Distance(anchor + data.Centroid,animal.transform.position) < 1e-6,"Sample centroid aligns with the animal exactly at birth.");
+            animal.transform.position += Vector3.right * 10; replay.Advance(.5);
+            Check(Vector3.Distance(a.transform.position,anchor + new Vector3(.5f,5,0)) < 1e-6,"Animal translation cannot drag a live moth.");
+            animal.transform.rotation = Quaternion.Euler(0,180,0); replay.Advance(1.5);
+            Check(a.activeSelf && Vector3.Distance(a.transform.position,anchor + new Vector3(1.5f,5,0)) < 1e-6,"Recorded endpoint continues at final velocity without steering with the animal.");
+            replay.Advance(2.1); var b = roots.Single(r=>r.activeSelf && r!=a);
+            Check(Vector3.Distance(b.transform.position - new Vector3(.1f,5,0) + data.Centroid,animal.transform.position) < .00001,"A later birth centres its volume on the animal's new position.");
+            replay.Advance(6);
+            Check(a.activeSelf && b.activeSelf && Vector3.Distance(a.transform.position,anchor + new Vector3(6,5,0)) < .00001,"Tail keeps flying after the entire nonlooping CSV ends.");
+            animal.transform.position = anchor + new Vector3(6,5,0); replay.Advance(7); animal.transform.position += Vector3.right;
+            Check(a.activeSelf && Vector3.Distance(a.transform.position,animal.transform.position) < 1e-5,"A co-moving animal can remain beside the continuing moth.");
+            animal.transform.position += Vector3.back * 200; replay.Advance(7.1);
+            Check(replay.ActiveCount==0 && roots.All(r=>!r.activeSelf),"Crossing 100m from the current animal retires all distant moths.");
+            animal.transform.position = Vector3.zero; replay.Advance(8);
+            Check(replay.ActiveCount==0,"Retired moths cannot reappear without another recorded birth.");
+
+            settings.loop=true; replay.Configure(data,settings,roots,animal.transform,null,Vector3.zero,Quaternion.identity,1,grow,()=>revisions++);
+            var first = roots.Single(r=>r.activeSelf); replay.Advance(3.01);
+            Check(first.activeSelf && replay.ActiveCount==3 && roots.Count==3,"Loop births are independent; previous tails survive and the pool can grow.");
+            Check(roots.Any(r=>r.name.EndsWith("_ID_A_C1_S0")),"Repeated source IDs have distinguishable log identities.");
+            var batch=host.AddComponent<BogongSwarmRenderer>(); batch.Configure(roots,new BogongVisualConfig {shape="Moth"},1);
+            int oldVertices=host.GetComponent<MeshFilter>().sharedMesh.vertexCount;
+            float phase=host.GetComponent<MeshFilter>().sharedMesh.uv2[0].x;
+            replay.Advance(6.01); batch.RefreshCenters();
+            Check(replay.ActiveCount==5 && roots.Count==5 && host.GetComponent<MeshFilter>().sharedMesh.vertexCount>oldVertices,"Overlapping loop populations grow the shared mesh without per-agent renderers.");
+            Check(host.GetComponent<MeshFilter>().sharedMesh.uv2[0].x==phase && host.GetComponents<MeshRenderer>().Length==1,"Pool growth preserves existing wing phases and one renderer.");
+            replay.Advance(.25);
+            Check(replay.ActiveCount==1,"Backward seeking clears tails and starts only tracks observed at that time.");
+
+            settings.loop=false; replay.Configure(data,settings,roots,animal.transform,null,Vector3.zero,Quaternion.Euler(0,90,0),100,grow,()=>revisions++);
+            first=roots.Single(r=>r.activeSelf); var start=first.transform.position;
+            replay.Advance(2);
+            Check(Vector3.Distance(first.transform.position-start,Quaternion.Euler(0,90,0)*new Vector3(200,0,0))<.001,"Continuation preserves CSV speed and yaw in centimetre scenes.");
+            animal.transform.position += Vector3.up*10001; replay.Advance(2.01);
+            Check(replay.ActiveCount==0,"100m cutoff becomes 10,000 world units in a centimetre scene.");
+            Check(revisions>0,"Pool births update logger identity caches.");
+
+            var gaps=SwarmTrajectoryData.Parse(new[] {"ID,X,Y,Z,time","G,0,0,0,0","G,1,0,0,.1","G,2,0,0,1","G,3,0,0,1.1"});
+            settings.maxGapSeconds=.2f; animal.transform.position=Vector3.zero;
+            replay.Configure(gaps,settings,roots,animal.transform,null,Vector3.zero,Quaternion.identity,1,grow,()=>revisions++);
+            replay.Advance(1.01);
+            Check(replay.ActiveCount==2 && roots.Any(r=>r.activeSelf && r.name.EndsWith("_ID_G_C0_S1")),"Missing-data gaps split independent recorded segments and never interpolate a false bridge.");
+            settings.periodicBoundary=true; bool rejected=false;
+            try { settings.Validate(); } catch(ArgumentException) { rejected=true; }
+            Check(rejected,"Continuing tracks cannot silently recycle through a periodic volume.");
+        }
+        finally { Object.DestroyImmediate(host); foreach(var root in roots) Object.DestroyImmediate(root); Object.DestroyImmediate(animal); }
     }
     private static void DataAndPlayback()
     {

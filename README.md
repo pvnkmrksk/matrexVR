@@ -6,7 +6,7 @@ Use **Unity 6000.3.16f1**, matching ProjectVersion.txt. Packages are pinned in `
 
 ## Start here
 
-1. Open `Assets/Scenes/ControlScene.unity`.
+1. Open `Assets/Scenes/ControlScene.unity`. The current sequence auto-starts the sanitized Selwyn CSV in Swarm: uniform gray sky, north 0°, 1200 seconds. See [playback setup](docs/swarm-playback.md).
 2. Keep your existing `Assets/StreamingAssets/system_config.json`, or copy the complete [system template](Assets/StreamingAssets/Templates/system_config.template.json). Set addresses/displays and retain explicit `"closedLoopMode": "Kinefly"` for flight. Walking alternatives live in [Examples/System](Assets/StreamingAssets/Examples/System).
 3. Use the complete [experiment](Assets/StreamingAssets/Templates/experiment.template.json) and [sequence](Assets/StreamingAssets/Templates/sequence.template.json) templates as a matched starting set. [Templates](Assets/StreamingAssets/Templates/README.md) covers every supported paradigm; [Examples](Assets/StreamingAssets/Examples/README.md) contains full variants. The active Choice_Selwyn sequence and all `Kannadi/` recipes are preserved. Old configs are in [Archive/Legacy](Assets/StreamingAssets/Archive/Legacy).
 4. Enter Play mode from Control, fill the experiment metadata, and start the sequence. Focus Game for hotkeys. R resets; P toggles tracked position; O toggles tracked orientation. Escape returns to Control. **Tab shows/hides the bottom-right status/error panel.**
@@ -25,7 +25,7 @@ Kinefly's existing single-frame JSON messages work without a publisher or config
 | [Experiment phases](docs/experiment-phases.md) | Continuous pre/stimulus/post conditions, opt-in frozen heading references, and the eight-minute Selwyn recipe. |
 | [Heading reference and telemetry](docs/heading-reference-telemetry.md) | Per-animal circular heading assessment, stimulus-relative angles, outbound ZMQ, and the restored Tab status/error panel. |
 | [Kinefly auto trim](docs/kinefly-auto-trim.md) | Sequence-row opt-in, flight variance gating, iterative median centering, dashboard controls and background swarm recording. |
-| [Recorded swarm playback and moths](docs/swarm-playback.md) | Standalone CSV conversion, metre-scale terrain playback, world anchors, periodic volumes, physical moth dimensions, GPU flapping and subpixel contrast. |
+| [Recorded swarm playback and moths](docs/swarm-playback.md) | CSV conversion, spawn-centred world anchors, straight-line continuation to 100m, metre-scale terrain playback, GPU flapping and subpixel contrast. |
 | [Data formats](docs/data-formats.md) | CSV/gzip/metadata columns, clocks, sensor-to-world conversion, coordinate conventions, replay and analysis limitations. |
 | [Kannadi integration](docs/kannadi-modernization.md) | Scene integration, camera allow-list, overview, trails, animation and validation history. |
 | [Experiment workflow](docs/experiment-workflow.md) | Controller lifecycle and adding experiments. |
