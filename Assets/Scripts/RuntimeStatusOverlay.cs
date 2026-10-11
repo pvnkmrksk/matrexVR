@@ -29,6 +29,8 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private Button flightCheckButton;
     private Text flightCheckButtonText;
     private double nextRefresh;
+    private int layoutLineCount = -1;
+    private long layoutErrorRevision = -1;
     private bool visible = true;
     private ExperimentTelemetry telemetry;
     public bool Visible => visible;
@@ -159,8 +161,21 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         flightCheckButtonText.text = flightCheck ? "FLIGHT CHECK ON  /  bypass" : "FLIGHT BYPASSED  /  restore check";
         flightCheckButton.targetGraphic.color = !available ? Color.gray : flightCheck ? new Color(.7f, .75f, .8f) : new Color(1, .8f, .4f);
         label.text = BuildText();
-        var panelRect = panel.GetComponent<RectTransform>();
-        panelRect.sizeDelta = new Vector2(720, Mathf.Clamp(label.preferredHeight + 62, 180, 820));
+        RefreshLayout();
+    }
+
+    private void RefreshLayout()
+    {
+        // Only remeasure the rich-text layout when rows or errors change. Numeric refreshes
+        // still update at 2 Hz, but no longer lay out the entire dashboard twice each time.
+        int lines = 0;
+        foreach (char c in label.text) if (c == '\n') lines++;
+        if (lines != layoutLineCount || layoutErrorRevision != shownRevision)
+        {
+            layoutLineCount = lines; layoutErrorRevision = shownRevision;
+            var panelRect = panel.GetComponent<RectTransform>();
+            panelRect.sizeDelta = new Vector2(720, Mathf.Clamp(label.preferredHeight + 62, 180, 820));
+        }
     }
 
     public string BuildText()

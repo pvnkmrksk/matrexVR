@@ -50,6 +50,10 @@ public sealed class KineflyAutoTrim
     private struct Sample { public double time, yaw; public Sample(double t, double y) { time = t; yaw = y; } }
     private readonly Queue<Sample> flight = new Queue<Sample>();
     private readonly Queue<Sample> trim = new Queue<Sample>();
+    // Retain workspace across evaluations; a long window must not allocate/sort every half second.
+    private Sample[] sampleWorkspace = Array.Empty<Sample>();
+    private double[] valueWorkspace = Array.Empty<double>();
+    private readonly List<double> blockWorkspace = new List<double>(300);
     private AutoTrimConfig settings = new AutoTrimConfig();
     private long lastSequence = -1;
     private double lastSampleTime = double.NegativeInfinity, nextEvaluation, settleUntil;
@@ -173,15 +177,22 @@ public sealed class KineflyAutoTrim
         if (now < nextEvaluation) return false;
         nextEvaluation = now + settings.updateIntervalSeconds;
         bool verifiedWindow = FullWindow(trim, now, MeasurementSeconds, trimStarted);
-        Sample[] samples = trim.ToArray();
-        Estimate estimate = Calculate(samples, 0);
+        int sampleCount = trim.Count;
+        if (sampleWorkspace.Length < sampleCount)
+        {
+            int capacity = Math.Max(sampleCount, Math.Max(1024, sampleWorkspace.Length * 2));
+            sampleWorkspace = new Sample[capacity]; valueWorkspace = new double[capacity];
+        }
+        trim.CopyTo(sampleWorkspace, 0);
+        Sample[] samples = sampleWorkspace;
+        Estimate estimate = Calculate(samples, sampleCount, 0);
         bool useMedian = string.Equals(settings.centerStatistic, "median", StringComparison.OrdinalIgnoreCase);
         // A long precision window must not conceal a new animal response. Reacquire only when
         // the latest initial-length window exceeds five combined standard errors, not ordinary sample noise.
         int recentStart = 0;
-        while (recentStart < samples.Length - 1 && now - samples[recentStart].time > settings.windowSeconds) recentStart++;
-        bool recentReady = samples.Length - recentStart >= Math.Max(5, (int)Math.Ceiling(settings.windowSeconds * 5));
-        Estimate recent = !recentReady || recentStart == 0 ? estimate : Calculate(samples, recentStart);
+        while (recentStart < sampleCount - 1 && now - samples[recentStart].time > settings.windowSeconds) recentStart++;
+        bool recentReady = sampleCount - recentStart >= Math.Max(5, (int)Math.Ceiling(settings.windowSeconds * 5));
+        Estimate recent = !recentReady || recentStart == 0 ? estimate : Calculate(samples, sampleCount, recentStart);
         double recentCenter = useMedian ? recent.median : recent.mean;
         double recentUncertainty = ErrorBand(Math.Sqrt(recent.standardError * recent.standardError + learnedStandardError * learnedStandardError), gain, useMedian);
         bool reacquiring = recentReady && settings.noiseAware && MeasurementSeconds > settings.windowSeconds &&
@@ -240,18 +251,18 @@ public sealed class KineflyAutoTrim
     private static double ErrorBand(double standardError, float gain, bool median) =>
         2 * standardError * Math.Abs(gain) * RadToDeg * (median ? 1.253314 : 1);
 
-    private static Estimate Calculate(Sample[] samples, int start)
+    private Estimate Calculate(Sample[] samples, int end, int start)
     {
-        int count = samples.Length - start;
-        double[] values = new double[count]; double mean = 0;
-        for (int i = start; i < samples.Length; i++) { values[i - start] = samples[i].yaw; mean += samples[i].yaw; }
+        int count = end - start;
+        double[] values = valueWorkspace; double mean = 0;
+        for (int i = start; i < end; i++) { values[i - start] = samples[i].yaw; mean += samples[i].yaw; }
         mean /= count;
         double variance = 0;
-        foreach (double value in values) variance += (value - mean) * (value - mean);
+        for (int i = 0; i < count; i++) variance += (values[i] - mean) * (values[i] - mean);
         double standardError = Math.Sqrt(variance / (count - 1) / count);
         // One-second block means expose correlated input; never assume every frame is independent.
-        var blocks = new List<double>(); double blockStart = samples[start].time, blockSum = 0; int blockCount = 0;
-        for (int i = start; i < samples.Length; i++)
+        var blocks = blockWorkspace; blocks.Clear(); double blockStart = samples[start].time, blockSum = 0; int blockCount = 0;
+        for (int i = start; i < end; i++)
         {
             var sample = samples[i];
             if (sample.time - blockStart >= 1)
@@ -264,9 +275,36 @@ public sealed class KineflyAutoTrim
             double blockVariance = 0; foreach (double block in blocks) blockVariance += (block - blockMean) * (block - blockMean);
             standardError = Math.Max(standardError, Math.Sqrt(blockVariance / (blocks.Count - 1) / blocks.Count));
         }
-        Array.Sort(values);
-        double median = count % 2 == 0 ? .5 * (values[count / 2 - 1] + values[count / 2]) : values[count / 2];
+        double median = SelectMedian(values, count);
         return new Estimate { mean = mean, median = median, standardError = standardError };
+    }
+
+    // Partition only around the median. Limit partition work before falling back to a partial sort
+    // so ordered, identical and adversarial input cannot produce an unbounded quadratic spike.
+    private static double SelectMedian(double[] values, int count)
+    {
+        int middle = count / 2, low = 0, high = count - 1;
+        int budget = 2 * (int)Math.Log(count, 2) + 1;
+        while (low < high)
+        {
+            if (--budget == 0) { Array.Sort(values, low, high - low + 1); break; }
+            double a = values[low], b = values[low + (high - low) / 2], c = values[high];
+            double pivot = Math.Max(Math.Min(a, b), Math.Min(Math.Max(a, b), c));
+            int left = low, right = high;
+            while (left <= right)
+            {
+                while (values[left] < pivot) left++;
+                while (values[right] > pivot) right--;
+                if (left <= right) { double swap = values[left]; values[left++] = values[right]; values[right--] = swap; }
+            }
+            if (middle <= right) high = right;
+            else if (middle >= left) low = left;
+            else break;
+        }
+        if (count % 2 != 0) return values[middle];
+        double lower = values[0];
+        for (int i = 1; i < middle; i++) lower = Math.Max(lower, values[i]);
+        return .5 * (lower + values[middle]);
     }
 
     private double RequiredWindow(double uncertainty, double tolerance)

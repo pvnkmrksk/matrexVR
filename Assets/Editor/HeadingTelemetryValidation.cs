@@ -27,6 +27,7 @@ public static class HeadingTelemetryValidation
     private static SubscriberSocket subscriber;
     private static PublisherSocket sensor;
     private static JObject received;
+    private static long resumeSequence;
     private static MainController main;
     private static ClosedLoop[] rigs;
     private static readonly List<string> failures = new List<string>();
@@ -218,6 +219,19 @@ public static class HeadingTelemetryValidation
                 case 5:
                     if (Time.frameCount < nextFrame + 3) return;
                     Check(failures.Count == 0, "Unexpected runtime errors: " + string.Join("\n", failures));
+                    var output = Object.FindFirstObjectByType<ExperimentTelemetry>();
+                    var queued = new NetMQMessage();
+                    resumeSequence = 0;
+                    while (subscriber.TryReceiveMultipartMessage(TimeSpan.Zero, ref queued))
+                        resumeSequence = Math.Max(resumeSequence, JObject.Parse(queued[1].ConvertToString()).Value<long>("sequence"));
+                    output.enabled = false;
+                    Check(output.State == "disabled", "Disabling telemetry closes its worker and socket");
+                    output.enabled = true; Later(7); break;
+                case 7:
+                    var resumed = new NetMQMessage();
+                    if (!subscriber.TryReceiveMultipartMessage(TimeSpan.Zero, ref resumed) ||
+                        JObject.Parse(resumed[1].ConvertToString()).Value<long>("sequence") <= resumeSequence) return;
+                    Check(Object.FindFirstObjectByType<ExperimentTelemetry>().State == "publishing", "Re-enabled worker rebinds and publishes fresh snapshots");
                     main.StopSequence(); SceneManager.LoadScene("ControlScene"); Later(6); break;
                 case 6:
                     Check(failures.Count == 0, "Clean scene shutdown: " + string.Join("\n", failures));

@@ -32,6 +32,8 @@ Use `bindAddress: "*"` to accept connections from other machines; subscribers co
 
 Each **outbound telemetry** message is two UTF-8 frames: topic, then one JSON object. This requirement does not apply to tracking input: the existing Kinefly single-frame JSON protocol is accepted unchanged, as are topic/JSON messages. This follows [NetMQ PUB/SUB framing](https://github.com/zeromq/netmq/blob/master/docs/pub-sub.md). It is live monitoring, not a lossless recording: the PUB queue is bounded to two messages per subscriber, slow subscribers may miss snapshots, and no subscriber can block the render loop. The socket is created, used and disposed on one thread. Tracking SUB sockets now also own their entire lifecycle on their receive thread.
 
+Unity captures the immutable snapshot on the frame thread; JSON serialization and PUB socket operations run on a dedicated worker. Its pending queue retains only the latest snapshot, replacing and counting an older pending snapshot if encoding falls behind. Capture timestamps and frame numbers describe the sampled frame, not the later send time. Disabling, re-enabling or reloading configuration closes and recreates the worker and its socket. See the [diagnostics performance measurements](diagnostics-performance.md).
+
 ```sh
 python3 -m pip install pyzmq
 python3 tools/listen_telemetry.py --pretty

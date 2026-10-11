@@ -69,6 +69,7 @@ public class DataLogger : MonoBehaviour
     protected List<string> additionalHeaders = new List<string>();
     protected Dictionary<string, object> additionalData = new Dictionary<string, object>();
     private readonly Dictionary<string, object> queuedOneShotData = new Dictionary<string, object>();
+    private readonly StringBuilder rowBuilder = new StringBuilder(2048);
     private int    stepIndex = -1;
     private string stepName  = "";
     private int    loopIndex = 0;
@@ -359,6 +360,7 @@ public class DataLogger : MonoBehaviour
 
         // Create base line
         line = $"\n{currentTime},{vr},{scene},{currentSequenceScene},{configFileName},{currentTrial},{currentStep},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z}";
+        rowBuilder.Clear(); rowBuilder.Append(line);
 
         // Add ZMQ data
         if (includeZmqData && zmq != null)
@@ -382,7 +384,8 @@ public class DataLogger : MonoBehaviour
                 sensPos = sample.position;
                 sensRot = sample.rotation.eulerAngles;
             }
-            line += $",{sensPos.x},{sensPos.y},{sensPos.z},{sensRot.x},{sensRot.y},{sensRot.z}";
+            rowBuilder.Append(',').Append(sensPos.x).Append(',').Append(sensPos.y).Append(',').Append(sensPos.z)
+                .Append(',').Append(sensRot.x).Append(',').Append(sensRot.y).Append(',').Append(sensRot.z);
         }
 
         // Allow subclasses to add additional data
@@ -405,15 +408,13 @@ public class DataLogger : MonoBehaviour
         // Add additional column data
         foreach (var header in additionalHeaders)
         {
+            rowBuilder.Append(',');
             if (additionalData.TryGetValue(header, out object value))
             {
-                line += $",{value}";
-            }
-            else
-            {
-                line += ",";
+                rowBuilder.Append(value);
             }
         }
+        line = rowBuilder.ToString();
     }
 
     /// <summary>

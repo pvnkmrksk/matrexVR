@@ -1,0 +1,543 @@
+{
+  "baselineCommit": "329217fa",
+  "platform": "Apple M2 Pro / Unity 6000.3.16f1 / macOS Editor",
+  "baselineCpuCallbacks": {
+    "failure": null,
+    "unity": "6000.3.16f1",
+    "gpu": "Apple M2 Pro",
+    "results": [
+      {
+        "name": "four CSV rows: capture and format",
+        "calls": 1000,
+        "medianMs": 0.1182,
+        "p95Ms": 0.136,
+        "p99Ms": 0.1745,
+        "maximumMs": 0.2396
+      },
+      {
+        "name": "telemetry: four-rig capture",
+        "calls": 500,
+        "medianMs": 0.0236,
+        "p95Ms": 0.0288,
+        "p99Ms": 0.0354,
+        "maximumMs": 0.1128
+      },
+      {
+        "name": "telemetry: JSON serialization",
+        "calls": 500,
+        "medianMs": 0.4365,
+        "p95Ms": 0.5428,
+        "p99Ms": 0.6245,
+        "maximumMs": 6.2618
+      },
+      {
+        "name": "dashboard: format",
+        "calls": 200,
+        "medianMs": 0.1936,
+        "p95Ms": 0.3501,
+        "p99Ms": 3.2243,
+        "maximumMs": 11.2162
+      },
+      {
+        "name": "dashboard: text layout and canvas rebuild",
+        "calls": 200,
+        "medianMs": 0.7872,
+        "p95Ms": 0.9234,
+        "p99Ms": 0.9805,
+        "maximumMs": 1.0083
+      },
+      {
+        "name": "four auto trim ticks: off",
+        "calls": 30000,
+        "medianMs": 0.0003,
+        "p95Ms": 0.0004,
+        "p99Ms": 0.0005,
+        "maximumMs": 0.0143
+      },
+      {
+        "name": "four auto trim ticks: on, full 120s windows",
+        "calls": 30000,
+        "medianMs": 0.0004,
+        "p95Ms": 0.0005,
+        "p99Ms": 2.361,
+        "maximumMs": 8.4243
+      }
+    ],
+    "note": "Unity Editor, warmed callbacks, four Kinefly rigs. CPU time and managed allocations only, not end-to-end GPU/display FPS. CSV measure excludes disk. Dashboard includes rich text layout and Canvas.ForceUpdateCanvases. Trim runs at 120 frames/s with distinct samples and 120s precision windows. Allocation bytes from the Mono GC API were unavailable and were removed; later allocation-event checks use Unity GC.Alloc, and frame-byte checks use GC Allocated In Frame."
+  },
+  "optimizedCpuCallbacks": {
+    "failure": null,
+    "unity": "6000.3.16f1",
+    "gpu": "Apple M2 Pro",
+    "results": [
+      {
+        "name": "four CSV rows: capture and format",
+        "calls": 1000,
+        "medianMs": 0.1447,
+        "p95Ms": 0.6712,
+        "p99Ms": 1.4482,
+        "maximumMs": 33.9554,
+        "allocationEventsPerCall": 248.0,
+        "allocationMarkerUnit": "TimeNanoseconds",
+        "allocationSamples": 4960,
+        "allocationSamplesOverflowed": false
+      },
+      {
+        "name": "telemetry: four-rig capture",
+        "calls": 500,
+        "medianMs": 0.0347,
+        "p95Ms": 0.0664,
+        "p99Ms": 0.1009,
+        "maximumMs": 0.226,
+        "allocationEventsPerCall": 85.0,
+        "allocationMarkerUnit": "TimeNanoseconds",
+        "allocationSamples": 1700,
+        "allocationSamplesOverflowed": false
+      },
+      {
+        "name": "telemetry: JSON serialization",
+        "calls": 500,
+        "medianMs": 0.3028,
+        "p95Ms": 1.5885,
+        "p99Ms": 3.8221,
+        "maximumMs": 58.2798,
+        "allocationEventsPerCall": 552.0,
+        "allocationMarkerUnit": "TimeNanoseconds",
+        "allocationSamples": 11040,
+        "allocationSamplesOverflowed": false
+      },
+      {
+        "name": "dashboard: format",
+        "calls": 200,
+        "medianMs": 0.0654,
+        "p95Ms": 0.1335,
+        "p99Ms": 0.1602,
+        "maximumMs": 0.2224,
+        "allocationEventsPerCall": 204.0,
+        "allocationMarkerUnit": "TimeNanoseconds",
+        "allocationSamples": 4080,
+        "allocationSamplesOverflowed": false
+      },
+      {
+        "name": "dashboard: repeat full layout (reference)",
+        "calls": 200,
+        "medianMs": 0.9621,
+        "p95Ms": 1.2494,
+        "p99Ms": 1.4813,
+        "maximumMs": 1.483,
+        "allocationEventsPerCall": 204.0,
+        "allocationMarkerUnit": "TimeNanoseconds",
+        "allocationSamples": 4080,
+        "allocationSamplesOverflowed": false
+      },
+      {
+        "name": "dashboard: cached panel layout and canvas rebuild",
+        "calls": 200,
+        "medianMs": 0.6722,
+        "p95Ms": 0.8347,
+        "p99Ms": 0.908,
+        "maximumMs": 0.9512,
+        "allocationEventsPerCall": 204.0,
+        "allocationMarkerUnit": "TimeNanoseconds",
+        "allocationSamples": 4080,
+        "allocationSamplesOverflowed": false
+      },
+      {
+        "name": "median selection truth checks",
+        "checks": 80
+      },
+      {
+        "name": "four auto trim ticks: off",
+        "calls": 30000,
+        "medianMs": 0.0003,
+        "p95Ms": 0.0004,
+        "p99Ms": 0.0005,
+        "maximumMs": 0.0204,
+        "allocationEventsPerCall": 0.0,
+        "allocationMarkerUnit": "TimeNanoseconds",
+        "allocationSamples": 0,
+        "allocationSamplesOverflowed": false
+      },
+      {
+        "name": "four auto trim ticks: on, full 120s windows",
+        "calls": 30000,
+        "medianMs": 0.0004,
+        "p95Ms": 0.0005,
+        "p99Ms": 0.3525,
+        "maximumMs": 0.5042,
+        "allocationEventsPerCall": 0.0,
+        "allocationMarkerUnit": "TimeNanoseconds",
+        "allocationSamples": 0,
+        "allocationSamplesOverflowed": false
+      }
+    ],
+    "note": "Unity Editor, warmed callbacks, four Kinefly rigs. CPU time and managed allocations only, not end-to-end GPU/display FPS. CSV measure excludes disk. Dashboard includes rich text layout and Canvas.ForceUpdateCanvases. Trim runs at 120 frames/s with distinct samples and 120s precision windows."
+  },
+  "baselineGameCallbacksAndAllocations": {
+    "failure": null,
+    "results": [
+      {
+        "name": "none",
+        "frames": 17597,
+        "frameMilliseconds": {
+          "median": 0.2046627050731331,
+          "p95": 0.31308108009397984,
+          "p99": 0.3412060614209622,
+          "maximum": 8.13541654497385,
+          "mean": 0.22732240823464034
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.109,
+          "p95": 0.144042,
+          "p99": 0.175291,
+          "maximum": 7.716374,
+          "mean": 0.11504021100187467
+        },
+        "gcBytesPerFrame": {
+          "median": 15232.0,
+          "p95": 15232.0,
+          "p99": 15232.0,
+          "maximum": 801760.0,
+          "mean": 15323.03733590953
+        }
+      },
+      {
+        "name": "CSV logging",
+        "frames": 8089,
+        "frameMilliseconds": {
+          "median": 0.4774589033331722,
+          "p95": 0.5314130103215575,
+          "p99": 0.6282100221142173,
+          "maximum": 12.264583259820938,
+          "mean": 0.49459577236147356
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.313167,
+          "p95": 0.37191599999999997,
+          "p99": 0.445583,
+          "maximum": 9.022,
+          "mean": 0.35563175373964623
+        },
+        "gcBytesPerFrame": {
+          "median": 137114.0,
+          "p95": 137732.0,
+          "p99": 137732.0,
+          "maximum": 138028.0,
+          "mean": 137099.95549511682
+        }
+      },
+      {
+        "name": "none repeat",
+        "frames": 17418,
+        "frameMilliseconds": {
+          "median": 0.20566894090734422,
+          "p95": 0.31446287175640464,
+          "p99": 0.3376629902049899,
+          "maximum": 7.803082466125488,
+          "mean": 0.22965331121142069
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.110708,
+          "p95": 0.145209,
+          "p99": 0.16674999999999998,
+          "maximum": 7.605957999999999,
+          "mean": 0.11632636416350893
+        },
+        "gcBytesPerFrame": {
+          "median": 15232.0,
+          "p95": 15232.0,
+          "p99": 15232.0,
+          "maximum": 15312.0,
+          "mean": 15232.177287863131
+        }
+      }
+    ],
+    "unity": "6000.3.16f1",
+    "gpu": "Apple M2 Pro",
+    "cameras": 24,
+    "note": "Pre-change PlayerLoop callback/GC isolation in batch Editor. No automatic Game view rendering; these frame wall times must not be used as display FPS or compared with later explicit camera-render wall times. The telemetry-only and all cases did not restart the old disabled publisher, so those cases are excluded from baseline comparisons."
+  },
+  "optimizedScene": {
+    "failure": null,
+    "results": [
+      {
+        "name": "none",
+        "frames": 1365,
+        "frameMilliseconds": {
+          "median": 2.9296271968632936,
+          "p95": 3.3073341473937035,
+          "p99": 3.5434949677437544,
+          "maximum": 4.29292069748044,
+          "mean": 2.9323963340944967
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.164793,
+          "p95": 0.29275,
+          "p99": 0.365875,
+          "maximum": 1.857874,
+          "mean": 0.18493298095238075
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.5381,
+          "p95": 2.8583,
+          "p99": 3.0267,
+          "maximum": 3.5176,
+          "mean": 2.5420992673992657
+        },
+        "gcBytesPerFrame": {
+          "median": 15226.0,
+          "p95": 15226.0,
+          "p99": 17402.0,
+          "maximum": 80890.0,
+          "mean": 15343.263003663003
+        }
+      },
+      {
+        "name": "dashboard",
+        "frames": 1333,
+        "frameMilliseconds": {
+          "median": 2.983000362291932,
+          "p95": 3.436961444094777,
+          "p99": 3.9174179546535015,
+          "maximum": 5.681370384991169,
+          "mean": 3.0036346013297934
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.16549999999999998,
+          "p95": 0.31133299999999997,
+          "p99": 0.384083,
+          "maximum": 1.3862919999999999,
+          "mean": 0.19029248537134305
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.585,
+          "p95": 2.9828,
+          "p99": 3.2992,
+          "maximum": 4.2898,
+          "mean": 2.605842910727679
+        },
+        "gcBytesPerFrame": {
+          "median": 15226.0,
+          "p95": 15226.0,
+          "p99": 15322.0,
+          "maximum": 45476.0,
+          "mean": 15409.837959489872
+        }
+      },
+      {
+        "name": "telemetry",
+        "frames": 1354,
+        "frameMilliseconds": {
+          "median": 2.949206391349435,
+          "p95": 3.293204354122281,
+          "p99": 3.4185019321739674,
+          "maximum": 4.244706593453884,
+          "mean": 2.954850500199168
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.160001,
+          "p95": 0.322416,
+          "p99": 0.402333,
+          "maximum": 1.3557919999999999,
+          "mean": 0.18374919719350077
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.5688,
+          "p95": 2.853,
+          "p99": 2.9577,
+          "maximum": 3.0963,
+          "mean": 2.570296528803551
+        },
+        "gcBytesPerFrame": {
+          "median": 15226.0,
+          "p95": 83287.0,
+          "p99": 96166.0,
+          "maximum": 111909.0,
+          "mean": 20802.96528803545
+        }
+      },
+      {
+        "name": "CSV logging",
+        "frames": 1278,
+        "frameMilliseconds": {
+          "median": 3.1462018378078938,
+          "p95": 3.4627977292984724,
+          "p99": 3.6119117867201567,
+          "maximum": 3.9107496850192547,
+          "mean": 3.1332429274348237
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.316334,
+          "p95": 0.495959,
+          "p99": 0.575124,
+          "maximum": 0.965375,
+          "mean": 0.339982714397496
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.5964,
+          "p95": 2.851,
+          "p99": 2.9691,
+          "maximum": 3.1185,
+          "mean": 2.5898808294209723
+        },
+        "gcBytesPerFrame": {
+          "median": 45702.0,
+          "p95": 45742.0,
+          "p99": 45804.0,
+          "maximum": 45838.0,
+          "mean": 45710.78247261346
+        }
+      },
+      {
+        "name": "auto trim",
+        "frames": 1344,
+        "frameMilliseconds": {
+          "median": 2.972831716760993,
+          "p95": 3.321874886751175,
+          "p99": 3.6760063376277685,
+          "maximum": 5.086125340312719,
+          "mean": 2.9767073091144476
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.16399999999999998,
+          "p95": 0.297376,
+          "p99": 0.585334,
+          "maximum": 2.1884159999999997,
+          "mean": 0.18819677529761905
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.5864,
+          "p95": 2.8556,
+          "p99": 2.9703,
+          "maximum": 3.621,
+          "mean": 2.5856357886904724
+        },
+        "gcBytesPerFrame": {
+          "median": 15226.0,
+          "p95": 15226.0,
+          "p99": 15304.0,
+          "maximum": 15306.0,
+          "mean": 15228.333333333334
+        }
+      },
+      {
+        "name": "all",
+        "frames": 1269,
+        "frameMilliseconds": {
+          "median": 3.1508714891970158,
+          "p95": 3.506207372993231,
+          "p99": 3.814377821981907,
+          "maximum": 4.411791451275349,
+          "mean": 3.1529196201903646
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.334459,
+          "p95": 0.5089589999999999,
+          "p99": 0.926209,
+          "maximum": 1.402083,
+          "mean": 0.36396113081166354
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.5903,
+          "p95": 2.8564,
+          "p99": 2.9934,
+          "maximum": 3.1149,
+          "mean": 2.5869691095350706
+        },
+        "gcBytesPerFrame": {
+          "median": 45758.0,
+          "p95": 113511.0,
+          "p99": 122522.0,
+          "maximum": 176974.0,
+          "mean": 51949.05752561072
+        }
+      },
+      {
+        "name": "none repeat",
+        "frames": 1357,
+        "frameMilliseconds": {
+          "median": 2.9515447095036507,
+          "p95": 3.2832128927111626,
+          "p99": 3.406412899494171,
+          "maximum": 4.458085168153048,
+          "mean": 2.9521978907383204
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.161457,
+          "p95": 0.282709,
+          "p99": 0.355875,
+          "maximum": 1.576292,
+          "mean": 0.17722635666912284
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.5735,
+          "p95": 2.857,
+          "p99": 2.9488,
+          "maximum": 3.1413,
+          "mean": 2.575950331613857
+        },
+        "gcBytesPerFrame": {
+          "median": 15226.0,
+          "p95": 15226.0,
+          "p99": 15304.0,
+          "maximum": 15374.0,
+          "mean": 15228.194546794399
+        }
+      }
+    ],
+    "unity": "6000.3.16f1",
+    "gpu": "Apple M2 Pro",
+    "cameras": 24,
+    "note": "Isolated batch Editor Play mode; same Selwyn MW sky and four rigs/six 128px cameras each. No swarm. Cameras explicitly rendered because batch mode has no automatically rendered Game view; camera timings measure CPU submission, not completed GPU time. PlayerLoop measures game callbacks separately. Two seconds settling and four seconds measured per case, synthetic fresh wing samples. These are not LED workstation/display FPS. CSV coroutines can drain their preceding case during warmup."
+  },
+  "checks": {
+    "gaussian": {
+      "checks": 24360,
+      "cases": 74,
+      "failure": null,
+      "allCasesExactlyMatchPriorResults": true
+    },
+    "liveFlightControlsAndRecording": {
+      "checks": 52256,
+      "failure": null,
+      "unity": "6000.3.16f1",
+      "agentsPerRig": 64,
+      "rigs": 4,
+      "asyncCapture": {
+        "samples": 49288,
+        "medianMs": 0.0392,
+        "p95Ms": 0.0775
+      },
+      "legacySynchronousLogging": {
+        "samples": 240,
+        "medianMs": 0.336,
+        "p95Ms": 0.3816
+      },
+      "maxQueue": 6
+    },
+    "liveTelemetryIncludingRestart": {
+      "checks": 82,
+      "failure": null,
+      "unexpectedErrors": [],
+      "unity": "6000.3.16f1",
+      "coverage": "Circular statistics, disabled/default/invalid/sequence config, generic and Choice adapters, real Swarm lifecycle, per-rig onset/no reset, repeat trial, PUB/SUB tracking and telemetry, raw units, player errors and HUD"
+    }
+  },
+  "pastRecording": {
+    "path": "/Volumes/MISC/Swarm_v1/RunData/20261011_035104/*_Choice_Selwyn_VR1_.csv",
+    "starSetupMedianFrameIntervalMs": 17,
+    "swarmStimulusMedianFrameIntervalMs": 22,
+    "starSetupP99Ms": 20,
+    "swarmStimulusP99Ms": 33,
+    "note": "Historical recording predates the current trim implementation; it cannot establish the cost of the new controller."
+  },
+  "sourceSha256": {
+    "Assets/Scripts/KineflyAutoTrim.cs": "14c96093eb04a8bdb26f58fcec5f29b468463abe7df7746db08216c17132190b",
+    "Assets/Scripts/RuntimeStatusOverlay.cs": "65dc03df192ec01d46a368e31fe3fd95bd8a496590cac287bcb352d35c5ac29e",
+    "Assets/Scripts/ExperimentTelemetry.cs": "eb2d3c20b146009e980e9786b542a4303d80e18d615bcbc456c0c490b7262466",
+    "Assets/Scripts/Loggers/DataLogger.cs": "9830e66c8622033a771dff14142d805e3f241aecbe53802a35470819a8bf8c32",
+    "Assets/Editor/DiagnosticsFrameValidation.cs": "eaa695a58017585468163ce811b45a0d32c6f2edb751ce690e0d1b1495bbc55f",
+    "Assets/Editor/DiagnosticsPerformanceValidation.cs": "3535d0be5c09ed48bedcc4c3e7baf106da4cab7563eaae048a3eca389b1789c1",
+    "Assets/Editor/HeadingTelemetryValidation.cs": "d06f3b78395ddafdc7ada368fda3750d8ef2ced6952d71ff8eebcfa89d151cf0"
+  }
+}

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NetMQ;
 using NetMQ.Sockets;
 using Newtonsoft.Json;
@@ -24,26 +25,33 @@ public sealed class TelemetryConfig
     }
 }
 
-/// <summary>Versioned snapshots on a dedicated PUB port. All socket operations stay on the Unity thread.</summary>
+/// <summary>Capture Unity state on the frame thread; serialize and publish a bounded latest snapshot on a worker.</summary>
 [DefaultExecutionOrder(2000)]
 public sealed class ExperimentTelemetry : MonoBehaviour
 {
-    private PublisherSocket publisher;
+    private PublishWorker worker;
     private TelemetryConfig settings;
     private double nextPublish;
     private long sequence;
-    public string State { get; private set; } = "waiting for system config";
+    private string state = "waiting for system config";
+    private long droppedSnapshots;
+    private bool reportedWorkerFailure;
+    public string State => worker == null ? state : worker.Failure != null ? "error" : worker.Ready ? "publishing" : "starting";
     public string Endpoint { get; private set; }
-    public long DroppedSnapshots { get; private set; }
+    public long DroppedSnapshots => Interlocked.Read(ref droppedSnapshots);
 
-    private void OnEnable() => MainController.SystemConfigurationChanged += Configure;
+    private void OnEnable()
+    {
+        MainController.SystemConfigurationChanged += Configure;
+        if (MainController.Instance != null && MainController.Instance.SystemConfigs.Count > 0) Configure();
+    }
     private void Start() { if (settings == null) Configure(); }
     private void OnDisable()
     {
         MainController.SystemConfigurationChanged -= Configure;
         Close();
     }
-    private void Close() { publisher?.Dispose(); publisher = null; }
+    private void Close() { worker?.Dispose(); worker = null; }
 
     public void Configure()
     {
@@ -51,7 +59,7 @@ public sealed class ExperimentTelemetry : MonoBehaviour
         var main = MainController.Instance;
         settings = main != null ? main.TelemetrySettings : null;
         if (settings == null) return;
-        State = "disabled";
+        state = "disabled";
         if (!settings.enabled) return;
         try
         {
@@ -61,35 +69,87 @@ public sealed class ExperimentTelemetry : MonoBehaviour
             if (main.SystemConfigs.Values.Any(rig => rig.zmqPort == settings.port))
                 throw new ArgumentException("Telemetry port must differ from every tracking input port.");
             Endpoint = $"tcp://{settings.bindAddress}:{settings.port}";
-            publisher = new PublisherSocket();
-            publisher.Options.Linger = TimeSpan.Zero;
-            publisher.Options.SendHighWatermark = 2;
-            publisher.Bind(Endpoint);
-            State = "publishing";
+            reportedWorkerFailure = false;
+            worker = new PublishWorker(Endpoint, settings.topic, () => Interlocked.Increment(ref droppedSnapshots));
             nextPublish = 0;
         }
         catch (Exception error)
         {
-            Close(); State = "error";
+            Close(); state = "error";
             Debug.LogError("Telemetry publisher failed: " + error);
         }
     }
 
     private void LateUpdate()
     {
-        if (publisher == null || Time.realtimeSinceStartupAsDouble < nextPublish) return;
+        if (worker == null) return;
+        if (worker.Failure != null)
+        {
+            if (!reportedWorkerFailure) { reportedWorkerFailure = true; Debug.LogError("Telemetry publisher failed: " + worker.Failure); }
+            return;
+        }
+        if (Time.realtimeSinceStartupAsDouble < nextPublish) return;
         nextPublish = Time.realtimeSinceStartupAsDouble + 1.0 / settings.rateHz;
         try
         {
-            var message = new NetMQMessage();
-            message.Append(settings.topic);
-            message.Append(JsonConvert.SerializeObject(Capture(++sequence)));
-            if (!publisher.TrySendMultipartMessage(TimeSpan.Zero, message)) DroppedSnapshots++;
+            worker.Submit(Capture(++sequence));
         }
         catch (Exception error)
         {
-            Close(); State = "error";
+            Close(); state = "error";
             Debug.LogError("Telemetry send failed: " + error);
+        }
+    }
+
+    // A slow subscriber or encoder never builds a queue on the frame thread. NetMQ sockets
+    // are created, used and disposed on the same worker, including after config changes.
+    private sealed class PublishWorker : IDisposable
+    {
+        private readonly AutoResetEvent signal = new AutoResetEvent(false);
+        private readonly Thread thread;
+        private readonly Action dropped;
+        private object latest;
+        private volatile bool stopping;
+        private volatile bool ready;
+        private volatile string failure;
+        public bool Ready => ready;
+        public string Failure => failure;
+        public PublishWorker(string endpoint, string topic, Action dropped)
+        {
+            this.dropped = dropped;
+            thread = new Thread(() => Run(endpoint, topic)) { IsBackground = true, Name = "Experiment telemetry" };
+            thread.Start();
+        }
+        public void Submit(object snapshot)
+        {
+            if (Interlocked.Exchange(ref latest, snapshot) != null) dropped();
+            signal.Set();
+        }
+        private void Run(string endpoint, string topic)
+        {
+            try
+            {
+                using (var publisher = new PublisherSocket())
+                {
+                    publisher.Options.Linger = TimeSpan.Zero;
+                    publisher.Options.SendHighWatermark = 2;
+                    publisher.Bind(endpoint); ready = true;
+                    while (!stopping)
+                    {
+                        object snapshot = Interlocked.Exchange(ref latest, null);
+                        if (snapshot == null) { signal.WaitOne(100); continue; }
+                        var message = new NetMQMessage();
+                        message.Append(topic); message.Append(JsonConvert.SerializeObject(snapshot));
+                        if (!publisher.TrySendMultipartMessage(TimeSpan.Zero, message)) dropped();
+                    }
+                }
+            }
+            catch (Exception error) { failure = error.ToString(); }
+        }
+        public void Dispose()
+        {
+            stopping = true; signal.Set(); thread.Join();
+            Interlocked.Exchange(ref latest, null); signal.Dispose();
         }
     }
 
