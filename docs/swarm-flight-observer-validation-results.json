@@ -1,0 +1,175 @@
+{
+  "validatedAtUtc": "2026-10-11T11:23:42.951287+00:00",
+  "sourceCodeCommit": "35660d8f",
+  "sequence": "Assets/StreamingAssets/sequenceConfig.json",
+  "experiment": "Examples/Swarm/selwyn-trajectory-playback.example.json",
+  "observerSpeedMetresPerSecond": 5,
+  "incomingSeconds": 0,
+  "extrapolationSpeedMetresPerSecond": 6,
+  "despawnDistanceMetres": 100,
+  "controlSceneStartup": {
+    "checks": 51,
+    "failure": null,
+    "errors": [],
+    "encounterAudit": {
+      "sourceIdsSeen": 430,
+      "segmentBirths": 437,
+      "firstMinuteSpawnEvents": 49,
+      "firstMinuteRecordedIdStarts": 49,
+      "cumulativeBirthsAtMinute": [
+        1,
+        49,
+        93,
+        123,
+        149,
+        187,
+        225,
+        255,
+        316,
+        387
+      ],
+      "meanLivePopulation": 30.683592446787216,
+      "maxLivePopulation": 62,
+      "liveAtSeconds": {
+        "10": 5,
+        "30": 28,
+        "60": 28,
+        "120": 31,
+        "300": 35,
+        "599": 31
+      },
+      "firstMinuteNativePanelDetectableWithin3m": {
+        "64": 35,
+        "128": 42
+      },
+      "firstMinuteNativePanelAnyByteContrastWithin3m": {
+        "64": 42,
+        "128": 42
+      },
+      "observerSpeedMetresPerSecond": 5.0,
+      "preRollSeconds": 0.0,
+      "continuationSpeedMetresPerSecond": 6.0,
+      "sampleStepSeconds": 0.02,
+      "renderStepSeconds": 0.1,
+      "note": "Real four-rig Swarm startup; audit one rig using its configured cameras at native 64/128 pixels, gray sky and current world positions. Contrast requires 3 bytes (any-byte count also reported) in a 5x5 patch around a moth within 3m. Overlapping moths can contribute to the same patch. This is numerical detectability, not a biological visibility threshold. Recorded samples/times are unchanged. Instantiation precedes first samples by preRollSeconds; incoming and outgoing extrapolation uses the configured physical speed."
+    },
+    "unity": "6000.3.16f1"
+  },
+  "geometricAudit": {
+    "sourceSha256": "7353033db12dd544eca10091d58ef265a73859452331be95a13d387b4def4817",
+    "rows": 14429,
+    "ids": 430,
+    "durationSeconds": 599.46,
+    "configuredContinuation": {
+      "continuationSpeedMetresPerSecond": 6,
+      "preRollSeconds": 0,
+      "nearestPassMetres": {
+        "min": 0.1369539527342799,
+        "p10": 0.8675435398637953,
+        "p25": 1.2838180622067357,
+        "median": 1.8583121163290306,
+        "p75": 2.3625958706113783,
+        "p90": 2.79118718077557,
+        "p95": 3.1821653860642973,
+        "max": 11.253436204429688
+      },
+      "closePassesWithinQuarterMetre": [
+        {
+          "id": "125",
+          "distanceMetres": 0.23398993314919908,
+          "timeSeconds": 191.17506297051563,
+          "stage": "outgoing"
+        },
+        {
+          "id": "175",
+          "distanceMetres": 0.2205474979280892,
+          "timeSeconds": 292.99077239893325,
+          "stage": "outgoing"
+        },
+        {
+          "id": "203",
+          "distanceMetres": 0.14953082291860811,
+          "timeSeconds": 323.54,
+          "stage": "recorded"
+        },
+        {
+          "id": "232",
+          "distanceMetres": 0.19107763029636282,
+          "timeSeconds": 391.37010508205987,
+          "stage": "outgoing"
+        },
+        {
+          "id": "295",
+          "distanceMetres": 0.1369539527342799,
+          "timeSeconds": 471.024587700377,
+          "stage": "outgoing"
+        }
+      ],
+      "passesWithinMetres": {
+        "0.1": {
+          "count": 0,
+          "perMinute": 0.0
+        },
+        "0.25": {
+          "count": 5,
+          "perMinute": 0.5004504053648283
+        },
+        "0.5": {
+          "count": 12,
+          "perMinute": 1.2010809728755878
+        },
+        "1": {
+          "count": 62,
+          "perMinute": 6.205585026523871
+        },
+        "2": {
+          "count": 244,
+          "perMinute": 24.42197978180362
+        },
+        "3": {
+          "count": 409,
+          "perMinute": 40.93684315884296
+        }
+      }
+    },
+    "note": "IDs are unique recorded arrivals, not simultaneous population. Co-observed spacing is conditional on multiple recorded IDs at exactly the same timestamp; it is not a complete density census. Closest-pass estimates assume exact-time spawn anchors, constant northward observer motion, unit playback clock, centered data, and continuing tails. Incoming mode anchors at max(0,firstTime-preRollSeconds); moving observers change the path relative to that earlier anchor. Reports the first CSV cycle, not future-cycle lead-ins at its end. No spatial rescaling."
+  },
+  "portableConfigValidation": {
+    "templatesAndExamples": 57,
+    "archivedHashes": 622,
+    "earlierArchivedInputs": 979,
+    "passed": true
+  },
+  "macOSBuild": {
+    "result": "Succeeded",
+    "architecture": "Apple Silicon ARM64",
+    "app": "/Users/pavan/src/ledpanelVR/Builds/BogongSwarm-macOS/MATREX.app",
+    "unity": "6000.3.16f1",
+    "totalErrors": 0,
+    "totalWarnings": 50,
+    "totalSize": 417864078,
+    "seconds": 16.997884,
+    "scenes": [
+      "Assets/Scenes/ControlScene.unity",
+      "Assets/Scenes/Optomotor.unity",
+      "Assets/Scenes/Swarm.unity",
+      "Assets/Scenes/Choice.unity",
+      "Assets/Scenes/Choice_desync.unity",
+      "Assets/Scenes/Choice_Forrest.unity",
+      "Assets/Scenes/ReplayScene.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_nopath_nopath.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_nopath_path.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_path_nopath.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_path_path.unity",
+      "Assets/Scenes/Kannadi.unity",
+      "Assets/Scenes/Choice_Selwyn.unity"
+    ],
+    "errors": []
+  },
+  "packagedConfigVerification": {
+    "experimentMatches": true,
+    "sequenceMatches": true,
+    "hardwareConfigMatches": true
+  },
+  "note": "Restores the active 5 m/s flying observer with zero incoming lead-in. The optional passive observer example retains five-second lead-in. Renderer and playback code are unchanged by this correction. Startup validation uses isolated hardware settings with tracker input disabled; the rebuilt app packages the unchanged main hardware config. Earlier rendering and performance test results remain in their separate historical reports."
+}
