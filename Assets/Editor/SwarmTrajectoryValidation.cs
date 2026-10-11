@@ -181,6 +181,7 @@ public static class SwarmTrajectoryValidation
         var material = root.GetComponent<MeshRenderer>().sharedMaterial;
         Check(material.shader.isSupported && !ShaderUtil.ShaderHasError(material.shader), "Moth shader compiles.");
         material.SetFloat("_ManualAnimation", 1);
+        float wingPhase=root.GetComponent<MeshFilter>().sharedMesh.uv2[0].x;
         captures.Add(new { graphics = SystemInfo.graphicsDeviceName, camera = camera.projectionMatrix.ToString(), bodyLength = material.GetFloat("_BodyLength"), bodyDiameter = material.GetFloat("_BodyDiameter") });
         try
         {
@@ -199,17 +200,47 @@ public static class SwarmTrajectoryValidation
                 previous = contrast;
             }
             agent.transform.position = new Vector3(0,0,.1f); batch.RefreshCenters();
-            material.SetFloat("_AnimationTime", .25f / 30f); var up = Capture(camera);
-            material.SetFloat("_AnimationTime", .75f / 30f); var down = Capture(camera);
+            material.SetFloat("_AnimationTime", (.25f-wingPhase) / 30f); var up = Capture(camera);
+            material.SetFloat("_AnimationTime", (.75f-wingPhase) / 30f); var down = Capture(camera);
             Check(!up.SequenceEqual(down), "GPU wings produce different upper/lower flap poses.");
             File.WriteAllBytes(Path.Combine(Application.dataPath, "../bogong-moth-preview.png"), Encode(camera));
             var preview = new RenderTexture(512,512,24); preview.Create(); camera.targetTexture = preview;
             File.WriteAllBytes(Path.Combine(Application.dataPath, "../bogong-moth-close-preview.png"), Encode(camera));
             camera.targetTexture = target; preview.Release(); Object.DestroyImmediate(preview);
             agent.transform.position = new Vector3(0,0,1); batch.RefreshCenters();
-            material.SetFloat("_AnimationTime", .25f / 30f); up = Capture(camera);
-            material.SetFloat("_AnimationTime", .75f / 30f); down = Capture(camera);
+            material.SetFloat("_AnimationTime", (.25f-wingPhase) / 30f); up = Capture(camera);
+            material.SetFloat("_AnimationTime", (.75f-wingPhase) / 30f); down = Capture(camera);
             Check(!up.SequenceEqual(down), "Subpixel proxy retains faint flap motion.");
+            var grayTarget=new RenderTexture(128,128,24,RenderTextureFormat.ARGB32); grayTarget.Create();
+            try
+            {
+                camera.targetTexture=grayTarget; camera.backgroundColor=Color.gray; material.SetFloat("_WingOpacity",0);
+                // Center on a pixel rather than on the four-pixel boundary at image center.
+                float pixelMetres=6f/128f;
+                agent.transform.position=new Vector3(.5f*pixelMetres,.5f*pixelMetres,3); batch.RefreshCenters();
+                var gray=Capture(camera); int blank=gray[0].r;
+                int peak=gray.Max(p=>blank-p.r), sum=gray.Sum(p=>blank-p.r);
+                captures.Add(new {mode="gray128-first",blank,peak,total=sum,colorSpace=QualitySettings.activeColorSpace.ToString()});
+                float expected=Mathf.PI*config.bodyLengthMetres*config.bodyDiameterMetres*.25f*Mathf.Pow(64f/3,2)*blank;
+                Check(peak>=expected*.65f && Math.Abs(sum-expected)<=3,
+                    "A broadside 3m subpixel moth concentrates its real projected area without increasing total contrast.");
+                var energy=new List<int>();
+                foreach(float phaseOffset in new[] {0f,.25f,.5f,.75f})
+                {
+                    agent.transform.position=new Vector3((.5f+phaseOffset)*pixelMetres,(.5f+phaseOffset)*pixelMetres,3);
+                    batch.RefreshCenters(); gray=Capture(camera); energy.Add(gray.Sum(p=>blank-p.r));
+                }
+                Check(energy.All(v=>v>=2) && energy.Max()-energy.Min()<=3,"Fractional pixel movement retains subpixel contrast rather than blinking out.");
+                captures.Add(new {mode="gray128",distanceMetres=3,peakContrastBytes=peak,totalContrastBytes=sum,fractionalPixelContrastBytes=energy});
+                agent.transform.rotation=Quaternion.identity;
+                agent.transform.position=new Vector3(.5f*pixelMetres,.5f*pixelMetres,3); batch.RefreshCenters(); gray=Capture(camera);
+                Check(gray.Max(p=>blank-p.r)>=3,"A head-on moth at 3m remains detectable in a 128px gray-sky panel.");
+            }
+            finally
+            {
+                camera.targetTexture=target; camera.backgroundColor=Color.white; material.SetFloat("_WingOpacity",config.wingOpacity);
+                grayTarget.Release(); Object.DestroyImmediate(grayTarget);
+            }
             agent.SetActive(false); batch.RefreshCenters();
             Check(Capture(camera).All(p => p.r == 255), "Inactive pooled tracks render no ghost moths.");
             Check(agent.GetComponentsInChildren<Animator>().Length == 0, "Moth does not use Animator callbacks.");
@@ -230,6 +261,11 @@ public static class SwarmTrajectoryValidation
     }
     private static void AuthoringAndUnits()
     {
+        var bodyMesh=BogongMothMesh.Create(1); var local=new List<Vector3>(); bodyMesh.GetUVs(2,local);
+        Check(Math.Abs(local.Take(32).Max(v=>v.x)-local.Take(32).Min(v=>v.x)-2)<1e-6 &&
+            Math.Abs(local.Take(32).Max(v=>v.y)-local.Take(32).Min(v=>v.y)-2)<1e-6,
+            "Low-poly body reaches the configured physical diameter rather than 86.6 percent of it.");
+        Object.DestroyImmediate(bodyMesh);
         var root = new GameObject("Bogong moth");
         var moth = root.AddComponent<BogongMoth>();
         Check(root.GetComponentsInChildren<BogongSwarmRenderer>().Length == 1, "Editor asset builds one procedural visual.");

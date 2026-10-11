@@ -19,6 +19,7 @@ public static class SwarmStartupValidation
     private static readonly List<string> errors = new List<string>();
     private static int checks, stage, nextFrame;
     private static double deadline;
+    private static object encounterAudit;
     private static void Check(bool ok, string message) { checks++; if (!ok) throw new Exception(message); }
 
     static SwarmStartupValidation()
@@ -71,7 +72,7 @@ public static class SwarmStartupValidation
                 populations.Any(s => s.Spawned.Count != 430)) return;
             Check(main.VRClosedLoops.Count == 4 && main.SequenceError == null, "ControlScene auto-starts Swarm with four configured rigs.");
             var recipe = KannadiConfig.Load(new Dictionary<string, object> { ["configFile"] = "Examples/Swarm/selwyn-trajectory-playback.example.json" });
-            Check(recipe.mu == 0 && recipe.playback.continueAfterTrack && !recipe.playback.periodicBoundary,
+            Check(recipe.mu == 0 && recipe.playback.continueAfterTrack && !recipe.playback.periodicBoundary && recipe.playback.continuationSpeedMetresPerSecond==6,
                 "North recipe enables world-space continuation without wrapping.");
             var data = SwarmTrajectoryData.Load(Path.Combine(Application.streamingAssetsPath, recipe.trajectoryFile));
             Vector3 displacement = Vector3.zero;
@@ -120,6 +121,7 @@ public static class SwarmStartupValidation
                 Check(batches.Length == 1 && batches[0].GetComponents<MeshRenderer>().Length == 1,
                     "VR" + index + " uses one shared moth renderer.");
             }
+            encounterAudit=SwarmEncounterAudit.Run(populations.Single(p=>p.layerName=="SimulatedLocustsVR1"),data,Check);
             Check(errors.Count == 0, "No startup runtime errors: " + string.Join("; ", errors));
             Finish(null);
         }
@@ -130,7 +132,7 @@ public static class SwarmStartupValidation
         EditorApplication.update -= Tick; SceneManager.sceneLoaded -= DisableInputs; Application.logMessageReceived -= OnLog;
         SessionState.SetBool(Key, false);
         File.WriteAllText(Path.Combine(Application.dataPath, "../swarm-startup-validation.json"),
-            JsonConvert.SerializeObject(new { checks, failure, errors, unity = Application.unityVersion }, Formatting.Indented));
+            JsonConvert.SerializeObject(new { checks, failure, errors, encounterAudit, unity = Application.unityVersion }, Formatting.Indented));
         EditorApplication.Exit(failure == null ? 0 : 1);
     }
 }

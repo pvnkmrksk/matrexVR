@@ -68,11 +68,12 @@ Shader "Bogong/BatchedMoth"
                 }
                 float3 view = center + mul((float3x3)UNITY_MATRIX_V, rotate(v.rotation,local));
                 if (v.part.x > 1.5)
-                    view = center + float3(v.local.xy * 1.5 / max(.0001,scale) + wingShift.xy * _WingOpacity, 0);
+                    view = center + float3(v.local.xy / max(.0001,scale) + wingShift.xy * _WingOpacity, 0);
                 o.position = mul(UNITY_MATRIX_P, float4(view,1));
-                o.proxy = v.local.xy * 1.5;
-                // A Gaussian integrates to one pixel; its peak scales with true projected area.
-                o.info = float4(v.part.x, saturate((area+wingArea) / UNITY_PI), .8 + .2 * abs(v.local.y), extent);
+                o.proxy = v.local.xy;
+                // A bilinear point footprint partitions area across 1-4 pixels without
+                // spreading a subpixel moth's contrast across a fixed 3x3 blur.
+                o.info = float4(v.part.x, area+wingArea, .8 + .2 * abs(v.local.y), extent);
                 return o;
             }
             float4 frag(v2f i):SV_Target
@@ -80,7 +81,8 @@ Shader "Bogong/BatchedMoth"
                 clip(i.visible);
                 if (i.info.x > 1.5)
                 {
-                    float coverage = exp(-dot(i.proxy,i.proxy)) * i.info.y;
+                    float2 weight = saturate(1 - abs(i.proxy));
+                    float coverage = saturate(weight.x * weight.y * i.info.y);
                     return float4(_Color.rgb, coverage);
                 }
                 if (i.info.x > .5) return float4(_Color.rgb, _WingOpacity);

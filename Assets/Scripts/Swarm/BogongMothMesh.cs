@@ -21,8 +21,11 @@ public static class BogongMothMesh
                 for (int side = 0; side < 8; side++)
                 {
                     float angle = side * Mathf.PI / 4;
-                    local.Add(new Vector3(Mathf.Cos(latitude) * Mathf.Cos(angle),
-                        Mathf.Cos(latitude) * Mathf.Sin(angle), Mathf.Sin(latitude)));
+                    // Four rings otherwise reach only cos(pi/6)=.866 of the configured
+                    // diameter. Normalize the interior rings to the stated thickness.
+                    float radius = ring == 0 || ring == 3 ? 0 : 1;
+                    local.Add(new Vector3(radius * Mathf.Cos(angle),
+                        radius * Mathf.Sin(angle), Mathf.Sin(latitude)));
                     parts.Add(Vector2.zero);
                 }
             }
