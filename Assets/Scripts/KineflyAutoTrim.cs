@@ -5,6 +5,9 @@ using System.Collections.Generic;
 public sealed class AutoTrimConfig
 {
     public double windowSeconds = 15;
+    public double maxWindowSeconds = 120;
+    public string centerStatistic = "mean";
+    public bool noiseAware = true;
     public double flightWindowSeconds = 2;
     // Population variance of the raw L-R signal, in radians squared (before gain/offset).
     public bool flightCheckEnabled = true;
@@ -12,15 +15,17 @@ public sealed class AutoTrimConfig
     public double flightConfirmationSeconds = 1;
     public double flightVarianceHysteresis = .5;
     public double updateIntervalSeconds = .5;
-    public double aggressiveness = .65;
-    public double maxStepRadians = .1;
+    public double aggressiveness = 1;
+    public double maxStepRadians = 1;
     public double maxOffsetRadians = 2;
     public double settleSeconds = 3;
     public double toleranceDegPerSecond = 1;
 
     public void Validate()
     {
-        if (!InRange(windowSeconds, 1, 300) || !InRange(flightWindowSeconds, .2, 30) ||
+        if (!InRange(windowSeconds, 1, 300) || !InRange(maxWindowSeconds, 1, 300) ||
+            !(string.Equals(centerStatistic, "mean", StringComparison.OrdinalIgnoreCase) || string.Equals(centerStatistic, "median", StringComparison.OrdinalIgnoreCase)) ||
+            !InRange(flightWindowSeconds, .2, 30) ||
             !InRange(flightVarianceThreshold, 0, 1000000) || !InRange(flightConfirmationSeconds, 0, 30) ||
             !InRange(flightVarianceHysteresis, 0, 1) || !InRange(updateIntervalSeconds, .1, 60) ||
             !InRange(aggressiveness, .001, 1) || !InRange(maxStepRadians, .000001, 10) || !InRange(maxOffsetRadians, .000001, 10) ||
@@ -33,12 +38,14 @@ public sealed class AutoTrimConfig
 /// <summary>Independent per-rig estimator. Only fresh, distinct input samples enter its windows.</summary>
 public sealed class KineflyAutoTrim
 {
+    public const double RadToDeg = 180 / Math.PI;
     public sealed class Adjustment
     {
         public readonly double time;
         public readonly float fromRadians, toRadians, deltaRadians;
-        public Adjustment(double time, float from, float to)
-        { this.time = time; fromRadians = from; toRadians = to; deltaRadians = to - from; }
+        public readonly float gain;
+        public Adjustment(double time, float from, float to, float gain)
+        { this.time = time; fromRadians = from; toRadians = to; deltaRadians = to - from; this.gain = gain; }
     }
     private struct Sample { public double time, yaw; public Sample(double t, double y) { time = t; yaw = y; } }
     private readonly Queue<Sample> flight = new Queue<Sample>();
@@ -46,7 +53,7 @@ public sealed class KineflyAutoTrim
     private AutoTrimConfig settings = new AutoTrimConfig();
     private long lastSequence = -1;
     private double lastSampleTime = double.NegativeInfinity, nextEvaluation, settleUntil;
-    private double sum, sumSquares;
+    private double sum, sumSquares, learnedStandardError;
     private double flightStarted, trimStarted;
     private double flightCandidateSince = double.NaN;
     private float previousGain, previousOffset;
@@ -60,6 +67,10 @@ public sealed class KineflyAutoTrim
     public int FlightSampleCount => flight.Count;
     public double FlightVariance { get; private set; }
     public double? EffectiveMedianDegPerSecond { get; private set; }
+    public double? EffectiveMeanDegPerSecond { get; private set; }
+    public double? UncertaintyDegPerSecond { get; private set; }
+    public double MeasurementSeconds { get; private set; } = 15;
+    public string CenterStatistic => settings.centerStatistic;
     public double WindowProgress { get; private set; }
     public int Passes { get; private set; }
     // Keep the last applied automatic change visible when trimming is paused or switched off.
@@ -70,6 +81,7 @@ public sealed class KineflyAutoTrim
     {
         settings = config ?? new AutoTrimConfig();
         settings.Validate();
+        learnedStandardError = 0;
         Enabled = enabled;
         FlightCheckEnabled = settings.flightCheckEnabled;
         flight.Clear(); sum = sumSquares = 0;
@@ -81,7 +93,11 @@ public sealed class KineflyAutoTrim
         ClearTrim(); State = enabled ? "WAITING FOR INPUT" : "OFF";
     }
 
-    private void ClearTrim() { trim.Clear(); WindowProgress = 0; EffectiveMedianDegPerSecond = null; }
+    private void ClearTrim()
+    {
+        trim.Clear(); WindowProgress = 0; EffectiveMedianDegPerSecond = EffectiveMeanDegPerSecond = UncertaintyDegPerSecond = null;
+        MeasurementSeconds = settings.windowSeconds;
+    }
     public void Disable() { Enabled = false; ClearTrim(); State = "OFF"; }
     public void SetFlightCheckEnabled(bool enabled)
     {
@@ -113,7 +129,7 @@ public sealed class KineflyAutoTrim
             ClearTrim();
         }
         if (haveControlValues && (gain != previousGain || offset != previousOffset))
-        { ClearTrim(); settleUntil = now + settings.settleSeconds; }
+        { if (offset != previousOffset) learnedStandardError = 0; ClearTrim(); settleUntil = now + settings.settleSeconds; }
         previousGain = gain; previousOffset = offset; haveControlValues = true;
 
         bool newSample = sequence != lastSequence && now - lastSampleTime >= .02; // At most 50 Hz per rig.
@@ -151,19 +167,47 @@ public sealed class KineflyAutoTrim
             if (trim.Count == 0) trimStarted = now;
             trim.Enqueue(new Sample(now, yaw));
         }
-        while (trim.Count > 0 && now - trim.Peek().time > settings.windowSeconds) trim.Dequeue();
-        WindowProgress = trim.Count == 0 ? 0 : Math.Min(1, (now - trimStarted) / settings.windowSeconds);
+        while (trim.Count > 0 && now - trim.Peek().time > MeasurementSeconds) trim.Dequeue();
+        WindowProgress = trim.Count == 0 ? 0 : Math.Min(1, (now - trimStarted) / MeasurementSeconds);
         if (!FullWindow(trim, now, settings.windowSeconds, trimStarted)) { State = "COLLECTING"; return false; }
         if (now < nextEvaluation) return false;
         nextEvaluation = now + settings.updateIntervalSeconds;
-        double[] values = new double[trim.Count]; int i = 0;
-        foreach (var sample in trim) values[i++] = sample.yaw;
-        Array.Sort(values);
-        double median = values.Length % 2 == 0 ? .5 * (values[values.Length / 2 - 1] + values[values.Length / 2]) : values[values.Length / 2];
-        double residual = median - offset;
-        EffectiveMedianDegPerSecond = gain * residual * (180 / Math.PI);
-        if (Math.Abs(EffectiveMedianDegPerSecond.Value) <= settings.toleranceDegPerSecond)
-        { State = "CENTERED"; return false; }
+        bool verifiedWindow = FullWindow(trim, now, MeasurementSeconds, trimStarted);
+        Sample[] samples = trim.ToArray();
+        Estimate estimate = Calculate(samples, 0);
+        bool useMedian = string.Equals(settings.centerStatistic, "median", StringComparison.OrdinalIgnoreCase);
+        // A long precision window must not conceal a new animal response. Reacquire only when
+        // the latest initial-length window exceeds five combined standard errors, not ordinary sample noise.
+        int recentStart = 0;
+        while (recentStart < samples.Length - 1 && now - samples[recentStart].time > settings.windowSeconds) recentStart++;
+        bool recentReady = samples.Length - recentStart >= Math.Max(5, (int)Math.Ceiling(settings.windowSeconds * 5));
+        Estimate recent = !recentReady || recentStart == 0 ? estimate : Calculate(samples, recentStart);
+        double recentCenter = useMedian ? recent.median : recent.mean;
+        double recentUncertainty = ErrorBand(Math.Sqrt(recent.standardError * recent.standardError + learnedStandardError * learnedStandardError), gain, useMedian);
+        bool reacquiring = recentReady && settings.noiseAware && MeasurementSeconds > settings.windowSeconds &&
+            Math.Abs(gain * (recentCenter - offset) * RadToDeg) > Math.Max(settings.toleranceDegPerSecond, 2.5 * recentUncertainty);
+        if (reacquiring) estimate = recent;
+        double mean = estimate.mean, median = estimate.median;
+        double residual = (useMedian ? median : mean) - offset;
+        EffectiveMedianDegPerSecond = gain * (median - offset) * RadToDeg;
+        EffectiveMeanDegPerSecond = gain * (mean - offset) * RadToDeg;
+        double rate = Math.Abs(gain * residual * RadToDeg);
+        UncertaintyDegPerSecond = ErrorBand(estimate.standardError, gain, useMedian);
+        double uncertainty = settings.noiseAware ? UncertaintyDegPerSecond.Value : 0;
+        double tolerance = settings.toleranceDegPerSecond;
+        double changeUncertainty = settings.noiseAware ? ErrorBand(Math.Sqrt(estimate.standardError * estimate.standardError + learnedStandardError * learnedStandardError), gain, useMedian) : 0;
+        if (!verifiedWindow && !reacquiring) { State = "VERIFYING / NOISE"; return false; }
+        // Once a complete precision window is available, the applied offset is a known number:
+        // use that window's error alone so uncertainty in an older fit cannot hold a proven bias.
+        double correctionBand = reacquiring ? 2.5 * changeUncertainty : uncertainty;
+        if (rate <= Math.Max(tolerance, correctionBand))
+        {
+            double expanded = RequiredWindow(uncertainty, tolerance);
+            if (expanded > MeasurementSeconds + .01)
+            { MeasurementSeconds = expanded; WindowProgress = Math.Min(1, (now - trimStarted) / expanded); State = "VERIFYING / NOISE"; return false; }
+            State = rate <= tolerance && uncertainty <= tolerance ? "CENTERED" : "NOISE LIMITED";
+            return false;
+        }
         double correction = Math.Max(-settings.maxStepRadians, Math.Min(settings.maxStepRadians, settings.aggressiveness * residual));
         // Respect both limits, even when a manually supplied starting offset exceeds the automatic range.
         double lower = Math.Max(-settings.maxStepRadians, -settings.maxOffsetRadians - offset);
@@ -172,11 +216,63 @@ public sealed class KineflyAutoTrim
         correction = Math.Max(lower, Math.Min(upper, correction));
         newOffset = (float)(offset + correction);
         if (newOffset == offset) { State = "OFFSET LIMIT"; return false; }
-        LastAdjustment = new Adjustment(now, offset, newOffset);
+        LastAdjustment = new Adjustment(now, offset, newOffset, gain);
+        // Display the window under the offset actually applied, rather than its obsolete pre-correction error.
+        EffectiveMedianDegPerSecond = gain * (median - newOffset) * RadToDeg;
+        EffectiveMeanDegPerSecond = gain * (mean - newOffset) * RadToDeg;
+        double afterRate = Math.Abs(gain * ((useMedian ? median : mean) - newOffset) * RadToDeg);
+        // A detected change makes the mixed old/new window unsuitable for precision estimates.
+        // Take a fresh short pass first, then extend only from the animal's new response.
+        MeasurementSeconds = !reacquiring && afterRate <= Math.Max(tolerance, uncertainty) ? RequiredWindow(uncertainty, tolerance) : settings.windowSeconds;
+        // Offset fitted to a noisy window has estimation error too. Include both windows' error
+        // when deciding whether a later short-window discrepancy warrants another correction.
+        if (Math.Abs(settings.aggressiveness * residual) <= settings.maxStepRadians && Math.Abs(newOffset) < settings.maxOffsetRadians)
+            learnedStandardError = Math.Sqrt(Math.Pow((1 - settings.aggressiveness) * learnedStandardError, 2) +
+                Math.Pow(settings.aggressiveness * estimate.standardError, 2));
         previousOffset = newOffset;
         Passes++; settleUntil = now + settings.settleSeconds;
         // Each pass uses a complete new window after the animal has had time to adapt.
         trim.Clear(); WindowProgress = 0; State = "TRIMMING";
         return true;
+    }
+
+    private struct Estimate { public double mean, median, standardError; }
+    private static double ErrorBand(double standardError, float gain, bool median) =>
+        2 * standardError * Math.Abs(gain) * RadToDeg * (median ? 1.253314 : 1);
+
+    private static Estimate Calculate(Sample[] samples, int start)
+    {
+        int count = samples.Length - start;
+        double[] values = new double[count]; double mean = 0;
+        for (int i = start; i < samples.Length; i++) { values[i - start] = samples[i].yaw; mean += samples[i].yaw; }
+        mean /= count;
+        double variance = 0;
+        foreach (double value in values) variance += (value - mean) * (value - mean);
+        double standardError = Math.Sqrt(variance / (count - 1) / count);
+        // One-second block means expose correlated input; never assume every frame is independent.
+        var blocks = new List<double>(); double blockStart = samples[start].time, blockSum = 0; int blockCount = 0;
+        for (int i = start; i < samples.Length; i++)
+        {
+            var sample = samples[i];
+            if (sample.time - blockStart >= 1)
+            { if (blockCount > 0) blocks.Add(blockSum / blockCount); blockStart = sample.time; blockSum = 0; blockCount = 0; }
+            blockSum += sample.yaw; blockCount++;
+        }
+        if (blocks.Count >= 3)
+        {
+            double blockMean = 0; foreach (double block in blocks) blockMean += block; blockMean /= blocks.Count;
+            double blockVariance = 0; foreach (double block in blocks) blockVariance += (block - blockMean) * (block - blockMean);
+            standardError = Math.Max(standardError, Math.Sqrt(blockVariance / (blocks.Count - 1) / blocks.Count));
+        }
+        Array.Sort(values);
+        double median = count % 2 == 0 ? .5 * (values[count / 2 - 1] + values[count / 2]) : values[count / 2];
+        return new Estimate { mean = mean, median = median, standardError = standardError };
+    }
+
+    private double RequiredWindow(double uncertainty, double tolerance)
+    {
+        if (uncertainty <= tolerance) return MeasurementSeconds;
+        double maximum = Math.Max(settings.windowSeconds, settings.maxWindowSeconds);
+        return Math.Min(maximum, Math.Max(MeasurementSeconds, MeasurementSeconds * Math.Pow(uncertainty / Math.Max(tolerance, 1e-9), 2)));
     }
 }

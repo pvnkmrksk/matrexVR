@@ -33,7 +33,7 @@ public static class KineflyAutoTrimValidation
     private static T Get<T>(object obj, string field) => (T)obj.GetType().GetField(field, Flags).GetValue(obj);
     private static double Wave(int i) => i % 4 == 0 ? -1.2 : i % 4 == 2 ? 1.2 : 0;
     private static AutoTrimConfig Fast() => new AutoTrimConfig { windowSeconds = 1, flightWindowSeconds = .2,
-        flightVarianceThreshold = .3, settleSeconds = .2, aggressiveness = .5, maxStepRadians = .1, toleranceDegPerSecond = 1 };
+        centerStatistic = "median", noiseAware = false, flightVarianceThreshold = .3, settleSeconds = .2, aggressiveness = .5, maxStepRadians = .1, toleranceDegPerSecond = 1 };
 
     static KineflyAutoTrimValidation()
     {
@@ -114,7 +114,7 @@ public static class KineflyAutoTrimValidation
             float defaultOffset = 0;
             for (int i = 0; i < 6000; i++)
                 if (defaults.Tick(i * .04, i, sign + .2 * Wave(i), true, true, true, 2.5f, defaultOffset, out float next)) defaultOffset = next;
-            Check(defaults.Flying && defaults.Passes >= 8 && defaults.State == "CENTERED" && Math.Abs(2.5 * (sign - defaultOffset) * Mathf.Rad2Deg) <= 1,
+            Check(defaults.Flying && defaults.Passes >= 1 && defaults.Passes <= 5 && defaults.State == "CENTERED" && Math.Abs(2.5 * (sign - defaultOffset) * Mathf.Rad2Deg) <= 1,
                 "Set-and-forget defaults center a signed unit bias with variance below .3 within 240s");
             Check(defaults.FlightThreshold == .01, "Omitted settings use the recording-informed threshold");
         }
@@ -231,6 +231,16 @@ public static class KineflyAutoTrimValidation
                 Check(hud.Contains("FLIGHT DASHBOARD") && hud.Contains("YAW CLOSED") && hud.Contains("AUTO TRIM") && hud.Contains("FLYING"), "Compact dashboard status");
                 Check(hud.Contains("DC +") && hud.Contains("DC -") && hud.Contains("LAST AUTO: DC UP") && hud.Contains("LAST AUTO: DC DOWN"),
                     "Dashboard shows signed DC offsets and each rig's actual adjustment direction");
+                Check(hud.Contains("°/s") && hud.Contains("wing SD") && !hud.Contains(" rad"), "Dashboard angles and rates use degrees");
+                var snapshot = JObject.FromObject(Object.FindFirstObjectByType<ExperimentTelemetry>().Capture(123));
+                foreach (var rigSnapshot in snapshot["rigs"].Take(3))
+                {
+                    var change = rigSnapshot["autoTrim"]["lastAdjustment"];
+                    Check(Math.Abs(change.Value<double>("toDegrees") - rigSnapshot["closedLoop"].Value<double>("yawDCOffsetDegrees")) < 1e-6,
+                        "Telemetry adjustment ends at the actual degree DC offset");
+                    Check(Math.Abs(change.Value<double>("yawRateChangeDegPerSecond") + 10 * change.Value<double>("deltaDegrees")) < 1e-5,
+                        "Telemetry reports the adjustment's gain-scaled rate change");
+                }
                 phaseTime = EditorApplication.timeSinceStartup; phase = 2; return;
             }
             if (phase == 2)

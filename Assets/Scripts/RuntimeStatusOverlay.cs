@@ -180,7 +180,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
                 if (!main.VRClosedLoops.TryGetValue(entry.Key, out var rig) || rig == null) { text.AppendLine("<color=#88929C>INACTIVE</color>"); continue; }
                 var listener = rig.GetComponent<ZmqListener>();
                 // Keep the actual offset at the front of every active rig, including unsupported/off modes.
-                text.Append($"<size=18><b><color=#{(rig.SupportsAutoTrim ? "FFFFFF" : "88929C")}>DC {Signed(rig.GetYawDCOffset())} rad</color></b></size> ");
+                text.Append($"<size=18><b><color=#{(rig.SupportsAutoTrim ? "FFFFFF" : "88929C")}>DC {Signed(rig.GetYawDCOffset() * KineflyAutoTrim.RadToDeg)}°</color></b></size> ");
                 text.Append(Badge(rig.OrientationTrackingEnabled ? "YAW CLOSED" : "YAW OPEN", rig.OrientationTrackingEnabled ? "70E1B0" : "88929C"));
                 text.Append(Badge(rig.PositionTrackingEnabled ? "POS CLOSED" : "POS OPEN", rig.PositionTrackingEnabled ? "70E1B0" : "88929C"));
                 text.AppendLine(entry.Key == "VR" + main.SelectedVRIndex ? " <color=#FFD166>SELECTED</color>" : "");
@@ -190,22 +190,24 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
                     text.AppendLine($"  {Badge($"GAIN {rig.GetYawGain():G4}", rig.OrientationTrackingEnabled && rig.GetYawGain() != 0 ? "FFFFFF" : "88929C")} " +
                         Badge(trim.Flying ? "FLYING" : trim.FlightReady ? "NOT FLYING" : "FLIGHT ?", trim.Flying ? "70E1B0" : "FFD166") +
                         (trim.FlightCheckEnabled ? "" : Badge("FLIGHT BYPASSED", "FFD166")));
-                    text.AppendLine($"  <color=#9DA8B5>{rig.GetCurrentMode()} | L-R var {trim.FlightVariance:F4} / entry > {trim.FlightThreshold:G4} rad² | {trim.FlightSampleCount} samples</color>");
+                    text.AppendLine($"  <color=#9DA8B5>yaw {Signed(rig.GetLastYawOutput())}°/s | DC compensation {Signed(rig.GetYawGain() * rig.GetYawDCOffset() * KineflyAutoTrim.RadToDeg)}°/s</color>");
+                    text.AppendLine($"  <color=#9DA8B5>{rig.GetCurrentMode()} | wing SD {Math.Sqrt(trim.FlightVariance) * KineflyAutoTrim.RadToDeg:F2}° / fly > {Math.Sqrt(trim.FlightThreshold) * KineflyAutoTrim.RadToDeg:F2}° | {trim.FlightSampleCount} samples</color>");
                     bool working = trim.Enabled && trim.FlightAllowsTrim && rig.OrientationTrackingEnabled && rig.GetYawGain() != 0;
                     string state = !trim.Enabled ? "AUTO TRIM OFF / DC HELD" : "AUTO TRIM: " + (trim.State == "TRIMMING" ? "ADJUSTING" : trim.State);
                     text.Append("  " + Badge(state, !trim.Enabled ? "88929C" : trim.State == "CENTERED" ? "70E1B0" : working ? "FFD166" : "88929C"));
-                    if (trim.State == "COLLECTING") text.Append($" {trim.WindowProgress:P0}");
-                    if (trim.EffectiveMedianDegPerSecond.HasValue) text.Append($" last median {trim.EffectiveMedianDegPerSecond.Value:+0.00;-0.00;0.00} deg/s");
+                    if (trim.State == "COLLECTING" || trim.State == "VERIFYING / NOISE") text.Append($" {trim.WindowProgress:P0} / {trim.MeasurementSeconds:F0}s");
                     if (trim.Enabled) text.Append($"  pass {trim.Passes}");
                     text.AppendLine();
+                    if (trim.EffectiveMeanDegPerSecond.HasValue)
+                        text.AppendLine($"  window mean {Signed(trim.EffectiveMeanDegPerSecond.Value)}°/s | median {Signed(trim.EffectiveMedianDegPerSecond.Value)}°/s | ±{trim.UncertaintyDegPerSecond:F2}°/s");
                     var change = trim.LastAdjustment;
                     if (change != null)
                     {
                         double age = Time.realtimeSinceStartupAsDouble - change.time;
                         bool recentChange = working && age >= 0 && age <= 5 && rig.GetYawDCOffset() == change.toRadians;
                         string direction = change.deltaRadians > 0 ? "DC UP" : "DC DOWN";
-                        text.AppendLine("  " + Badge($"LAST AUTO: {direction} {Signed(change.deltaRadians)} rad", recentChange ? "FFD166" : "9DA8B5") +
-                            $"{Signed(change.fromRadians)} -> {Signed(change.toRadians)} rad");
+                        text.AppendLine("  " + Badge($"LAST AUTO: {direction} {Signed(change.deltaRadians * KineflyAutoTrim.RadToDeg)}°", recentChange ? "FFD166" : "9DA8B5") +
+                            $"{Signed(change.fromRadians * KineflyAutoTrim.RadToDeg)} -> {Signed(change.toRadians * KineflyAutoTrim.RadToDeg)}°");
                     }
                     else text.AppendLine("  <color=#9DA8B5>DC HELD / no automatic adjustment yet</color>");
                 }
@@ -238,8 +240,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     }
 
     private static string Badge(string value, string color) => $"<color=#{color}><b>[{value}]</b></color> ";
-    private static string Signed(float value) => value.ToString(value != 0 && Math.Abs(value) < .0001f ?
-        "+0.000000;-0.000000;0.000000" : "+0.0000;-0.0000;0.0000", System.Globalization.CultureInfo.InvariantCulture);
+    private static string Signed(double value) => value.ToString("+0.00;-0.00;0.00", System.Globalization.CultureInfo.InvariantCulture);
     private static string EscapeRich(string value) => (value ?? "").Replace("<", "‹").Replace(">", "›");
 
     private static string Shorten(string value, int length) => value == null ? "" : value.Length <= length ? value : value.Substring(0, length) + "…";

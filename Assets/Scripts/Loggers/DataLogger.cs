@@ -187,6 +187,7 @@ public class DataLogger : MonoBehaviour
             AddColumns("trackingImplementation", "trackingMode", "trackingInputUnits", "wireYaw", "yawGain", "yawDCOffsetRadians", "yawOutputDegPerSecond");
             AddColumns("autoTrimEnabled", "autoTrimState", "flightDetected", "flightVarianceRadiansSquared", "autoTrimMedianDegPerSecond", "autoTrimPasses");
             AddColumns("flightCheckEnabled", "flightThresholdRadiansSquared", "flightSamples");
+            AddColumns("yawDCOffsetDegrees", "yawDCCompensationDegPerSecond", "autoTrimMeanDegPerSecond", "autoTrimUncertaintyDegPerSecond", "autoTrimMeasurementSeconds");
             AddColumns("experimentPhase");
 
             // Enable logging
@@ -306,6 +307,8 @@ public class DataLogger : MonoBehaviour
             {
                 SetData("yawGain", tracking.GetYawGain());
                 SetData("yawDCOffsetRadians", tracking.GetYawDCOffset());
+                SetData("yawDCOffsetDegrees", tracking.GetYawDCOffset() * KineflyAutoTrim.RadToDeg);
+                SetData("yawDCCompensationDegPerSecond", tracking.GetYawGain() * tracking.GetYawDCOffset() * KineflyAutoTrim.RadToDeg);
                 if (tracking.GetUseYawMode() && !tracking.GetUseForceMode())
                     SetData("yawOutputDegPerSecond", tracking.GetLastYawOutput());
             }
@@ -317,6 +320,9 @@ public class DataLogger : MonoBehaviour
                 SetData("flightDetected", trim.FlightReady ? (object)trim.Flying : null);
                 SetData("flightVarianceRadiansSquared", trim.FlightReady ? (object)trim.FlightVariance : null);
                 SetData("autoTrimMedianDegPerSecond", trim.EffectiveMedianDegPerSecond);
+                SetData("autoTrimMeanDegPerSecond", trim.EffectiveMeanDegPerSecond);
+                SetData("autoTrimUncertaintyDegPerSecond", trim.UncertaintyDegPerSecond);
+                SetData("autoTrimMeasurementSeconds", trim.MeasurementSeconds);
                 SetData("autoTrimPasses", trim.Passes);
                 SetData("flightCheckEnabled", trim.FlightCheckEnabled);
                 SetData("flightThresholdRadiansSquared", trim.FlightThreshold);

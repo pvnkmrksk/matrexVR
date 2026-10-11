@@ -1,30 +1,30 @@
 {
-  "checks": 56645,
+  "checks": 54204,
   "failure": null,
   "unity": "6000.3.16f1",
   "agentsPerRig": 64,
   "rigs": 4,
   "asyncCapture": {
-    "samples": 53684,
-    "medianMs": 0.0334,
-    "p95Ms": 0.0588
+    "samples": 51236,
+    "medianMs": 0.0371,
+    "p95Ms": 0.0618
   },
   "legacySynchronousLogging": {
     "samples": 240,
-    "medianMs": 0.3322,
-    "p95Ms": 0.369
+    "medianMs": 0.32830000000000004,
+    "p95Ms": 0.3759
   },
-  "maxQueue": 3,
+  "maxQueue": 5,
   "testedSources": {
-    "Assets/Scripts/KineflyAutoTrim.cs": "28af17f20669efe5d3a0225d541f97e790ee7041556cef24ddf5032bd040dcb2",
+    "Assets/Scripts/KineflyAutoTrim.cs": "97b88012eebd8016f542d2d15f6cc69825f26f85f80ceaa79ab94a140719a6c3",
     "Assets/Scripts/ClosedLoop.cs": "5e5e5ec6a4f323fd623f5d6f70853b94022051fddaac3858ca890e8a5768c493",
     "Assets/Scripts/MainController.cs": "bd275715b72ca82c6c97ced4a7d2349d04da44bb82edeeba3b7dfb05be513592",
-    "Assets/Scripts/RuntimeStatusOverlay.cs": "2a14473706ecbc2f87b93ecbb6fd0f58443638b1d2ec4c701714eceff49dfdf4",
+    "Assets/Scripts/RuntimeStatusOverlay.cs": "643ec6bfaed4ac77a2b55aae1daa94a3d182fecc1356d1983c192799e62d0b30",
     "Assets/Scripts/Swarm/SwarmLogger.cs": "a302b5092aa712116333f076699851f9b1a46af7567faa6d0a5ee8d083406cc0",
     "Assets/Scripts/Swarm/AsyncSwarmWriter.cs": "af63d01e1941d01b3ef6382add5f15f000555fc6ab58388ec0a65c3d04276eb1",
     "Assets/Scripts/Loggers/MasterDataLogger.cs": "2f06f52d7ea193fc356297f02cf8cbb2fb0a5ffbd729b143f5befbaf5e3aeee2",
-    "Assets/Editor/KineflyAutoTrimValidation.cs": "60fb84879272b5466980c444f4073a85bf6481d8183faca5478d08828cde0893",
-    "Assets/Scripts/Loggers/DataLogger.cs": "dc2ccab7f6c8f950238fcd35b91dd3377b5676306af929884c1721b6ed7043d3"
+    "Assets/Editor/KineflyAutoTrimValidation.cs": "531d09ea55bc4c0c84e5d0f1291aa98101b14140ff8ace5b24a04e5360d02146",
+    "Assets/Scripts/Loggers/DataLogger.cs": "23f0c2ba57e3dd8b0f8e849cbf157488cbcf2b4785dee4c010917de62d1f4d1a"
   },
   "historicalGainCompatibility": {
     "checks": 73746,
@@ -33,5 +33,5 @@
     "comparison": "Exact Vector3 and Quaternion component equality on every simulated frame",
     "unity": "6000.3.16f1"
   },
-  "notes": "Unity 6000.3.16f1 in a disposable macOS project. Independent trailing raw L-R population-variance comparison passed, unaffected by gain/DC. Final omitted-settings defaults center both signed 1-rad biases at gain 2.5 within 240 seconds. Automatic corrections respect 0.1-rad step and 2-rad absolute limits. Actual dashboard bypass retains measured NOT FLYING and permits live correction while open-loop/zero-gain/stale/duplicate/unsupported gates retain offsets. Experiment-only settings, in-place/reload persistence, restored gate and live multi-pass tests passed. Graphical dashboard inspected with signed DC on each active rig, before/after changes, variance versus threshold, sample counts and the bypass button. Expected injected experiment failure and known Unity Editor Search indexing errors are excluded. Capture timings are diagnostic. Historical gain compatibility is retained from the unchanged motion implementation."
+  "notes": "Final Gaussian-aware mean controller and optional median fixture tested in Unity 6000.3.16f1. Gates, population flight variance, signed gains, live corrections, per-rig adjustment telemetry in degrees, experiment-only settings, scene/row/stop persistence, dashboard toggles/bypass and 64 agents per rig passed. The default unit-bias cases converge within five passes. Historical motion arithmetic is unchanged and its earlier exact comparison is retained as prior evidence. Capture timings are diagnostic. Expected injected experiment failure and known Editor Search indexing errors are excluded."
 }

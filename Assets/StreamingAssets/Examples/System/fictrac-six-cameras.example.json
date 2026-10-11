@@ -4,7 +4,7 @@
     "bindAddress": "127.0.0.1",
     "port": 9880,
     "rateHz": 20,
-    "topic": "matrex.telemetry.v1"
+    "topic": "matrex.telemetry.v2"
   },
   "statusOverlay": {
     "visible": true,

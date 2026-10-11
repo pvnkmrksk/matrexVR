@@ -68,7 +68,7 @@ public static class HeadingTelemetryValidation
     private static void Fixture()
     {
         var system = JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "Templates/system_config.template.json")));
-        system["telemetry"] = JObject.FromObject(new { enabled = true, bindAddress = "127.0.0.1", port = 19880, rateHz = 30 });
+        system["telemetry"] = JObject.FromObject(new { enabled = true, bindAddress = "127.0.0.1", port = 19880, rateHz = 30, topic = "matrex.telemetry.v1" });
         system["overheadCamera"]["enabled"] = false;
         foreach (JObject rig in system["configs"])
         {
@@ -149,7 +149,7 @@ public static class HeadingTelemetryValidation
                     Check(Math.Abs(main.RemainingStepSeconds - 1000) < .01, "presentation duration not spent on assessment");
                     Check(Object.FindObjectsByType<LocustMover>(FindObjectsSortMode.None).Length == 8, "configured world remains visible during observation");
                     subscriber = new SubscriberSocket(); subscriber.Options.Linger = TimeSpan.Zero;
-                    subscriber.Connect("tcp://127.0.0.1:19880"); subscriber.Subscribe("matrex.telemetry.v1");
+                    subscriber.Connect("tcp://127.0.0.1:19880"); subscriber.Subscribe("matrex.telemetry.v2");
                     sensor = new PublisherSocket(); sensor.Options.Linger = TimeSpan.Zero; sensor.Bind("tcp://127.0.0.1:19871");
                     rigs[0].GetComponent<ZmqListener>().enabled = true;
                     Later(2); break;
@@ -158,11 +158,11 @@ public static class HeadingTelemetryValidation
                     NetMQMessage packet = new NetMQMessage();
                     if (subscriber.TryReceiveMultipartMessage(TimeSpan.Zero, ref packet))
                     {
-                        Check(packet.FrameCount == 2 && packet[0].ConvertToString() == "matrex.telemetry.v1", "wire topic and JSON two-frame contract");
+                        Check(packet.FrameCount == 2 && packet[0].ConvertToString() == "matrex.telemetry.v2", "wire topic and JSON two-frame contract");
                         received = JObject.Parse(packet[1].ConvertToString());
                     }
                     if (main.AssessmentPending || received == null || !rigs[0].GetComponent<ZmqListener>().HasPose) return;
-                    Check(received.Value<int>("schemaVersion") == 1 && received["rigs"].Count() == 4, "all four rigs in a versioned snapshot");
+                    Check(received.Value<int>("schemaVersion") == 2 && received["rigs"].Count() == 4, "all four rigs in a versioned snapshot");
                     for (int i = 0; i < 4; i++)
                     {
                         var reference = rigs[i].GetComponent<StimulusHeadingReference>();
@@ -175,8 +175,17 @@ public static class HeadingTelemetryValidation
                     var snapshot = JObject.FromObject(telemetry.Capture(999));
                     var first = snapshot["rigs"][0];
                     Check(first["pose"].Count() == 6, "full six-component pose");
-                    Check(first["input"]["latest"].Value<double>("yaw") < -.349 && first["input"]["latest"].Value<double>("x") == 1.25, "raw signed wire values preserved");
+                    Check(Math.Abs(first["input"]["latest"].Value<double>("yaw") - -.35 * KineflyAutoTrim.RadToDeg) < 1e-5 && Math.Abs(first["input"]["latest"].Value<double>("x") - 1.25 * KineflyAutoTrim.RadToDeg) < 1e-5, "signed input converted to degrees");
                     Check(first["input"].Value<string>("source") == "Kinefly" && first["closedLoop"].Value<double>("yawGain") == 2.5, "source and actual gains");
+                    rigs[0].GetComponent<ClosedLoop>().SetYawDCOffset(.4f);
+                    first = JObject.FromObject(telemetry.Capture(1000))["rigs"][0];
+                    Check(Math.Abs(first["closedLoop"].Value<double>("yawDCOffsetDegrees") - .4f * KineflyAutoTrim.RadToDeg) < 1e-5 &&
+                        Math.Abs(first["closedLoop"].Value<double>("yawDCCompensationDegPerSecond") - 2.5f * .4f * KineflyAutoTrim.RadToDeg) < 1e-5,
+                        "DC angle and gain-scaled rate have explicit degree units");
+                    Check(Math.Abs(first["autoTrim"].Value<double>("flightThresholdDegreesSquared") - .01 * KineflyAutoTrim.RadToDeg * KineflyAutoTrim.RadToDeg) < 1e-5,
+                        "Flight threshold converted to squared degrees");
+                    Check(!first["closedLoop"].Children<JProperty>().Any(p => p.Name.Contains("Radians")), "Schema 2 exposes no radian DC fields");
+                    rigs[0].GetComponent<ClosedLoop>().SetYawDCOffset(0);
                     Check(snapshot["system"].Value<int>("trialNumber") == 1 && snapshot["system"].Value<string>("sceneName") == "Swarm", "trial and scene state");
                     File.WriteAllText(Path.Combine(Application.dataPath, "../telemetry-example.json"), snapshot.ToString());
                     Check(File.ReadAllLines(Path.Combine(MasterDataLogger.Instance.directoryPath, "heading_reference.jsonl")).Length == 4, "onset context saved separately for every rig");

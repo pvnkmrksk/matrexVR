@@ -33,9 +33,11 @@ DataLogger emits a header and comma-separated rows. The rig's transform is the w
 | `blackSideAtTrialStart` | Adaptive trial side label. |
 | `skyboxId` | SHA-256 ID of the active managed Swarm/Kannadi sky. Join to `Skyboxes/<id>.json` and `.png`; otherwise blank. |
 | `skyboxSampleUtc` | Astronomical sample time as ISO-8601 UTC; blank for an explicit image or no managed sky. |
+| `yawDCOffsetDegrees`, `yawDCCompensationDegPerSecond` | DC angle in degrees and its gain-scaled term subtracted from untrimmed yaw in deg/s; raw DC columns remain for compatibility. |
+| `autoTrimMeanDegPerSecond`, `autoTrimUncertaintyDegPerSecond`, `autoTrimMeasurementSeconds` | Latest evaluated mean under the applied offset, approximate two-standard-error uncertainty, and active qualified window length. Blank before a full initial window. |
 | `autoTrimEnabled`, `autoTrimState` | Kinefly automatic centering flag/state. Blank for unsupported tracking modes. |
 | `flightDetected`, `flightVarianceRadiansSquared` | Flight decision and population variance of raw L−R before gain/offset; blank until the flight window is ready. |
-| `autoTrimMedianDegPerSecond`, `autoTrimPasses` | Last evaluated effective median before correction, and correction count in the current row/configuration. Median is blank while no complete qualified window is available. |
+| `autoTrimMedianDegPerSecond`, `autoTrimPasses` | Last evaluated effective median under the applied offset, and correction count in the current row/configuration. Median is blank while no complete qualified window is available. |
 | `flightCheckEnabled`, `flightThresholdRadiansSquared`, `flightSamples` | Actual flight gate flag, entry threshold in rad² and distinct samples in the rolling flight window; measured flight remains independent of a bypass. |
 | `experimentPhase` | Experiment state at row sampling: `preStimulus`, `stimulus`, or `postStimulus`. Flat experiments use `stimulus`; legacy flat heading observation uses `assessment`. Outside a running experiment: `idle`; failed experiment: `error`. |
 

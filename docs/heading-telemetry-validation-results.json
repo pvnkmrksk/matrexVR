@@ -1,29 +1,29 @@
 {
-  "date": "2026-10-05",
+  "date": "2026-10-11",
   "baseBranch": "codex/bogong-night-sky",
-  "baseCommit": "779926a80b02190d6dd0410f260e52bba105a04e",
+  "baseCommit": "5172312a",
   "unity": "6000.3.16f1",
   "testedFileSha256": {
-    "Assets/Scripts/StimulusHeadingReference.cs": "fde7da7299fac5e5b9c4d3efd11351ab614105190e5a1fd7a9b866e4154ed8ae",
-    "Assets/Scripts/ExperimentTelemetry.cs": "e5a7d7be01cc243ceb46724fc0dc09a589977728dc14fedccf2dc8fe8cb40e64",
-    "Assets/Scripts/RuntimeStatusOverlay.cs": "ef60c0b377eaf815e8ceb26399301663c6a84ec0c8a96b724ccd11a964b45cdd",
-    "Assets/Scripts/ZmqListener.cs": "cd733b541215c73d7ecd126cabd956da467d40960250dbafda4523c0ad852e19",
-    "Assets/Scripts/ClosedLoop.cs": "8a17a6412074106a952f46375859f006c3b1089338ac9eea4763e6523b68722c",
-    "Assets/Scripts/MainController.cs": "f4e7313a2aea78baa18d599bc1a63df3f59d316d66062d4f486904cd3167b116",
-    "Assets/Scripts/Swarm/SwarmController.cs": "8e98d6c396e92eaf347653143337856aa9599ad5b445b8f8b057316a8378d779",
-    "Assets/Scripts/Swarm/LocustSpawner.cs": "70f9d7d49a023dc6c76a8c2d8cc0b194931e9a3dda4eef47bed9f77425faafeb",
-    "Assets/Scripts/Swarm/KannadiConfig.cs": "2ee4613eb1983a465d45f6166ce3e80559d997992aee31388f44cee0fb142d7b",
-    "Assets/Scripts/ChoiceController.cs": "e7950e5f8c9bf340d7acde88895cf980741d3bf7c2f611063ee203b2ce9238c4",
-    "Assets/Scripts/BandSpawner.cs": "96666417c866e3b058804a5f561167bef6532db37a49a95cea930e4aea77c4a4",
+    "Assets/Scripts/StimulusHeadingReference.cs": "e679981a640ccd867854ef72bbf7f1603a64e182f6d4134afce49f08a2be5ed5",
+    "Assets/Scripts/ExperimentTelemetry.cs": "788d9ba9af3f51f5a79ac7b58476dff8422e37b4c9bebad1eaa4ac5a6b2d532e",
+    "Assets/Scripts/RuntimeStatusOverlay.cs": "643ec6bfaed4ac77a2b55aae1daa94a3d182fecc1356d1983c192799e62d0b30",
+    "Assets/Scripts/ZmqListener.cs": "04791738b30b19eaf9ac2d990caa18c1801a3665923225179e96a4219ff6b162",
+    "Assets/Scripts/ClosedLoop.cs": "5e5e5ec6a4f323fd623f5d6f70853b94022051fddaac3858ca890e8a5768c493",
+    "Assets/Scripts/MainController.cs": "bd275715b72ca82c6c97ced4a7d2349d04da44bb82edeeba3b7dfb05be513592",
+    "Assets/Scripts/Swarm/SwarmController.cs": "117b48150f9fb23bfe21c96ecbc6472f23391c7a6049ebc9841345a2166a0f4e",
+    "Assets/Scripts/Swarm/LocustSpawner.cs": "8791bf3623dcaaeb7b9d7a99f8cce0874dac5cff1aa7bcfeaded67c0d8f25166",
+    "Assets/Scripts/Swarm/KannadiConfig.cs": "3c9f66f58cfc046db8a809d9fdaf5bb6160d72aba9aece114f6161cfb9fc85b7",
+    "Assets/Scripts/ChoiceController.cs": "85765f6e66719e8f8af88113bb3fc89f0d554bf685930286fc32e3019dc2fd9c",
+    "Assets/Scripts/BandSpawner.cs": "164b29812e94e58d8d0d3a3a1546a885862b7073ec969fd0e8017852647748ed",
     "Assets/Scripts/Debugger.cs": "d31aa86d44735da913cebb9fd635847e750b124af24a2b473fee0022f05d123e",
-    "Assets/Editor/HeadingTelemetryValidation.cs": "04d332ffc2989c55c0d03d6ea168a060bf286d7782c2fd5bf6bd68ecd28c7d29"
+    "Assets/Editor/HeadingTelemetryValidation.cs": "e2e62d26c12a8dd0d752e2898eed6a3f22f205985c6dfc0d2b4636557861205a"
   },
   "headingTelemetry": {
-    "checks": 76,
+    "checks": 82,
     "failure": null,
     "unexpectedErrors": [],
     "unity": "6000.3.16f1",
-    "coverage": "Circular statistics, disabled/default/invalid/sequence config, generic and Choice adapters, real Swarm lifecycle, per-rig onset/no reset, repeat trial, PUB/SUB tracking and telemetry, raw units, player errors and HUD"
+    "coverage": "Circular statistics, disabled/default/invalid/sequence config, generic and Choice adapters, real Swarm lifecycle, per-rig onset/no reset, repeat trial, PUB/SUB tracking and telemetry, raw units, player errors and HUD; schema 2 signed degree conversion, DC compensation rate, degree-squared flight threshold, legacy default topic migration"
   },
   "historicalKinefly": {
     "checks": 73746,
@@ -44,15 +44,16 @@
     "library": "pyzmq 27.2.0",
     "receivedSnapshots": 5,
     "rigsPerSnapshot": 4,
-    "increasingSequence": true
+    "increasingSequence": true,
+    "evidence": "Retained earlier schema 1 subscriber test; current schema 2 framing and delivery were verified by the real NetMQ subscriber in the Unity suite."
   },
   "staticValidation": {
-    "templates": 22,
+    "templates": 57,
     "sceneCatalogDependencyFiles": 84,
     "uniqueAssetGuids": true,
     "featureDiffWhitespace": "passed"
   },
-  "visualValidation": "Rendered persistent bottom-right HUD inspected; trial, scene, per-rig gains/DC, heading references, input status, PUB endpoint and error message visible.",
+  "visualValidation": "Final graphical flight dashboard inspected at 1600x900: signed DC degrees, yaw and compensation in degrees/second, per-rig change history, flight/bypass and all four rigs visible.",
   "limitations": [
     "Physical tracker latency, LED timing, multi-monitor mapping and a packaged standalone player were not bench-tested.",
     "UnityEditor.Search.SearchDatabase emitted its existing indexing exception; recorded separately by the walking suite.",

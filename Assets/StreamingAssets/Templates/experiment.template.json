@@ -67,11 +67,14 @@
       "flightConfirmationSeconds": 1,
       "flightVarianceHysteresis": 0.5,
       "updateIntervalSeconds": 0.5,
-      "aggressiveness": 0.65,
-      "maxStepRadians": 0.1,
+      "aggressiveness": 1,
+      "maxStepRadians": 1,
       "maxOffsetRadians": 2,
       "settleSeconds": 3,
-      "toleranceDegPerSecond": 1
+      "toleranceDegPerSecond": 1,
+      "centerStatistic": "mean",
+      "noiseAware": true,
+      "maxWindowSeconds": 120
     }
   },
   "postStimulus": {

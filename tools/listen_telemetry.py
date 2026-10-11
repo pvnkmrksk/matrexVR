@@ -8,7 +8,7 @@ import sys
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--endpoint', default='tcp://127.0.0.1:9880')
-    parser.add_argument('--topic', default='matrex.telemetry.v1')
+    parser.add_argument('--topic', default='matrex.telemetry.v2')
     parser.add_argument('--count', type=int, default=0, help='stop after N snapshots; 0 means forever')
     parser.add_argument('--timeout', type=float, default=0, help='exit if no snapshot arrives within this many seconds; 0 waits forever')
     parser.add_argument('--pretty', action='store_true', help='indent JSON; default is one JSON object per line')
@@ -35,7 +35,7 @@ def main():
                     if len(frames) != 2 or frames[0].decode('utf-8') != args.topic:
                         continue
                     data = json.loads(frames[1])
-                    if data.get('schemaVersion') != 1:
+                    if data.get('schemaVersion') not in (1, 2):
                         raise ValueError('Unsupported telemetry schemaVersion')
                     print(json.dumps(data, indent=2 if args.pretty else None, allow_nan=False), flush=True)
                     received += 1

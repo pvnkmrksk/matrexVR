@@ -20,14 +20,16 @@ def validate(obj, path):
         assert obj['nearClipMetres'] > 0, path
     if obj.get('worldUnitsPerMetre') is not None:
         assert obj['worldUnitsPerMetre'] > 0, path
-    ranges = {'windowSeconds': (1, 300), 'flightWindowSeconds': (.2, 30),
+    ranges = {'windowSeconds': (1, 300), 'maxWindowSeconds': (1, 300), 'flightWindowSeconds': (.2, 30),
               'flightVarianceThreshold': (0, 1000000), 'flightConfirmationSeconds': (0, 30),
               'flightVarianceHysteresis': (0, 1), 'updateIntervalSeconds': (.1, 60),
               'aggressiveness': (.001, 1), 'maxStepRadians': (.000001, 10), 'maxOffsetRadians': (.000001, 10),
               'settleSeconds': (0, 300), 'toleranceDegPerSecond': (0, 1000000)}
     for key, value in (obj.get('autoTrimSettings') or {}).items():
-        if key == 'flightCheckEnabled':
+        if key in ('flightCheckEnabled', 'noiseAware'):
             assert isinstance(value, bool), (path, key)
+        elif key == 'centerStatistic':
+            assert value in ('mean', 'median'), (path, key)
         else:
             assert key in ranges and isinstance(value, (int, float)) and not isinstance(value, bool) and ranges[key][0] <= value <= ranges[key][1], (path, key)
     if any(name in obj for name in ('preStimulus', 'stimulus', 'postStimulus')):

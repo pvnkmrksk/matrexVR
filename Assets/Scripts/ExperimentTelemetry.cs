@@ -14,7 +14,7 @@ public sealed class TelemetryConfig
     public string bindAddress = "127.0.0.1";
     public int port = 9880;
     public float rateHz = 20;
-    public string topic = "matrex.telemetry.v1";
+    public string topic = "matrex.telemetry.v2";
     public void Validate()
     {
         if (!enabled) return;
@@ -56,6 +56,8 @@ public sealed class ExperimentTelemetry : MonoBehaviour
         try
         {
             settings.Validate();
+            // Upgrade the old built-in default in existing local system configs with the payload.
+            if (settings.topic == "matrex.telemetry.v1") settings.topic = "matrex.telemetry.v2";
             if (main.SystemConfigs.Values.Any(rig => rig.zmqPort == settings.port))
                 throw new ArgumentException("Telemetry port must differ from every tracking input port.");
             Endpoint = $"tcp://{settings.bindAddress}:{settings.port}";
@@ -115,20 +117,29 @@ public sealed class ExperimentTelemetry : MonoBehaviour
                         endpoint = listener != null ? listener.Endpoint : null,
                         state = listener != null ? listener.State : "missing listener",
                         wireFormat = listener != null ? listener.WireFormat : null,
-                        latest = Sample(raw), consumed = Sample(rig.LastConsumedSample),
-                        interpretation = rig.InputInterpretation },
+                        latest = Sample(raw, rig), consumed = Sample(rig.LastConsumedSample, rig),
+                        interpretation = rig.InputInterpretation.Replace("radians", "degrees"),
+                        angularUnits = rig.GetUseForceMode() ? "tracker-native-torque" : "degrees" },
                     closedLoop = new { positionEnabled = rig.PositionTrackingEnabled, orientationEnabled = rig.OrientationTrackingEnabled,
                         positionGain = rig.PositionGain, orientationGain = rig.OrientationGain,
-                        yawGain = rig.GetYawGain(), yawDCOffsetRadians = rig.GetYawDCOffset(), forceGain = rig.ForceGain, torqueGain = rig.TorqueGain,
+                        yawGain = rig.GetYawGain(), yawDCOffsetDegrees = rig.GetYawDCOffset() * KineflyAutoTrim.RadToDeg,
+                        yawDCCompensationDegPerSecond = rig.GetYawGain() * rig.GetYawDCOffset() * KineflyAutoTrim.RadToDeg,
+                        yawOutputDegPerSecond = rig.GetLastYawOutput(), forceGain = rig.ForceGain, torqueGain = rig.TorqueGain,
                         appliedThisFrame = rig.AppliedTrackingThisFrame,
                         appliedPositionDelta = new { x = rig.LastAppliedPositionDelta.x, y = rig.LastAppliedPositionDelta.y, z = rig.LastAppliedPositionDelta.z },
                         appliedYawDeltaDegrees = rig.LastAppliedYawDeltaDegrees },
                     autoTrim = new { supported = rig.SupportsAutoTrim, enabled = rig.AutoTrim.Enabled,
                         state = rig.AutoTrim.State, flightReady = rig.AutoTrim.FlightReady, flying = rig.AutoTrim.Flying,
-                        flightCheckEnabled = rig.AutoTrim.FlightCheckEnabled, flightThresholdRadiansSquared = rig.AutoTrim.FlightThreshold,
+                        flightCheckEnabled = rig.AutoTrim.FlightCheckEnabled,
+                        flightThresholdDegreesSquared = rig.AutoTrim.FlightThreshold * KineflyAutoTrim.RadToDeg * KineflyAutoTrim.RadToDeg,
                         flightSamples = rig.AutoTrim.FlightSampleCount,
-                        flightVarianceRadiansSquared = rig.AutoTrim.FlightVariance,
+                        flightVarianceDegreesSquared = rig.AutoTrim.FlightVariance * KineflyAutoTrim.RadToDeg * KineflyAutoTrim.RadToDeg,
+                        flightStdDevDegrees = Math.Sqrt(rig.AutoTrim.FlightVariance) * KineflyAutoTrim.RadToDeg,
+                        flightThresholdStdDevDegrees = Math.Sqrt(rig.AutoTrim.FlightThreshold) * KineflyAutoTrim.RadToDeg,
                         medianDegPerSecond = rig.AutoTrim.EffectiveMedianDegPerSecond,
+                        meanDegPerSecond = rig.AutoTrim.EffectiveMeanDegPerSecond, uncertaintyDegPerSecond = rig.AutoTrim.UncertaintyDegPerSecond,
+                        centerStatistic = rig.AutoTrim.CenterStatistic, measurementSeconds = rig.AutoTrim.MeasurementSeconds,
+                        lastAdjustment = Adjustment(rig.AutoTrim.LastAdjustment),
                         windowProgress = rig.AutoTrim.WindowProgress, passes = rig.AutoTrim.Passes },
                     headingReference = new { phase = reference != null ? reference.Phase : "disabled",
                         remainingSeconds = reference != null ? reference.RemainingSeconds : 0, result = reference != null ? reference.Result : null }
@@ -136,7 +147,7 @@ public sealed class ExperimentTelemetry : MonoBehaviour
             }
         }
         return new {
-            schemaVersion = 1, sequence = snapshotSequence, timestampUtc = DateTime.UtcNow.ToString("O"),
+            schemaVersion = 2, sequence = snapshotSequence, timestampUtc = DateTime.UtcNow.ToString("O"),
             realtimeSeconds = Time.realtimeSinceStartupAsDouble, experimentSeconds = Time.timeAsDouble, frame = Time.frameCount,
             system = new { running = main != null && main.SequenceRunning, trialNumber = main != null ? main.currentTrial + 1 : 0,
                 sceneNumber = main != null && main.SequenceRunning ? main.currentStep + 1 : 0,
@@ -150,13 +161,24 @@ public sealed class ExperimentTelemetry : MonoBehaviour
         };
     }
 
-    private static object Sample(ZmqListener.RawSample raw)
+    private static object Sample(ZmqListener.RawSample raw, ClosedLoop rig)
     {
         double? age = raw.hasPose ? Math.Max(0, TimeSpan.FromTicks(DateTime.UtcNow.Ticks - raw.receivedUtcTicks).TotalSeconds) : (double?)null;
+        bool wingAngles = rig.GetCurrentMode() == ClosedLoopMode.Kinefly;
+        double angularScale = rig.UsesBogongInput && !rig.GetUseForceMode() ? KineflyAutoTrim.RadToDeg : 1;
         return new { available = raw.hasPose, sequence = raw.sequence,
             receivedUtc = raw.hasPose ? new DateTime(raw.receivedUtcTicks, DateTimeKind.Utc).ToString("O") : null,
             ageSeconds = age, fresh = age.HasValue && age.Value <= 1,
-            x = raw.position.x, y = raw.position.y, z = raw.position.z,
-            pitch = raw.rotation.x, yaw = raw.rotation.y, roll = raw.rotation.z };
+            positionUnits = wingAngles ? "x/y: wing-angle-degrees; z: tracker-native" : "tracker-native",
+            x = raw.position.x * (wingAngles ? KineflyAutoTrim.RadToDeg : 1),
+            y = raw.position.y * (wingAngles ? KineflyAutoTrim.RadToDeg : 1), z = raw.position.z,
+            pitch = raw.rotation.x * angularScale,
+            yaw = raw.rotation.y * angularScale,
+            roll = raw.rotation.z * angularScale };
     }
+
+    private static object Adjustment(KineflyAutoTrim.Adjustment change) => change == null ? null : new {
+        realtimeSeconds = change.time, fromDegrees = change.fromRadians * KineflyAutoTrim.RadToDeg,
+        toDegrees = change.toRadians * KineflyAutoTrim.RadToDeg, deltaDegrees = change.deltaRadians * KineflyAutoTrim.RadToDeg,
+        yawRateChangeDegPerSecond = -change.gain * change.deltaRadians * KineflyAutoTrim.RadToDeg };
 }
