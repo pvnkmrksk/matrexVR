@@ -107,6 +107,13 @@ public class Vector3Config
 [Serializable]
 public class BogongVisualConfig
 {
+    public string shape = "Dot"; // Moth opts into a low-poly 3D body and GPU wing motion.
+    public float bodyLengthMetres = 0.0254f;
+    public float bodyDiameterMetres = 0.01f;
+    public float wingSpanMetres = 0.04f;
+    public float flapFrequencyHz = 30f;
+    public float wingOpacity = 0.25f;
+    public bool subpixelVisibility = true;
     // World keeps normal perspective. Angular keeps the apparent diameter in degrees.
     public string sizeMode = "World";
     public float size = 0.5f;
@@ -119,6 +126,12 @@ public class BogongVisualConfig
 
     public void Validate()
     {
+        if (!string.Equals(shape, "Dot", StringComparison.OrdinalIgnoreCase) && !string.Equals(shape, "Moth", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("Bogong shape must be Dot or Moth.");
+        if (!Finite(bodyLengthMetres) || bodyLengthMetres <= 0 || !Finite(bodyDiameterMetres) || bodyDiameterMetres <= 0 ||
+            !Finite(wingSpanMetres) || wingSpanMetres <= 0 || !Finite(flapFrequencyHz) || flapFrequencyHz < 0 ||
+            !Finite(wingOpacity) || wingOpacity < 0 || wingOpacity > 1)
+            throw new ArgumentException("Moth dimensions must be positive; flap frequency nonnegative; wing opacity in [0,1].");
         if (!string.Equals(sizeMode, "World", StringComparison.OrdinalIgnoreCase) &&
             !string.Equals(sizeMode, "Angular", StringComparison.OrdinalIgnoreCase))
             throw new ArgumentException("Bogong sizeMode must be World or Angular.");
@@ -151,6 +164,10 @@ public class LocustGainConverter : JsonConverter
 [Serializable]
 public class SwarmConfig
 {
+    public string trajectoryFile = ""; // Blank retains the generated swarm.
+    public SwarmPlaybackConfig playback = new SwarmPlaybackConfig();
+    public float? worldUnitsPerMetre; // Omitted: scenes with active Terrain=1; legacy walking scenes=100.
+    public float? nearClipMetres;
     public bool useHeadingReference = false;
     // With relative spawning or an available, opted-in heading reference, spawnCenter is an offset from the rig.
     public bool spawnRelativeToAnimal = false;
@@ -179,6 +196,11 @@ public class SwarmConfig
     public float animationSpeedThreshold = 0.5f;
     public void ValidateSwarm()
     {
+        playback?.Validate();
+        if (nearClipMetres.HasValue && (!Finite(nearClipMetres.Value) || nearClipMetres <= 0))
+            throw new ArgumentException("nearClipMetres must be positive metres.");
+        if (worldUnitsPerMetre.HasValue && (!Finite(worldUnitsPerMetre.Value) || worldUnitsPerMetre <= 0))
+            throw new ArgumentException("worldUnitsPerMetre must be positive.");
         if (!Finite(boundaryLengthX) || !Finite(boundaryLengthZ) || boundaryLengthX <= 0 || boundaryLengthZ <= 0)
             throw new ArgumentException("Boundary dimensions must be positive and finite.");
         if (!Finite(animationSpeedThreshold) || animationSpeedThreshold < 0)
@@ -218,5 +240,27 @@ public class SwarmConfig
         if (!Finite(value.x) || !Finite(value.y) || !Finite(value.z) ||
             (positive && (value.x <= 0 || value.y <= 0 || value.z <= 0)))
             throw new ArgumentException(name + " must contain finite" + (positive ? " positive" : "") + " components.");
+    }
+}
+
+[Serializable]
+public class SwarmPlaybackConfig
+{
+    public float dataUnitsPerMetre = 1f;
+    public bool loop = true;
+    public float speed = 1f;
+    public float startTimeSeconds;
+    public float maxGapSeconds = 0.1f;
+    public float yawOffsetDegrees;
+    public bool centerOnAnimal = true;
+    public bool periodicBoundary = true;
+    public void Validate()
+    {
+        if (float.IsNaN(dataUnitsPerMetre) || float.IsInfinity(dataUnitsPerMetre) || dataUnitsPerMetre <= 0 ||
+            float.IsNaN(speed) || float.IsInfinity(speed) || speed <= 0 ||
+            float.IsNaN(startTimeSeconds) || float.IsInfinity(startTimeSeconds) || startTimeSeconds < 0 ||
+            float.IsNaN(maxGapSeconds) || float.IsInfinity(maxGapSeconds) || maxGapSeconds <= 0 ||
+            float.IsNaN(yawOffsetDegrees) || float.IsInfinity(yawOffsetDegrees))
+            throw new ArgumentException("Invalid swarm playback timing/rotation.");
     }
 }

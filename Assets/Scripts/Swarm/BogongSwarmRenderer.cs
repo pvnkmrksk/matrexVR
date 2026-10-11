@@ -4,6 +4,7 @@ using UnityEngine.Rendering;
 
 /// <summary>One draw per swarm/camera; centers move on the CPU, camera sizing stays on the GPU.</summary>
 [DefaultExecutionOrder(1000)]
+[ExecuteAlways]
 public sealed class BogongSwarmRenderer : MonoBehaviour
 {
     private IReadOnlyList<GameObject> agents;
@@ -14,14 +15,19 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
     private Bounds centerBounds;
     private float tangentHalfAngle, worldRadius;
     private bool angular;
+    private bool moth;
+    private int stride;
+    private Vector4[] rotations;
+    private Vector2[] phases;
     public int AgentCount => agents?.Count ?? 0;
 
-    public void Configure(IReadOnlyList<GameObject> source, BogongVisualConfig config)
+    public void Configure(IReadOnlyList<GameObject> source, BogongVisualConfig config, float worldUnitsPerMetre = 100f)
     {
         config = config ?? new BogongVisualConfig();
         config.Validate(); agents = source;
-        Shader shader = Resources.Load<Shader>("Bogong/BatchedDot");
-        if (shader == null || !shader.isSupported) throw new System.InvalidOperationException("Bogong/BatchedDot shader is unavailable.");
+        moth = string.Equals(config.shape, "Moth", System.StringComparison.OrdinalIgnoreCase);
+        Shader shader = Resources.Load<Shader>(moth ? "Bogong/BatchedMoth" : "Bogong/BatchedDot");
+        if (shader == null || !shader.isSupported) throw new System.InvalidOperationException("Bogong batch shader is unavailable: " + config.shape);
         material = new Material(shader) { name = "Batched solid Bogong swarm" };
         angular = string.Equals(config.sizeMode, "Angular", System.StringComparison.OrdinalIgnoreCase);
         tangentHalfAngle = Mathf.Tan(.5f * config.angularSizeDegrees * Mathf.Deg2Rad);
@@ -32,12 +38,24 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
         material.SetFloat("_Radius", worldRadius);
         material.SetFloat("_FlickerFrequency", config.flickerFrequencyHz);
         material.SetFloat("_FlickerDuty", config.flickerDutyCycle);
-        mesh = new Mesh { name = "Bogong swarm centers", indexFormat = IndexFormat.UInt32 };
-        mesh.MarkDynamic();
+        if (moth)
+        {
+            material.SetFloat("_BodyLength", config.bodyLengthMetres * worldUnitsPerMetre);
+            material.SetFloat("_BodyDiameter", config.bodyDiameterMetres * worldUnitsPerMetre);
+            material.SetFloat("_WingSpan", config.wingSpanMetres * worldUnitsPerMetre);
+            material.SetFloat("_FlapFrequency", config.flapFrequencyHz);
+            material.SetFloat("_WingOpacity", config.wingOpacity);
+            material.SetFloat("_Subpixel", config.subpixelVisibility ? 1 : 0);
+            worldRadius = Mathf.Max(config.bodyLengthMetres, config.wingSpanMetres) * worldUnitsPerMetre / 2f;
+        }
         int count = agents.Count;
-        centers = new Vector3[count * 4];
+        mesh = moth ? BogongMothMesh.Create(count) : new Mesh { name = "Bogong swarm centers", indexFormat = IndexFormat.UInt32 };
+        mesh.MarkDynamic();
+        stride = moth ? BogongMothMesh.VerticesPerAgent : 4;
+        centers = new Vector3[count * stride];
+        phases = new Vector2[count * stride];
+        if (moth) rotations = new Vector4[centers.Length];
         var uv = new Vector2[count * 4];
-        var phases = new Vector2[count * 4];
         var triangles = new int[count * 6];
         for (int i = 0; i < count; i++)
         {
@@ -45,11 +63,12 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
             uv[v] = new Vector2(0, 0); uv[v + 1] = new Vector2(1, 0);
             uv[v + 2] = new Vector2(1, 1); uv[v + 3] = new Vector2(0, 1);
             float phase = Random.value;
-            for (int j = 0; j < 4; j++) phases[v + j] = new Vector2(phase, 0);
+            for (int j = 0; j < stride; j++) phases[i * stride + j] = new Vector2(phase, 1);
             triangles[t] = v; triangles[t + 1] = v + 1; triangles[t + 2] = v + 2;
             triangles[t + 3] = v; triangles[t + 4] = v + 2; triangles[t + 5] = v + 3;
         }
-        mesh.vertices = centers; mesh.uv = uv; mesh.uv2 = phases; mesh.triangles = triangles;
+        if (!moth) { mesh.vertices = centers; mesh.uv = uv; mesh.triangles = triangles; }
+        mesh.uv2 = phases;
         gameObject.AddComponent<MeshFilter>().sharedMesh = mesh;
         meshRenderer = gameObject.AddComponent<MeshRenderer>();
         meshRenderer.sharedMaterial = material;
@@ -67,33 +86,51 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
     public void RefreshCenters()
     {
         if (mesh == null || agents.Count == 0) return;
-        centerBounds = new Bounds(agents[0].transform.position, Vector3.zero);
+        bool any = false;
         for (int i = 0; i < agents.Count; i++)
         {
             Vector3 position = agents[i].transform.position;
-            centerBounds.Encapsulate(position);
-            int v = i * 4;
-            centers[v] = centers[v + 1] = centers[v + 2] = centers[v + 3] = position;
+            bool active = agents[i].activeInHierarchy;
+            if (active) { if (!any) centerBounds = new Bounds(position, Vector3.zero); else centerBounds.Encapsulate(position); any = true; }
+            Quaternion q = agents[i].transform.rotation;
+            for (int j = 0; j < stride; j++)
+            {
+                int v = i * stride + j;
+                centers[v] = position; phases[v].y = active ? 1 : 0;
+                if (moth) rotations[v] = new Vector4(q.x, q.y, q.z, q.w);
+            }
         }
         // Positions are world coordinates: the shader ignores the swarm host's transform.
         mesh.SetVertices(centers);
+        mesh.uv2 = phases;
+        if (moth) mesh.SetTangents(rotations);
+        meshRenderer.enabled = any;
         meshRenderer.bounds = centerBounds;
     }
 
     private void PrepareForCamera(Camera camera)
     {
         if (meshRenderer == null || (camera.cullingMask & (1 << gameObject.layer)) == 0) return;
+        if (moth) material.SetVector("_PanelPixels", new Vector4(camera.pixelWidth, camera.pixelHeight, 0, 0));
         // A conservative bound for the padded circles, including dots at cube-face seams.
         float radius = angular ? (Vector3.Distance(camera.transform.position, centerBounds.center) +
                                   centerBounds.extents.magnitude) * tangentHalfAngle : worldRadius;
         var bounds = centerBounds;
+        // Include the proxy's pixel-sized support as well as physical wings.
+        if (moth)
+        {
+            float depth = Vector3.Distance(camera.transform.position, centerBounds.center) + centerBounds.extents.magnitude;
+            float pixel = camera.orthographic ? 2f * camera.orthographicSize / Mathf.Max(1, camera.pixelHeight)
+                : 2f * depth * Mathf.Tan(camera.fieldOfView * .5f * Mathf.Deg2Rad) / Mathf.Max(1, camera.pixelHeight);
+            radius = Mathf.Max(radius, 3f * pixel);
+        }
         bounds.Expand(Mathf.Max(.0001f, 4.25f * radius));
         meshRenderer.bounds = bounds;
     }
 
     private void OnDestroy()
     {
-        if (mesh != null) Destroy(mesh);
-        if (material != null) Destroy(material);
+        if (mesh != null) { if (Application.isPlaying) Destroy(mesh); else DestroyImmediate(mesh); }
+        if (material != null) { if (Application.isPlaying) Destroy(material); else DestroyImmediate(material); }
     }
 }

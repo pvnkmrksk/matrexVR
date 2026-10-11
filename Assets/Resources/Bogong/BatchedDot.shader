@@ -38,6 +38,7 @@ Shader "Bogong/BatchedDot"
                 float3 view = center + radius * (right * o.circle.x + up * o.circle.y);
                 o.position = mul(UNITY_MATRIX_P, float4(view,1));
                 o.visible = _FlickerFrequency <= 0 || frac((_Time.y + v.phase.x) * _FlickerFrequency) < _FlickerDuty ? 1 : -1;
+                if (v.phase.y < .5) o.visible = -1;
                 return o;
             }
             float4 frag(v2f i) : SV_Target
