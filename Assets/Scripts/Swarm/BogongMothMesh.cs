@@ -6,12 +6,45 @@ using UnityEngine.Rendering;
 public static class BogongMothMesh
 {
     public const int VerticesPerAgent = 44; // 4 rings * 8 body vertices + 8 wings + 4 proxy.
+    public const int IndicesPerAgent = 162; // 48 body + 4 wing + 2 proxy triangles.
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    public struct PoseVertex
+    {
+        public Vector3 center;
+        public Vector4 rotation;
+        public Vector2 phase;
+    }
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    private struct ShapeVertex
+    {
+        public Vector2 part;
+        public Vector3 local;
+    }
+    // Static shape and dynamic pose live in separate buffers. Only live poses are uploaded.
+    public static Mesh CreateBatch(int count)
+    {
+        Mesh mesh = Create(count);
+        int[] indices = mesh.triangles;
+        var parts = new List<Vector2>(); var local = new List<Vector3>();
+        mesh.GetUVs(0,parts); mesh.GetUVs(2,local);
+        var shapes = new ShapeVertex[mesh.vertexCount];
+        for (int i=0;i<shapes.Length;i++) shapes[i] = new ShapeVertex { part=parts[i], local=local[i] };
+        mesh.SetVertexBufferParams(shapes.Length,
+            new VertexAttributeDescriptor(VertexAttribute.Position,VertexAttributeFormat.Float32,3,0),
+            new VertexAttributeDescriptor(VertexAttribute.Tangent,VertexAttributeFormat.Float32,4,0),
+            new VertexAttributeDescriptor(VertexAttribute.TexCoord0,VertexAttributeFormat.Float32,2,1),
+            new VertexAttributeDescriptor(VertexAttribute.TexCoord1,VertexAttributeFormat.Float32,2,0),
+            new VertexAttributeDescriptor(VertexAttribute.TexCoord2,VertexAttributeFormat.Float32,3,1));
+        mesh.SetVertexBufferData(shapes,0,0,shapes.Length,1,MeshUpdateFlags.DontRecalculateBounds);
+        mesh.SetTriangles(indices,0,false);
+        return mesh;
+    }
     public static Mesh Create(int count)
     {
         var vertices = new Vector3[count * VerticesPerAgent];
         var local = new List<Vector3>(vertices.Length);
         var parts = new List<Vector2>(vertices.Length);
-        var indices = new List<int>(count * 156);
+        var indices = new List<int>(count * IndicesPerAgent);
         for (int i = 0; i < count; i++)
         {
             int start = i * VerticesPerAgent;

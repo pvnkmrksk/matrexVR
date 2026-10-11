@@ -17,9 +17,13 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
     private bool angular;
     private bool moth;
     private int stride;
-    private Vector4[] rotations;
     private Vector2[] phases;
+    private BogongMothMesh.PoseVertex[] poses;
+    private float[] agentPhases;
+    private int drawCount = -1;
     public int AgentCount => agents?.Count ?? 0;
+    public int ActiveAgentCount { get; private set; }
+    public int UploadedVertexCount { get; private set; }
 
     public void Configure(IReadOnlyList<GameObject> source, BogongVisualConfig config, float worldUnitsPerMetre = 100f)
     {
@@ -63,12 +67,18 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
     {
         Mesh previous = mesh;
         Vector2[] previousPhases = phases;
-        mesh = moth ? BogongMothMesh.Create(count) : new Mesh { name = "Bogong swarm centers", indexFormat = IndexFormat.UInt32 };
+        mesh = moth ? BogongMothMesh.CreateBatch(count) : new Mesh { name = "Bogong swarm centers", indexFormat = IndexFormat.UInt32 };
         mesh.MarkDynamic();
         stride = moth ? BogongMothMesh.VerticesPerAgent : 4;
         centers = new Vector3[count * stride];
         phases = new Vector2[count * stride];
-        if (moth) rotations = new Vector4[centers.Length];
+        if (moth)
+        {
+            poses = new BogongMothMesh.PoseVertex[centers.Length];
+            float[] old = agentPhases; agentPhases = new float[count];
+            for(int i=0;i<count;i++) agentPhases[i] = old != null && i < old.Length ? old[i] : Random.value;
+            drawCount = -1;
+        }
         var uv = new Vector2[count * 4];
         var triangles = new int[count * 6];
         for (int i = 0; i < count; i++)
@@ -82,7 +92,7 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
             triangles[t + 3] = v; triangles[t + 4] = v + 2; triangles[t + 5] = v + 3;
         }
         if (!moth) { mesh.vertices = centers; mesh.uv = uv; mesh.triangles = triangles; }
-        mesh.uv2 = phases;
+        if (!moth) mesh.uv2 = phases;
         if (previous != null)
         {
             GetComponent<MeshFilter>().sharedMesh = mesh;
@@ -98,26 +108,54 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
     {
         if (mesh == null || agents.Count == 0) return;
         if (agents.Count * stride > centers.Length) Resize(Mathf.Max(agents.Count, centers.Length / stride * 2));
+        if (moth) { RefreshMoths(); return; }
         bool any = false;
+        ActiveAgentCount = 0;
         for (int i = 0; i < agents.Count; i++)
         {
             Vector3 position = agents[i].transform.position;
             bool active = agents[i].activeInHierarchy;
-            if (active) { if (!any) centerBounds = new Bounds(position, Vector3.zero); else centerBounds.Encapsulate(position); any = true; }
-            Quaternion q = agents[i].transform.rotation;
+            if (active) { if (!any) centerBounds = new Bounds(position, Vector3.zero); else centerBounds.Encapsulate(position); any = true; ActiveAgentCount++; }
             for (int j = 0; j < stride; j++)
             {
                 int v = i * stride + j;
                 centers[v] = position; phases[v].y = active ? 1 : 0;
-                if (moth) rotations[v] = new Vector4(q.x, q.y, q.z, q.w);
             }
         }
         // Positions are world coordinates: the shader ignores the swarm host's transform.
         mesh.SetVertices(centers);
         mesh.uv2 = phases;
-        if (moth) mesh.SetTangents(rotations);
+        UploadedVertexCount = centers.Length;
         meshRenderer.enabled = any;
         meshRenderer.bounds = centerBounds;
+    }
+
+    private void RefreshMoths()
+    {
+        int count=0;
+        for(int i=0;i<agents.Count;i++)
+        {
+            GameObject agent=agents[i];
+            if (!agent.activeInHierarchy) continue;
+            Transform transform=agent.transform;
+            Vector3 position=transform.position; Quaternion q=transform.rotation;
+            if(count==0) centerBounds=new Bounds(position,Vector3.zero); else centerBounds.Encapsulate(position);
+            var pose=new BogongMothMesh.PoseVertex { center=position,rotation=new Vector4(q.x,q.y,q.z,q.w),
+                phase=new Vector2(agentPhases[i],1) };
+            int start=count++*stride;
+            for(int v=0;v<stride;v++) poses[start+v]=pose;
+        }
+        ActiveAgentCount=count; UploadedVertexCount=count*stride;
+        if(count>0) mesh.SetVertexBufferData(poses,0,0,UploadedVertexCount,0,MeshUpdateFlags.DontRecalculateBounds);
+        mesh.bounds=centerBounds;
+        if(drawCount!=count)
+        {
+            mesh.SetSubMesh(0,new SubMeshDescriptor(0,count*BogongMothMesh.IndicesPerAgent) {
+                firstVertex=0,vertexCount=UploadedVertexCount,bounds=centerBounds },MeshUpdateFlags.DontRecalculateBounds);
+            drawCount=count;
+        }
+        meshRenderer.enabled=count>0;
+        if(count>0) meshRenderer.bounds=centerBounds;
     }
 
     private void PrepareForCamera(Camera camera)

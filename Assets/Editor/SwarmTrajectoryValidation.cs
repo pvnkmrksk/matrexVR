@@ -22,12 +22,130 @@ public static class SwarmTrajectoryValidation
         if (!File.Exists(Path.Combine(Application.dataPath, "../KANNADI_VALIDATION_COPY"))) throw new Exception("Disposable project only.");
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         string failure = null;
-        try { DataAndPlayback(); ContinuingTracks(); AuthoringAndUnits(); Rendering(); Performance(); }
+        try { DataAndPlayback(); ContinuingTracks(); IncomingTracks(); CompactBatch(); CompactRasterParity(); AuthoringAndUnits(); Rendering(); Performance(); }
         catch (Exception error) { failure = error.ToString(); Debug.LogError(failure); }
         File.WriteAllText(Path.Combine(Application.dataPath, "../swarm-trajectory-validation.json"),
             JsonConvert.SerializeObject(new { checks, failure, captures, timings, unity = Application.unityVersion,
                 timingNote = "Isolated CPU timings: four rigs, six 64px cameras each, 256 agents per rig. Not hardware-display FPS." }, Formatting.Indented));
         EditorApplication.Exit(failure == null ? 0 : 1);
+    }
+    private static void CompactBatch()
+    {
+        var host=new GameObject("Compact batch");
+        var roots=new[] {new GameObject("First"),new GameObject("Second"),new GameObject("Third")};
+        try
+        {
+            var batch=host.AddComponent<BogongSwarmRenderer>();batch.Configure(roots,new BogongVisualConfig {shape="Moth"},1);
+            var mesh=host.GetComponent<MeshFilter>().sharedMesh;float secondPhase=mesh.uv2[BogongMothMesh.VerticesPerAgent].x;
+            Check(mesh.GetIndexCount(0)==3*BogongMothMesh.IndicesPerAgent,"Compact draw range includes every body, wing and subpixel proxy triangle.");
+            roots[0].SetActive(false);batch.RefreshCenters();
+            Check(batch.ActiveAgentCount==2 && batch.UploadedVertexCount==88 && mesh.GetIndexCount(0)==2*BogongMothMesh.IndicesPerAgent,
+                "Inactive slots neither upload pose vertices nor issue geometry.");
+            Check(mesh.uv2[0].x==secondPhase,"Compaction preserves each moth's wing phase when an earlier slot retires.");
+            foreach(var root in roots) root.SetActive(false);batch.RefreshCenters();
+            Check(batch.UploadedVertexCount==0 && mesh.GetIndexCount(0)==0 && !host.GetComponent<MeshRenderer>().enabled,
+                "An empty population skips GPU uploads and rendering entirely.");
+            roots[1].SetActive(true);batch.RefreshCenters();
+            Check(batch.ActiveAgentCount==1 && mesh.uv2[0].x==secondPhase,"Pool reactivation restores only the live moth with its original phase.");
+        }
+        finally {Object.DestroyImmediate(host);foreach(var root in roots) Object.DestroyImmediate(root);}
+    }
+    private static void IncomingTracks()
+    {
+        var data=SwarmTrajectoryData.Parse(new[] {"ID,X,Y,Z,time","A,0,0,0,0","A,1,0,0,1","B,5,0,0,5","B,6,0,0,6"});
+        var animal=new GameObject("Incoming animal"); var host=new GameObject("Incoming host");
+        var roots=new List<GameObject> {new GameObject("Incoming_ID_pool"),new GameObject("Incoming_ID_pool")};
+        var settings=new SwarmPlaybackConfig {continueAfterTrack=true,periodicBoundary=false,loop=false,
+            maxGapSeconds=2,preRollSeconds=2,continuationSpeedMetresPerSecond=6};
+        var replay=host.AddComponent<SwarmTrajectoryPlayback>();
+        Func<GameObject> grow=()=> {var root=new GameObject("Incoming_ID_pool");roots.Add(root);return root;};
+        try
+        {
+            replay.Configure(data,settings,roots,animal.transform,null,Vector3.zero,Quaternion.identity,1,grow);
+            replay.Advance(2.99); Check(replay.TotalBirths==1,"An incoming track is not spawned before its configured lead-in.");
+            replay.Advance(3); var b=roots.Single(r=>r.name.EndsWith("_ID_B"));
+            Vector3 anchor=animal.transform.position-data.Centroid;
+            Check(Vector3.Distance(b.transform.position,anchor+new Vector3(-7,0,0))<1e-5,"Incoming line uses first-sample direction at 6m/s, two seconds before the recorded start.");
+            animal.transform.position=Vector3.up*10; replay.Advance(4);
+            Check(Vector3.Distance(b.transform.position,anchor+new Vector3(-1,0,0))<1e-5,"An incoming moth is already world anchored and cannot follow later animal motion.");
+            replay.Advance(5.5);
+            Check(Vector3.Distance(b.transform.position,anchor+new Vector3(5.5f,0,0))<1e-5,"Lead-in preserves exact recorded interpolation rather than stretching the samples.");
+            replay.Advance(6.5);
+            Check(Vector3.Distance(b.transform.position,anchor+new Vector3(9,0,0))<1e-5,"The same moth continues forward after its recorded end.");
+            settings.loop=true; animal.transform.position=Vector3.zero;
+            replay.Configure(data,settings,roots,animal.transform,null,Vector3.zero,Quaternion.identity,1,grow);
+            replay.Advance(4.01);
+            Check(roots.Any(r=>r.name.EndsWith("_ID_A_C1_S0")),"Incoming tracks of the next loop begin before the loop boundary.");
+            long births=replay.TotalBirths; replay.Advance(4.01);
+            Check(replay.TotalBirths==births,"Repeated calls at the same clock time never duplicate cursor births.");
+            replay.Advance(3.5);
+            Check(replay.TotalBirths==1,"Seeking resets the cursor and initializes the current incoming instance.");
+
+            var distant=SwarmTrajectoryData.Parse(new[] {"ID,X,Y,Z,time","A,0,0,0,0","A,1,0,0,1","B,0,0,0,80","B,1,0,0,81"});
+            settings.loop=false;settings.preRollSeconds=30;
+            replay.Configure(distant,settings,roots,animal.transform,null,Vector3.zero,Quaternion.identity,1,grow);
+            replay.Advance(50); b=roots.Single(r=>r.name.EndsWith("_ID_B"));
+            Check(!b.activeSelf && replay.TotalBirths==2,"A long incoming line outside 100m remains pending without rendering.");
+            replay.Advance(65);
+            Check(b.activeSelf && Vector3.Distance(b.transform.position,animal.transform.position)<=100,"Pending incoming moth becomes visible when it enters the cutoff.");
+            replay.Advance(80);
+            Check(Vector3.Distance(b.transform.position,new Vector3(-.5f,0,0))<1e-5,"Distance clipping never discards a pending recorded arrival.");
+            settings.preRollSeconds=-1; bool rejected=false;
+            try {settings.Validate();} catch(ArgumentException) {rejected=true;}
+            Check(rejected,"Negative incoming extension is rejected.");
+            settings.preRollSeconds=1;settings.continueAfterTrack=false;rejected=false;
+            try {settings.Validate();} catch(ArgumentException) {rejected=true;}
+            Check(rejected,"Incoming extension cannot silently affect legacy recorded-lifetime mode.");
+        }
+        finally {Object.DestroyImmediate(host);foreach(var root in roots) Object.DestroyImmediate(root);Object.DestroyImmediate(animal);}
+    }
+    private static void CompactRasterParity()
+    {
+        var root=new GameObject("Compact reference") {layer=29};var oldRoot=new GameObject("Full slot reference") {layer=29};
+        var cameraRoot=new GameObject("Parity camera");var camera=cameraRoot.AddComponent<Camera>();camera.enabled=false;
+        camera.fieldOfView=90;camera.aspect=1;camera.nearClipPlane=.001f;camera.farClipPlane=100;
+        camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=Color.gray;camera.cullingMask=1<<29;
+        camera.allowHDR=false;camera.allowMSAA=false;
+        var rt=new RenderTexture(128,128,24,RenderTextureFormat.ARGB32);rt.Create();camera.targetTexture=rt;
+        var agents=Enumerable.Range(0,4).Select(i=>new GameObject("Parity moth "+i)).ToArray();
+        var reference=BogongMothMesh.Create(4);
+        try
+        {
+            var batch=root.AddComponent<BogongSwarmRenderer>();batch.Configure(agents,new BogongVisualConfig {shape="Moth"},1);
+            var renderer=root.GetComponent<MeshRenderer>();var material=renderer.sharedMaterial;material.SetFloat("_ManualAnimation",1);
+            oldRoot.AddComponent<MeshFilter>().sharedMesh=reference;var old=oldRoot.AddComponent<MeshRenderer>();old.sharedMaterial=material;
+            float[] phases=(float[])typeof(BogongSwarmRenderer).GetField("agentPhases",BindingFlags.NonPublic|BindingFlags.Instance).GetValue(batch);
+            foreach(float distance in new[] {.177f,.5f,1f,3f})
+            {
+                // Swarm hosts are children of moving/rotating rigs. Poses remain world-space.
+                root.transform.SetPositionAndRotation(new Vector3(13,7,-11),Quaternion.Euler(20,130,10));
+                root.transform.localScale=Vector3.one*.7f;
+                var positions=new Vector3[reference.vertexCount];var rotations=new Vector4[reference.vertexCount];var visible=new Vector2[reference.vertexCount];
+                for(int i=0;i<4;i++)
+                {
+                    agents[i].SetActive(i==1 || i==3);agents[i].transform.SetPositionAndRotation(new Vector3((i-2)*distance*.08f,0,distance),Quaternion.Euler(0,90+i*17,0));
+                    Quaternion q=agents[i].transform.rotation;
+                    for(int v=0;v<BogongMothMesh.VerticesPerAgent;v++)
+                    {
+                        int index=i*BogongMothMesh.VerticesPerAgent+v;positions[index]=agents[i].transform.position;
+                        rotations[index]=new Vector4(q.x,q.y,q.z,q.w);visible[index]=new Vector2(phases[i],agents[i].activeSelf?1:0);
+                    }
+                }
+                reference.SetVertices(positions);reference.SetTangents(rotations);reference.uv2=visible;
+                old.bounds=new Bounds(Vector3.forward*distance,Vector3.one*100);
+                foreach(float time in new[] {.001f,.007f})
+                {
+                    material.SetFloat("_AnimationTime",time);batch.RefreshCenters();old.enabled=false;var compact=Capture(camera);
+                    renderer.enabled=false;old.enabled=true;var full=Capture(camera);
+                    Check(compact.SequenceEqual(full),"Live-only world poses ignore the host transform and match the full-slot shader at "+distance+"m, time "+time+".");
+                }
+            }
+        }
+        finally
+        {
+            camera.targetTexture=null;rt.Release();Object.DestroyImmediate(rt);Object.DestroyImmediate(reference);
+            Object.DestroyImmediate(root);Object.DestroyImmediate(oldRoot);Object.DestroyImmediate(cameraRoot);foreach(var agent in agents) Object.DestroyImmediate(agent);
+        }
     }
     private static void ContinuingTracks()
     {
