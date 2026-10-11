@@ -171,6 +171,7 @@ public static class SwarmTrajectoryValidation
             {
                 agent.transform.position = new Vector3(0,0,distance); batch.RefreshCenters();
                 Color32[] pixels = Capture(camera);
+                Check(pixels.All(p=>p.a==255), "Composited camera output stays opaque at " + distance + "m; previews do not apply contrast twice.");
                 float contrast = pixels.Sum(p => (255 - p.r) / 255f);
                 int changed = pixels.Count(p => p.r < 255);
                 captures.Add(new { distanceMetres = distance, contrast, changedPixels = changed });

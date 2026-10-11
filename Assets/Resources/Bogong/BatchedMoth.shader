@@ -17,7 +17,8 @@ Shader "Bogong/BatchedMoth"
     SubShader
     {
         Tags { "Queue"="Transparent" "RenderType"="Transparent" "DisableBatching"="True" }
-        Cull Off ZWrite Off ZTest LEqual Blend SrcAlpha OneMinusSrcAlpha
+        // Keep composited target alpha correct for render-texture/UI previews.
+        Cull Off ZWrite Off ZTest LEqual Blend SrcAlpha OneMinusSrcAlpha, One OneMinusSrcAlpha
         Pass
         {
             CGPROGRAM

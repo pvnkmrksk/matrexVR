@@ -99,11 +99,13 @@ Near animals use actual low-poly bodies and rudimentary wings. Far animals use a
 
 Flight AGL is settled before the first CSV birth is anchored, preventing first-frame moths from being left behind at the terrain scene’s authored height.
 
+The moth shader uses separate RGB/alpha blending so composited camera textures remain opaque over an opaque background. This preserves the intended faint RGB contrast when exported or displayed in a UI instead of applying transparency a second time. The RGB stimulus rendering is unchanged by the alpha fix.
+
 Existing pooled asynchronous gzip logging is retained. Swarm-scene logs identify agents by `_ID_<source ID>` names and record presented world positions; repeated births add `_C<recording-cycle>_S<segment>` so simultaneous instances are distinguishable. Pool reuse refreshes logger identity caches. Terrain Choice retains its rig logging. Loading a CSV adds no duplicate raw-data writes. Converted data and metadata retain provenance.
 
 ## Verification
 
-[Source verification](swarm-source-verification.json) independently compares every ID, position and relative TimeExact value against the supplied raw CSV: all 14,429 rows match. Reproduce that audit with `python3 tools/verify_swarm_source.py /path/to/Selwyn_Oct_7_2026_LongFormat.csv Assets/StreamingAssets/SwarmData/selwyn-oct7-unity.csv`.
+[Continuation validation](swarm-continuation-validation-results.json) records 61 playback/render/pooling checks, 30 real four-rig terrain checks, 4,833 config/UI checks, 46 ControlScene → Swarm startup checks and 7,866 legacy dot checks passing. [Source verification](swarm-source-verification.json) independently compares every ID, position and relative TimeExact value against the supplied raw CSV: all 14,429 rows match. Reproduce that audit with `python3 tools/verify_swarm_source.py /path/to/Selwyn_Oct_7_2026_LongFormat.csv Assets/StreamingAssets/SwarmData/selwyn-oct7-unity.csv`.
 
 The local 18-second preview at `Builds/BogongSwarm-preview/swarm-playback-and-close-pass.mp4` is captured from Unity Play Mode at deterministic 120fps. It shows the asset at real time and 0.25x, six recorded-swarm camera faces, then ID 158's measured 17.7cm close pass and its extrapolated tail. Slow motion and the direction-following diagnostic camera are labelled. An 8×8 centre crop enlarges pixels without changing contrast; MP4 decoding was checked to retain the faint 248/255 and 254/255 pixels. Capture background/observer settings are diagnostic only; the video uses the earlier southeast presentation. The active main experiment now uses a gray standalone Swarm sky, north presentation and 5m/s flight autopilot.
 
