@@ -95,7 +95,8 @@ public static class SwarmStartupValidation
                 Check(Mathf.Abs(Mathf.DeltaAngle(rig.transform.eulerAngles.y, 0)) < .001 && Mathf.Abs(rig.transform.position.y - 5) < .001,
                     "VR" + index + " starts at north 0 degrees and height 5m.");
                 var keyboard = rig.GetComponent<Keyboard>();
-                Check(keyboard.AutopilotEnabled && keyboard.AutopilotSpeed == 5, "VR" + index + " flight autopilot is 5m/s.");
+                Check(keyboard.AutopilotEnabled == recipe.autopilotEnabled && keyboard.AutopilotSpeed == recipe.autopilotSpeed,
+                    "VR" + index + " observer motion respects the active experiment recipe.");
                 keyboard.enabled = false;
                 var cameras = rig.GetComponentsInChildren<Camera>(true).Where(c => c.name.StartsWith("Main Camera ")).ToArray();
                 int all = LayerMask.GetMask("SimulatedLocustsVR1", "SimulatedLocustsVR2", "SimulatedLocustsVR3", "SimulatedLocustsVR4");
@@ -107,8 +108,8 @@ public static class SwarmStartupValidation
                 var replay = population.GetComponent<SwarmTrajectoryPlayback>(); replay.enabled = false; replay.Advance(0);
                 Check(Vector3.Distance(replay.SpawnVolumeCentroid, rig.transform.position) < .00001,
                     "VR" + index + " birth-volume centroid equals the current animal position.");
-                var first = population.Spawned.Single(a => a.activeSelf);
-                var track = data.Tracks.Single(t => first.name.EndsWith("_ID_" + t.id));
+                var track = data.Tracks.Single(t => t.samples[0].time == 0);
+                var first = population.Spawned.Single(a => a.activeSelf && a.name.EndsWith("_ID_" + track.id));
                 Vector3 origin = rig.transform.position;
                 Check(Vector3.Distance(first.transform.position, origin + yaw * (track.samples[0].position - data.Centroid)) < .00001,
                     "VR" + index + " initial birth uses the centered measured position.");

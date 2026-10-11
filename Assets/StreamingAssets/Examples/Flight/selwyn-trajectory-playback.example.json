@@ -118,7 +118,8 @@
       "continueAfterTrack": true,
       "despawnDistanceMetres": 100,
       "terminalVelocityWindowSeconds": 0.1,
-      "continuationSpeedMetresPerSecond": 6
+      "continuationSpeedMetresPerSecond": 6,
+      "preRollSeconds": 0
     },
     "worldUnitsPerMetre": 1,
     "nearClipMetres": 0.001

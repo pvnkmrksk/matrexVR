@@ -166,7 +166,8 @@
       "continueAfterTrack": false,
       "despawnDistanceMetres": 100,
       "terminalVelocityWindowSeconds": 0.1,
-      "continuationSpeedMetresPerSecond": null
+      "continuationSpeedMetresPerSecond": null,
+      "preRollSeconds": 0
     },
     "worldUnitsPerMetre": null,
     "nearClipMetres": null
@@ -338,7 +339,8 @@
       "continueAfterTrack": false,
       "despawnDistanceMetres": 100,
       "terminalVelocityWindowSeconds": 0.1,
-      "continuationSpeedMetresPerSecond": null
+      "continuationSpeedMetresPerSecond": null,
+      "preRollSeconds": 0
     },
     "worldUnitsPerMetre": null,
     "nearClipMetres": null
@@ -510,7 +512,8 @@
       "continueAfterTrack": false,
       "despawnDistanceMetres": 100,
       "terminalVelocityWindowSeconds": 0.1,
-      "continuationSpeedMetresPerSecond": null
+      "continuationSpeedMetresPerSecond": null,
+      "preRollSeconds": 0
     },
     "worldUnitsPerMetre": null,
     "nearClipMetres": null

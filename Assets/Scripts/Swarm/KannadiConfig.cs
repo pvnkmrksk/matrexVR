@@ -260,6 +260,8 @@ public class SwarmPlaybackConfig
     public float terminalVelocityWindowSeconds = 0.1f;
     // Null preserves measured terminal speed; an override affects extrapolated tails only.
     public float? continuationSpeedMetresPerSecond;
+    // Straight-line incoming extrapolation; zero retains the original first-sample spawn.
+    public float preRollSeconds = 0;
     public void Validate()
     {
         if (float.IsNaN(dataUnitsPerMetre) || float.IsInfinity(dataUnitsPerMetre) || dataUnitsPerMetre <= 0 ||
@@ -268,12 +270,15 @@ public class SwarmPlaybackConfig
             float.IsNaN(maxGapSeconds) || float.IsInfinity(maxGapSeconds) || maxGapSeconds <= 0 ||
             float.IsNaN(yawOffsetDegrees) || float.IsInfinity(yawOffsetDegrees) ||
             float.IsNaN(despawnDistanceMetres) || float.IsInfinity(despawnDistanceMetres) || despawnDistanceMetres <= 0 ||
-            float.IsNaN(terminalVelocityWindowSeconds) || float.IsInfinity(terminalVelocityWindowSeconds) || terminalVelocityWindowSeconds < 0)
+            float.IsNaN(terminalVelocityWindowSeconds) || float.IsInfinity(terminalVelocityWindowSeconds) || terminalVelocityWindowSeconds < 0 ||
+            float.IsNaN(preRollSeconds) || float.IsInfinity(preRollSeconds) || preRollSeconds < 0)
             throw new ArgumentException("Invalid swarm playback timing/rotation.");
         if (continuationSpeedMetresPerSecond.HasValue && (float.IsNaN(continuationSpeedMetresPerSecond.Value) ||
             float.IsInfinity(continuationSpeedMetresPerSecond.Value) || continuationSpeedMetresPerSecond <= 0))
             throw new ArgumentException("playback.continuationSpeedMetresPerSecond must be positive and finite, or null for measured speed.");
         if (continueAfterTrack && periodicBoundary)
             throw new ArgumentException("Continuing CSV tracks requires playback.periodicBoundary=false; moths must fly out rather than recycle through the mocap volume.");
+        if (preRollSeconds > 0 && !continueAfterTrack)
+            throw new ArgumentException("playback.preRollSeconds requires continueAfterTrack=true.");
     }
 }

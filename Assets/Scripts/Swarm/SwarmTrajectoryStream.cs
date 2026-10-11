@@ -10,12 +10,19 @@ public sealed class SwarmTrajectoryStream
     {
         public SwarmTrajectoryData.Track track;
         public int first, last, ordinal;
-        public Vector3 terminalVelocity;
+        public Vector3 initialVelocity, terminalVelocity;
+        public double SpawnTime;
         public double Start => track.samples[first].time;
         public double End => track.samples[last].time;
         public void Sample(double time, out Vector3 position, out Vector3 velocity)
         {
             var samples = track.samples;
+            if (time < Start)
+            {
+                velocity = initialVelocity;
+                position = samples[first].position + velocity * (float)(time - Start);
+                return;
+            }
             if (time >= End)
             {
                 velocity = terminalVelocity;
@@ -51,7 +58,9 @@ public sealed class SwarmTrajectoryStream
     private readonly List<Flight> flying = new List<Flight>();
     private readonly Queue<Flight> free = new Queue<Flight>();
     private double previous = double.NaN;
-    public int ActiveCount => flying.Count;
+    private long nextCycle;
+    private int nextSegment;
+    public int ActiveCount { get { int count=0; foreach(var f in flying) if(f.root.activeSelf) count++; return count; } }
     public long TotalBirths { get; private set; }
 
     public SwarmTrajectoryStream(SwarmTrajectoryData source, SwarmPlaybackConfig settings,
@@ -71,10 +80,15 @@ public sealed class SwarmTrajectoryStream
             {
                 if (i < track.samples.Length && track.samples[i].time - track.samples[i-1].time <= config.maxGapSeconds + 1e-8) continue;
                 var segment = new Segment { track = track, first = first, last = i - 1, ordinal = ordinal++ };
+                segment.SpawnTime = segment.Start - config.preRollSeconds;
                 int terminalStart = segment.last;
                 // Average only within this uninterrupted track segment; never bridge a missing-data gap.
                 if (terminalStart > first)
                 {
+                    int initialEnd=first+1;
+                    while(initialEnd<segment.last && track.samples[initialEnd].time < segment.Start+config.terminalVelocityWindowSeconds) initialEnd++;
+                    double initialDt=track.samples[initialEnd].time-segment.Start;
+                    segment.initialVelocity=(track.samples[initialEnd].position-track.samples[first].position)/(float)initialDt;
                     terminalStart--;
                     double cutoff = segment.End - config.terminalVelocityWindowSeconds;
                     while (terminalStart > first && track.samples[terminalStart].time > cutoff) terminalStart--;
@@ -82,6 +96,9 @@ public sealed class SwarmTrajectoryStream
                     segment.terminalVelocity = (track.samples[segment.last].position - track.samples[terminalStart].position) / (float)dt;
                     if (config.continuationSpeedMetresPerSecond.HasValue && segment.terminalVelocity.sqrMagnitude > 1e-12f)
                         segment.terminalVelocity = segment.terminalVelocity.normalized *
+                            config.continuationSpeedMetresPerSecond.Value * config.dataUnitsPerMetre;
+                    if (config.continuationSpeedMetresPerSecond.HasValue && segment.initialVelocity.sqrMagnitude > 1e-12f)
+                        segment.initialVelocity=segment.initialVelocity.normalized *
                             config.continuationSpeedMetresPerSecond.Value * config.dataUnitsPerMetre;
                 }
                 segments.Add(segment); first = i;
@@ -96,27 +113,35 @@ public sealed class SwarmTrajectoryStream
         {
             Reset();
             long cycle = config.loop ? (long)Math.Floor(rawTime / data.Duration) : 0;
-            double cycleStart = cycle * data.Duration, time = rawTime - cycleStart;
-            // Seeking starts currently recorded tracks, rather than inventing the animal's past path.
-            foreach (var segment in segments)
-                if (segment.Start <= time && segment.End >= time) Spawn(segment,cycle,cycleStart,rawTime);
+            long lastCycle=config.loop ? (long)Math.Floor((rawTime+config.preRollSeconds)/data.Duration) : 0;
+            // Seek can initialize incoming tracks too, but cannot reconstruct past animal anchors/tails.
+            for(long c=cycle;c<=lastCycle;c++)
+            {
+                double cycleStart=c*data.Duration, time=rawTime-cycleStart;
+                foreach (var segment in segments)
+                    if (segment.SpawnTime <= time && segment.End >= time) Spawn(segment,c,cycleStart,rawTime);
+            }
+            nextCycle=lastCycle;
+            nextSegment=FirstAfter(rawTime-nextCycle*data.Duration);
+            if(nextSegment==segments.Count) {nextCycle++;nextSegment=0;}
         }
         else
         {
             UpdateFlights(rawTime);
-            long firstCycle = config.loop ? (long)Math.Floor(previous / data.Duration) : 0;
-            long lastCycle = config.loop ? (long)Math.Floor(rawTime / data.Duration) : 0;
-            for (long cycle = firstCycle; cycle <= lastCycle; cycle++)
+            // A cursor replaces an O(all recorded segments) scan every frame.
+            while((config.loop || nextCycle==0) && nextCycle*data.Duration+segments[nextSegment].SpawnTime<=rawTime)
             {
-                double cycleStart = cycle * data.Duration;
-                foreach (var segment in segments)
-                {
-                    double birth = cycleStart + segment.Start;
-                    if (birth > previous && birth <= rawTime) Spawn(segment,cycle,cycleStart,rawTime);
-                }
+                Spawn(segments[nextSegment],nextCycle,nextCycle*data.Duration,rawTime);
+                if(++nextSegment==segments.Count) {nextCycle++;nextSegment=0;}
             }
         }
         previous = rawTime;
+    }
+    private int FirstAfter(double time)
+    {
+        int lo=0,hi=segments.Count;
+        while(lo<hi) {int mid=(lo+hi)/2; if(segments[mid].SpawnTime<=time) lo=mid+1; else hi=mid;}
+        return lo;
     }
     private void Reset()
     {
@@ -151,10 +176,18 @@ public sealed class SwarmTrajectoryStream
     }
     private bool Place(Flight flight, double rawTime)
     {
-        flight.segment.Sample(rawTime - flight.cycleStart, out Vector3 position, out Vector3 velocity);
+        double time=rawTime-flight.cycleStart;
+        flight.segment.Sample(time, out Vector3 position, out Vector3 velocity);
         position = flight.anchor + rotation * (position * scale);
         Vector3 observer = animal != null ? animal.position : fixedOrigin;
-        if ((position - observer).sqrMagnitude > distanceSquared) return false;
+        if ((position - observer).sqrMagnitude > distanceSquared)
+        {
+            // A long incoming lead can begin outside the cutoff. Keep its scheduled flight
+            // pending so it can enter; do not draw it or discard its later measured samples.
+            flight.root.SetActive(false);
+            return time<flight.segment.Start;
+        }
+        if(!flight.root.activeSelf) flight.root.SetActive(true);
         flight.root.transform.position = position;
         Vector3 forward = rotation * velocity;
         if (forward.sqrMagnitude > 1e-8f) flight.root.transform.rotation = Quaternion.LookRotation(forward,Vector3.up);

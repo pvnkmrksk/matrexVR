@@ -6,7 +6,7 @@ Use **Unity 6000.3.16f1**, matching ProjectVersion.txt. Packages are pinned in `
 
 ## Start here
 
-1. Open `Assets/Scenes/ControlScene.unity`. The current sequence auto-starts the sanitized Selwyn CSV in Swarm: uniform gray sky, north 0°, 6m/s extrapolated tails, 1200 seconds. See [playback setup](docs/swarm-playback.md).
+1. Open `Assets/Scenes/ControlScene.unity`. The current sequence auto-starts the sanitized Selwyn CSV in Swarm: uniform gray sky, north 0°, stationary observer, five-second incoming extension and 6m/s extrapolation, 1200 seconds. See [playback setup](docs/swarm-playback.md).
 2. Keep your existing `Assets/StreamingAssets/system_config.json`, or copy the complete [system template](Assets/StreamingAssets/Templates/system_config.template.json). Set addresses/displays and retain explicit `"closedLoopMode": "Kinefly"` for flight. Walking alternatives live in [Examples/System](Assets/StreamingAssets/Examples/System).
 3. Use the complete [experiment](Assets/StreamingAssets/Templates/experiment.template.json) and [sequence](Assets/StreamingAssets/Templates/sequence.template.json) templates as a matched starting set. [Templates](Assets/StreamingAssets/Templates/README.md) covers every supported paradigm; [Examples](Assets/StreamingAssets/Examples/README.md) contains full variants. The active Choice_Selwyn sequence and all `Kannadi/` recipes are preserved. Old configs are in [Archive/Legacy](Assets/StreamingAssets/Archive/Legacy).
 4. Enter Play mode from Control, fill the experiment metadata, and start the sequence. Focus Game for hotkeys. R resets; P toggles tracked position; O toggles tracked orientation. Escape returns to Control. **Tab shows/hides the bottom-right status/error panel.**

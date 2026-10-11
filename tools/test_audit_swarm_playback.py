@@ -32,6 +32,19 @@ class SwarmAuditTests(unittest.TestCase):
             self.assertFalse(result["closestPassModelSupported"])
             self.assertIsNone(result["configuredContinuation"])
 
+    def test_incoming_extension_is_reported_without_altering_observations(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "tracks.csv"
+            source = "ID,X,Y,Z,time\nA,2,0,0,0\nA,3,0,0,1\nB,4,0,0,5\nB,5,0,0,6\n"
+            path.write_text(source)
+            config = {"playback": {"maxGapSeconds": 2, "continuationSpeedMetresPerSecond": 2, "preRollSeconds": 2}}
+            result = audit(path, config, observer_speed=0)
+            without = result["configuredContinuation"]["passesWithinMetres"]["0.1"]["count"]
+            with_lead = result["configuredIncomingAndOutgoing"]["passesWithinMetres"]["0.1"]["count"]
+            self.assertEqual((without, with_lead), (1, 2))
+            self.assertEqual(result["recordedSpeedMetresPerSecond"]["median"], 1)
+            self.assertEqual(path.read_text(), source)
+
 
 if __name__ == "__main__":
     unittest.main()

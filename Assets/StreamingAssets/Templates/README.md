@@ -1,6 +1,6 @@
 # Complete configuration templates
 
-Recorded swarms and the lightweight flapping 3D moth are documented in [swarm-playback.md](../../../docs/swarm-playback.md). `swarm-playback.template.json` starts with a blank data path. Terrain/migration uses metres; walking scenes use centimetres. Set `worldUnitsPerMetre` when moving a swarm between them.
+Recorded swarms and the lightweight flapping 3D moth are documented in [swarm-playback.md](../../../docs/swarm-playback.md). `swarm-playback.template.json` starts with a blank data path. `playback.preRollSeconds` defaults to 0; the passive Selwyn example uses 5 seconds of incoming extrapolation. Its stationary-observer settings and the separate 5 m/s flight example are documented in the playback guide. Terrain/migration uses metres; walking scenes use centimetres. Set `worldUnitsPerMetre` when moving a swarm between them.
 
 Start a new **Kinefly flight** experiment with these three files:
 

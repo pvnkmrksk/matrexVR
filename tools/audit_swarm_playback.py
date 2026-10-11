@@ -35,12 +35,12 @@ def quantiles(values):
     return result
 
 
-def closest_on_line(position, delta, finite):
+def closest_line_point(position, delta, finite):
     squared = sum(x * x for x in delta)
     t = max(0, -sum(p * d for p, d in zip(position, delta)) / squared) if squared > 1e-12 else 0
     if finite:
         t = min(1, t)
-    return length(tuple(p + d * t for p, d in zip(position, delta)))
+    return length(tuple(p + d * t for p, d in zip(position, delta))), t
 
 
 def audit(path, recipe, observer_speed=5):
@@ -86,7 +86,12 @@ def audit(path, recipe, observer_speed=5):
                 terminal_start -= 1
             dt = segment[-1][0] - segment[terminal_start][0]
             velocity = tuple(v / dt for v in subtract(segment[-1][1], segment[terminal_start][1])) if dt > 0 else (0, 0, 0)
-            segments.append((key, segment, velocity))
+            initial_end = min(1, last)
+            while initial_end < last and segment[initial_end][0] < segment[0][0] + window:
+                initial_end += 1
+            initial_dt = segment[initial_end][0] - segment[0][0]
+            initial_velocity = tuple(v / initial_dt for v in subtract(segment[initial_end][1], segment[0][1])) if initial_dt > 0 else (0, 0, 0)
+            segments.append((key, segment, velocity, initial_velocity))
             first = i
     neighbour = []
     for points in observations.values():
@@ -100,37 +105,58 @@ def audit(path, recipe, observer_speed=5):
     model_supported = (centered and playback.get("speed", 1) == 1 and playback.get("startTimeSeconds", 0) == 0
                        and not experiment.get("useHeadingReference", False) and all(offset.get(k, 0) == 0 for k in "xyz"))
 
-    def contacts(tail_speed):
-        passes = []
-        for _, points, terminal in segments:
+    def contacts(tail_speed, pre_roll=0):
+        passes, close_events = [], []
+        for key, points, terminal, initial in segments:
+            anchor_time = max(0, points[0][0] - pre_roll)
             relative = []
             for t, p in points:
                 p = rotate(subtract(p, centroid))
-                relative.append((p[0], p[1], p[2] - observer_speed * (t - points[0][0])))
+                relative.append((p[0], p[1], p[2] - observer_speed * (t - anchor_time)))
             minimum = min(length(p) for p in relative)
-            for p, q in zip(relative, relative[1:]):
-                minimum = min(minimum, closest_on_line(p, subtract(q, p), True))
+            closest_time = points[min(range(len(relative)), key=lambda i: length(relative[i]))][0]
+            stage = "recorded"
+            for i, (p, q) in enumerate(zip(relative, relative[1:])):
+                distance, fraction = closest_line_point(p, subtract(q, p), True)
+                if distance < minimum:
+                    minimum, closest_time = distance, points[i][0] + fraction * (points[i+1][0] - points[i][0])
             speed = length(terminal)
             if tail_speed is not None and speed > 1e-8:
                 terminal = tuple(v * tail_speed / speed for v in terminal)
             v = rotate(terminal)
-            minimum = min(minimum, closest_on_line(relative[-1], (v[0], v[1], v[2] - observer_speed), False))
+            distance, seconds = closest_line_point(relative[-1], (v[0], v[1], v[2] - observer_speed), False)
+            if distance < minimum:
+                minimum, closest_time, stage = distance, points[-1][0] + seconds, "outgoing"
+            if pre_roll:
+                speed = length(initial)
+                if tail_speed is not None and speed > 1e-8:
+                    initial = tuple(v * tail_speed / speed for v in initial)
+                v = rotate(initial)
+                delta = tuple((value - (observer_speed if i == 2 else 0)) * (points[0][0] - anchor_time) for i, value in enumerate(v))
+                incoming = subtract(relative[0], delta)
+                distance, fraction = closest_line_point(incoming, delta, True)
+                if distance < minimum:
+                    minimum, closest_time, stage = distance, anchor_time + fraction * (points[0][0] - anchor_time), "incoming"
             passes.append(minimum)
-        return dict(continuationSpeedMetresPerSecond=tail_speed, nearestPassMetres=quantiles(passes),
+            if minimum <= .25:
+                close_events.append(dict(id=key, distanceMetres=minimum, timeSeconds=closest_time, stage=stage))
+        return dict(continuationSpeedMetresPerSecond=tail_speed, preRollSeconds=pre_roll, nearestPassMetres=quantiles(passes),
+                    closePassesWithinQuarterMetre=sorted(close_events, key=lambda event: event["timeSeconds"]),
                     passesWithinMetres={str(r): dict(count=sum(d <= r for d in passes),
-                                                      perMinute=sum(d <= r for d in passes) / duration * 60) for r in (1, 2, 3)})
+                                                      perMinute=sum(d <= r for d in passes) / duration * 60) for r in (.1, .25, .5, 1, 2, 3)})
 
     return dict(sourceSha256=hashlib.sha256(Path(path).read_bytes()).hexdigest(), rows=count, ids=len(groups),
                 uninterruptedSegments=len(segments), durationSeconds=duration, birthsPerMinute=len(groups) / duration * 60,
                 meanBirthIntervalSeconds=duration / len(groups), birthGapSeconds=quantiles(intervals), birthsByMinute=minute_bins,
-                recordedSpeedMetresPerSecond=quantiles(speeds), measuredTerminalSpeedMetresPerSecond=quantiles(length(v) for _, _, v in segments),
+                recordedSpeedMetresPerSecond=quantiles(speeds), measuredTerminalSpeedMetresPerSecond=quantiles(length(v) for _, _, v, _ in segments),
                 coobservedNearestNeighbourMetres=quantiles(neighbour), maximumSimultaneouslyObserved=max(map(len, observations.values())),
-                meanSimultaneouslyObserved=sum(p[-1][0] - p[0][0] for _, p, _ in segments) / duration,
+                meanSimultaneouslyObserved=sum(p[-1][0] - p[0][0] for _, p, _, _ in segments) / duration,
                 sampleCentroidMetres=dict(zip("XYZ", centroid)),
                 observerSpeedMetresPerSecond=observer_speed, closestPassModelSupported=model_supported,
                 measuredContinuation=contacts(None) if model_supported else None,
                 configuredContinuation=contacts(playback.get("continuationSpeedMetresPerSecond")) if model_supported else None,
-                note="IDs are unique recorded arrivals, not simultaneous population. Co-observed spacing is conditional on multiple recorded IDs at exactly the same timestamp; it is not a complete density census. Closest-pass estimates assume exact-time birth anchors, constant northward observer motion, unit playback clock, centered data, and continuing tails. No spatial rescaling.")
+                configuredIncomingAndOutgoing=contacts(playback.get("continuationSpeedMetresPerSecond"), playback.get("preRollSeconds", 0)) if model_supported else None,
+                note="IDs are unique recorded arrivals, not simultaneous population. Co-observed spacing is conditional on multiple recorded IDs at exactly the same timestamp; it is not a complete density census. Closest-pass estimates assume exact-time spawn anchors, constant northward observer motion, unit playback clock, centered data, and continuing tails. Incoming mode anchors at max(0,firstTime-preRollSeconds); moving observers change the path relative to that earlier anchor. Reports the first CSV cycle, not future-cycle lead-ins at its end. No spatial rescaling.")
 
 
 def main():

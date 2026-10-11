@@ -24,6 +24,7 @@ public static class SwarmEncounterAudit
         var material=batch.GetComponent<MeshRenderer>().sharedMaterial;
         bool loop=population.playbackSettings.loop;
         population.playbackSettings.loop=false;
+        float observerSpeed=population.GetComponent<Keyboard>().AutopilotEnabled ? population.GetComponent<Keyboard>().AutopilotSpeed : 0;
         Vector3 origin=animal.position;
         var panels=animal.GetComponentsInChildren<Camera>(true)
             .Where(c=>c.enabled && c.name.StartsWith("Main Camera "))
@@ -45,7 +46,7 @@ public static class SwarmEncounterAudit
             for(int step=0;step<=end;step++)
             {
                 double time=Math.Min(step*.02,data.Duration);
-                animal.position=origin+Vector3.forward*(5*(float)time); replay.Advance(time);
+                animal.position=origin+Vector3.forward*(observerSpeed*(float)time); replay.Advance(time);
                 int count=replay.ActiveCount; maxLive=Math.Max(maxLive,count); sumLive+=count; steps++;
                 foreach(int second in liveAtSeconds)
                     if(step==second*50) live[second]=count;
@@ -84,19 +85,21 @@ public static class SwarmEncounterAudit
                 }
             }
             int expectedSegments=data.Tracks.Sum(t=>1+t.samples.Zip(t.samples.Skip(1),(a,b)=>b.time-a.time).Count(dt=>dt>population.playbackSettings.maxGapSeconds+1e-8));
-            int expectedFirstMinute=data.Tracks.Sum(t=>t.samples.Where((p,i)=>i==0 || p.time-t.samples[i-1].time>population.playbackSettings.maxGapSeconds+1e-8).Count(p=>p.time<=60));
+            int expectedFirstMinute=data.Tracks.Sum(t=>t.samples.Where((p,i)=>i==0 || p.time-t.samples[i-1].time>population.playbackSettings.maxGapSeconds+1e-8).Count(p=>p.time-population.playbackSettings.preRollSeconds<=60));
             check(replay.TotalBirths==expectedSegments,"Ten-minute scene playback emits every recorded segment exactly once.");
             check(seen.Count==data.Tracks.Length,"Every source ID actually becomes active in the real scene.");
-            check(birthsAtMinute==expectedFirstMinute,"First-minute birth count matches the CSV schedule.");
-            check(live[60]>=20 && maxLive>20,"Moths remain alive after short recordings instead of disappearing at the endpoint.");
+            check(birthsAtMinute==expectedFirstMinute,"First-minute instantiation count matches the CSV schedule shifted by pre-roll.");
+            check(live[60]>=10 && maxLive>=15,"Moths remain alive after short recordings instead of disappearing at the endpoint.");
             check(visible[128].Count>=30,"At least 30 first-minute births produce measurable 3-byte contrast within 3m in the native 128px panels.");
-            return new {sourceIdsSeen=seen.Count,segmentBirths=replay.TotalBirths,firstMinuteBirths=birthsAtMinute,
+            return new {sourceIdsSeen=seen.Count,segmentBirths=replay.TotalBirths,firstMinuteSpawnEvents=birthsAtMinute,
+                firstMinuteRecordedIdStarts=data.Tracks.Count(t=>t.samples[0].time<=60),
                 cumulativeBirthsAtMinute=minuteBirths,meanLivePopulation=sumLive/steps,maxLivePopulation=maxLive,liveAtSeconds=live,
                 firstMinuteNativePanelDetectableWithin3m=visible.ToDictionary(v=>v.Key.ToString(),v=>v.Value.Count),
                 firstMinuteNativePanelAnyByteContrastWithin3m=measurable.ToDictionary(v=>v.Key.ToString(),v=>v.Value.Count),
-                observerSpeedMetresPerSecond=5,continuationSpeedMetresPerSecond=population.playbackSettings.continuationSpeedMetresPerSecond,
+                observerSpeedMetresPerSecond=observerSpeed,preRollSeconds=population.playbackSettings.preRollSeconds,
+                continuationSpeedMetresPerSecond=population.playbackSettings.continuationSpeedMetresPerSecond,
                 sampleStepSeconds=.02,renderStepSeconds=.1,
-                note="Real four-rig Swarm startup; audit one rig using its configured cameras at native 64/128 pixels, gray sky and current world positions. Contrast requires 3 bytes (any-byte count also reported) in a 5x5 patch around a moth within 3m. Overlapping moths can contribute to the same patch. This is numerical detectability, not a biological visibility threshold. Recorded positions/time/births unchanged; extrapolated tails use the configured physical speed."};
+                note="Real four-rig Swarm startup; audit one rig using its configured cameras at native 64/128 pixels, gray sky and current world positions. Contrast requires 3 bytes (any-byte count also reported) in a 5x5 patch around a moth within 3m. Overlapping moths can contribute to the same patch. This is numerical detectability, not a biological visibility threshold. Recorded samples/times are unchanged. Instantiation precedes first samples by preRollSeconds; incoming and outgoing extrapolation uses the configured physical speed."};
         }
         finally
         {
