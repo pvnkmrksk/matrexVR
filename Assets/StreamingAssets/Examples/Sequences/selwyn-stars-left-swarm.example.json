@@ -10,7 +10,8 @@
       "reloadScene": false,
       "parameters": {
         "configFile": "Examples/Flight/selwyn-stars-left-swarm.example.json"
-      }
+      },
+      "autoTrim": false
     }
   ]
 }

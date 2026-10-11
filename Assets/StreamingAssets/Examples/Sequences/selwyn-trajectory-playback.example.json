@@ -1,0 +1,17 @@
+{
+  "autoStart": false,
+  "loop": true,
+  "randomise": false,
+  "sequences": [
+    {
+      "sceneName": "Choice_Selwyn",
+      "duration": 1200,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Flight/selwyn-trajectory-playback.example.json"
+      },
+      "gain": 1,
+      "autoTrim": false
+    }
+  ]
+}

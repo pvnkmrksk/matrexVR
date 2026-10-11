@@ -10,7 +10,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/bogong-swarm.template.json"
-      }
+      },
+      "autoTrim": false
     }
   ]
 }

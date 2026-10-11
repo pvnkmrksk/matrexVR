@@ -5,12 +5,23 @@
   "sequences": [
     {
       "sceneName": "Choice_Selwyn",
-      "duration": 240,
+      "duration": 10,
       "gain": 2.5,
       "autoTrim": true,
       "reloadScene": false,
       "parameters": {
         "configFile": "Examples/Flight/auto-trim-calibration.example.json"
+      }
+    },
+
+    {
+      "sceneName": "Choice_Selwyn",
+      "duration": 1000,
+      "gain": 2.5,
+      "autoTrim": true,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Flight/selwyn-trajectory-playback.example.json"
       }
     }
   ]

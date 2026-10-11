@@ -10,7 +10,8 @@
       "reloadScene": true,
       "parameters": {
         "design": "Templates/dynamic-choice.template.json"
-      }
+      },
+      "autoTrim": false
     }
   ]
 }

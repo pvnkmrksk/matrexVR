@@ -10,6 +10,16 @@ SA = ROOT / 'Assets/StreamingAssets'
 TEMPLATES = SA / 'Templates'
 scenes = set(re.findall(r'enabled: 1\s+path: Assets/Scenes/([^\n]+)\.unity', (ROOT / 'ProjectSettings/EditorBuildSettings.asset').read_text()))
 def validate(obj, path):
+    if obj.get('trajectoryFile'):
+        assert (SA / obj['trajectoryFile']).is_file(), (path, 'trajectoryFile')
+    if 'playback' in obj:
+        playback = obj['playback']
+        assert playback.get('speed', 1) > 0 and playback.get('maxGapSeconds', .1) > 0, path
+        assert playback.get('startTimeSeconds', 0) >= 0, path
+    if obj.get('nearClipMetres') is not None:
+        assert obj['nearClipMetres'] > 0, path
+    if obj.get('worldUnitsPerMetre') is not None:
+        assert obj['worldUnitsPerMetre'] > 0, path
     ranges = {'windowSeconds': (1, 300), 'flightWindowSeconds': (.2, 30),
               'flightVarianceThreshold': (0, 1000000), 'flightConfirmationSeconds': (0, 30),
               'flightVarianceHysteresis': (0, 1), 'updateIntervalSeconds': (.1, 60),
@@ -71,7 +81,7 @@ def validate(obj, path):
             assert stimulus['duration'] > 0 and stimulus['frequency'] > 0, path
             assert 0 <= stimulus['contrast'] <= 1 and 0 <= stimulus['dutyCycle'] <= 1, path
             assert stimulus['rotationAxis'] in ['Yaw', 'Pitch', 'Roll'], path
-    if 'vrConfigs' in obj:
+    if obj.get('vrConfigs') is not None:
         assert all(1 <= vr['vrIndex'] <= 4 for vr in obj['vrConfigs']), path
     if 'aglHeight' in obj:
         assert obj['aglHeight'] >= 0 and obj['windSpeed'] >= 0, path
@@ -93,6 +103,10 @@ def validate(obj, path):
         assert visual['size'] > 0 and visual['angularSizeDegrees'] > 0, path
         assert 0 <= visual['metallic'] <= 1 and 0 <= visual['smoothness'] <= 1, path
         assert visual['flickerFrequencyHz'] >= 0 and 0 <= visual['flickerDutyCycle'] <= 1, path
+        assert visual.get('shape', 'Dot') in ['Dot', 'Moth'], path
+        if visual.get('shape') == 'Moth':
+            assert all(visual.get(k, 1) > 0 for k in ['bodyLengthMetres', 'bodyDiameterMetres', 'wingSpanMetres']), path
+            assert visual.get('flapFrequencyHz', 30) >= 0 and 0 <= visual.get('wingOpacity', .25) <= 1, path
     if 'nightSky' in obj:
         sky = obj['nightSky']
         assert -90 <= sky.get('latitude', 47.6896) <= 90, path

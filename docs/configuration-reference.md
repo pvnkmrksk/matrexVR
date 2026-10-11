@@ -1,5 +1,7 @@
 # Configuration reference
 
+For recorded swarm input, the standalone converter and batched 3D moth, see [swarm-playback.md](swarm-playback.md). Terrain/migration distances are metres; older walking distances are centimetres. `worldUnitsPerMetre` resolves this explicitly without changing existing movement-controller units.
+
 This reference describes the experiment configuration code, tested with Unity **6000.3.16f1**. Start with the complete JSON files in [StreamingAssets/Templates](../Assets/StreamingAssets/Templates). They contain editable example values; the tables below distinguish these from values used when a field is omitted. JSON does not allow comments. Keep notes in a separate text file; do not invent JSON keys, because most loaders silently ignore unknown keys.
 
 ## Files, precedence, and running an experiment
@@ -19,7 +21,7 @@ A default in a C# class is not necessarily a scene default: serialized prefab va
 
 ## Units and coordinate system
 
-Unity coordinates are **left-handed**: +X right, +Y up, +Z forward. In the current walking experiments, **one world unit is one centimeter**. Distances and translation speeds use world units and world units/second (cm, cm/s here); do not multiply by 100 in configs. Imported terrain, models, or flight branches may have a different authored scale; verify their scale before claiming physical centimeters.
+Unity coordinates are **left-handed**: +X right/east, +Y up, +Z forward/north. Walking experiments use **one world unit = one centimeter**; migration/Selwyn terrain uses **one world unit = one metre**. Distances and translation speeds use world units and world units/second (cm and cm/s for walking, m and m/s for terrain). Enter scene-native values in configs. Recorded-swarm input is in metres and is mapped using `worldUnitsPerMetre`; moth body/wing dimensions and near clip use physical metres independently.
 
 Euler angles are degrees: X pitch, Y yaw, Z roll. Positive yaw takes `(0,0,1)` to `(1,0,0)` at +90°. Viewed from above with +Z up on the page and +X right, this is clockwise. Euler log values wrap into 0–360°; unwrap yaw before differentiating. “Clockwise” for pitch/roll depends on viewing direction; use the axis and sign, not an unspecified viewpoint. See [Unity's rotation and orientation reference](https://docs.unity3d.com/6000.3/Documentation/Manual/QuaternionAndEulerRotationsInUnity.html).
 
@@ -59,9 +61,9 @@ The top-right HUD shows measured FPS and either the requested target or VSync mo
 | Field | Block default | Unit / meaning |
 |---|---|---|
 | `enabled` | true | Enable keyboard/gamepad manual movement for this rig. Reset and tracking toggles still work. |
-| `translateSpeed` | 10 | cm/s for full arrow-key/stick input. |
+| `translateSpeed` | 10 | World units/s for full arrow-key/stick input: cm/s walking, m/s terrain. |
 | `rotateSpeed` | 50 | degrees/s for full yaw input. |
-| `maxTranslateSpeed` | 100 | cm/s cap for operator speed adjustment. |
+| `maxTranslateSpeed` | 100 | World units/s cap for operator speed adjustment. |
 | `maxRotateSpeed` | 300 | degrees/s cap. |
 | `allowVerticalTranslation` | false | Allow C/Z vertical motion. |
 | `allowPitchAndRoll` | false | Allow W/S pitch and Q/E roll. |

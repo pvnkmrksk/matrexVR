@@ -155,12 +155,32 @@
         "metallic": 0,
         "smoothness": 0.25,
         "flickerFrequencyHz": 0,
-        "flickerDutyCycle": 1
+        "flickerDutyCycle": 1,
+        "shape": "Dot",
+        "bodyLengthMetres": 0.0254,
+        "bodyDiameterMetres": 0.01,
+        "wingSpanMetres": 0.04,
+        "flapFrequencyHz": 30,
+        "wingOpacity": 0.25,
+        "subpixelVisibility": true
       },
       "boundaryLengthX": 120,
       "boundaryLengthZ": 120,
       "animateOnMove": false,
-      "animationSpeedThreshold": 0.5
+      "animationSpeedThreshold": 0.5,
+      "trajectoryFile": "",
+      "playback": {
+        "dataUnitsPerMetre": 1,
+        "loop": true,
+        "speed": 1,
+        "startTimeSeconds": 0,
+        "maxGapSeconds": 0.1,
+        "yawOffsetDegrees": 0,
+        "centerOnAnimal": true,
+        "periodicBoundary": true
+      },
+      "worldUnitsPerMetre": null,
+      "nearClipMetres": null
     },
     "enabled": true,
     "durationSeconds": 240

@@ -25,13 +25,14 @@ Kinefly's existing single-frame JSON messages work without a publisher or config
 | [Experiment phases](docs/experiment-phases.md) | Continuous pre/stimulus/post conditions, opt-in frozen heading references, and the eight-minute Selwyn recipe. |
 | [Heading reference and telemetry](docs/heading-reference-telemetry.md) | Per-animal circular heading assessment, stimulus-relative angles, outbound ZMQ, and the restored Tab status/error panel. |
 | [Kinefly auto trim](docs/kinefly-auto-trim.md) | Sequence-row opt-in, flight variance gating, iterative median centering, dashboard controls and background swarm recording. |
+| [Recorded swarm playback and moths](docs/swarm-playback.md) | Standalone CSV conversion, metre-scale terrain playback, world anchors, periodic volumes, physical moth dimensions, GPU flapping and subpixel contrast. |
 | [Data formats](docs/data-formats.md) | CSV/gzip/metadata columns, clocks, sensor-to-world conversion, coordinate conventions, replay and analysis limitations. |
 | [Kannadi integration](docs/kannadi-modernization.md) | Scene integration, camera allow-list, overview, trails, animation and validation history. |
 | [Experiment workflow](docs/experiment-workflow.md) | Controller lifecycle and adding experiments. |
 
 ## Coordinates and visual behavior
 
-Current walking scenes use **one world unit = one centimeter**. Speeds are cm/s. Unity is **left-handed**: X right, Y up, Z forward. Positive yaw turns +Z toward +X, clockwise when viewed from above with +Z at the top. Rotations use degrees; log Euler angles wrap at 360. Imported flight terrain may have a different authored scale: check before interpreting world units as physical centimeters.
+Current walking scenes use **one world unit = one centimeter**, with speeds in cm/s. Migration/Selwyn terrain uses **one world unit = one metre**, with speeds in m/s and AGL in metres. Unity is **left-handed**: X right/east, Y up, Z forward/north. Positive yaw turns +Z toward +X, clockwise when viewed from above with +Z at the top. Rotations use degrees; log Euler angles wrap at 360. Recorded-swarm input is converted to metres; `worldUnitsPerMetre` maps it to the scene scale while physical moth dimensions stay in metres.
 
 The system `displayOrder` is authoritative. A camera whose letter is missing is disabled even if it exists and is enabled in a scene. A rig absent from system config renders none of its stimulus cameras. The operator overview shows numbered heading arrows at actual rig positions with 60 s fading trajectories. It works in Swarm and Kannadi; Hide stops overview rendering and tracking work. FPS stays visible at the top right, alongside the configured target. Set top-level `targetFrameRate` (default 120) and `vSyncCount` (default 0) in system_config.json. Walking translation and yaw default to 1:1 gain; explicit numeric Swarm/Kannadi overrides scale displacement/angle.
 

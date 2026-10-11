@@ -10,7 +10,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/choice.template.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Choice_Forrest",
@@ -19,7 +20,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/choice.template.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Choice_TwoTreeIndia_nopath_nopath",
@@ -28,7 +30,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/choice.template.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Choice_TwoTreeIndia_nopath_path",
@@ -37,7 +40,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/choice.template.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Choice_TwoTreeIndia_path_nopath",
@@ -46,7 +50,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/choice.template.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Choice_TwoTreeIndia_path_path",
@@ -55,7 +60,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/choice.template.json"
-      }
+      },
+      "autoTrim": false
     }
   ]
 }

@@ -10,7 +10,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Examples/Flight/migration-agl10.example.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Choice_Selwyn",
@@ -19,7 +20,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Examples/Flight/migration-agl100.example.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Choice_Selwyn",
@@ -28,7 +30,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Examples/Flight/migration-agl1000.example.json"
-      }
+      },
+      "autoTrim": false
     }
   ]
 }

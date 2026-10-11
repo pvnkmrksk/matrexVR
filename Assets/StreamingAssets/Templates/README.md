@@ -1,12 +1,14 @@
 # Complete configuration templates
 
+Recorded swarms and the lightweight flapping 3D moth are documented in [swarm-playback.md](../../../docs/swarm-playback.md). `swarm-playback.template.json` starts with a blank data path. Terrain/migration uses metres; walking scenes use centimetres. Set `worldUnitsPerMetre` when moving a swarm between them.
+
 Start a new **Kinefly flight** experiment with these three files:
 
 1. `system_config.template.json` → `StreamingAssets/system_config.json`. Set the real tracking addresses, ports and displays. All four rigs explicitly select Kinefly; the template uses six cameras per rig.
 2. `experiment.template.json` → your own experiment file. This contains a complete Choice/Selwyn flight configuration under `stimulus`, with pre/post disabled by default.
 3. `sequence.template.json` → `StreamingAssets/sequenceConfig.json`. Change its `parameters.configFile` to your experiment file. Every sequence option is explicit; start is manual, gain is 1, and the example presentation lasts one hour.
 
-The active sequence selects a single 240-second Selwyn live-sky auto-trim calibration. The hardware file is unchanged. Copy templates when intentionally creating a new setup. JSON `null` explicitly leaves an optional alternative/inherited value unset; it is not a numeric zero. Fields that do not apply to a controller are not invented or shared across schemas. Scene names and paths are case-sensitive.
+The active sequence runs your 10-second Selwyn auto-trim calibration, then 1000 seconds of recorded moth playback. Copy templates when intentionally creating a new setup. JSON `null` explicitly leaves an optional alternative/inherited value unset; it is not a numeric zero. Fields that do not apply to a controller are not invented or shared across schemas. Scene names and paths are case-sensitive.
 
 | Template | Scene / paradigm | Notes |
 |---|---|---|
@@ -18,6 +20,7 @@ The active sequence selects a single 240-second Selwyn live-sky auto-trim calibr
 | `migration.template.json` | `Choice_Selwyn` / terrain Choice flight | Full Choice schema with wind/AGL/autopilot controls; procedural sky disabled. |
 | `swarm.template.json` | `Swarm`, planar swarm | Complete Swarm controls, gains, per-rig poses, visuals and optional sky/reference blocks. |
 | `bogong-swarm.template.json` | `Swarm`, 3D Bogong swarm | Same Swarm schema with a 3D volume, Bogong visual and generated sky. |
+| `swarm-playback.template.json` | `Swarm`, generated or recorded moths | Complete Swarm schema, metre-scale volume and physical 3D moth; blank `trajectoryFile` retains generated motion. |
 | `optomotor.template.json` | `Optomotor` | Full grating stimulus and repeat settings. |
 | `dynamic-choice.template.json` | `Choice_desync` | Full design, steps, trigger, intertrial, camera, object and adaptive controls. Use `parameters.design`, not `configFile`. |
 | `kannadi.template.json` | `Kannadi`, multiplayer mirror | Existing Kannadi template preserved unchanged. |

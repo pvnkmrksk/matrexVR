@@ -1,0 +1,39 @@
+{
+  "source": "Selwyn_Oct_7_2026_LongFormat.csv",
+  "sourceSha256": "620b3a90d59b31ab929d3271605e931a7b49fe1b07b45c79a28655a5c36baf92",
+  "sourceUnits": "mm",
+  "outputUnits": "m",
+  "unitsPerMetre": 1.0,
+  "axes": "X east, Y up, Z north",
+  "mapping": "(-sourceY, sourceZ, sourceX) * scale + (0, heightOriginMetres * unitsPerMetre, 0)",
+  "heightOriginMetres": 5,
+  "additionalYawDegrees": 0,
+  "startLocal": "2026-10-07T19:44:35.283000+11:00",
+  "timeZone": "Australia/Sydney",
+  "durationSeconds": 599.46,
+  "rows": 14429,
+  "tracks": 430,
+  "frameRange": [
+    1,
+    59947
+  ],
+  "duplicatePolicy": "error",
+  "duplicates": 0,
+  "rejectedRows": [],
+  "meanDisplacementHeadingDegrees": 225.64127709737375,
+  "bounds": {
+    "X": [
+      -5.0528260000000005,
+      2.637053
+    ],
+    "Y": [
+      -4.160281999999999,
+      7.8644169999999995
+    ],
+    "Z": [
+      -2.5436039999999998,
+      4.972721
+    ]
+  },
+  "note": "Geometry alone cannot establish geographical axes. Mapping uses the user's calibration; no outlier clipping or direction reversal."
+}

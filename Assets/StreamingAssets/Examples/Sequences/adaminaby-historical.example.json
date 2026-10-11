@@ -10,7 +10,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Examples/Flight/adaminaby-panorama.example.json"
-      }
+      },
+      "autoTrim": false
     }
   ]
 }

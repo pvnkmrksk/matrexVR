@@ -20,4 +20,6 @@ Flat experiments retain their sequence presentation timer after heading measurem
 
 The preserved Kannadi recipes remain under `Kannadi/`; this collection does not replace or rewrite them.
 
-`Sequences/kinefly-auto-trim.example.json` runs a 240-second Kinefly calibration over Selwyn terrain with the live Milky Way star sky. The active `sequenceConfig.json` uses this test. Its provisional flight threshold and bounded corrections are tuned from six past recordings. See [auto trim](../../../docs/kinefly-auto-trim.md) for controls, units, replay results and continuation with trimming off.
+`Sequences/kinefly-auto-trim.example.json` runs a 240-second Kinefly calibration over Selwyn terrain with the live Milky Way star sky. Its provisional flight threshold and bounded corrections are tuned from six past recordings. See [auto trim](../../../docs/kinefly-auto-trim.md) for controls, units, replay results and continuation with trimming off.
+
+`Flight/selwyn-trajectory-playback.example.json` plays the converted October 7 recording as lightweight flapping moths inside an animal-centered periodic volume. Terrain coordinates, speeds and AGL use metres. `Sequences/selwyn-trajectory-playback.example.json` is an independent 1200-second looping recipe; the active sequence retains your calibration and uses playback for its 1000-second second step. See [swarm-playback.md](../../../docs/swarm-playback.md) for conversion, axes, scaling and all playback/visual parameters.

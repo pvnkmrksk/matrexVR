@@ -53,6 +53,24 @@ public class LocustSpawner : MonoBehaviour
     public int SpawnRevision { get; private set; }
     private bool initialized;
     private GameObject batchedVisual;
+    [System.NonSerialized] public string trajectoryFile;
+    [System.NonSerialized] public SwarmPlaybackConfig playbackSettings;
+    [System.NonSerialized] public Transform playbackTarget;
+    [System.NonSerialized] public Vector3 playbackOffset;
+    [System.NonSerialized] public bool playbackVolumeSpecified;
+    [System.NonSerialized] public float worldUnitsPerMetre = 100f;
+    private SwarmTrajectoryPlayback playback;
+    private readonly System.Collections.Generic.Dictionary<Camera, float> originalNearClips = new System.Collections.Generic.Dictionary<Camera, float>();
+
+    public void OverrideNearClip(Camera[] cameras, float distance)
+    {
+        foreach (Camera camera in cameras)
+        {
+            if (!camera.name.StartsWith("Main Camera ")) continue;
+            if (!originalNearClips.ContainsKey(camera)) originalNearClips.Add(camera, camera.nearClipPlane);
+            camera.nearClipPlane = distance;
+        }
+    }
 
     void Start()
     {
@@ -96,17 +114,22 @@ public class LocustSpawner : MonoBehaviour
         Cleanup();
         initialized = true;
         if (locustPrefab == null && !UsesBogongVisual()) { Debug.LogError("LocustSpawner requires a locust prefab unless agentVisual is Bogong."); return; }
+        if (!string.IsNullOrWhiteSpace(trajectoryFile)) { SpawnPlayback(); return; }
         SpawnLocusts();
     }
     private void Cleanup()
     {
-        if (batchedVisual != null) { batchedVisual.SetActive(false); Destroy(batchedVisual); batchedVisual = null; }
+        foreach (var entry in originalNearClips) if (entry.Key != null) entry.Key.nearClipPlane = entry.Value;
+        originalNearClips.Clear();
+        if (playback != null) { playback.enabled = false; Release(playback); playback = null; }
+        if (batchedVisual != null) { batchedVisual.SetActive(false); Release(batchedVisual); batchedVisual = null; }
         foreach (GameObject locust in spawned)
-            if (locust != null) { locust.SetActive(false); Destroy(locust); }
+            if (locust != null) { locust.SetActive(false); Release(locust); }
         spawned.Clear();
         SpawnRevision++;
     }
     private void OnDestroy() => Cleanup();
+    private static void Release(Object obj) { if (Application.isPlaying) Destroy(obj); else DestroyImmediate(obj); }
 
     void SpawnLocusts()
     {
@@ -163,21 +186,61 @@ public class LocustSpawner : MonoBehaviour
                 locustMover.boundaryManager = boundaryManager;
             }
         }
-        if (UsesBogongVisual() && useBatchedBogongRendering && spawned.Count > 0)
+        BuildBatch(locustLayer);
+    }
+
+    private void BuildBatch(int locustLayer)
+    {
+        if (UsesBogongVisual() && (useBatchedBogongRendering || UsesMothVisual()) && spawned.Count > 0)
         {
             batchedVisual = new GameObject(layerName + "_BogongBatch");
             batchedVisual.layer = locustLayer;
             batchedVisual.transform.SetParent(transform, false);
-            batchedVisual.AddComponent<BogongSwarmRenderer>().Configure(spawned, bogongVisual);
+            batchedVisual.AddComponent<BogongSwarmRenderer>().Configure(spawned, bogongVisual, worldUnitsPerMetre);
         }
+    }
+
+    private void SpawnPlayback()
+    {
+        SwarmTrajectoryData data = SwarmTrajectoryData.Load(ExperimentConfigFiles.Resolve(trajectoryFile));
+        int layer = LayerMask.NameToLayer(layerName);
+        if (layer < 0) layer = gameObject.layer;
+        numberOfLocusts = data.Tracks.Length;
+        for (int i = 0; i < data.Tracks.Length; i++)
+        {
+            GameObject agent = UsesBogongVisual() ? CreateBogongAgent(Vector3.zero, i) : Instantiate(locustPrefab);
+            agent.name = layerName + "_ID_" + data.Tracks[i].id;
+            agent.tag = "SimulatedLocust";
+            SetLayerRecursively(agent.transform, layer);
+            foreach (LocustMover mover in agent.GetComponentsInChildren<LocustMover>(true)) mover.enabled = false;
+            spawned.Add(agent);
+        }
+        if (boundaryManager != null)
+        {
+            float scale = worldUnitsPerMetre / (playbackSettings?.dataUnitsPerMetre ?? 1f);
+            Vector3 size = playbackVolumeSpecified ? spawnVolumeSize : data.Bounds.size * scale;
+            boundaryManager.boundaryLengthX = Mathf.Max(.01f * worldUnitsPerMetre, size.x);
+            boundaryManager.boundaryLengthZ = Mathf.Max(.01f * worldUnitsPerMetre, size.z);
+            boundaryManager.boundaryHeight = Mathf.Max(.01f * worldUnitsPerMetre, size.y);
+            boundaryManager.wrapY = true;
+            boundaryManager.useCenterOverride = true;
+            boundaryManager.centerOverride = (playbackTarget != null ? playbackTarget.position : transform.position) + playbackOffset;
+            boundaryManager.followTarget = playbackSettings?.centerOnAnimal == false ? null : playbackTarget;
+            boundaryManager.followOffset = playbackOffset;
+            boundaryManager.referenceRotation = spawnRotation * Quaternion.Euler(0, playbackSettings?.yawOffsetDegrees ?? 0, 0);
+        }
+        playback = gameObject.AddComponent<SwarmTrajectoryPlayback>();
+        playback.Configure(data, playbackSettings, spawned, playbackTarget, boundaryManager, playbackOffset, spawnRotation, worldUnitsPerMetre);
+        BuildBatch(layer);
     }
 
     private bool Is3D() => string.Equals(dimension, "3D", System.StringComparison.OrdinalIgnoreCase);
     private bool UsesBogongVisual() => string.Equals(agentVisual, "Bogong", System.StringComparison.OrdinalIgnoreCase);
+    private bool UsesMothVisual() => string.Equals(bogongVisual?.shape, "Moth", System.StringComparison.OrdinalIgnoreCase);
 
     private GameObject CreateBogongAgent(Vector3 position, int index)
     {
-        if (useBatchedBogongRendering)
+        if (useBatchedBogongRendering || UsesMothVisual())
         {
             var root = new GameObject(layerName + "_Bogong_" + index);
             root.transform.position = position;

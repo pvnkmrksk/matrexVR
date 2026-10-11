@@ -10,7 +10,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Examples/Optomotor/yaw.example.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Optomotor",
@@ -19,7 +20,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Examples/Optomotor/pitch.example.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Optomotor",
@@ -28,7 +30,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Examples/Optomotor/roll.example.json"
-      }
+      },
+      "autoTrim": false
     }
   ]
 }

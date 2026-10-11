@@ -75,7 +75,9 @@ public static class ConfigCatalogValidation
             if (token is JArray list)
             {
                 child = child.IsArray ? child.GetElementType() : child.IsGenericType ? child.GetGenericArguments()[0] : null;
-                if (child != null) foreach (var item in list.OfType<JObject>()) Complete(item, child, path + "." + field.Name);
+                if (child != null) foreach (var item in list.OfType<JObject>())
+                    Complete(item, child, path + "." + field.Name,
+                        child == typeof(SequenceItem) ? new HashSet<string> { "autoTrimSettings" } : null); // Legacy sequence fallback; modern tuning belongs to the experiment.
             }
         }
     }
@@ -128,7 +130,14 @@ public static class ConfigCatalogValidation
     {
         Type type = obj["sequences"] != null ? typeof(SequenceConfig) : obj["objects"] != null ? typeof(SceneConfig) :
             obj["stimuli"] != null ? typeof(OptomotorConfig) : obj["steps"] != null ? typeof(DynamicSequenceController).GetNestedType("DesignFile", BindingFlags.NonPublic) : typeof(KannadiConfig);
-        Check(JsonConvert.DeserializeObject(obj.ToString(), type, strict) != null, "Strict schema " + file);
+        var controllerConfig = (JObject)obj.DeepClone();
+        if (controllerConfig["autoTrimSettings"] is JObject trim)
+        {
+            var settings = JsonConvert.DeserializeObject<AutoTrimConfig>(trim.ToString(), strict);
+            settings.Validate(); Complete(trim, typeof(AutoTrimConfig), file + ".autoTrimSettings");
+            controllerConfig.Remove("autoTrimSettings"); // MainController consumes this experiment-level block.
+        }
+        Check(JsonConvert.DeserializeObject(controllerConfig.ToString(), type, strict) != null, "Strict schema " + file);
         bool preservedKannadi = file.EndsWith("kannadi.template.json") || file.EndsWith("kinematic.template.json");
         var excluded = type == typeof(KannadiConfig) ? new HashSet<string>(swarmOnly) : new HashSet<string>();
         if (phased) excluded.Add("headingReference");

@@ -3,9 +3,21 @@ using UnityEngine;
 /// <summary>Shared by standalone Swarm and a swarm embedded in a Choice terrain scene.</summary>
 public static class SwarmConfiguration
 {
-    public static void Apply(LocustSpawner spawner, SwarmConfig config, ClosedLoop rig)
+    public static float SceneUnitsPerMetre(GameObject owner)
+    {
+        foreach (Terrain terrain in Terrain.activeTerrains)
+            if (terrain.gameObject.scene == owner.scene) return 1f;
+        return 100f;
+    }
+
+    public static void Apply(LocustSpawner spawner, SwarmConfig config, ClosedLoop rig, float sceneUnitsPerMetre = 0f)
     {
         config.ValidateSwarm();
+        spawner.worldUnitsPerMetre = config.worldUnitsPerMetre ?? (sceneUnitsPerMetre > 0 ? sceneUnitsPerMetre : SceneUnitsPerMetre(spawner.gameObject));
+        spawner.trajectoryFile = config.trajectoryFile;
+        spawner.playbackSettings = config.playback ?? new SwarmPlaybackConfig();
+        spawner.playbackTarget = rig != null ? rig.transform : null;
+        spawner.playbackVolumeSpecified = config.spawnVolumeSize != null;
         spawner.loadConfigFromJsonFile = false;
         spawner.numberOfLocusts = config.numberOfLocusts ?? spawner.numberOfLocusts;
         spawner.spawnAreaSize = config.spawnAreaSize ?? spawner.spawnAreaSize;
@@ -37,6 +49,7 @@ public static class SwarmConfiguration
         bool relative = config.spawnRelativeToAnimal || reference != null;
         Quaternion rotation = Quaternion.Euler(0, yaw, 0);
         Vector3 offset = rotation * (config.spawnCenter?.ToVector3() ?? Vector3.zero);
+        spawner.playbackOffset = offset;
         spawner.useSpawnCenter = config.spawnCenter != null || relative;
         spawner.spawnCenter = relative && rig != null ? rig.transform.position + offset : offset;
         spawner.spawnRotation = rotation;
@@ -55,5 +68,7 @@ public static class SwarmConfiguration
             boundary.followOffset = relative ? offset : spawner.spawnCenter - (rig != null ? rig.transform.position : Vector3.zero);
         }
         spawner.Rebuild();
+        if (rig != null && (config.nearClipMetres.HasValue || System.String.Equals(config.bogongVisual?.shape, "Moth", System.StringComparison.OrdinalIgnoreCase)))
+            spawner.OverrideNearClip(rig.GetComponentsInChildren<Camera>(true), (config.nearClipMetres ?? .001f) * spawner.worldUnitsPerMetre);
     }
 }

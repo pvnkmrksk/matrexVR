@@ -10,7 +10,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/choice.template.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Swarm",
@@ -19,7 +20,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/swarm.template.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Kannadi",
@@ -28,7 +30,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/kannadi.template.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Kannadi",
@@ -37,7 +40,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/kinematic.template.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Optomotor",
@@ -46,7 +50,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/optomotor.template.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Choice_Selwyn",
@@ -55,7 +60,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Templates/migration.template.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Choice_desync",
@@ -64,7 +70,8 @@
       "reloadScene": true,
       "parameters": {
         "design": "Templates/dynamic-choice.template.json"
-      }
+      },
+      "autoTrim": false
     }
   ]
 }

@@ -1,5 +1,7 @@
 # Recorded data and units
 
+Recorded swarm **input** uses `ID,X,Y,Z,time` with Unity axes (+X east, +Y up, +Z north), metres, and relative seconds. See [swarm-playback.md](swarm-playback.md). Presented/logged positions use the scene's world units: metres on terrain/migration, centimetres in walking scenes. The input CSV scale and physical moth scale are configured independently.
+
 MasterDataLogger creates `Assets/RunData/yyyyMMdd_HHmmss/` in the Editor (`Application.dataPath/RunData` in a player). It records a runtime trace and copies the system config, sequence config, and referenced experiment config files. On shutdown it attempts a session ZIP. Keep the original JSON alongside exported data: it defines gains, stimulus conditions, camera layout, and physical scale.
 
 Sampling is once per rendered Update, not a fixed Hz acquisition clock. Disk buffering flushes about every 0.5 seconds; clean scene exit flushes remaining rows. Wall-clock timestamps are local machine time and contain milliseconds, without a timezone offset. Record the workstation timezone and synchronize machines for cross-device analysis. Do not assume rows are evenly spaced or use row number as elapsed time.
@@ -70,7 +72,7 @@ Each row is one visible-model root per frame. VRIndex is 1–4; CloneIndex is ze
 
 ## Swarm and band logs
 
-Swarm gzip CSV uses nine row columns: `Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase`. Its header then appends `NumberOfLocusts:...`, `SpawnAreaSize:...`, `Mu:...`, `Kappa:...`, `LocustSpeed:...` as **header metadata**, not per-row columns. Read nine data columns and parse the appended metadata separately (older files have six or eight data columns). Units: X/Y/Z and area size in cm, mu in degrees, kappa dimensionless, speed cm/s. These logs have positions but no heading column; use experiment settings or extend the logger if individual heading histories are required.
+Swarm gzip CSV uses nine row columns: `Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase`. Its header then appends `NumberOfLocusts:...`, `SpawnAreaSize:...`, `Mu:...`, `Kappa:...`, `LocustSpeed:...` as **header metadata**, not per-row columns. Read nine data columns and parse the appended metadata separately (older files have six or eight data columns). Units: X/Y/Z and area size in scene world units (cm in walking scenes, m on terrain), mu in degrees, kappa dimensionless, speed in world units/s. These logs have positions but no heading column; use experiment settings or extend the logger if individual heading histories are required.
 
 See [night-sky.md](night-sky.md) for the `Skyboxes/` image/manifest files, `usage.jsonl` activation audit, and `loads.csv` load history. Each load records the previous/new IDs, panorama filename, actual load time and represented sky time in UTC and observer-local time with an explicit offset. These are included in the normal run directory/ZIP. The sky ID identifies a scene stimulus, including when scene geometry occludes it; it does not identify a camera screenshot.
 

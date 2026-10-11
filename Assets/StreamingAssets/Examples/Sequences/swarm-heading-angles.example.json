@@ -10,7 +10,8 @@
       "reloadScene": true,
       "parameters": {
         "configFile": "Examples/Swarm/heading-aligned.example.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Swarm",
@@ -19,7 +20,8 @@
       "reloadScene": false,
       "parameters": {
         "configFile": "Examples/Swarm/heading-crossed.example.json"
-      }
+      },
+      "autoTrim": false
     },
     {
       "sceneName": "Swarm",
@@ -28,7 +30,8 @@
       "reloadScene": false,
       "parameters": {
         "configFile": "Examples/Swarm/heading-opposed.example.json"
-      }
+      },
+      "autoTrim": false
     }
   ]
 }
