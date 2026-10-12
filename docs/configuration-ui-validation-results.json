@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-13",
+  "unity": "6000.3.16f1",
+  "branch": "codex/config-ui-test",
+  "failure": null,
+  "errors": [],
+  "uiChecks": 5291,
+  "timingsMs": {
+    "mount10000RowsMs": 288.475,
+    "parse10000StepsMs": 177.2054,
+    "validate10000StepsMs": 102.0931
+  },
+  "coverage": [
+    "Every scalar leaf in all 58 current JSON templates/examples",
+    "Byte-identical no-op save and lossless raw/form round trips",
+    "Unknown fields, arbitrary precision, integer/exponent/negative zero and null/false/missing distinctions",
+    "Invalid JSON and external edit conflicts",
+    "Conditional phase, auto-trim, flight/walking, inline Swarm 2D/3D, autopilot and vSync controls",
+    "10,000 sequence steps; fewer than 40 mounted visual rows",
+    "Actual runtime panel rendering, toggle and raw-JSON Apply callbacks",
+    "Selected non-default system/sequence paths reach runner and archive",
+    "Metadata saved without opening its tab",
+    "Two complete experiment runs return to setup; zero setup UIDocuments remain during either run"
+  ],
+  "archiveRegression": {
+    "checks": 39,
+    "failure": null,
+    "errors": [],
+    "note": "Isolated filesystem fixtures plus actual current ControlScene experiment, with live tracking disabled. Includes missing/corrupt snapshots, nested references, legacy lookup, duplicate filenames, reloads and version preservation. Main RunData and user configs are not modified."
+  },
+  "pythonChecks": {
+    "configTemplates": "PASS: 58 current templates/examples, 622 archive hashes, 979 earlier locust inputs",
+    "archiveAuditUnitTests": 4
+  },
+  "limitations": [
+    "Validation uses synthetic experiments on a disposable Unity copy, with tracking disabled.",
+    "Existing UnityEditor.Search.SearchDatabase indexing exception excluded by stack trace.",
+    "No signed/read-only packaged build, physical LED displays or tracker hardware were tested.",
+    "UI accepts additional rig rows; current scenes/controllers still support VR1\u2013VR4."
+  ],
+  "reproduce": "Assets/Editor/ConfigurationUIValidation.cs; Run and RunArchiveRegression require a disposable project marked KANNADI_VALIDATION_COPY."
+}

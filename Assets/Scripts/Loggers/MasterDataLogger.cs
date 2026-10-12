@@ -64,6 +64,29 @@ public class MasterDataLogger : MonoBehaviour
         dataLoggers = new List<DataLogger>();
     }
 
+    public void BeginConfiguredSession(string systemReference, string sequenceReference)
+    {
+        if (MainController.Instance != null && MainController.Instance.SequenceRunning)
+            throw new InvalidOperationException("Cannot rotate the data session during an experiment.");
+        AsyncSwarmWriter.DrainAll();
+        lock (runtimeTraceLock)
+        {
+            runtimeTraceWriter?.Flush(); runtimeTraceWriter?.Dispose(); runtimeTraceWriter = null;
+            ZipDataFolder();
+            string root = Path.Combine(Application.dataPath, "RunData");
+            string baseTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss"); int collision = 0;
+            do
+            {
+                timestamp = baseTimestamp + (collision == 0 ? "" : "_" + collision.ToString("D3")); collision++;
+                directoryPath = Path.Combine(root, timestamp);
+            } while (Directory.Exists(directoryPath) || File.Exists(Path.Combine(root, timestamp + ".zip")));
+            Directory.CreateDirectory(directoryPath);
+            ConfigArchive = new RunConfigArchive(directoryPath, Application.streamingAssetsPath, timestamp, Application.unityVersion);
+            ConfigArchive.CaptureStartup("ControlScene", systemReference, sequenceReference);
+            ConfigArchive.RequireComplete();
+        }
+    }
+
 
     // Zips the data folder
     public void ZipDataFolder()

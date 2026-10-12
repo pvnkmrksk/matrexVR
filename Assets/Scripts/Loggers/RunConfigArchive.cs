@@ -31,12 +31,12 @@ public sealed class RunConfigArchive
         directory=Path.GetFullPath(sessionDirectory);streaming=Path.GetFullPath(streamingDirectory);
         timestamp=sessionTimestamp;engineVersion=unityVersion;
     }
-    public void CaptureStartup(string scene,string systemReference="system_config.json")
+    public void CaptureStartup(string scene,string systemReference="system_config.json",string sequenceReference="sequenceConfig.json")
     {
         lock(gate)
         {
             CaptureFile(systemReference,"system",false,true,scene,new HashSet<string>());
-            CaptureFile("sequenceConfig.json","sequence",false,true,scene,new HashSet<string>());
+            CaptureFile(sequenceReference,"sequence",false,true,scene,new HashSet<string>());
             WriteManifest();
         }
     }

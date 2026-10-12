@@ -75,6 +75,24 @@ public class MainController : MonoBehaviour
     [SerializeField]
     private string systemConfigFileName = "system_config.json";
     public string SystemConfigurationFileName => systemConfigFileName;
+    private string sequenceConfigFileName = "sequenceConfig.json";
+    public string SequenceConfigurationFileName => sequenceConfigFileName;
+    public bool ReturnToSetupAfterSequence { get; private set; }
+
+    // Called only from the idle setup screen, after validation and saving.
+    public void PrepareConfiguredRun(string systemFile, string sequenceFile)
+    {
+        if (sequenceStarted) throw new System.InvalidOperationException("Stop the experiment before changing its configuration.");
+        systemConfigFileName = systemFile;
+        sequenceConfigFileName = sequenceFile;
+        masterDataLogger = MasterDataLogger.Instance;
+        masterDataLogger.BeginConfiguredSession(systemFile, sequenceFile);
+        SequenceError = null;
+        currentTrial = 0;
+        LoadSystemConfigurations();
+        LoadSequenceConfiguration();
+        ReturnToSetupAfterSequence = true;
+    }
 
     // Dictionary to store loaded system configs
     private Dictionary<string, SystemConfig> systemConfigs = new Dictionary<string, SystemConfig>();
@@ -188,7 +206,7 @@ public class MainController : MonoBehaviour
         LoadSequenceConfiguration();
         // Opt-in preview sequences can start with Play in ControlScene. Start only once:
         // returning to Control with Escape must not immediately restart the experiment.
-        if (autoStart && SceneManager.GetActiveScene().name == "ControlScene") StartSequence();
+        if (autoStart && SceneManager.GetActiveScene().name == "ControlScene" && !ConfigurationUI.ConfigWorkbench.ForceSetup) StartSequence();
     }
 
     // Load system configurations from the specified file
@@ -346,6 +364,7 @@ public class MainController : MonoBehaviour
         Debugger.Log("MainController.StartSequence()", 3);
         try {MasterDataLogger.Instance.ConfigArchive.RequireComplete();}
         catch(System.Exception error) {FailExperiment(error);return;}
+        if (sequenceStarted) return;
 
         if (sequenceSteps.Count == 0)
         {
@@ -576,7 +595,7 @@ public class MainController : MonoBehaviour
         autoStart = false;
 
         // Get the path to the sequence configuration JSON file
-        string jsonPath = Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json");
+        string jsonPath = Path.Combine(Application.streamingAssetsPath, sequenceConfigFileName);
 
         // Check if the streamingAssetsPath directory exists
         if (Directory.Exists(Application.streamingAssetsPath))
@@ -749,6 +768,12 @@ void ManageTimerAndTransitions()
         }
         else
         {
+            if (ReturnToSetupAfterSequence)
+            {
+                StopSequence();
+                SceneManager.LoadScene("ControlScene");
+                return;
+            }
             Debugger.Log("Sequence completed and looping disabled. Exiting application.", 3);
             Application.Quit();
             return;
