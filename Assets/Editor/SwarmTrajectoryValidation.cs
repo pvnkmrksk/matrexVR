@@ -235,8 +235,8 @@ public static class SwarmTrajectoryValidation
         Check(data.Tracks.Length == 430 && Math.Abs(data.Duration - 599.46) < 1e-6, "Dataset preserves 430 IDs and TimeExact duration.");
         Check(ReferenceEquals(data, SwarmTrajectoryData.Load(path)), "Four rigs share parsed immutable data.");
         var first = data.Tracks.Single(t => t.id == "1");
-        Check(Vector3.Distance(first.samples[0].position, new Vector3(-1.761669f,5.314589f,-1.114818f)) < .00001,
-            "Canonical metres: west is negative east, Z origin is 5m, source X is north.");
+        Check(Vector3.Distance(first.samples[0].position, new Vector3(-1.761669f,4.685411f,-1.114818f)) < .00001,
+            "Canonical metres: west is negative east, positive source Z lowers height from 5m, source X is north.");
         var fixture = SwarmTrajectoryData.Parse(new[] { "ID,X,Y,Z,time", "A,0,5,0,0", "A,2,5,-2,1", "B,0,5,0,2", "B,1,5,0,3" });
         Check(fixture.Tracks[0].TrySample(.5, 2, out Vector3 p, out Vector3 velocity) && p == new Vector3(1,5,-1), "Time interpolation.");
         Check(velocity == new Vector3(2,0,-2), "Heading derives from trajectory velocity.");
@@ -380,6 +380,13 @@ public static class SwarmTrajectoryValidation
     private static void AuthoringAndUnits()
     {
         var bodyMesh=BogongMothMesh.Create(1); var local=new List<Vector3>(); bodyMesh.GetUVs(2,local);
+        var parts=new List<Vector2>(); bodyMesh.GetUVs(0,parts);
+        Check(parts.Count(p=>p.x==1)==8 && parts.Count(p=>p.x==2)==4 &&
+            local.Skip(32).Take(4).All(p=>p.x<=0) && local.Skip(36).Take(4).All(p=>p.x>=0),
+            "Exactly one left/right wing pair shares a flap phase; four proxy vertices are separate from the wings.");
+        Check(bodyMesh.triangles.Skip(144).Take(12).All(i=>i>=32 && i<40) &&
+            bodyMesh.triangles.Skip(156).All(i=>i>=40),
+            "The two wing quads contain only four triangles; subpixel proxy geometry is not another wing pair.");
         Check(Math.Abs(local.Take(32).Max(v=>v.x)-local.Take(32).Min(v=>v.x)-2)<1e-6 &&
             Math.Abs(local.Take(32).Max(v=>v.y)-local.Take(32).Min(v=>v.y)-2)<1e-6,
             "Low-poly body reaches the configured physical diameter rather than 86.6 percent of it.");

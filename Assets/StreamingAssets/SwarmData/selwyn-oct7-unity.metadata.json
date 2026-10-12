@@ -5,7 +5,9 @@
   "outputUnits": "m",
   "unitsPerMetre": 1.0,
   "axes": "X east, Y up, Z north",
-  "mapping": "(-sourceY, sourceZ, sourceX) * scale + (0, heightOriginMetres * unitsPerMetre, 0)",
+  "sourceAxes": "X north, Y west, Z down",
+  "sourceZDirection": "down",
+  "mapping": "(-sourceY, -sourceZ, sourceX) * scale + (0, heightOriginMetres * unitsPerMetre, 0)",
   "heightOriginMetres": 5,
   "additionalYawDegrees": 0,
   "startLocal": "2026-10-07T19:44:35.283000+11:00",
@@ -27,8 +29,8 @@
       2.637053
     ],
     "Y": [
-      -4.160281999999999,
-      7.8644169999999995
+      2.135583,
+      14.160281999999999
     ],
     "Z": [
       -2.5436039999999998,

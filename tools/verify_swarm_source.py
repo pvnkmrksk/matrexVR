@@ -2,7 +2,7 @@
 """Independently compare every converted position/ID/time with the source CSV.
 
 No Unity or third-party modules needed. Source calibration is mm, +X north,
-+Y west, +Z up, Z=0 at 5m AGL. Checks canonical data before presentation yaw.
++Y west, +Z down, Z=0 at 5m AGL. Checks canonical data before presentation yaw.
 """
 import argparse
 import csv
@@ -14,7 +14,9 @@ from collections import defaultdict
 from pathlib import Path
 
 
-def verify(source, converted):
+def verify(source, converted, source_z="down"):
+    assert source_z in ("down", "up"), "source_z must be down or up"
+    vertical_sign = -1 if source_z == "down" else 1
     with Path(source).open(newline="", encoding="utf-8-sig") as file:
         raw = list(csv.DictReader(file))
     with Path(converted).open(newline="", encoding="utf-8-sig") as file:
@@ -25,7 +27,7 @@ def verify(source, converted):
         time = (dt.datetime.fromisoformat(row["TimeExact"]) - start).total_seconds()
         key = (row["ID"], round(time, 9))
         assert key not in original, f"Duplicate raw ID/time: {key}"
-        original[key] = (-float(row["Y"]) / 1000, 5 + float(row["Z"]) / 1000, float(row["X"]) / 1000)
+        original[key] = (-float(row["Y"]) / 1000, 5 + vertical_sign * float(row["Z"]) / 1000, float(row["X"]) / 1000)
     errors, seen, groups = [], set(), defaultdict(list)
     for row in unity:
         key = (row["ID"], round(float(row["time"]), 9))
@@ -40,6 +42,7 @@ def verify(source, converted):
     lengths = [max(t for t, _ in rows) - min(t for t, _ in rows) for rows in groups.values()]
     gaps = sum(b[0] - a[0] > .10000001 for rows in groups.values() for a, b in zip(sorted(rows), sorted(rows)[1:]))
     return dict(passed=True, rows=len(unity), ids=len(groups), durationSeconds=max(t for _, t in seen),
+                sourceAxes=f"X north, Y west, Z {source_z}",
                 sourceSha256=hashlib.sha256(Path(source).read_bytes()).hexdigest(),
                 convertedSha256=hashlib.sha256(Path(converted).read_bytes()).hexdigest(),
                 maxCoordinateErrorMetres=max(errors), sampleCentroidMetres=dict(zip("XYZ", centroid)),
@@ -53,8 +56,9 @@ def main():
     parser.add_argument("source", type=Path)
     parser.add_argument("converted", type=Path)
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--source-z", choices=("down", "up"), default="down")
     args = parser.parse_args()
-    report = verify(args.source, args.converted)
+    report = verify(args.source, args.converted, args.source_z)
     text = json.dumps(report, indent=2) + "\n"
     if args.report:
         args.report.write_text(text)

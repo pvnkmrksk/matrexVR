@@ -2,7 +2,7 @@
 """Convert Selwyn long-format tracking CSV to ID,X,Y,Z,time (Unity metres/seconds).
 
 Only the Python standard library is needed. Source +X=north, +Y=west,
-+Z=up; Z=0 is 5 m AGL. No compass correction is inferred from flight direction.
++Z=down; Z=0 is 5 m AGL. No compass correction is inferred from flight direction.
 """
 import argparse
 import csv
@@ -15,7 +15,10 @@ from zoneinfo import ZoneInfo
 
 
 def convert(source, output, source_units="mm", yaw_degrees=0, height_origin_m=5,
-            timezone="Australia/Sydney", duplicate_policy="error", output_units="m"):
+            timezone="Australia/Sydney", duplicate_policy="error", output_units="m", source_z="down"):
+    if source_z not in ("down", "up"):
+        raise ValueError("source_z must be down or up")
+    vertical_sign = -1 if source_z == "down" else 1
     units_per_metre = {"m": 1.0, "cm": 100.0}[output_units]
     scale = {"mm": .001, "cm": .01, "m": 1.0}[source_units] * units_per_metre
     records, rejected, duplicates = {}, [], 0
@@ -34,8 +37,8 @@ def convert(source, output, source_units="mm", yaw_degrees=0, height_origin_m=5,
                 # Naive wall times in this format are local time, not UTC.
                 timestamp = timestamp.replace(tzinfo=ZoneInfo(timezone)) if timestamp.tzinfo is None else timestamp
                 frame = int(row["Frame"])
-                north, west, up = (float(row[k]) for k in ("X", "Y", "Z"))
-                if not all(math.isfinite(v) for v in (north, west, up)):
+                north, west, vertical = (float(row[k]) for k in ("X", "Y", "Z"))
+                if not all(math.isfinite(v) for v in (north, west, vertical)):
                     raise ValueError("nonfinite position")
             except (ValueError, TypeError) as error:
                 rejected.append({"line": line, "reason": str(error)})
@@ -47,7 +50,7 @@ def convert(source, output, source_units="mm", yaw_degrees=0, height_origin_m=5,
                     raise ValueError(f"Duplicate ID/TimeExact at line {line}: {identifier}, {timestamp}")
                 if duplicate_policy == "first":
                     continue
-            x, y, z = -west * scale, up * scale + height_origin_m * units_per_metre, north * scale
+            x, y, z = -west * scale, vertical_sign * vertical * scale + height_origin_m * units_per_metre, north * scale
             angle = math.radians(yaw_degrees)
             records[key] = (x * math.cos(angle) + z * math.sin(angle), y,
                             -x * math.sin(angle) + z * math.cos(angle))
@@ -75,7 +78,9 @@ def convert(source, output, source_units="mm", yaw_degrees=0, height_origin_m=5,
         "source": Path(source).name, "sourceSha256": hashlib.sha256(Path(source).read_bytes()).hexdigest(),
         "sourceUnits": source_units, "outputUnits": output_units, "unitsPerMetre": units_per_metre,
         "axes": "X east, Y up, Z north",
-        "mapping": "(-sourceY, sourceZ, sourceX) * scale + (0, heightOriginMetres * unitsPerMetre, 0)",
+        "sourceAxes": f"X north, Y west, Z {source_z}",
+        "sourceZDirection": source_z,
+        "mapping": f"(-sourceY, {'-' if vertical_sign < 0 else ''}sourceZ, sourceX) * scale + (0, heightOriginMetres * unitsPerMetre, 0)",
         "heightOriginMetres": height_origin_m, "additionalYawDegrees": yaw_degrees,
         "startLocal": start.astimezone(ZoneInfo(timezone)).isoformat(), "timeZone": timezone,
         "durationSeconds": (max(t for _, t in records) - start).total_seconds(),
@@ -96,13 +101,14 @@ def main():
     parser.add_argument("output", type=Path)
     parser.add_argument("--source-units", choices=("mm", "cm", "m"), default="mm")
     parser.add_argument("--output-units", choices=("m", "cm"), default="m")
+    parser.add_argument("--source-z", choices=("down", "up"), default="down", help="Direction of positive source Z; down is the confirmed Selwyn calibration. Use up for older/upward datasets.")
     parser.add_argument("--yaw-degrees", type=float, default=0, help="Optional clockwise rotation around Unity up; -90 maps southwest to southeast.")
     parser.add_argument("--height-origin-m", type=float, default=5)
     parser.add_argument("--timezone", default="Australia/Sydney")
     parser.add_argument("--duplicates", choices=("error", "first", "last"), default="error")
     args = parser.parse_args()
     result = convert(args.source, args.output, args.source_units, args.yaw_degrees,
-                     args.height_origin_m, args.timezone, args.duplicates, args.output_units)
+                     args.height_origin_m, args.timezone, args.duplicates, args.output_units, args.source_z)
     print(f"Converted {result['rows']} rows / {result['tracks']} tracks, {result['durationSeconds']:.3f}s; heading {result['meanDisplacementHeadingDegrees']:.2f} degrees")
     print(f"Rejected {len(result['rejectedRows'])} invalid rows; metadata: {args.output.with_suffix('.metadata.json')}")
 
