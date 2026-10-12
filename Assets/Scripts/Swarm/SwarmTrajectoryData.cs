@@ -36,10 +36,10 @@ public sealed class SwarmTrajectoryData
 
     public static SwarmTrajectoryData Load(string path)
     {
-        var info = new FileInfo(path);
-        string key = info.FullName + "|" + info.LastWriteTimeUtc.Ticks + "|" + info.Length;
+        string text=ExperimentConfigFiles.ReadAllText(path,"trajectory");
+        string key=Path.GetFullPath(path)+"|"+RunConfigArchive.Hash(System.Text.Encoding.UTF8.GetBytes(text));
         if (cache.TryGetValue(key, out var data)) return data;
-        data = Parse(File.ReadLines(path)); cache[key] = data; return data;
+        data = Parse(text.Split('\n')); cache[key] = data; return data;
     }
     public static SwarmTrajectoryData Parse(IEnumerable<string> lines)
     {

@@ -5,6 +5,20 @@ using UnityEngine;
 /// <summary>Keep saved experiment references working after the legacy config archive move.</summary>
 public static class ExperimentConfigFiles
 {
+    public static string ReadAllText(string reference,string role="experiment")
+    {
+        var logger=MasterDataLogger.Instance;
+        return logger!=null && logger.ConfigArchive!=null
+            ? logger.ConfigArchive.ReadText(reference,role,UnityEngine.SceneManagement.SceneManager.GetActiveScene().name)
+            : File.ReadAllText(Resolve(reference));
+    }
+    public static byte[] ReadAllBytes(string reference,string role)
+    {
+        var logger=MasterDataLogger.Instance;
+        return logger!=null && logger.ConfigArchive!=null
+            ? logger.ConfigArchive.ReadBytes(reference,role,UnityEngine.SceneManagement.SceneManager.GetActiveScene().name)
+            : File.ReadAllBytes(Resolve(reference));
+    }
     public static string Resolve(string reference)
     {
         string current = Path.Combine(Application.streamingAssetsPath, reference);

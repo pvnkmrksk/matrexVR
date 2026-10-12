@@ -41,7 +41,7 @@ public class KannadiConfig : SwarmConfig
         if (ExperimentPhases.IsPhase(parameters))
             json = ExperimentPhases.Read(parameters);
         else if (parameters != null && parameters.TryGetValue("configFile", out object file))
-            json = JObject.Parse(File.ReadAllText(ExperimentConfigFiles.Resolve(file.ToString())));
+            json = JObject.Parse(ExperimentConfigFiles.ReadAllText(file.ToString()));
         // Inline sequence parameters override the referenced experiment file.
         if (parameters != null && !ExperimentPhases.IsPhase(parameters))
         {

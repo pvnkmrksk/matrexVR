@@ -73,7 +73,7 @@ public sealed class NightSkyController : MonoBehaviour
             else if (fromFile)
             {
                 string path = Path.IsPathRooted(skyboxPath) ? skyboxPath : Path.Combine(Application.streamingAssetsPath, skyboxPath);
-                byte[] bytes = File.ReadAllBytes(path);
+                byte[] bytes = ExperimentConfigFiles.ReadAllBytes(path,"skybox");
                 Texture2D loaded = new Texture2D(2, 2, TextureFormat.RGBA32, false, false);
                 try
                 {

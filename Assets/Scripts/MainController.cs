@@ -74,6 +74,7 @@ public class MainController : MonoBehaviour
     // System Config properties
     [SerializeField]
     private string systemConfigFileName = "system_config.json";
+    public string SystemConfigurationFileName => systemConfigFileName;
 
     // Dictionary to store loaded system configs
     private Dictionary<string, SystemConfig> systemConfigs = new Dictionary<string, SystemConfig>();
@@ -122,6 +123,8 @@ public class MainController : MonoBehaviour
 
         // Access the MasterDataLogger instance
         masterDataLogger = MasterDataLogger.Instance;
+        if(masterDataLogger==null)
+            masterDataLogger=new GameObject("MasterDataLogger").AddComponent<MasterDataLogger>();
 
         if (masterDataLogger == null)
         {
@@ -201,7 +204,7 @@ public class MainController : MonoBehaviour
             if (!File.Exists(configPath))
                 throw new FileNotFoundException("System config file not found", configPath);
 
-            string jsonText = File.ReadAllText(configPath);
+            string jsonText = ExperimentConfigFiles.ReadAllText(configPath,"system");
 
             // Parse the JSON using JObject instead of dynamic
             JObject fullConfig = JObject.Parse(jsonText);
@@ -241,19 +244,6 @@ public class MainController : MonoBehaviour
                 Debugger.Log("No configs array found in system config file", 1);
             }
 
-            // Copy the system config file to the log directory
-            if (masterDataLogger != null)
-            {
-                string timestamp = masterDataLogger.timestamp;
-                string sceneName = SceneManager.GetActiveScene().name;
-                string destPath = Path.Combine(
-                    masterDataLogger.directoryPath,
-                    $"{timestamp}_{sceneName}_{systemConfigFileName}"
-                );
-                Directory.CreateDirectory(Path.GetDirectoryName(destPath));
-                File.Copy(configPath, destPath, true);
-                Debugger.Log($"Copied system config file to: {destPath}", 3);
-            }
         }
         catch (System.Exception e)
         {
@@ -354,6 +344,8 @@ public class MainController : MonoBehaviour
     public void StartSequence()
     {
         Debugger.Log("MainController.StartSequence()", 3);
+        try {MasterDataLogger.Instance.ConfigArchive.RequireComplete();}
+        catch(System.Exception error) {FailExperiment(error);return;}
 
         if (sequenceSteps.Count == 0)
         {
@@ -569,6 +561,16 @@ public class MainController : MonoBehaviour
 
     void LoadSequenceConfiguration()
     {
+        try {LoadSequenceConfigurationCore();}
+        catch(System.Exception error)
+        {
+            sequenceSteps.Clear();executionOrder.Clear();autoStart=false;
+            FailExperiment(error);
+        }
+    }
+
+    private void LoadSequenceConfigurationCore()
+    {
         sequenceSteps.Clear();
         executionOrder.Clear();
         autoStart = false;
@@ -583,7 +585,7 @@ public class MainController : MonoBehaviour
             if (File.Exists(jsonPath))
             {
                 // Read the JSON file contents
-                string jsonString = File.ReadAllText(jsonPath);
+                string jsonString = ExperimentConfigFiles.ReadAllText(jsonPath,"sequence");
 
                 // Deserialize the JSON content into a custom object
                 SequenceConfig config = JsonConvert.DeserializeObject<SequenceConfig>(jsonString);
@@ -627,29 +629,6 @@ public class MainController : MonoBehaviour
                         }
                     }
 
-                    // Get the timestamp from the MasterDataLogger component
-                    if (masterDataLogger != null)
-                    {
-                        string timestamp = masterDataLogger.timestamp;
-                        Debugger.Log("Timestamp: " + timestamp, 4);
-                        Debug.Log("MasterDataLogger is not null");
-                        Debug.Log("Timestamp: " + timestamp);
-
-                        // Copy the sequence config JSON file
-                        string sceneName = SceneManager.GetActiveScene().name;
-                        string destinationPath = Path.Combine(
-                            masterDataLogger.directoryPath,
-                            $"{timestamp}_{sceneName}_sequenceConfig.json"
-                        );
-                        File.Copy(jsonPath, destinationPath);
-
-                        // Save referenced choice config JSON files
-                        SaveReferencedChoiceConfigs(config, timestamp, sceneName);
-                    }
-                    else
-                    {
-                        Debug.Log("MasterDataLogger is null");
-                    }
                 }
                 else
                 {
@@ -685,7 +664,9 @@ private void ApplyExperiment(Dictionary<string, object> parameters, System.Actio
         settings.Validate();
         currentAutoTrimSettings = settings;
         flightCheckOverride = null;
+        MasterDataLogger.Instance.ConfigArchive.RequireComplete();
         apply(payload);
+        MasterDataLogger.Instance.ConfigArchive.RequireComplete();
         if (step != null) ApplyAutoTrimToClosedLoopComponents(step);
     };
     if (!phaseRunner.TryBegin(resolved, applyConfigured, FailExperiment)) applyConfigured(resolved);
@@ -804,43 +785,6 @@ void ManageTimerAndTransitions()
     }
 }
 
-
-    void SaveReferencedChoiceConfigs(SequenceConfig config, string timestamp, string sceneName)
-    {
-        HashSet<string> copiedConfigFiles = new HashSet<string>();
-
-        foreach (SequenceItem item in config.sequences)
-        foreach (string referenceKey in new[] { "configFile", "design" })
-        {
-            if (item.parameters != null && item.parameters.TryGetValue(referenceKey, out object reference) && reference != null)
-            {
-                string configFileName = reference.ToString();
-
-                if (!copiedConfigFiles.Add(configFileName))
-                {
-                    Debugger.Log($"Skipping duplicate choice config copy: {configFileName}", 4);
-                    continue;
-                }
-
-                string sourcePath = ExperimentConfigFiles.Resolve(configFileName);
-
-                if (File.Exists(sourcePath))
-                {
-                    string destinationPath = Path.Combine(
-                        masterDataLogger.directoryPath,
-                        $"{timestamp}_{sceneName}_{configFileName}"
-                    );
-                    Directory.CreateDirectory(Path.GetDirectoryName(destinationPath));
-                    File.Copy(sourcePath, destinationPath, true);
-                    Debugger.Log($"Copied choice config: {configFileName}", 3);
-                }
-                else
-                {
-                    Debugger.Log($"Choice config file not found: {configFileName}", 2);
-                }
-            }
-        }
-    }
 
     // Add method to clear screen to black
     void ClearScreenToBlack()

@@ -82,13 +82,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
     {
         string jsonPath = ExperimentConfigFiles.Resolve(configFile);
 
-        if (!File.Exists(jsonPath))
-        {
-            Debug.LogError($"Config file not found at: {jsonPath}");
-            return null;
-        }
-
-        string jsonString = File.ReadAllText(jsonPath);
+        string jsonString = ExperimentConfigFiles.ReadAllText(jsonPath);
         return JsonConvert.DeserializeObject<SceneConfig>(jsonString);
     }
 
@@ -516,14 +510,11 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
         // Construct full path in StreamingAssets
         string fullPath = Path.Combine(Application.streamingAssetsPath, skyboxPath);
-
-        if (File.Exists(fullPath))
+        byte[] imageBytes = ExperimentConfigFiles.ReadAllBytes(fullPath,"skybox");
         {
             try
             {
                 // Load the image bytes
-                byte[] imageBytes = File.ReadAllBytes(fullPath);
-
                 // Create texture with explicit settings for panoramic skyboxes
                 Texture2D skyboxTexture = new Texture2D(
                     width: 2,
@@ -569,10 +560,6 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             {
                 Debug.LogError($"Error loading skybox: {e.Message}");
             }
-        }
-        else
-        {
-            Debug.LogWarning($"Skybox file not found at: {fullPath}");
         }
     }
 

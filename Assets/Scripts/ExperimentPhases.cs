@@ -70,7 +70,7 @@ public sealed class ExperimentPhases : MonoBehaviour
         object file;
         if (!source.TryGetValue("configFile", out file) && !source.TryGetValue("design", out file)) return false;
         if (file == null) return false;
-        JObject document = JObject.Parse(File.ReadAllText(ExperimentConfigFiles.Resolve(file.ToString())));
+        JObject document = JObject.Parse(ExperimentConfigFiles.ReadAllText(file.ToString()));
         if (document["preStimulus"] == null && document["stimulus"] == null && document["postStimulus"] == null) return false;
         phases = ExperimentPhase.Parse(document);
         parameters = new Dictionary<string, object>(source);
@@ -129,6 +129,6 @@ public sealed class ExperimentPhases : MonoBehaviour
     public static JObject Read(Dictionary<string, object> source, string key = "configFile")
     {
         if (IsPhase(source)) return (JObject)((JObject)source[PayloadKey]).DeepClone();
-        return JObject.Parse(File.ReadAllText(ExperimentConfigFiles.Resolve(source[key].ToString())));
+        return JObject.Parse(ExperimentConfigFiles.ReadAllText(source[key].ToString(),key=="design"?"design":"experiment"));
     }
 }

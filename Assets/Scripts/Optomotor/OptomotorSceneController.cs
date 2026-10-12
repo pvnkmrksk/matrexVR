@@ -116,12 +116,11 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
     {
         string configPath = ExperimentConfigFiles.Resolve(configFileName);
         Debug.Log($"Looking for config file at: {configPath}");
-
-        if (File.Exists(configPath))
+        optomotorConfig=null;
         {
             try
             {
-                string jsonText = File.ReadAllText(configPath);
+                string jsonText = ExperimentConfigFiles.ReadAllText(configFileName);
                 Debug.Log($"Read config file: {jsonText.Substring(0, Math.Min(100, jsonText.Length))}...");
 
                 optomotorConfig = JsonConvert.DeserializeObject<OptomotorConfig>(jsonText);
@@ -131,16 +130,12 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
 
                 Debug.Log($"Loaded optomotor config with {optomotorConfig.stimuli.Count} stimuli");
 
-                // Config copying is already handled by MainController
+                // The shared reader snapshots the exact bytes used by this controller.
             }
             catch (Exception e)
             {
                 Debug.LogError($"Error loading optomotor config: {e.Message}");
             }
-        }
-        else
-        {
-            Debug.LogError($"Optomotor config file not found: {configPath}");
         }
     }
 

@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 
 // Manages all data loggers in the scene
+[DefaultExecutionOrder(-10000)]
 public class MasterDataLogger : MonoBehaviour
 {
     // Singleton instance
@@ -12,6 +13,7 @@ public class MasterDataLogger : MonoBehaviour
 
     // Path to the directory where the log files will be saved
     public string directoryPath { get; private set; }
+    public RunConfigArchive ConfigArchive { get; private set; }
 
     // List of all DataLogger instances in the scene
     private List<DataLogger> dataLoggers;
@@ -23,6 +25,7 @@ public class MasterDataLogger : MonoBehaviour
 
     void Awake()
     {
+        string startingScene=gameObject.scene.name;
         /*          the Awake() method sets Instance to this only if Instance is null. 
         If Instance is not null, it remains the same. This ensures that only one instance 
         of MasterDataLogger exists in your game at any time.
@@ -38,12 +41,22 @@ public class MasterDataLogger : MonoBehaviour
             return;
         }
 
-        timestamp = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        directoryPath = Application.dataPath + "/RunData/" + timestamp;
+        string root=Path.Combine(Application.dataPath,"RunData");
+        string baseTimestamp=System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        int collision=0;
+        do
+        {
+            timestamp=baseTimestamp+(collision==0?"":"_"+collision.ToString("D3"));
+            directoryPath=Path.Combine(root,timestamp);collision++;
+        } while(Directory.Exists(directoryPath) || File.Exists(Path.Combine(root,timestamp+".zip")));
         Directory.CreateDirectory(directoryPath);
 
         Application.logMessageReceivedThreaded -= HandleLogMessage;
         Application.logMessageReceivedThreaded += HandleLogMessage;
+        ConfigArchive=new RunConfigArchive(directoryPath,Application.streamingAssetsPath,timestamp,Application.unityVersion);
+        var main=MainController.Instance!=null?MainController.Instance:FindFirstObjectByType<MainController>();
+        try {ConfigArchive.CaptureStartup(startingScene,main!=null?main.SystemConfigurationFileName:"system_config.json");}
+        catch(Exception error) {Debug.LogError("Cannot initialize run config archive: "+error.Message);}
     }
     // d at the start of the scene
     void Start()
@@ -76,8 +89,9 @@ public class MasterDataLogger : MonoBehaviour
 
         if (Instance == this)
         {
-            ZipDataFolder();
-            Instance = null;
+            try {ZipDataFolder();}
+            catch(Exception error) {Debug.LogError("Could not zip run folder; original data and config snapshots remain at "+directoryPath+": "+error.Message);}
+            finally {Instance = null;}
         }
     }
 
