@@ -1,171 +1,162 @@
 {
-  "headingReference": {
-    "enabled": true,
-    "windowSeconds": 180,
-    "startOffsetSeconds": 0
-  },
-  "numberOfLocusts": 512,
-  "density": null,
-  "spawnAreaSize": 200,
-  "mu": 0,
-  "kappa": 100000,
-  "locustSpeed": 2,
-  "dimension": "3D",
-  "spawnCenter": null,
-  "spawnVolumeSize": {
-    "x": 200,
-    "y": 100,
-    "z": 200
-  },
-  "muElevation": 0,
-  "kappaElevation": 100000,
-  "boundaryHeight": 100,
-  "wrapY": true,
-  "agentVisual": "Bogong",
-  "bogongVisual": {
-    "sizeMode": "World",
-    "size": 0.5,
-    "angularSizeDegrees": 1,
-    "color": {
-      "r": 0.12,
-      "g": 0.12,
-      "b": 0.12,
+  "preStimulus": {
+    "headingReference": {
+      "enabled": true,
+      "windowSeconds": 10,
+      "startOffsetSeconds": 0
+    },
+    "objects": [],
+    "initialPosition": {
+      "x": 0,
+      "y": 100,
+      "z": 0
+    },
+    "initialRotation": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "randomInitialRotation": true,
+    "closedLoopOrientation": true,
+    "closedLoopPosition": false,
+    "backgroundColor": {
+      "r": 1,
+      "g": 0.8,
+      "b": 0.8,
+      "a": 1.0
+    },
+    "skyboxPath": "",
+    "windSpeed": 0,
+    "windDirection": 0,
+    "aglHeight": 0,
+    "groundLayerMask": 1,
+    "autopilotEnabled": true,
+    "autopilotSpeed": 7,
+    "nightSky": {
+      "enabled": false,
+      "latitude": -35.894409,
+      "longitude": 148.453948,
+      "timeZoneId": "Australia/Sydney",
+      "utcOffsetHours": 11,
+      "utcOffsetMinutes": null,
+      "date": null,
+      "localTime": "now",
+      "advanceWithRealTime": true,
+      "updateIntervalMinutes": 30,
+      "roundToInterval": false,
+      "northYawDegrees": 0,
+      "exposure": 0.1,
+      "faintDetailCutoff": 0.05,
+      "maskBelowHorizon": false,
+      "imageWidth": 4096
+    },
+    "resetPositionOnStart": true,
+    "resetRotationOnStart": true,
+    "uniformSkyColor": {
+      "r": 1,
+      "g": 0.6,
+      "b": 0.6,
       "a": 1
     },
-    "metallic": 0,
-    "smoothness": 0.25,
-    "flickerFrequencyHz": 0,
-    "flickerDutyCycle": 0.5,
-    "shape": "Dot",
-    "bodyLengthMetres": 0.0254,
-    "bodyDiameterMetres": 0.01,
-    "wingSpanMetres": 0.04,
-    "flapFrequencyHz": 30,
-    "wingOpacity": 0.25,
-    "subpixelVisibility": true
-  },
-  "animateOnMove": false,
-  "animationSpeedThreshold": 0.5,
-  "autopilotEnabled": true,
-  "autopilotSpeed": 10,
-  "closedLoopPosition": 1,
-  "closedLoopOrientation": 1,
-  "vrConfigs": [
-    {
-      "vrIndex": 1,
-      "initialPosition": {
-        "x": 0.0,
-        "y": 1.0,
-        "z": 5.0
-      },
-      "initialRotation": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
-      },
-      "watchIndex": null,
-      "closedLoopPosition": null,
-      "closedLoopOrientation": null
-    },
-    {
-      "vrIndex": 2,
-      "initialPosition": {
-        "x": 5.0,
-        "y": 1.0,
-        "z": 0.0
-      },
-      "initialRotation": {
-        "x": 0.0,
-        "y": 90.0,
-        "z": 0.0
-      },
-      "watchIndex": null,
-      "closedLoopPosition": null,
-      "closedLoopOrientation": null
-    },
-    {
-      "vrIndex": 3,
-      "initialPosition": {
-        "x": 0.0,
-        "y": 1.0,
-        "z": -5.0
-      },
-      "initialRotation": {
-        "x": 0.0,
-        "y": 180.0,
-        "z": 0.0
-      },
-      "watchIndex": null,
-      "closedLoopPosition": null,
-      "closedLoopOrientation": null
-    },
-    {
-      "vrIndex": 4,
-      "initialPosition": {
-        "x": -5.0,
-        "y": 1.0,
-        "z": 0.0
-      },
-      "initialRotation": {
-        "x": 0.0,
-        "y": 270.0,
-        "z": 0.0
-      },
-      "watchIndex": null,
-      "closedLoopPosition": null,
-      "closedLoopOrientation": null
-    }
-  ],
-  "backgroundColor": {
-    "r": 0.5,
-    "g": 0.5,
-    "b": 0.5,
-    "a": 1
-  },
-  "skyboxPath": "",
-  "nightSky": {
+    "swarm": null,
     "enabled": true,
-    "latitude": 47.6896,
-    "longitude": 9.1881,
-    "timeZoneId": "Australia/Sydney",
-    "utcOffsetHours": 2,
-    "utcOffsetMinutes": null,
-    "date": null,
-    "localTime": "now",
-    "advanceWithRealTime": true,
-    "updateIntervalMinutes": 30,
-    "roundToInterval": false,
-    "northYawDegrees": 0,
-    "exposure": 1,
-    "faintDetailCutoff": 0,
-    "maskBelowHorizon": true,
-    "imageWidth": 4096
+    "durationSeconds": 10
   },
-  "boundaryLengthX": 200,
-  "boundaryLengthZ": 200,
-  "resetPositionOnStart": true,
-  "resetRotationOnStart": true,
-  "uniformSkyColor": null,
-  "useHeadingReference": true,
-  "spawnRelativeToAnimal": false,
-  "followAnimalPosition": false,
-  "randomInitialRotation": false,
-  "trajectoryFile": "",
-  "playback": {
-    "dataUnitsPerMetre": 1,
-    "loop": true,
-    "speed": 1,
-    "startTimeSeconds": 0,
-    "maxGapSeconds": 0.1,
-    "yawOffsetDegrees": 0,
-    "centerOnAnimal": true,
-    "periodicBoundary": true,
-    "continueAfterTrack": false,
-    "despawnDistanceMetres": 100,
-    "terminalVelocityWindowSeconds": 0.1,
-    "continuationSpeedMetresPerSecond": null,
-    "preRollSeconds": 0
+  "stimulus": {
+    "headingReference": {
+      "enabled": false,
+      "windowSeconds": 240,
+      "startOffsetSeconds": 0
+    },
+    "objects": [],
+    "initialPosition": {
+      "x": 0,
+      "y": 100,
+      "z": 0
+    },
+    "initialRotation": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "randomInitialRotation": false,
+    "closedLoopOrientation": true,
+    "closedLoopPosition": false,
+    "backgroundColor": {
+      "r": 0.5,
+      "g": 0.5,
+      "b": 0.5,
+      "a": 1.0
+    },
+    "skyboxPath": "",
+    "windSpeed": 0,
+    "windDirection": 0,
+    "groundLayerMask": 1,
+    "autopilotEnabled": true,
+    "autopilotSpeed": 7,
+    "nightSky": {
+      "enabled": false
+    },
+    "resetPositionOnStart": false,
+    "resetRotationOnStart": false,
+    "uniformSkyColor": {
+      "r": 1,
+      "g": 0.6,
+      "b": 0.6,
+      "a": 1
+    },
+    "swarm": {
+      "useHeadingReference": true,
+      "spawnRelativeToAnimal": true,
+      "followAnimalPosition": true,
+      "numberOfLocusts": 100,
+      "density": null,
+      "spawnAreaSize": 10,
+      "mu": -90,
+      "kappa": 1000,
+      "locustSpeed": 7,
+      "dimension": "3D",
+      "spawnCenter": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "spawnVolumeSize": {
+        "x": 10,
+        "y": 10,
+        "z": 10
+      },
+      "muElevation": 0,
+      "kappaElevation": 10000,
+      "boundaryHeight": 10,
+      "wrapY": true,
+      "agentVisual": "Bogong",
+      "bogongVisual": {
+        "shape": "Moth",
+        "sizeMode": "Angular",
+        "size": 0.5,
+        "angularSizeDegrees": 2,
+        "color": {
+          "r": 0.01,
+          "g": 0.01,
+          "b": 0.01,
+          "a": 1
+        },
+        "metallic": 0,
+        "smoothness": 0.25,
+        "flickerFrequencyHz": 0,
+        "flickerDutyCycle": 1
+      },
+      "boundaryLengthX": 10,
+      "boundaryLengthZ": 10,
+      "animateOnMove": false,
+      "animationSpeedThreshold": 0.5
+    },
+    "aglHeight": 0,
+    "enabled": true,
+    "durationSeconds": 240
   },
-  "worldUnitsPerMetre": null,
-  "nearClipMetres": null
+  "postStimulus": {
+    "enabled": false
+  }
 }

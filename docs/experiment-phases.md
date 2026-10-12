@@ -1,6 +1,6 @@
 # Pre-stimulus, stimulus and post-stimulus
 
-The active `sequenceConfig.json` selects `Examples/Flight/selwyn-stars-left-swarm.example.json` in **Choice_Selwyn**. Start it from Control. One cycle is **240 seconds of stars and terrain, then 240 seconds of gray sky and a leftward Bogong swarm**. The cycle repeats in the same scene. The existing `Kannadi/` recipes and hardware configuration are unchanged.
+The current `sequenceConfig.json` selects `Examples/Swarm/heading-aligned.example.json` in **Swarm**. Start it from Control: **10 seconds of heading observation with no agents, then 240 seconds with 100 Bogong moths per rig**. The nested stimulus uses the frozen heading minus 90°, two-degree angular sizing and a volume that follows animal position. Your outer sequence settings remain unchanged; enabled phase durations govern the run.
 
 ## One experimental file
 
@@ -34,13 +34,13 @@ An experiment can contain three phase objects. Each enabled object contains the 
 }
 ```
 
-Use the [complete canonical template](../Assets/StreamingAssets/Templates/experiment.template.json) for every Choice setting, or the [complete active recipe](../Assets/StreamingAssets/Examples/Flight/selwyn-stars-left-swarm.example.json) for the sky, movement and swarm details omitted from the minimal example.
+Use the [complete canonical template](../Assets/StreamingAssets/Templates/experiment.template.json) for every Choice setting, or the [complete Selwyn terrain recipe](../Assets/StreamingAssets/Examples/Flight/selwyn-stars-left-swarm.example.json) for the sky, movement and swarm details omitted from the minimal example.
 
 - **Old flat JSON remains supported**, with its existing scene schema and sequence timer. No phase keys means one stimulus. Existing fields do not need to move.
 - `preStimulus` and `postStimulus` default off. Omit them, use `null`, `{}`, or `{ "enabled": false }`. Disabled phase contents have no effect.
 - `stimulus` defaults enabled. A phased file requires an enabled stimulus with a positive finite `durationSeconds`.
 - Each phase is a complete scene configuration, not a patch inherited from the previous phase. Repeat closed-loop, autopilot, sky and other settings you intend to retain. Omitted fields use that controller's existing defaults.
-- The nested durations own the phased experiment's schedule. Keep outer sequence `duration` equal to their total for readability; the active sequence says `480`. An observation overrun extends that total. Flat files still use sequence `duration` as before.
+- The nested durations own the phased experiment's schedule. Keep outer sequence `duration` equal to their total for readability; the Selwyn terrain example uses `480`. An observation overrun extends that total. Flat files still use sequence `duration` as before.
 - Phases change conditions inside the current scene. `reloadScene: false` additionally keeps the same scene when the outer sequence repeats. Set outer `loop: true` to repeat the cycle.
 - Choice, Swarm, Kannadi, Optomotor and Dynamic Choice accept phase payloads. Dynamic Choice retains its design schema (`steps`, `intertrial`, etc.) inside each phase and still uses `parameters.design`. Its inner trials/triggers restart when entering a new phase.
 - Mixing flat experiment settings with phase objects is rejected, avoiding silently ignored settings. Phase durations must be explicit; invalid settings appear in the status/error panel.
@@ -56,9 +56,19 @@ Use the [complete canonical template](../Assets/StreamingAssets/Templates/experi
 | false | true | Keep position and apply initial/random heading. |
 | false | false | Continue current position and heading. |
 
-Choice uses its root initial pose. Swarm/Kannadi use their existing per-rig `vrConfigs` initial poses; the reset switches and random-yaw option are at the experiment root. Optomotor has optional root initial poses; omission preserves its historical pose behavior. Dynamic Choice uses the reset switches alongside initial pose in each design step/intertrial. The operator's **R** shortcut continues to work independently.
+Choice uses its root initial pose. Swarm supports shared root `initialPosition`/`initialRotation`, with per-rig `vrConfigs` poses taking precedence. Kannadi retains its existing per-rig poses. The reset switches and random-yaw option are at the experiment root. Optomotor has optional root initial poses; omission preserves its historical pose behavior. Dynamic Choice uses the reset switches alongside initial pose in each design step/intertrial. The operator's **R** shortcut continues to work independently.
 
-For the active recipe, every cycle starts pre-stimulus at its configured initial position with random yaw. The transition **from pre-stimulus to stimulus** resets neither position nor rotation. Autopilot remains 7 world units/s, yaw remains closed loop, and AGL remains 100 throughout.
+## Nested standalone Swarm settings
+
+Standalone Swarm accepts a phase's `swarm` object as well as its historical flat swarm fields. Nested swarm values override matching flat values; sky, autopilot, closed-loop gains, shared/per-rig poses and reset flags remain at the phase root. `swarm: null` clears the population for observation or post-stimulus phases. Omitting `swarm` retains flat-config behavior. A non-null `swarm` must be an object; malformed values raise a configuration error instead of falling back to the scene's locust prefab.
+
+To render the procedural moth, set `swarm.agentVisual: "Bogong"` and `swarm.bogongVisual.shape: "Moth"`. Omitting `shape` retains the historical dot default. The [heading-aligned example](../Assets/StreamingAssets/Examples/Swarm/heading-aligned.example.json) uses a 10-second observation with no swarm, then a 240-second nested 100-moth stimulus. Its angular sizing, speed, volume, color and follow/reference flags remain explicit in that file. Moth dimensions and 30 Hz coupled flapping use the existing defaults when omitted.
+
+`worldUnitsPerMetre` belongs to the swarm settings. If omitted, standalone Swarm retains its legacy centimetre scale (100 world units per metre), while terrain scenes resolve to metres. Adding a nested block or choosing a moth does not change the units of positions, speeds or volume sizes.
+
+`SwarmNestedConfigValidation.Run` checks the actual ControlScene phase transition in an isolated Unity project, including an empty observation phase, the moth shader, per-rig heading alignment, system camera omissions, repeated disable/re-enable and legacy flat loading.
+
+For the Selwyn terrain recipe, every cycle starts pre-stimulus at its configured initial position with random yaw. The transition **from pre-stimulus to stimulus** resets neither position nor rotation. Autopilot remains 7 world units/s, yaw remains closed loop, and AGL remains 100 throughout.
 
 ## Heading measurement and application are separate
 
@@ -84,7 +94,7 @@ The old flat `headingReference` form remains readable: its observation precedes 
 
 ## Selwyn stars → gray sky and leftward swarm
 
-The active file specifies:
+The Selwyn terrain reference file specifies:
 
 - **Pre-stimulus:** 240 s, live Selwyn night-sky sample, terrain, no conspecifics, random initial yaw; measurement from offset 0 for 240 s.
 - **Stimulus:** 240 s, the same terrain and continuous pose, uniform RGB `(0.12, 0.12, 0.12)` sky; 256 dark Bogong dots per rig, RGB `(0.01, 0.01, 0.01)`, constant **2° diameter**, no blinking, fixed heading `mean − 90°`, speed 2 world units/s.

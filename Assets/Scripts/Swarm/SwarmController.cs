@@ -7,7 +7,7 @@ public class SwarmController : MonoBehaviour, IInSceneSequencer
 {
     public void InitializeScene(Dictionary<string, object> parameters)
     {
-        KannadiConfig config = KannadiConfig.Load(parameters);
+        KannadiConfig config = KannadiConfig.LoadSwarm(parameters);
         NightSkyController.Apply(gameObject, config.nightSky, config.skyboxPath, config.uniformSkyColor);
         Keyboard.ApplyAutopilotConfig(config.autopilotEnabled, config.autopilotSpeed);
         foreach (LocustSpawner spawner in FindObjectsOfType<LocustSpawner>())
@@ -19,18 +19,20 @@ public class SwarmController : MonoBehaviour, IInSceneSequencer
             {
                 rig.SetLocustGains(vr?.closedLoopPosition ?? config.closedLoopPosition ?? 1,
                                   vr?.closedLoopOrientation ?? config.closedLoopOrientation ?? 1);
-                Vector3 rotation = vr?.initialRotation?.ToVector3() ?? rig.transform.eulerAngles;
+                Vector3 position = (vr?.initialPosition ?? config.initialPosition)?.ToVector3() ?? rig.transform.position;
+                Vector3 rotation = (vr?.initialRotation ?? config.initialRotation)?.ToVector3() ?? rig.transform.eulerAngles;
                 if (config.randomInitialRotation && config.resetRotationOnStart) rotation.y = Random.Range(0f, 360f);
-                if (vr != null || config.randomInitialRotation)
-                    rig.ApplyStartPose(vr?.initialPosition?.ToVector3() ?? rig.transform.position,
+                if (vr != null || config.initialPosition != null || config.initialRotation != null || config.randomInitialRotation)
+                    rig.ApplyStartPose(position,
                         Quaternion.Euler(rotation), config.resetPositionOnStart, config.resetRotationOnStart);
                 if (!ExperimentPhases.IsPhase(parameters))
                     StimulusHeadingReference.For(rig).Begin(config.headingReference,
-                        reference => { if (reference != null && config.useHeadingReference) SwarmConfiguration.Apply(spawner, config, rig); });
+                        reference => { if (reference != null && config.SwarmEnabled && config.useHeadingReference) SwarmConfiguration.Apply(spawner, config, rig); });
             }
             else if (config.headingReference?.enabled == true)
                 throw new System.InvalidOperationException("Heading reference requires a ClosedLoop rig: " + spawner.name);
-            SwarmConfiguration.Apply(spawner, config, rig);
+            if (config.SwarmEnabled) SwarmConfiguration.Apply(spawner, config, rig);
+            else spawner.PrepareObservation();
         }
         SimpleOverheadCamera.EnsureInScene();
     }

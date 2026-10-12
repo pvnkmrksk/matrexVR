@@ -10,7 +10,7 @@
       "autoTrim": false,
       "reloadScene": true,
       "parameters": {
-        "configFile": "Examples/Swarm/selwyn-trajectory-playback.example.json"
+        "configFile": "Examples/Swarm/heading-aligned.example.json"
       }
     }
   ]

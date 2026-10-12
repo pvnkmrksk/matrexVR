@@ -1,0 +1,44 @@
+{
+  "validatedAtUtc": "2026-10-12T09:23:57.020493+00:00",
+  "focused": {
+    "checks": 54,
+    "failure": null,
+    "errors": [],
+    "unity": "6000.3.16f1",
+    "recipe": "Examples/Swarm/heading-aligned.example.json",
+    "note": "Real current ControlScene sequence, 10-second heading observation, four rigs and nested 100-moth stimulus. Tracker input disabled in an isolated project. Main hardware/sequence/other config edits are not rewritten."
+  },
+  "legacyPhaseAdapters": {
+    "checks": 85947,
+    "failure": null,
+    "errors": [],
+    "unity": "6000.3.16f1"
+  },
+  "configPreservation": {
+    "Assets/StreamingAssets/sequenceConfig.json": {
+      "unchanged": true,
+      "sha256": "e5db64aa2e774f4a2531fb9c13ce03388ab692ab1029cba57fc2a51d98fd18c4"
+    },
+    "Assets/StreamingAssets/Examples/Swarm/selwyn-trajectory-playback.example.json": {
+      "unchanged": true,
+      "sha256": "415aa1bea8bf55cef420ba925db05dc46646eb8ba02060f0586cccf9fbff7399"
+    },
+    "Assets/StreamingAssets/system_config.json": {
+      "unchanged": true,
+      "sha256": "f78e0082f3a64e01ffcaa528edf7a0c8ee05fbb551b67108316659d4242463cf"
+    },
+    "headingConfigOnlyAddsMothShape": true
+  },
+  "portableConfigValidation": {
+    "passed": true,
+    "templatesAndExamples": 58,
+    "archivedHashes": 622,
+    "earlierArchivedInputs": 979
+  },
+  "notes": [
+    "Nested SwarmConfig fields are loaded separately from phase-level control/sky/pose fields. Swarm null disables the population, while absent swarm preserves legacy flat loading.",
+    "The current sequence and user settings are preserved. Only shape=Moth is added to heading-aligned JSON. The sequence remains on that config; the unrelated Selwyn white-sky edit is not changed.",
+    "Real ten-second heading measurement and four-rig stimulus were exercised in an isolated Unity 6000.3.16f1 copy with live tracking disabled. System camera omissions, shared pose, heading alignment, 100 moths per rig, shader selection, boundary follow and reactivation are checked.",
+    "Legacy phase-adapter assertion totals include recorded CSV rows across five scenes, not only controller assertions."
+  ]
+}

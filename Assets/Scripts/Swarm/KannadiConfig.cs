@@ -27,19 +27,23 @@ public class KannadiConfig : SwarmConfig
     public VRConfig[] vrConfigs;
     [JsonConverter(typeof(LocustGainConverter))] public float? closedLoopPosition;
     [JsonConverter(typeof(LocustGainConverter))] public float? closedLoopOrientation;
+    // Shared start poses used by nested standalone Swarm experiments. Per-VR poses take precedence.
+    public Vector3Config initialPosition { get; set; }
+    public Vector3Config initialRotation { get; set; }
+    [JsonIgnore] public bool SwarmEnabled { get; private set; } = true;
 
-    public static KannadiConfig Load(Dictionary<string, object> parameters)
+    public static KannadiConfig Load(Dictionary<string, object> parameters) => Load(parameters, false);
+    public static KannadiConfig LoadSwarm(Dictionary<string, object> parameters) => Load(parameters, true);
+
+    private static KannadiConfig Load(Dictionary<string, object> parameters, bool readNestedSwarm)
     {
         JObject json = new JObject();
         if (ExperimentPhases.IsPhase(parameters))
-        {
-            KannadiConfig phase = ExperimentPhases.Read(parameters).ToObject<KannadiConfig>();
-            phase.Validate(); return phase;
-        }
-        if (parameters != null && parameters.TryGetValue("configFile", out object file))
+            json = ExperimentPhases.Read(parameters);
+        else if (parameters != null && parameters.TryGetValue("configFile", out object file))
             json = JObject.Parse(File.ReadAllText(ExperimentConfigFiles.Resolve(file.ToString())));
         // Inline sequence parameters override the referenced experiment file.
-        if (parameters != null)
+        if (parameters != null && !ExperimentPhases.IsPhase(parameters))
         {
             JObject inline = JObject.FromObject(parameters);
             // Autopilot belongs to the referenced individual config file;
@@ -49,9 +53,24 @@ public class KannadiConfig : SwarmConfig
             inline.Remove("headingReference"); // Experiment-file only; never a sequence override.
             json.Merge(inline, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace });
         }
+        bool swarmEnabled = true;
+        if (readNestedSwarm && json.TryGetValue("swarm", out JToken nested))
+        {
+            swarmEnabled = nested.Type != JTokenType.Null;
+            if (swarmEnabled)
+            {
+                if (!(nested is JObject swarm)) throw new ArgumentException("swarm must be an object or null.");
+                // Only swarm fields move into the inherited schema. Phase-level motion,
+                // sky, gains and reset flags retain their own values.
+                foreach (var field in typeof(SwarmConfig).GetFields())
+                    if (swarm.TryGetValue(field.Name, out JToken value)) json[field.Name] = value.DeepClone();
+            }
+            json.Remove("swarm");
+        }
         if (json["animationSpeedThreshold"] == null && json["animationNoiseThreshold"] != null)
             json["animationSpeedThreshold"] = json["animationNoiseThreshold"];
         KannadiConfig config = json.ToObject<KannadiConfig>();
+        config.SwarmEnabled = swarmEnabled;
         config.Validate();
         return config;
     }
