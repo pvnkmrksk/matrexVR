@@ -27,9 +27,9 @@
     "size": 0.5,
     "angularSizeDegrees": 1,
     "color": {
-      "r": 0.12,
-      "g": 0.12,
-      "b": 0.12,
+      "r": 0.012,
+      "g": 0.012,
+      "b": 0.012,
       "a": 1
     },
     "metallic": 0,
@@ -37,11 +37,11 @@
     "flickerFrequencyHz": 0,
     "flickerDutyCycle": 1,
     "shape": "Moth",
-    "bodyLengthMetres": 0.0254,
+    "bodyLengthMetres": 0.03,
     "bodyDiameterMetres": 0.01,
-    "wingSpanMetres": 0.04,
+    "wingSpanMetres": 0.06,
     "flapFrequencyHz": 30,
-    "wingOpacity": 0.25,
+    "wingOpacity": 0.75,
     "subpixelVisibility": true
   },
   "animateOnMove": true,
@@ -146,9 +146,9 @@
   "resetPositionOnStart": true,
   "resetRotationOnStart": true,
   "uniformSkyColor": {
-    "r": 0.5,
-    "g": 0.5,
-    "b": 0.5,
+    "r": 0.1,
+    "g": 0.1,
+    "b": 0.1,
     "a": 1
   },
   "useHeadingReference": false,

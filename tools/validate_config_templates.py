@@ -3,6 +3,7 @@
 import json
 import re
 import hashlib
+import math
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,6 +11,10 @@ SA = ROOT / 'Assets/StreamingAssets'
 TEMPLATES = SA / 'Templates'
 scenes = set(re.findall(r'enabled: 1\s+path: Assets/Scenes/([^\n]+)\.unity', (ROOT / 'ProjectSettings/EditorBuildSettings.asset').read_text()))
 def validate(obj, path):
+    if obj.get('uniformSkyColor') is not None:
+        assert all(isinstance(obj['uniformSkyColor'].get(k), (int,float)) and
+                   math.isfinite(obj['uniformSkyColor'][k]) and 0 <= obj['uniformSkyColor'][k] <= 1
+                   for k in ('r','g','b')), (path, 'uniformSkyColor RGB uses 0–1, not 0–255')
     if obj.get('trajectoryFile'):
         assert (SA / obj['trajectoryFile']).is_file(), (path, 'trajectoryFile')
     if 'playback' in obj:

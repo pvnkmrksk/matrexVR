@@ -84,8 +84,10 @@ public static class SwarmStartupValidation
             Check(RenderSettings.skybox != null && RenderSettings.skybox.shader.name == "NightSky/Panorama",
                 "Uniform sky replaces the authored scene skybox.");
             var texture = (Texture2D)RenderSettings.skybox.mainTexture;
-            Check(texture.width == 2 && texture.GetPixels().All(c => Math.Abs(c.r - .5f) < .01f &&
-                Math.Abs(c.g - .5f) < .01f && Math.Abs(c.b - .5f) < .01f && c.a == 1), "Sky is opaque uniform gray.");
+            var requested=recipe.uniformSkyColor;
+            Check(texture.width == 2 && texture.GetPixels().All(c => Math.Abs(c.r - Mathf.Clamp01(requested.r)) < .01f &&
+                Math.Abs(c.g - Mathf.Clamp01(requested.g)) < .01f && Math.Abs(c.b - Mathf.Clamp01(requested.b)) < .01f && c.a == 1),
+                "Sky is opaque and matches the configured color in the normalized render-texture range.");
             foreach (var population in populations)
             {
                 var rig = population.GetComponent<ClosedLoop>();

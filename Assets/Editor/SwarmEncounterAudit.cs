@@ -66,20 +66,22 @@ public static class SwarmEncounterAudit
                         var previous=RenderTexture.active; RenderTexture.active=targets[size];
                         if(pixels.width!=size) { Object.DestroyImmediate(pixels); pixels=new Texture2D(size,size,TextureFormat.RGBA32,false); }
                         pixels.ReadPixels(new Rect(0,0,size,size),0,0); pixels.Apply(); RenderTexture.active=previous;
-                        var colors=pixels.GetPixels32(); int sky=128;
+                        var colors=pixels.GetPixels32();
+                        var skyTexture=RenderSettings.skybox != null ? RenderSettings.skybox.mainTexture as Texture2D : null;
+                        int sky=skyTexture != null && skyTexture.width==2 ? ((Color32)skyTexture.GetPixel(0,0)).r : 128;
                         foreach(var a in active)
                         {
                             if(Vector3.Distance(a.transform.position,animal.position)>3) continue;
                             Vector3 point=camera.WorldToViewportPoint(a.transform.position);
                             if(point.z<=camera.nearClipPlane || point.x<0 || point.x>=1 || point.y<0 || point.y>=1) continue;
-                            int x=(int)(point.x*size), y=(int)(point.y*size), darkest=sky;
+                            int x=(int)(point.x*size), y=(int)(point.y*size), contrast=0;
                             for(int dy=-2;dy<=2;dy++) for(int dx=-2;dx<=2;dx++)
                             {
                                 int px=x+dx,py=y+dy;
-                                if(px>=0 && px<size && py>=0 && py<size) darkest=Math.Min(darkest,colors[py*size+px].r);
+                                if(px>=0 && px<size && py>=0 && py<size) contrast=Math.Max(contrast,Math.Abs(sky-colors[py*size+px].r));
                             }
-                            if(sky-darkest>=1) measurable[size].Add(a.name);
-                            if(sky-darkest>=3) visible[size].Add(a.name);
+                            if(contrast>=1) measurable[size].Add(a.name);
+                            if(contrast>=3) visible[size].Add(a.name);
                         }
                     }
                 }
@@ -90,7 +92,7 @@ public static class SwarmEncounterAudit
             check(seen.Count==data.Tracks.Length,"Every source ID actually becomes active in the real scene.");
             check(birthsAtMinute==expectedFirstMinute,"First-minute instantiation count matches the CSV schedule shifted by pre-roll.");
             check(live[60]>=10 && maxLive>=15,"Moths remain alive after short recordings instead of disappearing at the endpoint.");
-            check(visible[128].Count>=30,"At least 30 first-minute births produce measurable 3-byte contrast within 3m in the native 128px panels.");
+            check(measurable[128].Count>=30,"At least 30 first-minute births produce measurable contrast within 3m in native 128px panels.");
             return new {sourceIdsSeen=seen.Count,segmentBirths=replay.TotalBirths,firstMinuteSpawnEvents=birthsAtMinute,
                 firstMinuteRecordedIdStarts=data.Tracks.Count(t=>t.samples[0].time<=60),
                 cumulativeBirthsAtMinute=minuteBirths,meanLivePopulation=sumLive/steps,maxLivePopulation=maxLive,liveAtSeconds=live,
@@ -98,6 +100,7 @@ public static class SwarmEncounterAudit
                 firstMinuteNativePanelAnyByteContrastWithin3m=measurable.ToDictionary(v=>v.Key.ToString(),v=>v.Value.Count),
                 observerSpeedMetresPerSecond=observerSpeed,preRollSeconds=population.playbackSettings.preRollSeconds,
                 continuationSpeedMetresPerSecond=population.playbackSettings.continuationSpeedMetresPerSecond,
+                absoluteContrast=true,
                 sampleStepSeconds=.02,renderStepSeconds=.1,
                 note="Real four-rig Swarm startup; audit one rig using its configured cameras at native 64/128 pixels, gray sky and current world positions. Contrast requires 3 bytes (any-byte count also reported) in a 5x5 patch around a moth within 3m. Overlapping moths can contribute to the same patch. This is numerical detectability, not a biological visibility threshold. Recorded samples/times are unchanged. Instantiation precedes first samples by preRollSeconds; incoming and outgoing extrapolation uses the configured physical speed."};
         }

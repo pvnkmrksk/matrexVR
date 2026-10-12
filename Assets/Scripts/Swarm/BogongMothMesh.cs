@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-/// <summary>48 body triangles, two wing quads and a subpixel proxy per moth. No Animator.</summary>
+/// <summary>48 body triangles, one coupled left/right wing pair (two quads) and a subpixel proxy. No Animator.</summary>
 public static class BogongMothMesh
 {
     public const int VerticesPerAgent = 44; // 4 rings * 8 body vertices + 8 wings + 4 proxy.

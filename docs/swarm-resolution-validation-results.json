@@ -1,0 +1,1508 @@
+{
+  "validatedAtUtc": "2026-10-12T08:14:02.697920+00:00",
+  "sourceCalibrationCommit": "74c241c6",
+  "sourceVerification": {
+    "passed": true,
+    "rows": 14429,
+    "ids": 430,
+    "durationSeconds": 599.46,
+    "sourceAxes": "X north, Y west, Z down",
+    "sourceSha256": "620b3a90d59b31ab929d3271605e931a7b49fe1b07b45c79a28655a5c36baf92",
+    "convertedSha256": "d573f7c174c176c635d49c1fe0ccc9486f9aff594cf025e22c039263dfbb620c",
+    "maxCoordinateErrorMetres": 1.7763568394002505e-15,
+    "sampleCentroidMetres": {
+      "X": -0.26974953025157666,
+      "Y": 4.274847073185945,
+      "Z": 0.10780537521657772
+    },
+    "medianTrackSeconds": 0.14999999999999147,
+    "minTrackSeconds": 0.01999999999998181,
+    "maxTrackSeconds": 1.8300000000000018,
+    "gapsOverPointOneSecond": 7,
+    "note": "Canonical data matches every source ID/TimeExact/position. Presentation yaw is configured separately from the canonical data; continuation after recorded samples is extrapolated."
+  },
+  "flyingGeometry": {
+    "continuationSpeedMetresPerSecond": 6,
+    "preRollSeconds": 0,
+    "nearestPassMetres": {
+      "min": 0.1369539527342694,
+      "p10": 0.8675435398638026,
+      "p25": 1.2838180622067348,
+      "median": 1.858312116329037,
+      "p75": 2.3625958706113686,
+      "p90": 2.7911871807755677,
+      "p95": 3.1821653860642956,
+      "max": 11.2534362044297
+    },
+    "closePassesWithinQuarterMetre": [
+      {
+        "id": "125",
+        "distanceMetres": 0.233989933149191,
+        "timeSeconds": 191.17506297051563,
+        "stage": "outgoing"
+      },
+      {
+        "id": "175",
+        "distanceMetres": 0.22054749792807624,
+        "timeSeconds": 292.99077239893325,
+        "stage": "outgoing"
+      },
+      {
+        "id": "203",
+        "distanceMetres": 0.1495308229186156,
+        "timeSeconds": 323.54,
+        "stage": "recorded"
+      },
+      {
+        "id": "232",
+        "distanceMetres": 0.19107763029635264,
+        "timeSeconds": 391.37010508205987,
+        "stage": "outgoing"
+      },
+      {
+        "id": "295",
+        "distanceMetres": 0.1369539527342694,
+        "timeSeconds": 471.024587700377,
+        "stage": "outgoing"
+      }
+    ],
+    "passesWithinMetres": {
+      "0.1": {
+        "count": 0,
+        "perMinute": 0.0
+      },
+      "0.25": {
+        "count": 5,
+        "perMinute": 0.5004504053648283
+      },
+      "0.5": {
+        "count": 12,
+        "perMinute": 1.2010809728755878
+      },
+      "1": {
+        "count": 62,
+        "perMinute": 6.205585026523871
+      },
+      "2": {
+        "count": 244,
+        "perMinute": 24.42197978180362
+      },
+      "3": {
+        "count": 409,
+        "perMinute": 40.93684315884296
+      }
+    }
+  },
+  "stationaryGeometry": {
+    "continuationSpeedMetresPerSecond": 6,
+    "preRollSeconds": 5,
+    "nearestPassMetres": {
+      "min": 0.17699829702193667,
+      "p10": 0.619317944585656,
+      "p25": 1.0853843355752162,
+      "median": 1.5264979757134793,
+      "p75": 2.0496180847419776,
+      "p90": 2.507884981496072,
+      "p95": 3.067296771982216,
+      "max": 11.253436204429699
+    },
+    "closePassesWithinQuarterMetre": [
+      {
+        "id": "158",
+        "distanceMetres": 0.17699829702193667,
+        "timeSeconds": 268.4963751630769,
+        "stage": "recorded"
+      },
+      {
+        "id": "166",
+        "distanceMetres": 0.22640533327870818,
+        "timeSeconds": 285.83,
+        "stage": "recorded"
+      },
+      {
+        "id": "203",
+        "distanceMetres": 0.1971789395328085,
+        "timeSeconds": 323.4521795557514,
+        "stage": "recorded"
+      },
+      {
+        "id": "259",
+        "distanceMetres": 0.22491907129291813,
+        "timeSeconds": 429.0,
+        "stage": "recorded"
+      },
+      {
+        "id": "354",
+        "distanceMetres": 0.19999539047739665,
+        "timeSeconds": 523.71,
+        "stage": "recorded"
+      },
+      {
+        "id": "362",
+        "distanceMetres": 0.237035484357728,
+        "timeSeconds": 527.870043018746,
+        "stage": "recorded"
+      },
+      {
+        "id": "395",
+        "distanceMetres": 0.18226815469782978,
+        "timeSeconds": 550.87,
+        "stage": "recorded"
+      }
+    ],
+    "passesWithinMetres": {
+      "0.1": {
+        "count": 0,
+        "perMinute": 0.0
+      },
+      "0.25": {
+        "count": 7,
+        "perMinute": 0.7006305675107597
+      },
+      "0.5": {
+        "count": 28,
+        "perMinute": 2.8025222700430388
+      },
+      "1": {
+        "count": 94,
+        "perMinute": 9.408467620858772
+      },
+      "2": {
+        "count": 317,
+        "perMinute": 31.728555700130116
+      },
+      "3": {
+        "count": 414,
+        "perMinute": 41.437293564207785
+      }
+    }
+  },
+  "controlSceneStartup": {
+    "checks": 51,
+    "failure": null,
+    "errors": [],
+    "encounterAudit": {
+      "sourceIdsSeen": 430,
+      "segmentBirths": 437,
+      "firstMinuteSpawnEvents": 49,
+      "firstMinuteRecordedIdStarts": 49,
+      "cumulativeBirthsAtMinute": [
+        1,
+        49,
+        93,
+        123,
+        149,
+        187,
+        225,
+        255,
+        316,
+        387
+      ],
+      "meanLivePopulation": 30.683592446787216,
+      "maxLivePopulation": 62,
+      "liveAtSeconds": {
+        "10": 5,
+        "30": 28,
+        "60": 28,
+        "120": 31,
+        "300": 35,
+        "599": 31
+      },
+      "firstMinuteNativePanelDetectableWithin3m": {
+        "64": 26,
+        "128": 41
+      },
+      "firstMinuteNativePanelAnyByteContrastWithin3m": {
+        "64": 41,
+        "128": 42
+      },
+      "observerSpeedMetresPerSecond": 5.0,
+      "preRollSeconds": 0.0,
+      "continuationSpeedMetresPerSecond": 6.0,
+      "absoluteContrast": true,
+      "sampleStepSeconds": 0.02,
+      "renderStepSeconds": 0.1,
+      "note": "Real four-rig Swarm startup; audit one rig using its configured cameras at native 64/128 pixels, gray sky and current world positions. Contrast requires 3 bytes (any-byte count also reported) in a 5x5 patch around a moth within 3m. Overlapping moths can contribute to the same patch. This is numerical detectability, not a biological visibility threshold. Recorded samples/times are unchanged. Instantiation precedes first samples by preRollSeconds; incoming and outgoing extrapolation uses the configured physical speed."
+    },
+    "unity": "6000.3.16f1"
+  },
+  "resolutionAndRetention": {
+    "checks": 92,
+    "failure": null,
+    "unity": "6000.3.16f1",
+    "graphics": "Apple M2 Pro",
+    "visual": {
+      "shape": "Moth",
+      "bodyLengthMetres": 0.03,
+      "bodyDiameterMetres": 0.01,
+      "wingSpanMetres": 0.06,
+      "flapFrequencyHz": 30.0,
+      "wingOpacity": 0.75,
+      "subpixelVisibility": true,
+      "sizeMode": "World",
+      "size": 0.5,
+      "angularSizeDegrees": 1.0,
+      "color": {
+        "r": 0.012,
+        "g": 0.012,
+        "b": 0.012,
+        "a": 1.0
+      },
+      "metallic": 0.0,
+      "smoothness": 0.25,
+      "flickerFrequencyHz": 0.0,
+      "flickerDutyCycle": 1.0
+    },
+    "requestedSky": {
+      "r": 0.1,
+      "g": 0.1,
+      "b": 0.1,
+      "a": 1.0
+    },
+    "results": [
+      {
+        "scenario": "stationary",
+        "observerSpeedMetresPerSecond": 0.0,
+        "preRollSeconds": 5.0,
+        "sourceIdsSeen": 430,
+        "totalBirths": 437,
+        "meanLivePopulation": 15.768899713084673,
+        "maxLive": 37,
+        "meanWithin3Metres": 0.6393207446453593,
+        "meanBehindObserver": 4.296023220124107,
+        "snapshots": [
+          {
+            "timeSeconds": 30.0,
+            "live": 26,
+            "within3Metres": 0,
+            "nearestMetres": 9.222691,
+            "behind": 4,
+            "images": [
+              {
+                "face": "F",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-ordinary-F-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 4,
+                    "totalContrastBytes": 12,
+                    "changedPixels": 7,
+                    "pixelsAtLeastThreeBytes": 1,
+                    "image": "stationary-ordinary-F-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "F",
+                "control": "Mid-gray sky; otherwise identical",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 128,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-ordinary-F-mid-gray-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 128,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 24,
+                    "totalContrastBytes": 87,
+                    "changedPixels": 28,
+                    "pixelsAtLeastThreeBytes": 7,
+                    "image": "stationary-ordinary-F-mid-gray-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "R",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-ordinary-R-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 18,
+                    "totalContrastBytes": 47,
+                    "changedPixels": 8,
+                    "pixelsAtLeastThreeBytes": 6,
+                    "image": "stationary-ordinary-R-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "B",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-ordinary-B-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 3,
+                    "totalContrastBytes": 9,
+                    "changedPixels": 6,
+                    "pixelsAtLeastThreeBytes": 1,
+                    "image": "stationary-ordinary-B-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "L",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-ordinary-L-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-ordinary-L-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "U",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-ordinary-U-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-ordinary-U-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "D",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-ordinary-D-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-ordinary-D-1024.png"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "timeSeconds": 268.4963751630769,
+            "live": 9,
+            "within3Metres": 1,
+            "nearestMetres": 0.176998317,
+            "behind": 5,
+            "images": [
+              {
+                "face": "F",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-close-F-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 23,
+                    "totalContrastBytes": 64,
+                    "changedPixels": 4,
+                    "pixelsAtLeastThreeBytes": 4,
+                    "image": "stationary-close-F-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "R",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-close-R-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 2,
+                    "totalContrastBytes": 3,
+                    "changedPixels": 2,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-close-R-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "B",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-close-B-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 3,
+                    "totalContrastBytes": 14,
+                    "changedPixels": 9,
+                    "pixelsAtLeastThreeBytes": 1,
+                    "image": "stationary-close-B-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "L",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-close-L-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-close-L-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "U",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 23,
+                    "totalContrastBytes": 718,
+                    "changedPixels": 38,
+                    "pixelsAtLeastThreeBytes": 38,
+                    "image": "stationary-close-U-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 24,
+                    "totalContrastBytes": 197777,
+                    "changedPixels": 10582,
+                    "pixelsAtLeastThreeBytes": 10582,
+                    "image": "stationary-close-U-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "U",
+                "control": "Mid-gray sky; otherwise identical",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 128,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 125,
+                    "totalContrastBytes": 3944,
+                    "changedPixels": 38,
+                    "pixelsAtLeastThreeBytes": 38,
+                    "image": "stationary-close-U-mid-gray-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 128,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 126,
+                    "totalContrastBytes": 1086916,
+                    "changedPixels": 10582,
+                    "pixelsAtLeastThreeBytes": 10582,
+                    "image": "stationary-close-U-mid-gray-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "D",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-close-D-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "stationary-close-D-1024.png"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "scenario": "flying",
+        "observerSpeedMetresPerSecond": 5.0,
+        "preRollSeconds": 0.0,
+        "sourceIdsSeen": 430,
+        "totalBirths": 437,
+        "meanLivePopulation": 30.683592446787216,
+        "maxLive": 62,
+        "meanWithin3Metres": 0.8179422165877094,
+        "meanBehindObserver": 6.35450723960766,
+        "snapshots": [
+          {
+            "timeSeconds": 30.0,
+            "live": 28,
+            "within3Metres": 1,
+            "nearestMetres": 1.37774444,
+            "behind": 10,
+            "images": [
+              {
+                "face": "F",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 1,
+                    "totalContrastBytes": 2,
+                    "changedPixels": 2,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-ordinary-F-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 24,
+                    "totalContrastBytes": 1729,
+                    "changedPixels": 97,
+                    "pixelsAtLeastThreeBytes": 92,
+                    "image": "flying-ordinary-F-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "F",
+                "control": "Mid-gray sky; otherwise identical",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 128,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 7,
+                    "totalContrastBytes": 14,
+                    "changedPixels": 4,
+                    "pixelsAtLeastThreeBytes": 2,
+                    "image": "flying-ordinary-F-mid-gray-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 128,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 126,
+                    "totalContrastBytes": 9481,
+                    "changedPixels": 98,
+                    "pixelsAtLeastThreeBytes": 97,
+                    "image": "flying-ordinary-F-mid-gray-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "R",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-ordinary-R-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 23,
+                    "totalContrastBytes": 57,
+                    "changedPixels": 13,
+                    "pixelsAtLeastThreeBytes": 5,
+                    "image": "flying-ordinary-R-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "B",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-ordinary-B-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-ordinary-B-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "L",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-ordinary-L-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 7,
+                    "totalContrastBytes": 11,
+                    "changedPixels": 3,
+                    "pixelsAtLeastThreeBytes": 1,
+                    "image": "flying-ordinary-L-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "U",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-ordinary-U-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 11,
+                    "totalContrastBytes": 54,
+                    "changedPixels": 16,
+                    "pixelsAtLeastThreeBytes": 7,
+                    "image": "flying-ordinary-U-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "D",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 1,
+                    "totalContrastBytes": 1,
+                    "changedPixels": 1,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-ordinary-D-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 23,
+                    "totalContrastBytes": 407,
+                    "changedPixels": 29,
+                    "pixelsAtLeastThreeBytes": 26,
+                    "image": "flying-ordinary-D-1024.png"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "timeSeconds": 268.4963751630769,
+            "live": 22,
+            "within3Metres": 2,
+            "nearestMetres": 1.64355683,
+            "behind": 1,
+            "images": [
+              {
+                "face": "F",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-close-F-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 9,
+                    "totalContrastBytes": 17,
+                    "changedPixels": 7,
+                    "pixelsAtLeastThreeBytes": 2,
+                    "image": "flying-close-F-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "R",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-close-R-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 4,
+                    "totalContrastBytes": 8,
+                    "changedPixels": 4,
+                    "pixelsAtLeastThreeBytes": 1,
+                    "image": "flying-close-R-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "B",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 1,
+                    "totalContrastBytes": 2,
+                    "changedPixels": 2,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-close-B-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 24,
+                    "totalContrastBytes": 686,
+                    "changedPixels": 35,
+                    "pixelsAtLeastThreeBytes": 35,
+                    "image": "flying-close-B-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "L",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 3,
+                    "totalContrastBytes": 7,
+                    "changedPixels": 4,
+                    "pixelsAtLeastThreeBytes": 1,
+                    "image": "flying-close-L-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 24,
+                    "totalContrastBytes": 2886,
+                    "changedPixels": 159,
+                    "pixelsAtLeastThreeBytes": 155,
+                    "image": "flying-close-L-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "U",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-close-U-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-close-U-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "U",
+                "control": "Mid-gray sky; otherwise identical",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 128,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-close-U-mid-gray-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 128,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-close-U-mid-gray-1024.png"
+                  }
+                ]
+              },
+              {
+                "face": "D",
+                "renders": [
+                  {
+                    "size": 64,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 0,
+                    "totalContrastBytes": 0,
+                    "changedPixels": 0,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-close-D-64.png"
+                  },
+                  {
+                    "size": 1024,
+                    "sky": 26,
+                    "absoluteContrast": true,
+                    "peakContrastBytes": 1,
+                    "totalContrastBytes": 5,
+                    "changedPixels": 5,
+                    "pixelsAtLeastThreeBytes": 0,
+                    "image": "flying-close-D-1024.png"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "scenario": "physical-broadside",
+        "bodyLengthMetres": 0.03,
+        "bodyDiameterMetres": 0.01,
+        "wingSpanMetres": 0.06,
+        "images": [
+          {
+            "distanceMetres": 0.177,
+            "flap": "up",
+            "renders": [
+              {
+                "size": 64,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 24,
+                "totalContrastBytes": 420,
+                "changedPixels": 20,
+                "pixelsAtLeastThreeBytes": 20,
+                "image": "physical-0.177-up-64.png"
+              },
+              {
+                "size": 1024,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 24,
+                "totalContrastBytes": 115960,
+                "changedPixels": 5532,
+                "pixelsAtLeastThreeBytes": 5532,
+                "image": "physical-0.177-up-1024.png"
+              }
+            ]
+          },
+          {
+            "distanceMetres": 0.177,
+            "flap": "down",
+            "renders": [
+              {
+                "size": 64,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 24,
+                "totalContrastBytes": 423,
+                "changedPixels": 20,
+                "pixelsAtLeastThreeBytes": 20,
+                "image": "physical-0.177-down-64.png"
+              },
+              {
+                "size": 1024,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 24,
+                "totalContrastBytes": 114468,
+                "changedPixels": 5432,
+                "pixelsAtLeastThreeBytes": 5432,
+                "image": "physical-0.177-down-1024.png"
+              }
+            ]
+          },
+          {
+            "distanceMetres": 0.5,
+            "flap": "up",
+            "renders": [
+              {
+                "size": 64,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 23,
+                "totalContrastBytes": 46,
+                "changedPixels": 2,
+                "pixelsAtLeastThreeBytes": 2,
+                "image": "physical-0.500-up-64.png"
+              },
+              {
+                "size": 1024,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 23,
+                "totalContrastBytes": 14014,
+                "changedPixels": 654,
+                "pixelsAtLeastThreeBytes": 654,
+                "image": "physical-0.500-up-1024.png"
+              }
+            ]
+          },
+          {
+            "distanceMetres": 0.5,
+            "flap": "down",
+            "renders": [
+              {
+                "size": 64,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 23,
+                "totalContrastBytes": 46,
+                "changedPixels": 2,
+                "pixelsAtLeastThreeBytes": 2,
+                "image": "physical-0.500-down-64.png"
+              },
+              {
+                "size": 1024,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 23,
+                "totalContrastBytes": 13750,
+                "changedPixels": 638,
+                "pixelsAtLeastThreeBytes": 638,
+                "image": "physical-0.500-down-1024.png"
+              }
+            ]
+          },
+          {
+            "distanceMetres": 1.0,
+            "flap": "up",
+            "renders": [
+              {
+                "size": 64,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 15,
+                "totalContrastBytes": 22,
+                "changedPixels": 2,
+                "pixelsAtLeastThreeBytes": 2,
+                "image": "physical-1.000-up-64.png"
+              },
+              {
+                "size": 1024,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 23,
+                "totalContrastBytes": 3549,
+                "changedPixels": 165,
+                "pixelsAtLeastThreeBytes": 165,
+                "image": "physical-1.000-up-1024.png"
+              }
+            ]
+          },
+          {
+            "distanceMetres": 1.0,
+            "flap": "down",
+            "renders": [
+              {
+                "size": 64,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 15,
+                "totalContrastBytes": 22,
+                "changedPixels": 2,
+                "pixelsAtLeastThreeBytes": 2,
+                "image": "physical-1.000-down-64.png"
+              },
+              {
+                "size": 1024,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 23,
+                "totalContrastBytes": 3413,
+                "changedPixels": 157,
+                "pixelsAtLeastThreeBytes": 157,
+                "image": "physical-1.000-down-1024.png"
+              }
+            ]
+          },
+          {
+            "distanceMetres": 3.0,
+            "flap": "up",
+            "renders": [
+              {
+                "size": 64,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 2,
+                "totalContrastBytes": 2,
+                "changedPixels": 1,
+                "pixelsAtLeastThreeBytes": 0,
+                "image": "physical-3.000-up-64.png"
+              },
+              {
+                "size": 1024,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 23,
+                "totalContrastBytes": 420,
+                "changedPixels": 20,
+                "pixelsAtLeastThreeBytes": 20,
+                "image": "physical-3.000-up-1024.png"
+              }
+            ]
+          },
+          {
+            "distanceMetres": 3.0,
+            "flap": "down",
+            "renders": [
+              {
+                "size": 64,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 2,
+                "totalContrastBytes": 2,
+                "changedPixels": 1,
+                "pixelsAtLeastThreeBytes": 0,
+                "image": "physical-3.000-down-64.png"
+              },
+              {
+                "size": 1024,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 23,
+                "totalContrastBytes": 386,
+                "changedPixels": 18,
+                "pixelsAtLeastThreeBytes": 18,
+                "image": "physical-3.000-down-1024.png"
+              }
+            ]
+          },
+          {
+            "distanceMetres": 10.0,
+            "flap": "up",
+            "renders": [
+              {
+                "size": 64,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 0,
+                "totalContrastBytes": 0,
+                "changedPixels": 0,
+                "pixelsAtLeastThreeBytes": 0,
+                "image": "physical-10.000-up-64.png"
+              },
+              {
+                "size": 1024,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 23,
+                "totalContrastBytes": 46,
+                "changedPixels": 2,
+                "pixelsAtLeastThreeBytes": 2,
+                "image": "physical-10.000-up-1024.png"
+              }
+            ]
+          },
+          {
+            "distanceMetres": 10.0,
+            "flap": "down",
+            "renders": [
+              {
+                "size": 64,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 0,
+                "totalContrastBytes": 0,
+                "changedPixels": 0,
+                "pixelsAtLeastThreeBytes": 0,
+                "image": "physical-10.000-down-64.png"
+              },
+              {
+                "size": 1024,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 23,
+                "totalContrastBytes": 46,
+                "changedPixels": 2,
+                "pixelsAtLeastThreeBytes": 2,
+                "image": "physical-10.000-down-1024.png"
+              }
+            ]
+          },
+          {
+            "distanceMetres": 30.0,
+            "flap": "up",
+            "renders": [
+              {
+                "size": 64,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 0,
+                "totalContrastBytes": 0,
+                "changedPixels": 0,
+                "pixelsAtLeastThreeBytes": 0,
+                "image": "physical-30.000-up-64.png"
+              },
+              {
+                "size": 1024,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 2,
+                "totalContrastBytes": 6,
+                "changedPixels": 4,
+                "pixelsAtLeastThreeBytes": 0,
+                "image": "physical-30.000-up-1024.png"
+              }
+            ]
+          },
+          {
+            "distanceMetres": 30.0,
+            "flap": "down",
+            "renders": [
+              {
+                "size": 64,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 0,
+                "totalContrastBytes": 0,
+                "changedPixels": 0,
+                "pixelsAtLeastThreeBytes": 0,
+                "image": "physical-30.000-down-64.png"
+              },
+              {
+                "size": 1024,
+                "sky": 26,
+                "absoluteContrast": true,
+                "peakContrastBytes": 2,
+                "totalContrastBytes": 6,
+                "changedPixels": 4,
+                "pixelsAtLeastThreeBytes": 0,
+                "image": "physical-30.000-down-1024.png"
+              }
+            ]
+          },
+          {
+            "detail": "One coupled wing pair",
+            "flap": "up",
+            "render": {
+              "size": 1024,
+              "sky": 26,
+              "absoluteContrast": true,
+              "peakContrastBytes": 24,
+              "totalContrastBytes": 1092747,
+              "changedPixels": 57881,
+              "pixelsAtLeastThreeBytes": 57881,
+              "image": "coupled-pair-up.png"
+            }
+          },
+          {
+            "detail": "One coupled wing pair",
+            "flap": "down",
+            "render": {
+              "size": 1024,
+              "sky": 26,
+              "absoluteContrast": true,
+              "peakContrastBytes": 24,
+              "totalContrastBytes": 984623,
+              "changedPixels": 51465,
+              "pixelsAtLeastThreeBytes": 51465,
+              "image": "coupled-pair-down.png"
+            }
+          }
+        ]
+      }
+    ],
+    "note": "1024px is a resolution diagnostic, not a calibrated human-vision simulation. Native 64/1024 images share camera position, orientation, 90-degree FOV, world positions and wing phase. Stationary diagnostic uses 5s extrapolated lead-in; active 5m/s flight uses zero. No extra births, spatial compression, minimum opacity, or moth-size boost. Readbacks and image encoding are editor validation only."
+  },
+  "playbackAndRendering": {
+    "checks": 99,
+    "failure": null,
+    "captures": [
+      {
+        "blank": "RGBA(255, 255, 255, 255)",
+        "rect": "(x:0.00, y:0.00, width:64.00, height:64.00)",
+        "color": "RGBA(1.000, 1.000, 1.000, 1.000)"
+      },
+      {
+        "graphics": "Apple M2 Pro",
+        "camera": "1.00000\t0.00000\t0.00000\t0.00000\n0.00000\t1.00000\t0.00000\t0.00000\n0.00000\t0.00000\t-1.00002\t-0.00200\n0.00000\t0.00000\t-1.00000\t0.00000\n",
+        "bodyLength": 0.0254,
+        "bodyDiameter": 0.01
+      },
+      {
+        "distanceMetres": 0.01,
+        "contrast": 2513.451,
+        "changedPixels": 3136
+      },
+      {
+        "distanceMetres": 0.1,
+        "contrast": 28.1568623,
+        "changedPixels": 42
+      },
+      {
+        "distanceMetres": 1.0,
+        "contrast": 0.345098048,
+        "changedPixels": 4
+      },
+      {
+        "distanceMetres": 2.0,
+        "contrast": 0.08627451,
+        "changedPixels": 4
+      },
+      {
+        "mode": "gray128-first",
+        "blank": 128,
+        "peak": 12,
+        "total": 12,
+        "colorSpace": "Gamma"
+      },
+      {
+        "mode": "gray128",
+        "distanceMetres": 3,
+        "peakContrastBytes": 12,
+        "totalContrastBytes": 12,
+        "fractionalPixelContrastBytes": [
+          12,
+          12,
+          12,
+          12
+        ]
+      }
+    ],
+    "timings": [
+      {
+        "shape": "Dot",
+        "medianCpuMilliseconds": 2.3708,
+        "p95CpuMilliseconds": 2.8451,
+        "agents": 1024,
+        "rigs": 4,
+        "cameras": 24,
+        "materials": 4
+      },
+      {
+        "shape": "Moth",
+        "medianCpuMilliseconds": 2.7235,
+        "p95CpuMilliseconds": 3.5924,
+        "agents": 1024,
+        "rigs": 4,
+        "cameras": 24,
+        "materials": 4
+      }
+    ],
+    "unity": "6000.3.16f1",
+    "timingNote": "Isolated CPU timings: four rigs, six 64px cameras each, 256 agents per rig. Not hardware-display FPS."
+  },
+  "pythonTests": {
+    "passed": 6
+  },
+  "portableConfigValidation": {
+    "passed": true,
+    "templatesAndExamples": 58,
+    "archivedHashes": 622,
+    "earlierArchivedInputs": 979
+  },
+  "macOSBuild": {
+    "result": "Succeeded",
+    "architecture": "Apple Silicon ARM64",
+    "app": "/Users/pavan/src/ledpanelVR/Builds/BogongSwarm-macOS/MATREX.app",
+    "unity": "6000.3.16f1",
+    "totalErrors": 0,
+    "totalWarnings": 1,
+    "totalSize": 417871232,
+    "seconds": 8.090169999999999,
+    "scenes": [
+      "Assets/Scenes/ControlScene.unity",
+      "Assets/Scenes/Optomotor.unity",
+      "Assets/Scenes/Swarm.unity",
+      "Assets/Scenes/Choice.unity",
+      "Assets/Scenes/Choice_desync.unity",
+      "Assets/Scenes/Choice_Forrest.unity",
+      "Assets/Scenes/ReplayScene.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_nopath_nopath.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_nopath_path.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_path_nopath.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_path_path.unity",
+      "Assets/Scenes/Kannadi.unity",
+      "Assets/Scenes/Choice_Selwyn.unity"
+    ],
+    "errors": []
+  },
+  "packagedConfigurationMatches": true,
+  "hardwareConfigUnchanged": true,
+  "hardwarePanelSize": {
+    "width": 128,
+    "height": 128
+  },
+  "notes": [
+    "Source +Z down was confirmed by the user. Corrected Y=5-sourceZ/1000; 14429 original observations and all ID/TimeExact values are preserved. Horizontal orientation and distance/speed statistics are unchanged by vertical reflection.",
+    "Active recipe retains the user's 3cm body, 1cm thickness, 6cm wingspan, 0.75 wing opacity and 5m/s observer. User-selected sky RGB is 0.1. Direct unlit moth RGB is explicitly 0.012 to create a dark silhouette; this is not calibrated photometry.",
+    "The single left/right wing pair was already present. Geometry and GPU upper/lower poses are checked; no extra wing pair, per-agent Animator or camera is added to player runtime.",
+    "Current hardware config requests 128px panels. Resolution tests explicitly render 64px and 1024px with identical poses and phase; 1024px is not a calibrated human-vision model.",
+    "Startup uses isolated hardware settings and disables tracker input. Its visibility counts use four horizontal faces; separate retention/resolution captures include all six faces.",
+    "Same RGB/background and native 8bit contrast are retained in captures. Mid-gray controls isolate resolution. No additional births, spatial compression, angular-size override or opacity floor is used.",
+    "Diagnostic image readbacks and high-resolution cameras run only in editor validation, never in the experimental player. Existing compact rendering and asynchronous logging remain unchanged."
+  ]
+}
