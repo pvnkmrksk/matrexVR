@@ -66,6 +66,7 @@ namespace ConfigurationUI
         public static bool Visible(JToken owner,JObject schema,string key,JObject context=null) => MatchesWithDefaults(owner,schema,Child(schema,key)["x-ui"]?["visibleWhen"],context);
         private static bool MatchesWithDefaults(JToken owner,JObject schema,JToken rule,JObject context)
         {
+            if(rule?["all"] is JArray conditions) return conditions.All(r=>MatchesWithDefaults(owner,schema,r,context));
             if(rule?["property"]!=null && owner is JObject obj && obj[rule["property"].ToString()]==null)
             {
                 var copy=(JObject)obj.DeepClone(); string key=rule["property"].ToString(); copy[key]=Child(schema,key)["default"]?.DeepClone();

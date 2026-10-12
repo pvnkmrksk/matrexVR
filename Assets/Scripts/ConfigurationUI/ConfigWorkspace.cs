@@ -34,6 +34,7 @@ namespace ConfigurationUI
         public void RefreshReferences()
         {
             ReferenceErrors.Clear(); active.Clear(); active.Add(System.Path); active.Add(Sequence.Path);
+            var resolved=new Dictionary<string,string>(StringComparer.Ordinal);
             if(!(Sequence.Root["sequences"] is JArray steps)) return;
             foreach(var step in steps.OfType<JObject>())
             {
@@ -42,8 +43,14 @@ namespace ConfigurationUI
                 var value=step["parameters"]?[key];
                 if(value?.Type!=JTokenType.String || string.IsNullOrWhiteSpace((string)value))
                 { ReferenceErrors.Add("Sequence "+step["sceneName"]+": parameters."+key+" is required."); continue; }
-                try { active.Add(Open((string)value,schema).Path); }
-                catch(Exception error) { ReferenceErrors.Add(error.Message); }
+                string cacheKey=schema+"|"+(string)value;
+                if(!resolved.TryGetValue(cacheKey,out string path))
+                {
+                    try { path=Open((string)value,schema).Path; }
+                    catch(Exception error) { ReferenceErrors.Add(error.Message); path=null; }
+                    resolved[cacheKey]=path;
+                }
+                if(path!=null) active.Add(path);
             }
         }
         public List<string> Validate(bool scenes=true)

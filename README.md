@@ -6,7 +6,7 @@ Use **Unity 6000.3.16f1**, matching ProjectVersion.txt. Packages are pinned in `
 
 ## Start here
 
-For the native configuration UI prototype, choose **Tools → Experiment setup → Open setup screen (Play)**. It edits system, sequence and experiment JSON, validates before Start, and is removed during experiments. See [Unity setup UI](docs/configuration-ui.md) for JSON parity, conditional fields, release behavior and validation.
+For the native experiment studio, choose **Tools → Experiment setup → Open setup screen (Play)**. Build a sequence from searchable config blocks, drag to reorder, edit grouped settings with switches/sliders and exact entries, and inspect the run overview. JSON stays lossless and the studio is removed during experiments. See [Unity experiment studio](docs/configuration-ui.md) for the workflow, previews, extension points and validation.
 
 1. Open `Assets/Scenes/ControlScene.unity`. The current sequence auto-starts Swarm with the heading-aligned experiment: 10 seconds of heading observation without agents, then 240 seconds with 100 Bogong moths per rig, using the measured heading and the configured −90° offset. The nested swarm retains 2° angular sizing and follows animal position. For recorded Selwyn CSV playback, select `Examples/Swarm/selwyn-trajectory-playback.example.json` instead; see [playback setup](docs/swarm-playback.md).
 2. Keep your existing `Assets/StreamingAssets/system_config.json`, or copy the complete [system template](Assets/StreamingAssets/Templates/system_config.template.json). Set addresses/displays and retain explicit `"closedLoopMode": "Kinefly"` for flight. Walking alternatives live in [Examples/System](Assets/StreamingAssets/Examples/System).

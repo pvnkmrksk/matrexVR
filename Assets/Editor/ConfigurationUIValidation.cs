@@ -156,7 +156,7 @@ public static class ConfigurationUIValidation
                 File.WriteAllBytes(Path.Combine(Application.dataPath,"../config-ui-preview.png"),image.EncodeToPNG()); Object.Destroy(image);
                 ui.Document.panelSettings.targetTexture=null; Object.Destroy(texture);
                 // Actual form callback edits a value; raw view applies it back to the same document.
-                var boolField=ui.Document.rootVisualElement.Query<Toggle>().ToList().First(t=>t.parent?.ClassListContains("field-controls")==true);
+                var boolField=ui.Document.rootVisualElement.Query<Toggle>(className:"studio-switch").ToList().First();
                 boolField.value=!boolField.value;
                 Check(ui.Workspace.Sequence.Dirty,"Actual UI toggle updates JSON DOM"); ui.Workspace.Sequence.Undo();
                 ui.Workspace.Sequence.Edit(doc=>{ doc["sequences"][0]["sceneName"]="Swarm"; doc["sequences"][0]["parameters"]["dimension"]="2D"; doc["sequences"][0]["parameters"]["muElevation"]=12; });

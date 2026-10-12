@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-13",
+  "branch": "codex/config-ui-test",
+  "unity": "6000.3.16f1",
+  "checks": 5310,
+  "failure": null,
+  "errors": [],
+  "timingsMs": {
+    "mount10000BlockCardsMs": 448.0749
+  },
+  "studioChecks": [
+    "Sequence builder is the default workspace",
+    "Rendering builder controls never inserts or rounds values",
+    "Library selection shows config effects and timing before insertion",
+    "Actual library Add button inserts a referenced complete config",
+    "Newly referenced experiment appears in navigation immediately",
+    "Custom absolute paths load and insert through the real library UI",
+    "Native vector icons render throughout builder",
+    "Native ListView reorder controller exposes Move",
+    "Native drag reorder event updates JSON while preserving full blocks",
+    "Duplicate copies every block field losslessly",
+    "Remove affects only selected block",
+    "Exact number entry retains precision beyond slider float precision",
+    "Slider and exact entry synchronize on explicit edits",
+    "Undo slider edit restores the exact previous number",
+    "Movement switch displays an illuminated ON state",
+    "Actual styled switch updates experiment config",
+    "Autopilot OFF greys its dependent speed immediately",
+    "Grouped editors preserve all untouched config values",
+    "Viewing an absent optional phase does not create JSON settings",
+    "Absent/disabled phase overview does not claim its settings are active",
+    "Numeric vSync changes immediately grey FPS controls and update the system overview",
+    "Replacing a config changes its reference and preserves existing block tuning/extensions",
+    "Creating a variation copies every config value and relinks only that block",
+    "Undo variation restores the original reference",
+    "10,000 native block cards mount fewer than 20 visual cards (actual 5)",
+    "Raw JSON Apply remains interoperable with builder",
+    "Refined builder starts the production runner",
+    "Refined UI and its modal/schedulers are absent during experiment",
+    "Experiment completion recreates the builder",
+    "Refined builder starts the production runner",
+    "Refined UI and its modal/schedulers are absent during experiment",
+    "Experiment completion recreates the builder",
+    "No UI or experiment runtime errors"
+  ],
+  "fullFieldRegression": {
+    "checks": 5291,
+    "failure": null,
+    "errors": [],
+    "timingsMs": {
+      "mount10000RowsMs": 247.4439,
+      "parse10000StepsMs": 223.3283,
+      "validate10000StepsMs": 91.4991
+    }
+  },
+  "pythonChecks": {
+    "templatesExamples": 58,
+    "archivedHashes": 622,
+    "consolidatedLocustInputs": 979,
+    "archiveAuditUnitTests": 4,
+    "result": "PASS"
+  },
+  "coverage": "All original template/example scalar leaves and lossless JSON checks, actual library/custom-path insertion, native drag events, duplicate/remove/replace/variation/undo, exact entry/sliders, state switches, conditional pose/vSync, absent phases, 10,000 cards and two run lifecycles.",
+  "previewFixtures": "Synthetic three-block sequence using experiment, heading-aligned swarm and custom absolute-path yaw config.",
+  "limitations": [
+    "No physical tracking/display calibration or packaged release was tested.",
+    "Existing UnityEditor.Search.SearchDatabase startup exception is excluded by its specific stack trace.",
+    "The UI supports added rigs; engine scenes/controllers still require authored support beyond VR1\u2013VR4."
+  ]
+}

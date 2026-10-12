@@ -60,7 +60,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
                 var phase=(JObject)schema.DeepClone(); phase.Remove("$id"); phase.Remove("$schema"); phase.Remove("default");
                 var props=(JObject)phase["properties"];
                 props["enabled"]=new JObject { ["type"]="boolean",["default"]=true };
-                props["durationSeconds"]=new JObject { ["type"]="number",["exclusiveMinimum"]=0,["default"]=10 };
+                props["durationSeconds"]=new JObject { ["type"]="number",["exclusiveMinimum"]=0,["default"]=10,["x-ui"]=new JObject { ["unit"]="seconds",["slider"]=new JObject { ["min"]=1,["max"]=3600,["step"]=1 } } };
                 props["autoTrimSettings"]=Schema(typeof(AutoTrimConfig));
                 props["headingReference"]=Schema(typeof(HeadingReferenceConfig));
                 if(property.Name=="swarm") props["swarm"]=Schema(typeof(SwarmConfig));
@@ -80,6 +80,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         system["properties"]["vSyncCount"]["default"]=0;
         system["properties"]["vSyncCount"]["minimum"]=0; system["properties"]["vSyncCount"]["maximum"]=4;
         system["properties"]["targetFrameRate"]["x-ui"]=new JObject { ["enabledWhen"]=Rule("vSyncCount",0),["help"]="Positive FPS, or -1 for uncapped. vSync overrides this value." };
+        system["properties"]["targetFrameRate"]["x-ui"]["slider"]=new JObject { ["min"]=30,["max"]=240,["step"]=1 };
         var rig=system["properties"]["configs"]["items"];
         rig["required"]=new JArray("vrId");
         rig["properties"]["sphereDiameter"]["x-ui"]=new JObject { ["visibleWhen"]=Rule("closedLoopMode","FicTrac",0),["help"]="Walking ball diameter in centimetres. Hidden in wing-angle flight mode." };
@@ -161,7 +162,9 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(owner==typeof(SceneConfig) && new[]{"windSpeed","windDirection","aglHeight","groundLayerMask"}.Contains(name))
             ui["visibleWhen"]=new JObject { ["contextProperty"]="flight",["equals"]=true };
         if(name=="animationSpeedThreshold") ui["enabledWhen"]=Rule("animateOnMove",true);
-        if(name=="initialRotation") ui["enabledWhen"]=Rule("randomInitialRotation",false);
+        if(name=="initialPosition" && owner.GetField("resetPositionOnStart")!=null) ui["enabledWhen"]=Rule("resetPositionOnStart",true);
+        if(name=="initialRotation" && owner.GetField("randomInitialRotation")!=null)
+            ui["enabledWhen"]=owner.GetField("resetRotationOnStart")!=null?new JObject { ["all"]=new JArray(Rule("randomInitialRotation",false),Rule("resetRotationOnStart",true)) }:Rule("randomInitialRotation",false);
         if(name=="playback") ui["enabledWhen"]=new JObject { ["property"]="trajectoryFile",["nonEmpty"]=true };
         if(new[]{"muElevation","kappaElevation","boundaryHeight","wrapY"}.Contains(name)) ui["visibleWhen"]=Rule("dimension","3D");
         if(name=="bogongVisual") ui["visibleWhen"]=Rule("agentVisual","Bogong");
@@ -184,6 +187,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(name=="autopilotSpeed" || name=="locustSpeed" || name=="translateSpeed") ui["unit"]="scene units / s";
         if(name=="latitude") { child["minimum"]=-90; child["maximum"]=90; }
         if(name=="longitude") { child["minimum"]=-180; child["maximum"]=180; }
+        if(owner==typeof(NightSkyConfig) && name=="imageWidth") child["enum"]=new JArray(1024,2048,4096);
         if(name=="port" || name=="zmqPort") { child["minimum"]=1; child["maximum"]=65535; }
         if(owner==typeof(ColorConfig) || name=="contrast" || name=="dutyCycle") { child["minimum"]=0; child["maximum"]=1; }
         Dictionary<string,string[]> enums=new Dictionary<string,string[]> {
@@ -193,6 +197,24 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(owner==typeof(BogongVisualConfig) && name=="shape") child["enum"]=new JArray("Dot","Moth");
         if(owner==typeof(DynamicSequenceController.Trigger) && name=="type") child["enum"]=new JArray("time","area");
         if(ui.HasValues) child["x-ui"]=ui;
+        var ranges=new Dictionary<string,double[]> {
+            ["duration"]=new[]{1d,3600,1},["durationSeconds"]=new[]{1d,3600,1},["gain"]=new[]{-10d,10,.1},
+            ["autopilotSpeed"]=new[]{0d,30,.1},["locustSpeed"]=new[]{0d,30,.1},["windSpeed"]=new[]{0d,20,.1},["windDirection"]=new[]{0d,360,1},["aglHeight"]=new[]{0d,1000,1},
+            ["closedLoopPosition"]=new[]{0d,5,.1},["closedLoopOrientation"]=new[]{0d,5,.1},
+            ["numberOfLocusts"]=new[]{0d,1000,1},["numberOfRings"]=new[]{0d,10,1},["mu"]=new[]{-180d,180,1},["muElevation"]=new[]{-90d,90,1},["kappa"]=new[]{0d,50,.1},
+            ["angularSizeDegrees"]=new[]{.1d,10,.1},["size"]=new[]{.01d,5,.01},["contrast"]=new[]{0d,1,.01},["dutyCycle"]=new[]{0d,1,.01},
+            ["frequency"]=new[]{0d,40,.1},["speed"]=new[]{0d,100,.1},["exposure"]=new[]{.1d,5,.1},["latitude"]=new[]{-90d,90,.01},["longitude"]=new[]{-180d,180,.01},
+            ["northYawDegrees"]=new[]{0d,360,1},["windowSeconds"]=new[]{1d,180,1},["flightWindowSeconds"]=new[]{.2d,30,.1},["aggressiveness"]=new[]{.001d,1,.01},
+            ["maxOffsetRadians"]=new[]{.01d,2,.01},["rateHz"]=new[]{1d,120,1},["targetFrameRate"]=new[]{30d,240,1},["translateSpeed"]=new[]{0d,100,1},["rotateSpeed"]=new[]{0d,300,1},
+            ["wingOpacity"]=new[]{0d,1,.01},["faintDetailCutoff"]=new[]{0d,1,.01},["flickerDutyCycle"]=new[]{0d,1,.01},["flapFrequencyHz"]=new[]{0d,100,1},["animationSpeedThreshold"]=new[]{0d,5,.1}
+        };
+        double[] range=null;
+        if(owner==typeof(ColorConfig)) range=new[]{0d,1,.01}; else ranges.TryGetValue(name,out range);
+        if(range!=null)
+        {
+            if(child["x-ui"]==null) child["x-ui"]=new JObject();
+            child["x-ui"]["slider"]=new JObject { ["min"]=range[0],["max"]=range[1],["step"]=range[2] };
+        }
     }
 }
 #endif

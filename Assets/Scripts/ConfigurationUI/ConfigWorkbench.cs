@@ -12,7 +12,7 @@ using UnityEngine.UIElements;
 namespace ConfigurationUI
 {
     /// <summary>Scene-owned setup UI. No Update, panel, file polling or form binding during experiments.</summary>
-    public sealed class ConfigWorkbench : MonoBehaviour
+    public sealed partial class ConfigWorkbench : MonoBehaviour
     {
         public static ConfigWorkbench Instance { get; private set; }
         public static bool IsOpen => Instance!=null && Instance.isActiveAndEnabled;
@@ -78,14 +78,14 @@ namespace ConfigurationUI
             }
         }
         private Button Button(string label,Action action,string css=null)
-        { var button=new Button(()=>Guard(action)) { text=label }; if(css!=null) button.AddToClassList(css); return button; }
+        { var button=new Button(()=>Guard(()=>{ FlushNumbers(); action(); })) { text=label }; if(css!=null) button.AddToClassList(css); return button; }
         private void Guard(Action action)
         { try { action(); } catch(Exception error) { if(status!=null) { status.text=error.GetBaseException().Message; status.AddToClassList("error"); } } }
-        private VisualElement Row(string css="row") { var row=new VisualElement(); row.AddToClassList(css); return row; }
+        private VisualElement Row(string css="row") { var row=new VisualElement(); row.AddToClassList("row"); if(css!="row") row.AddToClassList(css); return row; }
         private void BuildShell()
         {
             var header=Row("header");
-            var brand=new Label("MATREX   /   EXPERIMENT SETUP"); brand.AddToClassList("brand"); header.Add(brand);
+            var brand=new Label("MATREX  /  Experiment studio"); brand.AddToClassList("brand"); header.Add(brand);
             var badge=new Label("●  SETUP · IDLE"); badge.AddToClassList("badge"); header.Add(badge); root.Add(header);
             var main=Row("main"); root.Add(main);
             side=new ScrollView(); side.AddToClassList("sidebar"); main.Add(side);
@@ -96,45 +96,12 @@ namespace ConfigurationUI
             undo=Button("Undo",()=>{ RequireApplied(); selected.Undo(); BuildContent(); }); footer.Add(undo);
             redo=Button("Redo",()=>{ RequireApplied(); selected.Redo(); BuildContent(); }); footer.Add(redo);
             save=Button("Save all",()=>{ RequireApplied(); Workspace.SaveAll(); UpdateStatus("Saved all JSON files."); }); footer.Add(save);
-            start=Button("Start experiment  →",StartExperiment,"primary"); footer.Add(start);
+            start=StudioButton("Start experiment","play",StartExperiment,"primary"); footer.Add(start);
         }
-        private void BuildNavigation()
-        {
-            side.Clear(); side.Add(new Label("CONFIGURATION") { name="navigation-title" });
-            side.Add(Button("System & VR rigs",()=>Select(Workspace.System)));
-            side.Add(Button("Experiment sequence",()=>Select(Workspace.Sequence)));
-            side.Add(Button("Session metadata",()=>{ RequireApplied(); metadataMode=true; BuildContent(); }));
-            side.Add(new Label("EXPERIMENT FILES"));
-            foreach(var doc in Workspace.Documents.Where(d=>d!=Workspace.System && d!=Workspace.Sequence))
-                side.Add(Button(Path.GetFileName(doc.Path)+(doc.Dirty?"  •":""),()=>Select(doc)));
-            side.Add(new Label("LOAD A CONFIGURATION"));
-            var source=new TextField { value="Templates/sequence.template.json" }; side.Add(source);
-            var role=new DropdownField(new List<string>{"sequence","system","choice","swarm","kannadi","optomotor","dynamic-choice"},0); side.Add(role);
-            side.Add(Button("Open file",()=>{
-                RequireApplied();
-                if(role.value=="system" || role.value=="sequence") { Workspace.SelectPrimary(role.value,source.value); Select(role.value=="system"?Workspace.System:Workspace.Sequence); }
-                else Select(Workspace.Open(source.value,role.value));
-            }));
-            side.Add(new Label("Paths are relative to StreamingAssets, or absolute."));
-            var catalog=Directory.GetFiles(Path.Combine(Application.streamingAssetsPath,"Templates"),"*.json").Concat(Directory.GetFiles(Path.Combine(Application.streamingAssetsPath,"Examples"),"*.json",SearchOption.AllDirectories)).Select(p=>Path.GetRelativePath(Application.streamingAssetsPath,p).Replace('\\','/')).ToList();
-            var preset=new DropdownField("Templates & examples",catalog,0); side.Add(preset);
-            preset.RegisterValueChangedCallback(e=>{ source.value=e.newValue; if(e.newValue.Contains("/System/") || e.newValue.Contains("system_config")) role.value="system"; else if(e.newValue.Contains("/Sequences/") || e.newValue.EndsWith("sequence.template.json")) role.value="sequence"; else if(e.newValue.Contains("dynamic-choice") || e.newValue.Contains("/DynamicChoice/")) role.value="dynamic-choice"; else if(e.newValue.Contains("swarm") || e.newValue.Contains("/Swarm/")) role.value="swarm"; else if(e.newValue.Contains("optomotor") || e.newValue.Contains("/Optomotor/")) role.value="optomotor"; else if(e.newValue.Contains("kannadi") || e.newValue.Contains("kinematic")) role.value="kannadi"; else role.value="choice"; });
-            side.Add(Button("Refresh references",()=>{ RequireApplied(); Workspace.RefreshReferences(); BuildNavigation(); UpdateStatus(); }));
-            side.Add(new Label("COPY CURRENT FILE"));
-            var destination=new TextField { value="UserConfigs/new-config.json" }; side.Add(destination);
-            side.Add(Button("Create editable copy",()=>{
-                RequireApplied(); string target=Path.IsPathRooted(destination.value)?destination.value:Path.Combine(Application.streamingAssetsPath,destination.value);
-                if(File.Exists(target)) throw new IOException("File already exists; choose a new name: "+target);
-                Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(target)));
-                File.WriteAllText(target,selected.Root.ToString(Formatting.Indented)+"\n");
-                if(selected.SchemaId=="system" || selected.SchemaId=="sequence") { Workspace.SelectPrimary(selected.SchemaId,target); Select(selected.SchemaId=="system"?Workspace.System:Workspace.Sequence); }
-                else Select(Workspace.Open(target,selected.SchemaId));
-            }));
-            side.Add(Button("Quit",()=>Application.Quit(),"quiet"));
-        }
+        private void BuildNavigation() { Workspace.RefreshReferences(); BuildStudioNavigation(); }
         private void Select(ConfigDocument doc)
-        { RequireApplied(); selected=doc; path.Clear(); metadataMode=false; jsonMode=false; filter=""; BuildNavigation(); BuildContent(); }
-        private void RequireApplied() { if(rawPending) throw new InvalidOperationException("Apply the JSON draft or discard it before saving, navigating or starting."); }
+        { RequireApplied(); if(selected!=doc) { activePhase="stimulus"; settingsTab="Essentials"; } selected=doc; path.Clear(); metadataMode=false; jsonMode=false; advancedMode=false; filter=""; BuildNavigation(); BuildContent(); }
+        private void RequireApplied() { FlushNumbers(); if(rawPending) throw new InvalidOperationException("Apply the JSON draft or discard it before saving, navigating or starting."); }
         private JToken Current => ConfigDocument.At(selected.Root,path);
         private JObject Context => new JObject { ["flight"]=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().Any(r=>string.Equals(r["closedLoopMode"]?.ToString(),"Kinefly",StringComparison.OrdinalIgnoreCase) || r["closedLoopMode"]?.ToString()=="1") };
         private JObject CurrentSchema
@@ -164,13 +131,16 @@ namespace ConfigurationUI
         }
         private void BuildContent()
         {
+            numberFlushes.Clear(); blockList=null;
+            enableUpdates.Clear();
             body.Clear(); inspector.Clear(); rawPending=false;
             if(metadataMode) { BuildMetadata(); return; }
             if(Current==null) path.Clear();
+            if(!jsonMode && !advancedMode && path.Count==0) { BuildStudio(); return; }
             var title=new Label(selected.SchemaId=="system"?"System & VR rigs":selected.SchemaId=="sequence"?"Experiment sequence":Path.GetFileNameWithoutExtension(selected.Path)); title.AddToClassList("title"); body.Add(title);
             var location=new Label(selected.Path); location.AddToClassList("location"); body.Add(location);
             var toolbar=Row(); body.Add(toolbar);
-            toolbar.Add(Button("Structured",()=>{ RequireApplied(); jsonMode=false; BuildContent(); }));
+            toolbar.Add(Button("← Builder",()=>{ RequireApplied(); jsonMode=false; advancedMode=false; path.Clear(); BuildContent(); }));
             toolbar.Add(Button("JSON",()=>{ RequireApplied(); jsonMode=true; BuildContent(); }));
             toolbar.Add(Button("Reload disk",()=>{ selected.Reload(); path.Clear(); BuildContent(); BuildNavigation(); }));
             if(jsonMode)
