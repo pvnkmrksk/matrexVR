@@ -16,14 +16,14 @@ public class MainController : MonoBehaviour
     public static MainController Instance { get; private set; }
     public static event System.Action SystemConfigurationChanged;
     public bool SequenceRunning => sequenceStarted;
-    public float RemainingStepSeconds => phaseRunner != null && phaseRunner.Active ? (float)phaseRunner.RemainingSeconds : timer;
+    public float RemainingStepSeconds => phaseRunner != null && phaseRunner.Active ? (float)phaseRunner.RemainingSeconds : Mathf.Max(0,timer);
     private ExperimentPhases phaseRunner;
     public string ExperimentPhase => phaseRunner != null && phaseRunner.Active ? phaseRunner.CurrentPhase : AssessmentPending ? "assessment" : "stimulus";
     // Shared by recorded rows and live telemetry; do not label idle/error rows as stimulus.
     public static string RecordedExperimentPhase => Instance == null ? "idle" :
         Instance.SequenceError != null || Instance.AssessmentFailed ? "error" :
         !Instance.SequenceRunning ? "idle" : Instance.ExperimentPhase;
-    public double RemainingPhaseSeconds => phaseRunner != null && phaseRunner.Active ? phaseRunner.RemainingPhaseSeconds : timer;
+    public double RemainingPhaseSeconds => phaseRunner != null && phaseRunner.Active ? phaseRunner.RemainingPhaseSeconds : Mathf.Max(0,timer);
     public string SequenceError { get; private set; }
     public IReadOnlyDictionary<string, ClosedLoop> VRClosedLoops => vrClosedLoops;
     public IReadOnlyDictionary<string, SystemConfig> SystemConfigs => systemConfigs;

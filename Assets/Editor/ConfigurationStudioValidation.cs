@@ -57,7 +57,7 @@ public static class ConfigurationStudioValidation
         var pure=LosslessJson.Parse("{\"sequences\":[{\"tag\":\"a\",\"extension\":1.2345678901234567890123456789},{\"tag\":\"b\"},{\"tag\":\"c\"}]}");
         ExperimentBlocks.Move(pure,0,2); Check((string)pure["sequences"][2]["tag"]=="a" && pure["sequences"][2]["extension"].ToString()=="1.2345678901234567890123456789","Reorder retains extensions and numeric lexemes");
         var phased=JObject.Parse("{\"preStimulus\":{\"enabled\":true,\"durationSeconds\":10,\"headingReference\":{\"enabled\":true,\"windowSeconds\":20}},\"stimulus\":{\"enabled\":true,\"durationSeconds\":30},\"postStimulus\":{\"enabled\":false,\"durationSeconds\":100}}");
-        Check(ExperimentBlocks.EffectiveDuration(phased,900)==50,"Overview accounts for phase-owned timing and heading assessment");
+        Check(ExperimentBlocks.EffectiveDuration(phased,900)==40,"Overview honors scene duration and caps heading assessment");
         Check(ExperimentBlocks.Time(3860)=="1 h 4 min 20 s","Run overview reports exact minutes and seconds");
         Check(ExperimentBlocks.Describe(JObject.Parse("{\"uniformSkyColor\":{},\"skyboxPath\":\"x.png\",\"nightSky\":{\"enabled\":true}}")).Contains("Uniform sky") && !ExperimentBlocks.Describe(JObject.Parse("{\"uniformSkyColor\":{},\"skyboxPath\":\"x.png\",\"nightSky\":{\"enabled\":true}}")).Contains("Live sky"),"Overview respects actual sky override precedence");
         var schemas=ConfigSchema.Load();

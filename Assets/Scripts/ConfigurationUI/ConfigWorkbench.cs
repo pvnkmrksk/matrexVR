@@ -60,12 +60,14 @@ namespace ConfigurationUI
                 Workspace=new ConfigWorkspace(MainController.Instance.SystemConfigurationFileName,MainController.Instance.SequenceConfigurationFileName,ConfigSchema.Load());
                 selected=Workspace.Sequence;
                 panel=ScriptableObject.CreateInstance<PanelSettings>(); panel.name="Setup only";
-                panel.scaleMode=PanelScaleMode.ScaleWithScreenSize; panel.referenceResolution=new Vector2Int(1440,900);
-                panel.screenMatchMode=PanelScreenMatchMode.MatchWidthOrHeight; panel.match=.5f; panel.targetDisplay=0; panel.sortingOrder=500;
+                panel.scaleMode=PanelScaleMode.ConstantPixelSize; panel.scale=1; panel.targetDisplay=0; panel.sortingOrder=500;
                 panel.themeStyleSheet=Resources.Load<ThemeStyleSheet>("ConfigurationUI/runtime");
                 Document=gameObject.AddComponent<UIDocument>(); Document.panelSettings=panel;
                 root=Document.rootVisualElement; root.AddToClassList("workbench");
                 root.styleSheets.Add(Resources.Load<StyleSheet>("ConfigurationUI/workbench"));
+                root.RegisterCallback<GeometryChangedEvent>(evt=>{
+                    ApplyResponsiveLayout(evt.newRect.width);
+                });
                 BuildShell(); BuildNavigation(); BuildContent();
                 // Cover the previous form and stop its raycasts; metadata is generated for the actual rig list.
                 foreach(var raycaster in FindObjectsByType<UnityEngine.UI.GraphicRaycaster>(FindObjectsSortMode.None))
@@ -142,7 +144,7 @@ namespace ConfigurationUI
             body.Clear(); inspector.Clear(); rawPending=false;
             body.EnableInClassList("session-body",homeMode || experimentIndexMode);
             side.style.display=homeMode || experimentIndexMode?DisplayStyle.None:DisplayStyle.Flex;
-            inspector.style.display=homeMode || experimentIndexMode?DisplayStyle.None:DisplayStyle.Flex;
+            inspector.style.display=homeMode || experimentIndexMode || root.resolvedStyle.width<1220?DisplayStyle.None:DisplayStyle.Flex;
             backToSession.style.display=homeMode?DisplayStyle.None:DisplayStyle.Flex;
             undo.style.display=redo.style.display=homeMode?DisplayStyle.None:DisplayStyle.Flex;
             if(homeMode) { BuildSessionHome(); return; }
@@ -285,9 +287,18 @@ namespace ConfigurationUI
         private void UpdateStatus(string message=null)
         {
             List<string> errors=Workspace.Validate();
+            var warnings=new List<string>();
+            if(errors.Count==0) foreach(var step in BuilderSteps.OfType<JObject>())
+            {
+                var parameters=step["parameters"] as JObject;string file=(string)parameters?["configFile"];
+                if(file==null) continue;
+                var doc=Workspace.Documents.FirstOrDefault(d=>d.Path==Path.GetFullPath(ExperimentConfigFiles.Resolve(file)));
+                if(doc?.Root is JObject payload) warnings.AddRange(ExperimentBlocks.TimingWarnings(payload,ExperimentBlocks.Number(step["duration"])));
+            }
             if(summary!=null) summary.text=errors.Count==0?"✓  Configuration ready\n\n"+Workspace.Documents.Count+" files loaded\n"+(Workspace.System.Root["configs"] as JArray)?.Count+" VR entries\n"+(Workspace.Sequence.Root["sequences"] as JArray)?.Count+" sequence steps":string.Join("\n\n",errors.Take(12));
-            status.text=message??(errors.Count>0?string.Join(" · ",errors.Take(2)):Workspace.Documents.Any(d=>d.Dirty)?"Unsaved config changes · saved when you start":"Ready to run · session details saved when you start");
+            status.text=message??(errors.Count>0?string.Join(" · ",errors.Take(2)):warnings.Count>0?warnings[0]:Workspace.Documents.Any(d=>d.Dirty)?"Unsaved config changes · saved when you start":"Ready to run · session details saved when you start");
             status.EnableInClassList("error",errors.Count>0);
+            status.EnableInClassList("warning",errors.Count==0 && warnings.Count>0);
             start.SetEnabled(errors.Count==0 && !rawPending); save.SetEnabled(!rawPending); undo.SetEnabled(selected.CanUndo && !rawPending); redo.SetEnabled(selected.CanRedo && !rawPending);
         }
         private void PollFiles()

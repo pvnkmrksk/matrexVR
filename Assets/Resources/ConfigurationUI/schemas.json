@@ -1709,7 +1709,7 @@
             "type": "boolean",
             "default": false,
             "x-ui": {
-              "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+              "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
             }
           },
           "saveAs": {
@@ -3505,7 +3505,7 @@
                 "type": "boolean",
                 "default": false,
                 "x-ui": {
-                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                  "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
                 }
               },
               "saveAs": {
@@ -5320,7 +5320,7 @@
                 "type": "boolean",
                 "default": false,
                 "x-ui": {
-                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                  "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
                 }
               },
               "saveAs": {
@@ -7135,7 +7135,7 @@
                 "type": "boolean",
                 "default": false,
                 "x-ui": {
-                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                  "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
                 }
               },
               "saveAs": {
@@ -8175,7 +8175,7 @@
             "type": "boolean",
             "default": false,
             "x-ui": {
-              "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+              "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
             }
           },
           "saveAs": {
@@ -9778,7 +9778,7 @@
                 "type": "boolean",
                 "default": false,
                 "x-ui": {
-                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                  "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
                 }
               },
               "saveAs": {
@@ -12214,7 +12214,7 @@
                 "type": "boolean",
                 "default": false,
                 "x-ui": {
-                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                  "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
                 }
               },
               "saveAs": {
@@ -14650,7 +14650,7 @@
                 "type": "boolean",
                 "default": false,
                 "x-ui": {
-                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                  "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
                 }
               },
               "saveAs": {
@@ -18079,7 +18079,7 @@
             "type": "boolean",
             "default": false,
             "x-ui": {
-              "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+              "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
             }
           },
           "saveAs": {
@@ -19682,7 +19682,7 @@
                 "type": "boolean",
                 "default": false,
                 "x-ui": {
-                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                  "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
                 }
               },
               "saveAs": {
@@ -21304,7 +21304,7 @@
                 "type": "boolean",
                 "default": false,
                 "x-ui": {
-                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                  "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
                 }
               },
               "saveAs": {
@@ -22926,7 +22926,7 @@
                 "type": "boolean",
                 "default": false,
                 "x-ui": {
-                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                  "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
                 }
               },
               "saveAs": {
@@ -25418,7 +25418,7 @@
                 "type": "boolean",
                 "default": false,
                 "x-ui": {
-                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                  "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
                 }
               },
               "saveAs": {
@@ -25871,7 +25871,7 @@
                 "type": "boolean",
                 "default": false,
                 "x-ui": {
-                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                  "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
                 }
               },
               "saveAs": {
@@ -26324,7 +26324,7 @@
                 "type": "boolean",
                 "default": false,
                 "x-ui": {
-                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                  "help": "Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference."
                 }
               },
               "saveAs": {

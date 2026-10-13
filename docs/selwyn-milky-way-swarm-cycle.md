@@ -42,7 +42,7 @@ The measurement block contains:
 
 Each rig samples its own **virtual world yaw** after movement once per frame, and computes the circular mean over that 240-second window. A 359°/1° pair averages north, rather than 180°. This is a mean of unit heading vectors, not a straight average of angles or a displacement-weighted direction. Resultant length and sample count are recorded; low resultant length does not extend or reject a trial.
 
-`measureDuringPresentation: true` runs observation and the sequence timer together. Block 2 therefore lasts 240 seconds, rather than an observation period followed by an additional 240-second presentation. The final observation completes before the sequence advances. Ordinary flat experiments retain their previous timing when this flag is omitted/false. In phased files, measurement remains in `preStimulus`, under the phase runner's timer.
+`measureDuringPresentation: true` runs observation and the sequence timer together. Block 2 therefore lasts 240 seconds, rather than an observation period followed by an additional 240-second presentation. The final observation completes before the sequence advances. On the experimental GUI branch, scene duration now takes precedence for both values of this retained flag; long observation windows are shortened at runtime without rewriting the JSON. In phased files, measurement remains in `preStimulus`, under the phase runner's timer.
 
 Both swarm blocks contain:
 

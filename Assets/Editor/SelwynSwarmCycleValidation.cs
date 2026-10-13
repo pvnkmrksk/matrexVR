@@ -82,7 +82,7 @@ public static class SelwynSwarmCycleValidation
         var heading = document["headingReference"]?.ToObject<HeadingReferenceConfig>();
         if (heading?.enabled != true) return duration;
         double window = heading.startOffsetSeconds + heading.windowSeconds;
-        return heading.measureDuringPresentation ? Math.Max(duration, window) : duration + window;
+        return duration;
     }
     private static JObject Read(string file) => JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, Folder + file)));
     private static void ConfigsAndDistributions()
@@ -106,7 +106,7 @@ public static class SelwynSwarmCycleValidation
             if (i < 3) { config.nightSky.Validate(); Check(config.nightSky.localTime == "now" && config.nightSky.timeZoneId == "Australia/Sydney" && config.nightSky.northYawDegrees == 0, "Current local Selwyn sky with north zero."); }
         }
         var legacy = new JObject { ["headingReference"] = new JObject { ["enabled"] = true, ["windowSeconds"] = 10 } };
-        Check(EffectiveDuration(legacy, 30) == 40, "Legacy observation still precedes presentation.");
+        Check(EffectiveDuration(legacy, 30) == 30, "Flat scene duration includes observation.");
         Check(EffectiveDuration(new JObject { ["headingReference"] = JValue.CreateNull() }, 30) == 30, "Null reference does not break the setup duration display.");
         var cfg = Read(Files[2])["swarm"].ToObject<SwarmConfig>(); cfg.ValidateSwarm();
         Check(cfg.directionDistribution == "VonMises" && cfg.kappa >= 100 && cfg.kappaElevation >= 100, "Opt-in high normalized yaw and elevation concentrations, retaining configured tuning.");

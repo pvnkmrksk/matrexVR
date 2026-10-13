@@ -185,7 +185,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
             ui["help"]="Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run.";
         }
         if(owner==typeof(HeadingReferenceConfig) && name=="measureDuringPresentation")
-            ui["help"]="Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing.";
+            ui["help"]="Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference.";
         if(owner==typeof(HeadingReferenceConfig) && name=="saveAs")
             ui["help"]="Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop.";
         if(name=="directionDistribution") ui["help"]="Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order.";

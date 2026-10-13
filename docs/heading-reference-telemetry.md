@@ -2,7 +2,7 @@
 
 ## Experiment configuration
 
-Use [pre-stimulus / stimulus / post-stimulus](experiment-phases.md) in one experimental file. Heading measurement belongs to `preStimulus.headingReference`, with `enabled` (default false), `startOffsetSeconds` (default 0) and `windowSeconds` (default 180). The configured pre-stimulus world remains visible and controllable while each rig measures its circular mean and resultant length. An overlong observation extends pre-stimulus. Each spawner separately opts into the frozen zero with `useHeadingReference: true`; computing the reference alone changes no stimulus direction.
+Use [pre-stimulus / stimulus / post-stimulus](experiment-phases.md) in one experimental file. Heading measurement belongs to `preStimulus.headingReference`, with `enabled` (default false), `startOffsetSeconds` (default 0) and `windowSeconds` (default 180). The configured pre-stimulus world remains visible and controllable while each rig measures its circular mean and resultant length. An overlong observation is shortened to fit pre-stimulus, with a small GUI warning; the configured window remains saved. Each spawner separately opts into the frozen zero with `useHeadingReference: true`; computing the reference alone changes no stimulus direction.
 
 Old flat experiments still work. Their sequence presentation timer begins after an enabled flat heading observation, and their configured objects remain visible during observation. The default pose reset switches are true; set both false for continuity between conditions. The phase reference documents supported spawners, angle conventions, independent reset switches, examples and audit fields.
 

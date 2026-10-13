@@ -49,6 +49,7 @@ namespace ConfigurationUI
             foreach(string name in new[]{"Essentials","Motion","Stimulus","Sky","Tuning","All parameters"})
             { string key=name; tabs.Add(Button(name,()=>{ settingsTab=key; BuildContent(); },settingsTab==name?"tab-active":"quiet")); }
             var scroll=new ScrollView(); scroll.AddToClassList("settings-scroll"); body.Add(scroll);
+            AddTimingWarnings(scroll,selected);
             if(settingsTab=="Essentials")
             {
                 Section(scroll,"Core controls","motion",payload,schema,prefix,new[]{"durationSeconds","closedLoopOrientation","closedLoopPosition","autopilotEnabled","autopilotSpeed","aglHeight","numberOfLocusts","locustSpeed","dimension","agentVisual","numberOfRings","animateOnMove","loop","repetitions","sync"});
@@ -68,6 +69,7 @@ namespace ConfigurationUI
                 if(settingsTab=="All parameters")
                 {
                     var addMissing=new Toggle("Show omitted fields") { name="show-omitted-settings" }; scroll.Add(addMissing);
+                    scroll.Add(Button("Add parameter…",()=>ShowParameterDialog(selected,prefix),"quiet"));
                     var content=new VisualElement(); scroll.Add(content);
                     Action render=()=>{ content.Clear(); var keys=present.ToList(); if(addMissing.value) keys.AddRange(((JObject)schema["properties"]).Properties().Select(p=>p.Name).Where(k=>!keys.Contains(k) && k!="enabled" && !new[]{"preStimulus","stimulus","postStimulus"}.Contains(k)));
                         foreach(string group in new[]{"Motion","Stimulus","Sky","Tuning","Other"}) Section(content,group,GroupIcon(group),payload,schema,prefix,keys.Where(k=>Group(k)==group),false); };
@@ -114,16 +116,20 @@ namespace ConfigurationUI
             },rebuild);
             JToken shown=value??schema["default"];
             if(shown?.Type==JTokenType.Boolean)
+            {
+                setting.AddToClassList("boolean-setting");
                 setting.Add(StateSwitch((bool)shown,v=>assign(new JValue(v),true),"flag-"+string.Join("-",parts)));
+            }
             else if(value is JObject obj && new[]{"x","y","z"}.All(k=>obj[k]!=null) && obj.Properties().All(p=>new[]{"x","y","z"}.Contains(p.Name)))
             {
+                setting.AddToClassList("vector-setting");
                 var vector=Row("vector-controls"); setting.Add(vector);
                 foreach(string axis in new[]{"x","y","z"}) { string component=axis; var field=NumberControl(obj[axis],ConfigSchema.Child(schema,axis),axis,v=>StudioEdit(doc,r=>ConfigDocument.At(r,parts)[component]=v,false),false); field.tooltip="Exact "+axis+" component"; vector.Add(new Label(axis.ToUpperInvariant())); vector.Add(field); }
             }
             else if(value is JObject color && new[]{"r","g","b"}.All(k=>color[k]!=null))
             {
-                var swatch=new VisualElement(); swatch.AddToClassList("color-swatch"); swatch.style.backgroundColor=new Color((float)ExperimentBlocks.Number(color["r"]),(float)ExperimentBlocks.Number(color["g"]),(float)ExperimentBlocks.Number(color["b"])); setting.Add(swatch);
-                foreach(string component in new[]{"r","g","b","a"}.Where(k=>color[k]!=null)) { string channel=component; var field=NumberControl(color[channel],ConfigSchema.Child(schema,channel),channel,v=>{ StudioEdit(doc,r=>ConfigDocument.At(r,parts)[channel]=v,false); var c=(JObject)ConfigDocument.At(doc.Root,parts); swatch.style.backgroundColor=new Color((float)ExperimentBlocks.Number(c["r"]),(float)ExperimentBlocks.Number(c["g"]),(float)ExperimentBlocks.Number(c["b"])); }); setting.Add(field); }
+                setting.AddToClassList("color-setting");
+                setting.Add(ColorControl(doc,parts,color));
             }
             else if(value is JObject nested)
             {
@@ -162,9 +168,13 @@ namespace ConfigurationUI
                 dropdown.RegisterValueChangedCallback(e=>Guard(()=>{ var chosen=options.FirstOrDefault(o=>o.ToString()==e.newValue); assign(chosen?.DeepClone()??new JValue(e.newValue),true); }));
             }
             else if(LosslessJson.Kind(shown)=="number" || LosslessJson.Kind(shown)=="integer")
+            {
+                setting.AddToClassList("numeric-setting");
                 setting.Add(NumberControl(shown,schema,key,v=>assign(v,false)));
+            }
             else
             {
+                setting.AddToClassList("text-setting");
                 var input=new TextField { value=shown.ToString(),isDelayed=true }; setting.Add(input); input.RegisterValueChangedCallback(e=>Guard(()=>assign(new JValue(e.newValue),false)));
             }
             Action enable=()=>setting.SetEnabled(ConfigSchema.Enabled(ConfigDocument.At(doc.Root,parts.Take(parts.Length-1).ToArray()),ownerSchema,key,Context));
@@ -173,25 +183,50 @@ namespace ConfigurationUI
         private VisualElement NumberControl(JToken value,JObject schema,string key,Action<JToken> commit,bool allowSlider=true)
         {
             var control=new VisualElement(); control.AddToClassList("number-control");
-            var input=new TextField { value=value.ToString(),isDelayed=true,name="number-"+key }; input.AddToClassList("exact-number"); control.Add(input);
+            var spin=Row("spin-box"); control.Add(spin);
+            var input=new TextField { value=value.ToString(),isDelayed=true,name="number-"+key }; input.AddToClassList("exact-number"); spin.Add(input);
+            string lastValidText=value.ToString();
+            input.style.width=Mathf.Clamp(value.ToString().Length*7+23,64,160);
             Slider slider=null; IVisualElementScheduledItem pending=null;
             JToken draft=null;
-            Action flush=()=>{ if(draft==null) return; var number=draft; draft=null; Guard(()=>commit(number)); };
+            Action flush=()=>{ if(draft==null) return; var number=draft; draft=null; Guard(()=>{commit(number);lastValidText=number.ToString();}); };
             var range=schema["x-ui"]?["slider"] as JObject;
-            if(allowSlider && range!=null && double.TryParse(value.ToString(),NumberStyles.Float,CultureInfo.InvariantCulture,out double n) && !double.IsInfinity(n))
+            bool integer=schema["type"] is JArray types?types.Any(t=>t.ToString()=="integer"):schema["type"]?.ToString()=="integer";
+            string step=integer?"1":(range?["step"]?.ToString()??"0.1");
+            Action<int,int> increment=(direction,power)=>Guard(()=>{
+                pending?.Pause();draft=null;
+                var current=LosslessJson.Parse(input.value);
+                JToken next=JsonNumberStepper.Step(current,step,direction,power);commit(next);input.SetValueWithoutNotify(next.ToString());
+                lastValidText=next.ToString();
+                if(slider!=null) slider.SetValueWithoutNotify((float)ExperimentBlocks.Number(next));
+            });
+            var arrows=new VisualElement();arrows.AddToClassList("spin-arrows");spin.Add(arrows);
+            var up=new Button(()=>increment(1,0)){text="▴",name="spin-up-"+key};var down=new Button(()=>increment(-1,0)){text="▾",name="spin-down-"+key};arrows.Add(up);arrows.Add(down);
+            input.RegisterCallback<KeyDownEvent>(evt=>{
+                if(evt.keyCode!=KeyCode.UpArrow && evt.keyCode!=KeyCode.DownArrow) return;
+                increment(evt.keyCode==KeyCode.UpArrow?1:-1,evt.shiftKey?1:evt.altKey&&!integer?-1:0);evt.StopImmediatePropagation();evt.PreventDefault();
+            },TrickleDown.TrickleDown);
+            spin.RegisterCallback<WheelEvent>(evt=>{
+                if(input.panel?.focusController.focusedElement!=input && !input.Contains(input.panel?.focusController.focusedElement as VisualElement)) return;
+                increment(evt.delta.y<0?1:-1,evt.shiftKey?1:0);evt.StopPropagation();evt.PreventDefault();
+            });
+            control.tooltip="Exact number · ↑/↓ or arrows to step · Shift ×10 · Alt ÷10 · wheel when focused";
+            bool usefulSlider=new[]{"gain","autopilotSpeed","locustSpeed","locustSpeedStdDev","windSpeed","kappa","kappaElevation","angularSizeDegrees","contrast","wingOpacity","exposure","faintDetailCutoff","aggressiveness","flickerDutyCycle"}.Contains(key);
+            if(allowSlider && usefulSlider && !integer && range!=null && double.TryParse(value.ToString(),NumberStyles.Float,CultureInfo.InvariantCulture,out double n) && !double.IsInfinity(n))
             {
-                double min=(double)range["min"],max=(double)range["max"],step=(double?)range["step"]??.01;
+                control.AddToClassList("with-slider");
+                double min=(double)range["min"],max=(double)range["max"],sliderStep=(double?)range["step"]??.01;
                 slider=new Slider((float)min,(float)max) { name="slider-"+key }; slider.SetValueWithoutNotify((float)Math.Max(min,Math.Min(max,n))); control.Add(slider);
                 if(n<min || n>max) { var outside=new Label("Outside slider range · exact value retained"); outside.AddToClassList("key-hint"); control.Add(outside); }
                 slider.RegisterValueChangedCallback(e=>{
-                    double chosen=Math.Round(Math.Round(e.newValue/step)*step,6); string text=chosen.ToString("0.######",CultureInfo.InvariantCulture); input.SetValueWithoutNotify(text); draft=new JRaw(text); pending?.Pause(); pending=control.schedule.Execute(flush).StartingIn(180);
+                    double chosen=Math.Round(Math.Round(e.newValue/sliderStep)*sliderStep,6); string text=chosen.ToString("0.######",CultureInfo.InvariantCulture); input.SetValueWithoutNotify(text); draft=new JRaw(text); pending?.Pause(); pending=control.schedule.Execute(flush).StartingIn(180);
                 });
                 slider.RegisterCallback<PointerUpEvent>(_=>flush()); slider.RegisterCallback<FocusOutEvent>(_=>flush());
             }
             input.RegisterValueChangedCallback(e=>Guard(()=>{
                 pending?.Pause(); draft=null;
-                try { JToken parsed=LosslessJson.Parse(e.newValue); string kind=LosslessJson.Kind(parsed); if(kind!="integer" && kind!="number") throw new ArgumentException("Enter a JSON number."); commit(parsed); if(slider!=null) slider.SetValueWithoutNotify((float)ExperimentBlocks.Number(parsed)); }
-                catch { input.SetValueWithoutNotify(value.ToString()); throw; }
+                try { JToken parsed=LosslessJson.Parse(e.newValue); string kind=LosslessJson.Kind(parsed); if(kind!="integer" && kind!="number") throw new ArgumentException("Enter a JSON number."); commit(parsed); lastValidText=parsed.ToString();if(slider!=null) slider.SetValueWithoutNotify((float)ExperimentBlocks.Number(parsed)); }
+                catch { input.SetValueWithoutNotify(lastValidText); throw; }
             }));
             // A quick Start, navigation, Undo or Save must flush the last visual slider position first.
             control.RegisterCallback<DetachFromPanelEvent>(_=>numberFlushes.Remove(flush)); numberFlushes.Add(flush);
@@ -202,6 +237,7 @@ namespace ConfigurationUI
         private void FlushNumbers() { foreach(var flush in numberFlushes.ToArray()) flush(); }
         private void RefreshStudioValues()
         {
+            var timing=body.Q<VisualElement>("timing-warnings");if(timing!=null) PopulateTimingWarnings(timing,selected);
             var duration=inspector.Q<Label>(className:"overview-duration"); if(duration!=null) duration.text=SequenceDuration();
             var effects=inspector.Q<Label>("config-effects"); if(effects!=null) effects.text=ExperimentBlocks.Describe(EditingPayload());
             foreach(var update in enableUpdates.ToArray()) update();

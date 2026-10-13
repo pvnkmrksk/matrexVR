@@ -91,7 +91,7 @@ public static class ExperimentPhaseValidation
     private static void UnitChecks()
     {
         var phases = ExperimentPhase.Parse(JObject.Parse("{ 'preStimulus': {'enabled': true, 'durationSeconds': 3, 'headingReference': {'enabled':true,'startOffsetSeconds':2,'windowSeconds':4}}, 'stimulus': {'durationSeconds': 5}, 'postStimulus': {'enabled':false} }"));
-        Check(phases.Count == 2 && phases[0].Duration == 6 && phases[1].Duration == 5, "Observation overrun extends pre; disabled post omitted; stimulus defaults enabled");
+        Check(phases.Count == 2 && phases[0].Duration == 3 && phases[1].Duration == 5, "Scene duration caps observation; disabled post omitted; stimulus defaults enabled");
         Check(phases[0].Config["headingReference"] == null, "Runner owns observation independently of visible world settings");
         foreach (string invalid in new[] { "{'stimulus':{'durationSeconds':0}}", "{'preStimulus':{'enabled':true,'durationSeconds':1}}", "{'stimulus':{'durationSeconds':1,'headingReference':{'enabled':true}}}", "{'stimulus':{'durationSeconds':1},'objects':[]}" })
         {
@@ -185,7 +185,7 @@ public static class ExperimentPhaseValidation
                 Check(main.ExperimentPhase == "stimulus", "Pre transitions directly to stimulus");
                 if (!full) Check(rigs.All(r => r.AutoTrim.FlightThreshold == .04 && r.AutoTrim.FlightCheckEnabled), "New phase loads its settings and clears temporary flight bypass");
                 stimulusAt = Time.timeAsDouble;
-                Check(stimulusAt - preAt >= (full ? 238 : 2), "Pre-stimulus duration includes offset/window overrun");
+                Check(stimulusAt - preAt >= (full ? 238 : 1), "Pre-stimulus honors the configured duration despite the longer heading window");
                 Check(sceneId == SceneManager.GetActiveScene().handle && rigIds.SequenceEqual(rigs.Select(r => r.GetInstanceID())) && terrainIds.SequenceEqual(Terrain.activeTerrains.Select(t => t.GetInstanceID())), "Scene, rigs and terrain retained across phase change");
                 means = new float[rigs.Length];
                 for (int i = 0; i < rigs.Length; i++)

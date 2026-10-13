@@ -37,14 +37,31 @@ namespace ConfigurationUI
                 var heading=config["headingReference"] as JObject;
                 if(!Flag(heading?["enabled"])) return outer;
                 double observation=Number(heading?["windowSeconds"],180)+Number(heading?["startOffsetSeconds"]);
-                return Flag(heading?["measureDuringPresentation"])?Math.Max(outer,observation):outer+observation;
+                return outer;
             }
             double total=0;
             foreach(string phase in new[]{"preStimulus","stimulus","postStimulus"})
                 if(config[phase] is JObject obj && Flag(obj["enabled"],phase=="stimulus"))
-                { double seconds=Number(obj["durationSeconds"]); if(Flag(obj["headingReference"]?["enabled"])) seconds=Math.Max(seconds,Number(obj["headingReference"]?["windowSeconds"],180)+Number(obj["headingReference"]?["startOffsetSeconds"])); total+=seconds; }
+                { total+=Number(obj["durationSeconds"]); }
             return total;
         }
+        public static List<string> TimingWarnings(JObject config,double duration)
+        {
+            var warnings=new List<string>();
+            if(config==null) return warnings;
+            Action<JObject,double,string> inspect=(payload,seconds,prefix)=>{
+                var heading=(payload["headingReference"] as JObject)?.ToObject<HeadingReferenceConfig>();
+                if(heading==null) return;
+                heading.WithinDuration(seconds,out string warning);
+                if(warning!=null) warnings.Add(prefix+warning);
+            };
+            var parsed=JObject.Parse(config.ToString());
+            if(!Phased(parsed)) inspect(parsed,duration,"");
+            else foreach(string phase in new[]{"preStimulus","stimulus","postStimulus"})
+                if(parsed[phase] is JObject obj && Flag(obj["enabled"],phase=="stimulus")) inspect(obj,Number(obj["durationSeconds"]),PrettyPhase(phase)+": ");
+            return warnings;
+        }
+        private static string PrettyPhase(string phase) => phase=="preStimulus"?"Before stimulus":phase=="postStimulus"?"After stimulus":"Stimulus";
         public static string Time(double seconds)
         {
             if(seconds<60) return seconds.ToString("0.###",CultureInfo.InvariantCulture)+" s";

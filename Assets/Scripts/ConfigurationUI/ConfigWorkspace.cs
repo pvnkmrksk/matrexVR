@@ -88,6 +88,11 @@ namespace ConfigurationUI
                             if(step==null) { errors.Add(label+": null sequence step."); continue; }
                             if(scenes && !Application.CanStreamedLevelBeLoaded(step.sceneName)) errors.Add(label+": scene unavailable in this build: "+step.sceneName);
                             step.autoTrimSettings?.Validate();
+                            if(step.parameters!=null && step.parameters.TryGetValue("configFile",out object reference) && reference!=null)
+                            {
+                                var experiment=Documents.FirstOrDefault(d=>d.Path==Path.GetFullPath(ExperimentConfigFiles.Resolve(reference.ToString())));
+                                if(experiment?.Root is JObject payload) ExperimentBlocks.TimingWarnings(payload,step.duration);
+                            }
                         }
                     }
                     else if(doc.SchemaId!="dynamic-choice")

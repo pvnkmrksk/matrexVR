@@ -340,7 +340,7 @@ The [Selwyn four-block cycle](selwyn-milky-way-swarm-cycle.md) uses separate fla
 | `enabled` | false | Enable per-rig virtual-yaw circular observation. |
 | `windowSeconds` | 180 | Positive finite observation window, seconds. |
 | `startOffsetSeconds` | 0 | Nonnegative finite delay after configuration, seconds. |
-| `measureDuringPresentation` | false | Flat Choice: true shares the sequence timer; the step still waits for the observation's final sample. False keeps the legacy extra assessment period before presentation. Phased timing is owned by the phase runner. |
+| `measureDuringPresentation` | false | Legacy key retained. The scene clock now includes observation for either value; effective windows are capped to the remaining scene/phase duration. False still permits spawners to reapply the completed reference. |
 | `saveAs` | empty | Optional name for the completed per-rig mean. Reused by later `swarm.headingReferenceId`; cleared at run start/stop and every loop. Does not automatically rotate stimuli. |
 
 Sequence `loopStartIndex` defaults to 0 (repeat all rows). A positive zero-based index runs preceding rows once and repeats from that row; it requires fixed order and an existing row. The current cycle uses 1, keeping the 360-second trimming setup one-time while repeating the three 240-second conditions. The original ControlScene form remains; edit this index in the sequence JSON before starting.

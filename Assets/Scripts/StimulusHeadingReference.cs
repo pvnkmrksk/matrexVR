@@ -20,6 +20,22 @@ public sealed class HeadingReferenceConfig
         if (enabled && (double.IsNaN(windowSeconds) || double.IsInfinity(windowSeconds) || windowSeconds <= 0))
             throw new ArgumentException("headingReference.windowSeconds must be positive and finite when enabled.");
     }
+
+    public HeadingReferenceConfig WithinDuration(double seconds, out string warning)
+    {
+        Validate(); warning = null;
+        var bounded = new HeadingReferenceConfig { enabled = enabled, windowSeconds = windowSeconds,
+            startOffsetSeconds = startOffsetSeconds, measureDuringPresentation = measureDuringPresentation, saveAs = saveAs };
+        if (!enabled) return bounded;
+        if (double.IsNaN(seconds) || double.IsInfinity(seconds) || seconds <= 0)
+            throw new ArgumentException("Scene duration must be positive and finite.");
+        if (startOffsetSeconds >= seconds)
+            throw new ArgumentException("Heading observation starts after the scene ends. Reduce startOffsetSeconds.");
+        bounded.windowSeconds = Math.Min(windowSeconds, seconds - startOffsetSeconds);
+        if (bounded.windowSeconds < windowSeconds)
+            warning = $"Heading window shortened from {windowSeconds:G} s to {bounded.windowSeconds:G} s to fit the {seconds:G} s scene. The configured JSON value is retained.";
+        return bounded;
+    }
 }
 
 [Serializable]
@@ -29,7 +45,7 @@ public sealed class HeadingReferenceResult
     public double meanSin, meanCos;
     public double resultantLength; // r = |mean unit vector|, in [0,1]. Not a significance test.
     public int sampleCount;
-    public double windowSeconds, observationStartedAt, presentedAt;
+    public double windowSeconds, requestedWindowSeconds, observationStartedAt, presentedAt;
     public string presentedUtc;
     public float Resolve(float relativeDegrees) => Mathf.Repeat((float)meanHeadingDegrees + relativeDegrees, 360f);
 }
@@ -82,10 +98,11 @@ public sealed class StimulusHeadingReference : MonoBehaviour
     private HeadingReferenceConfig config = new HeadingReferenceConfig();
     private Action<HeadingReferenceResult> present;
     private double startedAt, deadline;
+    private double requestedWindowSeconds;
     public string Phase { get; private set; } = "disabled";
     public HeadingReferenceResult Result { get; private set; }
     public bool IsObserving => Phase == "observing";
-    public bool BlocksPresentationTimer => IsObserving && !config.measureDuringPresentation;
+    public bool BlocksPresentationTimer => false; // Scene/phase duration owns the clock, including observation.
     public double RemainingSeconds => IsObserving ? Math.Max(0, deadline - Time.timeAsDouble) : 0;
 
     public static StimulusHeadingReference For(ClosedLoop rig)
@@ -94,11 +111,20 @@ public sealed class StimulusHeadingReference : MonoBehaviour
         return reference != null ? reference : rig.gameObject.AddComponent<StimulusHeadingReference>();
     }
 
-    public void Begin(HeadingReferenceConfig settings, Action<HeadingReferenceResult> onPresent)
+    public void Begin(HeadingReferenceConfig settings, Action<HeadingReferenceResult> onPresent, double? durationSeconds = null)
     {
         Cancel();
         config = settings ?? new HeadingReferenceConfig();
         config.Validate();
+        requestedWindowSeconds = config.windowSeconds;
+        var main = MainController.Instance;
+        if (!durationSeconds.HasValue && main != null && main.SequenceRunning && main.GetComponent<ExperimentPhases>()?.Active != true)
+            durationSeconds = main.GetCurrentSequenceStep()?.duration;
+        if (durationSeconds.HasValue)
+        {
+            config = config.WithinDuration(durationSeconds.Value, out string warning);
+            if (warning != null) Debug.LogWarning(warning);
+        }
         if (!config.enabled) { onPresent?.Invoke(null); return; }
         present = onPresent;
         startedAt = Time.timeAsDouble + config.startOffsetSeconds;
@@ -126,6 +152,7 @@ public sealed class StimulusHeadingReference : MonoBehaviour
         {
             Result = history.Read();
             Result.windowSeconds = config.windowSeconds;
+            Result.requestedWindowSeconds = requestedWindowSeconds;
             Result.observationStartedAt = startedAt;
             Result.presentedAt = now;
             Result.presentedUtc = DateTime.UtcNow.ToString("O");

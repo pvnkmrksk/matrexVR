@@ -241,3 +241,71 @@ Button.mini { padding: 3px 6px; height: 29px; font-size: 11px; }
 .session-body .session-section-heading { margin-top: 5px; margin-bottom: 5px; }
 .session-body .unity-base-text-field__input--placeholder { color: rgb(116, 141, 163); }
 .session-system > #session-system-headline { -unity-text-align: middle-left; }
+
+/* Compact operator layout: controls follow the size of their values, not the card. */
+.workbench { background-color: rgb(16, 23, 31); color: rgb(221, 230, 238); font-size: 13px; }
+.header { background-color: rgb(20, 29, 39); padding-left: 20px; padding-right: 20px; }
+.sidebar { width: 182px; background-color: rgb(17, 25, 34); padding: 14px 10px; }
+.body { min-width: 0; padding: 20px 22px 14px; }
+.inspector { width: 248px; padding: 18px 15px; background-color: rgb(17, 25, 34); }
+.title { font-size: 24px; margin-bottom: 6px; }
+.section-heading > Label { font-size: 13px; color: rgb(186, 203, 216); }
+.studio-setting { width: 48%; min-height: 58px; padding: 10px 12px; margin-bottom: 8px; background-color: rgb(23, 34, 45); border-color: rgb(39, 53, 66); border-radius: 7px; }
+.setting-label { margin-bottom: 5px; min-height: 20px; }
+.setting-title { font-size: 12px; color: rgb(204, 217, 227); white-space: normal; }
+.numeric-setting, .boolean-setting, .color-setting { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.numeric-setting > .setting-label, .boolean-setting > .setting-label, .color-setting > .setting-label { flex-grow: 1; flex-basis: 125px; margin: 0 8px 0 0; }
+.numeric-setting > .number-control { flex-grow: 0; flex-shrink: 0; width: auto; }
+.container-setting { width: 98%; background-color: rgb(20, 30, 40); }
+.container-setting .studio-setting { background-color: rgb(22, 33, 43); }
+.number-control { flex-grow: 0; min-width: 64px; }
+.spin-box { min-height: 30px; flex-grow: 0; flex-shrink: 0; }
+.exact-number { margin: 0; flex-grow: 0; flex-shrink: 0; }
+.exact-number .unity-base-field__input { -unity-text-align: middle-right; min-height: 29px; padding: 4px 7px; border-color: rgb(54, 72, 87); }
+.spin-arrows { width: 18px; height: 30px; margin-left: 2px; flex-shrink: 0; }
+.spin-arrows Button { width: 18px; height: 15px; min-height: 15px; padding: 0; margin: 0; border-width: 0; border-radius: 3px; font-size: 10px; background-color: rgb(34, 48, 60); }
+.spin-arrows Button:hover { color: rgb(134, 227, 203); background-color: rgb(49, 72, 78); }
+.number-control.with-slider { min-width: 118px; }
+.number-control .unity-base-slider { margin: 5px 0 1px; min-height: 12px; width: 118px; }
+.vector-setting { width: 98%; }
+.vector-controls { flex-wrap: wrap; align-items: center; }
+.vector-controls > .number-control { margin-right: 15px; }
+.vector-controls > Label { margin-right: 5px; color: rgb(159, 188, 203); }
+.color-control { flex-grow: 0; min-height: 30px; }
+.color-control .unity-color-field { min-width: 68px; width: 80px; margin: 0; }
+.color-hex { margin-left: 9px; color: rgb(147, 169, 185); font-size: 10px; }
+.color-preview { height: 56px; border-radius: 6px; margin-bottom: 12px; }
+.text-setting > TextField { width: 100%; max-width: 500px; }
+.timing-warning { padding: 8px 11px; margin-bottom: 10px; min-height: 40px; background-color: rgb(45, 39, 29); border-radius: 6px; }
+.timing-warning > Label { flex-grow: 1; flex-basis: 0; color: rgb(220, 197, 147); font-size: 11px; white-space: normal; }
+.timing-warning .studio-icon { width: 17px; height: 17px; color: rgb(220, 197, 147); }
+.sequence-flags { flex-wrap: wrap; }
+.sequence-flags .unity-integer-field { max-width: 155px; }
+.sequence-flags .unity-integer-field > .unity-base-field__label { min-width: 0; width: 105px; font-size: 10px; }
+.small-dialog { width: 530px; height: auto; min-height: 240px; max-height: 80%; }
+.small-dialog > .unity-base-field { margin-bottom: 12px; }
+.small-dialog TextField { max-width: 470px; }
+.compact-layout .inspector { display: none; }
+.compact-layout .sidebar { width: 160px; }
+.compact-layout .body { padding-left: 16px; padding-right: 16px; }
+.compact-layout .header { padding-left: 14px; padding-right: 14px; }
+.compact-layout .config-nav Button { padding-left: 6px; padding-right: 6px; font-size: 11px; }
+.narrow-layout .studio-setting { width: 98%; }
+.narrow-layout .subject-card { width: 98%; }
+.narrow-layout .brand { font-size: 20px; margin-right: 10px; }
+.narrow-layout .badge { display: none; }
+.narrow-layout .header .studio-icon { width: 18px; height: 18px; margin-right: 4px; }
+.narrow-layout .settings-tabs { flex-wrap: wrap; }
+.vector-setting { width: 48%; }
+.vector-controls > .number-control { flex-grow: 0; flex-shrink: 0; }
+.narrow-layout .vector-setting { width: 98%; }
+.footer .studio-button Label { white-space: nowrap; }
+.footer .primary { min-width: 200px; }
+.subject-traits > .session-field { flex-grow: 0; min-width: 160px; max-width: 180px; }
+.subject-traits > .unity-base-popup-field { min-width: 180px; max-width: 230px; }
+.warning { color: rgb(220, 197, 147); }
+.compact-layout .sidebar { width: 178px; }
+.sidebar .studio-button { padding-left: 7px; padding-right: 7px; }
+.sidebar .studio-icon { width: 20px; height: 20px; margin-right: 6px; }
+.footer .status { flex-grow: 1; flex-basis: 0; min-width: 0; }
+.footer .studio-button { flex-shrink: 0; }

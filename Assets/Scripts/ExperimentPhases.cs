@@ -28,6 +28,7 @@ public sealed class ExperimentPhase
                 throw new ArgumentException(name + ".durationSeconds must be positive and finite when enabled.");
             var heading = source["headingReference"]?.ToObject<HeadingReferenceConfig>() ?? new HeadingReferenceConfig();
             heading.Validate();
+            heading.WithinDuration(seconds, out _);
             if (heading.enabled && name != "preStimulus")
                 throw new ArgumentException("In a phased experiment, headingReference is measured in preStimulus. Use useHeadingReference on stimulus spawners.");
             var payload = (JObject)source.DeepClone();
@@ -35,7 +36,7 @@ public sealed class ExperimentPhase
             // The runner owns sampling; controllers must retain the frozen result at transitions.
             payload.Remove("headingReference");
             phases.Add(new ExperimentPhase { Name = name, Config = payload, Heading = heading,
-                Duration = heading.enabled ? Math.Max(seconds, heading.startOffsetSeconds + heading.windowSeconds) : seconds });
+                Duration = seconds });
         }
         if (!phases.Any(p => p.Name == "stimulus"))
             throw new ArgumentException("A phased experiment requires an enabled stimulus object with durationSeconds.");
@@ -94,7 +95,7 @@ public sealed class ExperimentPhases : MonoBehaviour
         if (phase.Heading.enabled)
         {
             if (references.Count == 0) throw new InvalidOperationException("Heading reference requires at least one ClosedLoop rig.");
-            foreach (var reference in references) reference.Begin(phase.Heading, null);
+            foreach (var reference in references) reference.Begin(phase.Heading, null, phase.Duration);
         }
         string record = JsonConvert.SerializeObject(new { phase = phase.Name, startedAt = phaseStarted,
             durationSeconds = phase.Duration, trial = MainController.Instance?.currentTrial,

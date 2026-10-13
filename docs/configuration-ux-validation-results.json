@@ -1,0 +1,117 @@
+{
+  "checks": 40,
+  "failure": null,
+  "errors": [],
+  "layouts": [
+    {
+      "width": 1440,
+      "height": 900,
+      "numericControls": 1,
+      "maxNumericWidth": 64.0,
+      "compact": false,
+      "narrow": false
+    },
+    {
+      "width": 1024,
+      "height": 720,
+      "numericControls": 1,
+      "maxNumericWidth": 64.0,
+      "compact": true,
+      "narrow": false
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "numericControls": 1,
+      "maxNumericWidth": 64.0,
+      "compact": false,
+      "narrow": false
+    }
+  ],
+  "observed": {
+    "meanHeadingDegrees": 0.0,
+    "meanSin": 0.0,
+    "meanCos": 1.0,
+    "resultantLength": 1.0,
+    "sampleCount": 82,
+    "windowSeconds": 0.699999988079071,
+    "requestedWindowSeconds": 30.0,
+    "observationStartedAt": 0.5516547831632653,
+    "presentedAt": 1.254928939909297,
+    "presentedUtc": "2026-10-13T12:34:56.3147530Z"
+  },
+  "tabDiagnostics": {
+    "visible": false,
+    "actionEnabled": true,
+    "phase": "Performed",
+    "controls": 2,
+    "keyPressed": false,
+    "keyboardEnabled": true,
+    "lastToggleFrame": 112,
+    "guiOpen": false,
+    "running": true,
+    "hudEnabled": true
+  },
+  "details": [
+    "Offset plus window is bounded by scene duration.",
+    "Phase clock wins; configured window stays unchanged.",
+    "Exact spin arithmetic: 1.12345678901234567890123456789",
+    "Exact spin arithmetic: 99999999999999999999999999",
+    "Exact spin arithmetic: -0.01",
+    "Opening compact controls leaves every JSON value unchanged.",
+    "Numeric boxes are compact at 1440 px.",
+    "Visible numeric controls fit horizontally at 1440 px.",
+    "Labels keep readable space at 1440 px.",
+    "Start remains fully visible at 1440 px.",
+    "Oversized heading gets a small nonblocking warning.",
+    "Mouse spin preserves all exact decimal digits.",
+    "Undo restores the exact value before spin.",
+    "Keyboard Shift-Up steps precisely, just like the mouse spin control.",
+    "Numeric boxes are compact at 1024 px.",
+    "Visible numeric controls fit horizontally at 1024 px.",
+    "Labels keep readable space at 1024 px.",
+    "Start remains fully visible at 1024 px.",
+    "Secondary overview makes room for controls in a compact window.",
+    "Numeric boxes are compact at 1920 px.",
+    "Visible numeric controls fit horizontally at 1920 px.",
+    "Labels keep readable space at 1920 px.",
+    "Start remains fully visible at 1920 px.",
+    "Editor uses the native color picker and does not invent a missing alpha.",
+    "Native picker retains color extensions and absent keys.",
+    "Native color edits are exactly reversible.",
+    "Future unknown parameters remain visible and editable.",
+    "New unassigned extensions retain exact JSON numbers.",
+    "Capped heading is a warning, not a blocked run.",
+    "Runtime caps 30-second observation to 0.7-second scene without changing config.",
+    "Observation cannot turn a short scene into a 30-second wait.",
+    "Flying state is the first information tier, above DC and tuning.",
+    "Actual Tab input hides the HUD rather than stopping only its text updates.",
+    "Actual Tab requests exactly one HUD washout.",
+    "The actual clear pass writes a completely black frame.",
+    "Washout camera disables after its first actual render.",
+    "Hidden HUD has no persistent clearing camera or black overlay.",
+    "The HUD stays hidden after its clear pass.",
+    "Saved experiment retains requested window and unknown values after runtime capping.",
+    "No unexpected Unity errors: "
+  ],
+  "unity": "6000.3.16f1",
+  "phaseRegression": {
+    "checks": 4422,
+    "failure": null
+  },
+  "playerCompile": {
+    "complete": true,
+    "target": "StandaloneOSX",
+    "editorColorFieldExcluded": true
+  },
+  "configValidation": {
+    "templatesAndExamples": 66,
+    "archiveHashes": 622,
+    "legacyInputs": 979,
+    "pythonTests": 10
+  },
+  "studioRegression": {
+    "checks": 5987,
+    "failure": null
+  }
+}
