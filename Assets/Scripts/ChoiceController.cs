@@ -157,6 +157,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
                 var heading = StimulusHeadingReference.For(rig);
                 headingReferences.Add(heading);
                 heading.Begin(config.headingReference, reference => {
+                    if (config.headingReference.measureDuringPresentation) return;
                     if (headingReferences.Any(h => h != null && h.IsObserving)) return;
                     ClearObjects(); SpawnConfiguredObjects(config, closedLoopComponents);
                 });
@@ -194,6 +195,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             foreach (Camera camera in rig.GetComponentsInChildren<Camera>(true))
                 camera.cullingMask = (camera.cullingMask & ~layers) | LayerMask.GetMask(spawner.layerName);
             SwarmConfiguration.Apply(spawner, config.swarm, rig);
+            host.AddComponent<SwarmLogger>().locustLayerMask = LayerMask.GetMask(spawner.layerName);
         }
     }
 

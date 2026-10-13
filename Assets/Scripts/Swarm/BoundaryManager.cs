@@ -13,6 +13,7 @@ public class BoundaryManager : MonoBehaviour
     public float boundaryLengthZ;
     public float boundaryHeight = 0;
     public bool wrapY;
+    [System.NonSerialized] public bool preserveOvershoot;
     public float boundaryBuffer = 0.1f;
     void OnDrawGizmos()
 {

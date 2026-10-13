@@ -41,10 +41,28 @@ public class MainController : MonoBehaviour
     private bool sequenceStarted = false;
     private MasterDataLogger masterDataLogger;
     public bool loopSequence = false;
+    public int LoopStartIndex { get; private set; } = 0;
     private bool randomise = false; // Added field
     private bool autoStart;
     private readonly Dictionary<string, ClosedLoop> vrClosedLoops = new Dictionary<string, ClosedLoop>();
     private readonly Dictionary<string, float> persistentDCOffsets = new Dictionary<string, float>();
+    private readonly Dictionary<string, HeadingReferenceResult> savedHeadings = new Dictionary<string, HeadingReferenceResult>();
+
+    private string HeadingKey(GameObject rig, string id) =>
+        (TryGetSystemConfigForGameObject(rig, out var config) ? config.vrId : rig.name) + ":" + id;
+
+    public void SaveHeadingReference(GameObject rig, string id, HeadingReferenceResult result)
+    {
+        if (!sequenceStarted || result == null) throw new System.InvalidOperationException("Cannot save a heading outside a running sequence.");
+        savedHeadings[HeadingKey(rig, id)] = result;
+    }
+
+    public HeadingReferenceResult ResolveHeadingReference(GameObject rig, string id)
+    {
+        if (!sequenceStarted || !savedHeadings.TryGetValue(HeadingKey(rig, id), out var result))
+            throw new System.InvalidOperationException($"Heading reference '{id}' has not been measured for {rig.name} in this sequence cycle. Run the Milky Way measurement block first.");
+        return result;
+    }
     private int selectedVRIndex = 1;
     public int SelectedVRIndex => selectedVRIndex;
     public bool CurrentAutoTrimEnabled => sequenceStarted && GetCurrentSequenceStep()?.autoTrim == true;
@@ -331,6 +349,7 @@ public class MainController : MonoBehaviour
     public void StopSequence()
     {
         sequenceStarted = false;
+        savedHeadings.Clear();
         phaseRunner?.Cancel();
         currentStep = 0;
         foreach (ClosedLoop rig in vrClosedLoops.Values)
@@ -343,6 +362,7 @@ public class MainController : MonoBehaviour
 
     public void StartSequence()
     {
+        if (sequenceStarted) return;
         Debugger.Log("MainController.StartSequence()", 3);
         try {MasterDataLogger.Instance.ConfigArchive.RequireComplete();}
         catch(System.Exception error) {FailExperiment(error);return;}
@@ -355,6 +375,7 @@ public class MainController : MonoBehaviour
 
         sequenceStarted = true;
         SequenceError = null;
+        savedHeadings.Clear();
 
         // Initialize execution order
         if (randomise)
@@ -592,8 +613,10 @@ public class MainController : MonoBehaviour
 
                 if (config != null)
                 {
+                    SwarmHeadingSequenceValidation.Validate(config);
                     randomise = config.randomise; // Get the randomise parameter
                     loopSequence = config.loop; // Set looping based on config
+                    LoopStartIndex = config.loopStartIndex;
                     autoStart = config.autoStart;
 
                     foreach (SequenceItem item in config.sequences)
@@ -726,11 +749,17 @@ void ManageTimerAndTransitions()
     }
     else
     {
-        if (AssessmentPending) return;
+        foreach (ClosedLoop rig in vrClosedLoops.Values)
+        {
+            var reference = rig != null ? rig.GetComponent<StimulusHeadingReference>() : null;
+            if (reference != null && (reference.BlocksPresentationTimer || reference.Phase == "error")) return;
+        }
         timer -= Time.deltaTime;
     }
 
     if (timer > 0) return;   // still running this step
+    // Concurrent measurements finish in LateUpdate; keep their final frame before advancing.
+    if (AssessmentPending) return;
 
     // ----------------------------------------------------------
     // TIME’S UP → decide how to move to the next SequenceStep
@@ -742,8 +771,9 @@ void ManageTimerAndTransitions()
     {
         if (loopSequence)
         {
-            currentStep = 0;
+            currentStep = LoopStartIndex;
             currentTrial++;
+            savedHeadings.Clear(); // Never reuse a previous cycle's baseline.
 
             if (randomise) InitializeExecutionOrder();
         }
@@ -829,6 +859,14 @@ public class SequenceStep
 [System.Serializable]
 public class SequenceConfig
 {
+    public int loopStartIndex = 0; // Zero-based first row to revisit after the final row; preceding rows run once.
+    public void ValidateLoop()
+    {
+        if (loopStartIndex < 0 || (loopStartIndex > 0 && (sequences == null || loopStartIndex >= sequences.Length)))
+            throw new System.ArgumentException("loopStartIndex must identify an existing zero-based sequence row.");
+        if (loopStartIndex > 0 && randomise)
+            throw new System.ArgumentException("A one-time sequence prefix requires randomise=false.");
+    }
     public bool autoStart = false;
     public bool randomise = false; // Added field
     public bool loop = true; // Added field for controlling whether the sequence should loop
