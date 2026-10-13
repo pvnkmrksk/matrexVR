@@ -32,7 +32,13 @@ namespace ConfigurationUI
         public static double EffectiveDuration(JObject config,double outer)
         {
             if(config==null) return outer;
-            if(!Phased(config)) return outer+(Flag(config["headingReference"]?["enabled"])?Number(config["headingReference"]?["windowSeconds"],180)+Number(config["headingReference"]?["startOffsetSeconds"]):0);
+            if(!Phased(config))
+            {
+                var heading=config["headingReference"] as JObject;
+                if(!Flag(heading?["enabled"])) return outer;
+                double observation=Number(heading?["windowSeconds"],180)+Number(heading?["startOffsetSeconds"]);
+                return Flag(heading?["measureDuringPresentation"])?Math.Max(outer,observation):outer+observation;
+            }
             double total=0;
             foreach(string phase in new[]{"preStimulus","stimulus","postStimulus"})
                 if(config[phase] is JObject obj && Flag(obj["enabled"],phase=="stimulus"))

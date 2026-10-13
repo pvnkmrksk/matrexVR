@@ -188,6 +188,8 @@ public class SwarmConfig
     public float? worldUnitsPerMetre; // Omitted: scenes with active Terrain=1; legacy walking scenes=100.
     public float? nearClipMetres;
     public bool useHeadingReference = false;
+    public string headingReferenceId = ""; // Empty retains the existing within-experiment reference.
+    public string directionDistribution = "Legacy"; // VonMises opts into the normalized circular sampler.
     // With relative spawning or an available, opted-in heading reference, spawnCenter is an offset from the rig.
     public bool spawnRelativeToAnimal = false;
     public bool followAnimalPosition = false;
@@ -199,6 +201,9 @@ public class SwarmConfig
     public float? mu;
     public float? kappa;
     public float? locustSpeed;
+    public float locustSpeedStdDev; // Nonnegative normal distribution, sampled once per generated agent. Zero preserves legacy speed/RNG.
+    public float? volumeHalfExtentMetres; // Optional generated cube: +/- this physical distance on each axis.
+    public bool preserveBoundaryOvershoot; // Opt-in exact periodic wrapping instead of legacy edge snapping.
     // "2D" is the historical X/Z swarm. "3D" enables a sampled Y volume and Y wrapping.
     public string dimension = "2D";
     public Vector3Config spawnCenter;
@@ -215,6 +220,11 @@ public class SwarmConfig
     public float animationSpeedThreshold = 0.5f;
     public void ValidateSwarm()
     {
+        if (!string.IsNullOrWhiteSpace(headingReferenceId) && !useHeadingReference)
+            throw new ArgumentException("headingReferenceId requires useHeadingReference=true.");
+        if (!string.Equals(directionDistribution, "Legacy", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(directionDistribution, "VonMises", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("directionDistribution must be Legacy or VonMises.");
         playback?.Validate();
         if (nearClipMetres.HasValue && (!Finite(nearClipMetres.Value) || nearClipMetres <= 0))
             throw new ArgumentException("nearClipMetres must be positive metres.");
@@ -236,6 +246,10 @@ public class SwarmConfig
             throw new ArgumentException("kappa must be finite and nonnegative.");
         if (locustSpeed.HasValue && (!Finite(locustSpeed.Value) || locustSpeed.Value < 0))
             throw new ArgumentException("locustSpeed must be finite and nonnegative world units per second.");
+        if (!Finite(locustSpeedStdDev) || locustSpeedStdDev < 0)
+            throw new ArgumentException("locustSpeedStdDev must be finite and nonnegative world units per second.");
+        if (volumeHalfExtentMetres.HasValue && (!Finite(volumeHalfExtentMetres.Value) || volumeHalfExtentMetres <= 0))
+            throw new ArgumentException("volumeHalfExtentMetres must be positive metres.");
         if (!string.Equals(dimension, "2D", StringComparison.OrdinalIgnoreCase) &&
             !string.Equals(dimension, "3D", StringComparison.OrdinalIgnoreCase))
             throw new ArgumentException("dimension must be 2D or 3D.");

@@ -2,24 +2,30 @@
   "headingReference": {
     "enabled": false,
     "windowSeconds": 180,
-    "startOffsetSeconds": 0
+    "startOffsetSeconds": 0,
+    "measureDuringPresentation": false,
+    "saveAs": ""
   },
-  "numberOfLocusts": 512,
+  "numberOfLocusts": 64,
   "density": null,
-  "spawnAreaSize": 200,
+  "spawnAreaSize": 4,
   "mu": 0,
-  "kappa": 100000,
-  "locustSpeed": 2,
+  "kappa": 1000,
+  "locustSpeed": 6.17,
   "dimension": "3D",
-  "spawnCenter": null,
+  "spawnCenter": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
   "spawnVolumeSize": {
-    "x": 200,
-    "y": 100,
-    "z": 200
+    "x": 4,
+    "y": 4,
+    "z": 4
   },
   "muElevation": 0,
-  "kappaElevation": 100000,
-  "boundaryHeight": 100,
+  "kappaElevation": 1000,
+  "boundaryHeight": 4,
   "wrapY": true,
   "agentVisual": "Bogong",
   "bogongVisual": {
@@ -27,41 +33,41 @@
     "size": 0.5,
     "angularSizeDegrees": 1,
     "color": {
-      "r": 0.12,
-      "g": 0.12,
-      "b": 0.12,
+      "r": 0.012,
+      "g": 0.012,
+      "b": 0.012,
       "a": 1
     },
     "metallic": 0,
     "smoothness": 0.25,
     "flickerFrequencyHz": 0,
-    "flickerDutyCycle": 0.5,
-    "shape": "Dot",
-    "bodyLengthMetres": 0.0254,
+    "flickerDutyCycle": 1,
+    "shape": "Moth",
+    "bodyLengthMetres": 0.03,
     "bodyDiameterMetres": 0.01,
-    "wingSpanMetres": 0.04,
+    "wingSpanMetres": 0.06,
     "flapFrequencyHz": 30,
-    "wingOpacity": 0.25,
+    "wingOpacity": 0.75,
     "subpixelVisibility": true
   },
   "animateOnMove": false,
   "animationSpeedThreshold": 0.5,
   "autopilotEnabled": true,
-  "autopilotSpeed": 10,
+  "autopilotSpeed": 6.17,
   "closedLoopPosition": 1,
   "closedLoopOrientation": 1,
   "vrConfigs": [
     {
       "vrIndex": 1,
       "initialPosition": {
-        "x": 0.0,
-        "y": 1.0,
-        "z": 5.0
+        "x": 0,
+        "y": 5,
+        "z": 0
       },
       "initialRotation": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
       "watchIndex": null,
       "closedLoopPosition": null,
@@ -70,14 +76,14 @@
     {
       "vrIndex": 2,
       "initialPosition": {
-        "x": 5.0,
-        "y": 1.0,
-        "z": 0.0
+        "x": 0,
+        "y": 5,
+        "z": 0
       },
       "initialRotation": {
-        "x": 0.0,
-        "y": 90.0,
-        "z": 0.0
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
       "watchIndex": null,
       "closedLoopPosition": null,
@@ -86,14 +92,14 @@
     {
       "vrIndex": 3,
       "initialPosition": {
-        "x": 0.0,
-        "y": 1.0,
-        "z": -5.0
+        "x": 0,
+        "y": 5,
+        "z": 0
       },
       "initialRotation": {
-        "x": 0.0,
-        "y": 180.0,
-        "z": 0.0
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
       "watchIndex": null,
       "closedLoopPosition": null,
@@ -102,14 +108,14 @@
     {
       "vrIndex": 4,
       "initialPosition": {
-        "x": -5.0,
-        "y": 1.0,
-        "z": 0.0
+        "x": 0,
+        "y": 5,
+        "z": 0
       },
       "initialRotation": {
-        "x": 0.0,
-        "y": 270.0,
-        "z": 0.0
+        "x": 0,
+        "y": 0,
+        "z": 0
       },
       "watchIndex": null,
       "closedLoopPosition": null,
@@ -141,14 +147,14 @@
     "maskBelowHorizon": true,
     "imageWidth": 4096
   },
-  "boundaryLengthX": 200,
-  "boundaryLengthZ": 200,
+  "boundaryLengthX": 4,
+  "boundaryLengthZ": 4,
   "resetPositionOnStart": true,
   "resetRotationOnStart": true,
   "uniformSkyColor": null,
   "useHeadingReference": false,
-  "spawnRelativeToAnimal": false,
-  "followAnimalPosition": false,
+  "spawnRelativeToAnimal": true,
+  "followAnimalPosition": true,
   "randomInitialRotation": false,
   "trajectoryFile": "",
   "playback": {
@@ -166,6 +172,11 @@
     "continuationSpeedMetresPerSecond": null,
     "preRollSeconds": 0
   },
-  "worldUnitsPerMetre": null,
-  "nearClipMetres": null
+  "worldUnitsPerMetre": 1,
+  "nearClipMetres": 0.001,
+  "locustSpeedStdDev": 1.24,
+  "volumeHalfExtentMetres": 2,
+  "preserveBoundaryOvershoot": true,
+  "headingReferenceId": "",
+  "directionDistribution": "Legacy"
 }

@@ -27,10 +27,19 @@ public static class SwarmConfiguration
         // Keep authored direction separate from the resolved world direction across repeats.
         spawner.authoredMu = config.mu ?? spawner.authoredMu ?? spawner.mu;
         var reference = config.useHeadingReference && rig != null ? rig.GetComponent<StimulusHeadingReference>()?.Result : null;
+        if (!string.IsNullOrWhiteSpace(config.headingReferenceId))
+        {
+            if (rig == null || MainController.Instance == null)
+                throw new System.InvalidOperationException("A named swarm heading requires a rig and a running sequence.");
+            reference = MainController.Instance.ResolveHeadingReference(rig.gameObject, config.headingReferenceId);
+        }
         float yaw = reference != null ? (float)reference.meanHeadingDegrees : 0;
         spawner.mu = Mathf.Repeat(spawner.authoredMu.Value + yaw, 360);
         spawner.kappa = config.kappa ?? spawner.kappa;
+        spawner.directionDistribution = config.directionDistribution;
         spawner.locustSpeed = config.locustSpeed ?? spawner.locustSpeed;
+        spawner.locustSpeedStdDev = config.locustSpeedStdDev;
+        spawner.preserveBoundaryOvershoot = config.preserveBoundaryOvershoot;
         spawner.dimension = config.dimension ?? spawner.dimension;
         spawner.useSpawnVolume = config.spawnVolumeSize != null;
         if (config.spawnVolumeSize != null) spawner.spawnVolumeSize = config.spawnVolumeSize.ToVector3();
@@ -38,6 +47,15 @@ public static class SwarmConfiguration
         spawner.kappaElevation = config.kappaElevation ?? spawner.kappaElevation;
         spawner.boundaryHeight = config.boundaryHeight ?? spawner.boundaryHeight;
         spawner.wrapY = config.wrapY;
+        bool generatedCube = string.IsNullOrWhiteSpace(config.trajectoryFile) && config.volumeHalfExtentMetres.HasValue;
+        if (generatedCube)
+        {
+            float side = 2f * config.volumeHalfExtentMetres.Value * spawner.worldUnitsPerMetre;
+            spawner.spawnAreaSize = side;
+            spawner.useSpawnVolume = true;
+            spawner.spawnVolumeSize = Vector3.one * side;
+            spawner.boundaryHeight = side;
+        }
         spawner.agentVisual = config.agentVisual ?? spawner.agentVisual;
         if (config.bogongVisual != null) { config.bogongVisual.Validate(); spawner.bogongVisual = config.bogongVisual; }
         spawner.animateOnMove = config.animateOnMove;
@@ -59,8 +77,9 @@ public static class SwarmConfiguration
         if (spawner.boundaryManager != null)
         {
             var boundary = spawner.boundaryManager;
-            boundary.boundaryLengthX = is3D ? config.boundaryLengthX : 0;
-            boundary.boundaryLengthZ = is3D ? config.boundaryLengthZ : 0;
+            boundary.boundaryLengthX = generatedCube ? spawner.spawnVolumeSize.x : is3D ? config.boundaryLengthX : 0;
+            boundary.boundaryLengthZ = generatedCube ? spawner.spawnVolumeSize.z : is3D ? config.boundaryLengthZ : 0;
+            boundary.preserveOvershoot = config.preserveBoundaryOvershoot;
             boundary.wrapY = is3D && config.wrapY;
             boundary.boundaryHeight = boundary.wrapY ? (spawner.boundaryHeight > 0 ? spawner.boundaryHeight : spawner.spawnVolumeSize.y) : 0;
             boundary.referenceRotation = rotation;

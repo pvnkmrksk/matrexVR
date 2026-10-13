@@ -166,6 +166,34 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(name=="initialRotation" && owner.GetField("randomInitialRotation")!=null)
             ui["enabledWhen"]=owner.GetField("resetRotationOnStart")!=null?new JObject { ["all"]=new JArray(Rule("randomInitialRotation",false),Rule("resetRotationOnStart",true)) }:Rule("randomInitialRotation",false);
         if(name=="playback") ui["enabledWhen"]=new JObject { ["property"]="trajectoryFile",["nonEmpty"]=true };
+        if(new[]{"locustSpeedStdDev","volumeHalfExtentMetres","preserveBoundaryOvershoot"}.Contains(name))
+            ui["visibleWhen"]=Rule("trajectoryFile","");
+        if(name=="locustSpeedStdDev")
+        {
+            child["minimum"]=0;
+            ui["help"]="Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.";
+        }
+        if(name=="volumeHalfExtentMetres")
+        {
+            child["exclusiveMinimum"]=0;
+            ui["help"]="Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.";
+        }
+        if(name=="preserveBoundaryOvershoot") ui["help"]="Keep excess travel when wrapping the generated population; legacy edge snapping is used when false.";
+        if(name=="headingReferenceId")
+        {
+            ui["enabledWhen"]=Rule("useHeadingReference",true);
+            ui["help"]="Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run.";
+        }
+        if(owner==typeof(HeadingReferenceConfig) && name=="measureDuringPresentation")
+            ui["help"]="Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing.";
+        if(owner==typeof(HeadingReferenceConfig) && name=="saveAs")
+            ui["help"]="Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop.";
+        if(name=="directionDistribution") ui["help"]="Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order.";
+        if(name=="loopStartIndex")
+        {
+            child["minimum"]=0;
+            ui["help"]="Zero-based row to restart after the final row: 0 repeats everything; 1 runs row 0 once, then repeats rows 1 onward. Requires fixed order when nonzero.";
+        }
         if(new[]{"muElevation","kappaElevation","boundaryHeight","wrapY"}.Contains(name)) ui["visibleWhen"]=Rule("dimension","3D");
         if(name=="bogongVisual") ui["visibleWhen"]=Rule("agentVisual","Bogong");
         if(owner==typeof(BogongVisualConfig))
@@ -184,14 +212,14 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(name.EndsWith("Seconds") || name=="duration") ui["unit"]="seconds";
         if(name.EndsWith("Degrees") || name=="mu" || name=="muElevation" || name=="windDirection") ui["unit"]="degrees";
         if(name.EndsWith("Metres")) ui["unit"]="metres";
-        if(name=="autopilotSpeed" || name=="locustSpeed" || name=="translateSpeed") ui["unit"]="scene units / s";
+        if(name=="autopilotSpeed" || name=="locustSpeed" || name=="locustSpeedStdDev" || name=="translateSpeed") ui["unit"]="scene units / s";
         if(name=="latitude") { child["minimum"]=-90; child["maximum"]=90; }
         if(name=="longitude") { child["minimum"]=-180; child["maximum"]=180; }
         if(owner==typeof(NightSkyConfig) && name=="imageWidth") child["enum"]=new JArray(1024,2048,4096);
         if(name=="port" || name=="zmqPort") { child["minimum"]=1; child["maximum"]=65535; }
         if(owner==typeof(ColorConfig) || name=="contrast" || name=="dutyCycle") { child["minimum"]=0; child["maximum"]=1; }
         Dictionary<string,string[]> enums=new Dictionary<string,string[]> {
-            ["dimension"]=new[]{"2D","3D"},["agentVisual"]=new[]{"ScenePrefab","Bogong"},["sizeMode"]=new[]{"World","Angular"},
+            ["dimension"]=new[]{"2D","3D"},["directionDistribution"]=new[]{"Legacy","VonMises"},["agentVisual"]=new[]{"ScenePrefab","Bogong"},["sizeMode"]=new[]{"World","Angular"},
             ["centerStatistic"]=new[]{"mean","median"},["rotationAxis"]=new[]{"Yaw","Pitch","Roll"} };
         if(enums.TryGetValue(name,out var options)) child["enum"]=new JArray(options);
         if(owner==typeof(BogongVisualConfig) && name=="shape") child["enum"]=new JArray("Dot","Moth");
@@ -200,8 +228,9 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         var ranges=new Dictionary<string,double[]> {
             ["duration"]=new[]{1d,3600,1},["durationSeconds"]=new[]{1d,3600,1},["gain"]=new[]{-10d,10,.1},
             ["autopilotSpeed"]=new[]{0d,30,.1},["locustSpeed"]=new[]{0d,30,.1},["windSpeed"]=new[]{0d,20,.1},["windDirection"]=new[]{0d,360,1},["aglHeight"]=new[]{0d,1000,1},
+            ["locustSpeedStdDev"]=new[]{0d,10,.01},["volumeHalfExtentMetres"]=new[]{.1d,10,.1},
             ["closedLoopPosition"]=new[]{0d,5,.1},["closedLoopOrientation"]=new[]{0d,5,.1},
-            ["numberOfLocusts"]=new[]{0d,1000,1},["numberOfRings"]=new[]{0d,10,1},["mu"]=new[]{-180d,180,1},["muElevation"]=new[]{-90d,90,1},["kappa"]=new[]{0d,50,.1},
+            ["numberOfLocusts"]=new[]{0d,1000,1},["numberOfRings"]=new[]{0d,10,1},["mu"]=new[]{-180d,180,1},["muElevation"]=new[]{-90d,90,1},["kappa"]=new[]{0d,1000,1},["kappaElevation"]=new[]{0d,1000,1},
             ["angularSizeDegrees"]=new[]{.1d,10,.1},["size"]=new[]{.01d,5,.01},["contrast"]=new[]{0d,1,.01},["dutyCycle"]=new[]{0d,1,.01},
             ["frequency"]=new[]{0d,40,.1},["speed"]=new[]{0d,100,.1},["exposure"]=new[]{.1d,5,.1},["latitude"]=new[]{-90d,90,.01},["longitude"]=new[]{-180d,180,.01},
             ["northYawDegrees"]=new[]{0d,360,1},["windowSeconds"]=new[]{1d,180,1},["flightWindowSeconds"]=new[]{.2d,30,.1},["aggressiveness"]=new[]{.001d,1,.01},
@@ -210,6 +239,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         };
         double[] range=null;
         if(owner==typeof(ColorConfig)) range=new[]{0d,1,.01}; else ranges.TryGetValue(name,out range);
+        if(owner==typeof(HeadingReferenceConfig) && name=="windowSeconds") range=new[]{1d,600,1};
         if(range!=null)
         {
             if(child["x-ui"]==null) child["x-ui"]=new JObject();

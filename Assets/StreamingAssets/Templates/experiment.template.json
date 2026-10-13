@@ -8,7 +8,9 @@
     "headingReference": {
       "enabled": false,
       "windowSeconds": 180,
-      "startOffsetSeconds": 0
+      "startOffsetSeconds": 0,
+      "measureDuringPresentation": false,
+      "saveAs": ""
     },
     "objects": [],
     "initialPosition": {

@@ -494,6 +494,15 @@
     ],
     "additionalProperties": true,
     "properties": {
+      "loopStartIndex": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 2147483647,
+        "default": 0,
+        "x-ui": {
+          "help": "Zero-based row to restart after the final row: 0 repeats everything; 1 runs row 0 once, then repeats rows 1 onward. Requires fixed order when nonzero."
+        }
+      },
       "autoStart": {
         "type": "boolean",
         "default": false
@@ -767,7 +776,8 @@
           },
           "autoTrim": false
         }
-      ]
+      ],
+      "loopStartIndex": 0
     },
     "required": [
       "sequences"
@@ -1028,6 +1038,36 @@
             "type": "boolean",
             "default": false
           },
+          "headingReferenceId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "enabledWhen": {
+                "property": "useHeadingReference",
+                "oneOf": [
+                  true
+                ]
+              },
+              "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+            }
+          },
+          "directionDistribution": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "Legacy",
+            "enum": [
+              "Legacy",
+              "VonMises"
+            ],
+            "x-ui": {
+              "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+            }
+          },
           "spawnRelativeToAnimal": {
             "type": "boolean",
             "default": false
@@ -1098,8 +1138,8 @@
             "x-ui": {
               "slider": {
                 "min": 0.0,
-                "max": 50.0,
-                "step": 0.1
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -1118,6 +1158,65 @@
                 "max": 30.0,
                 "step": 0.1
               }
+            }
+          },
+          "locustSpeedStdDev": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": 0.0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "volumeHalfExtentMetres": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+              "unit": "metres",
+              "slider": {
+                "min": 0.1,
+                "max": 10.0,
+                "step": 0.1
+              }
+            }
+          },
+          "preserveBoundaryOvershoot": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
             }
           },
           "dimension": {
@@ -1224,6 +1323,11 @@
                 "oneOf": [
                   "3D"
                 ]
+              },
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -1589,7 +1693,7 @@
               "unit": "seconds",
               "slider": {
                 "min": 1.0,
-                "max": 180.0,
+                "max": 600.0,
                 "step": 1.0
               }
             }
@@ -1599,6 +1703,23 @@
             "default": 0.0,
             "x-ui": {
               "unit": "seconds"
+            }
+          },
+          "measureDuringPresentation": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+            }
+          },
+          "saveAs": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
             }
           }
         },
@@ -1853,8 +1974,8 @@
               "x-ui": {
                 "slider": {
                   "min": 0.0,
-                  "max": 50.0,
-                  "step": 0.1
+                  "max": 1000.0,
+                  "step": 1.0
                 }
               }
             },
@@ -2713,6 +2834,36 @@
                 "type": "boolean",
                 "default": false
               },
+              "headingReferenceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "enabledWhen": {
+                    "property": "useHeadingReference",
+                    "oneOf": [
+                      true
+                    ]
+                  },
+                  "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+                }
+              },
+              "directionDistribution": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "Legacy",
+                "enum": [
+                  "Legacy",
+                  "VonMises"
+                ],
+                "x-ui": {
+                  "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+                }
+              },
               "spawnRelativeToAnimal": {
                 "type": "boolean",
                 "default": false
@@ -2783,8 +2934,8 @@
                 "x-ui": {
                   "slider": {
                     "min": 0.0,
-                    "max": 50.0,
-                    "step": 0.1
+                    "max": 1000.0,
+                    "step": 1.0
                   }
                 }
               },
@@ -2803,6 +2954,65 @@
                     "max": 30.0,
                     "step": 0.1
                   }
+                }
+              },
+              "locustSpeedStdDev": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": 0.0,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 10.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "volumeHalfExtentMetres": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+                  "unit": "metres",
+                  "slider": {
+                    "min": 0.1,
+                    "max": 10.0,
+                    "step": 0.1
+                  }
+                }
+              },
+              "preserveBoundaryOvershoot": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
                 }
               },
               "dimension": {
@@ -2909,6 +3119,11 @@
                     "oneOf": [
                       "3D"
                     ]
+                  },
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 1.0
                   }
                 }
               },
@@ -3274,7 +3489,7 @@
                   "unit": "seconds",
                   "slider": {
                     "min": 1.0,
-                    "max": 180.0,
+                    "max": 600.0,
                     "step": 1.0
                   }
                 }
@@ -3284,6 +3499,23 @@
                 "default": 0.0,
                 "x-ui": {
                   "unit": "seconds"
+                }
+              },
+              "measureDuringPresentation": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                }
+              },
+              "saveAs": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
                 }
               }
             }
@@ -3537,8 +3769,8 @@
                   "x-ui": {
                     "slider": {
                       "min": 0.0,
-                      "max": 50.0,
-                      "step": 0.1
+                      "max": 1000.0,
+                      "step": 1.0
                     }
                   }
                 },
@@ -4417,6 +4649,36 @@
                 "type": "boolean",
                 "default": false
               },
+              "headingReferenceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "enabledWhen": {
+                    "property": "useHeadingReference",
+                    "oneOf": [
+                      true
+                    ]
+                  },
+                  "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+                }
+              },
+              "directionDistribution": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "Legacy",
+                "enum": [
+                  "Legacy",
+                  "VonMises"
+                ],
+                "x-ui": {
+                  "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+                }
+              },
               "spawnRelativeToAnimal": {
                 "type": "boolean",
                 "default": false
@@ -4487,8 +4749,8 @@
                 "x-ui": {
                   "slider": {
                     "min": 0.0,
-                    "max": 50.0,
-                    "step": 0.1
+                    "max": 1000.0,
+                    "step": 1.0
                   }
                 }
               },
@@ -4507,6 +4769,65 @@
                     "max": 30.0,
                     "step": 0.1
                   }
+                }
+              },
+              "locustSpeedStdDev": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": 0.0,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 10.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "volumeHalfExtentMetres": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+                  "unit": "metres",
+                  "slider": {
+                    "min": 0.1,
+                    "max": 10.0,
+                    "step": 0.1
+                  }
+                }
+              },
+              "preserveBoundaryOvershoot": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
                 }
               },
               "dimension": {
@@ -4613,6 +4934,11 @@
                     "oneOf": [
                       "3D"
                     ]
+                  },
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 1.0
                   }
                 }
               },
@@ -4978,7 +5304,7 @@
                   "unit": "seconds",
                   "slider": {
                     "min": 1.0,
-                    "max": 180.0,
+                    "max": 600.0,
                     "step": 1.0
                   }
                 }
@@ -4988,6 +5314,23 @@
                 "default": 0.0,
                 "x-ui": {
                   "unit": "seconds"
+                }
+              },
+              "measureDuringPresentation": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                }
+              },
+              "saveAs": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
                 }
               }
             }
@@ -5241,8 +5584,8 @@
                   "x-ui": {
                     "slider": {
                       "min": 0.0,
-                      "max": 50.0,
-                      "step": 0.1
+                      "max": 1000.0,
+                      "step": 1.0
                     }
                   }
                 },
@@ -6121,6 +6464,36 @@
                 "type": "boolean",
                 "default": false
               },
+              "headingReferenceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "enabledWhen": {
+                    "property": "useHeadingReference",
+                    "oneOf": [
+                      true
+                    ]
+                  },
+                  "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+                }
+              },
+              "directionDistribution": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "Legacy",
+                "enum": [
+                  "Legacy",
+                  "VonMises"
+                ],
+                "x-ui": {
+                  "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+                }
+              },
               "spawnRelativeToAnimal": {
                 "type": "boolean",
                 "default": false
@@ -6191,8 +6564,8 @@
                 "x-ui": {
                   "slider": {
                     "min": 0.0,
-                    "max": 50.0,
-                    "step": 0.1
+                    "max": 1000.0,
+                    "step": 1.0
                   }
                 }
               },
@@ -6211,6 +6584,65 @@
                     "max": 30.0,
                     "step": 0.1
                   }
+                }
+              },
+              "locustSpeedStdDev": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": 0.0,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 10.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "volumeHalfExtentMetres": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+                  "unit": "metres",
+                  "slider": {
+                    "min": 0.1,
+                    "max": 10.0,
+                    "step": 0.1
+                  }
+                }
+              },
+              "preserveBoundaryOvershoot": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
                 }
               },
               "dimension": {
@@ -6317,6 +6749,11 @@
                     "oneOf": [
                       "3D"
                     ]
+                  },
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 1.0
                   }
                 }
               },
@@ -6682,7 +7119,7 @@
                   "unit": "seconds",
                   "slider": {
                     "min": 1.0,
-                    "max": 180.0,
+                    "max": 600.0,
                     "step": 1.0
                   }
                 }
@@ -6692,6 +7129,23 @@
                 "default": 0.0,
                 "x-ui": {
                   "unit": "seconds"
+                }
+              },
+              "measureDuringPresentation": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                }
+              },
+              "saveAs": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
                 }
               }
             }
@@ -6945,8 +7399,8 @@
                   "x-ui": {
                     "slider": {
                       "min": 0.0,
-                      "max": 50.0,
-                      "step": 0.1
+                      "max": 1000.0,
+                      "step": 1.0
                     }
                   }
                 },
@@ -7578,7 +8032,9 @@
       "headingReference": {
         "enabled": false,
         "windowSeconds": 180,
-        "startOffsetSeconds": 0
+        "startOffsetSeconds": 0,
+        "measureDuringPresentation": false,
+        "saveAs": ""
       },
       "objects": [
         {
@@ -7703,7 +8159,7 @@
               "unit": "seconds",
               "slider": {
                 "min": 1.0,
-                "max": 180.0,
+                "max": 600.0,
                 "step": 1.0
               }
             }
@@ -7713,6 +8169,23 @@
             "default": 0.0,
             "x-ui": {
               "unit": "seconds"
+            }
+          },
+          "measureDuringPresentation": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+            }
+          },
+          "saveAs": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
             }
           }
         },
@@ -8402,6 +8875,36 @@
         "type": "boolean",
         "default": false
       },
+      "headingReferenceId": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "default": "",
+        "x-ui": {
+          "enabledWhen": {
+            "property": "useHeadingReference",
+            "oneOf": [
+              true
+            ]
+          },
+          "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+        }
+      },
+      "directionDistribution": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "default": "Legacy",
+        "enum": [
+          "Legacy",
+          "VonMises"
+        ],
+        "x-ui": {
+          "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+        }
+      },
       "spawnRelativeToAnimal": {
         "type": "boolean",
         "default": false
@@ -8472,8 +8975,8 @@
         "x-ui": {
           "slider": {
             "min": 0.0,
-            "max": 50.0,
-            "step": 0.1
+            "max": 1000.0,
+            "step": 1.0
           }
         }
       },
@@ -8492,6 +8995,65 @@
             "max": 30.0,
             "step": 0.1
           }
+        }
+      },
+      "locustSpeedStdDev": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 3.40282347E+38,
+        "default": 0.0,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "trajectoryFile",
+            "oneOf": [
+              ""
+            ]
+          },
+          "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+          "unit": "scene units / s",
+          "slider": {
+            "min": 0.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        }
+      },
+      "volumeHalfExtentMetres": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": -3.40282347E+38,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "exclusiveMinimum": 0,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "trajectoryFile",
+            "oneOf": [
+              ""
+            ]
+          },
+          "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+          "unit": "metres",
+          "slider": {
+            "min": 0.1,
+            "max": 10.0,
+            "step": 0.1
+          }
+        }
+      },
+      "preserveBoundaryOvershoot": {
+        "type": "boolean",
+        "default": false,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "trajectoryFile",
+            "oneOf": [
+              ""
+            ]
+          },
+          "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
         }
       },
       "dimension": {
@@ -8598,6 +9160,11 @@
             "oneOf": [
               "3D"
             ]
+          },
+          "slider": {
+            "min": 0.0,
+            "max": 1000.0,
+            "step": 1.0
           }
         }
       },
@@ -9195,7 +9762,7 @@
                   "unit": "seconds",
                   "slider": {
                     "min": 1.0,
-                    "max": 180.0,
+                    "max": 600.0,
                     "step": 1.0
                   }
                 }
@@ -9205,6 +9772,23 @@
                 "default": 0.0,
                 "x-ui": {
                   "unit": "seconds"
+                }
+              },
+              "measureDuringPresentation": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                }
+              },
+              "saveAs": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
                 }
               }
             }
@@ -9893,6 +10477,36 @@
             "type": "boolean",
             "default": false
           },
+          "headingReferenceId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "enabledWhen": {
+                "property": "useHeadingReference",
+                "oneOf": [
+                  true
+                ]
+              },
+              "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+            }
+          },
+          "directionDistribution": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "Legacy",
+            "enum": [
+              "Legacy",
+              "VonMises"
+            ],
+            "x-ui": {
+              "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+            }
+          },
           "spawnRelativeToAnimal": {
             "type": "boolean",
             "default": false
@@ -9963,8 +10577,8 @@
             "x-ui": {
               "slider": {
                 "min": 0.0,
-                "max": 50.0,
-                "step": 0.1
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -9983,6 +10597,65 @@
                 "max": 30.0,
                 "step": 0.1
               }
+            }
+          },
+          "locustSpeedStdDev": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": 0.0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "volumeHalfExtentMetres": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+              "unit": "metres",
+              "slider": {
+                "min": 0.1,
+                "max": 10.0,
+                "step": 0.1
+              }
+            }
+          },
+          "preserveBoundaryOvershoot": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
             }
           },
           "dimension": {
@@ -10089,6 +10762,11 @@
                 "oneOf": [
                   "3D"
                 ]
+              },
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -10856,6 +11534,36 @@
                 "type": "boolean",
                 "default": false
               },
+              "headingReferenceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "enabledWhen": {
+                    "property": "useHeadingReference",
+                    "oneOf": [
+                      true
+                    ]
+                  },
+                  "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+                }
+              },
+              "directionDistribution": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "Legacy",
+                "enum": [
+                  "Legacy",
+                  "VonMises"
+                ],
+                "x-ui": {
+                  "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+                }
+              },
               "spawnRelativeToAnimal": {
                 "type": "boolean",
                 "default": false
@@ -10926,8 +11634,8 @@
                 "x-ui": {
                   "slider": {
                     "min": 0.0,
-                    "max": 50.0,
-                    "step": 0.1
+                    "max": 1000.0,
+                    "step": 1.0
                   }
                 }
               },
@@ -10946,6 +11654,65 @@
                     "max": 30.0,
                     "step": 0.1
                   }
+                }
+              },
+              "locustSpeedStdDev": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": 0.0,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 10.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "volumeHalfExtentMetres": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+                  "unit": "metres",
+                  "slider": {
+                    "min": 0.1,
+                    "max": 10.0,
+                    "step": 0.1
+                  }
+                }
+              },
+              "preserveBoundaryOvershoot": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
                 }
               },
               "dimension": {
@@ -11052,6 +11819,11 @@
                     "oneOf": [
                       "3D"
                     ]
+                  },
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 1.0
                   }
                 }
               },
@@ -11426,7 +12198,7 @@
                   "unit": "seconds",
                   "slider": {
                     "min": 1.0,
-                    "max": 180.0,
+                    "max": 600.0,
                     "step": 1.0
                   }
                 }
@@ -11436,6 +12208,23 @@
                 "default": 0.0,
                 "x-ui": {
                   "unit": "seconds"
+                }
+              },
+              "measureDuringPresentation": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                }
+              },
+              "saveAs": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
                 }
               }
             }
@@ -12124,6 +12913,36 @@
             "type": "boolean",
             "default": false
           },
+          "headingReferenceId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "enabledWhen": {
+                "property": "useHeadingReference",
+                "oneOf": [
+                  true
+                ]
+              },
+              "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+            }
+          },
+          "directionDistribution": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "Legacy",
+            "enum": [
+              "Legacy",
+              "VonMises"
+            ],
+            "x-ui": {
+              "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+            }
+          },
           "spawnRelativeToAnimal": {
             "type": "boolean",
             "default": false
@@ -12194,8 +13013,8 @@
             "x-ui": {
               "slider": {
                 "min": 0.0,
-                "max": 50.0,
-                "step": 0.1
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -12214,6 +13033,65 @@
                 "max": 30.0,
                 "step": 0.1
               }
+            }
+          },
+          "locustSpeedStdDev": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": 0.0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "volumeHalfExtentMetres": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+              "unit": "metres",
+              "slider": {
+                "min": 0.1,
+                "max": 10.0,
+                "step": 0.1
+              }
+            }
+          },
+          "preserveBoundaryOvershoot": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
             }
           },
           "dimension": {
@@ -12320,6 +13198,11 @@
                 "oneOf": [
                   "3D"
                 ]
+              },
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -13087,6 +13970,36 @@
                 "type": "boolean",
                 "default": false
               },
+              "headingReferenceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "enabledWhen": {
+                    "property": "useHeadingReference",
+                    "oneOf": [
+                      true
+                    ]
+                  },
+                  "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+                }
+              },
+              "directionDistribution": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "Legacy",
+                "enum": [
+                  "Legacy",
+                  "VonMises"
+                ],
+                "x-ui": {
+                  "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+                }
+              },
               "spawnRelativeToAnimal": {
                 "type": "boolean",
                 "default": false
@@ -13157,8 +14070,8 @@
                 "x-ui": {
                   "slider": {
                     "min": 0.0,
-                    "max": 50.0,
-                    "step": 0.1
+                    "max": 1000.0,
+                    "step": 1.0
                   }
                 }
               },
@@ -13177,6 +14090,65 @@
                     "max": 30.0,
                     "step": 0.1
                   }
+                }
+              },
+              "locustSpeedStdDev": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": 0.0,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 10.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "volumeHalfExtentMetres": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+                  "unit": "metres",
+                  "slider": {
+                    "min": 0.1,
+                    "max": 10.0,
+                    "step": 0.1
+                  }
+                }
+              },
+              "preserveBoundaryOvershoot": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
                 }
               },
               "dimension": {
@@ -13283,6 +14255,11 @@
                     "oneOf": [
                       "3D"
                     ]
+                  },
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 1.0
                   }
                 }
               },
@@ -13657,7 +14634,7 @@
                   "unit": "seconds",
                   "slider": {
                     "min": 1.0,
-                    "max": 180.0,
+                    "max": 600.0,
                     "step": 1.0
                   }
                 }
@@ -13667,6 +14644,23 @@
                 "default": 0.0,
                 "x-ui": {
                   "unit": "seconds"
+                }
+              },
+              "measureDuringPresentation": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                }
+              },
+              "saveAs": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
                 }
               }
             }
@@ -14355,6 +15349,36 @@
             "type": "boolean",
             "default": false
           },
+          "headingReferenceId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "enabledWhen": {
+                "property": "useHeadingReference",
+                "oneOf": [
+                  true
+                ]
+              },
+              "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+            }
+          },
+          "directionDistribution": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "Legacy",
+            "enum": [
+              "Legacy",
+              "VonMises"
+            ],
+            "x-ui": {
+              "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+            }
+          },
           "spawnRelativeToAnimal": {
             "type": "boolean",
             "default": false
@@ -14425,8 +15449,8 @@
             "x-ui": {
               "slider": {
                 "min": 0.0,
-                "max": 50.0,
-                "step": 0.1
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -14445,6 +15469,65 @@
                 "max": 30.0,
                 "step": 0.1
               }
+            }
+          },
+          "locustSpeedStdDev": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": 0.0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "volumeHalfExtentMetres": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+              "unit": "metres",
+              "slider": {
+                "min": 0.1,
+                "max": 10.0,
+                "step": 0.1
+              }
+            }
+          },
+          "preserveBoundaryOvershoot": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
             }
           },
           "dimension": {
@@ -14551,6 +15634,11 @@
                 "oneOf": [
                   "3D"
                 ]
+              },
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -15318,6 +16406,36 @@
                 "type": "boolean",
                 "default": false
               },
+              "headingReferenceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "enabledWhen": {
+                    "property": "useHeadingReference",
+                    "oneOf": [
+                      true
+                    ]
+                  },
+                  "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+                }
+              },
+              "directionDistribution": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "Legacy",
+                "enum": [
+                  "Legacy",
+                  "VonMises"
+                ],
+                "x-ui": {
+                  "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+                }
+              },
               "spawnRelativeToAnimal": {
                 "type": "boolean",
                 "default": false
@@ -15388,8 +16506,8 @@
                 "x-ui": {
                   "slider": {
                     "min": 0.0,
-                    "max": 50.0,
-                    "step": 0.1
+                    "max": 1000.0,
+                    "step": 1.0
                   }
                 }
               },
@@ -15408,6 +16526,65 @@
                     "max": 30.0,
                     "step": 0.1
                   }
+                }
+              },
+              "locustSpeedStdDev": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": 0.0,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 10.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "volumeHalfExtentMetres": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+                  "unit": "metres",
+                  "slider": {
+                    "min": 0.1,
+                    "max": 10.0,
+                    "step": 0.1
+                  }
+                }
+              },
+              "preserveBoundaryOvershoot": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
                 }
               },
               "dimension": {
@@ -15514,6 +16691,11 @@
                     "oneOf": [
                       "3D"
                     ]
+                  },
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 1.0
                   }
                 }
               },
@@ -16041,6 +17223,36 @@
             "type": "boolean",
             "default": false
           },
+          "headingReferenceId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "enabledWhen": {
+                "property": "useHeadingReference",
+                "oneOf": [
+                  true
+                ]
+              },
+              "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+            }
+          },
+          "directionDistribution": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "Legacy",
+            "enum": [
+              "Legacy",
+              "VonMises"
+            ],
+            "x-ui": {
+              "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+            }
+          },
           "spawnRelativeToAnimal": {
             "type": "boolean",
             "default": false
@@ -16111,8 +17323,8 @@
             "x-ui": {
               "slider": {
                 "min": 0.0,
-                "max": 50.0,
-                "step": 0.1
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -16131,6 +17343,65 @@
                 "max": 30.0,
                 "step": 0.1
               }
+            }
+          },
+          "locustSpeedStdDev": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": 0.0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "volumeHalfExtentMetres": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+              "unit": "metres",
+              "slider": {
+                "min": 0.1,
+                "max": 10.0,
+                "step": 0.1
+              }
+            }
+          },
+          "preserveBoundaryOvershoot": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
             }
           },
           "dimension": {
@@ -16237,6 +17508,11 @@
                 "oneOf": [
                   "3D"
                 ]
+              },
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -16591,7 +17867,9 @@
       "headingReference": {
         "enabled": false,
         "windowSeconds": 180,
-        "startOffsetSeconds": 0
+        "startOffsetSeconds": 0,
+        "measureDuringPresentation": false,
+        "saveAs": ""
       },
       "numberOfLocusts": 256,
       "density": null,
@@ -16752,7 +18030,12 @@
         "preRollSeconds": 0
       },
       "worldUnitsPerMetre": null,
-      "nearClipMetres": null
+      "nearClipMetres": null,
+      "locustSpeedStdDev": 0,
+      "volumeHalfExtentMetres": null,
+      "preserveBoundaryOvershoot": false,
+      "headingReferenceId": "",
+      "directionDistribution": "Legacy"
     }
   },
   "kannadi": {
@@ -16780,7 +18063,7 @@
               "unit": "seconds",
               "slider": {
                 "min": 1.0,
-                "max": 180.0,
+                "max": 600.0,
                 "step": 1.0
               }
             }
@@ -16790,6 +18073,23 @@
             "default": 0.0,
             "x-ui": {
               "unit": "seconds"
+            }
+          },
+          "measureDuringPresentation": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+            }
+          },
+          "saveAs": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
             }
           }
         },
@@ -17479,6 +18779,36 @@
         "type": "boolean",
         "default": false
       },
+      "headingReferenceId": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "default": "",
+        "x-ui": {
+          "enabledWhen": {
+            "property": "useHeadingReference",
+            "oneOf": [
+              true
+            ]
+          },
+          "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+        }
+      },
+      "directionDistribution": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "default": "Legacy",
+        "enum": [
+          "Legacy",
+          "VonMises"
+        ],
+        "x-ui": {
+          "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+        }
+      },
       "spawnRelativeToAnimal": {
         "type": "boolean",
         "default": false
@@ -17549,8 +18879,8 @@
         "x-ui": {
           "slider": {
             "min": 0.0,
-            "max": 50.0,
-            "step": 0.1
+            "max": 1000.0,
+            "step": 1.0
           }
         }
       },
@@ -17569,6 +18899,65 @@
             "max": 30.0,
             "step": 0.1
           }
+        }
+      },
+      "locustSpeedStdDev": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 3.40282347E+38,
+        "default": 0.0,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "trajectoryFile",
+            "oneOf": [
+              ""
+            ]
+          },
+          "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+          "unit": "scene units / s",
+          "slider": {
+            "min": 0.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        }
+      },
+      "volumeHalfExtentMetres": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": -3.40282347E+38,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "exclusiveMinimum": 0,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "trajectoryFile",
+            "oneOf": [
+              ""
+            ]
+          },
+          "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+          "unit": "metres",
+          "slider": {
+            "min": 0.1,
+            "max": 10.0,
+            "step": 0.1
+          }
+        }
+      },
+      "preserveBoundaryOvershoot": {
+        "type": "boolean",
+        "default": false,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "trajectoryFile",
+            "oneOf": [
+              ""
+            ]
+          },
+          "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
         }
       },
       "dimension": {
@@ -17675,6 +19064,11 @@
             "oneOf": [
               "3D"
             ]
+          },
+          "slider": {
+            "min": 0.0,
+            "max": 1000.0,
+            "step": 1.0
           }
         }
       },
@@ -18272,7 +19666,7 @@
                   "unit": "seconds",
                   "slider": {
                     "min": 1.0,
-                    "max": 180.0,
+                    "max": 600.0,
                     "step": 1.0
                   }
                 }
@@ -18282,6 +19676,23 @@
                 "default": 0.0,
                 "x-ui": {
                   "unit": "seconds"
+                }
+              },
+              "measureDuringPresentation": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                }
+              },
+              "saveAs": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
                 }
               }
             }
@@ -18970,6 +20381,36 @@
             "type": "boolean",
             "default": false
           },
+          "headingReferenceId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "enabledWhen": {
+                "property": "useHeadingReference",
+                "oneOf": [
+                  true
+                ]
+              },
+              "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+            }
+          },
+          "directionDistribution": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "Legacy",
+            "enum": [
+              "Legacy",
+              "VonMises"
+            ],
+            "x-ui": {
+              "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+            }
+          },
           "spawnRelativeToAnimal": {
             "type": "boolean",
             "default": false
@@ -19040,8 +20481,8 @@
             "x-ui": {
               "slider": {
                 "min": 0.0,
-                "max": 50.0,
-                "step": 0.1
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -19060,6 +20501,65 @@
                 "max": 30.0,
                 "step": 0.1
               }
+            }
+          },
+          "locustSpeedStdDev": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": 0.0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "volumeHalfExtentMetres": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+              "unit": "metres",
+              "slider": {
+                "min": 0.1,
+                "max": 10.0,
+                "step": 0.1
+              }
+            }
+          },
+          "preserveBoundaryOvershoot": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
             }
           },
           "dimension": {
@@ -19166,6 +20666,11 @@
                 "oneOf": [
                   "3D"
                 ]
+              },
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -19783,7 +21288,7 @@
                   "unit": "seconds",
                   "slider": {
                     "min": 1.0,
-                    "max": 180.0,
+                    "max": 600.0,
                     "step": 1.0
                   }
                 }
@@ -19793,6 +21298,23 @@
                 "default": 0.0,
                 "x-ui": {
                   "unit": "seconds"
+                }
+              },
+              "measureDuringPresentation": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                }
+              },
+              "saveAs": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
                 }
               }
             }
@@ -20481,6 +22003,36 @@
             "type": "boolean",
             "default": false
           },
+          "headingReferenceId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "enabledWhen": {
+                "property": "useHeadingReference",
+                "oneOf": [
+                  true
+                ]
+              },
+              "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+            }
+          },
+          "directionDistribution": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "Legacy",
+            "enum": [
+              "Legacy",
+              "VonMises"
+            ],
+            "x-ui": {
+              "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+            }
+          },
           "spawnRelativeToAnimal": {
             "type": "boolean",
             "default": false
@@ -20551,8 +22103,8 @@
             "x-ui": {
               "slider": {
                 "min": 0.0,
-                "max": 50.0,
-                "step": 0.1
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -20571,6 +22123,65 @@
                 "max": 30.0,
                 "step": 0.1
               }
+            }
+          },
+          "locustSpeedStdDev": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": 0.0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "volumeHalfExtentMetres": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+              "unit": "metres",
+              "slider": {
+                "min": 0.1,
+                "max": 10.0,
+                "step": 0.1
+              }
+            }
+          },
+          "preserveBoundaryOvershoot": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
             }
           },
           "dimension": {
@@ -20677,6 +22288,11 @@
                 "oneOf": [
                   "3D"
                 ]
+              },
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -21294,7 +22910,7 @@
                   "unit": "seconds",
                   "slider": {
                     "min": 1.0,
-                    "max": 180.0,
+                    "max": 600.0,
                     "step": 1.0
                   }
                 }
@@ -21304,6 +22920,23 @@
                 "default": 0.0,
                 "x-ui": {
                   "unit": "seconds"
+                }
+              },
+              "measureDuringPresentation": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                }
+              },
+              "saveAs": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
                 }
               }
             }
@@ -21992,6 +23625,36 @@
             "type": "boolean",
             "default": false
           },
+          "headingReferenceId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "enabledWhen": {
+                "property": "useHeadingReference",
+                "oneOf": [
+                  true
+                ]
+              },
+              "help": "Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run."
+            }
+          },
+          "directionDistribution": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "Legacy",
+            "enum": [
+              "Legacy",
+              "VonMises"
+            ],
+            "x-ui": {
+              "help": "Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order."
+            }
+          },
           "spawnRelativeToAnimal": {
             "type": "boolean",
             "default": false
@@ -22062,8 +23725,8 @@
             "x-ui": {
               "slider": {
                 "min": 0.0,
-                "max": 50.0,
-                "step": 0.1
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -22082,6 +23745,65 @@
                 "max": 30.0,
                 "step": 0.1
               }
+            }
+          },
+          "locustSpeedStdDev": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": 0.0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "volumeHalfExtentMetres": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.",
+              "unit": "metres",
+              "slider": {
+                "min": 0.1,
+                "max": 10.0,
+                "step": 0.1
+              }
+            }
+          },
+          "preserveBoundaryOvershoot": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Keep excess travel when wrapping the generated population; legacy edge snapping is used when false."
             }
           },
           "dimension": {
@@ -22188,6 +23910,11 @@
                 "oneOf": [
                   "3D"
                 ]
+              },
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
               }
             }
           },
@@ -23675,7 +25402,7 @@
                   "unit": "seconds",
                   "slider": {
                     "min": 1.0,
-                    "max": 180.0,
+                    "max": 600.0,
                     "step": 1.0
                   }
                 }
@@ -23685,6 +25412,23 @@
                 "default": 0.0,
                 "x-ui": {
                   "unit": "seconds"
+                }
+              },
+              "measureDuringPresentation": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                }
+              },
+              "saveAs": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
                 }
               }
             }
@@ -24111,7 +25855,7 @@
                   "unit": "seconds",
                   "slider": {
                     "min": 1.0,
-                    "max": 180.0,
+                    "max": 600.0,
                     "step": 1.0
                   }
                 }
@@ -24121,6 +25865,23 @@
                 "default": 0.0,
                 "x-ui": {
                   "unit": "seconds"
+                }
+              },
+              "measureDuringPresentation": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                }
+              },
+              "saveAs": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
                 }
               }
             }
@@ -24547,7 +26308,7 @@
                   "unit": "seconds",
                   "slider": {
                     "min": 1.0,
-                    "max": 180.0,
+                    "max": 600.0,
                     "step": 1.0
                   }
                 }
@@ -24557,6 +26318,23 @@
                 "default": 0.0,
                 "x-ui": {
                   "unit": "seconds"
+                }
+              },
+              "measureDuringPresentation": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Flat experiment: measure while the sequence timer runs, rather than adding an assessment period before presentation. Default false preserves legacy timing."
+                }
+              },
+              "saveAs": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop."
                 }
               }
             }

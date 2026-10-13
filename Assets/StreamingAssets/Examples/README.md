@@ -6,7 +6,7 @@ Each JSON file is a complete example that can be copied and edited independently
 |---|---|
 | `System` | Explicit Kinefly six-camera flight; FicTrac four-camera and six-camera walking layouts. |
 | `Flight` | Selwyn live sampled sky, fixed date/time sky, historical Adaminaby panorama, migration AGL 10/100/1000; the active 240 s stars → 240 s leftward dorsal swarm recipe. |
-| `Swarm` | Per-rig mean-heading aligned (0°), crossed (+90°) and opposed (180°) presentation after 180 seconds; dispersed 3D directions; constant-angular-size flickering Bogong dots. |
+| `Swarm` | Physical generated moths in a moving 4 m cube, speeds 6.17 ± 1.24 m/s; per-rig mean-heading aligned (0°), crossed (+90°) and opposed (180°) presentations; dispersed 3D directions; angular flickering Bogong dots; recorded Selwyn moth playback. |
 | `Choice` | Empty control, two cylinders at ±45°, moving band. |
 | `DynamicChoice` | Time trigger, area trigger with timeout, independent per-rig sequences, adaptive gray discrimination. |
 | `Optomotor` | Yaw, pitch, roll, and a frequency/speed sweep. |
@@ -22,4 +22,6 @@ The preserved Kannadi recipes remain under `Kannadi/`; this collection does not 
 
 `Sequences/kinefly-auto-trim.example.json` runs a 240-second Kinefly calibration over Selwyn terrain with the live Milky Way star sky. Its provisional flight threshold and bounded corrections are tuned from six past recordings. See [auto trim](../../../docs/kinefly-auto-trim.md) for controls, units, replay results and continuation with trimming off.
 
-`Flight/selwyn-trajectory-playback.example.json` plays the converted October 7 recording as lightweight flapping moths inside an animal-centered periodic volume. Terrain coordinates, speeds and AGL use metres. `Sequences/selwyn-trajectory-playback.example.json` is an independent 1200-second looping recipe; the active sequence retains your calibration and uses playback for its 1000-second second step. See [swarm-playback.md](../../../docs/swarm-playback.md) for conversion, axes, scaling and all playback/visual parameters.
+`Flight/selwyn-trajectory-playback.example.json` plays the converted October 7 recording as lightweight flapping moths inside an animal-centered periodic volume. Terrain coordinates, speeds and AGL use metres. `Sequences/selwyn-trajectory-playback.example.json` is an independent 1200-second looping recipe. The full-duration four-file reference is `Swarm/selwyn-milky-way-swarm-cycle.sequence.json`: 360 s setup, 240 s Milky Way measurement, 240 s Milky Way/swarm and 240 s swarm-only; setup runs once, then the three 240 s blocks repeat with trimming off. It uses 150 physical moths per rig and a 7 m/s observer. See [cycle configuration](../../../docs/selwyn-milky-way-swarm-cycle.md). See [generated swarm](../../../docs/generated-bogong-swarm.md) and [recorded playback](../../../docs/swarm-playback.md) for parameters, units and validation.
+
+The active sequence retains your quick-test 3-second setup/measurement timings and gain 2.5 on those first two rows. The full-duration cycle uses separate `-full.example.json` setup/measurement files, retaining the requested 240-second mean window.

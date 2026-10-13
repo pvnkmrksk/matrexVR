@@ -81,6 +81,7 @@ namespace ConfigurationUI
                     else if(doc.SchemaId=="sequence")
                     {
                         var sequence=json.ToObject<SequenceConfig>();
+                        sequence.ValidateLoop();
                         if(sequence.sequences==null || sequence.sequences.Length==0) errors.Add(label+": add at least one sequence step.");
                         foreach(var step in sequence.sequences??Array.Empty<SequenceItem>())
                         {
@@ -111,7 +112,43 @@ namespace ConfigurationUI
                 catch(Exception e) { errors.Add(label+": "+e.GetBaseException().Message); }
                 if(doc.Conflict) errors.Add(label+": external edit conflict.");
             }
+            ValidateHeadingReferences(errors);
             return errors;
+        }
+        private void ValidateHeadingReferences(List<string> errors)
+        {
+            var saved = new HashSet<string>(StringComparer.Ordinal);
+            if (!(Sequence.Root["sequences"] is JArray steps)) return;
+            int index = 0;
+            foreach (var step in steps.OfType<JObject>())
+            {
+                if (index++ == (int?)Sequence.Root["loopStartIndex"] && ExperimentBlocks.Flag(Sequence.Root["loop"])) saved.Clear();
+                string file = (string)step["parameters"]?["configFile"];
+                if (string.IsNullOrWhiteSpace(file)) continue;
+                var doc = Documents.FirstOrDefault(d => d.Path == Path.GetFullPath(ExperimentConfigFiles.Resolve(file)));
+                if (doc == null) continue;
+                var root = doc.Root as JObject;
+                if (root == null) continue;
+                IEnumerable<JObject> payloads = ExperimentBlocks.Phased(root)
+                    ? new[] { "preStimulus", "stimulus", "postStimulus" }.Select(p => root[p] as JObject)
+                        .Where(p => p != null && ExperimentBlocks.Flag(p["enabled"], ReferenceEquals(p, root["stimulus"])))
+                    : new[] { root };
+                foreach (var payload in payloads)
+                {
+                    var swarm = payload["swarm"] as JObject;
+                    string reference = (string)(swarm?["headingReferenceId"] ?? payload["headingReferenceId"]);
+                    if (!string.IsNullOrWhiteSpace(reference))
+                    {
+                        if (ExperimentBlocks.Flag(Sequence.Root["randomise"]))
+                            errors.Add("Named heading references require randomise=false so the measurement runs first.");
+                        if (!saved.Contains(reference))
+                            errors.Add(Path.GetFileName(file) + ": headingReferenceId '" + reference + "' must be saved by an earlier block in this cycle.");
+                    }
+                    var heading = payload["headingReference"] as JObject;
+                    string saveAs = (string)heading?["saveAs"];
+                    if (ExperimentBlocks.Flag(heading?["enabled"]) && !string.IsNullOrWhiteSpace(saveAs)) saved.Add(saveAs);
+                }
+            }
         }
         private static void CheckFiles(JToken token,string path,List<string> errors,string label,bool enabled)
         {

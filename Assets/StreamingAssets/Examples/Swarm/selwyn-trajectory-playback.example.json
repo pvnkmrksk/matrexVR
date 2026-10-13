@@ -146,9 +146,9 @@
   "resetPositionOnStart": true,
   "resetRotationOnStart": true,
   "uniformSkyColor": {
-    "r": 0.1,
-    "g": 0.1,
-    "b": 0.1,
+    "r": 1,
+    "g": 1,
+    "b": 1,
     "a": 1
   },
   "useHeadingReference": false,

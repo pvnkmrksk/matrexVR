@@ -10,6 +10,8 @@ public sealed class HeadingReferenceConfig
     public bool enabled = false;
     public double windowSeconds = 180;
     public double startOffsetSeconds = 0;
+    public bool measureDuringPresentation = false; // Flat experiments: observation shares the sequence timer.
+    public string saveAs = ""; // Optional per-rig reference, reusable only within the current sequence cycle.
 
     public void Validate()
     {
@@ -83,6 +85,7 @@ public sealed class StimulusHeadingReference : MonoBehaviour
     public string Phase { get; private set; } = "disabled";
     public HeadingReferenceResult Result { get; private set; }
     public bool IsObserving => Phase == "observing";
+    public bool BlocksPresentationTimer => IsObserving && !config.measureDuringPresentation;
     public double RemainingSeconds => IsObserving ? Math.Max(0, deadline - Time.timeAsDouble) : 0;
 
     public static StimulusHeadingReference For(ClosedLoop rig)
@@ -126,6 +129,11 @@ public sealed class StimulusHeadingReference : MonoBehaviour
             Result.observationStartedAt = startedAt;
             Result.presentedAt = now;
             Result.presentedUtc = DateTime.UtcNow.ToString("O");
+            if (!string.IsNullOrWhiteSpace(config.saveAs))
+            {
+                if (MainController.Instance == null) throw new InvalidOperationException("Saving a heading reference requires a running sequence.");
+                MainController.Instance.SaveHeadingReference(gameObject, config.saveAs, Result);
+            }
             Phase = "presented";
             Action<HeadingReferenceResult> callback = present;
             present = null; // Invoke exactly once, including after a failed presentation.
@@ -134,7 +142,8 @@ public sealed class StimulusHeadingReference : MonoBehaviour
             string vrId = main != null && main.TryGetSystemConfigForGameObject(gameObject, out var system) ? system.vrId : name;
             string record = JsonConvert.SerializeObject(new {
                 vrId, scene = gameObject.scene.name, trial = main != null ? main.currentTrial : 0,
-                step = main != null ? main.currentStep : 0, reference = Result });
+                step = main != null ? main.currentStep : 0, savedAs = config.saveAs,
+                measureDuringPresentation = config.measureDuringPresentation, reference = Result });
             Debug.Log("Heading reference presented: " + record);
             if (MasterDataLogger.Instance != null)
                 File.AppendAllText(Path.Combine(MasterDataLogger.Instance.directoryPath, "heading_reference.jsonl"), record + "\n");

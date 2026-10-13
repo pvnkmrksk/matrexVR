@@ -22,9 +22,12 @@ public class LocustSpawner : MonoBehaviour
         "The kappa value for the Van Mises distribution (0 to infinity). 0 + eps is uniform distribution, infinity is a point distribution."
     )]
     public float kappa = 10000f; // kappa value for Van Mises
+    public string directionDistribution = "Legacy";
 
     [Tooltip("The speed of the locusts")]
     public float locustSpeed = 3.0f; // Default speed for locusts
+    public float locustSpeedStdDev;
+    public bool preserveBoundaryOvershoot;
     public string layerName = "LocustLayer"; // Default value
     public BoundaryManager boundaryManager;
 
@@ -60,6 +63,7 @@ public class LocustSpawner : MonoBehaviour
     [System.NonSerialized] public bool playbackVolumeSpecified;
     [System.NonSerialized] public float worldUnitsPerMetre = 100f;
     private SwarmTrajectoryPlayback playback;
+    private GeneratedSwarmMotion generatedMotion;
     private readonly System.Collections.Generic.Dictionary<Camera, float> originalNearClips = new System.Collections.Generic.Dictionary<Camera, float>();
 
     public void OverrideNearClip(Camera[] cameras, float distance)
@@ -122,6 +126,7 @@ public class LocustSpawner : MonoBehaviour
         foreach (var entry in originalNearClips) if (entry.Key != null) entry.Key.nearClipPlane = entry.Value;
         originalNearClips.Clear();
         if (playback != null) { playback.enabled = false; Release(playback); playback = null; }
+        if (generatedMotion != null) { generatedMotion.enabled = false; Release(generatedMotion); generatedMotion = null; }
         if (batchedVisual != null) { batchedVisual.SetActive(false); Release(batchedVisual); batchedVisual = null; }
         foreach (GameObject locust in spawned)
             if (locust != null) { locust.SetActive(false); Release(locust); }
@@ -164,7 +169,8 @@ public class LocustSpawner : MonoBehaviour
             SetLayerRecursively(locust.transform, locustLayer); // Set layer for all children
 
             locust.transform.localRotation = GenerateSwarmRotation(); // Set the local rotation
-            if (locust.GetComponent<LocustMover>() != null) locust.GetComponent<LocustMover>().speed = locustSpeed; // Set the speed of the locust
+            if (locust.GetComponent<LocustMover>() != null)
+                locust.GetComponent<LocustMover>().speed = GeneratedSwarmMotion.SampleSpeed(locustSpeed, locustSpeedStdDev);
             locust.name = layerName + "_Locust_" + i; // Set the name
             locust.tag = "SimulatedLocust"; // Set the tag for the locust
             float wrap = boundaryManager != null ? boundaryManager.boundarySize : 0;
@@ -187,6 +193,11 @@ public class LocustSpawner : MonoBehaviour
             }
         }
         BuildBatch(locustLayer);
+        if (preserveBoundaryOvershoot)
+        {
+            generatedMotion = gameObject.AddComponent<GeneratedSwarmMotion>();
+            generatedMotion.Configure(spawned);
+        }
     }
 
     private void BuildBatch(int locustLayer)
@@ -283,6 +294,8 @@ public class LocustSpawner : MonoBehaviour
 
     Quaternion GenerateVanMisesRotation(float mu, float kappa)
     {
+        if (string.Equals(directionDistribution, "VonMises", System.StringComparison.OrdinalIgnoreCase))
+            return Quaternion.Euler(0, CircularDirectionDistribution.Sample(mu, kappa), 0);
         // if kappa is 0 or less than 0 , add a small epsilon to prevent div by 0 error
 
         if (kappa <= 0)
@@ -308,7 +321,9 @@ public class LocustSpawner : MonoBehaviour
         Quaternion yaw = GenerateVanMisesRotation(mu, kappa);
         if (!Is3D()) return yaw;
         float elevation = muElevation;
-        if (kappaElevation <= 0) elevation = Random.Range(-90f, 90f);
+        if (string.Equals(directionDistribution, "VonMises", System.StringComparison.OrdinalIgnoreCase))
+            elevation = CircularDirectionDistribution.Sample(muElevation, kappaElevation);
+        else if (kappaElevation <= 0) elevation = Random.Range(-90f, 90f);
         else if (kappaElevation < 10000f)
             elevation = VanMisesDistribution.Generate(Mathf.Deg2Rad * muElevation, kappaElevation) * Mathf.Rad2Deg;
         return Quaternion.Euler(elevation, yaw.eulerAngles.y, 0f);

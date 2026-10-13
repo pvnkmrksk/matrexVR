@@ -35,6 +35,14 @@ namespace ConfigurationUI
                 var state=new Label(on?"ON":"OFF"); state.AddToClassList("flag-state"); button.Add(state);
                 flags.Add(button);
             }
+            if(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true))
+            {
+                var loopStart=new IntegerField("Repeat from block") {
+                    name="sequence-loop-start", value=(int?)Workspace.Sequence.Root["loopStartIndex"]+1??1,
+                    tooltip="1 repeats every block. 2 runs the first block once, then repeats from the second block. Requires listed order." };
+                loopStart.RegisterValueChangedCallback(evt=>StudioEdit(Workspace.Sequence,r=>r["loopStartIndex"]=Math.Max(0,evt.newValue-1)));
+                flags.Add(loopStart);
+            }
             return flags;
         }
         private TextField SessionField(VisualElement parent,string label,string name,string value,Action<string> change,string placeholder,bool multiline=false)
@@ -92,8 +100,8 @@ namespace ConfigurationUI
             system.Add(new Label("System details  ›")); scroll.Add(system);
 
             string order=(ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])?"Random order":"Listed order")+
-                " · "+(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass");
-            var planHeading=SessionHeading("Coming up","sequence",BuilderSteps.Count+" blocks · "+SequenceDuration()+" per pass · "+order);
+                " · "+(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats from block "+((int?)Workspace.Sequence.Root["loopStartIndex"]+1??1):"One pass");
+            var planHeading=SessionHeading("Coming up","sequence",BuilderSteps.Count+" blocks · "+SequenceDuration()+" first pass · "+order);
             planHeading.Add(StudioButton("Edit sequence","settings",()=>Select(Workspace.Sequence),"quiet")); scroll.Add(planHeading);
             var summaryIndices=Enumerable.Range(0,BuilderSteps.Count).ToList();
             var plan=new ListView(summaryIndices,50,()=>new VisualElement(),BindSessionBlock)

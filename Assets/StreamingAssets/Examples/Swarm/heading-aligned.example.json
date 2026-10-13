@@ -20,20 +20,20 @@
     "closedLoopOrientation": true,
     "closedLoopPosition": false,
     "backgroundColor": {
-      "r": 1,
-      "g": 0.8,
-      "b": 0.8,
+      "r": 0.5,
+      "g": 0.5,
+      "b": 0.5,
       "a": 1.0
     },
     "skyboxPath": "",
     "windSpeed": 0,
     "windDirection": 0,
-    "aglHeight": 0,
+    "aglHeight": 100,
     "groundLayerMask": 1,
     "autopilotEnabled": true,
     "autopilotSpeed": 7,
     "nightSky": {
-      "enabled": false,
+      "enabled": true,
       "latitude": -35.894409,
       "longitude": 148.453948,
       "timeZoneId": "Australia/Sydney",
@@ -52,22 +52,12 @@
     },
     "resetPositionOnStart": true,
     "resetRotationOnStart": true,
-    "uniformSkyColor": {
-      "r": 1,
-      "g": 0.6,
-      "b": 0.6,
-      "a": 1
-    },
+    "uniformSkyColor": null,
     "swarm": null,
     "enabled": true,
     "durationSeconds": 10
   },
   "stimulus": {
-    "headingReference": {
-      "enabled": false,
-      "windowSeconds": 240,
-      "startOffsetSeconds": 0
-    },
     "objects": [],
     "initialPosition": {
       "x": 0,
@@ -91,6 +81,7 @@
     "skyboxPath": "",
     "windSpeed": 0,
     "windDirection": 0,
+    "aglHeight": 100,
     "groundLayerMask": 1,
     "autopilotEnabled": true,
     "autopilotSpeed": 7,
@@ -100,39 +91,38 @@
     "resetPositionOnStart": false,
     "resetRotationOnStart": false,
     "uniformSkyColor": {
-      "r": 1,
-      "g": 0.6,
-      "b": 0.6,
+      "r": 0.12,
+      "g": 0.12,
+      "b": 0.12,
       "a": 1
     },
     "swarm": {
       "useHeadingReference": true,
       "spawnRelativeToAnimal": true,
       "followAnimalPosition": true,
-      "numberOfLocusts": 100,
+      "numberOfLocusts": 64,
       "density": null,
-      "spawnAreaSize": 10,
-      "mu": -90,
-      "kappa": 1000,
+      "spawnAreaSize": 120,
+      "mu": 0,
+      "kappa": 10000,
       "locustSpeed": 7,
       "dimension": "3D",
       "spawnCenter": {
         "x": 0,
-        "y": 0,
+        "y": 50,
         "z": 0
       },
       "spawnVolumeSize": {
-        "x": 10,
-        "y": 10,
-        "z": 10
+        "x": 120,
+        "y": 40,
+        "z": 120
       },
       "muElevation": 0,
       "kappaElevation": 10000,
-      "boundaryHeight": 10,
+      "boundaryHeight": 40,
       "wrapY": true,
       "agentVisual": "Bogong",
       "bogongVisual": {
-        "shape": "Moth",
         "sizeMode": "Angular",
         "size": 0.5,
         "angularSizeDegrees": 2,
@@ -147,12 +137,11 @@
         "flickerFrequencyHz": 0,
         "flickerDutyCycle": 1
       },
-      "boundaryLengthX": 10,
-      "boundaryLengthZ": 10,
+      "boundaryLengthX": 120,
+      "boundaryLengthZ": 120,
       "animateOnMove": false,
       "animationSpeedThreshold": 0.5
     },
-    "aglHeight": 0,
     "enabled": true,
     "durationSeconds": 240
   },

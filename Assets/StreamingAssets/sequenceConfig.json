@@ -1,17 +1,48 @@
 {
-  "autoStart": true,
-  "loop": false,
+  "autoStart": false,
+  "loop": true,
   "randomise": false,
   "sequences": [
     {
-      "sceneName": "Swarm",
-      "duration": 1200,
+      "sceneName": "Choice_Selwyn",
+      "duration": 3,
+      "gain": 2.5,
+      "autoTrim": true,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Swarm/selwyn-cycle-01-setup.example.json"
+      }
+    },
+    {
+      "sceneName": "Choice_Selwyn",
+      "duration": 3,
+      "gain": 2.5,
+      "autoTrim": false,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Swarm/selwyn-cycle-02-milky-way.example.json"
+      }
+    },
+    {
+      "sceneName": "Choice_Selwyn",
+      "duration": 240,
       "gain": 1,
       "autoTrim": false,
-      "reloadScene": true,
+      "reloadScene": false,
       "parameters": {
-        "configFile": "Examples/Swarm/heading-aligned.example.json"
+        "configFile": "Examples/Swarm/selwyn-cycle-03-milky-way-swarm.example.json"
+      }
+    },
+    {
+      "sceneName": "Choice_Selwyn",
+      "duration": 240,
+      "gain": 1,
+      "autoTrim": false,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Swarm/selwyn-cycle-04-swarm-only.example.json"
       }
     }
-  ]
+  ],
+  "loopStartIndex": 1
 }

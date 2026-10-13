@@ -2,7 +2,9 @@
   "headingReference": {
     "enabled": false,
     "windowSeconds": 180,
-    "startOffsetSeconds": 0
+    "startOffsetSeconds": 0,
+    "measureDuringPresentation": false,
+    "saveAs": ""
   },
   "numberOfLocusts": 256,
   "density": null,
@@ -163,5 +165,10 @@
     "preRollSeconds": 0
   },
   "worldUnitsPerMetre": null,
-  "nearClipMetres": null
+  "nearClipMetres": null,
+  "locustSpeedStdDev": 0,
+  "volumeHalfExtentMetres": null,
+  "preserveBoundaryOvershoot": false,
+  "headingReferenceId": "",
+  "directionDistribution": "Legacy"
 }

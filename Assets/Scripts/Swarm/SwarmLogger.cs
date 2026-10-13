@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+[DefaultExecutionOrder(1100)]
 public class SwarmLogger : MonoBehaviour
 {
     public LayerMask locustLayerMask;
@@ -17,6 +18,8 @@ public class SwarmLogger : MonoBehaviour
     public long DroppedFrames => writer?.DroppedFrames ?? 0;
     public string Failure => writer?.Failure;
     public double CaptureMilliseconds { get; private set; }
+    public long WrittenRows => writer?.WrittenRows ?? 0;
+    public string LogPath { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void InstallShutdown() { Application.quitting -= AsyncSwarmWriter.DrainAll; Application.quitting += AsyncSwarmWriter.DrainAll; }
@@ -30,11 +33,13 @@ public class SwarmLogger : MonoBehaviour
         for (int i = 0; i < 32; i++) if ((locustLayerMask.value & (1 << i)) != 0) layerNames += LayerMask.LayerToName(i) + "_";
         string path = Path.Combine(master.directoryPath,
             $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_SimulatedLocustData_{layerNames.TrimEnd('_')}_{spawner.numberOfLocusts}_{spawner.spawnAreaSize}_{spawner.mu}_{spawner.kappa}_{spawner.locustSpeed}.csv.gz");
-        string header = FormattableString.Invariant($"Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase,NumberOfLocusts:{spawner.numberOfLocusts},SpawnAreaSize:{spawner.spawnAreaSize},Mu:{spawner.mu},Kappa:{spawner.kappa},LocustSpeed:{spawner.locustSpeed}");
+        LogPath = path;
+        string header = FormattableString.Invariant($"Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase,NumberOfLocusts:{spawner.numberOfLocusts},SpawnAreaSize:{spawner.spawnAreaSize},Mu:{spawner.mu},Kappa:{spawner.kappa},LocustSpeed:{spawner.locustSpeed},LocustSpeedStdDev:{spawner.locustSpeedStdDev},DirectionDistribution:{spawner.directionDistribution},KappaElevation:{spawner.kappaElevation}");
         writer = new AsyncSwarmWriter(path, header);
     }
 
-    private void LateUpdate()
+    private void LateUpdate() => CaptureFrame();
+    public void CaptureFrame()
     {
         if (writer == null || spawner == null || writer.Failure != null) return;
         long start = System.Diagnostics.Stopwatch.GetTimestamp();

@@ -218,21 +218,29 @@ Kannadi replicas use the tracked source's translation speed for animation. Wrapp
 | `density` | null | Optional agents per world-unit area (2D) or volume (3D). Used only when `numberOfLocusts` is omitted; count is rounded to the nearest whole agent. |
 | `spawnAreaSize` | Keep scene/current value (200) | Square spawn extent in world units. |
 | `mu` | Keep scene/current value (0) | Mean heading degrees; 0=+Z. |
-| `kappa` | Keep scene/current value (10000) | Von Mises concentration; >=10000 uses exactly mu, 0 is uniform. Template 100000. |
-| `locustSpeed` | Keep scene/current value (2) | cm/s; template 2. |
+| `kappa` | Keep scene/current value (10000) | Heading concentration, dimensionless. Legacy sampler uses exactly mu at >=10000. Corrected `VonMises` mode retains spread: 100 gives about 5.74° yaw SD. |
+| `directionDistribution` | `Legacy` | Historical sampler or normalized `VonMises`. New cycle uses VonMises: block 3 yaw/elevation kappa 1000/100 gives about 99.45% 3D order, block 4 100/100 about 99%. Omission preserves old motion. |
+| `useHeadingReference` | false | Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly. |
+| `headingReferenceId` | empty | Named per-rig mean from an earlier experiment's `headingReference.saveAs`, in this sequence cycle. Requires `useHeadingReference=true`; missing reference stops the run. Empty retains within-experiment reference. |
+| `locustSpeed` | Keep scene/current value (2) | Generated mean speed in world units/s: cm/s in walking scenes, m/s on terrain. Recorded CSV playback is unaffected. |
+| `locustSpeedStdDev` | 0 | Speed standard deviation in the same world units/s. Sampled once per generated agent from a normal distribution; negative samples are redrawn. Zero retains the exact legacy constant speed and random sequence. Bogong example: mean 6.17, SD 1.24 m/s. SD is not variance. |
+| `volumeHalfExtentMetres` | null | Generated cube's physical half extent, in metres. Overrides spawn dimensions and periodic boundary lengths with `2 × value × worldUnitsPerMetre`; in 2D only X/Z matter. Null retains legacy sizes. Example 2 gives a 4 m cube. Does not impose a hard radial visibility cutoff. |
+| `preserveBoundaryOvershoot` | false | Exact periodic wrapping, retaining excess distance across all enabled axes, even after a large frame step or observer teleport. Shared motion runs after observer/AGL movement and before rendering/logging. False retains historical edge snapping. |
 | `dimension` | `2D` | `2D` preserves the historical X/Z swarm. `3D` samples a volume and can wrap Y. |
 | `spawnCenter` | Spawner X/Z and legacy Y | Optional `{x,y,z}` center of the spawn volume. In 2D only X/Z are used. |
 | `spawnVolumeSize` | A square; 3D uses a cube | Positive `{x,y,z}` volume dimensions. Omit for `spawnAreaSize` in every dimension. |
 | `muElevation` | 0 | Unity X pitch in degrees: negative tilts upward, positive downward; ignored in 2D. |
-| `kappaElevation` | 10000 | 3D elevation concentration; 0 is uniform, >=10000 is fixed. |
+| `kappaElevation` | 10000 | 3D elevation concentration. Legacy: 0 is uniform, >=10000 fixed. VonMises: concentration uses the corrected circular sampler without that cutoff. |
 | `boundaryHeight` | 0 | 3D periodic Y extent. Required only when `wrapY` is true; otherwise Y is not wrapped. |
 | `wrapY` | false | Enable periodic Y wrapping for a 3D swarm. |
 | `agentVisual` | `ScenePrefab` | Existing prefab, or `Bogong` for an opaque, unlit circular patch. |
 | `bogongVisual` | World-size circle, 0.5 units, dark gray | `sizeMode` is `World` (diameter `size`) or `Angular` (diameter `angularSizeDegrees`, 0–180 exclusive). Both draw a camera-facing circular patch of solid `color` RGB; alpha, metallic and smoothness have no visual effect. No lighting, fog, shadows, textures or soft edges. `flickerFrequencyHz` 0 disables flicker; `flickerDutyCycle` is the visible fraction. |
 
-Bogong angular size is resolved separately for each rendering camera before culling, so an overhead view or another rig cannot change the panel stimulus size. Movement heading is unchanged by the camera-facing patch. For a 90° square perspective camera, center-screen diameter in pixels is `panelWidth × tan(angularSizeDegrees / 2)` (angle in degrees). A 2° dot is about **1.12 pixels across at 64×64**, or **2.23 pixels across at 128×128**; filled pixel area differs from diameter. The 64-pixel center has about 1.79° per pixel, with a finer angular pitch toward the edges. Filled-pixel counts depend on position and subpixel alignment; very small dots can fall between pixel centers. There is no minimum-pixel clamp or brightness blending. The active `system_config.json` currently requests 128×128 panels; changing the physical panel resolution requires matching that config.
+Bogong angular size is resolved separately for each rendering camera before culling, so an overhead view or another rig cannot change the panel stimulus size. Movement heading is unchanged by the camera-facing patch. For a 90° square perspective camera, center-screen diameter in pixels is `panelWidth × tan(angularSizeDegrees / 2)` (angle in degrees). A 2° dot is about **1.12 pixels across at 64×64**, or **2.23 pixels across at 128×128**; filled pixel area differs from diameter. The 64-pixel center has about 1.79° per pixel, with a finer angular pitch toward the edges. Filled-pixel counts depend on position and subpixel alignment; very small dots can fall between pixel centers. There is no minimum-pixel clamp or brightness blending. The local `system_config.json` currently requests 64×64 panels; changing the physical panel resolution requires matching that config.
 
 The historical 2D swarm keeps its scene-owned boundary manager and prefab assignments. A 3D swarm uses `boundaryLengthX`, `boundaryLengthZ`, and `boundaryHeight` from the individual file when `wrapY` is enabled. Kannadi's ring/prefab/watch fields do not configure Swarm geometry. Swarm parameters rebuild the population on each in-scene step. Density is count divided by spawn area squared in 2D, or by the volume in 3D. The active sequence files reference individual Swarm config files; older inline sequence fields remain accepted as a compatibility fallback.
+
+The physical generated moth recipe is `Examples/Swarm/generated-bogong-speed-distribution.example.json`. It uses `shape: "Moth"`, `sizeMode: "World"`, one coupled wing pair at 30 Hz and subpixel contrast fading. The existing `Dot` visual and angular mode remain available. See [generated Bogong swarm](generated-bogong-swarm.md) for the native contrast test, moving volume, logging and default density.
 
 ## Optomotor
 
@@ -320,6 +328,19 @@ Older files in `StreamingAssets/Archive/Legacy` and `Assets/StreamingAssets/Arch
 
 ## Heading-relative presentations, telemetry and status
 
-Experiment files can contain `preStimulus`, `stimulus` and `postStimulus`, each using its scene schema plus `enabled` and `durationSeconds`. Flat files remain compatible. Heading reference is measured during visible pre-stimulus conditions, with an optional start offset; spawners opt into it separately with `useHeadingReference` (default false). Position and rotation resets are independently configurable, both default true. Choice also accepts an embedded `swarm` and `uniformSkyColor`. See [experiment phases](experiment-phases.md) for timing, schema, supported controllers and the active eight-minute Selwyn example, and [telemetry](heading-reference-telemetry.md) for wire fields.
+Experiment files can contain `preStimulus`, `stimulus` and `postStimulus`, each using its scene schema plus `enabled` and `durationSeconds`. Flat files remain compatible. Heading reference is measured during visible pre-stimulus conditions, with an optional start offset; spawners opt into it separately with `useHeadingReference` (default false). Position and rotation resets are independently configurable, both default true. Choice also accepts an embedded `swarm` and `uniformSkyColor`. See [experiment phases](experiment-phases.md) for timing, schema, supported controllers and separate phased Selwyn examples, and [telemetry](heading-reference-telemetry.md) for wire fields.
 
 System config accepts `telemetry` (defaults: enabled, loopback port 9880, 20 Hz, topic `matrex.telemetry.v1`) and `statusOverlay` (visible on display 0). The same reference documents every field. **Tab** restores the bottom-right panel; errors reopen it automatically.
+
+
+The [Selwyn four-block cycle](selwyn-milky-way-swarm-cycle.md) uses separate flat experiment files. Heading measurement controls are experiment-level:
+
+| `headingReference` field | Default | Meaning |
+|---|---|---|
+| `enabled` | false | Enable per-rig virtual-yaw circular observation. |
+| `windowSeconds` | 180 | Positive finite observation window, seconds. |
+| `startOffsetSeconds` | 0 | Nonnegative finite delay after configuration, seconds. |
+| `measureDuringPresentation` | false | Flat Choice: true shares the sequence timer; the step still waits for the observation's final sample. False keeps the legacy extra assessment period before presentation. Phased timing is owned by the phase runner. |
+| `saveAs` | empty | Optional name for the completed per-rig mean. Reused by later `swarm.headingReferenceId`; cleared at run start/stop and every loop. Does not automatically rotate stimuli. |
+
+Sequence `loopStartIndex` defaults to 0 (repeat all rows). A positive zero-based index runs preceding rows once and repeats from that row; it requires fixed order and an existing row. The current cycle uses 1, keeping the 360-second trimming setup one-time while repeating the three 240-second conditions. The original ControlScene form remains; edit this index in the sequence JSON before starting.
