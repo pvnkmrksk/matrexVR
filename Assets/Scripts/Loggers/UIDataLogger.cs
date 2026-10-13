@@ -5,13 +5,16 @@ using System.IO;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 
 public class FlyData
 {
+    public string ExperimentName { get; set; }
     public string ExperimenterName { get; set; }
     public List<Fly> Flies { get; set; }
     public string Comments { get; set; }
     public List<string> UsedFlyIDs { get; set; } = new List<string>();  // Stores all used IDs
+    [JsonExtensionData] public IDictionary<string,JToken> Extensions { get; set; }
 }
 
 public class Fly
@@ -21,6 +24,8 @@ public class Fly
     public string StarvedSinceHours { get; set; }
     public string Sex { get; set; }
     public string FlyID { get; set; }
+    public string Comments { get; set; }
+    [JsonExtensionData] public IDictionary<string,JToken> Extensions { get; set; }
 }
 
 
@@ -82,6 +87,8 @@ public class UIDataLogger : MonoBehaviour
     {
         FlyData flyData = new FlyData
         {
+            ExperimentName = FliesData?.ExperimentName,
+            Extensions = FliesData?.Extensions,
             ExperimenterName = experimenterNameInput.text,
             Comments = commentsInput.text,
             Flies = new List<Fly>(),
@@ -90,8 +97,11 @@ public class UIDataLogger : MonoBehaviour
 
         for (int i = 0; i < flyIDInputs.Count; i++)
         {
+            var previous = FliesData?.Flies?.FirstOrDefault(f => f.VR == "VR" + (i + 1));
             Fly newFly = new Fly
             {
+                Comments = previous?.Comments,
+                Extensions = previous?.Extensions,
                 VR = "VR" + (i + 1),
                 AgeDays = ageInputs[i].text,
                 StarvedSinceHours = starvedSinceInputs[i].text,

@@ -2,19 +2,39 @@
   "date": "2026-10-13",
   "branch": "codex/config-ui-test",
   "unity": "6000.3.16f1",
-  "checks": 5310,
+  "checks": 5334,
   "failure": null,
   "errors": [],
   "timingsMs": {
-    "mount10000BlockCardsMs": 448.0749
+    "mount10000BlockCardsMs": 420.6771
   },
   "studioChecks": [
-    "Sequence builder is the default workspace",
+    "Simple session setup is the default screen",
+    "Landing screen displays all four configured VR subjects",
+    "New subject sex and age default to unspecified",
+    "Displaying session overview leaves sequence JSON untouched",
+    "Icon button writes autoStart and visibly lights ON",
+    "Icon button writes loop and visibly lights ON",
+    "Icon button writes randomise and visibly lights ON",
+    "Flag toggles preserve in-progress subject labels",
+    "Flight dashboard is suspended during setup even when configured visible",
+    "Tab during setup keeps the dashboard suspended and preserves runtime visibility preference",
+    "Subject cards use the full landing-screen width without a sidebar",
+    "Experiment configs screen lists only configs referenced by this sequence",
+    "Back to session retains session and per-VR comments",
+    "System navigation retains flexible text subject IDs",
+    "System summary reports actual runtime telemetry defaults and panels per VR",
+    "Saving setup draft never rewrites a completed run's metadata",
+    "Session save includes every VR and preserves metadata extensions",
+    "Text IDs, per-VR comments and unspecified sex round-trip to run metadata",
+    "Sequence editor retains all three direct icon buttons",
     "Rendering builder controls never inserts or rounds values",
     "Library selection shows config effects and timing before insertion",
     "Actual library Add button inserts a referenced complete config",
     "Newly referenced experiment appears in navigation immediately",
     "Custom absolute paths load and insert through the real library UI",
+    "Three-block run summary fits above the footer with four VR cards",
+    "Landing screen reflects sequence changes made in detailed config",
     "Native vector icons render throughout builder",
     "Native ListView reorder controller exposes Move",
     "Native drag reorder event updates JSON while preserving full blocks",
@@ -37,10 +57,14 @@
     "Raw JSON Apply remains interoperable with builder",
     "Refined builder starts the production runner",
     "Refined UI and its modal/schedulers are absent during experiment",
-    "Experiment completion recreates the builder",
+    "Actual Input System Tab press closes flight dashboard during a run",
+    "Experiment completion returns to simple session setup",
+    "Run completion reloads saved session labels",
     "Refined builder starts the production runner",
     "Refined UI and its modal/schedulers are absent during experiment",
-    "Experiment completion recreates the builder",
+    "Actual Input System Tab press closes flight dashboard during a run",
+    "Experiment completion returns to simple session setup",
+    "Run completion reloads saved session labels",
     "No UI or experiment runtime errors"
   ],
   "fullFieldRegression": {
@@ -48,9 +72,9 @@
     "failure": null,
     "errors": [],
     "timingsMs": {
-      "mount10000RowsMs": 247.4439,
-      "parse10000StepsMs": 223.3283,
-      "validate10000StepsMs": 91.4991
+      "mount10000RowsMs": 236.3631,
+      "parse10000StepsMs": 226.78670000000002,
+      "validate10000StepsMs": 94.6924
     }
   },
   "pythonChecks": {
@@ -60,7 +84,7 @@
     "archiveAuditUnitTests": 4,
     "result": "PASS"
   },
-  "coverage": "All original template/example scalar leaves and lossless JSON checks, actual library/custom-path insertion, native drag events, duplicate/remove/replace/variation/undo, exact entry/sliders, state switches, conditional pose/vSync, absent phases, 10,000 cards and two run lifecycles.",
+  "coverage": "All original template/example scalar leaves and lossless JSON checks, simple session form/defaults, three actual icon toggles, navigation persistence, flexible text IDs, per-VR/session notes, metadata extension retention, dashboard suspension, actual Input System Tab presses, library/custom paths, native drag events, variation/undo, numeric controls, conditional settings, 10,000 cards and two run lifecycles. Setup saves also preserve completed-run metadata.",
   "previewFixtures": "Synthetic three-block sequence using experiment, heading-aligned swarm and custom absolute-path yaw config.",
   "limitations": [
     "No physical tracking/display calibration or packaged release was tested.",

@@ -14,6 +14,8 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using Object=UnityEngine.Object;
 
 [InitializeOnLoad]
@@ -27,6 +29,7 @@ public static class ConfigurationStudioValidation
     private static double deadline;
     private static RenderTexture target;
     private static List<ExperimentPreset> library;
+    private static UnityEngine.InputSystem.Keyboard testKeyboard;
     private static void Check(bool value,string label) { if(!value) throw new Exception(label); checks.Add(label); }
     private static void Call(ConfigWorkbench ui,string name,params object[] args) => typeof(ConfigWorkbench).GetMethod(name,Private).Invoke(ui,args);
     private static void Put(ConfigWorkbench ui,string key,object value) => typeof(ConfigWorkbench).GetField(key,Private).SetValue(ui,value);
@@ -65,6 +68,8 @@ public static class ConfigurationStudioValidation
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath,"system_config.json"),system.ToString());
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath,"ui-smoke.json"),"{\"objects\":[],\"closedLoopOrientation\":false,\"closedLoopPosition\":false}");
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath,"sequenceConfig.json"),"{\"autoStart\":false,\"loop\":false,\"randomise\":false,\"sequences\":[{\"sceneName\":\"Choice\",\"duration\":0.4,\"gain\":1,\"parameters\":{\"configFile\":\"ui-smoke.json\"}}]}");
+        string backup=Path.Combine(Application.dataPath,"RunData/Backup"); Directory.CreateDirectory(backup);
+        File.WriteAllText(Path.Combine(backup,"FlyMetaData.json"),"{\"customSession\":\"preserve me\",\"Flies\":[{\"VR\":\"VR1\",\"customSubject\":\"keep this too\"}]}");
         SessionState.SetBool(Key,true); EditorSceneManager.OpenScene("Assets/Scenes/ControlScene.unity"); EditorApplication.isPlaying=true;
     }
     private static void Later(int next,int delay=8) { stage=next; frame=Time.frameCount+delay; }
@@ -81,7 +86,62 @@ public static class ConfigurationStudioValidation
             var ui=ConfigWorkbench.Instance;
             if(stage==0)
             {
-                Check(ui!=null && ui.Document.rootVisualElement.Q<ListView>(className:"block-list")!=null,"Sequence builder is the default workspace");
+                Check(ui!=null && ui.Document.rootVisualElement.Q<ListView>("session-plan")!=null,"Simple session setup is the default screen");
+                // Batchmode has no focused Game View. Route synthetic devices to the
+                // player exactly as a focused release window would, in memory only.
+                InputSystem.settings=Object.Instantiate(InputSystem.settings);
+                InputSystem.settings.editorInputBehaviorInPlayMode=InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+                InputSystem.settings.backgroundBehavior=InputSettings.BackgroundBehavior.IgnoreFocus;
+                var root=ui.Document.rootVisualElement;
+                Check(root.Query<VisualElement>(className:"subject-card").ToList().Count==4,"Landing screen displays all four configured VR subjects");
+                Check(root.Query<DropdownField>().ToList().All(d=>d.value=="Unspecified") && root.Q<TextField>("subject-age-VR1").value=="","New subject sex and age default to unspecified");
+                string beforeHome=ui.Workspace.Sequence.Root.ToString(Formatting.None); Call(ui,"BuildContent");
+                Check(ui.Workspace.Sequence.Root.ToString(Formatting.None)==beforeHome,"Displaying session overview leaves sequence JSON untouched");
+                root.Q<TextField>("session-experiment-name").value="Flight response / pilot";
+                root.Q<TextField>("session-experimenter").value="Dr Example";
+                root.Q<TextField>("session-comments").value="Session notes";
+                root.Q<TextField>("subject-id-VR1").value="Subject A / β 001";
+                root.Q<TextField>("subject-comments-VR1").value="Per-VR notes";
+                foreach(string flag in new[]{"autoStart","loop","randomise"})
+                {
+                    Submit(root.Q<Button>("sequence-"+flag));
+                    Check(ui.Workspace.Sequence.Root[flag].Value<bool>() && root.Q<Button>("sequence-"+flag).ClassListContains("is-on"),"Icon button writes "+flag+" and visibly lights ON");
+                    ui.Workspace.Sequence.Undo(); Call(ui,"BuildContent");
+                }
+                Check(root.Q<TextField>("subject-id-VR1").value=="Subject A / β 001","Flag toggles preserve in-progress subject labels");
+                var overlay=Object.FindFirstObjectByType<RuntimeStatusOverlay>(); overlay.SetVisible(true);
+                Check(!overlay.ShouldDisplay && !overlay.transform.Find("Status canvas/Status panel").gameObject.activeSelf,"Flight dashboard is suspended during setup even when configured visible");
+                testKeyboard=InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>();
+                InputSystem.QueueStateEvent(testKeyboard,new KeyboardState(UnityEngine.InputSystem.Key.Tab));
+                Render(ui); Later(100);
+            }
+            else if(stage==100)
+            {
+                Capture("config-ui-session.png");
+                var root=ui.Document.rootVisualElement;
+                var overlay=Object.FindFirstObjectByType<RuntimeStatusOverlay>();
+                Check(!overlay.ShouldDisplay && overlay.Visible,"Tab during setup keeps the dashboard suspended and preserves runtime visibility preference");
+                InputSystem.QueueStateEvent(testKeyboard,new KeyboardState());
+                Check(root.Q<TextField>("subject-id-VR4").worldBound.xMax<=1440 && root.Q<VisualElement>(className:"session-body").resolvedStyle.width>1250,"Subject cards use the full landing-screen width without a sidebar");
+                Submit(root.Q<Button>("open-experiments"));
+                Check(root.Query<Button>(className:"experiment-link").ToList().Count==1,"Experiment configs screen lists only configs referenced by this sequence");
+                Submit(root.Q<Button>("back-to-session"));
+                Check(root.Q<TextField>("session-experiment-name").value=="Flight response / pilot" && root.Q<TextField>("subject-comments-VR1").value=="Per-VR notes","Back to session retains session and per-VR comments");
+                Submit(root.Q<Button>("open-system")); Submit(root.Q<Button>("back-to-session"));
+                Check(root.Q<TextField>("subject-id-VR1").value=="Subject A / β 001","System navigation retains flexible text subject IDs");
+                ui.Workspace.System.Edit(r=>((JObject)r).Remove("telemetry"));
+                string headline=(string)typeof(ConfigWorkbench).GetMethod("SystemHeadline",Private).Invoke(ui,null);
+                Check(headline.Contains("Telemetry → 127.0.0.1:9880") && headline.Contains("6 panels per VR"),"System summary reports actual runtime telemetry defaults and panels per VR");
+                ui.Workspace.System.Undo();
+                string previousRunMetadata=Path.Combine(MasterDataLogger.Instance.directoryPath,"FlyMetaData.json");
+                File.WriteAllText(previousRunMetadata,"{\"completedRun\":\"keep this original metadata\"}");
+                Call(ui,"SaveMetadata");
+                Check(File.ReadAllText(previousRunMetadata)=="{\"completedRun\":\"keep this original metadata\"}","Saving setup draft never rewrites a completed run's metadata");
+                var saved=JObject.Parse(File.ReadAllText(Path.Combine(Application.dataPath,"RunData/Backup/FlyMetaData.json")));
+                Check((string)saved["ExperimentName"]=="Flight response / pilot" && (string)saved["customSession"]=="preserve me" && (string)saved["Flies"][0]["customSubject"]=="keep this too" && saved["Flies"].Count()==4,"Session save includes every VR and preserves metadata extensions");
+                Check((string)saved["Flies"][0]["FlyID"]=="Subject A / β 001" && (string)saved["Flies"][0]["Comments"]=="Per-VR notes" && (string)saved["Flies"][1]["Sex"]=="Unspecified","Text IDs, per-VR comments and unspecified sex round-trip to run metadata");
+                Submit(root.Q<Button>("open-sequence"));
+                Check(root.Q<ListView>(className:"block-list")!=null && root.Query<Button>(className:"sequence-flag").ToList().Count==3,"Sequence editor retains all three direct icon buttons");
                 library=ExperimentBlocks.Catalog(Application.streamingAssetsPath);
                 string before=ui.Workspace.Sequence.Root.ToString(Formatting.None); Call(ui,"BuildContent"); Check(ui.Workspace.Sequence.Root.ToString(Formatting.None)==before,"Rendering builder controls never inserts or rounds values");
                 // Add blocks through the same GUI library button and selection event the experimenter uses.
@@ -103,6 +163,15 @@ public static class ConfigurationStudioValidation
             else if(stage==1)
             {
                 Capture("config-ui-studio-sequence.png");
+                ui.Workspace.Sequence.Edit(r=>r["randomise"]=true);
+                Call(ui,"ShowSessionHome"); Render(ui); Later(101);
+            }
+            else if(stage==101)
+            {
+                Capture("config-ui-session.png");
+                Check(ui.Document.rootVisualElement.Q<ListView>("session-plan").worldBound.yMax<834,"Three-block run summary fits above the footer with four VR cards");
+                Check(ui.Document.rootVisualElement.Q<Button>("sequence-randomise").ClassListContains("is-on"),"Landing screen reflects sequence changes made in detailed config");
+                ui.Workspace.Sequence.Undo(); Call(ui,"Select",ui.Workspace.Sequence);
                 Check(ui.Document.rootVisualElement.Query<WorkbenchIcon>().ToList().Count>8,"Native vector icons render throughout builder");
                 var steps=(JArray)ui.Workspace.Sequence.Root["sequences"]; steps[0]["extension"]=new JRaw("1.2345678901234567890123456789");
                 string original=steps[0].ToString(Formatting.None);
@@ -181,10 +250,20 @@ public static class ConfigurationStudioValidation
             {
                 Check(MainController.Instance.SequenceRunning,"Refined builder starts the production runner");
                 Check(ui==null && Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None).Length==0,"Refined UI and its modal/schedulers are absent during experiment"); Later(6,5);
+                var overlay=Object.FindFirstObjectByType<RuntimeStatusOverlay>(); overlay.SetVisible(true);
+                InputSystem.QueueStateEvent(testKeyboard,new KeyboardState(UnityEngine.InputSystem.Key.Tab)); Later(51,2);
+            }
+            else if(stage==51)
+            {
+                var overlay=Object.FindFirstObjectByType<RuntimeStatusOverlay>();
+                Check(!overlay.Visible && !overlay.ShouldDisplay,"Actual Input System Tab press closes flight dashboard during a run"+
+                    (overlay.Visible?" [running="+MainController.Instance.SequenceRunning+", setup="+ConfigWorkbench.IsOpen+", current="+(UnityEngine.InputSystem.Keyboard.current==testKeyboard)+", enabled="+testKeyboard.enabled+", held="+testKeyboard.tabKey.isPressed+", pressed="+testKeyboard.tabKey.wasPressedThisFrame+", focused="+Application.isFocused+", mode="+InputSystem.settings.updateMode+"]":""));
+                InputSystem.QueueStateEvent(testKeyboard,new KeyboardState()); Later(6,3);
             }
             else if(stage==6 && ui!=null)
             {
-                Check(SceneManager.GetActiveScene().name=="ControlScene" && !MainController.Instance.SequenceRunning,"Experiment completion recreates the builder");
+                Check(SceneManager.GetActiveScene().name=="ControlScene" && !MainController.Instance.SequenceRunning && ui.Document.rootVisualElement.Q<ListView>("session-plan")!=null,"Experiment completion returns to simple session setup");
+                Check(ui.Document.rootVisualElement.Q<TextField>("subject-id-VR1").value=="Subject A / β 001","Run completion reloads saved session labels");
                 if(runs++==0) { ui.StartExperiment(); Later(5,2); } else { Check(errors.Count==0,"No UI or experiment runtime errors"); Finish(null); }
             }
         }

@@ -1,6 +1,52 @@
 .workbench { position: absolute; left: 0; right: 0; top: 0; bottom: 0; background-color: rgb(13, 19, 29); color: rgb(221, 230, 241); font-size: 13px; }
 .header { height: 64px; padding-left: 26px; padding-right: 26px; flex-direction: row; align-items: center; justify-content: space-between; background-color: rgb(20, 29, 42); border-bottom-width: 1px; border-bottom-color: rgb(42, 58, 77); }
 .brand { font-size: 18px; -unity-font-style: bold; letter-spacing: 1px; }
+.config-nav { flex-grow: 1; justify-content: flex-end; margin-right: 18px; }
+.config-nav Button { border-color: rgba(0,0,0,0); background-color: rgba(0,0,0,0); margin-left: 9px; font-size: 12px; }
+.config-nav Button:hover { background-color: rgb(33, 50, 65); }
+.session-body { padding: 28px 38px 20px; }
+.session-scroll { flex-grow: 1; }
+.session-scroll > .unity-scroll-view__content-and-vertical-scroll-container > .unity-scroll-view__content-container { padding-right: 10px; }
+.session-welcome { align-items: flex-start; margin-bottom: 21px; }
+.session-hint { color: rgb(144, 163, 184); font-size: 11px; white-space: normal; }
+.sequence-flags { flex-shrink: 0; margin-bottom: 8px; }
+.sequence-flag { height: 46px; padding: 8px 12px; background-color: rgb(25, 34, 48); color: rgb(147, 166, 187); border-color: rgb(43, 58, 78); border-radius: 12px; }
+.sequence-flag.is-on { color: rgb(153, 245, 216); background-color: rgb(25, 59, 52); border-color: rgb(63, 166, 140); }
+.flag-state { font-size: 9px; -unity-font-style: bold; margin-left: 11px; color: rgb(117, 138, 162); padding: 4px 7px; background-color: rgb(17, 26, 38); border-radius: 5px; }
+.is-on .flag-state { color: rgb(105, 237, 185); background-color: rgb(13, 44, 34); }
+.session-details { align-items: flex-start; margin-bottom: 16px; padding: 15px 18px; background-color: rgb(20, 30, 44); border-radius: 12px; }
+.session-field { flex-grow: 1; flex-basis: 0; margin: 0 12px 10px 0; }
+.session-field > .unity-base-field__label, .subject-traits > .unity-base-field > .unity-base-field__label { min-width: 0; color: rgb(150, 173, 194); font-size: 11px; margin-bottom: 7px; }
+.session-field, .subject-traits > .unity-base-field { flex-direction: column; align-items: stretch; }
+.session-field .unity-text-field__input, .subject-traits .unity-base-popup-field__input { min-height: 36px; padding: 8px 10px; border-radius: 7px; background-color: rgb(12, 21, 33); border-width: 1px; border-color: rgb(43, 62, 83); color: rgb(224, 233, 243); }
+.session-field .unity-text-field__input:focus { border-color: rgb(87, 197, 174); }
+.session-details > .session-comments { flex-grow: 1.6; }
+.session-comments .unity-text-field__input { min-height: 54px; white-space: normal; }
+.session-section-heading { margin: 10px 0 12px; }
+.session-section-title { -unity-font-style: bold; font-size: 16px; margin-right: 16px; }
+.session-section-heading > .session-hint { flex-grow: 1; }
+.subject-grid { flex-wrap: wrap; align-items: flex-start; margin-right: -12px; }
+.subject-card { flex-grow: 1; flex-basis: 22%; min-width: 230px; margin: 0 12px 15px 0; padding: 16px; background-color: rgb(20, 30, 44); border-color: rgb(43, 61, 80); border-width: 1px; border-radius: 12px; }
+.subject-heading { margin-bottom: 13px; }
+.subject-heading .studio-icon { color: rgb(91, 203, 174); }
+.subject-name { -unity-font-style: bold; font-size: 18px; flex-grow: 1; }
+.subject-card > .session-field { flex-basis: auto; margin-right: 0; }
+.subject-traits { align-items: flex-start; }
+.subject-traits > .unity-base-field { flex-grow: 1; flex-basis: 0; min-width: 0; margin: 0 10px 12px 0; }
+.subject-traits > .session-field { margin-right: 0; }
+.subject-card > Foldout { margin: 3px 0 0; font-size: 10px; color: rgb(143, 165, 187); }
+.subject-card > Foldout > .unity-foldout__toggle { font-size: 10px; }
+.session-system { height: auto; min-height: 77px; padding: 13px 17px; margin: 0 0 12px; background-color: rgb(20, 37, 45); border-color: rgb(37, 72, 77); border-radius: 10px; justify-content: flex-start; }
+.session-system > #session-system-headline { flex-grow: 1; font-size: 11px; white-space: normal; color: rgb(169, 201, 208); margin: 0 16px; }
+.session-system > .studio-icon { color: rgb(92, 209, 181); }
+.session-system > Label { font-size: 11px; color: rgb(108, 223, 191); }
+.session-plan { flex-shrink: 0; margin: 0 0 9px; }
+.session-plan-holder { height: 65px; padding-bottom: 7px; }
+.session-plan-row { height: 58px; padding: 9px 14px; background-color: rgb(21, 31, 46); border-radius: 8px; }
+.session-plan-title { font-size: 12px; -unity-font-style: bold; white-space: nowrap; overflow: hidden; }
+.session-plan-description { font-size: 10px; color: rgb(134, 162, 185); margin-top: 4px; white-space: nowrap; overflow: hidden; }
+.experiment-link { min-height: 82px; height: auto; padding: 15px 20px; justify-content: flex-start; margin: 0 0 12px; }
+.experiment-link > .studio-icon { margin-right: 16px; color: rgb(89, 210, 179); }
 .badge { color: rgb(98, 228, 191); font-size: 11px; padding: 8px 13px; background-color: rgb(24, 52, 48); border-radius: 18px; }
 .main { flex-grow: 1; flex-direction: row; }
 .sidebar { width: 214px; padding: 16px 13px; background-color: rgb(17, 25, 37); border-right-width: 1px; border-right-color: rgb(40, 54, 73); }
@@ -158,3 +204,40 @@ Button.mini { padding: 3px 6px; height: 29px; font-size: 11px; }
 .inspector .unity-base-field { flex-direction: column; align-items: stretch; }
 .inspector .unity-base-field__label { min-width: 0; margin-bottom: 6px; }
 .studio-dialog > .row .unity-base-field__label { min-width: 65px; }
+
+/* The session form is intentionally compact: subjects, system and plan share one screen. */
+.body.session-body { padding: 20px 26px 12px; }
+.session-welcome { margin-bottom: 12px; }
+.session-welcome .title { font-size: 26px; margin-bottom: 4px; }
+.session-details { padding: 11px 15px 8px; margin-bottom: 6px; }
+.session-field { flex-grow: 0; margin-bottom: 7px; min-width: 0; }
+.session-details > .session-field { flex-grow: 1; }
+.session-details > .session-comments { flex-grow: 1.6; }
+.session-field > .unity-base-field__label, .subject-traits > .unity-base-field > .unity-base-field__label { margin-bottom: 4px; }
+.session-field .unity-text-field__input, .subject-traits .unity-base-popup-field__input { min-height: 32px; padding: 6px 9px; }
+.session-comments .unity-text-field__input { min-height: 42px; }
+.session-section-heading { min-height: 30px; margin: 7px 0 8px; }
+.subject-card { padding: 12px 14px; margin-bottom: 10px; }
+.subject-heading { min-height: 28px; margin-bottom: 6px; }
+.subject-traits { min-height: 0; }
+.subject-traits > .unity-base-field { margin-bottom: 8px; }
+.subject-traits > DropdownField { flex-grow: 1.35; }
+.subject-card > Foldout { margin-top: 0; }
+.subject-card > Foldout > .unity-foldout__toggle { min-height: 24px; height: 24px; }
+.session-system { min-height: 66px; padding: 9px 14px; margin-bottom: 7px; }
+.session-plan-holder { height: 50px; padding-bottom: 5px; }
+.session-plan-row { height: 45px; padding: 4px 12px; }
+.session-plan .block-number { font-size: 16px; }
+.session-plan-description { margin-top: 2px; }
+.session-plan .pill { padding: 4px 7px; }
+.session-body .session-details { min-height: 76px; height: 76px; }
+.subject-card { padding: 10px 13px; }
+.subject-card .subject-heading { min-height: 26px; height: 26px; margin-bottom: 7px; }
+.subject-card > .session-field { flex-grow: 0; height: 55px; padding: 0; margin: 0 0 5px; }
+.subject-card > .session-comments { height: 64px; margin-bottom: 0; }
+.subject-card .subject-traits { height: 48px; min-height: 48px; margin: 0 0 8px; }
+.subject-card .subject-traits > .unity-base-field { margin-bottom: 0; }
+.subject-card .unity-base-field__label { height: 15px; min-height: 15px; }
+.session-body .session-section-heading { margin-top: 5px; margin-bottom: 5px; }
+.session-body .unity-base-text-field__input--placeholder { color: rgb(116, 141, 163); }
+.session-system > #session-system-headline { -unity-text-align: middle-left; }

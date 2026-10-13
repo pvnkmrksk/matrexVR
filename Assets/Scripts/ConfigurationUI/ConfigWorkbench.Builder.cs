@@ -41,12 +41,12 @@ namespace ConfigurationUI
         {
             side.Clear(); side.AddToClassList("studio-sidebar");
             side.Add(new Label("WORKSPACE") { name="navigation-title" });
-            side.Add(StudioButton("Sequence","sequence",()=>Select(Workspace.Sequence),selected==Workspace.Sequence?"nav-active":null));
-            side.Add(StudioButton("System & rigs","system",()=>Select(Workspace.System),selected==Workspace.System?"nav-active":null));
-            side.Add(StudioButton("Session details","file",()=>{ RequireApplied(); metadataMode=true; BuildContent(); }));
+            side.Add(StudioButton("Sequence config","sequence",()=>Select(Workspace.Sequence),selected==Workspace.Sequence?"nav-active":null));
+            side.Add(StudioButton("System config","system",()=>Select(Workspace.System),selected==Workspace.System?"nav-active":null));
+            side.Add(StudioButton("Session","home",ShowSessionHome));
             side.Add(new Label("EXPERIMENT CONFIGS"));
             var linked=new HashSet<string>(BuilderSteps.OfType<JObject>().Select(BlockReference).Where(r=>!string.IsNullOrEmpty(r)).Select(r=>Path.GetFullPath(ExperimentConfigFiles.Resolve(r))));
-            foreach(var doc in Workspace.Documents.Where(d=>d.SchemaId!="sequence" && d.SchemaId!="system" && (linked.Contains(d.Path) || d==selected)))
+            foreach(var doc in Workspace.Documents.Where(d=>d.SchemaId!="sequence" && d.SchemaId!="system" && linked.Contains(d.Path)))
             {
                 var b=StudioButton(ExperimentBlocks.Title(doc.Path)+(doc.Dirty?" •":""),doc.SchemaId=="swarm"?"swarm":doc.SchemaId=="optomotor"?"settings":"file",()=>Select(doc),selected==doc?"nav-active":null);
                 b.tooltip=doc.Path; side.Add(b);
@@ -63,10 +63,9 @@ namespace ConfigurationUI
             body.AddToClassList("studio-body"); inspector.AddToClassList("studio-inspector");
             var top=Row("studio-title-row"); body.Add(top);
             var titles=new VisualElement(); titles.style.flexGrow=1; top.Add(titles);
-            var title=new Label(selected==Workspace.Sequence?"Build your experiment":selected==Workspace.System?"System & VR rigs":ExperimentBlocks.Title(selected.Path)); title.AddToClassList("title"); titles.Add(title);
+            var title=new Label(selected==Workspace.Sequence?"Sequence config":selected==Workspace.System?"System config":ExperimentBlocks.Title(selected.Path)); title.AddToClassList("title"); titles.Add(title);
             var subtitle=new Label(selected==Workspace.Sequence?"Combine reusable configs. Drag to reorder. Open a block to edit its stimulus.":Path.GetRelativePath(Application.streamingAssetsPath,selected.Path).Replace('\\','/')); subtitle.AddToClassList("studio-subtitle"); titles.Add(subtitle);
-            top.Add(StudioButton("All fields","settings",()=>{ advancedMode=true; BuildContent(); },"quiet"));
-            top.Add(Button("JSON",()=>{ jsonMode=true; BuildContent(); },"quiet"));
+            top.Add(StudioButton("More","settings",ShowEditorTools,"quiet"));
             if(selected==Workspace.Sequence) BuildSequenceBuilder();
             else if(selected==Workspace.System) BuildSystemEditor();
             else BuildExperimentEditor();
@@ -87,13 +86,7 @@ namespace ConfigurationUI
             stats.Add(Pill(SequenceDuration()+" total"));
             stats.Add(Pill(ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])?"Shuffled order":"Listed order"));
             stats.Add(Pill(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass"));
-            var options=new Foldout { text="Run options",value=false }; options.AddToClassList("run-options"); body.Add(options);
-            var optionRow=Row(); options.Add(optionRow);
-            foreach(string key in new[]{"randomise","loop","autoStart"})
-            {
-                string flag=key; var box=Row("run-option"); optionRow.Add(box); box.Add(new Label(Pretty(key)));
-                box.Add(StateSwitch(ExperimentBlocks.Flag(Workspace.Sequence.Root[key],key=="loop"),v=>StudioEdit(Workspace.Sequence,_=>Workspace.Sequence.Root[flag]=v),key));
-            }
+            body.Add(BuildSequenceFlags());
             blockIndices.Clear(); blockIndices.AddRange(Enumerable.Range(0,BuilderSteps.Count));
             blockList=new ListView(blockIndices,156,()=>new VisualElement(),BindBlockCard) { selectionType=SelectionType.Single,reorderable=true,reorderMode=ListViewReorderMode.Animated,virtualizationMethod=CollectionVirtualizationMethod.FixedHeight };
             blockList.AddToClassList("block-list"); body.Add(blockList);

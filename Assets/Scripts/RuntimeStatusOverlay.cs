@@ -35,7 +35,9 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private bool visible = true;
     private bool operatorVisibility;
     private ExperimentTelemetry telemetry;
+    private UnityEngine.InputSystem.InputAction dashboardToggle;
     public bool Visible => visible;
+    public bool ShouldDisplay => visible && !ConfigurationUI.ConfigWorkbench.IsOpen;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetErrors()
@@ -59,6 +61,26 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         instance = this;
         Application.logMessageReceivedThreaded += CaptureError;
         MainController.SystemConfigurationChanged += Configure;
+    }
+
+    private void OnEnable()
+    {
+        if (instance != this) return;
+        if (dashboardToggle == null)
+        {
+            dashboardToggle = new UnityEngine.InputSystem.InputAction("Toggle flight dashboard", UnityEngine.InputSystem.InputActionType.Button, "<Keyboard>/tab");
+            dashboardToggle.performed += ToggleDashboard;
+        }
+        dashboardToggle.Enable();
+    }
+    private void OnDisable() { dashboardToggle?.Disable(); }
+    private void ToggleDashboard(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        if (ConfigurationUI.ConfigWorkbench.IsOpen) return;
+        // Display-only control stays available during a run, including stale legacy
+        // metadata focus. Idle text forms retain Tab for field navigation.
+        if ((MainController.Instance != null && MainController.Instance.SequenceRunning) || !ExperimentInput.IsEditingText)
+            SetVisible(!visible);
     }
 
     private void Start()
@@ -141,19 +163,17 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     }
 
     public void SetVisible(bool value) { operatorVisibility = true; ApplyVisibility(value); }
-    private void ApplyVisibility(bool value) { visible = value; if (panel != null) panel.SetActive(visible); }
+    private void ApplyVisibility(bool value) { visible = value; if (panel != null) panel.SetActive(ShouldDisplay); }
 
     private void Update()
     {
+        // The setup form owns the idle screen and Tab navigation. Keep the operator's
+        // dashboard preference, but suspend its canvas and refresh work between runs.
+        if (panel != null && panel.activeSelf != ShouldDisplay) panel.SetActive(ShouldDisplay);
+        if (ConfigurationUI.ConfigWorkbench.IsOpen) return;
         long revision;
         lock (errorLock) revision = errorRevision;
         if (revision != shownRevision) { shownRevision = revision; ApplyVisibility(true); nextRefresh = 0; }
-        var keyboard = UnityEngine.InputSystem.Keyboard.current;
-        // Tab is a display-only operator control throughout a running experiment,
-        // even if the metadata UI retained focus. Idle metadata keeps Tab navigation.
-        if (keyboard != null && keyboard.tabKey.wasPressedThisFrame &&
-            ((MainController.Instance != null && MainController.Instance.SequenceRunning) || !ExperimentInput.IsEditingText))
-            SetVisible(!visible);
         if (!visible || label == null || Time.realtimeSinceStartupAsDouble < nextRefresh) return;
         nextRefresh = Time.realtimeSinceStartupAsDouble + .5;
         if (UnityEngine.EventSystems.EventSystem.current == null)
@@ -284,6 +304,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     public static ErrorEntry[] RecentErrors() { lock (errorLock) return errors.ToArray(); }
     private void OnDestroy()
     {
+        dashboardToggle?.Dispose();
         if (instance != this) return;
         Application.logMessageReceivedThreaded -= CaptureError;
         MainController.SystemConfigurationChanged -= Configure;

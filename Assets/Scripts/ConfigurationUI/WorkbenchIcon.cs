@@ -13,6 +13,11 @@ namespace ConfigurationUI
             var p=context.painter2D; p.strokeColor=resolvedStyle.color; p.fillColor=p.strokeColor; p.lineWidth=1.6f; p.lineCap=LineCap.Round; p.lineJoin=LineJoin.Round;
             switch(kind)
             {
+                case "home": Line(p,3,11,12,3,21,11); Line(p,5,10,5,21,10,21,10,15,14,15,14,21,19,21,19,10); break;
+                case "person": Circle(p,12,7,4); Line(p,4,21,5,16,8,13,16,13,19,16,20,21); break;
+                case "auto": Line(p,13,2,5,13,11,13,10,22,19,10,13,10,13,2); break;
+                case "loop": Line(p,4,9,4,6,19,6,16,3); Line(p,19,6,16,9); Line(p,20,15,20,18,5,18,8,21); Line(p,5,18,8,15); break;
+                case "shuffle": Line(p,3,5,7,5,17,19,21,19,18,16); Line(p,21,19,18,22); Line(p,3,19,7,19,17,5,21,5,18,2); Line(p,21,5,18,8); break;
                 case "play": Line(p,7,4,19,12,7,20,7,4); break;
                 case "sequence": for(int y=5;y<=19;y+=7) { Line(p,8,y,21,y); Circle(p,3,y,1); } break;
                 case "system": Line(p,3,4,21,4,21,17,3,17,3,4); Line(p,12,17,12,21,7,21,17,21); break;

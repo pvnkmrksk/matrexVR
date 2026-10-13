@@ -32,7 +32,8 @@ namespace ConfigurationUI
         private TextField search,raw;
         private Toggle omitted,inapplicable;
         private Button save,start,undo,redo;
-        private bool jsonMode,rawPending,metadataMode;
+        private bool jsonMode,rawPending,metadataMode,homeMode=true,experimentIndexMode;
+        private Button backToSession;
         private string filter="";
         private readonly List<string> rows=new List<string>();
         private FlyData metadata;
@@ -85,7 +86,12 @@ namespace ConfigurationUI
         private void BuildShell()
         {
             var header=Row("header");
-            var brand=new Label("MATREX  /  Experiment studio"); brand.AddToClassList("brand"); header.Add(brand);
+            var brand=new Label("MATREX"); brand.AddToClassList("brand"); header.Add(brand);
+            backToSession=StudioButton("Session","home",ShowSessionHome,"quiet"); backToSession.name="back-to-session"; header.Add(backToSession);
+            var configNav=Row("config-nav"); header.Add(configNav);
+            var sequenceNav=StudioButton("Sequence config","sequence",()=>Select(Workspace.Sequence),"quiet"); sequenceNav.name="open-sequence"; configNav.Add(sequenceNav);
+            var systemNav=StudioButton("System config","system",()=>Select(Workspace.System),"quiet"); systemNav.name="open-system"; configNav.Add(systemNav);
+            var experimentNav=StudioButton("Experiment configs","settings",ShowExperimentConfigs,"quiet"); experimentNav.name="open-experiments"; configNav.Add(experimentNav);
             var badge=new Label("●  SETUP · IDLE"); badge.AddToClassList("badge"); header.Add(badge); root.Add(header);
             var main=Row("main"); root.Add(main);
             side=new ScrollView(); side.AddToClassList("sidebar"); main.Add(side);
@@ -95,12 +101,12 @@ namespace ConfigurationUI
             status=new Label(); status.AddToClassList("status"); footer.Add(status);
             undo=Button("Undo",()=>{ RequireApplied(); selected.Undo(); BuildContent(); }); footer.Add(undo);
             redo=Button("Redo",()=>{ RequireApplied(); selected.Redo(); BuildContent(); }); footer.Add(redo);
-            save=Button("Save all",()=>{ RequireApplied(); Workspace.SaveAll(); UpdateStatus("Saved all JSON files."); }); footer.Add(save);
+            save=StudioButton("Save setup","file",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); UpdateStatus("Setup and session details saved."); }); footer.Add(save);
             start=StudioButton("Start experiment","play",StartExperiment,"primary"); footer.Add(start);
         }
         private void BuildNavigation() { Workspace.RefreshReferences(); BuildStudioNavigation(); }
         private void Select(ConfigDocument doc)
-        { RequireApplied(); if(selected!=doc) { activePhase="stimulus"; settingsTab="Essentials"; } selected=doc; path.Clear(); metadataMode=false; jsonMode=false; advancedMode=false; filter=""; BuildNavigation(); BuildContent(); }
+        { RequireApplied(); if(selected!=doc) { activePhase="stimulus"; settingsTab="Essentials"; } selected=doc; path.Clear(); homeMode=false; experimentIndexMode=false; metadataMode=false; jsonMode=false; advancedMode=false; filter=""; BuildNavigation(); BuildContent(); }
         private void RequireApplied() { FlushNumbers(); if(rawPending) throw new InvalidOperationException("Apply the JSON draft or discard it before saving, navigating or starting."); }
         private JToken Current => ConfigDocument.At(selected.Root,path);
         private JObject Context => new JObject { ["flight"]=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().Any(r=>string.Equals(r["closedLoopMode"]?.ToString(),"Kinefly",StringComparison.OrdinalIgnoreCase) || r["closedLoopMode"]?.ToString()=="1") };
@@ -134,6 +140,13 @@ namespace ConfigurationUI
             numberFlushes.Clear(); blockList=null;
             enableUpdates.Clear();
             body.Clear(); inspector.Clear(); rawPending=false;
+            body.EnableInClassList("session-body",homeMode || experimentIndexMode);
+            side.style.display=homeMode || experimentIndexMode?DisplayStyle.None:DisplayStyle.Flex;
+            inspector.style.display=homeMode || experimentIndexMode?DisplayStyle.None:DisplayStyle.Flex;
+            backToSession.style.display=homeMode?DisplayStyle.None:DisplayStyle.Flex;
+            undo.style.display=redo.style.display=homeMode?DisplayStyle.None:DisplayStyle.Flex;
+            if(homeMode) { BuildSessionHome(); return; }
+            if(experimentIndexMode) { BuildExperimentConfigs(); return; }
             if(metadataMode) { BuildMetadata(); return; }
             if(Current==null) path.Clear();
             if(!jsonMode && !advancedMode && path.Count==0) { BuildStudio(); return; }
@@ -273,7 +286,7 @@ namespace ConfigurationUI
         {
             List<string> errors=Workspace.Validate();
             if(summary!=null) summary.text=errors.Count==0?"✓  Configuration ready\n\n"+Workspace.Documents.Count+" files loaded\n"+(Workspace.System.Root["configs"] as JArray)?.Count+" VR entries\n"+(Workspace.Sequence.Root["sequences"] as JArray)?.Count+" sequence steps":string.Join("\n\n",errors.Take(12));
-            status.text=message??(errors.Count>0?errors.Count+" issue(s) — review the check panel":Workspace.Documents.Any(d=>d.Dirty)?"Unsaved changes · ready to save":"Ready · setup only");
+            status.text=message??(errors.Count>0?string.Join(" · ",errors.Take(2)):Workspace.Documents.Any(d=>d.Dirty)?"Unsaved config changes · saved when you start":"Ready to run · session details saved when you start");
             status.EnableInClassList("error",errors.Count>0);
             start.SetEnabled(errors.Count==0 && !rawPending); save.SetEnabled(!rawPending); undo.SetEnabled(selected.CanUndo && !rawPending); redo.SetEnabled(selected.CanRedo && !rawPending);
         }
@@ -310,23 +323,33 @@ namespace ConfigurationUI
             scroll.Add(Button("Save metadata",()=>{ SaveMetadata(); UpdateStatus("Session metadata saved."); }));
             UpdateStatus();
         }
-        private void SaveMetadata()
+        private string SaveMetadata()
         {
             EnsureMetadata();
             var ids=new HashSet<string>((Workspace.System.Root["configs"] as JArray??new JArray()).Select(v=>(string)v["vrId"]));
-            var data=new FlyData { ExperimenterName=metadata.ExperimenterName,Comments=metadata.Comments,Flies=metadata.Flies.Where(f=>ids.Contains(f.VR)).ToList(),UsedFlyIDs=metadata.UsedFlyIDs??new List<string>() };
+            var data=new FlyData { ExperimentName=metadata.ExperimentName,ExperimenterName=metadata.ExperimenterName,Comments=metadata.Comments,Extensions=metadata.Extensions,Flies=metadata.Flies.Where(f=>ids.Contains(f.VR)).ToList(),UsedFlyIDs=metadata.UsedFlyIDs??new List<string>() };
             foreach(var fly in data.Flies) if(!string.IsNullOrWhiteSpace(fly.FlyID) && !data.UsedFlyIDs.Contains(fly.FlyID)) data.UsedFlyIDs.Add(fly.FlyID);
             string json=JsonConvert.SerializeObject(data,Formatting.Indented);
             string backup=Path.Combine(Application.dataPath,"RunData/Backup"); Directory.CreateDirectory(backup);
             File.WriteAllText(Path.Combine(backup,"FlyMetaData.json"),json);
-            File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"FlyMetaData.json"),json);
+            // Setup edits belong to the draft backup. A completed run's metadata
+            // is written only once, into the fresh folder prepared by Start.
+            return json;
         }
         private void EnsureMetadata()
         {
-            if(metadata!=null) return;
-            string backup=Path.Combine(Application.dataPath,"RunData/Backup/FlyMetaData.json");
-            metadata=File.Exists(backup)?JsonConvert.DeserializeObject<FlyData>(File.ReadAllText(backup)):new FlyData();
-            metadata=metadata??new FlyData(); metadata.Flies=metadata.Flies??new List<Fly>();
+            if(metadata==null)
+            {
+                string backup=Path.Combine(Application.dataPath,"RunData/Backup/FlyMetaData.json");
+                metadata=File.Exists(backup)?JsonConvert.DeserializeObject<FlyData>(File.ReadAllText(backup)):new FlyData();
+                metadata=metadata??new FlyData(); metadata.Flies=metadata.Flies??new List<Fly>();
+            }
+            foreach(var rig in (Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>())
+            {
+                string id=(string)rig["vrId"];
+                if(!metadata.Flies.Any(f=>f.VR==id)) metadata.Flies.Add(new Fly { VR=id,Sex="Unspecified" });
+                var fly=metadata.Flies.First(f=>f.VR==id); if(string.IsNullOrEmpty(fly.Sex)) fly.Sex="Unspecified";
+            }
         }
         public void StartExperiment()
         {
@@ -335,7 +358,8 @@ namespace ConfigurationUI
             Workspace.SaveAll();
             var main=MainController.Instance;
             main.PrepareConfiguredRun(Workspace.System.Path,Workspace.Sequence.Path);
-            SaveMetadata();
+            string metadataJson=SaveMetadata();
+            File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"FlyMetaData.json"),metadataJson);
             // Detach immediately; Destroy alone is deferred until end of frame.
             Document.enabled=false; root.Clear(); enabled=false;
             main.StartSequence();
