@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-14",
+  "unity": "6000.3.16f1",
+  "branch": "codex/config-ui-test",
+  "native_dashboard_checks": 2773,
+  "studio_regression_checks": 5987,
+  "interaction_layout_hud_checks": 40,
+  "player_script_compile": {
+    "complete": true,
+    "target": "StandaloneOSX",
+    "editorColorFieldExcluded": true
+  },
+  "config_templates": 66,
+  "python_tests": 10,
+  "protected_bogong_tip": "78c7ee0e920311714922b71e3ef86e93dd616b56",
+  "screenshots": [
+    "experiments-1920.png",
+    "hover-help-1920.png",
+    "monitoring-defaults-1920.png",
+    "motion-1920.png",
+    "sequence-1920.png",
+    "session-1920.png",
+    "system-1920.png"
+  ],
+  "fixture_note": "Native renders in a disposable Unity project with example configs and synthetic metadata. Not a live closed loop hardware session."
+}

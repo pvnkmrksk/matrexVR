@@ -102,12 +102,14 @@ public static class ConfigurationStudioValidation
                 root.Q<TextField>("session-comments").value="Session notes";
                 root.Q<TextField>("subject-id-VR1").value="Subject A / β 001";
                 root.Q<TextField>("subject-comments-VR1").value="Per-VR notes";
+                Submit(root.Q<Button>("open-sequence"));
                 foreach(string flag in new[]{"autoStart","loop","randomise"})
                 {
                     Submit(root.Q<Button>("sequence-"+flag));
                     Check(ui.Workspace.Sequence.Root[flag].Value<bool>() && root.Q<Button>("sequence-"+flag).ClassListContains("is-on"),"Icon button writes "+flag+" and visibly lights ON");
                     ui.Workspace.Sequence.Undo(); Call(ui,"BuildContent");
                 }
+                Submit(root.Q<Button>("back-to-session"));
                 Check(root.Q<TextField>("subject-id-VR1").value=="Subject A / β 001","Flag toggles preserve in-progress subject labels");
                 var overlay=Object.FindFirstObjectByType<RuntimeStatusOverlay>(); overlay.SetVisible(true);
                 Check(!overlay.ShouldDisplay && !overlay.transform.Find("Status canvas/Status panel").gameObject.activeSelf,"Flight dashboard is suspended during setup even when configured visible");
@@ -122,7 +124,7 @@ public static class ConfigurationStudioValidation
                 var overlay=Object.FindFirstObjectByType<RuntimeStatusOverlay>();
                 Check(!overlay.ShouldDisplay && overlay.Visible,"Tab during setup keeps the dashboard suspended and preserves runtime visibility preference");
                 InputSystem.QueueStateEvent(testKeyboard,new KeyboardState());
-                Check(root.Q<TextField>("subject-id-VR4").worldBound.xMax<=1440 && root.Q<VisualElement>(className:"session-body").resolvedStyle.width>1250,"Subject cards use the full landing-screen width without a sidebar");
+                Check(root.Q<TextField>("subject-id-VR4").worldBound.xMax<=1440 && root.Q<VisualElement>("setup-navigation").resolvedStyle.display==DisplayStyle.Flex,"Subject cards fit alongside the persistent workspace navigation");
                 Submit(root.Q<Button>("open-experiments"));
                 Check(root.Query<Button>(className:"experiment-link").ToList().Count==1,"Experiment configs screen lists only configs referenced by this sequence");
                 Submit(root.Q<Button>("back-to-session"));
@@ -169,8 +171,8 @@ public static class ConfigurationStudioValidation
             else if(stage==101)
             {
                 Capture("config-ui-session.png");
-                Check(ui.Document.rootVisualElement.Q<ListView>("session-plan").worldBound.yMax<834,"Three-block run summary fits above the footer with four VR cards");
-                Check(ui.Document.rootVisualElement.Q<Button>("sequence-randomise").ClassListContains("is-on"),"Landing screen reflects sequence changes made in detailed config");
+                Check(ui.Document.rootVisualElement.Q<ScrollView>(className:"session-scroll").contentViewport.worldBound.yMax<ui.Document.rootVisualElement.Q<VisualElement>(className:"footer").worldBound.y,"Smaller session viewport clips scrolling content above the fixed footer");
+                Check(ui.Document.rootVisualElement.Query<Label>().ToList().Any(l=>l.text.Contains("Random order")),"Session plan reflects sequence order without duplicating sequence controls");
                 ui.Workspace.Sequence.Undo(); Call(ui,"Select",ui.Workspace.Sequence);
                 Check(ui.Document.rootVisualElement.Query<WorkbenchIcon>().ToList().Count>8,"Native vector icons render throughout builder");
                 var steps=(JArray)ui.Workspace.Sequence.Root["sequences"]; steps[0]["extension"]=new JRaw("1.2345678901234567890123456789");

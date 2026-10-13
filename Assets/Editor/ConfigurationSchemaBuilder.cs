@@ -74,6 +74,11 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         var system=schemas["system"];
         system["required"]=new JArray("configs"); system["properties"]["configs"]["minItems"]=1;
         system["properties"]["configs"]["type"]="array";
+        // Top-level monitoring objects are optional, but have real runtime defaults.
+        // Expose those to the form without inserting them into the user's JSON.
+        system["properties"]["telemetry"]["default"]=JToken.FromObject(new TelemetryConfig());
+        system["properties"]["statusOverlay"]["default"]=JToken.FromObject(new StatusOverlayConfig());
+        system["properties"]["overheadCamera"]["default"]=JToken.FromObject(new OverheadCameraConfig());
         system["properties"]["targetDisplay"]["minimum"]=0;
         system["properties"]["targetDisplay"]["default"]=1;
         system["properties"]["targetFrameRate"]["default"]=120;
@@ -143,6 +148,10 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
                         object value=instance==null?null:property.ValueProvider.GetValue(instance);
                         if(value==null || value is string || value.GetType().IsPrimitive || value is Enum)
                             child["default"]=value==null?JValue.CreateNull():value is Enum?new JValue(value.ToString()):JToken.FromObject(value);
+                        else if(value is Vector3 vector)
+                            child["default"]=new JObject { ["x"]=vector.x,["y"]=vector.y,["z"]=vector.z };
+                        else if(!property.PropertyType.IsArray && !typeof(IEnumerable).IsAssignableFrom(property.PropertyType))
+                            child["default"]=JToken.FromObject(value);
                     } catch { }
                     if(property.Converter is LocustGainConverter)
                         child["type"]=new JArray("number","boolean","null");
@@ -158,6 +167,12 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
     private static void Annotate(JObject child,string name,Type owner)
     {
         var ui=new JObject();
+        var attribute=owner.GetField(name)?.GetCustomAttribute<TooltipAttribute>();
+        if(attribute!=null) ui["help"]=attribute.tooltip;
+        if(name=="speed" && owner==typeof(OptomotorStimulus)) { ui["unit"]="degrees / s"; ui["help"]="Angular drum speed in degrees per second. Use nonnegative speed and the clockwise switch to choose direction."; }
+        if(name=="speed" && owner==typeof(SwarmPlaybackConfig)) { ui["unit"]="× time"; ui["help"]="Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second."; }
+        if(name=="loop" && owner==typeof(OptomotorConfig)) ui["help"]="Repeat the configured optomotor stimuli while this scene runs. The sequence block's duration still ends the scene.";
+        if(name=="loop" && owner==typeof(SwarmPlaybackConfig)) ui["help"]="Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration.";
         if(name=="autopilotSpeed") ui["enabledWhen"]=Rule("autopilotEnabled",true);
         if(owner==typeof(SceneConfig) && new[]{"windSpeed","windDirection","aglHeight","groundLayerMask"}.Contains(name))
             ui["visibleWhen"]=new JObject { ["contextProperty"]="flight",["equals"]=true };

@@ -54,6 +54,7 @@ namespace ConfigurationUI
                 (float)ExperimentBlocks.Number(source["b"]),(float)ExperimentBlocks.Number(source["a"],1));
             var row=Row("color-control");
             Action<Color> commit=color=>StudioEdit(doc,r=>{
+                if(ConfigDocument.At(r,parts)==null) AssignAt(r,parts,source.DeepClone());
                 var obj=(JObject)ConfigDocument.At(r,parts);
                 obj["r"]=new JRaw(color.r.ToString("R",CultureInfo.InvariantCulture));
                 obj["g"]=new JRaw(color.g.ToString("R",CultureInfo.InvariantCulture));

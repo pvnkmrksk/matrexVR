@@ -48,7 +48,7 @@ namespace ConfigurationUI
             var tabs=Row("settings-tabs"); body.Add(tabs);
             foreach(string name in new[]{"Essentials","Motion","Stimulus","Sky","Tuning","All parameters"})
             { string key=name; tabs.Add(Button(name,()=>{ settingsTab=key; BuildContent(); },settingsTab==name?"tab-active":"quiet")); }
-            var scroll=new ScrollView(); scroll.AddToClassList("settings-scroll"); body.Add(scroll);
+            var scroll=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; scroll.AddToClassList("settings-scroll"); body.Add(scroll);
             AddTimingWarnings(scroll,selected);
             if(settingsTab=="Essentials")
             {
@@ -65,21 +65,32 @@ namespace ConfigurationUI
             }
             else
             {
-                var present=payload.Properties().Select(p=>p.Name).Where(k=>k!="enabled").ToList();
+                var present=DisplayKeys(payload,schema).Where(k=>k!="enabled" && !new[]{"preStimulus","stimulus","postStimulus"}.Contains(k)).ToList();
                 if(settingsTab=="All parameters")
                 {
-                    var addMissing=new Toggle("Show omitted fields") { name="show-omitted-settings" }; scroll.Add(addMissing);
+                    var addMissing=new Toggle("Show unset optional fields") { name="show-omitted-settings",tooltip="Defaults are already shown. Also reveal optional fields whose omitted value is null or unspecified; viewing them does not write to JSON." }; scroll.Add(addMissing);
                     scroll.Add(Button("Add parameter…",()=>ShowParameterDialog(selected,prefix),"quiet"));
                     var content=new VisualElement(); scroll.Add(content);
                     Action render=()=>{ content.Clear(); var keys=present.ToList(); if(addMissing.value) keys.AddRange(((JObject)schema["properties"]).Properties().Select(p=>p.Name).Where(k=>!keys.Contains(k) && k!="enabled" && !new[]{"preStimulus","stimulus","postStimulus"}.Contains(k)));
                         foreach(string group in new[]{"Motion","Stimulus","Sky","Tuning","Other"}) Section(content,group,GroupIcon(group),payload,schema,prefix,keys.Where(k=>Group(k)==group),false); };
                     addMissing.RegisterValueChangedCallback(_=>render()); render();
                 }
+                else if(settingsTab=="Motion")
+                {
+                    Section(scroll,"Closed loop","motion",payload,schema,prefix,present.Where(k=>k.StartsWith("closedLoop")));
+                    Section(scroll,"Forward motion & altitude","motion",payload,schema,prefix,present.Where(k=>k.StartsWith("autopilot") || k.StartsWith("wind") || new[]{"aglHeight","groundLayerMask","durationSeconds"}.Contains(k)));
+                    Section(scroll,"Starting pose & resets","settings",payload,schema,prefix,present.Where(k=>k.StartsWith("initial") || k.StartsWith("reset") || k=="randomInitialRotation"));
+                }
                 else Section(scroll,settingsTab,GroupIcon(settingsTab),payload,schema,prefix,present.Where(k=>Group(k)==settingsTab));
             }
             if(phased && !ExperimentBlocks.Flag(payload["enabled"],activePhase=="stimulus")) scroll.SetEnabled(false);
         }
         private static string GroupIcon(string group) => group=="Motion"?"motion":group=="Stimulus"?"swarm":group=="Sky"?"sky":"settings";
+        private static IEnumerable<string> DisplayKeys(JObject owner,JObject schema)
+        {
+            return owner.Properties().Select(p=>p.Name).Concat((schema["properties"] as JObject??new JObject()).Properties()
+                .Where(p=>p.Value["default"]!=null && p.Value["default"].Type!=JTokenType.Null).Select(p=>p.Name)).Distinct();
+        }
         private static string Group(string key)
         {
             if(key.StartsWith("initial") || key.StartsWith("reset") || key.StartsWith("closedLoop") || key.StartsWith("autopilot") || key.StartsWith("wind") || new[]{"randomInitialRotation","aglHeight","groundLayerMask","durationSeconds"}.Contains(key)) return "Motion";
@@ -93,9 +104,9 @@ namespace ConfigurationUI
         private void Section(VisualElement target,string title,string icon,JObject owner,JObject schema,string[] prefix,IEnumerable<string> keys,bool hideInapplicable=true)
         {
             var names=keys.Where(k=>owner[k]!=null || schema["properties"]?[k]!=null).Where(k=>!hideInapplicable || ConfigSchema.Visible(owner,schema,k,Context)).Distinct().ToList();
-            if(title=="Motion")
+            if(title=="Motion" || title=="Forward motion & altitude" || title=="Starting pose & resets")
             {
-                var priority=new[]{"durationSeconds","closedLoopOrientation","closedLoopPosition","autopilotEnabled","autopilotSpeed","aglHeight","windSpeed","windDirection","initialPosition","initialRotation","randomInitialRotation","resetPositionOnStart","resetRotationOnStart","groundLayerMask"};
+                var priority=new[]{"durationSeconds","closedLoopOrientation","closedLoopPosition","autopilotEnabled","autopilotSpeed","aglHeight","windSpeed","windDirection","groundLayerMask","resetPositionOnStart","resetRotationOnStart","randomInitialRotation","initialPosition","initialRotation"};
                 names=names.OrderBy(k=>{ int i=Array.IndexOf(priority,k); return i<0?99:i; }).ToList();
             }
             if(names.Count==0) return;
@@ -109,46 +120,49 @@ namespace ConfigurationUI
             var setting=new VisualElement(); setting.AddToClassList("studio-setting"); setting.name="setting-"+string.Join("-",parts);
             var label=Row("setting-label"); setting.Add(label); var caption=new Label(Pretty(key)); caption.AddToClassList("setting-title"); label.Add(caption);
             string unit=(string)schema["x-ui"]?["unit"]; if(!string.IsNullOrEmpty(unit)) label.Add(Pill(unit,"unit-pill"));
-            if(value==null) label.Add(Pill("default","muted-pill"));
-            setting.tooltip=(string)schema["x-ui"]?["help"]??key;
-            Action<JToken,bool> assign=(v,rebuild)=>StudioEdit(doc,root=>{
-                var parent=ConfigDocument.At(root,parts.Take(parts.Length-1).ToArray()); if(parent is JObject obj) obj[key]=v; else if(parent is JArray array) array[int.Parse(key)]=v;
-            },rebuild);
+            if(value==null && schema["default"]!=null && schema["default"].Type!=JTokenType.Null)
+            { var inherited=Pill("Inherited","muted-pill"); inherited.tooltip="Not explicitly set in this file. The displayed value comes from the runtime/schema default."; label.Add(inherited); }
+            setting.tooltip=ConfigParameterHelp.Description(key,parts,schema); caption.tooltip=setting.tooltip;
+            Action<JToken,bool> assign=(v,rebuild)=>StudioEdit(doc,root=>AssignAt(root,parts,v),rebuild);
             JToken shown=value??schema["default"];
             if(shown?.Type==JTokenType.Boolean)
             {
                 setting.AddToClassList("boolean-setting");
                 setting.Add(StateSwitch((bool)shown,v=>assign(new JValue(v),true),"flag-"+string.Join("-",parts)));
             }
-            else if(value is JObject obj && new[]{"x","y","z"}.All(k=>obj[k]!=null) && obj.Properties().All(p=>new[]{"x","y","z"}.Contains(p.Name)))
+            else if(shown is JObject obj && new[]{"x","y","z"}.All(k=>obj[k]!=null) && obj.Properties().All(p=>new[]{"x","y","z"}.Contains(p.Name)))
             {
                 setting.AddToClassList("vector-setting");
                 var vector=Row("vector-controls"); setting.Add(vector);
-                foreach(string axis in new[]{"x","y","z"}) { string component=axis; var field=NumberControl(obj[axis],ConfigSchema.Child(schema,axis),axis,v=>StudioEdit(doc,r=>ConfigDocument.At(r,parts)[component]=v,false),false); field.tooltip="Exact "+axis+" component"; vector.Add(new Label(axis.ToUpperInvariant())); vector.Add(field); }
+                foreach(string axis in new[]{"x","y","z"}) { string component=axis; var field=NumberControl(obj[axis],ConfigSchema.Child(schema,axis),axis,v=>StudioEdit(doc,r=>{ if(ConfigDocument.At(r,parts)==null) AssignAt(r,parts,obj.DeepClone()); ConfigDocument.At(r,parts)[component]=v; },false),false); field.tooltip=ConfigParameterHelp.Description(axis,parts.Concat(new[]{axis}).ToArray(),ConfigSchema.Child(schema,axis)); vector.Add(new Label(axis.ToUpperInvariant())); vector.Add(field); }
             }
-            else if(value is JObject color && new[]{"r","g","b"}.All(k=>color[k]!=null))
+            else if(shown is JObject color && new[]{"r","g","b"}.All(k=>color[k]!=null))
             {
                 setting.AddToClassList("color-setting");
                 setting.Add(ColorControl(doc,parts,color));
             }
-            else if(value is JObject nested)
+            else if(shown is JObject nested)
             {
                 string id=doc.Path+"|"+string.Join("/",parts);
-                var fold=new Foldout { text="Settings",value=expandedSections.Contains(id) }; setting.Add(fold);
+                var fold=new Foldout { text="Parameters",value=expandedSections.Contains(id),tooltip=setting.tooltip }; setting.Add(fold);
+                var disclosure=Button(fold.value?"Parameters ▾":"Parameters ▸",()=>fold.value=!fold.value,"disclosure-button");
+                disclosure.tooltip="Show or hide the parameters for "+Pretty(key)+". This does not enable the feature or change JSON.";
                 string flag=schema["properties"]?["enabled"]!=null || nested["enabled"]?.Type==JTokenType.Boolean?"enabled":schema["properties"]?["visible"]!=null || nested["visible"]?.Type==JTokenType.Boolean?"visible":null;
                 if(flag!=null)
                 {
                     bool on=ExperimentBlocks.Flag(nested[flag],ExperimentBlocks.Flag(schema["properties"]?[flag]?["default"]));
-                    setting.Insert(1,StateSwitch(on,v=>StudioEdit(doc,r=>ConfigDocument.At(r,parts)[flag]=v,true),"flag-"+string.Join("-",parts)+"-"+flag));
+                    var toggle=StateSwitch(on,v=>StudioEdit(doc,r=>AssignAt(r,parts.Concat(new[]{flag}).ToArray(),new JValue(v)),true),"flag-"+string.Join("-",parts)+"-"+flag);
+                    toggle.tooltip=ConfigParameterHelp.Description(flag,parts.Concat(new[]{flag}).ToArray(),ConfigSchema.Child(schema,flag)); label.Add(toggle);
                 }
+                label.Add(disclosure);
                 Action populate=()=>{
                     fold.Clear();
-                    foreach(var property in nested.Properties().Where(p=>p.Name!=flag && ConfigSchema.Visible(nested,schema,p.Name,Context)))
-                        fold.Add(Setting(doc,parts.Concat(new[]{property.Name}).ToArray(),ConfigSchema.Child(schema,property.Name),nested,schema));
+                    foreach(string property in DisplayKeys(nested,schema).Where(p=>p!=flag && ConfigSchema.Visible(nested,schema,p,Context)))
+                        fold.Add(Setting(doc,parts.Concat(new[]{property}).ToArray(),ConfigSchema.Child(schema,property),nested,schema));
                     fold.contentContainer.SetEnabled(flag==null || ExperimentBlocks.Flag(nested[flag],ExperimentBlocks.Flag(schema["properties"]?[flag]?["default"],true)));
                 };
                 if(fold.value) populate();
-                fold.RegisterValueChangedCallback(e=>{ if(e.target!=fold) return; if(e.newValue) { expandedSections.Add(id); populate(); } else { expandedSections.Remove(id); fold.Clear(); } });
+                fold.RegisterValueChangedCallback(e=>{ if(e.target!=fold) return; disclosure.text=e.newValue?"Parameters ▾":"Parameters ▸"; if(e.newValue) { expandedSections.Add(id); populate(); } else { expandedSections.Remove(id); fold.Clear(); } });
                 setting.AddToClassList("container-setting");
             }
             else if(value is JArray array)
@@ -163,6 +177,7 @@ namespace ConfigurationUI
             }
             else if(schema["enum"] is JArray options)
             {
+                setting.AddToClassList("choice-setting");
                 var choices=options.Where(o=>o.Type!=JTokenType.Null).Select(o=>o.ToString()).ToList(); if(!choices.Contains(shown.ToString())) choices.Add(shown.ToString());
                 var dropdown=new DropdownField(choices,choices.IndexOf(shown.ToString())); setting.Add(dropdown);
                 dropdown.RegisterValueChangedCallback(e=>Guard(()=>{ var chosen=options.FirstOrDefault(o=>o.ToString()==e.newValue); assign(chosen?.DeepClone()??new JValue(e.newValue),true); }));
@@ -175,6 +190,7 @@ namespace ConfigurationUI
             else
             {
                 setting.AddToClassList("text-setting");
+                if(key.EndsWith("File") || key.EndsWith("Path") || key=="design" || key=="configFile") setting.AddToClassList("path-setting");
                 var input=new TextField { value=shown.ToString(),isDelayed=true }; setting.Add(input); input.RegisterValueChangedCallback(e=>Guard(()=>assign(new JValue(e.newValue),false)));
             }
             Action enable=()=>setting.SetEnabled(ConfigSchema.Enabled(ConfigDocument.At(doc.Root,parts.Take(parts.Length-1).ToArray()),ownerSchema,key,Context));
@@ -247,7 +263,7 @@ namespace ConfigurationUI
         }
         private void BuildSystemEditor()
         {
-            var scroll=new ScrollView(); scroll.AddToClassList("settings-scroll"); body.Add(scroll);
+            var scroll=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; scroll.AddToClassList("settings-scroll"); body.Add(scroll);
             var obj=(JObject)selected.Root; var schema=Workspace.Schemas.Get("system");
             Section(scroll,"Rendering & timing","system",obj,schema,Array.Empty<string>(),new[]{"targetDisplay","targetFrameRate","vSyncCount"});
             if(obj["configs"] is JArray rigs)
@@ -261,8 +277,9 @@ namespace ConfigurationUI
                 {
                     int index=i; var rig=rigs[i] as JObject; if(rig==null) continue; var rigSchema=(JObject)schema["properties"]["configs"]["items"];
                     var fold=new Foldout { text=(string)rig["vrId"]+" · "+(rig["closedLoopMode"]?.ToString()??"FicTrac")+" · "+rig["zmqAddress"]+":"+rig["zmqPort"],value=i==0 }; fold.AddToClassList("rig-card"); scroll.Add(fold);
+                    var grid=new VisualElement(); grid.AddToClassList("settings-grid"); fold.Add(grid);
                     foreach(string key in new[]{"vrId","closedLoopMode","zmqAddress","zmqPort","displayOrder","ledPanelWidth","ledPanelHeight","startRow","startCol","horizontal","sphereDiameter","manualControls"})
-                        if(ConfigSchema.Visible(rig,rigSchema,key,Context)) fold.Add(Setting(selected,new[]{"configs",i.ToString(),key},ConfigSchema.Child(rigSchema,key),rig,rigSchema));
+                        if(ConfigSchema.Visible(rig,rigSchema,key,Context)) grid.Add(Setting(selected,new[]{"configs",i.ToString(),key},ConfigSchema.Child(rigSchema,key),rig,rigSchema));
                     fold.Add(StudioButton("Remove rig","trash",()=>StudioEdit(selected,r=>((JArray)r["configs"]).RemoveAt(index)),"quiet"));
                 }
             }

@@ -33,7 +33,11 @@ namespace ConfigurationUI
         private Toggle omitted,inapplicable;
         private Button save,start,undo,redo;
         private bool jsonMode,rawPending,metadataMode,homeMode=true,experimentIndexMode;
-        private Button backToSession;
+        private Label pageLocation,frameRate;
+        private VisualElement hoverHelp;
+        private Label hoverHelpText;
+        private VisualElement helpTarget;
+        private IVisualElementScheduledItem helpDelay;
         private string filter="";
         private readonly List<string> rows=new List<string>();
         private FlyData metadata;
@@ -88,23 +92,28 @@ namespace ConfigurationUI
         private void BuildShell()
         {
             var header=Row("header");
-            var brand=new Label("MATREX"); brand.AddToClassList("brand"); header.Add(brand);
-            backToSession=StudioButton("Session","home",ShowSessionHome,"quiet"); backToSession.name="back-to-session"; header.Add(backToSession);
-            var configNav=Row("config-nav"); header.Add(configNav);
-            var sequenceNav=StudioButton("Sequence config","sequence",()=>Select(Workspace.Sequence),"quiet"); sequenceNav.name="open-sequence"; configNav.Add(sequenceNav);
-            var systemNav=StudioButton("System config","system",()=>Select(Workspace.System),"quiet"); systemNav.name="open-system"; configNav.Add(systemNav);
-            var experimentNav=StudioButton("Experiment configs","settings",ShowExperimentConfigs,"quiet"); experimentNav.name="open-experiments"; configNav.Add(experimentNav);
-            var badge=new Label("●  SETUP · IDLE"); badge.AddToClassList("badge"); header.Add(badge); root.Add(header);
+            var identity=new VisualElement(); identity.AddToClassList("identity"); header.Add(identity);
+            var brand=new Label("MATREX"); brand.AddToClassList("brand"); identity.Add(brand);
+            var descriptor=new Label("EXPERIMENT CONTROL"); descriptor.AddToClassList("brand-detail"); identity.Add(descriptor);
+            pageLocation=new Label(); pageLocation.AddToClassList("page-location"); header.Add(pageLocation);
+            var badge=new Label("●  SETUP"); badge.AddToClassList("badge"); badge.tooltip="Setup is open. The experiment starts when you choose Start experiment."; header.Add(badge);
+            frameRate=new Label("— FPS"){name="setup-frame-rate"}; frameRate.AddToClassList("frame-rate"); header.Add(frameRate);
+            root.Add(header);
             var main=Row("main"); root.Add(main);
-            side=new ScrollView(); side.AddToClassList("sidebar"); main.Add(side);
+            side=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; side.name="setup-navigation"; side.AddToClassList("sidebar"); main.Add(side);
             body=new VisualElement(); body.AddToClassList("body"); main.Add(body);
-            inspector=new ScrollView(); inspector.AddToClassList("inspector"); main.Add(inspector);
+            inspector=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; inspector.AddToClassList("inspector"); main.Add(inspector);
             var footer=Row("footer"); root.Add(footer);
             status=new Label(); status.AddToClassList("status"); footer.Add(status);
             undo=Button("Undo",()=>{ RequireApplied(); selected.Undo(); BuildContent(); }); footer.Add(undo);
             redo=Button("Redo",()=>{ RequireApplied(); selected.Redo(); BuildContent(); }); footer.Add(redo);
             save=StudioButton("Save setup","file",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); UpdateStatus("Setup and session details saved."); }); footer.Add(save);
             start=StudioButton("Start experiment","play",StartExperiment,"primary"); footer.Add(start);
+            save.tooltip="Save the system, sequence, edited experiment files and subject metadata. Omitted values and unknown JSON fields are preserved.";
+            start.tooltip="Validate and save this setup, archive the run's configuration files, then start the experiment.";
+            undo.tooltip="Undo the last change in the current configuration file."; redo.tooltip="Redo the last undone change in the current configuration file.";
+            InstallHoverHelp();
+            root.schedule.Execute(UpdateFrameRate).Every(500); UpdateFrameRate();
         }
         private void BuildNavigation() { Workspace.RefreshReferences(); BuildStudioNavigation(); }
         private void Select(ConfigDocument doc)
@@ -142,10 +151,11 @@ namespace ConfigurationUI
             numberFlushes.Clear(); blockList=null;
             enableUpdates.Clear();
             body.Clear(); inspector.Clear(); rawPending=false;
+            HideHoverHelp();
             body.EnableInClassList("session-body",homeMode || experimentIndexMode);
-            side.style.display=homeMode || experimentIndexMode?DisplayStyle.None:DisplayStyle.Flex;
+            side.style.display=DisplayStyle.Flex;
             inspector.style.display=homeMode || experimentIndexMode || root.resolvedStyle.width<1220?DisplayStyle.None:DisplayStyle.Flex;
-            backToSession.style.display=homeMode?DisplayStyle.None:DisplayStyle.Flex;
+            pageLocation.text=homeMode?"Session / Setup":experimentIndexMode?"Experiment configs / Library":selected==Workspace.System?"System config / Hardware":selected==Workspace.Sequence?"Sequence config / Run plan":"Experiment configs / "+ExperimentBlocks.Title(selected.Path);
             undo.style.display=redo.style.display=homeMode?DisplayStyle.None:DisplayStyle.Flex;
             if(homeMode) { BuildSessionHome(); return; }
             if(experimentIndexMode) { BuildExperimentConfigs(); return; }
@@ -230,9 +240,9 @@ namespace ConfigurationUI
             string key=rows[index]; bool array=Current is JArray;
             JToken value=array?Current[int.Parse(key)]:Current[key]; JObject schema=ConfigSchema.Child(CurrentSchema,key,array);
             var caption=new VisualElement(); caption.AddToClassList("caption"); row.Add(caption);
-            caption.Add(new Label(array?ItemLabel(value,int.Parse(key)):Human(key)));
+            caption.Add(new Label(array?ItemLabel(value,int.Parse(key)):Pretty(key)));
             var hint=new Label(array?"item "+key:key+(schema["x-ui"]?["unit"]!=null?" · "+schema["x-ui"]["unit"]:"")); hint.AddToClassList("key-hint"); caption.Add(hint);
-            row.tooltip=schema["x-ui"]?["help"]?.ToString()??key;
+            row.tooltip=ConfigParameterHelp.Description(key,path.Concat(new[]{key}).ToArray(),schema);
             var edit=Row("field-controls"); row.Add(edit);
             bool enabled=array || ConfigSchema.Enabled(Current,CurrentSchema,key,Context);
             edit.SetEnabled(enabled);

@@ -113,8 +113,8 @@ namespace ConfigurationUI
             JObject p=Payload(config); if(p==null) return "Configuration unavailable";
             var details=new List<string>();
             if(Flag(p["autopilotEnabled"])) details.Add("Autopilot "+p["autopilotSpeed"]+" units/s");
-            else if(p["closedLoopPosition"]!=null) details.Add("Translation "+(Flag(p["closedLoopPosition"],Number(p["closedLoopPosition"],1)!=0)?"tracked":"off"));
-            if(p["closedLoopOrientation"]!=null) details.Add("Turning "+(Flag(p["closedLoopOrientation"],Number(p["closedLoopOrientation"],1)!=0)?"tracked":"off"));
+            else if(p["closedLoopPosition"]!=null) details.Add("Closed loop position "+(Flag(p["closedLoopPosition"],Number(p["closedLoopPosition"],1)!=0)?"ON":"OFF"));
+            if(p["closedLoopOrientation"]!=null) details.Add("Closed loop orientation "+(Flag(p["closedLoopOrientation"],Number(p["closedLoopOrientation"],1)!=0)?"ON":"OFF"));
             JObject swarm=p["swarm"] as JObject??(p["numberOfLocusts"]!=null?p:null);
             if(swarm!=null) details.Add(!string.IsNullOrWhiteSpace((string)swarm["trajectoryFile"])?"Recorded swarm":(swarm["numberOfLocusts"]?.ToString()??"Scene default")+" agents · "+(string)(swarm["dimension"]??new JValue("2D")));
             if(p["objects"] is JArray objects && objects.Count>0) details.Add(objects.Count+" objects");

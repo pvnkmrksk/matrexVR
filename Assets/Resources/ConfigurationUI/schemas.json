@@ -252,6 +252,13 @@
             ],
             "default": "matrex.telemetry.v2"
           }
+        },
+        "default": {
+          "enabled": true,
+          "bindAddress": "127.0.0.1",
+          "port": 9880,
+          "rateHz": 20.0,
+          "topic": "matrex.telemetry.v2"
         }
       },
       "statusOverlay": {
@@ -271,6 +278,10 @@
             "maximum": 2147483647,
             "default": 0
           }
+        },
+        "default": {
+          "visible": true,
+          "targetDisplay": 0
         }
       },
       "overheadCamera": {
@@ -353,6 +364,20 @@
             "maximum": 3.40282347E+38,
             "default": 50.0
           }
+        },
+        "default": {
+          "enabled": true,
+          "targetDisplay": -1,
+          "x": 0.58,
+          "y": 0.02,
+          "width": 0.4,
+          "height": 0.4,
+          "resolution": 512,
+          "markerSizePixels": 14.0,
+          "trailDurationSeconds": 60.0,
+          "trailSampleInterval": 0.1,
+          "trailWidthPixels": 1.5,
+          "trailBreakDistance": 50.0
         }
       }
     },
@@ -889,7 +914,10 @@
               },
               "loop": {
                 "type": "boolean",
-                "default": true
+                "default": true,
+                "x-ui": {
+                  "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                }
               },
               "speed": {
                 "type": "number",
@@ -897,6 +925,8 @@
                 "maximum": 3.40282347E+38,
                 "default": 1.0,
                 "x-ui": {
+                  "unit": "× time",
+                  "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                   "slider": {
                     "min": 0.0,
                     "max": 100.0,
@@ -1005,6 +1035,21 @@
                   "unit": "seconds"
                 }
               }
+            },
+            "default": {
+              "dataUnitsPerMetre": 1.0,
+              "loop": true,
+              "speed": 1.0,
+              "startTimeSeconds": 0.0,
+              "maxGapSeconds": 0.1,
+              "yawOffsetDegrees": 0.0,
+              "centerOnAnimal": true,
+              "periodicBoundary": true,
+              "continueAfterTrack": false,
+              "despawnDistanceMetres": 100.0,
+              "terminalVelocityWindowSeconds": 0.1,
+              "continuationSpeedMetresPerSecond": null,
+              "preRollSeconds": 0.0
             },
             "x-ui": {
               "enabledWhen": {
@@ -1593,6 +1638,12 @@
                       }
                     }
                   }
+                },
+                "default": {
+                  "r": 0.12,
+                  "g": 0.12,
+                  "b": 0.12,
+                  "a": 1.0
                 }
               },
               "metallic": {
@@ -2081,6 +2132,11 @@
             "default": 0
           }
         },
+        "default": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
         "x-ui": {
           "enabledWhen": {
             "property": "resetPositionOnStart",
@@ -2106,6 +2162,11 @@
             "type": "number",
             "default": 0
           }
+        },
+        "default": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
         },
         "x-ui": {
           "enabledWhen": {
@@ -2685,7 +2746,10 @@
                   },
                   "loop": {
                     "type": "boolean",
-                    "default": true
+                    "default": true,
+                    "x-ui": {
+                      "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                    }
                   },
                   "speed": {
                     "type": "number",
@@ -2693,6 +2757,8 @@
                     "maximum": 3.40282347E+38,
                     "default": 1.0,
                     "x-ui": {
+                      "unit": "× time",
+                      "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                       "slider": {
                         "min": 0.0,
                         "max": 100.0,
@@ -2801,6 +2867,21 @@
                       "unit": "seconds"
                     }
                   }
+                },
+                "default": {
+                  "dataUnitsPerMetre": 1.0,
+                  "loop": true,
+                  "speed": 1.0,
+                  "startTimeSeconds": 0.0,
+                  "maxGapSeconds": 0.1,
+                  "yawOffsetDegrees": 0.0,
+                  "centerOnAnimal": true,
+                  "periodicBoundary": true,
+                  "continueAfterTrack": false,
+                  "despawnDistanceMetres": 100.0,
+                  "terminalVelocityWindowSeconds": 0.1,
+                  "continuationSpeedMetresPerSecond": null,
+                  "preRollSeconds": 0.0
                 },
                 "x-ui": {
                   "enabledWhen": {
@@ -3389,6 +3470,12 @@
                           }
                         }
                       }
+                    },
+                    "default": {
+                      "r": 0.12,
+                      "g": 0.12,
+                      "b": 0.12,
+                      "a": 1.0
                     }
                   },
                   "metallic": {
@@ -3876,6 +3963,11 @@
                 "default": 0
               }
             },
+            "default": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
             "x-ui": {
               "enabledWhen": {
                 "property": "resetPositionOnStart",
@@ -3901,6 +3993,11 @@
                 "type": "number",
                 "default": 0
               }
+            },
+            "default": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
             },
             "x-ui": {
               "enabledWhen": {
@@ -4500,7 +4597,10 @@
                   },
                   "loop": {
                     "type": "boolean",
-                    "default": true
+                    "default": true,
+                    "x-ui": {
+                      "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                    }
                   },
                   "speed": {
                     "type": "number",
@@ -4508,6 +4608,8 @@
                     "maximum": 3.40282347E+38,
                     "default": 1.0,
                     "x-ui": {
+                      "unit": "× time",
+                      "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                       "slider": {
                         "min": 0.0,
                         "max": 100.0,
@@ -4616,6 +4718,21 @@
                       "unit": "seconds"
                     }
                   }
+                },
+                "default": {
+                  "dataUnitsPerMetre": 1.0,
+                  "loop": true,
+                  "speed": 1.0,
+                  "startTimeSeconds": 0.0,
+                  "maxGapSeconds": 0.1,
+                  "yawOffsetDegrees": 0.0,
+                  "centerOnAnimal": true,
+                  "periodicBoundary": true,
+                  "continueAfterTrack": false,
+                  "despawnDistanceMetres": 100.0,
+                  "terminalVelocityWindowSeconds": 0.1,
+                  "continuationSpeedMetresPerSecond": null,
+                  "preRollSeconds": 0.0
                 },
                 "x-ui": {
                   "enabledWhen": {
@@ -5204,6 +5321,12 @@
                           }
                         }
                       }
+                    },
+                    "default": {
+                      "r": 0.12,
+                      "g": 0.12,
+                      "b": 0.12,
+                      "a": 1.0
                     }
                   },
                   "metallic": {
@@ -5691,6 +5814,11 @@
                 "default": 0
               }
             },
+            "default": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
             "x-ui": {
               "enabledWhen": {
                 "property": "resetPositionOnStart",
@@ -5716,6 +5844,11 @@
                 "type": "number",
                 "default": 0
               }
+            },
+            "default": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
             },
             "x-ui": {
               "enabledWhen": {
@@ -6315,7 +6448,10 @@
                   },
                   "loop": {
                     "type": "boolean",
-                    "default": true
+                    "default": true,
+                    "x-ui": {
+                      "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                    }
                   },
                   "speed": {
                     "type": "number",
@@ -6323,6 +6459,8 @@
                     "maximum": 3.40282347E+38,
                     "default": 1.0,
                     "x-ui": {
+                      "unit": "× time",
+                      "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                       "slider": {
                         "min": 0.0,
                         "max": 100.0,
@@ -6431,6 +6569,21 @@
                       "unit": "seconds"
                     }
                   }
+                },
+                "default": {
+                  "dataUnitsPerMetre": 1.0,
+                  "loop": true,
+                  "speed": 1.0,
+                  "startTimeSeconds": 0.0,
+                  "maxGapSeconds": 0.1,
+                  "yawOffsetDegrees": 0.0,
+                  "centerOnAnimal": true,
+                  "periodicBoundary": true,
+                  "continueAfterTrack": false,
+                  "despawnDistanceMetres": 100.0,
+                  "terminalVelocityWindowSeconds": 0.1,
+                  "continuationSpeedMetresPerSecond": null,
+                  "preRollSeconds": 0.0
                 },
                 "x-ui": {
                   "enabledWhen": {
@@ -7019,6 +7172,12 @@
                           }
                         }
                       }
+                    },
+                    "default": {
+                      "r": 0.12,
+                      "g": 0.12,
+                      "b": 0.12,
+                      "a": 1.0
                     }
                   },
                   "metallic": {
@@ -7506,6 +7665,11 @@
                 "default": 0
               }
             },
+            "default": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
             "x-ui": {
               "enabledWhen": {
                 "property": "resetPositionOnStart",
@@ -7531,6 +7695,11 @@
                 "type": "number",
                 "default": 0
               }
+            },
+            "default": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
             },
             "x-ui": {
               "enabledWhen": {
@@ -8726,7 +8895,10 @@
           },
           "loop": {
             "type": "boolean",
-            "default": true
+            "default": true,
+            "x-ui": {
+              "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+            }
           },
           "speed": {
             "type": "number",
@@ -8734,6 +8906,8 @@
             "maximum": 3.40282347E+38,
             "default": 1.0,
             "x-ui": {
+              "unit": "× time",
+              "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
               "slider": {
                 "min": 0.0,
                 "max": 100.0,
@@ -8842,6 +9016,21 @@
               "unit": "seconds"
             }
           }
+        },
+        "default": {
+          "dataUnitsPerMetre": 1.0,
+          "loop": true,
+          "speed": 1.0,
+          "startTimeSeconds": 0.0,
+          "maxGapSeconds": 0.1,
+          "yawOffsetDegrees": 0.0,
+          "centerOnAnimal": true,
+          "periodicBoundary": true,
+          "continueAfterTrack": false,
+          "despawnDistanceMetres": 100.0,
+          "terminalVelocityWindowSeconds": 0.1,
+          "continuationSpeedMetresPerSecond": null,
+          "preRollSeconds": 0.0
         },
         "x-ui": {
           "enabledWhen": {
@@ -9430,6 +9619,12 @@
                   }
                 }
               }
+            },
+            "default": {
+              "r": 0.12,
+              "g": 0.12,
+              "b": 0.12,
+              "a": 1.0
             }
           },
           "metallic": {
@@ -10328,7 +10523,10 @@
               },
               "loop": {
                 "type": "boolean",
-                "default": true
+                "default": true,
+                "x-ui": {
+                  "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                }
               },
               "speed": {
                 "type": "number",
@@ -10336,6 +10534,8 @@
                 "maximum": 3.40282347E+38,
                 "default": 1.0,
                 "x-ui": {
+                  "unit": "× time",
+                  "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                   "slider": {
                     "min": 0.0,
                     "max": 100.0,
@@ -10444,6 +10644,21 @@
                   "unit": "seconds"
                 }
               }
+            },
+            "default": {
+              "dataUnitsPerMetre": 1.0,
+              "loop": true,
+              "speed": 1.0,
+              "startTimeSeconds": 0.0,
+              "maxGapSeconds": 0.1,
+              "yawOffsetDegrees": 0.0,
+              "centerOnAnimal": true,
+              "periodicBoundary": true,
+              "continueAfterTrack": false,
+              "despawnDistanceMetres": 100.0,
+              "terminalVelocityWindowSeconds": 0.1,
+              "continuationSpeedMetresPerSecond": null,
+              "preRollSeconds": 0.0
             },
             "x-ui": {
               "enabledWhen": {
@@ -11032,6 +11247,12 @@
                       }
                     }
                   }
+                },
+                "default": {
+                  "r": 0.12,
+                  "g": 0.12,
+                  "b": 0.12,
+                  "a": 1.0
                 }
               },
               "metallic": {
@@ -11385,7 +11606,10 @@
                   },
                   "loop": {
                     "type": "boolean",
-                    "default": true
+                    "default": true,
+                    "x-ui": {
+                      "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                    }
                   },
                   "speed": {
                     "type": "number",
@@ -11393,6 +11617,8 @@
                     "maximum": 3.40282347E+38,
                     "default": 1.0,
                     "x-ui": {
+                      "unit": "× time",
+                      "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                       "slider": {
                         "min": 0.0,
                         "max": 100.0,
@@ -11501,6 +11727,21 @@
                       "unit": "seconds"
                     }
                   }
+                },
+                "default": {
+                  "dataUnitsPerMetre": 1.0,
+                  "loop": true,
+                  "speed": 1.0,
+                  "startTimeSeconds": 0.0,
+                  "maxGapSeconds": 0.1,
+                  "yawOffsetDegrees": 0.0,
+                  "centerOnAnimal": true,
+                  "periodicBoundary": true,
+                  "continueAfterTrack": false,
+                  "despawnDistanceMetres": 100.0,
+                  "terminalVelocityWindowSeconds": 0.1,
+                  "continuationSpeedMetresPerSecond": null,
+                  "preRollSeconds": 0.0
                 },
                 "x-ui": {
                   "enabledWhen": {
@@ -12089,6 +12330,12 @@
                           }
                         }
                       }
+                    },
+                    "default": {
+                      "r": 0.12,
+                      "g": 0.12,
+                      "b": 0.12,
+                      "a": 1.0
                     }
                   },
                   "metallic": {
@@ -12764,7 +13011,10 @@
               },
               "loop": {
                 "type": "boolean",
-                "default": true
+                "default": true,
+                "x-ui": {
+                  "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                }
               },
               "speed": {
                 "type": "number",
@@ -12772,6 +13022,8 @@
                 "maximum": 3.40282347E+38,
                 "default": 1.0,
                 "x-ui": {
+                  "unit": "× time",
+                  "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                   "slider": {
                     "min": 0.0,
                     "max": 100.0,
@@ -12880,6 +13132,21 @@
                   "unit": "seconds"
                 }
               }
+            },
+            "default": {
+              "dataUnitsPerMetre": 1.0,
+              "loop": true,
+              "speed": 1.0,
+              "startTimeSeconds": 0.0,
+              "maxGapSeconds": 0.1,
+              "yawOffsetDegrees": 0.0,
+              "centerOnAnimal": true,
+              "periodicBoundary": true,
+              "continueAfterTrack": false,
+              "despawnDistanceMetres": 100.0,
+              "terminalVelocityWindowSeconds": 0.1,
+              "continuationSpeedMetresPerSecond": null,
+              "preRollSeconds": 0.0
             },
             "x-ui": {
               "enabledWhen": {
@@ -13468,6 +13735,12 @@
                       }
                     }
                   }
+                },
+                "default": {
+                  "r": 0.12,
+                  "g": 0.12,
+                  "b": 0.12,
+                  "a": 1.0
                 }
               },
               "metallic": {
@@ -13821,7 +14094,10 @@
                   },
                   "loop": {
                     "type": "boolean",
-                    "default": true
+                    "default": true,
+                    "x-ui": {
+                      "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                    }
                   },
                   "speed": {
                     "type": "number",
@@ -13829,6 +14105,8 @@
                     "maximum": 3.40282347E+38,
                     "default": 1.0,
                     "x-ui": {
+                      "unit": "× time",
+                      "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                       "slider": {
                         "min": 0.0,
                         "max": 100.0,
@@ -13937,6 +14215,21 @@
                       "unit": "seconds"
                     }
                   }
+                },
+                "default": {
+                  "dataUnitsPerMetre": 1.0,
+                  "loop": true,
+                  "speed": 1.0,
+                  "startTimeSeconds": 0.0,
+                  "maxGapSeconds": 0.1,
+                  "yawOffsetDegrees": 0.0,
+                  "centerOnAnimal": true,
+                  "periodicBoundary": true,
+                  "continueAfterTrack": false,
+                  "despawnDistanceMetres": 100.0,
+                  "terminalVelocityWindowSeconds": 0.1,
+                  "continuationSpeedMetresPerSecond": null,
+                  "preRollSeconds": 0.0
                 },
                 "x-ui": {
                   "enabledWhen": {
@@ -14525,6 +14818,12 @@
                           }
                         }
                       }
+                    },
+                    "default": {
+                      "r": 0.12,
+                      "g": 0.12,
+                      "b": 0.12,
+                      "a": 1.0
                     }
                   },
                   "metallic": {
@@ -15200,7 +15499,10 @@
               },
               "loop": {
                 "type": "boolean",
-                "default": true
+                "default": true,
+                "x-ui": {
+                  "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                }
               },
               "speed": {
                 "type": "number",
@@ -15208,6 +15510,8 @@
                 "maximum": 3.40282347E+38,
                 "default": 1.0,
                 "x-ui": {
+                  "unit": "× time",
+                  "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                   "slider": {
                     "min": 0.0,
                     "max": 100.0,
@@ -15316,6 +15620,21 @@
                   "unit": "seconds"
                 }
               }
+            },
+            "default": {
+              "dataUnitsPerMetre": 1.0,
+              "loop": true,
+              "speed": 1.0,
+              "startTimeSeconds": 0.0,
+              "maxGapSeconds": 0.1,
+              "yawOffsetDegrees": 0.0,
+              "centerOnAnimal": true,
+              "periodicBoundary": true,
+              "continueAfterTrack": false,
+              "despawnDistanceMetres": 100.0,
+              "terminalVelocityWindowSeconds": 0.1,
+              "continuationSpeedMetresPerSecond": null,
+              "preRollSeconds": 0.0
             },
             "x-ui": {
               "enabledWhen": {
@@ -15904,6 +16223,12 @@
                       }
                     }
                   }
+                },
+                "default": {
+                  "r": 0.12,
+                  "g": 0.12,
+                  "b": 0.12,
+                  "a": 1.0
                 }
               },
               "metallic": {
@@ -16257,7 +16582,10 @@
                   },
                   "loop": {
                     "type": "boolean",
-                    "default": true
+                    "default": true,
+                    "x-ui": {
+                      "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                    }
                   },
                   "speed": {
                     "type": "number",
@@ -16265,6 +16593,8 @@
                     "maximum": 3.40282347E+38,
                     "default": 1.0,
                     "x-ui": {
+                      "unit": "× time",
+                      "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                       "slider": {
                         "min": 0.0,
                         "max": 100.0,
@@ -16373,6 +16703,21 @@
                       "unit": "seconds"
                     }
                   }
+                },
+                "default": {
+                  "dataUnitsPerMetre": 1.0,
+                  "loop": true,
+                  "speed": 1.0,
+                  "startTimeSeconds": 0.0,
+                  "maxGapSeconds": 0.1,
+                  "yawOffsetDegrees": 0.0,
+                  "centerOnAnimal": true,
+                  "periodicBoundary": true,
+                  "continueAfterTrack": false,
+                  "despawnDistanceMetres": 100.0,
+                  "terminalVelocityWindowSeconds": 0.1,
+                  "continuationSpeedMetresPerSecond": null,
+                  "preRollSeconds": 0.0
                 },
                 "x-ui": {
                   "enabledWhen": {
@@ -16961,6 +17306,12 @@
                           }
                         }
                       }
+                    },
+                    "default": {
+                      "r": 0.12,
+                      "g": 0.12,
+                      "b": 0.12,
+                      "a": 1.0
                     }
                   },
                   "metallic": {
@@ -17074,7 +17425,10 @@
               },
               "loop": {
                 "type": "boolean",
-                "default": true
+                "default": true,
+                "x-ui": {
+                  "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                }
               },
               "speed": {
                 "type": "number",
@@ -17082,6 +17436,8 @@
                 "maximum": 3.40282347E+38,
                 "default": 1.0,
                 "x-ui": {
+                  "unit": "× time",
+                  "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                   "slider": {
                     "min": 0.0,
                     "max": 100.0,
@@ -17190,6 +17546,21 @@
                   "unit": "seconds"
                 }
               }
+            },
+            "default": {
+              "dataUnitsPerMetre": 1.0,
+              "loop": true,
+              "speed": 1.0,
+              "startTimeSeconds": 0.0,
+              "maxGapSeconds": 0.1,
+              "yawOffsetDegrees": 0.0,
+              "centerOnAnimal": true,
+              "periodicBoundary": true,
+              "continueAfterTrack": false,
+              "despawnDistanceMetres": 100.0,
+              "terminalVelocityWindowSeconds": 0.1,
+              "continuationSpeedMetresPerSecond": null,
+              "preRollSeconds": 0.0
             },
             "x-ui": {
               "enabledWhen": {
@@ -17778,6 +18149,12 @@
                       }
                     }
                   }
+                },
+                "default": {
+                  "r": 0.12,
+                  "g": 0.12,
+                  "b": 0.12,
+                  "a": 1.0
                 }
               },
               "metallic": {
@@ -18630,7 +19007,10 @@
           },
           "loop": {
             "type": "boolean",
-            "default": true
+            "default": true,
+            "x-ui": {
+              "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+            }
           },
           "speed": {
             "type": "number",
@@ -18638,6 +19018,8 @@
             "maximum": 3.40282347E+38,
             "default": 1.0,
             "x-ui": {
+              "unit": "× time",
+              "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
               "slider": {
                 "min": 0.0,
                 "max": 100.0,
@@ -18746,6 +19128,21 @@
               "unit": "seconds"
             }
           }
+        },
+        "default": {
+          "dataUnitsPerMetre": 1.0,
+          "loop": true,
+          "speed": 1.0,
+          "startTimeSeconds": 0.0,
+          "maxGapSeconds": 0.1,
+          "yawOffsetDegrees": 0.0,
+          "centerOnAnimal": true,
+          "periodicBoundary": true,
+          "continueAfterTrack": false,
+          "despawnDistanceMetres": 100.0,
+          "terminalVelocityWindowSeconds": 0.1,
+          "continuationSpeedMetresPerSecond": null,
+          "preRollSeconds": 0.0
         },
         "x-ui": {
           "enabledWhen": {
@@ -19334,6 +19731,12 @@
                   }
                 }
               }
+            },
+            "default": {
+              "r": 0.12,
+              "g": 0.12,
+              "b": 0.12,
+              "a": 1.0
             }
           },
           "metallic": {
@@ -20232,7 +20635,10 @@
               },
               "loop": {
                 "type": "boolean",
-                "default": true
+                "default": true,
+                "x-ui": {
+                  "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                }
               },
               "speed": {
                 "type": "number",
@@ -20240,6 +20646,8 @@
                 "maximum": 3.40282347E+38,
                 "default": 1.0,
                 "x-ui": {
+                  "unit": "× time",
+                  "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                   "slider": {
                     "min": 0.0,
                     "max": 100.0,
@@ -20348,6 +20756,21 @@
                   "unit": "seconds"
                 }
               }
+            },
+            "default": {
+              "dataUnitsPerMetre": 1.0,
+              "loop": true,
+              "speed": 1.0,
+              "startTimeSeconds": 0.0,
+              "maxGapSeconds": 0.1,
+              "yawOffsetDegrees": 0.0,
+              "centerOnAnimal": true,
+              "periodicBoundary": true,
+              "continueAfterTrack": false,
+              "despawnDistanceMetres": 100.0,
+              "terminalVelocityWindowSeconds": 0.1,
+              "continuationSpeedMetresPerSecond": null,
+              "preRollSeconds": 0.0
             },
             "x-ui": {
               "enabledWhen": {
@@ -20936,6 +21359,12 @@
                       }
                     }
                   }
+                },
+                "default": {
+                  "r": 0.12,
+                  "g": 0.12,
+                  "b": 0.12,
+                  "a": 1.0
                 }
               },
               "metallic": {
@@ -21854,7 +22283,10 @@
               },
               "loop": {
                 "type": "boolean",
-                "default": true
+                "default": true,
+                "x-ui": {
+                  "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                }
               },
               "speed": {
                 "type": "number",
@@ -21862,6 +22294,8 @@
                 "maximum": 3.40282347E+38,
                 "default": 1.0,
                 "x-ui": {
+                  "unit": "× time",
+                  "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                   "slider": {
                     "min": 0.0,
                     "max": 100.0,
@@ -21970,6 +22404,21 @@
                   "unit": "seconds"
                 }
               }
+            },
+            "default": {
+              "dataUnitsPerMetre": 1.0,
+              "loop": true,
+              "speed": 1.0,
+              "startTimeSeconds": 0.0,
+              "maxGapSeconds": 0.1,
+              "yawOffsetDegrees": 0.0,
+              "centerOnAnimal": true,
+              "periodicBoundary": true,
+              "continueAfterTrack": false,
+              "despawnDistanceMetres": 100.0,
+              "terminalVelocityWindowSeconds": 0.1,
+              "continuationSpeedMetresPerSecond": null,
+              "preRollSeconds": 0.0
             },
             "x-ui": {
               "enabledWhen": {
@@ -22558,6 +23007,12 @@
                       }
                     }
                   }
+                },
+                "default": {
+                  "r": 0.12,
+                  "g": 0.12,
+                  "b": 0.12,
+                  "a": 1.0
                 }
               },
               "metallic": {
@@ -23476,7 +23931,10 @@
               },
               "loop": {
                 "type": "boolean",
-                "default": true
+                "default": true,
+                "x-ui": {
+                  "help": "Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration."
+                }
               },
               "speed": {
                 "type": "number",
@@ -23484,6 +23942,8 @@
                 "maximum": 3.40282347E+38,
                 "default": 1.0,
                 "x-ui": {
+                  "unit": "× time",
+                  "help": "Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.",
                   "slider": {
                     "min": 0.0,
                     "max": 100.0,
@@ -23592,6 +24052,21 @@
                   "unit": "seconds"
                 }
               }
+            },
+            "default": {
+              "dataUnitsPerMetre": 1.0,
+              "loop": true,
+              "speed": 1.0,
+              "startTimeSeconds": 0.0,
+              "maxGapSeconds": 0.1,
+              "yawOffsetDegrees": 0.0,
+              "centerOnAnimal": true,
+              "periodicBoundary": true,
+              "continueAfterTrack": false,
+              "despawnDistanceMetres": 100.0,
+              "terminalVelocityWindowSeconds": 0.1,
+              "continuationSpeedMetresPerSecond": null,
+              "preRollSeconds": 0.0
             },
             "x-ui": {
               "enabledWhen": {
@@ -24180,6 +24655,12 @@
                       }
                     }
                   }
+                },
+                "default": {
+                  "r": 0.12,
+                  "g": 0.12,
+                  "b": 0.12,
+                  "a": 1.0
                 }
               },
               "metallic": {
@@ -24702,7 +25183,10 @@
       },
       "loop": {
         "type": "boolean",
-        "default": false
+        "default": false,
+        "x-ui": {
+          "help": "Repeat the configured optomotor stimuli while this scene runs. The sequence block's duration still ends the scene."
+        }
       },
       "stimuli": {
         "type": [
@@ -24722,6 +25206,7 @@
               "maximum": 3.40282347E+38,
               "default": 10.0,
               "x-ui": {
+                "help": "Duration of the stimulus in seconds",
                 "unit": "seconds",
                 "slider": {
                   "min": 1.0,
@@ -24736,6 +25221,8 @@
               "maximum": 3.40282347E+38,
               "default": 20.0,
               "x-ui": {
+                "help": "Angular drum speed in degrees per second. Use nonnegative speed and the clockwise switch to choose direction.",
+                "unit": "degrees / s",
                 "slider": {
                   "min": 0.0,
                   "max": 100.0,
@@ -24745,7 +25232,10 @@
             },
             "clockwise": {
               "type": "boolean",
-              "default": true
+              "default": true,
+              "x-ui": {
+                "help": "Whether the rotation is clockwise"
+              }
             },
             "rotationAxis": {
               "type": [
@@ -24757,7 +25247,10 @@
                 "Yaw",
                 "Pitch",
                 "Roll"
-              ]
+              ],
+              "x-ui": {
+                "help": "Axis of rotation (Yaw, Pitch, or Roll)"
+              }
             },
             "frequency": {
               "type": "number",
@@ -24765,6 +25258,7 @@
               "maximum": 3.40282347E+38,
               "default": 4.0,
               "x-ui": {
+                "help": "Spatial frequency of the grating in cycles per revolution",
                 "slider": {
                   "min": 0.0,
                   "max": 40.0,
@@ -24778,6 +25272,7 @@
               "maximum": 1,
               "default": 0.5,
               "x-ui": {
+                "help": "Contrast of the grating (0 = no contrast, 1 = maximum contrast)",
                 "slider": {
                   "min": 0.0,
                   "max": 1.0,
@@ -24791,6 +25286,7 @@
               "maximum": 1,
               "default": 0.5,
               "x-ui": {
+                "help": "Duty cycle of the grating (0 = all dark, 1 = all light, 0.5 = equal dark/light)",
                 "slider": {
                   "min": 0.0,
                   "max": 1.0,
@@ -24803,19 +25299,26 @@
                 "string",
                 "null"
               ],
-              "default": "#000000"
+              "default": "#000000",
+              "x-ui": {
+                "help": "First color of the grating in hex format (e.g. #000000)"
+              }
             },
             "color2": {
               "type": [
                 "string",
                 "null"
               ],
-              "default": "#FFFFFF"
+              "default": "#FFFFFF",
+              "x-ui": {
+                "help": "Second color of the grating in hex format (e.g. #FFFFFF)"
+              }
             },
             "closedLoopOrientation": {
               "type": "boolean",
               "default": false,
               "x-ui": {
+                "help": "Whether to use closed-loop orientation control",
                 "slider": {
                   "min": 0.0,
                   "max": 5.0,
@@ -24827,6 +25330,7 @@
               "type": "boolean",
               "default": false,
               "x-ui": {
+                "help": "Whether to use closed-loop position control",
                 "slider": {
                   "min": 0.0,
                   "max": 5.0,
@@ -25086,7 +25590,10 @@
           },
           "loop": {
             "type": "boolean",
-            "default": false
+            "default": false,
+            "x-ui": {
+              "help": "Repeat the configured optomotor stimuli while this scene runs. The sequence block's duration still ends the scene."
+            }
           },
           "stimuli": {
             "type": [
@@ -25106,6 +25613,7 @@
                   "maximum": 3.40282347E+38,
                   "default": 10.0,
                   "x-ui": {
+                    "help": "Duration of the stimulus in seconds",
                     "unit": "seconds",
                     "slider": {
                       "min": 1.0,
@@ -25120,6 +25628,8 @@
                   "maximum": 3.40282347E+38,
                   "default": 20.0,
                   "x-ui": {
+                    "help": "Angular drum speed in degrees per second. Use nonnegative speed and the clockwise switch to choose direction.",
+                    "unit": "degrees / s",
                     "slider": {
                       "min": 0.0,
                       "max": 100.0,
@@ -25129,7 +25639,10 @@
                 },
                 "clockwise": {
                   "type": "boolean",
-                  "default": true
+                  "default": true,
+                  "x-ui": {
+                    "help": "Whether the rotation is clockwise"
+                  }
                 },
                 "rotationAxis": {
                   "type": [
@@ -25141,7 +25654,10 @@
                     "Yaw",
                     "Pitch",
                     "Roll"
-                  ]
+                  ],
+                  "x-ui": {
+                    "help": "Axis of rotation (Yaw, Pitch, or Roll)"
+                  }
                 },
                 "frequency": {
                   "type": "number",
@@ -25149,6 +25665,7 @@
                   "maximum": 3.40282347E+38,
                   "default": 4.0,
                   "x-ui": {
+                    "help": "Spatial frequency of the grating in cycles per revolution",
                     "slider": {
                       "min": 0.0,
                       "max": 40.0,
@@ -25162,6 +25679,7 @@
                   "maximum": 1,
                   "default": 0.5,
                   "x-ui": {
+                    "help": "Contrast of the grating (0 = no contrast, 1 = maximum contrast)",
                     "slider": {
                       "min": 0.0,
                       "max": 1.0,
@@ -25175,6 +25693,7 @@
                   "maximum": 1,
                   "default": 0.5,
                   "x-ui": {
+                    "help": "Duty cycle of the grating (0 = all dark, 1 = all light, 0.5 = equal dark/light)",
                     "slider": {
                       "min": 0.0,
                       "max": 1.0,
@@ -25187,19 +25706,26 @@
                     "string",
                     "null"
                   ],
-                  "default": "#000000"
+                  "default": "#000000",
+                  "x-ui": {
+                    "help": "First color of the grating in hex format (e.g. #000000)"
+                  }
                 },
                 "color2": {
                   "type": [
                     "string",
                     "null"
                   ],
-                  "default": "#FFFFFF"
+                  "default": "#FFFFFF",
+                  "x-ui": {
+                    "help": "Second color of the grating in hex format (e.g. #FFFFFF)"
+                  }
                 },
                 "closedLoopOrientation": {
                   "type": "boolean",
                   "default": false,
                   "x-ui": {
+                    "help": "Whether to use closed-loop orientation control",
                     "slider": {
                       "min": 0.0,
                       "max": 5.0,
@@ -25211,6 +25737,7 @@
                   "type": "boolean",
                   "default": false,
                   "x-ui": {
+                    "help": "Whether to use closed-loop position control",
                     "slider": {
                       "min": 0.0,
                       "max": 5.0,
@@ -25539,7 +26066,10 @@
           },
           "loop": {
             "type": "boolean",
-            "default": false
+            "default": false,
+            "x-ui": {
+              "help": "Repeat the configured optomotor stimuli while this scene runs. The sequence block's duration still ends the scene."
+            }
           },
           "stimuli": {
             "type": [
@@ -25559,6 +26089,7 @@
                   "maximum": 3.40282347E+38,
                   "default": 10.0,
                   "x-ui": {
+                    "help": "Duration of the stimulus in seconds",
                     "unit": "seconds",
                     "slider": {
                       "min": 1.0,
@@ -25573,6 +26104,8 @@
                   "maximum": 3.40282347E+38,
                   "default": 20.0,
                   "x-ui": {
+                    "help": "Angular drum speed in degrees per second. Use nonnegative speed and the clockwise switch to choose direction.",
+                    "unit": "degrees / s",
                     "slider": {
                       "min": 0.0,
                       "max": 100.0,
@@ -25582,7 +26115,10 @@
                 },
                 "clockwise": {
                   "type": "boolean",
-                  "default": true
+                  "default": true,
+                  "x-ui": {
+                    "help": "Whether the rotation is clockwise"
+                  }
                 },
                 "rotationAxis": {
                   "type": [
@@ -25594,7 +26130,10 @@
                     "Yaw",
                     "Pitch",
                     "Roll"
-                  ]
+                  ],
+                  "x-ui": {
+                    "help": "Axis of rotation (Yaw, Pitch, or Roll)"
+                  }
                 },
                 "frequency": {
                   "type": "number",
@@ -25602,6 +26141,7 @@
                   "maximum": 3.40282347E+38,
                   "default": 4.0,
                   "x-ui": {
+                    "help": "Spatial frequency of the grating in cycles per revolution",
                     "slider": {
                       "min": 0.0,
                       "max": 40.0,
@@ -25615,6 +26155,7 @@
                   "maximum": 1,
                   "default": 0.5,
                   "x-ui": {
+                    "help": "Contrast of the grating (0 = no contrast, 1 = maximum contrast)",
                     "slider": {
                       "min": 0.0,
                       "max": 1.0,
@@ -25628,6 +26169,7 @@
                   "maximum": 1,
                   "default": 0.5,
                   "x-ui": {
+                    "help": "Duty cycle of the grating (0 = all dark, 1 = all light, 0.5 = equal dark/light)",
                     "slider": {
                       "min": 0.0,
                       "max": 1.0,
@@ -25640,19 +26182,26 @@
                     "string",
                     "null"
                   ],
-                  "default": "#000000"
+                  "default": "#000000",
+                  "x-ui": {
+                    "help": "First color of the grating in hex format (e.g. #000000)"
+                  }
                 },
                 "color2": {
                   "type": [
                     "string",
                     "null"
                   ],
-                  "default": "#FFFFFF"
+                  "default": "#FFFFFF",
+                  "x-ui": {
+                    "help": "Second color of the grating in hex format (e.g. #FFFFFF)"
+                  }
                 },
                 "closedLoopOrientation": {
                   "type": "boolean",
                   "default": false,
                   "x-ui": {
+                    "help": "Whether to use closed-loop orientation control",
                     "slider": {
                       "min": 0.0,
                       "max": 5.0,
@@ -25664,6 +26213,7 @@
                   "type": "boolean",
                   "default": false,
                   "x-ui": {
+                    "help": "Whether to use closed-loop position control",
                     "slider": {
                       "min": 0.0,
                       "max": 5.0,
@@ -25992,7 +26542,10 @@
           },
           "loop": {
             "type": "boolean",
-            "default": false
+            "default": false,
+            "x-ui": {
+              "help": "Repeat the configured optomotor stimuli while this scene runs. The sequence block's duration still ends the scene."
+            }
           },
           "stimuli": {
             "type": [
@@ -26012,6 +26565,7 @@
                   "maximum": 3.40282347E+38,
                   "default": 10.0,
                   "x-ui": {
+                    "help": "Duration of the stimulus in seconds",
                     "unit": "seconds",
                     "slider": {
                       "min": 1.0,
@@ -26026,6 +26580,8 @@
                   "maximum": 3.40282347E+38,
                   "default": 20.0,
                   "x-ui": {
+                    "help": "Angular drum speed in degrees per second. Use nonnegative speed and the clockwise switch to choose direction.",
+                    "unit": "degrees / s",
                     "slider": {
                       "min": 0.0,
                       "max": 100.0,
@@ -26035,7 +26591,10 @@
                 },
                 "clockwise": {
                   "type": "boolean",
-                  "default": true
+                  "default": true,
+                  "x-ui": {
+                    "help": "Whether the rotation is clockwise"
+                  }
                 },
                 "rotationAxis": {
                   "type": [
@@ -26047,7 +26606,10 @@
                     "Yaw",
                     "Pitch",
                     "Roll"
-                  ]
+                  ],
+                  "x-ui": {
+                    "help": "Axis of rotation (Yaw, Pitch, or Roll)"
+                  }
                 },
                 "frequency": {
                   "type": "number",
@@ -26055,6 +26617,7 @@
                   "maximum": 3.40282347E+38,
                   "default": 4.0,
                   "x-ui": {
+                    "help": "Spatial frequency of the grating in cycles per revolution",
                     "slider": {
                       "min": 0.0,
                       "max": 40.0,
@@ -26068,6 +26631,7 @@
                   "maximum": 1,
                   "default": 0.5,
                   "x-ui": {
+                    "help": "Contrast of the grating (0 = no contrast, 1 = maximum contrast)",
                     "slider": {
                       "min": 0.0,
                       "max": 1.0,
@@ -26081,6 +26645,7 @@
                   "maximum": 1,
                   "default": 0.5,
                   "x-ui": {
+                    "help": "Duty cycle of the grating (0 = all dark, 1 = all light, 0.5 = equal dark/light)",
                     "slider": {
                       "min": 0.0,
                       "max": 1.0,
@@ -26093,19 +26658,26 @@
                     "string",
                     "null"
                   ],
-                  "default": "#000000"
+                  "default": "#000000",
+                  "x-ui": {
+                    "help": "First color of the grating in hex format (e.g. #000000)"
+                  }
                 },
                 "color2": {
                   "type": [
                     "string",
                     "null"
                   ],
-                  "default": "#FFFFFF"
+                  "default": "#FFFFFF",
+                  "x-ui": {
+                    "help": "Second color of the grating in hex format (e.g. #FFFFFF)"
+                  }
                 },
                 "closedLoopOrientation": {
                   "type": "boolean",
                   "default": false,
                   "x-ui": {
+                    "help": "Whether to use closed-loop orientation control",
                     "slider": {
                       "min": 0.0,
                       "max": 5.0,
@@ -26117,6 +26689,7 @@
                   "type": "boolean",
                   "default": false,
                   "x-ui": {
+                    "help": "Whether to use closed-loop position control",
                     "slider": {
                       "min": 0.0,
                       "max": 5.0,
@@ -26896,6 +27469,11 @@
                 "default": 0
               }
             },
+            "default": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
             "x-ui": {
               "enabledWhen": {
                 "property": "resetPositionOnStart",
@@ -26921,6 +27499,11 @@
                 "type": "number",
                 "default": 0
               }
+            },
+            "default": {
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
             },
             "x-ui": {
               "enabledWhen": {
@@ -27465,6 +28048,11 @@
                   "default": 0
                 }
               },
+              "default": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
               "x-ui": {
                 "enabledWhen": {
                   "property": "resetPositionOnStart",
@@ -27490,6 +28078,11 @@
                   "type": "number",
                   "default": 0
                 }
+              },
+              "default": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
               },
               "x-ui": {
                 "enabledWhen": {

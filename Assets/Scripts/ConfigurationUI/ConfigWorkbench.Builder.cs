@@ -23,9 +23,9 @@ namespace ConfigurationUI
         private readonly HashSet<string> expandedSections=new HashSet<string>();
         private static string Pretty(string key)
         {
-            var names=new Dictionary<string,string> { ["closedLoopOrientation"]="Tracked turning",["closedLoopPosition"]="Tracked translation",["autoTrim"]="Auto-trim",["reloadScene"]="Reload environment",["autoStart"]="Start automatically",["randomise"]="Shuffle blocks",["loop"]="Loop sequence",["aglHeight"]="Height above terrain",["mu"]="Mean heading",["kappa"]="Heading concentration",["numberOfLocusts"]="Agent count",["nightSky"]="Night sky",["zmqAddress"]="Tracking host",["zmqPort"]="Tracking port" };
+            var names=new Dictionary<string,string> { ["closedLoopOrientation"]="Closed loop orientation",["closedLoopPosition"]="Closed loop position",["closedLoopMode"]="Input mode",["vrId"]="VR ID",["ledPanelWidth"]="LED panel width",["ledPanelHeight"]="LED panel height",["vSyncCount"]="VSync count",["autoTrim"]="Auto-trim",["reloadScene"]="Reload environment",["autoStart"]="Start automatically",["randomise"]="Shuffle blocks",["loop"]="Loop sequence",["aglHeight"]="Height above terrain",["mu"]="Mean heading",["kappa"]="Heading concentration",["numberOfLocusts"]="Agent count",["nightSky"]="Night sky",["zmqAddress"]="Input host",["zmqPort"]="Input port" };
             if(names.TryGetValue(key,out string label)) return label;
-            string text=Human(key); return string.IsNullOrEmpty(text)?text:char.ToUpperInvariant(text[0])+text.Substring(1);
+            string text=Human(key).ToLowerInvariant(); return string.IsNullOrEmpty(text)?text:char.ToUpperInvariant(text[0])+text.Substring(1);
         }
         private Button StudioButton(string text,string icon,Action action,string css=null)
         {
@@ -41,22 +41,23 @@ namespace ConfigurationUI
         {
             side.Clear(); side.AddToClassList("studio-sidebar");
             side.Add(new Label("WORKSPACE") { name="navigation-title" });
-            side.Add(StudioButton("Sequence config","sequence",()=>Select(Workspace.Sequence),selected==Workspace.Sequence?"nav-active":null));
-            side.Add(StudioButton("System config","system",()=>Select(Workspace.System),selected==Workspace.System?"nav-active":null));
-            side.Add(StudioButton("Session","home",ShowSessionHome));
-            side.Add(new Label("EXPERIMENT CONFIGS"));
+            var session=StudioButton("Session","home",ShowSessionHome,homeMode?"nav-active":null); session.name="back-to-session"; session.tooltip="Subject IDs, experimenter and session notes. These are saved with this run."; side.Add(session);
+            var sequence=StudioButton("Sequence config","sequence",()=>Select(Workspace.Sequence),!homeMode && !experimentIndexMode && selected==Workspace.Sequence?"nav-active":null); sequence.name="open-sequence"; sequence.tooltip="Order, duration, gain and trim settings for the experiment blocks."; side.Add(sequence);
+            var system=StudioButton("System config","system",()=>Select(Workspace.System),!homeMode && !experimentIndexMode && selected==Workspace.System?"nav-active":null); system.name="open-system"; system.tooltip="Physical rigs, closed loop input, camera layout, frame pacing and operator monitoring."; side.Add(system);
+            var experiments=StudioButton("Experiment configs","settings",ShowExperimentConfigs,experimentIndexMode || !homeMode && selected!=Workspace.Sequence && selected!=Workspace.System?"nav-active":null); experiments.name="open-experiments"; experiments.tooltip="Open the experiment files used in this sequence; stimulus and movement settings belong here."; side.Add(experiments);
+            side.Add(new Label("IN THIS SEQUENCE"));
             var linked=new HashSet<string>(BuilderSteps.OfType<JObject>().Select(BlockReference).Where(r=>!string.IsNullOrEmpty(r)).Select(r=>Path.GetFullPath(ExperimentConfigFiles.Resolve(r))));
             foreach(var doc in Workspace.Documents.Where(d=>d.SchemaId!="sequence" && d.SchemaId!="system" && linked.Contains(d.Path)))
             {
-                var b=StudioButton(ExperimentBlocks.Title(doc.Path)+(doc.Dirty?" •":""),doc.SchemaId=="swarm"?"swarm":doc.SchemaId=="optomotor"?"settings":"file",()=>Select(doc),selected==doc?"nav-active":null);
-                b.tooltip=doc.Path; side.Add(b);
+                var b=StudioButton(ExperimentBlocks.Title(doc.Path)+(doc.Dirty?" •":""),doc.SchemaId=="swarm"?"swarm":doc.SchemaId=="optomotor"?"settings":"file",()=>Select(doc),!homeMode && !experimentIndexMode && selected==doc?"file-active":null);
+                b.AddToClassList("nav-file"); b.tooltip="Edit this experiment file: "+doc.Path; side.Add(b);
             }
             side.Add(new Label("LIBRARY"));
             side.Add(StudioButton("Browse configs","plus",()=>ShowBlockLibrary()));
             side.Add(StudioButton("Open a file","file",ShowOpenFile));
             side.Add(StudioButton("Save a variation","copy",()=>ShowVariation(null)));
-            side.Add(new Label("JSON remains fully editable. Builder controls never insert values just by displaying them."));
             side.Add(StudioButton("Quit","play",()=>Application.Quit(),"quiet"));
+            foreach(var heading in side.Children().OfType<Label>()) heading.AddToClassList("nav-heading");
         }
         private void BuildStudio()
         {
@@ -197,7 +198,7 @@ namespace ConfigurationUI
                 if(ExperimentBlocks.Phased(config)) inspector.Add(new Label("Its phase timeline owns run timing. The outer duration is retained as a fallback."));
                 var sceneChoices=ScenesFor(ConfigSchema.ForScene((string)step["sceneName"]));
                 string scene=(string)step["sceneName"]??"Choice"; if(!sceneChoices.Contains(scene)) sceneChoices.Add(scene);
-                var dropdown=new DropdownField("Environment",sceneChoices,Math.Max(0,sceneChoices.IndexOf(scene))); inspector.Add(dropdown);
+                var dropdown=new DropdownField("Environment",sceneChoices,Math.Max(0,sceneChoices.IndexOf(scene))) { tooltip="Unity scene used for this block. Its experiment file controls the stimulus and movement settings." }; inspector.Add(dropdown);
                 dropdown.RegisterValueChangedCallback(e=>StudioEdit(Workspace.Sequence,r=>r["sequences"][activeBlock]["sceneName"]=e.newValue));
                 var schema=(JObject)Workspace.Schemas.Get("sequence")["properties"]["sequences"]["items"];
                 foreach(string key in new[]{"duration","gain","autoTrim","reloadScene"})

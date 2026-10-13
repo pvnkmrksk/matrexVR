@@ -13,6 +13,7 @@ public class fps : MonoBehaviour
         public string graphicsApi;
     }
     public static FrameStatistics Latest { get; private set; }
+    public bool OverlayVisible => displayCanvas != null && displayCanvas.enabled;
     private static fps instance;
     private Text label;
     private Canvas displayCanvas;
@@ -73,6 +74,9 @@ public class fps : MonoBehaviour
     private void Update()
     {
         if (instance != this) return;
+        // Setup owns the frame readout. Keep the same timing collector for telemetry,
+        // and restore the standalone readout when the workbench closes.
+        displayCanvas.enabled = !ConfigurationUI.ConfigWorkbench.IsOpen;
         double now = Time.realtimeSinceStartupAsDouble;
         double interval = now - previousTime;
         previousTime = now;

@@ -48,6 +48,7 @@ namespace ConfigurationUI
         private TextField SessionField(VisualElement parent,string label,string name,string value,Action<string> change,string placeholder,bool multiline=false)
         {
             var field=new TextField(label) { name=name,value=value??"",multiline=multiline };
+            field.tooltip=label+". "+placeholder+". Saved in this run's subject/session metadata.";
             field.textEdition.placeholder=placeholder; field.AddToClassList("session-field");
             if(multiline) field.AddToClassList("session-comments");
             field.RegisterValueChangedCallback(e=>change(e.newValue)); parent.Add(field); return field;
@@ -65,9 +66,8 @@ namespace ConfigurationUI
             var scroll=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; scroll.AddToClassList("session-scroll"); body.Add(scroll);
             var welcome=Row("session-welcome"); scroll.Add(welcome);
             var titles=new VisualElement(); titles.style.flexGrow=1; welcome.Add(titles);
-            var title=new Label("Set up your session"); title.AddToClassList("title"); titles.Add(title);
+            var title=new Label("Session"); title.AddToClassList("title"); titles.Add(title);
             var hint=new Label("Label your subjects, check the plan, and you're ready to run."); hint.AddToClassList("session-hint"); titles.Add(hint);
-            welcome.Add(BuildSequenceFlags());
 
             var details=Row("session-details"); scroll.Add(details);
             SessionField(details,"Experiment name","session-experiment-name",metadata.ExperimentName,v=>metadata.ExperimentName=v,"Name this experiment");
@@ -89,7 +89,7 @@ namespace ConfigurationUI
                 var sexes=new List<string>{"Unspecified","Female","Male"};
                 string sex=string.IsNullOrEmpty(fly.Sex)?"Unspecified":fly.Sex;
                 if(!sexes.Contains(sex)) sexes.Add(sex); // Preserve labels from existing metadata.
-                var sexField=new DropdownField("Sex",sexes,0) { name="subject-sex-"+id,value=sex }; traits.Add(sexField);
+                var sexField=new DropdownField("Sex",sexes,0) { name="subject-sex-"+id,value=sex,tooltip="Subject sex recorded with the run. Unspecified leaves it unclassified." }; traits.Add(sexField);
                 sexField.RegisterValueChangedCallback(e=>fly.Sex=e.newValue);
                 SessionField(traits,"Age (days)","subject-age-"+id,fly.AgeDays,v=>fly.AgeDays=v,"Unspecified");
                 SessionField(card,"Comments","subject-comments-"+id,fly.Comments,v=>fly.Comments=v,"Notes for "+id,true);
@@ -106,7 +106,7 @@ namespace ConfigurationUI
             var summaryIndices=Enumerable.Range(0,BuilderSteps.Count).ToList();
             var plan=new ListView(summaryIndices,50,()=>new VisualElement(),BindSessionBlock)
             { name="session-plan",selectionType=SelectionType.None,virtualizationMethod=CollectionVirtualizationMethod.FixedHeight };
-            plan.AddToClassList("session-plan"); plan.style.height=Math.Min(3,Math.Max(1,BuilderSteps.Count))*50; scroll.Add(plan);
+            plan.AddToClassList("session-plan"); plan.style.height=Math.Min(6,Math.Max(1,BuilderSteps.Count))*50; scroll.Add(plan);
             if(BuilderSteps.Count==0) scroll.Add(StudioButton("Add your first block","plus",()=>{ Select(Workspace.Sequence); ShowBlockLibrary(); },"primary"));
             UpdateStatus();
         }
@@ -123,7 +123,7 @@ namespace ConfigurationUI
             string inputs=string.Join(", ",rigs.Select(r=>r["vrId"]+" "+(r["zmqAddress"]?.ToString()??"localhost")+":"+(r["zmqPort"]?.ToString()??"9872")));
             var telemetry=Workspace.System.Root["telemetry"];
             string output=ExperimentBlocks.Flag(telemetry?["enabled"],true)?"Telemetry → "+(telemetry?["bindAddress"]?.ToString()??"127.0.0.1")+":"+(telemetry?["port"]?.ToString()??"9880"):"Telemetry off";
-            return modes+" · "+rigs.Count+" VRs · "+panels+"\nTracking input: "+inputs+"\n"+output;
+            return modes+" · "+rigs.Count+" VRs · "+panels+"\nClosed loop input: "+inputs+"\n"+output;
         }
         private static string RigMode(JObject rig)
         {
