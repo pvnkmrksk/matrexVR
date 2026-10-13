@@ -125,3 +125,9 @@ The previous README identifies this project as MIT-licensed; this checkout has n
 
 - [Unity Engine](https://unity.com/)
 - [NetMQ](https://github.com/zeromq/netmq)
+
+## Visual and navigational rugosity
+
+Use **Tools → Rugosity → Open RS tuning scene** for a landscape with rough and smooth regions. Its Inspector independently selects visible geometry, physical collision, height reference and normal reference; changes work live in Play mode and can be retained after Stop or exported to JSON.
+
+See [the rugosity guide](docs/rugosity.md) for traditional matching geometry, visible bumps with a level camera, a flat view with hidden rough motion, fixed-height controls, scene/choice/sequence precedence and six runnable configs. Open ControlScene and press Play to cycle through all six conditions. The previous Selwyn sequence is saved as `Examples/Sequences/selwyn-before-rugosity.json`.
