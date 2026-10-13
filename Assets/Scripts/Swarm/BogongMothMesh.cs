@@ -74,7 +74,7 @@ public static class BogongMothMesh
                 float sign = wing == 0 ? -1 : 1;
                 local.Add(new Vector3(0, 0, -.35f)); local.Add(new Vector3(sign, 0, -.25f));
                 local.Add(new Vector3(sign, 0, .25f)); local.Add(new Vector3(0, 0, .35f));
-                for (int j = 0; j < 4; j++) parts.Add(new Vector2(1, 0));
+                for (int j = 0; j < 4; j++) parts.Add(new Vector2(1, sign));
                 int v = start + 32 + wing * 4;
                 indices.AddRange(new[] { v, v + 1, v + 2, v, v + 2, v + 3 });
             }

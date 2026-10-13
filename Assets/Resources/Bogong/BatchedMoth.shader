@@ -53,6 +53,10 @@ Shader "Bogong/BatchedMoth"
                 float3 rightNormal = mul((float3x3)UNITY_MATRIX_V, rotate(v.rotation,float3(-sin(wingAngle),cos(wingAngle),0)));
                 float wingArea = _WingSpan * _BodyLength * .6 * factor * factor *
                     .5 * (abs(leftNormal.z)+abs(rightNormal.z)) * scale * scale * _WingOpacity;
+                // A rudimentary 0.5mm blur edge for a 1cm body, retaining physical area.
+                // It is the same coupled wing pair, not an extra silhouette or opacity floor.
+                float blurWidth = _BodyDiameter * .05 * factor;
+                wingArea += _WingSpan * factor * blurWidth * abs(forward.z) * scale * scale * _WingOpacity;
                 // Keep faint flap motion below one pixel as well as in the near-field geometry.
                 float3 wingShift = mul((float3x3)UNITY_MATRIX_V,
                     rotate(v.rotation,float3(0,_WingSpan*.25*factor*sin(wingAngle),0)));
@@ -67,13 +71,32 @@ Shader "Bogong/BatchedMoth"
                     local.z = v.local.z * _BodyLength * factor;
                 }
                 float3 view = center + mul((float3x3)UNITY_MATRIX_V, rotate(v.rotation,local));
+                float wingAlpha = _WingOpacity;
+                if (v.part.x > .5 && v.part.x < 1.5)
+                {
+                    float normalZ = v.part.y < 0 ? abs(leftNormal.z) : abs(rightNormal.z);
+                    float3 span = mul((float3x3)UNITY_MATRIX_V,
+                        rotate(v.rotation,float3(v.part.y*cos(wingAngle),sin(wingAngle),0)));
+                    if (normalZ < .05 && length(span.xy) > .1)
+                    {
+                        // Support a thin projected edge on the raster while reducing its
+                        // opacity by its actual coverage. Front/back flapping no longer vanishes.
+                        float width = max(blurWidth*abs(forward.z),_BodyLength*.6*factor*normalZ);
+                        float widthPixels = width * scale;
+                        float2 across = normalize(float2(-span.y,span.x));
+                        local.z = 0;
+                        view = center + mul((float3x3)UNITY_MATRIX_V,rotate(v.rotation,local));
+                        view.xy += across * (v.local.z/.6) * max(1,widthPixels) / max(.0001,scale);
+                        wingAlpha *= saturate(widthPixels);
+                    }
+                }
                 if (v.part.x > 1.5)
-                    view = center + float3(v.local.xy / max(.0001,scale) + wingShift.xy * _WingOpacity, 0);
+                    view = center + float3(v.local.xy / max(.0001,scale) + wingShift.xy * wingArea / max(.000001,area+wingArea), 0);
                 o.position = mul(UNITY_MATRIX_P, float4(view,1));
                 o.proxy = v.local.xy;
                 // A bilinear point footprint partitions area across 1-4 pixels without
                 // spreading a subpixel moth's contrast across a fixed 3x3 blur.
-                o.info = float4(v.part.x, area+wingArea, .8 + .2 * abs(v.local.y), extent);
+                o.info = float4(v.part.x, area+wingArea, v.part.x > .5 && v.part.x < 1.5 ? wingAlpha : .8 + .2 * abs(v.local.y), extent);
                 return o;
             }
             float4 frag(v2f i):SV_Target
@@ -85,7 +108,7 @@ Shader "Bogong/BatchedMoth"
                     float coverage = saturate(weight.x * weight.y * i.info.y);
                     return float4(_Color.rgb, coverage);
                 }
-                if (i.info.x > .5) return float4(_Color.rgb, _WingOpacity);
+                if (i.info.x > .5) return float4(_Color.rgb, i.info.z);
                 return float4(_Color.rgb * i.info.z, 1);
             }
             ENDCG
