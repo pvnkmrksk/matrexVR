@@ -8,7 +8,7 @@ Old flat experiments still work. Their sequence presentation timer begins after 
 
 The mean is `atan2(mean(sin(yaw)), mean(cos(yaw)))`; resultant length is `sqrt(mean(sin(yaw))² + mean(cos(yaw))²)`. One current virtual yaw sample is taken per rendered frame during the requested window. Samples are equally weighted, with no invented catch-up samples. There is no stability threshold; circling animals still get a finite angle with low resultant length. Kinefly input is control input, not the heading being averaged. Zero is +Z, +90° is right, and −90° is left of the frozen mean when opted in. Subsequent turns do not move that reference.
 
-`heading_reference.jsonl` records per-rig measurement completion; `experiment_phases.jsonl` records actual phase onsets and the references used then. Telemetry repeats the frozen results for late subscribers. The active [Selwyn recipe](../Assets/StreamingAssets/Examples/Flight/selwyn-stars-left-swarm.example.json) runs four minutes of stars then four minutes of gray sky and a leftward dorsal swarm.
+`heading_reference.jsonl` records per-rig measurement completion; `experiment_phases.jsonl` records actual phase onsets and the references used then. Telemetry repeats the frozen results for late subscribers. The active [Selwyn cycle](selwyn-milky-way-swarm-cycle.md) runs one-time trimming, then repeating Milky Way-only, Milky Way/swarm and swarm-only blocks. Its named cross-block references are recorded in `heading_reference.jsonl` and resolved into each swarm log header. The earlier [leftward swarm recipe](../Assets/StreamingAssets/Examples/Flight/selwyn-stars-left-swarm.example.json) remains a separate phased example.
 
 ## Dedicated outbound ZMQ channel
 

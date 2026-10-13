@@ -6,7 +6,7 @@ MasterDataLogger creates `Assets/RunData/yyyyMMdd_HHmmss/` in the Editor (`Appli
 
 Sampling is once per rendered Update, not a fixed Hz acquisition clock. Disk buffering flushes about every 0.5 seconds; clean scene exit flushes remaining rows. Wall-clock timestamps are local machine time and contain milliseconds, without a timezone offset. Record the workstation timezone and synchronize machines for cross-device analysis. Do not assume rows are evenly spaced or use row number as elapsed time.
 
-Swarm position snapshots are captured in LateUpdate; CSV formatting, gzip and disk writes run on a worker. They retain sample-time metadata and drain on clean exit. The dashboard reports queue overflow/dropped frames. Embedded Choice/Selwyn swarms currently have no agent-position logger.
+Swarm position snapshots are captured in LateUpdate after generated movement; CSV formatting, gzip and disk writes run on a worker. They retain sample-time metadata and drain on clean exit. The dashboard reports queue overflow/dropped frames. Embedded Choice/Selwyn swarms also record all presented agent positions in one gzip file per rig/population.
 
 ## Rig CSV (`*_VRn_.csv`)
 
@@ -76,6 +76,8 @@ Each row is one visible-model root per frame. VRIndex is 1–4; CloneIndex is ze
 
 Swarm gzip CSV uses nine row columns: `Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase`. Its header then appends `NumberOfLocusts:...`, `SpawnAreaSize:...`, `Mu:...`, `Kappa:...`, `LocustSpeed:...` as **header metadata**, not per-row columns. Read nine data columns and parse the appended metadata separately (older files have six or eight data columns). Units: X/Y/Z and area size in scene world units (cm in walking scenes, m on terrain), mu in degrees, kappa dimensionless, speed in world units/s. These logs have positions but no heading column; use experiment settings or extend the logger if individual heading histories are required.
 
+New headers additionally include `LocustSpeedStdDev` in world units/s, `DirectionDistribution` and `KappaElevation`; the nine data columns are unchanged. `LocustSpeed` is the generated population mean, not each individual's sampled speed. The archived experiment specifies the distribution; successive recorded positions give the realized motion. Periodic crossings jump across the cube and must be unwrapped before estimating speed. Embedded Choice populations create a new per-rig file when a phase rebuilds them.
+
 See [night-sky.md](night-sky.md) for the `Skyboxes/` image/manifest files, `usage.jsonl` activation audit, and `loads.csv` load history. Each load records the previous/new IDs, panorama filename, actual load time and represented sky time in UTC and observer-local time with an explicit offset. These are included in the normal run directory/ZIP. The sky ID identifies a scene stimulus, including when scene geometry occludes it; it does not identify a camera screenshot.
 
 Band gzip CSV has twelve row columns: `Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase,experimentPhase`, followed by extra `Key:Value` header metadata for spawn/boundary/grid parameters. Speed is cm/s; VisibilityPhase is elapsed phase in seconds modulo the total on+off cycle, not a normalized fraction. Read twelve data columns, then parse header metadata separately (older files have eleven). Layer indicates the rig-specific stimulus population, not a physical display number.
@@ -103,3 +105,5 @@ Replay settings are inspector/UI fields: sessionFolder (newest when empty), abso
 ## Live monitoring and heading-onset records
 
 The dedicated `matrex.telemetry.v1` PUB stream provides all rigs on port 9880, separately from tracking inputs. Heading-relative presentations append per-rig onset context to `heading_reference.jsonl`. See [the versioned telemetry and onset schema](heading-reference-telemetry.md) for clocks, coordinate units, raw/consumed inputs, gains, sample freshness, circular mean and resultant length.
+
+For named cross-block heading references, `heading_reference.jsonl` additionally records `savedAs` and `measureDuringPresentation`. In the current Selwyn cycle, measurements are independent per rig, saved as `milky-way-baseline` each 240-second Milky Way block, and the following two swarm headers record the resolved world `Mu`. Sequence `CurrentTrial` increments when the repeated block group restarts; the setup prefix occurs only in the first pass.

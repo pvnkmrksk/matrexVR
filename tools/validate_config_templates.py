@@ -4,6 +4,7 @@ import json
 import re
 import hashlib
 import math
+import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,6 +53,10 @@ def validate(obj, path):
     if obj.get('swarm') is not None:
         validate(obj['swarm'], str(path) + ':swarm')
     if 'sequences' in obj:
+        loop_start = obj.get('loopStartIndex', 0)
+        assert isinstance(loop_start, int) and not isinstance(loop_start, bool) and loop_start >= 0, (path, 'loopStartIndex')
+        if loop_start:
+            assert loop_start < len(obj['sequences']) and not obj.get('randomise', False), (path, 'loopStartIndex requires an existing row and fixed order')
         for step in obj['sequences']:
             assert step['sceneName'] in scenes, (path, step['sceneName'])
             assert step['duration'] > 0, path
@@ -64,6 +69,8 @@ def validate(obj, path):
     if 'headingReference' in obj:
         reference = obj['headingReference']
         assert isinstance(reference.get('enabled', False), bool), path
+        assert isinstance(reference.get('measureDuringPresentation', False), bool), path
+        assert isinstance(reference.get('saveAs', ''), str), path
         if reference.get('enabled', False):
             assert reference.get('startOffsetSeconds', 0) >= 0, path
         if reference.get('enabled', False):
@@ -99,8 +106,18 @@ def validate(obj, path):
         assert obj['agentVisual'] in ['ScenePrefab', 'Bogong'], path
     if 'dimension' in obj:
         assert obj['dimension'] in ['2D', '3D'], path
+    if 'directionDistribution' in obj:
+        assert obj['directionDistribution'] in ['Legacy', 'VonMises'], path
+    if obj.get('headingReferenceId'):
+        assert obj.get('useHeadingReference') is True, path
     if 'density' in obj and obj['density'] is not None:
         assert obj['density'] >= 0, path
+    if 'locustSpeedStdDev' in obj:
+        assert obj['locustSpeedStdDev'] >= 0, path
+    if 'volumeHalfExtentMetres' in obj and obj['volumeHalfExtentMetres'] is not None:
+        assert obj['volumeHalfExtentMetres'] > 0, path
+    if 'preserveBoundaryOvershoot' in obj:
+        assert isinstance(obj['preserveBoundaryOvershoot'], bool), path
     if 'spawnVolumeSize' in obj:
         size = obj['spawnVolumeSize']
         assert size is None or all(size[key] > 0 for key in ['x', 'y', 'z']), path
@@ -122,6 +139,15 @@ def validate(obj, path):
         assert sky.get('imageWidth', 4096) in [1024, 2048, 4096], path
 
 paths = sorted(list(TEMPLATES.glob('*.json')) + list((SA / 'Examples').rglob('*.json')))
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--exclude', action='append', default=[], metavar='STREAMING_ASSETS_PATH',
+                    help='Explicitly omit a locally edited example from schema validation; other wiring/archive checks still run.')
+options = parser.parse_args()
+excluded = {SA / path for path in options.exclude}
+assert excluded <= set(paths), ('Unknown exclusion', excluded - set(paths))
+paths = [path for path in paths if path not in excluded]
+if excluded:
+    print('Explicitly excluded from schema checks: ' + ', '.join(str(path.relative_to(SA)) for path in sorted(excluded)))
 count = len(paths)
 for path in paths:
     validate(json.loads(path.read_text()), path)

@@ -124,3 +124,8 @@ Rendered dorsal camera checks (256 × 256 capture; angular sizes are preserved a
 ![Uniform gray and dark dorsal swarm](phase-validation/gray-swarm-dorsal.png)
 
 The [saved validation report](experiment-phase-validation-results.json) includes the full-duration run, final-source regressions and a standalone macOS build. The standalone smoke run received 452 ZMQ snapshots across four shortened cycles with four synthetic Kinefly publishers, four continuous pose transitions and no runtime errors.
+
+
+## References shared between sequence blocks
+
+The current [four-block Selwyn cycle](selwyn-milky-way-swarm-cycle.md) uses four flat Choice files. Its Milky Way-only block sets `headingReference.measureDuringPresentation: true`, `windowSeconds: 240` and `saveAs: "milky-way-baseline"`. Measurement shares that 240-second row rather than adding another presentation period. Later swarm files set `useHeadingReference: true`, `headingReferenceId: "milky-way-baseline"`, `mu: 0` and reuse each rig's frozen result across blocks. Names are cleared each cycle. This feature is opt-in; omitted/false concurrent measurement retains flat legacy timing. The preStimulus-only rule for phased assessment still applies. Core sequence validation rejects randomized or reordered named-reference dependencies.
