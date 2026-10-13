@@ -43,6 +43,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
             ["sequence"]=Schema(typeof(SequenceConfig)), ["choice"]=Schema(typeof(SceneConfig)),
             ["swarm"]=Schema(typeof(KannadiConfig)), ["kannadi"]=Schema(typeof(KannadiConfig)),
             ["optomotor"]=Schema(typeof(OptomotorConfig)),
+            ["rugosity"]=Schema(typeof(RugosityConfig)),
             ["dynamic-choice"]=Schema(typeof(DynamicSequenceController).GetNestedType("DesignFile",BindingFlags.NonPublic))
         };
         foreach (var property in schemas.Properties().ToList())
@@ -98,6 +99,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         item["properties"]["duration"]["exclusiveMinimum"]=0;
         item["properties"]["autoTrimSettings"]["x-ui"]=new JObject { ["enabledWhen"]=Rule("autoTrim",true) };
         item["properties"]["parameters"]=new JObject { ["type"]="object", ["additionalProperties"]=true, ["properties"]=new JObject {
+            ["rugosity"]=Schema(typeof(RugosityConfig)),
             ["configFile"]=new JObject { ["type"]="string",["default"]="Templates/experiment.template.json",["x-ui"]=new JObject { ["visibleWhen"]=new JObject { ["ancestorProperty"]="sceneName",["notEquals"]="Choice_desync" } } },
             ["design"]=new JObject { ["type"]="string",["default"]="Templates/dynamic-choice.template.json",["x-ui"]=new JObject { ["visibleWhen"]=new JObject { ["ancestorProperty"]="sceneName",["equals"]="Choice_desync" } } }
         } };
@@ -223,6 +225,15 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         {
             if(name=="seconds") ui["visibleWhen"]=Rule("type","time");
             if(new[]{"areaTag","vrId","shape","size","boxSize","radius","height","triggerOnExit","timeoutSeconds"}.Contains(name)) ui["visibleWhen"]=Rule("type","area");
+        }
+        if (name == "rugosity") ui["help"] = "Independent visible, collision, height and normal surfaces. IDs refer to RugositySurface components in the scene; omitted values preserve scene tuning.";
+        if (owner == typeof(RugosityConfig))
+        {
+            if (name.EndsWith("Cm")) ui["unit"] = "cm";
+            if (name == "absoluteHeight") ui["unit"] = "world Y (scene units)";
+            if (name == "centimetersPerUnit") { child["exclusiveMinimum"] = 0; ui["help"] = "1 for centimeter scenes; 100 for meter terrain scenes."; }
+            if (name == "normalSamples") { child["minimum"] = 1; child["maximum"] = 32; }
+            if (new[] { "clearanceCm", "normalRadiusCm", "tiltResponse" }.Contains(name)) child["minimum"] = 0;
         }
         if(name.EndsWith("Seconds") || name=="duration") ui["unit"]="seconds";
         if(name.EndsWith("Degrees") || name=="mu" || name=="muElevation" || name=="windDirection") ui["unit"]="degrees";

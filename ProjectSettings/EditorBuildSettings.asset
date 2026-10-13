@@ -71,5 +71,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Choice_Selwyn.unity
     guid: 64f2e691bf7034a68bfedc62e99e0b65
+  - enabled: 1
+    path: Assets/Scenes/Rugosity_RS.unity
+    guid: dfbcbf5c3bea24c468c15a0db59ab109
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

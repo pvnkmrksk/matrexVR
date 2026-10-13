@@ -165,6 +165,8 @@ public class ClosedLoop : MonoBehaviour
         AdvanceTracking(Time.deltaTime);
     }
 
+    private Space HeadingSpace => (GetComponent<RugosityRig>()?.ControlsPose ?? false) ? Space.World : Space.Self;
+
     private void AdvanceTracking(float seconds)
     {
         Vector3 beforePosition = transform.position;
@@ -178,6 +180,7 @@ public class ClosedLoop : MonoBehaviour
             // Use _ficTracRotationOffset to correctly transform the position delta
             // This accounts for both the initial FicTrac orientation and any random initial rotation
             Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius;
+            if (GetComponent<RugosityRig>()?.ControlsPose ?? false) positionDelta.y = 0;
             if (useLocustGains) positionDelta *= locustPositionGain;
             transform.Translate(positionDelta, Space.World);
         }
@@ -192,7 +195,7 @@ public class ClosedLoop : MonoBehaviour
             // True angular gain: one sensor degree produces one world degree at gain 1.
             // No dt-based convergence, smoothing, or turn-speed clamp in walking mode.
             float rotationDelta = Mathf.DeltaAngle(_lastFicTracData.z * Mathf.Rad2Deg, currentFicTracData.z * Mathf.Rad2Deg);
-            transform.Rotate(0, rotationDelta * locustOrientationGain, 0, Space.Self);
+            transform.Rotate(0, rotationDelta * locustOrientationGain, 0, HeadingSpace);
         }
 
         _lastFicTracData = currentFicTracData;
@@ -209,7 +212,7 @@ public class ClosedLoop : MonoBehaviour
             if (closedLoopOrientation)
             {
                 transform.Translate(new Vector3(current.x * forceGain, 0, 0) * sphereRadius, Space.World);
-                transform.Rotate(0, current.z * torqueGain, 0, Space.Self);
+                transform.Rotate(0, current.z * torqueGain, 0, HeadingSpace);
             }
         }
         else if (useYawMode)
@@ -220,14 +223,14 @@ public class ClosedLoop : MonoBehaviour
                 float rotationDeltaRadians = yawGain * (current.z - yawDCOffset);
                 float rotationDeltaDegrees = rotationDeltaRadians * Mathf.Rad2Deg;
                 lastYawOutput = rotationDeltaDegrees;
-                transform.Rotate(0, rotationDeltaDegrees * seconds, 0, Space.Self);
+                transform.Rotate(0, rotationDeltaDegrees * seconds, 0, HeadingSpace);
             }
             else lastYawOutput = 0;
         }
         else
         {
             lastYawInput = lastYawOutput = closedLoopOrientation ? delta.z * Mathf.Rad2Deg : 0;
-            if (closedLoopOrientation) transform.Rotate(0, lastYawOutput, 0, Space.Self);
+            if (closedLoopOrientation) transform.Rotate(0, lastYawOutput, 0, HeadingSpace);
         }
     }
 

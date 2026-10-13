@@ -56,12 +56,16 @@ public class Keyboard : MonoBehaviour
         float manualForward = move.y * translateSpeed;
         if (autopilotEnabled) manualForward = Mathf.Min(move.y, 0f) * translateSpeed;
         float forward = (autopilotEnabled ? autopilotSpeed : 0f) + manualForward;
-        transform.Translate(new Vector3(move.x * translateSpeed,
-            allowVerticalTranslation ? ExperimentInput.Axis("Vertical") * translateSpeed : 0,
-            forward) * deltaTime, Space.Self);
+        bool terrainControlled = GetComponent<RugosityRig>()?.ControlsPose ?? false;
+        Vector3 translation = new Vector3(move.x * translateSpeed,
+            allowVerticalTranslation && !terrainControlled ? ExperimentInput.Axis("Vertical") * translateSpeed : 0,
+            forward) * deltaTime;
+        if (terrainControlled) transform.position += Quaternion.Euler(0, transform.eulerAngles.y, 0) * translation;
+        else transform.Translate(translation, Space.Self);
         Quaternion before = transform.rotation;
-        transform.Rotate(new Vector3(allowPitchAndRoll ? ExperimentInput.Axis("Pitch") : 0,
-            ExperimentInput.Axis("Yaw"), allowPitchAndRoll ? ExperimentInput.Axis("Roll") : 0) * (rotateSpeed * deltaTime), Space.Self);
+        transform.Rotate(new Vector3(allowPitchAndRoll && !terrainControlled ? ExperimentInput.Axis("Pitch") : 0,
+            ExperimentInput.Axis("Yaw"), allowPitchAndRoll && !terrainControlled ? ExperimentInput.Axis("Roll") : 0) * (rotateSpeed * deltaTime),
+            terrainControlled ? Space.World : Space.Self);
         if (Quaternion.Angle(before, transform.rotation) > 0.00001f)
             GetComponent<ClosedLoop>()?.ApplyManualRotation(transform.rotation * Quaternion.Inverse(before));
     }

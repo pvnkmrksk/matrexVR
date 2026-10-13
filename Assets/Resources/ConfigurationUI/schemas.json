@@ -747,6 +747,147 @@
               "type": "object",
               "additionalProperties": true,
               "properties": {
+                "rugosity": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "visualSurface": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "collisionSurface": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "heightSurface": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "normalSurface": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "heightMode": {
+                      "type": [
+                        "string",
+                        "integer",
+                        "null"
+                      ],
+                      "enum": [
+                        "AboveGround",
+                        "Absolute",
+                        0,
+                        1,
+                        null
+                      ],
+                      "default": null
+                    },
+                    "orientationMode": {
+                      "type": [
+                        "string",
+                        "integer",
+                        "null"
+                      ],
+                      "enum": [
+                        "WorldUp",
+                        "SurfaceNormal",
+                        0,
+                        1,
+                        null
+                      ],
+                      "default": null
+                    },
+                    "centimetersPerUnit": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "minimum": -3.40282347E+38,
+                      "maximum": 3.40282347E+38,
+                      "default": null,
+                      "exclusiveMinimum": 0,
+                      "x-ui": {
+                        "help": "1 for centimeter scenes; 100 for meter terrain scenes."
+                      }
+                    },
+                    "clearanceCm": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "minimum": 0,
+                      "maximum": 3.40282347E+38,
+                      "default": null,
+                      "x-ui": {
+                        "unit": "cm"
+                      }
+                    },
+                    "absoluteHeight": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "minimum": -3.40282347E+38,
+                      "maximum": 3.40282347E+38,
+                      "default": null,
+                      "x-ui": {
+                        "unit": "world Y (scene units)"
+                      }
+                    },
+                    "normalRadiusCm": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "minimum": 0,
+                      "maximum": 3.40282347E+38,
+                      "default": null,
+                      "x-ui": {
+                        "unit": "cm"
+                      }
+                    },
+                    "tiltResponse": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "minimum": 0,
+                      "maximum": 3.40282347E+38,
+                      "default": null
+                    },
+                    "normalSamples": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ],
+                      "minimum": 1,
+                      "maximum": 32,
+                      "default": null
+                    }
+                  }
+                },
                 "configFile": {
                   "type": "string",
                   "default": "Templates/experiment.template.json",
@@ -815,6 +956,151 @@
     ],
     "additionalProperties": true,
     "properties": {
+      "rugosity": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "default": null
+          },
+          "visualSurface": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "collisionSurface": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "heightSurface": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "normalSurface": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "heightMode": {
+            "type": [
+              "string",
+              "integer",
+              "null"
+            ],
+            "enum": [
+              "AboveGround",
+              "Absolute",
+              0,
+              1,
+              null
+            ],
+            "default": null
+          },
+          "orientationMode": {
+            "type": [
+              "string",
+              "integer",
+              "null"
+            ],
+            "enum": [
+              "WorldUp",
+              "SurfaceNormal",
+              0,
+              1,
+              null
+            ],
+            "default": null
+          },
+          "centimetersPerUnit": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "help": "1 for centimeter scenes; 100 for meter terrain scenes."
+            }
+          },
+          "clearanceCm": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "cm"
+            }
+          },
+          "absoluteHeight": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "world Y (scene units)"
+            }
+          },
+          "normalRadiusCm": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "cm"
+            }
+          },
+          "tiltResponse": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null
+          },
+          "normalSamples": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 32,
+            "default": null
+          }
+        },
+        "default": null,
+        "x-ui": {
+          "help": "Independent visible, collision, height and normal surfaces. IDs refer to RugositySurface components in the scene; omitted values preserve scene tuning."
+        }
+      },
       "resetPositionOnStart": {
         "type": "boolean",
         "default": true
@@ -2647,6 +2933,151 @@
         ],
         "additionalProperties": true,
         "properties": {
+          "rugosity": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "enabled": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "default": null
+              },
+              "visualSurface": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "collisionSurface": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "heightSurface": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "normalSurface": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "heightMode": {
+                "type": [
+                  "string",
+                  "integer",
+                  "null"
+                ],
+                "enum": [
+                  "AboveGround",
+                  "Absolute",
+                  0,
+                  1,
+                  null
+                ],
+                "default": null
+              },
+              "orientationMode": {
+                "type": [
+                  "string",
+                  "integer",
+                  "null"
+                ],
+                "enum": [
+                  "WorldUp",
+                  "SurfaceNormal",
+                  0,
+                  1,
+                  null
+                ],
+                "default": null
+              },
+              "centimetersPerUnit": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "1 for centimeter scenes; 100 for meter terrain scenes."
+                }
+              },
+              "clearanceCm": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "cm"
+                }
+              },
+              "absoluteHeight": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "world Y (scene units)"
+                }
+              },
+              "normalRadiusCm": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "cm"
+                }
+              },
+              "tiltResponse": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null
+              },
+              "normalSamples": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "maximum": 32,
+                "default": null
+              }
+            },
+            "default": null,
+            "x-ui": {
+              "help": "Independent visible, collision, height and normal surfaces. IDs refer to RugositySurface components in the scene; omitted values preserve scene tuning."
+            }
+          },
           "resetPositionOnStart": {
             "type": "boolean",
             "default": true
@@ -4498,6 +4929,151 @@
         ],
         "additionalProperties": true,
         "properties": {
+          "rugosity": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "enabled": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "default": null
+              },
+              "visualSurface": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "collisionSurface": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "heightSurface": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "normalSurface": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "heightMode": {
+                "type": [
+                  "string",
+                  "integer",
+                  "null"
+                ],
+                "enum": [
+                  "AboveGround",
+                  "Absolute",
+                  0,
+                  1,
+                  null
+                ],
+                "default": null
+              },
+              "orientationMode": {
+                "type": [
+                  "string",
+                  "integer",
+                  "null"
+                ],
+                "enum": [
+                  "WorldUp",
+                  "SurfaceNormal",
+                  0,
+                  1,
+                  null
+                ],
+                "default": null
+              },
+              "centimetersPerUnit": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "1 for centimeter scenes; 100 for meter terrain scenes."
+                }
+              },
+              "clearanceCm": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "cm"
+                }
+              },
+              "absoluteHeight": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "world Y (scene units)"
+                }
+              },
+              "normalRadiusCm": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "cm"
+                }
+              },
+              "tiltResponse": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null
+              },
+              "normalSamples": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "maximum": 32,
+                "default": null
+              }
+            },
+            "default": null,
+            "x-ui": {
+              "help": "Independent visible, collision, height and normal surfaces. IDs refer to RugositySurface components in the scene; omitted values preserve scene tuning."
+            }
+          },
           "resetPositionOnStart": {
             "type": "boolean",
             "default": true
@@ -6349,6 +6925,151 @@
         ],
         "additionalProperties": true,
         "properties": {
+          "rugosity": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "enabled": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "default": null
+              },
+              "visualSurface": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "collisionSurface": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "heightSurface": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "normalSurface": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "heightMode": {
+                "type": [
+                  "string",
+                  "integer",
+                  "null"
+                ],
+                "enum": [
+                  "AboveGround",
+                  "Absolute",
+                  0,
+                  1,
+                  null
+                ],
+                "default": null
+              },
+              "orientationMode": {
+                "type": [
+                  "string",
+                  "integer",
+                  "null"
+                ],
+                "enum": [
+                  "WorldUp",
+                  "SurfaceNormal",
+                  0,
+                  1,
+                  null
+                ],
+                "default": null
+              },
+              "centimetersPerUnit": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "help": "1 for centimeter scenes; 100 for meter terrain scenes."
+                }
+              },
+              "clearanceCm": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "cm"
+                }
+              },
+              "absoluteHeight": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "world Y (scene units)"
+                }
+              },
+              "normalRadiusCm": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "cm"
+                }
+              },
+              "tiltResponse": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null
+              },
+              "normalSamples": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 1,
+                "maximum": 32,
+                "default": null
+              }
+            },
+            "default": null,
+            "x-ui": {
+              "help": "Independent visible, collision, height and normal surfaces. IDs refer to RugositySurface components in the scene; omitted values preserve scene tuning."
+            }
+          },
           "resetPositionOnStart": {
             "type": "boolean",
             "default": true
@@ -26942,6 +27663,150 @@
       "initialRotation": null,
       "randomInitialRotation": false
     }
+  },
+  "rugosity": {
+    "type": [
+      "object",
+      "null"
+    ],
+    "additionalProperties": true,
+    "properties": {
+      "enabled": {
+        "type": [
+          "boolean",
+          "null"
+        ],
+        "default": null
+      },
+      "visualSurface": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "default": null
+      },
+      "collisionSurface": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "default": null
+      },
+      "heightSurface": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "default": null
+      },
+      "normalSurface": {
+        "type": [
+          "string",
+          "null"
+        ],
+        "default": null
+      },
+      "heightMode": {
+        "type": [
+          "string",
+          "integer",
+          "null"
+        ],
+        "enum": [
+          "AboveGround",
+          "Absolute",
+          0,
+          1,
+          null
+        ],
+        "default": null
+      },
+      "orientationMode": {
+        "type": [
+          "string",
+          "integer",
+          "null"
+        ],
+        "enum": [
+          "WorldUp",
+          "SurfaceNormal",
+          0,
+          1,
+          null
+        ],
+        "default": null
+      },
+      "centimetersPerUnit": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": -3.40282347E+38,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "exclusiveMinimum": 0,
+        "x-ui": {
+          "help": "1 for centimeter scenes; 100 for meter terrain scenes."
+        }
+      },
+      "clearanceCm": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "x-ui": {
+          "unit": "cm"
+        }
+      },
+      "absoluteHeight": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": -3.40282347E+38,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "x-ui": {
+          "unit": "world Y (scene units)"
+        }
+      },
+      "normalRadiusCm": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "x-ui": {
+          "unit": "cm"
+        }
+      },
+      "tiltResponse": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 3.40282347E+38,
+        "default": null
+      },
+      "normalSamples": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 1,
+        "maximum": 32,
+        "default": null
+      }
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:matrex:config:rugosity",
+    "title": "rugosity"
   },
   "dynamic-choice": {
     "type": [

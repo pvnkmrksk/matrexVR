@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Linq;
 using InSceneSequence;
@@ -76,6 +77,10 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
         CleanupSpawnedObjects();
         ApplyConfig(config);
+        JObject rugosityOverride = null;
+        if (parameters.TryGetValue("rugosity", out var patch) && patch != null)
+            rugosityOverride = patch as JObject ?? JObject.FromObject(patch);
+        RugosityWorld.Apply(gameObject.scene, config.rugosity, rugosityOverride);
     }
 
     private SceneConfig LoadSceneConfig(string configFile)
@@ -629,6 +634,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 [System.Serializable]
 public class SceneConfig
 {
+    public RugosityConfig rugosity;
     public bool resetPositionOnStart = true;
     public bool resetRotationOnStart = true;
     public ColorConfig uniformSkyColor;

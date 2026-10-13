@@ -26,7 +26,7 @@ public class MigrationMotion : MonoBehaviour
         // Meteorological convention: direction indicates where the wind comes FROM.
         float angle = (WindDirection + 180f) * Mathf.Deg2Rad;
         Vector3 position = transform.position + new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle)) * (WindSpeed * seconds);
-        if (AglHeight > 0 && TryGroundHeight(position, out float ground)) position.y = ground + AglHeight;
+        if (AglHeight > 0 && !(GetComponent<RugosityRig>()?.ControlsPose ?? false) && TryGroundHeight(position, out float ground)) position.y = ground + AglHeight;
         transform.position = position;
     }
 

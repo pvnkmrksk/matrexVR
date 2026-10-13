@@ -1,48 +1,55 @@
 {
-  "autoStart": false,
+  "autoStart": true,
   "loop": true,
   "randomise": false,
   "sequences": [
     {
-      "sceneName": "Choice_Selwyn",
-      "duration": 3,
-      "gain": 2.5,
-      "autoTrim": true,
+      "sceneName": "Rugosity_RS",
+      "duration": 30,
       "reloadScene": false,
       "parameters": {
-        "configFile": "Examples/Swarm/selwyn-cycle-01-setup.example.json"
+        "configFile": "Examples/Rugosity/traditional-rs.json"
       }
     },
     {
-      "sceneName": "Choice_Selwyn",
-      "duration": 3,
-      "gain": 2.5,
-      "autoTrim": false,
+      "sceneName": "Rugosity_RS",
+      "duration": 30,
       "reloadScene": false,
       "parameters": {
-        "configFile": "Examples/Swarm/selwyn-cycle-02-milky-way.example.json"
+        "configFile": "Examples/Rugosity/visual-rs-level-agl.json"
       }
     },
     {
-      "sceneName": "Choice_Selwyn",
-      "duration": 240,
-      "gain": 1,
-      "autoTrim": false,
+      "sceneName": "Rugosity_RS",
+      "duration": 30,
       "reloadScene": false,
       "parameters": {
-        "configFile": "Examples/Swarm/selwyn-cycle-03-milky-way-swarm.example.json"
+        "configFile": "Examples/Rugosity/visual-flat-hidden-rs.json"
       }
     },
     {
-      "sceneName": "Choice_Selwyn",
-      "duration": 240,
-      "gain": 1,
-      "autoTrim": false,
+      "sceneName": "Rugosity_RS",
+      "duration": 30,
       "reloadScene": false,
       "parameters": {
-        "configFile": "Examples/Swarm/selwyn-cycle-04-swarm-only.example.json"
+        "configFile": "Examples/Rugosity/flat-control.json"
+      }
+    },
+    {
+      "sceneName": "Rugosity_RS",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/visual-rs-fixed-height.json"
+      }
+    },
+    {
+      "sceneName": "Rugosity_RS",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/visual-flat-tilt-only.json"
       }
     }
-  ],
-  "loopStartIndex": 1
+  ]
 }
