@@ -56,7 +56,7 @@ def main():
     parser.add_argument('--skip-local-dashboard', action='store_true', help='Advanced development-only opt-out; uses the older published dashboard renderer')
     args = parser.parse_args()
     local_dashboard = platform.machine() == 'arm64' and not args.skip_companions and not args.skip_local_dashboard
-    if local_dashboard and not args.local_dashboard_archive.is_file():
+    if local_dashboard and not args.prepare_only and not args.local_dashboard_archive.is_file():
         parser.error('Reviewed local dashboard archive is absent: '+str(args.local_dashboard_archive)+'. See tools/native_patches/README.md for the pinned source build.')
     prepare(args.project, args.library)
     if args.prepare_only:
