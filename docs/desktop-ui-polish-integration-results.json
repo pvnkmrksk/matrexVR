@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "passed": true,
+  "runtimeSourceRevision": "87c425dd29211c6cd6192a77fa3f384e27b33937",
+  "nativePlayer": {
+    "resolution": [
+      3024,
+      1898
+    ],
+    "nativeFullscreen": true,
+    "uiScale": 2,
+    "directFramebuffer": true,
+    "freshDefault": {
+      "movement": "flying",
+      "world": "night-sky",
+      "demo": true
+    },
+    "capture": "images/desktop-ui/current-player-provenance.json",
+    "manualMacClickTest": "Unavailable because macOS was locked; native UI Toolkit callbacks independently passed 393 assertions."
+  },
+  "dashboardBundle": {
+    "schemaVersion": 1,
+    "repository": "pvnkmrksk/trajectory-dashboard",
+    "sourceRevision": "f122518a20210252a0b2f23e984cb87e0e5f1d3a",
+    "sourceUrl": "https://github.com/pvnkmrksk/trajectory-dashboard/commit/f122518a20210252a0b2f23e984cb87e0e5f1d3a",
+    "platform": "macos-arm64",
+    "archiveSha256": "83e15d0f5899a2b900e43f91205b957c16f521aab701024590b1c1db9e2ce6dd",
+    "executable": "DaariDeepa/DaariDeepa",
+    "executableSha256": "4d6a67cf2afecc242e2054de04cfaa7cf6d3eb16c29e0d2b959570e6ce01c9e8",
+    "buildType": "local-source",
+    "published": false,
+    "archiveUrl": "https://github.com/pvnkmrksk/trajectory-dashboard/commit/f122518a20210252a0b2f23e984cb87e0e5f1d3a"
+  },
+  "externalPythonOnPath": false,
+  "nativePackageSmoke": {
+    "passed": true,
+    "executable": "/private/tmp/daari-live-pause/dist/DaariDeepa/DaariDeepa",
+    "pythonOnPath": false,
+    "realZmqHandshake": true,
+    "lateJoinContext": true,
+    "sse": true,
+    "staticAssets": true,
+    "recordedDurationSeconds": 2.0,
+    "canonicalAnimalIdentity": true
+  },
+  "liveUnityIntegration": {
+    "transport": "Actual native Unity ZMQ PUB \u2192 bundled native Daari Deepa \u2192 browser SSE",
+    "endpoint": "tcp://127.0.0.1:29980",
+    "topic": "matrex.telemetry.v2",
+    "sourceKind": "Explicit native generated Rekkefly demo; no camera or animal measurement",
+    "fourRigIds": [
+      "VR1",
+      "VR2",
+      "VR3",
+      "VR4"
+    ],
+    "receiver": {
+      "ageSeconds": 0.0008361251093447208,
+      "contextAgeSeconds": 1.4378900000592694,
+      "contexts": 65,
+      "endpoint": "tcp://127.0.0.1:29980",
+      "error": null,
+      "invalidPackets": 0,
+      "publisherRestarts": 0,
+      "sequenceGaps": 0,
+      "snapshotAgeSeconds": 0.0008369579445570707,
+      "snapshots": 2200,
+      "state": "receiving",
+      "topic": "matrex.telemetry.v2"
+    },
+    "browserHeadings": "Four animal series rendered using the recorded-data renderer",
+    "pauseRegression": {
+      "pausedAtBlock": 233,
+      "liveAdvancedToBlock": 256,
+      "frozenRigCount": 4,
+      "frozenSamples": 8,
+      "frozenHeadingTimeRangeSeconds": [
+        0,
+        0.2
+      ],
+      "fitAtBlock": 259,
+      "fitRetainsOriginalBlock": 233,
+      "resumeAtBlock": 260,
+      "resumedSeries": 4,
+      "resumedDisplayedSamples": 72
+    }
+  },
+  "parentMacSignature": "codesign --verify --strict passed after embedding corrected viewer",
+  "scope": "Local Apple Silicon Mac build and synthetic input. Other platform dashboard payloads retain official published lock; no release, deployment, physical LED or new physical camera claim."
+}
