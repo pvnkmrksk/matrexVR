@@ -1,0 +1,244 @@
+{
+  "date": "2026-10-25",
+  "passed": true,
+  "scope": "Native Unity Editor/Metal full same-scene reload endurance on one Mac; native Rekkefly uses an explicitly generated demo, not a camera or animal measurement. This tests base10b6c403 before the later missing-face-camera/UI changes.",
+  "runtimeSourceRevision": "10b6c403810b10e1e0279ecc2f0c40419087855f",
+  "diagnosticCommit": "c1da4228",
+  "diagnosticsSha256": "2ee5f6277ac2c340034f48a444c92b4c5be1e5ce2b1e6e8957f9ea8fafffef7a",
+  "unity": "6000.3.16f1",
+  "gpu": "Apple M2 Pro",
+  "graphicsApi": "Metal",
+  "protocol": {
+    "scene": "Choice_desync",
+    "requestedLoads": 300,
+    "completedLoads": 300,
+    "configuredSecondsPerScene": 2,
+    "reloadScene": true,
+    "newSceneHandlesChecked": true,
+    "fourVRs": true,
+    "authoredFaceCamerasPerVR": 5,
+    "pixelsPerFace": [
+      128,
+      128
+    ],
+    "sourceGeometry": "All20 authored face cameras rendered; sixrequestedfaces revealmissingU in this olderprefab, addressed by a separate later fix."
+  },
+  "coverage": {
+    "activeSamples": 600,
+    "minimumLiveInputComponents": 4,
+    "minimumInputComponents": 4,
+    "staleOrNonprogressingInputObservations": 0,
+    "renderedFaces": [
+      20
+    ],
+    "naturalCameraRenders": 281760,
+    "forcedCameraRenders": 563500
+  },
+  "durations": {
+    "minimum": 2.0131045409999615,
+    "median": 2.217578374499979,
+    "maximum": 3.020554749999974,
+    "totalSceneSeconds": 666.47414475
+  },
+  "nativeTracker": {
+    "executableSha256": "631ce45f37bf9af9969abad1e00997d2b8b208ccffb2236c7ea1e8cd771bb644",
+    "configSha256": "9a10f7ce0f5550e954ff6db7371c7fcbcd565ef44a1d06bb053809861a3c23a1",
+    "singleNativePid": 92990,
+    "observedPids": [
+      92990
+    ],
+    "observedSourceKinds": [
+      "demo"
+    ],
+    "fallbackEverObserved": false,
+    "firstNativeFrame": 21,
+    "lastNativeFrame": 82798,
+    "observedPackets": 82773,
+    "nativeExitCode": 0,
+    "finalNativeSummary": {
+      "frames": 82799,
+      "frames_per_second": 119.98566800970688,
+      "recording": {
+        "accepted": 0,
+        "directory": null,
+        "error": null,
+        "written": 0
+      },
+      "seconds": 690.074084459,
+      "source": "Simulated fly",
+      "udp_dropped": 0,
+      "zmq_dropped": 0
+    },
+    "sourceScope": "Real native Rekkefly acquisition/tracking/publisher process using its explicit generated demo, not a camera or animal measurement."
+  },
+  "after20WarmupLoads": {
+    "fileDescriptors": {
+      "first": 113,
+      "last": 113,
+      "minimum": 113,
+      "maximum": 114,
+      "median": 113.0,
+      "first5Median": 113,
+      "last5Median": 113,
+      "slopePer100Reloads": -0.4981113097288049
+    },
+    "activeTrackingWorkers": {
+      "first": 4,
+      "last": 4,
+      "minimum": 4,
+      "maximum": 4,
+      "median": 4.0,
+      "first5Median": 4,
+      "last5Median": 4,
+      "slopePer100Reloads": 0.0
+    },
+    "activeAsyncWriters": {
+      "first": 0,
+      "last": 0,
+      "minimum": 0,
+      "maximum": 0,
+      "median": 0.0,
+      "first5Median": 0,
+      "last5Median": 0,
+      "slopePer100Reloads": 0.0
+    },
+    "ownedTrialMaterials": {
+      "first": 8,
+      "last": 8,
+      "minimum": 8,
+      "maximum": 8,
+      "median": 8.0,
+      "first5Median": 8,
+      "last5Median": 8,
+      "slopePer100Reloads": 0.0
+    },
+    "materials.nonPersistentCount": {
+      "first": 46,
+      "last": 46,
+      "minimum": 46,
+      "maximum": 46,
+      "median": 46.0,
+      "first5Median": 46,
+      "last5Median": 46,
+      "slopePer100Reloads": 0.0
+    },
+    "meshes.nonPersistentCount": {
+      "first": 1,
+      "last": 1,
+      "minimum": 1,
+      "maximum": 1,
+      "median": 1.0,
+      "first5Median": 1,
+      "last5Median": 1,
+      "slopePer100Reloads": 0.0
+    },
+    "textures.nonPersistentCount": {
+      "first": 92,
+      "last": 92,
+      "minimum": 92,
+      "maximum": 92,
+      "median": 92.0,
+      "first5Median": 92,
+      "last5Median": 92,
+      "slopePer100Reloads": 0.0
+    },
+    "renderTextures.nonPersistentCount": {
+      "first": 24,
+      "last": 24,
+      "minimum": 24,
+      "maximum": 24,
+      "median": 24.0,
+      "first5Median": 24,
+      "last5Median": 24,
+      "slopePer100Reloads": 0.0
+    },
+    "externalNativeTracker.rssBytes": {
+      "first": 22528000,
+      "last": 22102016,
+      "minimum": 22036480,
+      "maximum": 22528000,
+      "median": 22396928.0,
+      "first5Median": 22528000,
+      "last5Median": 22102016,
+      "slopePer100Reloads": -70116.38355445495
+    },
+    "externalNativeTracker.osThreadCount": {
+      "first": 15,
+      "last": 15,
+      "minimum": 7,
+      "maximum": 15,
+      "median": 15.0,
+      "first5Median": 15,
+      "last5Median": 15,
+      "slopePer100Reloads": 0.05603205580246108
+    },
+    "externalNativeTracker.fileDescriptorCount": {
+      "first": 10,
+      "last": 10,
+      "minimum": 6,
+      "maximum": 10,
+      "median": 10.0,
+      "first5Median": 10,
+      "last5Median": 10,
+      "slopePer100Reloads": 0.030885962466722434
+    }
+  },
+  "allocationScope": {
+    "managedBytes": {
+      "first": 849125376,
+      "last": 862560256,
+      "minimum": 846659584,
+      "maximum": 862793728,
+      "median": 852140032.0,
+      "first5Median": 849125376,
+      "last5Median": 862461952,
+      "slopePer100Reloads": 3948436.881665764
+    },
+    "unityAllocatedBytes": {
+      "first": 420892019,
+      "last": 430267022,
+      "minimum": 420860319,
+      "maximum": 430267022,
+      "median": 426314807.5,
+      "first5Median": 420910007,
+      "last5Median": 430187452,
+      "slopePer100Reloads": 2741388.93539094
+    },
+    "note": "Managed/Unityallocated memory modestly increased while native livecounts remained constant; RSS fell during the run. Allocator/editor caches and resource ownership are reported separately."
+  },
+  "teardown": [
+    {
+      "kind": "after-scene-teardown-no-forced-GC",
+      "activeTrackingWorkers": 0,
+      "activeAsyncWriters": 0,
+      "ownedTrialMaterials": 0,
+      "diagnosticRenderTargets": 0,
+      "fileDescriptors": 97
+    },
+    {
+      "kind": "after-explicit-GC-and-UnloadUnusedAssets",
+      "activeTrackingWorkers": 0,
+      "activeAsyncWriters": 0,
+      "ownedTrialMaterials": 0,
+      "diagnosticRenderTargets": 0,
+      "fileDescriptors": 97
+    }
+  ],
+  "teardownBeforeForcedGCPassed": true,
+  "runtimeErrors": [],
+  "newCrashReports": [],
+  "publisherErrors": [],
+  "editorOnlyExceptions": [
+    {
+      "type": "Exception",
+      "message": "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.\nParameter name: index",
+      "classification": "UnityEditor.Search.SearchDatabase startup indexing; rawtrace retained in ignored output."
+    }
+  ],
+  "limits": [
+    "No original historical Unity crash dump establishes one single cause.",
+    "This bounded Mac/Editor demo-input test does not certify physical-camera drivers, LEDhardware timing, other OSes, multi-hour runs or arbitrary custom scenes.",
+    "Later missing-face-camera and UI changes need their own final-source validation."
+  ],
+  "rawLocalDirectory": ".release-work/scene-reload-diagnostics/native-rekkefly-300x2s"
+}
