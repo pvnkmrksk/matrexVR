@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use MATREX VR, cite this software and the exact release or source commit used for acquisition."
+type: software
+title: "MATREX VR"
+authors:
+  - family-names: "Kaushik"
+    given-names: "Pavan Kumar"
+version: "0.3.0"
+date-released: "2026-10-25"
+repository-code: "https://github.com/pvnkmrksk/matrexVR"
+url: "https://pvnkmrksk.github.io/matrexVR/"
+abstract: "Unity experiments for tracked animals and LED-panel virtual environments, with JSON configuration, Choice tasks, swarms, mirrored animal poses, astronomical night skies, recording and replay."
+keywords:
+  - animal virtual reality
+  - Unity
+  - behavioral experiments
+  - visual stimuli
+  - reproducible experiments

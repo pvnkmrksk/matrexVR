@@ -1,0 +1,53 @@
+{
+  "headingReference": {
+    "enabled": false,
+    "windowSeconds": 180,
+    "startOffsetSeconds": 0,
+    "measureDuringPresentation": false,
+    "saveAs": ""
+  },
+  "objects": [],
+  "initialPosition": {
+    "x": 0,
+    "y": 100,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
+  "randomInitialRotation": false,
+  "closedLoopOrientation": false,
+  "closedLoopPosition": false,
+  "backgroundColor": null,
+  "skyboxPath": "Photosphere/adaminaby.png",
+  "windSpeed": 0,
+  "windDirection": 0,
+  "aglHeight": 100,
+  "groundLayerMask": 1,
+  "autopilotEnabled": false,
+  "autopilotSpeed": 10,
+  "nightSky": {
+    "enabled": false,
+    "latitude": -35.894409,
+    "longitude": 148.453948,
+    "timeZoneId": "Australia/Sydney",
+    "utcOffsetHours": null,
+    "utcOffsetMinutes": null,
+    "date": null,
+    "localTime": "now",
+    "advanceWithRealTime": true,
+    "updateIntervalMinutes": 30,
+    "roundToInterval": false,
+    "northYawDegrees": 0,
+    "exposure": 0.5,
+    "faintDetailCutoff": 0.15,
+    "maskBelowHorizon": false,
+    "imageWidth": 4096
+  },
+  "resetPositionOnStart": true,
+  "resetRotationOnStart": true,
+  "uniformSkyColor": null,
+  "swarm": null
+}

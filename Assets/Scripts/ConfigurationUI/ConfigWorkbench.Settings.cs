@@ -178,6 +178,16 @@ namespace ConfigurationUI
                 var controls=Row(); controls.Add(Pill(value==null?"Inherited / scene default":"Unset · null","muted-pill"));
                 controls.Add(Button("Set value",()=>assign(ConfigSchema.NewValue(schema),true),"quiet")); setting.Add(controls);
             }
+            else if(key=="closedLoopMode")
+            {
+                setting.AddToClassList("choice-setting");setting.AddToClassList("backend-setting");
+                var modes=new List<ClosedLoopMode>{ClosedLoopMode.Hejjetrac,ClosedLoopMode.Rekkefly,ClosedLoopMode.Tirbala};
+                var current=TrackerBackend.Parse(shown.ToString());
+                if(!modes.Contains(current)) modes.Add(current);
+                Func<ClosedLoopMode,string> title=mode=>TrackerBackend.DisplayName(mode)+(mode==ClosedLoopMode.FicTrac?" · legacy FicTrac":mode==ClosedLoopMode.Kinefly?" · legacy Kinefly":TrackerBackend.IsWalking(mode)?" · walking":TrackerBackend.IsFlight(mode)?" · flight":" · force/torque");
+                var choices=modes.Select(title).ToList();var dropdown=new DropdownField(choices,modes.IndexOf(current)) {name="tracker-backend-"+string.Join("-",parts)};setting.Add(dropdown);
+                dropdown.RegisterValueChangedCallback(e=>Guard(()=>assign(new JValue(modes[choices.IndexOf(e.newValue)].ToString()),true)));
+            }
             else if(schema["enum"] is JArray options)
             {
                 setting.AddToClassList("choice-setting");
@@ -289,10 +299,11 @@ namespace ConfigurationUI
                 for(int i=0;i<rigs.Count;i++)
                 {
                     int index=i; var rig=rigs[i] as JObject; if(rig==null) continue; var rigSchema=(JObject)schema["properties"]["configs"]["items"];
-                    var fold=new Foldout { text=(string)rig["vrId"]+" · "+(rig["closedLoopMode"]?.ToString()??"FicTrac")+" · "+rig["zmqAddress"]+":"+rig["zmqPort"],value=i==0 }; fold.AddToClassList("rig-card"); scroll.Add(fold);
+                    var fold=new Foldout { text=(string)rig["vrId"]+" · "+RigMode(rig)+" · "+rig["zmqAddress"]+":"+rig["zmqPort"],value=i==0 }; fold.AddToClassList("rig-card"); scroll.Add(fold);
                     var grid=new VisualElement(); grid.AddToClassList("settings-grid"); fold.Add(grid);
-                    foreach(string key in new[]{"vrId","speciesName","closedLoopMode","zmqAddress","zmqPort","displayOrder","ledPanelWidth","ledPanelHeight","startRow","startCol","horizontal","sphereDiameter","manualControls"})
+                    foreach(string key in new[]{"vrId","speciesName","closedLoopMode","zmqAddress","zmqPort","displayOrder","ledPanelWidth","ledPanelHeight","startRow","startCol","horizontal","sphereDiameter","manualControls","tracker"})
                         if(ConfigSchema.Visible(rig,rigSchema,key,Context)) grid.Add(Setting(selected,new[]{"configs",i.ToString(),key},ConfigSchema.Child(rigSchema,key),rig,rigSchema));
+                    AddTrackerControls(fold,rig);
                     fold.Add(StudioButton("Remove rig","trash",()=>StudioEdit(selected,r=>((JArray)r["configs"]).RemoveAt(index)),"quiet"));
                 }
             }

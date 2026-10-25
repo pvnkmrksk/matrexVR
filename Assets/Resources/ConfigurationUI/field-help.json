@@ -4,9 +4,9 @@
   "targetDisplay": "Zero-based physical display for stimulus cameras. 0 is the primary monitor. The top-level setting overrides legacy per-rig values.",
   "configs": "Array of per-rig entries. Use one entry for every rig that should render.",
   "overheadCamera": "Operator overview in Swarm/Kannadi; independent of animal camera letter order.",
-  "vrId": "Exact rig identifier, e.g. VR1–VR4. Duplicate IDs overwrite earlier entries; use unique IDs.",
+  "vrId": "Unique positive rig identifier, such as VR1 or VR10. Duplicate IDs are rejected. Additional rigs require unused Unity layers and sufficient rendering resources.",
   "sphereDiameter": "Walking path ball diameter in cm; template 2.6. Historical Bogong/Kinefly retains the rig prefab diameter, as in the reference branch.",
-  "closedLoopMode": "Historical enum (also accepts 0/1/2): FicTrac, Kinefly, Tirbala. Set Kinefly for wing-angle input. See gain compatibility for the reference branch's unusual FicTrac label and the separate walking path.",
+  "closedLoopMode": "Tracker backend: Hejjetrac (3) for HejjéTrac walking, Rekkefly (4) for flight, or Tirbala (2). Legacy FicTrac (0) and Kinefly (1) remain accepted without rewriting saved files. HejjéTrac and hejjetrak name aliases are also accepted. Native FT rows select sphere-radian walking interpretation; legacy JSON retains its gain behavior.",
   "ledPanelWidth": "Width of each stimulus camera viewport in pixels. For a 64 × 64 panel, use 64. Independent of the physical monitor resolution.",
   "ledPanelHeight": "Height of each stimulus camera viewport in pixels. For a 64 × 64 panel, use 64.",
   "startRow": "Zero-based panel cells, measured from the top-left.",
@@ -62,7 +62,7 @@
   "autoTrim": "Opt-in per-row Kinefly median centering; pauses outside flight/closed-loop yaw. Learned DC offsets persist when false.",
   "reloadScene": "When false and the scene stays the same, call its in-scene sequencer. Use true for Dynamic Choice: its AdvanceStep is intentionally empty.",
   "parameters": "Controller-specific dictionary.",
-  "configFile": "Choice, Optomotor, Kannadi or Swarm file relative to StreamingAssets.",
+  "tracker.configFile": "Existing tracker calibration/config file for optional tracker launch. Relative paths resolve under the MATREX config folder. MATREX never rewrites this file.",
   "design": "Dynamic Choice design file.",
   "autopilotEnabled": "Move continuously forward while the animal controls steering through closed loop orientation. Default depends on the experiment; flying templates enable it.",
   "autopilotSpeed": "Forward autopilot speed in scene units per second: m/s on terrain, cm/s for walking. Applies when autopilot is enabled.",
@@ -305,5 +305,11 @@
   "absoluteHeight": "Fixed world Y in scene units when heightMode is Absolute. It is not an above-ground clearance.",
   "normalRadiusCm": "Radius in centimetres used to sample nearby terrain normals. Zero samples the local normal directly, without spatial smoothing.",
   "normalSamples": "Number of surrounding terrain-normal samples, from 1 to 32, in addition to the centre sample. Set normalRadiusCm to zero to disable spatial averaging.",
-  "tiltResponse": "Tilt response rate in inverse seconds. Zero follows the sampled normal immediately; positive values smooth orientation over time."
+  "tiltResponse": "Tilt response rate in inverse seconds. Zero follows the sampled normal immediately; positive values smooth orientation over time.",
+  "tracker": "Optional local tracker app launch. Nothing launches automatically. Choose an installed native executable and its existing calibration file; MATREX only stops processes it launches. Save tracker calibration edits before Stop.",
+  "executablePath": "Absolute installed native tracker executable path. On macOS select the binary inside the app Contents/MacOS folder. No shell, download, or automatic executable discovery.",
+  "device": "Optional Rekkefly camera/device override. HejjéTrac source selection remains in its calibration config.",
+  "headless": "Launch Rekkefly without its native window. HejjéTrac optional launch uses its desktop app.",
+  "contextIntervalSeconds": "Seconds between compact session context heartbeats. A late-joining dashboard learns active rig/species/backend and experiment phase without exposing raw config paths.",
+  "configFile": "Choice, Optomotor, Kannadi or Swarm file relative to StreamingAssets."
 }

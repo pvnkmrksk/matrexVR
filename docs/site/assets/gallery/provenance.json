@@ -1,0 +1,224 @@
+{
+  "records": [
+    {
+      "name": "forest-choice",
+      "scene": "Choice_Forrest",
+      "image": "forest-choice.jpg",
+      "configuration": "forest-choice.config.json",
+      "additionalPrefab": "Assets/Prefabs/Landscape.prefab",
+      "width": 1440,
+      "height": 900,
+      "cameraPosition": {
+        "x": 0.0,
+        "y": -1.0,
+        "z": 0.0
+      },
+      "cameraEuler": {
+        "x": 0.0,
+        "y": 35.0,
+        "z": 0.0
+      },
+      "fov": 80.0,
+      "skyboxId": "",
+      "skyboxSampleUtc": "",
+      "unity": "6000.3.16f1",
+      "source": "Actual Unity scene/controller render; synthetic demonstration, no measured animal behavior"
+    },
+    {
+      "name": "milky-way-terrain",
+      "scene": "Choice_Selwyn",
+      "image": "milky-way-terrain.jpg",
+      "configuration": "milky-way-terrain.config.json",
+      "additionalPrefab": null,
+      "width": 1440,
+      "height": 900,
+      "cameraPosition": {
+        "x": 0.0,
+        "y": -209.5321,
+        "z": 0.0
+      },
+      "cameraEuler": {
+        "x": 352.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "fov": 80.0,
+      "skyboxId": "d344a72dc3e0d212f5f135c33e388ae7b5f78f1c394a368ca573605424af74d6",
+      "skyboxSampleUtc": "2026-10-07T11:00:00.0000000Z",
+      "unity": "6000.3.16f1",
+      "source": "Actual Unity scene/controller render; synthetic demonstration, no measured animal behavior"
+    },
+    {
+      "name": "panorama-terrain",
+      "scene": "Choice_Selwyn",
+      "image": "panorama-terrain.jpg",
+      "configuration": "panorama-terrain.config.json",
+      "additionalPrefab": null,
+      "width": 1440,
+      "height": 900,
+      "cameraPosition": {
+        "x": 0.0,
+        "y": -209.5321,
+        "z": 0.0
+      },
+      "cameraEuler": {
+        "x": 2.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "fov": 80.0,
+      "skyboxId": "",
+      "skyboxSampleUtc": "",
+      "unity": "6000.3.16f1",
+      "source": "Actual Unity scene/controller render; synthetic demonstration, no measured animal behavior"
+    },
+    {
+      "name": "choice-bars",
+      "scene": "Choice",
+      "image": "choice-bars.jpg",
+      "configuration": "choice-bars.config.json",
+      "additionalPrefab": null,
+      "width": 1440,
+      "height": 900,
+      "cameraPosition": {
+        "x": 0.0,
+        "y": 0.5,
+        "z": 0.0
+      },
+      "cameraEuler": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "fov": 80.0,
+      "skyboxId": "eb466cac551c4ce11693f66c14bfebe9f10d0ad987cc8a4e18736c2e74ea1edb",
+      "skyboxSampleUtc": "",
+      "unity": "6000.3.16f1",
+      "source": "Actual Unity scene/controller render; synthetic demonstration, no measured animal behavior"
+    },
+    {
+      "name": "optomotor",
+      "scene": "Optomotor",
+      "image": "optomotor.jpg",
+      "configuration": "optomotor.config.json",
+      "additionalPrefab": null,
+      "width": 1440,
+      "height": 900,
+      "cameraPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "cameraEuler": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "fov": 80.0,
+      "skyboxId": "",
+      "skyboxSampleUtc": "",
+      "unity": "6000.3.16f1",
+      "source": "Actual Unity scene/controller render; synthetic demonstration, no measured animal behavior"
+    },
+    {
+      "name": "stripe-fixation",
+      "scene": "Choice",
+      "image": "stripe-fixation.jpg",
+      "configuration": "stripe-fixation.config.json",
+      "additionalPrefab": null,
+      "width": 1440,
+      "height": 900,
+      "cameraPosition": {
+        "x": 0.0,
+        "y": 0.5,
+        "z": 0.0
+      },
+      "cameraEuler": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "fov": 80.0,
+      "skyboxId": "eb466cac551c4ce11693f66c14bfebe9f10d0ad987cc8a4e18736c2e74ea1edb",
+      "skyboxSampleUtc": "",
+      "unity": "6000.3.16f1",
+      "source": "Actual Unity scene/controller render; synthetic demonstration, no measured animal behavior"
+    },
+    {
+      "name": "choice-objects",
+      "scene": "Choice",
+      "image": "choice-objects.jpg",
+      "configuration": "choice-objects.config.json",
+      "additionalPrefab": null,
+      "width": 1440,
+      "height": 900,
+      "cameraPosition": {
+        "x": 0.0,
+        "y": 0.5,
+        "z": 0.0
+      },
+      "cameraEuler": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "fov": 80.0,
+      "skyboxId": "",
+      "skyboxSampleUtc": "",
+      "unity": "6000.3.16f1",
+      "source": "Actual Unity scene/controller render; synthetic demonstration, no measured animal behavior"
+    },
+    {
+      "name": "locust-swarm",
+      "scene": "Swarm",
+      "image": "locust-swarm.jpg",
+      "configuration": "locust-swarm.config.json",
+      "additionalPrefab": null,
+      "width": 1440,
+      "height": 900,
+      "cameraPosition": {
+        "x": 40.0,
+        "y": 55.0,
+        "z": -60.0
+      },
+      "cameraEuler": {
+        "x": 37.33323,
+        "y": 326.309937,
+        "z": -1.07376434E-06
+      },
+      "fov": 80.0,
+      "skyboxId": "",
+      "skyboxSampleUtc": "",
+      "unity": "6000.3.16f1",
+      "source": "Actual Unity scene/controller render; synthetic demonstration, no measured animal behavior"
+    },
+    {
+      "name": "kannadi",
+      "scene": "Kannadi",
+      "image": "kannadi.jpg",
+      "configuration": "kannadi.config.json",
+      "additionalPrefab": null,
+      "width": 1440,
+      "height": 900,
+      "cameraPosition": {
+        "x": 40.0,
+        "y": 55.0,
+        "z": -60.0
+      },
+      "cameraEuler": {
+        "x": 37.33323,
+        "y": 326.309937,
+        "z": -1.07376434E-06
+      },
+      "fov": 80.0,
+      "skyboxId": "",
+      "skyboxSampleUtc": "",
+      "unity": "6000.3.16f1",
+      "source": "Actual Unity scene/controller render; synthetic demonstration, no measured animal behavior"
+    }
+  ],
+  "failure": null,
+  "errors": [
+    "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.\nParameter name: index\nSystem.Collections.Generic.List`1[T].get_Item (System.Int32 index) (at <c5eeda5e65d44b388e164c6c5cfe0702>:0)\nUnityEditor.Search.SearchDatabase+<EnumerateAll>d__80.MoveNext () (at /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/Indexing/SearchDatabase.cs:445)\nSystem.Linq.Enumerable.TryGetFirst[TSource] (System.Collections.Generic.IEnumerable`1[T] source, System.Boolean& found) (at <8203c5af529241e2a5cc4b3c5a3dc69a>:0)\nSystem.Linq.Enumerable.First[TSource] (System.Collections.Generic.IEnumerable`1[T] source) (at <8203c5af529241e2a5cc4b3c5a3dc69a>:0)\nUnityEditor.Search.SearchDatabase.GetDefaultSearchDatabase () (at /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/Indexing/SearchDatabase.cs:420)\nUnityEditor.Search.SearchInit.IndexationOnStartup () (at /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/SearchInit.cs:109)\nUnityEditor.EditorApplication.Internal_CallDelayFunctions () (at /Users/bokken/build/output/unity/unity/Editor/Mono/EditorApplication.cs:407)\n"
+  ]
+}

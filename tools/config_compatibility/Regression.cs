@@ -24,12 +24,21 @@ public static class Regression
         Directory.CreateDirectory(scratch);
         try
         {
-            Metadata(); Swarms(); Documents(scratch); Schemas(args[0]);
+            Metadata(); Swarms(); Descriptions(); Documents(scratch); Schemas(args[0]);
             Console.WriteLine(JsonConvert.SerializeObject(new { checks = checks.Count, passed = checks }, Formatting.Indented));
             return 0;
         }
         catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         finally { Directory.Delete(scratch, true); }
+    }
+    private static void Descriptions()
+    {
+        foreach(string optional in new[]{"nightSky","adaptiveDecision"})
+        {
+            Check(ExperimentBlocks.Describe(JObject.Parse("{\""+optional+"\":null}"))=="Scene defaults · open to inspect", "Explicit null optional config is safe in setup summary: "+optional);
+            Check(ExperimentBlocks.Describe(JObject.Parse("{\"stimulus\":{\""+optional+"\":null}}"))=="Scene defaults · open to inspect", "Explicit null optional phase config is safe in setup summary: "+optional);
+        }
+        Check(ExperimentBlocks.Describe(JObject.Parse("{\"nightSky\":{\"enabled\":true}}"))=="Live sky", "Object-valued sky summary retains behavior");
     }
     private static void Metadata()
     {

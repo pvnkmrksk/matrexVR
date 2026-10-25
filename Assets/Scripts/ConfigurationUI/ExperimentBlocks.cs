@@ -123,10 +123,10 @@ namespace ConfigurationUI
             if(p["stimuli"] is JArray stimuli)
             { details.Add(stimuli.Count+" gratings"); if(stimuli.First is JObject first) { details.Add((first["rotationAxis"]?.ToString()??"Yaw")+" · "+first["speed"]+" deg/s"); if(first["contrast"]!=null) details.Add((Number(first["contrast"])*100).ToString("0.#",CultureInfo.InvariantCulture)+"% contrast"); } }
             if(p["steps"] is JArray steps) details.Add(steps.Count+" decision steps · "+(Flag(p["sync"],true)?"synchronized":"independent"));
-            if(Flag(p["adaptiveDecision"]?["enabled"])) details.Add("Adaptive decision ON");
+            if(p["adaptiveDecision"] is JObject adaptive && Flag(adaptive["enabled"])) details.Add("Adaptive decision ON");
             if(p["uniformSkyColor"] is JObject) details.Add("Uniform sky");
             else if(!string.IsNullOrWhiteSpace((string)p["skyboxPath"])) details.Add("Panorama");
-            else if(Flag(p["nightSky"]?["enabled"])) details.Add(Flag(p["nightSky"]?["advanceWithRealTime"],true)?"Live sky":"Fixed sky");
+            else if(p["nightSky"] is JObject sky && Flag(sky["enabled"])) details.Add(Flag(sky["advanceWithRealTime"],true)?"Live sky":"Fixed sky");
             if(Number(p["aglHeight"])>0) details.Add(p["aglHeight"]+" units AGL");
             return details.Count==0?"Scene defaults · open to inspect":string.Join("  ·  ",details);
         }

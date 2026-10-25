@@ -28,6 +28,9 @@ public class MainController : MonoBehaviour
     public string SequenceError { get; private set; }
     public IReadOnlyDictionary<string, ClosedLoop> VRClosedLoops => vrClosedLoops;
     public IReadOnlyDictionary<string, SystemConfig> SystemConfigs => systemConfigs;
+    public AnimalData CurrentAnimalMetadata { get; private set; } = new AnimalData();
+    public string GetBackendDisplayName(SystemConfig config) => TrackerBackend.DisplayName(config.closedLoopMode);
+    public void SetAnimalMetadata(AnimalData metadata) => CurrentAnimalMetadata = metadata ?? new AnimalData();
     public TelemetryConfig TelemetrySettings { get; private set; } = new TelemetryConfig();
     public StatusOverlayConfig StatusOverlaySettings { get; private set; } = new StatusOverlayConfig();
     public int TargetFrameRate { get; private set; } = 120;
@@ -177,6 +180,7 @@ public class MainController : MonoBehaviour
 
         // Load system configurations first
         LoadSystemConfigurations();
+        LoadAnimalMetadata();
 
         // Setup display handling if enabled
         if (preventMultipleWindows)
@@ -228,6 +232,14 @@ public class MainController : MonoBehaviour
         // Opt-in preview sequences can start with Play in ControlScene. Start only once:
         // returning to Control with Escape must not immediately restart the experiment.
         if (autoStart && SceneManager.GetActiveScene().name == "ControlScene" && !ConfigurationUI.ConfigWorkbench.ForceSetup) StartSequence();
+    }
+
+    private void LoadAnimalMetadata()
+    {
+        string backup = Path.Combine(RuntimePaths.RunDataRoot, "Backup", "AnimalMetadata.json");
+        if (!File.Exists(backup)) backup = Path.Combine(RuntimePaths.RunDataRoot, "Backup", "FlyMetaData.json");
+        try { if (File.Exists(backup)) SetAnimalMetadata(JsonConvert.DeserializeObject<AnimalData>(File.ReadAllText(backup))); }
+        catch (System.Exception error) { Debug.LogWarning("Animal metadata could not be read: " + error.Message); }
     }
 
     // Load system configurations from the specified file
@@ -940,7 +952,8 @@ public class SequenceItem
 }
 
 [System.Serializable]
-public enum ClosedLoopMode { FicTrac, Kinefly, Tirbala }
+[JsonConverter(typeof(TrackerBackendConverter))]
+public enum ClosedLoopMode { FicTrac = 0, Kinefly = 1, Tirbala = 2, Hejjetrac = 3, Rekkefly = 4 }
 
 [System.Serializable]
 public class SystemConfig
@@ -957,6 +970,7 @@ public class SystemConfig
     public int zmqPort = 9872;
     public string vrId = "VR1";
     public string speciesName = "";
+    public TrackerLaunchConfig tracker;
     public string displayOrder = ""; // Explicit rendering allow-list: Down, Right, Back, Left, Front, Up.
     public int targetDisplay = 1; // 0 for primary, 1 for secondary display
 }

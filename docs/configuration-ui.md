@@ -75,3 +75,7 @@ Unity's existing editor search-indexing exception is excluded by its specific st
 ## 0.3 native GUI verification
 
 **2,946 native checks passed** with no errors. Fresh Full HD captures show the current animal/species Session screen, sequence/system/settings panels, raw JSON, all fields and replay launcher. See the [0.3 GUI report](configuration-dashboard-v0.3-validation-results.json), [capture manifest](images/dashboard-v0.3/provenance.json), [Session](images/dashboard-v0.3/session-1920.png), [raw JSON](images/dashboard-v0.3/raw-json-1920.png) and [replay launcher](images/dashboard-v0.3/replay-launcher-1920.png). These are actual graphics-enabled runtime UI Toolkit captures with synthetic validation animals, not live collection data.
+
+## Current-source ecosystem UI after 0.3
+
+The [ecosystem GUI report](configuration-dashboard-ecosystem-validation-results.json) passed **2,970 checks** with no runtime errors, including modern backend labels, explicit optional tracker launch controls, metadata/JSON/Undo/navigation and readable full-width selectors. [Fresh current-source Session](images/dashboard-ecosystem/session-1920.jpg) and [capture provenance](images/dashboard-ecosystem/provenance.json) use synthetic animals, not camera acquisition. These additions are separate from the immutable 0.3 player. See [native tracker integration](tracker-integration.md).

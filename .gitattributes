@@ -1,0 +1,4 @@
+# Preserve Unity-generated importer metadata and verbatim upstream notices.
+Assets/Resources/ConfigurationUI/Icons/*.meta -whitespace
+Assets/Plugins/NaCl.dll.meta -whitespace
+Assets/ThirdParty/TrackerTransport/** -whitespace

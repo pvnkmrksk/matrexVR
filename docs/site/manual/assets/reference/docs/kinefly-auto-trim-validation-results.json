@@ -1,0 +1,37 @@
+{
+  "checks": 54204,
+  "failure": null,
+  "unity": "6000.3.16f1",
+  "agentsPerRig": 64,
+  "rigs": 4,
+  "asyncCapture": {
+    "samples": 51236,
+    "medianMs": 0.0371,
+    "p95Ms": 0.0618
+  },
+  "legacySynchronousLogging": {
+    "samples": 240,
+    "medianMs": 0.32830000000000004,
+    "p95Ms": 0.3759
+  },
+  "maxQueue": 5,
+  "testedSources": {
+    "Assets/Scripts/KineflyAutoTrim.cs": "97b88012eebd8016f542d2d15f6cc69825f26f85f80ceaa79ab94a140719a6c3",
+    "Assets/Scripts/ClosedLoop.cs": "5e5e5ec6a4f323fd623f5d6f70853b94022051fddaac3858ca890e8a5768c493",
+    "Assets/Scripts/MainController.cs": "bd275715b72ca82c6c97ced4a7d2349d04da44bb82edeeba3b7dfb05be513592",
+    "Assets/Scripts/RuntimeStatusOverlay.cs": "643ec6bfaed4ac77a2b55aae1daa94a3d182fecc1356d1983c192799e62d0b30",
+    "Assets/Scripts/Swarm/SwarmLogger.cs": "a302b5092aa712116333f076699851f9b1a46af7567faa6d0a5ee8d083406cc0",
+    "Assets/Scripts/Swarm/AsyncSwarmWriter.cs": "af63d01e1941d01b3ef6382add5f15f000555fc6ab58388ec0a65c3d04276eb1",
+    "Assets/Scripts/Loggers/MasterDataLogger.cs": "2f06f52d7ea193fc356297f02cf8cbb2fb0a5ffbd729b143f5befbaf5e3aeee2",
+    "Assets/Editor/KineflyAutoTrimValidation.cs": "531d09ea55bc4c0c84e5d0f1291aa98101b14140ff8ace5b24a04e5360d02146",
+    "Assets/Scripts/Loggers/DataLogger.cs": "23f0c2ba57e3dd8b0f8e849cbf157488cbcf2b4785dee4c010917de62d1f4d1a"
+  },
+  "historicalGainCompatibility": {
+    "checks": 73746,
+    "failure": null,
+    "referenceCommit": "ef8a68b2ad2ff690e803007511666296a31eda5a",
+    "comparison": "Exact Vector3 and Quaternion component equality on every simulated frame",
+    "unity": "6000.3.16f1"
+  },
+  "notes": "Final Gaussian-aware mean controller and optional median fixture tested in Unity 6000.3.16f1. Gates, population flight variance, signed gains, live corrections, per-rig adjustment telemetry in degrees, experiment-only settings, scene/row/stop persistence, dashboard toggles/bypass and 64 agents per rig passed. The default unit-bias cases converge within five passes. Historical motion arithmetic is unchanged and its earlier exact comparison is retained as prior evidence. Capture timings are diagnostic. Expected injected experiment failure and known Editor Search indexing errors are excluded."
+}

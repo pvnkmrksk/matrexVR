@@ -89,7 +89,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         system["properties"]["targetFrameRate"]["x-ui"]["slider"]=new JObject { ["min"]=30,["max"]=240,["step"]=1 };
         var rig=system["properties"]["configs"]["items"];
         rig["required"]=new JArray("vrId");
-        rig["properties"]["sphereDiameter"]["x-ui"]=new JObject { ["visibleWhen"]=Rule("closedLoopMode","FicTrac",0),["help"]="Walking ball diameter in centimetres. Hidden in wing-angle flight mode." };
+        rig["properties"]["sphereDiameter"]["x-ui"]=new JObject { ["visibleWhen"]=Rule("closedLoopMode","FicTrac","Hejjetrac","HejjéTrac","hejjetrak",0,3),["help"]="Walking ball diameter in centimetres. Hidden in wing-angle flight mode." };
         rig["properties"]["targetDisplay"]["x-ui"]=new JObject { ["readOnly"]=true,["help"]="The top-level targetDisplay overrides this legacy field." };
         schemas["sequence"]["required"]=new JArray("sequences");
         schemas["sequence"]["properties"]["sequences"]["type"]="array";
@@ -116,7 +116,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(type==typeof(object)) return result;
         if(type==typeof(string)) result["type"]="string";
         else if(type==typeof(bool)) result["type"]="boolean";
-        else if(type.IsEnum) { result["type"]=new JArray("string","integer"); result["enum"]=new JArray(Enum.GetNames(type).Cast<object>().Concat(Enum.GetValues(type).Cast<object>().Select(v=>(object)Convert.ToInt32(v)))); }
+        else if(type.IsEnum) { result["type"]=new JArray("string","integer"); result["enum"]=new JArray(Enum.GetNames(type).Cast<object>().Concat(Enum.GetValues(type).Cast<object>().Select(v=>(object)Convert.ToInt32(v)))); if(type==typeof(ClosedLoopMode)) { ((JArray)result["enum"]).Add("HejjéTrac");((JArray)result["enum"]).Add("hejjetrak"); } }
         else if(type==typeof(int) || type==typeof(long) || type==typeof(uint) || type==typeof(short))
         {
             result["type"]="integer";
@@ -184,6 +184,12 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
             ui["enabledWhen"]=owner.GetField("resetRotationOnStart")!=null?new JObject { ["all"]=new JArray(Rule("randomInitialRotation",false),Rule("resetRotationOnStart",true)) }:Rule("randomInitialRotation",false);
         if(name=="playback") ui["enabledWhen"]=new JObject { ["property"]="trajectoryFile",["nonEmpty"]=true };
         if(name=="speciesName") ui["help"]="Common or scientific name of the real animal controlling this rig. Saved with its AnimalID in run metadata.";
+        if(owner==typeof(TelemetryConfig) && name=="contextIntervalSeconds")
+        {
+            child["minimum"]=.25;child["maximum"]=60;child["default"]=2;
+            ui["unit"]="seconds";ui["help"]="Compact session context heartbeat for late-joining dashboards. Topic matrex.telemetry.v2.context uses schema 1/kind matrex.context; normal frame snapshots retain schema 2.";
+        }
+        if(owner==typeof(TrackerLaunchConfig)) ui["help"]=name=="executablePath"?"Absolute installed native executable. On macOS choose Contents/MacOS inside the app. Nothing launches automatically.":name=="configFile"?"Existing tracker calibration file. Relative paths resolve inside the MATREX config folder; MATREX never rewrites this file.":name=="device"?"Optional Rekkefly device override. HejjéTrac source selection stays in its calibration config.":"Optional headless Rekkefly launch. HejjéTrac uses its native desktop window.";
         if(owner==typeof(VRConfig) && (name=="vrIndex" || name=="watchIndex")) child["minimum"]=1;
         if(new[]{"agentSpeed","locoSpeed","agentSpeedStdDev","locustSpeedStdDev","volumeHalfExtentMetres","preserveBoundaryOvershoot"}.Contains(name))
             ui["visibleWhen"]=Rule("trajectoryFile","");

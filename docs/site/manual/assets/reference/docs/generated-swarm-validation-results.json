@@ -1,0 +1,1295 @@
+{
+  "checks": 100319,
+  "failure": null,
+  "errors": [],
+  "distribution": {
+    "samples": 100000,
+    "meanMetresPerSecond": 6.16718125606358,
+    "standardDeviationMetresPerSecond": 1.2358387517496368
+  },
+  "visibility": {
+    "panelWidth": 64,
+    "panelHeight": 64,
+    "fovDegrees": 90,
+    "skyByte": 31,
+    "fullContrastBytes": 28,
+    "furthestSampleAtHalfContrastMetres": 1.0,
+    "selectedVolumeHalfExtentMetres": 2.0,
+    "maxPeakContrastAt2mBytes": 4,
+    "samples": [
+      {
+        "distanceMetres": 0.05,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 1400,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.05,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 1288,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.05,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 1456,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.05,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 1344,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.05,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 1456,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.05,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 1344,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.05,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 2464,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.05,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 2408,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.05,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 9160,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.05,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 8757,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.05,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 9160,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.05,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 8757,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.1,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 372,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.1,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 260,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.1,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 378,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.1,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 272,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.1,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 378,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.1,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 272,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.1,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 784,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.1,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 784,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.1,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 1922,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.1,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 2011,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.1,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 1922,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.1,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 2011,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.15,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 112,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.15,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 56,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.15,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 72,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.15,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 43,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.15,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 72,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.15,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 43,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.15,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 224,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.15,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 280,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.15,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 724,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.15,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 765,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.15,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 724,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.15,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 765,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.2,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 18,
+        "totalContrastBytes": 72,
+        "peakFractionOfFullContrast": 0.6428571428571429
+      },
+      {
+        "distanceMetres": 0.2,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 56,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.2,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 58,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.2,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 31,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.2,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 58,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.2,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 31,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.2,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 224,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.2,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 168,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.2,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 422,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.2,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 402,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.2,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 464,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.2,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 465,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.3,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 8,
+        "totalContrastBytes": 32,
+        "peakFractionOfFullContrast": 0.2857142857142857
+      },
+      {
+        "distanceMetres": 0.3,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 16,
+        "totalContrastBytes": 32,
+        "peakFractionOfFullContrast": 0.5714285714285714
+      },
+      {
+        "distanceMetres": 0.3,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 13,
+        "totalContrastBytes": 32,
+        "peakFractionOfFullContrast": 0.4642857142857143
+      },
+      {
+        "distanceMetres": 0.3,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 26,
+        "totalContrastBytes": 32,
+        "peakFractionOfFullContrast": 0.9285714285714286
+      },
+      {
+        "distanceMetres": 0.3,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 13,
+        "totalContrastBytes": 32,
+        "peakFractionOfFullContrast": 0.4642857142857143
+      },
+      {
+        "distanceMetres": 0.3,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 26,
+        "totalContrastBytes": 32,
+        "peakFractionOfFullContrast": 0.9285714285714286
+      },
+      {
+        "distanceMetres": 0.3,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 112,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.3,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 56,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.3,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 216,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.3,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 160,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.3,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 216,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.3,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 160,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.5,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 3,
+        "totalContrastBytes": 12,
+        "peakFractionOfFullContrast": 0.10714285714285714
+      },
+      {
+        "distanceMetres": 0.5,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 6,
+        "totalContrastBytes": 12,
+        "peakFractionOfFullContrast": 0.21428571428571427
+      },
+      {
+        "distanceMetres": 0.5,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 4,
+        "totalContrastBytes": 12,
+        "peakFractionOfFullContrast": 0.14285714285714285
+      },
+      {
+        "distanceMetres": 0.5,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 8,
+        "totalContrastBytes": 12,
+        "peakFractionOfFullContrast": 0.2857142857142857
+      },
+      {
+        "distanceMetres": 0.5,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 4,
+        "totalContrastBytes": 12,
+        "peakFractionOfFullContrast": 0.14285714285714285
+      },
+      {
+        "distanceMetres": 0.5,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 8,
+        "totalContrastBytes": 12,
+        "peakFractionOfFullContrast": 0.2857142857142857
+      },
+      {
+        "distanceMetres": 0.5,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 7,
+        "totalContrastBytes": 28,
+        "peakFractionOfFullContrast": 0.25
+      },
+      {
+        "distanceMetres": 0.5,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 13,
+        "totalContrastBytes": 26,
+        "peakFractionOfFullContrast": 0.4642857142857143
+      },
+      {
+        "distanceMetres": 0.5,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 70,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.5,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 41,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.5,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 70,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.5,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 41,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.75,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 4,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 0.75,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 3,
+        "totalContrastBytes": 6,
+        "peakFractionOfFullContrast": 0.10714285714285714
+      },
+      {
+        "distanceMetres": 0.75,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 2,
+        "totalContrastBytes": 6,
+        "peakFractionOfFullContrast": 0.07142857142857142
+      },
+      {
+        "distanceMetres": 0.75,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 3,
+        "totalContrastBytes": 5,
+        "peakFractionOfFullContrast": 0.10714285714285714
+      },
+      {
+        "distanceMetres": 0.75,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 2,
+        "totalContrastBytes": 6,
+        "peakFractionOfFullContrast": 0.07142857142857142
+      },
+      {
+        "distanceMetres": 0.75,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 3,
+        "totalContrastBytes": 5,
+        "peakFractionOfFullContrast": 0.10714285714285714
+      },
+      {
+        "distanceMetres": 0.75,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 3,
+        "totalContrastBytes": 12,
+        "peakFractionOfFullContrast": 0.10714285714285714
+      },
+      {
+        "distanceMetres": 0.75,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 6,
+        "totalContrastBytes": 12,
+        "peakFractionOfFullContrast": 0.21428571428571427
+      },
+      {
+        "distanceMetres": 0.75,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 22,
+        "totalContrastBytes": 48,
+        "peakFractionOfFullContrast": 0.7857142857142857
+      },
+      {
+        "distanceMetres": 0.75,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 32,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 0.75,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 22,
+        "totalContrastBytes": 48,
+        "peakFractionOfFullContrast": 0.7857142857142857
+      },
+      {
+        "distanceMetres": 0.75,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 28,
+        "totalContrastBytes": 32,
+        "peakFractionOfFullContrast": 1.0
+      },
+      {
+        "distanceMetres": 1.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 4,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 1.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 2,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 1.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 4,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 1.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 2,
+        "totalContrastBytes": 3,
+        "peakFractionOfFullContrast": 0.07142857142857142
+      },
+      {
+        "distanceMetres": 1.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 4,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 1.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 2,
+        "totalContrastBytes": 3,
+        "peakFractionOfFullContrast": 0.07142857142857142
+      },
+      {
+        "distanceMetres": 1.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 2,
+        "totalContrastBytes": 8,
+        "peakFractionOfFullContrast": 0.07142857142857142
+      },
+      {
+        "distanceMetres": 1.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 3,
+        "totalContrastBytes": 6,
+        "peakFractionOfFullContrast": 0.10714285714285714
+      },
+      {
+        "distanceMetres": 1.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 11,
+        "totalContrastBytes": 28,
+        "peakFractionOfFullContrast": 0.39285714285714285
+      },
+      {
+        "distanceMetres": 1.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 22,
+        "totalContrastBytes": 27,
+        "peakFractionOfFullContrast": 0.7857142857142857
+      },
+      {
+        "distanceMetres": 1.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 11,
+        "totalContrastBytes": 28,
+        "peakFractionOfFullContrast": 0.39285714285714285
+      },
+      {
+        "distanceMetres": 1.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 22,
+        "totalContrastBytes": 27,
+        "peakFractionOfFullContrast": 0.7857142857142857
+      },
+      {
+        "distanceMetres": 1.5,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 1.5,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 2,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 1.5,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 1.5,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 2,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 1.5,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 1.5,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 2,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 1.5,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 4,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 1.5,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 2,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 1.5,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 4,
+        "totalContrastBytes": 12,
+        "peakFractionOfFullContrast": 0.14285714285714285
+      },
+      {
+        "distanceMetres": 1.5,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 8,
+        "totalContrastBytes": 11,
+        "peakFractionOfFullContrast": 0.2857142857142857
+      },
+      {
+        "distanceMetres": 1.5,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 4,
+        "totalContrastBytes": 12,
+        "peakFractionOfFullContrast": 0.14285714285714285
+      },
+      {
+        "distanceMetres": 1.5,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 8,
+        "totalContrastBytes": 11,
+        "peakFractionOfFullContrast": 0.2857142857142857
+      },
+      {
+        "distanceMetres": 2.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 2.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 2.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 2.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 2.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 2.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 2.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 2.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 2,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 2.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 2,
+        "totalContrastBytes": 6,
+        "peakFractionOfFullContrast": 0.07142857142857142
+      },
+      {
+        "distanceMetres": 2.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 4,
+        "totalContrastBytes": 6,
+        "peakFractionOfFullContrast": 0.14285714285714285
+      },
+      {
+        "distanceMetres": 2.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 2,
+        "totalContrastBytes": 6,
+        "peakFractionOfFullContrast": 0.07142857142857142
+      },
+      {
+        "distanceMetres": 2.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 4,
+        "totalContrastBytes": 6,
+        "peakFractionOfFullContrast": 0.14285714285714285
+      },
+      {
+        "distanceMetres": 3.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 3.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 3.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 3.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 3.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 3.0,
+        "yawDegrees": 0.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 3.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 3.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.0,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 0,
+        "totalContrastBytes": 0,
+        "peakFractionOfFullContrast": 0.0
+      },
+      {
+        "distanceMetres": 3.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 4,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 3.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.25,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 2,
+        "totalContrastBytes": 3,
+        "peakFractionOfFullContrast": 0.07142857142857142
+      },
+      {
+        "distanceMetres": 3.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.0,
+        "peakContrastBytes": 1,
+        "totalContrastBytes": 4,
+        "peakFractionOfFullContrast": 0.03571428571428571
+      },
+      {
+        "distanceMetres": 3.0,
+        "yawDegrees": 90.0,
+        "flapPhase": 0.75,
+        "pixelOffset": 0.5,
+        "peakContrastBytes": 2,
+        "totalContrastBytes": 3,
+        "peakFractionOfFullContrast": 0.07142857142857142
+      }
+    ],
+    "note": "Rendered pixel contrast, not calibrated moth acuity. Half threshold varies with orientation, phase and pixel position. The cube corner lies 3.46m away."
+  },
+  "encounters": {
+    "durationSeconds": 600,
+    "agents": 64,
+    "seed": 703,
+    "observerMetresPerSecond": 6.17,
+    "within10cmEntries": 19,
+    "within25cmEntries": 203,
+    "nearestMetres": 0.0235551726,
+    "meanAgentsWithin1m": 4.3485,
+    "note": "One deterministic stochastic realization, sampled every 50ms; not a promised encounter rate."
+  },
+  "performance": {
+    "results": [
+      {
+        "logging": false,
+        "agents": 256,
+        "rigs": 4,
+        "cameras": 24,
+        "movementAndUploadMedianMilliseconds": 0.2257,
+        "captureMedianMilliseconds": 0.0,
+        "refreshRecordRenderMedianMilliseconds": 2.2933,
+        "refreshRecordRenderP95Milliseconds": 2.8828
+      },
+      {
+        "logging": true,
+        "agents": 256,
+        "rigs": 4,
+        "cameras": 24,
+        "movementAndUploadMedianMilliseconds": 0.232,
+        "captureMedianMilliseconds": 0.1044,
+        "refreshRecordRenderMedianMilliseconds": 2.4461,
+        "refreshRecordRenderP95Milliseconds": 5.2724
+      }
+    ],
+    "mainThreadManagedBytesPerFrame": 0.0,
+    "saved": [
+      {
+        "rig": "VR3_EmbeddedSwarm",
+        "rows": 17920,
+        "droppedFrames": 0,
+        "pendingFrames": 0
+      },
+      {
+        "rig": "VR2_EmbeddedSwarm",
+        "rows": 17920,
+        "droppedFrames": 0,
+        "pendingFrames": 0
+      },
+      {
+        "rig": "VR1_EmbeddedSwarm",
+        "rows": 17920,
+        "droppedFrames": 0,
+        "pendingFrames": 0
+      },
+      {
+        "rig": "VR4_EmbeddedSwarm",
+        "rows": 17920,
+        "droppedFrames": 0,
+        "pendingFrames": 0
+      }
+    ],
+    "note": "Isolated CPU submission timings include actual generated motion, native cameras and asynchronous recording. Excludes GPU completion, terrain drawing, real tracking and LED display hardware; not a guaranteed workstation FPS."
+  },
+  "unity": "6000.3.16f1",
+  "gpu": "Apple M2 Pro",
+  "interface": "Original ControlScene UnityEngine.UI metadata form and persistent Save/Start button; no ConfigurationUI or schema builder.",
+  "baseCommit": "fd9b516a3d67fcbffa09ad22f2985875fd4cd1a2",
+  "branch": "codex/bogong-night-sky",
+  "regressions": {
+    "legacyPhases": {
+      "checks": 85479,
+      "failure": null
+    },
+    "recordedPlayback": {
+      "checks": 99,
+      "failure": null
+    }
+  },
+  "configurationValidation": {
+    "configs": 66,
+    "archiveHashes": 622,
+    "legacyInputs": 979,
+    "exclusions": []
+  }
+}

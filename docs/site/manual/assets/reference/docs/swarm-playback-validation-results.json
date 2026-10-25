@@ -1,0 +1,184 @@
+{
+  "date": "2026-10-11",
+  "branch": "codex/bogong-night-sky",
+  "unity": "6000.3.16f1",
+  "graphics": "Apple M2 Pro",
+  "testedSourceSha256": {
+    "Assets/Editor/SwarmTrajectoryValidation.cs": "41b0c30f5b3b41740cb4503046383ea93c4090ae206a4e6546f90ffa82afc826",
+    "Assets/Editor/SwarmPlaybackSceneValidation.cs": "f259af8b56bdc547c4fa1a0876aed8e0328159a1ef958270e5543dcb9ac6278d",
+    "Assets/Editor/ConfigCatalogValidation.cs": "6210fce56412d7c533537067cbfb1e21d93f98b3cf11950fc5805eac0af0bc9b",
+    "Assets/Scripts/Swarm/KannadiConfig.cs": "03010ca3ae9a9a32841f74163a2e8f65a9796d8f64c006bc8aa8ec0436ec6766",
+    "Assets/Scripts/Swarm/SwarmConfiguration.cs": "a22c82d0a89a44940679a238a49ee7a586a85caa375f5cced3e7e4411ce089be",
+    "Assets/Scripts/Swarm/LocustSpawner.cs": "f9146eacbc087a35087c4d6e4375ed0868b6bcb2e58581f3b4bff902a445ef1e",
+    "Assets/Scripts/Swarm/SwarmTrajectoryData.cs": "7581038d4bd86fdd24e1c361b0e517be022d67e9879229ccf0a53b974af0b704",
+    "Assets/Scripts/Swarm/SwarmTrajectoryPlayback.cs": "831728353905eb7aedecba20d1e89a44975b5871db7fb96cb8f1dfb2e2cae7d0",
+    "Assets/Scripts/Swarm/BogongSwarmRenderer.cs": "365c845e8538e72d94255071ef1923b142a972dca804dd6b99dec149d57cf2c1",
+    "Assets/Scripts/Swarm/BogongMothMesh.cs": "2218e00c2a9b432fa80c47d60d1798c647ad230bd0952e2c69ed5e1a5fc98337",
+    "Assets/Scripts/Swarm/BogongMoth.cs": "6a11bf36d584c7741d9c2ab12e046579ad2159fa0bbdb9b9583cf44162b45a2b",
+    "Assets/Resources/Bogong/BatchedMoth.shader": "e5e5a35dd7881b9c113ce3a7f2c7b78ca1edc11317dce3ab056a24ca2bfd2422",
+    "Assets/Resources/Bogong/BatchedDot.shader": "16193c04fb1ac80b3b6c7f71ad0ad931c92b93680e48fe19240bf5bc73d9882e",
+    "Assets/Resources/Bogong/Moth.prefab": "f1ddcf07f9b122a0a054c288f5a4bd453d8ac7d3146dcb6d273ef048c5fef6db",
+    "Assets/StreamingAssets/SwarmData/selwyn-oct7-unity.csv": "7353033db12dd544eca10091d58ef265a73859452331be95a13d387b4def4817",
+    "Assets/StreamingAssets/Examples/Flight/selwyn-trajectory-playback.example.json": "3e3d8126506b74912057fbc08a39db1b8b6c43f7b7e0ce12f9705348b290a25b",
+    "tools/convert_swarm_trajectories.py": "9590e3df19d5522c6c11e95d89f9aaa2726538bdd387b12fc7aec2eb4b97959d",
+    "tools/test_convert_swarm_trajectories.py": "6604ac61e46127ed574bdf63ced1691eebd647f2d4e2ea80856b13444ebe8779"
+  },
+  "renderAndPlayback": {
+    "checks": 39,
+    "failure": null,
+    "captures": [
+      {
+        "blank": "RGBA(255, 255, 255, 255)",
+        "rect": "(x:0.00, y:0.00, width:64.00, height:64.00)",
+        "color": "RGBA(1.000, 1.000, 1.000, 1.000)"
+      },
+      {
+        "graphics": "Apple M2 Pro",
+        "camera": "1.00000\t0.00000\t0.00000\t0.00000\n0.00000\t1.00000\t0.00000\t0.00000\n0.00000\t0.00000\t-1.00002\t-0.00200\n0.00000\t0.00000\t-1.00000\t0.00000\n",
+        "bodyLength": 0.0254,
+        "bodyDiameter": 0.01
+      },
+      {
+        "distanceMetres": 0.01,
+        "contrast": 2070.52539,
+        "changedPixels": 2936
+      },
+      {
+        "distanceMetres": 0.1,
+        "contrast": 19.02745,
+        "changedPixels": 34
+      },
+      {
+        "distanceMetres": 1.0,
+        "contrast": 0.266666681,
+        "changedPixels": 8
+      },
+      {
+        "distanceMetres": 2.0,
+        "contrast": 0.07450981,
+        "changedPixels": 7
+      }
+    ],
+    "timings": [
+      {
+        "shape": "Dot",
+        "medianCpuMilliseconds": 2.2709,
+        "p95CpuMilliseconds": 2.6351,
+        "agents": 1024,
+        "rigs": 4,
+        "cameras": 24,
+        "materials": 4
+      },
+      {
+        "shape": "Moth",
+        "medianCpuMilliseconds": 2.8868,
+        "p95CpuMilliseconds": 3.9658,
+        "agents": 1024,
+        "rigs": 4,
+        "cameras": 24,
+        "materials": 4
+      }
+    ],
+    "unity": "6000.3.16f1",
+    "timingNote": "Isolated CPU timings: four rigs, six 64px cameras each, 256 agents per rig. Not hardware-display FPS."
+  },
+  "terrainSequence": {
+    "checks": 30,
+    "failure": null,
+    "errors": [],
+    "unity": "6000.3.16f1"
+  },
+  "configurationCatalog": {
+    "checks": 4743,
+    "failure": null,
+    "errors": [],
+    "unity": "6000.3.16f1"
+  },
+  "generatedSwarmRegression": {
+    "checks": 798525,
+    "failure": null,
+    "renders": [
+      {
+        "agentsPerRig": 64,
+        "rigs": 4,
+        "cameras": 24,
+        "comparedPixels": 393216,
+        "legacyMedianMs": 3.94255,
+        "batchedMedianMs": 1.8294000000000001,
+        "legacyP95Ms": 4.5747,
+        "batchedP95Ms": 2.1984,
+        "legacyMaterials": 256,
+        "batchedMaterials": 4,
+        "legacyCameraCallbacks": 256,
+        "batchedCameraCallbacks": 4
+      },
+      {
+        "agentsPerRig": 256,
+        "rigs": 4,
+        "cameras": 24,
+        "comparedPixels": 393216,
+        "legacyMedianMs": 10.162600000000001,
+        "batchedMedianMs": 1.98265,
+        "legacyP95Ms": 10.9032,
+        "batchedP95Ms": 2.1993,
+        "legacyMaterials": 1024,
+        "batchedMaterials": 4,
+        "legacyCameraCallbacks": 1024,
+        "batchedCameraCallbacks": 4
+      }
+    ],
+    "unity": "6000.3.16f1",
+    "graphics": "Apple M2 Pro",
+    "note": "Isolated Camera.Render CPU timings, four rigs/six 128px cameras each. Not LED workstation FPS. Recorded replay cannot model animal adaptation."
+  },
+  "converter": {
+    "tests": 2,
+    "failure": null,
+    "metadata": {
+      "source": "Selwyn_Oct_7_2026_LongFormat.csv",
+      "sourceSha256": "620b3a90d59b31ab929d3271605e931a7b49fe1b07b45c79a28655a5c36baf92",
+      "sourceUnits": "mm",
+      "outputUnits": "m",
+      "unitsPerMetre": 1.0,
+      "axes": "X east, Y up, Z north",
+      "mapping": "(-sourceY, sourceZ, sourceX) * scale + (0, heightOriginMetres * unitsPerMetre, 0)",
+      "heightOriginMetres": 5,
+      "additionalYawDegrees": 0,
+      "startLocal": "2026-10-07T19:44:35.283000+11:00",
+      "timeZone": "Australia/Sydney",
+      "durationSeconds": 599.46,
+      "rows": 14429,
+      "tracks": 430,
+      "frameRange": [
+        1,
+        59947
+      ],
+      "duplicatePolicy": "error",
+      "duplicates": 0,
+      "rejectedRows": [],
+      "meanDisplacementHeadingDegrees": 225.64127709737375,
+      "bounds": {
+        "X": [
+          -5.0528260000000005,
+          2.637053
+        ],
+        "Y": [
+          -4.160281999999999,
+          7.8644169999999995
+        ],
+        "Z": [
+          -2.5436039999999998,
+          4.972721
+        ]
+      },
+      "note": "Geometry alone cannot establish geographical axes. Mapping uses the user's calibration; no outlier clipping or direction reversal."
+    },
+    "lineEndingCheck": "LF output; all 14,429 parsed rows are identical to the Unity-tested CRLF artifact.",
+    "assetWhitespaceCheck": "Unity-generated prefab empty-field trailing spaces normalized; serialized values unchanged."
+  },
+  "limitations": [
+    "CPU Camera.Render timings on this Mac are not LED-workstation GPU/display FPS.",
+    "Finite display precision eventually makes extremely low contrast invisible.",
+    "Unity editor SearchDatabase indexing exception is filtered; no experiment runtime errors were recorded."
+  ]
+}

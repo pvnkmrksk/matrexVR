@@ -119,3 +119,7 @@ tools/__pycache__/
 /RealWorldTerrainPrefs.xml
 .DS_Store
 /.release-work/
+/.integration/
+
+# Bundled Lucide artwork for the native setup UI.
+!Assets/Resources/ConfigurationUI/Icons/*.png

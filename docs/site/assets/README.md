@@ -4,8 +4,11 @@
 
 Source credit: NASA/Goddard Space Flight Center Scientific Visualization Studio; Ernie Wright (USRA); Gaia DR2: ESA/Gaia/DPAC. [NASA Deep Star Maps 2020](https://svs.gsfc.nasa.gov/4851/). The original source hash and Astronomy Engine revision appear in the manifest.
 
-`configuration-studio.jpg` derives from the actual 0.3 Session capture `docs/images/dashboard-v0.3/session-1920.png`, encoded as JPEG without cropping or color correction. It shows the current Animal ID/Species cards, hardware summary and sequence. The [0.3 capture manifest](https://github.com/pvnkmrksk/matrexVR/blob/v0.3.0/docs/images/dashboard-v0.3/provenance.json) records source hashes, Unity version, runner and transformation. The [GUI report](https://github.com/pvnkmrksk/matrexVR/blob/v0.3.0/docs/configuration-dashboard-v0.3-validation-results.json) records the native checks.
+`configuration-studio.jpg` is an unchanged copy of the actual current-source Session JPEG `docs/images/dashboard-ecosystem/session-1920.jpg`. It shows Animal ID/Species cards, modern tracker labels, hardware summary and sequence after 0.3. The [ecosystem capture manifest](https://github.com/pvnkmrksk/matrexVR/blob/main/docs/images/dashboard-ecosystem/provenance.json) records hashes, Unity version and fixture; the [2,970-check GUI report](https://github.com/pvnkmrksk/matrexVR/blob/main/docs/configuration-dashboard-ecosystem-validation-results.json) records native verification. Stable 0.3 binaries retain their archived UI.
 
 `flight-dashboard.jpg` and `kannadi-overview.jpg` derive from `docs/images/ux/flight-hud.png` and `docs/kannadi-overview.png`. The HUD is a 0.2 baseline capture; current selection also supports 1–9 and 0/Next animal. All UI/overview images use synthetic validation metadata/trajectories, not live animal collection data.
 
 `terrain-cue-four-conditions.svg` is copied from `docs/terrain-cue-four-conditions.svg`. The schematic uses actual Unity mesh and rig samples exported by RugosityValidation; its vertical scale is exaggerated. See `docs/rugosity.md`.
+
+
+The nine actual scene JPGs under `gallery/` are native Unity demonstration renders. [Their unmodified provenance](gallery/provenance.json) identifies scene, camera, sample context and matching config sidecars. The forest capture explicitly instantiates `Assets/Prefabs/Landscape.prefab` into Choice_Forrest as source customization. The manual adds image/config SHA-256 hashes when built.

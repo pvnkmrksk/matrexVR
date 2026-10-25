@@ -1,0 +1,5374 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optomotor fields · MATREX VR manual</title><meta name="description" content="Generated types, defaults, runtime constraints and UI annotations for the optomotor schema.">
+<link rel="canonical" href="https://pvnkmrksk.github.io/matrexVR/manual/schema-optomotor.html"><meta name="theme-color" content="#102d33">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/manual.css"><script src="assets/manual.js" defer></script><noscript><style>.search-open,.mobile-menu{display:none!important}@media(max-width:800px){.left-sidebar{display:block;position:static;width:auto;height:auto;box-shadow:none}}</style></noscript></head>
+<body><a class="skip-link" href="#article">Skip to content</a>
+<header class="docs-header"><a class="docs-brand" href="../index.html"><span class="brand-mark" aria-hidden="true">M</span> MATREX <span>VR</span></a><a class="manual-label" href="index.html">Documentation <span>0.3 + source</span></a><div class="header-actions"><a href="gallery.html">Gallery</a><a href="../index.html#downloads">Downloads</a><a href="https://github.com/pvnkmrksk/matrexVR">Source ↗</a><button type="button" class="mobile-menu" aria-controls="manual-nav" aria-expanded="false">Menu</button></div></header>
+<div class="docs-layout"><aside class="left-sidebar" id="manual-nav"><button class="search-open" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg> Search the manual <kbd>/</kbd></button><nav aria-label="Documentation chapters"><details class="nav-group" open><summary>Start here<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Manual overview</span></a><a href="getting-started.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Getting started</span></a><a href="gallery.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Native gallery</span></a></div></details><details class="nav-group"><summary>How it works<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="architecture.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Runtime architecture</span></a><a href="components.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Component index</span></a><a href="scenes.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Scenes and Kannadi</span></a><a href="viewports.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Rigs and viewports</span></a><a href="closed-loop.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>ClosedLoop and motion</span></a><a href="input-contracts.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Input contracts</span></a><a href="controls.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Keyboard and gamepad</span></a></div></details><details class="nav-group"><summary>Configure<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="configuration-studio.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Configuration studio</span></a><a href="configuration-ux.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>GUI and HUD details</span></a><a href="configuration-reference.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Parameter reference</span></a><a href="animal-agent-compatibility.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Animal and agent names</span></a><a href="experiment-phases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment phases</span></a><a href="auto-trim.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Flight gate and auto trim</span></a></div></details><details class="nav-group" open><summary>Schema field atlas<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="schema-index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Full schema index</span></a><a href="schema-system.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>System fields</span></a><a href="schema-sequence.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Sequence fields</span></a><a href="schema-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Choice fields</span></a><a href="schema-swarm.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Swarm fields</span></a><a href="schema-kannadi.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Kannadi fields</span></a><a href="schema-optomotor.html" class="active" aria-current="page"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Optomotor fields</span></a><a href="schema-rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Rugosity fields</span></a><a href="schema-dynamic-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Dynamic-Choice fields</span></a></div></details><details class="nav-group"><summary>Stimuli<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="night-sky.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Astronomical night sky</span></a><a href="generated-swarms.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Generated swarms</span></a><a href="swarm-playback.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Recorded swarm playback</span></a><a href="selwyn-cycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Selwyn sky and swarm cycle</span></a><a href="rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Visual/navigation rugosity</span></a><a href="selwyn-terrain.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Selwyn terrain source</span></a><a href="historical-panorama.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Historical panorama recipe</span></a></div></details><details class="nav-group"><summary>Data and replay<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="recording-pipeline.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Recording pipeline</span></a><a href="data-formats.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Saved data formats</span></a><a href="run-config-snapshots.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Configuration snapshots</span></a><a href="telemetry.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live telemetry and headings</span></a><a href="live-monitoring.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live browser monitoring</span></a><a href="replay.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Replay a recorded run</span></a></div></details><details class="nav-group"><summary>Extend and validate<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="extending.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Extend the source</span></a><a href="experiment-workflow.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment workflow</span></a><a href="scene-lifecycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene lifecycle</span></a><a href="diagnostics-performance.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Diagnostics and performance</span></a><a href="scene-reload-investigation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene reload investigation</span></a><a href="six-camera-rig.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Six-camera reference</span></a><a href="kannadi-history.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Kannadi integration history</span></a><a href="releases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Releases and rebuilding</span></a></div></details><details class="nav-group"><summary>Hardware and ecosystem<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="hardware.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Hardware and calibration</span></a><a href="integrations.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Trackers and analysis</span></a><a href="tracker-integration.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Native tracker integration</span></a><a href="citation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Cite MATREX VR</span></a></div></details></nav><div class="sidebar-footer"><a href="citation.html">Cite the software</a><a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/manual/generated/schema-optomotor.md">Edit this page ↗</a></div></aside>
+<main id="article" tabindex="-1"><div class="article-context"><span>Schema field atlas</span><span>MATREX VR / source manual</span></div><article class="prose"><h1 id="optomotor-schema-fields">Optomotor schema fields</h1>
+<p>This atlas lists <strong>187 emitted property paths</strong> from the current <code>optomotor</code> runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.</p>
+<p>The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See <a href="configuration-reference.html">parameter semantics</a> and <a href="assets/reference/docs/manual/generated/schema-source.json">the exact emitted schema</a>.</p>
+<p>Every field has a deep link and is indexed by the manual search. Array items use <code>[]</code> in their path. Nested pre/stimulus/post fields are listed where the schema emits them; repeated names in different phases are distinct paths.</p>
+<h2 id="resetpositiononstart-group">resetPositionOnStart group</h2>
+<h3 id="resetpositiononstart"><code>resetPositionOnStart</code></h3>
+<p>Apply the configured initial position when this experiment begins. When disabled, retain the current position.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="resetrotationonstart-group">resetRotationOnStart group</h2>
+<h3 id="resetrotationonstart"><code>resetRotationOnStart</code></h3>
+<p>Apply the initial orientation when this experiment begins. When disabled, retain the current orientation unless the experiment requests randomization.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="initialposition-group">initialPosition group</h2>
+<h3 id="initialposition"><code>initialPosition</code></h3>
+<p>World x/y/z, cm. Template ground-eye height 0.5; migration example 100.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"resetPositionOnStart","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="initialpositionx"><code>initialPosition.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="initialpositiony"><code>initialPosition.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="initialpositionz"><code>initialPosition.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="initialrotation-group">initialRotation group</h2>
+<h3 id="initialrotation"><code>initialRotation</code></h3>
+<p>Euler x/y/z degrees.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"all":[{"property":"randomInitialRotation","oneOf":[false]},{"property":"resetRotationOnStart","oneOf":[true]}]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="initialrotationx"><code>initialRotation.x</code></h3>
+<p>Initial Euler pitch about Unity +X, in degrees.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="initialrotationy"><code>initialRotation.y</code></h3>
+<p>Initial Euler yaw about Unity +Y, in degrees. 0 faces +Z/north; +90 faces +X/east. Positive yaw is clockwise from above.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="initialrotationz"><code>initialRotation.z</code></h3>
+<p>Initial Euler roll about Unity +Z, in degrees.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="randominitialrotation-group">randomInitialRotation group</h2>
+<h3 id="randominitialrotation"><code>randomInitialRotation</code></h3>
+<p>Random starting yaw; Choice shares that sampled yaw across its rigs.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="loop-group">loop group</h2>
+<h3 id="loop"><code>loop</code></h3>
+<p>Repeat the configured optomotor stimuli while this scene runs. The sequence block's duration still ends the scene.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="stimuli-group">stimuli group</h2>
+<h3 id="stimuli"><code>stimuli</code></h3>
+<p>Required nonempty stimulus list.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="stimuli-group-1">stimuli[] group</h2>
+<h3 id="stimuliduration"><code>stimuli[].duration</code></h3>
+<p>Duration of the stimulus in seconds</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>10.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":3600.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulispeed"><code>stimuli[].speed</code></h3>
+<p>Angular drum speed in degrees per second. Use nonnegative speed and the clockwise switch to choose direction.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>20.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>degrees / s</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":100.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimuliclockwise"><code>stimuli[].clockwise</code></h3>
+<p>Whether the rotation is clockwise</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulirotationaxis"><code>stimuli[].rotationAxis</code></h3>
+<p>Axis of rotation (Yaw, Pitch, or Roll)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"Yaw"</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["Yaw","Pitch","Roll"]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulifrequency"><code>stimuli[].frequency</code></h3>
+<p>Spatial frequency of the grating in cycles per revolution</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>4.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":40.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulicontrast"><code>stimuli[].contrast</code></h3>
+<p>Contrast of the grating (0 = no contrast, 1 = maximum contrast)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulidutycycle"><code>stimuli[].dutyCycle</code></h3>
+<p>Duty cycle of the grating (0 = all dark, 1 = all light, 0.5 = equal dark/light)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulicolor1"><code>stimuli[].color1</code></h3>
+<p>First color of the grating in hex format (e.g. #000000)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"#000000"</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulicolor2"><code>stimuli[].color2</code></h3>
+<p>Second color of the grating in hex format (e.g. #FFFFFF)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"#FFFFFF"</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimuliclosedlooporientation"><code>stimuli[].closedLoopOrientation</code></h3>
+<p>Whether to use closed-loop orientation control</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":5.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimuliclosedloopposition"><code>stimuli[].closedLoopPosition</code></h3>
+<p>Whether to use closed-loop position control</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":5.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="autotrimsettings-group">autoTrimSettings group</h2>
+<h3 id="autotrimsettings"><code>autoTrimSettings</code></h3>
+<p>Per-rig flight classification and automatic yaw-bias compensation. These settings apply while auto-trim is enabled for the sequence block.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="autotrimsettingswindowseconds"><code>autoTrimSettings.windowSeconds</code></h3>
+<p>Qualified L−R sampling window for yaw-bias compensation, in seconds. It can grow toward maxWindowSeconds when noise-aware trimming needs more data.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>15.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":180.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="autotrimsettingsmaxwindowseconds"><code>autoTrimSettings.maxWindowSeconds</code></h3>
+<p>Maximum yaw-trim observation window in seconds. Used by noise-aware compensation.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>120.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="autotrimsettingscenterstatistic"><code>autoTrimSettings.centerStatistic</code></h3>
+<p>mean removes expected heading drift; median retains median centering.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"mean"</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["mean","median"]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="autotrimsettingsnoiseaware"><code>autoTrimSettings.noiseAware</code></h3>
+<p>Extend measurements and suppress corrections within the approximate noise band.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="autotrimsettingsflightwindowseconds"><code>autoTrimSettings.flightWindowSeconds</code></h3>
+<p>0.2–30 s raw-signal variance window.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>2.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.2,"max":30.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="autotrimsettingsflightcheckenabled"><code>autoTrimSettings.flightCheckEnabled</code></h3>
+<p>Set false to bypass nonflight while retaining measured flight status.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="autotrimsettingsflightvariancethreshold"><code>autoTrimSettings.flightVarianceThreshold</code></h3>
+<p>0–1,000,000 rad²; entry requires variance strictly above it.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.01</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="autotrimsettingsflightconfirmationseconds"><code>autoTrimSettings.flightConfirmationSeconds</code></h3>
+<p>0–30 s continuously above entry threshold before declaring flight.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="autotrimsettingsflightvariancehysteresis"><code>autoTrimSettings.flightVarianceHysteresis</code></h3>
+<p>0–1 multiplier of entry threshold for exiting flight.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="autotrimsettingsupdateintervalseconds"><code>autoTrimSettings.updateIntervalSeconds</code></h3>
+<p>0.1–60 s between center evaluations.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="autotrimsettingsaggressiveness"><code>autoTrimSettings.aggressiveness</code></h3>
+<p>0.001–1 fraction of selected residual removed per pass.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.001,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="autotrimsettingsmaxstepradians"><code>autoTrimSettings.maxStepRadians</code></h3>
+<p>0.000001–10 rad maximum DC change per pass.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="autotrimsettingsmaxoffsetradians"><code>autoTrimSettings.maxOffsetRadians</code></h3>
+<p>0.000001–10 rad maximum absolute automatic offset.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>2.0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.01,"max":2.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="autotrimsettingssettleseconds"><code>autoTrimSettings.settleSeconds</code></h3>
+<p>0–300 s adaptation time after corrections or gain/manual-offset changes.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>3.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="autotrimsettingstolerancedegpersecond"><code>autoTrimSettings.toleranceDegPerSecond</code></h3>
+<p>0–1,000,000 deg/s effective center tolerance after gain.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="prestimulus-group">preStimulus group</h2>
+<h3 id="prestimulus"><code>preStimulus</code></h3>
+<p>Optional phase before the main stimulus. It retains its own duration, movement, sky and stimulus settings when disabled.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusresetpositiononstart"><code>preStimulus.resetPositionOnStart</code></h3>
+<p>Apply the configured initial position when this experiment begins. When disabled, retain the current position.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusresetrotationonstart"><code>preStimulus.resetRotationOnStart</code></h3>
+<p>Apply the initial orientation when this experiment begins. When disabled, retain the current orientation unless the experiment requests randomization.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusinitialposition"><code>preStimulus.initialPosition</code></h3>
+<p>World x/y/z, cm. Template ground-eye height 0.5; migration example 100.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"resetPositionOnStart","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="prestimulusinitialpositionx"><code>preStimulus.initialPosition.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusinitialpositiony"><code>preStimulus.initialPosition.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusinitialpositionz"><code>preStimulus.initialPosition.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusinitialrotation"><code>preStimulus.initialRotation</code></h3>
+<p>Euler x/y/z degrees.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"all":[{"property":"randomInitialRotation","oneOf":[false]},{"property":"resetRotationOnStart","oneOf":[true]}]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="prestimulusinitialrotationx"><code>preStimulus.initialRotation.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusinitialrotationy"><code>preStimulus.initialRotation.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusinitialrotationz"><code>preStimulus.initialRotation.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusrandominitialrotation"><code>preStimulus.randomInitialRotation</code></h3>
+<p>Random starting yaw; Choice shares that sampled yaw across its rigs.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusloop"><code>preStimulus.loop</code></h3>
+<p>Repeat the configured optomotor stimuli while this scene runs. The sequence block's duration still ends the scene.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusstimuli"><code>preStimulus.stimuli</code></h3>
+<p>Required nonempty stimulus list.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusstimuliduration"><code>preStimulus.stimuli[].duration</code></h3>
+<p>Duration of the stimulus in seconds</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>10.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":3600.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusstimulispeed"><code>preStimulus.stimuli[].speed</code></h3>
+<p>Angular drum speed in degrees per second. Use nonnegative speed and the clockwise switch to choose direction.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>20.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>degrees / s</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":100.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusstimuliclockwise"><code>preStimulus.stimuli[].clockwise</code></h3>
+<p>Whether the rotation is clockwise</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusstimulirotationaxis"><code>preStimulus.stimuli[].rotationAxis</code></h3>
+<p>Axis of rotation (Yaw, Pitch, or Roll)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"Yaw"</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["Yaw","Pitch","Roll"]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusstimulifrequency"><code>preStimulus.stimuli[].frequency</code></h3>
+<p>Spatial frequency of the grating in cycles per revolution</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>4.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":40.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusstimulicontrast"><code>preStimulus.stimuli[].contrast</code></h3>
+<p>Contrast of the grating (0 = no contrast, 1 = maximum contrast)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusstimulidutycycle"><code>preStimulus.stimuli[].dutyCycle</code></h3>
+<p>Duty cycle of the grating (0 = all dark, 1 = all light, 0.5 = equal dark/light)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusstimulicolor1"><code>preStimulus.stimuli[].color1</code></h3>
+<p>First color of the grating in hex format (e.g. #000000)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"#000000"</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusstimulicolor2"><code>preStimulus.stimuli[].color2</code></h3>
+<p>Second color of the grating in hex format (e.g. #FFFFFF)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"#FFFFFF"</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusstimuliclosedlooporientation"><code>preStimulus.stimuli[].closedLoopOrientation</code></h3>
+<p>Whether to use closed-loop orientation control</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":5.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusstimuliclosedloopposition"><code>preStimulus.stimuli[].closedLoopPosition</code></h3>
+<p>Whether to use closed-loop position control</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":5.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusautotrimsettings"><code>preStimulus.autoTrimSettings</code></h3>
+<p>Per-rig flight classification and automatic yaw-bias compensation. These settings apply while auto-trim is enabled for the sequence block.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusautotrimsettingswindowseconds"><code>preStimulus.autoTrimSettings.windowSeconds</code></h3>
+<p>Positive finite observation window, seconds.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>15.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":180.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusautotrimsettingsmaxwindowseconds"><code>preStimulus.autoTrimSettings.maxWindowSeconds</code></h3>
+<p>1–300 s maximum noise-verification window, at least the initial window in effect.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>120.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusautotrimsettingscenterstatistic"><code>preStimulus.autoTrimSettings.centerStatistic</code></h3>
+<p>mean removes expected heading drift; median retains median centering.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"mean"</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["mean","median"]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusautotrimsettingsnoiseaware"><code>preStimulus.autoTrimSettings.noiseAware</code></h3>
+<p>Extend measurements and suppress corrections within the approximate noise band.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusautotrimsettingsflightwindowseconds"><code>preStimulus.autoTrimSettings.flightWindowSeconds</code></h3>
+<p>0.2–30 s raw-signal variance window.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>2.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.2,"max":30.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="prestimulusautotrimsettingsflightcheckenabled"><code>preStimulus.autoTrimSettings.flightCheckEnabled</code></h3>
+<p>Set false to bypass nonflight while retaining measured flight status.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusautotrimsettingsflightvariancethreshold"><code>preStimulus.autoTrimSettings.flightVarianceThreshold</code></h3>
+<p>0–1,000,000 rad²; entry requires variance strictly above it.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.01</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="prestimulusautotrimsettingsflightconfirmationseconds"><code>preStimulus.autoTrimSettings.flightConfirmationSeconds</code></h3>
+<p>0–30 s continuously above entry threshold before declaring flight.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="prestimulusautotrimsettingsflightvariancehysteresis"><code>preStimulus.autoTrimSettings.flightVarianceHysteresis</code></h3>
+<p>0–1 multiplier of entry threshold for exiting flight.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="prestimulusautotrimsettingsupdateintervalseconds"><code>preStimulus.autoTrimSettings.updateIntervalSeconds</code></h3>
+<p>0.1–60 s between center evaluations.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusautotrimsettingsaggressiveness"><code>preStimulus.autoTrimSettings.aggressiveness</code></h3>
+<p>0.001–1 fraction of selected residual removed per pass.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.001,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusautotrimsettingsmaxstepradians"><code>preStimulus.autoTrimSettings.maxStepRadians</code></h3>
+<p>0.000001–10 rad maximum DC change per pass.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusautotrimsettingsmaxoffsetradians"><code>preStimulus.autoTrimSettings.maxOffsetRadians</code></h3>
+<p>0.000001–10 rad maximum absolute automatic offset.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>2.0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.01,"max":2.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusautotrimsettingssettleseconds"><code>preStimulus.autoTrimSettings.settleSeconds</code></h3>
+<p>0–300 s adaptation time after corrections or gain/manual-offset changes.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>3.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusautotrimsettingstolerancedegpersecond"><code>preStimulus.autoTrimSettings.toleranceDegPerSecond</code></h3>
+<p>0–1,000,000 deg/s effective center tolerance after gain.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusenabled"><code>preStimulus.enabled</code></h3>
+<p>Enable this feature. Its saved parameters remain in the JSON when disabled.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusdurationseconds"><code>preStimulus.durationSeconds</code></h3>
+<p>Duration of this phase, in seconds. Its clock takes priority over the heading observation window; oversized windows are shortened with a warning.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>10</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>exclusiveMinimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1,"max":3600,"step":1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusheadingreference"><code>preStimulus.headingReference</code></h3>
+<p>Measure each animal’s circular mean virtual yaw over an observation window. Save it for later heading-aligned presentations. Observation cannot extend the scene duration.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusheadingreferenceenabled"><code>preStimulus.headingReference.enabled</code></h3>
+<p>Enable this feature. Its saved parameters remain in the JSON when disabled.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusheadingreferencewindowseconds"><code>preStimulus.headingReference.windowSeconds</code></h3>
+<p>Positive finite observation window, seconds.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>180.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":600.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusheadingreferencestartoffsetseconds"><code>preStimulus.headingReference.startOffsetSeconds</code></h3>
+<p>Nonnegative finite delay after configuration, seconds.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusheadingreferencemeasureduringpresentation"><code>preStimulus.headingReference.measureDuringPresentation</code></h3>
+<p>Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="prestimulusheadingreferencesaveas"><code>preStimulus.headingReference.saveAs</code></h3>
+<p>Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>""</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="stimulus-group">stimulus group</h2>
+<h3 id="stimulus"><code>stimulus</code></h3>
+<p>Main phase of this experiment. Duration, motion and stimuli are configured within this phase.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusresetpositiononstart"><code>stimulus.resetPositionOnStart</code></h3>
+<p>Apply the configured initial position when this experiment begins. When disabled, retain the current position.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusresetrotationonstart"><code>stimulus.resetRotationOnStart</code></h3>
+<p>Apply the initial orientation when this experiment begins. When disabled, retain the current orientation unless the experiment requests randomization.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusinitialposition"><code>stimulus.initialPosition</code></h3>
+<p>World x/y/z, cm. Template ground-eye height 0.5; migration example 100.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"resetPositionOnStart","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stimulusinitialpositionx"><code>stimulus.initialPosition.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusinitialpositiony"><code>stimulus.initialPosition.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusinitialpositionz"><code>stimulus.initialPosition.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusinitialrotation"><code>stimulus.initialRotation</code></h3>
+<p>Euler x/y/z degrees.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"all":[{"property":"randomInitialRotation","oneOf":[false]},{"property":"resetRotationOnStart","oneOf":[true]}]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stimulusinitialrotationx"><code>stimulus.initialRotation.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusinitialrotationy"><code>stimulus.initialRotation.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusinitialrotationz"><code>stimulus.initialRotation.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusrandominitialrotation"><code>stimulus.randomInitialRotation</code></h3>
+<p>Random starting yaw; Choice shares that sampled yaw across its rigs.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusloop"><code>stimulus.loop</code></h3>
+<p>Repeat the configured optomotor stimuli while this scene runs. The sequence block's duration still ends the scene.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusstimuli"><code>stimulus.stimuli</code></h3>
+<p>Required nonempty stimulus list.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusstimuliduration"><code>stimulus.stimuli[].duration</code></h3>
+<p>Duration of the stimulus in seconds</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>10.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":3600.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusstimulispeed"><code>stimulus.stimuli[].speed</code></h3>
+<p>Angular drum speed in degrees per second. Use nonnegative speed and the clockwise switch to choose direction.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>20.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>degrees / s</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":100.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusstimuliclockwise"><code>stimulus.stimuli[].clockwise</code></h3>
+<p>Whether the rotation is clockwise</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusstimulirotationaxis"><code>stimulus.stimuli[].rotationAxis</code></h3>
+<p>Axis of rotation (Yaw, Pitch, or Roll)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"Yaw"</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["Yaw","Pitch","Roll"]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusstimulifrequency"><code>stimulus.stimuli[].frequency</code></h3>
+<p>Spatial frequency of the grating in cycles per revolution</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>4.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":40.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusstimulicontrast"><code>stimulus.stimuli[].contrast</code></h3>
+<p>Contrast of the grating (0 = no contrast, 1 = maximum contrast)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusstimulidutycycle"><code>stimulus.stimuli[].dutyCycle</code></h3>
+<p>Duty cycle of the grating (0 = all dark, 1 = all light, 0.5 = equal dark/light)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusstimulicolor1"><code>stimulus.stimuli[].color1</code></h3>
+<p>First color of the grating in hex format (e.g. #000000)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"#000000"</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusstimulicolor2"><code>stimulus.stimuli[].color2</code></h3>
+<p>Second color of the grating in hex format (e.g. #FFFFFF)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"#FFFFFF"</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusstimuliclosedlooporientation"><code>stimulus.stimuli[].closedLoopOrientation</code></h3>
+<p>Whether to use closed-loop orientation control</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":5.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusstimuliclosedloopposition"><code>stimulus.stimuli[].closedLoopPosition</code></h3>
+<p>Whether to use closed-loop position control</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":5.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusautotrimsettings"><code>stimulus.autoTrimSettings</code></h3>
+<p>Per-rig flight classification and automatic yaw-bias compensation. These settings apply while auto-trim is enabled for the sequence block.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusautotrimsettingswindowseconds"><code>stimulus.autoTrimSettings.windowSeconds</code></h3>
+<p>Positive finite observation window, seconds.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>15.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":180.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusautotrimsettingsmaxwindowseconds"><code>stimulus.autoTrimSettings.maxWindowSeconds</code></h3>
+<p>1–300 s maximum noise-verification window, at least the initial window in effect.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>120.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusautotrimsettingscenterstatistic"><code>stimulus.autoTrimSettings.centerStatistic</code></h3>
+<p>mean removes expected heading drift; median retains median centering.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"mean"</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["mean","median"]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusautotrimsettingsnoiseaware"><code>stimulus.autoTrimSettings.noiseAware</code></h3>
+<p>Extend measurements and suppress corrections within the approximate noise band.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusautotrimsettingsflightwindowseconds"><code>stimulus.autoTrimSettings.flightWindowSeconds</code></h3>
+<p>0.2–30 s raw-signal variance window.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>2.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.2,"max":30.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stimulusautotrimsettingsflightcheckenabled"><code>stimulus.autoTrimSettings.flightCheckEnabled</code></h3>
+<p>Set false to bypass nonflight while retaining measured flight status.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusautotrimsettingsflightvariancethreshold"><code>stimulus.autoTrimSettings.flightVarianceThreshold</code></h3>
+<p>0–1,000,000 rad²; entry requires variance strictly above it.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.01</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stimulusautotrimsettingsflightconfirmationseconds"><code>stimulus.autoTrimSettings.flightConfirmationSeconds</code></h3>
+<p>0–30 s continuously above entry threshold before declaring flight.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stimulusautotrimsettingsflightvariancehysteresis"><code>stimulus.autoTrimSettings.flightVarianceHysteresis</code></h3>
+<p>0–1 multiplier of entry threshold for exiting flight.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stimulusautotrimsettingsupdateintervalseconds"><code>stimulus.autoTrimSettings.updateIntervalSeconds</code></h3>
+<p>0.1–60 s between center evaluations.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusautotrimsettingsaggressiveness"><code>stimulus.autoTrimSettings.aggressiveness</code></h3>
+<p>0.001–1 fraction of selected residual removed per pass.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.001,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusautotrimsettingsmaxstepradians"><code>stimulus.autoTrimSettings.maxStepRadians</code></h3>
+<p>0.000001–10 rad maximum DC change per pass.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusautotrimsettingsmaxoffsetradians"><code>stimulus.autoTrimSettings.maxOffsetRadians</code></h3>
+<p>0.000001–10 rad maximum absolute automatic offset.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>2.0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.01,"max":2.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusautotrimsettingssettleseconds"><code>stimulus.autoTrimSettings.settleSeconds</code></h3>
+<p>0–300 s adaptation time after corrections or gain/manual-offset changes.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>3.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusautotrimsettingstolerancedegpersecond"><code>stimulus.autoTrimSettings.toleranceDegPerSecond</code></h3>
+<p>0–1,000,000 deg/s effective center tolerance after gain.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusenabled"><code>stimulus.enabled</code></h3>
+<p>Enable this feature. Its saved parameters remain in the JSON when disabled.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusdurationseconds"><code>stimulus.durationSeconds</code></h3>
+<p>Duration of this phase, in seconds. Its clock takes priority over the heading observation window; oversized windows are shortened with a warning.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>10</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>exclusiveMinimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1,"max":3600,"step":1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusheadingreference"><code>stimulus.headingReference</code></h3>
+<p>Measure each animal’s circular mean virtual yaw over an observation window. Save it for later heading-aligned presentations. Observation cannot extend the scene duration.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusheadingreferenceenabled"><code>stimulus.headingReference.enabled</code></h3>
+<p>Enable this feature. Its saved parameters remain in the JSON when disabled.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusheadingreferencewindowseconds"><code>stimulus.headingReference.windowSeconds</code></h3>
+<p>Positive finite observation window, seconds.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>180.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":600.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusheadingreferencestartoffsetseconds"><code>stimulus.headingReference.startOffsetSeconds</code></h3>
+<p>Nonnegative finite delay after configuration, seconds.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusheadingreferencemeasureduringpresentation"><code>stimulus.headingReference.measureDuringPresentation</code></h3>
+<p>Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stimulusheadingreferencesaveas"><code>stimulus.headingReference.saveAs</code></h3>
+<p>Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>""</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="poststimulus-group">postStimulus group</h2>
+<h3 id="poststimulus"><code>postStimulus</code></h3>
+<p>Optional phase after the main stimulus. It retains its own duration, movement, sky and stimulus settings when disabled.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusresetpositiononstart"><code>postStimulus.resetPositionOnStart</code></h3>
+<p>Apply the configured initial position when this experiment begins. When disabled, retain the current position.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusresetrotationonstart"><code>postStimulus.resetRotationOnStart</code></h3>
+<p>Apply the initial orientation when this experiment begins. When disabled, retain the current orientation unless the experiment requests randomization.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusinitialposition"><code>postStimulus.initialPosition</code></h3>
+<p>World x/y/z, cm. Template ground-eye height 0.5; migration example 100.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"resetPositionOnStart","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="poststimulusinitialpositionx"><code>postStimulus.initialPosition.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusinitialpositiony"><code>postStimulus.initialPosition.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusinitialpositionz"><code>postStimulus.initialPosition.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusinitialrotation"><code>postStimulus.initialRotation</code></h3>
+<p>Euler x/y/z degrees.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"all":[{"property":"randomInitialRotation","oneOf":[false]},{"property":"resetRotationOnStart","oneOf":[true]}]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="poststimulusinitialrotationx"><code>postStimulus.initialRotation.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusinitialrotationy"><code>postStimulus.initialRotation.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusinitialrotationz"><code>postStimulus.initialRotation.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusrandominitialrotation"><code>postStimulus.randomInitialRotation</code></h3>
+<p>Random starting yaw; Choice shares that sampled yaw across its rigs.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusloop"><code>postStimulus.loop</code></h3>
+<p>Repeat the configured optomotor stimuli while this scene runs. The sequence block's duration still ends the scene.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusstimuli"><code>postStimulus.stimuli</code></h3>
+<p>Required nonempty stimulus list.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusstimuliduration"><code>postStimulus.stimuli[].duration</code></h3>
+<p>Duration of the stimulus in seconds</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>10.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":3600.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusstimulispeed"><code>postStimulus.stimuli[].speed</code></h3>
+<p>Angular drum speed in degrees per second. Use nonnegative speed and the clockwise switch to choose direction.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>20.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>degrees / s</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":100.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusstimuliclockwise"><code>postStimulus.stimuli[].clockwise</code></h3>
+<p>Whether the rotation is clockwise</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusstimulirotationaxis"><code>postStimulus.stimuli[].rotationAxis</code></h3>
+<p>Axis of rotation (Yaw, Pitch, or Roll)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"Yaw"</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["Yaw","Pitch","Roll"]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusstimulifrequency"><code>postStimulus.stimuli[].frequency</code></h3>
+<p>Spatial frequency of the grating in cycles per revolution</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>4.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":40.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusstimulicontrast"><code>postStimulus.stimuli[].contrast</code></h3>
+<p>Contrast of the grating (0 = no contrast, 1 = maximum contrast)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusstimulidutycycle"><code>postStimulus.stimuli[].dutyCycle</code></h3>
+<p>Duty cycle of the grating (0 = all dark, 1 = all light, 0.5 = equal dark/light)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusstimulicolor1"><code>postStimulus.stimuli[].color1</code></h3>
+<p>First color of the grating in hex format (e.g. #000000)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"#000000"</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusstimulicolor2"><code>postStimulus.stimuli[].color2</code></h3>
+<p>Second color of the grating in hex format (e.g. #FFFFFF)</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"#FFFFFF"</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusstimuliclosedlooporientation"><code>postStimulus.stimuli[].closedLoopOrientation</code></h3>
+<p>Whether to use closed-loop orientation control</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":5.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusstimuliclosedloopposition"><code>postStimulus.stimuli[].closedLoopPosition</code></h3>
+<p>Whether to use closed-loop position control</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":5.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusautotrimsettings"><code>postStimulus.autoTrimSettings</code></h3>
+<p>Per-rig flight classification and automatic yaw-bias compensation. These settings apply while auto-trim is enabled for the sequence block.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusautotrimsettingswindowseconds"><code>postStimulus.autoTrimSettings.windowSeconds</code></h3>
+<p>Positive finite observation window, seconds.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>15.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":180.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusautotrimsettingsmaxwindowseconds"><code>postStimulus.autoTrimSettings.maxWindowSeconds</code></h3>
+<p>1–300 s maximum noise-verification window, at least the initial window in effect.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>120.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusautotrimsettingscenterstatistic"><code>postStimulus.autoTrimSettings.centerStatistic</code></h3>
+<p>mean removes expected heading drift; median retains median centering.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"mean"</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["mean","median"]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusautotrimsettingsnoiseaware"><code>postStimulus.autoTrimSettings.noiseAware</code></h3>
+<p>Extend measurements and suppress corrections within the approximate noise band.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusautotrimsettingsflightwindowseconds"><code>postStimulus.autoTrimSettings.flightWindowSeconds</code></h3>
+<p>0.2–30 s raw-signal variance window.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>2.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.2,"max":30.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="poststimulusautotrimsettingsflightcheckenabled"><code>postStimulus.autoTrimSettings.flightCheckEnabled</code></h3>
+<p>Set false to bypass nonflight while retaining measured flight status.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusautotrimsettingsflightvariancethreshold"><code>postStimulus.autoTrimSettings.flightVarianceThreshold</code></h3>
+<p>0–1,000,000 rad²; entry requires variance strictly above it.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.01</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="poststimulusautotrimsettingsflightconfirmationseconds"><code>postStimulus.autoTrimSettings.flightConfirmationSeconds</code></h3>
+<p>0–30 s continuously above entry threshold before declaring flight.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="poststimulusautotrimsettingsflightvariancehysteresis"><code>postStimulus.autoTrimSettings.flightVarianceHysteresis</code></h3>
+<p>0–1 multiplier of entry threshold for exiting flight.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="poststimulusautotrimsettingsupdateintervalseconds"><code>postStimulus.autoTrimSettings.updateIntervalSeconds</code></h3>
+<p>0.1–60 s between center evaluations.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusautotrimsettingsaggressiveness"><code>postStimulus.autoTrimSettings.aggressiveness</code></h3>
+<p>0.001–1 fraction of selected residual removed per pass.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.001,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusautotrimsettingsmaxstepradians"><code>postStimulus.autoTrimSettings.maxStepRadians</code></h3>
+<p>0.000001–10 rad maximum DC change per pass.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusautotrimsettingsmaxoffsetradians"><code>postStimulus.autoTrimSettings.maxOffsetRadians</code></h3>
+<p>0.000001–10 rad maximum absolute automatic offset.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>2.0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.01,"max":2.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusautotrimsettingssettleseconds"><code>postStimulus.autoTrimSettings.settleSeconds</code></h3>
+<p>0–300 s adaptation time after corrections or gain/manual-offset changes.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>3.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusautotrimsettingstolerancedegpersecond"><code>postStimulus.autoTrimSettings.toleranceDegPerSecond</code></h3>
+<p>0–1,000,000 deg/s effective center tolerance after gain.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusenabled"><code>postStimulus.enabled</code></h3>
+<p>Enable this feature. Its saved parameters remain in the JSON when disabled.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusdurationseconds"><code>postStimulus.durationSeconds</code></h3>
+<p>Duration of this phase, in seconds. Its clock takes priority over the heading observation window; oversized windows are shortened with a warning.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>10</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>exclusiveMinimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1,"max":3600,"step":1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusheadingreference"><code>postStimulus.headingReference</code></h3>
+<p>Measure each animal’s circular mean virtual yaw over an observation window. Save it for later heading-aligned presentations. Observation cannot extend the scene duration.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusheadingreferenceenabled"><code>postStimulus.headingReference.enabled</code></h3>
+<p>Enable this feature. Its saved parameters remain in the JSON when disabled.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusheadingreferencewindowseconds"><code>postStimulus.headingReference.windowSeconds</code></h3>
+<p>Positive finite observation window, seconds.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>180.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":600.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusheadingreferencestartoffsetseconds"><code>postStimulus.headingReference.startOffsetSeconds</code></h3>
+<p>Nonnegative finite delay after configuration, seconds.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusheadingreferencemeasureduringpresentation"><code>postStimulus.headingReference.measureDuringPresentation</code></h3>
+<p>Retained legacy setting. Observation now fits within the configured scene duration; it never extends a scene. False still permits spawners to reapply the completed reference.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="poststimulusheadingreferencesaveas"><code>postStimulus.headingReference.saveAs</code></h3>
+<p>Save this mean separately for each VR, for later swarm.headingReferenceId. Cleared at restart and each sequence loop.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>""</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="source">Source</h2>
+<p><a href="https://github.com/pvnkmrksk/matrexVR/blob/main/Assets/Resources/ConfigurationUI/schemas.json">Bundled schema source</a> · <a href="https://github.com/pvnkmrksk/matrexVR/blob/main/Assets/Editor/ConfigurationSchemaBuilder.cs">Schema generator</a></p>
+</article><nav class="chapter-pager" aria-label="Adjacent chapters"><a href="schema-kannadi.html"><small>Previous</small>Kannadi fields</a><a href="schema-rugosity.html"><small>Next</small>Rugosity fields<span aria-hidden="true"> →</span></a></nav><footer class="article-footer">Static documentation · software contracts and recorded evidence. <a href="citation.html">Citation and credits</a></footer></main>
+<aside class="right-sidebar"><nav aria-label="On this page"><p>On this page</p><a href="#resetpositiononstart-group" class="toc-level-2">resetPositionOnStart group</a><a href="#resetrotationonstart-group" class="toc-level-2">resetRotationOnStart group</a><a href="#initialposition-group" class="toc-level-2">initialPosition group</a><a href="#initialrotation-group" class="toc-level-2">initialRotation group</a><a href="#randominitialrotation-group" class="toc-level-2">randomInitialRotation group</a><a href="#loop-group" class="toc-level-2">loop group</a><a href="#stimuli-group" class="toc-level-2">stimuli group</a><a href="#stimuli-group-1" class="toc-level-2">stimuli[] group</a><a href="#autotrimsettings-group" class="toc-level-2">autoTrimSettings group</a><a href="#prestimulus-group" class="toc-level-2">preStimulus group</a><a href="#stimulus-group" class="toc-level-2">stimulus group</a><a href="#poststimulus-group" class="toc-level-2">postStimulus group</a><a href="#source" class="toc-level-2">Source</a></nav><a class="source-link" href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/manual/generated/schema-optomotor.md">View Markdown source ↗</a></aside></div>
+<dialog class="search-dialog" aria-labelledby="search-title"><form method="dialog"><h2 id="search-title">Search documentation</h2><button class="search-close" aria-label="Close search">×</button></form><label class="sr-only" for="manual-search">Search every manual section</label><input id="manual-search" type="search" placeholder="Try: ViewportSetter, yaw units, replay, sky…" autocomplete="off"><p class="search-status" role="status">Search runs locally in your browser.</p><div class="search-results"></div><p class="search-hint">Enter a term · Tab to a result · Escape to close</p></dialog>
+</body></html>

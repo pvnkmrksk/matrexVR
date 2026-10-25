@@ -1,0 +1,200 @@
+{
+  "date": "2026-10-11",
+  "unity": "6000.3.16f1",
+  "tests": {
+    "playbackRenderPooling": {
+      "checks": 61,
+      "failure": null,
+      "unity": "6000.3.16f1",
+      "captures": [
+        {
+          "blank": "RGBA(255, 255, 255, 255)",
+          "rect": "(x:0.00, y:0.00, width:64.00, height:64.00)",
+          "color": "RGBA(1.000, 1.000, 1.000, 1.000)"
+        },
+        {
+          "graphics": "Apple M2 Pro",
+          "camera": "1.00000\t0.00000\t0.00000\t0.00000\n0.00000\t1.00000\t0.00000\t0.00000\n0.00000\t0.00000\t-1.00002\t-0.00200\n0.00000\t0.00000\t-1.00000\t0.00000\n",
+          "bodyLength": 0.0254,
+          "bodyDiameter": 0.01
+        },
+        {
+          "distanceMetres": 0.01,
+          "contrast": 2136.78442,
+          "changedPixels": 2936
+        },
+        {
+          "distanceMetres": 0.1,
+          "contrast": 21.9137249,
+          "changedPixels": 38
+        },
+        {
+          "distanceMetres": 1.0,
+          "contrast": 0.298039228,
+          "changedPixels": 8
+        },
+        {
+          "distanceMetres": 2.0,
+          "contrast": 0.0784313753,
+          "changedPixels": 8
+        }
+      ],
+      "timings": [
+        {
+          "shape": "Dot",
+          "medianCpuMilliseconds": 2.5115000000000003,
+          "p95CpuMilliseconds": 2.8505000000000003,
+          "agents": 1024,
+          "rigs": 4,
+          "cameras": 24,
+          "materials": 4
+        },
+        {
+          "shape": "Moth",
+          "medianCpuMilliseconds": 3.3019000000000003,
+          "p95CpuMilliseconds": 4.2295,
+          "agents": 1024,
+          "rigs": 4,
+          "cameras": 24,
+          "materials": 4
+        }
+      ],
+      "timingNote": "Isolated CPU timings: four rigs, six 64px cameras each, 256 agents per rig. Not hardware-display FPS."
+    },
+    "fourRigScene": {
+      "checks": 30,
+      "failure": null,
+      "unity": "6000.3.16f1",
+      "errors": []
+    },
+    "configCatalog": {
+      "checks": 4833,
+      "failure": null,
+      "errors": [],
+      "unity": "6000.3.16f1"
+    },
+    "legacyDots": {
+      "checks": 7866,
+      "failure": null,
+      "unity": "6000.3.16f1"
+    },
+    "northSwarmStartup": {
+      "checks": 46,
+      "failure": null,
+      "errors": [],
+      "unity": "6000.3.16f1"
+    }
+  },
+  "totalUnityChecks": 12836,
+  "converterTests": {
+    "count": 2,
+    "passed": true
+  },
+  "sourceVerification": {
+    "passed": true,
+    "rows": 14429,
+    "ids": 430,
+    "durationSeconds": 599.46,
+    "sourceSha256": "620b3a90d59b31ab929d3271605e931a7b49fe1b07b45c79a28655a5c36baf92",
+    "convertedSha256": "7353033db12dd544eca10091d58ef265a73859452331be95a13d387b4def4817",
+    "maxCoordinateErrorMetres": 8.881784197001252e-16,
+    "sampleCentroidMetres": {
+      "X": -0.26974953025157666,
+      "Y": 5.725152926814055,
+      "Z": 0.10780537521657772
+    },
+    "medianTrackSeconds": 0.14999999999999147,
+    "minTrackSeconds": 0.01999999999998181,
+    "maxTrackSeconds": 1.8300000000000018,
+    "gapsOverPointOneSecond": 7,
+    "note": "Canonical data matches every source ID/TimeExact/position. Presentation yaw is configured separately from the canonical data; continuation after recorded samples is extrapolated."
+  },
+  "video": {
+    "path": "Builds/BogongSwarm-preview/swarm-playback-and-close-pass.mp4",
+    "fps": 120,
+    "frames": 2160,
+    "seconds": 18,
+    "nearestPassMetres": 0.177037179,
+    "notes": "Actual Unity Play Mode renders at deterministic 120fps; camera/UI diagnostics only. Recorded swarm stationary observer; ID158 diagnostic camera follows direction without modifying positions. Slow-motion section is labelled. After t268.87 ID158 is extrapolated.",
+    "encodedValidation": {
+      "passed": true,
+      "encodedWingFramesDiffer": true,
+      "pixelSamples": [
+        {
+          "frame": 150,
+          "nativeDarkest": 25,
+          "encodedDarkest": 23,
+          "headerMaxError": 6
+        },
+        {
+          "frame": 151,
+          "nativeDarkest": 24,
+          "encodedDarkest": 22,
+          "headerMaxError": 6
+        },
+        {
+          "frame": 1440,
+          "nativeDarkest": 118,
+          "encodedDarkest": 118,
+          "headerMaxError": 6
+        },
+        {
+          "frame": 1530,
+          "nativeDarkest": 248,
+          "encodedDarkest": 248,
+          "headerMaxError": 6
+        },
+        {
+          "frame": 1680,
+          "nativeDarkest": 254,
+          "encodedDarkest": 254,
+          "headerMaxError": 6
+        }
+      ]
+    }
+  },
+  "build": {
+    "result": "Succeeded",
+    "architecture": "Apple Silicon ARM64",
+    "app": "/Users/pavan/src/ledpanelVR/Builds/BogongSwarm-macOS/MATREX.app",
+    "unity": "6000.3.16f1",
+    "totalErrors": 0,
+    "totalWarnings": 1,
+    "totalSize": 417838655,
+    "seconds": 9.080062999999999,
+    "scenes": [
+      "Assets/Scenes/ControlScene.unity",
+      "Assets/Scenes/Optomotor.unity",
+      "Assets/Scenes/Swarm.unity",
+      "Assets/Scenes/Choice.unity",
+      "Assets/Scenes/Choice_desync.unity",
+      "Assets/Scenes/Choice_Forrest.unity",
+      "Assets/Scenes/ReplayScene.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_nopath_nopath.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_nopath_path.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_path_nopath.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_path_path.unity",
+      "Assets/Scenes/Kannadi.unity",
+      "Assets/Scenes/Choice_Selwyn.unity"
+    ],
+    "errors": []
+  },
+  "fixes": [
+    "Resolve flight AGL before anchoring the first recorded birth; prevents initial moths being placed hundreds of metres away on offset terrain.",
+    "Correct composited render-target alpha; native RGB remains unchanged, while UI/export no longer applies faint transparency twice."
+  ],
+  "behavior": "Recorded positions/IDs/times remain measured. Each uninterrupted segment gets one animal-centred world anchor at birth. Tails extrapolate measured terminal velocity, do not wrap, survive source loops, and retire beyond 100 physical metres from the current animal. Legacy playback is retained with continueAfterTrack=false.",
+  "startup": {
+    "scene": "Swarm",
+    "autoStart": true,
+    "durationSeconds": 1200,
+    "sky": "uniform gray RGB .5,.5,.5",
+    "meanSwarmYawDegrees": 0,
+    "initialAnimalYawDegrees": 0,
+    "worldUnitsPerMetre": 1,
+    "autopilotSpeedMetresPerSecond": 5,
+    "gain": 1,
+    "autoTrim": false,
+    "configFile": "Examples/Swarm/selwyn-trajectory-playback.example.json"
+  }
+}

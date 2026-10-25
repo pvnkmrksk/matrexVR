@@ -1,0 +1,1231 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sequence fields · MATREX VR manual</title><meta name="description" content="Generated types, defaults, runtime constraints and UI annotations for the sequence schema.">
+<link rel="canonical" href="https://pvnkmrksk.github.io/matrexVR/manual/schema-sequence.html"><meta name="theme-color" content="#102d33">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/manual.css"><script src="assets/manual.js" defer></script><noscript><style>.search-open,.mobile-menu{display:none!important}@media(max-width:800px){.left-sidebar{display:block;position:static;width:auto;height:auto;box-shadow:none}}</style></noscript></head>
+<body><a class="skip-link" href="#article">Skip to content</a>
+<header class="docs-header"><a class="docs-brand" href="../index.html"><span class="brand-mark" aria-hidden="true">M</span> MATREX <span>VR</span></a><a class="manual-label" href="index.html">Documentation <span>0.3 + source</span></a><div class="header-actions"><a href="gallery.html">Gallery</a><a href="../index.html#downloads">Downloads</a><a href="https://github.com/pvnkmrksk/matrexVR">Source ↗</a><button type="button" class="mobile-menu" aria-controls="manual-nav" aria-expanded="false">Menu</button></div></header>
+<div class="docs-layout"><aside class="left-sidebar" id="manual-nav"><button class="search-open" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg> Search the manual <kbd>/</kbd></button><nav aria-label="Documentation chapters"><details class="nav-group" open><summary>Start here<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Manual overview</span></a><a href="getting-started.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Getting started</span></a><a href="gallery.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Native gallery</span></a></div></details><details class="nav-group"><summary>How it works<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="architecture.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Runtime architecture</span></a><a href="components.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Component index</span></a><a href="scenes.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Scenes and Kannadi</span></a><a href="viewports.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Rigs and viewports</span></a><a href="closed-loop.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>ClosedLoop and motion</span></a><a href="input-contracts.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Input contracts</span></a><a href="controls.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Keyboard and gamepad</span></a></div></details><details class="nav-group"><summary>Configure<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="configuration-studio.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Configuration studio</span></a><a href="configuration-ux.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>GUI and HUD details</span></a><a href="configuration-reference.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Parameter reference</span></a><a href="animal-agent-compatibility.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Animal and agent names</span></a><a href="experiment-phases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment phases</span></a><a href="auto-trim.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Flight gate and auto trim</span></a></div></details><details class="nav-group" open><summary>Schema field atlas<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="schema-index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Full schema index</span></a><a href="schema-system.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>System fields</span></a><a href="schema-sequence.html" class="active" aria-current="page"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Sequence fields</span></a><a href="schema-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Choice fields</span></a><a href="schema-swarm.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Swarm fields</span></a><a href="schema-kannadi.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Kannadi fields</span></a><a href="schema-optomotor.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Optomotor fields</span></a><a href="schema-rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Rugosity fields</span></a><a href="schema-dynamic-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Dynamic-Choice fields</span></a></div></details><details class="nav-group"><summary>Stimuli<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="night-sky.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Astronomical night sky</span></a><a href="generated-swarms.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Generated swarms</span></a><a href="swarm-playback.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Recorded swarm playback</span></a><a href="selwyn-cycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Selwyn sky and swarm cycle</span></a><a href="rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Visual/navigation rugosity</span></a><a href="selwyn-terrain.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Selwyn terrain source</span></a><a href="historical-panorama.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Historical panorama recipe</span></a></div></details><details class="nav-group"><summary>Data and replay<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="recording-pipeline.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Recording pipeline</span></a><a href="data-formats.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Saved data formats</span></a><a href="run-config-snapshots.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Configuration snapshots</span></a><a href="telemetry.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live telemetry and headings</span></a><a href="live-monitoring.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live browser monitoring</span></a><a href="replay.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Replay a recorded run</span></a></div></details><details class="nav-group"><summary>Extend and validate<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="extending.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Extend the source</span></a><a href="experiment-workflow.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment workflow</span></a><a href="scene-lifecycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene lifecycle</span></a><a href="diagnostics-performance.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Diagnostics and performance</span></a><a href="scene-reload-investigation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene reload investigation</span></a><a href="six-camera-rig.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Six-camera reference</span></a><a href="kannadi-history.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Kannadi integration history</span></a><a href="releases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Releases and rebuilding</span></a></div></details><details class="nav-group"><summary>Hardware and ecosystem<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="hardware.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Hardware and calibration</span></a><a href="integrations.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Trackers and analysis</span></a><a href="tracker-integration.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Native tracker integration</span></a><a href="citation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Cite MATREX VR</span></a></div></details></nav><div class="sidebar-footer"><a href="citation.html">Cite the software</a><a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/manual/generated/schema-sequence.md">Edit this page ↗</a></div></aside>
+<main id="article" tabindex="-1"><div class="article-context"><span>Schema field atlas</span><span>MATREX VR / source manual</span></div><article class="prose"><h1 id="sequence-schema-fields">Sequence schema fields</h1>
+<p>This atlas lists <strong>43 emitted property paths</strong> from the current <code>sequence</code> runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.</p>
+<p>The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See <a href="configuration-reference.html">parameter semantics</a> and <a href="assets/reference/docs/manual/generated/schema-source.json">the exact emitted schema</a>.</p>
+<p>Every field has a deep link and is indexed by the manual search. Array items use <code>[]</code> in their path. Nested pre/stimulus/post fields are listed where the schema emits them; repeated names in different phases are distinct paths.</p>
+<h2 id="loopstartindex-group">loopStartIndex group</h2>
+<h3 id="loopstartindex"><code>loopStartIndex</code></h3>
+<p>Zero-based row to restart after the final row: 0 repeats everything; 1 runs row 0 once, then repeats rows 1 onward. Requires fixed order when nonzero.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="autostart-group">autoStart group</h2>
+<h3 id="autostart"><code>autoStart</code></h3>
+<p>Start the sequence when Play begins in ControlScene. Returning with Escape does not auto-start again. Canonical templates explicitly use false.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="randomise-group">randomise group</h2>
+<h3 id="randomise"><code>randomise</code></h3>
+<p>Shuffle outer scene execution order.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="loop-group">loop group</h2>
+<h3 id="loop"><code>loop</code></h3>
+<p>Repeat outer sequence; templates explicitly use false.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sequences-group">sequences group</h2>
+<h3 id="sequences"><code>sequences</code></h3>
+<p>Required nonempty array of scene steps.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sequences-group-1">sequences[] group</h2>
+<h3 id="sequencesscenename"><code>sequences[].sceneName</code></h3>
+<p>Exact enabled scene name, e.g. Swarm, Kannadi, Choice, Optomotor, Choice_desync. No Matrix scene exists.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesduration"><code>sequences[].duration</code></h3>
+<p>Outer step time, seconds; use a positive duration.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>exclusiveMinimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":3600.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesgain"><code>sequences[].gain</code></h3>
+<p>Historical Bogong/Kinefly signed yaw gain, applied on scene load and in-place trial transitions. Zero disables yaw response; negative reverses it. It does not replace the separate walking angular multiplier.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":-10.0,"max":10.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesautotrim"><code>sequences[].autoTrim</code></h3>
+<p>Opt-in per-row Kinefly median centering; pauses outside flight/closed-loop yaw. Learned DC offsets persist when false.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesautotrimsettings"><code>sequences[].autoTrimSettings</code></h3>
+<p>Per-rig flight classification and automatic yaw-bias compensation. These settings apply while auto-trim is enabled for the sequence block.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"autoTrim","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="sequencesautotrimsettingswindowseconds"><code>sequences[].autoTrimSettings.windowSeconds</code></h3>
+<p>Positive finite observation window, seconds.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>15.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":180.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesautotrimsettingsmaxwindowseconds"><code>sequences[].autoTrimSettings.maxWindowSeconds</code></h3>
+<p>1–300 s maximum noise-verification window, at least the initial window in effect.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>120.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesautotrimsettingscenterstatistic"><code>sequences[].autoTrimSettings.centerStatistic</code></h3>
+<p>mean removes expected heading drift; median retains median centering.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"mean"</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["mean","median"]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesautotrimsettingsnoiseaware"><code>sequences[].autoTrimSettings.noiseAware</code></h3>
+<p>Extend measurements and suppress corrections within the approximate noise band.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesautotrimsettingsflightwindowseconds"><code>sequences[].autoTrimSettings.flightWindowSeconds</code></h3>
+<p>0.2–30 s raw-signal variance window.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>2.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.2,"max":30.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="sequencesautotrimsettingsflightcheckenabled"><code>sequences[].autoTrimSettings.flightCheckEnabled</code></h3>
+<p>Set false to bypass nonflight while retaining measured flight status.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesautotrimsettingsflightvariancethreshold"><code>sequences[].autoTrimSettings.flightVarianceThreshold</code></h3>
+<p>0–1,000,000 rad²; entry requires variance strictly above it.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.01</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="sequencesautotrimsettingsflightconfirmationseconds"><code>sequences[].autoTrimSettings.flightConfirmationSeconds</code></h3>
+<p>0–30 s continuously above entry threshold before declaring flight.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="sequencesautotrimsettingsflightvariancehysteresis"><code>sequences[].autoTrimSettings.flightVarianceHysteresis</code></h3>
+<p>0–1 multiplier of entry threshold for exiting flight.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"flightCheckEnabled","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="sequencesautotrimsettingsupdateintervalseconds"><code>sequences[].autoTrimSettings.updateIntervalSeconds</code></h3>
+<p>0.1–60 s between center evaluations.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesautotrimsettingsaggressiveness"><code>sequences[].autoTrimSettings.aggressiveness</code></h3>
+<p>0.001–1 fraction of selected residual removed per pass.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.001,"max":1.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesautotrimsettingsmaxstepradians"><code>sequences[].autoTrimSettings.maxStepRadians</code></h3>
+<p>0.000001–10 rad maximum DC change per pass.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesautotrimsettingsmaxoffsetradians"><code>sequences[].autoTrimSettings.maxOffsetRadians</code></h3>
+<p>0.000001–10 rad maximum absolute automatic offset.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>2.0</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.01,"max":2.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesautotrimsettingssettleseconds"><code>sequences[].autoTrimSettings.settleSeconds</code></h3>
+<p>0–300 s adaptation time after corrections or gain/manual-offset changes.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>3.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesautotrimsettingstolerancedegpersecond"><code>sequences[].autoTrimSettings.toleranceDegPerSecond</code></h3>
+<p>0–1,000,000 deg/s effective center tolerance after gain.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparameters"><code>sequences[].parameters</code></h3>
+<p>Controller-specific dictionary.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugosity"><code>sequences[].parameters.rugosity</code></h3>
+<p>Independent visual and navigation terrain cues. Requires a RugosityWorld in the selected scene; omitted/null settings retain its authored tuning.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugosityenabled"><code>sequences[].parameters.rugosity.enabled</code></h3>
+<p>Enable this feature. Its saved parameters remain in the JSON when disabled.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugosityvisualsurface"><code>sequences[].parameters.rugosity.visualSurface</code></h3>
+<p>Registered surface ID rendered to the animal, for example Flat or RoughSmooth in TerrainCueLab. This can differ from the navigation surface.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugositycollisionsurface"><code>sequences[].parameters.rugosity.collisionSurface</code></h3>
+<p>Registered navigation/collision surface ID. Height and orientation follow this surface unless a separate override is supplied.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugosityheightsurface"><code>sequences[].parameters.rugosity.heightSurface</code></h3>
+<p>Optional registered surface ID for AboveGround height sampling. Empty inherits collisionSurface, allowing height and tilt cues to be isolated.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugositynormalsurface"><code>sequences[].parameters.rugosity.normalSurface</code></h3>
+<p>Optional registered surface ID for orientation normals. Empty inherits collisionSurface, allowing tilt to be independent of rendered terrain and height.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugosityheightmode"><code>sequences[].parameters.rugosity.heightMode</code></h3>
+<p>AboveGround follows the sampled terrain plus vertical clearanceCm. Absolute uses a fixed world Y from absoluteHeight.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or integer or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["AboveGround","Absolute",0,1,null]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugosityorientationmode"><code>sequences[].parameters.rugosity.orientationMode</code></h3>
+<p>WorldUp keeps the rig level. SurfaceNormal tilts its up direction to the sampled navigation normal while retaining its heading.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or integer or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["WorldUp","SurfaceNormal",0,1,null]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugositycentimetersperunit"><code>sequences[].parameters.rugosity.centimetersPerUnit</code></h3>
+<p>1 for centimeter scenes; 100 for meter terrain scenes.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>exclusiveMinimum</code></td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugosityclearancecm"><code>sequences[].parameters.rugosity.clearanceCm</code></h3>
+<p>Vertical camera/animal clearance above the height surface, in centimetres. This is measured along world Y, not along the surface normal.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>cm</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugosityabsoluteheight"><code>sequences[].parameters.rugosity.absoluteHeight</code></h3>
+<p>Fixed world Y in scene units when heightMode is Absolute. It is not an above-ground clearance.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>world Y (scene units)</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugositynormalradiuscm"><code>sequences[].parameters.rugosity.normalRadiusCm</code></h3>
+<p>Radius in centimetres used to sample nearby terrain normals. Zero samples the local normal directly, without spatial smoothing.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>cm</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugositytiltresponse"><code>sequences[].parameters.rugosity.tiltResponse</code></h3>
+<p>Tilt response rate in inverse seconds. Zero follows the sampled normal immediately; positive values smooth orientation over time.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersrugositynormalsamples"><code>sequences[].parameters.rugosity.normalSamples</code></h3>
+<p>Number of surrounding terrain-normal samples, from 1 to 32, in addition to the centre sample. Set normalRadiusCm to zero to disable spatial averaging.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>32</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sequencesparametersconfigfile"><code>sequences[].parameters.configFile</code></h3>
+<p>Choice, Optomotor, Kannadi or Swarm file relative to StreamingAssets.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"Templates/experiment.template.json"</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"ancestorProperty":"sceneName","notEquals":"Choice_desync"}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="sequencesparametersdesign"><code>sequences[].parameters.design</code></h3>
+<p>Dynamic Choice design file.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"Templates/dynamic-choice.template.json"</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"ancestorProperty":"sceneName","equals":"Choice_desync"}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="sequencesreloadscene"><code>sequences[].reloadScene</code></h3>
+<p>When false and the scene stays the same, call its in-scene sequencer. Use true for Dynamic Choice: its AdvanceStep is intentionally empty.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="source">Source</h2>
+<p><a href="https://github.com/pvnkmrksk/matrexVR/blob/main/Assets/Resources/ConfigurationUI/schemas.json">Bundled schema source</a> · <a href="https://github.com/pvnkmrksk/matrexVR/blob/main/Assets/Editor/ConfigurationSchemaBuilder.cs">Schema generator</a></p>
+</article><nav class="chapter-pager" aria-label="Adjacent chapters"><a href="schema-system.html"><small>Previous</small>System fields</a><a href="schema-choice.html"><small>Next</small>Choice fields<span aria-hidden="true"> →</span></a></nav><footer class="article-footer">Static documentation · software contracts and recorded evidence. <a href="citation.html">Citation and credits</a></footer></main>
+<aside class="right-sidebar"><nav aria-label="On this page"><p>On this page</p><a href="#loopstartindex-group" class="toc-level-2">loopStartIndex group</a><a href="#autostart-group" class="toc-level-2">autoStart group</a><a href="#randomise-group" class="toc-level-2">randomise group</a><a href="#loop-group" class="toc-level-2">loop group</a><a href="#sequences-group" class="toc-level-2">sequences group</a><a href="#sequences-group-1" class="toc-level-2">sequences[] group</a><a href="#source" class="toc-level-2">Source</a></nav><a class="source-link" href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/manual/generated/schema-sequence.md">View Markdown source ↗</a></aside></div>
+<dialog class="search-dialog" aria-labelledby="search-title"><form method="dialog"><h2 id="search-title">Search documentation</h2><button class="search-close" aria-label="Close search">×</button></form><label class="sr-only" for="manual-search">Search every manual section</label><input id="manual-search" type="search" placeholder="Try: ViewportSetter, yaw units, replay, sky…" autocomplete="off"><p class="search-status" role="status">Search runs locally in your browser.</p><div class="search-results"></div><p class="search-hint">Enter a term · Tab to a result · Escape to close</p></dialog>
+</body></html>

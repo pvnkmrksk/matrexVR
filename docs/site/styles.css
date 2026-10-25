@@ -816,3 +816,16 @@ footer .credits {
     font-size:3.25rem
   }
 }
+
+.native-gallery { padding-top:20px; }
+.native-gallery-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+.native-gallery-card { margin:0; border:1px solid var(--line); border-radius:5px; overflow:hidden; background:white; }
+.native-gallery-card>a { display:block; }
+.native-gallery-card img { width:100%; aspect-ratio:16/10; object-fit:cover; }
+.native-gallery-card figcaption { padding:21px; }
+.native-gallery-card figcaption>span { font-size:.6rem; text-transform:uppercase; letter-spacing:.07em; color:var(--teal); }
+.native-gallery-card h3 { font-size:1.12rem; line-height:1.4; margin:11px 0 12px; color:var(--ink); }
+.native-gallery-card p { font-size:.78rem; color:var(--muted); margin:0; line-height:1.75; }
+.native-gallery-more { margin:25px 0 0; }
+@media(max-width:850px) { .native-gallery-grid { gap:14px; } .native-gallery-card figcaption { padding:15px; } .native-gallery-card h3 { font-size:1rem; } }
+@media(max-width:650px) { .native-gallery-grid { grid-template-columns:1fr; gap:20px; } .native-gallery-card figcaption { padding:20px; } }

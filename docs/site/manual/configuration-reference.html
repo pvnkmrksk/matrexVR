@@ -1,0 +1,1134 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parameter reference · MATREX VR manual</title><meta name="description" content="Current and accepted legacy fields, units, defaults and precedence.">
+<link rel="canonical" href="https://pvnkmrksk.github.io/matrexVR/manual/configuration-reference.html"><meta name="theme-color" content="#102d33">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/manual.css"><script src="assets/manual.js" defer></script><noscript><style>.search-open,.mobile-menu{display:none!important}@media(max-width:800px){.left-sidebar{display:block;position:static;width:auto;height:auto;box-shadow:none}}</style></noscript></head>
+<body><a class="skip-link" href="#article">Skip to content</a>
+<header class="docs-header"><a class="docs-brand" href="../index.html"><span class="brand-mark" aria-hidden="true">M</span> MATREX <span>VR</span></a><a class="manual-label" href="index.html">Documentation <span>0.3 + source</span></a><div class="header-actions"><a href="gallery.html">Gallery</a><a href="../index.html#downloads">Downloads</a><a href="https://github.com/pvnkmrksk/matrexVR">Source ↗</a><button type="button" class="mobile-menu" aria-controls="manual-nav" aria-expanded="false">Menu</button></div></header>
+<div class="docs-layout"><aside class="left-sidebar" id="manual-nav"><button class="search-open" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg> Search the manual <kbd>/</kbd></button><nav aria-label="Documentation chapters"><details class="nav-group" open><summary>Start here<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Manual overview</span></a><a href="getting-started.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Getting started</span></a><a href="gallery.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Native gallery</span></a></div></details><details class="nav-group"><summary>How it works<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="architecture.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Runtime architecture</span></a><a href="components.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Component index</span></a><a href="scenes.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Scenes and Kannadi</span></a><a href="viewports.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Rigs and viewports</span></a><a href="closed-loop.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>ClosedLoop and motion</span></a><a href="input-contracts.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Input contracts</span></a><a href="controls.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Keyboard and gamepad</span></a></div></details><details class="nav-group" open><summary>Configure<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="configuration-studio.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Configuration studio</span></a><a href="configuration-ux.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>GUI and HUD details</span></a><a href="configuration-reference.html" class="active" aria-current="page"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Parameter reference</span></a><a href="animal-agent-compatibility.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Animal and agent names</span></a><a href="experiment-phases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment phases</span></a><a href="auto-trim.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Flight gate and auto trim</span></a></div></details><details class="nav-group"><summary>Schema field atlas<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="schema-index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Full schema index</span></a><a href="schema-system.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>System fields</span></a><a href="schema-sequence.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Sequence fields</span></a><a href="schema-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Choice fields</span></a><a href="schema-swarm.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Swarm fields</span></a><a href="schema-kannadi.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Kannadi fields</span></a><a href="schema-optomotor.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Optomotor fields</span></a><a href="schema-rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Rugosity fields</span></a><a href="schema-dynamic-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Dynamic-Choice fields</span></a></div></details><details class="nav-group"><summary>Stimuli<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="night-sky.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Astronomical night sky</span></a><a href="generated-swarms.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Generated swarms</span></a><a href="swarm-playback.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Recorded swarm playback</span></a><a href="selwyn-cycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Selwyn sky and swarm cycle</span></a><a href="rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Visual/navigation rugosity</span></a><a href="selwyn-terrain.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Selwyn terrain source</span></a><a href="historical-panorama.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Historical panorama recipe</span></a></div></details><details class="nav-group"><summary>Data and replay<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="recording-pipeline.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Recording pipeline</span></a><a href="data-formats.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Saved data formats</span></a><a href="run-config-snapshots.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Configuration snapshots</span></a><a href="telemetry.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live telemetry and headings</span></a><a href="live-monitoring.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live browser monitoring</span></a><a href="replay.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Replay a recorded run</span></a></div></details><details class="nav-group"><summary>Extend and validate<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="extending.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Extend the source</span></a><a href="experiment-workflow.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment workflow</span></a><a href="scene-lifecycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene lifecycle</span></a><a href="diagnostics-performance.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Diagnostics and performance</span></a><a href="scene-reload-investigation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene reload investigation</span></a><a href="six-camera-rig.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Six-camera reference</span></a><a href="kannadi-history.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Kannadi integration history</span></a><a href="releases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Releases and rebuilding</span></a></div></details><details class="nav-group"><summary>Hardware and ecosystem<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="hardware.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Hardware and calibration</span></a><a href="integrations.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Trackers and analysis</span></a><a href="tracker-integration.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Native tracker integration</span></a><a href="citation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Cite MATREX VR</span></a></div></details></nav><div class="sidebar-footer"><a href="citation.html">Cite the software</a><a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/configuration-reference.md">Edit this page ↗</a></div></aside>
+<main id="article" tabindex="-1"><div class="article-context"><span>Configure</span><span>MATREX VR / source manual</span></div><article class="prose"><h1 id="configuration-reference">Configuration reference</h1>
+<p>For 0.3 species/animal IDs, <code>agentCount</code>/<code>agentSpeed</code> aliases, rig counts and reversible editing, see <a href="animal-agent-compatibility.html">animal/agent compatibility</a>. The tables retain older accepted JSON names so existing experiments remain interpretable. Current standalone paths use a writable profile; see <a href="getting-started.html">getting started</a>.</p>
+<p>For recorded swarm input, the standalone converter and batched 3D moth, see <a href="swarm-playback.html">swarm-playback.md</a>. The recorded-swarm example centres each recorded birth on the current animal and continues its terminal direction at the configured 6m/s until 100m away (<code>playback.continueAfterTrack: true</code>, <code>periodicBoundary: false</code>, <code>continuationSpeedMetresPerSecond: 6</code>; nested under <code>swarm</code> for Choice terrain experiments). <code>playback.preRollSeconds</code> defaults to 0; that example flies the observer at 5 m/s with zero incoming lead-in, matching <code>Examples/Swarm/selwyn-trajectory-flight-observer.example.json</code>. The optional <code>Examples/Swarm/selwyn-trajectory-passive-observer.example.json</code> disables observer autopilot and uses five seconds of incoming extrapolation for a stationary visibility check. These settings belong to the individual experiment, with defaults and units in that guide. Terrain/migration distances are metres; older walking distances are centimetres. <code>worldUnitsPerMetre</code> resolves this explicitly without changing existing movement-controller units.</p>
+<p>This reference describes the experiment configuration code, tested with Unity <strong>6000.3.16f1</strong>. Start with the complete JSON files in <a href="https://github.com/pvnkmrksk/matrexVR/tree/main/Assets/StreamingAssets/Templates">StreamingAssets/Templates</a>. They contain editable example values; the tables below distinguish these from values used when a field is omitted. JSON does not allow comments. Keep notes in a separate text file; do not invent JSON keys, because most loaders silently ignore unknown keys.</p>
+<h2 id="files-precedence-and-running-an-experiment">Files, precedence, and running an experiment</h2>
+<ol type="1">
+<li>Use the complete <code>Templates/system_config.template.json</code>, <code>Templates/experiment.template.json</code> and <code>Templates/sequence.template.json</code> as a matched Kinefly flight starting set. Set actual hardware addresses and displays. The local <code>system_config.json</code> is Git-ignored and is not replaced by cleanup.</li>
+<li>For other paradigms, choose a complete file from <a href="https://github.com/pvnkmrksk/matrexVR/blob/main/Assets/StreamingAssets/Templates/README.md">Templates</a>; use <a href="https://github.com/pvnkmrksk/matrexVR/blob/main/Assets/StreamingAssets/Examples/README.md">Examples</a> for variations. Relative references resolve from <code>RuntimePaths.ConfigRoot</code> (Editor: StreamingAssets; current standalone: writable profile Config). Dynamic Choice uses <code>parameters.design</code>; other experiment controllers use <code>parameters.configFile</code>.</li>
+<li>Open <code>Assets/Scenes/ControlScene.unity</code>, enter Play, enter metadata, and start the sequence. Sex is visible for each animal, with Unspecified as the fresh default. Saved Female/Male values are restored on reload. Focus Game for hotkeys.</li>
+<li>The prior Selwyn sequence and all files in <code>Kannadi/</code> are preserved; current source defaults to the TerrainCueLab demonstration. The old collection is under <code>Archive/Legacy/</code>, with original bytes and a checksum manifest. If an experiment reference is missing at its current path, the loader checks that archive, so unchanged Kannadi sequences can still resolve their old Choice dependency.</li>
+</ol>
+<p>System config owns physical camera layout and sphere calibration. Sequence config owns scene order and duration. Experiment configs own stimuli and tracked motion. Kannadi/Swarm merge inline <code>parameters</code> over <code>configFile</code> (arrays replace, rather than append), while autopilot remains owned by the referenced file. Choice/Optomotor read their referenced file without merging inline stimulus fields. Dynamic Choice uses <code>parameters.design</code>, not <code>configFile</code>.</p>
+<p>The recovered historical Adaminaby image/config can also run through the current six-camera Choice scene: use <code>Examples/Sequences/adaminaby-historical.example.json</code>. See <a href="historical-panorama.html">its provenance and run instructions</a>, including the original screenshot's projection limitations.</p>
+<p>Autopilot is controlled by the individual experiment file referenced by <code>parameters.configFile</code>, so the sequence selects a complete movement configuration without duplicating its fields.</p>
+<p>A default in a C# class is not necessarily a scene default: serialized prefab values override inspector defaults, and omitted fields on an in-scene step can retain state. Use explicit values for reproducibility. Current source provisions configured rigs from an authored scene template within the available Unity layer capacity. JSON does not create new scenes/assets or physical hardware.</p>
+<h2 id="units-and-coordinate-system">Units and coordinate system</h2>
+<p>Unity coordinates are <strong>left-handed</strong>: +X right/east, +Y up, +Z forward/north. Walking experiments use <strong>one world unit = one centimeter</strong>; migration/Selwyn terrain uses <strong>one world unit = one metre</strong>. Distances and translation speeds use world units and world units/second (cm and cm/s for walking, m and m/s for terrain). Enter scene-native values in configs. Recorded-swarm input is in metres and is mapped using <code>worldUnitsPerMetre</code>; moth body/wing dimensions and near clip use physical metres independently.</p>
+<p>Euler angles are degrees: X pitch, Y yaw, Z roll. Positive yaw takes <code>(0,0,1)</code> to <code>(1,0,0)</code> at +90°. Viewed from above with +Z up on the page and +X right, this is clockwise. Euler log values wrap into 0–360°; unwrap yaw before differentiating. “Clockwise” for pitch/roll depends on viewing direction; use the axis and sign, not an unspecified viewpoint. See <a href="https://docs.unity3d.com/6000.3/Documentation/Manual/QuaternionAndEulerRotationsInUnity.html">Unity's rotation and orientation reference</a>.</p>
+<p>Polar positions use <code>x = radius × sin(angle)</code>, <code>z = radius × cos(angle)</code>, <code>y = height</code>, with angle in degrees. Thus 0° is +Z and +90° is +X. Colors are normalized 0–1 channels unless given as hex; they are stimulus values, not calibrated physical luminance. Time/duration fields use seconds, display indices are zero-based, rig numbers are one-based.</p>
+<h2 id="system-configuration">System configuration</h2>
+<p>Templates: <code>Templates/system_config.template.json</code> for this branch’s Bogong flight setup; <code>Examples/System/fictrac-four-cameras.example.json</code> or <code>fictrac-six-cameras.example.json</code> for walking. Existing Kinefly configs and single-frame JSON publishers require no migration. Select <code>"closedLoopMode": "Kinefly"</code> per rig; <strong>Tab</strong> shows the effective mode and input endpoint.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Omitted default</th>
+<th>Meaning / useful example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Per-rig <code>speciesName</code></td>
+<td>empty</td>
+<td>Species recorded for the real animal, also saved as metadata <code>SpeciesName</code>; does not change input routing.</td>
+</tr>
+<tr>
+<td><code>targetFrameRate</code></td>
+<td>120</td>
+<td>Positive desired FPS, or -1 for uncapped desktop rendering. Effective when vSyncCount=0. This is a target, not a guaranteed achieved rate.</td>
+</tr>
+<tr>
+<td><code>vSyncCount</code></td>
+<td>0</td>
+<td>0 uses the FPS target; 1–4 synchronize to every Nth display refresh and override the target on desktop.</td>
+</tr>
+<tr>
+<td><code>targetDisplay</code></td>
+<td>1</td>
+<td>Zero-based physical display; template uses 0. Applies globally to every rig. Per-rig <code>targetDisplay</code> is overwritten. The legacy <code>-display N</code> startup flag affects initial activation; use JSON targetDisplay for reliable experiment camera mapping.</td>
+</tr>
+<tr>
+<td><code>configs</code></td>
+<td>none</td>
+<td>Array of per-rig entries. Use one entry for every rig that should render.</td>
+</tr>
+<tr>
+<td><code>overheadCamera</code></td>
+<td>defaults below</td>
+<td>Operator overview in Swarm/Kannadi; independent of animal camera letter order.</td>
+</tr>
+<tr>
+<td><code>configs[].vrId</code></td>
+<td><code>VR1</code></td>
+<td>Exact rig identifier, e.g. VR1–VR4. Duplicate IDs overwrite earlier entries; use unique IDs.</td>
+</tr>
+<tr>
+<td><code>sphereDiameter</code></td>
+<td>1</td>
+<td>Walking path ball diameter in cm; template 2.6. Historical Bogong/Kinefly retains the rig prefab diameter, as in the reference branch.</td>
+</tr>
+<tr>
+<td><code>closedLoopMode</code></td>
+<td><code>FicTrac</code></td>
+<td>Historical enum (also accepts 0/1/2): <code>FicTrac</code>, <code>Kinefly</code>, <code>Tirbala</code>. Set <code>Kinefly</code> for wing-angle input. See <a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/bogong-gain-compatibility.md">gain compatibility</a> for the reference branch's unusual FicTrac label and the separate walking path.</td>
+</tr>
+<tr>
+<td><code>ledPanelWidth</code>, <code>ledPanelHeight</code></td>
+<td>128, 128</td>
+<td>Each camera viewport size in pixels.</td>
+</tr>
+<tr>
+<td><code>startRow</code>, <code>startCol</code></td>
+<td>0, 0</td>
+<td>Zero-based panel cells, measured from the top-left.</td>
+</tr>
+<tr>
+<td><code>horizontal</code></td>
+<td>true</td>
+<td>Advance through columns when true, rows when false.</td>
+</tr>
+<tr>
+<td><code>displayOrder</code></td>
+<td>empty</td>
+<td>Camera allow-list and order. <code>RBLF</code> means Right, Back, Left, Front. Other letters: U=Up, D=Down. Missing letters disable the corresponding cameras even if enabled in the scene. Empty order or missing rig config renders none of its stimulus cameras.</td>
+</tr>
+<tr>
+<td><code>zmqAddress</code></td>
+<td><code>localhost</code></td>
+<td>Host running the pose publisher; no <code>tcp://</code> prefix.</td>
+</tr>
+<tr>
+<td><code>zmqPort</code></td>
+<td>9872</td>
+<td>TCP port; template uses 9871–9874.</td>
+</tr>
+<tr>
+<td><code>targetDisplay</code> inside rig</td>
+<td>1, then overwritten</td>
+<td>Use the top-level value.</td>
+</tr>
+<tr>
+<td><code>manualControls</code></td>
+<td>null</td>
+<td>Optional per-rig operator movement settings below. Omission preserves prefab tuning.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The base VR prefab and its standard, Swarm, Kannadi and Cube variants now contain all six camera faces, including Down. Use <code>displayOrder: "DRBLFU"</code> for all six. <code>Examples/System/fictrac-six-cameras.example.json</code> provides four non-overlapping rows of six 128×128 panels (768×512 total) on display 0. Copy it to the local <code>system_config.json</code> and edit tracker addresses for your hardware. Up/Down are reactivated when requested and use Front's origin, clip planes and visibility mask. Existing <code>RBLF</code> configurations still enable only four faces. See <a href="six-camera-rig.html">six-camera-rig.md</a>.</p>
+<p>Viewport slot <code>i</code>: x=(startCol + i if horizontal)×width; y=screenHeight−(startRow+1 + i if vertical)×height. Ensure these rectangles fit the physical display. An unavailable display disables its cameras. Configuring VR10 does not accidentally match VR1. Configured letters do not create a camera absent from the prefab. Camera disabling does not delete the rig or stop its sensor logging.</p>
+<p>The top-right HUD refreshes at 2 Hz and shows measured FPS, frame mean/peak milliseconds, the software-cap budget, and CPU main/render, GPU and presentation/target-FPS wait times. A dash means unavailable, not zero work. It remains visible when Tab hides the flight dashboard. The same captured summary appears in telemetry as <code>frameTiming</code>; see <a href="diagnostics-performance.html#workstation-frame-pacing">diagnostics</a>.</p>
+<p>No viewport component changes frame timing. For a 60 Hz LED output, use top-level <code>"targetFrameRate":60, "vSyncCount":1</code>, or start from <code>Examples/System/kinefly-six-cameras-60hz.example.json</code> and retain your actual display mapping and tracker addresses. VSync follows the output's actual refresh rate: <code>/1</code> gives 120 FPS on a 120 Hz output; <code>/2</code> gives 60 FPS there. For a numeric software cap use <code>vSyncCount:0</code>. A 58–60 FPS readout under a 60 FPS software cap does not establish low compute headroom. Unity recommends hardware synchronization for smooth desktop pacing because <a href="https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Application-targetFrameRate.html">software targets can microstutter</a>.</p>
+<h3 id="manual-controls-inside-each-rig">Manual controls (inside each rig)</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Block default</th>
+<th>Unit / meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>true</td>
+<td>Enable keyboard/gamepad manual movement for this rig. Reset and tracking toggles still work.</td>
+</tr>
+<tr>
+<td><code>translateSpeed</code></td>
+<td>10</td>
+<td>World units/s for full arrow-key/stick input: cm/s walking, m/s terrain.</td>
+</tr>
+<tr>
+<td><code>rotateSpeed</code></td>
+<td>50</td>
+<td>degrees/s for full yaw input.</td>
+</tr>
+<tr>
+<td><code>maxTranslateSpeed</code></td>
+<td>100</td>
+<td>World units/s cap for operator speed adjustment.</td>
+</tr>
+<tr>
+<td><code>maxRotateSpeed</code></td>
+<td>300</td>
+<td>degrees/s cap.</td>
+</tr>
+<tr>
+<td><code>allowVerticalTranslation</code></td>
+<td>false</td>
+<td>Allow C/Z vertical motion.</td>
+</tr>
+<tr>
+<td><code>allowPitchAndRoll</code></td>
+<td>false</td>
+<td>Allow W/S pitch and Q/E roll.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="overview">Overview</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th><code>overheadCamera</code> field</th>
+<th>Default</th>
+<th>Meaning / useful range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>true</td>
+<td>Create the overview.</td>
+</tr>
+<tr>
+<td><code>targetDisplay</code></td>
+<td>-1</td>
+<td>Follow VR1's configured display; otherwise a zero-based display.</td>
+</tr>
+<tr>
+<td><code>x</code>, <code>y</code></td>
+<td>0.58, 0.02</td>
+<td>Normalized bottom-left of panel.</td>
+</tr>
+<tr>
+<td><code>width</code>, <code>height</code></td>
+<td>0.4, 0.4</td>
+<td>Fraction of display width/height.</td>
+</tr>
+<tr>
+<td><code>resolution</code></td>
+<td>512</td>
+<td>Square render texture pixels; 512 is a practical starting point.</td>
+</tr>
+<tr>
+<td><code>markerSizePixels</code></td>
+<td>14</td>
+<td>Fixed screen-size arrow, visible while zooming out.</td>
+</tr>
+<tr>
+<td><code>trailDurationSeconds</code></td>
+<td>60</td>
+<td>Fading history; use 30 for shorter trails.</td>
+</tr>
+<tr>
+<td><code>trailSampleInterval</code></td>
+<td>0.1</td>
+<td>Seconds between samples.</td>
+</tr>
+<tr>
+<td><code>trailWidthPixels</code></td>
+<td>1.5</td>
+<td>Screen-space trail width.</td>
+</tr>
+<tr>
+<td><code>trailBreakDistance</code></td>
+<td>50</td>
+<td>World-unit jump that breaks a trail at reset/wrap.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Numbered arrows track active <code>VR&lt;number&gt;</code> roots and their headings. Overlapping animals keep overlapping labels. Right drag orbits, middle drag pans, wheel zooms, Reset view returns overhead. Hide disables both overview cameras and tracking updates and releases the render texture; showing starts a fresh trail. FPS remains visible. The overview can discover additional numbered rigs, but Kannadi's mirror routing currently supports only VR1–VR4.</p>
+<h2 id="sequence-configuration">Sequence configuration</h2>
+<p>Template: <code>sequence.template.json</code>.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>randomise</code></td>
+<td>false</td>
+<td>Shuffle outer scene execution order.</td>
+</tr>
+<tr>
+<td><code>loop</code></td>
+<td>true</td>
+<td>Repeat outer sequence; templates explicitly use false.</td>
+</tr>
+<tr>
+<td><code>autoStart</code></td>
+<td>false</td>
+<td>Start the sequence when Play begins in ControlScene. Returning with Escape does not auto-start again. Canonical templates explicitly use false.</td>
+</tr>
+<tr>
+<td><code>sequences</code></td>
+<td>none</td>
+<td>Required nonempty array of scene steps.</td>
+</tr>
+<tr>
+<td><code>sceneName</code></td>
+<td>none</td>
+<td>Exact enabled scene name, e.g. Swarm, Kannadi, Choice, Optomotor, Choice_desync. No Matrix scene exists.</td>
+</tr>
+<tr>
+<td><code>duration</code></td>
+<td>0</td>
+<td>Outer step time, seconds; use a positive duration.</td>
+</tr>
+<tr>
+<td><code>gain</code></td>
+<td>1</td>
+<td>Historical Bogong/Kinefly signed yaw gain, applied on scene load and in-place trial transitions. Zero disables yaw response; negative reverses it. It does not replace the separate walking angular multiplier.</td>
+</tr>
+<tr>
+<td><code>autoTrim</code></td>
+<td>false</td>
+<td>Opt-in per-row Kinefly median centering; pauses outside flight/closed-loop yaw. Learned DC offsets persist when false.</td>
+</tr>
+<tr>
+<td>Experiment <code>autoTrimSettings</code></td>
+<td>defaults when omitted</td>
+<td>Put tuning in the referenced experiment JSON, inside a phase for phased files. Default flight threshold 0.01 rad², step cap 0.1 rad, absolute cap 2 rad; <code>flightCheckEnabled: false</code> bypasses the flight gate. Legacy row settings remain readable. See <a href="auto-trim.html">auto trim</a>.</td>
+</tr>
+<tr>
+<td><code>reloadScene</code></td>
+<td>true</td>
+<td>When false and the scene stays the same, call its in-scene sequencer. Use true for Dynamic Choice: its AdvanceStep is intentionally empty.</td>
+</tr>
+<tr>
+<td><code>parameters</code></td>
+<td>null</td>
+<td>Controller-specific dictionary.</td>
+</tr>
+<tr>
+<td><code>parameters.configFile</code></td>
+<td>none</td>
+<td>Choice, Optomotor, Kannadi or Swarm file relative to StreamingAssets.</td>
+</tr>
+<tr>
+<td><code>parameters.design</code></td>
+<td><code>dynamicSequenceDesign.json</code></td>
+<td>Dynamic Choice design file.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Outer duration always limits time spent in a scene, including an inner looping optomotor/dynamic sequence. Top-level step <code>gain</code> from Bogong is restored and defaults to 1 exactly as in <code>BogongAustralia</code>; it is applied even when the same scene advances without reloading.</p>
+<h2 id="movement-settings-in-individual-experiment-files">Movement settings in individual experiment files</h2>
+<p>Kannadi, Swarm, Choice, and migration config files accept these fields. The sequence only references the file through <code>parameters.configFile</code>.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Omitted default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>autopilotEnabled</code></td>
+<td>false</td>
+<td>Keep moving forward while retaining lateral, reverse, and yaw steering. Ctrl+Space toggles the active mode.</td>
+</tr>
+<tr>
+<td><code>autopilotSpeed</code></td>
+<td>10</td>
+<td>Constant forward speed in world units/second (cm/s for the walking setup).</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="choice-and-migration">Choice and migration</h2>
+<p>Templates: <code>choice.template.json</code>, <code>choice-band.template.json</code>, <code>migration.template.json</code>. Migration is a Choice configuration with wind/AGL settings, not a new scene or an alternate tracking protocol.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Top-level field</th>
+<th>Omitted default</th>
+<th>Meaning / example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>objects</code></td>
+<td>empty array</td>
+<td>Omitted, null or <code>[]</code> means environment-only flight/migration; sky and movement settings still apply.</td>
+</tr>
+<tr>
+<td><code>closedLoopPosition</code>, <code>closedLoopOrientation</code></td>
+<td>false</td>
+<td>Boolean FicTrac translation/yaw switches. Use true for walking.</td>
+</tr>
+<tr>
+<td><code>initialPosition</code></td>
+<td>(0,0,0)</td>
+<td>World x/y/z, cm. Template ground-eye height 0.5; migration example 100.</td>
+</tr>
+<tr>
+<td><code>initialRotation</code></td>
+<td>(0,0,0)</td>
+<td>Euler x/y/z degrees.</td>
+</tr>
+<tr>
+<td><code>randomInitialRotation</code></td>
+<td>false</td>
+<td>Random starting yaw; Choice shares that sampled yaw across its rigs.</td>
+</tr>
+<tr>
+<td><code>backgroundColor</code></td>
+<td>null</td>
+<td><code>{r,g,b,a}</code> (0–1); null keeps existing camera background.</td>
+</tr>
+<tr>
+<td><code>skyboxPath</code></td>
+<td>null</td>
+<td>Panorama path under StreamingAssets; takes precedence over <code>nightSky</code>. Uses Choice's legacy image loader.</td>
+</tr>
+<tr>
+<td><code>nightSky</code></td>
+<td>null</td>
+<td>Generated astronomical sky and RunData archive, with the same location/time settings as Swarm. Used when <code>skyboxPath</code> is empty. Omitted/disabled restores the scene background.</td>
+</tr>
+<tr>
+<td><code>windSpeed</code></td>
+<td>0</td>
+<td>Nonnegative world units/s, independent of FicTrac position gain. Zero disables drift.</td>
+</tr>
+<tr>
+<td><code>windDirection</code></td>
+<td>0</td>
+<td>Degrees wind comes <strong>FROM</strong>: 0 from +Z, 90 from +X. Motion is opposite.</td>
+</tr>
+<tr>
+<td><code>aglHeight</code></td>
+<td>0</td>
+<td>Height above ground in world units. Zero disables height regulation. Examples: 10, 100, 1000.</td>
+</tr>
+<tr>
+<td><code>groundLayerMask</code></td>
+<td>1</td>
+<td>Physics bit mask (1 = Default layer), not a layer index. Select only ground/terrain layers.</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>groundLayerMask</code> tells the migration AGL raycast which Unity physics layers count as ground. It is a bit mask: layer <code>n</code> contributes <code>1 &lt;&lt; n</code>, so <code>1</code> selects the built-in <strong>Default</strong> layer, while a custom layer number 8 would use <code>256</code>. In the Inspector, use the layer mask picker; in JSON, add the corresponding bit values together. The raycast goes downward at the animal's X/Z position. If the mask excludes the terrain or collider, no ground is found and the current Y position is preserved. Exclude locusts, trees, and other movable objects so AGL cannot lock onto an animal.</p>
+<p>Wind/AGL support is adapted from <code>origin/BogongAustralia</code> and <code>origin/smrmah-optomotor-updated</code>. AGL samples a matching Unity Terrain at the current X/Z; otherwise it raycasts ground colliders. It includes the terrain's world offset. No ground hit preserves current Y. Wind/AGL continue without FicTrac packets, and turning both to zero disables this work. Use a ground-only mask to avoid sampling trees/animals. Each new Choice config resets these optional settings, including in-scene transitions.</p>
+<p>A Choice terrain scene can use <code>nightSky</code> without spawning objects. Start it through ControlScene so the sequence's <code>parameters.configFile</code> is loaded; with <code>autoStart: false</code>, press Start after entering Play mode. Choice uses boolean tracking switches (<code>true</code>/<code>false</code>). For an embedded swarm, supply a nested <code>swarm</code> object in the individual Choice config, as in <code>Examples/Flight/selwyn-trajectory-playback.example.json</code>. Swarm fields such as <code>spawnVolumeSize</code>, <code>mu</code> and <code>bogongVisual</code> belong inside that object, not at the Choice config's top level.</p>
+<p>Exact historical inputs are in <a href="https://github.com/pvnkmrksk/matrexVR/tree/main/docs/config-history">config-history</a>. They reference <code>Choice_Bogong</code> and <code>Photosphere/LSM.png</code>, which are not guaranteed here. The runnable examples use the existing Choice environment. SmrMah examples are provided with their branch identity; no remote branch actually named Deathhead was found. The Bogong Kinefly yaw-rate path and its sequence gain are restored; see <a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/bogong-gain-compatibility.md">gain compatibility</a>.</p>
+<h3 id="choice-object-fields">Choice object fields</h3>
+<p>Each entry uses prefab/material names registered in that scene controller's Inspector arrays; an arbitrary filename does not automatically load a prefab. Unknown prefab names are skipped. For a given stimulus, irrelevant component-specific fields have no effect.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default if omitted</th>
+<th>Meaning / reasonable example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td>null</td>
+<td>Required prefab name, e.g. <code>tree01</code> or <code>LocustBand_black</code>.</td>
+</tr>
+<tr>
+<td><code>position</code></td>
+<td>null</td>
+<td>World zero if absent; position object described below.</td>
+</tr>
+<tr>
+<td><code>scale</code></td>
+<td>null</td>
+<td>Omitted object resolves to (1,1,1); scalar fields in a supplied object default to 0. Use <code>{x:1,y:1,z:1}</code> for unit scale.</td>
+</tr>
+<tr>
+<td><code>rotation</code></td>
+<td>null</td>
+<td>Nullable Euler x/y/z degrees; all three present overrides <code>mu</code>.</td>
+</tr>
+<tr>
+<td><code>material</code></td>
+<td>null</td>
+<td>Registered material name; empty keeps prefab material.</td>
+</tr>
+<tr>
+<td><code>flip</code></td>
+<td>false</td>
+<td>Negate X scale.</td>
+</tr>
+<tr>
+<td><code>speed</code></td>
+<td>0</td>
+<td>cm/s on LocustMover/band movement components; example 2.</td>
+</tr>
+<tr>
+<td><code>mu</code></td>
+<td>0</td>
+<td>Mean/explicit yaw in degrees.</td>
+</tr>
+<tr>
+<td><code>visualAngleDegrees</code></td>
+<td>0</td>
+<td>Angular size for prefabs with ScaleWithDistance; example 10.</td>
+</tr>
+<tr>
+<td><code>meanBlueA</code>, <code>meanBlueB</code></td>
+<td>0, 0</td>
+<td>Blue-channel means for supported color-drift stimuli; normalized 0–1.</td>
+</tr>
+<tr>
+<td><code>switchInterval</code></td>
+<td>0</td>
+<td>Color switching period, seconds; set positive for switching.</td>
+</tr>
+<tr>
+<td><code>numberOfInstances</code></td>
+<td>0</td>
+<td>Band population; example 32.</td>
+</tr>
+<tr>
+<td><code>spawnLengthX</code>, <code>spawnLengthZ</code></td>
+<td>0, 0</td>
+<td>Band spawn extent in world units; example 100 each.</td>
+</tr>
+<tr>
+<td><code>gridType</code></td>
+<td>0</td>
+<td>0 Hexagonal, 1 Manhattan, 2 Random.</td>
+</tr>
+<tr>
+<td><code>kappa</code></td>
+<td>0</td>
+<td>Dimensionless heading concentration: 0 uniform, 10 concentrated, 100000 aligned.</td>
+</tr>
+<tr>
+<td><code>visibleOffDuration</code>, <code>visibleOnDuration</code></td>
+<td>0, 0</td>
+<td>Band invisibility/visibility durations in seconds; example 0/10.</td>
+</tr>
+<tr>
+<td><code>boundaryLengthX</code>, <code>boundaryLengthZ</code></td>
+<td>0, 0</td>
+<td>Periodic arena lengths in world units; example 200 each.</td>
+</tr>
+<tr>
+<td><code>lockBoundaryWithAnimalPosition</code></td>
+<td>false</td>
+<td>Translate band boundary with tracked animal.</td>
+</tr>
+<tr>
+<td><code>lockAgentWithAnimalPosition</code></td>
+<td>false</td>
+<td>Translate agents with their parent animal.</td>
+</tr>
+<tr>
+<td><code>prioritizeNumbers</code></td>
+<td>false</td>
+<td>Prefer requested count over geometric grid filling.</td>
+</tr>
+<tr>
+<td><code>hexRadius</code></td>
+<td>0</td>
+<td>Band grid spacing parameter in world units; example 10.</td>
+</tr>
+<tr>
+<td><code>sectionLengthX</code>, <code>sectionLengthZ</code></td>
+<td>0, 0</td>
+<td>Band grid section dimensions; example 100 each.</td>
+</tr>
+<tr>
+<td><code>rotationAngle</code></td>
+<td>0</td>
+<td>Band layout rotation in degrees.</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>position.radius</code>, <code>.angle</code>, <code>.height</code> default to zero. Supply all Cartesian <code>position.x/y/z</code> to override polar positioning; these three default to null. Partial Cartesian coordinates fall back to the polar position. Explicit rotation likewise needs all three values. The full Choice template includes nullable alternatives for reference; don't set both conventions unless the override is intentional.</p>
+<h2 id="swarm-kannadi-and-kinematics">Swarm, Kannadi, and kinematics</h2>
+<p>Swarm/Bogong and Kannadi accept optional <code>nightSky</code> settings and a top-level <code>skyboxPath</code> override. See <a href="night-sky.html">night-sky.md</a> for location, local date/time, 30-minute updates, physical north alignment, and saved images/IDs. The Bogong template enables this feature; omission preserves the scene background.</p>
+<p>Templates: <code>swarm.template.json</code>, <code>kannadi.template.json</code>, <code>kinematic.template.json</code>. The kinematic template uses the <strong>Kannadi parser</strong> and a single tile per rig (<code>numberOfRings:0</code>); there is no separate Kinematic scene or magic kinematic filename.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Shared movement field</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>closedLoopPosition</code></td>
+<td>null → 1</td>
+<td>Nonnegative translation multiplier. Booleans remain accepted: true=1, false=0.</td>
+</tr>
+<tr>
+<td><code>closedLoopOrientation</code></td>
+<td>null → 1</td>
+<td>Nonnegative <strong>angular multiplier</strong>: 1 means one world degree per sensor degree; 0 disables turning, 0.5 halves yaw, 2 doubles it. No turn-speed cap or smoothing.</td>
+</tr>
+<tr>
+<td><code>animateOnMove</code></td>
+<td>false</td>
+<td>Enable leg-animation gating; templates set true.</td>
+</tr>
+<tr>
+<td><code>animationSpeedThreshold</code></td>
+<td>0.5</td>
+<td>cm/s planar translation; animate only strictly above threshold. Rotation alone does not animate.</td>
+</tr>
+<tr>
+<td><code>autopilotEnabled</code></td>
+<td>false</td>
+<td>Constant forward motion for walking/Swarm/Kannadi templates. Migration/flying templates set this to true. Ctrl+Space toggles it during a run.</td>
+</tr>
+<tr>
+<td><code>autopilotSpeed</code></td>
+<td>10</td>
+<td>Constant forward speed in world units/second; cm/s in the current walking scale.</td>
+</tr>
+<tr>
+<td><code>vrConfigs</code></td>
+<td>null</td>
+<td>Optional per-rig pose/gain overrides below.</td>
+</tr>
+<tr>
+<td><code>animationNoiseThreshold</code></td>
+<td>legacy alias</td>
+<td>Used only when <code>animationSpeedThreshold</code> is absent. Prefer the canonical name.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The Swarm/Kannadi walking path uses <strong>unit gain by default for both translation and yaw</strong>. Explicit numeric fields override those defaults; per-rig values take precedence over global values. Walking gain operates on displacement/angle, independent of render FPS. The former locust turn-speed interpretation has been removed. Walking yaw differences use the shortest signed angle across 0/360; the input must not turn more than 180 degrees between consumed samples to avoid angular aliasing.</p>
+<p>Kinefly explicitly selected in the system config uses the historical raw-radian yaw-rate path instead. The numeric Swarm/Kannadi gains only act as enabled/disabled switches there, and the sequence's <code>gain</code> controls Kinefly yaw. Ordinary Choice follows the historical Bogong tracking path.</p>
+<p><code>vrConfigs[]</code>: <code>vrIndex</code> is required (1–4, unique); <code>initialPosition</code> and <code>initialRotation</code> are optional <code>{x,y,z}</code> world position/Euler degrees and otherwise keep current pose. Nullable <code>closedLoopPosition</code>/<code>closedLoopOrientation</code> override global gains. <code>watchIndex</code> is optional 1–4: in Kannadi it selects that animal's replica layer; omit/null to see the other animals. Self-view excludes its own central tile. Swarm does not use <code>watchIndex</code>.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Kannadi field</th>
+<th>Omitted behavior</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>numberOfRings</code></td>
+<td>Keep scene/current value (3 initially)</td>
+<td>Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 100.</td>
+</tr>
+<tr>
+<td><code>hexRadius</code></td>
+<td>Keep scene/current value (10 initially)</td>
+<td>Positive grid spacing in world units.</td>
+</tr>
+<tr>
+<td><code>spacing</code></td>
+<td>null</td>
+<td>Legacy alias, overridden by hexRadius.</td>
+</tr>
+<tr>
+<td><code>kannadiTilePrefab</code></td>
+<td>Keep scene prefab</td>
+<td>Catalog name, e.g. SimulatedLocust or LocustBand_black. Catalog is a build-safe Resources asset.</td>
+</tr>
+<tr>
+<td><code>periodicBoundary</code></td>
+<td>true</td>
+<td>Wrap animal and replicas in X/Z.</td>
+</tr>
+<tr>
+<td><code>boundaryLengthX</code>, <code>boundaryLengthZ</code></td>
+<td>200, 200</td>
+<td>Positive world-unit arena extents, centered at zero.</td>
+</tr>
+<tr>
+<td><code>backgroundColor</code></td>
+<td>null</td>
+<td>Optional normalized RGBA background.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Kannadi replicas use the tracked source's translation speed for animation. Wrapped displacement is measured across the short edge; teleport-sized trail jumps break rather than draw across the whole arena. Bands mirror their source and do not independently walk away.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Swarm field</th>
+<th>Omitted behavior</th>
+<th>Meaning / template</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>numberOfLocusts</code></td>
+<td>Keep scene/current value (128 per rig in shipped scene)</td>
+<td>Population <strong>per rig</strong>; template 256 means 1024 total.</td>
+</tr>
+<tr>
+<td><code>density</code></td>
+<td>null</td>
+<td>Optional agents per world-unit area (2D) or volume (3D). Used only when <code>numberOfLocusts</code> is omitted; count is rounded to the nearest whole agent.</td>
+</tr>
+<tr>
+<td><code>spawnAreaSize</code></td>
+<td>Keep scene/current value (200)</td>
+<td>Square spawn extent in world units.</td>
+</tr>
+<tr>
+<td><code>mu</code></td>
+<td>Keep scene/current value (0)</td>
+<td>Mean heading degrees; 0=+Z.</td>
+</tr>
+<tr>
+<td><code>kappa</code></td>
+<td>Keep scene/current value (10000)</td>
+<td>Heading concentration, dimensionless. Legacy sampler uses exactly mu at &gt;=10000. Corrected <code>VonMises</code> mode retains spread: 100 gives about 5.74° yaw SD.</td>
+</tr>
+<tr>
+<td><code>directionDistribution</code></td>
+<td><code>Legacy</code></td>
+<td>Historical sampler or normalized <code>VonMises</code>. New cycle uses VonMises: block 3 yaw/elevation kappa 1000/100 gives about 99.45% 3D order, block 4 100/100 about 99%. Omission preserves old motion.</td>
+</tr>
+<tr>
+<td><code>useHeadingReference</code></td>
+<td>false</td>
+<td>Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.</td>
+</tr>
+<tr>
+<td><code>headingReferenceId</code></td>
+<td>empty</td>
+<td>Named per-rig mean from an earlier experiment's <code>headingReference.saveAs</code>, in this sequence cycle. Requires <code>useHeadingReference=true</code>; missing reference stops the run. Empty retains within-experiment reference.</td>
+</tr>
+<tr>
+<td><code>locustSpeed</code></td>
+<td>Keep scene/current value (2)</td>
+<td>Generated mean speed in world units/s: cm/s in walking scenes, m/s on terrain. Recorded CSV playback is unaffected.</td>
+</tr>
+<tr>
+<td><code>locustSpeedStdDev</code></td>
+<td>0</td>
+<td>Speed standard deviation in the same world units/s. Sampled once per generated agent from a normal distribution; negative samples are redrawn. Zero retains the exact legacy constant speed and random sequence. Bogong example: mean 6.17, SD 1.24 m/s. SD is not variance.</td>
+</tr>
+<tr>
+<td><code>volumeHalfExtentMetres</code></td>
+<td>null</td>
+<td>Generated cube's physical half extent, in metres. Overrides spawn dimensions and periodic boundary lengths with <code>2 × value × worldUnitsPerMetre</code>; in 2D only X/Z matter. Null retains legacy sizes. Example 2 gives a 4 m cube. Does not impose a hard radial visibility cutoff.</td>
+</tr>
+<tr>
+<td><code>preserveBoundaryOvershoot</code></td>
+<td>false</td>
+<td>Exact periodic wrapping, retaining excess distance across all enabled axes, even after a large frame step or observer teleport. Shared motion runs after observer/AGL movement and before rendering/logging. False retains historical edge snapping.</td>
+</tr>
+<tr>
+<td><code>dimension</code></td>
+<td><code>2D</code></td>
+<td><code>2D</code> preserves the historical X/Z swarm. <code>3D</code> samples a volume and can wrap Y.</td>
+</tr>
+<tr>
+<td><code>spawnCenter</code></td>
+<td>Spawner X/Z and legacy Y</td>
+<td>Optional <code>{x,y,z}</code> center of the spawn volume. In 2D only X/Z are used.</td>
+</tr>
+<tr>
+<td><code>spawnVolumeSize</code></td>
+<td>A square; 3D uses a cube</td>
+<td>Positive <code>{x,y,z}</code> volume dimensions. Omit for <code>spawnAreaSize</code> in every dimension.</td>
+</tr>
+<tr>
+<td><code>muElevation</code></td>
+<td>0</td>
+<td>Unity X pitch in degrees: negative tilts upward, positive downward; ignored in 2D.</td>
+</tr>
+<tr>
+<td><code>kappaElevation</code></td>
+<td>10000</td>
+<td>3D elevation concentration. Legacy: 0 is uniform, &gt;=10000 fixed. VonMises: concentration uses the corrected circular sampler without that cutoff.</td>
+</tr>
+<tr>
+<td><code>boundaryHeight</code></td>
+<td>0</td>
+<td>3D periodic Y extent. Required only when <code>wrapY</code> is true; otherwise Y is not wrapped.</td>
+</tr>
+<tr>
+<td><code>wrapY</code></td>
+<td>false</td>
+<td>Enable periodic Y wrapping for a 3D swarm.</td>
+</tr>
+<tr>
+<td><code>agentVisual</code></td>
+<td><code>ScenePrefab</code></td>
+<td>Existing prefab, or <code>Bogong</code> for an opaque, unlit circular patch.</td>
+</tr>
+<tr>
+<td><code>bogongVisual</code></td>
+<td>World-size circle, 0.5 units, dark gray</td>
+<td><code>sizeMode</code> is <code>World</code> (diameter <code>size</code>) or <code>Angular</code> (diameter <code>angularSizeDegrees</code>, 0–180 exclusive). Both draw a camera-facing circular patch of solid <code>color</code> RGB; alpha, metallic and smoothness have no visual effect. No lighting, fog, shadows, textures or soft edges. <code>flickerFrequencyHz</code> 0 disables flicker; <code>flickerDutyCycle</code> is the visible fraction.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Bogong angular size is resolved separately for each rendering camera before culling, so an overhead view or another rig cannot change the panel stimulus size. Movement heading is unchanged by the camera-facing patch. For a 90° square perspective camera, center-screen diameter in pixels is <code>panelWidth × tan(angularSizeDegrees / 2)</code> (angle in degrees). A 2° dot is about <strong>1.12 pixels across at 64×64</strong>, or <strong>2.23 pixels across at 128×128</strong>; filled pixel area differs from diameter. The 64-pixel center has about 1.79° per pixel, with a finer angular pitch toward the edges. Filled-pixel counts depend on position and subpixel alignment; very small dots can fall between pixel centers. There is no minimum-pixel clamp or brightness blending. The local <code>system_config.json</code> currently requests 64×64 panels; changing the physical panel resolution requires matching that config.</p>
+<p>The historical 2D swarm keeps its scene-owned boundary manager and prefab assignments. A 3D swarm uses <code>boundaryLengthX</code>, <code>boundaryLengthZ</code>, and <code>boundaryHeight</code> from the individual file when <code>wrapY</code> is enabled. Kannadi's ring/prefab/watch fields do not configure Swarm geometry. Swarm parameters rebuild the population on each in-scene step. Density is count divided by spawn area squared in 2D, or by the volume in 3D. The active sequence files reference individual Swarm config files; older inline sequence fields remain accepted as a compatibility fallback.</p>
+<p>The physical generated moth recipe is <code>Examples/Swarm/generated-bogong-speed-distribution.example.json</code>. It uses <code>shape: "Moth"</code>, <code>sizeMode: "World"</code>, one coupled wing pair at 30 Hz and subpixel contrast fading. The existing <code>Dot</code> visual and angular mode remain available. See <a href="generated-swarms.html">generated Bogong swarm</a> for the native contrast test, moving volume, logging and default density.</p>
+<h2 id="optomotor">Optomotor</h2>
+<p>Template: <code>optomotor.template.json</code>. <code>Examples/Optomotor/frequency-speed-sweep.example.json</code> preserves the frequency/speed sweep from <code>origin/Optomotor</code>. The Optomotor scene is enabled in the build list.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>loop</code></td>
+<td>false</td>
+<td>Repeat stimulus list internally.</td>
+</tr>
+<tr>
+<td><code>stimuli</code></td>
+<td>empty array</td>
+<td>Required nonempty stimulus list.</td>
+</tr>
+<tr>
+<td><code>stimuli[].duration</code></td>
+<td>10</td>
+<td>Seconds per stimulus.</td>
+</tr>
+<tr>
+<td><code>speed</code></td>
+<td>20</td>
+<td>Drum angular speed, degrees/s. Use nonnegative values and <code>clockwise</code> for sign.</td>
+</tr>
+<tr>
+<td><code>clockwise</code></td>
+<td>true</td>
+<td>Positive rotation around the selected local axis when true; negative when false.</td>
+</tr>
+<tr>
+<td><code>rotationAxis</code></td>
+<td><code>Yaw</code></td>
+<td>Case-sensitive Yaw=Y, Pitch=X, Roll=Z; unknown values fall back to Yaw.</td>
+</tr>
+<tr>
+<td><code>frequency</code></td>
+<td>4</td>
+<td>Cycles per complete revolution, not Hz. A 20°/s, 4-cycle stimulus has temporal frequency 20×4/360 Hz.</td>
+</tr>
+<tr>
+<td><code>contrast</code></td>
+<td>0.5</td>
+<td>0–1; at &gt;=0.99 the texture becomes discrete rather than sinusoidal.</td>
+</tr>
+<tr>
+<td><code>dutyCycle</code></td>
+<td>0.5</td>
+<td>Fraction in color2 for discrete grating; used at contrast &gt;=0.99.</td>
+</tr>
+<tr>
+<td><code>color1</code>, <code>color2</code></td>
+<td><code>#000000</code>, <code>#FFFFFF</code></td>
+<td>Hex grating endpoints.</td>
+</tr>
+<tr>
+<td><code>closedLoopOrientation</code>, <code>closedLoopPosition</code></td>
+<td>false, false</td>
+<td>Boolean tracking switches for the animal.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The outer sequence duration and internal sum of stimulus durations are distinct. Use enough outer time for the desired stimulus list. R also resets drum orientation; Space or backslash pauses/resumes drum rotation. These debug keys are not a replacement for logged experimental timing.</p>
+<h2 id="dynamic-choice-design-choice_desync">Dynamic Choice design (Choice_desync)</h2>
+<p>Template: <code>dynamic-choice.template.json</code>, loaded via <code>parameters.design</code>. This schema is different from ordinary Choice. The controller maintains an internal sequence for each rig and shuffles each repetition. Outer sequence time ends the scene. Its Inspector <code>loopSequence</code> defaults true and controls repetition after exhausting the list; there is no JSON <code>loop</code> field here.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Design field</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>seed</code></td>
+<td>-1</td>
+<td>Shuffle seed; negative uses time. Example 42 for initial reproducibility; later controller loops reseed using time.</td>
+</tr>
+<tr>
+<td><code>repetitions</code></td>
+<td>1</td>
+<td>Number of shuffled repetitions before reaching the end.</td>
+</tr>
+<tr>
+<td><code>steps</code></td>
+<td>null</td>
+<td>Array of steps.</td>
+</tr>
+<tr>
+<td><code>intertrial</code></td>
+<td>null</td>
+<td>Optional step inserted before each trial. Same schema as a step.</td>
+</tr>
+<tr>
+<td><code>adaptiveDecision</code></td>
+<td>null</td>
+<td>Optional adaptive staircase below.</td>
+</tr>
+<tr>
+<td><code>sync</code></td>
+<td>true</td>
+<td>Legacy serialized field; currently not consulted by execution. Do not infer rig synchronization from it.</td>
+</tr>
+<tr>
+<td><code>size</code>, <code>boxSize</code> at design root</td>
+<td>1.5, null</td>
+<td>Legacy fields not consulted by trigger construction; use trigger fields.</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Step field</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>empty</td>
+<td>Logged step label; keep names unique and avoid CSV delimiters.</td>
+</tr>
+<tr>
+<td><code>trigger</code></td>
+<td>null</td>
+<td>Null advances immediately; explicit time or area trigger is recommended.</td>
+</tr>
+<tr>
+<td><code>objects</code></td>
+<td>null</td>
+<td>Array of dynamic objects below.</td>
+</tr>
+<tr>
+<td><code>camera</code></td>
+<td>null</td>
+<td>Array of <code>{vrId,clearFlags,bgColor}</code>. clearFlags defaults SolidColor; bgColor is [r,g,b,a] (alpha optional). Changes clear/background, never system camera order.</td>
+</tr>
+<tr>
+<td><code>skybox</code></td>
+<td>null</td>
+<td>Material name loaded by Resources.Load<material>. This differs from Choice's panorama file path.</td>
+</tr>
+<tr>
+<td><code>closedLoopPosition</code>, <code>closedLoopOrientation</code></td>
+<td>false</td>
+<td>Per-step tracking switches.</td>
+</tr>
+<tr>
+<td><code>initialPosition</code>, <code>initialRotation</code></td>
+<td>(0,0,0)</td>
+<td>World position/Euler degrees applied on each rig's step entry.</td>
+</tr>
+<tr>
+<td><code>randomInitialRotation</code></td>
+<td>false</td>
+<td>Random yaw on reset.</td>
+</tr>
+<tr>
+<td><code>swapAfterSeconds</code></td>
+<td>0</td>
+<td>Positive delay before swapping object colors; 0 disables.</td>
+</tr>
+<tr>
+<td><code>resetVR</code></td>
+<td>null</td>
+<td>Legacy serialized list; currently resets the executing rig regardless of this list.</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Trigger field</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td>null</td>
+<td><code>time</code> waits seconds; use <code>area</code> for collider-based trials. Other values take the area path.</td>
+</tr>
+<tr>
+<td><code>seconds</code></td>
+<td>0</td>
+<td>Time trigger duration.</td>
+</tr>
+<tr>
+<td><code>areaTag</code></td>
+<td>null</td>
+<td>Tag assigned to trigger objects (fallback Untagged).</td>
+</tr>
+<tr>
+<td><code>vrId</code></td>
+<td>null</td>
+<td>Rig allowed to trigger; null/<code>any</code> means the executing rig.</td>
+</tr>
+<tr>
+<td><code>shape</code></td>
+<td><code>box</code></td>
+<td><code>box</code> or <code>cylinder</code> (capsule collider).</td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td>1.5</td>
+<td>Default box size in world units, with minimum 0.5.</td>
+</tr>
+<tr>
+<td><code>boxSize</code></td>
+<td>null</td>
+<td>Explicit [x,y,z] trigger dimensions overriding size.</td>
+</tr>
+<tr>
+<td><code>radius</code>, <code>height</code></td>
+<td>0, 0</td>
+<td>Cylinder dimensions in world units; controller applies fallback/minimum geometry.</td>
+</tr>
+<tr>
+<td><code>timeoutSeconds</code></td>
+<td>0</td>
+<td>Positive timeout, otherwise wait indefinitely for area event.</td>
+</tr>
+<tr>
+<td><code>triggerOnExit</code></td>
+<td>false</td>
+<td>Use exit instead of entry.</td>
+</tr>
+<tr>
+<td><code>advanceOnTrigger</code></td>
+<td>true</td>
+<td>false resets the rig on contact and keeps waiting for timeout.</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Dynamic object field</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>type</code></td>
+<td>null</td>
+<td>Registered prefab name (fallback alias <code>prefab</code>).</td>
+</tr>
+<tr>
+<td><code>polar</code></td>
+<td>null</td>
+<td><code>{radius,angle,height}</code> as above, defaults zero for each scalar. Takes precedence over Cartesian <code>pos</code>.</td>
+</tr>
+<tr>
+<td><code>pos</code></td>
+<td>null</td>
+<td>Legacy [x,y,z], fallback zero.</td>
+</tr>
+<tr>
+<td><code>scale</code></td>
+<td>null</td>
+<td><code>{x,y,z}</code> multipliers; null preserves prefab scale.</td>
+</tr>
+<tr>
+<td><code>material</code></td>
+<td>null</td>
+<td>Registered name (alias <code>mat</code>).</td>
+</tr>
+<tr>
+<td><code>color</code>, <code>swapColor</code></td>
+<td>null</td>
+<td>Normalized [r,g,b,a]; RGB allowed. Explicit swapColor sets swap target. Otherwise first two colors exchange.</td>
+</tr>
+<tr>
+<td><code>flip</code></td>
+<td>false</td>
+<td>Negate X scale.</td>
+</tr>
+<tr>
+<td><code>visualAngleDegrees</code></td>
+<td>0</td>
+<td>ScaleWithDistance angular width.</td>
+</tr>
+<tr>
+<td><code>randomInitialRotation</code></td>
+<td>false</td>
+<td>Random object yaw.</td>
+</tr>
+<tr>
+<td><code>mu</code></td>
+<td>0</td>
+<td>Object yaw in degrees when not random.</td>
+</tr>
+<tr>
+<td><code>rot</code></td>
+<td>null</td>
+<td>Legacy serialized array, currently ignored. Use mu for yaw.</td>
+</tr>
+<tr>
+<td><code>role</code></td>
+<td>null</td>
+<td><code>black</code> or <code>gray</code> for adaptive decisions.</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>adaptiveDecision</code>: <code>enabled=false</code>, <code>startGray=0.5</code> (normalized intensity), <code>grayStep=0.05</code> (intensity change), <code>controlEvery=5</code> (trial count), <code>noBarControlSeconds=20</code> (seconds). When enabled, the controller generates adaptive trial/control steps and logs the starting gray/side. The ordinary steps list is not used as the adaptive schedule.</p>
+<h2 id="replay-and-historical-configuration-limits">Replay and historical configuration limits</h2>
+<p>Replay uses the Control UI and ReplayController inspector fields, not a standalone JSON motion config. Select a run directory and its data files. The environment loader can use a saved dynamic design, including step names, object names, polar positions, scales, materials, and camera backgrounds. Operator bindings are in <a href="controls.html">Unity 6 controls</a>; data requirements are in <a href="data-formats.html">data formats</a>.</p>
+<p>Older files in <code>StreamingAssets/Archive/Legacy</code> and <code>Assets/StreamingAssets/Archive/LegacyLocustInputs</code> are retained research inputs, not the authoritative template library. Read the modern parser before reusing an old parameter: a silently ignored <code>rot</code>, <code>sync</code>, or unsupported tracking setting will not produce the intended experiment.</p>
+<h2 id="heading-relative-presentations-telemetry-and-status">Heading-relative presentations, telemetry and status</h2>
+<p>Experiment files can contain <code>preStimulus</code>, <code>stimulus</code> and <code>postStimulus</code>, each using its scene schema plus <code>enabled</code> and <code>durationSeconds</code>. Flat files remain compatible. Heading reference is measured during visible pre-stimulus conditions, with an optional start offset; spawners opt into it separately with <code>useHeadingReference</code> (default false). Position and rotation resets are independently configurable, both default true. Choice also accepts an embedded <code>swarm</code> and <code>uniformSkyColor</code>. See <a href="experiment-phases.html">experiment phases</a> for timing, schema, supported controllers and separate phased Selwyn examples, and <a href="telemetry.html">telemetry</a> for wire fields.</p>
+<p>System config accepts <code>telemetry</code> (defaults: enabled, loopback port 9880, 20 Hz, topic <code>matrex.telemetry.v1</code>) and <code>statusOverlay</code> (visible on display 0). The same reference documents every field. <strong>Tab</strong> restores the bottom-right panel; errors reopen it automatically.</p>
+<p>The <a href="selwyn-cycle.html">Selwyn four-block cycle</a> uses separate flat experiment files. Heading measurement controls are experiment-level:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th><code>headingReference</code> field</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>false</td>
+<td>Enable per-rig virtual-yaw circular observation.</td>
+</tr>
+<tr>
+<td><code>windowSeconds</code></td>
+<td>180</td>
+<td>Positive finite observation window, seconds.</td>
+</tr>
+<tr>
+<td><code>startOffsetSeconds</code></td>
+<td>0</td>
+<td>Nonnegative finite delay after configuration, seconds.</td>
+</tr>
+<tr>
+<td><code>measureDuringPresentation</code></td>
+<td>false</td>
+<td>Legacy key retained. The scene clock now includes observation for either value; effective windows are capped to the remaining scene/phase duration. False still permits spawners to reapply the completed reference.</td>
+</tr>
+<tr>
+<td><code>saveAs</code></td>
+<td>empty</td>
+<td>Optional name for the completed per-rig mean. Reused by later <code>swarm.headingReferenceId</code>; cleared at run start/stop and every loop. Does not automatically rotate stimuli.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Sequence <code>loopStartIndex</code> defaults to 0 (repeat all rows). A positive zero-based index runs preceding rows once and repeats from that row; it requires fixed order and an existing row. The current cycle uses 1, keeping the 360-second trimming setup one-time while repeating the three 240-second conditions. The original ControlScene form remains; edit this index in the sequence JSON before starting.</p>
+</article><nav class="chapter-pager" aria-label="Adjacent chapters"><a href="configuration-ux.html"><small>Previous</small>GUI and HUD details</a><a href="animal-agent-compatibility.html"><small>Next</small>Animal and agent names<span aria-hidden="true"> →</span></a></nav><footer class="article-footer">Static documentation · software contracts and recorded evidence. <a href="citation.html">Citation and credits</a></footer></main>
+<aside class="right-sidebar"><nav aria-label="On this page"><p>On this page</p><a href="#files-precedence-and-running-an-experiment" class="toc-level-2">Files, precedence, and running an experiment</a><a href="#units-and-coordinate-system" class="toc-level-2">Units and coordinate system</a><a href="#system-configuration" class="toc-level-2">System configuration</a><a href="#manual-controls-inside-each-rig" class="toc-level-3">Manual controls (inside each rig)</a><a href="#overview" class="toc-level-3">Overview</a><a href="#sequence-configuration" class="toc-level-2">Sequence configuration</a><a href="#movement-settings-in-individual-experiment-files" class="toc-level-2">Movement settings in individual experiment files</a><a href="#choice-and-migration" class="toc-level-2">Choice and migration</a><a href="#choice-object-fields" class="toc-level-3">Choice object fields</a><a href="#swarm-kannadi-and-kinematics" class="toc-level-2">Swarm, Kannadi, and kinematics</a><a href="#optomotor" class="toc-level-2">Optomotor</a><a href="#dynamic-choice-design-choice_desync" class="toc-level-2">Dynamic Choice design (Choice_desync)</a><a href="#replay-and-historical-configuration-limits" class="toc-level-2">Replay and historical configuration limits</a><a href="#heading-relative-presentations-telemetry-and-status" class="toc-level-2">Heading-relative presentations, telemetry and status</a></nav><a class="source-link" href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/configuration-reference.md">View Markdown source ↗</a></aside></div>
+<dialog class="search-dialog" aria-labelledby="search-title"><form method="dialog"><h2 id="search-title">Search documentation</h2><button class="search-close" aria-label="Close search">×</button></form><label class="sr-only" for="manual-search">Search every manual section</label><input id="manual-search" type="search" placeholder="Try: ViewportSetter, yaw units, replay, sky…" autocomplete="off"><p class="search-status" role="status">Search runs locally in your browser.</p><div class="search-results"></div><p class="search-hint">Enter a term · Tab to a result · Escape to close</p></dialog>
+</body></html>

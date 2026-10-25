@@ -15,7 +15,7 @@ The integration branch is `codex/kannadi-modernize`. It starts from `origin/curr
 
 ## Hardware configuration and startup
 
-Open `/Users/pavan/src/ledpanelVR` as a Unity project and start `Assets/Scenes/ControlScene.unity` as usual. Use Unity 6000.3.16f1, matching the upgraded project version.
+Open your MATREX VR checkout as a Unity project and start `Assets/Scenes/ControlScene.unity` as usual. Use Unity 6000.3.16f1, matching the upgraded project version.
 
 Copy `Assets/StreamingAssets/Kannadi/system_config.example.json` to the ignored local `Assets/StreamingAssets/system_config.json`, or retain your existing hardware file and add its `overheadCamera` section. Set the actual sphere diameters in **centimeters**, FicTrac addresses/ports, LED panel pixel dimensions, panel rows/columns, and display order for VR1–VR4. The example uses a 5 cm sphere and ports 9872–9875 as editable starting values, not a calibration.
 

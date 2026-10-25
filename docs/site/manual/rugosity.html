@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visual/navigation rugosity · MATREX VR manual</title><meta name="description" content="Independent visible and navigation surfaces and isolation controls.">
+<link rel="canonical" href="https://pvnkmrksk.github.io/matrexVR/manual/rugosity.html"><meta name="theme-color" content="#102d33">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/manual.css"><script src="assets/manual.js" defer></script><noscript><style>.search-open,.mobile-menu{display:none!important}@media(max-width:800px){.left-sidebar{display:block;position:static;width:auto;height:auto;box-shadow:none}}</style></noscript></head>
+<body><a class="skip-link" href="#article">Skip to content</a>
+<header class="docs-header"><a class="docs-brand" href="../index.html"><span class="brand-mark" aria-hidden="true">M</span> MATREX <span>VR</span></a><a class="manual-label" href="index.html">Documentation <span>0.3 + source</span></a><div class="header-actions"><a href="gallery.html">Gallery</a><a href="../index.html#downloads">Downloads</a><a href="https://github.com/pvnkmrksk/matrexVR">Source ↗</a><button type="button" class="mobile-menu" aria-controls="manual-nav" aria-expanded="false">Menu</button></div></header>
+<div class="docs-layout"><aside class="left-sidebar" id="manual-nav"><button class="search-open" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg> Search the manual <kbd>/</kbd></button><nav aria-label="Documentation chapters"><details class="nav-group" open><summary>Start here<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Manual overview</span></a><a href="getting-started.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Getting started</span></a><a href="gallery.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Native gallery</span></a></div></details><details class="nav-group"><summary>How it works<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="architecture.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Runtime architecture</span></a><a href="components.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Component index</span></a><a href="scenes.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Scenes and Kannadi</span></a><a href="viewports.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Rigs and viewports</span></a><a href="closed-loop.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>ClosedLoop and motion</span></a><a href="input-contracts.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Input contracts</span></a><a href="controls.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Keyboard and gamepad</span></a></div></details><details class="nav-group"><summary>Configure<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="configuration-studio.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Configuration studio</span></a><a href="configuration-ux.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>GUI and HUD details</span></a><a href="configuration-reference.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Parameter reference</span></a><a href="animal-agent-compatibility.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Animal and agent names</span></a><a href="experiment-phases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment phases</span></a><a href="auto-trim.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Flight gate and auto trim</span></a></div></details><details class="nav-group"><summary>Schema field atlas<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="schema-index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Full schema index</span></a><a href="schema-system.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>System fields</span></a><a href="schema-sequence.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Sequence fields</span></a><a href="schema-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Choice fields</span></a><a href="schema-swarm.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Swarm fields</span></a><a href="schema-kannadi.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Kannadi fields</span></a><a href="schema-optomotor.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Optomotor fields</span></a><a href="schema-rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Rugosity fields</span></a><a href="schema-dynamic-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Dynamic-Choice fields</span></a></div></details><details class="nav-group" open><summary>Stimuli<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="night-sky.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Astronomical night sky</span></a><a href="generated-swarms.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Generated swarms</span></a><a href="swarm-playback.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Recorded swarm playback</span></a><a href="selwyn-cycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Selwyn sky and swarm cycle</span></a><a href="rugosity.html" class="active" aria-current="page"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Visual/navigation rugosity</span></a><a href="selwyn-terrain.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Selwyn terrain source</span></a><a href="historical-panorama.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Historical panorama recipe</span></a></div></details><details class="nav-group"><summary>Data and replay<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="recording-pipeline.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Recording pipeline</span></a><a href="data-formats.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Saved data formats</span></a><a href="run-config-snapshots.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Configuration snapshots</span></a><a href="telemetry.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live telemetry and headings</span></a><a href="live-monitoring.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live browser monitoring</span></a><a href="replay.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Replay a recorded run</span></a></div></details><details class="nav-group"><summary>Extend and validate<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="extending.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Extend the source</span></a><a href="experiment-workflow.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment workflow</span></a><a href="scene-lifecycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene lifecycle</span></a><a href="diagnostics-performance.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Diagnostics and performance</span></a><a href="scene-reload-investigation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene reload investigation</span></a><a href="six-camera-rig.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Six-camera reference</span></a><a href="kannadi-history.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Kannadi integration history</span></a><a href="releases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Releases and rebuilding</span></a></div></details><details class="nav-group"><summary>Hardware and ecosystem<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="hardware.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Hardware and calibration</span></a><a href="integrations.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Trackers and analysis</span></a><a href="tracker-integration.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Native tracker integration</span></a><a href="citation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Cite MATREX VR</span></a></div></details></nav><div class="sidebar-footer"><a href="citation.html">Cite the software</a><a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/rugosity.md">Edit this page ↗</a></div></aside>
+<main id="article" tabindex="-1"><div class="article-context"><span>Stimuli</span><span>MATREX VR / source manual</span></div><article class="prose"><h1 id="terrain-cue-lab-separate-visual-and-navigation-rugosity">Terrain cue lab: separate visual and navigation rugosity</h1>
+<p>Use <strong>TerrainCueLab</strong> for this experiment. Scene identity, spatial terrain pattern, and experimental condition are separate concepts. Existing RS/navrug scenes are not renamed or repurposed. The earlier <code>Assets/Scenes/Rugosity_RS.unity</code>, its GUID, meshes and six choice files remain unchanged and runnable with <code>Examples/Rugosity/sequence-legacy-rugosity.json</code>.</p>
+<p>The Bogong night-sky improvements were already inherited on this branch. The terrain work adds optional behavior; scenes without an enabled RugosityWorld keep their original movement behavior.</p>
+<h2 id="the-four-primary-conditions">The four primary conditions</h2>
+<p><img src="assets/reference/docs/terrain-cue-four-conditions.png" alt="Measured cross-sections: visible surface, navigation surface and agent eye path" loading="lazy"></p>
+<p><a href="assets/reference/docs/terrain-cue-four-conditions.svg">Vector schematic</a>. The figure uses <strong>actual Unity mesh samples and rig poses</strong>, exported by <code>RugosityValidation</code>, rather than a separate idealized drawing. Blue is rendered terrain; dashed orange is navigation/collision terrain; purple arrows show eye position and the forward direction as the agent moves from left to right. The vertical scale is exaggerated. The clearance is vertical, not measured along the normal.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Condition / choice file</th>
+<th>Visual surface</th>
+<th>Navigation surface</th>
+<th>Agent behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>matched-flat.json</code></td>
+<td>Flat</td>
+<td>Flat</td>
+<td>Fixed height, level orientation</td>
+</tr>
+<tr>
+<td><code>matched-terrain.json</code></td>
+<td>RoughSmooth</td>
+<td>RoughSmooth</td>
+<td>Follows terrain height and normal: the canonical ant walk</td>
+</tr>
+<tr>
+<td><code>visual-terrain_navigation-flat.json</code></td>
+<td>RoughSmooth</td>
+<td>Flat</td>
+<td>Sees bumps, moves horizontally with level orientation</td>
+</tr>
+<tr>
+<td><code>visual-flat_navigation-terrain.json</code></td>
+<td>Flat</td>
+<td>RoughSmooth</td>
+<td>Sees a plane, rises/falls and tilts with hidden terrain</td>
+</tr>
+</tbody>
+</table></div>
+<p>All four use <code>AboveGround</code> height, <code>SurfaceNormal</code> orientation, <strong>1 cm clearance</strong>, and no spatial or temporal normal smoothing. A flat navigation surface naturally has a constant normal; the same controller can therefore be used for all four conditions. The last two change only the geometry assignments. Pitch moves a flat horizon vertically and roll tilts it; these are distinct from irregularities in a visible terrain silhouette.</p>
+<p>“Looks rough / feels smooth” is shorthand for the third condition. Here <strong>navigation rugosity</strong> means the movement of the camera rig; perceived roughness remains an experimental outcome.</p>
+<h2 id="spatial-pattern-is-independent-of-the-condition">Spatial pattern is independent of the condition</h2>
+<p>Registered surface IDs spell out left-to-right spatial structure. They do not encode visual/navigation pairings:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Surface ID</th>
+<th>Negative X region</th>
+<th>Positive X region</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RoughSmooth</code></td>
+<td>Rough</td>
+<td>Smooth</td>
+</tr>
+<tr>
+<td><code>SmoothRough</code></td>
+<td>Smooth</td>
+<td>Rough</td>
+</tr>
+<tr>
+<td><code>RoughRough</code></td>
+<td>Rough</td>
+<td>Rough</td>
+</tr>
+<tr>
+<td><code>SmoothSmooth</code></td>
+<td>Smooth</td>
+<td>Smooth</td>
+</tr>
+<tr>
+<td><code>Flat</code></td>
+<td>Exactly planar</td>
+<td>Exactly planar</td>
+</tr>
+</tbody>
+</table></div>
+<p>The mixed patterns transition continuously from X = −5 to +5 cm. Smooth is low rugosity, <strong>not</strong> an atomically flat plane. The new demonstration uses maximum rough extrusion 0.8 cm and smooth extrusion 0.025 cm, so all four conditions stay above the visible ground at 1 cm clearance. The earlier 4 cm bumps could intersect a 1 cm flat camera path; the previous lab and examples retain their original geometry for compatibility.</p>
+<p>Select any pattern independently for visual and navigation surfaces. To reverse the spatial pattern in a sequence without changing scene names:</p>
+<pre class="json"><code>{
+  &quot;sceneName&quot;: &quot;TerrainCueLab&quot;,
+  &quot;duration&quot;: 30,
+  &quot;reloadScene&quot;: false,
+  &quot;parameters&quot;: {
+    &quot;configFile&quot;: &quot;Examples/Rugosity/matched-terrain.json&quot;,
+    &quot;rugosity&quot;: {
+      &quot;visualSurface&quot;: &quot;SmoothRough&quot;,
+      &quot;collisionSurface&quot;: &quot;SmoothRough&quot;
+    }
+  }
+}</code></pre>
+<p><code>Examples/Rugosity/sequence-spatial-patterns.json</code> demonstrates all four non-flat spatial patterns. Each assignment is a surface ID registered on this scene's RugosityWorld, not an asset filename or a global object-name search.</p>
+<h2 id="press-play-or-tune-in-the-editor">Press Play or tune in the Editor</h2>
+<p><strong>Open ControlScene and press Play</strong> for the active sequence. It runs the four main conditions followed by three isolation controls, 30 seconds each, looping. Each condition starts at X = −60, Z = 0, facing +X, and moves at 5 cm/s. This crosses the rough/smooth boundary automatically. Arrow keys and A/D allow movement and steering; Ctrl+Space toggles autopilot. Turning or reverse input changes the route.</p>
+<p>Files under <code>Assets/StreamingAssets/Examples/Rugosity/</code>:</p>
+<ul>
+<li><code>sequence.json</code>: seven conditions; also installed as the active <code>sequenceConfig.json</code>.</li>
+<li><code>sequence-four-conditions.json</code>: only the four primary mesh combinations.</li>
+<li><code>sequence-spatial-patterns.json</code>: matched visual/navigation geometry with four spatial patterns.</li>
+<li><code>sequence-legacy-rugosity.json</code>: the earlier six conditions in the unchanged Rugosity_RS scene.</li>
+</ul>
+<p>The previous Selwyn sequence remains at <code>Examples/Sequences/selwyn-before-rugosity.json</code>.</p>
+<p>For direct authoring, use <strong>Tools → Rugosity → Open terrain cue lab</strong>, or open <code>Assets/Scenes/TerrainCueLab.unity</code>. Select <strong>Terrain cues — select to tune</strong>:</p>
+<ol type="1">
+<li>Press Play and edit the surface dropdowns, height/orientation modes, clearance and normal response. Changes apply live without restarting.</li>
+<li>If running a sequence, choose <strong>InspectorOnly</strong> to prevent the next trial from replacing your tuning. Builds always honor JSON.</li>
+<li><strong>Keep current settings in scene after Stop</strong> captures the current snapshot and restores it after Play ends. Save the scene afterward. Click again if you change more settings before stopping.</li>
+<li><strong>Copy effective rugosity JSON</strong> copies the settings. <strong>Save rugosity into choice JSON…</strong> preserves the other choice fields; phased documents receive <code>stimulus.rugosity</code>.</li>
+</ol>
+<p>Opening the lab directly starts a manual walkthrough without a MainController. Its authored scene pose is the canonical condition. In Edit mode, changing the Inspector updates visibility/collider roles; <strong>Preview pose at current rig positions</strong> applies height and orientation and supports Undo. Existing RS scenes do not acquire this component automatically.</p>
+<p>The checker pattern provides depth and motion cues. A rendered surround extends the visible ground to 1 km so a nearby square boundary does not produce a false kink in a flat horizon. This surround has no collider and does not extend the 200 × 200 cm navigation footprint.</p>
+<h2 id="configuration-and-isolation-controls">Configuration and isolation controls</h2>
+<p>Navigation normally uses <code>collisionSurface</code> for <strong>both</strong> height and orientation. Keep <code>heightSurface</code> and <code>normalSurface</code> empty for the four primary conditions:</p>
+<pre class="json"><code>{
+  &quot;objects&quot;: [],
+  &quot;closedLoopPosition&quot;: false,
+  &quot;closedLoopOrientation&quot;: false,
+  &quot;initialPosition&quot;: { &quot;x&quot;: -60, &quot;y&quot;: 1, &quot;z&quot;: 0 },
+  &quot;initialRotation&quot;: { &quot;x&quot;: 0, &quot;y&quot;: 90, &quot;z&quot;: 0 },
+  &quot;resetPositionOnStart&quot;: true,
+  &quot;resetRotationOnStart&quot;: true,
+  &quot;autopilotEnabled&quot;: true,
+  &quot;autopilotSpeed&quot;: 5,
+  &quot;rugosity&quot;: {
+    &quot;enabled&quot;: true,
+    &quot;visualSurface&quot;: &quot;RoughSmooth&quot;,
+    &quot;collisionSurface&quot;: &quot;Flat&quot;,
+    &quot;heightSurface&quot;: &quot;&quot;,
+    &quot;normalSurface&quot;: &quot;&quot;,
+    &quot;heightMode&quot;: &quot;AboveGround&quot;,
+    &quot;orientationMode&quot;: &quot;SurfaceNormal&quot;,
+    &quot;centimetersPerUnit&quot;: 1,
+    &quot;clearanceCm&quot;: 1,
+    &quot;normalRadiusCm&quot;: 0,
+    &quot;normalSamples&quot;: 5,
+    &quot;tiltResponse&quot;: 0
+  }
+}</code></pre>
+<p>Optional overrides separate the camera's height and orientation effects:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Choice file</th>
+<th>Height</th>
+<th>Orientation</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>control-height-only.json</code></td>
+<td>AGL over RoughSmooth, despite Flat collision</td>
+<td>WorldUp</td>
+<td>Up/down movement without pitch/roll</td>
+</tr>
+<tr>
+<td><code>control-tilt-only.json</code></td>
+<td>Absolute world Y = 1</td>
+<td>RoughSmooth normal</td>
+<td>Tilt without vertical movement; Flat visual surface</td>
+</tr>
+<tr>
+<td><code>control-fixed-pose.json</code></td>
+<td>Absolute world Y = 1</td>
+<td>WorldUp</td>
+<td>Visible RoughSmooth geometry with fixed height and level orientation</td>
+</tr>
+</tbody>
+</table></div>
+<p>The old <code>visual-rs-level-agl.json</code> is the earlier <strong>height-only</strong> experiment, not a pure flat-navigation condition: it deliberately follows the visible RS terrain for height despite Flat collision. It remains supported with that explicit meaning.</p>
+<p>Precedence at every trial/phase boundary is <strong>authored scene settings → choice/phase patch → sequence patch</strong>. Omitted or null fields preserve the authored baseline; an empty height/normal ID means “inherit collision.” A new trial starts from the authored baseline, so previous overrides do not leak. Config is not reapplied every frame; Inspector changes remain until the next boundary. <code>enabled: false</code> restores authored renderer/collider states and releases pose control. Disabling the component also releases control without changing other scenes.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>visualSurface</code></td>
+<td>Rendered geometry</td>
+</tr>
+<tr>
+<td><code>collisionSurface</code></td>
+<td>Physical collider set and default navigation reference</td>
+</tr>
+<tr>
+<td><code>heightSurface</code> / <code>normalSurface</code></td>
+<td>Optional independent references for isolation controls</td>
+</tr>
+<tr>
+<td><code>heightMode</code></td>
+<td><code>AboveGround</code> adds clearance to the reference; <code>Absolute</code> uses fixed world Y</td>
+</tr>
+<tr>
+<td><code>orientationMode</code></td>
+<td><code>SurfaceNormal</code> follows the reference normal; <code>WorldUp</code> removes pitch/roll</td>
+</tr>
+<tr>
+<td><code>clearanceCm</code></td>
+<td>Vertical clearance, in centimeters</td>
+</tr>
+<tr>
+<td><code>centimetersPerUnit</code></td>
+<td>1 for centimeter scenes; 100 for meter scenes</td>
+</tr>
+<tr>
+<td><code>absoluteHeight</code></td>
+<td>Fixed world Y in scene units</td>
+</tr>
+<tr>
+<td><code>normalRadiusCm</code></td>
+<td>Spatial averaging radius; 0 samples the center alone</td>
+</tr>
+<tr>
+<td><code>normalSamples</code></td>
+<td>Additional ring samples, 1–32</td>
+</tr>
+<tr>
+<td><code>tiltResponse</code></td>
+<td>0 is exact; positive values smooth the up vector, in inverse seconds</td>
+</tr>
+</tbody>
+</table></div>
+<p>Heading is preserved even while orientation is smoothed. Keyboard/autopilot and tracking translation use a horizontal movement frame while the terrain controller owns the pose. Terrain-induced pitch/roll therefore does not reduce horizontal speed or introduce steering. Legacy delayed pose resets are skipped for explicitly enabled rugosity trials. <code>MigrationMotion</code> retains its wind but yields height correction while rugosity is active.</p>
+<h2 id="use-existing-terrain-assets">Use existing terrain assets</h2>
+<p>A RugositySurface explicitly registers Terrain components, MeshFilters for sampling, Renderers for appearance and Colliders for physical roles. Register alternatives on a RugosityWorld; assign rig targets or let it find this scene's ClosedLoop rigs. Keep GameObjects active so visibility and collision remain independent. Do not include unrelated trees, animals or scenery in these arrays.</p>
+<p>Sampling reads the assigned geometry even when hidden or when its colliders are disabled. This is a <strong>kinematic ground follower</strong>, not a Rigidbody locomotion or wall/cave solver. Meshes need Read/Write enabled. TerrainData supports holes and boundaries and must remain world-up. Mesh sampling supports transforms/nonuniform scale; call <code>InvalidateGeometry()</code> after modifying vertex data in place. The highest vertical ground intersection is selected. Missing ground or walking outside the navigation footprint retains the last valid position.</p>
+<p>Custom geometry can intersect a requested camera path. There is no automatic visual-ground avoidance, since that would change the experimental condition. Choose heights and clearances deliberately; the supplied new profiles avoid that intersection at the default 1 cm clearance. Hidden navigation geometry is not baked into or substituted for the visible source mesh.</p>
+<p>Effective config and Inspector changes are recorded as <code>RUGOSITY_STATE</code> messages and, with a MasterDataLogger, appended to <code>rugosity_states.jsonl</code> with UTC time and frame number. The normal config archive preserves the input files.</p>
+<h2 id="reproducible-checks">Reproducible checks</h2>
+<p>Use a <strong>disposable project copy</strong> containing the <code>KANNADI_VALIDATION_COPY</code> marker. The runners may rewrite test sequence/system configs there. Do not run them against the authoring project.</p>
+<pre class="sh"><code>Unity -batchmode -projectPath /path/to/disposable-copy \
+  -executeMethod RugosityValidation.Run -logFile /tmp/terrain-cues.log
+Unity -batchmode -projectPath /path/to/disposable-copy \
+  -executeMethod RugosityValidation.RunLegacy -logFile /tmp/terrain-cues-legacy.log
+Unity -batchmode -projectPath /path/to/disposable-copy \
+  -executeMethod TerrainCueSequenceValidation.Run -logFile /tmp/terrain-cues-sequence.log</code></pre>
+<p>Do not add <code>-quit</code>; the runners exit after Play/Edit checks. Restore the active sequence from the example before testing the full sequence runner, because it shortens durations in its disposable copy.</p>
+<p>The new checks compare sampled heights to <strong>independent Unity MeshCollider ray intersections</strong>, verify the four spatial profiles, clearance above visible geometry, renderer/collider selection, heading under smoothing, centimeter conversion, transformed meshes, hidden TerrainData, bounds, Inspector/config precedence and retention after Stop. Autopilot traversal goes through actual Keyboard movement and LateUpdate. A separate run starts ControlScene and advances all seven trials through the real MainController. The unchanged older scene is tested with its original six files.</p>
+<p>Results and native camera renders are kept beside this guide. <code>terrain-cue-cross-sections.json</code> records the sampled geometry and poses used by <code>tools/draw_terrain_cues.py</code> to regenerate the PNG/SVG schematic. Hardware timing and live tracking are outside these checks.</p>
+<h3 id="verified-on-25-october-2026">Verified on 25 October 2026</h3>
+<ul>
+<li>Unity 6000.3.16f1: <strong>4,570</strong> new-lab checks passed, including independent collider intersections, synthetic tracking displacement, analytic normal checks, 60 traversal frames per condition, and keeping Inspector settings after Stop.</li>
+<li>Original Rugosity_RS scene: <strong>2,391</strong> checks passed with its six unchanged configs.</li>
+<li>Actual ControlScene auto-start: <strong>43</strong> checks passed across all seven conditions, using shortened durations only in the disposable copy.</li>
+<li>Inherited Choice/night-sky regression: <strong>70</strong> checks passed.</li>
+<li>Static validation: <strong>84</strong> JSON templates/examples, <strong>88</strong> scene/catalog dependency files, unique GUIDs, preserved archive hashes and build registration passed.</li>
+</ul>
+<p>On the measured new-lab traversal, matched terrain and hidden terrain both moved from approximately <strong>1.002 to 1.799 cm</strong> in world Y with up to <strong>9.53°</strong> tilt. Flat navigation stayed at <strong>1 cm with 0° tilt</strong> despite the visible bumps. The height-only and tilt-only controls isolate those effects as intended.</p>
+</article><nav class="chapter-pager" aria-label="Adjacent chapters"><a href="selwyn-cycle.html"><small>Previous</small>Selwyn sky and swarm cycle</a><a href="selwyn-terrain.html"><small>Next</small>Selwyn terrain source<span aria-hidden="true"> →</span></a></nav><footer class="article-footer">Static documentation · software contracts and recorded evidence. <a href="citation.html">Citation and credits</a></footer></main>
+<aside class="right-sidebar"><nav aria-label="On this page"><p>On this page</p><a href="#the-four-primary-conditions" class="toc-level-2">The four primary conditions</a><a href="#spatial-pattern-is-independent-of-the-condition" class="toc-level-2">Spatial pattern is independent of the condition</a><a href="#press-play-or-tune-in-the-editor" class="toc-level-2">Press Play or tune in the Editor</a><a href="#configuration-and-isolation-controls" class="toc-level-2">Configuration and isolation controls</a><a href="#use-existing-terrain-assets" class="toc-level-2">Use existing terrain assets</a><a href="#reproducible-checks" class="toc-level-2">Reproducible checks</a><a href="#verified-on-25-october-2026" class="toc-level-3">Verified on 25 October 2026</a></nav><a class="source-link" href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/rugosity.md">View Markdown source ↗</a></aside></div>
+<dialog class="search-dialog" aria-labelledby="search-title"><form method="dialog"><h2 id="search-title">Search documentation</h2><button class="search-close" aria-label="Close search">×</button></form><label class="sr-only" for="manual-search">Search every manual section</label><input id="manual-search" type="search" placeholder="Try: ViewportSetter, yaw units, replay, sky…" autocomplete="off"><p class="search-status" role="status">Search runs locally in your browser.</p><div class="search-results"></div><p class="search-hint">Enter a term · Tab to a result · Escape to close</p></dialog>
+</body></html>

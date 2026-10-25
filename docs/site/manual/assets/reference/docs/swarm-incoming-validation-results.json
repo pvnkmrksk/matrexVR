@@ -1,0 +1,197 @@
+{
+  "unity": "6000.3.16f1",
+  "experiment": "Examples/Swarm/selwyn-trajectory-playback.example.json",
+  "observerSpeedMetresPerSecond": 0,
+  "incomingSeconds": 5,
+  "extrapolationSpeedMetresPerSecond": 6,
+  "despawnDistanceMetres": 100,
+  "playbackAndRendering": {
+    "checks": 97,
+    "failure": null,
+    "captures": [
+      {
+        "blank": "RGBA(255, 255, 255, 255)",
+        "rect": "(x:0.00, y:0.00, width:64.00, height:64.00)",
+        "color": "RGBA(1.000, 1.000, 1.000, 1.000)"
+      },
+      {
+        "graphics": "Apple M2 Pro",
+        "camera": "1.00000\t0.00000\t0.00000\t0.00000\n0.00000\t1.00000\t0.00000\t0.00000\n0.00000\t0.00000\t-1.00002\t-0.00200\n0.00000\t0.00000\t-1.00000\t0.00000\n",
+        "bodyLength": 0.0254,
+        "bodyDiameter": 0.01
+      },
+      {
+        "distanceMetres": 0.01,
+        "contrast": 2463.38037,
+        "changedPixels": 3136
+      },
+      {
+        "distanceMetres": 0.1,
+        "contrast": 25.2705879,
+        "changedPixels": 38
+      },
+      {
+        "distanceMetres": 1.0,
+        "contrast": 0.298039228,
+        "changedPixels": 4
+      },
+      {
+        "distanceMetres": 2.0,
+        "contrast": 0.0784313753,
+        "changedPixels": 4
+      },
+      {
+        "mode": "gray128-first",
+        "blank": 128,
+        "peak": 12,
+        "total": 12,
+        "colorSpace": "Gamma"
+      },
+      {
+        "mode": "gray128",
+        "distanceMetres": 3,
+        "peakContrastBytes": 12,
+        "totalContrastBytes": 12,
+        "fractionalPixelContrastBytes": [
+          12,
+          12,
+          12,
+          12
+        ]
+      }
+    ],
+    "timings": [
+      {
+        "shape": "Dot",
+        "medianCpuMilliseconds": 2.3566000000000003,
+        "p95CpuMilliseconds": 2.8102,
+        "agents": 1024,
+        "rigs": 4,
+        "cameras": 24,
+        "materials": 4
+      },
+      {
+        "shape": "Moth",
+        "medianCpuMilliseconds": 3.0396,
+        "p95CpuMilliseconds": 4.2565,
+        "agents": 1024,
+        "rigs": 4,
+        "cameras": 24,
+        "materials": 4
+      }
+    ],
+    "unity": "6000.3.16f1",
+    "timingNote": "Isolated CPU timings: four rigs, six 64px cameras each, 256 agents per rig. Not hardware-display FPS."
+  },
+  "controlSceneStartup": {
+    "checks": 51,
+    "failure": null,
+    "errors": [],
+    "encounterAudit": {
+      "sourceIdsSeen": 430,
+      "segmentBirths": 437,
+      "cumulativeBirthsAtMinute": [
+        2,
+        54,
+        94,
+        126,
+        154,
+        188,
+        226,
+        260,
+        324,
+        392
+      ],
+      "meanLivePopulation": 15.768899713084673,
+      "maxLivePopulation": 37,
+      "liveAtSeconds": {
+        "10": 16,
+        "30": 26,
+        "60": 14,
+        "120": 17,
+        "300": 21,
+        "599": 11
+      },
+      "firstMinuteNativePanelDetectableWithin3m": {
+        "64": 43,
+        "128": 48
+      },
+      "firstMinuteNativePanelAnyByteContrastWithin3m": {
+        "64": 48,
+        "128": 48
+      },
+      "observerSpeedMetresPerSecond": 0.0,
+      "preRollSeconds": 5.0,
+      "continuationSpeedMetresPerSecond": 6.0,
+      "sampleStepSeconds": 0.02,
+      "renderStepSeconds": 0.1,
+      "note": "Real scene audit with stationary observer and five-second incoming extension. Recorded samples/times unchanged. Instantiations precede first samples by preRollSeconds. First-minute 54 instantiations include future first samples; 49 source IDs begin recording that minute. Contrast counts use a 5x5 patch within 3m, at 0.1s render steps, with overlapping moths contributing; numerical detectability is not a night-level biological threshold.",
+      "firstMinuteSpawnEvents": 54,
+      "firstMinuteRecordedIdStarts": 49
+    },
+    "unity": "6000.3.16f1"
+  },
+  "configurationCatalog": {
+    "checks": 5167,
+    "failure": null,
+    "errors": [],
+    "unity": "6000.3.16f1"
+  },
+  "unityAssertionsPassed": 5315,
+  "pythonUnitTestsPassed": 5,
+  "portableCatalogFilesPassed": 57,
+  "sourceVerification": {
+    "passed": true,
+    "rows": 14429,
+    "ids": 430,
+    "durationSeconds": 599.46,
+    "sourceSha256": "620b3a90d59b31ab929d3271605e931a7b49fe1b07b45c79a28655a5c36baf92",
+    "convertedSha256": "7353033db12dd544eca10091d58ef265a73859452331be95a13d387b4def4817",
+    "maxCoordinateErrorMetres": 8.881784197001252e-16,
+    "sampleCentroidMetres": {
+      "X": -0.26974953025157666,
+      "Y": 5.725152926814055,
+      "Z": 0.10780537521657772
+    },
+    "medianTrackSeconds": 0.14999999999999147,
+    "minTrackSeconds": 0.01999999999998181,
+    "maxTrackSeconds": 1.8300000000000018,
+    "gapsOverPointOneSecond": 7,
+    "note": "Canonical data matches every source ID/TimeExact/position. Presentation yaw is configured separately from the canonical data; continuation after recorded samples is extrapolated."
+  },
+  "build": {
+    "result": "Succeeded",
+    "architecture": "Apple Silicon ARM64",
+    "app": "/Users/pavan/src/ledpanelVR/Builds/BogongSwarm-macOS/MATREX.app",
+    "unity": "6000.3.16f1",
+    "totalErrors": 0,
+    "totalWarnings": 51,
+    "totalSize": 417861519,
+    "seconds": 19.251842999999997,
+    "scenes": [
+      "Assets/Scenes/ControlScene.unity",
+      "Assets/Scenes/Optomotor.unity",
+      "Assets/Scenes/Swarm.unity",
+      "Assets/Scenes/Choice.unity",
+      "Assets/Scenes/Choice_desync.unity",
+      "Assets/Scenes/Choice_Forrest.unity",
+      "Assets/Scenes/ReplayScene.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_nopath_nopath.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_nopath_path.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_path_nopath.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_path_path.unity",
+      "Assets/Scenes/Kannadi.unity",
+      "Assets/Scenes/Choice_Selwyn.unity"
+    ],
+    "errors": []
+  },
+  "performanceReport": "swarm-playback-performance-results.json",
+  "hardwareSystemConfigUnchangedSha256": "f78e0082f3a64e01ffcaa528edf7a0c8ee05fbb551b67108316659d4242463cf",
+  "notes": [
+    "Disposable Unity copy; live tracker inputs disabled for tests. Main hardware file preserved.",
+    "Eight pixel-identical comparisons against the previous full-slot moth mesh, including translated/rotated/scaled host transforms.",
+    "Incoming lines and outgoing tails are extrapolated, separate from unchanged CSV observations.",
+    "Native contrast checks do not establish naked-eye or animal visibility at a specified luminance.",
+    "The build includes the current shared-checkout source snapshot; unrelated auto-trim/telemetry work remains separate from the swarm commits."
+  ]
+}

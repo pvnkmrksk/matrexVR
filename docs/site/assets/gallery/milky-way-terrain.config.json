@@ -1,0 +1,53 @@
+{
+  "headingReference": {
+    "enabled": false,
+    "windowSeconds": 180,
+    "startOffsetSeconds": 0,
+    "measureDuringPresentation": false,
+    "saveAs": ""
+  },
+  "objects": [],
+  "initialPosition": {
+    "x": 0,
+    "y": 100,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.0
+  },
+  "randomInitialRotation": false,
+  "closedLoopOrientation": false,
+  "closedLoopPosition": false,
+  "backgroundColor": null,
+  "skyboxPath": "",
+  "windSpeed": 0,
+  "windDirection": 0,
+  "aglHeight": 100,
+  "groundLayerMask": 1,
+  "autopilotEnabled": false,
+  "autopilotSpeed": 10,
+  "nightSky": {
+    "enabled": true,
+    "latitude": -35.894409,
+    "longitude": 148.453948,
+    "timeZoneId": null,
+    "utcOffsetHours": 11,
+    "utcOffsetMinutes": null,
+    "date": "2026-10-07",
+    "localTime": "22:00:00",
+    "advanceWithRealTime": false,
+    "updateIntervalMinutes": 30,
+    "roundToInterval": false,
+    "northYawDegrees": 0,
+    "exposure": 0.9,
+    "faintDetailCutoff": 0.03,
+    "maskBelowHorizon": false,
+    "imageWidth": 2048
+  },
+  "resetPositionOnStart": true,
+  "resetRotationOnStart": true,
+  "uniformSkyColor": null,
+  "swarm": null
+}

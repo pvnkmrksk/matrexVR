@@ -1,0 +1,140 @@
+MATREX VR 0.2 — INTEGRATED CONFIG UI / TELEMETRY BASELINE
+Source: c13d33dd (codex/config-ui-test)
+Engine: Unity 6000.3.16f1
+https://github.com/pvnkmrksk/matrexVR
+
+1. EXTRACT AND LAUNCH
+
+Extract the whole OS-specific ZIP to a writable folder. Keep the executable, data
+folder and supplied Unity libraries together. Launch its .exe (Windows), .app
+(macOS) or .x86_64 (Linux). Unity Editor and Python are not required.
+
+macOS player is ad hoc signed but not notarized. Use Finder's Open action and Privacy & Security when
+prompted. Keep the baseline app writable: its configuration lives inside the
+bundle and its historical logger writes inside Contents/RunData.
+Linux needs a graphical desktop and compatible graphics driver. If extracting
+loses the executable bit, restore it in file Properties or chmod +x.
+
+2. FIRST LAUNCH AND SETUP
+
+This baseline intentionally retains its archived default sequence, with autoStart
+true: TerrainCueLab starts immediately and cycles seven 30-second conditions:
+  matched terrain; visible terrain / flat navigation; flat view / terrain
+  navigation; matched flat; height only; tilt only; fixed pose.
+They repeat without a scene reload at each block. The automatic walkthrough starts
+at X=-60 cm, faces +X and moves at 5 cm/s through the rough/smooth boundary.
+
+Press Escape to return to the experiment studio. To open setup immediately from
+the command line, pass -configure to the executable. On macOS, for example:
+  open /path/to/application.app --args -configure
+
+In Session, enter experiment name, experimenter, comments and subject details.
+There is one card per configured VR. Open System config to enter your actual
+tracker endpoint, tracking mode, sphere diameter and display layout. The packaged
+public starter template is not a calibration for your apparatus.
+
+Open Sequence config to add, remove, duplicate, reorder or edit blocks. Edit each
+block's referenced config through Experiment configs. The library includes Choice,
+Swarm, Kannadi, Optomotor, night sky, generated/recorded swarms and rugosity recipes.
+Examples/Sequences/selwyn-before-rugosity.json preserves the earlier Selwyn cycle.
+
+Use Save setup to save changed documents, then Start experiment to begin a fresh
+run. Auto start governs the NEXT launch. It can be turned off for manual startup.
+A sequence run started from setup returns there when finished or on Escape.
+
+3. JSON AND FILE LOCATIONS
+
+Windows/Linux configs: <application>_Data/StreamingAssets/
+macOS configs: application.app/Contents/Resources/Data/StreamingAssets/
+  In Finder: right-click the app > Show Package Contents.
+
+system_config.json is the hardware configuration. sequenceConfig.json contains
+blocks. Each block's parameters.configFile identifies its experiment JSON relative
+to StreamingAssets. Templates/ and Examples/ provide complete starting files.
+
+The form and Edit JSON use one lossless document model. Unknown fields and exact
+untouched numeric text survive. An unchanged save preserves original file bytes.
+An actual edit formats JSON, preserving property order and untouched values.
+Omitted values, null, false and zero remain distinct. Showing an Inherited field
+does not add it to the JSON. Editing it makes that explicit; Undo can restore its
+omission. Undo/Redo covers the latest 32 editing transactions. Apply or discard a
+raw JSON draft before navigation, saving or start. External disk edits produce a
+conflict if the studio has unsaved changes. Each changed file gets an atomic
+replacement and .bak; a group of files is not one filesystem-wide transaction.
+
+Back up your complete config graph before experimentation. Preserve the saved
+config_manifest.json, Configs/ and Skyboxes/ folders in every recorded run.
+
+4. OPERATOR CONTROLS
+
+R                 Reset all rigs to the active experiment initial pose.
+P / O             Toggle tracked position / tracked orientation.
+Arrow keys        Manual translation when enabled.
+A / D             Positive / negative manual yaw (historical polarity).
+Ctrl + Space      Toggle forward autopilot at the active config's autopilotSpeed.
+Shift + Up/Down   Adjust manual translation speed by 1 per press.
+Shift + W/S       Adjust manual turn speed by 1 degree/s per press.
+C / Z             Up/down if enabled. W/S pitch and E/Q roll if permitted.
+Escape (release)  Stop and return to setup; from Control, quit player.
+Tab               Show/hide dashboard during an experiment; navigate in setup.
+
+Overview: right-drag orbits; middle-drag pans; wheel zooms. Use its Show/Hide or
+Reset view buttons. Hotkeys do not operate while editing metadata text. A new
+runtime error can reopen the dashboard. More details expands input and diagnostics.
+
+Kinefly/Bogong: + and - adjust yaw gain. Ctrl+Y toggles yaw-rate mode. 1–4 selects
+the rig; hold [ or ] to change that rig's DC offset. Dashboard Auto Trim controls
+the current sequence row. Configure flight detection/trim in the row and JSON.
+
+Replay scene only: Space play/pause; Left/Right seek 1s (Shift:10s); N/M move to
+previous/next step marker. The older replay remains a rig-trajectory viewer and
+does not reconstruct every recorded stimulus. Optomotor: Space/backslash pauses.
+
+5. DASHBOARD, TRACKING AND TELEMETRY
+
+The in-app dashboard shows per-rig flight/trim state, gains/DC offsets, heading
+measurements, input freshness, phase/sequence timing, telemetry and errors.
+Tab hides its rendering and formatting work. Full messages go to runtime_trace.log.
+
+Input SUB endpoints consume the tracker stream configured per rig.
+Telemetry PUB is a separate outbound monitoring feed, default:
+  tcp://127.0.0.1:9880; 20 Hz; two frames: topic, JSON
+  topic: matrex.telemetry.v2; JSON schemaVersion: 2
+
+A static web page cannot subscribe directly to raw ZMQ. Use an external subscriber
+or the Unity dashboard. Outbound telemetry does not replace your tracking publisher.
+
+6. RECORDINGS AND UNITS
+
+Historical data locations:
+  Windows/Linux: <application>_Data/RunData/<timestamp>/
+  macOS: application.app/Contents/RunData/<timestamp>/
+  Editor: Assets/RunData/<timestamp>/
+
+Each new run archives its system, sequence, referenced experiments and loaded
+inputs, hashes/versions, metadata, rig CSVs and population gzip CSVs. Generated
+night-sky PNGs and JSON manifests identify the actual represented sky. Retain the
+whole session directory or complete ZIP. Allow writers to drain on a clean exit.
+The original folder remains available if ZIP creation fails.
+
+Terrain/migration/Selwyn scenes use metres; walking/rugosity scenes use centimetres.
+North is +Z, east +X, up +Y. Positive yaw turns +Z toward +X. Kinefly's input yaw
+uses raw radians; walking FicTrac uses its documented displacement contract. Use
+the archived configs and data-format manual when interpreting any trajectory.
+
+7. SCOPE
+
+0.2 preserves the integrated branch rather than silently applying 0.3 changes.
+It retains historical FlyID/Flies and locustSpeed naming, authored VR1–VR4 engine
+limits, application-relative writable files, older replay behavior and existing
+scene lifecycle. Later profile storage, animal/species naming, dynamic rig and
+replay/lifecycle changes belong to 0.3. Validate physical LED timing, tracking and
+display geometry on your acquisition machine before collecting experimental data.
+
+Exact baseline manuals:
+https://github.com/pvnkmrksk/matrexVR/tree/c13d33dd
+https://github.com/pvnkmrksk/matrexVR/blob/c13d33dd/docs/configuration-ui.md
+https://github.com/pvnkmrksk/matrexVR/blob/c13d33dd/docs/configuration-reference.md
+https://github.com/pvnkmrksk/matrexVR/blob/c13d33dd/docs/unity6-controls.md
+https://github.com/pvnkmrksk/matrexVR/blob/c13d33dd/docs/rugosity.md
+https://github.com/pvnkmrksk/matrexVR/blob/c13d33dd/docs/data-formats.md

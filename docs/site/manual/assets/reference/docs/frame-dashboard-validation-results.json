@@ -1,0 +1,289 @@
+{
+  "date": "2026-10-11",
+  "baseCommit": "35660d8f96bcf207863aae1056ccea6681ea05cf",
+  "testedFileSha256": {
+    "Assets/Scripts/ExperimentInput.cs": "a7d96dd2c4bd7aebecebc1a32ba22063aaa47799a92dddb4035c57ccc5c56f3d",
+    "Assets/Scripts/RuntimeStatusOverlay.cs": "112675d5aaff784234729a52ac3f732318868b92ad1aa3d0d389cdff47fb2e1e",
+    "Assets/Scripts/fps.cs": "fc2878d0cef4bedebc43481e1a4845c4f78dccd25425a5a7b85452417e1e4bf4",
+    "Assets/Scripts/ExperimentTelemetry.cs": "74ed8c581be96b03c55b4f1b3414fb5e7d7ae1b3414fef8a131a4b3add94b678",
+    "Assets/Editor/HeadingTelemetryValidation.cs": "194a42a56068f6fe47de61e85147ca01a6aa51ac1f3b95d446fdc774455c67e7",
+    "ProjectSettings/ProjectSettings.asset": "05272b8a418681e4163a8766117b4706d36b88c7ec866394a1aef4472ccbeb23"
+  },
+  "beforeFocusRegression": {
+    "checks": 78,
+    "failure": "System.Exception: Hidden canvas cannot retain a blocking metadata focus\n  at HeadingTelemetryValidation.Check (System.Boolean ok, System.String message) [0x00016] in /private/tmp/kinefly-performance-validation/Assets/Editor/HeadingTelemetryValidation.cs:37 \n  at HeadingTelemetryValidation.CheckTab (RuntimeStatusOverlay overlay) [0x000d8] in /private/tmp/kinefly-performance-validation/Assets/Editor/HeadingTelemetryValidation.cs:268 \n  at HeadingTelemetryValidation.Tick () [0x0092e] in /private/tmp/kinefly-performance-validation/Assets/Editor/HeadingTelemetryValidation.cs:216 ",
+    "unexpectedErrors": [],
+    "unity": "6000.3.16f1",
+    "coverage": "Circular statistics, disabled/default/invalid/sequence config, generic and Choice adapters, real Swarm lifecycle, per-rig onset/no reset, repeat trial, PUB/SUB tracking and telemetry, raw units, player errors and HUD"
+  },
+  "afterLiveValidation": {
+    "checks": 100,
+    "failure": null,
+    "unexpectedErrors": [],
+    "unity": "6000.3.16f1",
+    "coverage": "Circular statistics, disabled/default/invalid/sequence config, generic and Choice adapters, real Swarm lifecycle, per-rig onset/no reset, repeat trial, PUB/SUB tracking and telemetry, raw units, player errors and HUD"
+  },
+  "exampleFrameTiming": {
+    "realtimeSeconds": 3.767427798802723,
+    "windowSeconds": 0.5083884170000008,
+    "framesPerSecond": 119.98699805153095,
+    "frameMeanMs": 8.334236344262308,
+    "framePeakMs": 8.512625000001606,
+    "targetFrameRate": 120,
+    "vSyncCount": 0,
+    "timingSamples": 61,
+    "budgetMs": 8.333333333333334,
+    "cpuMainMs": 0.8316710491803279,
+    "cpuRenderMs": null,
+    "gpuMs": 0.0014165998436510563,
+    "presentWaitMs": 4.1672131147540964e-05,
+    "graphicsApi": "Metal"
+  },
+  "sceneCpuSmoke": {
+    "failure": null,
+    "results": [
+      {
+        "name": "none",
+        "frames": 1394,
+        "frameMilliseconds": {
+          "median": 2.8317885007709265,
+          "p95": 3.272583708167076,
+          "p99": 3.4633290488272905,
+          "maximum": 3.794501069933176,
+          "mean": 2.8721397359143284
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.15445799999999998,
+          "p95": 0.26958299999999996,
+          "p99": 0.329375,
+          "maximum": 0.475083,
+          "mean": 0.16756863629842167
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.4781,
+          "p95": 2.8674,
+          "p99": 3.0208,
+          "maximum": 3.303,
+          "mean": 2.5129142037302707
+        },
+        "gcBytesPerFrame": {
+          "median": 15196.0,
+          "p95": 15196.0,
+          "p99": 17372.0,
+          "maximum": 80860.0,
+          "mean": 15314.588235294117
+        }
+      },
+      {
+        "name": "dashboard",
+        "frames": 1399,
+        "frameMilliseconds": {
+          "median": 2.820500172674656,
+          "p95": 3.2707483042031527,
+          "p99": 3.5276643466204405,
+          "maximum": 4.169791471213102,
+          "mean": 2.859981800812304
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.14937499999999998,
+          "p95": 0.27391699999999997,
+          "p99": 0.365542,
+          "maximum": 1.2788329999999999,
+          "mean": 0.168664214438885
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.4723,
+          "p95": 2.8374,
+          "p99": 3.0588,
+          "maximum": 3.196,
+          "mean": 2.500288849177984
+        },
+        "gcBytesPerFrame": {
+          "median": 15196.0,
+          "p95": 15196.0,
+          "p99": 16008.0,
+          "maximum": 45776.0,
+          "mean": 15376.80343102216
+        }
+      },
+      {
+        "name": "telemetry",
+        "frames": 1398,
+        "frameMilliseconds": {
+          "median": 2.8447136282920837,
+          "p95": 3.241666592657566,
+          "p99": 3.4339213743805885,
+          "maximum": 3.644628683105111,
+          "mean": 2.8648617081490686
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.15445799999999998,
+          "p95": 0.27675,
+          "p99": 0.3475,
+          "maximum": 0.443625,
+          "mean": 0.1701802761087267
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.4899,
+          "p95": 2.8188,
+          "p99": 3.0134,
+          "maximum": 3.1676,
+          "mean": 2.5050283977110164
+        },
+        "gcBytesPerFrame": {
+          "median": 15196.0,
+          "p95": 84859.0,
+          "p99": 96899.0,
+          "maximum": 99758.0,
+          "mean": 20726.67024320458
+        }
+      },
+      {
+        "name": "CSV logging",
+        "frames": 1310,
+        "frameMilliseconds": {
+          "median": 3.056710585951805,
+          "p95": 3.3867063466459513,
+          "p99": 3.6194161511957645,
+          "maximum": 4.251332022249699,
+          "mean": 3.0570736016281916
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.315708,
+          "p95": 0.42174999999999996,
+          "p99": 0.487792,
+          "maximum": 1.3189579999999999,
+          "mean": 0.3294265160305339
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.5388,
+          "p95": 2.8233,
+          "p99": 2.9544,
+          "maximum": 3.157,
+          "mean": 2.5347253435114503
+        },
+        "gcBytesPerFrame": {
+          "median": 45680.0,
+          "p95": 45728.0,
+          "p99": 45760.0,
+          "maximum": 46604.0,
+          "mean": 45688.28091603053
+        }
+      },
+      {
+        "name": "auto trim",
+        "frames": 1424,
+        "frameMilliseconds": {
+          "median": 2.7764951810240746,
+          "p95": 3.1736677046865225,
+          "p99": 3.364668460562825,
+          "maximum": 4.529294092208147,
+          "mean": 2.8101207838548095
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.142166,
+          "p95": 0.227458,
+          "p99": 0.322167,
+          "maximum": 0.411958,
+          "mean": 0.15292766221910103
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.4439,
+          "p95": 2.7814,
+          "p99": 2.9429,
+          "maximum": 3.2089,
+          "mean": 2.471292977528091
+        },
+        "gcBytesPerFrame": {
+          "median": 15196.0,
+          "p95": 15196.0,
+          "p99": 15248.0,
+          "maximum": 16104.0,
+          "mean": 15201.887640449439
+        }
+      },
+      {
+        "name": "all",
+        "frames": 1351,
+        "frameMilliseconds": {
+          "median": 2.9240362346172333,
+          "p95": 3.3666242379695177,
+          "p99": 3.6562499590218067,
+          "maximum": 4.627288784831762,
+          "mean": 2.9641895504636646
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.297251,
+          "p95": 0.433459,
+          "p99": 0.863417,
+          "maximum": 1.4593749999999999,
+          "mean": 0.3219840710584755
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.433,
+          "p95": 2.7777,
+          "p99": 2.9717,
+          "maximum": 3.2158,
+          "mean": 2.45808090303479
+        },
+        "gcBytesPerFrame": {
+          "median": 45728.0,
+          "p95": 115119.0,
+          "p99": 126956.0,
+          "maximum": 177019.0,
+          "mean": 51744.91635825315
+        }
+      },
+      {
+        "name": "none repeat",
+        "frames": 1425,
+        "frameMilliseconds": {
+          "median": 2.778954105451703,
+          "p95": 3.183085238561034,
+          "p99": 3.3955781254917383,
+          "maximum": 3.5735403653234243,
+          "mean": 2.808924527642758
+        },
+        "playerLoopMilliseconds": {
+          "median": 0.142,
+          "p95": 0.23149999999999998,
+          "p99": 0.29858399999999996,
+          "maximum": 0.341333,
+          "mean": 0.15209788210526332
+        },
+        "cameraSubmissionMilliseconds": {
+          "median": 2.448,
+          "p95": 2.7836,
+          "p99": 2.9789,
+          "maximum": 3.1633,
+          "mean": 2.472078807017543
+        },
+        "gcBytesPerFrame": {
+          "median": 15196.0,
+          "p95": 15196.0,
+          "p99": 15292.0,
+          "maximum": 16008.0,
+          "mean": 15201.827368421053
+        }
+      }
+    ],
+    "unity": "6000.3.16f1",
+    "gpu": "Apple M2 Pro",
+    "cameras": 24,
+    "note": "Isolated batch Editor Play mode; same Selwyn MW sky and four rigs/six 128px cameras each. No swarm. Cameras explicitly rendered because batch mode has no automatically rendered Game view; camera timings measure CPU submission, not completed GPU time. PlayerLoop measures game callbacks separately. Two seconds settling and four seconds measured per case, synthetic fresh wing samples. These are not LED workstation/display FPS. CSV coroutines can drain their preceding case during warmup."
+  },
+  "configurationValidation": "PASS: 58 JSON templates/examples, scene/file references, ranges and Input System migration; 622 archive hashes; 979 archived locust inputs.",
+  "scope": "Mac M2 Pro Unity Editor/Metal. New focus fixture fails on preceding code and passes on updated code. Current timing stats and callbacks are not LED workstation, display pacing or end-to-end GPU performance measurements. Batch scene smoke explicitly submits 24 Selwyn sky cameras, without swarm; historical swarm/controller validation remains in preceding reports.",
+  "coverage": [
+    "Tab toggles with focused metadata in a running sequence",
+    "Tab deactivates actual graphics and retains hide choice after config refresh",
+    "Idle visible metadata retains Tab navigation and motion hotkey protection",
+    "Legacy and TMP metadata cannot suppress keys behind a disabled Canvas",
+    "Non-interactable metadata cannot suppress keys",
+    "Duplicate HUD is disabled/destroyed without losing live error capture",
+    "Real PUB/SUB receives timing summary and degree telemetry, including worker restart",
+    "Frame mean/peak/FPS are consistent; timing label fits three lines",
+    "Frame Timing Stats enabled for release builds",
+    "New four-rig six-camera 60 Hz Kinefly hardware example uses target 60 and VSync /1"
+  ]
+}

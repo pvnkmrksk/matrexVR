@@ -1,0 +1,2 @@
+# Keep the native documentation captures copied by the manual builder.
+!**/*.png

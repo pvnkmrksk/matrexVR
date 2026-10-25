@@ -2,7 +2,11 @@
 
 Unity experiments for tracked **animals** and LED-panel virtual environments: Choice tasks, Bogong night sky, generated and recorded swarms, **Kannadi** (ಕನ್ನಡಿ, mirror) populations, Optomotor and independent visual/navigation rugosity.
 
-[**Download a standalone application**](https://github.com/pvnkmrksk/matrexVR/releases) · [**Website and OS downloads**](https://pvnkmrksk.github.io/matrexVR/) · [**Getting started and controls**](docs/getting-started.md) · [**Release history**](docs/releases.md)
+[**Download a standalone application**](https://github.com/pvnkmrksk/matrexVR/releases) · [**Website and OS downloads**](https://pvnkmrksk.github.io/matrexVR/) · [**Complete documentation site**](https://pvnkmrksk.github.io/matrexVR/manual/) · [**Getting started and controls**](docs/getting-started.md) · [**Release history**](docs/releases.md)
+
+[![Complete online manual](docs/site/assets/docs-badge.svg)](https://pvnkmrksk.github.io/matrexVR/manual/) [![Cite MATREX VR](docs/site/assets/cite-badge.svg)](CITATION.cff)
+
+The [navigable manual](https://pvnkmrksk.github.io/matrexVR/manual/) includes local section search, runtime architecture, every major component, scenes, ViewportSetter, ClosedLoop, tracker contracts, configuration/UI, saving, telemetry, replay, extensions and hardware boundaries. The [native gallery](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html) shows genuine Unity capability captures. **Kannadi — ಕನ್ನಡಿ — means mirror in Kannada** and presents a full matrix of mirrored animal poses.
 
 ## Choose a version
 
@@ -26,9 +30,24 @@ The configuration studio and JSON share one lossless document model. No-op saves
 
 A fresh 0.3 profile opens setup by default. Its supplied demonstration is **TerrainCueLab**: four visual/navigation mesh combinations followed by height-only, tilt-only and fixed-pose controls, 30 seconds each, with `reloadScene: false`. The previous Selwyn cycle is preserved in `Examples/Sequences/selwyn-before-rugosity.json`. Configuration JSON is authoritative; old branch guides may describe their historical default sequence.
 
-![MATREX VR 0.3 session setup with animal IDs, species and the experiment sequence](docs/images/dashboard-v0.3/session-1920.png)
+![Current-source MATREX VR session setup with animal IDs, species and modern tracker labels](docs/images/dashboard-ecosystem/session-1920.jpg)
 
-*Actual 0.3 Unity studio capture with synthetic animals and metadata. [Sequence](docs/images/dashboard-v0.3/sequence-1920.png) · [Raw JSON](docs/images/dashboard-v0.3/raw-json-1920.png) · [Replay launcher](docs/images/dashboard-v0.3/replay-launcher-1920.png) · [capture provenance](docs/images/dashboard-v0.3/provenance.json).*
+*Current-source Unity studio after 0.3, with synthetic animals and metadata. [Sequence](docs/images/dashboard-ecosystem/sequence-1920.jpg) · [Raw JSON](docs/images/dashboard-ecosystem/raw-json-1920.jpg) · [Replay launcher](docs/images/dashboard-ecosystem/replay-launcher-1920.jpg) · [capture provenance](docs/images/dashboard-ecosystem/provenance.json). These source additions do not alter archived 0.3 binaries.*
+
+## Native scene previews
+
+| Choice_Forrest + Landscape | Selwyn terrain + Milky Way | Kannadi · ಕನ್ನಡಿ |
+| --- | --- | --- |
+| [![Choice_Forrest with bundled Landscape prefab](docs/site/assets/gallery/forest-choice.jpg)](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html#forest-choice) | [![Actual Selwyn terrain beneath generated Milky Way](docs/site/assets/gallery/milky-way-terrain.jpg)](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html#milky-way-terrain) | [![Actual Kannadi hexagonal mirror matrix](docs/site/assets/gallery/kannadi.jpg)](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html#kannadi) |
+| Optional source customization: the native fixture adds the bundled Landscape prefab; this is not the default compact-player environment. | Core Choice_Selwyn scene with generated astronomical sky. | Core mirror scene: animal poses replicated across a hexagonal matrix. |
+
+Actual Unity renders of synthetic demonstrations. The [full nine-capability gallery](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html) includes bars, stripe fixation, objects, Optomotor, locust swarm and explicit panorama terrain, with [exact configurations and provenance](docs/site/assets/gallery/provenance.json).
+
+## Current source integration
+
+Current source after 0.3 adds native **Rekkefly** flight and **HejjéTrac** walking modes, optional owned tracker Launch/Stop controls, and periodic experiment context for live browser plots. [Daari Deepa](https://pvnkmrksk.github.io/trajectory-dashboard/) has self-contained Windows, Linux and both Mac downloads; viewing computers only need a browser. Read the [connection guide](docs/tracker-integration.md) and [live monitoring manual](https://pvnkmrksk.github.io/matrexVR/manual/live-monitoring.html). These changes do not alter archived 0.3 binaries.
+
+The [scene reload investigation](docs/diagnostics.md) documents the isolated historical listener resource leak and the separately corrected material ownership regression, with matched stress-test evidence. It distinguishes those results from a captured native Unity crash.
 
 ## Controls and live monitoring
 
@@ -102,3 +121,7 @@ Software verification includes [1,293 Unity lifecycle/replay checks](docs/lifecy
 Run `python3 tools/validate_kannadi_assets.py` and `python3 tools/validate_config_templates.py` for static checks. Unity regression runners under `Assets/Editor` require a disposable copy containing the `KANNADI_VALIDATION_COPY` sentinel. Historical reports document synthetic/rendered software checks; physical LED timing, tracker calibration and display mapping require a bench check on the actual apparatus.
 
 The prior README identifies MIT licensing, but this checkout has no root LICENSE file. Third-party assets retain their own license terms. Engine: [Unity](https://unity.com/). Tracking transport: [NetMQ](https://github.com/zeromq/netmq). Astronomical orientation: bundled Astronomy Engine with its retained MIT notice.
+
+## Citation
+
+Use [CITATION.cff](CITATION.cff) and record the exact release/source revision used for acquisition. [Citation and stimulus credits](https://pvnkmrksk.github.io/matrexVR/manual/citation.html) distinguish the software from its bundled dependencies and sky sources.

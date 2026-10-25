@@ -1,0 +1,148 @@
+{
+  "recordedUtc": "2026-10-12T10:45:16.495071+00:00",
+  "unity": "6000.3.16f1",
+  "validationProject": "Disposable copy; main RunData never modified by tests.",
+  "suites": {
+    "run-config-archive-validation": {
+      "checks": 39,
+      "failure": null,
+      "errors": [],
+      "unity": "6000.3.16f1",
+      "note": "Isolated filesystem fixtures plus actual current ControlScene experiment, with live tracking disabled. Includes missing/corrupt snapshots, nested references, legacy lookup, duplicate filenames, reloads and version preservation. Main RunData and user configs are not modified."
+    },
+    "phase-adapter-validation": {
+      "checks": 85897,
+      "failure": null,
+      "errors": [],
+      "unity": "6000.3.16f1"
+    },
+    "swarm-trajectory-validation": {
+      "checks": 99,
+      "failure": null,
+      "captures": [
+        {
+          "blank": "RGBA(255, 255, 255, 255)",
+          "rect": "(x:0.00, y:0.00, width:64.00, height:64.00)",
+          "color": "RGBA(1.000, 1.000, 1.000, 1.000)"
+        },
+        {
+          "graphics": "Apple M2 Pro",
+          "camera": "1.00000\t0.00000\t0.00000\t0.00000\n0.00000\t1.00000\t0.00000\t0.00000\n0.00000\t0.00000\t-1.00002\t-0.00200\n0.00000\t0.00000\t-1.00000\t0.00000\n",
+          "bodyLength": 0.0254,
+          "bodyDiameter": 0.01
+        },
+        {
+          "distanceMetres": 0.01,
+          "contrast": 2478.94116,
+          "changedPixels": 3198
+        },
+        {
+          "distanceMetres": 0.1,
+          "contrast": 22.007843,
+          "changedPixels": 28
+        },
+        {
+          "distanceMetres": 1.0,
+          "contrast": 0.274509817,
+          "changedPixels": 4
+        },
+        {
+          "distanceMetres": 2.0,
+          "contrast": 0.0627451,
+          "changedPixels": 4
+        },
+        {
+          "mode": "gray128-first",
+          "blank": 128,
+          "peak": 12,
+          "total": 12,
+          "colorSpace": "Gamma"
+        },
+        {
+          "mode": "gray128",
+          "distanceMetres": 3,
+          "peakContrastBytes": 12,
+          "totalContrastBytes": 12,
+          "fractionalPixelContrastBytes": [
+            12,
+            12,
+            12,
+            12
+          ]
+        }
+      ],
+      "timings": [
+        {
+          "shape": "Dot",
+          "medianCpuMilliseconds": 2.1152,
+          "p95CpuMilliseconds": 2.5735,
+          "agents": 1024,
+          "rigs": 4,
+          "cameras": 24,
+          "materials": 4
+        },
+        {
+          "shape": "Moth",
+          "medianCpuMilliseconds": 2.5918,
+          "p95CpuMilliseconds": 3.1492,
+          "agents": 1024,
+          "rigs": 4,
+          "cameras": 24,
+          "materials": 4
+        }
+      ],
+      "unity": "6000.3.16f1",
+      "timingNote": "Isolated CPU timings: four rigs, six 64px cameras each, 256 agents per rig. Not hardware-display FPS."
+    }
+  },
+  "pythonAuditTests": {
+    "checks": 4,
+    "passed": true,
+    "command": "python3 -m unittest discover -s tools -p test_audit_run_config_snapshots.py"
+  },
+  "pythonSwarmTests": {
+    "checks": 6,
+    "passed": true,
+    "command": "python3 -m unittest discover -s tools -p 'test_*swarm*.py'"
+  },
+  "templateValidation": {
+    "passed": true,
+    "jsonConfigs": 58,
+    "archivedHashChecks": 622,
+    "archivedInputs": 979,
+    "command": "python3 tools/validate_config_templates.py"
+  },
+  "userConfigBytesUnchanged": {
+    "Assets/StreamingAssets/sequenceConfig.json": true,
+    "Assets/StreamingAssets/Examples/Swarm/heading-aligned.example.json": true,
+    "Assets/StreamingAssets/Examples/Swarm/selwyn-trajectory-playback.example.json": true,
+    "Assets/StreamingAssets/system_config.json": true
+  },
+  "historicalAudit": {
+    "report": "run-config-historical-audit.json",
+    "counts": {
+      "sessions": 474,
+      "missingSequence": 4,
+      "missingSystem": 349,
+      "sessionsMissingExperimentConfigs": 118,
+      "missingUniqueExperimentReferences": 1389,
+      "unreadableSequences": 0,
+      "sessionsWithNestedExperimentCopies": 65,
+      "sessionsWithManifest": 0,
+      "invalidSnapshotSessions": 0
+    },
+    "recentCounts": {
+      "sessions": 60,
+      "missingSequence": 0,
+      "missingSystem": 0,
+      "sessionsMissingExperimentConfigs": 1,
+      "missingUniqueExperimentReferences": 1,
+      "unreadableSequences": 0,
+      "sessionsWithNestedExperimentCopies": 60,
+      "sessionsWithManifest": 0,
+      "invalidSnapshotSessions": 0
+    },
+    "historicalFilesModified": false
+  },
+  "scope": "Filesystem integrity and Unity ControlScene integration; existing five-scene phase and CSV/rendering regressions. Live tracking and physical LED hardware are not exercised. Restart Play for a new archived session. No player rebuild is claimed."
+}
