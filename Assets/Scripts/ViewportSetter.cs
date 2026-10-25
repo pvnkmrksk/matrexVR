@@ -66,6 +66,52 @@ public class ViewportSetter : MonoBehaviour
     private Camera[] RigCameras() => GetComponentsInChildren<Camera>(true);
     private bool Owns(Camera camera) => camera.GetComponentInParent<ViewportSetter>(true) == this;
 
+    private Camera[] EnsureRequestedCameras(Camera[] cameras, string order)
+    {
+        Camera front = null;
+        foreach (Camera camera in cameras)
+            if (Owns(camera) && camera.name == "Main Camera F") { front = camera; break; }
+        // Custom rigs without an authored Front have no trustworthy projection or
+        // centre to copy. Leave those rigs unchanged instead of inventing a view.
+        if (front == null) return cameras;
+        var complete = new List<Camera>(cameras);
+        foreach (char face in order)
+        {
+            bool exists = false;
+            foreach (Camera camera in complete)
+                if (Owns(camera) && camera.name == "Main Camera " + face) { exists = true; break; }
+            if (exists) continue;
+
+            var child = new GameObject("Main Camera " + face);
+            child.SetActive(false);
+            child.layer = front.gameObject.layer;
+            child.transform.SetParent(front.transform.parent, false);
+            Vector3 turn = face == 'R' ? new Vector3(0, 90, 0) :
+                face == 'B' ? new Vector3(0, 180, 0) :
+                face == 'L' ? new Vector3(0, -90, 0) :
+                face == 'U' ? new Vector3(-90, 0, 0) : new Vector3(90, 0, 0);
+            var generated = child.AddComponent<Camera>();
+            generated.CopyFrom(front);
+            child.transform.localPosition = front.transform.localPosition;
+            child.transform.localScale = front.transform.localScale;
+            child.transform.localRotation = front.transform.localRotation * Quaternion.Euler(turn);
+            generated.ResetWorldToCameraMatrix();
+            generated.ResetCullingMatrix();
+            generated.enabled = false;
+            var sourceSky = front.GetComponent<Skybox>();
+            if (sourceSky != null)
+            {
+                var sky = child.AddComponent<Skybox>();
+                sky.material = sourceSky.material;
+                sky.enabled = sourceSky.enabled;
+            }
+            // The child belongs to this scene's rig. Ordinary scene destruction
+            // releases it; there is no cross-scene camera cache or persistent host.
+            complete.Add(generated);
+        }
+        return complete.ToArray();
+    }
+
     private void DisableCameras()
     {
         foreach (Camera camera in RigCameras())
@@ -115,6 +161,7 @@ public class ViewportSetter : MonoBehaviour
                 startRow = startRow, startCol = startCol, horizontal = horizontal, desktopPreview = desktopPreview
             };
             if (desktopPreview && order.Length != 1) return;
+            cameras = EnsureRequestedCameras(cameras, order);
             for (int slot = 0; slot < order.Length; slot++)
             {
                 foreach (Camera camera in cameras)
