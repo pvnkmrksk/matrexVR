@@ -1,0 +1,324 @@
+{
+  "passed": true,
+  "runtimeCommit": "87c425dd29211c6cd6192a77fa3f384e27b33937",
+  "runtimeSourceScope": "Frozen final runtime from committed git archive including apparatus workflow, operator overlay lifecycle, and generated requested camera faces. Later Editor-only validation/report commits are excluded.",
+  "snapshotAggregateSha256": "1f0154a9fd5f39e6a95481288412df7db20f786eae19e5d07a322085e61cde67",
+  "snapshotFileCount": 484,
+  "snapshotFingerprintScope": "Tracked runtime scripts, scenes, ConfigurationUI resources, packages, and project settings",
+  "diagnosticsSha256": "8da9cc24388f177d18528e621caeb4dc80ae2305f835da29f38da37a6b738913",
+  "runtimeScriptCount": 126,
+  "runtimeScriptMismatchesAgainstWorkingTreeAtReportTime": [],
+  "unity": "6000.3.16f1",
+  "gpu": "Apple M2 Pro",
+  "graphicsApi": "Metal",
+  "scope": "Actual Unity Editor/Metal rendering with a real native Rekkefly process using its explicit generated demo. No physical camera, animal, LED hardware, or release-player endurance claim. A bounded non-crashing run does not identify the historical crash cause.",
+  "protocol": {
+    "loads": 300,
+    "configuredDurationSeconds": 2,
+    "sameScene": "Choice_desync",
+    "forcedFullReload": true,
+    "newSceneHandleRequiredForEveryLoad": true,
+    "VRs": 4,
+    "facesPerVR": 6,
+    "pixelsPerFace": [
+      128,
+      128
+    ],
+    "telemetryEndpoint": "tcp://127.0.0.1:29980",
+    "nativeTrackerEndpoint": "tcp://127.0.0.1:29971"
+  },
+  "coverage": {
+    "activeSamples": 600,
+    "uniqueSceneHandles": 300,
+    "freshInputObservations": 2400,
+    "minimumLiveInputComponents": 4,
+    "minimumInputComponents": 4,
+    "staleOrNonprogressingInputObservations": 0,
+    "renderedFaces": [
+      24
+    ],
+    "naturalCameraRenders": 338328,
+    "forcedCameraRenders": 676632
+  },
+  "allRequestedFacesCoveredAtEveryActiveSample": true,
+  "durations": {
+    "minimum": 2.0116834589999826,
+    "median": 2.1915045835000058,
+    "maximum": 2.3089914170000014,
+    "totalSceneSeconds": 657.530765084
+  },
+  "nativeTracker": {
+    "executableSha256": "631ce45f37bf9af9969abad1e00997d2b8b208ccffb2236c7ea1e8cd771bb644",
+    "configSha256": "9a10f7ce0f5550e954ff6db7371c7fcbcd565ef44a1d06bb053809861a3c23a1",
+    "singleNativePid": 9014,
+    "observedPids": [
+      9014
+    ],
+    "observedSourceKinds": [
+      "demo"
+    ],
+    "fallbackEverObserved": false,
+    "firstNativeFrame": 11,
+    "lastNativeFrame": 82548,
+    "observedPackets": 82533,
+    "nativeExitCode": 0,
+    "finalNativeSummary": {
+      "frames": 82572,
+      "frames_per_second": 119.98055625375116,
+      "recording": {
+        "accepted": 0,
+        "directory": null,
+        "error": null,
+        "written": 0
+      },
+      "seconds": 688.21151175,
+      "source": "Simulated fly",
+      "udp_dropped": 0,
+      "zmq_dropped": 0
+    },
+    "sourceScope": "Real native Rekkefly acquisition/tracking/publisher process using its explicit generated demo, not a camera or animal measurement."
+  },
+  "after20WarmupLoads": {
+    "rssBytes": {
+      "first": 2710913024,
+      "last": 2286010368,
+      "minimum": 2281570304,
+      "maximum": 2717777920,
+      "median": 2495864832.0,
+      "first5Median": 2711191552,
+      "last5Median": 2285518848,
+      "slopePer100Reloads": -228955709.66189438
+    },
+    "managedBytes": {
+      "first": 768757760,
+      "last": 780644352,
+      "minimum": 768684032,
+      "maximum": 780644352,
+      "median": 774520832.0,
+      "first5Median": 768782336,
+      "last5Median": 780488704,
+      "slopePer100Reloads": 4433871.6915121
+    },
+    "monoUsedBytes": {
+      "first": 768757760,
+      "last": 780644352,
+      "minimum": 768684032,
+      "maximum": 780644352,
+      "median": 774520832.0,
+      "first5Median": 768782336,
+      "last5Median": 780488704,
+      "slopePer100Reloads": 4433871.6915121
+    },
+    "monoHeapBytes": {
+      "first": 826327040,
+      "last": 829751296,
+      "minimum": 826327040,
+      "maximum": 829751296,
+      "median": 827850752.0,
+      "first5Median": 826376192,
+      "last5Median": 829325312,
+      "slopePer100Reloads": 679411.917280286
+    },
+    "unityAllocatedBytes": {
+      "first": 429233192,
+      "last": 438590635,
+      "minimum": 429081673,
+      "maximum": 438590635,
+      "median": 434833160.0,
+      "first5Median": 429143284,
+      "last5Median": 438515783,
+      "slopePer100Reloads": 2773910.73885782
+    },
+    "unityReservedBytes": {
+      "first": 817528832,
+      "last": 818577408,
+      "minimum": 817528832,
+      "maximum": 818577408,
+      "median": 817528832.0,
+      "first5Median": 817528832,
+      "last5Median": 818577408,
+      "slopePer100Reloads": 214953.17906751725
+    },
+    "graphicsDriverBytes": {
+      "first": 125777107,
+      "last": 129958671,
+      "minimum": 125762967,
+      "maximum": 129971411,
+      "median": 129958671.0,
+      "first5Median": 129958671,
+      "last5Median": 129958671,
+      "slopePer100Reloads": 41451.47285041897
+    },
+    "fileDescriptors": {
+      "first": 112,
+      "last": 112,
+      "minimum": 111,
+      "maximum": 115,
+      "median": 112.0,
+      "first5Median": 112,
+      "last5Median": 112,
+      "slopePer100Reloads": -0.5187201731800514
+    },
+    "externalOsThreads": {
+      "first": 127,
+      "last": 130,
+      "minimum": 122,
+      "maximum": 130,
+      "median": 130.0,
+      "first5Median": 127,
+      "last5Median": 130,
+      "slopePer100Reloads": 1.3112594366181785
+    },
+    "activeTrackingWorkers": {
+      "first": 4,
+      "last": 4,
+      "minimum": 4,
+      "maximum": 4,
+      "median": 4.0,
+      "first5Median": 4,
+      "last5Median": 4,
+      "slopePer100Reloads": 0.0
+    },
+    "activeAsyncWriters": {
+      "first": 0,
+      "last": 0,
+      "minimum": 0,
+      "maximum": 0,
+      "median": 0.0,
+      "first5Median": 0,
+      "last5Median": 0,
+      "slopePer100Reloads": 0.0
+    },
+    "ownedTrialMaterials": {
+      "first": 8,
+      "last": 8,
+      "minimum": 8,
+      "maximum": 8,
+      "median": 8.0,
+      "first5Median": 8,
+      "last5Median": 8,
+      "slopePer100Reloads": 0.0
+    },
+    "gameObjects": {
+      "first": 64,
+      "last": 64,
+      "minimum": 64,
+      "maximum": 64,
+      "median": 64.0,
+      "first5Median": 64,
+      "last5Median": 64,
+      "slopePer100Reloads": 0.0
+    },
+    "materials.nonPersistentCount": {
+      "first": 45,
+      "last": 45,
+      "minimum": 45,
+      "maximum": 45,
+      "median": 45.0,
+      "first5Median": 45,
+      "last5Median": 45,
+      "slopePer100Reloads": 0.0
+    },
+    "meshes.nonPersistentCount": {
+      "first": 1,
+      "last": 1,
+      "minimum": 1,
+      "maximum": 1,
+      "median": 1.0,
+      "first5Median": 1,
+      "last5Median": 1,
+      "slopePer100Reloads": 0.0
+    },
+    "textures.nonPersistentCount": {
+      "first": 96,
+      "last": 96,
+      "minimum": 96,
+      "maximum": 96,
+      "median": 96.0,
+      "first5Median": 96,
+      "last5Median": 96,
+      "slopePer100Reloads": 0.0
+    },
+    "renderTextures.nonPersistentCount": {
+      "first": 28,
+      "last": 28,
+      "minimum": 28,
+      "maximum": 28,
+      "median": 28.0,
+      "first5Median": 28,
+      "last5Median": 28,
+      "slopePer100Reloads": 0.0
+    },
+    "diagnosticRenderTargets": {
+      "first": 24,
+      "last": 24,
+      "minimum": 24,
+      "maximum": 24,
+      "median": 24.0,
+      "first5Median": 24,
+      "last5Median": 24,
+      "slopePer100Reloads": 0.0
+    },
+    "externalNativeTracker.rssBytes": {
+      "first": 24395776,
+      "last": 24395776,
+      "minimum": 24330240,
+      "maximum": 24395776,
+      "median": 24395776.0,
+      "first5Median": 24395776,
+      "last5Median": 24395776,
+      "slopePer100Reloads": 214.95317906751725
+    },
+    "externalNativeTracker.osThreadCount": {
+      "first": 15,
+      "last": 15,
+      "minimum": 7,
+      "maximum": 15,
+      "median": 15.0,
+      "first5Median": 15,
+      "last5Median": 15,
+      "slopePer100Reloads": 0.03588784842372262
+    },
+    "externalNativeTracker.fileDescriptorCount": {
+      "first": 10,
+      "last": 10,
+      "minimum": 6,
+      "maximum": 10,
+      "median": 10.0,
+      "first5Median": 10,
+      "last5Median": 10,
+      "slopePer100Reloads": 0.005466542029508406
+    }
+  },
+  "teardown": [
+    {
+      "kind": "after-scene-teardown-no-forced-GC",
+      "activeTrackingWorkers": 0,
+      "activeAsyncWriters": 0,
+      "ownedTrialMaterials": 0,
+      "diagnosticRenderTargets": 0,
+      "fileDescriptors": 96,
+      "gameObjects": 19
+    },
+    {
+      "kind": "after-explicit-GC-and-UnloadUnusedAssets",
+      "activeTrackingWorkers": 0,
+      "activeAsyncWriters": 0,
+      "ownedTrialMaterials": 0,
+      "diagnosticRenderTargets": 0,
+      "fileDescriptors": 96,
+      "gameObjects": 19
+    }
+  ],
+  "teardownBeforeForcedGCPassed": true,
+  "runtimeErrors": [],
+  "supervisor": {
+    "unityExitCode": 0,
+    "failure": null,
+    "publisherErrors": [],
+    "newCrashReports": []
+  },
+  "editorOnlyExceptionCount": 1,
+  "editorOnlyExceptionScope": "Known UnityEditor.Search.SearchDatabase startup exception retained with its raw stack trace; no runtime exceptions are excluded.",
+  "rawLocalDirectory": ".release-work/scene-reload-diagnostics/final-source-native-rekkefly-300x2s"
+}
