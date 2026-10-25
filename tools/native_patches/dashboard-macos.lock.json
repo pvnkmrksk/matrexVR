@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "repository": "pvnkmrksk/trajectory-dashboard",
+  "sourceRevision": "e545509d5298abf9f9800b7d7760cc207eb120cc",
+  "sourceUrl": "https://github.com/pvnkmrksk/trajectory-dashboard/commit/e545509d5298abf9f9800b7d7760cc207eb120cc",
+  "platform": "macos-arm64",
+  "archiveSha256": "646f40c1c809bb745b398fae67997bc64ade227e0b1e00da0e26499549b5ee80",
+  "executable": "DaariDeepa/DaariDeepa",
+  "executableSha256": "71c90d4f9718fd658f8e4d33807c34ed443dd96e2ab601ab4e10b2fbe6393659",
+  "buildType": "local-source",
+  "published": false
+}

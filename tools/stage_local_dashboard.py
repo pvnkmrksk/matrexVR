@@ -15,6 +15,7 @@ import companion_bundles
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = ROOT / 'Assets/StreamingAssets/Companions/dashboard.lock.json'
+LOCAL_LOCK = ROOT / 'tools/native_patches/dashboard-macos.lock.json'
 CACHE = ROOT / '.release-work/dashboard-cache'
 PLATFORMS = ('macos-arm64', 'macos-x64', 'windows-x64', 'linux-x64')
 TARGETS = {'macOS': PLATFORMS[:2], 'Windows': ('windows-x64',), 'Linux': ('linux-x64',), 'all': PLATFORMS}
@@ -112,13 +113,62 @@ def stage(platforms, output, cache=CACHE, lock=None):
     return entries
 
 
+def stage_local(archive, output, lock=None):
+    """Replace only the reviewed local arm64 payload, preserving other official platforms."""
+    lock = json.loads(LOCAL_LOCK.read_text()) if lock is None else lock
+    if (lock.get('schemaVersion') != 1 or lock.get('platform') != 'macos-arm64'
+            or lock.get('published') is not False or lock.get('buildType') != 'local-source'
+            or lock.get('repository') != 'pvnkmrksk/trajectory-dashboard'
+            or not re.fullmatch(r'[0-9a-f]{40}', lock.get('sourceRevision', ''))
+            or lock.get('executable') != 'DaariDeepa/DaariDeepa'):
+        raise ValueError('Invalid local dashboard provenance')
+    archive = Path(archive).resolve()
+    if companion_bundles.digest(archive) != lock['archiveSha256']:
+        raise ValueError('Local dashboard archive differs from its reviewed lock')
+    dashboard = Path(output) / 'dashboard'
+    dashboard.mkdir(parents=True, exist_ok=True)
+    temporary = Path(tempfile.mkdtemp(prefix='macos-arm64.local-', dir=dashboard))
+    try:
+        companion_bundles.extract(archive, temporary)
+        executable = temporary / lock['executable']
+        if (not executable.is_file() or not executable.stat().st_mode & 0o111
+                or companion_bundles.digest(executable) != lock['executableSha256']):
+            raise ValueError('Local dashboard executable differs from its reviewed lock')
+        current = dict(lock, archiveUrl=lock['sourceUrl'])
+        (temporary / 'dashboard-bundle.json').write_text(json.dumps(current, indent=2) + '\n')
+        destination = dashboard / lock['platform']
+        if destination.exists():
+            marker = destination / 'dashboard-bundle.json'
+            if not marker.is_file():
+                raise FileExistsError('Refusing to replace an unmarked dashboard payload')
+            previous = json.loads(marker.read_text())
+            repository = previous.get('repository', '').removeprefix('https://github.com/').removesuffix('.git')
+            if repository != lock['repository'] or previous.get('platform') != lock['platform']:
+                raise FileExistsError('Refusing to replace an unrelated dashboard payload')
+            shutil.rmtree(destination)
+        temporary.rename(destination)
+        (dashboard / 'dashboard-local.lock.json').write_text(json.dumps(lock, indent=2) + '\n')
+        return current
+    finally:
+        shutil.rmtree(temporary, ignore_errors=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--platform', choices=[*TARGETS, *PLATFORMS], default='macOS')
     parser.add_argument('--cache', type=Path, default=CACHE)
+    parser.add_argument('--local-archive', type=Path, help='Apply the reviewed local Mac arm64 live-plot build after official staging')
     args = parser.parse_args()
-    stage(platforms_for_target(args.platform), args.output, args.cache)
+    platforms = platforms_for_target(args.platform)
+    if args.local_archive:
+        if 'macos-arm64' not in platforms:
+            raise ValueError('Local dashboard correction supports macos-arm64 only')
+        platforms.remove('macos-arm64')
+    if platforms:
+        stage(platforms, args.output, args.cache)
+    if args.local_archive:
+        stage_local(args.local_archive, args.output)
     print('Verified dashboard payload:', args.output / 'dashboard')
 
 

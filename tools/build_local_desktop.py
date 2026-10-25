@@ -52,7 +52,12 @@ def main():
     parser.add_argument('--library', type=Path, default=ROOT / '.release-work/project-v0.3/Library')
     parser.add_argument('--skip-companions', action='store_true', help='Advanced development-only opt-out')
     parser.add_argument('--skip-native-camera-fix', action='store_true', help='Advanced development-only opt-out; bundled flight camera input then remains unavailable')
+    parser.add_argument('--local-dashboard-archive', type=Path, default=ROOT / '.integration/local-dashboard/DaariDeepa-macos-arm64.zip')
+    parser.add_argument('--skip-local-dashboard', action='store_true', help='Advanced development-only opt-out; uses the older published dashboard renderer')
     args = parser.parse_args()
+    local_dashboard = platform.machine() == 'arm64' and not args.skip_companions and not args.skip_local_dashboard
+    if local_dashboard and not args.local_dashboard_archive.is_file():
+        parser.error('Reviewed local dashboard archive is absent: '+str(args.local_dashboard_archive)+'. See tools/native_patches/README.md for the pinned source build.')
     prepare(args.project, args.library)
     if args.prepare_only:
         print(args.project)
@@ -69,7 +74,8 @@ def main():
         run(sys.executable, ROOT / 'tools/companion_bundles.py', '--platform', 'macOS', '--output', args.app / 'Contents/Companions')
         if platform.machine() == 'arm64' and not args.skip_native_camera_fix:
             run(sys.executable, ROOT / 'tools/build_local_rekkefly.py', '--companions', args.app / 'Contents/Companions')
-        run(sys.executable, ROOT / 'tools/stage_local_dashboard.py', '--output', args.app / 'Contents/Companions')
+        dashboard_args = ['--local-archive', args.local_dashboard_archive] if local_dashboard else []
+        run(sys.executable, ROOT / 'tools/stage_local_dashboard.py', '--output', args.app / 'Contents/Companions', *dashboard_args)
     # Seal after embedding. Upstream tracker signatures are retained; no recursive re-signing.
     run('/usr/bin/codesign', '--force', '--sign', '-', '--timestamp=none', args.app)
     run('/usr/bin/codesign', '--verify', '--strict', args.app)

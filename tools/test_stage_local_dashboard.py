@@ -100,6 +100,34 @@ class DashboardPackagingTests(unittest.TestCase):
                 dashboard.stage(['linux-x64'], output, cache, lock)
             self.assertEqual(executable.read_bytes(), b'modified')
 
+    def test_reviewed_local_payload_replaces_only_arm64_and_preserves_provenance(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            official, cache = self.fixture_lock(root)
+            output = root / 'Companions'
+            dashboard.stage(list(dashboard.PLATFORMS), output, cache, official)
+            untouched = {p: (output / 'dashboard' / p / 'dashboard-bundle.json').read_bytes()
+                         for p in dashboard.PLATFORMS if p != 'macos-arm64'}
+            lock = json.loads(dashboard.LOCAL_LOCK.read_text())
+            asset = official['platforms']['macos-arm64']
+            archive = cache / (asset['sha256'] + '-' + asset['asset'])
+            lock['archiveSha256'] = asset['sha256']
+            lock['executableSha256'] = companion_bundles.digest(output / 'dashboard/macos-arm64' / lock['executable'])
+            info = dashboard.stage_local(archive, output, lock)
+            self.assertFalse(info['published'])
+            self.assertEqual(info['sourceRevision'], lock['sourceRevision'])
+            self.assertEqual(dashboard.stage_local(archive, output, lock), info)
+            for platform, before in untouched.items():
+                self.assertEqual((output / 'dashboard' / platform / 'dashboard-bundle.json').read_bytes(), before)
+            marker = output / 'dashboard/macos-arm64/dashboard-bundle.json'
+            before = marker.read_bytes()
+            for field in ('archiveSha256', 'executableSha256'):
+                bad = dict(lock, **{field: '0' * 64})
+                with self.assertRaises(ValueError):
+                    dashboard.stage_local(archive, output, bad)
+                self.assertEqual(marker.read_bytes(), before)
+            self.assertFalse(list((output / 'dashboard').glob('*.local-*')))
+
     def test_release_defaults_embed_dashboard_before_mac_parent_signing(self):
         for platform in ('macOS', 'Windows', 'Linux'):
             with self.subTest(platform=platform), tempfile.TemporaryDirectory() as temp:
