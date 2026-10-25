@@ -300,7 +300,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
                 {
                     text.AppendLine($"  {rig.GetCurrentMode()} / {rig.MotionMode} " + Badge("AUTO TRIM UNAVAILABLE", "88929C"));
                     text.AppendLine($"  {Badge($"P GAIN {rig.PositionGain:G4}", rig.PositionTrackingEnabled ? "FFFFFF" : "88929C")} " +
-                        Badge($"YAW GAIN {rig.OrientationGain:G4}", rig.OrientationTrackingEnabled ? "FFFFFF" : "88929C") + "<color=#9DA8B5>Requires Kinefly yaw-rate mode</color>");
+                        Badge($"YAW GAIN {rig.OrientationGain:G4}", rig.OrientationTrackingEnabled ? "FFFFFF" : "88929C") + "<color=#9DA8B5>Requires flight yaw-rate mode</color>");
                 }
                 if(showDetails) text.AppendLine($"  <size=12><color=#99ADBD>Input SUB: {(listener == null ? "missing listener" : EscapeRich(listener.Endpoint) + " / " + listener.State)}</color></size>");
                 var reference = rig.GetComponent<StimulusHeadingReference>();

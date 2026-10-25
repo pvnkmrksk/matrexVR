@@ -1,0 +1,2177 @@
+{
+  "checks": 24360,
+  "failure": null,
+  "unity": "6000.3.16f1",
+  "cases": [
+    {
+      "hiddenMeanDegrees": -103.13240312354819,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 0.0,
+      "gain": 2.5,
+      "seed": 42,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 15.0,
+          "dcDegrees": -57.29577951308232,
+          "residualMeanDegPerSecond": -114.59155219597548
+        },
+        {
+          "seconds": 33.0,
+          "dcDegrees": -103.13240039147252,
+          "residualMeanDegPerSecond": 0.0
+        }
+      ],
+      "centeredAtSeconds": 51.0,
+      "finalDCOffsetDegrees": -103.13240039147252,
+      "trueResidualDriftDegPerSecond": -6.83018917637386e-06,
+      "final60SecondHeadingSlopeDegPerSecond": 0.0,
+      "uncertaintyDegPerSecond": 0.0,
+      "measurementSeconds": 15.0,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -57.29577951308232,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 0.0,
+      "gain": 2.5,
+      "seed": 42,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 15.0,
+          "dcDegrees": -57.29577951308232,
+          "residualMeanDegPerSecond": 0.0
+        }
+      ],
+      "centeredAtSeconds": 33.0,
+      "finalDCOffsetDegrees": -57.29577951308232,
+      "trueResidualDriftDegPerSecond": 0.0,
+      "final60SecondHeadingSlopeDegPerSecond": 0.0,
+      "uncertaintyDegPerSecond": 0.0,
+      "measurementSeconds": 15.0,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 57.29577951308232,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 0.0,
+      "gain": 2.5,
+      "seed": 42,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 15.0,
+          "dcDegrees": 57.29577951308232,
+          "residualMeanDegPerSecond": 0.0
+        }
+      ],
+      "centeredAtSeconds": 33.0,
+      "finalDCOffsetDegrees": 57.29577951308232,
+      "trueResidualDriftDegPerSecond": 0.0,
+      "final60SecondHeadingSlopeDegPerSecond": 0.0,
+      "uncertaintyDegPerSecond": 0.0,
+      "measurementSeconds": 15.0,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 103.13240312354819,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 0.0,
+      "gain": 2.5,
+      "seed": 42,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 15.0,
+          "dcDegrees": 57.29577951308232,
+          "residualMeanDegPerSecond": 114.59155219597548
+        },
+        {
+          "seconds": 33.0,
+          "dcDegrees": 103.13240039147252,
+          "residualMeanDegPerSecond": 0.0
+        }
+      ],
+      "centeredAtSeconds": 51.0,
+      "finalDCOffsetDegrees": 103.13240039147252,
+      "trueResidualDriftDegPerSecond": 6.83018917637386e-06,
+      "final60SecondHeadingSlopeDegPerSecond": 0.0,
+      "uncertaintyDegPerSecond": 0.0,
+      "measurementSeconds": 15.0,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 114.59155902616465,
+      "initialDCOffsetDegrees": -114.59155902616465,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 0.0,
+      "gain": 2.5,
+      "seed": 42,
+      "actualMotionIntegration": false,
+      "passes": 4,
+      "corrections": [
+        {
+          "seconds": 15.0,
+          "dcDegrees": -57.29577951308232,
+          "residualMeanDegPerSecond": 429.7183463481174
+        },
+        {
+          "seconds": 33.0,
+          "dcDegrees": 0.0,
+          "residualMeanDegPerSecond": 286.4788975654116
+        },
+        {
+          "seconds": 51.0,
+          "dcDegrees": 57.29577951308232,
+          "residualMeanDegPerSecond": 143.2394487827058
+        },
+        {
+          "seconds": 69.0,
+          "dcDegrees": 114.59155902616465,
+          "residualMeanDegPerSecond": 0.0
+        }
+      ],
+      "centeredAtSeconds": 87.0,
+      "finalDCOffsetDegrees": 114.59155902616465,
+      "trueResidualDriftDegPerSecond": 0.0,
+      "final60SecondHeadingSlopeDegPerSecond": 0.0,
+      "uncertaintyDegPerSecond": 0.0,
+      "measurementSeconds": 15.0,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -114.59155902616465,
+      "initialDCOffsetDegrees": 114.59155902616465,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 0.0,
+      "gain": -2.5,
+      "seed": 43,
+      "actualMotionIntegration": false,
+      "passes": 4,
+      "corrections": [
+        {
+          "seconds": 15.0,
+          "dcDegrees": 57.29577951308232,
+          "residualMeanDegPerSecond": 429.7183463481174
+        },
+        {
+          "seconds": 33.0,
+          "dcDegrees": 0.0,
+          "residualMeanDegPerSecond": 286.4788975654116
+        },
+        {
+          "seconds": 51.0,
+          "dcDegrees": -57.29577951308232,
+          "residualMeanDegPerSecond": 143.2394487827058
+        },
+        {
+          "seconds": 69.0,
+          "dcDegrees": -114.59155902616465,
+          "residualMeanDegPerSecond": 0.0
+        }
+      ],
+      "centeredAtSeconds": 87.0,
+      "finalDCOffsetDegrees": -114.59155902616465,
+      "trueResidualDriftDegPerSecond": 0.0,
+      "final60SecondHeadingSlopeDegPerSecond": 0.0,
+      "uncertaintyDegPerSecond": 0.0,
+      "measurementSeconds": 15.0,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 0,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.95028538798035,
+          "residualMeanDegPerSecond": -3.0881174415202457e-06
+        }
+      ],
+      "centeredAtSeconds": 101.0,
+      "finalDCOffsetDegrees": -42.95028538798035,
+      "trueResidualDriftDegPerSecond": 0.05387311707847557,
+      "final60SecondHeadingSlopeDegPerSecond": 1.2744416561318104,
+      "uncertaintyDegPerSecond": 0.9081836641372879,
+      "measurementSeconds": 93.58500298661629,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 1,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.00372478804653,
+          "residualMeanDegPerSecond": 3.2470646598516603e-06
+        }
+      ],
+      "centeredAtSeconds": 105.68,
+      "finalDCOffsetDegrees": -43.00372478804653,
+      "trueResidualDriftDegPerSecond": -0.07972538308697384,
+      "final60SecondHeadingSlopeDegPerSecond": 0.11403858008077111,
+      "uncertaintyDegPerSecond": 0.9075416437745298,
+      "measurementSeconds": 102.25961143943798,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 2,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -41.941497183420736,
+          "residualMeanDegPerSecond": -3.985033909401278e-06
+        },
+        {
+          "seconds": 100.48,
+          "dcDegrees": -42.85674936239161,
+          "residualMeanDegPerSecond": 9.40269861313711e-07
+        }
+      ],
+      "centeredAtSeconds": 182.96,
+      "finalDCOffsetDegrees": -42.85674936239161,
+      "trueResidualDriftDegPerSecond": 0.2877131810503246,
+      "final60SecondHeadingSlopeDegPerSecond": 1.0276117363366681,
+      "uncertaintyDegPerSecond": 0.9806246172117014,
+      "measurementSeconds": 79.59953779962018,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 3,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.97678652196,
+          "residualMeanDegPerSecond": -2.0095470121037076e-06
+        }
+      ],
+      "centeredAtSeconds": 98.4,
+      "finalDCOffsetDegrees": -42.97678652196,
+      "trueResidualDriftDegPerSecond": -0.012379717870648111,
+      "final60SecondHeadingSlopeDegPerSecond": -0.39166303242663403,
+      "uncertaintyDegPerSecond": 0.864914804904289,
+      "measurementSeconds": 104.50928952982683,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 4,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.9468361424495,
+          "residualMeanDegPerSecond": 2.838343218566918e-07
+        }
+      ],
+      "centeredAtSeconds": 101.52,
+      "finalDCOffsetDegrees": -42.9468361424495,
+      "trueResidualDriftDegPerSecond": 0.06249623090561667,
+      "final60SecondHeadingSlopeDegPerSecond": 0.25255247995475194,
+      "uncertaintyDegPerSecond": 0.8345530137808266,
+      "measurementSeconds": 107.55769569071303,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 5,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.248201164103385,
+          "residualMeanDegPerSecond": 4.047477453212529e-06
+        },
+        {
+          "seconds": 123.36,
+          "dcDegrees": -42.841777587730945,
+          "residualMeanDegPerSecond": 3.1608444024359257e-06
+        }
+      ],
+      "centeredAtSeconds": 103.08,
+      "finalDCOffsetDegrees": -42.841777587730945,
+      "trueResidualDriftDegPerSecond": 0.3251426177019945,
+      "final60SecondHeadingSlopeDegPerSecond": -1.2675610231688634,
+      "uncertaintyDegPerSecond": 1.0236490356912076,
+      "measurementSeconds": 116.24160089797611,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 6,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.45861538676938,
+          "residualMeanDegPerSecond": 3.2470646598516603e-06
+        },
+        {
+          "seconds": 95.8,
+          "dcDegrees": -42.64115444124016,
+          "residualMeanDegPerSecond": 2.0219746796605112e-06
+        }
+      ],
+      "centeredAtSeconds": 184.0,
+      "finalDCOffsetDegrees": -42.64115444124016,
+      "trueResidualDriftDegPerSecond": 0.8267004839289558,
+      "final60SecondHeadingSlopeDegPerSecond": 0.4197788743524947,
+      "uncertaintyDegPerSecond": 0.9301905799419212,
+      "measurementSeconds": 84.79991411064358,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 7,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.482418596026875,
+          "residualMeanDegPerSecond": 2.452328552291814e-06
+        },
+        {
+          "seconds": 93.72,
+          "dcDegrees": -43.01045252437899,
+          "residualMeanDegPerSecond": -1.7369960260349757e-06
+        }
+      ],
+      "centeredAtSeconds": 91.12,
+      "finalDCOffsetDegrees": -43.01045252437899,
+      "trueResidualDriftDegPerSecond": -0.09654472391813024,
+      "final60SecondHeadingSlopeDegPerSecond": 0.13155342199963682,
+      "uncertaintyDegPerSecond": 0.9066804418924908,
+      "measurementSeconds": 91.09176930966251,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 0,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.95028538798035,
+          "residualMeanDegPerSecond": 3.0881174415202457e-06
+        }
+      ],
+      "centeredAtSeconds": 101.0,
+      "finalDCOffsetDegrees": -42.95028538798035,
+      "trueResidualDriftDegPerSecond": -0.05387311707847557,
+      "final60SecondHeadingSlopeDegPerSecond": -1.2744416561318104,
+      "uncertaintyDegPerSecond": 0.9081836641372879,
+      "measurementSeconds": 93.58500298661629,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 1,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.00372478804653,
+          "residualMeanDegPerSecond": -3.2470646598516603e-06
+        }
+      ],
+      "centeredAtSeconds": 105.68,
+      "finalDCOffsetDegrees": -43.00372478804653,
+      "trueResidualDriftDegPerSecond": 0.07972538308697384,
+      "final60SecondHeadingSlopeDegPerSecond": -0.11403858008077111,
+      "uncertaintyDegPerSecond": 0.9075416437745298,
+      "measurementSeconds": 102.25961143943798,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 2,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -41.941497183420736,
+          "residualMeanDegPerSecond": 3.985033909401278e-06
+        },
+        {
+          "seconds": 100.48,
+          "dcDegrees": -42.85674936239161,
+          "residualMeanDegPerSecond": -9.40269861313711e-07
+        }
+      ],
+      "centeredAtSeconds": 182.96,
+      "finalDCOffsetDegrees": -42.85674936239161,
+      "trueResidualDriftDegPerSecond": -0.2877131810503246,
+      "final60SecondHeadingSlopeDegPerSecond": -1.0276117363366681,
+      "uncertaintyDegPerSecond": 0.9806246172117014,
+      "measurementSeconds": 79.59953779962018,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 3,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.97678652196,
+          "residualMeanDegPerSecond": 2.0095470121037076e-06
+        }
+      ],
+      "centeredAtSeconds": 98.4,
+      "finalDCOffsetDegrees": -42.97678652196,
+      "trueResidualDriftDegPerSecond": 0.012379717870648111,
+      "final60SecondHeadingSlopeDegPerSecond": 0.39166303242663403,
+      "uncertaintyDegPerSecond": 0.864914804904289,
+      "measurementSeconds": 104.50928952982683,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 4,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.9468361424495,
+          "residualMeanDegPerSecond": -2.838343218566918e-07
+        }
+      ],
+      "centeredAtSeconds": 101.52,
+      "finalDCOffsetDegrees": -42.9468361424495,
+      "trueResidualDriftDegPerSecond": -0.06249623090561667,
+      "final60SecondHeadingSlopeDegPerSecond": -0.25255247995475194,
+      "uncertaintyDegPerSecond": 0.8345530137808266,
+      "measurementSeconds": 107.55769569071303,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 5,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.248201164103385,
+          "residualMeanDegPerSecond": -4.047477453212529e-06
+        },
+        {
+          "seconds": 123.36,
+          "dcDegrees": -42.841777587730945,
+          "residualMeanDegPerSecond": -3.1608444024359257e-06
+        }
+      ],
+      "centeredAtSeconds": 103.08,
+      "finalDCOffsetDegrees": -42.841777587730945,
+      "trueResidualDriftDegPerSecond": -0.3251426177019945,
+      "final60SecondHeadingSlopeDegPerSecond": 1.2675610231688634,
+      "uncertaintyDegPerSecond": 1.0236490356912076,
+      "measurementSeconds": 116.24160089797611,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 6,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.45861538676938,
+          "residualMeanDegPerSecond": -3.2470646598516603e-06
+        },
+        {
+          "seconds": 95.8,
+          "dcDegrees": -42.64115444124016,
+          "residualMeanDegPerSecond": -2.0219746796605112e-06
+        }
+      ],
+      "centeredAtSeconds": 184.0,
+      "finalDCOffsetDegrees": -42.64115444124016,
+      "trueResidualDriftDegPerSecond": -0.8267004839289558,
+      "final60SecondHeadingSlopeDegPerSecond": -0.4197788743524947,
+      "uncertaintyDegPerSecond": 0.9301905799419212,
+      "measurementSeconds": 84.79991411064358,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 7,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.482418596026875,
+          "residualMeanDegPerSecond": -2.452328552291814e-06
+        },
+        {
+          "seconds": 93.72,
+          "dcDegrees": -43.01045252437899,
+          "residualMeanDegPerSecond": 1.7369960260349757e-06
+        }
+      ],
+      "centeredAtSeconds": 91.12,
+      "finalDCOffsetDegrees": -43.01045252437899,
+      "trueResidualDriftDegPerSecond": 0.09654472391813024,
+      "final60SecondHeadingSlopeDegPerSecond": -0.13155342199963682,
+      "uncertaintyDegPerSecond": 0.9066804418924908,
+      "measurementSeconds": 91.09176930966251,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 0,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.921550782142106,
+          "residualMeanDegPerSecond": -1.3498096116096738e-06
+        },
+        {
+          "seconds": 235.68,
+          "dcDegrees": -43.663309326005496,
+          "residualMeanDegPerSecond": 4.014644046541486e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -43.663309326005496,
+      "trueResidualDriftDegPerSecond": -1.7286867279843772,
+      "final60SecondHeadingSlopeDegPerSecond": 2.8401864086362614,
+      "uncertaintyDegPerSecond": 1.8435089569546563,
+      "measurementSeconds": 120.0,
+      "state": "COLLECTING"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 1,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.04624954581903,
+          "residualMeanDegPerSecond": -3.006515079154848e-06
+        },
+        {
+          "seconds": 159.24,
+          "dcDegrees": -42.287859491326664,
+          "residualMeanDegPerSecond": -1.403061781766378e-07
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.287859491326664,
+      "trueResidualDriftDegPerSecond": 1.709937858712692,
+      "final60SecondHeadingSlopeDegPerSecond": 2.1620540853347396,
+      "uncertaintyDegPerSecond": 2.2867852246629714,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 2,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -40.567710499804804,
+          "residualMeanDegPerSecond": -8.290623234734084e-07
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": -42.739966787962736,
+          "residualMeanDegPerSecond": 2.2744555069394444e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.739966787962736,
+      "trueResidualDriftDegPerSecond": 0.5796696171225196,
+      "final60SecondHeadingSlopeDegPerSecond": 2.306099640199758,
+      "uncertaintyDegPerSecond": 2.0650262013522034,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 3,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.98338789979282,
+          "residualMeanDegPerSecond": -2.028705830657853e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.98338789979282,
+      "trueResidualDriftDegPerSecond": -0.02888316245269142,
+      "final60SecondHeadingSlopeDegPerSecond": -0.913877425530904,
+      "uncertaintyDegPerSecond": 1.81653524599779,
+      "measurementSeconds": 120.0,
+      "state": "NOISE LIMITED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 4,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.91350481929983,
+          "residualMeanDegPerSecond": 3.9213486452368354e-07
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.91350481929983,
+      "trueResidualDriftDegPerSecond": 0.14582453877977222,
+      "final60SecondHeadingSlopeDegPerSecond": 0.5892890308114407,
+      "uncertaintyDegPerSecond": 1.805954503880197,
+      "measurementSeconds": 120.0,
+      "state": "NOISE LIMITED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 5,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.61669328492015,
+          "residualMeanDegPerSecond": 1.1112113807238064e-06
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": -42.79920160353967,
+          "residualMeanDegPerSecond": -3.0596877513472893e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.79920160353967,
+      "trueResidualDriftDegPerSecond": 0.4315825781801807,
+      "final60SecondHeadingSlopeDegPerSecond": -3.2847258063353957,
+      "uncertaintyDegPerSecond": 2.2900258794608837,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 6,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -44.10766094283901,
+          "residualMeanDegPerSecond": -3.853760538325543e-06
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": -42.31690145567756,
+          "residualMeanDegPerSecond": 1.6690408195023485e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.31690145567756,
+      "trueResidualDriftDegPerSecond": 1.6373329478354566,
+      "final60SecondHeadingSlopeDegPerSecond": 0.6878489827842482,
+      "uncertaintyDegPerSecond": 2.0499052069845405,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 7,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -44.163200626074975,
+          "residualMeanDegPerSecond": -3.6445214193016495e-06
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": -42.916226649684084,
+          "residualMeanDegPerSecond": -1.1042071473015142e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.916226649684084,
+      "trueResidualDriftDegPerSecond": 0.13901996281914702,
+      "final60SecondHeadingSlopeDegPerSecond": 0.671248903748679,
+      "uncertaintyDegPerSecond": 2.057833494197278,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 0,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.921550782142106,
+          "residualMeanDegPerSecond": 1.3498096116096738e-06
+        },
+        {
+          "seconds": 235.68,
+          "dcDegrees": -43.663309326005496,
+          "residualMeanDegPerSecond": -4.014644046541486e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -43.663309326005496,
+      "trueResidualDriftDegPerSecond": 1.7286867279843772,
+      "final60SecondHeadingSlopeDegPerSecond": -2.8401864086362614,
+      "uncertaintyDegPerSecond": 1.8435089569546563,
+      "measurementSeconds": 120.0,
+      "state": "COLLECTING"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 1,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.04624954581903,
+          "residualMeanDegPerSecond": 3.006515079154848e-06
+        },
+        {
+          "seconds": 159.24,
+          "dcDegrees": -42.287859491326664,
+          "residualMeanDegPerSecond": 1.403061781766378e-07
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.287859491326664,
+      "trueResidualDriftDegPerSecond": -1.709937858712692,
+      "final60SecondHeadingSlopeDegPerSecond": -2.1620540853347396,
+      "uncertaintyDegPerSecond": 2.2867852246629714,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 2,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -40.567710499804804,
+          "residualMeanDegPerSecond": 8.290623234734084e-07
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": -42.739966787962736,
+          "residualMeanDegPerSecond": -2.2744555069394444e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.739966787962736,
+      "trueResidualDriftDegPerSecond": -0.5796696171225196,
+      "final60SecondHeadingSlopeDegPerSecond": -2.306099640199758,
+      "uncertaintyDegPerSecond": 2.0650262013522034,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 3,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.98338789979282,
+          "residualMeanDegPerSecond": 2.028705830657853e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.98338789979282,
+      "trueResidualDriftDegPerSecond": 0.02888316245269142,
+      "final60SecondHeadingSlopeDegPerSecond": 0.913877425530904,
+      "uncertaintyDegPerSecond": 1.81653524599779,
+      "measurementSeconds": 120.0,
+      "state": "NOISE LIMITED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 4,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.91350481929983,
+          "residualMeanDegPerSecond": -3.9213486452368354e-07
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.91350481929983,
+      "trueResidualDriftDegPerSecond": -0.14582453877977222,
+      "final60SecondHeadingSlopeDegPerSecond": -0.5892890308114407,
+      "uncertaintyDegPerSecond": 1.805954503880197,
+      "measurementSeconds": 120.0,
+      "state": "NOISE LIMITED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 5,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.61669328492015,
+          "residualMeanDegPerSecond": -1.1112113807238064e-06
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": -42.79920160353967,
+          "residualMeanDegPerSecond": 3.0596877513472893e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.79920160353967,
+      "trueResidualDriftDegPerSecond": -0.4315825781801807,
+      "final60SecondHeadingSlopeDegPerSecond": 3.2847258063353957,
+      "uncertaintyDegPerSecond": 2.2900258794608837,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 6,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -44.10766094283901,
+          "residualMeanDegPerSecond": 3.853760538325543e-06
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": -42.31690145567756,
+          "residualMeanDegPerSecond": -1.6690408195023485e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.31690145567756,
+      "trueResidualDriftDegPerSecond": -1.6373329478354566,
+      "final60SecondHeadingSlopeDegPerSecond": -0.6878489827842482,
+      "uncertaintyDegPerSecond": 2.0499052069845405,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 7,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -44.163200626074975,
+          "residualMeanDegPerSecond": 3.6445214193016495e-06
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": -42.916226649684084,
+          "residualMeanDegPerSecond": 1.1042071473015142e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.916226649684084,
+      "trueResidualDriftDegPerSecond": -0.13901996281914702,
+      "final60SecondHeadingSlopeDegPerSecond": -0.671248903748679,
+      "uncertaintyDegPerSecond": 2.057833494197278,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 0,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.99338388164313,
+          "residualMeanDegPerSecond": -3.008643840305925e-06
+        }
+      ],
+      "centeredAtSeconds": 101.0,
+      "finalDCOffsetDegrees": 42.99338388164313,
+      "trueResidualDriftDegPerSecond": 0.05387311707847557,
+      "final60SecondHeadingSlopeDegPerSecond": 1.2744417215877901,
+      "uncertaintyDegPerSecond": 0.908183663379807,
+      "measurementSeconds": 93.58501708525824,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 1,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.93994448157695,
+          "residualMeanDegPerSecond": 3.3151849053667083e-06
+        }
+      ],
+      "centeredAtSeconds": 105.68,
+      "finalDCOffsetDegrees": 42.93994448157695,
+      "trueResidualDriftDegPerSecond": -0.07972538308697384,
+      "final60SecondHeadingSlopeDegPerSecond": 0.11403868111065246,
+      "uncertaintyDegPerSecond": 0.90754163222432,
+      "measurementSeconds": 102.25959268257144,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 2,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 44.00217208620275,
+          "residualMeanDegPerSecond": -3.939620422993095e-06
+        },
+        {
+          "seconds": 100.48,
+          "dcDegrees": 43.086919907231874,
+          "residualMeanDegPerSecond": 9.671654586443836e-07
+        }
+      ],
+      "centeredAtSeconds": 182.96,
+      "finalDCOffsetDegrees": 43.086919907231874,
+      "trueResidualDriftDegPerSecond": 0.2877131810503246,
+      "final60SecondHeadingSlopeDegPerSecond": 1.0276116908020734,
+      "uncertaintyDegPerSecond": 0.9806246171052124,
+      "measurementSeconds": 79.59953473095231,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 3,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.96688274766348,
+          "residualMeanDegPerSecond": -1.964133525695524e-06
+        }
+      ],
+      "centeredAtSeconds": 98.4,
+      "finalDCOffsetDegrees": 42.96688274766348,
+      "trueResidualDriftDegPerSecond": -0.012379717870648111,
+      "final60SecondHeadingSlopeDegPerSecond": -0.39166302815776555,
+      "uncertaintyDegPerSecond": 0.8649148074563487,
+      "measurementSeconds": 104.50929099835656,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 4,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.996833127173986,
+          "residualMeanDegPerSecond": 2.9518769345873757e-07
+        }
+      ],
+      "centeredAtSeconds": 101.52,
+      "finalDCOffsetDegrees": 42.996833127173986,
+      "trueResidualDriftDegPerSecond": 0.06249623090561667,
+      "final60SecondHeadingSlopeDegPerSecond": 0.25255252548934654,
+      "uncertaintyDegPerSecond": 0.834553012345157,
+      "measurementSeconds": 107.55771594417376,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 5,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.6954681055201,
+          "residualMeanDegPerSecond": 4.064507510615598e-06
+        },
+        {
+          "seconds": 123.36,
+          "dcDegrees": 43.10189168189254,
+          "residualMeanDegPerSecond": 3.127238820699316e-06
+        }
+      ],
+      "centeredAtSeconds": 103.08,
+      "finalDCOffsetDegrees": 43.10189168189254,
+      "trueResidualDriftDegPerSecond": 0.3251426177019945,
+      "final60SecondHeadingSlopeDegPerSecond": -1.267560994709742,
+      "uncertaintyDegPerSecond": 1.0236490372595983,
+      "measurementSeconds": 116.24160087162304,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 6,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.4850538828541,
+          "residualMeanDegPerSecond": 3.1732677444383625e-06
+        },
+        {
+          "seconds": 95.8,
+          "dcDegrees": 43.30251482838332,
+          "residualMeanDegPerSecond": 2.030007504466789e-06
+        }
+      ],
+      "centeredAtSeconds": 184.0,
+      "finalDCOffsetDegrees": 43.30251482838332,
+      "trueResidualDriftDegPerSecond": 0.8267004839289558,
+      "final60SecondHeadingSlopeDegPerSecond": 0.4197788700836263,
+      "uncertaintyDegPerSecond": 0.9301905825376311,
+      "measurementSeconds": 84.7999076671725,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 7,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.46125067359661,
+          "residualMeanDegPerSecond": 2.327441448766537e-06
+        },
+        {
+          "seconds": 93.72,
+          "dcDegrees": 42.93321674524449,
+          "residualMeanDegPerSecond": -1.666366958987189e-06
+        }
+      ],
+      "centeredAtSeconds": 91.12,
+      "finalDCOffsetDegrees": 42.93321674524449,
+      "trueResidualDriftDegPerSecond": -0.09654472391813024,
+      "final60SecondHeadingSlopeDegPerSecond": 0.1315533764650424,
+      "uncertaintyDegPerSecond": 0.9066804406881255,
+      "measurementSeconds": 91.09176258539607,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 0,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.99338388164313,
+          "residualMeanDegPerSecond": 3.008643840305925e-06
+        }
+      ],
+      "centeredAtSeconds": 101.0,
+      "finalDCOffsetDegrees": 42.99338388164313,
+      "trueResidualDriftDegPerSecond": -0.05387311707847557,
+      "final60SecondHeadingSlopeDegPerSecond": -1.2744417215877901,
+      "uncertaintyDegPerSecond": 0.908183663379807,
+      "measurementSeconds": 93.58501708525824,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 1,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.93994448157695,
+          "residualMeanDegPerSecond": -3.3151849053667083e-06
+        }
+      ],
+      "centeredAtSeconds": 105.68,
+      "finalDCOffsetDegrees": 42.93994448157695,
+      "trueResidualDriftDegPerSecond": 0.07972538308697384,
+      "final60SecondHeadingSlopeDegPerSecond": -0.11403868111065246,
+      "uncertaintyDegPerSecond": 0.90754163222432,
+      "measurementSeconds": 102.25959268257144,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 2,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 44.00217208620275,
+          "residualMeanDegPerSecond": 3.939620422993095e-06
+        },
+        {
+          "seconds": 100.48,
+          "dcDegrees": 43.086919907231874,
+          "residualMeanDegPerSecond": -9.671654586443836e-07
+        }
+      ],
+      "centeredAtSeconds": 182.96,
+      "finalDCOffsetDegrees": 43.086919907231874,
+      "trueResidualDriftDegPerSecond": -0.2877131810503246,
+      "final60SecondHeadingSlopeDegPerSecond": -1.0276116908020734,
+      "uncertaintyDegPerSecond": 0.9806246171052124,
+      "measurementSeconds": 79.59953473095231,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 3,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.96688274766348,
+          "residualMeanDegPerSecond": 1.964133525695524e-06
+        }
+      ],
+      "centeredAtSeconds": 98.4,
+      "finalDCOffsetDegrees": 42.96688274766348,
+      "trueResidualDriftDegPerSecond": 0.012379717870648111,
+      "final60SecondHeadingSlopeDegPerSecond": 0.39166302815776555,
+      "uncertaintyDegPerSecond": 0.8649148074563487,
+      "measurementSeconds": 104.50929099835656,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 4,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.996833127173986,
+          "residualMeanDegPerSecond": -2.9518769345873757e-07
+        }
+      ],
+      "centeredAtSeconds": 101.52,
+      "finalDCOffsetDegrees": 42.996833127173986,
+      "trueResidualDriftDegPerSecond": -0.06249623090561667,
+      "final60SecondHeadingSlopeDegPerSecond": -0.25255252548934654,
+      "uncertaintyDegPerSecond": 0.834553012345157,
+      "measurementSeconds": 107.55771594417376,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 5,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.6954681055201,
+          "residualMeanDegPerSecond": -4.064507510615598e-06
+        },
+        {
+          "seconds": 123.36,
+          "dcDegrees": 43.10189168189254,
+          "residualMeanDegPerSecond": -3.127238820699316e-06
+        }
+      ],
+      "centeredAtSeconds": 103.08,
+      "finalDCOffsetDegrees": 43.10189168189254,
+      "trueResidualDriftDegPerSecond": -0.3251426177019945,
+      "final60SecondHeadingSlopeDegPerSecond": 1.267560994709742,
+      "uncertaintyDegPerSecond": 1.0236490372595983,
+      "measurementSeconds": 116.24160087162304,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 6,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.4850538828541,
+          "residualMeanDegPerSecond": -3.1732677444383625e-06
+        },
+        {
+          "seconds": 95.8,
+          "dcDegrees": 43.30251482838332,
+          "residualMeanDegPerSecond": -2.030007504466789e-06
+        }
+      ],
+      "centeredAtSeconds": 184.0,
+      "finalDCOffsetDegrees": 43.30251482838332,
+      "trueResidualDriftDegPerSecond": -0.8267004839289558,
+      "final60SecondHeadingSlopeDegPerSecond": -0.4197788700836263,
+      "uncertaintyDegPerSecond": 0.9301905825376311,
+      "measurementSeconds": 84.7999076671725,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 7,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.46125067359661,
+          "residualMeanDegPerSecond": -2.327441448766537e-06
+        },
+        {
+          "seconds": 93.72,
+          "dcDegrees": 42.93321674524449,
+          "residualMeanDegPerSecond": 1.666366958987189e-06
+        }
+      ],
+      "centeredAtSeconds": 91.12,
+      "finalDCOffsetDegrees": 42.93321674524449,
+      "trueResidualDriftDegPerSecond": 0.09654472391813024,
+      "final60SecondHeadingSlopeDegPerSecond": -0.1315533764650424,
+      "uncertaintyDegPerSecond": 0.9066804406881255,
+      "measurementSeconds": 91.09176258539607,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 0,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 43.02211848748138,
+          "residualMeanDegPerSecond": -1.2715777784568636e-06
+        },
+        {
+          "seconds": 235.68,
+          "dcDegrees": 42.28035994361799,
+          "residualMeanDegPerSecond": 4.019772754576439e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 42.28035994361799,
+      "trueResidualDriftDegPerSecond": -1.7286867279843772,
+      "final60SecondHeadingSlopeDegPerSecond": 2.840186390693674,
+      "uncertaintyDegPerSecond": 1.8435089618143163,
+      "measurementSeconds": 120.0,
+      "state": "COLLECTING"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 1,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.897419723804454,
+          "residualMeanDegPerSecond": -2.831380427772125e-06
+        },
+        {
+          "seconds": 159.24,
+          "dcDegrees": 43.65580977829682,
+          "residualMeanDegPerSecond": -1.4294775606178052e-07
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 43.65580977829682,
+      "trueResidualDriftDegPerSecond": 1.709937858712692,
+      "final60SecondHeadingSlopeDegPerSecond": 2.16205408233041,
+      "uncertaintyDegPerSecond": 2.2867852447110106,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 2,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 45.37595876981868,
+          "residualMeanDegPerSecond": -1.0459294781092698e-06
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": 43.20370248166075,
+          "residualMeanDegPerSecond": 2.2347691022212117e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 43.20370248166075,
+      "trueResidualDriftDegPerSecond": 0.5796696171225196,
+      "final60SecondHeadingSlopeDegPerSecond": 2.306099803533994,
+      "uncertaintyDegPerSecond": 2.065026207895739,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 3,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.96028136983067,
+          "residualMeanDegPerSecond": -2.2511609813274447e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 42.96028136983067,
+      "trueResidualDriftDegPerSecond": -0.02888316245269142,
+      "final60SecondHeadingSlopeDegPerSecond": -0.9138772853030289,
+      "uncertaintyDegPerSecond": 1.8165352442634604,
+      "measurementSeconds": 120.0,
+      "state": "NOISE LIMITED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 4,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 43.03016445032365,
+          "residualMeanDegPerSecond": 6.123725483721323e-07
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 43.03016445032365,
+      "trueResidualDriftDegPerSecond": 0.14582453877977222,
+      "final60SecondHeadingSlopeDegPerSecond": 0.5892890299943527,
+      "uncertaintyDegPerSecond": 1.805954503505446,
+      "measurementSeconds": 120.0,
+      "state": "NOISE LIMITED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 5,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.32697598470333,
+          "residualMeanDegPerSecond": 9.195345054150575e-07
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": 43.14446766608381,
+          "residualMeanDegPerSecond": -3.1140574093913258e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 43.14446766608381,
+      "trueResidualDriftDegPerSecond": 0.4315825781801807,
+      "final60SecondHeadingSlopeDegPerSecond": -3.284725856172215,
+      "uncertaintyDegPerSecond": 2.2900258488808936,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 6,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 41.83600832678447,
+          "residualMeanDegPerSecond": -4.256450487031772e-06
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": 43.626767813945925,
+          "residualMeanDegPerSecond": 1.6220239041598258e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 43.626767813945925,
+      "trueResidualDriftDegPerSecond": 1.6373329478354566,
+      "final60SecondHeadingSlopeDegPerSecond": 0.6878491259302966,
+      "uncertaintyDegPerSecond": 2.0499052114684178,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": -2.5,
+      "seed": 7,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 41.78046864354851,
+          "residualMeanDegPerSecond": -3.458876036571414e-06
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": 43.0274426199394,
+          "residualMeanDegPerSecond": -9.903419061638338e-07
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 43.0274426199394,
+      "trueResidualDriftDegPerSecond": 0.13901996281914702,
+      "final60SecondHeadingSlopeDegPerSecond": 0.6712489474156432,
+      "uncertaintyDegPerSecond": 2.0578334919185632,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 0,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 43.02211848748138,
+          "residualMeanDegPerSecond": 1.2715777784568636e-06
+        },
+        {
+          "seconds": 235.68,
+          "dcDegrees": 42.28035994361799,
+          "residualMeanDegPerSecond": -4.019772754576439e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 42.28035994361799,
+      "trueResidualDriftDegPerSecond": 1.7286867279843772,
+      "final60SecondHeadingSlopeDegPerSecond": -2.840186390693674,
+      "uncertaintyDegPerSecond": 1.8435089618143163,
+      "measurementSeconds": 120.0,
+      "state": "COLLECTING"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 1,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.897419723804454,
+          "residualMeanDegPerSecond": 2.831380427772125e-06
+        },
+        {
+          "seconds": 159.24,
+          "dcDegrees": 43.65580977829682,
+          "residualMeanDegPerSecond": 1.4294775606178052e-07
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 43.65580977829682,
+      "trueResidualDriftDegPerSecond": -1.709937858712692,
+      "final60SecondHeadingSlopeDegPerSecond": -2.16205408233041,
+      "uncertaintyDegPerSecond": 2.2867852447110106,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 2,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 45.37595876981868,
+          "residualMeanDegPerSecond": 1.0459294781092698e-06
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": 43.20370248166075,
+          "residualMeanDegPerSecond": -2.2347691022212117e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 43.20370248166075,
+      "trueResidualDriftDegPerSecond": -0.5796696171225196,
+      "final60SecondHeadingSlopeDegPerSecond": -2.306099803533994,
+      "uncertaintyDegPerSecond": 2.065026207895739,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 3,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.96028136983067,
+          "residualMeanDegPerSecond": 2.2511609813274447e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 42.96028136983067,
+      "trueResidualDriftDegPerSecond": 0.02888316245269142,
+      "final60SecondHeadingSlopeDegPerSecond": 0.9138772853030289,
+      "uncertaintyDegPerSecond": 1.8165352442634604,
+      "measurementSeconds": 120.0,
+      "state": "NOISE LIMITED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 4,
+      "actualMotionIntegration": false,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 43.03016445032365,
+          "residualMeanDegPerSecond": -6.123725483721323e-07
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 43.03016445032365,
+      "trueResidualDriftDegPerSecond": -0.14582453877977222,
+      "final60SecondHeadingSlopeDegPerSecond": -0.5892890299943527,
+      "uncertaintyDegPerSecond": 1.805954503505446,
+      "measurementSeconds": 120.0,
+      "state": "NOISE LIMITED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 5,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.32697598470333,
+          "residualMeanDegPerSecond": -9.195345054150575e-07
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": 43.14446766608381,
+          "residualMeanDegPerSecond": 3.1140574093913258e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 43.14446766608381,
+      "trueResidualDriftDegPerSecond": -0.4315825781801807,
+      "final60SecondHeadingSlopeDegPerSecond": 3.284725856172215,
+      "uncertaintyDegPerSecond": 2.2900258488808936,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 6,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 41.83600832678447,
+          "residualMeanDegPerSecond": 4.256450487031772e-06
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": 43.626767813945925,
+          "residualMeanDegPerSecond": -1.6220239041598258e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 43.626767813945925,
+      "trueResidualDriftDegPerSecond": -1.6373329478354566,
+      "final60SecondHeadingSlopeDegPerSecond": -0.6878491259302966,
+      "uncertaintyDegPerSecond": 2.0499052114684178,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 20.05352282957881,
+      "gain": 2.5,
+      "seed": 7,
+      "actualMotionIntegration": false,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 41.78046864354851,
+          "residualMeanDegPerSecond": 3.458876036571414e-06
+        },
+        {
+          "seconds": 141.04,
+          "dcDegrees": 43.0274426199394,
+          "residualMeanDegPerSecond": 9.903419061638338e-07
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": 43.0274426199394,
+      "trueResidualDriftDegPerSecond": -0.13901996281914702,
+      "final60SecondHeadingSlopeDegPerSecond": -0.6712489474156432,
+      "uncertaintyDegPerSecond": 2.0578334919185632,
+      "measurementSeconds": 120.0,
+      "state": "VERIFYING / NOISE"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": -42.97183463481174,
+      "meanChangesAtSeconds": 120.0,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 44,
+      "actualMotionIntegration": false,
+      "passes": 5,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 42.12690266844073,
+          "residualMeanDegPerSecond": 3.882853549080092e-06
+        },
+        {
+          "seconds": 93.72,
+          "dcDegrees": 43.000989297283944,
+          "residualMeanDegPerSecond": 7.063763864265317e-08
+        },
+        {
+          "seconds": 130.44,
+          "dcDegrees": -14.29479021579838,
+          "residualMeanDegPerSecond": -5.099660238055931
+        },
+        {
+          "seconds": 148.44,
+          "dcDegrees": -43.84367413141802,
+          "residualMeanDegPerSecond": 2.577215655817091e-06
+        },
+        {
+          "seconds": 230.4,
+          "dcDegrees": -42.77574331883526,
+          "residualMeanDegPerSecond": -4.040644619882021e-06
+        }
+      ],
+      "centeredAtSeconds": null,
+      "finalDCOffsetDegrees": -42.77574331883526,
+      "trueResidualDriftDegPerSecond": -0.4902282899412027,
+      "final60SecondHeadingSlopeDegPerSecond": 2.3642409870468852,
+      "uncertaintyDegPerSecond": 0.9692841149385151,
+      "measurementSeconds": 78.53289631046343,
+      "state": "COLLECTING"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": 42.97183463481174,
+      "meanChangesAtSeconds": 120.0,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 45,
+      "actualMotionIntegration": false,
+      "passes": 4,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -42.49417560049066,
+          "residualMeanDegPerSecond": -1.2829311500589094e-06
+        },
+        {
+          "seconds": 93.2,
+          "dcDegrees": -42.926813442897604,
+          "residualMeanDegPerSecond": 1.3409867052149737e-06
+        },
+        {
+          "seconds": 129.4,
+          "dcDegrees": 10.9234515301624,
+          "residualMeanDegPerSecond": -5.109017817274612e-07
+        },
+        {
+          "seconds": 147.4,
+          "dcDegrees": 43.33063471719627,
+          "residualMeanDegPerSecond": 1.5554121003135553e-06
+        }
+      ],
+      "centeredAtSeconds": 91.64,
+      "finalDCOffsetDegrees": 43.33063471719627,
+      "trueResidualDriftDegPerSecond": 0.897000205961312,
+      "final60SecondHeadingSlopeDegPerSecond": -0.5608373028605615,
+      "uncertaintyDegPerSecond": 0.9589978779196384,
+      "measurementSeconds": 88.84516245373531,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": 42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": 2.5,
+      "seed": 42,
+      "actualMotionIntegration": true,
+      "passes": 1,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": 43.00510448625887,
+          "residualMeanDegPerSecond": 3.0994708131222913e-06
+        }
+      ],
+      "centeredAtSeconds": 123.88000000000001,
+      "finalDCOffsetDegrees": 43.00510448625887,
+      "trueResidualDriftDegPerSecond": -0.08317462861783027,
+      "final60SecondHeadingSlopeDegPerSecond": 0.9077070871988933,
+      "uncertaintyDegPerSecond": 0.8961670655729831,
+      "measurementSeconds": 102.66361815550272,
+      "state": "CENTERED"
+    },
+    {
+      "hiddenMeanDegrees": -42.97183463481174,
+      "initialDCOffsetDegrees": 0.0,
+      "changedMeanDegrees": null,
+      "meanChangesAtSeconds": null,
+      "noiseStdDevDegrees": 8.594366926962348,
+      "gain": -2.5,
+      "seed": 43,
+      "actualMotionIntegration": true,
+      "passes": 2,
+      "corrections": [
+        {
+          "seconds": 18.0,
+          "dcDegrees": -43.6054542086409,
+          "residualMeanDegPerSecond": -5.109017857031545e-07
+        },
+        {
+          "seconds": 89.56,
+          "dcDegrees": -42.8836739680998,
+          "residualMeanDegPerSecond": -1.393328552913523e-06
+        }
+      ],
+      "centeredAtSeconds": 170.48,
+      "finalDCOffsetDegrees": -42.8836739680998,
+      "trueResidualDriftDegPerSecond": 0.22040166677984896,
+      "final60SecondHeadingSlopeDegPerSecond": 0.5435009611149629,
+      "uncertaintyDegPerSecond": 0.9041090716730035,
+      "measurementSeconds": 103.96585486314366,
+      "state": "CENTERED"
+    }
+  ],
+  "settings": {
+    "windowSeconds": 15.0,
+    "maxWindowSeconds": 120.0,
+    "centerStatistic": "mean",
+    "noiseAware": true,
+    "flightWindowSeconds": 2.0,
+    "flightCheckEnabled": true,
+    "flightVarianceThreshold": 0.01,
+    "flightConfirmationSeconds": 1.0,
+    "flightVarianceHysteresis": 0.5,
+    "updateIntervalSeconds": 0.5,
+    "aggressiveness": 1.0,
+    "maxStepRadians": 1.0,
+    "maxOffsetRadians": 2.0,
+    "settleSeconds": 3.0,
+    "toleranceDegPerSecond": 1.0
+  },
+  "note": "Independent seeded Gaussian samples at 25 Hz for 240 seconds. The hidden mean is supplied only to the generator and truth checks, never to the controller. Two traces feed the real ZmqListener raw-packet path and ClosedLoop motion method. Noise permits diffusion of heading; tests check residual drift and statistical uncertainty, not perfectly constant heading.",
+  "date": "2026-10-11",
+  "testedSources": {
+    "Assets/Scripts/KineflyAutoTrim.cs": "97b88012eebd8016f542d2d15f6cc69825f26f85f80ceaa79ab94a140719a6c3",
+    "Assets/Scripts/ClosedLoop.cs": "5e5e5ec6a4f323fd623f5d6f70853b94022051fddaac3858ca890e8a5768c493",
+    "Assets/Scripts/ZmqListener.cs": "04791738b30b19eaf9ac2d990caa18c1801a3665923225179e96a4219ff6b162",
+    "Assets/Editor/KineflyGaussianValidation.cs": "6939c217a2dde6d7e93dc2174e67faebbafa1c5cbd6f747537d39c7b7f489dee"
+  },
+  "summary": {
+    "cases": 74,
+    "stationaryCases": 72,
+    "changingMeanCases": 2,
+    "passesDistribution": {
+      "2": 43,
+      "1": 27,
+      "4": 3,
+      "5": 1
+    },
+    "maxStationaryCorrections": 4,
+    "maxCorrections": 5,
+    "maximumTrueResidualDriftDegPerSecond": 1.7286867279843772,
+    "maximumFinal60SecondHeadingSlopeDegPerSecond": 3.284725856172215
+  }
+}

@@ -1,0 +1,1062 @@
+{
+  "passed": true,
+  "checks": 1293,
+  "nativeResourceCycles": 150,
+  "fullSceneLoads": 150,
+  "soakSamples": [
+    {
+      "scene": "Choice",
+      "load": 1,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 2,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 3,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 4,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 5,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 6,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 7,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 8,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 9,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 10,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 11,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 12,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 13,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 14,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 15,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 16,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 17,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 18,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 19,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 20,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 21,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 22,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 23,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 24,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 25,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 26,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 27,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 28,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 29,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 30,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 31,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 32,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 33,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 34,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 35,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 36,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 37,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 38,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 39,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 40,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 41,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 42,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 43,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 44,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 45,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 46,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 47,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 48,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 49,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 50,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 51,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 52,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 53,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 54,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 55,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 56,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 57,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 58,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 59,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 60,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 61,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 62,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 63,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 64,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 65,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 66,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 67,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 68,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 69,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 70,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 71,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 72,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 73,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 74,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 75,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 76,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 77,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 78,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 79,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 80,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 81,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 82,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 83,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 84,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 85,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 86,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 87,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 88,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 89,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 90,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 91,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 92,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 93,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 94,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 95,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 96,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 97,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 98,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 99,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 100,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 101,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 102,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 103,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 104,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 105,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 106,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 107,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 108,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 109,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 110,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 111,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 112,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 113,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 114,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 115,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 116,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 117,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 118,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 119,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 120,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 121,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 122,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 123,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 124,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 125,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 126,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 127,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 128,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 129,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 130,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 131,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 132,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 133,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 134,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 135,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 136,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 137,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 138,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 139,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 140,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 141,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 142,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 143,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 144,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 145,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 146,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 147,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 148,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Choice",
+      "load": 149,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    },
+    {
+      "scene": "Swarm",
+      "load": 150,
+      "trackingWorkers": 0,
+      "asyncWriters": 0,
+      "ownedMaterials": 0
+    }
+  ],
+  "unity": "6000.3.16f1",
+  "failure": null,
+  "errors": [],
+  "scope": "150 accelerated native material/grating/ColorDrift/socket teardown cycles;150 actual MainController Choice/Swarm full scene loads at0.1s configured duration with4local SUB listeners and generated2-agent populations; six-animal asynchronous object/layer/camera/reference checks; actual ReplayScene saved-folder/geometry/sky/population/scrub/overview checks. Does not reproduce30s hardware acquisition or prove its historical crash eliminated."
+}

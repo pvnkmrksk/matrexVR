@@ -1,0 +1,1615 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>System fields · MATREX VR manual</title><meta name="description" content="Generated types, defaults, runtime constraints and UI annotations for the system schema.">
+<link rel="canonical" href="https://pvnkmrksk.github.io/matrexVR/manual/schema-system.html"><meta name="theme-color" content="#102d33">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/manual.css"><script src="assets/manual.js" defer></script><noscript><style>.search-open,.mobile-menu{display:none!important}@media(max-width:800px){.left-sidebar{display:block;position:static;width:auto;height:auto;box-shadow:none}}</style></noscript></head>
+<body><a class="skip-link" href="#article">Skip to content</a>
+<header class="docs-header"><a class="docs-brand" href="../index.html"><span class="brand-mark" aria-hidden="true">M</span> MATREX <span>VR</span></a><a class="manual-label" href="index.html">Documentation <span>0.3 + source</span></a><div class="header-actions"><a href="gallery.html">Gallery</a><a href="../index.html#downloads">Downloads</a><a href="https://github.com/pvnkmrksk/matrexVR">Source ↗</a><button type="button" class="mobile-menu" aria-controls="manual-nav" aria-expanded="false">Menu</button></div></header>
+<div class="docs-layout"><aside class="left-sidebar" id="manual-nav"><button class="search-open" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg> Search the manual <kbd>/</kbd></button><nav aria-label="Documentation chapters"><details class="nav-group" open><summary>Start here<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Manual overview</span></a><a href="getting-started.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Getting started</span></a><a href="gallery.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Native gallery</span></a></div></details><details class="nav-group"><summary>How it works<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="architecture.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Runtime architecture</span></a><a href="components.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Component index</span></a><a href="scenes.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Scenes and Kannadi</span></a><a href="viewports.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Rigs and viewports</span></a><a href="closed-loop.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>ClosedLoop and motion</span></a><a href="input-contracts.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Input contracts</span></a><a href="controls.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Keyboard and gamepad</span></a></div></details><details class="nav-group"><summary>Configure<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="configuration-studio.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Configuration studio</span></a><a href="configuration-ux.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>GUI and HUD details</span></a><a href="configuration-reference.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Parameter reference</span></a><a href="animal-agent-compatibility.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Animal and agent names</span></a><a href="experiment-phases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment phases</span></a><a href="auto-trim.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Flight gate and auto trim</span></a></div></details><details class="nav-group" open><summary>Schema field atlas<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="schema-index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Full schema index</span></a><a href="schema-system.html" class="active" aria-current="page"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>System fields</span></a><a href="schema-sequence.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Sequence fields</span></a><a href="schema-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Choice fields</span></a><a href="schema-swarm.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Swarm fields</span></a><a href="schema-kannadi.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Kannadi fields</span></a><a href="schema-optomotor.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Optomotor fields</span></a><a href="schema-rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Rugosity fields</span></a><a href="schema-dynamic-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Dynamic-Choice fields</span></a></div></details><details class="nav-group"><summary>Stimuli<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="night-sky.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Astronomical night sky</span></a><a href="generated-swarms.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Generated swarms</span></a><a href="swarm-playback.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Recorded swarm playback</span></a><a href="selwyn-cycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Selwyn sky and swarm cycle</span></a><a href="rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Visual/navigation rugosity</span></a><a href="selwyn-terrain.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Selwyn terrain source</span></a><a href="historical-panorama.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Historical panorama recipe</span></a></div></details><details class="nav-group"><summary>Data and replay<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="recording-pipeline.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Recording pipeline</span></a><a href="data-formats.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Saved data formats</span></a><a href="run-config-snapshots.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Configuration snapshots</span></a><a href="telemetry.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live telemetry and headings</span></a><a href="live-monitoring.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live browser monitoring</span></a><a href="replay.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Replay a recorded run</span></a></div></details><details class="nav-group"><summary>Extend and validate<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="extending.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Extend the source</span></a><a href="experiment-workflow.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment workflow</span></a><a href="scene-lifecycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene lifecycle</span></a><a href="diagnostics-performance.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Diagnostics and performance</span></a><a href="scene-reload-investigation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene reload investigation</span></a><a href="six-camera-rig.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Six-camera reference</span></a><a href="kannadi-history.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Kannadi integration history</span></a><a href="releases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Releases and rebuilding</span></a></div></details><details class="nav-group"><summary>Hardware and ecosystem<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="hardware.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Hardware and calibration</span></a><a href="integrations.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Trackers and analysis</span></a><a href="tracker-integration.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Native tracker integration</span></a><a href="citation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Cite MATREX VR</span></a></div></details></nav><div class="sidebar-footer"><a href="citation.html">Cite the software</a><a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/manual/generated/schema-system.md">Edit this page ↗</a></div></aside>
+<main id="article" tabindex="-1"><div class="article-context"><span>Schema field atlas</span><span>MATREX VR / source manual</span></div><article class="prose"><h1 id="system-schema-fields">System schema fields</h1>
+<p>This atlas lists <strong>53 emitted property paths</strong> from the current <code>system</code> runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.</p>
+<p>The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See <a href="configuration-reference.html">parameter semantics</a> and <a href="assets/reference/docs/manual/generated/schema-source.json">the exact emitted schema</a>.</p>
+<p>Every field has a deep link and is indexed by the manual search. Array items use <code>[]</code> in their path. Nested pre/stimulus/post fields are listed where the schema emits them; repeated names in different phases are distinct paths.</p>
+<h2 id="targetdisplay-group">targetDisplay group</h2>
+<h3 id="targetdisplay"><code>targetDisplay</code></h3>
+<p>Zero-based physical display for stimulus cameras. 0 is the primary monitor. The top-level setting overrides legacy per-rig values.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="targetframerate-group">targetFrameRate group</h2>
+<h3 id="targetframerate"><code>targetFrameRate</code></h3>
+<p>Positive FPS, or -1 for uncapped. vSync overrides this value.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>120</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-2147483648</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":30,"max":240,"step":1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>enabledWhen</code>: <code>{"property":"vSyncCount","oneOf":[0]}</code>. This governs the form, not removal of stored values.</p>
+<h2 id="vsynccount-group">vSyncCount group</h2>
+<h3 id="vsynccount"><code>vSyncCount</code></h3>
+<p>0 uses the FPS target; 1–4 synchronize to every Nth display refresh and override the target on desktop.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>4</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="configs-group">configs group</h2>
+<h3 id="configs"><code>configs</code></h3>
+<p>Array of per-rig entries. Use one entry for every rig that should render.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>No default emitted at this path.</td>
+</tr>
+<tr>
+<td><code>minItems</code></td>
+<td><code>1</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="configs-group-1">configs[] group</h2>
+<h3 id="configsclosedloopmode"><code>configs[].closedLoopMode</code></h3>
+<p>Tracker backend: Hejjetrac (3) for HejjéTrac walking, Rekkefly (4) for flight, or Tirbala (2). Legacy FicTrac (0) and Kinefly (1) remain accepted without rewriting saved files. HejjéTrac and hejjetrak name aliases are also accepted. Native FT rows select sphere-radian walking interpretation; legacy JSON retains its gain behavior.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"FicTrac"</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["FicTrac","Kinefly","Tirbala","Hejjetrac","Rekkefly",0,1,2,3,4,"HejjéTrac","hejjetrak"]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsmanualcontrols"><code>configs[].manualControls</code></h3>
+<p>Optional per-rig operator movement settings below. Omission preserves prefab tuning.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsmanualcontrolsenabled"><code>configs[].manualControls.enabled</code></h3>
+<p>Enable this feature. Its saved parameters remain in the JSON when disabled.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsmanualcontrolstranslatespeed"><code>configs[].manualControls.translateSpeed</code></h3>
+<p>World units/s for full arrow-key/stick input: cm/s walking, m/s terrain.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>10.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>scene units / s</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":100.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsmanualcontrolsrotatespeed"><code>configs[].manualControls.rotateSpeed</code></h3>
+<p>degrees/s for full yaw input.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>50.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":300.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsmanualcontrolsmaxtranslatespeed"><code>configs[].manualControls.maxTranslateSpeed</code></h3>
+<p>World units/s cap for operator speed adjustment.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>100.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsmanualcontrolsmaxrotatespeed"><code>configs[].manualControls.maxRotateSpeed</code></h3>
+<p>degrees/s cap.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>300.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsmanualcontrolsallowverticaltranslation"><code>configs[].manualControls.allowVerticalTranslation</code></h3>
+<p>Allow C/Z vertical motion.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsmanualcontrolsallowpitchandroll"><code>configs[].manualControls.allowPitchAndRoll</code></h3>
+<p>Allow W/S pitch and Q/E roll.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsspherediameter"><code>configs[].sphereDiameter</code></h3>
+<p>Walking ball diameter in centimetres. Hidden in wing-angle flight mode.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"closedLoopMode","oneOf":["FicTrac","Hejjetrac","HejjéTrac","hejjetrak",0,3]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="configsledpanelwidth"><code>configs[].ledPanelWidth</code></h3>
+<p>Width of each stimulus camera viewport in pixels. For a 64 × 64 panel, use 64. Independent of the physical monitor resolution.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>128</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-2147483648</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsledpanelheight"><code>configs[].ledPanelHeight</code></h3>
+<p>Height of each stimulus camera viewport in pixels. For a 64 × 64 panel, use 64.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>128</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-2147483648</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsstartrow"><code>configs[].startRow</code></h3>
+<p>Zero-based panel cells, measured from the top-left.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-2147483648</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsstartcol"><code>configs[].startCol</code></h3>
+<p>Zero-based panel cells, measured from the top-left.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-2147483648</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configshorizontal"><code>configs[].horizontal</code></h3>
+<p>Advance through columns when true, rows when false.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configszmqaddress"><code>configs[].zmqAddress</code></h3>
+<p>Host running the pose publisher; no tcp:// prefix.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"localhost"</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configszmqport"><code>configs[].zmqPort</code></h3>
+<p>TCP port; template uses 9871–9874.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>9872</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>65535</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsvrid"><code>configs[].vrId</code></h3>
+<p>Exact unique positive VR identifier, such as VR1 or VR10. Duplicate IDs are rejected; a rig is separate from its animal ID/species.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"VR1"</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsspeciesname"><code>configs[].speciesName</code></h3>
+<p>Common or scientific name of the real animal controlling this rig. Saved with its AnimalID in run metadata.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>""</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configstracker"><code>configs[].tracker</code></h3>
+<p>Optional local tracker app launch. Nothing launches automatically. Choose an installed native executable and its existing calibration file; MATREX only stops processes it launches. Save tracker calibration edits before Stop.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configstrackerexecutablepath"><code>configs[].tracker.executablePath</code></h3>
+<p>Absolute installed native executable. On macOS choose Contents/MacOS inside the app. Nothing launches automatically.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>""</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configstrackerconfigfile"><code>configs[].tracker.configFile</code></h3>
+<p>Existing tracker calibration file. Relative paths resolve inside the MATREX config folder; MATREX never rewrites this file.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>""</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configstrackerdevice"><code>configs[].tracker.device</code></h3>
+<p>Optional Rekkefly device override. HejjéTrac source selection stays in its calibration config.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>""</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configstrackerheadless"><code>configs[].tracker.headless</code></h3>
+<p>Optional headless Rekkefly launch. HejjéTrac uses its native desktop window.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configsdisplayorder"><code>configs[].displayOrder</code></h3>
+<p>Ordered camera allow-list. R=Right, B=Back, L=Left, F=Front, U=Up, D=Down. RBLF draws those four views in that order. Omitted letters disable their cameras; an empty order renders no stimulus cameras.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>""</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="configstargetdisplay"><code>configs[].targetDisplay</code></h3>
+<p>The top-level targetDisplay overrides this legacy field.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-2147483648</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>readOnly</code>: <code>true</code>. This governs the form, not removal of stored values.</p>
+<h2 id="telemetry-group">telemetry group</h2>
+<h3 id="telemetry"><code>telemetry</code></h3>
+<p>Publish live experiment state and frame timing over a ZeroMQ PUB output. Independent of the incoming closed loop data. Enabled by default.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<details><summary>Exact emitted default JSON</summary>
+
+<pre class="json"><code>{
+  &quot;enabled&quot;: true,
+  &quot;bindAddress&quot;: &quot;127.0.0.1&quot;,
+  &quot;port&quot;: 9880,
+  &quot;rateHz&quot;: 20.0,
+  &quot;topic&quot;: &quot;matrex.telemetry.v2&quot;,
+  &quot;contextIntervalSeconds&quot;: 2.0
+}</code></pre>
+</details>
+
+<h3 id="telemetryenabled"><code>telemetry.enabled</code></h3>
+<p>Publish live state and frame timing. Default ON; this output is separate from the closed loop input.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="telemetrybindaddress"><code>telemetry.bindAddress</code></h3>
+<p>Local interface used by the telemetry publisher. 127.0.0.1 allows local subscribers; 0.0.0.0 allows network subscribers.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"127.0.0.1"</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="telemetryport"><code>telemetry.port</code></h3>
+<p>TCP port for telemetry output. Default 9880. Choose a free port, distinct from all closed loop input ports.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>9880</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>65535</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="telemetryratehz"><code>telemetry.rateHz</code></h3>
+<p>Maximum telemetry snapshots per second. Default 20 Hz; captured on the main thread and serialized/published on a worker.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>20.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":1.0,"max":120.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="telemetrytopic"><code>telemetry.topic</code></h3>
+<p>ZeroMQ topic prefix for experiment telemetry. Default matrex.telemetry.v2.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"matrex.telemetry.v2"</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="telemetrycontextintervalseconds"><code>telemetry.contextIntervalSeconds</code></h3>
+<p>Compact session context heartbeat for late-joining dashboards. Topic matrex.telemetry.v2.context uses schema 1/kind matrex.context; normal frame snapshots retain schema 2.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>0.25</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>60</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="statusoverlay-group">statusOverlay group</h2>
+<h3 id="statusoverlay"><code>statusOverlay</code></h3>
+<p>Operator status panel showing flight state, run progress and diagnostics. Visible by default. Tab shows or hides it during the experiment.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<details><summary>Exact emitted default JSON</summary>
+
+<pre class="json"><code>{
+  &quot;visible&quot;: true,
+  &quot;targetDisplay&quot;: 0
+}</code></pre>
+</details>
+
+<h3 id="statusoverlayvisible"><code>statusOverlay.visible</code></h3>
+<p>Show the operator status panel when the experiment starts. Default ON. Tab toggles it during the run.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="statusoverlaytargetdisplay"><code>statusOverlay.targetDisplay</code></h3>
+<p>Zero-based monitor for the operator status panel. Default 0 is the primary monitor; separate from stimulus camera output.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-2147483648</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="overheadcamera-group">overheadCamera group</h2>
+<h3 id="overheadcamera"><code>overheadCamera</code></h3>
+<p>Operator overview in Swarm/Kannadi; independent of animal camera letter order.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<details><summary>Exact emitted default JSON</summary>
+
+<pre class="json"><code>{
+  &quot;enabled&quot;: true,
+  &quot;targetDisplay&quot;: -1,
+  &quot;x&quot;: 0.58,
+  &quot;y&quot;: 0.02,
+  &quot;width&quot;: 0.4,
+  &quot;height&quot;: 0.4,
+  &quot;resolution&quot;: 512,
+  &quot;markerSizePixels&quot;: 14.0,
+  &quot;trailDurationSeconds&quot;: 60.0,
+  &quot;trailSampleInterval&quot;: 0.1,
+  &quot;trailWidthPixels&quot;: 1.5,
+  &quot;trailBreakDistance&quot;: 50.0
+}</code></pre>
+</details>
+
+<h3 id="overheadcameraenabled"><code>overheadCamera.enabled</code></h3>
+<p>Create the overview.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="overheadcameratargetdisplay"><code>overheadCamera.targetDisplay</code></h3>
+<p>Zero-based monitor for the overview. -1 follows the stimulus display. Default -1.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>-1</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-2147483648</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="overheadcamerax"><code>overheadCamera.x</code></h3>
+<p>Normalized bottom-left of panel.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.58</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="overheadcameray"><code>overheadCamera.y</code></h3>
+<p>Normalized bottom-left of panel.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.02</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="overheadcamerawidth"><code>overheadCamera.width</code></h3>
+<p>Fraction of display width/height.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.4</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="overheadcameraheight"><code>overheadCamera.height</code></h3>
+<p>Fraction of display width/height.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.4</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="overheadcameraresolution"><code>overheadCamera.resolution</code></h3>
+<p>Square render texture pixels; 512 is a practical starting point.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>512</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-2147483648</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="overheadcameramarkersizepixels"><code>overheadCamera.markerSizePixels</code></h3>
+<p>Fixed screen-size arrow, visible while zooming out.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>14.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="overheadcameratraildurationseconds"><code>overheadCamera.trailDurationSeconds</code></h3>
+<p>Fading history; use 30 for shorter trails.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>60.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="overheadcameratrailsampleinterval"><code>overheadCamera.trailSampleInterval</code></h3>
+<p>Seconds between samples.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.1</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="overheadcameratrailwidthpixels"><code>overheadCamera.trailWidthPixels</code></h3>
+<p>Screen-space trail width.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="overheadcameratrailbreakdistance"><code>overheadCamera.trailBreakDistance</code></h3>
+<p>World-unit jump that breaks a trail at reset/wrap.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>50.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="source">Source</h2>
+<p><a href="https://github.com/pvnkmrksk/matrexVR/blob/main/Assets/Resources/ConfigurationUI/schemas.json">Bundled schema source</a> · <a href="https://github.com/pvnkmrksk/matrexVR/blob/main/Assets/Editor/ConfigurationSchemaBuilder.cs">Schema generator</a></p>
+</article><nav class="chapter-pager" aria-label="Adjacent chapters"><a href="schema-index.html"><small>Previous</small>Full schema index</a><a href="schema-sequence.html"><small>Next</small>Sequence fields<span aria-hidden="true"> →</span></a></nav><footer class="article-footer">Static documentation · software contracts and recorded evidence. <a href="citation.html">Citation and credits</a></footer></main>
+<aside class="right-sidebar"><nav aria-label="On this page"><p>On this page</p><a href="#targetdisplay-group" class="toc-level-2">targetDisplay group</a><a href="#targetframerate-group" class="toc-level-2">targetFrameRate group</a><a href="#vsynccount-group" class="toc-level-2">vSyncCount group</a><a href="#configs-group" class="toc-level-2">configs group</a><a href="#configs-group-1" class="toc-level-2">configs[] group</a><a href="#telemetry-group" class="toc-level-2">telemetry group</a><a href="#statusoverlay-group" class="toc-level-2">statusOverlay group</a><a href="#overheadcamera-group" class="toc-level-2">overheadCamera group</a><a href="#source" class="toc-level-2">Source</a></nav><a class="source-link" href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/manual/generated/schema-system.md">View Markdown source ↗</a></aside></div>
+<dialog class="search-dialog" aria-labelledby="search-title"><form method="dialog"><h2 id="search-title">Search documentation</h2><button class="search-close" aria-label="Close search">×</button></form><label class="sr-only" for="manual-search">Search every manual section</label><input id="manual-search" type="search" placeholder="Try: ViewportSetter, yaw units, replay, sky…" autocomplete="off"><p class="search-status" role="status">Search runs locally in your browser.</p><div class="search-results"></div><p class="search-hint">Enter a term · Tab to a result · Escape to close</p></dialog>
+</body></html>

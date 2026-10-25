@@ -1,0 +1,402 @@
+[
+  {
+    "group": "Start here",
+    "title": "Manual overview",
+    "slug": "index",
+    "source": "docs/manual/index.md",
+    "icon": "layout-dashboard",
+    "summary": "Find the right workflow, units and ownership boundary."
+  },
+  {
+    "group": "Start here",
+    "title": "Getting started",
+    "slug": "getting-started",
+    "source": "docs/getting-started.md",
+    "icon": "play",
+    "summary": "Downloads, first launch, controls, storage and configuration."
+  },
+  {
+    "group": "Start here",
+    "title": "Native gallery",
+    "slug": "gallery",
+    "source": "docs/manual/gallery.md",
+    "icon": "camera",
+    "summary": "Genuine Unity scene captures and stimulus provenance."
+  },
+  {
+    "group": "How it works",
+    "title": "Runtime architecture",
+    "slug": "architecture",
+    "source": "docs/manual/architecture.md",
+    "icon": "layout-dashboard",
+    "summary": "Ownership, scene transitions, workers and frame-side flow."
+  },
+  {
+    "group": "How it works",
+    "title": "Component index",
+    "slug": "components",
+    "source": "docs/manual/components.md",
+    "icon": "ellipsis",
+    "summary": "Map every runtime component to its responsibility and contract."
+  },
+  {
+    "group": "How it works",
+    "title": "Scenes and Kannadi",
+    "slug": "scenes",
+    "source": "docs/manual/scenes.md",
+    "icon": "maximize",
+    "summary": "Compact scenes, source environments and the mirror matrix."
+  },
+  {
+    "group": "How it works",
+    "title": "Rigs and viewports",
+    "slug": "viewports",
+    "source": "docs/manual/viewports.md",
+    "icon": "camera",
+    "summary": "Camera allow-lists, LED pixel rectangles, layers and rig count."
+  },
+  {
+    "group": "How it works",
+    "title": "ClosedLoop and motion",
+    "slug": "closed-loop",
+    "source": "docs/manual/closed-loop.md",
+    "icon": "circle-dot",
+    "summary": "Walking displacement, flight yaw, resets, gains and autopilot."
+  },
+  {
+    "group": "How it works",
+    "title": "Input contracts",
+    "slug": "input-contracts",
+    "source": "docs/manual/input-contracts.md",
+    "icon": "circle-dot",
+    "summary": "Tracking SUB frames, units, packet handoff and stale behavior."
+  },
+  {
+    "group": "How it works",
+    "title": "Keyboard and gamepad",
+    "slug": "controls",
+    "source": "docs/unity6-controls.md",
+    "icon": "sliders-horizontal",
+    "summary": "Action map, movement, reset, overview and operator shortcuts."
+  },
+  {
+    "group": "Configure",
+    "title": "Configuration studio",
+    "slug": "configuration-studio",
+    "source": "docs/configuration-ui.md",
+    "icon": "layout-dashboard",
+    "summary": "Visual setup, sequence blocks, lossless JSON and schema extension."
+  },
+  {
+    "group": "Configure",
+    "title": "GUI and HUD details",
+    "slug": "configuration-ux",
+    "source": "docs/configuration-ux.md",
+    "icon": "sliders-horizontal",
+    "summary": "Inherited defaults, exact controls, layout and runtime HUD."
+  },
+  {
+    "group": "Configure",
+    "title": "Parameter reference",
+    "slug": "configuration-reference",
+    "source": "docs/configuration-reference.md",
+    "icon": "sliders-horizontal",
+    "summary": "Current and accepted legacy fields, units, defaults and precedence."
+  },
+  {
+    "group": "Configure",
+    "title": "Animal and agent names",
+    "slug": "animal-agent-compatibility",
+    "source": "docs/animal-agent-compatibility.md",
+    "icon": "circle-dot",
+    "summary": "Species, metadata aliases, speed/count names and undoable editing."
+  },
+  {
+    "group": "Configure",
+    "title": "Experiment phases",
+    "slug": "experiment-phases",
+    "source": "docs/experiment-phases.md",
+    "icon": "skip-forward",
+    "summary": "Continuous pre/stimulus/post conditions and heading references."
+  },
+  {
+    "group": "Configure",
+    "title": "Flight gate and auto trim",
+    "slug": "auto-trim",
+    "source": "docs/kinefly-auto-trim.md",
+    "icon": "sliders-horizontal",
+    "summary": "Distinct samples, flight qualification, median windows and DC offsets."
+  },
+  {
+    "group": "Schema field atlas",
+    "title": "Full schema index",
+    "slug": "schema-index",
+    "source": "docs/manual/generated/schema-index.md",
+    "icon": "sliders-horizontal",
+    "summary": "Every emitted property path from the actual bundled runtime/UI schemas."
+  },
+  {
+    "group": "Schema field atlas",
+    "title": "System fields",
+    "slug": "schema-system",
+    "source": "docs/manual/generated/schema-system.md",
+    "icon": "sliders-horizontal",
+    "summary": "Generated types, defaults, runtime constraints and UI annotations for the system schema."
+  },
+  {
+    "group": "Schema field atlas",
+    "title": "Sequence fields",
+    "slug": "schema-sequence",
+    "source": "docs/manual/generated/schema-sequence.md",
+    "icon": "sliders-horizontal",
+    "summary": "Generated types, defaults, runtime constraints and UI annotations for the sequence schema."
+  },
+  {
+    "group": "Schema field atlas",
+    "title": "Choice fields",
+    "slug": "schema-choice",
+    "source": "docs/manual/generated/schema-choice.md",
+    "icon": "sliders-horizontal",
+    "summary": "Generated types, defaults, runtime constraints and UI annotations for the choice schema."
+  },
+  {
+    "group": "Schema field atlas",
+    "title": "Swarm fields",
+    "slug": "schema-swarm",
+    "source": "docs/manual/generated/schema-swarm.md",
+    "icon": "sliders-horizontal",
+    "summary": "Generated types, defaults, runtime constraints and UI annotations for the swarm schema."
+  },
+  {
+    "group": "Schema field atlas",
+    "title": "Kannadi fields",
+    "slug": "schema-kannadi",
+    "source": "docs/manual/generated/schema-kannadi.md",
+    "icon": "sliders-horizontal",
+    "summary": "Generated types, defaults, runtime constraints and UI annotations for the kannadi schema."
+  },
+  {
+    "group": "Schema field atlas",
+    "title": "Optomotor fields",
+    "slug": "schema-optomotor",
+    "source": "docs/manual/generated/schema-optomotor.md",
+    "icon": "sliders-horizontal",
+    "summary": "Generated types, defaults, runtime constraints and UI annotations for the optomotor schema."
+  },
+  {
+    "group": "Schema field atlas",
+    "title": "Rugosity fields",
+    "slug": "schema-rugosity",
+    "source": "docs/manual/generated/schema-rugosity.md",
+    "icon": "sliders-horizontal",
+    "summary": "Generated types, defaults, runtime constraints and UI annotations for the rugosity schema."
+  },
+  {
+    "group": "Schema field atlas",
+    "title": "Dynamic-Choice fields",
+    "slug": "schema-dynamic-choice",
+    "source": "docs/manual/generated/schema-dynamic-choice.md",
+    "icon": "sliders-horizontal",
+    "summary": "Generated types, defaults, runtime constraints and UI annotations for the dynamic-choice schema."
+  },
+  {
+    "group": "Stimuli",
+    "title": "Astronomical night sky",
+    "slug": "night-sky",
+    "source": "docs/night-sky.md",
+    "icon": "circle-dot",
+    "summary": "Observer/time settings, offline sky generation and activation audit."
+  },
+  {
+    "group": "Stimuli",
+    "title": "Generated swarms",
+    "slug": "generated-swarms",
+    "source": "docs/generated-bogong-swarm.md",
+    "icon": "maximize",
+    "summary": "Directional populations, physical moths and authored recipes."
+  },
+  {
+    "group": "Stimuli",
+    "title": "Recorded swarm playback",
+    "slug": "swarm-playback",
+    "source": "docs/swarm-playback.md",
+    "icon": "play",
+    "summary": "Trajectory conversion, scales, world anchors and continuation."
+  },
+  {
+    "group": "Stimuli",
+    "title": "Selwyn sky and swarm cycle",
+    "slug": "selwyn-cycle",
+    "source": "docs/selwyn-milky-way-swarm-cycle.md",
+    "icon": "skip-forward",
+    "summary": "Named heading references, cyclic conditions and measurement scope."
+  },
+  {
+    "group": "Stimuli",
+    "title": "Visual/navigation rugosity",
+    "slug": "rugosity",
+    "source": "docs/rugosity.md",
+    "icon": "maximize",
+    "summary": "Independent visible and navigation surfaces and isolation controls."
+  },
+  {
+    "group": "Stimuli",
+    "title": "Selwyn terrain source",
+    "slug": "selwyn-terrain",
+    "source": "docs/selwyn-terrain.md",
+    "icon": "maximize",
+    "summary": "Authored terrain provenance and scene-scale choices."
+  },
+  {
+    "group": "Stimuli",
+    "title": "Historical panorama recipe",
+    "slug": "historical-panorama",
+    "source": "docs/adaminaby-historical-scene.md",
+    "icon": "camera",
+    "summary": "Recovered background image, configuration and projection limits."
+  },
+  {
+    "group": "Data and replay",
+    "title": "Recording pipeline",
+    "slug": "recording-pipeline",
+    "source": "docs/manual/recording-pipeline.md",
+    "icon": "rotate-ccw",
+    "summary": "Session ownership, immutable input versions, row sampling and finalization."
+  },
+  {
+    "group": "Data and replay",
+    "title": "Saved data formats",
+    "slug": "data-formats",
+    "source": "docs/data-formats.md",
+    "icon": "ellipsis",
+    "summary": "CSV/gzip/metadata columns, clocks, units and analysis cautions."
+  },
+  {
+    "group": "Data and replay",
+    "title": "Configuration snapshots",
+    "slug": "run-config-snapshots",
+    "source": "docs/run-config-snapshots.md",
+    "icon": "rotate-ccw",
+    "summary": "Original bytes, hashes, load attribution and historical-run audits."
+  },
+  {
+    "group": "Data and replay",
+    "title": "Live telemetry and headings",
+    "slug": "telemetry",
+    "source": "docs/heading-reference-telemetry.md",
+    "icon": "circle-dot",
+    "summary": "Versioned PUB frames, angular reporting, diagnostics and onset records."
+  },
+  {
+    "group": "Data and replay",
+    "title": "Live browser monitoring",
+    "slug": "live-monitoring",
+    "source": "docs/manual/live-monitoring.md",
+    "icon": "circle-dot",
+    "summary": "Post-0.3 context heartbeat, ZMQ-to-SSE browser bridge and read-only viewing."
+  },
+  {
+    "group": "Data and replay",
+    "title": "Replay a recorded run",
+    "slug": "replay",
+    "source": "docs/replay.md",
+    "icon": "play",
+    "summary": "Folder browser, shared timeline, archived stimuli and reconstruction limits."
+  },
+  {
+    "group": "Extend and validate",
+    "title": "Extend the source",
+    "slug": "extending",
+    "source": "docs/manual/extending.md",
+    "icon": "sliders-horizontal",
+    "summary": "Add parameters, scenes, assets, trackers and recording support."
+  },
+  {
+    "group": "Extend and validate",
+    "title": "Experiment workflow",
+    "slug": "experiment-workflow",
+    "source": "docs/experiment-workflow.md",
+    "icon": "skip-forward",
+    "summary": "Sequence scene/design references and in-scene controllers."
+  },
+  {
+    "group": "Extend and validate",
+    "title": "Scene lifecycle",
+    "slug": "scene-lifecycle",
+    "source": "docs/scene-lifecycle.md",
+    "icon": "refresh-cw",
+    "summary": "Repeated resets, explicit resource owners and measured stress evidence."
+  },
+  {
+    "group": "Extend and validate",
+    "title": "Diagnostics and performance",
+    "slug": "diagnostics-performance",
+    "source": "docs/diagnostics-performance.md",
+    "icon": "layout-dashboard",
+    "summary": "Frame work/waits, worker capture and monitoring performance."
+  },
+  {
+    "group": "Extend and validate",
+    "title": "Scene reload investigation",
+    "slug": "scene-reload-investigation",
+    "source": "docs/diagnostics.md",
+    "icon": "refresh-cw",
+    "summary": "Matched two-second reload stress, interrupted input, socket lifetime and material ownership evidence."
+  },
+  {
+    "group": "Extend and validate",
+    "title": "Six-camera reference",
+    "slug": "six-camera-rig",
+    "source": "docs/six-camera-rig.md",
+    "icon": "camera",
+    "summary": "RBLF/DRBLFU projection, clip and vertical-face configuration."
+  },
+  {
+    "group": "Extend and validate",
+    "title": "Kannadi integration history",
+    "slug": "kannadi-history",
+    "source": "docs/kannadi-modernization.md",
+    "icon": "rotate-ccw",
+    "summary": "Historical branch integration and original validation context."
+  },
+  {
+    "group": "Extend and validate",
+    "title": "Releases and rebuilding",
+    "slug": "releases",
+    "source": "docs/releases.md",
+    "icon": "skip-forward",
+    "summary": "Version boundaries, desktop packaging and verification reports."
+  },
+  {
+    "group": "Hardware and ecosystem",
+    "title": "Hardware and calibration",
+    "slug": "hardware",
+    "source": "docs/manual/hardware.md",
+    "icon": "sliders-horizontal",
+    "summary": "Apparatus-dependent checks and the current hardware-documentation boundary."
+  },
+  {
+    "group": "Hardware and ecosystem",
+    "title": "Trackers and analysis",
+    "slug": "integrations",
+    "source": "docs/manual/integrations.md",
+    "icon": "circle-dot",
+    "summary": "Rekkefly, HejjéTrac, Daari Deepa and transport directions."
+  },
+  {
+    "group": "Hardware and ecosystem",
+    "title": "Native tracker integration",
+    "slug": "tracker-integration",
+    "source": "docs/tracker-integration.md",
+    "icon": "circle-dot",
+    "summary": "Current-source backend names, native FT25 transport, optional owned launch and measured integration evidence."
+  },
+  {
+    "group": "Hardware and ecosystem",
+    "title": "Cite MATREX VR",
+    "slug": "citation",
+    "source": "docs/manual/citation.md",
+    "icon": "ellipsis",
+    "summary": "Verified software citation, stimulus sources and third-party notices."
+  }
+]

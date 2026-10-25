@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Selwyn sky and swarm cycle · MATREX VR manual</title><meta name="description" content="Named heading references, cyclic conditions and measurement scope.">
+<link rel="canonical" href="https://pvnkmrksk.github.io/matrexVR/manual/selwyn-cycle.html"><meta name="theme-color" content="#102d33">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/manual.css"><script src="assets/manual.js" defer></script><noscript><style>.search-open,.mobile-menu{display:none!important}@media(max-width:800px){.left-sidebar{display:block;position:static;width:auto;height:auto;box-shadow:none}}</style></noscript></head>
+<body><a class="skip-link" href="#article">Skip to content</a>
+<header class="docs-header"><a class="docs-brand" href="../index.html"><span class="brand-mark" aria-hidden="true">M</span> MATREX <span>VR</span></a><a class="manual-label" href="index.html">Documentation <span>0.3 + source</span></a><div class="header-actions"><a href="gallery.html">Gallery</a><a href="../index.html#downloads">Downloads</a><a href="https://github.com/pvnkmrksk/matrexVR">Source ↗</a><button type="button" class="mobile-menu" aria-controls="manual-nav" aria-expanded="false">Menu</button></div></header>
+<div class="docs-layout"><aside class="left-sidebar" id="manual-nav"><button class="search-open" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg> Search the manual <kbd>/</kbd></button><nav aria-label="Documentation chapters"><details class="nav-group" open><summary>Start here<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Manual overview</span></a><a href="getting-started.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Getting started</span></a><a href="gallery.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Native gallery</span></a></div></details><details class="nav-group"><summary>How it works<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="architecture.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Runtime architecture</span></a><a href="components.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Component index</span></a><a href="scenes.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Scenes and Kannadi</span></a><a href="viewports.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Rigs and viewports</span></a><a href="closed-loop.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>ClosedLoop and motion</span></a><a href="input-contracts.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Input contracts</span></a><a href="controls.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Keyboard and gamepad</span></a></div></details><details class="nav-group"><summary>Configure<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="configuration-studio.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Configuration studio</span></a><a href="configuration-ux.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>GUI and HUD details</span></a><a href="configuration-reference.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Parameter reference</span></a><a href="animal-agent-compatibility.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Animal and agent names</span></a><a href="experiment-phases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment phases</span></a><a href="auto-trim.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Flight gate and auto trim</span></a></div></details><details class="nav-group"><summary>Schema field atlas<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="schema-index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Full schema index</span></a><a href="schema-system.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>System fields</span></a><a href="schema-sequence.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Sequence fields</span></a><a href="schema-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Choice fields</span></a><a href="schema-swarm.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Swarm fields</span></a><a href="schema-kannadi.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Kannadi fields</span></a><a href="schema-optomotor.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Optomotor fields</span></a><a href="schema-rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Rugosity fields</span></a><a href="schema-dynamic-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Dynamic-Choice fields</span></a></div></details><details class="nav-group" open><summary>Stimuli<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="night-sky.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Astronomical night sky</span></a><a href="generated-swarms.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Generated swarms</span></a><a href="swarm-playback.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Recorded swarm playback</span></a><a href="selwyn-cycle.html" class="active" aria-current="page"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Selwyn sky and swarm cycle</span></a><a href="rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Visual/navigation rugosity</span></a><a href="selwyn-terrain.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Selwyn terrain source</span></a><a href="historical-panorama.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Historical panorama recipe</span></a></div></details><details class="nav-group"><summary>Data and replay<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="recording-pipeline.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Recording pipeline</span></a><a href="data-formats.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Saved data formats</span></a><a href="run-config-snapshots.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Configuration snapshots</span></a><a href="telemetry.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live telemetry and headings</span></a><a href="live-monitoring.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live browser monitoring</span></a><a href="replay.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Replay a recorded run</span></a></div></details><details class="nav-group"><summary>Extend and validate<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="extending.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Extend the source</span></a><a href="experiment-workflow.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment workflow</span></a><a href="scene-lifecycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene lifecycle</span></a><a href="diagnostics-performance.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Diagnostics and performance</span></a><a href="scene-reload-investigation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene reload investigation</span></a><a href="six-camera-rig.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Six-camera reference</span></a><a href="kannadi-history.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Kannadi integration history</span></a><a href="releases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Releases and rebuilding</span></a></div></details><details class="nav-group"><summary>Hardware and ecosystem<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="hardware.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Hardware and calibration</span></a><a href="integrations.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Trackers and analysis</span></a><a href="tracker-integration.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Native tracker integration</span></a><a href="citation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Cite MATREX VR</span></a></div></details></nav><div class="sidebar-footer"><a href="citation.html">Cite the software</a><a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/selwyn-milky-way-swarm-cycle.md">Edit this page ↗</a></div></aside>
+<main id="article" tabindex="-1"><div class="article-context"><span>Stimuli</span><span>MATREX VR / source manual</span></div><article class="prose"><h1 id="selwyn-milky-way--ordered-swarm-cycle">Selwyn Milky Way / ordered swarm cycle</h1>
+<p>The full-duration reference <code>Assets/StreamingAssets/Examples/Swarm/selwyn-milky-way-swarm-cycle.sequence.json</code> runs the protocol below in <code>Choice_Selwyn</code>. Your active <code>Assets/StreamingAssets/sequenceConfig.json</code> retains the quick-test edits made during implementation: the first two blocks and heading window are 3 seconds, with gain 2.5 on those rows. The later swarm blocks are 240 seconds each. To run the full protocol, copy the reference sequence over <code>Assets/StreamingAssets/sequenceConfig.json</code> before Play. Open <code>Assets/Scenes/ControlScene.unity</code>, press Play, fill the original metadata form, then press Save/Start. Automatic start is off. Your system config, tracking addresses, camera order, resolution and FPS settings are retained.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Block</th>
+<th style="text-align: right;">Seconds</th>
+<th>Sky</th>
+<th>Conspecifics</th>
+<th>Auto-trim</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1: Setup</td>
+<td style="text-align: right;">360</td>
+<td>Current Selwyn Milky Way</td>
+<td>None</td>
+<td>On</td>
+</tr>
+<tr>
+<td>2: Milky Way measurement</td>
+<td style="text-align: right;">240</td>
+<td>Current Selwyn Milky Way</td>
+<td>None</td>
+<td>Off</td>
+</tr>
+<tr>
+<td>3: Milky Way + swarm</td>
+<td style="text-align: right;">240</td>
+<td>Current Selwyn Milky Way</td>
+<td>150 Bogong moths per rig</td>
+<td>Off</td>
+</tr>
+<tr>
+<td>4: Swarm only</td>
+<td style="text-align: right;">240</td>
+<td>Uniform gray RGB 0.12</td>
+<td>150 Bogong moths per rig</td>
+<td>Off</td>
+</tr>
+</tbody>
+</table></div>
+<p>Setup runs once. The first pass lasts 18 minutes; subsequently blocks 2–4 repeat every 12 minutes, with auto-trim staying off. <code>loopStartIndex: 1</code> (zero-based) returns to the Milky Way-only block. Index 1 means the second sequence row. Randomization is off because blocks 3 and 4 depend on block 2. <code>reloadScene: false</code> retains the same rigs across these blocks. Setup resets their positions/headings to <code>(0,100,0)</code> / north; later blocks retain pose. The calibrated yaw DC offset persists, including when auto-trim turns off. Flight variance gating and tuning are copied from the existing auto-trim calibration example. The dashboard can still control the current row.</p>
+<p>All four experiments enable autopilot at <strong>7 m/s</strong>, with animal steering enabled and tracked translation disabled. Wind is zero and AGL is 100 m. Terrain scenes use metre world units: Unity +Z is north/forward, +X east, +Y up; positive yaw turns clockwise from north. This generated experiment does not read the recorded CSV or change its conversion.</p>
+<p>The three stellar blocks use latitude −35.894409, longitude 148.453948, <code>Australia/Sydney</code>, <code>date: null</code>, <code>localTime: "now"</code>, and north yaw zero. UTC offset is resolved from that timezone, including daylight saving. The sky is regenerated on block entry and held between the configured 30-minute image updates. Exposure 0.1 and faint-detail cutoff 0.05 retain the existing generated moth recipe's settings. Block 4 replaces the Milky Way with an archived uniform gray image; the scene's authored terrain remains.</p>
+<h2 id="config-files-and-hierarchy">Config files and hierarchy</h2>
+<p>The full-duration sequence contains timing, order, loop start index, scene name, yaw gain 1, reload flag, auto-trim enable flag and each experiment file reference. All flight, sky, measurement and swarm parameters live in the <strong>individual experiment files</strong>:</p>
+<ul>
+<li><code>Examples/Swarm/selwyn-cycle-01-setup-full.example.json</code></li>
+<li><code>Examples/Swarm/selwyn-cycle-02-milky-way-full.example.json</code></li>
+<li><code>Examples/Swarm/selwyn-cycle-03-milky-way-swarm.example.json</code></li>
+<li><code>Examples/Swarm/selwyn-cycle-04-swarm-only.example.json</code></li>
+</ul>
+<p>The full-duration sequence is <code>Examples/Swarm/selwyn-milky-way-swarm-cycle.sequence.json</code>. These are complete flat Choice experiment configs, editable as JSON. The active quick-test sequence retains the original <code>selwyn-cycle-01-setup.example.json</code> and <code>selwyn-cycle-02-milky-way.example.json</code> names and your edits; their full-duration counterparts set the heading window to 240 seconds. Hardware remains in <code>system_config.json</code>. Existing generated and CSV examples remain available as separate recipes.</p>
+<h2 id="heading-measured-during-block-2">Heading measured during block 2</h2>
+<p>The measurement block contains:</p>
+<pre class="json"><code>&quot;headingReference&quot;: {
+  &quot;enabled&quot;: true,
+  &quot;windowSeconds&quot;: 240,
+  &quot;startOffsetSeconds&quot;: 0,
+  &quot;measureDuringPresentation&quot;: true,
+  &quot;saveAs&quot;: &quot;milky-way-baseline&quot;
+}</code></pre>
+<p>Each rig samples its own <strong>virtual world yaw</strong> after movement once per frame, and computes the circular mean over that 240-second window. A 359°/1° pair averages north, rather than 180°. This is a mean of unit heading vectors, not a straight average of angles or a displacement-weighted direction. Resultant length and sample count are recorded; low resultant length does not extend or reject a trial.</p>
+<p><code>measureDuringPresentation: true</code> runs observation and the sequence timer together. Block 2 therefore lasts 240 seconds, rather than an observation period followed by an additional 240-second presentation. The final observation completes before the sequence advances. On the experimental GUI branch, scene duration now takes precedence for both values of this retained flag; long observation windows are shortened at runtime without rewriting the JSON. In phased files, measurement remains in <code>preStimulus</code>, under the phase runner's timer.</p>
+<p>Both swarm blocks contain:</p>
+<pre class="json"><code>&quot;useHeadingReference&quot;: true,
+&quot;headingReferenceId&quot;: &quot;milky-way-baseline&quot;,
+&quot;mu&quot;: 0</code></pre>
+<p>Thus each rig's swarm mean is that animal's saved mean from block 2 plus zero degrees. It is frozen in the world through both swarm blocks, even while the animal steers. This does not continuously steer the swarm toward the animal or recompute the mean in block 3. References are held by the session controller, separately by rig and name; they survive in-place block changes and scene reloads. They are cleared at start, stop and each sequence loop, so a previous cycle cannot supply the next baseline. Each repeat starts a fresh 240-second Milky Way measurement, without returning to trimming. Missing named references fail explicitly. Core validation rejects shuffled or reordered sequences that present a named swarm before measuring it.</p>
+<p><code>headingReference.jsonl</code> records each rig's mean, resultant, sample count, observation times, trial/step, saved name and concurrent-measurement flag. Each swarm log header records its resolved world <code>Mu</code>, yaw/elevation kappa and sampler. The exact system, sequence and all four experiments are archived with the run; generated sky images and metadata are also saved.</p>
+<h2 id="ordered-motion-with-independent-speeds-and-wing-phases">Ordered motion with independent speeds and wing phases</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Nested <code>swarm</code> parameter</th>
+<th style="text-align: right;">Active value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>numberOfLocusts</code></td>
+<td style="text-align: right;">150</td>
+<td>Moth count <strong>per rig</strong>; four rigs give 600 total. Legacy field name retained.</td>
+</tr>
+<tr>
+<td><code>trajectoryFile</code></td>
+<td style="text-align: right;">empty</td>
+<td>Generated distribution; no recorded data input.</td>
+</tr>
+<tr>
+<td><code>locustSpeed</code></td>
+<td style="text-align: right;">6.17</td>
+<td>Mean speed, m/s in this terrain scene.</td>
+</tr>
+<tr>
+<td><code>locustSpeedStdDev</code></td>
+<td style="text-align: right;">1.24</td>
+<td>Speed standard deviation, m/s; not variance.</td>
+</tr>
+<tr>
+<td><code>directionDistribution</code></td>
+<td style="text-align: right;"><code>VonMises</code></td>
+<td>Corrected normalized circular sampler.</td>
+</tr>
+<tr>
+<td><code>kappa</code></td>
+<td style="text-align: right;">1000 in block 3; 100 in block 4</td>
+<td>Yaw concentration around the frozen baseline; retains your later tuning.</td>
+</tr>
+<tr>
+<td><code>muElevation</code></td>
+<td style="text-align: right;">0</td>
+<td>Mean horizontal motion; positive Unity pitch points downward.</td>
+</tr>
+<tr>
+<td><code>kappaElevation</code></td>
+<td style="text-align: right;">100</td>
+<td>Elevation concentration. Combined order is about 99.45% with yaw kappa 1000, or 99% with yaw kappa 100.</td>
+</tr>
+<tr>
+<td><code>volumeHalfExtentMetres</code></td>
+<td style="text-align: right;">2</td>
+<td>Moving cube ±2 m on all axes, side 4 m, volume 64 m³.</td>
+</tr>
+<tr>
+<td><code>spawnRelativeToAnimal</code>, <code>followAnimalPosition</code></td>
+<td style="text-align: right;">true</td>
+<td>Cube centered on the current animal; mean direction stays frozen.</td>
+</tr>
+<tr>
+<td><code>preserveBoundaryOvershoot</code>, <code>wrapY</code></td>
+<td style="text-align: right;">true</td>
+<td>Exact periodic wrapping on all three cube axes.</td>
+</tr>
+<tr>
+<td><code>agentVisual</code>, <code>bogongVisual.shape</code></td>
+<td style="text-align: right;"><code>Bogong</code>, <code>Moth</code></td>
+<td>Physical cigar body and one coupled wing pair.</td>
+</tr>
+<tr>
+<td><code>bodyLengthMetres</code>, <code>bodyDiameterMetres</code>, <code>wingSpanMetres</code></td>
+<td style="text-align: right;">0.03, 0.01, 0.06</td>
+<td>Perspective body and wing dimensions.</td>
+</tr>
+<tr>
+<td><code>flapFrequencyHz</code></td>
+<td style="text-align: right;">30</td>
+<td>GPU wing motion with independently randomized phases.</td>
+</tr>
+<tr>
+<td><code>sizeMode</code>, <code>subpixelVisibility</code></td>
+<td style="text-align: right;"><code>World</code>, true</td>
+<td>Physical perspective; contrast attenuation below pixel resolution.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Speeds are independent nonnegative normal samples taken once per agent; a rare negative draw is resampled. Headings/elevations are independently sampled once at spawn. Steady motion retains those directions and speeds. Periodic boundaries recirculate the finite population; no per-frame random direction changes or synchronized spawning/flapping are imposed. Observer motion is subtracted naturally by world-relative geometry: a moth at the observer's speed/direction remains near it, and faster/slower moths pass.</p>
+<p>The historical direction sampler has a broad tail: kappa 1000 does <strong>not</strong> give its mathematically expected high concentration, while kappa ≥10000 forces exactly parallel motion. It is preserved for old configs using omitted/default <code>directionDistribution: "Legacy"</code>. The new cycle opts into <code>"VonMises"</code>, using the normalized rejection sampler. Your current block 3 tuning raises yaw kappa to 1000 (about 1.81° yaw SD); block 4 retains yaw kappa 100. Yaw kappa 100 has about 5.74° SD and resultant 0.995; adding independent elevation kappa 100 gives about <strong>0.990 3D directional order</strong>. This is an order parameter, not a guarantee that 99% of individuals have identical headings. Higher kappa narrows the spread without the legacy point-mass cutoff.</p>
+<h2 id="visible-population-and-contrast">Visible population and contrast</h2>
+<p>Six square 90° views cover directions around the animal; for a uniform cube centered on it, each face receives about one sixth of the population. <strong>150 agents → about 25 geometric moth positions per view.</strong> It is editable in both swarm block files. Density is 2.344 agents/m³. Natural counts fluctuate; the implementation does not insert/remove moths to clamp each view to a count or force near passes. Turning changes which moths are visible, while the cube stays centered.</p>
+<p>In the deterministic two-minute test at observer speed 7 m/s, the six view means ranged 24.1–25.8. About 77.5% of camera frames contained 20–30 positions. A natural closest approach was 2.74 cm. These are one realization's statistics, not guaranteed rates.</p>
+<p>Geometric view counts do not mean 25 equally clear silhouettes on a 64×64 panel. Far moths still fade with projected coverage, and visibility depends on body orientation, pixel placement and sky contrast. The earlier native physical-moth test reached half full contrast between sampled distances 1 and 1.5 m; the cube retains the requested minimum 2 m half extent. There is no hard radial cutoff at 2 m; cube corners are 3.46 m away. Close 10 cm wing views and far fading use the existing rendering fixes, without enlarging moths or adding wing pairs. See <a href="generated-swarms.html">generated moth rendering</a>.</p>
+<h2 id="validation-and-performance">Validation and performance</h2>
+<p><code>Assets/Editor/SelwynSwarmCycleValidation.cs</code> runs in the marked disposable validation project. It validates the full-duration reference files and tests the original ControlScene Save/Start button, in-place transitions, auto-trim flags, retained rigs/DC offsets, circular per-rig means, frozen reuse after steering, sky modes, cycle reset, misordered/shuffled references, exact coordinate recording and population statistics. The observation window is shortened only in the disposable copy; sequence durations and runtime assertions use the full-duration reference values, without modifying the main checkout's active quick-test configuration. This is an accelerated transition test, not a complete live hardware run.</p>
+<p>The normalized distribution test samples 100,000 independent yaw/elevation pairs. The recording benchmark exercises four 150-agent swarms and 24 actual 64×64 cameras, including pooled capture and asynchronous gzip output. It verifies every final coordinate against its presented transform and requires no dropped frames, pending backlog or steady main-thread managed allocation. Results and machine details are in <a href="assets/reference/docs/selwyn-swarm-cycle-validation-results.json">selwyn-swarm-cycle-validation-results.json</a>. Timings cover CPU movement/upload/capture/render submission; they exclude terrain rendering, GPU completion, tracking and physical panels, so they do not guarantee live 120 FPS. The existing system target remains 120 FPS.</p>
+<p>These features are on <code>codex/bogong-night-sky</code>, using the original metadata form and existing status overlay. The experimental configuration GUI stays on its separate UI branch.</p>
+<p>On the tested non-GUI branch, the 600-moth/24-camera recording benchmark submitted 170,400 rows without drops. Median CPU movement/upload/capture/render submission was 3.01 ms; pooled coordinate capture was 0.158 ms. Native renderer tests passed 100,319 checks; the legacy five-scene phase suite passed 85,479, and recorded trajectory/continuation passed 99.</p>
+</article><nav class="chapter-pager" aria-label="Adjacent chapters"><a href="swarm-playback.html"><small>Previous</small>Recorded swarm playback</a><a href="rugosity.html"><small>Next</small>Visual/navigation rugosity<span aria-hidden="true"> →</span></a></nav><footer class="article-footer">Static documentation · software contracts and recorded evidence. <a href="citation.html">Citation and credits</a></footer></main>
+<aside class="right-sidebar"><nav aria-label="On this page"><p>On this page</p><a href="#config-files-and-hierarchy" class="toc-level-2">Config files and hierarchy</a><a href="#heading-measured-during-block-2" class="toc-level-2">Heading measured during block 2</a><a href="#ordered-motion-with-independent-speeds-and-wing-phases" class="toc-level-2">Ordered motion with independent speeds and wing phases</a><a href="#visible-population-and-contrast" class="toc-level-2">Visible population and contrast</a><a href="#validation-and-performance" class="toc-level-2">Validation and performance</a></nav><a class="source-link" href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/selwyn-milky-way-swarm-cycle.md">View Markdown source ↗</a></aside></div>
+<dialog class="search-dialog" aria-labelledby="search-title"><form method="dialog"><h2 id="search-title">Search documentation</h2><button class="search-close" aria-label="Close search">×</button></form><label class="sr-only" for="manual-search">Search every manual section</label><input id="manual-search" type="search" placeholder="Try: ViewportSetter, yaw units, replay, sky…" autocomplete="off"><p class="search-status" role="status">Search runs locally in your browser.</p><div class="search-results"></div><p class="search-hint">Enter a term · Tab to a result · Escape to close</p></dialog>
+</body></html>

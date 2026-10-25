@@ -229,7 +229,7 @@ namespace ConfigurationUI
             {
                 inspector.Add(new Label("SYSTEM OUTPUT"));
                 var rigs=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().ToList();
-                foreach(var mode in rigs.GroupBy(r=>r["closedLoopMode"]?.ToString()??"FicTrac")) inspector.Add(Pill(mode.Key+" · "+mode.Count()+" rigs","accent"));
+                foreach(var mode in rigs.GroupBy(RigMode)) inspector.Add(Pill(mode.Key+" · "+mode.Count()+" rigs","accent"));
                 inspector.Add(new Label(SystemSyncSummary()) { name="system-sync" });
                 inspector.Add(new Label(SystemDisplaySummary()) { name="system-display" });
                 inspector.Add(Pill("Telemetry "+(ExperimentBlocks.Flag(Workspace.System.Root["telemetry"]?["enabled"],true)?"ON":"OFF")));

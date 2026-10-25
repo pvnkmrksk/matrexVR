@@ -1,0 +1,68 @@
+{
+  "description": "SHA-256 of actual gallery images and consumed demonstration JSON copied with the static manual build. Capture provenance remains separate and unmodified.",
+  "records": [
+    {
+      "name": "forest-choice",
+      "image": "gallery/forest-choice.jpg",
+      "imageSha256": "86f452ed71bf152e1ebcfc2245fdecf5f33d40261671440ef121f02d04e576dd",
+      "configuration": "gallery/forest-choice.config.json",
+      "configSha256": "62e0b28cc1c4ed60a5ae2523de77795e5c61342639d1892fb276b18a7db67721"
+    },
+    {
+      "name": "milky-way-terrain",
+      "image": "gallery/milky-way-terrain.jpg",
+      "imageSha256": "e26737d38bcfba09e55d243f9d8a39d5802fe0cda76f02cfc5d1223770b0a02f",
+      "configuration": "gallery/milky-way-terrain.config.json",
+      "configSha256": "40ff1ff3bd8954fe2aef0314fce9728d714ff19aeb9981d7aca5c7eab55bdd49"
+    },
+    {
+      "name": "panorama-terrain",
+      "image": "gallery/panorama-terrain.jpg",
+      "imageSha256": "440f9ca3124e49951ce2e2798cdaf26fa436e37d13facc085850974876813d66",
+      "configuration": "gallery/panorama-terrain.config.json",
+      "configSha256": "8b8b3cfb6b714e306b76cd9d42d2820eeaa6629aa61ac57baff8866df4a144be"
+    },
+    {
+      "name": "choice-bars",
+      "image": "gallery/choice-bars.jpg",
+      "imageSha256": "d5398dcae659063eb45d76254a2f944310a7a57feb3486facdf7b8c68a4b93a0",
+      "configuration": "gallery/choice-bars.config.json",
+      "configSha256": "022df8ef9e670e28216354256dd25e6535bea91c101f04313c15c063871b21fb"
+    },
+    {
+      "name": "optomotor",
+      "image": "gallery/optomotor.jpg",
+      "imageSha256": "775e16a1fff4faa21174c24e4bf596ae30520e81a55cd2daeaadf1fbda887359",
+      "configuration": "gallery/optomotor.config.json",
+      "configSha256": "da921ab2d538fddda6f06dd7b9bec9e59d03bcc1e52504aee545e82011ee1811"
+    },
+    {
+      "name": "stripe-fixation",
+      "image": "gallery/stripe-fixation.jpg",
+      "imageSha256": "1e88b5fd0c39b8ec6fcfed011295906ff1083c054ae40bcc81ba7d529a900271",
+      "configuration": "gallery/stripe-fixation.config.json",
+      "configSha256": "6526a1d0ab57aa63ace263911facabf1eee81f388f5937c83b0d51d2492a27c1"
+    },
+    {
+      "name": "choice-objects",
+      "image": "gallery/choice-objects.jpg",
+      "imageSha256": "459cdfb45d375fb6b6cf79a8397751fd5559aea868f6ef0d73daab1bd0c94020",
+      "configuration": "gallery/choice-objects.config.json",
+      "configSha256": "62e0b28cc1c4ed60a5ae2523de77795e5c61342639d1892fb276b18a7db67721"
+    },
+    {
+      "name": "locust-swarm",
+      "image": "gallery/locust-swarm.jpg",
+      "imageSha256": "cd7a6e1df5098285f3e28f0b5b23514ab235f19cbc0403926c99dc7e0cd8eb4d",
+      "configuration": "gallery/locust-swarm.config.json",
+      "configSha256": "9a11be27273a48c7f7610e39aabd94cd557d5513aab21b208258e819a294df07"
+    },
+    {
+      "name": "kannadi",
+      "image": "gallery/kannadi.jpg",
+      "imageSha256": "94f696b7efa8a064ac3d8244531786f6ecc5de3745ba7e307f7d756b0c7dbfef",
+      "configuration": "gallery/kannadi.config.json",
+      "configSha256": "5f7f665c5d132bb0def4d222d892439c1dfe8a24bd1df4b1706819fb7801e3a1"
+    }
+  ]
+}

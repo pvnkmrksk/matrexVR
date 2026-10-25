@@ -1,0 +1,192 @@
+{
+  "date": "2026-10-11",
+  "unity": "6000.3.16f1",
+  "tests": {
+    "playbackAndRendering": {
+      "checks": 71,
+      "failure": null,
+      "captures": [
+        {
+          "blank": "RGBA(255, 255, 255, 255)",
+          "rect": "(x:0.00, y:0.00, width:64.00, height:64.00)",
+          "color": "RGBA(1.000, 1.000, 1.000, 1.000)"
+        },
+        {
+          "graphics": "Apple M2 Pro",
+          "camera": "1.00000\t0.00000\t0.00000\t0.00000\n0.00000\t1.00000\t0.00000\t0.00000\n0.00000\t0.00000\t-1.00002\t-0.00200\n0.00000\t0.00000\t-1.00000\t0.00000\n",
+          "bodyLength": 0.0254,
+          "bodyDiameter": 0.01
+        },
+        {
+          "distanceMetres": 0.01,
+          "contrast": 2508.557,
+          "changedPixels": 3136
+        },
+        {
+          "distanceMetres": 0.1,
+          "contrast": 28.1568623,
+          "changedPixels": 42
+        },
+        {
+          "distanceMetres": 1.0,
+          "contrast": 0.345098048,
+          "changedPixels": 4
+        },
+        {
+          "distanceMetres": 2.0,
+          "contrast": 0.08627451,
+          "changedPixels": 4
+        },
+        {
+          "mode": "gray128-first",
+          "blank": 128,
+          "peak": 12,
+          "total": 12,
+          "colorSpace": "Gamma"
+        },
+        {
+          "mode": "gray128",
+          "distanceMetres": 3,
+          "peakContrastBytes": 12,
+          "totalContrastBytes": 12,
+          "fractionalPixelContrastBytes": [
+            12,
+            12,
+            12,
+            12
+          ]
+        }
+      ],
+      "timings": [
+        {
+          "shape": "Dot",
+          "medianCpuMilliseconds": 2.4164000000000003,
+          "p95CpuMilliseconds": 2.8344,
+          "agents": 1024,
+          "rigs": 4,
+          "cameras": 24,
+          "materials": 4
+        },
+        {
+          "shape": "Moth",
+          "medianCpuMilliseconds": 4.5166,
+          "p95CpuMilliseconds": 5.3561000000000005,
+          "agents": 1024,
+          "rigs": 4,
+          "cameras": 24,
+          "materials": 4
+        }
+      ],
+      "unity": "6000.3.16f1",
+      "timingNote": "Isolated CPU timings: four rigs, six 64px cameras each, 256 agents per rig. Not hardware-display FPS."
+    },
+    "startupAndEncounters": {
+      "checks": 51,
+      "failure": null,
+      "errors": [],
+      "encounterAudit": {
+        "sourceIdsSeen": 430,
+        "segmentBirths": 437,
+        "firstMinuteBirths": 49,
+        "cumulativeBirthsAtMinute": [
+          1,
+          49,
+          93,
+          123,
+          149,
+          187,
+          225,
+          255,
+          316,
+          387
+        ],
+        "meanLivePopulation": 30.683592446787216,
+        "maxLivePopulation": 62,
+        "liveAtSeconds": {
+          "10": 5,
+          "30": 28,
+          "60": 28,
+          "120": 31,
+          "300": 35,
+          "599": 31
+        },
+        "firstMinuteNativePanelDetectableWithin3m": {
+          "64": 34,
+          "128": 42
+        },
+        "firstMinuteNativePanelAnyByteContrastWithin3m": {
+          "64": 42,
+          "128": 42
+        },
+        "observerSpeedMetresPerSecond": 5,
+        "continuationSpeedMetresPerSecond": 6.0,
+        "sampleStepSeconds": 0.02,
+        "renderStepSeconds": 0.1,
+        "note": "Real four-rig Swarm startup; audit one rig using its configured cameras at native 64/128 pixels, gray sky and current world positions. Contrast requires 3 bytes (any-byte count also reported) in a 5x5 patch around a moth within 3m. Overlapping moths can contribute to the same patch. This is numerical detectability, not a biological visibility threshold. Recorded positions/time/births unchanged; extrapolated tails use the configured physical speed."
+      },
+      "unity": "6000.3.16f1"
+    },
+    "configurationCatalog": {
+      "checks": 4847,
+      "failure": null,
+      "errors": [],
+      "unity": "6000.3.16f1"
+    }
+  },
+  "totalUnityChecks": 4969,
+  "pythonTests": {
+    "count": 4,
+    "passed": true
+  },
+  "sourceVerification": {
+    "passed": true,
+    "rows": 14429,
+    "ids": 430,
+    "durationSeconds": 599.46,
+    "sourceSha256": "620b3a90d59b31ab929d3271605e931a7b49fe1b07b45c79a28655a5c36baf92",
+    "convertedSha256": "7353033db12dd544eca10091d58ef265a73859452331be95a13d387b4def4817",
+    "maxCoordinateErrorMetres": 8.881784197001252e-16,
+    "sampleCentroidMetres": {
+      "X": -0.26974953025157666,
+      "Y": 5.725152926814055,
+      "Z": 0.10780537521657772
+    },
+    "medianTrackSeconds": 0.14999999999999147,
+    "minTrackSeconds": 0.01999999999998181,
+    "maxTrackSeconds": 1.8300000000000018,
+    "gapsOverPointOneSecond": 7,
+    "note": "Canonical data matches every source ID/TimeExact/position. Presentation yaw is configured separately from the canonical data; continuation after recorded samples is extrapolated."
+  },
+  "build": {
+    "result": "Succeeded",
+    "architecture": "Apple Silicon ARM64",
+    "app": "/Users/pavan/src/ledpanelVR/Builds/BogongSwarm-macOS/MATREX.app",
+    "unity": "6000.3.16f1",
+    "totalErrors": 0,
+    "totalWarnings": 50,
+    "totalSize": 417840310,
+    "seconds": 15.925251,
+    "scenes": [
+      "Assets/Scenes/ControlScene.unity",
+      "Assets/Scenes/Optomotor.unity",
+      "Assets/Scenes/Swarm.unity",
+      "Assets/Scenes/Choice.unity",
+      "Assets/Scenes/Choice_desync.unity",
+      "Assets/Scenes/Choice_Forrest.unity",
+      "Assets/Scenes/ReplayScene.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_nopath_nopath.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_nopath_path.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_path_nopath.unity",
+      "Assets/Scenes/Choice_TwoTreeIndia_path_path.unity",
+      "Assets/Scenes/Kannadi.unity",
+      "Assets/Scenes/Choice_Selwyn.unity"
+    ],
+    "errors": []
+  },
+  "changes": [
+    "Optional physical continuation speed; active playback examples use 6m/s after each measured segment, preserving source observations and birth times.",
+    "Area-weighted bilinear subpixel footprint replaces a broad Gaussian; contrast partitions across one to four pixels and fades with projected area.",
+    "Low-poly body thickness reaches the configured 1cm instead of 0.87cm.",
+    "Independent portable density/speed audit and full ten-minute real-scene birth verification."
+  ]
+}

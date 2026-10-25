@@ -668,18 +668,20 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             {
                 if (so.Renderer == null || so.Spec.swapColor == null || so.Spec.swapColor.Length < 3)
                     continue;
-                so.Renderer.material.color = ToColor(so.Spec.swapColor);
+                // SpawnObjects installed an owned per-object material. Renderer.material
+                // would clone it again here, leaving the rendered clone without that owner.
+                so.Renderer.sharedMaterial.color = ToColor(so.Spec.swapColor);
             }
         }
         else if (spawned.Count >= 2)
         {
-            Color c0 = spawned[0].Renderer ? spawned[0].Renderer.material.color : Color.black;
-            Color c1 = spawned[1].Renderer ? spawned[1].Renderer.material.color : Color.black;
+            Color c0 = spawned[0].Renderer ? spawned[0].Renderer.sharedMaterial.color : Color.black;
+            Color c1 = spawned[1].Renderer ? spawned[1].Renderer.sharedMaterial.color : Color.black;
 
             if (spawned[0].Renderer)
-                spawned[0].Renderer.material.color = c1;
+                spawned[0].Renderer.sharedMaterial.color = c1;
             if (spawned[1].Renderer)
-                spawned[1].Renderer.material.color = c0;
+                spawned[1].Renderer.sharedMaterial.color = c0;
         }
     }
 

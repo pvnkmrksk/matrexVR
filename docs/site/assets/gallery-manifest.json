@@ -1,0 +1,68 @@
+{
+  "description": "Only genuine Unity captures with recorded provenance are displayed. The manual builder emits an explicit pending state for a missing capture.",
+  "items": [
+    {
+      "id": "forest-choice",
+      "title": "Choice_Forrest + Landscape prefab",
+      "image": "gallery/forest-choice.jpg",
+      "scene": "Choice_Forrest",
+      "summary": "Actual Choice_Forrest rendering with the bundled Assets/Prefabs/Landscape.prefab instantiated by the capture fixture to supply ground and forest. This is a source customization, not the default scene or a compact-player preset."
+    },
+    {
+      "id": "milky-way-terrain",
+      "title": "Terrain beneath the Milky Way",
+      "image": "gallery/milky-way-terrain.jpg",
+      "scene": "Choice_Selwyn",
+      "summary": "Authored terrain and an automatically generated astronomical sky. The sky manifest identifies its observer location and represented time."
+    },
+    {
+      "id": "panorama-terrain",
+      "title": "Terrain and a panoramic background",
+      "image": "gallery/panorama-terrain.jpg",
+      "scene": "Choice-family source environment",
+      "summary": "Homing-style visual context combines authored terrain with an explicit panorama. A panorama background does not define navigable geometry."
+    },
+    {
+      "id": "choice-bars",
+      "title": "Choice bars",
+      "image": "gallery/choice-bars.jpg",
+      "scene": "Choice",
+      "summary": "Configured bar stimuli in the existing Choice controller family; positions and appearance belong to the experiment JSON."
+    },
+    {
+      "id": "optomotor",
+      "title": "Optomotor drum",
+      "image": "gallery/optomotor.jpg",
+      "scene": "Optomotor",
+      "summary": "The rotating grating/drum path owns stimulus motion and records its stimulus parameters."
+    },
+    {
+      "id": "stripe-fixation",
+      "title": "Stripe fixation recipe",
+      "image": "gallery/stripe-fixation.jpg",
+      "scene": "Choice-family stimulus recipe",
+      "summary": "A stripe/fixation configuration uses the existing controller and registered visual assets rather than requiring a separate scene per parameter."
+    },
+    {
+      "id": "choice-objects",
+      "title": "Objects and landmarks",
+      "image": "gallery/choice-objects.jpg",
+      "scene": "Choice",
+      "summary": "A configured set of object stimuli with explicit pose/appearance and the active tracking/reset choices."
+    },
+    {
+      "id": "locust-swarm",
+      "title": "Locust swarm",
+      "image": "gallery/locust-swarm.jpg",
+      "scene": "Swarm",
+      "summary": "Virtual agent populations rendered around an animal-controlled rig, with independent agent motion and per-rig visibility."
+    },
+    {
+      "id": "kannadi",
+      "title": "Kannadi — the mirror matrix",
+      "image": "gallery/kannadi.jpg",
+      "scene": "Kannadi",
+      "summary": "ಕನ್ನಡಿ means mirror in Kannada. The scene replicates tracked animal poses across a hexagonal matrix with configured self/peer viewing."
+    }
+  ]
+}

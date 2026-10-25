@@ -38,7 +38,7 @@ public class ClosedLoop : MonoBehaviour
     private float lastYawInput, lastYawOutput;
     private string registeredVrId;
     public KineflyAutoTrim AutoTrim { get; } = new KineflyAutoTrim();
-    public bool SupportsAutoTrim => currentMode == ClosedLoopMode.Kinefly && !useLocustGains && useYawMode && !useForceMode;
+    public bool SupportsAutoTrim => TrackerBackend.IsFlight(currentMode) && !useLocustGains && useYawMode && !useForceMode;
     public ZmqListener.RawSample LastConsumedSample { get; private set; }
     public Vector3 LastAppliedPositionDelta { get; private set; }
     public float LastAppliedYawDeltaDegrees { get; private set; }
@@ -77,7 +77,8 @@ public class ClosedLoop : MonoBehaviour
         MainController main = FindObjectOfType<MainController>();
         currentMode = main != null ? main.GetSystemConfigForGameObject(gameObject).closedLoopMode : ClosedLoopMode.Kinefly;
         if (!System.Enum.IsDefined(typeof(ClosedLoopMode), currentMode)) currentMode = ClosedLoopMode.FicTrac;
-        if (currentMode == ClosedLoopMode.Kinefly || currentMode == ClosedLoopMode.Tirbala) useLocustGains = false;
+        if (TrackerBackend.IsFlight(currentMode) || currentMode == ClosedLoopMode.Tirbala) useLocustGains = false;
+        else if (currentMode == ClosedLoopMode.Hejjetrac) useLocustGains = true;
         // BogongAustralia sets yaw mode true even for its FicTrac enum value.
         // Preserve that historical behavior; SetLocustGains is the separate walking path.
         useYawMode = true;
@@ -120,6 +121,14 @@ public class ClosedLoop : MonoBehaviour
 
         if (_zmqListener == null || (useLocustGains && !_zmqListener.HasPose))
             return;
+
+        if(!useLocustGains && TrackerBackend.IsWalking(currentMode) && _zmqListener.ReadRawSample().ficTracRow)
+        {
+            // Native FT rows identify walking unambiguously; legacy FicTrac-named
+            // Bogong JSON keeps its previous flight behavior.
+            useLocustGains=true;ApplySphereDiameterFromSystemConfig();_initialWorldRotation=_initialRotation;
+            _isInitialized=false;_initializationTimer=0;
+        }
 
         if (useLocustGains && !_zmqListener.HasFreshPose())
         {
@@ -269,7 +278,7 @@ public class ClosedLoop : MonoBehaviour
         locustOrientationGain = orientationGain;
         MainController main = FindObjectOfType<MainController>();
         currentMode = main != null ? main.GetSystemConfigForGameObject(gameObject).closedLoopMode : ClosedLoopMode.FicTrac;
-        useLocustGains = currentMode != ClosedLoopMode.Kinefly && currentMode != ClosedLoopMode.Tirbala;
+        useLocustGains = !TrackerBackend.IsFlight(currentMode) && currentMode != ClosedLoopMode.Tirbala;
         if (useLocustGains) ApplySphereDiameterFromSystemConfig();
         closedLoopPosition = positionGain != 0;
         closedLoopOrientation = orientationGain > 0;

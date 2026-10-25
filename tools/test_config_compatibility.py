@@ -32,7 +32,7 @@ def main():
     versions = [int(n) for n in re.findall(r"^(\d+)\.", sdks, re.MULTILINE) if int(n) >= 6]
     if not versions:
         parser.error("A .NET SDK 6 or newer is required.")
-    paths = ["Assets/Scripts/ConfigurationUI/LosslessJson.cs", "Assets/Scripts/ConfigurationUI/ConfigDocument.cs", "Assets/Scripts/Loggers/AnimalMetadata.cs", "Assets/Scripts/Swarm/KannadiConfig.cs", "tools/config_compatibility/Stubs.cs", "tools/config_compatibility/Regression.cs"]
+    paths = ["Assets/Scripts/ConfigurationUI/LosslessJson.cs", "Assets/Scripts/ConfigurationUI/ConfigDocument.cs", "Assets/Scripts/ConfigurationUI/ExperimentBlocks.cs", "Assets/Scripts/Loggers/AnimalMetadata.cs", "Assets/Scripts/Swarm/KannadiConfig.cs", "tools/config_compatibility/Stubs.cs", "tools/config_compatibility/Regression.cs"]
     with tempfile.TemporaryDirectory(prefix="matrex-config-contracts-") as tmp:
         root = Path(tmp)
         project = root / "Regression.csproj"

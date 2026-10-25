@@ -1,0 +1,199 @@
+{
+  "passed": true,
+  "netmq": "4.0.1.13",
+  "sawJson": true,
+  "sawFT": true,
+  "packets": 791,
+  "format": "FicTrac FT25",
+  "cycles": [
+    {
+      "cycle": 0,
+      "bytes": 364232704,
+      "threads": 10,
+      "workers": 0
+    },
+    {
+      "cycle": 25,
+      "bytes": 364380160,
+      "threads": 10,
+      "workers": 0
+    },
+    {
+      "cycle": 50,
+      "bytes": 364511232,
+      "threads": 10,
+      "workers": 0
+    },
+    {
+      "cycle": 75,
+      "bytes": 364642304,
+      "threads": 10,
+      "workers": 0
+    },
+    {
+      "cycle": 100,
+      "bytes": 364871680,
+      "threads": 10,
+      "workers": 0
+    },
+    {
+      "cycle": 125,
+      "bytes": 365002752,
+      "threads": 10,
+      "workers": 0
+    }
+  ],
+  "workers": 0,
+  "before": 345767936,
+  "after": 309493760,
+  "threadsBefore": 10,
+  "threadsAfter": 10,
+  "platform": "Darwin",
+  "fixture": "Production Unity listener:25topic+JSON +25separate topic/JSON +50singleJSON +391/400actualRekkefly synthetic frames +300/300actualHejjéTrac FT rows",
+  "publisherStatus": {
+    "serial_enabled": false,
+    "udp_destination": null,
+    "udp_enabled": false,
+    "zmq": {
+      "dropped": 0,
+      "endpoint": "tcp://127.0.0.1:52613",
+      "enqueued": 300,
+      "failures": 0,
+      "last_error": null,
+      "published": 300,
+      "queue_capacity": 256,
+      "queue_len": 0,
+      "worker_alive": true
+    }
+  },
+  "rekkefly": {
+    "stats": {
+      "frames": 400,
+      "frames_per_second": 59.813509322474275,
+      "recording": {
+        "accepted": 0,
+        "directory": null,
+        "error": null,
+        "written": 0
+      },
+      "seconds": 6.687452459,
+      "source": "Simulated fly",
+      "udp_dropped": 0,
+      "zmq_dropped": 0
+    },
+    "unityReceived": 391,
+    "libzmqReceived": 391,
+    "sample": {
+      "sequence": 491,
+      "position": {
+        "x": 1.00885892,
+        "y": 0.762029648,
+        "z": 0.0
+      },
+      "rotation": {
+        "x": 0.0,
+        "y": 0.246829271,
+        "z": 0.0
+      },
+      "format": "single JSON"
+    },
+    "binarySha256": "bf64c39130d8a6f5f6605da3415414c6ea25c0d33629bc54f90cc1a4fcf5edd4",
+    "configFixture": "Unmodified marker/detector/source values from supplied demo config; temporary copy disables UDP/autosave; no cameras/source config writes",
+    "sourceCommit": "2df99c3",
+    "startupMissedFrames": 9,
+    "deliveryNote": "Both subscribers missed the same initial9 frames during handshake; livePUBdoes not replay pre-subscription samples."
+  },
+  "heartbeat": {
+    "passed": true,
+    "seconds": 3,
+    "snapshotRateHz": 0.2,
+    "contextIntervalSeconds": 0.25,
+    "publisherCycles": 25,
+    "threadsBefore": 10,
+    "threadsAfter": 10,
+    "receivedContexts": 12,
+    "receivedSnapshots": 1,
+    "firstContext": {
+      "schemaVersion": 1,
+      "kind": "matrex.context",
+      "sequence": 1,
+      "timestampUtc": "2026-10-25T18:03:27.3701410Z",
+      "sessionId": "native-probe-session",
+      "experimentName": "Native heartbeat experiment",
+      "experiment": {
+        "running": true,
+        "sceneName": "",
+        "sceneNumber": 4,
+        "trialNumber": 3,
+        "phase": "stimulus",
+        "configFile": "experiment.json",
+        "design": "design.csv",
+        "remainingStepSeconds": 4.0,
+        "durationSeconds": 30.0
+      },
+      "scene": {
+        "name": "",
+        "buildIndex": -1,
+        "worldUnitsPerMetre": 100
+      },
+      "telemetry": {
+        "topic": "matrex.telemetry.v2",
+        "contextIntervalSeconds": 0.25
+      },
+      "animals": [
+        {
+          "vrId": "VR10",
+          "animalId": "animal β",
+          "speciesName": "Agrotis infusa",
+          "backend": "HejjéTrac",
+          "compatibilityMode": "Hejjetrac",
+          "displayOrder": "LFR",
+          "targetDisplay": 1,
+          "panelWidthPixels": 128,
+          "panelHeightPixels": 128
+        }
+      ]
+    }
+  },
+  "hejjetracBinarySha256": "89f4f81612ec9eed19a9da1bebdc8f123813c1983f43e79e2a52885dabe6b2b6",
+  "transport": {
+    "assemblies": [
+      {
+        "file": "NetMQ.dll",
+        "package": "netmq",
+        "version": "4.0.1.13",
+        "target": "net47",
+        "sha256": "87f9aa1954579a1353d6b926e2882162f23bbc152c6b63919de547859462cbd8",
+        "source": "https://www.nuget.org/packages/netmq/4.0.1.13"
+      },
+      {
+        "file": "AsyncIO.dll",
+        "package": "asyncio",
+        "version": "0.1.69",
+        "target": "net40",
+        "sha256": "7124e586dda40a009fcf31eb3f224f6d378af1116fca76ceb31770d93c0cc0c7",
+        "source": "https://www.nuget.org/packages/asyncio/0.1.69"
+      },
+      {
+        "file": "NaCl.dll",
+        "package": "nacl.net",
+        "version": "0.1.13",
+        "target": "netstandard2.1",
+        "sha256": "d4a491bcdfcf92bc438ec29ed88cc5a52a81d14592bbb2897aeaf53826093935",
+        "source": "https://www.nuget.org/packages/nacl.net/0.1.13"
+      }
+    ],
+    "netmqSourceCommit": "41a940c5893413ecda04f30af771deb4accaf251",
+    "unity": "6000.3.16f1",
+    "rationale": "Verified real HejjéTrac ZMTP3 handshake, legacy JSON reception,150 production listener teardown cycles in Unity; net47 avoids extra WCF NuGet implementation. Unity framework supplies its framework dependencies."
+  },
+  "scope": "Native no-graphics Editor probe on this machine; no camera or other-platform runtime claim. Production consumers/timers/publisher copied unchanged; Main/rig state uses explicit fixture stubs.",
+  "hejjetrac": {
+    "binaryVersion": "hejjetrac-cli 0.1.4",
+    "sourceCheckoutCommit": "94404c64",
+    "codeReleaseCommit": "eed74b1",
+    "binarySha256": "89f4f81612ec9eed19a9da1bebdc8f123813c1983f43e79e2a52885dabe6b2b6",
+    "sourceNaming": "Cargo binary fictrac; packages rename it hejjetrac-cli",
+    "note": "Checkout at94404c6 adds download documentation to code release eed74b1. Tested existing built native binary; SHA256 identifies exact artifact."
+  }
+}

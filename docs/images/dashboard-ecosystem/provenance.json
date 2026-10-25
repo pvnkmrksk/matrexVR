@@ -1,0 +1,51 @@
+{
+  "source": "Actual Unity setup UI, rendered from current source in isolated project-v0.3; synthetic session metadata, no measured animal behavior",
+  "unity": "6000.3.16f1",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "checks": 2970,
+  "images": [
+    {
+      "file": "all-fields-1920.jpg",
+      "sha256": "ed33e061ee9451989dca2658115ed331b688fde6e3d5074f57ef70ac5a7da88a"
+    },
+    {
+      "file": "experiments-1920.jpg",
+      "sha256": "d56bb47f28a9e906b0a8a8b51425dccac3a253d5be2cae8a8fce993b37fa51bb"
+    },
+    {
+      "file": "hover-help-1920.jpg",
+      "sha256": "712314e32a59edac35a1248e8befbf8e442c412ad67b6eb10f126cf588c01366"
+    },
+    {
+      "file": "monitoring-defaults-1920.jpg",
+      "sha256": "838bdeee145f88677bdb78f5a547296796fc28086576a7a4837752305c5943b0"
+    },
+    {
+      "file": "motion-1920.jpg",
+      "sha256": "6ddf18de7100e1ee3577a3cbd0659ea126adf12dfd17c5bf85481796c8676292"
+    },
+    {
+      "file": "raw-json-1920.jpg",
+      "sha256": "28ad5ef8d678586a3f4b7296da6bcd3f398837e8c3fcbda8d64ae192595def07"
+    },
+    {
+      "file": "replay-launcher-1920.jpg",
+      "sha256": "598eafff5db1d0fe084c84173d84d86e2cc91e153eb91373e4b37a472307c002"
+    },
+    {
+      "file": "sequence-1920.jpg",
+      "sha256": "c5c25fa5621e48fdaff4bbb4c31676ec4f21271da6a7df5d0a346f8989474fe1"
+    },
+    {
+      "file": "session-1920.jpg",
+      "sha256": "03180ec1acc8cc16e2321f1be9eec919cc697d97e3f6ea8c1a2acfb7559c50fa"
+    },
+    {
+      "file": "system-1920.jpg",
+      "sha256": "7fdeb26450f0f009fce875ee4ac0c0bc8971128717c8f9389c39097258438a2d"
+    }
+  ]
+}

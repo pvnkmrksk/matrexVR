@@ -1,0 +1,1926 @@
+{
+  "schemaVersion": 1,
+  "generatedUtc": "2026-10-25T18:42:40.382049+00:00",
+  "host": {
+    "os": "macOS",
+    "cpu": "Apple M2 Pro",
+    "unity": "6000.3.16f1",
+    "graphicsApi": "Metal"
+  },
+  "historicalNativeCrashReproduced": false,
+  "interpretation": "Matched archival listener test isolates resource growth from cross-thread socket disposal plus blocking receives. The initial NetMQ IOThread exception is real, but its subsequent supervisor SIGTERM is not a native process crash. Material-swap leakage is a separate later regression. No cross-platform or multi-hour stability claim.",
+  "runs": [
+    {
+      "id": "modern-200x2s-B",
+      "status": "completed",
+      "sourceRevision": "cd207862",
+      "runtimeManifestSha256": null,
+      "pluginsSha256": null,
+      "diagnosticSourceSha256": null,
+      "unityExitCode": 0,
+      "rawSummaryPassed": false,
+      "completedRequestedLoads": true,
+      "loads": 200,
+      "targetLoads": 200,
+      "experimentSeconds": 2.0,
+      "forcedFullReload": true,
+      "headless": false,
+      "pauseBeforeReloadSeconds": 0,
+      "profile": "standard",
+      "elapsedWallSeconds": 465.936362083,
+      "coverage": {
+        "activeSamples": 400,
+        "minimumLiveInputComponents": 4,
+        "minimumInputComponents": 4,
+        "staleOrNonprogressingInputObservations": 0,
+        "renderedFaces": [
+          20,
+          24
+        ],
+        "naturalCameraRenders": 206386,
+        "forcedCameraRenders": 412752
+      },
+      "stimulusCoverage": {
+        "terrainComponentCounts": [],
+        "skyImageSizes": [],
+        "samplesWithRecordedSky": 0
+      },
+      "actualSceneIntervals": {
+        "minimum": 2.0156763329999876,
+        "median": 2.2006799794999807,
+        "maximum": 2.5549373750000086,
+        "totalSceneSeconds": 440.6862481670001
+      },
+      "perSceneLateSamples": {
+        "Choice_desync": {
+          "samples": 100,
+          "observed": {
+            "fileDescriptors": {
+              "first": 111,
+              "last": 111,
+              "minimum": 111,
+              "maximum": 112,
+              "median": 112.0,
+              "first5Median": 111,
+              "last5Median": 111,
+              "slopePer100Reloads": -0.12241224122412242
+            },
+            "externalOsThreads": {
+              "first": 125,
+              "last": 122,
+              "minimum": 118,
+              "maximum": 128,
+              "median": 123.0,
+              "first5Median": 125,
+              "last5Median": 122,
+              "slopePer100Reloads": -0.9807980798079806
+            },
+            "activeTrackingWorkers": {
+              "first": 4,
+              "last": 4,
+              "minimum": 4,
+              "maximum": 4,
+              "median": 4.0,
+              "first5Median": 4,
+              "last5Median": 4,
+              "slopePer100Reloads": 0.0
+            },
+            "activeAsyncWriters": {
+              "first": 0,
+              "last": 0,
+              "minimum": 0,
+              "maximum": 0,
+              "median": 0.0,
+              "first5Median": 0,
+              "last5Median": 0,
+              "slopePer100Reloads": 0.0
+            },
+            "ownedTrialMaterials": {
+              "first": 8,
+              "last": 8,
+              "minimum": 8,
+              "maximum": 8,
+              "median": 8.0,
+              "first5Median": 8,
+              "last5Median": 8,
+              "slopePer100Reloads": 0.0
+            },
+            "gameObjects": {
+              "first": 60,
+              "last": 60,
+              "minimum": 60,
+              "maximum": 60,
+              "median": 60.0,
+              "first5Median": 60,
+              "last5Median": 60,
+              "slopePer100Reloads": 0.0
+            },
+            "materials.nonPersistentCount": {
+              "first": 47,
+              "last": 47,
+              "minimum": 47,
+              "maximum": 47,
+              "median": 47.0,
+              "first5Median": 47,
+              "last5Median": 47,
+              "slopePer100Reloads": 0.0
+            },
+            "meshes.nonPersistentCount": {
+              "first": 1,
+              "last": 1,
+              "minimum": 1,
+              "maximum": 1,
+              "median": 1.0,
+              "first5Median": 1,
+              "last5Median": 1,
+              "slopePer100Reloads": 0.0
+            },
+            "textures.nonPersistentCount": {
+              "first": 86,
+              "last": 86,
+              "minimum": 86,
+              "maximum": 86,
+              "median": 86.0,
+              "first5Median": 86,
+              "last5Median": 86,
+              "slopePer100Reloads": 0.0
+            },
+            "renderTextures.nonPersistentCount": {
+              "first": 24,
+              "last": 24,
+              "minimum": 24,
+              "maximum": 24,
+              "median": 24.0,
+              "first5Median": 24,
+              "last5Median": 24,
+              "slopePer100Reloads": 0.0
+            },
+            "rssBytes": {
+              "first": 2139045888,
+              "last": 1182547968,
+              "minimum": 1182547968,
+              "maximum": 2139045888,
+              "median": 1200406528.0,
+              "first5Median": 2014199808,
+              "last5Median": 1196965888,
+              "slopePer100Reloads": -337733306.9498951
+            },
+            "managedBytes": {
+              "first": 796778496,
+              "last": 790978560,
+              "minimum": 782499840,
+              "maximum": 796778496,
+              "median": 786692096.0,
+              "first5Median": 784007168,
+              "last5Median": 790544384,
+              "slopePer100Reloads": 2967770.1338133817
+            },
+            "unityAllocatedBytes": {
+              "first": 420136990,
+              "last": 411339458,
+              "minimum": 403165686,
+              "maximum": 420136990,
+              "median": 408232127.0,
+              "first5Median": 403272942,
+              "last5Median": 411233954,
+              "slopePer100Reloads": 3294671.791479148
+            }
+          }
+        },
+        "Swarm": {
+          "samples": 100,
+          "observed": {
+            "fileDescriptors": {
+              "first": 115,
+              "last": 115,
+              "minimum": 115,
+              "maximum": 116,
+              "median": 116.0,
+              "first5Median": 115,
+              "last5Median": 115,
+              "slopePer100Reloads": -0.1632163216321632
+            },
+            "externalOsThreads": {
+              "first": 129,
+              "last": 126,
+              "minimum": 118,
+              "maximum": 129,
+              "median": 126.0,
+              "first5Median": 128,
+              "last5Median": 125,
+              "slopePer100Reloads": -1.5178517851785178
+            },
+            "activeTrackingWorkers": {
+              "first": 4,
+              "last": 4,
+              "minimum": 4,
+              "maximum": 4,
+              "median": 4.0,
+              "first5Median": 4,
+              "last5Median": 4,
+              "slopePer100Reloads": 0.0
+            },
+            "activeAsyncWriters": {
+              "first": 4,
+              "last": 4,
+              "minimum": 4,
+              "maximum": 4,
+              "median": 4.0,
+              "first5Median": 4,
+              "last5Median": 4,
+              "slopePer100Reloads": 0.0
+            },
+            "ownedTrialMaterials": {
+              "first": 0,
+              "last": 0,
+              "minimum": 0,
+              "maximum": 0,
+              "median": 0.0,
+              "first5Median": 0,
+              "last5Median": 0,
+              "slopePer100Reloads": 0.0
+            },
+            "gameObjects": {
+              "first": 325,
+              "last": 325,
+              "minimum": 325,
+              "maximum": 325,
+              "median": 325.0,
+              "first5Median": 325,
+              "last5Median": 325,
+              "slopePer100Reloads": 0.0
+            },
+            "materials.nonPersistentCount": {
+              "first": 35,
+              "last": 35,
+              "minimum": 35,
+              "maximum": 35,
+              "median": 35.0,
+              "first5Median": 35,
+              "last5Median": 35,
+              "slopePer100Reloads": 0.0
+            },
+            "meshes.nonPersistentCount": {
+              "first": 5,
+              "last": 5,
+              "minimum": 5,
+              "maximum": 5,
+              "median": 5.0,
+              "first5Median": 5,
+              "last5Median": 5,
+              "slopePer100Reloads": 0.0
+            },
+            "textures.nonPersistentCount": {
+              "first": 93,
+              "last": 93,
+              "minimum": 93,
+              "maximum": 93,
+              "median": 93.0,
+              "first5Median": 93,
+              "last5Median": 93,
+              "slopePer100Reloads": 0.0
+            },
+            "renderTextures.nonPersistentCount": {
+              "first": 31,
+              "last": 31,
+              "minimum": 31,
+              "maximum": 31,
+              "median": 31.0,
+              "first5Median": 31,
+              "last5Median": 31,
+              "slopePer100Reloads": 0.0
+            },
+            "rssBytes": {
+              "first": 2042413056,
+              "last": 1121337344,
+              "minimum": 1121222656,
+              "maximum": 2042413056,
+              "median": 1139400704.0,
+              "first5Median": 1950662656,
+              "last5Median": 1133674496,
+              "slopePer100Reloads": -326122615.5127513
+            },
+            "managedBytes": {
+              "first": 806465536,
+              "last": 800120832,
+              "minimum": 791785472,
+              "maximum": 806465536,
+              "median": 796065792.0,
+              "first5Median": 793624576,
+              "last5Median": 800120832,
+              "slopePer100Reloads": 3291187.00030003
+            },
+            "unityAllocatedBytes": {
+              "first": 347791731,
+              "last": 356068455,
+              "minimum": 347791731,
+              "maximum": 356068455,
+              "median": 352878518.0,
+              "first5Median": 347929293,
+              "last5Median": 355953509,
+              "slopePer100Reloads": 3756749.657965797
+            }
+          }
+        }
+      },
+      "totalWarnings": 0,
+      "missingScriptWarnings": 0,
+      "shutdownTimeouts": 0,
+      "shutdownTimeoutsBeforeExperimentLoads": 0,
+      "cleanup": [
+        {
+          "kind": "after-scene-teardown-no-forced-GC",
+          "fileDescriptors": 95,
+          "gameObjects": 19,
+          "activeTrackingWorkers": 0,
+          "activeAsyncWriters": 0,
+          "ownedTrialMaterials": 0,
+          "diagnosticRenderTargets": 0,
+          "rssBytes": 1218920448,
+          "managedBytes": 856776704,
+          "unityAllocatedBytes": 334498796,
+          "nativeResources": {
+            "materials": 36,
+            "meshes": 1,
+            "textures": 69,
+            "renderTextures": 2
+          }
+        },
+        {
+          "kind": "after-explicit-GC-and-UnloadUnusedAssets",
+          "fileDescriptors": 95,
+          "gameObjects": 19,
+          "activeTrackingWorkers": 0,
+          "activeAsyncWriters": 0,
+          "ownedTrialMaterials": 0,
+          "diagnosticRenderTargets": 0,
+          "rssBytes": 1215004672,
+          "managedBytes": 809529344,
+          "unityAllocatedBytes": 325807356,
+          "nativeResources": {
+            "materials": 36,
+            "meshes": 1,
+            "textures": 69,
+            "renderTextures": 2
+          }
+        }
+      ],
+      "externalProcess": {
+        "samples": 227,
+        "peakRssBytes": 2137014272,
+        "minimumThreads": 2,
+        "maximumThreads": 129,
+        "maxFileDescriptors": 125
+      },
+      "runtimeErrorsDuringActiveProtocol": [],
+      "runtimeErrorsOutsideActiveProtocol": [
+        "InvalidOperationException: Cannot access child value on Newtonsoft.Json.Linq.JValue.",
+        "InvalidOperationException: Cannot access child value on Newtonsoft.Json.Linq.JValue."
+      ],
+      "excludedEditorIndexErrors": 1,
+      "supervisorFailure": null,
+      "publisherErrors": [],
+      "capturedNativeCrashReports": 0
+    },
+    {
+      "id": "pre03-200x2s-A",
+      "status": "completed",
+      "sourceRevision": "c13d33dd57109f21fab03554c66a4e94438794d0",
+      "runtimeManifestSha256": "b164f2cabedfde8908a5f7e58b3c3fb21130f1fef7369ac9919b19c3b4bf201d",
+      "pluginsSha256": null,
+      "diagnosticSourceSha256": "8178ac396ab51b59eb7073f668f69cef1b8429cf1d5ee814e9458ce9faa04718",
+      "unityExitCode": 0,
+      "rawSummaryPassed": false,
+      "completedRequestedLoads": true,
+      "loads": 200,
+      "targetLoads": 200,
+      "experimentSeconds": 2.0,
+      "forcedFullReload": true,
+      "headless": false,
+      "pauseBeforeReloadSeconds": 0,
+      "profile": "standard",
+      "elapsedWallSeconds": 474.565678834,
+      "coverage": {
+        "activeSamples": 400,
+        "minimumLiveInputComponents": 4,
+        "minimumInputComponents": 4,
+        "staleOrNonprogressingInputObservations": 0,
+        "renderedFaces": [
+          20,
+          24
+        ],
+        "naturalCameraRenders": 206542,
+        "forcedCameraRenders": 413064
+      },
+      "stimulusCoverage": {
+        "terrainComponentCounts": [],
+        "skyImageSizes": [],
+        "samplesWithRecordedSky": 0
+      },
+      "actualSceneIntervals": {
+        "minimum": 2.014825459000008,
+        "median": 2.203650812500001,
+        "maximum": 2.463514792000012,
+        "totalSceneSeconds": 441.01990479200003
+      },
+      "perSceneLateSamples": {
+        "Choice_desync": {
+          "samples": 100,
+          "observed": {
+            "fileDescriptors": {
+              "first": 111,
+              "last": 111,
+              "minimum": 111,
+              "maximum": 112,
+              "median": 112.0,
+              "first5Median": 111,
+              "last5Median": 111,
+              "slopePer100Reloads": -0.12241224122412242
+            },
+            "externalOsThreads": {
+              "first": 122,
+              "last": 126,
+              "minimum": 120,
+              "maximum": 131,
+              "median": 126.0,
+              "first5Median": 125,
+              "last5Median": 126,
+              "slopePer100Reloads": 0.5238523852385238
+            },
+            "activeTrackingWorkers": null,
+            "activeAsyncWriters": null,
+            "ownedTrialMaterials": null,
+            "gameObjects": {
+              "first": 58,
+              "last": 58,
+              "minimum": 58,
+              "maximum": 58,
+              "median": 58.0,
+              "first5Median": 58,
+              "last5Median": 58,
+              "slopePer100Reloads": 0.0
+            },
+            "materials.nonPersistentCount": {
+              "first": 39,
+              "last": 39,
+              "minimum": 39,
+              "maximum": 39,
+              "median": 39.0,
+              "first5Median": 39,
+              "last5Median": 39,
+              "slopePer100Reloads": 0.0
+            },
+            "meshes.nonPersistentCount": {
+              "first": 1,
+              "last": 1,
+              "minimum": 1,
+              "maximum": 1,
+              "median": 1.0,
+              "first5Median": 1,
+              "last5Median": 1,
+              "slopePer100Reloads": 0.0
+            },
+            "textures.nonPersistentCount": {
+              "first": 86,
+              "last": 86,
+              "minimum": 86,
+              "maximum": 86,
+              "median": 86.0,
+              "first5Median": 86,
+              "last5Median": 86,
+              "slopePer100Reloads": 0.0
+            },
+            "renderTextures.nonPersistentCount": {
+              "first": 24,
+              "last": 24,
+              "minimum": 24,
+              "maximum": 24,
+              "median": 24.0,
+              "first5Median": 24,
+              "last5Median": 24,
+              "slopePer100Reloads": 0.0
+            },
+            "rssBytes": {
+              "first": 2530197504,
+              "last": 1020968960,
+              "minimum": 1012695040,
+              "maximum": 2530197504,
+              "median": 1223254016.0,
+              "first5Median": 2458337280,
+              "last5Median": 1021870080,
+              "slopePer100Reloads": -514904918.1014101
+            },
+            "managedBytes": {
+              "first": 771424256,
+              "last": 769044480,
+              "minimum": 761667584,
+              "maximum": 771424256,
+              "median": 764809216.0,
+              "first5Median": 762064896,
+              "last5Median": 769044480,
+              "slopePer100Reloads": 3415068.572457246
+            },
+            "unityAllocatedBytes": {
+              "first": 439560352,
+              "last": 425144358,
+              "minimum": 417054474,
+              "maximum": 439560352,
+              "median": 422047508.0,
+              "first5Median": 417142461,
+              "last5Median": 425025278,
+              "slopePer100Reloads": 3095917.8187818783
+            }
+          }
+        },
+        "Swarm": {
+          "samples": 100,
+          "observed": {
+            "fileDescriptors": {
+              "first": 115,
+              "last": 115,
+              "minimum": 115,
+              "maximum": 116,
+              "median": 116.0,
+              "first5Median": 115,
+              "last5Median": 115,
+              "slopePer100Reloads": -0.1632163216321632
+            },
+            "externalOsThreads": {
+              "first": 130,
+              "last": 129,
+              "minimum": 121,
+              "maximum": 131,
+              "median": 129.0,
+              "first5Median": 129,
+              "last5Median": 130,
+              "slopePer100Reloads": -0.06810681068106807
+            },
+            "activeTrackingWorkers": null,
+            "activeAsyncWriters": null,
+            "ownedTrialMaterials": null,
+            "gameObjects": {
+              "first": 323,
+              "last": 323,
+              "minimum": 323,
+              "maximum": 323,
+              "median": 323.0,
+              "first5Median": 323,
+              "last5Median": 323,
+              "slopePer100Reloads": 0.0
+            },
+            "materials.nonPersistentCount": {
+              "first": 35,
+              "last": 35,
+              "minimum": 35,
+              "maximum": 35,
+              "median": 35.0,
+              "first5Median": 35,
+              "last5Median": 35,
+              "slopePer100Reloads": 0.0
+            },
+            "meshes.nonPersistentCount": {
+              "first": 5,
+              "last": 5,
+              "minimum": 5,
+              "maximum": 5,
+              "median": 5.0,
+              "first5Median": 5,
+              "last5Median": 5,
+              "slopePer100Reloads": 0.0
+            },
+            "textures.nonPersistentCount": {
+              "first": 93,
+              "last": 93,
+              "minimum": 93,
+              "maximum": 93,
+              "median": 93.0,
+              "first5Median": 93,
+              "last5Median": 93,
+              "slopePer100Reloads": 0.0
+            },
+            "renderTextures.nonPersistentCount": {
+              "first": 31,
+              "last": 31,
+              "minimum": 31,
+              "maximum": 31,
+              "median": 31.0,
+              "first5Median": 31,
+              "last5Median": 31,
+              "slopePer100Reloads": 0.0
+            },
+            "rssBytes": {
+              "first": 2425470976,
+              "last": 959430656,
+              "minimum": 951582720,
+              "maximum": 2429157376,
+              "median": 1162256384.0,
+              "first5Median": 2402058240,
+              "last5Median": 960512000,
+              "slopePer100Reloads": -497585245.7053707
+            },
+            "managedBytes": {
+              "first": 779362304,
+              "last": 777277440,
+              "minimum": 769851392,
+              "maximum": 779362304,
+              "median": 772943872.0,
+              "first5Median": 770121728,
+              "last5Median": 776806400,
+              "slopePer100Reloads": 3496859.535553556
+            },
+            "unityAllocatedBytes": {
+              "first": 361711642,
+              "last": 369907881,
+              "minimum": 361711642,
+              "maximum": 369907881,
+              "median": 366732284.5,
+              "first5Median": 361838412,
+              "last5Median": 369769971,
+              "slopePer100Reloads": 3723078.2331233122
+            }
+          }
+        }
+      },
+      "totalWarnings": 0,
+      "missingScriptWarnings": 0,
+      "shutdownTimeouts": 0,
+      "shutdownTimeoutsBeforeExperimentLoads": 0,
+      "cleanup": [
+        {
+          "kind": "after-scene-teardown-no-forced-GC",
+          "fileDescriptors": 95,
+          "gameObjects": 17,
+          "activeTrackingWorkers": null,
+          "activeAsyncWriters": null,
+          "ownedTrialMaterials": null,
+          "diagnosticRenderTargets": 0,
+          "rssBytes": 1061994496,
+          "managedBytes": 828452864,
+          "unityAllocatedBytes": 346222843,
+          "nativeResources": {
+            "materials": 36,
+            "meshes": 1,
+            "textures": 69,
+            "renderTextures": 2
+          }
+        },
+        {
+          "kind": "after-explicit-GC-and-UnloadUnusedAssets",
+          "fileDescriptors": 95,
+          "gameObjects": 17,
+          "activeTrackingWorkers": null,
+          "activeAsyncWriters": null,
+          "ownedTrialMaterials": null,
+          "diagnosticRenderTargets": 0,
+          "rssBytes": 1057177600,
+          "managedBytes": 782467072,
+          "unityAllocatedBytes": 337551891,
+          "nativeResources": {
+            "materials": 36,
+            "meshes": 1,
+            "textures": 69,
+            "renderTextures": 2
+          }
+        }
+      ],
+      "externalProcess": {
+        "samples": 231,
+        "peakRssBytes": 2541535232,
+        "minimumThreads": 2,
+        "maximumThreads": 131,
+        "maxFileDescriptors": 120
+      },
+      "runtimeErrorsDuringActiveProtocol": [],
+      "runtimeErrorsOutsideActiveProtocol": [
+        "InvalidOperationException: Cannot access child value on Newtonsoft.Json.Linq.JValue.",
+        "InvalidOperationException: Cannot access child value on Newtonsoft.Json.Linq.JValue."
+      ],
+      "excludedEditorIndexErrors": 1,
+      "supervisorFailure": null,
+      "publisherErrors": [],
+      "capturedNativeCrashReports": 0
+    },
+    {
+      "id": "archival-40x2s-pub-gap-B",
+      "status": "completed",
+      "sourceRevision": "779926a80b02190d6dd0410f260e52bba105a04e",
+      "runtimeManifestSha256": "9572439862e2ffe38d14fd9d3c6fe38720913310977585a74371df335211ccb1",
+      "pluginsSha256": null,
+      "diagnosticSourceSha256": "d82b0d46f45dd7bd68b76e089d81d6c6345527994f0d323a71f743a8b1944f34",
+      "unityExitCode": 0,
+      "rawSummaryPassed": false,
+      "completedRequestedLoads": true,
+      "loads": 40,
+      "targetLoads": 40,
+      "experimentSeconds": 2.0,
+      "forcedFullReload": true,
+      "headless": false,
+      "pauseBeforeReloadSeconds": 0.25,
+      "profile": "standard",
+      "elapsedWallSeconds": 125.228637625,
+      "coverage": {
+        "activeSamples": 80,
+        "minimumLiveInputComponents": 4,
+        "minimumInputComponents": 4,
+        "staleOrNonprogressingInputObservations": 0,
+        "renderedFaces": [
+          20
+        ],
+        "naturalCameraRenders": 37590,
+        "forcedCameraRenders": 75160
+      },
+      "stimulusCoverage": {
+        "terrainComponentCounts": [],
+        "skyImageSizes": [],
+        "samplesWithRecordedSky": 0
+      },
+      "actualSceneIntervals": {
+        "minimum": 2.0015125420000004,
+        "median": 2.671058249999998,
+        "maximum": 3.678368292000002,
+        "totalSceneSeconds": 103.762360959
+      },
+      "perSceneLateSamples": {
+        "Choice_desync": {
+          "samples": 40,
+          "observed": {
+            "fileDescriptors": {
+              "first": 113,
+              "last": 183,
+              "minimum": 113,
+              "maximum": 183,
+              "median": 149.0,
+              "first5Median": 117,
+              "last5Median": 181,
+              "slopePer100Reloads": 185.422138836773
+            },
+            "externalOsThreads": {
+              "first": 120,
+              "last": 149,
+              "minimum": 118,
+              "maximum": 152,
+              "median": 135.5,
+              "first5Median": 121,
+              "last5Median": 152,
+              "slopePer100Reloads": 87.4859287054409
+            },
+            "activeTrackingWorkers": null,
+            "activeAsyncWriters": null,
+            "ownedTrialMaterials": null,
+            "gameObjects": {
+              "first": 47,
+              "last": 47,
+              "minimum": 47,
+              "maximum": 47,
+              "median": 47.0,
+              "first5Median": 47,
+              "last5Median": 47,
+              "slopePer100Reloads": 0.0
+            },
+            "materials.nonPersistentCount": {
+              "first": 38,
+              "last": 38,
+              "minimum": 38,
+              "maximum": 38,
+              "median": 38.0,
+              "first5Median": 38,
+              "last5Median": 38,
+              "slopePer100Reloads": 0.0
+            },
+            "meshes.nonPersistentCount": {
+              "first": 1,
+              "last": 1,
+              "minimum": 1,
+              "maximum": 1,
+              "median": 1.0,
+              "first5Median": 1,
+              "last5Median": 1,
+              "slopePer100Reloads": 0.0
+            },
+            "textures.nonPersistentCount": {
+              "first": 85,
+              "last": 85,
+              "minimum": 85,
+              "maximum": 85,
+              "median": 85.0,
+              "first5Median": 85,
+              "last5Median": 85,
+              "slopePer100Reloads": 0.0
+            },
+            "renderTextures.nonPersistentCount": {
+              "first": 24,
+              "last": 24,
+              "minimum": 24,
+              "maximum": 24,
+              "median": 24.0,
+              "first5Median": 24,
+              "last5Median": 24,
+              "slopePer100Reloads": 0.0
+            },
+            "rssBytes": {
+              "first": 2517860352,
+              "last": 2448867328,
+              "minimum": 2445262848,
+              "maximum": 2521694208,
+              "median": 2446983168.0,
+              "first5Median": 2519580672,
+              "last5Median": 2448703488,
+              "slopePer100Reloads": -128908727.95497186
+            },
+            "managedBytes": {
+              "first": 729518080,
+              "last": 730664960,
+              "minimum": 729489408,
+              "maximum": 731045888,
+              "median": 730329088.0,
+              "first5Median": 729882624,
+              "last5Median": 730664960,
+              "slopePer100Reloads": 2590086.003752345
+            },
+            "unityAllocatedBytes": {
+              "first": 396850090,
+              "last": 386247736,
+              "minimum": 385373056,
+              "maximum": 396850090,
+              "median": 385830677.0,
+              "first5Median": 385400348,
+              "last5Median": 386181516,
+              "slopePer100Reloads": -2094734.2776735458
+            }
+          }
+        }
+      },
+      "totalWarnings": 38,
+      "missingScriptWarnings": 0,
+      "shutdownTimeouts": 37,
+      "shutdownTimeoutsBeforeExperimentLoads": 2,
+      "cleanup": [
+        {
+          "kind": "after-scene-teardown-no-forced-GC",
+          "fileDescriptors": 167,
+          "gameObjects": 6,
+          "activeTrackingWorkers": null,
+          "activeAsyncWriters": null,
+          "ownedTrialMaterials": null,
+          "diagnosticRenderTargets": 0,
+          "rssBytes": 2340798464,
+          "managedBytes": 752480256,
+          "unityAllocatedBytes": 306316701,
+          "nativeResources": {
+            "materials": 30,
+            "meshes": 1,
+            "textures": 63,
+            "renderTextures": 2
+          }
+        },
+        {
+          "kind": "after-explicit-GC-and-UnloadUnusedAssets",
+          "fileDescriptors": 167,
+          "gameObjects": 6,
+          "activeTrackingWorkers": null,
+          "activeAsyncWriters": null,
+          "ownedTrialMaterials": null,
+          "diagnosticRenderTargets": 0,
+          "rssBytes": 2336620544,
+          "managedBytes": 753049600,
+          "unityAllocatedBytes": 299426542,
+          "nativeResources": {
+            "materials": 30,
+            "meshes": 1,
+            "textures": 63,
+            "renderTextures": 2
+          }
+        }
+      ],
+      "externalProcess": {
+        "samples": 61,
+        "peakRssBytes": 2521841664,
+        "minimumThreads": 2,
+        "maximumThreads": 153,
+        "maxFileDescriptors": 182
+      },
+      "runtimeErrorsDuringActiveProtocol": [],
+      "runtimeErrorsOutsideActiveProtocol": [
+        "No backup data file found."
+      ],
+      "excludedEditorIndexErrors": 1,
+      "supervisorFailure": null,
+      "publisherErrors": [],
+      "capturedNativeCrashReports": 0
+    },
+    {
+      "id": "archival-40x2s-pub-gap-treatment",
+      "status": "completed",
+      "sourceRevision": "779926a80b02190d6dd0410f260e52bba105a04e",
+      "runtimeManifestSha256": "bbfc76daf8104f230893b55839437fc5a55d69de50f52bdd47e73a593f530066",
+      "pluginsSha256": null,
+      "diagnosticSourceSha256": "d82b0d46f45dd7bd68b76e089d81d6c6345527994f0d323a71f743a8b1944f34",
+      "unityExitCode": 0,
+      "rawSummaryPassed": false,
+      "completedRequestedLoads": true,
+      "loads": 40,
+      "targetLoads": 40,
+      "experimentSeconds": 2.0,
+      "forcedFullReload": true,
+      "headless": false,
+      "pauseBeforeReloadSeconds": 0.25,
+      "profile": "standard",
+      "elapsedWallSeconds": 116.95924712499999,
+      "coverage": {
+        "activeSamples": 80,
+        "minimumLiveInputComponents": 4,
+        "minimumInputComponents": 4,
+        "staleOrNonprogressingInputObservations": 0,
+        "renderedFaces": [
+          20
+        ],
+        "naturalCameraRenders": 37620,
+        "forcedCameraRenders": 75220
+      },
+      "stimulusCoverage": {
+        "terrainComponentCounts": [],
+        "skyImageSizes": [],
+        "samplesWithRecordedSky": 0
+      },
+      "actualSceneIntervals": {
+        "minimum": 2.0022481669999905,
+        "median": 2.4268144375000027,
+        "maximum": 2.532146209000004,
+        "totalSceneSeconds": 97.143204334
+      },
+      "perSceneLateSamples": {
+        "Choice_desync": {
+          "samples": 40,
+          "observed": {
+            "fileDescriptors": {
+              "first": 109,
+              "last": 109,
+              "minimum": 109,
+              "maximum": 109,
+              "median": 109.0,
+              "first5Median": 109,
+              "last5Median": 109,
+              "slopePer100Reloads": 0.0
+            },
+            "externalOsThreads": {
+              "first": 127,
+              "last": 123,
+              "minimum": 119,
+              "maximum": 127,
+              "median": 123.0,
+              "first5Median": 124,
+              "last5Median": 123,
+              "slopePer100Reloads": -3.1050656660412757
+            },
+            "activeTrackingWorkers": null,
+            "activeAsyncWriters": null,
+            "ownedTrialMaterials": null,
+            "gameObjects": {
+              "first": 47,
+              "last": 47,
+              "minimum": 47,
+              "maximum": 47,
+              "median": 47.0,
+              "first5Median": 47,
+              "last5Median": 47,
+              "slopePer100Reloads": 0.0
+            },
+            "materials.nonPersistentCount": {
+              "first": 38,
+              "last": 38,
+              "minimum": 38,
+              "maximum": 38,
+              "median": 38.0,
+              "first5Median": 38,
+              "last5Median": 38,
+              "slopePer100Reloads": 0.0
+            },
+            "meshes.nonPersistentCount": {
+              "first": 1,
+              "last": 1,
+              "minimum": 1,
+              "maximum": 1,
+              "median": 1.0,
+              "first5Median": 1,
+              "last5Median": 1,
+              "slopePer100Reloads": 0.0
+            },
+            "textures.nonPersistentCount": {
+              "first": 85,
+              "last": 85,
+              "minimum": 85,
+              "maximum": 85,
+              "median": 85.0,
+              "first5Median": 85,
+              "last5Median": 85,
+              "slopePer100Reloads": 0.0
+            },
+            "renderTextures.nonPersistentCount": {
+              "first": 24,
+              "last": 24,
+              "minimum": 24,
+              "maximum": 24,
+              "median": 24.0,
+              "first5Median": 24,
+              "last5Median": 24,
+              "slopePer100Reloads": 0.0
+            },
+            "rssBytes": {
+              "first": 2313715712,
+              "last": 1362264064,
+              "minimum": 1362264064,
+              "maximum": 2317025280,
+              "median": 2255429632.0,
+              "first5Median": 2315157504,
+              "last5Median": 1368195072,
+              "slopePer100Reloads": -1848384936.585366
+            },
+            "managedBytes": {
+              "first": 746176512,
+              "last": 747073536,
+              "minimum": 746176512,
+              "maximum": 747307008,
+              "median": 746784768.0,
+              "first5Median": 746467328,
+              "last5Median": 746651648,
+              "slopePer100Reloads": -539818.9868667917
+            },
+            "unityAllocatedBytes": {
+              "first": 397846363,
+              "last": 386105702,
+              "minimum": 385257465,
+              "maximum": 397846363,
+              "median": 385723054.5,
+              "first5Median": 385327653,
+              "last5Median": 386022482,
+              "slopePer100Reloads": -2692374.0900562853
+            }
+          }
+        }
+      },
+      "totalWarnings": 1,
+      "missingScriptWarnings": 0,
+      "shutdownTimeouts": 0,
+      "shutdownTimeoutsBeforeExperimentLoads": 0,
+      "cleanup": [
+        {
+          "kind": "after-scene-teardown-no-forced-GC",
+          "fileDescriptors": 93,
+          "gameObjects": 6,
+          "activeTrackingWorkers": null,
+          "activeAsyncWriters": null,
+          "ownedTrialMaterials": null,
+          "diagnosticRenderTargets": 0,
+          "rssBytes": 1382596608,
+          "managedBytes": 761556992,
+          "unityAllocatedBytes": 305999819,
+          "nativeResources": {
+            "materials": 30,
+            "meshes": 1,
+            "textures": 63,
+            "renderTextures": 2
+          }
+        },
+        {
+          "kind": "after-explicit-GC-and-UnloadUnusedAssets",
+          "fileDescriptors": 93,
+          "gameObjects": 6,
+          "activeTrackingWorkers": null,
+          "activeAsyncWriters": null,
+          "ownedTrialMaterials": null,
+          "diagnosticRenderTargets": 0,
+          "rssBytes": 1383677952,
+          "managedBytes": 768315392,
+          "unityAllocatedBytes": 299264316,
+          "nativeResources": {
+            "materials": 30,
+            "meshes": 1,
+            "textures": 63,
+            "renderTextures": 2
+          }
+        }
+      ],
+      "externalProcess": {
+        "samples": 57,
+        "peakRssBytes": 2317090816,
+        "minimumThreads": 2,
+        "maximumThreads": 127,
+        "maxFileDescriptors": 108
+      },
+      "runtimeErrorsDuringActiveProtocol": [],
+      "runtimeErrorsOutsideActiveProtocol": [
+        "No backup data file found."
+      ],
+      "excludedEditorIndexErrors": 1,
+      "supervisorFailure": null,
+      "publisherErrors": [],
+      "capturedNativeCrashReports": 0
+    },
+    {
+      "id": "current-final-200x2s",
+      "status": "completed",
+      "sourceRevision": "cd207862cacf0a82d5e2ecfe39e23478679d5792",
+      "runtimeManifestSha256": "439202de8801e0bb3329db63ce2331fdb97ade83d61195b05f35fecc7681260c",
+      "pluginsSha256": {
+        "Assets/Plugins/AsyncIO.dll": "7124e586dda40a009fcf31eb3f224f6d378af1116fca76ceb31770d93c0cc0c7",
+        "Assets/Plugins/NaCl.dll": "d4a491bcdfcf92bc438ec29ed88cc5a52a81d14592bbb2897aeaf53826093935",
+        "Assets/Plugins/NetMQ.dll": "87f9aa1954579a1353d6b926e2882162f23bbc152c6b63919de547859462cbd8"
+      },
+      "diagnosticSourceSha256": "f3a6789b25e66d9f60b0c2df0b1fd5791292f12b6c367df8e000ffe4abfcfd12",
+      "unityExitCode": 0,
+      "rawSummaryPassed": true,
+      "completedRequestedLoads": true,
+      "loads": 200,
+      "targetLoads": 200,
+      "experimentSeconds": 2.0,
+      "forcedFullReload": true,
+      "headless": false,
+      "pauseBeforeReloadSeconds": 0,
+      "profile": "standard",
+      "elapsedWallSeconds": 469.99592337499996,
+      "coverage": {
+        "activeSamples": 400,
+        "minimumLiveInputComponents": 4,
+        "minimumInputComponents": 4,
+        "staleOrNonprogressingInputObservations": 0,
+        "renderedFaces": [
+          20,
+          24
+        ],
+        "naturalCameraRenders": 206290,
+        "forcedCameraRenders": 412560
+      },
+      "stimulusCoverage": {
+        "terrainComponentCounts": [],
+        "skyImageSizes": [],
+        "samplesWithRecordedSky": 0
+      },
+      "actualSceneIntervals": {
+        "minimum": 2.0015783750000082,
+        "median": 2.214778583499964,
+        "maximum": 2.3012098750000014,
+        "totalSceneSeconds": 442.84179808300007
+      },
+      "perSceneLateSamples": {
+        "Choice_desync": {
+          "samples": 100,
+          "observed": {
+            "fileDescriptors": {
+              "first": 113,
+              "last": 112,
+              "minimum": 112,
+              "maximum": 113,
+              "median": 113.0,
+              "first5Median": 113,
+              "last5Median": 112,
+              "slopePer100Reloads": -0.4800480048004801
+            },
+            "externalOsThreads": {
+              "first": 119,
+              "last": 118,
+              "minimum": 113,
+              "maximum": 122,
+              "median": 118.0,
+              "first5Median": 119,
+              "last5Median": 118,
+              "slopePer100Reloads": -0.1347134713471347
+            },
+            "activeTrackingWorkers": {
+              "first": 4,
+              "last": 4,
+              "minimum": 4,
+              "maximum": 4,
+              "median": 4.0,
+              "first5Median": 4,
+              "last5Median": 4,
+              "slopePer100Reloads": 0.0
+            },
+            "activeAsyncWriters": {
+              "first": 0,
+              "last": 0,
+              "minimum": 0,
+              "maximum": 0,
+              "median": 0.0,
+              "first5Median": 0,
+              "last5Median": 0,
+              "slopePer100Reloads": 0.0
+            },
+            "ownedTrialMaterials": {
+              "first": 8,
+              "last": 8,
+              "minimum": 8,
+              "maximum": 8,
+              "median": 8.0,
+              "first5Median": 8,
+              "last5Median": 8,
+              "slopePer100Reloads": 0.0
+            },
+            "gameObjects": {
+              "first": 60,
+              "last": 60,
+              "minimum": 60,
+              "maximum": 60,
+              "median": 60.0,
+              "first5Median": 60,
+              "last5Median": 60,
+              "slopePer100Reloads": 0.0
+            },
+            "materials.nonPersistentCount": {
+              "first": 44,
+              "last": 44,
+              "minimum": 44,
+              "maximum": 44,
+              "median": 44.0,
+              "first5Median": 44,
+              "last5Median": 44,
+              "slopePer100Reloads": 0.0
+            },
+            "meshes.nonPersistentCount": {
+              "first": 1,
+              "last": 1,
+              "minimum": 1,
+              "maximum": 1,
+              "median": 1.0,
+              "first5Median": 1,
+              "last5Median": 1,
+              "slopePer100Reloads": 0.0
+            },
+            "textures.nonPersistentCount": {
+              "first": 91,
+              "last": 91,
+              "minimum": 91,
+              "maximum": 91,
+              "median": 91.0,
+              "first5Median": 91,
+              "last5Median": 91,
+              "slopePer100Reloads": 0.0
+            },
+            "renderTextures.nonPersistentCount": {
+              "first": 24,
+              "last": 24,
+              "minimum": 24,
+              "maximum": 24,
+              "median": 24.0,
+              "first5Median": 24,
+              "last5Median": 24,
+              "slopePer100Reloads": 0.0
+            },
+            "rssBytes": {
+              "first": 2446442496,
+              "last": 2383659008,
+              "minimum": 2356084736,
+              "maximum": 2446442496,
+              "median": 2377957376.0,
+              "first5Median": 2408480768,
+              "last5Median": 2383085568,
+              "slopePer100Reloads": -118920.4104410441
+            },
+            "managedBytes": {
+              "first": 853434368,
+              "last": 846405632,
+              "minimum": 837935104,
+              "maximum": 853434368,
+              "median": 841775104.0,
+              "first5Median": 839761920,
+              "last5Median": 845946880,
+              "slopePer100Reloads": 3115796.3540354036
+            },
+            "unityAllocatedBytes": {
+              "first": 429384281,
+              "last": 415978947,
+              "minimum": 409834845,
+              "maximum": 429384281,
+              "median": 412831757.0,
+              "first5Median": 409935257,
+              "last5Median": 415867653,
+              "slopePer100Reloads": 2517569.0081008105
+            }
+          }
+        },
+        "Swarm": {
+          "samples": 100,
+          "observed": {
+            "fileDescriptors": {
+              "first": 117,
+              "last": 116,
+              "minimum": 116,
+              "maximum": 117,
+              "median": 117.0,
+              "first5Median": 117,
+              "last5Median": 116,
+              "slopePer100Reloads": -0.4800480048004801
+            },
+            "externalOsThreads": {
+              "first": 123,
+              "last": 122,
+              "minimum": 113,
+              "maximum": 123,
+              "median": 121.0,
+              "first5Median": 121,
+              "last5Median": 122,
+              "slopePer100Reloads": -0.1554155415541554
+            },
+            "activeTrackingWorkers": {
+              "first": 4,
+              "last": 4,
+              "minimum": 4,
+              "maximum": 4,
+              "median": 4.0,
+              "first5Median": 4,
+              "last5Median": 4,
+              "slopePer100Reloads": 0.0
+            },
+            "activeAsyncWriters": {
+              "first": 4,
+              "last": 4,
+              "minimum": 4,
+              "maximum": 4,
+              "median": 4.0,
+              "first5Median": 4,
+              "last5Median": 4,
+              "slopePer100Reloads": 0.0
+            },
+            "ownedTrialMaterials": {
+              "first": 0,
+              "last": 0,
+              "minimum": 0,
+              "maximum": 0,
+              "median": 0.0,
+              "first5Median": 0,
+              "last5Median": 0,
+              "slopePer100Reloads": 0.0
+            },
+            "gameObjects": {
+              "first": 325,
+              "last": 325,
+              "minimum": 325,
+              "maximum": 325,
+              "median": 325.0,
+              "first5Median": 325,
+              "last5Median": 325,
+              "slopePer100Reloads": 0.0
+            },
+            "materials.nonPersistentCount": {
+              "first": 40,
+              "last": 40,
+              "minimum": 40,
+              "maximum": 40,
+              "median": 40.0,
+              "first5Median": 40,
+              "last5Median": 40,
+              "slopePer100Reloads": 0.0
+            },
+            "meshes.nonPersistentCount": {
+              "first": 5,
+              "last": 5,
+              "minimum": 5,
+              "maximum": 5,
+              "median": 5.0,
+              "first5Median": 5,
+              "last5Median": 5,
+              "slopePer100Reloads": 0.0
+            },
+            "textures.nonPersistentCount": {
+              "first": 98,
+              "last": 98,
+              "minimum": 98,
+              "maximum": 98,
+              "median": 98.0,
+              "first5Median": 98,
+              "last5Median": 98,
+              "slopePer100Reloads": 0.0
+            },
+            "renderTextures.nonPersistentCount": {
+              "first": 31,
+              "last": 31,
+              "minimum": 31,
+              "maximum": 31,
+              "median": 31.0,
+              "first5Median": 31,
+              "last5Median": 31,
+              "slopePer100Reloads": 0.0
+            },
+            "rssBytes": {
+              "first": 2342240256,
+              "last": 2322481152,
+              "minimum": 2294349824,
+              "maximum": 2362638336,
+              "median": 2316738560.0,
+              "first5Median": 2342240256,
+              "last5Median": 2322284544,
+              "slopePer100Reloads": 652454.8262826285
+            },
+            "managedBytes": {
+              "first": 861224960,
+              "last": 854728704,
+              "minimum": 846663680,
+              "maximum": 861224960,
+              "median": 850503680.0,
+              "first5Median": 848375808,
+              "last5Median": 854818816,
+              "slopePer100Reloads": 3294709.0933093308
+            },
+            "unityAllocatedBytes": {
+              "first": 354486520,
+              "last": 360708152,
+              "minimum": 354486520,
+              "maximum": 360708152,
+              "median": 357503540.0,
+              "first5Median": 354624408,
+              "last5Median": 360595648,
+              "slopePer100Reloads": 3119898.2451245124
+            }
+          }
+        }
+      },
+      "totalWarnings": 1,
+      "missingScriptWarnings": 0,
+      "shutdownTimeouts": 0,
+      "shutdownTimeoutsBeforeExperimentLoads": 0,
+      "cleanup": [
+        {
+          "kind": "after-scene-teardown-no-forced-GC",
+          "fileDescriptors": 96,
+          "gameObjects": 19,
+          "activeTrackingWorkers": 0,
+          "activeAsyncWriters": 0,
+          "ownedTrialMaterials": 0,
+          "diagnosticRenderTargets": 0,
+          "rssBytes": 2323382272,
+          "managedBytes": 904523776,
+          "unityAllocatedBytes": 332876421,
+          "nativeResources": {
+            "materials": 36,
+            "meshes": 1,
+            "textures": 69,
+            "renderTextures": 2
+          }
+        },
+        {
+          "kind": "after-explicit-GC-and-UnloadUnusedAssets",
+          "fileDescriptors": 96,
+          "gameObjects": 19,
+          "activeTrackingWorkers": 0,
+          "activeAsyncWriters": 0,
+          "ownedTrialMaterials": 0,
+          "diagnosticRenderTargets": 0,
+          "rssBytes": 2318958592,
+          "managedBytes": 867205120,
+          "unityAllocatedBytes": 324129369,
+          "nativeResources": {
+            "materials": 36,
+            "meshes": 1,
+            "textures": 69,
+            "renderTextures": 2
+          }
+        }
+      ],
+      "externalProcess": {
+        "samples": 229,
+        "peakRssBytes": 2446114816,
+        "minimumThreads": 2,
+        "maximumThreads": 123,
+        "maxFileDescriptors": 116
+      },
+      "runtimeErrorsDuringActiveProtocol": [],
+      "runtimeErrorsOutsideActiveProtocol": [],
+      "excludedEditorIndexErrors": 1,
+      "supervisorFailure": null,
+      "publisherErrors": [],
+      "capturedNativeCrashReports": 0
+    },
+    {
+      "id": "current-terrain-sky-40x2s",
+      "status": "completed",
+      "sourceRevision": "cd207862cacf0a82d5e2ecfe39e23478679d5792",
+      "runtimeManifestSha256": "439202de8801e0bb3329db63ce2331fdb97ade83d61195b05f35fecc7681260c",
+      "pluginsSha256": {
+        "Assets/Plugins/AsyncIO.dll": "7124e586dda40a009fcf31eb3f224f6d378af1116fca76ceb31770d93c0cc0c7",
+        "Assets/Plugins/NaCl.dll": "d4a491bcdfcf92bc438ec29ed88cc5a52a81d14592bbb2897aeaf53826093935",
+        "Assets/Plugins/NetMQ.dll": "87f9aa1954579a1353d6b926e2882162f23bbc152c6b63919de547859462cbd8"
+      },
+      "diagnosticSourceSha256": "804d10e4ca6ac30ca212264697a2b4b88de66dbfec4cbd6468a389a56245f0e0",
+      "unityExitCode": 0,
+      "rawSummaryPassed": true,
+      "completedRequestedLoads": true,
+      "loads": 40,
+      "targetLoads": 40,
+      "experimentSeconds": 2.0,
+      "forcedFullReload": true,
+      "headless": false,
+      "pauseBeforeReloadSeconds": 0.25,
+      "profile": "terrain-night-sky",
+      "elapsedWallSeconds": 133.397239584,
+      "coverage": {
+        "activeSamples": 80,
+        "minimumLiveInputComponents": 4,
+        "minimumInputComponents": 4,
+        "staleOrNonprogressingInputObservations": 0,
+        "renderedFaces": [
+          24
+        ],
+        "naturalCameraRenders": 45072,
+        "forcedCameraRenders": 90120
+      },
+      "stimulusCoverage": {
+        "terrainComponentCounts": [
+          2
+        ],
+        "skyImageSizes": [
+          [
+            4096,
+            2048
+          ]
+        ],
+        "samplesWithRecordedSky": 80
+      },
+      "actualSceneIntervals": {
+        "minimum": 2.0138923750000117,
+        "median": 2.7756110414999995,
+        "maximum": 2.9903032079999985,
+        "totalSceneSeconds": 111.38627412500001
+      },
+      "perSceneLateSamples": {
+        "Choice_Selwyn": {
+          "samples": 40,
+          "observed": {
+            "fileDescriptors": {
+              "first": 112,
+              "last": 113,
+              "minimum": 112,
+              "maximum": 113,
+              "median": 112.5,
+              "first5Median": 112,
+              "last5Median": 113,
+              "slopePer100Reloads": 3.75234521575985
+            },
+            "externalOsThreads": {
+              "first": 124,
+              "last": 123,
+              "minimum": 119,
+              "maximum": 124,
+              "median": 123.0,
+              "first5Median": 123,
+              "last5Median": 123,
+              "slopePer100Reloads": -0.7504690431519699
+            },
+            "activeTrackingWorkers": {
+              "first": 4,
+              "last": 4,
+              "minimum": 4,
+              "maximum": 4,
+              "median": 4.0,
+              "first5Median": 4,
+              "last5Median": 4,
+              "slopePer100Reloads": 0.0
+            },
+            "activeAsyncWriters": {
+              "first": 0,
+              "last": 0,
+              "minimum": 0,
+              "maximum": 0,
+              "median": 0.0,
+              "first5Median": 0,
+              "last5Median": 0,
+              "slopePer100Reloads": 0.0
+            },
+            "ownedTrialMaterials": {
+              "first": 0,
+              "last": 0,
+              "minimum": 0,
+              "maximum": 0,
+              "median": 0.0,
+              "first5Median": 0,
+              "last5Median": 0,
+              "slopePer100Reloads": 0.0
+            },
+            "gameObjects": {
+              "first": 57,
+              "last": 57,
+              "minimum": 57,
+              "maximum": 57,
+              "median": 57.0,
+              "first5Median": 57,
+              "last5Median": 57,
+              "slopePer100Reloads": 0.0
+            },
+            "materials.nonPersistentCount": {
+              "first": 188,
+              "last": 188,
+              "minimum": 188,
+              "maximum": 188,
+              "median": 188.0,
+              "first5Median": 188,
+              "last5Median": 188,
+              "slopePer100Reloads": 0.0
+            },
+            "meshes.nonPersistentCount": {
+              "first": 1,
+              "last": 1,
+              "minimum": 1,
+              "maximum": 1,
+              "median": 1.0,
+              "first5Median": 1,
+              "last5Median": 1,
+              "slopePer100Reloads": 0.0
+            },
+            "textures.nonPersistentCount": {
+              "first": 100,
+              "last": 100,
+              "minimum": 100,
+              "maximum": 100,
+              "median": 100.0,
+              "first5Median": 100,
+              "last5Median": 100,
+              "slopePer100Reloads": 0.0
+            },
+            "renderTextures.nonPersistentCount": {
+              "first": 32,
+              "last": 32,
+              "minimum": 32,
+              "maximum": 32,
+              "median": 32.0,
+              "first5Median": 32,
+              "last5Median": 32,
+              "slopePer100Reloads": 0.0
+            },
+            "rssBytes": {
+              "first": 2875965440,
+              "last": 2816868352,
+              "minimum": 2813755392,
+              "maximum": 2877227008,
+              "median": 2816663552.0,
+              "first5Median": 2876637184,
+              "last5Median": 2816868352,
+              "slopePer100Reloads": -97171106.3414634
+            },
+            "managedBytes": {
+              "first": 804659200,
+              "last": 795275264,
+              "minimum": 794546176,
+              "maximum": 804659200,
+              "median": 795183104.0,
+              "first5Median": 795025408,
+              "last5Median": 795316224,
+              "slopePer100Reloads": -5072738.461538462
+            },
+            "unityAllocatedBytes": {
+              "first": 574222630,
+              "last": 556910533,
+              "minimum": 553259475,
+              "maximum": 574222630,
+              "median": 556061506.5,
+              "first5Median": 553346225,
+              "last5Median": 556825455,
+              "slopePer100Reloads": 4043573.742964353
+            }
+          }
+        }
+      },
+      "totalWarnings": 201,
+      "missingScriptWarnings": 200,
+      "shutdownTimeouts": 0,
+      "shutdownTimeoutsBeforeExperimentLoads": 0,
+      "cleanup": [
+        {
+          "kind": "after-scene-teardown-no-forced-GC",
+          "fileDescriptors": 97,
+          "gameObjects": 19,
+          "activeTrackingWorkers": 0,
+          "activeAsyncWriters": 0,
+          "ownedTrialMaterials": 0,
+          "diagnosticRenderTargets": 0,
+          "rssBytes": 2550071296,
+          "managedBytes": 816951296,
+          "unityAllocatedBytes": 391260944,
+          "nativeResources": {
+            "materials": 36,
+            "meshes": 1,
+            "textures": 69,
+            "renderTextures": 2
+          }
+        },
+        {
+          "kind": "after-explicit-GC-and-UnloadUnusedAssets",
+          "fileDescriptors": 97,
+          "gameObjects": 19,
+          "activeTrackingWorkers": 0,
+          "activeAsyncWriters": 0,
+          "ownedTrialMaterials": 0,
+          "diagnosticRenderTargets": 0,
+          "rssBytes": 2546597888,
+          "managedBytes": 816848896,
+          "unityAllocatedBytes": 382693227,
+          "nativeResources": {
+            "materials": 36,
+            "meshes": 1,
+            "textures": 69,
+            "renderTextures": 2
+          }
+        }
+      ],
+      "externalProcess": {
+        "samples": 65,
+        "peakRssBytes": 3108421632,
+        "minimumThreads": 2,
+        "maximumThreads": 124,
+        "maxFileDescriptors": 112
+      },
+      "runtimeErrorsDuringActiveProtocol": [],
+      "runtimeErrorsOutsideActiveProtocol": [],
+      "excludedEditorIndexErrors": 1,
+      "supervisorFailure": null,
+      "publisherErrors": [],
+      "capturedNativeCrashReports": 0
+    }
+  ],
+  "materialOwnership": [
+    {
+      "passed": false,
+      "cyclesCompleted": 40,
+      "failure": null,
+      "errors": [],
+      "sourceSha256": "ffb88b1c44657407cc1063c20812fbacaa47629bf5a36cd6c2801bfa60b16fd4",
+      "scope": "Focused native API probe, not the experiment reset protocol:40 in-scene rebuilds exercise explicit and implicit color swaps. No GC.Collect or Resources.UnloadUnusedAssets; compare material slots with their actual owners and check destruction. Full scene reload investigation is separate.",
+      "id": "material-owner-before-timed",
+      "firstBeforeSwap": {
+        "cycle": 0,
+        "point": "before-swap",
+        "nativeMaterials": 9,
+        "rendererCount": 8,
+        "allRenderedMaterialsOwned": true,
+        "ownedMaterialCounter": 8,
+        "names": [
+          {
+            "name": "DIAG ownership source (owned trial instance)",
+            "count": 8
+          },
+          {
+            "name": "DIAG ownership source",
+            "count": 1
+          }
+        ]
+      },
+      "firstAfterSwap": {
+        "cycle": 0,
+        "point": "after-swap",
+        "nativeMaterials": 17,
+        "rendererCount": 8,
+        "allRenderedMaterialsOwned": false,
+        "ownedMaterialCounter": 8,
+        "names": [
+          {
+            "name": "DIAG ownership source (owned trial instance) (Instance)",
+            "count": 8
+          },
+          {
+            "name": "DIAG ownership source (owned trial instance)",
+            "count": 8
+          },
+          {
+            "name": "DIAG ownership source",
+            "count": 1
+          }
+        ]
+      },
+      "afterDestruction": {
+        "cycle": 40,
+        "point": "after-object-destruction-no-GC-no-UnloadUnusedAssets",
+        "nativeMaterials": 320,
+        "rendererCount": 0,
+        "allRenderedMaterialsOwned": true,
+        "ownedMaterialCounter": 0,
+        "names": [
+          {
+            "name": "DIAG ownership source (owned trial instance) (Instance)",
+            "count": 320
+          }
+        ]
+      }
+    },
+    {
+      "passed": true,
+      "cyclesCompleted": 40,
+      "failure": null,
+      "errors": [],
+      "sourceSha256": "7ac11e2791f2f21a512e9682f288561df8a43e75312cb201e09311f42efc92fb",
+      "scope": "Focused native API probe, not the experiment reset protocol:40 in-scene rebuilds exercise explicit and implicit color swaps. No GC.Collect or Resources.UnloadUnusedAssets; compare material slots with their actual owners and check destruction. Full scene reload investigation is separate.",
+      "id": "material-owner-after",
+      "firstBeforeSwap": {
+        "cycle": 0,
+        "point": "before-swap",
+        "nativeMaterials": 9,
+        "rendererCount": 8,
+        "allRenderedMaterialsOwned": true,
+        "ownedMaterialCounter": 8,
+        "names": [
+          {
+            "name": "DIAG ownership source (owned trial instance)",
+            "count": 8
+          },
+          {
+            "name": "DIAG ownership source",
+            "count": 1
+          }
+        ]
+      },
+      "firstAfterSwap": {
+        "cycle": 0,
+        "point": "after-swap",
+        "nativeMaterials": 9,
+        "rendererCount": 8,
+        "allRenderedMaterialsOwned": true,
+        "ownedMaterialCounter": 8,
+        "names": [
+          {
+            "name": "DIAG ownership source (owned trial instance)",
+            "count": 8
+          },
+          {
+            "name": "DIAG ownership source",
+            "count": 1
+          }
+        ]
+      },
+      "afterDestruction": {
+        "cycle": 40,
+        "point": "after-object-destruction-no-GC-no-UnloadUnusedAssets",
+        "nativeMaterials": 0,
+        "rendererCount": 0,
+        "allRenderedMaterialsOwned": true,
+        "ownedMaterialCounter": 0,
+        "names": []
+      }
+    }
+  ],
+  "incompleteOriginalListenerAttempt": {
+    "id": "archival-40x2s-pub-gap",
+    "activeLoadsObserved": 17,
+    "unityExitCode": -15,
+    "termination": "Supervisor SIGTERM after timestamp parser error; not a native Unity crash",
+    "inputFailureAtLoad": 2,
+    "exception": "NullReferenceException: Object reference not set to an instance of an object",
+    "stack": [
+      "NetMQ.Core.Pipe.ProcessPipeTermAck () (at <cd775f2ee43b4afd8cc83c9f5ddee1f4>:0)",
+      "NetMQ.Core.ZObject.ProcessCommand (NetMQ.Core.Command cmd) (at <cd775f2ee43b4afd8cc83c9f5ddee1f4>:0)",
+      "NetMQ.Core.IOThread.Ready () (at <cd775f2ee43b4afd8cc83c9f5ddee1f4>:0)",
+      "NetMQ.Core.IOThreadMailbox.RaiseEvent () (at <cd775f2ee43b4afd8cc83c9f5ddee1f4>:0)",
+      "NetMQ.Core.Utils.Proactor.Loop () (at <cd775f2ee43b4afd8cc83c9f5ddee1f4>:0)",
+      "System.Threading.ThreadHelper.ThreadStart_Context (System.Object state) (at <c5eeda5e65d44b388e164c6c5cfe0702>:0)"
+    ],
+    "publisherFailure": [
+      "ValueError(\"Invalid isoformat string: '2026-10-25T18:19:21.62247+00:00'\")"
+    ],
+    "capturedNativeCrashReports": 0
+  },
+  "matchedArchivalTreatment": {
+    "runtimeChanges": {
+      "Assets/Scripts/ZmqListener.cs": {
+        "before": "94d5d22b32235b82bcc38d3b978b38d097cb8cf7d66886b2a1b714366096915f",
+        "after": "c114dd2bb976d1a69e2b0d7f47f5e0dff2a41b10e2a02fdaf3a261173c0830ab"
+      }
+    },
+    "pluginsSha256": {
+      "Assets/Plugins/AsyncIO.dll": "ce336909941800b36c92ea665444e4fcd41ca84d2b270b2fd4025c96c13187b3",
+      "Assets/Plugins/NetMQ.dll": "ce9b347a4cf35c4ed96e1343f3ce84ce6514be680347e59de0f5a29f6ee6fba1"
+    },
+    "scope": "Only archival ZmqListener: worker owns create/read/dispose; bounded100ms reads; no DLL change, no global cleanup."
+  },
+  "excludedDiagnosticDevelopmentRuns": [
+    {
+      "id": "modern-200x2s-A",
+      "reason": "Initial assertion assumed 24 cameras; Choice_desync authors 20. Aborted on the first load; corrected to check the authored count before the complete 200-load run."
+    },
+    {
+      "id": "material-owner-before",
+      "reason": "Superseded by deterministic 60 Hz simulation timing in material-owner-before-timed; not the primary causal comparison."
+    },
+    {
+      "id": "current-terrain-sky-40x2s-A-instrumentation",
+      "reason": "Supervisor intentionally stopped the probe after its idle default-sky inspection queried unsupported _MainTex. Added HasProperty guard and repeated 40 loads; no production change or native crash."
+    }
+  ],
+  "currentSourceVerification": {
+    "baseGitSha": "cd207862cacf0a82d5e2ecfe39e23478679d5792",
+    "scope": "All tracked and nonignored untracked Assets/Packages/ProjectSettings files; historical RunData deliberately excluded as release helper does.",
+    "matchedSourceFiles": 4091,
+    "restored": [
+      "Assets/StreamingAssets/sequenceConfig.json",
+      "Packages/manifest.json",
+      "Packages/packages-lock.json"
+    ]
+  },
+  "terrainMissingScriptReferences": {
+    "scene": "Choice_Selwyn",
+    "referencesPerLoad": 5,
+    "classes": [
+      "InfinityCode.RealWorldTerrain.RealWorldTerrainItem",
+      "InfinityCode.RealWorldTerrain.RealWorldTerrainContainer"
+    ],
+    "guids": [
+      "fc9fccbe3f9587140a1e1601f0e73d70",
+      "35746522d0c34a74e98f963412f0defe"
+    ],
+    "runtimeTerrainComponentsConfirmed": 2
+  }
+}

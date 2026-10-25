@@ -120,7 +120,7 @@ namespace ConfigurationUI
         { RequireApplied(); if(selected!=doc) { activePhase="stimulus"; settingsTab="Essentials"; } selected=doc; path.Clear(); homeMode=false; experimentIndexMode=false; metadataMode=false; jsonMode=false; advancedMode=false; filter=""; BuildNavigation(); BuildContent(); }
         private void RequireApplied() { FlushNumbers(); if(rawPending) throw new InvalidOperationException("Apply the JSON draft or discard it before saving, navigating or starting."); }
         private JToken Current => ConfigDocument.At(selected.Root,path);
-        private JObject Context => new JObject { ["flight"]=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().Any(r=>string.Equals(r["closedLoopMode"]?.ToString(),"Kinefly",StringComparison.OrdinalIgnoreCase) || r["closedLoopMode"]?.ToString()=="1") };
+        private JObject Context => new JObject { ["flight"]=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().Any(r=>TrackerBackend.TryParse(r["closedLoopMode"]?.ToString()??"FicTrac",out var mode) && TrackerBackend.IsFlight(mode)) };
         private JObject CurrentSchema
         {
             get
@@ -217,7 +217,7 @@ namespace ConfigurationUI
             inspector.Add(new Label("Start saves and validates the referenced files, snapshots a fresh session, then removes this setup panel. Python analysis remains optional."));
             if(selected.SchemaId=="system") inspector.Add(new Label("The configured VR entries determine the active animals. Extra rigs are created from the scene template, with separate stimulus layers; validation checks this build’s available capacity."));
             inspector.Add(new Label("Flight / walking"));
-            inspector.Add(new Label("Kinefly selects wing-angle flight input. FicTrac selects ball tracking. Choose the corresponding scene and complete experiment template. Scene units: terrain metres, walking centimetres."));
+            inspector.Add(new Label("Rekkefly supplies wing-angle flight input; HejjéTrac supplies ball tracking. Existing Kinefly/FicTrac settings remain compatible. Scene units: terrain metres, walking centimetres."));
             UpdateStatus();
         }
         private void RefreshRows()
@@ -352,6 +352,7 @@ namespace ConfigurationUI
             var data=new AnimalData { ExperimentName=metadata.ExperimentName,ExperimenterName=metadata.ExperimenterName,Comments=metadata.Comments,Extensions=metadata.Extensions,Animals=metadata.Animals.Where(f=>ids.Contains(f.VR)).ToList(),UsedAnimalIDs=metadata.UsedAnimalIDs??new List<string>() };
             foreach(var fly in data.Animals) if(!string.IsNullOrWhiteSpace(fly.AnimalID) && !data.UsedAnimalIDs.Contains(fly.AnimalID)) data.UsedAnimalIDs.Add(fly.AnimalID);
             string json=JsonConvert.SerializeObject(data,Formatting.Indented);
+            MainController.Instance?.SetAnimalMetadata(data);
             string backup=Path.Combine(RuntimePaths.RunDataRoot,"Backup"); Directory.CreateDirectory(backup);
             File.WriteAllText(Path.Combine(backup,"AnimalMetadata.json"),json);
             File.WriteAllText(Path.Combine(backup,"FlyMetaData.json"),json);

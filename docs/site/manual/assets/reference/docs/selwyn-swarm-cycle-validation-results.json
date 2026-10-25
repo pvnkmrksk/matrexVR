@@ -1,0 +1,150 @@
+{
+  "checks": 3818,
+  "failure": null,
+  "errors": [],
+  "directions": {
+    "samples": 100000,
+    "kappaYaw": 1000.0,
+    "kappaElevation": 100.0,
+    "meanYawDegrees": -0.005018320129586845,
+    "yawStdDevDegrees": 1.8123848219573628,
+    "yawResultant": 0.9994998267915706,
+    "threeDimensionalOrder": 0.9944363405500072
+  },
+  "population": {
+    "agentsPerRig": 150,
+    "densityPerCubicMetre": 2.34375,
+    "durationSeconds": 120,
+    "observerMetresPerSecond": 7,
+    "meanMothsPerCamera": [
+      24.0625,
+      25.534444444444443,
+      25.14388888888889,
+      24.561944444444446,
+      25.75611111111111,
+      24.941111111111113
+    ],
+    "fractionCameraFramesWith20To30": 0.7801851851851852,
+    "nearestMetres": 0.0236891937,
+    "within10cmSampleCount": 21,
+    "note": "Geometric FOV counts; tiny/subpixel moths are still contrast attenuated. Random counts fluctuate and are not clamped to 20-30."
+  },
+  "performance": {
+    "results": [
+      {
+        "logging": false,
+        "agents": 600,
+        "rigs": 4,
+        "cameras": 24,
+        "movementAndUploadMedianMilliseconds": 0.4757,
+        "captureMedianMilliseconds": 0.0,
+        "refreshRecordRenderMedianMilliseconds": 2.9172,
+        "refreshRecordRenderP95Milliseconds": 3.7507
+      },
+      {
+        "logging": true,
+        "agents": 600,
+        "rigs": 4,
+        "cameras": 24,
+        "movementAndUploadMedianMilliseconds": 0.4956,
+        "captureMedianMilliseconds": 0.1575,
+        "refreshRecordRenderMedianMilliseconds": 3.0134,
+        "refreshRecordRenderP95Milliseconds": 6.4778
+      }
+    ],
+    "mainThreadManagedBytesPerFrame": 0.0,
+    "saved": [
+      {
+        "rig": "VR4_EmbeddedSwarm",
+        "rows": 42600,
+        "droppedFrames": 0,
+        "pendingFrames": 0
+      },
+      {
+        "rig": "VR3_EmbeddedSwarm",
+        "rows": 42600,
+        "droppedFrames": 0,
+        "pendingFrames": 0
+      },
+      {
+        "rig": "VR2_EmbeddedSwarm",
+        "rows": 42600,
+        "droppedFrames": 0,
+        "pendingFrames": 0
+      },
+      {
+        "rig": "VR1_EmbeddedSwarm",
+        "rows": 42600,
+        "droppedFrames": 0,
+        "pendingFrames": 0
+      }
+    ],
+    "note": "Isolated CPU submission timings include actual generated motion, native cameras and asynchronous recording. Excludes GPU completion, terrain drawing, real tracking and LED display hardware; not a guaranteed workstation FPS."
+  },
+  "unity": "6000.3.16f1",
+  "gpu": "Apple M2 Pro",
+  "interface": "Original ControlScene UnityEngine.UI metadata form and persistent Save/Start button; no ConfigurationUI or schema builder.",
+  "baseCommit": "fd9b516a3d67fcbffa09ad22f2985875fd4cd1a2",
+  "branch": "codex/bogong-night-sky",
+  "protocol": {
+    "firstPassDurationsSeconds": [
+      360,
+      240,
+      240,
+      240
+    ],
+    "repeatedDurationsSeconds": [
+      240,
+      240,
+      240
+    ],
+    "loopStartIndex": 1,
+    "autoTrim": [
+      true,
+      false,
+      false,
+      false
+    ],
+    "validationObservationSeconds": 0.4,
+    "referenceObservationSeconds": 240
+  },
+  "preservedActiveEdits": {
+    "durationsSeconds": [
+      3,
+      3,
+      240,
+      240
+    ],
+    "gains": [
+      2.5,
+      2.5,
+      1,
+      1
+    ]
+  },
+  "archiveCheck": {
+    "complete": true,
+    "consumedExperiments": [
+      "selwyn-cycle-01-setup-full.example.json",
+      "selwyn-cycle-02-milky-way-full.example.json",
+      "selwyn-cycle-03-milky-way-swarm.example.json",
+      "selwyn-cycle-04-swarm-only.example.json"
+    ]
+  },
+  "regressions": {
+    "legacyPhases": {
+      "checks": 85479,
+      "failure": null
+    },
+    "recordedPlayback": {
+      "checks": 99,
+      "failure": null
+    }
+  },
+  "configurationValidation": {
+    "configs": 66,
+    "archiveHashes": 622,
+    "legacyInputs": 979,
+    "exclusions": []
+  }
+}

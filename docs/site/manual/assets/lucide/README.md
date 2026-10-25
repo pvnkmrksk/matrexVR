@@ -1,0 +1,1 @@
+Lucide 24px round-stroke icons, retained from the vendored collection in pvnkmrksk/hejjetrak assets/lucide. Original source: https://github.com/lucide-icons/lucide. ISC license retained. The generated sprite preserves the icon paths; colors/stroke sizes inherit from the documentation theme.

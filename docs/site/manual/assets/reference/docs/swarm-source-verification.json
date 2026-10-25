@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "rows": 14429,
+  "ids": 430,
+  "durationSeconds": 599.46,
+  "sourceAxes": "X north, Y west, Z down",
+  "sourceSha256": "620b3a90d59b31ab929d3271605e931a7b49fe1b07b45c79a28655a5c36baf92",
+  "convertedSha256": "d573f7c174c176c635d49c1fe0ccc9486f9aff594cf025e22c039263dfbb620c",
+  "maxCoordinateErrorMetres": 1.7763568394002505e-15,
+  "sampleCentroidMetres": {
+    "X": -0.26974953025157666,
+    "Y": 4.274847073185945,
+    "Z": 0.10780537521657772
+  },
+  "medianTrackSeconds": 0.14999999999999147,
+  "minTrackSeconds": 0.01999999999998181,
+  "maxTrackSeconds": 1.8300000000000018,
+  "gapsOverPointOneSecond": 7,
+  "note": "Canonical data matches every source ID/TimeExact/position. Presentation yaw is configured separately from the canonical data; continuation after recorded samples is extrapolated."
+}

@@ -1,0 +1,115 @@
+MATREX VR 0.1 — ARCHIVAL MAIN BUILD
+Source: 779926a80b02190d6dd0410f260e52bba105a04e
+Engine: Unity 6000.3.16f1
+https://github.com/pvnkmrksk/matrexVR
+
+1. START THE APPLICATION
+
+Extract the entire operating-system ZIP to a writable folder. Keep the executable,
+its data directory, Unity libraries and other supplied files together. Double-click
+the application. Unity Editor and Unity Hub are not required for a player.
+
+Windows: launch the supplied .exe; keep its adjacent *_Data folder and DLLs.
+macOS: launch the supplied .app. It is ad hoc signed but not notarized; if macOS prompts, use Finder's
+Open action and the corresponding Privacy & Security setting when needed. Keep
+this archival app in a writable location because it records inside the app bundle.
+Linux: launch the supplied .x86_64 file in a graphical desktop. If your archive
+manager loses its executable permission, restore it through file Properties or
+chmod +x <application>.x86_64. A compatible graphics driver is required.
+
+2. CONFIGURE THE APPARATUS
+
+This archive includes a public starter system configuration. Before animal
+recording, edit system_config.json for the actual tracker addresses/ports, rig IDs,
+sphere diameter, physical target display, LED panel geometry and displayOrder.
+A starter configuration is not a calibration of your apparatus.
+
+StreamingAssets location:
+  Windows/Linux: <application>_Data/StreamingAssets/
+  macOS: right-click the .app > Show Package Contents > Contents/Resources/Data/
+         StreamingAssets/
+
+system_config.json describes hardware. sequenceConfig.json describes the ordered
+experiment blocks. Each block's parameters.configFile identifies its experiment
+JSON relative to StreamingAssets. Complete templates are under Templates/.
+Back up edited JSON and keep all referenced files with it.
+
+The archived default sequence is MANUAL START, looping Choice_Selwyn for 86400
+seconds per block with reloadScene:false and Kannadi/selwyn-night-sky.json.
+The experiment has a current-time generated Selwyn night sky (latitude -35.894409,
+longitude 148.453948, fixed UTC+11), a 30-minute sky update, forward autopilot
+7 m/s, tracked orientation ON and tracked position OFF. This source revision's
+older README describes an earlier default; the shipped JSON is authoritative.
+
+Use the Control screen's existing metadata form and Save/Start control to begin.
+Click away from text fields before using keyboard controls. No tracking publisher
+is needed to open the app; live closed-loop movement needs the configured input.
+The recorded metadata retains historical FlyID/Flies names in this release.
+
+3. KEYBOARD AND MOUSE
+
+R                 Reset rigs to the active experiment's initial pose.
+P                 Toggle tracked translation (not a reset).
+O                 Toggle tracked orientation (not a reset).
+Arrow keys        Manual local X/Z translation when manual controls are enabled.
+A / D             Positive / negative manual yaw (historical polarity).
+Ctrl + Space      Toggle the experiment's forward autopilot.
+Shift + Up/Down   Increase/decrease manual translation speed by 1 per press.
+Shift + W/S       Increase/decrease manual turn speed by 1 degree/s per press.
+C / Z             Up/down, when vertical translation is permitted in system config.
+W / S             Pitch, when pitch/roll is permitted.
+E / Q             Roll, when pitch/roll is permitted.
+Escape (release)  Stop sequence and return to Control; from Control, exit player.
+
+Overview image: right-drag to orbit, middle-drag to pan, wheel to zoom. Its visible
+Show/Hide and Reset view controls govern the overview. Gestures outside its image
+do not control the camera. FPS remains independent of the overview.
+
+Kinefly/Bogong controls:
++ / -             Adjust yaw gain by 1 per press.
+Ctrl + Y          Toggle yaw-rate mode.
+1 / 2 / 3 / 4     Select rig for DC-offset changes.
+Hold [ / ]        Decrease/increase selected rig's DC offset, 0.5 rad/s per second.
+
+Replay scene only:
+Space             Play/pause.
+Left/Right        Seek backward/forward 1 second (10 seconds with Shift).
+N / M             Previous/next recorded step marker.
+
+Optomotor: Space or backslash pauses. It disables forward autopilot. The source
+contains optional gamepad bindings; see docs/unity6-controls.md for the full map.
+
+4. FIND AND PRESERVE DATA
+
+The historical logger writes RunData/<timestamp>/ relative to Application.dataPath:
+  Windows/Linux: <application>_Data/RunData/
+  macOS: <application>.app/Contents/RunData/
+  Editor: Assets/RunData/
+
+runtime_trace.log records detailed messages. Keep the session folder, its config
+copies, metadata, rig CSVs, population CSV/gzip files and Skyboxes/ together. A ZIP
+is attempted at shutdown; keep the original folder if zipping fails. Quit cleanly
+and allow data writers to finish.
+
+Walking scenes use centimetres; Selwyn/terrain flight uses metres. Rotations are
+degrees unless an input contract explicitly identifies raw radians. Kinefly's
+historical yaw-rate input is radians; walking FicTrac motion uses its own contract.
+Use the saved configuration and source manual when interpreting recordings.
+
+5. SCOPE OF THIS ARCHIVE
+
+This is the preserved main runtime, before the configuration workbench/dashboard
+integration. No later UI, metadata rename, telemetry or replay overhaul is implied.
+Existing replay reads rig trajectories; it does not fully reconstruct every
+population or archived generated sky. The existing repeated-scene-reset behavior
+is retained. Physical LED scanout, hardware tracking and cross-platform runtime
+behavior must be checked on the actual workstation before collection.
+
+Source and exact-revision manuals:
+https://github.com/pvnkmrksk/matrexVR/tree/779926a80b02190d6dd0410f260e52bba105a04e
+https://github.com/pvnkmrksk/matrexVR/blob/779926a80b02190d6dd0410f260e52bba105a04e/docs/unity6-controls.md
+https://github.com/pvnkmrksk/matrexVR/blob/779926a80b02190d6dd0410f260e52bba105a04e/docs/configuration-reference.md
+https://github.com/pvnkmrksk/matrexVR/blob/779926a80b02190d6dd0410f260e52bba105a04e/docs/data-formats.md
+
+The prior README identifies MIT licensing but this revision has no root LICENSE;
+third-party assets retain their own notices. See bundled third-party licenses.

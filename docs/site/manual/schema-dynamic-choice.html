@@ -1,0 +1,3535 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dynamic-Choice fields · MATREX VR manual</title><meta name="description" content="Generated types, defaults, runtime constraints and UI annotations for the dynamic-choice schema.">
+<link rel="canonical" href="https://pvnkmrksk.github.io/matrexVR/manual/schema-dynamic-choice.html"><meta name="theme-color" content="#102d33">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/manual.css"><script src="assets/manual.js" defer></script><noscript><style>.search-open,.mobile-menu{display:none!important}@media(max-width:800px){.left-sidebar{display:block;position:static;width:auto;height:auto;box-shadow:none}}</style></noscript></head>
+<body><a class="skip-link" href="#article">Skip to content</a>
+<header class="docs-header"><a class="docs-brand" href="../index.html"><span class="brand-mark" aria-hidden="true">M</span> MATREX <span>VR</span></a><a class="manual-label" href="index.html">Documentation <span>0.3 + source</span></a><div class="header-actions"><a href="gallery.html">Gallery</a><a href="../index.html#downloads">Downloads</a><a href="https://github.com/pvnkmrksk/matrexVR">Source ↗</a><button type="button" class="mobile-menu" aria-controls="manual-nav" aria-expanded="false">Menu</button></div></header>
+<div class="docs-layout"><aside class="left-sidebar" id="manual-nav"><button class="search-open" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg> Search the manual <kbd>/</kbd></button><nav aria-label="Documentation chapters"><details class="nav-group" open><summary>Start here<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Manual overview</span></a><a href="getting-started.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Getting started</span></a><a href="gallery.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Native gallery</span></a></div></details><details class="nav-group"><summary>How it works<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="architecture.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Runtime architecture</span></a><a href="components.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Component index</span></a><a href="scenes.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Scenes and Kannadi</span></a><a href="viewports.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Rigs and viewports</span></a><a href="closed-loop.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>ClosedLoop and motion</span></a><a href="input-contracts.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Input contracts</span></a><a href="controls.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Keyboard and gamepad</span></a></div></details><details class="nav-group"><summary>Configure<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="configuration-studio.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Configuration studio</span></a><a href="configuration-ux.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>GUI and HUD details</span></a><a href="configuration-reference.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Parameter reference</span></a><a href="animal-agent-compatibility.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Animal and agent names</span></a><a href="experiment-phases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment phases</span></a><a href="auto-trim.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Flight gate and auto trim</span></a></div></details><details class="nav-group" open><summary>Schema field atlas<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="schema-index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Full schema index</span></a><a href="schema-system.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>System fields</span></a><a href="schema-sequence.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Sequence fields</span></a><a href="schema-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Choice fields</span></a><a href="schema-swarm.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Swarm fields</span></a><a href="schema-kannadi.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Kannadi fields</span></a><a href="schema-optomotor.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Optomotor fields</span></a><a href="schema-rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Rugosity fields</span></a><a href="schema-dynamic-choice.html" class="active" aria-current="page"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Dynamic-Choice fields</span></a></div></details><details class="nav-group"><summary>Stimuli<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="night-sky.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Astronomical night sky</span></a><a href="generated-swarms.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Generated swarms</span></a><a href="swarm-playback.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Recorded swarm playback</span></a><a href="selwyn-cycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Selwyn sky and swarm cycle</span></a><a href="rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Visual/navigation rugosity</span></a><a href="selwyn-terrain.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Selwyn terrain source</span></a><a href="historical-panorama.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Historical panorama recipe</span></a></div></details><details class="nav-group"><summary>Data and replay<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="recording-pipeline.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Recording pipeline</span></a><a href="data-formats.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Saved data formats</span></a><a href="run-config-snapshots.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Configuration snapshots</span></a><a href="telemetry.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live telemetry and headings</span></a><a href="live-monitoring.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live browser monitoring</span></a><a href="replay.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Replay a recorded run</span></a></div></details><details class="nav-group"><summary>Extend and validate<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="extending.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Extend the source</span></a><a href="experiment-workflow.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment workflow</span></a><a href="scene-lifecycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene lifecycle</span></a><a href="diagnostics-performance.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Diagnostics and performance</span></a><a href="scene-reload-investigation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene reload investigation</span></a><a href="six-camera-rig.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Six-camera reference</span></a><a href="kannadi-history.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Kannadi integration history</span></a><a href="releases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Releases and rebuilding</span></a></div></details><details class="nav-group"><summary>Hardware and ecosystem<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="hardware.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Hardware and calibration</span></a><a href="integrations.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Trackers and analysis</span></a><a href="tracker-integration.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Native tracker integration</span></a><a href="citation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Cite MATREX VR</span></a></div></details></nav><div class="sidebar-footer"><a href="citation.html">Cite the software</a><a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/manual/generated/schema-dynamic-choice.md">Edit this page ↗</a></div></aside>
+<main id="article" tabindex="-1"><div class="article-context"><span>Schema field atlas</span><span>MATREX VR / source manual</span></div><article class="prose"><h1 id="dynamic-choice-schema-fields">Dynamic-Choice schema fields</h1>
+<p>This atlas lists <strong>127 emitted property paths</strong> from the current <code>dynamic-choice</code> runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.</p>
+<p>The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See <a href="configuration-reference.html">parameter semantics</a> and <a href="assets/reference/docs/manual/generated/schema-source.json">the exact emitted schema</a>.</p>
+<p>Every field has a deep link and is indexed by the manual search. Array items use <code>[]</code> in their path. Nested pre/stimulus/post fields are listed where the schema emits them; repeated names in different phases are distinct paths.</p>
+<h2 id="seed-group">seed group</h2>
+<h3 id="seed"><code>seed</code></h3>
+<p>Shuffle seed; negative uses time. Example 42 for initial reproducibility; later controller loops reseed using time.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>-1</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-2147483648</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="repetitions-group">repetitions group</h2>
+<h3 id="repetitions"><code>repetitions</code></h3>
+<p>Number of shuffled repetitions before reaching the end.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-2147483648</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="sync-group">sync group</h2>
+<h3 id="sync"><code>sync</code></h3>
+<p>Legacy serialized field; currently not consulted by execution. Do not infer rig synchronization from it.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="intertrial-group">intertrial group</h2>
+<h3 id="intertrial"><code>intertrial</code></h3>
+<p>Optional step inserted before each trial. Same schema as a step.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialresetpositiononstart"><code>intertrial.resetPositionOnStart</code></h3>
+<p>Apply the configured initial position when this experiment begins. When disabled, retain the current position.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialresetrotationonstart"><code>intertrial.resetRotationOnStart</code></h3>
+<p>Apply the initial orientation when this experiment begins. When disabled, retain the current orientation unless the experiment requests randomization.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialname"><code>intertrial.name</code></h3>
+<p>Logged step label; keep names unique and avoid CSV delimiters.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>""</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialtrigger"><code>intertrial.trigger</code></h3>
+<p>Null advances immediately; explicit time or area trigger is recommended.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialtriggertype"><code>intertrial.trigger.type</code></h3>
+<p>Required prefab name, e.g. tree01 or LocustBand_black.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["time","area"]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialtriggerseconds"><code>intertrial.trigger.seconds</code></h3>
+<p>Time trigger duration.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["time"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="intertrialtriggerareatag"><code>intertrial.trigger.areaTag</code></h3>
+<p>Tag assigned to trigger objects (fallback Untagged).</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="intertrialtriggervrid"><code>intertrial.trigger.vrId</code></h3>
+<p>Exact unique positive VR identifier, such as VR1 or VR10. Duplicate IDs are rejected; a rig is separate from its animal ID/species.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="intertrialtriggershape"><code>intertrial.trigger.shape</code></h3>
+<p>box or cylinder (capsule collider).</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"box"</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="intertrialtriggersize"><code>intertrial.trigger.size</code></h3>
+<p>Legacy fields not consulted by trigger construction; use trigger fields.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.01,"max":5.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="intertrialtriggerboxsize"><code>intertrial.trigger.boxSize</code></h3>
+<p>Legacy fields not consulted by trigger construction; use trigger fields.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="intertrialtriggerradius"><code>intertrial.trigger.radius</code></h3>
+<p>Cylinder dimensions in world units; controller applies fallback/minimum geometry.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="intertrialtriggerheight"><code>intertrial.trigger.height</code></h3>
+<p>Fraction of display width/height.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="intertrialtriggertimeoutseconds"><code>intertrial.trigger.timeoutSeconds</code></h3>
+<p>Positive timeout, otherwise wait indefinitely for area event.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="intertrialtriggertriggeronexit"><code>intertrial.trigger.triggerOnExit</code></h3>
+<p>Use exit instead of entry.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="intertrialtriggeradvanceontrigger"><code>intertrial.trigger.advanceOnTrigger</code></h3>
+<p>false resets the rig on contact and keeps waiting for timeout.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjects"><code>intertrial.objects</code></h3>
+<p>Omitted, null or [] means environment-only flight/migration; sky and movement settings still apply.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsuseheadingreference"><code>intertrial.objects[].useHeadingReference</code></h3>
+<p>Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectstype"><code>intertrial.objects[].type</code></h3>
+<p>Required prefab name, e.g. tree01 or LocustBand_black.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectspolar"><code>intertrial.objects[].polar</code></h3>
+<p>{radius,angle,height} as above, defaults zero for each scalar. Takes precedence over Cartesian pos.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectspolarradius"><code>intertrial.objects[].polar.radius</code></h3>
+<p>Cylinder dimensions in world units; controller applies fallback/minimum geometry.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectspolarangle"><code>intertrial.objects[].polar.angle</code></h3>
+<p>Polar angle in degrees. Zero points along Unity +Z/north; positive 90 points +X/east. Positive yaw is clockwise from above.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectspolarheight"><code>intertrial.objects[].polar.height</code></h3>
+<p>Fraction of display width/height.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsscale"><code>intertrial.objects[].scale</code></h3>
+<p>Omitted object resolves to (1,1,1); scalar fields in a supplied object default to 0. Use {x:1,y:1,z:1} for unit scale.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsscalex"><code>intertrial.objects[].scale.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsscaley"><code>intertrial.objects[].scale.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsscalez"><code>intertrial.objects[].scale.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsmaterial"><code>intertrial.objects[].material</code></h3>
+<p>Registered material name; empty keeps prefab material.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectscolor"><code>intertrial.objects[].color</code></h3>
+<p>Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsswapcolor"><code>intertrial.objects[].swapColor</code></h3>
+<p>Normalized [r,g,b,a]; RGB allowed. Explicit swapColor sets swap target. Otherwise first two colors exchange.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsflip"><code>intertrial.objects[].flip</code></h3>
+<p>Negate X scale.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsvisualangledegrees"><code>intertrial.objects[].visualAngleDegrees</code></h3>
+<p>Angular size for prefabs with ScaleWithDistance; example 10.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>degrees</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsrandominitialrotation"><code>intertrial.objects[].randomInitialRotation</code></h3>
+<p>Random starting yaw; Choice shares that sampled yaw across its rigs.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsmu"><code>intertrial.objects[].mu</code></h3>
+<p>Mean/explicit yaw in degrees.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>degrees</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":-180.0,"max":180.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsprefab"><code>intertrial.objects[].prefab</code></h3>
+<p>Name of a registered scene prefab to instantiate. The asset must be present in the scene registry.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectspos"><code>intertrial.objects[].pos</code></h3>
+<p>Legacy [x,y,z], fallback zero.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsrot"><code>intertrial.objects[].rot</code></h3>
+<p>Legacy serialized array, currently ignored. Use mu for yaw.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsmat"><code>intertrial.objects[].mat</code></h3>
+<p>Legacy alias for a registered material name. The asset must be present in the scene’s registry.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialobjectsrole"><code>intertrial.objects[].role</code></h3>
+<p>black or gray for adaptive decisions.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialcamera"><code>intertrial.camera</code></h3>
+<p>Array of {vrId,clearFlags,bgColor}. clearFlags defaults SolidColor; bgColor is [r,g,b,a] (alpha optional). Changes clear/background, never system camera order.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialcameravrid"><code>intertrial.camera[].vrId</code></h3>
+<p>Exact unique positive VR identifier, such as VR1 or VR10. Duplicate IDs are rejected; a rig is separate from its animal ID/species.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialcameraclearflags"><code>intertrial.camera[].clearFlags</code></h3>
+<p>Camera background clearing mode, such as Skybox or SolidColor. SolidColor uses the configured background color.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"SolidColor"</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["Skybox","Color","SolidColor","Depth","Nothing",1,2,2,3,4]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialcamerabgcolor"><code>intertrial.camera[].bgColor</code></h3>
+<p>Dynamic Choice camera background as normalized RGB or RGBA channels (0–1). Used with SolidColor camera clearing.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialskybox"><code>intertrial.skybox</code></h3>
+<p>Material name loaded by Resources.Load<material>. This differs from Choice's panorama file path.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialresetvr"><code>intertrial.resetVR</code></h3>
+<p>Legacy serialized list; currently resets the executing rig regardless of this list.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialclosedlooporientation"><code>intertrial.closedLoopOrientation</code></h3>
+<p>Use the animal’s measured orientation to control virtual yaw. Position is controlled separately by Closed loop position or autopilot. A numeric value sets the orientation gain; true uses gain 1 and false disables it.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":5.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialclosedloopposition"><code>intertrial.closedLoopPosition</code></h3>
+<p>Use the animal’s measured translation to move its virtual rig. Orientation remains independent. A numeric value sets the translation gain; true uses gain 1 and false disables it. Walking uses scene units (centimetres).</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":5.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialinitialposition"><code>intertrial.initialPosition</code></h3>
+<p>World x/y/z, cm. Template ground-eye height 0.5; migration example 100.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<details><summary>Exact emitted default JSON</summary>
+
+<pre class="json"><code>{
+  &quot;x&quot;: 0.0,
+  &quot;y&quot;: 0.0,
+  &quot;z&quot;: 0.0
+}</code></pre>
+</details>
+
+<p>UI <code>enabledWhen</code>: <code>{"property":"resetPositionOnStart","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="intertrialinitialpositionx"><code>intertrial.initialPosition.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialinitialpositiony"><code>intertrial.initialPosition.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialinitialpositionz"><code>intertrial.initialPosition.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialinitialrotation"><code>intertrial.initialRotation</code></h3>
+<p>Euler x/y/z degrees.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<details><summary>Exact emitted default JSON</summary>
+
+<pre class="json"><code>{
+  &quot;x&quot;: 0.0,
+  &quot;y&quot;: 0.0,
+  &quot;z&quot;: 0.0
+}</code></pre>
+</details>
+
+<p>UI <code>enabledWhen</code>: <code>{"all":[{"property":"randomInitialRotation","oneOf":[false]},{"property":"resetRotationOnStart","oneOf":[true]}]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="intertrialinitialrotationx"><code>intertrial.initialRotation.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialinitialrotationy"><code>intertrial.initialRotation.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialinitialrotationz"><code>intertrial.initialRotation.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialrandominitialrotation"><code>intertrial.randomInitialRotation</code></h3>
+<p>Random starting yaw; Choice shares that sampled yaw across its rigs.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="intertrialswapafterseconds"><code>intertrial.swapAfterSeconds</code></h3>
+<p>Positive delay before swapping object colors; 0 disables.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="steps-group">steps group</h2>
+<h3 id="steps"><code>steps</code></h3>
+<p>Array of steps.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="steps-group-1">steps[] group</h2>
+<h3 id="stepsresetpositiononstart"><code>steps[].resetPositionOnStart</code></h3>
+<p>Apply the configured initial position when this experiment begins. When disabled, retain the current position.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsresetrotationonstart"><code>steps[].resetRotationOnStart</code></h3>
+<p>Apply the initial orientation when this experiment begins. When disabled, retain the current orientation unless the experiment requests randomization.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsname"><code>steps[].name</code></h3>
+<p>Logged step label; keep names unique and avoid CSV delimiters.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>""</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepstrigger"><code>steps[].trigger</code></h3>
+<p>Null advances immediately; explicit time or area trigger is recommended.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepstriggertype"><code>steps[].trigger.type</code></h3>
+<p>Required prefab name, e.g. tree01 or LocustBand_black.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["time","area"]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepstriggerseconds"><code>steps[].trigger.seconds</code></h3>
+<p>Time trigger duration.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["time"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stepstriggerareatag"><code>steps[].trigger.areaTag</code></h3>
+<p>Tag assigned to trigger objects (fallback Untagged).</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stepstriggervrid"><code>steps[].trigger.vrId</code></h3>
+<p>Exact unique positive VR identifier, such as VR1 or VR10. Duplicate IDs are rejected; a rig is separate from its animal ID/species.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stepstriggershape"><code>steps[].trigger.shape</code></h3>
+<p>box or cylinder (capsule collider).</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"box"</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stepstriggersize"><code>steps[].trigger.size</code></h3>
+<p>Legacy fields not consulted by trigger construction; use trigger fields.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.01,"max":5.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stepstriggerboxsize"><code>steps[].trigger.boxSize</code></h3>
+<p>Legacy fields not consulted by trigger construction; use trigger fields.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stepstriggerradius"><code>steps[].trigger.radius</code></h3>
+<p>Cylinder dimensions in world units; controller applies fallback/minimum geometry.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stepstriggerheight"><code>steps[].trigger.height</code></h3>
+<p>Fraction of display width/height.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stepstriggertimeoutseconds"><code>steps[].trigger.timeoutSeconds</code></h3>
+<p>Positive timeout, otherwise wait indefinitely for area event.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stepstriggertriggeronexit"><code>steps[].trigger.triggerOnExit</code></h3>
+<p>Use exit instead of entry.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>UI <code>visibleWhen</code>: <code>{"property":"type","oneOf":["area"]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stepstriggeradvanceontrigger"><code>steps[].trigger.advanceOnTrigger</code></h3>
+<p>false resets the rig on contact and keeps waiting for timeout.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjects"><code>steps[].objects</code></h3>
+<p>Omitted, null or [] means environment-only flight/migration; sky and movement settings still apply.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsuseheadingreference"><code>steps[].objects[].useHeadingReference</code></h3>
+<p>Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectstype"><code>steps[].objects[].type</code></h3>
+<p>Required prefab name, e.g. tree01 or LocustBand_black.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectspolar"><code>steps[].objects[].polar</code></h3>
+<p>{radius,angle,height} as above, defaults zero for each scalar. Takes precedence over Cartesian pos.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectspolarradius"><code>steps[].objects[].polar.radius</code></h3>
+<p>Cylinder dimensions in world units; controller applies fallback/minimum geometry.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectspolarangle"><code>steps[].objects[].polar.angle</code></h3>
+<p>Polar angle in degrees. Zero points along Unity +Z/north; positive 90 points +X/east. Positive yaw is clockwise from above.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectspolarheight"><code>steps[].objects[].polar.height</code></h3>
+<p>Fraction of display width/height.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsscale"><code>steps[].objects[].scale</code></h3>
+<p>Omitted object resolves to (1,1,1); scalar fields in a supplied object default to 0. Use {x:1,y:1,z:1} for unit scale.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsscalex"><code>steps[].objects[].scale.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsscaley"><code>steps[].objects[].scale.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsscalez"><code>steps[].objects[].scale.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsmaterial"><code>steps[].objects[].material</code></h3>
+<p>Registered material name; empty keeps prefab material.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectscolor"><code>steps[].objects[].color</code></h3>
+<p>Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsswapcolor"><code>steps[].objects[].swapColor</code></h3>
+<p>Normalized [r,g,b,a]; RGB allowed. Explicit swapColor sets swap target. Otherwise first two colors exchange.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsflip"><code>steps[].objects[].flip</code></h3>
+<p>Negate X scale.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsvisualangledegrees"><code>steps[].objects[].visualAngleDegrees</code></h3>
+<p>Angular size for prefabs with ScaleWithDistance; example 10.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>degrees</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsrandominitialrotation"><code>steps[].objects[].randomInitialRotation</code></h3>
+<p>Random starting yaw; Choice shares that sampled yaw across its rigs.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsmu"><code>steps[].objects[].mu</code></h3>
+<p>Mean/explicit yaw in degrees.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>degrees</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":-180.0,"max":180.0,"step":1.0}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsprefab"><code>steps[].objects[].prefab</code></h3>
+<p>Name of a registered scene prefab to instantiate. The asset must be present in the scene registry.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectspos"><code>steps[].objects[].pos</code></h3>
+<p>Legacy [x,y,z], fallback zero.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsrot"><code>steps[].objects[].rot</code></h3>
+<p>Legacy serialized array, currently ignored. Use mu for yaw.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsmat"><code>steps[].objects[].mat</code></h3>
+<p>Legacy alias for a registered material name. The asset must be present in the scene’s registry.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsobjectsrole"><code>steps[].objects[].role</code></h3>
+<p>black or gray for adaptive decisions.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepscamera"><code>steps[].camera</code></h3>
+<p>Array of {vrId,clearFlags,bgColor}. clearFlags defaults SolidColor; bgColor is [r,g,b,a] (alpha optional). Changes clear/background, never system camera order.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepscameravrid"><code>steps[].camera[].vrId</code></h3>
+<p>Exact unique positive VR identifier, such as VR1 or VR10. Duplicate IDs are rejected; a rig is separate from its animal ID/species.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepscameraclearflags"><code>steps[].camera[].clearFlags</code></h3>
+<p>Camera background clearing mode, such as Skybox or SolidColor. SolidColor uses the configured background color.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>"SolidColor"</code></td>
+</tr>
+<tr>
+<td><code>enum</code></td>
+<td><code>["Skybox","Color","SolidColor","Depth","Nothing",1,2,2,3,4]</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepscamerabgcolor"><code>steps[].camera[].bgColor</code></h3>
+<p>Dynamic Choice camera background as normalized RGB or RGBA channels (0–1). Used with SolidColor camera clearing.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsskybox"><code>steps[].skybox</code></h3>
+<p>Material name loaded by Resources.Load<material>. This differs from Choice's panorama file path.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>string or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsresetvr"><code>steps[].resetVR</code></h3>
+<p>Legacy serialized list; currently resets the executing rig regardless of this list.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsclosedlooporientation"><code>steps[].closedLoopOrientation</code></h3>
+<p>Use the animal’s measured orientation to control virtual yaw. Position is controlled separately by Closed loop position or autopilot. A numeric value sets the orientation gain; true uses gain 1 and false disables it.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":5.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsclosedloopposition"><code>steps[].closedLoopPosition</code></h3>
+<p>Use the animal’s measured translation to move its virtual rig. Orientation remains independent. A numeric value sets the translation gain; true uses gain 1 and false disables it. Walking uses scene units (centimetres).</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.0,"max":5.0,"step":0.1}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsinitialposition"><code>steps[].initialPosition</code></h3>
+<p>World x/y/z, cm. Template ground-eye height 0.5; migration example 100.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<details><summary>Exact emitted default JSON</summary>
+
+<pre class="json"><code>{
+  &quot;x&quot;: 0.0,
+  &quot;y&quot;: 0.0,
+  &quot;z&quot;: 0.0
+}</code></pre>
+</details>
+
+<p>UI <code>enabledWhen</code>: <code>{"property":"resetPositionOnStart","oneOf":[true]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stepsinitialpositionx"><code>steps[].initialPosition.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsinitialpositiony"><code>steps[].initialPosition.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsinitialpositionz"><code>steps[].initialPosition.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsinitialrotation"><code>steps[].initialRotation</code></h3>
+<p>Euler x/y/z degrees.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<details><summary>Exact emitted default JSON</summary>
+
+<pre class="json"><code>{
+  &quot;x&quot;: 0.0,
+  &quot;y&quot;: 0.0,
+  &quot;z&quot;: 0.0
+}</code></pre>
+</details>
+
+<p>UI <code>enabledWhen</code>: <code>{"all":[{"property":"randomInitialRotation","oneOf":[false]},{"property":"resetRotationOnStart","oneOf":[true]}]}</code>. This governs the form, not removal of stored values.</p>
+<h3 id="stepsinitialrotationx"><code>steps[].initialRotation.x</code></h3>
+<p>X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsinitialrotationy"><code>steps[].initialRotation.y</code></h3>
+<p>Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsinitialrotationz"><code>steps[].initialRotation.z</code></h3>
+<p>Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsrandominitialrotation"><code>steps[].randomInitialRotation</code></h3>
+<p>Random starting yaw; Choice shares that sampled yaw across its rigs.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="stepsswapafterseconds"><code>steps[].swapAfterSeconds</code></h3>
+<p>Positive delay before swapping object colors; 0 disables.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="size-group">size group</h2>
+<h3 id="size"><code>size</code></h3>
+<p>Legacy fields not consulted by trigger construction; use trigger fields.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>1.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+<tr>
+<td>UI soft slider range</td>
+<td><code>{"min":0.01,"max":5.0,"step":0.01}</code>; display/edit convenience, not an extra runtime constraint.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="boxsize-group">boxSize group</h2>
+<h3 id="boxsize"><code>boxSize</code></h3>
+<p>Legacy fields not consulted by trigger construction; use trigger fields.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>array or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="adaptivedecision-group">adaptiveDecision group</h2>
+<h3 id="adaptivedecision"><code>adaptiveDecision</code></h3>
+<p>Optional adaptive staircase below.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>object or null</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>additionalProperties</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="adaptivedecisionenabled"><code>adaptiveDecision.enabled</code></h3>
+<p>Enable this feature. Its saved parameters remain in the JSON when disabled.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>boolean</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="adaptivedecisionstartgray"><code>adaptiveDecision.startGray</code></h3>
+<p>Initial normalized gray for adaptive decision trials. 0 is black and 1 is white.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="adaptivedecisiongraystep"><code>adaptiveDecision.grayStep</code></h3>
+<p>Normalized change in adaptive gray after each decision (0–1 luminance channel units). The resulting gray is clamped to 0–1.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>0.05</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="adaptivedecisioncontrolevery"><code>adaptiveDecision.controlEvery</code></h3>
+<p>Run a no-bar control every N adaptive decision trials. Zero disables these control trials.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>integer</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>5</code></td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-2147483648</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>2147483647</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="adaptivedecisionnobarcontrolseconds"><code>adaptiveDecision.noBarControlSeconds</code></h3>
+<p>Duration, in seconds, of a no-bar adaptive control trial.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Contract</th>
+<th>Emitted value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type</td>
+<td><code>number</code></td>
+</tr>
+<tr>
+<td>Required by parent schema</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Default</td>
+<td><code>20.0</code></td>
+</tr>
+<tr>
+<td>UI unit label</td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><code>minimum</code></td>
+<td><code>-3.40282347e+38</code></td>
+</tr>
+<tr>
+<td><code>maximum</code></td>
+<td><code>3.40282347e+38</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="source">Source</h2>
+<p><a href="https://github.com/pvnkmrksk/matrexVR/blob/main/Assets/Resources/ConfigurationUI/schemas.json">Bundled schema source</a> · <a href="https://github.com/pvnkmrksk/matrexVR/blob/main/Assets/Editor/ConfigurationSchemaBuilder.cs">Schema generator</a></p>
+</article><nav class="chapter-pager" aria-label="Adjacent chapters"><a href="schema-rugosity.html"><small>Previous</small>Rugosity fields</a><a href="night-sky.html"><small>Next</small>Astronomical night sky<span aria-hidden="true"> →</span></a></nav><footer class="article-footer">Static documentation · software contracts and recorded evidence. <a href="citation.html">Citation and credits</a></footer></main>
+<aside class="right-sidebar"><nav aria-label="On this page"><p>On this page</p><a href="#seed-group" class="toc-level-2">seed group</a><a href="#repetitions-group" class="toc-level-2">repetitions group</a><a href="#sync-group" class="toc-level-2">sync group</a><a href="#intertrial-group" class="toc-level-2">intertrial group</a><a href="#steps-group" class="toc-level-2">steps group</a><a href="#steps-group-1" class="toc-level-2">steps[] group</a><a href="#size-group" class="toc-level-2">size group</a><a href="#boxsize-group" class="toc-level-2">boxSize group</a><a href="#adaptivedecision-group" class="toc-level-2">adaptiveDecision group</a><a href="#source" class="toc-level-2">Source</a></nav><a class="source-link" href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/manual/generated/schema-dynamic-choice.md">View Markdown source ↗</a></aside></div>
+<dialog class="search-dialog" aria-labelledby="search-title"><form method="dialog"><h2 id="search-title">Search documentation</h2><button class="search-close" aria-label="Close search">×</button></form><label class="sr-only" for="manual-search">Search every manual section</label><input id="manual-search" type="search" placeholder="Try: ViewportSetter, yaw units, replay, sky…" autocomplete="off"><p class="search-status" role="status">Search runs locally in your browser.</p><div class="search-results"></div><p class="search-hint">Enter a term · Tab to a result · Escape to close</p></dialog>
+</body></html>

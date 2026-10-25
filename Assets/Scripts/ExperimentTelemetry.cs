@@ -16,12 +16,15 @@ public sealed class TelemetryConfig
     public int port = 9880;
     public float rateHz = 20;
     public string topic = "matrex.telemetry.v2";
+    public float contextIntervalSeconds = 2f;
     public void Validate()
     {
         if (!enabled) return;
         if (port < 1 || port > 65535 || string.IsNullOrWhiteSpace(bindAddress) || string.IsNullOrWhiteSpace(topic) ||
             float.IsNaN(rateHz) || float.IsInfinity(rateHz) || rateHz <= 0 || rateHz > 240)
             throw new ArgumentException("telemetry requires an address, port 1..65535, topic, and rateHz in (0,240].");
+        if (float.IsNaN(contextIntervalSeconds) || float.IsInfinity(contextIntervalSeconds) || contextIntervalSeconds < .25f || contextIntervalSeconds > 60f)
+            throw new ArgumentException("telemetry.contextIntervalSeconds must be from 0.25 to 60 seconds.");
     }
 }
 
@@ -31,7 +34,8 @@ public sealed class ExperimentTelemetry : MonoBehaviour
 {
     private PublishWorker worker;
     private TelemetryConfig settings;
-    private double nextPublish;
+    private double nextPublish, nextContext;
+    private long contextSequence;
     private long sequence;
     private string state = "waiting for system config";
     private long droppedSnapshots;
@@ -71,7 +75,7 @@ public sealed class ExperimentTelemetry : MonoBehaviour
             Endpoint = $"tcp://{settings.bindAddress}:{settings.port}";
             reportedWorkerFailure = false;
             worker = new PublishWorker(Endpoint, settings.topic, () => Interlocked.Increment(ref droppedSnapshots));
-            nextPublish = 0;
+            nextPublish = 0; nextContext = 0;
         }
         catch (Exception error)
         {
@@ -88,11 +92,20 @@ public sealed class ExperimentTelemetry : MonoBehaviour
             if (!reportedWorkerFailure) { reportedWorkerFailure = true; Debug.LogError("Telemetry publisher failed: " + worker.Failure); }
             return;
         }
-        if (Time.realtimeSinceStartupAsDouble < nextPublish) return;
-        nextPublish = Time.realtimeSinceStartupAsDouble + 1.0 / settings.rateHz;
+        double now = Time.realtimeSinceStartupAsDouble;
+        if (now < nextPublish && now < nextContext) return;
         try
         {
-            worker.Submit(Capture(++sequence));
+            if (now >= nextPublish)
+            {
+                nextPublish = now + 1.0 / settings.rateHz;
+                worker.Submit(Capture(++sequence));
+            }
+            if (Time.realtimeSinceStartupAsDouble >= nextContext)
+            {
+                nextContext = Time.realtimeSinceStartupAsDouble + settings.contextIntervalSeconds;
+                worker.SubmitContext(CaptureContext(++contextSequence));
+            }
         }
         catch (Exception error)
         {
@@ -108,7 +121,7 @@ public sealed class ExperimentTelemetry : MonoBehaviour
         private readonly AutoResetEvent signal = new AutoResetEvent(false);
         private readonly Thread thread;
         private readonly Action dropped;
-        private object latest;
+        private object latest, latestContext;
         private volatile bool stopping;
         private volatile bool ready;
         private volatile string failure;
@@ -125,6 +138,11 @@ public sealed class ExperimentTelemetry : MonoBehaviour
             if (Interlocked.Exchange(ref latest, snapshot) != null) dropped();
             signal.Set();
         }
+        public void SubmitContext(object context)
+        {
+            Interlocked.Exchange(ref latestContext, context);
+            signal.Set();
+        }
         private void Run(string endpoint, string topic)
         {
             try
@@ -137,19 +155,26 @@ public sealed class ExperimentTelemetry : MonoBehaviour
                     while (!stopping)
                     {
                         object snapshot = Interlocked.Exchange(ref latest, null);
-                        if (snapshot == null) { signal.WaitOne(100); continue; }
-                        var message = new NetMQMessage();
-                        message.Append(topic); message.Append(JsonConvert.SerializeObject(snapshot));
-                        if (!publisher.TrySendMultipartMessage(TimeSpan.Zero, message)) dropped();
+                        object context = Interlocked.Exchange(ref latestContext, null);
+                        if (snapshot == null && context == null) { signal.WaitOne(100); continue; }
+                        if (snapshot != null) Send(publisher, topic, snapshot);
+                        if (context != null) Send(publisher, topic + ".context", context);
                     }
                 }
             }
             catch (Exception error) { failure = error.ToString(); }
         }
+        private void Send(PublisherSocket publisher, string topic, object payload)
+        {
+            var message = new NetMQMessage();
+            message.Append(System.Text.Encoding.UTF8.GetBytes(topic));
+            message.Append(System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(payload)));
+            if (!publisher.TrySendMultipartMessage(TimeSpan.Zero, message)) dropped();
+        }
         public void Dispose()
         {
             stopping = true; signal.Set(); thread.Join();
-            Interlocked.Exchange(ref latest, null); signal.Dispose();
+            Interlocked.Exchange(ref latest, null); Interlocked.Exchange(ref latestContext, null); signal.Dispose();
         }
     }
 
@@ -217,14 +242,69 @@ public sealed class ExperimentTelemetry : MonoBehaviour
                 phase = MainController.RecordedExperimentPhase,
                 error = main != null ? main.SequenceError : null,
                 telemetry = State, droppedSnapshots = DroppedSnapshots },
-            frameTiming = fps.Latest, rigs, errors = RuntimeStatusOverlay.RecentErrors()
+            experimentContext = ContextIdentity(), frameTiming = fps.Latest, rigs, errors = RuntimeStatusOverlay.RecentErrors()
         };
+    }
+
+    private static string PublicReference(SequenceStep step, string key)
+    {
+        if (step?.parameters == null || !step.parameters.TryGetValue(key, out var value) || value == null) return null;
+        string reference = value.ToString();
+        string normalized = reference.Replace('\\', '/');
+        bool drivePrefix = normalized.Length >= 2 && char.IsLetter(normalized[0]) && normalized[1] == ':';
+        if (System.IO.Path.IsPathRooted(reference) || normalized.StartsWith("/") || drivePrefix)
+        {
+            string filename = normalized.Substring(normalized.LastIndexOf('/') + 1);
+            return drivePrefix && !normalized.Contains("/") ? filename.Substring(2) : filename;
+        }
+        return reference;
+    }
+
+    private static object ContextIdentity()
+    {
+        var main = MainController.Instance;
+        var step = main != null ? main.GetCurrentSequenceStep() : null;
+        var scene = SceneManager.GetActiveScene();
+        return new { sessionId = MasterDataLogger.Instance?.timestamp, configFile = PublicReference(step, "configFile"),
+            design = PublicReference(step, "design"), worldUnitsPerMetre = Terrain.activeTerrains.Any(t => t.gameObject.scene == scene) ? 1 : 100 };
+    }
+
+    // Self-contained context is repeated for subscribers joining after the run has begun.
+    // It contains public experiment references, never host filesystem paths or operator comments.
+    public object CaptureContext(long heartbeatSequence)
+    {
+        var main = MainController.Instance;
+        var scene = SceneManager.GetActiveScene();
+        var step = main != null ? main.GetCurrentSequenceStep() : null;
+        var metadata = main?.CurrentAnimalMetadata;
+        var animals = new List<object>();
+        if (main != null)
+            foreach (var rig in main.SystemConfigs.Values.OrderBy(r => RuntimeRigRegistry.ParseIndex(r.vrId)))
+            {
+                var animal = metadata?.Animals?.FirstOrDefault(a => a != null && a.VR == rig.vrId);
+                animals.Add(new { vrId = rig.vrId, animalId = animal?.AnimalID, speciesName = animal?.SpeciesName ?? rig.speciesName,
+                    backend = TrackerBackend.DisplayName(rig.closedLoopMode), compatibilityMode = rig.closedLoopMode.ToString(),
+                    displayOrder = rig.displayOrder, targetDisplay = rig.targetDisplay,
+                    panelWidthPixels = rig.ledPanelWidth, panelHeightPixels = rig.ledPanelHeight });
+            }
+        return new { schemaVersion = 1, kind = "matrex.context", sequence = heartbeatSequence,
+            timestampUtc = DateTime.UtcNow.ToString("O"), sessionId = MasterDataLogger.Instance?.timestamp,
+            experimentName = metadata?.ExperimentName,
+            experiment = new { running = main != null && main.SequenceRunning, sceneName = scene.name,
+                sceneNumber = main != null && main.SequenceRunning ? main.currentStep + 1 : 0,
+                trialNumber = main != null ? main.currentTrial + 1 : 0,
+                phase = MainController.RecordedExperimentPhase, configFile = PublicReference(step, "configFile"),
+                design = PublicReference(step, "design"), remainingStepSeconds = main?.RemainingStepSeconds ?? 0,
+                durationSeconds = step?.duration ?? 0 },
+            scene = new { name = scene.name, buildIndex = scene.buildIndex,
+                worldUnitsPerMetre = Terrain.activeTerrains.Any(t => t.gameObject.scene == scene) ? 1 : 100 },
+            telemetry = new { topic = settings?.topic ?? "matrex.telemetry.v2", contextIntervalSeconds = settings?.contextIntervalSeconds ?? 2 }, animals };
     }
 
     private static object Sample(ZmqListener.RawSample raw, ClosedLoop rig)
     {
         double? age = raw.hasPose ? Math.Max(0, TimeSpan.FromTicks(DateTime.UtcNow.Ticks - raw.receivedUtcTicks).TotalSeconds) : (double?)null;
-        bool wingAngles = rig.GetCurrentMode() == ClosedLoopMode.Kinefly;
+        bool wingAngles = TrackerBackend.IsFlight(rig.GetCurrentMode());
         double angularScale = rig.UsesBogongInput && !rig.GetUseForceMode() ? KineflyAutoTrim.RadToDeg : 1;
         return new { available = raw.hasPose, sequence = raw.sequence,
             receivedUtc = raw.hasPose ? new DateTime(raw.receivedUtcTicks, DateTimeKind.Utc).ToString("O") : null,

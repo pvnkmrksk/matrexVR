@@ -1,0 +1,85 @@
+{
+  "before": {
+    "failure": null,
+    "results": [
+      {
+        "allocatedAgents": 1720,
+        "activeAgents": 140,
+        "rigs": 4,
+        "cameras": 24,
+        "refreshMedianMilliseconds": 1.4099,
+        "refreshP95Milliseconds": 1.7616,
+        "refreshAndRenderMedianMilliseconds": 4.2863,
+        "refreshAndRenderP95Milliseconds": 5.358,
+        "refreshManagedBytesPerFrame": 0.0
+      },
+      {
+        "allocatedAgents": 1720,
+        "activeAgents": 280,
+        "rigs": 4,
+        "cameras": 24,
+        "refreshMedianMilliseconds": 1.4628,
+        "refreshP95Milliseconds": 1.7471,
+        "refreshAndRenderMedianMilliseconds": 4.3763,
+        "refreshAndRenderP95Milliseconds": 7.8049,
+        "refreshManagedBytesPerFrame": 0.0
+      },
+      {
+        "allocatedAgents": 1720,
+        "activeAgents": 1720,
+        "rigs": 4,
+        "cameras": 24,
+        "refreshMedianMilliseconds": 1.4565,
+        "refreshP95Milliseconds": 1.833,
+        "refreshAndRenderMedianMilliseconds": 4.3781,
+        "refreshAndRenderP95Milliseconds": 8.4772,
+        "refreshManagedBytesPerFrame": 0.0
+      }
+    ],
+    "unity": "6000.3.16f1",
+    "gpu": "Apple M2 Pro",
+    "note": "CPU submission timings only, not end-to-end GPU/display FPS. Four pools of 430 slots; 24 cameras at 64px. Fixed positions and random seed."
+  },
+  "after": {
+    "failure": null,
+    "results": [
+      {
+        "allocatedAgents": 1720,
+        "activeAgents": 140,
+        "rigs": 4,
+        "cameras": 24,
+        "refreshMedianMilliseconds": 0.0877,
+        "refreshP95Milliseconds": 0.1807,
+        "refreshAndRenderMedianMilliseconds": 3.392,
+        "refreshAndRenderP95Milliseconds": 4.9866,
+        "refreshManagedBytesPerFrame": 0.0
+      },
+      {
+        "allocatedAgents": 1720,
+        "activeAgents": 280,
+        "rigs": 4,
+        "cameras": 24,
+        "refreshMedianMilliseconds": 0.1493,
+        "refreshP95Milliseconds": 0.2451,
+        "refreshAndRenderMedianMilliseconds": 2.9464,
+        "refreshAndRenderP95Milliseconds": 5.5914,
+        "refreshManagedBytesPerFrame": 0.0
+      },
+      {
+        "allocatedAgents": 1720,
+        "activeAgents": 1720,
+        "rigs": 4,
+        "cameras": 24,
+        "refreshMedianMilliseconds": 0.6495,
+        "refreshP95Milliseconds": 1.0327,
+        "refreshAndRenderMedianMilliseconds": 3.6847,
+        "refreshAndRenderP95Milliseconds": 9.3435,
+        "refreshManagedBytesPerFrame": 0.0
+      }
+    ],
+    "unity": "6000.3.16f1",
+    "gpu": "Apple M2 Pro",
+    "note": "CPU submission timings only, not end-to-end GPU/display FPS. Four pools of 430 slots; 24 cameras at 64px. Fixed positions and random seed."
+  },
+  "note": "Identical benchmark settings. CPU submission timings on this machine; render calls do not measure full GPU/display latency. Inactive slots previously uploaded/drew clipped geometry; live-only pose buffers and index ranges now omit it."
+}

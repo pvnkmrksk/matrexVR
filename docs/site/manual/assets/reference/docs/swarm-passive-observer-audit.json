@@ -1,0 +1,323 @@
+{
+  "sourceSha256": "7353033db12dd544eca10091d58ef265a73859452331be95a13d387b4def4817",
+  "rows": 14429,
+  "ids": 430,
+  "uninterruptedSegments": 437,
+  "durationSeconds": 599.46,
+  "birthsPerMinute": 43.03873486137523,
+  "meanBirthIntervalSeconds": 1.394093023255814,
+  "birthGapSeconds": {
+    "min": 0.0,
+    "p10": 0.10000000000002274,
+    "p25": 0.2399999999998954,
+    "median": 0.6599999999999966,
+    "p75": 1.9399999999999977,
+    "p90": 3.5600000000000076,
+    "p95": 5.179999999999989,
+    "max": 12.670000000000016
+  },
+  "birthsByMinute": [
+    49,
+    42,
+    29,
+    26,
+    38,
+    37,
+    30,
+    59,
+    71,
+    49
+  ],
+  "recordedSpeedMetresPerSecond": {
+    "min": 0.8454752332267522,
+    "p10": 2.9364360571484363,
+    "p25": 3.4802735139738985,
+    "median": 4.097892974917696,
+    "p75": 4.787353566287974,
+    "p90": 5.803445921208857,
+    "p95": 6.9477531417554905,
+    "max": 102.0554261122461
+  },
+  "measuredTerminalSpeedMetresPerSecond": {
+    "min": 1.3445991539462374,
+    "p10": 3.4612015777261504,
+    "p25": 3.9506687564514666,
+    "median": 5.022221352061186,
+    "p75": 7.907665820358848,
+    "p90": 11.669745120391516,
+    "p95": 17.72587802594678,
+    "max": 53.68365188339442
+  },
+  "coobservedNearestNeighbourMetres": {
+    "min": 0.01347376729055398,
+    "p10": 0.9096030432150062,
+    "p25": 1.4196484247506491,
+    "median": 2.1611558217009708,
+    "p75": 2.861848206670997,
+    "p90": 3.4782581807005064,
+    "p95": 4.020804001977341,
+    "max": 6.623301656030019
+  },
+  "maximumSimultaneouslyObserved": 4,
+  "meanSimultaneouslyObserved": 0.23341006906215653,
+  "sampleCentroidMetres": {
+    "X": -0.2697495302515775,
+    "Y": 5.725152926814054,
+    "Z": 0.10780537521657788
+  },
+  "observerSpeedMetresPerSecond": 0.0,
+  "closestPassModelSupported": true,
+  "measuredContinuation": {
+    "continuationSpeedMetresPerSecond": null,
+    "preRollSeconds": 0,
+    "nearestPassMetres": {
+      "min": 0.17699829702192546,
+      "p10": 0.7253010912006729,
+      "p25": 1.1521077560212543,
+      "median": 1.6322362155463523,
+      "p75": 2.185647946296075,
+      "p90": 2.7488669745486956,
+      "p95": 3.222940185433574,
+      "max": 11.253436204429688
+    },
+    "closePassesWithinQuarterMetre": [
+      {
+        "id": "158",
+        "distanceMetres": 0.17699829702192546,
+        "timeSeconds": 268.4963751630769,
+        "stage": "recorded"
+      },
+      {
+        "id": "166",
+        "distanceMetres": 0.2264053332787152,
+        "timeSeconds": 285.83,
+        "stage": "recorded"
+      },
+      {
+        "id": "203",
+        "distanceMetres": 0.19717893953279844,
+        "timeSeconds": 323.4521795557514,
+        "stage": "recorded"
+      },
+      {
+        "id": "259",
+        "distanceMetres": 0.22491907129292601,
+        "timeSeconds": 429.0,
+        "stage": "recorded"
+      },
+      {
+        "id": "354",
+        "distanceMetres": 0.19999539047739753,
+        "timeSeconds": 523.71,
+        "stage": "recorded"
+      },
+      {
+        "id": "362",
+        "distanceMetres": 0.23703548435771515,
+        "timeSeconds": 527.870043018746,
+        "stage": "recorded"
+      },
+      {
+        "id": "395",
+        "distanceMetres": 0.18226815469784302,
+        "timeSeconds": 550.87,
+        "stage": "recorded"
+      }
+    ],
+    "passesWithinMetres": {
+      "0.1": {
+        "count": 0,
+        "perMinute": 0.0
+      },
+      "0.25": {
+        "count": 7,
+        "perMinute": 0.7006305675107597
+      },
+      "0.5": {
+        "count": 20,
+        "perMinute": 2.0018016214593133
+      },
+      "1": {
+        "count": 78,
+        "perMinute": 7.807026323691321
+      },
+      "2": {
+        "count": 298,
+        "perMinute": 29.826844159743764
+      },
+      "3": {
+        "count": 407,
+        "perMinute": 40.73666299669703
+      }
+    }
+  },
+  "configuredContinuation": {
+    "continuationSpeedMetresPerSecond": 6,
+    "preRollSeconds": 0,
+    "nearestPassMetres": {
+      "min": 0.17699829702192546,
+      "p10": 0.7253010912006731,
+      "p25": 1.1521077560212543,
+      "median": 1.6322362155463523,
+      "p75": 2.185647946296075,
+      "p90": 2.7488669745486956,
+      "p95": 3.222940185433574,
+      "max": 11.253436204429688
+    },
+    "closePassesWithinQuarterMetre": [
+      {
+        "id": "158",
+        "distanceMetres": 0.17699829702192546,
+        "timeSeconds": 268.4963751630769,
+        "stage": "recorded"
+      },
+      {
+        "id": "166",
+        "distanceMetres": 0.2264053332787152,
+        "timeSeconds": 285.83,
+        "stage": "recorded"
+      },
+      {
+        "id": "203",
+        "distanceMetres": 0.19717893953279844,
+        "timeSeconds": 323.4521795557514,
+        "stage": "recorded"
+      },
+      {
+        "id": "259",
+        "distanceMetres": 0.22491907129292601,
+        "timeSeconds": 429.0,
+        "stage": "recorded"
+      },
+      {
+        "id": "354",
+        "distanceMetres": 0.19999539047739753,
+        "timeSeconds": 523.71,
+        "stage": "recorded"
+      },
+      {
+        "id": "362",
+        "distanceMetres": 0.23703548435771515,
+        "timeSeconds": 527.870043018746,
+        "stage": "recorded"
+      },
+      {
+        "id": "395",
+        "distanceMetres": 0.18226815469784302,
+        "timeSeconds": 550.87,
+        "stage": "recorded"
+      }
+    ],
+    "passesWithinMetres": {
+      "0.1": {
+        "count": 0,
+        "perMinute": 0.0
+      },
+      "0.25": {
+        "count": 7,
+        "perMinute": 0.7006305675107597
+      },
+      "0.5": {
+        "count": 20,
+        "perMinute": 2.0018016214593133
+      },
+      "1": {
+        "count": 78,
+        "perMinute": 7.807026323691321
+      },
+      "2": {
+        "count": 298,
+        "perMinute": 29.826844159743764
+      },
+      "3": {
+        "count": 407,
+        "perMinute": 40.73666299669703
+      }
+    }
+  },
+  "configuredIncomingAndOutgoing": {
+    "continuationSpeedMetresPerSecond": 6,
+    "preRollSeconds": 5,
+    "nearestPassMetres": {
+      "min": 0.17699829702192546,
+      "p10": 0.6193179445856682,
+      "p25": 1.0853843355752264,
+      "median": 1.526497975713473,
+      "p75": 2.0496180847419723,
+      "p90": 2.5078849814960726,
+      "p95": 3.067296771982221,
+      "max": 11.253436204429688
+    },
+    "closePassesWithinQuarterMetre": [
+      {
+        "id": "158",
+        "distanceMetres": 0.17699829702192546,
+        "timeSeconds": 268.4963751630769,
+        "stage": "recorded"
+      },
+      {
+        "id": "166",
+        "distanceMetres": 0.2264053332787152,
+        "timeSeconds": 285.83,
+        "stage": "recorded"
+      },
+      {
+        "id": "203",
+        "distanceMetres": 0.19717893953279844,
+        "timeSeconds": 323.4521795557514,
+        "stage": "recorded"
+      },
+      {
+        "id": "259",
+        "distanceMetres": 0.22491907129292601,
+        "timeSeconds": 429.0,
+        "stage": "recorded"
+      },
+      {
+        "id": "354",
+        "distanceMetres": 0.19999539047739753,
+        "timeSeconds": 523.71,
+        "stage": "recorded"
+      },
+      {
+        "id": "362",
+        "distanceMetres": 0.23703548435771515,
+        "timeSeconds": 527.870043018746,
+        "stage": "recorded"
+      },
+      {
+        "id": "395",
+        "distanceMetres": 0.18226815469784302,
+        "timeSeconds": 550.87,
+        "stage": "recorded"
+      }
+    ],
+    "passesWithinMetres": {
+      "0.1": {
+        "count": 0,
+        "perMinute": 0.0
+      },
+      "0.25": {
+        "count": 7,
+        "perMinute": 0.7006305675107597
+      },
+      "0.5": {
+        "count": 28,
+        "perMinute": 2.8025222700430388
+      },
+      "1": {
+        "count": 94,
+        "perMinute": 9.408467620858772
+      },
+      "2": {
+        "count": 317,
+        "perMinute": 31.728555700130116
+      },
+      "3": {
+        "count": 414,
+        "perMinute": 41.437293564207785
+      }
+    }
+  },
+  "note": "IDs are unique recorded arrivals, not simultaneous population. Co-observed spacing is conditional on multiple recorded IDs at exactly the same timestamp; it is not a complete density census. Closest-pass estimates assume exact-time spawn anchors, constant northward observer motion, unit playback clock, centered data, and continuing tails. Incoming mode anchors at max(0,firstTime-preRollSeconds); moving observers change the path relative to that earlier anchor. Reports the first CSV cycle, not future-cycle lead-ins at its end. No spatial rescaling."
+}

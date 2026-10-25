@@ -97,6 +97,7 @@ namespace ConfigurationUI
                 sexField.RegisterValueChangedCallback(e=>fly.Sex=e.newValue);
                 SessionField(traits,"Age (days)","subject-age-"+id,fly.AgeDays,v=>fly.AgeDays=v,"Unspecified");
                 SessionField(card,"Comments","subject-comments-"+id,fly.Comments,v=>fly.Comments=v,"Notes for "+id,true);
+                AddTrackerControls(card,rig);
             }
 
             var system=StudioButton("","system",()=>Select(Workspace.System),"session-system"); system.name="session-system-summary";
@@ -125,14 +126,38 @@ namespace ConfigurationUI
             string modes=string.Join(" / ",rigs.Select(RigMode).Distinct());
             string panels=string.Join(" / ",rigs.Select(r=>((string)r["displayOrder"]??"").Length+" panels per VR · "+(r["ledPanelWidth"]?.ToString()??"128")+" × "+(r["ledPanelHeight"]?.ToString()??"128")+" · "+r["displayOrder"]).Distinct());
             string inputs=string.Join(", ",rigs.Select(r=>r["vrId"]+" "+(r["zmqAddress"]?.ToString()??"localhost")+":"+(r["zmqPort"]?.ToString()??"9872")));
-            var telemetry=Workspace.System.Root["telemetry"];
+            var telemetry=Workspace.System.Root["telemetry"] as JObject;
             string output=ExperimentBlocks.Flag(telemetry?["enabled"],true)?"Telemetry → "+(telemetry?["bindAddress"]?.ToString()??"127.0.0.1")+":"+(telemetry?["port"]?.ToString()??"9880"):"Telemetry off";
             return modes+" · "+rigs.Count+" VRs · "+panels+"\nClosed loop input: "+inputs+"\n"+output;
         }
         private static string RigMode(JObject rig)
         {
             string value=rig["closedLoopMode"]?.ToString()??"FicTrac";
-            return Enum.TryParse(value,true,out ClosedLoopMode mode) && Enum.IsDefined(typeof(ClosedLoopMode),mode)?mode.ToString():value;
+            return TrackerBackend.TryParse(value,out ClosedLoopMode mode)?TrackerBackend.DisplayName(mode):value;
+        }
+        private void AddTrackerControls(VisualElement parent,JObject rig)
+        {
+            string id=(string)rig["vrId"];
+            if(string.IsNullOrWhiteSpace(id)) return;
+            var launch=rig["tracker"] as JObject;
+            bool configured=!string.IsNullOrWhiteSpace((string)launch?["executablePath"]);
+            // An owned camera process still needs a Stop button after its optional
+            // launch configuration is cleared. Renamed/removed rigs reconcile on apply.
+            if(!configured && !TrackerProcessManager.IsRunning(id)) return;
+            var container=new VisualElement();container.AddToClassList("tracker-controls");parent.Add(container);
+            var state=new Label();state.style.fontSize=12;state.style.whiteSpace=WhiteSpace.Normal;container.Add(state);
+            var row=Row();container.Add(row);
+            var start=StudioButton("Launch tracker","play",()=>{
+                RequireApplied();
+                TrackerProcessManager.Instance.Launch(rig.ToObject<SystemConfig>());
+                UpdateStatus(id+" tracker launched. Verify tracking input before starting the experiment.");
+            },"quiet");start.name="tracker-launch-"+id;row.Add(start);
+            var stop=StudioButton("Stop tracker","stop",()=>{
+                TrackerProcessManager.Instance.Stop(id);UpdateStatus(id+" tracker stopped.");
+            },"quiet");stop.name="tracker-stop-"+id;row.Add(stop);
+            stop.tooltip="Stop only the tracker MATREX launched for this rig. Save calibration edits in the tracker before stopping; an unresponsive process is terminated.";
+            Action refresh=()=>{ bool running=TrackerProcessManager.IsRunning(id);state.text=running?TrackerProcessManager.Status(id):configured?"Tracker app · ready to launch":"Tracker launch is not configured";state.tooltip=TrackerProcessManager.Status(id);start.SetEnabled(configured&&!running);stop.SetEnabled(running); };
+            refresh();row.schedule.Execute(refresh).Every(500);
         }
         private void BindSessionBlock(VisualElement holder,int index)
         {

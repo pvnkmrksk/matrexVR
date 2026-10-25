@@ -111,6 +111,9 @@ public static class ConfigurationDashboardValidation
                     foreach(var input in card.Query<TextField>().ToList())
                         Check(input.Q<VisualElement>(className:"unity-base-field__input").worldBound.yMax<=input.worldBound.yMax+.1f,"Subject input not clipped: "+input.name+" (field "+input.worldBound+", input "+input.Q<VisualElement>(className:"unity-base-field__input").worldBound+")");
                 Check(root.Q<TextField>("subject-id-VR1").label=="Animal ID","Real animal ID uses neutral terminology");
+                Check(root.Q<VisualElement>("subject-VR1").Q<Label>(className:"pill").text=="Rekkefly","Legacy flight config displays the modern backend name");
+                foreach(string icon in new[]{"house","user","play","monitor","sliders-horizontal","square","file-text","trash"})
+                    Check(Resources.Load<Texture2D>("ConfigurationUI/Icons/"+icon)!=null,"Bundled Lucide icon loads: "+icon);
                 var species=root.Q<TextField>("subject-species-VR1");
                 Check(species!=null && species.value=="Agrotis infusa","Species from system JSON appears on the animal card");
                 species.value="Agrotis infusa / pilot";
@@ -121,6 +124,7 @@ public static class ConfigurationDashboardValidation
                 var saved=JObject.Parse(File.ReadAllText(Path.Combine(RuntimePaths.RunDataRoot,"Backup/AnimalMetadata.json")));
                 Check((string)saved["Animals"][0]["AnimalID"]=="Animal A / β 001" && (string)saved["Animals"][0]["SpeciesName"]=="Agrotis infusa","Actual session controls save canonical animal ID and species");
                 Check(JToken.DeepEquals(saved["Animals"],saved["Flies"]) && (string)saved["Flies"][0]["FlyID"]=="Animal A / β 001","Actual session save retains equivalent legacy metadata aliases");
+                Check(MainController.Instance.CurrentAnimalMetadata.Animals[0].AnimalID=="Animal A / β 001","Saved animal metadata is immediately available to context heartbeats");
                 Capture("session-1920"); Submit(root.Q<Button>("open-sequence"));Next(2);
             }
             else if(stage==2)
@@ -131,6 +135,19 @@ public static class ConfigurationDashboardValidation
             else if(stage==3)
             {
                 Layout(ui,"System");
+                var backend=root.Q<DropdownField>("tracker-backend-configs-0-closedLoopMode");
+                Check(backend.choices.Contains("HejjéTrac · walking") && backend.choices.Contains("Rekkefly · flight") && backend.value.Contains("legacy Kinefly"),"Backend picker offers modern modes and preserves current legacy mode");
+                backend.value="HejjéTrac · walking";
+                Check((string)ui.Workspace.System.Root["configs"][0]["closedLoopMode"]=="Hejjetrac","Explicit backend selection writes its canonical JSON name");
+                ui.Workspace.System.Undo();Call(ui,"BuildContent");
+                Check(ui.Workspace.System.Root.ToString(Formatting.None)==originalSystem,"Backend selection Undo restores exact legacy JSON");
+                Submit(root.Q<VisualElement>("setting-configs-0-tracker").Q<Button>());
+                Check(ui.Workspace.System.Root["configs"][0]["tracker"] is JObject,"Optional tracker launch fields can be added through setup");
+                var tracker=root.Q<VisualElement>("setting-configs-0-tracker");tracker.Q<Foldout>().value=true;
+                root.Q<VisualElement>("setting-configs-0-tracker-executablePath").Q<TextField>().value="/never/launched/tracker";Call(ui,"BuildContent");
+                Check(root.Q<Button>("tracker-launch-VR1")!=null && !TrackerProcessManager.IsRunning("VR1"),"Configured tracker offers an explicit Launch button without starting a process");
+                ui.Workspace.System.Undo();ui.Workspace.System.Undo();Call(ui,"BuildContent");
+                Check(ui.Workspace.System.Root.ToString(Formatting.None)==originalSystem,"Optional tracker setup is fully undoable");
                 Check(root.Q<Toggle>("flag-telemetry-enabled").value && root.Q<Toggle>("flag-statusOverlay-visible").value,"Omitted telemetry and status show ON defaults");
                 var telemetry=root.Q<VisualElement>("setting-telemetry"); telemetry.Q<Foldout>().value=true;
                 root.Q<VisualElement>("setting-statusOverlay").Q<Foldout>().value=true;Next(4);

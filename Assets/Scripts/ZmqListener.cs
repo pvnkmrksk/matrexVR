@@ -22,6 +22,7 @@ public class ZmqListener : MonoBehaviour
     public static int ActiveWorkerCount => Volatile.Read(ref activeWorkerCount);
     private volatile string workerState = "not started";
     private volatile string wireFormat;
+    private ClosedLoopMode backend=ClosedLoopMode.Kinefly;
     public string Endpoint { get; private set; }
     public string WireFormat => wireFormat;
     public string State => workerState != "waiting for packets" ? workerState :
@@ -39,13 +40,15 @@ public class ZmqListener : MonoBehaviour
         public Quaternion convertedRotation;
         public long sequence, receivedUtcTicks;
         public bool hasPose;
+        public bool ficTracRow;
     }
     public RawSample ReadRawSample()
     {
         lock (poseLock) return new RawSample { position = latestPose.position, rotation = latestRawRotation, convertedRotation = latestPose.rotation,
-            sequence = receivedSequence, receivedUtcTicks = lastPoseTicksUtc, hasPose = hasPose };
+            sequence = receivedSequence, receivedUtcTicks = lastPoseTicksUtc, hasPose = hasPose, ficTracRow=isFicTracRow };
     }
     private bool hasPose;
+    private bool isFicTracRow;
     public Pose pose
     {
         get { lock (poseLock) return latestPose; }
@@ -103,11 +106,12 @@ public class ZmqListener : MonoBehaviour
         Endpoint = endpoint;
         workerState = "starting";
         isRunning = true;
-        listenerThread = new Thread(() => Listen(endpoint)) { IsBackground = true, Name = name + "_ZmqListener" };
+        ClosedLoopMode interpretation=backend;
+        listenerThread = new Thread(() => Listen(endpoint,interpretation)) { IsBackground = true, Name = name + "_ZmqListener" };
         listenerThread.Start();
     }
 
-    private void Listen(string endpoint)
+    private void Listen(string endpoint,ClosedLoopMode interpretation)
     {
         Interlocked.Increment(ref activeWorkerCount);
         // Create, use and dispose on one thread. Main-thread shutdown only sets a flag.
@@ -134,8 +138,8 @@ public class ZmqListener : MonoBehaviour
                             // Kinefly's ROS bridge sends a single JSON frame, with no topic.
                             // Older publishers may send the topic as a separate message.
                             // Do not discard alternate JSON samples as the old paired reads did.
-                            if (!json.StartsWith("{", StringComparison.Ordinal)) continue;
-                            format = "single JSON";
+                            if (!TrackerWireDecoder.IsPayload(json)) continue;
+                            format = "single frame";
                         }
                         else if (frames.FrameCount == 2)
                         {
@@ -143,7 +147,13 @@ public class ZmqListener : MonoBehaviour
                             format = "topic + JSON";
                         }
                         else throw new FormatException("Expected a JSON pose frame or topic + JSON pose frames.");
-                        UpdatePose(JsonConvert.DeserializeObject<ZmqMessage>(json));
+                        var decoded=TrackerWireDecoder.Decode(json,interpretation);
+                        lock(poseLock)
+                        {
+                            latestRawRotation=decoded.rotation;latestPose=new Pose(decoded.position,decoded.orientation);
+                            isFicTracRow=decoded.ficTracRow;hasPose=true;lastPoseTicksUtc=DateTime.UtcNow.Ticks;receivedSequence++;
+                        }
+                        format=decoded.format=="JSON pose"?(frames.FrameCount==1?"single JSON":"topic + JSON"):decoded.format;
                         if (wireFormat == null) Debug.Log("Tracking input received on " + endpoint + " (" + format + ").");
                         wireFormat = format;
                     }
@@ -192,6 +202,7 @@ public class ZmqListener : MonoBehaviour
             // Apply config values directly
             address = config.zmqAddress;
             port = config.zmqPort;
+            backend = config.closedLoopMode;
 
             Debug.Log($"Applied system config to {gameObject.name}: ZMQ={address}:{port}");
         }
@@ -218,6 +229,7 @@ public class ZmqListener : MonoBehaviour
         {
             latestRawRotation = new Vector3(zmqMessage.pitch, zmqMessage.yaw, zmqMessage.roll);
             latestPose = new Pose(position, rotation);
+            isFicTracRow = false;
             hasPose = true;
             lastPoseTicksUtc = DateTime.UtcNow.Ticks;
             receivedSequence++;
@@ -229,6 +241,7 @@ public class ZmqListener : MonoBehaviour
         lock (poseLock)
         {
             latestPose = value;
+            isFicTracRow = false;
             hasPose = true;
             lastPoseTicksUtc = DateTime.UtcNow.Ticks;
             receivedSequence++;

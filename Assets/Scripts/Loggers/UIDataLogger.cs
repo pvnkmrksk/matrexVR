@@ -99,6 +99,7 @@ public class UIDataLogger : MonoBehaviour
             }
         }
 
+        MainController.Instance?.SetAnimalMetadata(animalData);
         string json = JsonConvert.SerializeObject(animalData, Formatting.Indented);
         WriteJsonToFile(json);
     }

@@ -40,7 +40,7 @@ def prepare(ref, project):
                     p = Path(current) / name
                     if not any(p.iterdir()):
                         p.rmdir()
-        changed = [p for p in git('diff', '--name-only', ref, '--', 'Assets', 'Packages', 'ProjectSettings').decode().splitlines() if p in tracked]
+        changed = [p for p in git('diff', '--no-renames', '--name-only', ref, '--', 'Assets', 'Packages', 'ProjectSettings').decode().splitlines() if p in tracked]
         for name in changed:
             p = project / name
             p.parent.mkdir(parents=True, exist_ok=True)

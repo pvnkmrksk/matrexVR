@@ -16,7 +16,7 @@ namespace UnityEngine
 }
 
 public class ColorConfig { public float r, g, b, a; }
-public class HeadingReferenceConfig { public void Validate() { } }
+public class HeadingReferenceConfig { public void Validate() { } public void WithinDuration(double duration,out string warning) { warning=null; } }
 public class NightSkyConfig { public bool enabled; public void Validate() { } }
 public static class ExperimentConfigFiles { public static string ReadAllText(string path) => File.ReadAllText(path); }
 public static class ExperimentPhases
