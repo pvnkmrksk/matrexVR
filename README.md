@@ -19,9 +19,9 @@ MATREX VR turns measured animal movement into a controlled visual world: Choice 
 
 > **Current desktop preview: source/local build.** Native fullscreen and Retina-aware UI, the demo/Configure workflow, bundled native trackers and the latest replay fixes are current source. Public **0.1–0.3 downloads remain archival** and do not contain this new desktop experience. No new signed release is implied.
 
-[![Current MATREX VR start screen with Flying and Walking, Night sky and Forest, and a clearly labelled hardware-free demo](docs/images/desktop-ui/quickstart-retina-3024.png)](docs/images/desktop-ui/quickstart-retina-3024.png)
+[![MATREX VR native Mac start screen with a hardware-free Night sky demo and separate Configure workspace](docs/images/desktop-ui/start-native-3024.png)](docs/images/desktop-ui/start-native-3024.png)
 
-*Earlier Unity UI capture at 2× scale, with synthetic profile data; the current workflow is described below. [Sequence editor](docs/images/desktop-ui/sequence-1920.png) · [Experiment controls](docs/images/desktop-ui/motion-1920.png) · [Tooltips](docs/images/desktop-ui/hover-help-1920.png) · [Capture provenance](docs/images/desktop-ui/provenance.json).*
+*Actual Mac player at native 3024 × 1898 with 2× UI scale and a fresh demo profile. [Capture provenance](docs/images/desktop-ui/current-player-provenance.json). Earlier editor views: [Sequence](docs/images/desktop-ui/sequence-1920.png) · [Parameters](docs/images/desktop-ui/motion-1920.png) · [Tooltips](docs/images/desktop-ui/hover-help-1920.png).*
 
 ## Try the current desktop preview
 

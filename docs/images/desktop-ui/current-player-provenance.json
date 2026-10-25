@@ -1,0 +1,36 @@
+{
+  "unity": "6000.3.16f1",
+  "os": "Mac OS X 27.0.1",
+  "screen": {
+    "width": 3024,
+    "height": 1898,
+    "mode": "FullScreenWindow",
+    "dpi": 255.0
+  },
+  "native": {
+    "width": 3024,
+    "height": 1898
+  },
+  "display": {
+    "name": "Built-in Retina Display",
+    "width": 3024,
+    "height": 1898
+  },
+  "ui": {
+    "scale": 2.0,
+    "panelScale": 2.0,
+    "directFramebuffer": true,
+    "logicalWidth": 1512.0,
+    "logicalHeight": 949.0
+  },
+  "profile": {
+    "mode": "flying",
+    "scene": "night-sky",
+    "demo": true
+  },
+  "source": "Actual standalone Mac player framebuffer, captured by DesktopPlayerDiagnostics; synthetic fresh demo profile; no camera or LED hardware claim.",
+  "runtimeSourceRevision": "87c425dd29211c6cd6192a77fa3f384e27b33937",
+  "image": "start-native-3024.png",
+  "imageSha256": "05493fefc03e18699e2616bd0169f79e4eee0e3e38c272bfe68bc6484f4fa454",
+  "manualInteraction": "Unavailable during this capture because macOS was locked; native UI Toolkit interaction suite separately passed393 assertions."
+}
