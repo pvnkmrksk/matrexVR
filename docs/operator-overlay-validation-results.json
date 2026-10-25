@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "testedUtc": "2026-10-25T22:11:25.312069+00:00",
+  "testedUtc": "2026-10-25T22:23:17.959429+00:00",
   "passed": true,
   "native": {
-    "assertions": 172,
+    "assertions": 190,
     "layouts": 7,
     "unity": "6000.3.16f1",
     "gpu": "Apple M2 Pro",
@@ -23,7 +23,7 @@
         "startCol": 0,
         "fullDisplay": false,
         "ledPixelsChanged": 0,
-        "operatorPixelsDrawn": 334061,
+        "operatorPixelsDrawn": 334059,
         "overviewVisible": true,
         "width": 1920,
         "height": 1080
@@ -37,7 +37,7 @@
         "startCol": 0,
         "fullDisplay": false,
         "ledPixelsChanged": 0,
-        "operatorPixelsDrawn": 334051,
+        "operatorPixelsDrawn": 334078,
         "overviewVisible": true,
         "width": 1920,
         "height": 1080
@@ -51,7 +51,7 @@
         "startCol": 0,
         "fullDisplay": false,
         "ledPixelsChanged": 0,
-        "operatorPixelsDrawn": 422990,
+        "operatorPixelsDrawn": 422966,
         "overviewVisible": true,
         "width": 1920,
         "height": 1080
@@ -65,7 +65,7 @@
         "startCol": 0,
         "fullDisplay": false,
         "ledPixelsChanged": 0,
-        "operatorPixelsDrawn": 422983,
+        "operatorPixelsDrawn": 423024,
         "overviewVisible": true,
         "width": 1920,
         "height": 1080
@@ -79,7 +79,7 @@
         "startCol": 11,
         "fullDisplay": false,
         "ledPixelsChanged": 0,
-        "operatorPixelsDrawn": 334006,
+        "operatorPixelsDrawn": 334100,
         "overviewVisible": true,
         "width": 1920,
         "height": 1080
@@ -93,7 +93,7 @@
         "startCol": 9,
         "fullDisplay": false,
         "ledPixelsChanged": 0,
-        "operatorPixelsDrawn": 334026,
+        "operatorPixelsDrawn": 334047,
         "overviewVisible": true,
         "width": 1920,
         "height": 1080
@@ -124,7 +124,16 @@
     ],
     "tolerance": "Per-channel byte difference greater than2 counts as a changed pixel; all interior and edge raster pixels whose centers fall inside calibrated LED rectangles are included.",
     "command": "Unity -projectPath <marked-disposable-copy> -executeMethod OperatorOverlayValidation.Run -logFile <log> (graphics enabled, naturally rendering Game view)",
-    "artifactDirectory": ".integration/overlay-ui-project/operator-overlay-validation (ignored local evidence;35 PNGs)"
+    "artifactDirectory": ".integration/overlay-ui-project/operator-overlay-validation (ignored local evidence;35 PNGs)",
+    "framebufferAssertions": 172,
+    "lifecycleAssertions": 18,
+    "lifecycleChecks": [
+      "Destroying duplicate FPS/status components preserves the exact real owner reservation and layout revision",
+      "Disabling FPS/status immediately hides graphics and releases owner keys; later frames stay unreserved",
+      "Calling SetVisible(true) cannot show a disabled status component",
+      "Disabling overview hides its independent canvas/cameras and releases its render texture; shared visibility callbacks cannot revive it",
+      "Re-enabling each component reacquires layout and restores its canvas; overview cameras/background/render texture return"
+    ]
   },
   "offline": {
     "assertions": 6428,
@@ -143,15 +152,15 @@
       "matchesCurrentWorkspace": true
     },
     "Assets/Scripts/RuntimeStatusOverlay.cs": {
-      "sha256": "03f9d5a46aea1c9f2967625eacc522fbd97324141f5273f62f4df98c2af0bf90",
+      "sha256": "6426be48c7fef321d0dad6cfffc7a8c2c361e9f80f51a6d24c987f9538dd7142",
       "matchesCurrentWorkspace": true
     },
     "Assets/Scripts/fps.cs": {
-      "sha256": "e91b83aed788ad5bff4a06f51360db5f5c7f6772347914e2de36621b7c161719",
+      "sha256": "c4c9c88f595f4a6af6e752c352ffb6c2a7b8395c68c5960da4833cf608c3ad95",
       "matchesCurrentWorkspace": true
     },
     "Assets/Scripts/SimpleOverheadCamera.cs": {
-      "sha256": "8019f9882e011e528034a5e1bd8e14a5be0b736c3b7e1ab85c4184c1af8be9e5",
+      "sha256": "33da63331ff0739a65092b50c0ee6cfe371279718e0900ff7532bcc9b693a62c",
       "matchesCurrentWorkspace": true
     },
     "Assets/Scripts/ViewportSetter.cs": {
@@ -159,9 +168,10 @@
       "matchesCurrentWorkspace": true
     },
     "Assets/Editor/OperatorOverlayValidation.cs": {
-      "sha256": "2c1d94ea708b7705834b75e82f5b66d0338039114d3a2ee967ba4007e0b0ef51",
+      "sha256": "a2d87b99df624c0a2f83a239a83547520fefbed2134731c28d2802eafddec2a9",
       "matchesCurrentWorkspace": true
     }
   },
-  "scope": "Synthetic solid-color stimulus and operator UI compositing only. No physical LED receiver, monitor mapping, animal, tracker camera, experiment acquisition or native-player performance measurement. Desktop preview UI Toolkit and replay IMGUI hiding are separate production paths and are not claimed by these framebuffer cases."
+  "scope": "Synthetic solid-color stimulus and operator UI compositing only. No physical LED receiver, monitor mapping, animal, tracker camera, experiment acquisition or native-player performance measurement. Desktop preview UI Toolkit and replay IMGUI hiding are separate production paths and are not claimed by these framebuffer cases.",
+  "runtimeRevision": "87c425dd29211c6cd6192a77fa3f384e27b33937"
 }

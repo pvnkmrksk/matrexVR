@@ -30,6 +30,7 @@ public static class OperatorOverlayValidation
     private static UnityEngine.InputSystem.Keyboard keyboard;
     private static double deadline;
     private static bool finished;
+    private static int lifecycleAssertions;
     private static string Output=>Path.Combine(Application.dataPath,"../operator-overlay-validation");
     static OperatorOverlayValidation()
     {
@@ -104,6 +105,7 @@ public static class OperatorOverlayValidation
         overview=new GameObject("Production overview validation").AddComponent<SimpleOverheadCamera>();status.SetVisible(true);
         for(int n=0;n<10;n++)yield return null;
         Check(Screen.width==1920&&Screen.height==1080,"actual Game-view framebuffer uses1920x1080 pixels");
+        var lifecycle=ExerciseLifecycle();while(lifecycle.MoveNext())yield return lifecycle.Current;
         // Cover sparse strips, common4-rig6-face apparatus, vertical wiring, and a fully allocated display.
         foreach(var layout in new[]{new[]{1,4,64,1,0,0},new[]{4,6,128,1,0,0},new[]{4,6,128,0,0,0},new[]{1,4,128,1,7,0},new[]{1,4,128,1,0,11},new[]{1,4,128,1,7,9},new[]{1,1,1920,2,0,0}}){
             ConfigureStimulus(layout[0],layout[1],layout[2],layout[3],layout[4],layout[5]);
@@ -136,6 +138,52 @@ public static class OperatorOverlayValidation
         }
         Finish(null);
     }
+    private static IEnumerator ExerciseLifecycle()
+    {
+        ConfigureStimulus(1,4,64,1,0,0);OperatorOverlayVisibility.SetHidden(false);
+        for(int n=0;n<5;n++)yield return null;
+        int before=checks.Count;
+        var allocations=(System.Collections.IDictionary)typeof(OperatorOverlayLayout).GetField("reservations",BindingFlags.Static|BindingFlags.NonPublic).GetValue(null);
+        string overviewOwner="overview-"+overview.GetInstanceID();
+        Check(allocations.Contains("fps")&&allocations.Contains("status")&&allocations.Contains(overviewOwner),"all three production overlays own reservations before lifecycle checks");
+        object realFps=allocations["fps"],realStatus=allocations["status"];int revision=OperatorOverlayLayout.Revision;
+        var duplicateFps=new GameObject("Duplicate FPS lifecycle fixture");duplicateFps.AddComponent<fps>();Object.DestroyImmediate(duplicateFps);
+        Check(ReferenceEquals(realFps,allocations["fps"])&&OperatorOverlayLayout.Revision==revision,"duplicate FPS destruction cannot release the real owner's reservation");
+        Check(frames.enabled&&frames.OverlayVisible,"duplicate FPS destruction leaves the real canvas visible");
+        var duplicateStatus=new GameObject("Duplicate status lifecycle fixture");duplicateStatus.AddComponent<RuntimeStatusOverlay>();Object.DestroyImmediate(duplicateStatus);
+        Check(ReferenceEquals(realStatus,allocations["status"])&&OperatorOverlayLayout.Revision==revision,"duplicate status destruction cannot release the real owner's reservation");
+        Check(status.enabled&&Field<GameObject>(status,"panel").activeInHierarchy,"duplicate status destruction leaves the real panel visible");
+
+        frames.enabled=false;
+        Check(!frames.OverlayVisible&&!allocations.Contains("fps"),"disabling FPS hides its independent canvas and releases its owner key immediately");
+        for(int n=0;n<3;n++)yield return null;
+        Check(!frames.OverlayVisible&&!allocations.Contains("fps"),"disabled FPS cannot reclaim space on later frames");
+        frames.enabled=true;for(int n=0;n<4;n++)yield return null;
+        Check(frames.OverlayVisible&&allocations.Contains("fps"),"re-enabling FPS restores its real canvas and reservation");
+
+        status.enabled=false;
+        Check(!Field<GameObject>(status,"panel").activeSelf&&!allocations.Contains("status"),"disabling status hides its panel and releases its owner key immediately");
+        status.SetVisible(true);
+        Check(!status.ShouldDisplay&&!Field<GameObject>(status,"panel").activeSelf,"explicit show cannot resurrect a disabled status component");
+        for(int n=0;n<3;n++)yield return null;
+        Check(!Field<GameObject>(status,"panel").activeSelf&&!allocations.Contains("status"),"disabled status stays hidden without a stale allocation");
+        status.enabled=true;for(int n=0;n<4;n++)yield return null;
+        Check(status.ShouldDisplay&&Field<GameObject>(status,"panel").activeInHierarchy&&allocations.Contains("status"),"re-enabling status restores its panel and reservation");
+
+        var overviewCamera=Field<Camera>(overview,"overheadCam");var background=Field<GameObject>(overview,"backgroundObject");var texture=Field<RenderTexture>(overview,"renderTexture");
+        Check(OverviewCanvas().enabled&&overviewCamera.enabled&&background.activeSelf&&texture.IsCreated(),"overview owns live output cameras and render texture before disable");
+        overview.enabled=false;
+        Check(!allocations.Contains(overviewOwner)&&!OverviewCanvas().enabled,"disabling overview hides its independent canvas and releases its owner key immediately");
+        Check(!overviewCamera.enabled&&!overviewCamera.gameObject.activeSelf&&!background.activeSelf&&!texture.IsCreated(),"disabling overview stops cameras and releases its render texture immediately");
+        OperatorOverlayVisibility.SetHidden(true);OperatorOverlayVisibility.SetHidden(false);
+        Check(!OverviewCanvas().enabled&&!overviewCamera.enabled&&!texture.IsCreated(),"shared visibility callbacks cannot resurrect a disabled overview");
+        for(int n=0;n<3;n++)yield return null;
+        Check(!allocations.Contains(overviewOwner)&&!OverviewCanvas().enabled,"disabled overview stays hidden without a stale allocation");
+        overview.enabled=true;for(int n=0;n<5;n++)yield return null;
+        Check(allocations.Contains(overviewOwner)&&OverviewCanvas().enabled&&overviewCamera.enabled&&background.activeSelf&&texture.IsCreated(),"re-enabling overview reacquires space, canvas, cameras and render texture");
+        lifecycleAssertions=checks.Count-before;
+    }
+    private static T Field<T>(object owner,string name)=> (T)owner.GetType().GetField(name,Hidden).GetValue(owner);
     private static Canvas OverviewCanvas()=>GameObject.Find("Overhead Camera Canvas").GetComponent<Canvas>();
     private static void PressTab(){if(EventSystem.current!=null)EventSystem.current.SetSelectedGameObject(null);InputSystem.QueueStateEvent(keyboard,new KeyboardState(UnityEngine.InputSystem.Key.Tab));InputSystem.Update();}
     private static void ReleaseTab(){InputSystem.QueueStateEvent(keyboard,new KeyboardState());InputSystem.Update();}
@@ -178,7 +226,7 @@ public static class OperatorOverlayValidation
     {
         if(finished)return;finished=true;SessionState.SetBool(Key,false);EditorApplication.update-=Watchdog;Application.logMessageReceived-=Log;
         if(keyboard!=null)InputSystem.RemoveDevice(keyboard);
-        Directory.CreateDirectory(Output);File.WriteAllText(Path.Combine(Output,"results.json"),JsonConvert.SerializeObject(new{failure,checks=checks.Count,passed=checks,cases,errors,unity=Application.unityVersion,gpu=SystemInfo.graphicsDeviceName,scope="Natural Game-view framebuffer ScreenCapture at end-of-frame, unchanged ScreenSpaceOverlay status/FPS/overview canvases, actual queued Tab keyboard input; synthetic solid-color stimulus only, no tracker/camera acquisition or experiment"},Formatting.Indented));
+        Directory.CreateDirectory(Output);File.WriteAllText(Path.Combine(Output,"results.json"),JsonConvert.SerializeObject(new{failure,checks=checks.Count,lifecycleAssertions,framebufferAssertions=checks.Count-lifecycleAssertions,passed=checks,cases,errors,unity=Application.unityVersion,gpu=SystemInfo.graphicsDeviceName,scope="Natural Game-view framebuffer ScreenCapture at end-of-frame, unchanged ScreenSpaceOverlay status/FPS/overview canvases, actual queued Tab keyboard input; production duplicate/disable/re-enable lifecycle checks; synthetic solid-color stimulus only, no tracker/camera acquisition or experiment"},Formatting.Indented));
         EditorApplication.Exit(failure==null&&errors.Count==0?0:1);
     }
 }
