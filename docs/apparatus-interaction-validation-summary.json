@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-25",
+  "unity": "6000.3.16f1",
+  "result": "passed",
+  "nativeAssertions": 393,
+  "runtimeErrors": [],
+  "entryPoint": "ApparatusInteractionValidation.Run",
+  "disposableProjectRequired": true,
+  "configurationCases": {
+    "vrCounts": [
+      1,
+      4,
+      8
+    ],
+    "faces": [
+      4,
+      6
+    ],
+    "panelPixels": [
+      64,
+      128
+    ],
+    "movement": [
+      "flying",
+      "walking"
+    ],
+    "packing": [
+      "horizontal",
+      "vertical"
+    ],
+    "combinations": 48
+  },
+  "covered": [
+    "Unconfigured first run uses an explicit demo with secondary options collapsed",
+    "Configure forks system, sequence and experiments; saving leaves original demo bytes identical",
+    "An untouched starter becomes closed-loop walking with autopilot disabled after Walking hardware selection",
+    "Exact face letters and framebuffer pixel geometry match authoritative JSON",
+    "VR2 movement and arbitrary panel-size edits retain scroll offset and foldout expansion",
+    "Gain slider range is 0–50; manual -12.5 and 250 remain exact",
+    "Collapsed navigation retains descriptive Configure tooltip and restores full navigation",
+    "Configured home prioritizes sequence; species and hardware choices remain in Configure",
+    "Start rejects disconnected display indices and LED rectangles beyond connected framebuffer bounds",
+    "Injected native preparation handles four rigs exactly once and starts once",
+    "Imported geometry, calibration references, unknown fields and external/manual launch preference survive review"
+  ],
+  "offlineChecks": {
+    "apparatusAndStarterFork": 43,
+    "profileInitializationCases": 5
+  },
+  "scope": "Rendered native UI Toolkit in a disposable Unity Editor project at 1920×1080. Values and submit events use actual UI controls. Companion preparation and experiment start are injected no-launch callbacks. No animal, camera, tracker process or experimental scene starts; this does not prove physical LED wiring or camera tracking.",
+  "editorDiagnostics": [
+    {
+      "classification": "Unity Editor Search startup indexing",
+      "applicationError": false,
+      "stack": "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.\nParameter name: index\nSystem.Collections.Generic.List`1[T].get_Item (System.Int32 index) (at <c5eeda5e65d44b388e164c6c5cfe0702>:0)\nUnityEditor.Search.SearchDatabase+<EnumerateAll>d__80.MoveNext () (at /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/Indexing/SearchDatabase.cs:445)\nSystem.Linq.Enumerable.TryGetFirst[TSource] (System.Collections.Generic.IEnumerable`1[T] source, System.Boolean& found) (at <8203c5af529241e2a5cc4b3c5a3dc69a>:0)\nSystem.Linq.Enumerable.First[TSource] (System.Collections.Generic.IEnumerable`1[T] source) (at <8203c5af529241e2a5cc4b3c5a3dc69a>:0)\nUnityEditor.Search.SearchDatabase.GetDefaultSearchDatabase () (at /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/Indexing/SearchDatabase.cs:420)\nUnityEditor.Search.SearchInit.IndexationOnStartup () (at /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/SearchInit.cs:109)\nUnityEditor.EditorApplication.Internal_CallDelayFunctions () (at /Users/bokken/build/output/unity/unity/Editor/Mono/EditorApplication.cs:407)\n"
+    }
+  ],
+  "screenshots": [
+    "demo-home.png",
+    "configured-daily-home.png",
+    "led-one-vr-four-faces.png",
+    "led-four-vr-six-faces.png",
+    "configure-scrolled-vr2.png",
+    "gain-manual-override.png"
+  ],
+  "localEvidenceDirectory": ".integration/apparatus-ui-project/apparatus-interaction-validation"
+}
