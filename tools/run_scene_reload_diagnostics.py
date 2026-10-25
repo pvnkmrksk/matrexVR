@@ -122,6 +122,7 @@ def main():
                 if lib.zmq_connect(sock, f'tcp://127.0.0.1:{args.base_port}'.encode()) != 0:
                     raise RuntimeError('Could not observe native tracker endpoint')
                 started, next_report, sample, last_frame = time.monotonic(), time.monotonic(), 0, -1
+                last_packet = started
                 buffer = ctypes.create_string_buffer(1024*1024)
                 with (output/'publisher.jsonl').open('w') as writer:
                     while not stop.is_set():
@@ -129,8 +130,8 @@ def main():
                             raise RuntimeError(f'Native tracker exited during reload protocol: {native.returncode}')
                         size = lib.zmq_recv(sock, buffer, len(buffer), 0)
                         if size < 0:
-                            if time.monotonic()-started > 10 and not ready.is_set():
-                                raise RuntimeError('Native tracker produced no verified demo packets')
+                            if time.monotonic()-last_packet > 10:
+                                raise RuntimeError('Native tracker stopped producing verified demo packets')
                             continue
                         packet = json.loads(buffer.raw[:size])
                         if packet.get('source_kind') != 'demo' or packet.get('source_fallback') is not False:
@@ -139,6 +140,7 @@ def main():
                         if not isinstance(frame, int) or frame <= last_frame:
                             raise RuntimeError('Native frame numbers did not progress')
                         last_frame = frame; sample += 1; ready.set()
+                        last_packet = time.monotonic()
                         if time.monotonic() >= next_report:
                             writer.write(json.dumps({'utc': utc(), 'nativePid': native.pid, 'observedPackets': sample, 'nativeFrame': frame, 'sourceKind': packet['source_kind'], 'sourceFallback': packet['source_fallback'], 'ports': [args.base_port], 'elapsedSeconds': time.monotonic()-started})+'\n')
                             writer.flush(); next_report += 1
@@ -287,7 +289,8 @@ def main():
     metadata['newCrashReports'] = new_crashes
     (output/'completion.json').write_text(json.dumps(metadata, indent=2))
     print(json.dumps({key:value for key,value in metadata.items() if key!='runtimeSha256'}, indent=2), flush=True)
-    raise SystemExit(code)
+    failed = bool(supervisor_failure or errors or (native_metadata is not None and native_metadata.get('exitCode') != 0))
+    raise SystemExit(code or (1 if failed else 0))
 
 
 if __name__ == '__main__':

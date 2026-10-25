@@ -271,10 +271,11 @@ public static class SceneReloadDiagnostics
     private static void Finish(string failure)
     {
         if(events==null)return;
+        bool passed=failure==null && runtimeErrors.Count==0 && coverageFailures==0 && loads==targetLoads;
         EditorApplication.update-=Tick;Application.logMessageReceivedThreaded-=OnLog;SceneManager.sceneLoaded-=Loaded;SceneManager.sceneUnloaded-=Unloaded;Camera.onPostRender-=Rendered;SessionState.SetBool(ActiveKey,false);ReleaseTargets();
         lock(logGate)
         {
-            File.WriteAllText(Path.Combine(output,"summary.json"),JsonConvert.SerializeObject(new{completed=failure==null,passed=failure==null && runtimeErrors.Count==0 && coverageFailures==0 && loads==targetLoads,sourceSha,unity=Application.unityVersion,gpu=SystemInfo.graphicsDeviceName,graphicsApi=SystemInfo.graphicsDeviceType.ToString(),loads,targetLoads,experimentDurationSeconds=duration,forcedFullReload=true,coverageFailures,cleanupSampled,elapsedSeconds=EditorApplication.timeSinceStartup-runStarted,failure,runtimeErrors,steps=rows,
+            File.WriteAllText(Path.Combine(output,"summary.json"),JsonConvert.SerializeObject(new{completed=failure==null,passed,sourceSha,unity=Application.unityVersion,gpu=SystemInfo.graphicsDeviceName,graphicsApi=SystemInfo.graphicsDeviceType.ToString(),loads,targetLoads,experimentDurationSeconds=duration,forcedFullReload=true,coverageFailures,cleanupSampled,elapsedSeconds=EditorApplication.timeSinceStartup-runStarted,failure,runtimeErrors,steps=rows,
                 input=Argument("-soak-input-description","Four explicit synthetic120Hz PUBs; no camera or animal measurement."),
                 backend=Argument("-soak-backend","Kinefly"),sharedInput=Argument("-soak-shared-input","false")=="true",
                 note="Full reloads with four progressing SUB listeners. Active samples are taken after Start, not at sceneLoaded. Explicit offscreen renders supplement natural display rendering; diagnostic targets are counted separately. A completed non-crashing run does not identify the historical crash cause."},Formatting.Indented));
@@ -285,7 +286,7 @@ public static class SceneReloadDiagnostics
         foreach(string name in new[]{"system_config.json","sequenceConfig.json"}){string path=Path.Combine(original,name);if(File.Exists(path))File.Copy(path,Path.Combine(Application.streamingAssetsPath,name),true);}
         foreach(string name in new[]{"__reload-diagnostic-choice.json","__reload-diagnostic-swarm.json","__reload-diagnostic-design.json"})
         {string path=Path.Combine(Application.streamingAssetsPath,name);if(File.Exists(path))File.Delete(path);if(File.Exists(path+".meta"))File.Delete(path+".meta");}
-        EditorApplication.Exit(failure==null?0:1);
+        EditorApplication.Exit(passed?0:1);
     }
     private static void WriteConfigurations(string root,string[] names,int count,double seconds,int port,string profile,string backend,bool sharedInput)
     {
