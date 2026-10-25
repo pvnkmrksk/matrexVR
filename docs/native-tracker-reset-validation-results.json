@@ -1,7 +1,7 @@
 {
   "date": "2026-10-25",
   "passed": true,
-  "scope": "Native Unity Editor/Metal full same-scene reload endurance on one Mac; native Rekkefly uses an explicitly generated demo, not a camera or animal measurement. This tests base10b6c403 before the later missing-face-camera/UI changes.",
+  "scope": "Native Unity Editor/Metal full same-scene reload endurance on one Mac; native Rekkefly uses an explicitly generated demo, not a camera or animal measurement. This tests base 10b6c403 before the later missing-face-camera/UI changes.",
   "runtimeSourceRevision": "10b6c403810b10e1e0279ecc2f0c40419087855f",
   "diagnosticCommit": "c1da4228",
   "diagnosticsSha256": "2ee5f6277ac2c340034f48a444c92b4c5be1e5ce2b1e6e8957f9ea8fafffef7a",
@@ -21,7 +21,7 @@
       128,
       128
     ],
-    "sourceGeometry": "All20 authored face cameras rendered; sixrequestedfaces revealmissingU in this olderprefab, addressed by a separate later fix."
+    "sourceGeometry": "All 20 authored face cameras rendered; six requested faces revealmissingU in this older prefab, addressed by a separate later fix."
   },
   "coverage": {
     "activeSamples": 600,
@@ -204,7 +204,7 @@
       "last5Median": 430187452,
       "slopePer100Reloads": 2741388.93539094
     },
-    "note": "Managed/Unityallocated memory modestly increased while native livecounts remained constant; RSS fell during the run. Allocator/editor caches and resource ownership are reported separately."
+    "note": "Managed/Unity allocated memory modestly increased while native live counts remained constant; RSS fell during the run. Allocator/editor caches and resource ownership are reported separately."
   },
   "teardown": [
     {
@@ -237,7 +237,7 @@
   ],
   "limits": [
     "No original historical Unity crash dump establishes one single cause.",
-    "This bounded Mac/Editor demo-input test does not certify physical-camera drivers, LEDhardware timing, other OSes, multi-hour runs or arbitrary custom scenes.",
+    "This bounded Mac/Editor demo-input test does not certify physical-camera drivers, LED hardware timing, other OSes, multi-hour runs or arbitrary custom scenes.",
     "Later missing-face-camera and UI changes need their own final-source validation."
   ],
   "rawLocalDirectory": ".release-work/scene-reload-diagnostics/native-rekkefly-300x2s"

@@ -1,0 +1,174 @@
+{
+  "passed": true,
+  "runtimeBaseCommit": "10b6c403810b10e1e0279ecc2f0c40419087855f",
+  "viewportFeatureCommit": "ed840570",
+  "viewportSetterSha256": "6e2d057905613c463f10a86dfcd6a31706a03a57e50e62ce4572a8aa4196374d",
+  "diagnosticsSha256": "8da9cc24388f177d18528e621caeb4dc80ae2305f835da29f38da37a6b738913",
+  "scope": "Base runtime plus missing-face camera fix; later overlay and apparatus UI work is not included. Actual Unity Editor/Metal rendering with native explicit-demo tracker input; no physical camera or LED hardware claim.",
+  "protocol": {
+    "loads": 30,
+    "configuredDurationSeconds": 2,
+    "sameScene": "Choice_desync",
+    "forcedFullReload": true,
+    "VRs": 4,
+    "facesPerVR": 6,
+    "pixelsPerFace": [
+      128,
+      128
+    ]
+  },
+  "coverage": {
+    "activeSamples": 60,
+    "minimumLiveInputComponents": 4,
+    "minimumInputComponents": 4,
+    "staleOrNonprogressingInputObservations": 0,
+    "renderedFaces": [
+      24
+    ],
+    "naturalCameraRenders": 33708,
+    "forcedCameraRenders": 67392
+  },
+  "allRequestedFacesCoveredAtEveryActiveSample": true,
+  "durations": {
+    "minimum": 2.008543333999995,
+    "median": 2.2009606875000003,
+    "maximum": 2.3905223750000015,
+    "totalSceneSeconds": 66.028567
+  },
+  "nativeTracker": {
+    "executableSha256": "631ce45f37bf9af9969abad1e00997d2b8b208ccffb2236c7ea1e8cd771bb644",
+    "configSha256": "9a10f7ce0f5550e954ff6db7371c7fcbcd565ef44a1d06bb053809861a3c23a1",
+    "singleNativePid": 3534,
+    "observedPids": [
+      3534
+    ],
+    "observedSourceKinds": [
+      "demo"
+    ],
+    "fallbackEverObserved": false,
+    "firstNativeFrame": 4,
+    "lastNativeFrame": 10201,
+    "observedPackets": 10198,
+    "nativeExitCode": 0,
+    "finalNativeSummary": {
+      "frames": 10315,
+      "frames_per_second": 119.89681510481384,
+      "recording": {
+        "accepted": 0,
+        "directory": null,
+        "error": null,
+        "written": 0
+      },
+      "seconds": 86.032310291,
+      "source": "Simulated fly",
+      "udp_dropped": 0,
+      "zmq_dropped": 0
+    },
+    "sourceScope": "Real native Rekkefly acquisition/tracking/publisher process using its explicit generated demo, not a camera or animal measurement."
+  },
+  "after20WarmupLoads": {
+    "fileDescriptors": {
+      "first": 113,
+      "last": 113,
+      "minimum": 113,
+      "maximum": 113,
+      "median": 113.0,
+      "first5Median": 113,
+      "last5Median": 113,
+      "slopePer100Reloads": 0.0
+    },
+    "activeTrackingWorkers": {
+      "first": 4,
+      "last": 4,
+      "minimum": 4,
+      "maximum": 4,
+      "median": 4.0,
+      "first5Median": 4,
+      "last5Median": 4,
+      "slopePer100Reloads": 0.0
+    },
+    "activeAsyncWriters": {
+      "first": 0,
+      "last": 0,
+      "minimum": 0,
+      "maximum": 0,
+      "median": 0.0,
+      "first5Median": 0,
+      "last5Median": 0,
+      "slopePer100Reloads": 0.0
+    },
+    "ownedTrialMaterials": {
+      "first": 8,
+      "last": 8,
+      "minimum": 8,
+      "maximum": 8,
+      "median": 8.0,
+      "first5Median": 8,
+      "last5Median": 8,
+      "slopePer100Reloads": 0.0
+    },
+    "materials.nonPersistentCount": {
+      "first": 45,
+      "last": 45,
+      "minimum": 45,
+      "maximum": 45,
+      "median": 45.0,
+      "first5Median": 45,
+      "last5Median": 45,
+      "slopePer100Reloads": 0.0
+    },
+    "meshes.nonPersistentCount": {
+      "first": 1,
+      "last": 1,
+      "minimum": 1,
+      "maximum": 1,
+      "median": 1.0,
+      "first5Median": 1,
+      "last5Median": 1,
+      "slopePer100Reloads": 0.0
+    },
+    "textures.nonPersistentCount": {
+      "first": 96,
+      "last": 96,
+      "minimum": 96,
+      "maximum": 96,
+      "median": 96.0,
+      "first5Median": 96,
+      "last5Median": 96,
+      "slopePer100Reloads": 0.0
+    },
+    "renderTextures.nonPersistentCount": {
+      "first": 28,
+      "last": 28,
+      "minimum": 28,
+      "maximum": 28,
+      "median": 28.0,
+      "first5Median": 28,
+      "last5Median": 28,
+      "slopePer100Reloads": 0.0
+    }
+  },
+  "teardown": [
+    {
+      "kind": "after-scene-teardown-no-forced-GC",
+      "activeTrackingWorkers": 0,
+      "activeAsyncWriters": 0,
+      "ownedTrialMaterials": 0,
+      "diagnosticRenderTargets": 0,
+      "fileDescriptors": 97
+    },
+    {
+      "kind": "after-explicit-GC-and-UnloadUnusedAssets",
+      "activeTrackingWorkers": 0,
+      "activeAsyncWriters": 0,
+      "ownedTrialMaterials": 0,
+      "diagnosticRenderTargets": 0,
+      "fileDescriptors": 97
+    }
+  ],
+  "teardownBeforeForcedGCPassed": true,
+  "runtimeErrors": [],
+  "newCrashReports": [],
+  "editorOnlyExceptionCount": 1,
+  "rawLocalDirectory": ".release-work/scene-reload-diagnostics/native-rekkefly-six-face-30x2s"
+}

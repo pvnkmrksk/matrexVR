@@ -247,6 +247,15 @@ public static class SceneReloadDiagnostics
                 sequenceCounter=sampleType.GetField("sequence")!=null?"packet-count":"last-received-UTC-ticks"});
         }
         var cameras=Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).Where(c=>c.enabled && c.gameObject.scene.handle==sceneHandle && c.GetComponentInParent<ViewportSetter>()!=null).ToArray();
+        var layouts=new List<object>();bool requestedFacesCovered=true;
+        foreach(var viewport in Object.FindObjectsByType<ViewportSetter>(FindObjectsSortMode.None).Where(v=>v.isActiveAndEnabled && v.gameObject.scene.handle==sceneHandle))
+        {
+            string order=MainController.Instance.TryGetSystemConfigForGameObject(viewport.gameObject,out SystemConfig rigConfig)?ViewportSetter.NormalizeDisplayOrder(rigConfig.displayOrder):"";
+            var owned=viewport.GetComponentsInChildren<Camera>(true).Where(c=>c.GetComponentInParent<ViewportSetter>(true)==viewport).ToArray();
+            var missing=order.Where(face=>!owned.Any(c=>c.name=="Main Camera "+face && c.enabled && c.gameObject.activeInHierarchy)).Select(face=>face.ToString()).ToArray();
+            requestedFacesCovered&=order.Length>0 && missing.Length==0;
+            layouts.Add(new{name=viewport.name,requestedOrder=order,availableCameras=owned.Select(c=>c.name).ToArray(),enabledCameras=owned.Where(c=>c.enabled && c.gameObject.activeInHierarchy).Select(c=>c.name).ToArray(),missingRequestedFaces=missing});
+        }
         var writerState=Object.FindObjectsByType<SwarmLogger>(FindObjectsSortMode.None).Where(w=>w.isActiveAndEnabled && w.gameObject.scene.handle==sceneHandle)
             .Select(w=>new{name=w.name,pending=Property(w,"PendingFrames"),dropped=Property(w,"DroppedFrames"),writtenRows=Property(w,"WrittenRows"),failure=Property(w,"Failure")}).ToArray();
         int expectedCameras=Object.FindObjectsByType<Camera>(FindObjectsInactive.Include,FindObjectsSortMode.None).Count(c=>c.gameObject.activeInHierarchy && c.gameObject.scene.handle==sceneHandle && c.GetComponentInParent<ViewportSetter>()!=null);
@@ -256,13 +265,13 @@ public static class SceneReloadDiagnostics
         int terrains=Object.FindObjectsByType<Terrain>(FindObjectsSortMode.None).Count(t=>t.gameObject.scene.handle==sceneHandle);
         if(kind=="active-after-Start")
         {
-            bool valid=inputs.Length==4 && coverage && expectedCameras>=4 && cameras.Length==expectedCameras && (!forcedRender || renderedFaceIds.Count==expectedCameras);
+            bool valid=inputs.Length==4 && coverage && requestedFacesCovered && expectedCameras>=4 && cameras.Length==expectedCameras && (!forcedRender || renderedFaceIds.Count==expectedCameras);
             if(Argument("-soak-profile","standard")=="terrain-night-sky")valid&=terrains>0 && !string.IsNullOrEmpty(skyId) && skyImage!=null && skyImage.width==4096;
             if(!valid)coverageFailures++;
         }
         long rss=0;try{process.Refresh();rss=process.WorkingSet64;}catch{}
         Write(metrics,new{kind,utc=DateTimeOffset.UtcNow,load=loads,scene=SceneManager.GetActiveScene().name,sceneHandle,frame=Time.frameCount,elapsedInSceneSeconds=elapsed,elapsedTotalSeconds=EditorApplication.timeSinceStartup-runStarted,
-            renderedFramesSinceLoad=Time.frameCount-loadedFrame,expectedPanelCameras=expectedCameras,sourcePanelCameras=cameras.Length,renderedFaceCameraIds=renderedFaceIds.Count,forcedCameraRenders=forcedCameraRenders-loadForcedStart,naturalCameraRenders=naturalCameraRenders-loadNaturalStart,
+            renderedFramesSinceLoad=Time.frameCount-loadedFrame,expectedPanelCameras=expectedCameras,sourcePanelCameras=cameras.Length,requestedFacesCovered,cameraLayouts=layouts,renderedFaceCameraIds=renderedFaceIds.Count,forcedCameraRenders=forcedCameraRenders-loadForcedStart,naturalCameraRenders=naturalCameraRenders-loadNaturalStart,
             rssBytes=rss,managedBytes=GC.GetTotalMemory(false),monoUsedBytes=Profiler.GetMonoUsedSizeLong(),monoHeapBytes=Profiler.GetMonoHeapSizeLong(),unityAllocatedBytes=Profiler.GetTotalAllocatedMemoryLong(),unityReservedBytes=Profiler.GetTotalReservedMemoryLong(),unityUnusedReservedBytes=Profiler.GetTotalUnusedReservedMemoryLong(),graphicsDriverBytes=Profiler.GetAllocatedMemoryForGraphicsDriver(),
             dotnetReportedThreads=ThreadCount(),fileDescriptors=Descriptors(),editorConsoleEntries=ConsoleEntries(),activeTrackingWorkers=StaticProperty("ZmqListener","ActiveWorkerCount"),activeAsyncWriters=StaticProperty("AsyncSwarmWriter","ActiveWriterCount"),ownedTrialMaterials=StaticProperty("RuntimeMaterialOwner","ActiveMaterialCount"),diagnosticRenderTargets=panelTargets.Count,writerState,
             gameObjects=Object.FindObjectsByType<Transform>(FindObjectsInactive.Include,FindObjectsSortMode.None).Length,terrainComponents=terrains,nightSkyId=skyId,skyImageWidth=skyImage==null?0:skyImage.width,skyImageHeight=skyImage==null?0:skyImage.height,materials=TypeMemory<Material>(),meshes=TypeMemory<Mesh>(),textures=TypeMemory<Texture>(),renderTextures=TypeMemory<RenderTexture>(),received,
