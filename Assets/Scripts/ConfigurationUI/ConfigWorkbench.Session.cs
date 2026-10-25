@@ -75,62 +75,73 @@ namespace ConfigurationUI
         }
         private void BuildSessionHome()
         {
-            EnsureMetadata();
+            EnsureDailyWorkspace();EnsureMetadata();UseApparatusStyles();
             var scroll=new ScrollView {name="start-workspace",horizontalScrollerVisibility=ScrollerVisibility.Hidden};scroll.AddToClassList("session-scroll");body.Add(scroll);
-            var welcome=new VisualElement();welcome.AddToClassList("start-welcome");scroll.Add(welcome);
-            var eyebrow=SessionLabel("YOUR NEXT EXPERIMENT","eyebrow");welcome.Add(eyebrow);
-            welcome.Add(SessionLabel("Ready when you are.","start-title"));
-            welcome.Add(SessionLabel("Choose flying or walking, pick a world, and start. Your sequence is always yours to change.","start-subtitle"));
-
-            var launch=Row("launch-workspace");scroll.Add(launch);
-            var choices=new VisualElement();choices.AddToClassList("launch-choices");launch.Add(choices);
-            choices.Add(SessionHeading("How are you moving?","motion"));
-            var movements=Row("movement-choices");choices.Add(movements);
-            movements.Add(MovementChoice("flying","Flying","Wing-angle control with Rekkefly","flying"));
-            movements.Add(MovementChoice("walking","Walking","Ball tracking with HejjéTrac","walking"));
-            var sourceRow=Row("tracking-choice");choices.Add(sourceRow);
-            bool quick=DesktopQuickStart.IsQuickStart(Workspace);
-            bool walkingDemo=quick&&CurrentDemo&&CurrentMovement=="walking";
-            var source=new DropdownField("Tracking input",new List<string>{"Demo · no hardware needed","Camera · use my tracker"},CurrentDemo?0:1) {name="quickstart-input"};
-            source.tooltip=walkingDemo?DesktopPreviewHud.WalkingDemoTooltip:"Demo publishes clearly marked simulated or prerecorded input so you can try the full loop. Camera uses the native tracker and your calibration. Camera selection and calibration remain in the tracker window.";
-            sourceRow.Add(source);
-            source.RegisterValueChangedCallback(e=>ChooseQuickStart(CurrentMovement,CurrentWorld,e.newValue.StartsWith("Demo",StringComparison.Ordinal)));
-            var explanation=SessionLabel(walkingDemo?DesktopPreviewHud.WalkingDemoHelp:quick?(CurrentDemo?"Explore the complete loop now. No camera, animal or apparatus required.":"Your tracker opens independently. Configure its camera, then watch input freshness in the experiment."):"You are using a saved configuration. Choose a starter world to try the bundled experience; your files stay intact.","tracking-explanation");
-            choices.Add(explanation);
-            if(quick) AddQuickTrackerControls(choices);
-            var links=Row("tracker-links");choices.Add(links);
-            var repo=StudioButton(CurrentMovement=="walking"?"About HejjéTrac":"About Rekkefly","external",()=>UnityEngine.Application.OpenURL(CurrentMovement=="walking"?"https://github.com/pvnkmrksk/hejjetrak":"https://github.com/pvnkmrksk/rekkefly"),"text-link");
-            repo.tooltip="Open the native tracker’s repository, downloads and calibration guide.";links.Add(repo);
-            var plots=StudioButton("Live plots","radio",DesktopDashboard.Open,"text-link");plots.name="open-live-plots";plots.tooltip="Open the optional independent browser dashboard. It starts only when you request it; rendering and tracking do not depend on it.";links.Add(plots);
-            var help=StudioButton("How it connects","help",()=>UnityEngine.Application.OpenURL("https://pvnkmrksk.github.io/matrexVR/manual/integrations.html"),"text-link");links.Add(help);
-            var plotState=SessionLabel("","viewer-launch-state");choices.Add(plotState);
-            plots.clicked+=()=>plotState.text=DesktopDashboard.Status;
-            plotState.schedule.Execute(()=>{if(!DesktopDashboard.Status.StartsWith("Optional",StringComparison.Ordinal))plotState.text=DesktopDashboard.Status;}).Every(500);
-
-            var worlds=new VisualElement();worlds.AddToClassList("world-choices");launch.Add(worlds);
-            worlds.Add(SessionHeading("Start from a world","sky"));
-            var previews=Row("world-previews");worlds.Add(previews);
-            previews.Add(WorldChoice("night-sky","Night sky","Terrain beneath an astronomical sky.","night"));
-            previews.Add(WorldChoice("forest","Forest","Explore a landscape of trees.","forest"));
-
+            if(ApparatusConfigured)BuildDailyRunHeader(scroll);else BuildDemoLauncher(scroll);
             string order=(ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])?"Random order":"Listed order")+
                 " · "+(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass");
-            var planHeading=SessionHeading("Your experiment sequence","sequence",BuilderSteps.Count+(BuilderSteps.Count==1?" block · ":" blocks · ")+SequenceDuration()+" · "+order);
-            planHeading.Add(StudioButton("Edit sequence","settings",()=>Select(Workspace.Sequence),"quiet"));scroll.Add(planHeading);
+            var planHeading=SessionHeading("Experiment sequence","sequence",BuilderSteps.Count+(BuilderSteps.Count==1?" block · ":" blocks · ")+SequenceDuration()+" · "+order);
+            var edit=StudioButton("Edit sequence","settings",()=>Select(Workspace.Sequence),"quiet");edit.name="session-edit-sequence";planHeading.Add(edit);scroll.Add(planHeading);
             var summaryIndices=Enumerable.Range(0,BuilderSteps.Count).ToList();
             var plan=new ListView(summaryIndices,64,()=>new VisualElement(),BindSessionBlock)
             {name="session-plan",selectionType=SelectionType.None,virtualizationMethod=CollectionVirtualizationMethod.FixedHeight};
             plan.AddToClassList("session-plan");plan.style.height=Math.Min(5,Math.Max(1,BuilderSteps.Count))*64;scroll.Add(plan);
             if(BuilderSteps.Count==0)scroll.Add(StudioButton("Add your first block","plus",()=>{Select(Workspace.Sequence);ShowBlockLibrary();},"primary"));
-
             var recording=new Foldout {name="recording-details",text="Animal & recording details",value=sessionDetailsOpen};recording.AddToClassList("recording-details");scroll.Add(recording);
-            recording.tooltip="Optional labels, species, experimenter and notes saved with the recording. You can leave these unspecified while exploring.";
-            recording.RegisterValueChangedCallback(e=>sessionDetailsOpen=e.newValue);
-            BuildSessionDetails(recording);
-            var apparatus=Row("apparatus-summary");scroll.Add(apparatus);
-            var summary=SessionLabel("Apparatus is remembered between sessions. Change displays, rigs and tracking ports in Setup.","session-hint");summary.style.flexGrow=1;apparatus.Add(summary);
-            var system=StudioButton("Apparatus setup","system",()=>Select(Workspace.System),"text-link");system.name="session-system-summary";system.tooltip=SystemHeadline();apparatus.Add(system);
+            recording.tooltip="Animal labels, experimenter and notes saved with the recording. Species and tracking hardware are configured separately.";
+            recording.RegisterValueChangedCallback(e=>sessionDetailsOpen=e.newValue);BuildSessionDetails(recording);
             RefreshStartCaption();UpdateStatus();
+        }
+        private void BuildDemoLauncher(VisualElement parent)
+        {
+            var welcome=new VisualElement();welcome.AddToClassList("start-welcome");parent.Add(welcome);
+            welcome.Add(SessionLabel("DEMO","eyebrow"));welcome.Add(SessionLabel("Explore a world.","start-title"));
+            welcome.Add(SessionLabel("Press Start demo to try the complete loop. No animal, camera or LED hardware is required.","start-subtitle"));
+            var worlds=new VisualElement();worlds.AddToClassList("demo-worlds");parent.Add(worlds);
+            var previews=Row("world-previews");worlds.Add(previews);
+            previews.Add(WorldChoice("night-sky","Night sky","Terrain beneath an astronomical sky.","night"));
+            previews.Add(WorldChoice("forest","Forest","Explore a landscape of trees.","forest"));
+            var options=new Foldout {name="demo-options",text="Demo options & tracker windows",value=false};options.AddToClassList("apparatus-advanced");parent.Add(options);
+            var movement=new DropdownField("Demonstration",new List<string>{"Flying · simulated input","Walking · recorded sample"},CurrentMovement=="walking"?1:0){name="quickstart-demo-mode"};
+            movement.tooltip="This changes the hardware-free demo only. Configure real walking/flying inputs with the apparatus.";
+            movement.RegisterValueChangedCallback(e=>ChooseQuickStart(e.newValue.StartsWith("Walking",StringComparison.Ordinal)?"walking":"flying",CurrentWorld,true));options.Add(movement);
+            if(CurrentMovement=="walking")options.Add(SessionLabel(DesktopPreviewHud.WalkingDemoHelp,"apparatus-note"));
+            AddQuickTrackerControls(options);
+            var links=Row("tracker-links");options.Add(links);AddSessionPlotLink(links);
+            links.Add(StudioButton(CurrentMovement=="walking"?"About HejjéTrac":"About Rekkefly","external",()=>UnityEngine.Application.OpenURL(CurrentMovement=="walking"?"https://github.com/pvnkmrksk/hejjetrak":"https://github.com/pvnkmrksk/rekkefly"),"text-link"));
+            var configure=Row("demo-configure");parent.Add(configure);configure.Add(new WorkbenchIcon("system"));
+            var copy=SessionLabel("Have an apparatus? Configure its VRs, panels and tracker inputs.","apparatus-copy");copy.style.flexGrow=1;configure.Add(copy);
+            var button=StudioButton("Configure","settings",OpenApparatusConfiguration,"quiet");button.name="demo-configure";configure.Add(button);
+        }
+        private void BuildDailyRunHeader(VisualElement parent)
+        {
+            var welcome=new VisualElement();welcome.AddToClassList("daily-welcome");parent.Add(welcome);
+            welcome.Add(SessionLabel("EXPERIMENT","eyebrow"));welcome.Add(SessionLabel("Ready to run.","start-title"));
+            welcome.Add(SessionLabel("Review the sequence, adjust its parameters, and start.","start-subtitle"));
+            var rigs=DesktopApparatusProfile.Rigs(Workspace.System.Root).ToList();
+            var summary=Row("daily-apparatus-summary");parent.Add(summary);summary.Add(new WorkbenchIcon("system"));
+            var text=SessionLabel(rigs.Count+(rigs.Count==1?" VR":" VRs")+" · "+(DesktopApparatusProfile.Presentation(Workspace.System.Root)=="led"?"LED panels":"Desktop preview")+" · "+string.Join(" / ",rigs.Select(RigMode).Distinct()),"apparatus-copy");text.name="configured-apparatus-summary";text.tooltip=SystemHeadline();summary.Add(text);
+            var links=Row("tracker-links");parent.Add(links);AddSessionPlotLink(links);
+            if(DesktopApparatusProfile.ShouldPrepareCompanions(Workspace.System.Root))
+            {
+                var open=StudioButton("Open tracker windows","camera",OpenQuickTracker,"text-link");open.name="session-open-trackers";open.tooltip="Open or show the independent native tracker windows for eligible local rigs. Camera calibration stays in those windows.";links.Add(open);
+            }
+            var state=new Foldout {name="session-tracker-windows",text="Tracker windows",value=false};state.AddToClassList("apparatus-advanced");parent.Add(state);
+            foreach(var rig in rigs)
+            {
+                string id=(string)rig["vrId"];
+                var row=Row("session-native-row");state.Add(row);
+                var label=SessionLabel(id+" · "+RigMode(rig),"apparatus-copy");label.style.flexGrow=1;row.Add(label);
+                var show=StudioButton("Show","external",()=>TrackerProcessManager.Instance.Show(id),"quiet");row.Add(show);
+                var stop=StudioButton("Stop","stop",()=>TrackerProcessManager.Instance.Stop(id),"quiet");row.Add(stop);
+                Action refresh=()=>{bool running=TrackerProcessManager.IsRunning(id);label.text=id+" · "+(running?TrackerProcessManager.Status(id):rig["zmqAddress"]+":"+rig["zmqPort"]+" · input configured");show.SetEnabled(running);stop.SetEnabled(running);};refresh();row.schedule.Execute(refresh).Every(500);
+            }
+        }
+        private void AddSessionPlotLink(VisualElement parent)
+        {
+            var plots=StudioButton("Live plots","radio",DesktopDashboard.Open,"text-link");plots.name="open-live-plots";plots.tooltip="Open the optional independent live trajectory dashboard. Plotting is separate from stimulus rendering.";parent.Add(plots);
+            var state=SessionLabel("","viewer-launch-state");parent.Add(state);
+            state.schedule.Execute(()=>{if(!DesktopDashboard.Status.StartsWith("Optional",StringComparison.Ordinal))state.text=DesktopDashboard.Status;}).Every(500);
         }
         private void AddQuickTrackerControls(VisualElement parent)
         {
@@ -164,7 +175,7 @@ namespace ConfigurationUI
         }
         private void RefreshStartCaption()
         {
-            if(start==null)return;var label=start.Q<Label>();if(label!=null)label.text=CurrentDemo?"Start demo":DesktopQuickStart.IsQuickStart(Workspace)?"Start experiment":"Start saved experiment";
+            if(start==null)return;var label=start.Q<Label>();if(label!=null)label.text=CurrentDemo?"Start demo":"Start experiment";
             start.tooltip=CurrentDemo?"Start this clearly marked demo, including the native tracker companion. No hardware is required.":"Save and validate the current sequence, connect its configured tracking input and start recording.";
         }
         private void BuildSessionDetails(VisualElement parent)
@@ -185,10 +196,8 @@ namespace ConfigurationUI
                 heading.Add(Pill(RigMode(rig),"accent"));
                 heading.Add(IconButton("settings","More subject details for "+id,()=>ShowSubjectDetails(fly)));
                 SessionField(card,"Animal ID","subject-id-"+id,fly.AnimalID,v=>fly.AnimalID=v,"Any name, label or ID");
-                var species=SessionField(card,"Species","subject-species-"+id,fly.SpeciesName,v=>{
-                    fly.SpeciesName=v; Workspace.System.Edit(r=>((JArray)r["configs"]).OfType<JObject>().First(c=>(string)c["vrId"]==id)["speciesName"]=v); UpdateStatus();
-                },"Common or scientific name");
-                species.tooltip="Species name saved as speciesName in system config and SpeciesName in this animal’s run metadata.";
+                var species=SessionLabel("Species · "+(string.IsNullOrWhiteSpace((string)rig["speciesName"])?"Unspecified":(string)rig["speciesName"]),"session-hint");
+                species.tooltip="Species is part of the apparatus configuration. Change it in Configure.";card.Add(species);
                 var traits=Row("subject-traits"); card.Add(traits);
                 var sexes=new List<string>{"Unspecified","Female","Male"};
                 string sex=string.IsNullOrEmpty(fly.Sex)?"Unspecified":fly.Sex;
