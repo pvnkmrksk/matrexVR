@@ -63,10 +63,14 @@ public static class SceneReloadDiagnostics
         {string path=Path.Combine(root,name);if(File.Exists(path))File.Copy(path,Path.Combine(backup,name),true);}
         string profile=Argument("-soak-profile","standard");
         if(profile!="standard" && profile!="terrain-night-sky")throw new ArgumentException("Unknown soak profile.");
-        WriteConfigurations(root,names,count,seconds,int.Parse(Argument("-soak-base-port","29871")),profile);
+        string backend=Argument("-soak-backend","Kinefly");
+        if(!TrackerBackend.TryParse(backend,out _))throw new ArgumentException("Unknown diagnostic tracker backend.");
+        bool sharedInput=Argument("-soak-shared-input","false")=="true";
+        string inputDescription=Argument("-soak-input-description","Four external120Hz PUB endpoints, topic+JSON, synthetic continuous translation and yaw; no live animal/tracker endpoints.");
+        WriteConfigurations(root,names,count,seconds,int.Parse(Argument("-soak-base-port","29871")),profile,backend,sharedInput);
         File.WriteAllText(Path.Combine(directory,"fixture.json"),JsonConvert.SerializeObject(new{unity=Application.unityVersion,count,durationSeconds=seconds,scenes=names,profile,reloadScene=true,configurationDirectory=root,
             graphics="Natural display cameras plus explicit128x128 offscreen renders of every authored face camera each Unity frame; instrument-owned targets are reported separately.",
-            input="Four external120Hz PUB endpoints, topic+JSON, synthetic continuous translation and yaw; no live animal/tracker endpoints."},Formatting.Indented));
+            input=inputDescription,backend,sharedInput},Formatting.Indented));
         SessionState.SetString(ActiveKey+".Output",Path.GetFullPath(directory));SessionState.SetBool(ActiveKey,true);
         EditorSceneManager.OpenScene("Assets/Scenes/ControlScene.unity");
         Type gameView=typeof(EditorWindow).Assembly.GetType("UnityEditor.GameView");
@@ -271,7 +275,9 @@ public static class SceneReloadDiagnostics
         lock(logGate)
         {
             File.WriteAllText(Path.Combine(output,"summary.json"),JsonConvert.SerializeObject(new{completed=failure==null,passed=failure==null && runtimeErrors.Count==0 && coverageFailures==0 && loads==targetLoads,sourceSha,unity=Application.unityVersion,gpu=SystemInfo.graphicsDeviceName,graphicsApi=SystemInfo.graphicsDeviceType.ToString(),loads,targetLoads,experimentDurationSeconds=duration,forcedFullReload=true,coverageFailures,cleanupSampled,elapsedSeconds=EditorApplication.timeSinceStartup-runStarted,failure,runtimeErrors,steps=rows,
-                note="Two-second full reloads with four real external120Hz PUBs. Active samples are taken after Start, not at sceneLoaded. Explicit offscreen renders supplement natural display rendering; diagnostic targets are counted separately. A completed non-crashing run does not identify the historical crash cause."},Formatting.Indented));
+                input=Argument("-soak-input-description","Four explicit synthetic120Hz PUBs; no camera or animal measurement."),
+                backend=Argument("-soak-backend","Kinefly"),sharedInput=Argument("-soak-shared-input","false")=="true",
+                note="Full reloads with four progressing SUB listeners. Active samples are taken after Start, not at sceneLoaded. Explicit offscreen renders supplement natural display rendering; diagnostic targets are counted separately. A completed non-crashing run does not identify the historical crash cause."},Formatting.Indented));
             events.Dispose();metrics.Dispose();errors.Dispose();warnings.Dispose();events=metrics=errors=warnings=null;
         }
         process?.Dispose();
@@ -281,7 +287,7 @@ public static class SceneReloadDiagnostics
         {string path=Path.Combine(Application.streamingAssetsPath,name);if(File.Exists(path))File.Delete(path);if(File.Exists(path+".meta"))File.Delete(path+".meta");}
         EditorApplication.Exit(failure==null?0:1);
     }
-    private static void WriteConfigurations(string root,string[] names,int count,double seconds,int port,string profile)
+    private static void WriteConfigurations(string root,string[] names,int count,double seconds,int port,string profile,string backend,bool sharedInput)
     {
         var system=JObject.Parse(File.ReadAllText(Path.Combine(root,"Templates/system_config.template.json")));
         system["targetDisplay"]=0;system["targetFrameRate"]=60;system["vSyncCount"]=0;
@@ -290,7 +296,7 @@ public static class SceneReloadDiagnostics
         var rigs=(JArray)system["configs"];while(rigs.Count>4)rigs.RemoveAt(rigs.Count-1);
         for(int i=0;i<4;i++)
         {
-            if(i>=rigs.Count)rigs.Add(rigs[0].DeepClone());var rig=(JObject)rigs[i];rig["vrId"]="VR"+(i+1);rig["zmqAddress"]="127.0.0.1";rig["zmqPort"]=port+i;rig["closedLoopMode"]="Kinefly";
+            if(i>=rigs.Count)rigs.Add(rigs[0].DeepClone());var rig=(JObject)rigs[i];rig["vrId"]="VR"+(i+1);rig["zmqAddress"]="127.0.0.1";rig["zmqPort"]=sharedInput?port:port+i;rig["closedLoopMode"]=backend;
             rig["targetDisplay"]=0;rig["startRow"]=i;rig["startCol"]=0;rig["displayOrder"]="DRBLFU";rig["ledPanelWidth"]=128;rig["ledPanelHeight"]=128;
         }
         File.WriteAllText(Path.Combine(root,"system_config.json"),system.ToString());
