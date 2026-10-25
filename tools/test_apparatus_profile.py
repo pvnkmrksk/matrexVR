@@ -77,6 +77,23 @@ static class Regression {
   var mixed=Demo();DesktopApparatusProfile.Begin(mixed,"led",true);mixed["configs"][0]["ledPanelHeight"]=128;DesktopApparatusProfile.ResizeRigs(mixed,2);mixed["configs"][1]["ledPanelHeight"]=64;mixed["configs"][1]["startRow"]=2;DesktopApparatusProfile.ResizeRigs(mixed,3);
   Check((int)mixed["configs"][2]["startRow"]>=3,"mixed panel sizes overlap after adding rig");
   Check(DesktopApparatusProfile.FaceName('U')=="Up"&&DesktopApparatusProfile.FaceName('D')=="Down","face labels differ from renderer letters");
+  string folder=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"matrex-starter-fork-"+Guid.NewGuid().ToString("N"));System.IO.Directory.CreateDirectory(folder);
+  try {
+   string reference="QuickStart/flying-night-sky-demo/night-sky.json",path=System.IO.Path.Combine(folder,reference);System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+   var environment=JObject.Parse("{\"closedLoopPosition\":false,\"autopilotEnabled\":true,\"objects\":[]}");System.IO.File.WriteAllText(path,environment.ToString());string originalBytes=System.IO.File.ReadAllText(path);
+   var sequence=new JObject {["autoStart"]=false,["sequences"]=new JArray(new JObject {["sceneName"]="Choice_Selwyn",["duration"]=600,["parameters"]=new JObject {["configFile"]=reference}})};
+   var fork=ApparatusStarterFiles.Fork(sequence,folder,(r,scene)=>environment,sequence,environment);
+   Check(fork.FactoryStarter&&fork.CopiedSources.Count==1,"factory starter was not recognized");
+   Check(System.IO.File.ReadAllText(path)==originalBytes,"fork rewrote the source demo experiment");
+   var saved=JObject.Parse(System.IO.File.ReadAllText(fork.SequencePath));Check(((string)saved["sequences"][0]["parameters"]["configFile"]).StartsWith("Apparatus/Experiments/"),"daily sequence still references demo files");
+   Check(ApparatusStarterFiles.Fingerprint(JObject.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,fork.ExperimentReference))))==ApparatusStarterFiles.Fingerprint(environment),"fork changed experiment settings");
+   var edited=(JObject)environment.DeepClone();edited["operatorSetting"]=17;string second=System.IO.Path.Combine(folder,"edited");System.IO.Directory.CreateDirectory(second);
+   var customized=ApparatusStarterFiles.Fork(sequence,second,(r,scene)=>edited,sequence,environment);Check(!customized.FactoryStarter,"edited starter would receive automatic motion defaults");
+   var importedSequence=(JObject)sequence.DeepClone();importedSequence["sequences"][0]["parameters"]["configFile"]="Experiments/operator-authored.json";string third=System.IO.Path.Combine(folder,"imported");System.IO.Directory.CreateDirectory(third);
+   var external=ApparatusStarterFiles.Fork(importedSequence,third,(r,scene)=>throw new Exception("custom reference must not be read or copied"),sequence,environment);
+   Check(external.CopiedSources.Count==0&&!external.FactoryStarter&&(string)JObject.Parse(System.IO.File.ReadAllText(external.SequencePath))["sequences"][0]["parameters"]["configFile"]=="Experiments/operator-authored.json","imported experiment references were rewritten");
+  } finally { System.IO.Directory.Delete(folder,true); }
+
   Console.WriteLine("PASS: "+checks+" apparatus profile checks; no hardware or native apps launched.");
  }
 }
@@ -97,7 +114,7 @@ def main():
         (temporary / 'Program.cs').write_text(PROGRAM)
         project = temporary / 'Regression.csproj'
         production = ROOT / 'Assets/Scripts/ConfigurationUI/DesktopApparatusProfile.cs'
-        project.write_text(f'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net{version}.0</TargetFramework></PropertyGroup><ItemGroup><Reference Include="Newtonsoft.Json"><HintPath>{escape(str(newtonsoft))}</HintPath></Reference><Compile Include="{escape(str(production))}" /></ItemGroup></Project>')
+        project.write_text(f'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net{version}.0</TargetFramework></PropertyGroup><ItemGroup><Reference Include="Newtonsoft.Json"><HintPath>{escape(str(newtonsoft))}</HintPath></Reference><Compile Include="{escape(str(production))}" /><Compile Include="{escape(str(ROOT / "Assets/Scripts/ConfigurationUI/ApparatusStarterFiles.cs"))}" /><Compile Include="{escape(str(ROOT / "Assets/Scripts/ConfigurationUI/LosslessJson.cs"))}" /></ItemGroup></Project>')
         result = subprocess.run([dotnet, 'build', str(project), '--configfile', str(temporary / 'NuGet.Config'), '-p:UseSharedCompilation=false', '-v:q'], env=environment, capture_output=True, text=True)
         if result.returncode:
             raise SystemExit(result.stdout + result.stderr)

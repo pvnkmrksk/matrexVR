@@ -90,6 +90,18 @@ public static class DesktopQuickStart
                 ["manualControls"] = new JObject { ["enabled"] = true, ["translateSpeed"] = mode == "flying" ? 7 : 1.5, ["rotateSpeed"] = 50, ["maxTranslateSpeed"] = 30, ["maxRotateSpeed"] = 180, ["allowVerticalTranslation"] = mode == "flying" }
             })
         };
+        var environment = EnvironmentDefaults(mode, scene);
+        var sequence = SequenceDefaults(mode, scene, demo);
+        WriteMissing(Path.Combine(folder, "system.json"), system);
+        WriteMissing(Path.Combine(folder, scene + ".json"), environment);
+        WriteMissing(Path.Combine(folder, "sequence.json"), sequence);
+        return folder;
+    }
+    /// <summary>Factory values for a new starter. Existing edited files are never loaded or normalized here.</summary>
+    public static JObject EnvironmentDefaults(string mode, string scene)
+    {
+        if (mode != "flying" && mode != "walking") throw new ArgumentException("Choose flying or walking.");
+        if (scene != "night-sky" && scene != "forest") throw new ArgumentException("Choose night-sky or forest.");
         var environment = new JObject {
             ["objects"] = new JArray(), ["initialPosition"] = new JObject { ["x"] = 0, ["y"] = 100, ["z"] = 0 },
             ["initialRotation"] = new JObject { ["x"] = 0, ["y"] = 0, ["z"] = 0 },
@@ -114,13 +126,15 @@ public static class DesktopQuickStart
                         ["scale"] = new JObject { ["x"] = 1, ["y"] = 1, ["z"] = 1 } });
                 }
         }
+        return environment;
+    }
+    public static JObject SequenceDefaults(string mode, string scene, bool demo)
+    {
+        string relative = "QuickStart/" + mode + "-" + scene + "-" + (demo ? "demo" : "live");
         var sequence = new JObject { ["autoStart"] = false, ["loop"] = true, ["loopStartIndex"] = 0, ["randomise"] = false,
             ["sequences"] = new JArray(new JObject { ["sceneName"] = "Choice_Selwyn", ["duration"] = 600, ["gain"] = 35, ["autoTrim"] = false, ["reloadScene"] = false,
                 ["parameters"] = new JObject { ["configFile"] = relative + "/" + scene + ".json" } }) };
-        WriteMissing(Path.Combine(folder, "system.json"), system);
-        WriteMissing(Path.Combine(folder, scene + ".json"), environment);
-        WriteMissing(Path.Combine(folder, "sequence.json"), sequence);
-        return folder;
+        return sequence;
     }
     private static void WriteMissing(string path, JObject value) { if (!File.Exists(path)) File.WriteAllText(path, value.ToString() + "\n"); }
     public static Vector3 GroundPosition(Vector3 position)

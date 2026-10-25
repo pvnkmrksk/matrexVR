@@ -38,13 +38,41 @@ namespace ConfigurationUI
             string destination=OwnedApparatusPath;
             if(!File.Exists(destination))
             {
+                string mode=CurrentMovement,world=CurrentWorld;
+                var sourceSystem=Workspace.System;var sourceSequence=Workspace.Sequence;
+                var system=(JObject)sourceSystem.Root.DeepClone();DesktopApparatusProfile.Begin(system,presentation,true);
+                var fork=ApparatusStarterFiles.Fork((JObject)sourceSequence.Root,RuntimePaths.ConfigRoot,(reference,scene)=>(JObject)Workspace.Open(reference,ConfigSchema.ForScene(scene)).Root,
+                    DesktopQuickStart.SequenceDefaults(mode,world,true),DesktopQuickStart.EnvironmentDefaults(mode,world));
+                var marker=DesktopApparatusProfile.Marker(system);marker["createdFromDemo"]=true;marker["starterWorld"]=world;
+                marker["starterSequence"]=Path.GetRelativePath(RuntimePaths.ConfigRoot,fork.SequencePath).Replace('\\','/');marker["starterSequenceFingerprint"]=fork.SequenceFingerprint;
+                marker["starterExperiment"]=fork.ExperimentReference;marker["starterExperimentFingerprint"]=fork.ExperimentFingerprint;marker["factoryStarter"]=fork.FactoryStarter;
                 Directory.CreateDirectory(Path.GetDirectoryName(destination));
-                var system=(JObject)Workspace.System.Root.DeepClone();
-                DesktopApparatusProfile.Begin(system,presentation,true);
                 using(var file=new FileStream(destination,FileMode.CreateNew,FileAccess.Write,FileShare.None))
                 using(var writer=new StreamWriter(file,new System.Text.UTF8Encoding(false)))writer.Write(system.ToString(Formatting.Indented)+"\n");
+                // Edits were transferred to the new files. Keep every original demo
+                // byte intact when SaveAll later saves this hardware workspace.
+                if(sourceSystem.Dirty)sourceSystem.RevertToSaved();if(sourceSequence.Dirty)sourceSequence.RevertToSaved();
+                foreach(var path in fork.CopiedSources){var source=Workspace.Documents.FirstOrDefault(d=>d.Path==path);if(source?.Dirty==true)source.RevertToSaved();}
             }
-            Workspace.SelectPrimary("system",destination);Select(Workspace.System);
+            Workspace.SelectPrimary("system",destination);
+            string sequence=Path.Combine(RuntimePaths.ConfigRoot,"Apparatus","sequence.json");
+            if(File.Exists(sequence))Workspace.SelectPrimary("sequence",sequence);
+            Select(Workspace.System);
+        }
+        private void ApplyUntouchedStarterMotion()
+        {
+            var system=(JObject)Workspace.System.Root;var marker=system[DesktopApparatusProfile.MarkerName] as JObject;
+            if(marker==null||!DesktopApparatusProfile.Flag(marker["factoryStarter"]))return;
+            string expectedSequence=(string)marker["starterSequenceFingerprint"],reference=(string)marker["starterExperiment"];
+            string savedSequence=(string)marker["starterSequence"];
+            if(string.IsNullOrEmpty(reference)||string.IsNullOrEmpty(savedSequence)||Workspace.Sequence.Path!=Path.GetFullPath(Path.Combine(RuntimePaths.ConfigRoot,savedSequence))||ApparatusStarterFiles.Fingerprint(Workspace.Sequence.Root)!=expectedSequence)return;
+            var experiment=Workspace.Open(reference,"choice");
+            if(ApparatusStarterFiles.Fingerprint(experiment.Root)!=(string)marker["starterExperimentFingerprint"])return;
+            var modes=DesktopApparatusProfile.Rigs(system).Select(r=>TrackerBackend.TryParse(r["closedLoopMode"]?.ToString(),out var value)?TrackerBackend.IsWalking(value)?"walking":TrackerBackend.IsFlight(value)?"flying":"other":"other").Distinct().ToList();
+            if(modes.Count!=1||modes[0]=="other")return;
+            var defaults=DesktopQuickStart.EnvironmentDefaults(modes[0],(string)marker["starterWorld"]??"night-sky");
+            experiment.Edit(r=>{foreach(string key in new[]{"closedLoopOrientation","closedLoopPosition","walkingPositionGain","walkingOrientationGain","autopilotEnabled","autopilotSpeed","aglHeight"})r[key]=defaults[key].DeepClone();});
+            Workspace.System.Edit(r=>DesktopApparatusProfile.Marker((JObject)r)["starterExperimentFingerprint"]=ApparatusStarterFiles.Fingerprint(experiment.Root));
         }
         private void ReviewExistingApparatus(string system,string sequence=null)
         {
@@ -59,6 +87,7 @@ namespace ConfigurationUI
             var errors=DesktopApparatusProfile.Validate(Workspace.System.Root);
             errors.AddRange(ConfigSchema.Validate(Workspace.System.Root,Workspace.Schemas.Get("system")));
             if(errors.Count>0)throw new InvalidOperationException(string.Join("\n",errors));
+            ApplyUntouchedStarterMotion();
             Workspace.System.Edit(r=>DesktopApparatusProfile.Complete((JObject)r));Workspace.SaveAll();
             DesktopQuickStart.RememberWorkspace(Workspace.System.Path,Workspace.Sequence.Path);
             ShowSessionHome();UpdateStatus("Configuration saved. Your experiment sequence is ready to edit and run.");
@@ -74,7 +103,7 @@ namespace ConfigurationUI
                 intro.Add(SessionHeading("Configure your apparatus","system"));
                 intro.Add(SessionLabel("Define the hardware and tracking inputs here. Experiment sequences and their parameters stay in the everyday workspace.","apparatus-copy"));
                 if(File.Exists(OwnedApparatusPath))
-                    intro.Add(StudioButton("Review saved apparatus","system",()=>ReviewExistingApparatus(OwnedApparatusPath),"primary"));
+                    intro.Add(StudioButton("Review saved apparatus","system",()=>ReviewExistingApparatus(OwnedApparatusPath,Path.Combine(RuntimePaths.ConfigRoot,"Apparatus","sequence.json")),"primary"));
                 else
                 {
                     var types=Row("apparatus-type-choices");intro.Add(types);
@@ -120,6 +149,7 @@ namespace ConfigurationUI
             Section(monitorOptions,"Rendering & timing","system",system,schema,Array.Empty<string>(),new[]{"targetDisplay","targetFrameRate","vSyncCount"});
             Section(monitorOptions,"Telemetry & overview","radio",system,schema,Array.Empty<string>(),new[]{"telemetry","statusOverlay","overheadCamera"});
             foreach(string warning in DesktopApparatusProfile.SharedInputWarnings(system))scroll.Add(SessionLabel(warning,"apparatus-validation"));
+            if(DesktopApparatusProfile.Rigs(system).Select(RigMode).Distinct().Count()>1)scroll.Add(SessionLabel("Mixed input contracts: review motion settings in each experiment block. A shared block can apply different walking/flight gains, but its movement options are not guessed from one rig.","apparatus-validation"));
             var errors=DesktopApparatusProfile.Validate(system);
             if(errors.Count>0){var validation=SessionLabel(string.Join("\n",errors),"apparatus-validation");validation.AddToClassList("error");scroll.Add(validation);}
             var complete=StudioButton(ApparatusConfigured?"Save configuration":"Use this configuration","system",FinishApparatusConfiguration,"primary");complete.name="apparatus-complete";scroll.Add(complete);
