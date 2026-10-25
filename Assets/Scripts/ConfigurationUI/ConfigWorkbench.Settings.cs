@@ -48,7 +48,7 @@ namespace ConfigurationUI
             var tabs=Row("settings-tabs"); body.Add(tabs);
             foreach(string name in new[]{"Essentials","Motion","Stimulus","Sky","Tuning","All parameters"})
             { string key=name; tabs.Add(Button(name,()=>{ settingsTab=key; BuildContent(); },settingsTab==name?"tab-active":"quiet")); }
-            var scroll=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; scroll.AddToClassList("settings-scroll"); body.Add(scroll);
+            var scroll=new ScrollView { name="settings-editor-scroll",horizontalScrollerVisibility=ScrollerVisibility.Hidden }; scroll.AddToClassList("settings-scroll"); body.Add(scroll);
             AddTimingWarnings(scroll,selected);
             if(settingsTab=="Essentials")
             {
@@ -276,7 +276,7 @@ namespace ConfigurationUI
         }
         private void BuildSystemEditor()
         {
-            var scroll=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; scroll.AddToClassList("settings-scroll"); body.Add(scroll);
+            var scroll=new ScrollView { name="settings-editor-scroll",horizontalScrollerVisibility=ScrollerVisibility.Hidden }; scroll.AddToClassList("settings-scroll"); body.Add(scroll);
             var obj=(JObject)selected.Root; var schema=Workspace.Schemas.Get("system");
             var presentation=new VisualElement();presentation.AddToClassList("desktop-presentation");scroll.Add(presentation);
             presentation.Add(SessionHeading("Application display","system","Native fullscreen. This is separate from your LED viewport layout."));
@@ -308,7 +308,7 @@ namespace ConfigurationUI
                 for(int i=0;i<rigs.Count;i++)
                 {
                     int index=i; var rig=rigs[i] as JObject; if(rig==null) continue; var rigSchema=(JObject)schema["properties"]["configs"]["items"];
-                    var fold=new Foldout { text=(string)rig["vrId"]+" · "+RigMode(rig)+" · "+rig["zmqAddress"]+":"+rig["zmqPort"],value=i==0 }; fold.AddToClassList("rig-card"); scroll.Add(fold);
+                    var fold=new Foldout { name="rig-"+(string)rig["vrId"],text=(string)rig["vrId"]+" · "+RigMode(rig)+" · "+rig["zmqAddress"]+":"+rig["zmqPort"],value=i==0 }; fold.AddToClassList("rig-card"); scroll.Add(fold);
                     var grid=new VisualElement(); grid.AddToClassList("settings-grid"); fold.Add(grid);
                     foreach(string key in new[]{"vrId","speciesName","closedLoopMode","zmqAddress","zmqPort","displayOrder","ledPanelWidth","ledPanelHeight","startRow","startCol","horizontal","sphereDiameter","manualControls","tracker"})
                         if(ConfigSchema.Visible(rig,rigSchema,key,Context)) grid.Add(Setting(selected,new[]{"configs",i.ToString(),key},ConfigSchema.Child(rigSchema,key),rig,rigSchema));

@@ -159,8 +159,14 @@ namespace ConfigurationUI
         private void StudioEdit(ConfigDocument doc,Action<JToken> change,bool rebuild=true)
         {
             if(rebuild) FlushNumbers();
+            // Capture before changing the document: summaries and rig headings may change.
+            var state=rebuild?WorkbenchViewState.Capture(root):null;
             doc.Edit(change);
-            if(rebuild) { BuildNavigation(); BuildContent(); }
+            if(rebuild)
+            {
+                BuildNavigation(); BuildContent();
+                int version=viewGeneration;state.Restore(root,()=>version==viewGeneration);
+            }
             else { RefreshStudioValues(); UpdateStatus(); }
         }
         private Toggle StateSwitch(bool value,Action<bool> changed,string name=null)

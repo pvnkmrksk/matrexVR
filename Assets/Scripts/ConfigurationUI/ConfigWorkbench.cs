@@ -95,6 +95,14 @@ namespace ConfigurationUI
                 if(root!=null) { root.Clear(); root.Add(new Label("Setup failed: "+error.Message)); }
             }
         }
+        private void RebuildPreservingView(bool navigation=false)
+        {
+            var state=WorkbenchViewState.Capture(root);
+            if(navigation)BuildNavigation();
+            BuildContent();
+            int version=viewGeneration;
+            state.Restore(root,()=>version==viewGeneration);
+        }
         private Button Button(string label,Action action,string css=null)
         { var button=new Button(()=>Guard(()=>{ FlushNumbers(); action(); })) { text=label }; if(css!=null) button.AddToClassList(css); return button; }
         private void Guard(Action action)
@@ -116,8 +124,8 @@ namespace ConfigurationUI
             inspector=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; inspector.AddToClassList("inspector"); main.Add(inspector);
             var footer=Row("footer"); root.Add(footer);
             status=new Label(); status.AddToClassList("status"); footer.Add(status);
-            undo=Button("Undo",()=>{ RequireApplied(); selected.Undo(); BuildContent(); }); footer.Add(undo);
-            redo=Button("Redo",()=>{ RequireApplied(); selected.Redo(); BuildContent(); }); footer.Add(redo);
+            undo=Button("Undo",()=>{ RequireApplied(); selected.Undo(); RebuildPreservingView(); }); footer.Add(undo);
+            redo=Button("Redo",()=>{ RequireApplied(); selected.Redo(); RebuildPreservingView(); }); footer.Add(redo);
             save=StudioButton("Save setup","file",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); UpdateStatus("Setup and session details saved."); }); footer.Add(save);
             start=StudioButton("Start experiment","play",StartExperiment,"primary"); start.name="start-experiment"; footer.Add(start);
             save.tooltip="Save the system, sequence, edited experiment files and subject metadata. Omitted values and unknown JSON fields are preserved.";
@@ -161,8 +169,10 @@ namespace ConfigurationUI
                 return schema;
             }
         }
+        private int viewGeneration;
         private void BuildContent()
         {
+            viewGeneration++;
             numberFlushes.Clear(); blockList=null;
             enableUpdates.Clear();
             body.Clear(); inspector.Clear(); rawPending=false;
