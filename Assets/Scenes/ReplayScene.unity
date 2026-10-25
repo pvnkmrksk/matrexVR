@@ -881,7 +881,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sessionFolder: 
-  absoluteSessionPath: /home/flyvr01/src/builds/Hangar3d/20251128_Hangar3dv3_Data/RunData/20251202_124128
+  absoluteSessionPath:
   rigMarkerPrefab: {fileID: 1274570263506488403, guid: eed7da0dd105843ff8b63e74c2eb7805, type: 3}
   createRigCameras: 1
   targetHorizontalFov: 110

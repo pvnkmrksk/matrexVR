@@ -1,133 +1,104 @@
 # MATREX VR
 
-Unity experiments for tracked animals and LED-panel virtual environments. This branch's current setup is **Bogong/Kinefly flight**, with Selwyn terrain and night sky. It also includes the JuliusTree infrastructure, Swarm and **Kannadi** (ಕನ್ನಡಿ, mirror) multiplayer scenes and their separate walking input path.
+Unity experiments for tracked **animals** and LED-panel virtual environments: Choice tasks, Bogong night sky, generated and recorded swarms, **Kannadi** (ಕನ್ನಡಿ, mirror) populations, Optomotor and independent visual/navigation rugosity.
 
-Use **Unity 6000.3.16f1**, matching ProjectVersion.txt. Packages are pinned in `Packages/manifest.json` and `packages-lock.json`; the operator controls now use Unity Input System 1.20.0. Restart an already open Editor after pulling the input-backend change.
+[**Download a standalone application**](https://github.com/pvnkmrksk/matrexVR/releases) · [**Website and OS downloads**](https://pvnkmrksk.github.io/matrexVR/) · [**Getting started and controls**](docs/getting-started.md) · [**Release history**](docs/releases.md)
 
-## Start here
+## Choose a version
 
-The experimental configuration GUI is on this branch. See [GUI controls and HUD](docs/configuration-ux.md) for compact exact spin boxes, native Editor colors, reversible JSON editing, scene-bound heading windows and display clearing.
+| Version | Purpose | Source |
+| --- | --- | --- |
+| **0.1** | Archive of `main`, before the configuration studio and telemetry integration. | [`779926a8`](https://github.com/pvnkmrksk/matrexVR/tree/779926a80b02190d6dd0410f260e52bba105a04e) |
+| **0.2** | Preserved Config UI Test baseline: studio, live dashboard, telemetry, modern Kannadi/Bogong and terrain cue lab. | [`c13d33dd`](https://github.com/pvnkmrksk/matrexVR/tree/c13d33dd) |
+| **0.3** | Holistic improvements: reversible configuration, writable profiles, configurable animals and saved-run replay/lifecycle cleanup. | [`v0.3.0`](https://github.com/pvnkmrksk/matrexVR/tree/v0.3.0) · [verification](docs/releases.md#software-verification) |
 
-1. Open `Assets/Scenes/ControlScene.unity`, press Play, fill the original metadata form and press Save/Start. The [Selwyn Milky Way/swarm cycle](docs/selwyn-milky-way-swarm-cycle.md) has a full-duration reference with 360 seconds of trimming, then 240 seconds each of Milky Way only, Milky Way plus swarm, and swarm only. Your active sequence preserves your quick-test edits: 3-second setup and Milky Way measurement, followed by the two 240-second swarm blocks. For the full-duration protocol, copy `Examples/Swarm/selwyn-milky-way-swarm-cycle.sequence.json` over `Assets/StreamingAssets/sequenceConfig.json` before Play. The observer flies at 7 m/s. Both swarm blocks use each animal's preceding Milky Way-only mean heading; 150 physical moths per rig have about 99% directional order and independent speeds (6.17 ± 1.24 m/s SD). Setup runs once; the three 240-second conditions then repeat with trimming off. Recorded CSV examples remain available separately.
-2. Keep your existing `Assets/StreamingAssets/system_config.json`, or copy the complete [system template](Assets/StreamingAssets/Templates/system_config.template.json). Set addresses/displays and retain explicit `"closedLoopMode": "Kinefly"` for flight. Walking alternatives live in [Examples/System](Assets/StreamingAssets/Examples/System).
-3. Use the complete [experiment](Assets/StreamingAssets/Templates/experiment.template.json) and [sequence](Assets/StreamingAssets/Templates/sequence.template.json) templates as a matched starting set. [Templates](Assets/StreamingAssets/Templates/README.md) covers every supported paradigm; [Examples](Assets/StreamingAssets/Examples/README.md) contains full variants. The active Choice_Selwyn cycle references four individual experiment files; all `Kannadi/` recipes are preserved. Old configs are in [Archive/Legacy](Assets/StreamingAssets/Archive/Legacy).
-4. Enter Play mode from Control, fill the experiment metadata, and start the sequence. Focus Game for hotkeys. R resets; P toggles tracked position; O toggles tracked orientation. Escape returns to Control. **Tab shows/hides the bottom-right status/error panel.**
-5. Each animal has a visible sex selector: **Unspecified** (fresh default), **Female**, **Male**. Reloading saved metadata restores the saved selection; old Unknown or missing values become Unspecified.
-6. Find recordings under `Assets/RunData/<session>/`. Preserve the saved config files with the data.
+Download the ZIP for your operating system, extract the **whole archive**, and launch the application. Unity Editor is needed only to modify or build the source. Each release includes `START-HERE.txt` with its exact startup behavior, configuration/data paths and shortcuts. Published download availability is listed on [GitHub Releases](https://github.com/pvnkmrksk/matrexVR/releases); the website resolves actual uploaded OS archives.
 
-Kinefly's existing single-frame JSON messages work without a publisher or config migration. The status panel identifies **Kinefly / flight**, each **Input SUB** address/port and reception state. **Telemetry PUB (output)** on port 9880 is a separate monitoring feed. See [Kinefly wire and gain compatibility](docs/bogong-gain-compatibility.md).
+## Configure and run
 
-## Reference manuals
+1. Open **ControlScene** in Unity **6000.3.16f1**, or launch a standalone player. Use `-configure` to open setup when a sequence has auto-start enabled. Escape returns a running experiment to Control.
+2. In **System config**, configure each rig's tracker endpoint/mode, physical display, panel geometry, camera order and sphere diameter. The complete [system template](Assets/StreamingAssets/Templates/system_config.template.json) is a starting point for your apparatus. Keep `closedLoopMode: "Kinefly"` for flight; [walking examples](Assets/StreamingAssets/Examples/System) select their own input contract.
+3. In **Session**, enter experimenter, animal IDs, species and comments. The system configuration's `speciesName` records species per rig. Hardware IDs such as `VR1` route inputs/displays; `AnimalID` labels the real animal. Simulated and replayed individuals are **agents**.
+4. Arrange blocks in **Sequence config**. Choose a recipe from **Experiment configs**, edit its motion/stimulus/sky settings, or inspect **Edit JSON**. [Templates](Assets/StreamingAssets/Templates/README.md) and [examples](Assets/StreamingAssets/Examples/README.md) cover the supported paradigms.
+5. **Save setup**, then **Start experiment**. Keep the whole saved run, including configuration snapshots, data and generated skies, for analysis and replay.
 
-| Document | Contents |
-|---|---|
-| [Configuration reference](docs/configuration-reference.md) | Every current system, sequence, Choice, Swarm, Kannadi/kinematic, optomotor, migration and dynamic-design parameter; defaults, units, precedence and legacy no-op fields. |
-| [Editable templates](Assets/StreamingAssets/Templates/README.md) | Complete JSON files and runnable example sequences, including migration AGL 10/100/1000. |
-| [Unity 6 controls](docs/unity6-controls.md) | Action map, keyboard/mouse/gamepad bindings, UI migration, tracking/reset behavior and bench checks. |
-| [Selwyn Milky Way / swarm cycle](docs/selwyn-milky-way-swarm-cycle.md) | Current four-block protocol, concurrent heading measurement, frozen references, ordered moths and population/performance tests. |
-| [Experiment phases](docs/experiment-phases.md) | Continuous pre/stimulus/post conditions, opt-in frozen heading references, and separate phased Selwyn recipes. |
-| [Heading reference and telemetry](docs/heading-reference-telemetry.md) | Per-animal circular heading assessment, stimulus-relative angles, outbound ZMQ, and the restored Tab status/error panel. |
-| [Kinefly auto trim](docs/kinefly-auto-trim.md) | Sequence-row opt-in, flight variance gating, iterative median centering, dashboard controls and background swarm recording. |
-| [Recorded swarm playback and moths](docs/swarm-playback.md) | CSV conversion, spawn-centred world anchors, straight-line continuation to 100m, metre-scale terrain playback, GPU flapping and subpixel contrast. |
-| [Data formats](docs/data-formats.md) | CSV/gzip/metadata columns, clocks, sensor-to-world conversion, coordinate conventions, replay and analysis limitations. |
-| [Kannadi integration](docs/kannadi-modernization.md) | Scene integration, camera allow-list, overview, trails, animation and validation history. |
-| [Experiment workflow](docs/experiment-workflow.md) | Controller lifecycle and adding experiments. |
+The configuration studio and JSON share one lossless document model. No-op saves preserve the original file bytes. Actual edits preserve unknown fields, property order and untouched numeric text; absent settings, explicit null, false and zero remain distinct. Showing an **Inherited** default never inserts it. Undo/Redo and external-file conflict checks protect the editing workflow. See [GUI and JSON parity](docs/configuration-ui.md).
 
-## Coordinates and visual behavior
+A fresh 0.3 profile opens setup by default. Its supplied demonstration is **TerrainCueLab**: four visual/navigation mesh combinations followed by height-only, tilt-only and fixed-pose controls, 30 seconds each, with `reloadScene: false`. The previous Selwyn cycle is preserved in `Examples/Sequences/selwyn-before-rugosity.json`. Configuration JSON is authoritative; old branch guides may describe their historical default sequence.
 
-Current walking scenes use **one world unit = one centimeter**, with speeds in cm/s. Migration/Selwyn terrain uses **one world unit = one metre**, with speeds in m/s and AGL in metres. Unity is **left-handed**: X right/east, Y up, Z forward/north. Positive yaw turns +Z toward +X, clockwise when viewed from above with +Z at the top. Rotations use degrees; log Euler angles wrap at 360. Recorded-swarm input is converted to metres; `worldUnitsPerMetre` maps it to the scene scale while physical moth dimensions stay in metres.
+![MATREX VR 0.3 session setup with animal IDs, species and the experiment sequence](docs/images/dashboard-v0.3/session-1920.png)
 
-The system `displayOrder` is authoritative. A camera whose letter is missing is disabled even if it exists and is enabled in a scene. A rig absent from system config renders none of its stimulus cameras. The operator overview shows numbered heading arrows at actual rig positions with 60 s fading trajectories. It works in Swarm and Kannadi; Hide stops overview rendering and tracking work. FPS stays visible at the top right, alongside the configured target. Set top-level `targetFrameRate` (default 120) and `vSyncCount` (default 0) in system_config.json. Walking translation and yaw default to 1:1 gain; explicit numeric Swarm/Kannadi overrides scale displacement/angle.
+*Actual 0.3 Unity studio capture with synthetic animals and metadata. [Sequence](docs/images/dashboard-v0.3/sequence-1920.png) · [Raw JSON](docs/images/dashboard-v0.3/raw-json-1920.png) · [Replay launcher](docs/images/dashboard-v0.3/replay-launcher-1920.png) · [capture provenance](docs/images/dashboard-v0.3/provenance.json).*
 
-Locust animation gating uses planar translation: at or below the default 0.5 cm/s threshold, legs stop; above it they animate. Rotation alone does not trigger walking. Configure `animateOnMove` and `animationSpeedThreshold` per experiment.
+## Controls and live monitoring
 
-## Linux tracking workstation installation
+Focus the Game/player view. Experiment hotkeys are suppressed while typing into metadata fields.
 
-### Prerequisites
-- Ubuntu for the setup commands below (the Unity project is also tested on macOS)
-- Terminal access
-- Unity account
+| Control | Action |
+| --- | --- |
+| **R** | Reset rigs to the current experiment's initial pose. |
+| **P / O** | Toggle tracked position / tracked orientation. |
+| **Arrow keys; A / D** | Manual translation; positive / negative yaw, when manual controls are enabled. |
+| **Ctrl+Space** | Toggle forward autopilot at the active config's `autopilotSpeed`. |
+| **Shift+Up/Down; Shift+W/S** | Adjust manual translation speed; adjust turn speed. |
+| **Tab** | Show/hide the live status dashboard during a run; navigate fields during setup. |
+| **Escape, on release** | Stop and return to Control; from Control, exit the standalone player. |
+| **Right / middle drag; wheel** | Orbit / pan; zoom inside the operator overview. |
+| **Space; Left/Right; N/M** | Replay play/pause; seek (Shift for 10 seconds); previous/next step. |
 
-### Step 1: Install FicTrac
+Kinefly controls retain **+/−** for yaw gain, **Ctrl+Y** for yaw-rate mode, **1–9** for matching rig IDs, **0** or the HUD’s **Next animal** button to cycle all configured IDs (including `VR10`), and held **[/]** for DC offset. Optional vertical/pitch/roll and gamepad bindings are covered in the [full controls guide](docs/unity6-controls.md). Autopilot retains steering/reverse input; Optomotor disables it.
 
-```bash
-# Create a folder for source code
-mkdir src
-cd src
+The in-app dashboard reports tracking freshness, flight and trim state, gains/DC offsets, heading measurements, phase/sequence state, frame timing and errors. New runtime errors can reopen a hidden panel. Outbound **ZMQ PUB telemetry** is separate from tracking inputs: default `127.0.0.1:9880`, 20 Hz, topic `matrex.telemetry.v2`, schema version 2. A static website cannot consume raw ZMQ directly. See [telemetry](docs/heading-reference-telemetry.md), [auto trim](docs/kinefly-auto-trim.md) and [data formats](docs/data-formats.md).
 
-# Clone the FicTrac repository
-git clone https://github.com/pvnkmrksk/fictrac.git
+![Flight dashboard](docs/images/ux/flight-hud.png)
 
-# Enter the FicTrac folder
-cd fictrac
+*Native 0.2 HUD capture with synthetic validation inputs; current selection also supports 1–9 and 0/Next animal.*
 
-# Make the install script executable and run it
-chmod +x install_ubuntu.sh
-./install_ubuntu.sh
-```
+## Automatic night sky
 
+Choose observer latitude/longitude, date/local time and UTC offset, or set `localTime: "now"`. The bundled NASA star panorama and Astronomy Engine generate the stars/Milky Way orientation offline; no Stellarium process or runtime internet is required. Configurable updates save each displayed PNG, hash, represented UTC and provenance alongside the run. Explicit `skyboxPath` images remain supported.
 
+![Actual generated Selwyn night-sky panorama](docs/site/assets/selwyn-night-sky.jpg)
 
-### Step 2: Install MatrexVR
+*Actual full-sphere stimulus panorama, downsampled without changing brightness: Selwyn, −35.894409°, 148.453948°, sampled 7 October 2026 at 07:14 UTC. [Manifest](docs/site/assets/selwyn-night-sky.provenance.json) · [credits](docs/site/assets/README.md). NASA/Goddard SVS; Ernie Wright (USRA); ESA/Gaia/DPAC. Stars and Milky Way only; atmosphere, Sun, Moon and planets are not modeled.*
 
-```bash
-# Go back to source folder
-cd ~/src
+See [night-sky configuration and audit files](docs/night-sky.md), [Selwyn cycle](docs/selwyn-milky-way-swarm-cycle.md), [generated swarms](docs/generated-bogong-swarm.md) and [recorded swarm playback](docs/swarm-playback.md).
 
-# Clone MatrexVR repository
-git clone https://github.com/pvnkmrksk/matrexVR.git
-```
+## Terrain and experimental scenes
 
-### Step 3: Install Unity Hub
+**TerrainCueLab** varies visual and navigation geometry independently; height and orientation controls isolate vertical movement from pitch/roll. The earlier Rugosity_RS and historical RS scenes retain their identities. Use **Tools → Rugosity → Open terrain cue lab** for source authoring. [The rugosity guide](docs/rugosity.md) explains measured geometry, JSON precedence and native validation.
 
-```bash
-# Add Unity's Public Key
-wget -qO - https://hub.unity3d.com/linux/keys/public | gpg --dearmor | sudo tee /usr/share/keyrings/Unity_Technologies_ApS.gpg > /dev/null
+![Four measured terrain conditions](docs/terrain-cue-four-conditions.svg)
 
-# Add Unity Hub Repository
-sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/Unity_Technologies_ApS.gpg] https://hub.unity3d.com/linux/repos/deb stable main" > /etc/apt/sources.list.d/unityhub.list'
+The compact build contains ten scenes: **ControlScene, Choice, Choice_desync, Choice_Selwyn, Swarm, Kannadi, Optomotor, TerrainCueLab, Rugosity_RS and ReplayScene**. Optional forest/two-tree examples are marked `sourceBuildOnly`; enable their scenes and rebuild to run them. Add custom scenes, assets and controllers in Unity, enable them in the build scene list, and rebuild. See [experiment workflow](docs/experiment-workflow.md); this project does not provide a general level editor.
 
-# Update and Install Unity Hub
-sudo apt update
-sudo apt-get install unityhub
-```
+## Compatibility and saved runs
 
-### Step 4: Launch Unity Hub
+Use `agentCount`, `agentSpeed` and `agentSpeedStdDev` for simulated populations; `locustSpeed` and `locoSpeed` remain accepted. Precedence is `agentSpeed` → `locustSpeed` → `locoSpeed`. The UI preserves existing key spellings; using a canonical key is an explicit configuration choice. New metadata uses `Animals`, `AnimalID`, `SpeciesName` and `UsedAnimalIDs`, retaining transitional `Flies`/`FlyID`/`UsedFlyIDs` aliases for existing analysis. [Animal/agent compatibility](docs/animal-agent-compatibility.md) and [version differences](docs/releases.md) give the scope.
 
-1. Run Unity Hub from terminal or applications:
-   ```bash
-   unityhub
-   ```
-2. Login or create a Unity account
-3. Do not install Unity yet
-4. Click Add or Open
-5. Navigate to: `~/src/matrexVR`
-6. Click Open
-7. Install Unity 6 (`6000.3.16f1`), matching `ProjectSettings/ProjectVersion.txt`.
+In 0.3 standalone players, editable files are seeded under `Application.persistentDataPath/Config` and recordings under `Application.persistentDataPath/RunData`; existing user files are never overwritten during seeding. `--config-dir <folder>` and `--data-dir <folder>` override these roots. Editor defaults remain `Assets/StreamingAssets` and `Assets/RunData`. Versions 0.1/0.2 retain their older application-relative paths. See [getting started](docs/getting-started.md) and [run snapshots](docs/run-config-snapshots.md).
 
-### Step 6: Run the Project
+Repeated transitions now have explicit owners for trial materials, generated Optomotor resources, writer handles and tracking workers. The in-scene `reloadScene: false` path remains available. See [scene lifecycle fixes and their limits](docs/scene-lifecycle.md); no original crash dump establishes a single cause.
 
-Once the correct Unity version is installed, open the project and you're ready to go!
+Replay reads saved animal poses and recorded stimulus evidence. Preserve the complete run directory, its `Configs` archive and `Skyboxes`; choose **Replay a recorded run** in setup, use its **Browse…** folder picker, or pass `--replay-session <folder>`, then follow the [replay guide](docs/replay.md). Older incomplete recordings cannot establish stimulus details that were never saved.
 
-## Validation
+## Reference and source development
 
-Run `python3 tools/validate_kannadi_assets.py` and `python3 tools/validate_config_templates.py` for static checks. Unity regression testing uses `Assets/Editor/KannadiValidation.cs` on a disposable project copy; it refuses to run without the `KANNADI_VALIDATION_COPY` sentinel. See [the saved report](docs/kannadi-validation-results.json). Physical FicTrac, gamepad devices, LED timing and multi-monitor mapping still need a bench check.
+| Guide | Contents |
+| --- | --- |
+| [Getting started](docs/getting-started.md) | Downloads, launch/configuration, data locations and controls. |
+| [Configuration reference](docs/configuration-reference.md) | Parameters, units, defaults, precedence and historical no-op fields. |
+| [Configuration studio](docs/configuration-ui.md) / [GUI and HUD](docs/configuration-ux.md) | Forms, raw JSON, inherited values, Undo/Redo and dashboard. |
+| [Data formats](docs/data-formats.md) / [run snapshots](docs/run-config-snapshots.md) | CSVs, clocks, units, original inputs and immutable versions. |
+| [Replay](docs/replay.md) | Saved-run loading, timeline, overview and reconstruction limits. |
+| [Kannadi](docs/kannadi-modernization.md) | Mirror populations, camera routing and software validation history. |
+| [Experiment phases](docs/experiment-phases.md) | Pre/stimulus/post conditions and heading references. |
+| [Release history](docs/releases.md) | Archival source pins, platform builds and compatibility changes. |
 
-## Contributing
+Packages are pinned in `Packages/manifest.json` and `packages-lock.json`. After pulling an input-backend change into an open Editor, restart it. For optional Linux/FicTrac acquisition setup, see the [source installation guide](docs/getting-started.md#source-and-tracker-setup).
 
-Contributions to the project are welcome! If you find any issues or have suggestions for improvements, please submit a pull request or create an issue.
+Software verification includes [1,293 Unity lifecycle/replay checks](docs/lifecycle-replay-validation-results.json), with **150 actual Choice↔Swarm scene loads** at accelerated 0.1-second durations and 150 native resource teardown cycles; [43 JSON compatibility contracts](docs/config-compatibility-validation-results.json); [71 rig isolation checks](docs/release-readiness-results.json); and [2,946 fresh 0.3 GUI checks/captures](docs/configuration-dashboard-v0.3-validation-results.json). [Release verification](docs/releases.md#software-verification) gives the scope, including 630 offline replay checks. This does not establish a cure for the historical crash during 30-second hardware acquisition.
 
-## License
+Run `python3 tools/validate_kannadi_assets.py` and `python3 tools/validate_config_templates.py` for static checks. Unity regression runners under `Assets/Editor` require a disposable copy containing the `KANNADI_VALIDATION_COPY` sentinel. Historical reports document synthetic/rendered software checks; physical LED timing, tracker calibration and display mapping require a bench check on the actual apparatus.
 
-The previous README identifies this project as MIT-licensed; this checkout has no root LICENSE file. Third-party assets retain their own license terms.
-
-## Acknowledgements
-
-- [Unity Engine](https://unity.com/)
-- [NetMQ](https://github.com/zeromq/netmq)
-
-## Visual and navigational rugosity
-
-Open ControlScene and press Play to cycle through the four visual/navigation mesh combinations, then three height/tilt isolation controls. The independent experiment scene is **TerrainCueLab**; existing RS scenes and the earlier Rugosity_RS lab remain compatible.
-
-Use **Tools → Rugosity → Open terrain cue lab** to tune live in the Inspector and retain or export settings. [The guide and four cross-section schematics](docs/rugosity.md) explain the geometry, agent paths, explicit RoughSmooth/SmoothRough spatial profiles, JSON files and validation. The previous Selwyn sequence is saved at `Examples/Sequences/selwyn-before-rugosity.json`.
+The prior README identifies MIT licensing, but this checkout has no root LICENSE file. Third-party assets retain their own license terms. Engine: [Unity](https://unity.com/). Tracking transport: [NetMQ](https://github.com/zeromq/netmq). Astronomical orientation: bundled Astronomy Engine with its retained MIT notice.

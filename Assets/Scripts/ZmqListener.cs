@@ -17,6 +17,9 @@ public class ZmqListener : MonoBehaviour
 
     private Thread listenerThread;
     private volatile bool isRunning;
+    private bool started;
+    private static int activeWorkerCount;
+    public static int ActiveWorkerCount => Volatile.Read(ref activeWorkerCount);
     private volatile string workerState = "not started";
     private volatile string wireFormat;
     public string Endpoint { get; private set; }
@@ -80,6 +83,21 @@ public class ZmqListener : MonoBehaviour
 
     void Start()
     {
+        started = true;
+        StartListener();
+    }
+
+    private void OnEnable() { if (started) StartListener(); }
+    private void OnDisable() => StopListener();
+
+    private void StartListener()
+    {
+        // A timed-out worker is still owned here. Never overwrite it and create another socket.
+        if (listenerThread != null && listenerThread.IsAlive)
+        {
+            if (!isRunning) Debug.LogError("Tracking listener is still stopping on " + Endpoint + "; wait before re-enabling it.");
+            return;
+        }
         ApplySystemConfig();
         string endpoint = $"tcp://{address}:{port}";
         Endpoint = endpoint;
@@ -91,6 +109,7 @@ public class ZmqListener : MonoBehaviour
 
     private void Listen(string endpoint)
     {
+        Interlocked.Increment(ref activeWorkerCount);
         // Create, use and dispose on one thread. Main-thread shutdown only sets a flag.
         try
         {
@@ -148,6 +167,11 @@ public class ZmqListener : MonoBehaviour
                 workerState = "error";
                 Debug.LogError("ZMQ listener failed on " + endpoint + ": " + ex);
             }
+        }
+        finally
+        {
+            Interlocked.Decrement(ref activeWorkerCount);
+            workerState = "stopped";
         }
     }
     private long lastPacketErrorTicks;
@@ -230,7 +254,11 @@ public class ZmqListener : MonoBehaviour
             }
         }
 
-        listenerThread = null;
-        workerState = "stopped";
+        if (listenerThread == null || !listenerThread.IsAlive)
+        {
+            listenerThread = null;
+            workerState = "stopped";
+        }
+        else workerState = "stopping";
     }
 }

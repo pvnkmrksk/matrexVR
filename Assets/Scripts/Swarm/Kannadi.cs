@@ -29,9 +29,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
 
     public static int ParseVRIndex(string name)
     {
-        for (int i = 1; i <= 4; i++)
-            if (name.StartsWith("VR" + i) && (name.Length == 3 || !char.IsDigit(name[3]))) return i;
-        return 0;
+        return RuntimeRigRegistry.ParseIndex(name);
     }
 
     public void InitializeScene(Dictionary<string, object> parameters)
@@ -106,9 +104,11 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
 
     private void ConfigureCameras()
     {
-        int swarmMask = LayerMask.GetMask("SimulatedLocustsVR1", "SimulatedLocustsVR2", "SimulatedLocustsVR3", "SimulatedLocustsVR4");
-        int ownLayer = LayerMask.NameToLayer("SimulatedLocustsVR" + VRIndex);
-        int visible = watchIndex.HasValue ? LayerMask.GetMask("SimulatedLocustsVR" + watchIndex.Value)
+        int swarmMask = RuntimeRigRegistry.StimulusMask;
+        int ownLayer = RuntimeRigRegistry.StimulusLayer(VRIndex);
+        if (watchIndex.HasValue && RuntimeRigRegistry.StimulusLayer(watchIndex.Value) < 0)
+            throw new InvalidOperationException("Kannadi watchIndex has no configured stimulus layer: " + watchIndex.Value);
+        int visible = watchIndex.HasValue ? (1 << RuntimeRigRegistry.StimulusLayer(watchIndex.Value))
                                         : swarmMask & ~(ownLayer >= 0 ? 1 << ownLayer : 0);
         int markerMask = LayerMask.GetMask("OverheadCameraMarkers");
         foreach (Camera camera in GetComponentsInChildren<Camera>(true))
@@ -126,7 +126,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
 
     public void SetVRCameraCullingMask(int vrIndex, int index)
     {
-        if (index < 1 || index > 4) throw new ArgumentOutOfRangeException(nameof(index));
+        if (index < 1 || RuntimeRigRegistry.StimulusLayer(index) < 0) throw new ArgumentOutOfRangeException(nameof(index));
         foreach (Kannadi rig in FindObjectsOfType<Kannadi>())
             if (rig.VRIndex == vrIndex) { rig.watchIndex = index; rig.ConfigureCameras(); }
     }
@@ -135,7 +135,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     {
         CleanupClones();
         if (numberOfRings < 0 || tilePrefab == null) return;
-        int layer = LayerMask.NameToLayer("SimulatedLocustsVR" + VRIndex);
+        int layer = RuntimeRigRegistry.StimulusLayer(VRIndex);
         if (layer < 0) throw new InvalidOperationException("Missing animal layer for " + gameObject.name);
         bool skipCenter = watchIndex == VRIndex;
         var copies = new List<GameObject>();

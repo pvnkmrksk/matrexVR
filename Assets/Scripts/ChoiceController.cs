@@ -14,7 +14,6 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
     public Material[] materials;
     private Dictionary<string, Material> materialDict = new Dictionary<string, Material>();
-    string[] tags = new string[] { "ChoiceVR1", "ChoiceVR2", "ChoiceVR3", "ChoiceVR4" };
     private Transform spawnedObjectsRoot;
     private bool phased;
     private readonly List<StimulusHeadingReference> headingReferences = new List<StimulusHeadingReference>();
@@ -40,6 +39,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
         defaultSkyboxMaterial = RenderSettings.skybox;
         spawnedObjectsRoot = new GameObject("ChoiceSpawnedObjects").transform;
+        UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(spawnedObjectsRoot.gameObject, gameObject.scene);
         spawnedObjectsRoot.position = Vector3.zero;
         spawnedObjectsRoot.rotation = Quaternion.identity;
         spawnedObjectsRoot.localScale = Vector3.one;
@@ -99,7 +99,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             return;
         }
 
-        ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
+        ClosedLoop[] closedLoopComponents = RuntimeRigRegistry.Rigs(gameObject.scene);
         Debugger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length, 4);
 
         // if randomInitialRotation is true, then set the rotation to a random value for y axis and the rest to initialRotation value
@@ -194,13 +194,14 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             var spawner = host.AddComponent<LocustSpawner>();
             spawner.boundaryManager = host.AddComponent<BoundaryManager>();
             spawner.layerName = "SimulatedLocustsVR" + vrIndex;
+            spawner.RuntimeLayer = RuntimeRigRegistry.StimulusLayer(vrIndex);
             var catalog = Resources.Load<KannadiPrefabCatalog>("KannadiPrefabCatalog");
             spawner.locustPrefab = catalog != null ? catalog.Find("SimulatedLocust") : null;
-            int layers = LayerMask.GetMask("SimulatedLocustsVR1", "SimulatedLocustsVR2", "SimulatedLocustsVR3", "SimulatedLocustsVR4");
+            int layers = RuntimeRigRegistry.StimulusMask;
             foreach (Camera camera in rig.GetComponentsInChildren<Camera>(true))
-                camera.cullingMask = (camera.cullingMask & ~layers) | LayerMask.GetMask(spawner.layerName);
+                camera.cullingMask = (camera.cullingMask & ~layers) | (1 << spawner.ResolvedLayer);
             SwarmConfiguration.Apply(spawner, config.swarm, rig);
-            host.AddComponent<SwarmLogger>().locustLayerMask = LayerMask.GetMask(spawner.layerName);
+            host.AddComponent<SwarmLogger>().locustLayerMask = (1 << spawner.ResolvedLayer);
         }
     }
 
@@ -217,10 +218,8 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
             if (isBandObject)
             {
-                for (int i = 0; i < tags.Length; i++)
-                {
-                    InstantiateBand(obj, i + 1);
-                }
+                foreach (ClosedLoop rig in RuntimeRigRegistry.Rigs(gameObject.scene))
+                    InstantiateBand(obj, Kannadi.ParseVRIndex(rig.name));
             }
             else if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
             {
@@ -235,10 +234,10 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
     private void SpawnRelativeObjects(SceneConfig config, ClosedLoop rig, HeadingReferenceResult reference)
     {
         int vrIndex = Kannadi.ParseVRIndex(rig.name);
-        if (vrIndex < 1 || vrIndex > 4) throw new System.InvalidOperationException("Cannot identify Choice rig: " + rig.name);
-        int layer = LayerMask.NameToLayer("SimulatedLocustsVR" + vrIndex);
+        if (vrIndex < 1) throw new System.InvalidOperationException("Cannot identify Choice rig: " + rig.name);
+        int layer = RuntimeRigRegistry.StimulusLayer(vrIndex);
         if (layer < 0) throw new System.InvalidOperationException("Missing per-rig Choice stimulus layer for VR" + vrIndex);
-        int layers = LayerMask.GetMask("SimulatedLocustsVR1", "SimulatedLocustsVR2", "SimulatedLocustsVR3", "SimulatedLocustsVR4");
+        int layers = RuntimeRigRegistry.StimulusMask;
         foreach (Camera camera in rig.GetComponentsInChildren<Camera>(true))
             camera.cullingMask = (camera.cullingMask & ~layers) | (1 << layer);
         foreach (SceneObject obj in config.objects ?? System.Array.Empty<SceneObject>())
@@ -313,7 +312,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             && materialDict.TryGetValue(obj.material, out Material material)
         )
         {
-            instance.GetComponent<Renderer>().material = material;
+            instance.GetComponent<Renderer>().sharedMaterial = material;
         }
 
         ScaleWithDistance scaleScript = instance.GetComponent<ScaleWithDistance>();
@@ -348,7 +347,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
             // Set layer
             string layerName = $"SimulatedLocustsVR{vrIndex}";
-            int layerIndex = LayerMask.NameToLayer(layerName);
+            int layerIndex = RuntimeRigRegistry.StimulusLayer(vrIndex);
             if (layerIndex == -1)
             {
                 Debug.LogError(
@@ -359,8 +358,8 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             bandInstance.layer = layerIndex;
             // Older Choice scenes serialized every rig with VR1's band layer.
             // Select the matching band without altering system-config camera enablement.
-            GameObject rig = GameObject.Find("VR" + vrIndex);
-            int bandLayers = LayerMask.GetMask("SimulatedLocustsVR1", "SimulatedLocustsVR2", "SimulatedLocustsVR3", "SimulatedLocustsVR4");
+            GameObject rig = RuntimeRigRegistry.Rigs(gameObject.scene).FirstOrDefault(r => Kannadi.ParseVRIndex(r.name) == vrIndex)?.gameObject;
+            int bandLayers = RuntimeRigRegistry.StimulusMask;
             if (rig != null)
                 foreach (Camera camera in rig.GetComponentsInChildren<Camera>(true))
                     camera.cullingMask = (camera.cullingMask & ~bandLayers) | (1 << layerIndex);
@@ -390,7 +389,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
                 // Set custom parent transform if either locking is enabled
                 if (obj.lockBoundaryWithAnimalPosition || obj.lockAgentWithAnimalPosition)
                 {
-                    GameObject vrObject = GameObject.Find($"VR{vrIndex}");
+                    GameObject vrObject = RuntimeRigRegistry.Rigs(gameObject.scene).FirstOrDefault(r => Kannadi.ParseVRIndex(r.name) == vrIndex)?.gameObject;
                     if (vrObject != null)
                     {
                         spawner.customParentTransform = vrObject.transform;
@@ -415,7 +414,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             BandLogger logger = bandInstance.GetComponent<BandLogger>();
             if (logger != null)
             {
-                logger.targetLayerMask = LayerMask.GetMask(layerName);
+                logger.targetLayerMask = 1 << layerIndex;
                 logger.enabled = true; // Ensure logger is enabled
             }
 
@@ -436,7 +435,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
     private void OnLoaded()
     {
-        ClosedLoop[] closedLoopComponents = FindObjectsOfType<ClosedLoop>();
+        ClosedLoop[] closedLoopComponents = RuntimeRigRegistry.Rigs(gameObject.scene);
         foreach (ClosedLoop cl in closedLoopComponents)
         {
             // cl.ResetPosition();
@@ -516,7 +515,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         }
 
         // Construct full path in StreamingAssets
-        string fullPath = Path.Combine(Application.streamingAssetsPath, skyboxPath);
+        string fullPath = Path.Combine(RuntimePaths.ConfigRoot, skyboxPath);
         byte[] imageBytes = ExperimentConfigFiles.ReadAllBytes(fullPath,"skybox");
         {
             try

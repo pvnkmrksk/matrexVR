@@ -1,0 +1,31 @@
+{
+  "version": "0.3 working tree",
+  "unity": "6000.3.16f1",
+  "runner": "ConfigurationDashboardValidation.Run",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "captureType": "Graphics-enabled Unity batchmode rendering through the runtime UI Toolkit panel",
+  "metadata": "Synthetic validation animals and experiment metadata; no live animal session",
+  "checks": 2946,
+  "failure": null,
+  "errors": [],
+  "files": {
+    "all-fields-1920.png": "55ca520dcf948202d9ee87011e33aeef4876199b3a88d0089cebfe581b17a1f2",
+    "experiments-1920.png": "2f13b1a8f418ad19f3b8ffb25d57ef07715fc70b5bc11c9b2b5effbc3ebcbfc9",
+    "hover-help-1920.png": "802a3fac02d43664c8e4a9ef899fe9615e4aedc3e0110e0873e594795dc0d36a",
+    "monitoring-defaults-1920.png": "0456cab214f8c29cb101177f59dcb06cc31c7c7d9fe05b3e879b60ac06ab0d98",
+    "motion-1920.png": "c6244ea5459f161ef2c675a9d9f4fa71b7cb57a24a9c5adf2997fd499c2e3419",
+    "raw-json-1920.png": "c46529e553f3bbb4781060c04cb06fdc9fe0843fe4114be41f614e19ea05f2a2",
+    "replay-launcher-1920.png": "3ebf9df0d8321785a02d2203e38f063676a16087ad4ffce1b467766ee2903e75",
+    "sequence-1920.png": "c2cd8a89902c6b37326b27f48604224dddec398f41a53e586a09cc02131b582a",
+    "session-1920.png": "a07ceb7e466635d6b77fc3b7d9bf3c4950592b134494c2627da71204579104e6",
+    "system-1920.png": "720de88e0e7a68ecbbfe2398f032d6874df888862047a8058daf486521415208"
+  },
+  "sitePreview": {
+    "path": "docs/site/assets/configuration-studio.jpg",
+    "source": "session-1920.png",
+    "transform": "JPEG encoding at quality88; no cropping or color correction"
+  }
+}

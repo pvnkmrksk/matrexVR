@@ -74,17 +74,21 @@ namespace ConfigurationUI
             SessionField(details,"Experimenter","session-experimenter",metadata.ExperimenterName,v=>metadata.ExperimenterName=v,"Your name");
             SessionField(details,"Overall comments","session-comments",metadata.Comments,v=>metadata.Comments=v,"Notes for this session",true);
 
-            scroll.Add(SessionHeading("Subjects","person","Names and IDs can be any text. Empty age means unspecified."));
+            scroll.Add(SessionHeading("Animals","person","Names and IDs can be any text. Empty age means unspecified."));
             var rigs=Row("subject-grid"); scroll.Add(rigs);
             foreach(var rig in (Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>())
             {
-                string id=(string)rig["vrId"]; var fly=metadata.Flies.First(f=>f.VR==id);
+                string id=(string)rig["vrId"]; var fly=metadata.Animals.First(f=>f.VR==id);
                 var card=new VisualElement { name="subject-"+id }; card.AddToClassList("subject-card"); rigs.Add(card);
                 var heading=Row("subject-heading"); card.Add(heading); heading.Add(new WorkbenchIcon("person"));
                 var label=new Label(id); label.AddToClassList("subject-name"); heading.Add(label);
                 heading.Add(Pill(RigMode(rig),"accent"));
                 heading.Add(IconButton("settings","More subject details for "+id,()=>ShowSubjectDetails(fly)));
-                SessionField(card,"Name / ID","subject-id-"+id,fly.FlyID,v=>fly.FlyID=v,"Any name, label or ID");
+                SessionField(card,"Animal ID","subject-id-"+id,fly.AnimalID,v=>fly.AnimalID=v,"Any name, label or ID");
+                var species=SessionField(card,"Species","subject-species-"+id,fly.SpeciesName,v=>{
+                    fly.SpeciesName=v; Workspace.System.Edit(r=>((JArray)r["configs"]).OfType<JObject>().First(c=>(string)c["vrId"]==id)["speciesName"]=v); UpdateStatus();
+                },"Common or scientific name");
+                species.tooltip="Species name saved as speciesName in system config and SpeciesName in this animal’s run metadata.";
                 var traits=Row("subject-traits"); card.Add(traits);
                 var sexes=new List<string>{"Unspecified","Female","Male"};
                 string sex=string.IsNullOrEmpty(fly.Sex)?"Unspecified":fly.Sex;
@@ -110,7 +114,7 @@ namespace ConfigurationUI
             if(BuilderSteps.Count==0) scroll.Add(StudioButton("Add your first block","plus",()=>{ Select(Workspace.Sequence); ShowBlockLibrary(); },"primary"));
             UpdateStatus();
         }
-        private void ShowSubjectDetails(Fly fly)
+        private void ShowSubjectDetails(AnimalMetadata fly)
         {
             var details=OpenModal(fly.VR+" · subject details","Additional metadata for this subject.");
             SessionField(details,"Starved since (hours)","subject-starved-"+fly.VR,fly.StarvedSinceHours,v=>fly.StarvedSinceHours=v,"Unspecified");
@@ -162,6 +166,18 @@ namespace ConfigurationUI
             UpdateStatus();
         }
         private Label SessionLabel(string text,string css) { var label=new Label(text); label.AddToClassList(css); return label; }
+        private void ShowReplayLauncher()
+        {
+            RequireApplied();
+            if(!UnityEngine.Application.CanStreamedLevelBeLoaded("ReplayScene"))
+                throw new InvalidOperationException("ReplayScene is not included in this build.");
+            var dialog=OpenModal("Replay a recorded run","Save this setup before leaving, then choose the recorded session folder in replay. Your JSON files and session details will be available when you return to setup.");
+            dialog.Add(StudioButton("Save setup and open replay","play",()=>{
+                RequireApplied(); Workspace.SaveAll(); SaveMetadata();
+                UnityEngine.SceneManagement.SceneManager.LoadScene("ReplayScene");
+            },"primary"));
+            dialog.Add(StudioButton("Keep editing","settings",CloseModal,"quiet"));
+        }
         private void ShowEditorTools()
         {
             var dialog=OpenModal("Config tools","Every JSON value remains accessible, including custom extensions.");
@@ -169,6 +185,9 @@ namespace ConfigurationUI
             dialog.Add(StudioButton("Edit JSON","file",()=>{ CloseModal(); jsonMode=true; BuildContent(); }));
             dialog.Add(StudioButton("Open another file","file",()=>{ CloseModal(); ShowOpenFile(); }));
             dialog.Add(StudioButton("Save a variation","copy",()=>{ CloseModal(); ShowVariation(null); }));
+            var revert=StudioButton("Revert to saved JSON","loop",()=>{ selected.RevertToSaved(); CloseModal(); BuildNavigation(); BuildContent(); });
+            revert.tooltip="Restore this file’s last saved values. Undo restores your draft, including custom fields.";
+            dialog.Add(revert);
         }
     }
 }

@@ -52,7 +52,7 @@ namespace ConfigurationUI
             AddTimingWarnings(scroll,selected);
             if(settingsTab=="Essentials")
             {
-                Section(scroll,"Core controls","motion",payload,schema,prefix,new[]{"durationSeconds","closedLoopOrientation","closedLoopPosition","autopilotEnabled","autopilotSpeed","aglHeight","numberOfLocusts","locustSpeed","dimension","agentVisual","numberOfRings","animateOnMove","loop","repetitions","sync"});
+                Section(scroll,"Core controls","motion",payload,schema,prefix,new[]{"durationSeconds","closedLoopOrientation","closedLoopPosition","autopilotEnabled","autopilotSpeed","aglHeight",AgentCountKey(payload),AgentSpeedKey(payload),"dimension","agentVisual","numberOfRings","animateOnMove","loop","repetitions","sync"});
                 var features=Row("feature-grid"); scroll.Add(features);
                 foreach(string name in new[]{"swarm","nightSky","headingReference","objects","stimuli","steps"})
                     if(payload[name]!=null)
@@ -85,6 +85,9 @@ namespace ConfigurationUI
             }
             if(phased && !ExperimentBlocks.Flag(payload["enabled"],activePhase=="stimulus")) scroll.SetEnabled(false);
         }
+        private static bool HasValue(JObject payload,string key) => payload[key]!=null && payload[key].Type!=JTokenType.Null;
+        private static string AgentCountKey(JObject payload) => HasValue(payload,"agentCount")?"agentCount":HasValue(payload,"numberOfLocusts")?"numberOfLocusts":"agentCount";
+        private static string AgentSpeedKey(JObject payload) => HasValue(payload,"agentSpeed")?"agentSpeed":HasValue(payload,"locustSpeed")?"locustSpeed":HasValue(payload,"locoSpeed")?"locoSpeed":"agentSpeed";
         private static string GroupIcon(string group) => group=="Motion"?"motion":group=="Stimulus"?"swarm":group=="Sky"?"sky":"settings";
         private static IEnumerable<string> DisplayKeys(JObject owner,JObject schema)
         {
@@ -270,21 +273,31 @@ namespace ConfigurationUI
             {
                 var title=Row("section-heading"); title.Add(new WorkbenchIcon("system")); title.Add(new Label("VR rigs · "+rigs.Count));
                 title.Add(StudioButton("Add rig","plus",()=>StudioEdit(selected,r=>{
-                    var array=(JArray)r["configs"]; var rig=ConfigSchema.NewValue((JObject)schema["properties"]["configs"]["items"]) as JObject;
-                    int next=1; while(array.OfType<JObject>().Any(o=>(string)o["vrId"]=="VR"+next)) next++; rig["vrId"]="VR"+next; array.Add(rig);
+                    var array=(JArray)r["configs"];
+                    var rig=array.OfType<JObject>().LastOrDefault()?.DeepClone() as JObject??ConfigSchema.NewValue((JObject)schema["properties"]["configs"]["items"]) as JObject;
+                    int next=1; while(array.OfType<JObject>().Any(o=>(string)o["vrId"]=="VR"+next)) next++;
+                    rig["vrId"]="VR"+next;
+                    var ports=new HashSet<int>(array.OfType<JObject>().Select(o=>(int?)o["zmqPort"]??9872));
+                    int port=9871; while(port<=65535 && ports.Contains(port)) port++;
+                    if(port>65535) throw new ArgumentException("No unused tracking port is available.");
+                    rig["zmqPort"]=port;
+                    bool horizontal=(bool?)rig["horizontal"]??true;
+                    string coordinate=horizontal?"startRow":"startCol";
+                    rig[coordinate]=array.OfType<JObject>().Select(o=>(int?)o[coordinate]??0).DefaultIfEmpty(-1).Max()+1;
+                    array.Add(rig);
                 }),"quiet")); scroll.Add(title);
                 for(int i=0;i<rigs.Count;i++)
                 {
                     int index=i; var rig=rigs[i] as JObject; if(rig==null) continue; var rigSchema=(JObject)schema["properties"]["configs"]["items"];
                     var fold=new Foldout { text=(string)rig["vrId"]+" · "+(rig["closedLoopMode"]?.ToString()??"FicTrac")+" · "+rig["zmqAddress"]+":"+rig["zmqPort"],value=i==0 }; fold.AddToClassList("rig-card"); scroll.Add(fold);
                     var grid=new VisualElement(); grid.AddToClassList("settings-grid"); fold.Add(grid);
-                    foreach(string key in new[]{"vrId","closedLoopMode","zmqAddress","zmqPort","displayOrder","ledPanelWidth","ledPanelHeight","startRow","startCol","horizontal","sphereDiameter","manualControls"})
+                    foreach(string key in new[]{"vrId","speciesName","closedLoopMode","zmqAddress","zmqPort","displayOrder","ledPanelWidth","ledPanelHeight","startRow","startCol","horizontal","sphereDiameter","manualControls"})
                         if(ConfigSchema.Visible(rig,rigSchema,key,Context)) grid.Add(Setting(selected,new[]{"configs",i.ToString(),key},ConfigSchema.Child(rigSchema,key),rig,rigSchema));
                     fold.Add(StudioButton("Remove rig","trash",()=>StudioEdit(selected,r=>((JArray)r["configs"]).RemoveAt(index)),"quiet"));
                 }
             }
             Section(scroll,"Monitoring & operator view","settings",obj,schema,Array.Empty<string>(),new[]{"telemetry","statusOverlay","overheadCamera"});
-            scroll.Add(new Label("Additional rig rows are editable here. Current scenes/controllers still require authored support beyond VR1–VR4."));
+            scroll.Add(new Label("One row per real animal. Add or remove rigs to match your setup. New rows receive a free tracking port and a separate panel row/column; verify the physical display layout before starting."));
         }
     }
 }

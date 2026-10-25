@@ -41,7 +41,7 @@ public class MasterDataLogger : MonoBehaviour
             return;
         }
 
-        string root=Path.Combine(Application.dataPath,"RunData");
+        string root=RuntimePaths.RunDataRoot;
         string baseTimestamp=System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
         int collision=0;
         do
@@ -53,7 +53,7 @@ public class MasterDataLogger : MonoBehaviour
 
         Application.logMessageReceivedThreaded -= HandleLogMessage;
         Application.logMessageReceivedThreaded += HandleLogMessage;
-        ConfigArchive=new RunConfigArchive(directoryPath,Application.streamingAssetsPath,timestamp,Application.unityVersion);
+        ConfigArchive=new RunConfigArchive(directoryPath,RuntimePaths.ConfigRoot,timestamp,Application.unityVersion);
         var main=MainController.Instance!=null?MainController.Instance:FindFirstObjectByType<MainController>();
         try {ConfigArchive.CaptureStartup(startingScene,main!=null?main.SystemConfigurationFileName:"system_config.json");}
         catch(Exception error) {Debug.LogError("Cannot initialize run config archive: "+error.Message);}
@@ -73,7 +73,7 @@ public class MasterDataLogger : MonoBehaviour
         {
             runtimeTraceWriter?.Flush(); runtimeTraceWriter?.Dispose(); runtimeTraceWriter = null;
             ZipDataFolder();
-            string root = Path.Combine(Application.dataPath, "RunData");
+            string root = RuntimePaths.RunDataRoot;
             string baseTimestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss"); int collision = 0;
             do
             {
@@ -81,7 +81,7 @@ public class MasterDataLogger : MonoBehaviour
                 directoryPath = Path.Combine(root, timestamp);
             } while (Directory.Exists(directoryPath) || File.Exists(Path.Combine(root, timestamp + ".zip")));
             Directory.CreateDirectory(directoryPath);
-            ConfigArchive = new RunConfigArchive(directoryPath, Application.streamingAssetsPath, timestamp, Application.unityVersion);
+            ConfigArchive = new RunConfigArchive(directoryPath, RuntimePaths.ConfigRoot, timestamp, Application.unityVersion);
             ConfigArchive.CaptureStartup("ControlScene", systemReference, sequenceReference);
             ConfigArchive.RequireComplete();
         }
@@ -91,12 +91,16 @@ public class MasterDataLogger : MonoBehaviour
     // Zips the data folder
     public void ZipDataFolder()
     {
+        // Finalize all streams before ZIP creation; OnDestroy ordering is not a flush barrier.
+        foreach (var logger in FindObjectsByType<DataLogger>(FindObjectsInactive.Include, FindObjectsSortMode.None)) logger.CloseForArchive();
+        foreach (var logger in FindObjectsByType<BandLogger>(FindObjectsInactive.Include, FindObjectsSortMode.None)) logger.CloseForArchive();
+        foreach (var logger in FindObjectsByType<KannadiLogger>(FindObjectsInactive.Include, FindObjectsSortMode.None)) logger.CloseForArchive();
         // Finish gzip trailers before packaging the session, including when Play mode stops.
         AsyncSwarmWriter.DrainAll();
         // Set the path to the zip file
-        string zipPath = Application.dataPath + $"/RunData/{timestamp}.zip";
+        string zipPath = Path.Combine(RuntimePaths.RunDataRoot, timestamp + ".zip");
         // Create the zip file from the directory
-        ZipFile.CreateFromDirectory(directoryPath, zipPath);
+        if (Directory.Exists(directoryPath) && !File.Exists(zipPath)) ZipFile.CreateFromDirectory(directoryPath, zipPath);
     }
 
     void OnDestroy()

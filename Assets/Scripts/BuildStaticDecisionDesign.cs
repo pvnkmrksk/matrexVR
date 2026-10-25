@@ -190,10 +190,10 @@ public class BuildstaticChoiceDesign
 
         // 4) write to StreamingAssets
         string path = Path.Combine(
-            Application.streamingAssetsPath,
+            RuntimePaths.ConfigRoot,
             "sequenceDesign_staticChoice.json"
         );
-        Directory.CreateDirectory(Application.streamingAssetsPath);
+        Directory.CreateDirectory(RuntimePaths.ConfigRoot);
         File.WriteAllText(path, JsonConvert.SerializeObject(design, Formatting.Indented));
 
         Debug.Log($"Wrote design → {path}");

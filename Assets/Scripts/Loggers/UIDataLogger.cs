@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
@@ -7,41 +8,21 @@ using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
-public class FlyData
-{
-    public string ExperimentName { get; set; }
-    public string ExperimenterName { get; set; }
-    public List<Fly> Flies { get; set; }
-    public string Comments { get; set; }
-    public List<string> UsedFlyIDs { get; set; } = new List<string>();  // Stores all used IDs
-    [JsonExtensionData] public IDictionary<string,JToken> Extensions { get; set; }
-}
-
-public class Fly
-{
-    public string VR { get; set; }
-    public string AgeDays { get; set; }
-    public string StarvedSinceHours { get; set; }
-    public string Sex { get; set; }
-    public string FlyID { get; set; }
-    public string Comments { get; set; }
-    [JsonExtensionData] public IDictionary<string,JToken> Extensions { get; set; }
-}
-
-
 public class UIDataLogger : MonoBehaviour
 {
     public InputField experimenterNameInput;
     public List<InputField> ageInputs;
     public List<InputField> starvedSinceInputs;
     public List<Dropdown> sexDropdowns;
-    public List<InputField> flyIDInputs;
+    [FormerlySerializedAs("flyIDInputs")] public List<InputField> animalIDInputs;
+    public List<InputField> flyIDInputs { get => animalIDInputs; set => animalIDInputs = value; }
     public InputField commentsInput;
     public Button saveButton;
-    public Button newFliesButton;
+    [FormerlySerializedAs("newFliesButton")] public Button newAnimalsButton;
+    public Button newFliesButton { get => newAnimalsButton; set => newAnimalsButton = value; }
     public Button reloadButton;  // New button for reloading data
 
-    private FlyData FliesData; // This will store the current session's fly data
+    private AnimalData animalsData; // This will store the current session's animal metadata
     private string directoryPath; // This will store the path to save data files
     private string backupDirectoryPath;
 
@@ -60,15 +41,15 @@ public class UIDataLogger : MonoBehaviour
         {
             directoryPath = masterDataLogger.directoryPath;
             // Set backupDirectoryPath to be a subdirectory or the same directory
-            backupDirectoryPath = Application.dataPath + "/RunData/Backup"; 
+            backupDirectoryPath = Path.Combine(RuntimePaths.RunDataRoot, "Backup");
             Debug.Log("UI Directory Path: " + directoryPath);
             Debug.Log("Backup Directory Path: " + backupDirectoryPath);
         }
         else
         {
             Debug.LogError("MasterDataLogger not found in the scene. Data will not be saved.");
-            //directoryPath = Application.persistentDataPath;  // Use a default path
-            //backupDirectoryPath = Path.Combine(Application.persistentDataPath, "Backup");
+            enabled=false;
+            return;
         }
         //check if backup path exists
         if (!Directory.Exists(backupDirectoryPath))
@@ -85,39 +66,40 @@ public class UIDataLogger : MonoBehaviour
 
     public void SaveData()
     {
-        FlyData flyData = new FlyData
+        AnimalData animalData = new AnimalData
         {
-            ExperimentName = FliesData?.ExperimentName,
-            Extensions = FliesData?.Extensions,
+            ExperimentName = animalsData?.ExperimentName,
+            Extensions = animalsData?.Extensions,
             ExperimenterName = experimenterNameInput.text,
             Comments = commentsInput.text,
-            Flies = new List<Fly>(),
-            UsedFlyIDs = FliesData != null ? new List<string>(FliesData.UsedFlyIDs) : new List<string>()
+            Animals = new List<AnimalMetadata>(),
+            UsedAnimalIDs = animalsData != null ? new List<string>(animalsData.UsedAnimalIDs ?? new List<string>()) : new List<string>()
         };
 
-        for (int i = 0; i < flyIDInputs.Count; i++)
+        for (int i = 0; i < animalIDInputs.Count; i++)
         {
-            var previous = FliesData?.Flies?.FirstOrDefault(f => f.VR == "VR" + (i + 1));
-            Fly newFly = new Fly
+            var previous = animalsData?.Animals?.FirstOrDefault(f => f.VR == "VR" + (i + 1));
+            AnimalMetadata newAnimal = new AnimalMetadata
             {
                 Comments = previous?.Comments,
+                SpeciesName = MainController.Instance?.GetSystemConfig("VR" + (i + 1))?.speciesName ?? previous?.SpeciesName,
                 Extensions = previous?.Extensions,
                 VR = "VR" + (i + 1),
                 AgeDays = ageInputs[i].text,
                 StarvedSinceHours = starvedSinceInputs[i].text,
                 Sex = sexDropdowns[i].options[sexDropdowns[i].value].text,
-                FlyID = flyIDInputs[i].text
+                AnimalID = animalIDInputs[i].text
             };
-            flyData.Flies.Add(newFly);
+            animalData.Animals.Add(newAnimal);
             // Simply store the string ID
             // This won't throw a format exception, even if the user typed letters
-            if (!string.IsNullOrEmpty(flyIDInputs[i].text))
+            if (!string.IsNullOrEmpty(animalIDInputs[i].text))
             {
-                flyData.UsedFlyIDs.Add(flyIDInputs[i].text);
+                animalData.UsedAnimalIDs.Add(animalIDInputs[i].text);
             }
         }
 
-        string json = JsonConvert.SerializeObject(flyData, Formatting.Indented);
+        string json = JsonConvert.SerializeObject(animalData, Formatting.Indented);
         WriteJsonToFile(json);
     }
 
@@ -128,6 +110,8 @@ public class UIDataLogger : MonoBehaviour
         try
         {
             WriteToFile(directoryPath, fileName, jsonContent);
+            WriteToFile(directoryPath, "AnimalMetadata.json", jsonContent);
+            WriteToFile(directoryPath, "FlyMetaData.json", jsonContent);
             Debug.Log("Normal data saved to file: " + Path.Combine(directoryPath, fileName));
         }
         catch (Exception ex)
@@ -142,6 +126,7 @@ public class UIDataLogger : MonoBehaviour
         try
         {
             WriteToFile(backupDirectoryPath, fileName, jsonContent);
+            WriteToFile(backupDirectoryPath, "AnimalMetadata.json", jsonContent);
             Debug.Log("Backup data saved to file: " + Path.Combine(backupDirectoryPath, fileName));
         }
         catch (Exception ex)
@@ -166,7 +151,7 @@ public class UIDataLogger : MonoBehaviour
     {
         // Generates a filename with a date-time prefix
         string dateTimePrefix = DateTime.Now.ToString("yyyyMMddHHmmss");
-        return dateTimePrefix + "_FlyMetaData.json";
+        return dateTimePrefix + "_AnimalMetadata.json";
     }
 
     // Usage
@@ -178,7 +163,8 @@ public class UIDataLogger : MonoBehaviour
 
     public void LoadLastSessionData()
     {
-        string filePath = Path.Combine(backupDirectoryPath, "FlyMetaData.json");
+        string filePath = Path.Combine(backupDirectoryPath, "AnimalMetadata.json");
+        if (!File.Exists(filePath)) filePath = Path.Combine(backupDirectoryPath, "FlyMetaData.json");
         if (File.Exists(filePath))
         {
             string jsonContent = File.ReadAllText(filePath);
@@ -193,22 +179,22 @@ public class UIDataLogger : MonoBehaviour
 
      private void DeserializeAndSetData(string jsonData)
     {
-        FlyData flyData = JsonConvert.DeserializeObject<FlyData>(jsonData);
+        AnimalData animalData = JsonConvert.DeserializeObject<AnimalData>(jsonData);
 
-        experimenterNameInput.text = flyData.ExperimenterName;
-        commentsInput.text = flyData.Comments;
+        experimenterNameInput.text = animalData.ExperimenterName;
+        commentsInput.text = animalData.Comments;
 
-        FliesData = flyData;  // Store the deserialized FlyData including used IDs
+        animalsData = animalData;  // Store the deserialized animal metadata, including used IDs
 
-        for (int i = 0; i < flyData.Flies.Count; i++)
+        for (int i = 0; i < animalData.Animals.Count && i < animalIDInputs.Count && i < ageInputs.Count && i < starvedSinceInputs.Count && i < sexDropdowns.Count; i++)
         {
-            Fly fly = flyData.Flies[i];
-            ageInputs[i].text = fly.AgeDays;
-            starvedSinceInputs[i].text = fly.StarvedSinceHours;
-            int sexIndex = sexDropdowns[i].options.FindIndex(option => string.Equals(option.text, fly.Sex, StringComparison.OrdinalIgnoreCase));
+            AnimalMetadata animal = animalData.Animals[i];
+            ageInputs[i].text = animal.AgeDays;
+            starvedSinceInputs[i].text = animal.StarvedSinceHours;
+            int sexIndex = sexDropdowns[i].options.FindIndex(option => string.Equals(option.text, animal.Sex, StringComparison.OrdinalIgnoreCase));
             sexDropdowns[i].SetValueWithoutNotify(Math.Max(0, sexIndex));
             sexDropdowns[i].RefreshShownValue();
-            flyIDInputs[i].text = fly.FlyID;
+            animalIDInputs[i].text = animal.AnimalID;
         }
     }    
 }

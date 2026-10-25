@@ -82,7 +82,7 @@ namespace ConfigurationUI
             if(config["steps"] is JArray || config["intertrial"]!=null) return "dynamic-choice";
             if(p?["stimuli"] is JArray) return "optomotor";
             if(path.Contains("kannadi") || path.Contains("kinematic") || p?["numberOfRings"]!=null) return "kannadi";
-            if(path.Contains("/swarm/") || p?["numberOfLocusts"]!=null || p?["agentVisual"]!=null || p?["vrConfigs"]!=null) return "swarm";
+            if(path.Contains("/swarm/") || p?["agentCount"]!=null || p?["numberOfLocusts"]!=null || p?["agentVisual"]!=null || p?["vrConfigs"]!=null) return "swarm";
             return "choice";
         }
         public static ExperimentPreset Read(string reference,string fullPath)
@@ -115,8 +115,10 @@ namespace ConfigurationUI
             if(Flag(p["autopilotEnabled"])) details.Add("Autopilot "+p["autopilotSpeed"]+" units/s");
             else if(p["closedLoopPosition"]!=null) details.Add("Closed loop position "+(Flag(p["closedLoopPosition"],Number(p["closedLoopPosition"],1)!=0)?"ON":"OFF"));
             if(p["closedLoopOrientation"]!=null) details.Add("Closed loop orientation "+(Flag(p["closedLoopOrientation"],Number(p["closedLoopOrientation"],1)!=0)?"ON":"OFF"));
-            JObject swarm=p["swarm"] as JObject??(p["numberOfLocusts"]!=null?p:null);
-            if(swarm!=null) details.Add(!string.IsNullOrWhiteSpace((string)swarm["trajectoryFile"])?"Recorded swarm":(swarm["numberOfLocusts"]?.ToString()??"Scene default")+" agents · "+(string)(swarm["dimension"]??new JValue("2D")));
+            JObject swarm=p["swarm"] as JObject??(p["agentCount"]!=null || p["numberOfLocusts"]!=null?p:null);
+            JToken count=swarm?["agentCount"];
+            if(count==null || count.Type==JTokenType.Null) count=swarm?["numberOfLocusts"];
+            if(swarm!=null) details.Add(!string.IsNullOrWhiteSpace((string)swarm["trajectoryFile"])?"Recorded swarm":(count==null || count.Type==JTokenType.Null?"Scene default":count.ToString())+" agents · "+(string)(swarm["dimension"]??new JValue("2D")));
             if(p["objects"] is JArray objects && objects.Count>0) details.Add(objects.Count+" objects");
             if(p["stimuli"] is JArray stimuli)
             { details.Add(stimuli.Count+" gratings"); if(stimuli.First is JObject first) { details.Add((first["rotationAxis"]?.ToString()??"Yaw")+" · "+first["speed"]+" deg/s"); if(first["contrast"]!=null) details.Add((Number(first["contrast"])*100).ToString("0.#",CultureInfo.InvariantCulture)+"% contrast"); } }

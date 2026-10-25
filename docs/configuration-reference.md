@@ -1,15 +1,17 @@
 # Configuration reference
 
-For recorded swarm input, the standalone converter and batched 3D moth, see [swarm-playback.md](swarm-playback.md). The active standalone Swarm experiment centres each recorded birth on the current animal and continues its terminal direction at the configured 6m/s until 100m away (`playback.continueAfterTrack: true`, `periodicBoundary: false`, `continuationSpeedMetresPerSecond: 6`; nested under `swarm` for Choice terrain experiments). `playback.preRollSeconds` defaults to 0; the active recipe flies the observer at 5 m/s with zero incoming lead-in, matching `Examples/Swarm/selwyn-trajectory-flight-observer.example.json`. The optional `Examples/Swarm/selwyn-trajectory-passive-observer.example.json` disables observer autopilot and uses five seconds of incoming extrapolation for a stationary visibility check. These settings belong to the individual experiment, with defaults and units in that guide. Terrain/migration distances are metres; older walking distances are centimetres. `worldUnitsPerMetre` resolves this explicitly without changing existing movement-controller units.
+For 0.3 species/animal IDs, `agentCount`/`agentSpeed` aliases, rig counts and reversible editing, see [animal/agent compatibility](animal-agent-compatibility.md). The tables retain older accepted JSON names so existing experiments remain interpretable. Current standalone paths use a writable profile; see [getting started](getting-started.md).
+
+For recorded swarm input, the standalone converter and batched 3D moth, see [swarm-playback.md](swarm-playback.md). The recorded-swarm example centres each recorded birth on the current animal and continues its terminal direction at the configured 6m/s until 100m away (`playback.continueAfterTrack: true`, `periodicBoundary: false`, `continuationSpeedMetresPerSecond: 6`; nested under `swarm` for Choice terrain experiments). `playback.preRollSeconds` defaults to 0; that example flies the observer at 5 m/s with zero incoming lead-in, matching `Examples/Swarm/selwyn-trajectory-flight-observer.example.json`. The optional `Examples/Swarm/selwyn-trajectory-passive-observer.example.json` disables observer autopilot and uses five seconds of incoming extrapolation for a stationary visibility check. These settings belong to the individual experiment, with defaults and units in that guide. Terrain/migration distances are metres; older walking distances are centimetres. `worldUnitsPerMetre` resolves this explicitly without changing existing movement-controller units.
 
 This reference describes the experiment configuration code, tested with Unity **6000.3.16f1**. Start with the complete JSON files in [StreamingAssets/Templates](../Assets/StreamingAssets/Templates). They contain editable example values; the tables below distinguish these from values used when a field is omitted. JSON does not allow comments. Keep notes in a separate text file; do not invent JSON keys, because most loaders silently ignore unknown keys.
 
 ## Files, precedence, and running an experiment
 
 1. Use the complete `Templates/system_config.template.json`, `Templates/experiment.template.json` and `Templates/sequence.template.json` as a matched Kinefly flight starting set. Set actual hardware addresses and displays. The local `system_config.json` is Git-ignored and is not replaced by cleanup.
-2. For other paradigms, choose a complete file from [Templates](../Assets/StreamingAssets/Templates/README.md); use [Examples](../Assets/StreamingAssets/Examples/README.md) for variations. All references are relative to StreamingAssets. Dynamic Choice uses `parameters.design`; other experiment controllers use `parameters.configFile`.
+2. For other paradigms, choose a complete file from [Templates](../Assets/StreamingAssets/Templates/README.md); use [Examples](../Assets/StreamingAssets/Examples/README.md) for variations. Relative references resolve from `RuntimePaths.ConfigRoot` (Editor: StreamingAssets; current standalone: writable profile Config). Dynamic Choice uses `parameters.design`; other experiment controllers use `parameters.configFile`.
 3. Open `Assets/Scenes/ControlScene.unity`, enter Play, enter metadata, and start the sequence. Sex is visible for each animal, with Unspecified as the fresh default. Saved Female/Male values are restored on reload. Focus Game for hotkeys.
-4. The active Selwyn sequence and all files in `Kannadi/` are preserved. The old collection is under `Archive/Legacy/`, with original bytes and a checksum manifest. If an experiment reference is missing at its current path, the loader checks that archive, so unchanged Kannadi sequences can still resolve their old Choice dependency.
+4. The prior Selwyn sequence and all files in `Kannadi/` are preserved; current source defaults to the TerrainCueLab demonstration. The old collection is under `Archive/Legacy/`, with original bytes and a checksum manifest. If an experiment reference is missing at its current path, the loader checks that archive, so unchanged Kannadi sequences can still resolve their old Choice dependency.
 
 System config owns physical camera layout and sphere calibration. Sequence config owns scene order and duration. Experiment configs own stimuli and tracked motion. Kannadi/Swarm merge inline `parameters` over `configFile` (arrays replace, rather than append), while autopilot remains owned by the referenced file. Choice/Optomotor read their referenced file without merging inline stimulus fields. Dynamic Choice uses `parameters.design`, not `configFile`.
 
@@ -17,7 +19,7 @@ The recovered historical Adaminaby image/config can also run through the current
 
 Autopilot is controlled by the individual experiment file referenced by `parameters.configFile`, so the sequence selects a complete movement configuration without duplicating its fields.
 
-A default in a C# class is not necessarily a scene default: serialized prefab values override inspector defaults, and omitted fields on an in-scene step can retain state. Use explicit values for reproducibility. A template does not add rigs, scene assets, or hardware automatically.
+A default in a C# class is not necessarily a scene default: serialized prefab values override inspector defaults, and omitted fields on an in-scene step can retain state. Use explicit values for reproducibility. Current source provisions configured rigs from an authored scene template within the available Unity layer capacity. JSON does not create new scenes/assets or physical hardware.
 
 ## Units and coordinate system
 
@@ -33,6 +35,7 @@ Templates: `Templates/system_config.template.json` for this branch’s Bogong fl
 
 | Field | Omitted default | Meaning / useful example |
 |---|---|---|
+| Per-rig `speciesName` | empty | Species recorded for the real animal, also saved as metadata `SpeciesName`; does not change input routing. |
 | `targetFrameRate` | 120 | Positive desired FPS, or -1 for uncapped desktop rendering. Effective when vSyncCount=0. This is a target, not a guaranteed achieved rate. |
 | `vSyncCount` | 0 | 0 uses the FPS target; 1–4 synchronize to every Nth display refresh and override the target on desktop. |
 | `targetDisplay` | 1 | Zero-based physical display; template uses 0. Applies globally to every rig. Per-rig `targetDisplay` is overwritten. The legacy `-display N` startup flag affects initial activation; use JSON targetDisplay for reliable experiment camera mapping. |

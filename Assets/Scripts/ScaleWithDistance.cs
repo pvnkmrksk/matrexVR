@@ -8,6 +8,7 @@ public class ScaleWithDistance : MonoBehaviour
 
     void Start()
     {
+        if(playerCamera!=null)return;
         // Get the tag of this GameObject
         string objectTag = gameObject.tag;
 

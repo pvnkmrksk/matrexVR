@@ -59,6 +59,8 @@ public class SinusoidalGrating : MonoBehaviour
     private Material material;
     private bool textureNeedsUpdate = false;
     private int updateCount = 0;
+    public static int ActiveResourceSets { get; private set; }
+    private bool countedResources;
 
     private void Awake()
     {
@@ -90,8 +92,24 @@ public class SinusoidalGrating : MonoBehaviour
             Debug.Log("Added MeshRenderer component");
         }
         meshRenderer.material = material;
+        ActiveResourceSets++;
+        countedResources = true;
 
         Debug.Log("SinusoidalGrating initialization complete");
+    }
+
+    private void OnDestroy()
+    {
+        // Unity does not destroy native meshes, materials or textures when their GameObject goes away.
+        var filter = GetComponent<MeshFilter>();
+        if (filter != null && filter.sharedMesh == mesh) filter.sharedMesh = null;
+        var renderer = GetComponent<Renderer>();
+        if (renderer != null && renderer.sharedMaterial == material) renderer.sharedMaterial = null;
+        if (material != null) Destroy(material);
+        if (texture != null) Destroy(texture);
+        if (mesh != null) Destroy(mesh);
+        material = null; texture = null; mesh = null;
+        if (countedResources) { ActiveResourceSets--; countedResources = false; }
     }
 
     private void Start()

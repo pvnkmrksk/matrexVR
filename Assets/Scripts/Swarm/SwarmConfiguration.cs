@@ -22,7 +22,7 @@ public static class SwarmConfiguration
         spawner.playbackTarget = rig != null ? rig.transform : null;
         spawner.playbackVolumeSpecified = config.spawnVolumeSize != null;
         spawner.loadConfigFromJsonFile = false;
-        spawner.numberOfLocusts = config.numberOfLocusts ?? spawner.numberOfLocusts;
+        spawner.numberOfLocusts = config.EffectiveAgentCount ?? spawner.numberOfLocusts;
         spawner.spawnAreaSize = config.spawnAreaSize ?? spawner.spawnAreaSize;
         // Keep authored direction separate from the resolved world direction across repeats.
         spawner.authoredMu = config.mu ?? spawner.authoredMu ?? spawner.mu;
@@ -37,8 +37,8 @@ public static class SwarmConfiguration
         spawner.mu = Mathf.Repeat(spawner.authoredMu.Value + yaw, 360);
         spawner.kappa = config.kappa ?? spawner.kappa;
         spawner.directionDistribution = config.directionDistribution;
-        spawner.locustSpeed = config.locustSpeed ?? spawner.locustSpeed;
-        spawner.locustSpeedStdDev = config.locustSpeedStdDev;
+        spawner.locustSpeed = config.EffectiveAgentSpeed ?? spawner.locustSpeed;
+        spawner.locustSpeedStdDev = config.EffectiveAgentSpeedStdDev;
         spawner.preserveBoundaryOvershoot = config.preserveBoundaryOvershoot;
         spawner.dimension = config.dimension ?? spawner.dimension;
         spawner.useSpawnVolume = config.spawnVolumeSize != null;
@@ -61,7 +61,7 @@ public static class SwarmConfiguration
         spawner.animateOnMove = config.animateOnMove;
         spawner.animationSpeedThreshold = config.animationSpeedThreshold;
         bool is3D = string.Equals(spawner.dimension, "3D", System.StringComparison.OrdinalIgnoreCase);
-        if (!config.numberOfLocusts.HasValue && config.density.HasValue)
+        if (!config.EffectiveAgentCount.HasValue && config.density.HasValue)
         {
             Vector3 size = spawner.useSpawnVolume ? spawner.spawnVolumeSize : Vector3.one * spawner.spawnAreaSize;
             float measure = is3D ? size.x * size.y * size.z : spawner.spawnAreaSize * spawner.spawnAreaSize;

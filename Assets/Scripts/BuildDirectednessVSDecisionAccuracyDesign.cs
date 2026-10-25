@@ -222,11 +222,11 @@ public class BuildDirectednessVSDecisionAccuracyDesign
         };
 
         string path = Path.Combine(
-            Application.streamingAssetsPath,
+            RuntimePaths.ConfigRoot,
             "sequenceDesign_directednessVSDecisionAccuracy.json"
         );
 
-        Directory.CreateDirectory(Application.streamingAssetsPath);
+        Directory.CreateDirectory(RuntimePaths.ConfigRoot);
         File.WriteAllText(path, JsonConvert.SerializeObject(design, Formatting.Indented));
 
         Debug.Log($"Wrote design -> {path}");

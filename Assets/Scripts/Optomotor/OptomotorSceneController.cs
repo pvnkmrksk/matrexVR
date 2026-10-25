@@ -45,6 +45,7 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
         }
 
         drumObject = Instantiate(drumPrefab);
+        UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(drumObject, gameObject.scene);
         drumRotator = drumObject.GetComponent<DrumRotator>();
         sinusoidalGrating = drumObject.GetComponent<SinusoidalGrating>();
         drumObject.AddComponent<OptomotorDataLogger>();
@@ -269,6 +270,7 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
     void OnDestroy()
     {
         StopStimulusSequence();
+        if (drumObject != null) Destroy(drumObject);
     }
 
     private void StopStimulusSequence()

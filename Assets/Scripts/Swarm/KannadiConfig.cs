@@ -90,10 +90,10 @@ public class KannadiConfig : SwarmConfig
         if (vrConfigs == null) return;
         foreach (VRConfig vr in vrConfigs)
         {
-            if (vr == null || vr.vrIndex < 1 || vr.vrIndex > 4 || !ids.Add(vr.vrIndex))
-                throw new ArgumentException("vrConfigs must contain unique vrIndex values from 1 to 4.");
-            if (vr.watchIndex.HasValue && (vr.watchIndex < 1 || vr.watchIndex > 4))
-                throw new ArgumentException("watchIndex must be from 1 to 4, or omitted to see the other animals.");
+            if (vr == null || vr.vrIndex < 1 || !ids.Add(vr.vrIndex))
+                throw new ArgumentException("vrConfigs must contain unique positive vrIndex values.");
+            if (vr.watchIndex.HasValue && vr.watchIndex < 1)
+                throw new ArgumentException("watchIndex must be a positive configured rig index, or omitted to see the other animals.");
             ValidateGain(vr.closedLoopPosition); ValidateGain(vr.closedLoopOrientation);
         }
     }
@@ -196,12 +196,19 @@ public class SwarmConfig
     // Swarm settings belong to the individual experiment file. Nullable values
     // preserve scene defaults when an older config omits a setting.
     public int? numberOfLocusts;
+    public int? agentCount; // Preferred neutral name; takes precedence over numberOfLocusts.
     public float? density;
     public float? spawnAreaSize;
     public float? mu;
     public float? kappa;
     public float? locustSpeed;
     public float locustSpeedStdDev; // Nonnegative normal distribution, sampled once per generated agent. Zero preserves legacy speed/RNG.
+    public float? agentSpeed;
+    public float? agentSpeedStdDev;
+    public float? locoSpeed; // Historical spelling accepted on input.
+    [JsonIgnore] public int? EffectiveAgentCount => agentCount ?? numberOfLocusts;
+    [JsonIgnore] public float? EffectiveAgentSpeed => agentSpeed ?? locustSpeed ?? locoSpeed;
+    [JsonIgnore] public float EffectiveAgentSpeedStdDev => agentSpeedStdDev ?? locustSpeedStdDev;
     public float? volumeHalfExtentMetres; // Optional generated cube: +/- this physical distance on each axis.
     public bool preserveBoundaryOvershoot; // Opt-in exact periodic wrapping instead of legacy edge snapping.
     // "2D" is the historical X/Z swarm. "3D" enables a sampled Y volume and Y wrapping.
@@ -236,6 +243,8 @@ public class SwarmConfig
             throw new ArgumentException("animationSpeedThreshold must be finite and nonnegative (world units per second).");
         if (numberOfLocusts.HasValue && numberOfLocusts.Value < 0)
             throw new ArgumentException("numberOfLocusts must be nonnegative.");
+        if (agentCount.HasValue && agentCount.Value < 0)
+            throw new ArgumentException("agentCount must be nonnegative.");
         if (density.HasValue && (!Finite(density.Value) || density.Value < 0))
             throw new ArgumentException("density must be finite and nonnegative agents per world-unit area/volume.");
         if (spawnAreaSize.HasValue && (!Finite(spawnAreaSize.Value) || spawnAreaSize.Value <= 0))
@@ -248,6 +257,9 @@ public class SwarmConfig
             throw new ArgumentException("locustSpeed must be finite and nonnegative world units per second.");
         if (!Finite(locustSpeedStdDev) || locustSpeedStdDev < 0)
             throw new ArgumentException("locustSpeedStdDev must be finite and nonnegative world units per second.");
+        foreach (var speed in new[] { agentSpeed, agentSpeedStdDev, locoSpeed })
+            if (speed.HasValue && (!Finite(speed.Value) || speed.Value < 0))
+                throw new ArgumentException("agentSpeed, agentSpeedStdDev and locoSpeed must be finite and nonnegative world units per second.");
         if (volumeHalfExtentMetres.HasValue && (!Finite(volumeHalfExtentMetres.Value) || volumeHalfExtentMetres <= 0))
             throw new ArgumentException("volumeHalfExtentMetres must be positive metres.");
         if (!string.Equals(dimension, "2D", StringComparison.OrdinalIgnoreCase) &&

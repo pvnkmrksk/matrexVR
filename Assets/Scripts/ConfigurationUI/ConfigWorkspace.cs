@@ -71,9 +71,14 @@ namespace ConfigurationUI
                         {
                             string id=(string)rig["vrId"];
                             if(string.IsNullOrWhiteSpace(id) || !ids.Add(id)) errors.Add(label+": unique nonempty vrId required.");
+                            int index=RuntimeRigRegistry.ParseIndex(id);
+                            if(index<1 || id!="VR"+index) errors.Add(label+": vrId must be VR followed by a positive integer, such as VR1 or VR10.");
                             string order=(string)rig["displayOrder"]??"";
                             if(order.Any(c=>"DRBLFU".IndexOf(c)<0) || order.Distinct().Count()!=order.Length) errors.Add(label+": displayOrder uses each D/R/B/L/F/U at most once.");
                         }
+                        int extraRigs=ids.Count(id=>RuntimeRigRegistry.ParseIndex(id)>4);
+                        int availableLayers=Enumerable.Range(8,24).Count(layer=>string.IsNullOrEmpty(LayerMask.LayerToName(layer)));
+                        if(extraRigs>availableLayers) errors.Add(label+": "+extraRigs+" additional rigs require isolated stimulus layers; this build has "+availableLayers+" available.");
                         int fps=(int?)json["targetFrameRate"]??120;
                         if(fps!=-1 && fps<=0) errors.Add(label+": targetFrameRate must be positive or -1.");
                         json["telemetry"]?.ToObject<TelemetryConfig>()?.Validate();

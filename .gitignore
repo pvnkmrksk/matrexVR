@@ -118,3 +118,4 @@ tools/__pycache__/
 /RWT_Cache/
 /RealWorldTerrainPrefs.xml
 .DS_Store
+/.release-work/

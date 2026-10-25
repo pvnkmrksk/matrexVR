@@ -21,9 +21,9 @@ public static class ExperimentConfigFiles
     }
     public static string Resolve(string reference)
     {
-        string current = Path.Combine(Application.streamingAssetsPath, reference);
+        string current = Path.Combine(RuntimePaths.ConfigRoot, reference);
         if (File.Exists(current) || Path.IsPathRooted(reference)) return current;
-        string archived = Path.Combine(Application.streamingAssetsPath, "Archive", "Legacy", reference);
+        string archived = Path.Combine(RuntimePaths.ConfigRoot, "Archive", "Legacy", reference);
         return File.Exists(archived) ? archived : current;
     }
 
@@ -37,8 +37,8 @@ public static class ExperimentConfigFiles
             {
                 string reference = value.ToString();
                 string path = Resolve(reference);
-                if (path != Path.Combine(Application.streamingAssetsPath, reference))
-                    resolved[key] = Path.GetRelativePath(Application.streamingAssetsPath, path);
+                if (path != Path.Combine(RuntimePaths.ConfigRoot, reference))
+                    resolved[key] = Path.GetRelativePath(RuntimePaths.ConfigRoot, path);
             }
         return resolved;
     }

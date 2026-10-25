@@ -462,7 +462,9 @@ public class DataLogger : MonoBehaviour
     /// Called when the GameObject is destroyed.
     /// Cleans up resources and flushes remaining data.
     /// </summary>
-    protected virtual void OnDestroy()
+    protected virtual void OnDestroy() => CloseForArchive();
+
+    public void CloseForArchive()
     {
         isLogging = false;
         isBuffering = false;

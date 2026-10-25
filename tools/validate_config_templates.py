@@ -53,12 +53,19 @@ def validate(obj, path):
     if obj.get('swarm') is not None:
         validate(obj['swarm'], str(path) + ':swarm')
     if 'sequences' in obj:
+        source_only = obj.get('sourceBuildOnly', False)
+        assert isinstance(source_only, bool), (path, 'sourceBuildOnly must be boolean')
+        if source_only:
+            assert (SA / 'Examples') in Path(path).parents and obj.get('_comment'), (path, 'Only documented Examples may opt into source-only scene checks')
         loop_start = obj.get('loopStartIndex', 0)
         assert isinstance(loop_start, int) and not isinstance(loop_start, bool) and loop_start >= 0, (path, 'loopStartIndex')
         if loop_start:
             assert loop_start < len(obj['sequences']) and not obj.get('randomise', False), (path, 'loopStartIndex requires an existing row and fixed order')
         for step in obj['sequences']:
-            assert step['sceneName'] in scenes, (path, step['sceneName'])
+            if source_only:
+                assert (ROOT / 'Assets/Scenes' / (step['sceneName'] + '.unity')).is_file(), (path, step['sceneName'])
+            else:
+                assert step['sceneName'] in scenes, (path, step['sceneName'])
             assert step['duration'] > 0, path
             assert isinstance(step.get('autoTrim', False), bool), path
             validate(step, str(path) + ':sequence')
@@ -96,7 +103,10 @@ def validate(obj, path):
             assert 0 <= stimulus['contrast'] <= 1 and 0 <= stimulus['dutyCycle'] <= 1, path
             assert stimulus['rotationAxis'] in ['Yaw', 'Pitch', 'Roll'], path
     if obj.get('vrConfigs') is not None:
-        assert all(1 <= vr['vrIndex'] <= 4 for vr in obj['vrConfigs']), path
+        indexes = [vr['vrIndex'] for vr in obj['vrConfigs']]
+        assert all(isinstance(index, int) and not isinstance(index, bool) and index >= 1 for index in indexes), path
+        assert len(indexes) == len(set(indexes)), path
+        assert all(vr.get('watchIndex') is None or vr['watchIndex'] >= 1 for vr in obj['vrConfigs']), path
     if 'aglHeight' in obj:
         assert obj['aglHeight'] >= 0 and obj['windSpeed'] >= 0, path
     if 'autopilotSpeed' in obj:
@@ -114,6 +124,11 @@ def validate(obj, path):
         assert obj['density'] >= 0, path
     if 'locustSpeedStdDev' in obj:
         assert obj['locustSpeedStdDev'] >= 0, path
+    for name in ['agentCount', 'agentSpeed', 'agentSpeedStdDev', 'locoSpeed']:
+        if obj.get(name) is not None:
+            assert isinstance(obj[name], (int, float)) and not isinstance(obj[name], bool) and math.isfinite(obj[name]) and obj[name] >= 0, path
+            if name == 'agentCount':
+                assert isinstance(obj[name], int), path
     if 'volumeHalfExtentMetres' in obj and obj['volumeHalfExtentMetres'] is not None:
         assert obj['volumeHalfExtentMetres'] > 0, path
     if 'preserveBoundaryOvershoot' in obj:

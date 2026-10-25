@@ -1,4 +1,6 @@
 {
+  "sourceBuildOnly": true,
+  "_comment": "Source-build example: enable the optional Choice_Forrest and Choice_TwoTreeIndia scenes referenced below in Unity Build Profiles before running this sequence. They are not included in the compact downloadable application.",
   "autoStart": false,
   "loop": false,
   "randomise": false,

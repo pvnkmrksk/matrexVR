@@ -1,6 +1,6 @@
 # Configuration GUI and operator HUD
 
-The experimental GUI remains on `codex/config-ui-test`. The Bogong night-sky branch keeps the older interface. Open ControlScene and press Play, or use **Tools → Experiment setup → Open setup screen (Play)**. No GUI changes are pushed to the Bogong branch by this work.
+The Config UI Test work is preserved in the 0.2 baseline and carried into current source. Older Bogong-only builds retain their historical interface. Open ControlScene and press Play, or use **Tools → Experiment setup → Open setup screen (Play)**. No GUI changes are pushed to the Bogong branch by this work.
 
 The dashboard is designed first for **1920 × 1080**. Session, Sequence config, System config and Experiment configs always occupy the same left navigation rail, with a selected-page highlight. The header carries page context, setup state and live FPS/frame time; the independent FPS canvas is suspended while setup is open and restored for the run. The footer owns Save and Start. Experiment controls stay in the workspace, and the secondary overview gives run context. Smaller windows retain the navigation and use vertical scrolling where necessary; horizontal scrollbars are hidden and controls are checked for overflow.
 

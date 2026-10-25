@@ -216,10 +216,10 @@ public class BuildGrayShadeChoiceDesign
 
         // 4) write to StreamingAssets
         string path = Path.Combine(
-            Application.streamingAssetsPath,
+            RuntimePaths.ConfigRoot,
             "sequenceDesign_grayShades.json"
         );
-        Directory.CreateDirectory(Application.streamingAssetsPath);
+        Directory.CreateDirectory(RuntimePaths.ConfigRoot);
         File.WriteAllText(path, JsonConvert.SerializeObject(design, Formatting.Indented));
 
         Debug.Log($"Wrote design → {path}");

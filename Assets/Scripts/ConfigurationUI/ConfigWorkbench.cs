@@ -40,7 +40,7 @@ namespace ConfigurationUI
         private IVisualElementScheduledItem helpDelay;
         private string filter="";
         private readonly List<string> rows=new List<string>();
-        private FlyData metadata;
+        private AnimalData metadata;
         private readonly List<UnityEngine.UI.GraphicRaycaster> legacyRaycasters=new List<UnityEngine.UI.GraphicRaycaster>();
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Reset() { Instance=null; SceneManager.sceneLoaded-=Loaded; }
@@ -167,13 +167,14 @@ namespace ConfigurationUI
             var toolbar=Row(); body.Add(toolbar);
             toolbar.Add(Button("← Builder",()=>{ RequireApplied(); jsonMode=false; advancedMode=false; path.Clear(); BuildContent(); }));
             toolbar.Add(Button("JSON",()=>{ RequireApplied(); jsonMode=true; BuildContent(); }));
-            toolbar.Add(Button("Reload disk",()=>{ selected.Reload(); path.Clear(); BuildContent(); BuildNavigation(); }));
+            toolbar.Add(Button("Reload disk (undoable)",()=>{ RequireApplied(); selected.Reload(true); path.Clear(); BuildContent(); BuildNavigation(); }));
             if(jsonMode)
             {
-                raw=new TextField { multiline=true,value=selected.Root.ToString(Formatting.Indented) }; raw.AddToClassList("raw-json"); body.Add(raw);
+                raw=new TextField { name="raw-json-editor",multiline=true,verticalScrollerVisibility=ScrollerVisibility.Auto,value=selected.Root.ToString(Formatting.Indented) }; raw.AddToClassList("raw-json"); body.Add(raw);
                 raw.RegisterValueChangedCallback(e=>{ rawPending=true; status.text="JSON draft — apply to synchronize the form."; save.SetEnabled(false); start.SetEnabled(false); });
-                var actions=Row(); actions.Add(Button("Apply JSON",()=>{ selected.ApplyJson(raw.value); rawPending=false; Workspace.RefreshReferences(); BuildNavigation(); UpdateStatus(); }));
-                actions.Add(Button("Discard draft",()=>BuildContent())); body.Add(actions);
+                var actions=Row("json-actions");
+                var apply=Button("Apply JSON",()=>{ selected.ApplyJson(raw.value); rawPending=false; Workspace.RefreshReferences(); BuildNavigation(); UpdateStatus(); }); apply.name="apply-raw-json";actions.Add(apply);
+                var discard=Button("Discard draft",()=>BuildContent());discard.name="discard-raw-json";actions.Add(discard);body.Add(actions);
             }
             else
             {
@@ -214,7 +215,7 @@ namespace ConfigurationUI
             inspector.Add(new Label("Existing keys and numeric precision are retained. Missing, null, false and zero remain distinct. Omitted fields are added only when you choose them."));
             inspector.Add(new Label("Run behavior"));
             inspector.Add(new Label("Start saves and validates the referenced files, snapshots a fresh session, then removes this setup panel. Python analysis remains optional."));
-            if(selected.SchemaId=="system") inspector.Add(new Label("You can add any number of rig entries here. Runtime scenes currently author VR1–VR4; extra entries require matching scene rigs and controller support."));
+            if(selected.SchemaId=="system") inspector.Add(new Label("The configured VR entries determine the active animals. Extra rigs are created from the scene template, with separate stimulus layers; validation checks this build’s available capacity."));
             inspector.Add(new Label("Flight / walking"));
             inspector.Add(new Label("Kinefly selects wing-angle flight input. FicTrac selects ball tracking. Choose the corresponding scene and complete experiment template. Scene units: terrain metres, walking centimetres."));
             UpdateStatus();
@@ -331,13 +332,13 @@ namespace ConfigurationUI
             var comments=new TextField("Comments") { multiline=true,value=metadata.Comments }; scroll.Add(comments); comments.RegisterValueChangedCallback(e=>metadata.Comments=e.newValue);
             foreach(var rig in (Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>())
             {
-                string id=(string)rig["vrId"]; var fly=metadata.Flies.FirstOrDefault(f=>f.VR==id);
-                if(fly==null) { fly=new Fly { VR=id,Sex="Unspecified" }; metadata.Flies.Add(fly); }
+                string id=(string)rig["vrId"]; var fly=metadata.Animals.FirstOrDefault(f=>f.VR==id);
+                if(fly==null) { fly=new AnimalMetadata { VR=id,Sex="Unspecified" }; metadata.Animals.Add(fly); }
                 scroll.Add(new Label(id));
                 var f=fly;
-                foreach(string key in new[]{"FlyID","AgeDays","StarvedSinceHours"})
+                foreach(string key in new[]{"AnimalID","AgeDays","StarvedSinceHours"})
                 {
-                    var property=typeof(Fly).GetProperty(key); var field=new TextField(Human(key)) { value=(string)property.GetValue(f) }; scroll.Add(field); field.RegisterValueChangedCallback(e=>property.SetValue(f,e.newValue));
+                    var property=typeof(AnimalMetadata).GetProperty(key); var field=new TextField(Human(key)) { value=(string)property.GetValue(f) }; scroll.Add(field); field.RegisterValueChangedCallback(e=>property.SetValue(f,e.newValue));
                 }
                 var sex=new DropdownField("Sex",new List<string>{"Unspecified","Female","Male"},0) { value=string.IsNullOrEmpty(f.Sex)?"Unspecified":f.Sex }; scroll.Add(sex); sex.RegisterValueChangedCallback(e=>f.Sex=e.newValue);
             }
@@ -348,10 +349,11 @@ namespace ConfigurationUI
         {
             EnsureMetadata();
             var ids=new HashSet<string>((Workspace.System.Root["configs"] as JArray??new JArray()).Select(v=>(string)v["vrId"]));
-            var data=new FlyData { ExperimentName=metadata.ExperimentName,ExperimenterName=metadata.ExperimenterName,Comments=metadata.Comments,Extensions=metadata.Extensions,Flies=metadata.Flies.Where(f=>ids.Contains(f.VR)).ToList(),UsedFlyIDs=metadata.UsedFlyIDs??new List<string>() };
-            foreach(var fly in data.Flies) if(!string.IsNullOrWhiteSpace(fly.FlyID) && !data.UsedFlyIDs.Contains(fly.FlyID)) data.UsedFlyIDs.Add(fly.FlyID);
+            var data=new AnimalData { ExperimentName=metadata.ExperimentName,ExperimenterName=metadata.ExperimenterName,Comments=metadata.Comments,Extensions=metadata.Extensions,Animals=metadata.Animals.Where(f=>ids.Contains(f.VR)).ToList(),UsedAnimalIDs=metadata.UsedAnimalIDs??new List<string>() };
+            foreach(var fly in data.Animals) if(!string.IsNullOrWhiteSpace(fly.AnimalID) && !data.UsedAnimalIDs.Contains(fly.AnimalID)) data.UsedAnimalIDs.Add(fly.AnimalID);
             string json=JsonConvert.SerializeObject(data,Formatting.Indented);
-            string backup=Path.Combine(Application.dataPath,"RunData/Backup"); Directory.CreateDirectory(backup);
+            string backup=Path.Combine(RuntimePaths.RunDataRoot,"Backup"); Directory.CreateDirectory(backup);
+            File.WriteAllText(Path.Combine(backup,"AnimalMetadata.json"),json);
             File.WriteAllText(Path.Combine(backup,"FlyMetaData.json"),json);
             // Setup edits belong to the draft backup. A completed run's metadata
             // is written only once, into the fresh folder prepared by Start.
@@ -361,15 +363,17 @@ namespace ConfigurationUI
         {
             if(metadata==null)
             {
-                string backup=Path.Combine(Application.dataPath,"RunData/Backup/FlyMetaData.json");
-                metadata=File.Exists(backup)?JsonConvert.DeserializeObject<FlyData>(File.ReadAllText(backup)):new FlyData();
-                metadata=metadata??new FlyData(); metadata.Flies=metadata.Flies??new List<Fly>();
+                string backup=Path.Combine(RuntimePaths.RunDataRoot,"Backup/AnimalMetadata.json");
+                if(!File.Exists(backup)) backup=Path.Combine(RuntimePaths.RunDataRoot,"Backup/FlyMetaData.json");
+                metadata=File.Exists(backup)?JsonConvert.DeserializeObject<AnimalData>(File.ReadAllText(backup)):new AnimalData();
+                metadata=metadata??new AnimalData(); metadata.Animals=metadata.Animals??new List<AnimalMetadata>();
             }
             foreach(var rig in (Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>())
             {
                 string id=(string)rig["vrId"];
-                if(!metadata.Flies.Any(f=>f.VR==id)) metadata.Flies.Add(new Fly { VR=id,Sex="Unspecified" });
-                var fly=metadata.Flies.First(f=>f.VR==id); if(string.IsNullOrEmpty(fly.Sex)) fly.Sex="Unspecified";
+                if(!metadata.Animals.Any(f=>f.VR==id)) metadata.Animals.Add(new AnimalMetadata { VR=id,Sex="Unspecified" });
+                var fly=metadata.Animals.First(f=>f.VR==id); if(string.IsNullOrEmpty(fly.Sex)) fly.Sex="Unspecified";
+                if(rig["speciesName"]!=null) fly.SpeciesName=(string)rig["speciesName"];
             }
         }
         public void StartExperiment()
@@ -380,6 +384,7 @@ namespace ConfigurationUI
             var main=MainController.Instance;
             main.PrepareConfiguredRun(Workspace.System.Path,Workspace.Sequence.Path);
             string metadataJson=SaveMetadata();
+            File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"AnimalMetadata.json"),metadataJson);
             File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"FlyMetaData.json"),metadataJson);
             // Detach immediately; Destroy alone is deferred until end of frame.
             Document.enabled=false; root.Clear(); enabled=false;

@@ -1,0 +1,41 @@
+{
+  "agentCount": 150,
+  "agentSpeed": 6.17,
+  "agentSpeedStdDev": 1.24,
+  "dimension": "3D",
+  "worldUnitsPerMetre": 1,
+  "spawnRelativeToAnimal": true,
+  "followAnimalPosition": true,
+  "volumeHalfExtentMetres": 2,
+  "directionDistribution": "VonMises",
+  "mu": 0,
+  "kappa": 100,
+  "muElevation": 0,
+  "kappaElevation": 100,
+  "wrapY": true,
+  "preserveBoundaryOvershoot": true,
+  "agentVisual": "Bogong",
+  "bogongVisual": {
+    "sizeMode": "World",
+    "size": 0.5,
+    "angularSizeDegrees": 1,
+    "color": {
+      "r": 0.12,
+      "g": 0.12,
+      "b": 0.12,
+      "a": 1
+    },
+    "metallic": 0,
+    "smoothness": 0.25,
+    "flickerFrequencyHz": 0,
+    "flickerDutyCycle": 0.5,
+    "shape": "Moth",
+    "bodyLengthMetres": 0.0254,
+    "bodyDiameterMetres": 0.01,
+    "wingSpanMetres": 0.04,
+    "flapFrequencyHz": 30,
+    "wingOpacity": 0.25,
+    "subpixelVisibility": true
+  },
+  "autopilotEnabled": false
+}

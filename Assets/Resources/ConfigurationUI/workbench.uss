@@ -186,6 +186,7 @@ Button.tab-active { background-color: rgb(42, 59, 77); color: rgb(196, 220, 243)
 .subject-grid { flex-wrap: wrap; align-items: flex-start; }
 .subject-card { flex-grow: 1; flex-basis: 22%; min-width: 230px; margin: 0 10px 12px 0; padding: 12px; border-width: 1px; border-color: rgb(57, 68, 82); border-radius: 5px; background-color: rgb(31, 38, 47); }
 .subject-heading { min-height: 28px; margin-bottom: 8px; }
+.subject-heading > .pill { flex-shrink: 0; white-space: nowrap; }
 .subject-name { flex-grow: 1; font-size: 16px; -unity-font-style: bold; }
 .subject-card > .session-field { margin: 0 0 5px; height: 58px; }
 .subject-card > .session-comments { height: 72px; margin-bottom: 0; }
@@ -234,8 +235,9 @@ Button.tab-active { background-color: rgb(42, 59, 77); color: rgb(196, 220, 243)
 .field-controls { flex-grow: 1; flex-basis: 0; flex-direction: row; align-items: center; }
 .field-controls TextField, .field-controls DropdownField { flex-grow: 1; flex-basis: 0; min-width: 45px; }
 Button.mini { height: 29px; padding: 3px 6px; font-size: 11px; }
-.raw-json { flex-grow: 1; margin-top: 16px; }
-.raw-json .unity-text-field__input { white-space: normal; -unity-text-align: upper-left; }
+.raw-json { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-height: 0; margin-top: 16px; }
+.raw-json .unity-text-field__input { min-height: 0; white-space: normal; -unity-text-align: upper-left; }
+.json-actions { flex-shrink: 0; min-height: 38px; margin-top: 8px; }
 .metadata { flex-grow: 1; padding-top: 15px; }
 .metadata Label { margin-top: 18px; margin-bottom: 5px; }
 .studio-setting:disabled { opacity: 0.55; }

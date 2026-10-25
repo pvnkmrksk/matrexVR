@@ -9,7 +9,7 @@ using System.Threading;
 /// <summary>Bounded, pooled snapshots. Formatting, gzip and file I/O run on one worker.</summary>
 public sealed class AsyncSwarmWriter
 {
-    public struct Agent { public string name, layer; public float x, y, z; }
+    public struct Agent { public string name, layer; public float x, y, z, rx, ry, rz; }
     public sealed class Frame
     {
         public Agent[] agents;
@@ -21,6 +21,8 @@ public sealed class AsyncSwarmWriter
     private readonly ConcurrentQueue<Frame> pending = new ConcurrentQueue<Frame>();
     private readonly ConcurrentQueue<Frame> pool = new ConcurrentQueue<Frame>();
     private readonly AutoResetEvent signal = new AutoResetEvent(false);
+    private readonly object signalGate = new object();
+    private bool signalDisposed;
     private readonly Thread worker;
     private volatile bool completing;
     private volatile string failure;
@@ -32,6 +34,7 @@ public sealed class AsyncSwarmWriter
     public long DroppedFrames => Interlocked.Read(ref droppedFrames);
     public long WrittenRows => Interlocked.Read(ref writtenRows);
     public string Failure => failure;
+    public static int ActiveWriterCount { get { lock (activeLock) return active.Count; } }
 
     public AsyncSwarmWriter(string path, string header)
     {
@@ -48,12 +51,22 @@ public sealed class AsyncSwarmWriter
     }
     public bool Submit(Frame frame)
     {
-        if (completing || failure != null || PendingFrames >= Capacity)
-        { Interlocked.Increment(ref droppedFrames); pool.Enqueue(frame); return false; }
-        Interlocked.Increment(ref pendingCount);
-        pending.Enqueue(frame); signal.Set(); return true;
+        lock (signalGate)
+        {
+            if (completing || signalDisposed || failure != null || PendingFrames >= Capacity)
+            { Interlocked.Increment(ref droppedFrames); pool.Enqueue(frame); return false; }
+            Interlocked.Increment(ref pendingCount);
+            pending.Enqueue(frame); signal.Set(); return true;
+        }
     }
-    public void Complete() { completing = true; signal.Set(); }
+    public void Complete()
+    {
+        lock (signalGate)
+        {
+            completing = true;
+            if (!signalDisposed) signal.Set();
+        }
+    }
     public static void DrainAll()
     {
         AsyncSwarmWriter[] writers;
@@ -80,7 +93,7 @@ public sealed class AsyncSwarmWriter
                         for (int i = 0; i < frame.count; i++)
                         {
                             Agent a = frame.agents[i];
-                            output.WriteLine(FormattableString.Invariant($"{timestamp},{Csv(a.name)},{Csv(a.layer)},{a.x},{a.y},{a.z},{Csv(frame.skyboxId)},{Csv(frame.skyboxSampleUtc)},{Csv(frame.phase)}"));
+                            output.WriteLine(FormattableString.Invariant($"{timestamp},{Csv(a.name)},{Csv(a.layer)},{a.x},{a.y},{a.z},{Csv(frame.skyboxId)},{Csv(frame.skyboxSampleUtc)},{Csv(frame.phase)},{a.rx},{a.ry},{a.rz}"));
                         }
                         Interlocked.Add(ref writtenRows, frame.count);
                         Interlocked.Decrement(ref pendingCount);
@@ -99,6 +112,7 @@ public sealed class AsyncSwarmWriter
         finally
         {
             while (pending.TryDequeue(out _)) { Interlocked.Decrement(ref pendingCount); Interlocked.Increment(ref droppedFrames); }
+            lock (signalGate) { signal.Dispose(); signalDisposed = true; }
             lock (activeLock) active.Remove(this);
         }
     }

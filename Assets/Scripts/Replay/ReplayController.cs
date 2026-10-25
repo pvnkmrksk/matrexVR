@@ -1,40 +1,23 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using Newtonsoft.Json;
-using UnityEngine.UI;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
-/// <summary>
-/// Minimal offline replay controller that reads existing DataLogger CSVs
-/// from RunData/<timestamp>/ and replays rig positions in the scene.
-/// </summary>
+/// <summary>Saved-run viewer with one acquisition timeline, disk-indexed agent frames and a default God's-eye view.</summary>
 public class ReplayController : MonoBehaviour
 {
-    [Tooltip("Name of the session folder under Assets/RunData (e.g., 20250101_123000). Leave empty to auto-pick newest.")]
     public string sessionFolder;
-
-    [Tooltip("Optional absolute path override; leave empty to use Assets/RunData/<sessionFolder>.")]
     public string absoluteSessionPath;
-
-    [Tooltip("Prefab used to visualize a rig (e.g., a sphere/arrow).")]
     public GameObject rigMarkerPrefab;
-
-    [Tooltip("Create a camera per rig and split the screen into viewports.")]
     public bool createRigCameras = true;
-
-    [Tooltip("Desired horizontal FOV in degrees for replay cameras.")]
     public float targetHorizontalFov = 110f;
-
-    [Tooltip("Seconds of replay per real-time second.")]
     public float playbackSpeed = 1f;
-
-    [Tooltip("Loop playback when reaching the end of the log.")]
     public bool loop = true;
-
-    [Header("Scrubbing / Controls")]
-    [Tooltip("UI slider that maps 0..1 to 0..maxTime; hook its OnValueChanged to SetScrubNormalized.")]
     public Slider scrubSlider;
     public KeyCode togglePlayKey = KeyCode.Space;
     public KeyCode backKey = KeyCode.LeftArrow;
@@ -44,522 +27,404 @@ public class ReplayController : MonoBehaviour
     public float smallStepSeconds = 1f;
     public float largeStepSeconds = 10f;
     public bool pauseOnSeek = true;
-    [Tooltip("If true, after a seek/scrub, playback resumes automatically if it was playing before.")]
     public bool autoResumeAfterSeek = true;
-
-    [Header("Step markers (optional)")]
-    [Tooltip("Parent RectTransform to place step markers under; if empty, uses the slider transform.")]
     public RectTransform stepMarkerContainer;
-    [Tooltip("Prefab (UI Image/RectTransform) for a step marker on the scrub bar.")]
     public GameObject stepMarkerPrefab;
-
-    [Header("Environment (optional)")]
-    [Tooltip("Optional environment loader; will swap environment when stepName changes.")]
     public ReplayEnvironmentLoader environmentLoader;
+    public bool showOverviewOnStart = true;
+    public bool loadRecordedAgents = true;
+    public bool interpolateAnimalPoses = true;
+    [Tooltip("Never interpolate a larger position jump; resets and periodic wrapping stay discontinuous.")]
+    public float maximumInterpolationDistance = 50f;
 
-    private readonly Dictionary<string, List<Sample>> samplesByRig = new();
-    private readonly Dictionary<string, int> cursorByRig = new();
-    private readonly Dictionary<string, GameObject> markerByRig = new();
-    private float replayTime;
-    private float maxTime;
-    private bool ready;
-    private string designFileName;
-    private string currentEnvStep;
-    private readonly Dictionary<string, Camera> camerasByRig = new();
-    private readonly List<string> rigOrder = new();
-    private bool isPlaying = true;
-    private bool sliderDragging;
-    private readonly List<StepChange> stepChanges = new();
-    private readonly List<GameObject> stepMarkerInstances = new();
-    private bool resumePending;
+    public double ReplayTime => replayTime;
+    public double Duration => archive?.Duration ?? 0;
+    public bool IsPlaying => isPlaying;
+    public bool Ready => archive != null;
+    public bool Loading => loading;
+    public bool OverviewVisible => selectedView < 0;
+    public string LoadError { get; private set; }
+    public ReplaySessionArchive Session => archive;
+    public int AnimalCount => rigOrder.Count;
+    public int PopulationRecordingCount => populations.Count;
 
-    private class Sample
+    private sealed class Population
     {
-        public float t;
-        public Vector3 pos;
-        public Vector3 rot;
-        public string stepName;
-        public int stepIndex;
+        public ReplayAgentStream stream;
+        public readonly Dictionary<int,GameObject> visuals = new Dictionary<int,GameObject>();
+        public readonly HashSet<int> active = new HashSet<int>();
+        public int contextVersion=-1;
+    }
+    private sealed class LoadedRun
+    {
+        public ReplaySessionArchive archive;
+        public readonly List<ReplayAgentStream> agents = new List<ReplayAgentStream>();
+    }
+    private static string pendingSessionPath;
+    private readonly Dictionary<string,GameObject> markerByRig = new Dictionary<string,GameObject>();
+    private readonly Dictionary<string,Camera> camerasByRig = new Dictionary<string,Camera>();
+    private readonly List<string> rigOrder = new List<string>();
+    private readonly List<ReplaySessionArchive.Sample> stepChanges = new List<ReplaySessionArchive.Sample>();
+    private readonly List<Population> populations = new List<Population>();
+    private ReplaySessionArchive archive;
+    private Transform generatedRoot, populationRoot;
+    private Camera overview;
+    private double replayTime;
+    private bool isPlaying=true, loading, pathFocused, showDetails;
+    private int selectedView=-1;
+    private string folderInput="", loadProgress="", cacheDirectory;
+    private Vector2 detailScroll;
+    private Task<LoadedRun> pendingLoad;
+    private ReplaySessionArchive.Sample referenceSample;
+    private Bounds trajectoryBounds;
+    private GUIStyle titleStyle, smallStyle;
+    private Task<string> folderPicker;
+    private int cameraLayoutVersion=-1;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()=>pendingSessionPath=null;
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void LaunchFromArguments()
+    {
+        string[] arguments=Environment.GetCommandLineArgs();
+        for(int i=1;i<arguments.Length;i++)
+        {
+            if((arguments[i]=="--replay-session" || arguments[i]=="-replay-session") && i+1<arguments.Length)
+            {OpenSession(arguments[i+1]);return;}
+        }
+    }
+    public static void OpenSession(string directory)
+    {
+        if(string.IsNullOrWhiteSpace(directory))throw new ArgumentException("Choose a saved run folder.");
+        pendingSessionPath=Path.GetFullPath(directory.Trim().Trim('"'));
+        MainController.Instance?.StopSequence();
+        SceneManager.LoadScene("ReplayScene");
     }
 
     private void Start()
     {
-        string path = ResolveSessionPath();
-        if (string.IsNullOrEmpty(path) || !Directory.Exists(path))
-        {
-            Debug.LogError($"[Replay] Session path not found: {path}");
-            return;
-        }
-
-        designFileName = ResolveDesignFile(path);
-        if (environmentLoader && !string.IsNullOrEmpty(designFileName))
-            environmentLoader.LoadDesign(designFileName);
-
-        LoadCsvs(path);
-        SpawnMarkers();
-        if (environmentLoader)
-            environmentLoader.SetRigIds(rigOrder);
-
-        if (createRigCameras)
-            CreateRigCameras();
-
-        BuildStepTimeline();
-        RenderStepMarkers();
-
-        ready = samplesByRig.Count > 0;
-        if (!ready)
-            Debug.LogWarning("[Replay] No samples loaded; nothing to replay.");
-    }
-
-    private void Update()
-    {
-        if (!ready || maxTime <= 0f)
-            return;
-
-        HandleInput();
-
-        if (isPlaying)
-        {
-            replayTime += Time.deltaTime * playbackSpeed;
-            if (replayTime > maxTime)
-            {
-                if (loop)
-                    replayTime %= maxTime;
-                else
-                {
-                    replayTime = maxTime;
-                    isPlaying = false;
-                }
-            }
-        }
-
-        foreach (var kvp in samplesByRig)
-        {
-            string rig = kvp.Key;
-            List<Sample> list = kvp.Value;
-            if (list.Count == 0 || !markerByRig.TryGetValue(rig, out var marker))
-                continue;
-
-            // advance cursor if needed
-            int cursor = cursorByRig[rig];
-            // move forward
-            while (cursor < list.Count - 1 && list[cursor + 1].t <= replayTime)
-                cursor++;
-            // move backward
-            while (cursor > 0 && list[cursor].t > replayTime)
-                cursor--;
-            cursorByRig[rig] = cursor;
-
-            Sample a = list[cursor];
-            Sample b = cursor < list.Count - 1 ? list[cursor + 1] : a;
-            float span = Mathf.Max(0.0001f, b.t - a.t);
-            float lerp = Mathf.Clamp01((replayTime - a.t) / span);
-            Vector3 pos = Vector3.Lerp(a.pos, b.pos, lerp);
-            Vector3 rot = Vector3.Lerp(a.rot, b.rot, lerp);
-
-            marker.transform.position = pos;
-            marker.transform.rotation = Quaternion.Euler(rot);
-
-            // Track step changes using the first rig as reference
-            if (environmentLoader != null && rig == GetReferenceRig() && !string.IsNullOrEmpty(a.stepName))
-            {
-                if (a.stepName != currentEnvStep)
-                {
-                    currentEnvStep = a.stepName;
-                    environmentLoader.ApplyStep(currentEnvStep);
-
-                    // update camera bg for this step
-                    var specs = environmentLoader.GetCameraSpecs(currentEnvStep);
-                    ApplyCameraSpecs(specs);
-                }
-            }
-        }
-
-        if (scrubSlider && !sliderDragging && maxTime > 0f)
-            scrubSlider.value = Mathf.Clamp01(replayTime / maxTime);
-
-        if (resumePending && !sliderDragging)
-        {
-            isPlaying = true;
-            resumePending = false;
-        }
+        MainController.Instance?.StopSequence();
+        generatedRoot=new GameObject("Replay generated visuals").transform;generatedRoot.SetParent(transform,false);
+        populationRoot=new GameObject("Recorded populations").transform;populationRoot.SetParent(generatedRoot,false);
+        if(environmentLoader==null)environmentLoader=GetComponent<ReplayEnvironmentLoader>()??gameObject.AddComponent<ReplayEnvironmentLoader>();
+        overview=Camera.main;
+        if(overview==null)overview=new GameObject("Replay overview",typeof(Camera)).GetComponent<Camera>();
+        overview.depth=10;overview.rect=new Rect(0,.20f,1,.80f);overview.clearFlags=CameraClearFlags.SolidColor;
+        overview.backgroundColor=new Color(.04f,.055f,.075f);overview.orthographic=true;
+        if(scrubSlider!=null)scrubSlider.gameObject.SetActive(false); // Runtime controls work without scene wiring.
+        cacheDirectory=Path.Combine(Application.temporaryCachePath,"MatrexReplay",Guid.NewGuid().ToString("N"));
+        selectedView=showOverviewOnStart?-1:0;
+        folderInput=ResolveSessionPath()??"";
+        if(!string.IsNullOrEmpty(folderInput))LoadSession(folderInput);
     }
 
     private string ResolveSessionPath()
     {
-        if (!string.IsNullOrEmpty(absoluteSessionPath))
-            return absoluteSessionPath;
-
-        string runDataRoot = Path.Combine(Application.dataPath, "RunData");
-        if (string.IsNullOrEmpty(sessionFolder))
-        {
-            if (!Directory.Exists(runDataRoot))
-                return null;
-
-            string[] dirs = Directory.GetDirectories(runDataRoot);
-            if (dirs.Length == 0)
-                return null;
-
-            Array.Sort(dirs, StringComparer.OrdinalIgnoreCase);
-            return dirs[^1];
-        }
-
-        return Path.Combine(runDataRoot, sessionFolder);
+        if(!string.IsNullOrEmpty(pendingSessionPath)){string path=pendingSessionPath;pendingSessionPath=null;return path;}
+        if(!string.IsNullOrEmpty(absoluteSessionPath) && Directory.Exists(absoluteSessionPath))return absoluteSessionPath;
+        string root=RuntimePaths.RunDataRoot;
+        if(!string.IsNullOrEmpty(sessionFolder))return Path.Combine(root,sessionFolder);
+        return ReplaySessionArchive.NewestRunFolder(root);
     }
 
-    private void LoadCsvs(string path)
+    public void LoadSession(string directory)
     {
-        string[] files = Directory.GetFiles(path, "*.csv", SearchOption.TopDirectoryOnly);
-        foreach (string file in files)
+        if(loading)return;
+        StartCoroutine(LoadRun(directory));
+    }
+    private IEnumerator LoadRun(string directory)
+    {
+        loading=true;LoadError=null;loadProgress="Reading saved configurations and animal logs…";
+        string cache=cacheDirectory??Path.Combine(Application.temporaryCachePath,"MatrexReplay",Guid.NewGuid().ToString("N"));
+        bool includeAgents=loadRecordedAgents;
+        pendingLoad=Task.Run(()=>
         {
+            var run=new LoadedRun();
             try
             {
-                LoadCsv(file);
+                run.archive=new ReplaySessionArchive(directory);run.archive.LoadRigSamples();
+                if(includeAgents)
+                    foreach(string file in ReplaySessionArchive.CsvFiles(run.archive.DirectoryPath))
+                    {
+                        try
+                        {
+                            var stream=ReplayAgentStream.TryOpen(file,cache,run.archive.OriginTicks);
+                            if(stream==null)continue;
+                            run.agents.Add(stream);
+                            if(!stream.HasRotations)run.archive.Warn(Path.GetFileName(file)+": historical agent positions have no orientation; heading/wing animation cannot be reconstructed exactly.");
+                            if(stream.HasDuplicateNames)run.archive.Warn(Path.GetFileName(file)+": duplicate agent names are distinguished by row order within each frame.");
+                        }
+                        catch(Exception error){run.archive.Warn("Population recording unavailable: "+Path.GetFileName(file)+" — "+error.Message);}
+                    }
+                if(run.agents.Count==0)run.archive.Warn("No recorded population tracks were loaded. Unrecorded agents are not resimulated as if they were the original experiment.");
+                return run;
             }
-            catch (Exception ex)
+            catch {foreach(var stream in run.agents)stream.Dispose();throw;}
+        });
+        while(!pendingLoad.IsCompleted)yield return null;
+        if(pendingLoad.IsFaulted)
+        {LoadError=pendingLoad.Exception?.GetBaseException().Message;loading=false;pendingLoad=null;yield break;}
+        var loaded=pendingLoad.Result;pendingLoad=null;
+        ClearSessionVisuals();archive=loaded.archive;
+        foreach(var stream in loaded.agents)populations.Add(new Population{stream=stream});
+        absoluteSessionPath=archive.DirectoryPath;folderInput=absoluteSessionPath;replayTime=0;referenceSample=null;
+        BuildMarkers();BuildStepTimeline();
+        environmentLoader.BeginSession(archive,rigOrder);
+        FitOverview();ApplyView();RenderFrame();
+        loading=false;loadProgress="";
+    }
+
+    private void BuildMarkers()
+    {
+        bool first=true;
+        foreach(var pair in archive.Rigs.OrderBy(p=>p.Key,StringComparer.Ordinal))
+        {
+            string id=pair.Key;rigOrder.Add(id);
+            GameObject marker=rigMarkerPrefab!=null?Instantiate(rigMarkerPrefab,generatedRoot):GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            marker.transform.SetParent(generatedRoot,false);marker.name="Recorded animal "+id;ReplayEnvironmentLoader.FreezeVisual(marker);
+            markerByRig[id]=marker;
+            foreach(var sample in pair.Value)
+            {if(first){trajectoryBounds=new Bounds(sample.position,Vector3.zero);first=false;}else trajectoryBounds.Encapsulate(sample.position);}
+            if(createRigCameras)
             {
-                Debug.LogWarning($"[Replay] Failed to parse {file}: {ex.Message}");
+                var camera=new GameObject("Replay animal view "+id,typeof(Camera)).GetComponent<Camera>();
+                camera.transform.SetParent(marker.transform,false);camera.nearClipPlane=.01f;camera.farClipPlane=100000;
+                camera.rect=new Rect(0,.20f,1,.80f);camera.depth=11;camera.clearFlags=CameraClearFlags.Skybox;
+                camera.fieldOfView=2*Mathf.Atan(Mathf.Tan(targetHorizontalFov*Mathf.Deg2Rad*.5f)/Mathf.Max(.1f,Screen.width/(Screen.height*.8f)))*Mathf.Rad2Deg;
+                camera.cullingMask=AnimalCameraMask(id);
+                camerasByRig[id]=camera;
             }
         }
-
-        // compute max time
-        foreach (var list in samplesByRig.Values)
+        float size=Mathf.Max(.15f,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z)*.008f);
+        foreach(var marker in markerByRig.Values)if(rigMarkerPrefab==null)marker.transform.localScale=Vector3.one*size;
+        foreach(var pair in archive.Rigs)
         {
-            if (list.Count > 0)
-                maxTime = Mathf.Max(maxTime, list[^1].t);
-        }
-    }
-
-    private void LoadCsv(string path)
-    {
-        string[] lines = File.ReadAllLines(path);
-        if (lines.Length < 2)
-            return;
-
-        string[] headers = lines[0].Split(',');
-        int idxTime = Array.IndexOf(headers, "Current Time");
-        int idxVr = Array.IndexOf(headers, "VR");
-        int idxPosX = Array.IndexOf(headers, "GameObjectPosX");
-        int idxPosY = Array.IndexOf(headers, "GameObjectPosY");
-        int idxPosZ = Array.IndexOf(headers, "GameObjectPosZ");
-        int idxRotX = Array.IndexOf(headers, "GameObjectRotX");
-        int idxRotY = Array.IndexOf(headers, "GameObjectRotY");
-        int idxRotZ = Array.IndexOf(headers, "GameObjectRotZ");
-        int idxStepName = Array.IndexOf(headers, "stepName");
-        int idxStepIndex = Array.IndexOf(headers, "stepIndex");
-
-        if (idxTime < 0 || idxVr < 0 || idxPosX < 0 || idxRotY < 0)
-            return;
-
-        DateTime? first = null;
-        foreach (string line in lines[1..])
-        {
-            if (string.IsNullOrWhiteSpace(line))
-                continue;
-
-            string[] parts = line.Split(',');
-            if (parts.Length <= Mathf.Max(idxRotZ, idxStepIndex, idxStepName))
-                continue;
-
-            if (!DateTime.TryParse(parts[idxTime], CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var ts))
-                continue;
-
-            if (first == null)
-                first = ts;
-
-            string rig = parts[idxVr];
-            float t = (float)(ts - first.Value).TotalSeconds;
-            float x = ParseFloat(parts[idxPosX]);
-            float y = ParseFloat(parts[idxPosY]);
-            float z = ParseFloat(parts[idxPosZ]);
-            float rx = ParseFloat(parts[idxRotX]);
-            float ry = ParseFloat(parts[idxRotY]);
-            float rz = ParseFloat(parts[idxRotZ]);
-
-            var sample = new Sample
+            var path=new GameObject("Recorded path "+pair.Key,typeof(LineRenderer));path.transform.SetParent(generatedRoot,false);
+            var line=path.GetComponent<LineRenderer>();line.useWorldSpace=true;
+            int stride=Math.Max(1,(pair.Value.Count+4999)/5000);var points=new List<Vector3>();
+            for(int i=0;i<pair.Value.Count;i+=stride)points.Add(pair.Value[i].position);
+            line.positionCount=points.Count;line.SetPositions(points.ToArray());line.widthMultiplier=Mathf.Max(.015f,size*.12f);
+            Shader shader=Shader.Find("Sprites/Default");
+            if(shader!=null)
             {
-                t = t,
-                pos = new Vector3(x, y, z),
-                rot = new Vector3(rx, ry, rz),
-                stepName = idxStepName >= 0 ? parts[idxStepName] : "",
-                stepIndex = idxStepIndex >= 0 ? ParseInt(parts[idxStepIndex]) : -1
-            };
-
-            if (!samplesByRig.TryGetValue(rig, out var list))
-            {
-                list = new List<Sample>();
-                samplesByRig[rig] = list;
-                cursorByRig[rig] = 0;
+                var sourceMaterial=new Material(shader){name="Replay path material"};
+                RuntimeMaterialOwner.Assign(line,sourceMaterial);Destroy(sourceMaterial);
             }
-            list.Add(sample);
+            line.startColor=line.endColor=new Color(.3f,.7f,.85f,.45f);
         }
     }
 
-    private void SpawnMarkers()
+    public void FitOverview()
     {
-        foreach (var kvp in samplesByRig)
+        if(overview==null)return;
+        float span=Mathf.Max(5,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z));
+        overview.transform.SetPositionAndRotation(trajectoryBounds.center+Vector3.up*(trajectoryBounds.extents.y+span*2+10),Quaternion.Euler(90,0,0));
+        float aspect=Mathf.Max(.1f,Screen.width/(Screen.height*.8f));
+        overview.orthographicSize=Mathf.Max(2,Mathf.Max(trajectoryBounds.extents.z,trajectoryBounds.extents.x/aspect))*1.15f;
+        overview.nearClipPlane=.01f;overview.farClipPlane=span*5+trajectoryBounds.size.y+1000;
+    }
+    private void ApplyView()
+    {
+        if(selectedView>=rigOrder.Count || !createRigCameras)selectedView=-1;
+        if(overview!=null)overview.enabled=selectedView<0;
+        for(int i=0;i<rigOrder.Count;i++)if(camerasByRig.TryGetValue(rigOrder[i],out var camera))camera.enabled=selectedView==i;
+    }
+    public void ShowOverview(){selectedView=-1;ApplyView();}
+    private void CycleView(){selectedView++;if(selectedView>=rigOrder.Count)selectedView=-1;ApplyView();}
+
+    private void Update()
+    {
+        if(folderPicker!=null && folderPicker.IsCompleted)
         {
-            string rig = kvp.Key;
-            if (rigMarkerPrefab == null)
+            if(folderPicker.IsFaulted)LoadError=folderPicker.Exception?.GetBaseException().Message;
+            else if(!string.IsNullOrWhiteSpace(folderPicker.Result)){folderInput=folderPicker.Result;LoadSession(folderInput);}
+            folderPicker=null;
+        }
+        if(archive==null || loading)return;
+        if(!pathFocused)
+        {
+            if(ExperimentInput.Pressed(togglePlayKey,KeyCode.Space,"Pause"))isPlaying=!isPlaying;
+            float step=ExperimentInput.Held("SpeedModifier")?largeStepSeconds:smallStepSeconds;
+            if(ExperimentInput.Pressed(backKey,KeyCode.LeftArrow,"Back"))Seek(replayTime-step);
+            if(ExperimentInput.Pressed(forwardKey,KeyCode.RightArrow,"Forward"))Seek(replayTime+step);
+            if(ExperimentInput.Pressed(prevStepKey,KeyCode.N,"PreviousStep"))JumpToStep(-1);
+            if(ExperimentInput.Pressed(nextStepKey,KeyCode.M,"NextStep"))JumpToStep(1);
+            if(selectedView<0 && overview!=null && !showDetails && ExperimentInput.MousePosition.y>Screen.height*.2f)
+                overview.orthographicSize=Mathf.Clamp(overview.orthographicSize*Mathf.Exp(-ExperimentInput.Scroll),.01f,100000);
+        }
+        if(isPlaying && (environmentLoader==null || !environmentLoader.Loading))
+        {
+            replayTime+=Time.unscaledDeltaTime*Mathf.Max(.01f,playbackSpeed);
+            if(replayTime>Duration){if(loop && Duration>0)replayTime%=Duration;else{replayTime=Duration;isPlaying=false;}}
+        }
+        RenderFrame();
+    }
+    private void RenderFrame()
+    {
+        if(archive==null)return;
+        if(environmentLoader!=null && !environmentLoader.Loading && cameraLayoutVersion!=environmentLoader.ContextVersion)
+        {
+            foreach(var pair in camerasByRig)pair.Value.cullingMask=AnimalCameraMask(pair.Key);
+            cameraLayoutVersion=environmentLoader.ContextVersion;
+        }
+        referenceSample=null;
+        ReplaySessionArchive.Sample environmentSample=null;
+        foreach(string id in rigOrder)
+        {
+            var samples=archive.Rigs[id];int cursor=AtOrBefore(samples,replayTime);var a=samples[cursor];
+            bool visible=replayTime>=samples[0].time && replayTime<=samples[samples.Count-1].time+.05;
+            var marker=markerByRig[id];marker.SetActive(visible);if(!visible)continue;
+            var b=cursor+1<samples.Count?samples[cursor+1]:a;
+            float amount=interpolateAnimalPoses && a.ContextKey==b.ContextKey && Vector3.Distance(a.position,b.position)<=maximumInterpolationDistance && b.time>a.time?(float)Math.Max(0,Math.Min(1,(replayTime-a.time)/(b.time-a.time))):0;
+            Vector3 position=Vector3.Lerp(a.position,b.position,amount);
+            Quaternion rotation=Quaternion.Slerp(Quaternion.Euler(a.rotation),Quaternion.Euler(b.rotation),amount);
+            marker.transform.SetPositionAndRotation(position,rotation);
+            environmentLoader?.DriveRecordedRig(id,position,rotation);
+            environmentLoader?.ApplyAsynchronousSample(a);
+            if(environmentSample==null)environmentSample=a;
+            if(referenceSample==null || (selectedView>=0 && rigOrder[selectedView]==id))referenceSample=a;
+        }
+        if(environmentSample!=null)environmentLoader?.ApplyRecordedSample(environmentSample);
+        float fallbackSize=Mathf.Max(.1f,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z)*.002f);
+        foreach(var population in populations)
+        {
+            if(environmentLoader.Loading){foreach(var visual in population.visuals.Values)if(visual!=null)visual.SetActive(false);continue;}
+            if(population.contextVersion!=environmentLoader.ContextVersion)
             {
-                var marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                marker.transform.localScale = Vector3.one * 0.25f;
-                marker.name = $"Replay_{rig}";
-                markerByRig[rig] = marker;
-                continue;
+                foreach(var visual in population.visuals.Values)if(visual!=null){visual.SetActive(false);Destroy(visual);}
+                population.visuals.Clear();population.contextVersion=environmentLoader.ContextVersion;
             }
-
-            GameObject go = Instantiate(rigMarkerPrefab);
-            go.name = $"Replay_{rig}";
-            markerByRig[rig] = go;
-
-            rigOrder.Add(rig);
+            population.active.Clear();
+            foreach(var pose in population.stream.Sample(replayTime))
+            {
+                if(!population.visuals.TryGetValue(pose.id,out var visual) || visual==null)
+                {
+                    visual=environmentLoader.CreateAgentVisual(population.stream.Kind,pose.name,pose.layer,populationRoot,fallbackSize);
+                    population.visuals[pose.id]=visual;
+                }
+                visual.SetActive(true);visual.transform.SetPositionAndRotation(pose.position,Quaternion.Euler(pose.rotation));population.active.Add(pose.id);
+            }
+            foreach(var pair in population.visuals)if(pair.Value!=null && !population.active.Contains(pair.Key))pair.Value.SetActive(false);
         }
+        if(scrubSlider!=null && Duration>0)scrubSlider.SetValueWithoutNotify((float)(replayTime/Duration));
     }
-
-    private static float ParseFloat(string s)
+    public static int AtOrBefore(List<ReplaySessionArchive.Sample> samples,double time)
     {
-        float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var v);
-        return v;
+        int lo=0,hi=samples.Count-1;
+        while(lo<hi){int mid=(lo+hi+1)/2;if(samples[mid].time<=time)lo=mid;else hi=mid-1;}return lo;
     }
-
-    private static int ParseInt(string s)
+    public static int AnimalCameraMask(string id)
     {
-        int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var v);
-        return v;
+        int isolated=RuntimeRigRegistry.StimulusMask|LayerMask.GetMask("ChoiceVR1","ChoiceVR2","ChoiceVR3","ChoiceVR4");
+        int index=RuntimeRigRegistry.ParseIndex(ReplayEnvironmentLoader.CanonicalRig(id));
+        int own=RuntimeRigRegistry.StimulusLayer(index),objects=ReplayEnvironmentLoader.ObjectLayerForRig(id);
+        int visible=(own>=0?1<<own:0)|(objects>=0?1<<objects:0);
+        return ~isolated|visible;
     }
-
-    private string GetReferenceRig()
+    private void Seek(double seconds)
     {
-        foreach (var kvp in samplesByRig)
-            return kvp.Key; // first
-        return null;
+        replayTime=Math.Max(0,Math.Min(Duration,seconds));
+        if(pauseOnSeek && !autoResumeAfterSeek)isPlaying=false;
+        RenderFrame();
     }
-
-    private void HandleInput()
-    {
-        if (ExperimentInput.Pressed(togglePlayKey, KeyCode.Space, "Pause")) isPlaying = !isPlaying;
-        float step = ExperimentInput.Held("SpeedModifier") ? largeStepSeconds : smallStepSeconds;
-        if (ExperimentInput.Pressed(backKey, KeyCode.LeftArrow, "Back")) Seek(-step);
-        if (ExperimentInput.Pressed(forwardKey, KeyCode.RightArrow, "Forward")) Seek(step);
-        if (ExperimentInput.Pressed(prevStepKey, KeyCode.N, "PreviousStep")) JumpToStep(-1);
-        if (ExperimentInput.Pressed(nextStepKey, KeyCode.M, "NextStep")) JumpToStep(1);
-    }
-
-    private void Seek(float deltaSeconds)
-    {
-        bool wasPlaying = isPlaying;
-        replayTime = Mathf.Clamp(replayTime + deltaSeconds, 0f, maxTime > 0 ? maxTime : replayTime);
-        if (pauseOnSeek)
-        {
-            isPlaying = false;
-            if (autoResumeAfterSeek && wasPlaying)
-                resumePending = true;
-        }
-        else
-        {
-            isPlaying = wasPlaying;
-        }
-    }
-
-    public void SetScrubNormalized(float normalized)
-    {
-        if (maxTime <= 0f)
-            return;
-        bool wasPlaying = isPlaying;
-        sliderDragging = true;
-        replayTime = Mathf.Clamp01(normalized) * maxTime;
-        sliderDragging = false;
-        if (pauseOnSeek)
-        {
-            isPlaying = false;
-            if (autoResumeAfterSeek && wasPlaying)
-                resumePending = true;
-        }
-        else
-        {
-            isPlaying = wasPlaying;
-        }
-    }
-
-    private void JumpToStep(int direction)
-    {
-        if (stepChanges.Count == 0)
-            return;
-
-        // find current step index
-        int currentIdx = 0;
-        for (int i = 0; i < stepChanges.Count; i++)
-        {
-            if (stepChanges[i].t <= replayTime)
-                currentIdx = i;
-            else
-                break;
-        }
-
-        int targetIdx = Mathf.Clamp(currentIdx + direction, 0, stepChanges.Count - 1);
-        replayTime = stepChanges[targetIdx].t;
-        if (pauseOnSeek)
-        {
-            bool wasPlaying = isPlaying;
-            isPlaying = false;
-            if (autoResumeAfterSeek && wasPlaying)
-                resumePending = true;
-        }
-    }
-
+    public void SetScrubNormalized(float normalized){if(archive!=null)Seek(Mathf.Clamp01(normalized)*Duration);}
+    public void SetPlaying(bool playing)=>isPlaying=playing;
     private void BuildStepTimeline()
     {
-        stepChanges.Clear();
-        string refRig = GetReferenceRig();
-        if (string.IsNullOrEmpty(refRig) || !samplesByRig.TryGetValue(refRig, out var list) || list.Count == 0)
-            return;
-
-        string lastName = list[0].stepName;
-        int lastIdx = list[0].stepIndex;
-        stepChanges.Add(new StepChange { t = list[0].t, name = lastName, index = lastIdx });
-        for (int i = 1; i < list.Count; i++)
+        stepChanges.Clear();if(rigOrder.Count==0)return;
+        foreach(string rig in rigOrder)
         {
-            if (list[i].stepName != lastName || list[i].stepIndex != lastIdx)
+            string key=null;
+            foreach(var sample in archive.Rigs[rig])if(sample.ContextKey!=key){stepChanges.Add(sample);key=sample.ContextKey;}
+        }
+        var union=stepChanges.GroupBy(s=>s.time.ToString("R",System.Globalization.CultureInfo.InvariantCulture)+"|"+s.ContextKey)
+            .Select(g=>g.First()).OrderBy(s=>s.time).ToArray();
+        stepChanges.Clear();stepChanges.AddRange(union);
+    }
+    private void JumpToStep(int direction)
+    {
+        if(stepChanges.Count==0)return;int index=0;
+        while(index+1<stepChanges.Count && stepChanges[index+1].time<=replayTime)index++;
+        Seek(stepChanges[Mathf.Clamp(index+direction,0,stepChanges.Count-1)].time);
+    }
+
+    private void OnGUI()
+    {
+        if(titleStyle==null){titleStyle=new GUIStyle(GUI.skin.label){fontSize=18,fontStyle=FontStyle.Bold};smallStyle=new GUIStyle(GUI.skin.label){fontSize=12,wordWrap=true};}
+        Matrix4x4 previousMatrix=GUI.matrix;float scale=Mathf.Min(1,Screen.width/1120f);
+        GUI.matrix=Matrix4x4.TRS(Vector3.zero,Quaternion.identity,Vector3.one*scale);
+        float screenWidth=Screen.width/scale,screenHeight=Screen.height/scale;
+        float height=Mathf.Max(152,screenHeight*.20f);var area=new Rect(8,screenHeight-height,screenWidth-16,height-8);
+        GUI.Box(area,GUIContent.none);GUILayout.BeginArea(new Rect(area.x+10,area.y+6,area.width-20,area.height-12));
+        GUILayout.BeginHorizontal();GUILayout.Label("Experiment replay",titleStyle,GUILayout.Width(185));
+        GUI.SetNextControlName("Replay run folder");folderInput=GUILayout.TextField(folderInput,GUILayout.MinWidth(100));pathFocused=GUI.GetNameOfFocusedControl()=="Replay run folder";
+        GUI.enabled=!loading && folderPicker==null;
+        if(GUILayout.Button("Browse…",GUILayout.Width(80))){GUI.FocusControl(null);pathFocused=false;folderPicker=ReplayFolderPicker.ChooseAsync();}
+        if(GUILayout.Button("Open run folder",GUILayout.Width(125))){GUI.FocusControl(null);pathFocused=false;LoadSession(folderInput);}GUI.enabled=true;
+        GUILayout.EndHorizontal();
+        if(loading)GUILayout.Label("Indexing recorded frames on disk… "+loadProgress,smallStyle);
+        else if(!string.IsNullOrEmpty(LoadError))GUILayout.Label(LoadError,smallStyle);
+        else if(archive==null)GUILayout.Label("Paste a saved run folder, or launch with --replay-session <folder>. In Unity Editor, drop a folder anywhere in this window.",smallStyle);
+        else
+        {
+            GUILayout.BeginHorizontal();
+            if(GUILayout.Button(isPlaying?"Pause":"Play",GUILayout.Width(65)))isPlaying=!isPlaying;
+            if(GUILayout.Button("−10s",GUILayout.Width(55)))Seek(replayTime-10);
+            if(GUILayout.Button("+10s",GUILayout.Width(55)))Seek(replayTime+10);
+            if(GUILayout.Button("Previous",GUILayout.Width(70)))JumpToStep(-1);
+            if(GUILayout.Button("Next",GUILayout.Width(50)))JumpToStep(1);
+            GUILayout.Label(Clock(replayTime)+" / "+Clock(Duration),GUILayout.Width(150));
+            GUILayout.Label("Speed",GUILayout.Width(40));playbackSpeed=GUILayout.HorizontalSlider(playbackSpeed,.1f,4,GUILayout.Width(90));GUILayout.Label(playbackSpeed.ToString("0.0")+"×",GUILayout.Width(38));
+            if(GUILayout.Button(selectedView<0?"God's-eye view":"Animal "+rigOrder[selectedView],GUILayout.Width(135)))CycleView();
+            if(GUILayout.Button("Fit",GUILayout.Width(40))){ShowOverview();FitOverview();}
+            showDetails=GUILayout.Toggle(showDetails,"Fidelity ("+archive.Warnings.Count+")",GUILayout.Width(100));
+            GUILayout.EndHorizontal();
+            float normalized=Duration>0?(float)(replayTime/Duration):0;
+            float changed=GUILayout.HorizontalSlider(normalized,0,1);
+            Rect timeline=GUILayoutUtility.GetLastRect();Color oldColor=GUI.color;GUI.color=new Color(.3f,.8f,.9f,.8f);
+            foreach(var step in stepChanges)if(Duration>0)GUI.DrawTexture(new Rect(timeline.x+(float)(step.time/Duration)*timeline.width,timeline.y+2,1,8),Texture2D.whiteTexture);
+            GUI.color=oldColor;
+            if(Mathf.Abs(changed-normalized)>.000001f)SetScrubNormalized(changed);
+            string context=referenceSample==null?"No animal sample at this time":referenceSample.scene+" · trial "+referenceSample.trial+" · sequence "+referenceSample.sequenceStep+" · "+referenceSample.stepName+" · "+referenceSample.phase;
+            GUILayout.Label(context+"   |   "+(environmentLoader?.FidelityStatus??""),smallStyle);
+            GUILayout.Label("Space: play/pause · ←/→: 1s · Shift+←/→: 10s · N/M: previous/next condition · mouse wheel: overview zoom",smallStyle);
+        }
+        GUILayout.EndArea();
+        if(showDetails && archive!=null)
+        {
+            var details=new Rect(12,12,Mathf.Min(700,screenWidth-24),Mathf.Max(100,screenHeight-height-32));GUI.Box(details,GUIContent.none);
+            GUILayout.BeginArea(new Rect(details.x+10,details.y+8,details.width-20,details.height-16));GUILayout.Label("Replay fidelity and saved evidence",titleStyle);
+            GUILayout.Label(archive.DirectoryPath,smallStyle);detailScroll=GUILayout.BeginScrollView(detailScroll);
+            foreach(string warning in archive.Warnings)GUILayout.Label("• "+warning,smallStyle);
+            GUILayout.EndScrollView();GUILayout.EndArea();
+        }
+#if UNITY_EDITOR
+        Event evt=Event.current;
+        if(evt.type==EventType.DragUpdated || evt.type==EventType.DragPerform)
+        {
+            string path=UnityEditor.DragAndDrop.paths.FirstOrDefault(Directory.Exists);
+            if(path!=null)
             {
-                lastName = list[i].stepName;
-                lastIdx = list[i].stepIndex;
-                stepChanges.Add(new StepChange { t = list[i].t, name = lastName, index = lastIdx });
+                UnityEditor.DragAndDrop.visualMode=UnityEditor.DragAndDropVisualMode.Copy;
+                if(evt.type==EventType.DragPerform){UnityEditor.DragAndDrop.AcceptDrag();folderInput=path;LoadSession(path);}
+                evt.Use();
             }
         }
+#endif
+        GUI.matrix=previousMatrix;
     }
-
-    private void RenderStepMarkers()
+    private static string Clock(double seconds)=>TimeSpan.FromSeconds(Math.Max(0,seconds)).ToString(@"hh\:mm\:ss\.f");
+    private void ClearSessionVisuals()
     {
-        foreach (var go in stepMarkerInstances)
-            Destroy(go);
-        stepMarkerInstances.Clear();
-
-        if (!scrubSlider || stepMarkerPrefab == null || maxTime <= 0f || stepChanges.Count == 0)
-            return;
-
-        RectTransform container = stepMarkerContainer ? stepMarkerContainer : scrubSlider.transform as RectTransform;
-        if (container == null)
-            return;
-
-        foreach (var sc in stepChanges)
-        {
-            float norm = Mathf.Clamp01(sc.t / maxTime);
-            GameObject marker = Instantiate(stepMarkerPrefab, container);
-            if (marker.transform is RectTransform rt)
-            {
-                rt.anchorMin = new Vector2(norm, 0);
-                rt.anchorMax = new Vector2(norm, 1);
-                rt.anchoredPosition = Vector2.zero;
-            }
-            stepMarkerInstances.Add(marker);
-        }
+        foreach(var population in populations){foreach(var visual in population.visuals.Values)if(visual!=null)Destroy(visual);population.stream.Dispose();}populations.Clear();
+        foreach(Transform child in generatedRoot)if(child!=populationRoot){child.gameObject.SetActive(false);Destroy(child.gameObject);}
+        markerByRig.Clear();camerasByRig.Clear();rigOrder.Clear();stepChanges.Clear();archive=null;
     }
-
-    private void ApplyCameraSpecs(ReplayEnvironmentLoader.CameraSpec[] specs)
+    private void OnDestroy()
     {
-        if (specs == null)
-            return;
-
-        foreach (var spec in specs)
-        {
-            if (string.IsNullOrEmpty(spec.vrId))
-                continue;
-            if (!camerasByRig.TryGetValue(spec.vrId, out var cam))
-                continue;
-
-            cam.clearFlags = spec.clearFlags;
-            if (spec.bgColor != null && spec.bgColor.Length >= 3)
-            {
-                cam.backgroundColor = new Color(spec.bgColor[0], spec.bgColor[1], spec.bgColor[2],
-                    spec.bgColor.Length > 3 ? spec.bgColor[3] : 1f);
-            }
-        }
-    }
-
-    private void CreateRigCameras()
-    {
-        int count = rigOrder.Count;
-        for (int i = 0; i < count; i++)
-        {
-            string rig = rigOrder[i];
-            if (!markerByRig.TryGetValue(rig, out var marker))
-                continue;
-
-            GameObject camGo = new GameObject($"{rig}_Camera");
-            camGo.transform.SetParent(marker.transform, false);
-            var cam = camGo.AddComponent<Camera>();
-
-            // split viewport into grid
-            Rect rect = new Rect(0, 0, 1, 1);
-            if (count == 2)
-                rect = new Rect(0, i * 0.5f, 1, 0.5f);
-            else if (count == 3 || count == 4)
-                rect = new Rect((i % 2) * 0.5f, (i / 2) * 0.5f, 0.5f, 0.5f);
-            cam.rect = rect;
-
-            // set vertical FOV based on desired horizontal FOV and aspect
-            float aspect = cam.aspect > 0 ? cam.aspect : 1f;
-            float vFov = 2f * Mathf.Atan(Mathf.Tan(targetHorizontalFov * Mathf.Deg2Rad * 0.5f) / aspect) * Mathf.Rad2Deg;
-            cam.fieldOfView = vFov;
-
-            // culling mask for layer
-            int layer = LayerMask.NameToLayer(GetLayerNameForRig(rig));
-            if (layer >= 0)
-                cam.cullingMask = 1 << layer;
-
-            camerasByRig[rig] = cam;
-        }
-    }
-
-    private static string GetLayerNameForRig(string rigId)
-    {
-        if (rigId.StartsWith("VR", StringComparison.OrdinalIgnoreCase) && rigId.Length >= 3)
-            return $"Choice{rigId}";
-        return rigId;
-    }
-
-    private string ResolveDesignFile(string sessionPath)
-    {
-        try
-        {
-            string[] cfgs = Directory.GetFiles(sessionPath, "*_sequenceConfig.json");
-            if (cfgs.Length == 0)
-                return null;
-
-            string json = File.ReadAllText(cfgs[0]);
-            var config = JsonConvert.DeserializeObject<SequenceConfigCopy>(json);
-            if (config?.sequences != null && config.sequences.Length > 0)
-            {
-                var seq = config.sequences[0];
-                if (seq.parameters != null && seq.parameters.TryGetValue("design", out var d))
-                    return d.ToString();
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.LogWarning($"[Replay] Failed to read sequenceConfig: {ex.Message}");
-        }
-        return null;
-    }
-
-    [Serializable]
-    private class SequenceConfigCopy
-    {
-        public SequenceItem[] sequences;
-    }
-
-    [Serializable]
-    private class SequenceItem
-    {
-        public string sceneName;
-        public Dictionary<string, object> parameters;
-    }
-
-    private class StepChange
-    {
-        public float t;
-        public string name;
-        public int index;
+        foreach(var population in populations)population.stream.Dispose();populations.Clear();
+        if(pendingLoad!=null)
+            pendingLoad.ContinueWith(task=>{if(task.Status==TaskStatus.RanToCompletion)foreach(var stream in task.Result.agents)stream.Dispose();});
+        if(overview!=null && overview.gameObject.name=="Replay overview")Destroy(overview.gameObject);
     }
 }

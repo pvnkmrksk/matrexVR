@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
@@ -115,6 +116,7 @@ public class MainController : MonoBehaviour
 
     // Dictionary to store loaded system configs
     private Dictionary<string, SystemConfig> systemConfigs = new Dictionary<string, SystemConfig>();
+    private string systemConfigurationError;
 
     [Tooltip("0: Off, ,1: Error, 2: Warning, 3: Info, 4: Debug")]
     [SerializeField]
@@ -233,11 +235,12 @@ public class MainController : MonoBehaviour
     {
         // A removed/invalid configuration must not leave the previous layout rendering.
         systemConfigs.Clear();
+        systemConfigurationError = null;
         try
         {
-            if (string.IsNullOrEmpty(Application.streamingAssetsPath) || string.IsNullOrEmpty(systemConfigFileName))
+            if (string.IsNullOrEmpty(RuntimePaths.ConfigRoot) || string.IsNullOrEmpty(systemConfigFileName))
                 throw new System.ArgumentException("System configuration path is empty.");
-            string configPath = Path.Combine(Application.streamingAssetsPath, systemConfigFileName);
+            string configPath = Path.Combine(RuntimePaths.ConfigRoot, systemConfigFileName);
             if (!File.Exists(configPath))
                 throw new FileNotFoundException("System config file not found", configPath);
 
@@ -269,11 +272,17 @@ public class MainController : MonoBehaviour
                 foreach (SystemConfig config in loadedConfigs)
                 {
                     // Set target display from global setting
+                    if (config == null) throw new System.ArgumentException("Null rig configuration.");
                     config.targetDisplay = globalTargetDisplay;
-                    systemConfigs[config.vrId] = config;
+                    if (config == null || RuntimeRigRegistry.ParseIndex(config.vrId) < 1 || config.vrId != "VR" + RuntimeRigRegistry.ParseIndex(config.vrId))
+                        throw new System.ArgumentException("Every rig needs an ID such as VR1 or VR10.");
+                    if (systemConfigs.ContainsKey(config.vrId)) throw new System.ArgumentException("Duplicate rig ID: " + config.vrId);
+                    systemConfigs.Add(config.vrId, config);
                     Debugger.Log($"Loaded system config for: {config.vrId} with targetDisplay: {config.targetDisplay}", 3);
                 }
 
+                if (!systemConfigs.ContainsKey("VR" + selectedVRIndex) && systemConfigs.Count > 0)
+                        selectedVRIndex = systemConfigs.Keys.Select(RuntimeRigRegistry.ParseIndex).Min();
                 Debugger.Log($"Successfully loaded system config file: {systemConfigFileName}", 3);
             }
             else
@@ -285,7 +294,8 @@ public class MainController : MonoBehaviour
         catch (System.Exception e)
         {
             systemConfigs.Clear();
-            Debugger.Log($"Error loading system config file: {e.Message}", 1);
+            systemConfigurationError = "Invalid system configuration: " + e.Message;
+            Debug.LogError(systemConfigurationError);
         }
         finally
         {
@@ -382,6 +392,7 @@ public class MainController : MonoBehaviour
     public void StartSequence()
     {
         if (sequenceStarted) return;
+        if (systemConfigurationError != null) { FailExperiment(new System.ArgumentException(systemConfigurationError)); return; }
         Debugger.Log("MainController.StartSequence()", 3);
         try {MasterDataLogger.Instance.ConfigArchive.RequireComplete();}
         catch(System.Exception error) {FailExperiment(error);return;}
@@ -447,6 +458,10 @@ public class MainController : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debugger.Log("MainController.OnSceneLoaded()", 3);
+        // Saved replay system/layout owns its additive environment, including its rig count.
+        if (mode == LoadSceneMode.Additive && FindFirstObjectByType<ReplayController>() != null) return;
+        try { RuntimeRigRegistry.Configure(scene, systemConfigs); }
+        catch (System.Exception error) { FailExperiment(error); return; }
 
         if (!sequenceStarted || executionOrder.Count == 0 || currentStep >= executionOrder.Count)
         {
@@ -532,15 +547,26 @@ public class MainController : MonoBehaviour
         if (vrClosedLoops.TryGetValue(vrId, out ClosedLoop current) && current == tracking) vrClosedLoops.Remove(vrId);
     }
 
+    private static readonly UnityEngine.InputSystem.Key[] animalDigitKeys = { UnityEngine.InputSystem.Key.Digit1, UnityEngine.InputSystem.Key.Digit2, UnityEngine.InputSystem.Key.Digit3, UnityEngine.InputSystem.Key.Digit4, UnityEngine.InputSystem.Key.Digit5, UnityEngine.InputSystem.Key.Digit6, UnityEngine.InputSystem.Key.Digit7, UnityEngine.InputSystem.Key.Digit8, UnityEngine.InputSystem.Key.Digit9 };
+    private static readonly UnityEngine.InputSystem.Key[] animalNumberKeys = { UnityEngine.InputSystem.Key.Numpad1, UnityEngine.InputSystem.Key.Numpad2, UnityEngine.InputSystem.Key.Numpad3, UnityEngine.InputSystem.Key.Numpad4, UnityEngine.InputSystem.Key.Numpad5, UnityEngine.InputSystem.Key.Numpad6, UnityEngine.InputSystem.Key.Numpad7, UnityEngine.InputSystem.Key.Numpad8, UnityEngine.InputSystem.Key.Numpad9 };
+
+    public void SelectNextAnimal()
+    {
+        int[] ids = systemConfigs.Keys.Select(RuntimeRigRegistry.ParseIndex).OrderBy(i => i).ToArray();
+        if (ids.Length == 0) return;
+        int at = System.Array.IndexOf(ids, selectedVRIndex);
+        selectedVRIndex = ids[(at + 1) % ids.Length];
+    }
+
     private void HandleBogongGainInput()
     {
         if (ExperimentInput.IsEditingText) return;
         var keys = UnityEngine.InputSystem.Keyboard.current;
         if (keys == null) return;
-        if (keys.digit1Key.wasPressedThisFrame || keys.numpad1Key.wasPressedThisFrame) selectedVRIndex = 1;
-        else if (keys.digit2Key.wasPressedThisFrame || keys.numpad2Key.wasPressedThisFrame) selectedVRIndex = 2;
-        else if (keys.digit3Key.wasPressedThisFrame || keys.numpad3Key.wasPressedThisFrame) selectedVRIndex = 3;
-        else if (keys.digit4Key.wasPressedThisFrame || keys.numpad4Key.wasPressedThisFrame) selectedVRIndex = 4;
+        for (int index = 0; index < animalDigitKeys.Length; index++)
+            if (keys[animalDigitKeys[index]].wasPressedThisFrame || keys[animalNumberKeys[index]].wasPressedThisFrame)
+                if (systemConfigs.ContainsKey("VR" + (index + 1))) selectedVRIndex = index + 1;
+        if (keys.digit0Key.wasPressedThisFrame || keys.numpad0Key.wasPressedThisFrame) SelectNextAnimal();
         string vrId = "VR" + selectedVRIndex;
         if (!vrClosedLoops.TryGetValue(vrId, out ClosedLoop tracking) || tracking == null || !tracking.UsesBogongInput) return;
         // BogongAustralia: dcOffsetStep (0.005) * 100 * dt; held brackets select the direction.
@@ -617,10 +643,10 @@ public class MainController : MonoBehaviour
         autoStart = false;
 
         // Get the path to the sequence configuration JSON file
-        string jsonPath = Path.Combine(Application.streamingAssetsPath, sequenceConfigFileName);
+        string jsonPath = Path.Combine(RuntimePaths.ConfigRoot, sequenceConfigFileName);
 
         // Check if the streamingAssetsPath directory exists
-        if (Directory.Exists(Application.streamingAssetsPath))
+        if (Directory.Exists(RuntimePaths.ConfigRoot))
         {
             // Check if the sequenceConfig.json file exists
             if (File.Exists(jsonPath))
@@ -930,6 +956,7 @@ public class SystemConfig
     public string zmqAddress = "localhost";
     public int zmqPort = 9872;
     public string vrId = "VR1";
+    public string speciesName = "";
     public string displayOrder = ""; // Explicit rendering allow-list: Down, Right, Back, Left, Front, Up.
     public int targetDisplay = 1; // 0 for primary, 1 for secondary display
 }

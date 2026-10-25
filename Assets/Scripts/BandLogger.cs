@@ -104,10 +104,7 @@ public class BandLogger : MonoBehaviour
         VisibilityScript visibility = instance.GetComponent<VisibilityScript>();
         float visibilityPhase = visibility ? visibility.GetCurrentPhase() : 0f;
 
-        string data = $"{timestamp},{instance.name},{LayerMask.LayerToName(instance.layer)}," +
-                      $"{position.x},{position.y},{position.z}," +
-                      $"{rotation.x},{rotation.y},{rotation.z}," +
-                      $"{speed},{visibilityPhase},{MainController.RecordedExperimentPhase}";
+        string data = FormattableString.Invariant($"{timestamp},{instance.name},{RuntimeRigRegistry.LayerLabel(instance.layer)},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z},{speed},{visibilityPhase},{MainController.RecordedExperimentPhase}");
         logFile.WriteLine(data);
     }
 
@@ -118,7 +115,7 @@ public class BandLogger : MonoBehaviour
         {
             if ((layerMask.value & (1 << i)) != 0)
             {
-                layerNames += LayerMask.LayerToName(i) + "_";
+                layerNames += RuntimeRigRegistry.LayerLabel(i) + "_";
             }
         }
         return layerNames.TrimEnd('_');
@@ -137,8 +134,11 @@ public class BandLogger : MonoBehaviour
         return fileName;
     }
 
-    void OnDestroy()
+    void OnDestroy() => CloseForArchive();
+
+    public void CloseForArchive()
     {
         logFile?.Dispose();
+        logFile = null;
     }
 }

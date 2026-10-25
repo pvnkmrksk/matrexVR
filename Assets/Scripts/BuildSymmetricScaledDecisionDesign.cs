@@ -97,11 +97,11 @@ public class BuildSymmetricScaledDecisionDesign
         };
 
         string path = Path.Combine(
-            Application.streamingAssetsPath,
+            RuntimePaths.ConfigRoot,
             "sequenceDesign_symmetricScaledDecision_adaptive.json"
         );
 
-        Directory.CreateDirectory(Application.streamingAssetsPath);
+        Directory.CreateDirectory(RuntimePaths.ConfigRoot);
         File.WriteAllText(path, JsonConvert.SerializeObject(design, Formatting.Indented));
 
         Debug.Log($"Wrote design -> {path}");

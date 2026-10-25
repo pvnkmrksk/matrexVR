@@ -200,6 +200,16 @@
                 "readOnly": true,
                 "help": "The top-level targetDisplay overrides this legacy field."
               }
+            },
+            "speciesName": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "default": "",
+              "x-ui": {
+                "help": "Common or scientific name of the real animal controlling this rig."
+              }
             }
           },
           "required": [
@@ -2007,6 +2017,83 @@
                 "max": 5.0,
                 "step": 0.1
               }
+            }
+          },
+          "agentCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
+              },
+              "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+            }
+          },
+          "agentSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+            }
+          },
+          "agentSpeedStdDev": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Preferred generated-agent speed standard deviation, not variance.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "locoSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
             }
           }
         },
@@ -3985,6 +4072,83 @@
                     "step": 0.1
                   }
                 }
+              },
+              "agentCount": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 2147483647,
+                "default": null,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 1.0
+                  },
+                  "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+                }
+              },
+              "agentSpeed": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.1
+                  },
+                  "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+                }
+              },
+              "agentSpeedStdDev": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Preferred generated-agent speed standard deviation, not variance.",
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 10.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "locoSpeed": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.1
+                  },
+                  "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
+                }
               }
             },
             "default": null
@@ -5981,6 +6145,83 @@
                     "step": 0.1
                   }
                 }
+              },
+              "agentCount": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 2147483647,
+                "default": null,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 1.0
+                  },
+                  "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+                }
+              },
+              "agentSpeed": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.1
+                  },
+                  "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+                }
+              },
+              "agentSpeedStdDev": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Preferred generated-agent speed standard deviation, not variance.",
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 10.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "locoSpeed": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.1
+                  },
+                  "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
+                }
               }
             },
             "default": null
@@ -7976,6 +8217,83 @@
                     "max": 5.0,
                     "step": 0.1
                   }
+                }
+              },
+              "agentCount": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 2147483647,
+                "default": null,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 1.0
+                  },
+                  "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+                }
+              },
+              "agentSpeed": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.1
+                  },
+                  "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+                }
+              },
+              "agentSpeedStdDev": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Preferred generated-agent speed standard deviation, not variance.",
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 10.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "locoSpeed": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.1
+                  },
+                  "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
                 }
               }
             },
@@ -9453,7 +9771,7 @@
           "properties": {
             "vrIndex": {
               "type": "integer",
-              "minimum": -2147483648,
+              "minimum": 1,
               "maximum": 2147483647,
               "default": 0
             },
@@ -9518,7 +9836,7 @@
                 "integer",
                 "null"
               ],
-              "minimum": -2147483648,
+              "minimum": 1,
               "maximum": 2147483647,
               "default": null
             },
@@ -11081,7 +11399,7 @@
               "properties": {
                 "vrIndex": {
                   "type": "integer",
-                  "minimum": -2147483648,
+                  "minimum": 1,
                   "maximum": 2147483647,
                   "default": 0
                 },
@@ -11146,7 +11464,7 @@
                     "integer",
                     "null"
                   ],
-                  "minimum": -2147483648,
+                  "minimum": 1,
                   "maximum": 2147483647,
                   "default": null
                 },
@@ -13135,7 +13453,161 @@
                     "step": 0.1
                   }
                 }
+              },
+              "agentCount": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 2147483647,
+                "default": null,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 1.0
+                  },
+                  "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+                }
+              },
+              "agentSpeed": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.1
+                  },
+                  "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+                }
+              },
+              "agentSpeedStdDev": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Preferred generated-agent speed standard deviation, not variance.",
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 10.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "locoSpeed": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.1
+                  },
+                  "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
+                }
               }
+            }
+          },
+          "agentCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
+              },
+              "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+            }
+          },
+          "agentSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+            }
+          },
+          "agentSpeedStdDev": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Preferred generated-agent speed standard deviation, not variance.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "locoSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
             }
           }
         },
@@ -13569,7 +14041,7 @@
               "properties": {
                 "vrIndex": {
                   "type": "integer",
-                  "minimum": -2147483648,
+                  "minimum": 1,
                   "maximum": 2147483647,
                   "default": 0
                 },
@@ -13634,7 +14106,7 @@
                     "integer",
                     "null"
                   ],
-                  "minimum": -2147483648,
+                  "minimum": 1,
                   "maximum": 2147483647,
                   "default": null
                 },
@@ -15623,7 +16095,161 @@
                     "step": 0.1
                   }
                 }
+              },
+              "agentCount": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 2147483647,
+                "default": null,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 1.0
+                  },
+                  "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+                }
+              },
+              "agentSpeed": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.1
+                  },
+                  "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+                }
+              },
+              "agentSpeedStdDev": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Preferred generated-agent speed standard deviation, not variance.",
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 10.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "locoSpeed": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.1
+                  },
+                  "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
+                }
               }
+            }
+          },
+          "agentCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
+              },
+              "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+            }
+          },
+          "agentSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+            }
+          },
+          "agentSpeedStdDev": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Preferred generated-agent speed standard deviation, not variance.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "locoSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
             }
           }
         },
@@ -16057,7 +16683,7 @@
               "properties": {
                 "vrIndex": {
                   "type": "integer",
-                  "minimum": -2147483648,
+                  "minimum": 1,
                   "maximum": 2147483647,
                   "default": 0
                 },
@@ -16122,7 +16748,7 @@
                     "integer",
                     "null"
                   ],
-                  "minimum": -2147483648,
+                  "minimum": 1,
                   "maximum": 2147483647,
                   "default": null
                 },
@@ -18111,7 +18737,161 @@
                     "step": 0.1
                   }
                 }
+              },
+              "agentCount": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 2147483647,
+                "default": null,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 1.0
+                  },
+                  "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+                }
+              },
+              "agentSpeed": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.1
+                  },
+                  "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+                }
+              },
+              "agentSpeedStdDev": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "visibleWhen": {
+                    "property": "trajectoryFile",
+                    "oneOf": [
+                      ""
+                    ]
+                  },
+                  "help": "Preferred generated-agent speed standard deviation, not variance.",
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 10.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "locoSpeed": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "x-ui": {
+                  "unit": "scene units / s",
+                  "slider": {
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.1
+                  },
+                  "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
+                }
               }
+            }
+          },
+          "agentCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
+              },
+              "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+            }
+          },
+          "agentSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+            }
+          },
+          "agentSpeedStdDev": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Preferred generated-agent speed standard deviation, not variance.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "locoSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
             }
           }
         },
@@ -18954,7 +19734,161 @@
                 "step": 0.1
               }
             }
+          },
+          "agentCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
+              },
+              "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+            }
+          },
+          "agentSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+            }
+          },
+          "agentSpeedStdDev": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Preferred generated-agent speed standard deviation, not variance.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "locoSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
+            }
           }
+        }
+      },
+      "agentCount": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 2147483647,
+        "default": null,
+        "x-ui": {
+          "slider": {
+            "min": 0.0,
+            "max": 1000.0,
+            "step": 1.0
+          },
+          "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+        }
+      },
+      "agentSpeed": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "x-ui": {
+          "unit": "scene units / s",
+          "slider": {
+            "min": 0.0,
+            "max": 30.0,
+            "step": 0.1
+          },
+          "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+        }
+      },
+      "agentSpeedStdDev": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "trajectoryFile",
+            "oneOf": [
+              ""
+            ]
+          },
+          "help": "Preferred generated-agent speed standard deviation, not variance.",
+          "unit": "scene units / s",
+          "slider": {
+            "min": 0.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        }
+      },
+      "locoSpeed": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "x-ui": {
+          "unit": "scene units / s",
+          "slider": {
+            "min": 0.0,
+            "max": 30.0,
+            "step": 0.1
+          },
+          "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
         }
       }
     },
@@ -19565,7 +20499,7 @@
           "properties": {
             "vrIndex": {
               "type": "integer",
-              "minimum": -2147483648,
+              "minimum": 1,
               "maximum": 2147483647,
               "default": 0
             },
@@ -19630,7 +20564,7 @@
                 "integer",
                 "null"
               ],
-              "minimum": -2147483648,
+              "minimum": 1,
               "maximum": 2147483647,
               "default": null
             },
@@ -21193,7 +22127,7 @@
               "properties": {
                 "vrIndex": {
                   "type": "integer",
-                  "minimum": -2147483648,
+                  "minimum": 1,
                   "maximum": 2147483647,
                   "default": 0
                 },
@@ -21258,7 +22192,7 @@
                     "integer",
                     "null"
                   ],
-                  "minimum": -2147483648,
+                  "minimum": 1,
                   "maximum": 2147483647,
                   "default": null
                 },
@@ -22408,6 +23342,83 @@
                 "max": 3600,
                 "step": 1
               }
+            }
+          },
+          "agentCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
+              },
+              "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+            }
+          },
+          "agentSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+            }
+          },
+          "agentSpeedStdDev": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Preferred generated-agent speed standard deviation, not variance.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "locoSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
             }
           }
         },
@@ -22841,7 +23852,7 @@
               "properties": {
                 "vrIndex": {
                   "type": "integer",
-                  "minimum": -2147483648,
+                  "minimum": 1,
                   "maximum": 2147483647,
                   "default": 0
                 },
@@ -22906,7 +23917,7 @@
                     "integer",
                     "null"
                   ],
-                  "minimum": -2147483648,
+                  "minimum": 1,
                   "maximum": 2147483647,
                   "default": null
                 },
@@ -24056,6 +25067,83 @@
                 "max": 3600,
                 "step": 1
               }
+            }
+          },
+          "agentCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
+              },
+              "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+            }
+          },
+          "agentSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+            }
+          },
+          "agentSpeedStdDev": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Preferred generated-agent speed standard deviation, not variance.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "locoSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
             }
           }
         },
@@ -24489,7 +25577,7 @@
               "properties": {
                 "vrIndex": {
                   "type": "integer",
-                  "minimum": -2147483648,
+                  "minimum": 1,
                   "maximum": 2147483647,
                   "default": 0
                 },
@@ -24554,7 +25642,7 @@
                     "integer",
                     "null"
                   ],
-                  "minimum": -2147483648,
+                  "minimum": 1,
                   "maximum": 2147483647,
                   "default": null
                 },
@@ -25705,9 +26793,163 @@
                 "step": 1
               }
             }
+          },
+          "agentCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 2147483647,
+            "default": null,
+            "x-ui": {
+              "slider": {
+                "min": 0.0,
+                "max": 1000.0,
+                "step": 1.0
+              },
+              "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+            }
+          },
+          "agentSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+            }
+          },
+          "agentSpeedStdDev": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "trajectoryFile",
+                "oneOf": [
+                  ""
+                ]
+              },
+              "help": "Preferred generated-agent speed standard deviation, not variance.",
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 10.0,
+                "step": 0.01
+              }
+            }
+          },
+          "locoSpeed": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "x-ui": {
+              "unit": "scene units / s",
+              "slider": {
+                "min": 0.0,
+                "max": 30.0,
+                "step": 0.1
+              },
+              "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
+            }
           }
         },
         "title": "kannadi"
+      },
+      "agentCount": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 2147483647,
+        "default": null,
+        "x-ui": {
+          "slider": {
+            "min": 0.0,
+            "max": 1000.0,
+            "step": 1.0
+          },
+          "help": "Preferred simulated-agent count; overrides numberOfLocusts."
+        }
+      },
+      "agentSpeed": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "x-ui": {
+          "unit": "scene units / s",
+          "slider": {
+            "min": 0.0,
+            "max": 30.0,
+            "step": 0.1
+          },
+          "help": "Preferred generated-agent speed; overrides locustSpeed and locoSpeed."
+        }
+      },
+      "agentSpeedStdDev": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "trajectoryFile",
+            "oneOf": [
+              ""
+            ]
+          },
+          "help": "Preferred generated-agent speed standard deviation, not variance.",
+          "unit": "scene units / s",
+          "slider": {
+            "min": 0.0,
+            "max": 10.0,
+            "step": 0.01
+          }
+        }
+      },
+      "locoSpeed": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "x-ui": {
+          "unit": "scene units / s",
+          "slider": {
+            "min": 0.0,
+            "max": 30.0,
+            "step": 0.1
+          },
+          "help": "Legacy speed spelling; used only if agentSpeed and locustSpeed are omitted."
+        }
       }
     },
     "$schema": "https://json-schema.org/draft/2020-12/schema",

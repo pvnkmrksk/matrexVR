@@ -23,7 +23,7 @@ namespace ConfigurationUI
         private readonly HashSet<string> expandedSections=new HashSet<string>();
         private static string Pretty(string key)
         {
-            var names=new Dictionary<string,string> { ["closedLoopOrientation"]="Closed loop orientation",["closedLoopPosition"]="Closed loop position",["closedLoopMode"]="Input mode",["vrId"]="VR ID",["ledPanelWidth"]="LED panel width",["ledPanelHeight"]="LED panel height",["vSyncCount"]="VSync count",["autoTrim"]="Auto-trim",["reloadScene"]="Reload environment",["autoStart"]="Start automatically",["randomise"]="Shuffle blocks",["loop"]="Loop sequence",["aglHeight"]="Height above terrain",["mu"]="Mean heading",["kappa"]="Heading concentration",["numberOfLocusts"]="Agent count",["nightSky"]="Night sky",["zmqAddress"]="Input host",["zmqPort"]="Input port" };
+            var names=new Dictionary<string,string> { ["closedLoopOrientation"]="Closed loop orientation",["closedLoopPosition"]="Closed loop position",["closedLoopMode"]="Input mode",["vrId"]="VR ID",["ledPanelWidth"]="LED panel width",["ledPanelHeight"]="LED panel height",["vSyncCount"]="VSync count",["autoTrim"]="Auto-trim",["reloadScene"]="Reload environment",["autoStart"]="Start automatically",["randomise"]="Shuffle blocks",["loop"]="Loop sequence",["aglHeight"]="Height above terrain",["mu"]="Mean heading",["kappa"]="Heading concentration",["numberOfLocusts"]="Agent count",["agentCount"]="Agent count",["locustSpeed"]="Agent speed",["locoSpeed"]="Agent speed",["agentSpeed"]="Agent speed",["locustSpeedStdDev"]="Agent speed SD",["agentSpeedStdDev"]="Agent speed SD",["speciesName"]="Species name",["nightSky"]="Night sky",["zmqAddress"]="Input host",["zmqPort"]="Input port" };
             if(names.TryGetValue(key,out string label)) return label;
             string text=Human(key).ToLowerInvariant(); return string.IsNullOrEmpty(text)?text:char.ToUpperInvariant(text[0])+text.Substring(1);
         }
@@ -56,6 +56,8 @@ namespace ConfigurationUI
             side.Add(StudioButton("Browse configs","plus",()=>ShowBlockLibrary()));
             side.Add(StudioButton("Open a file","file",ShowOpenFile));
             side.Add(StudioButton("Save a variation","copy",()=>ShowVariation(null)));
+            var replay=StudioButton("Replay a recorded run","play",ShowReplayLauncher); replay.name="open-recorded-replay";
+            replay.tooltip="Save the current setup, then open a recorded run folder in replay."; side.Add(replay);
             side.Add(StudioButton("Quit","play",()=>Application.Quit(),"quiet"));
             foreach(var heading in side.Children().OfType<Label>()) heading.AddToClassList("nav-heading");
         }
@@ -65,7 +67,7 @@ namespace ConfigurationUI
             var top=Row("studio-title-row"); body.Add(top);
             var titles=new VisualElement(); titles.style.flexGrow=1; top.Add(titles);
             var title=new Label(selected==Workspace.Sequence?"Sequence config":selected==Workspace.System?"System config":ExperimentBlocks.Title(selected.Path)); title.AddToClassList("title"); titles.Add(title);
-            var subtitle=new Label(selected==Workspace.Sequence?"Combine reusable configs. Drag to reorder. Open a block to edit its stimulus.":Path.GetRelativePath(Application.streamingAssetsPath,selected.Path).Replace('\\','/')); subtitle.AddToClassList("studio-subtitle"); titles.Add(subtitle);
+            var subtitle=new Label(selected==Workspace.Sequence?"Combine reusable configs. Drag to reorder. Open a block to edit its stimulus.":Path.GetRelativePath(RuntimePaths.ConfigRoot,selected.Path).Replace('\\','/')); subtitle.AddToClassList("studio-subtitle"); titles.Add(subtitle);
             top.Add(StudioButton("More","settings",ShowEditorTools,"quiet"));
             if(selected==Workspace.Sequence) BuildSequenceBuilder();
             else if(selected==Workspace.System) BuildSystemEditor();
@@ -253,7 +255,7 @@ namespace ConfigurationUI
         private void CloseModal() { modal?.RemoveFromHierarchy(); modal=null; }
         private void ShowBlockLibrary(int? replace=null)
         {
-            RequireApplied(); presets=ExperimentBlocks.Catalog(Application.streamingAssetsPath);
+            RequireApplied(); presets=ExperimentBlocks.Catalog(RuntimePaths.ConfigRoot);
             foreach(var preset in presets)
             { string full=Path.GetFullPath(ExperimentConfigFiles.Resolve(preset.Reference)); var edited=Workspace.Documents.FirstOrDefault(d=>d.Path==full); if(edited!=null) preset.Config=(JObject)edited.Root.DeepClone(); }
             var dialog=OpenModal(replace.HasValue?"Choose a new config":"Add an experiment block","Complete configurations become reusable blocks. No parameter-by-parameter setup.");
@@ -273,7 +275,7 @@ namespace ConfigurationUI
             Action update=()=>{ visible.Clear(); visible.AddRange(presets.Where(p=>(category.value=="All" || p.Category==category.value) && (p.Reference+" "+p.Title+" "+p.Description).IndexOf(find.value??"",StringComparison.OrdinalIgnoreCase)>=0)); chosen=null; list.ClearSelection(); list.Rebuild(); preview.Clear(); insert.SetEnabled(false); };
             bool archivesLoaded=false;
             find.RegisterValueChangedCallback(_=>update()); category.RegisterValueChangedCallback(_=>{
-                if(category.value=="Archive" && !archivesLoaded) { var archived=ExperimentBlocks.Catalog(Application.streamingAssetsPath,true).Where(p=>p.Category=="Archive"); presets.AddRange(archived); archivesLoaded=true; } update();
+                if(category.value=="Archive" && !archivesLoaded) { var archived=ExperimentBlocks.Catalog(RuntimePaths.ConfigRoot,true).Where(p=>p.Category=="Archive"); presets.AddRange(archived); archivesLoaded=true; } update();
             });
             list.selectionChanged+=values=>{
                 chosen=values.OfType<ExperimentPreset>().FirstOrDefault(); preview.Clear(); if(chosen==null) return;
@@ -301,7 +303,7 @@ namespace ConfigurationUI
             var dialog=OpenModal("Create a variation","The complete JSON is copied. Other blocks keep their original config.");
             var destination=new TextField("New path") { value="UserConfigs/"+Path.GetFileNameWithoutExtension(doc.Path)+"-variation.json" }; dialog.Add(destination);
             dialog.Add(StudioButton("Create variation","copy",()=>{
-                string target=Path.IsPathRooted(destination.value)?destination.value:Path.Combine(Application.streamingAssetsPath,destination.value);
+                string target=Path.IsPathRooted(destination.value)?destination.value:Path.Combine(RuntimePaths.ConfigRoot,destination.value);
                 if(File.Exists(target)) throw new IOException("Choose a new filename; this one already exists.");
                 Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(target))); File.WriteAllText(target,doc.Root.ToString(Formatting.Indented)+"\n");
                 if(block.HasValue) { string reference=Path.IsPathRooted(destination.value)?target:destination.value.Replace('\\','/'); var preset=ExperimentBlocks.Read(reference,target); AddPresetBlock(preset,(string)Block(block.Value)["sceneName"],block); EditBlock(block.Value); }

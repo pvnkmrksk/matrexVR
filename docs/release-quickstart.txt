@@ -1,0 +1,141 @@
+MATREX VR 0.3 — CONFIGURATION STUDIO, ANIMALS AND SAVED-RUN REPLAY
+Engine: Unity 6000.3.16f1
+https://github.com/pvnkmrksk/matrexVR
+https://pvnkmrksk.github.io/matrexVR/
+
+1. EXTRACT AND OPEN
+
+Extract the whole operating-system ZIP and keep its files together. Launch the
+.exe (Windows), .app (macOS) or .x86_64 (Linux). Unity Editor and Python are not
+required for the player. macOS is ad hoc signed but not notarized; use Finder Open and the corresponding
+Privacy & Security option if prompted. Linux requires a graphical desktop and a
+compatible graphics driver; restore executable permission if extraction loses it.
+
+A fresh profile opens setup by default (autoStart:false). Existing user sequences
+retain their own startup flags. Use -configure to force the experiment setup screen if an existing user sequence
+auto-starts. On macOS: open "/path/to/MATREX VR.app" --args -configure
+Press Escape during a running experiment to return to Control/setup.
+
+2. CONFIGURE THE APPARATUS AND ANIMALS
+
+System config: set actual tracker address/port/mode, display, LED panel layout,
+camera order and sphere diameter. The bundled public starter is not a hardware
+calibration. Use closedLoopMode Kinefly for flight input; FicTrac walking has a
+separate cumulative-displacement contract.
+
+Session: enter experimenter/comments and one Animal ID/Species per configured rig.
+VR1, VR2, etc. are hardware routing keys; Animal ID labels the real animal. Species
+is saved as per-rig system speciesName and run-metadata SpeciesName. Add rig copies
+the prior layout/endpoint with a new ID/port; review it for your actual equipment.
+Additional scene rigs are provisioned from authored templates. Independent stimulus
+layers are finite; setup reports when a configuration exceeds available capacity.
+
+Sequence config: arrange blocks. Experiment configs: choose/edit complete recipes
+for Choice, night sky, Swarm, Kannadi, Optomotor and rugosity. Auto start affects the
+next launch. Save setup, then Start experiment. Each run gets its own data folder.
+Included scenes: ControlScene, Choice, Choice_desync, Choice_Selwyn, Swarm,
+Kannadi, Optomotor, TerrainCueLab, Rugosity_RS, ReplayScene. Optional forest/tree
+examples marked sourceBuildOnly need those scenes enabled in a custom Unity build.
+
+3. WRITABLE CONFIGURATION AND RECORDINGS
+
+The current player uses Unity's writable per-user application profile:
+  <persistentDataPath>/Config/   — editable system, sequence, experiment files
+  <persistentDataPath>/RunData/  — recordings and setup metadata backup
+
+Unity normally places that profile under:
+  Windows: %USERPROFILE%\AppData\LocalLow\<Company>\<Product>
+  macOS: ~/Library/Application Support/<Company>/<Product>
+  Linux: $XDG_CONFIG_HOME/unity3d/<Company>/<Product>
+         (usually ~/.config/unity3d/<Company>/<Product>)
+Company/Product depend on the build's Player Settings; refer to the README/source.
+On first use, missing bundled files are copied to Config. Updates NEVER replace an
+existing user file. Editor defaults remain Assets/StreamingAssets and Assets/RunData.
+
+Override either directory explicitly, for example:
+  "./MATREX VR.x86_64" -configure --config-dir "/path/to/config" --data-dir "/path/to/runs"
+
+Versions 0.1/0.2 used bundled application-relative configuration/data directories.
+To migrate, copy their complete configuration tree to a chosen writable directory
+and use --config-dir; preserve their run folders and use --data-dir when desired.
+Do not overwrite an old run with today's configs.
+
+4. UI AND JSON
+
+Forms and Edit JSON use the same document. Unknown extensions, omitted values,
+null/false/zero distinctions and exact untouched numbers survive. An unchanged
+save preserves original bytes; an actual edit formats JSON. Showing Inherited
+defaults does not insert them. Undo/Redo retains 32 edit transactions. Revert to
+saved JSON and Reload disk are undoable. Apply/discard pending raw JSON text before
+navigation or saving. External conflicts block overwriting unsaved local changes.
+Each file saves atomically with a .bak; the workspace is not one global transaction.
+
+Preferred simulated-population fields:
+  agentCount        (old numberOfLocusts still accepted)
+  agentSpeed        (then locustSpeed, then locoSpeed as fallbacks)
+  agentSpeedStdDev  (old locustSpeedStdDev still accepted)
+Canonical non-null values win; zero is explicit. Speed remains scene world units/s.
+
+New AnimalMetadata.json stores Animals/AnimalID/SpeciesName/UsedAnimalIDs. It also
+writes legacy FlyMetaData.json and Flies/FlyID/UsedFlyIDs aliases for old analysis.
+Read/count one canonical Animals collection, rather than adding the aliases again.
+Historical CSV headers and serialized Unity asset identities remain compatible.
+
+5. CONTROLS AND TELEMETRY
+
+R                 Reset rigs to experiment initial pose.
+P / O             Toggle tracked position / orientation.
+Arrows; A / D     Manual translation; positive / negative yaw, when enabled.
+Ctrl + Space      Toggle configured forward autopilot (steering/reverse retained).
+Shift+Up/Down     Adjust manual translation speed by 1 per press.
+Shift+W/S         Adjust manual turn speed by 1 degree/s per press.
+C/Z; W/S; E/Q     Vertical; pitch; roll, when permitted in system config.
+Tab               Show/hide runtime dashboard; normal field navigation in setup.
+Escape (release)  Return to Control/setup; from Control, quit the player.
+Overview          Right-drag orbit, middle-drag pan, wheel zoom inside the image.
+
+Kinefly: +/- yaw gain; Ctrl+Y yaw-rate mode; keys1–9 select matching configured VR
+IDs; 0 or the HUD Next animal button cycles every configured ID, including VR10.
+Hold [/] to adjust the selected animal’s DC offset. Metadata text entry suppresses experiment hotkeys. Dashboard
+Auto Trim controls the current sequence row; new errors can reopen the panel.
+
+Telemetry is a separate outbound PUB, not the tracking SUB stream:
+  tcp://127.0.0.1:9880; default20Hz; frames: matrex.telemetry.v2, then JSON
+  schemaVersion:2. Use an external ZMQ subscriber; static web pages cannot consume
+  raw ZMQ. See docs/heading-reference-telemetry.md and tools/listen_telemetry.py.
+
+6. REPLAY A SAVED RUN
+
+Keep/extract the complete run folder with rig CSVs, population gzip logs, saved
+sequence/system/experiment snapshots, config_manifest.json and Skyboxes/.
+Choose Replay a recorded run in setup, or launch:
+  "./MATREX VR.x86_64" --replay-session "/path/to/session-folder"
+  open "/path/to/MATREX VR.app" --args --replay-session "/path/to/session-folder"
+
+ReplayScene Browse opens a native folder picker on Windows/macOS and in the
+Editor. Linux uses zenity/kdialog when installed; paste a folder path otherwise.
+Open run folder loads the chosen path. Editor folder drag/drop works; native
+standalone OS-drop is not implemented. Use Browse, the folder input or CLI.
+God's-eye view is enabled by default; fit/zoom and animal views help inspect the
+run. Space plays/pauses, Left/Right seeks 1s (Shift: 10s), N/M jumps steps, timeline
+scrubs forward/back, and speed ranges 0.1–4x. Animal-view cameras are analysis views,
+not calibrated LED-panel reproductions.
+
+Replay uses saved evidence and verifies snapshot hashes. It restores supported
+built scene geometry, archived skies and recorded populations, freezing live
+acquisition. Its fidelity panel identifies missing evidence. Old unrecorded
+headings, animations or exact pixels cannot be reconstructed as measurements.
+No present-day config is substituted for a missing historical file.
+
+7. PRESERVE DATA AND CHECK THE APPARATUS
+
+Retain the entire run directory/ZIP: configuration versions/hashes, metadata,
+rig/population CSV/gzip logs, runtime_trace.log, sky PNGs/manifests and audit files.
+Quit cleanly and allow writers to drain. Walking/rugosity uses cm; Selwyn/terrain
+uses metres. Kinefly raw yaw input uses radians. Interpret units with saved configs.
+
+Repeated-transition cleanup fixes identified ownership leaks/races. The existing
+reloadScene:false in-scene sequence remains available; no original crash dump proves
+all long-run Unity crashes eliminated. Check physical tracking, LED scanout, display
+layout and a representative repeated-reset workload on the acquisition workstation.
+See docs/scene-lifecycle.md, docs/data-formats.md, docs/replay.md and docs/releases.md.

@@ -30,11 +30,11 @@ public class SwarmLogger : MonoBehaviour
         spawner = GetComponent<LocustSpawner>();
         if (master == null || spawner == null || string.IsNullOrEmpty(master.directoryPath)) return;
         string layerNames = "";
-        for (int i = 0; i < 32; i++) if ((locustLayerMask.value & (1 << i)) != 0) layerNames += LayerMask.LayerToName(i) + "_";
+        for (int i = 0; i < 32; i++) if ((locustLayerMask.value & (1 << i)) != 0) layerNames += RuntimeRigRegistry.LayerLabel(i) + "_";
         string path = Path.Combine(master.directoryPath,
             $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_SimulatedLocustData_{layerNames.TrimEnd('_')}_{spawner.numberOfLocusts}_{spawner.spawnAreaSize}_{spawner.mu}_{spawner.kappa}_{spawner.locustSpeed}.csv.gz");
         LogPath = path;
-        string header = FormattableString.Invariant($"Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase,NumberOfLocusts:{spawner.numberOfLocusts},SpawnAreaSize:{spawner.spawnAreaSize},Mu:{spawner.mu},Kappa:{spawner.kappa},LocustSpeed:{spawner.locustSpeed},LocustSpeedStdDev:{spawner.locustSpeedStdDev},DirectionDistribution:{spawner.directionDistribution},KappaElevation:{spawner.kappaElevation}");
+        string header = FormattableString.Invariant($"Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase,RotationX,RotationY,RotationZ,NumberOfLocusts:{spawner.numberOfLocusts},SpawnAreaSize:{spawner.spawnAreaSize},Mu:{spawner.mu},Kappa:{spawner.kappa},LocustSpeed:{spawner.locustSpeed},LocustSpeedStdDev:{spawner.locustSpeedStdDev},DirectionDistribution:{spawner.directionDistribution},KappaElevation:{spawner.kappaElevation}");
         writer = new AsyncSwarmWriter(path, header);
     }
 
@@ -50,7 +50,7 @@ public class SwarmLogger : MonoBehaviour
                 agents.Clear(); names.Clear(); layers.Clear();
                 foreach (var agent in spawner.Spawned)
                     if (agent != null && (locustLayerMask.value & (1 << agent.layer)) != 0)
-                    { agents.Add(agent.transform); names.Add(agent.name); layers.Add(LayerMask.LayerToName(agent.layer)); }
+                    { agents.Add(agent.transform); names.Add(agent.name); layers.Add(RuntimeRigRegistry.LayerLabel(agent.layer)); }
                 cachedRevision = spawner.SpawnRevision; cachedMask = locustLayerMask.value;
             }
             var frame = writer.Rent(agents.Count);
@@ -62,7 +62,9 @@ public class SwarmLogger : MonoBehaviour
             {
                 if (agents[i] == null || !agents[i].gameObject.activeInHierarchy) continue;
                 Vector3 p = agents[i].position;
-                frame.agents[frame.count++] = new AsyncSwarmWriter.Agent { name = names[i], layer = layers[i], x = p.x, y = p.y, z = p.z };
+                Vector3 rotation = agents[i].rotation.eulerAngles;
+                frame.agents[frame.count++] = new AsyncSwarmWriter.Agent { name = names[i], layer = layers[i], x = p.x, y = p.y, z = p.z,
+                    rx = rotation.x, ry = rotation.y, rz = rotation.z };
             }
             writer.Submit(frame);
         }

@@ -1,0 +1,56 @@
+{
+  "skyboxId": "9bc91c3c8f64532e802899f0a174e32453034c00d7c41918c4f58152901e6b8f",
+  "imageFile": "9bc91c3c8f64532e802899f0a174e32453034c00d7c41918c4f58152901e6b8f.png",
+  "imageSha256": "b227da0aef4f1a993214e57426a82cd5fc1093d3334c8d4146998179cf6f37b7",
+  "width": 4096,
+  "height": 2048,
+  "description": {
+    "mode": "astronomical",
+    "renderer": "nasa-j2000-panorama-v2",
+    "source": {
+      "title": "NASA SVS Deep Star Maps 2020",
+      "url": "https://svs.gsfc.nasa.gov/4851/",
+      "assetUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a004800/a004851/starmap_2020_4k.exr",
+      "sha256": "69b841cd048c2ef35543eb1c5819b322530e78aa4b0cab97ec1de3ef56a4ddcd",
+      "credit": "NASA/Goddard Space Flight Center Scientific Visualization Studio; Ernie Wright (USRA); Gaia DR2: ESA/Gaia/DPAC",
+      "astronomyEngineCommit": "865d3da7d8112bbc7911238052c6af4aaf877181",
+      "coordinateSystem": "ICRF/J2000 geocentric RA/Dec; RA=0 at image centre increasing leftward",
+      "limitations": "Stars and Milky Way only. No atmosphere, refraction, extinction, Sun, Moon, planets or stellar proper motion."
+    },
+    "sampleUtc": "2026-10-07T07:14:38.3559010Z",
+    "settings": {
+      "enabled": true,
+      "latitude": -35.894409,
+      "longitude": 148.453948,
+      "timeZoneId": "Australia/Sydney",
+      "utcOffsetHours": 11.0,
+      "utcOffsetMinutes": null,
+      "date": null,
+      "localTime": "now",
+      "advanceWithRealTime": true,
+      "updateIntervalMinutes": 30,
+      "roundToInterval": false,
+      "northYawDegrees": 0.0,
+      "exposure": 0.5,
+      "faintDetailCutoff": 0.15,
+      "maskBelowHorizon": false,
+      "imageWidth": 4096
+    },
+    "worldToJ2000RowMajor": [
+      0.998865962,
+      0.036976736,
+      0.0299916472,
+      0.04753879,
+      -0.8092018,
+      -0.5856045,
+      -0.00261555146,
+      -0.5863661,
+      0.8100419
+    ],
+    "axes": "+X east, +Y zenith, +Z north before northYawDegrees",
+    "projection": "Unity Skybox/Panoramic 360 equirectangular; north at u=0.25; zenith at v=1",
+    "colour": "sRGB 8-bit, bilinear, no mipmaps; faint-detail smoothstep on max linear source channel, then exposure and clipping to [0,1]"
+  },
+  "unityVersion": "6000.3.16f1",
+  "colourSpace": "Gamma"
+}

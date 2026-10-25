@@ -22,29 +22,43 @@ namespace ConfigurationUI
         public bool CanRedo => redo.Count > 0;
         public ConfigDocument(string path, string schemaId)
         { Path = System.IO.Path.GetFullPath(path); SchemaId = schemaId; Reload(); }
-        public void Reload()
+        public void Reload(bool preserveHistory = false)
         {
             byte[] bytes = File.ReadAllBytes(Path);
             JToken parsed = LosslessJson.Parse(RunConfigArchive.Decode(bytes));
             if (!(parsed is JObject)) throw new ArgumentException("Configuration root must be an object.");
+            string before = Root?.ToString(Formatting.None);
+            if (preserveHistory && before != null && before != parsed.ToString(Formatting.None)) Remember(before);
             Root = parsed; baseline = bytes; baselineJson = Root.ToString(Formatting.None);
-            Conflict = false; undo.Clear(); redo.Clear();
+            Conflict = false;
+            if (!preserveHistory) { undo.Clear(); redo.Clear(); }
         }
         public bool CheckExternalChange()
         {
-            if (File.Exists(Path) && RunConfigArchive.Hash(File.ReadAllBytes(Path)) == RunConfigArchive.Hash(baseline)) return false;
+            if (File.Exists(Path) && RunConfigArchive.Hash(File.ReadAllBytes(Path)) == RunConfigArchive.Hash(baseline)) { Conflict = false; return false; }
             if (Dirty || !File.Exists(Path)) { Conflict = true; return false; }
-            Reload(); return true;
+            Reload(true); return true;
         }
         public void Edit(Action<JToken> change)
         {
             string before = Root.ToString(Formatting.None);
-            change(Root);
+            try { change(Root); }
+            catch
+            {
+                // A failed callback must never leave an untracked partial edit.
+                Root = LosslessJson.Parse(before);
+                throw;
+            }
             if (Root.ToString(Formatting.None) == before) return;
+            Remember(before);
+        }
+        private void Remember(string before)
+        {
             undo.Push(before); redo.Clear();
             // Bound history for large sequences; keep the most recent 32 transactions.
             if(undo.Count>32) { var recent=undo.ToArray(); undo.Clear(); for(int i=31;i>=0;i--) undo.Push(recent[i]); }
         }
+        public void RevertToSaved() => Edit(_ => Root = LosslessJson.Parse(baselineJson));
         public void ApplyJson(string json)
         {
             JToken parsed = LosslessJson.Parse(json);

@@ -183,9 +183,15 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(name=="initialRotation" && owner.GetField("randomInitialRotation")!=null)
             ui["enabledWhen"]=owner.GetField("resetRotationOnStart")!=null?new JObject { ["all"]=new JArray(Rule("randomInitialRotation",false),Rule("resetRotationOnStart",true)) }:Rule("randomInitialRotation",false);
         if(name=="playback") ui["enabledWhen"]=new JObject { ["property"]="trajectoryFile",["nonEmpty"]=true };
-        if(new[]{"locustSpeedStdDev","volumeHalfExtentMetres","preserveBoundaryOvershoot"}.Contains(name))
+        if(name=="speciesName") ui["help"]="Common or scientific name of the real animal controlling this rig. Saved with its AnimalID in run metadata.";
+        if(owner==typeof(VRConfig) && (name=="vrIndex" || name=="watchIndex")) child["minimum"]=1;
+        if(new[]{"agentSpeed","locoSpeed","agentSpeedStdDev","locustSpeedStdDev","volumeHalfExtentMetres","preserveBoundaryOvershoot"}.Contains(name))
             ui["visibleWhen"]=Rule("trajectoryFile","");
-        if(name=="locustSpeedStdDev")
+        if(new[]{"agentCount","agentSpeed","locoSpeed"}.Contains(name)) child["minimum"]=0;
+        if(name=="agentCount") ui["help"]="Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.";
+        if(name=="agentSpeed") ui["help"]="Generated agent speed in scene units/s. Takes precedence over locustSpeed and locoSpeed. Recorded trajectory timing is controlled by playback.speed.";
+        if(name=="locoSpeed") ui["help"]="Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitted.";
+        if(name=="locustSpeedStdDev" || name=="agentSpeedStdDev")
         {
             child["minimum"]=0;
             ui["help"]="Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.";
@@ -238,7 +244,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(name.EndsWith("Seconds") || name=="duration") ui["unit"]="seconds";
         if(name.EndsWith("Degrees") || name=="mu" || name=="muElevation" || name=="windDirection") ui["unit"]="degrees";
         if(name.EndsWith("Metres")) ui["unit"]="metres";
-        if(name=="autopilotSpeed" || name=="locustSpeed" || name=="locustSpeedStdDev" || name=="translateSpeed") ui["unit"]="scene units / s";
+        if(new[]{"autopilotSpeed","locustSpeed","locustSpeedStdDev","agentSpeed","agentSpeedStdDev","locoSpeed","translateSpeed"}.Contains(name)) ui["unit"]="scene units / s";
         if(name=="latitude") { child["minimum"]=-90; child["maximum"]=90; }
         if(name=="longitude") { child["minimum"]=-180; child["maximum"]=180; }
         if(owner==typeof(NightSkyConfig) && name=="imageWidth") child["enum"]=new JArray(1024,2048,4096);
@@ -253,10 +259,10 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(ui.HasValues) child["x-ui"]=ui;
         var ranges=new Dictionary<string,double[]> {
             ["duration"]=new[]{1d,3600,1},["durationSeconds"]=new[]{1d,3600,1},["gain"]=new[]{-10d,10,.1},
-            ["autopilotSpeed"]=new[]{0d,30,.1},["locustSpeed"]=new[]{0d,30,.1},["windSpeed"]=new[]{0d,20,.1},["windDirection"]=new[]{0d,360,1},["aglHeight"]=new[]{0d,1000,1},
-            ["locustSpeedStdDev"]=new[]{0d,10,.01},["volumeHalfExtentMetres"]=new[]{.1d,10,.1},
+            ["autopilotSpeed"]=new[]{0d,30,.1},["locustSpeed"]=new[]{0d,30,.1},["agentSpeed"]=new[]{0d,30,.1},["locoSpeed"]=new[]{0d,30,.1},["windSpeed"]=new[]{0d,20,.1},["windDirection"]=new[]{0d,360,1},["aglHeight"]=new[]{0d,1000,1},
+            ["locustSpeedStdDev"]=new[]{0d,10,.01},["agentSpeedStdDev"]=new[]{0d,10,.01},["volumeHalfExtentMetres"]=new[]{.1d,10,.1},
             ["closedLoopPosition"]=new[]{0d,5,.1},["closedLoopOrientation"]=new[]{0d,5,.1},
-            ["numberOfLocusts"]=new[]{0d,1000,1},["numberOfRings"]=new[]{0d,10,1},["mu"]=new[]{-180d,180,1},["muElevation"]=new[]{-90d,90,1},["kappa"]=new[]{0d,1000,1},["kappaElevation"]=new[]{0d,1000,1},
+            ["numberOfLocusts"]=new[]{0d,1000,1},["agentCount"]=new[]{0d,1000,1},["numberOfRings"]=new[]{0d,10,1},["mu"]=new[]{-180d,180,1},["muElevation"]=new[]{-90d,90,1},["kappa"]=new[]{0d,1000,1},["kappaElevation"]=new[]{0d,1000,1},
             ["angularSizeDegrees"]=new[]{.1d,10,.1},["size"]=new[]{.01d,5,.01},["contrast"]=new[]{0d,1,.01},["dutyCycle"]=new[]{0d,1,.01},
             ["frequency"]=new[]{0d,40,.1},["speed"]=new[]{0d,100,.1},["exposure"]=new[]{.1d,5,.1},["latitude"]=new[]{-90d,90,.01},["longitude"]=new[]{-180d,180,.01},
             ["northYawDegrees"]=new[]{0d,360,1},["windowSeconds"]=new[]{1d,180,1},["flightWindowSeconds"]=new[]{.2d,30,.1},["aggressiveness"]=new[]{.001d,1,.01},

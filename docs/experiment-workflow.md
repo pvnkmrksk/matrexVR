@@ -4,7 +4,7 @@ This project runs experiments by chaining Unity scenes and, within some scenes, 
 
 ## Scene sequencing (`sequenceConfig.json`)
 
-- Location: `Assets/StreamingAssets/sequenceConfig.json`.
+- Location: `RuntimePaths.ConfigRoot/sequenceConfig.json` (Editor: `Assets/StreamingAssets`; current standalone: writable profile `Config`).
 - Fields:
   - `randomise`: shuffle the order of the listed scenes when `true`.
   - `loop`: restart from the first scene when the list ends.
@@ -32,4 +32,4 @@ This project runs experiments by chaining Unity scenes and, within some scenes, 
 
 ## Continuous heading assessment
 
-For Swarm or ordinary Choice, enable `headingReference` in the individual experiment config. The rig continues tracking through assessment and stimulus onset, with no onset reset. The sequence duration starts counting down when all rigs have presented their stimuli. See [heading-relative presentation](heading-reference-telemetry.md) for a reusable component API and the required stimulus adapter when adding new controllers.
+For Swarm or ordinary Choice, enable `headingReference` in the individual experiment config. The rig continues tracking through assessment and stimulus onset, with no onset reset. Heading observation shares the configured scene/phase timer and is capped to the remaining duration; it does not add time to a condition. See [heading-relative presentation](heading-reference-telemetry.md) for a reusable component API and the required stimulus adapter when adding new controllers.

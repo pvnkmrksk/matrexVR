@@ -28,6 +28,8 @@ public class LocustSpawner : MonoBehaviour
     public float locustSpeed = 3.0f; // Default speed for locusts
     public float locustSpeedStdDev;
     public bool preserveBoundaryOvershoot;
+    [System.NonSerialized] public int RuntimeLayer = -1;
+    public int ResolvedLayer => RuntimeLayer >= 0 ? RuntimeLayer : LayerMask.NameToLayer(layerName);
     public string layerName = "LocustLayer"; // Default value
     public BoundaryManager boundaryManager;
 
@@ -138,7 +140,7 @@ public class LocustSpawner : MonoBehaviour
 
     void SpawnLocusts()
     {
-        int locustLayer = LayerMask.NameToLayer(layerName); // Get the layer by name
+        int locustLayer = ResolvedLayer; // Get the layer by name
         if (locustLayer == -1) // Layer not found
         {
             Debugger.Log(
@@ -215,7 +217,7 @@ public class LocustSpawner : MonoBehaviour
     {
         GameObject agent = UsesBogongVisual() ? CreateBogongAgent(Vector3.zero, spawned.Count) : Instantiate(locustPrefab);
         agent.name = layerName + "_ID_pool"; agent.tag = "SimulatedLocust";
-        int layer = LayerMask.NameToLayer(layerName); if (layer < 0) layer = gameObject.layer;
+        int layer = ResolvedLayer; if (layer < 0) layer = gameObject.layer;
         SetLayerRecursively(agent.transform,layer);
         foreach (LocustMover mover in agent.GetComponentsInChildren<LocustMover>(true)) mover.enabled = false;
         agent.SetActive(false); spawned.Add(agent);
@@ -225,7 +227,7 @@ public class LocustSpawner : MonoBehaviour
     private void SpawnPlayback()
     {
         SwarmTrajectoryData data = SwarmTrajectoryData.Load(ExperimentConfigFiles.Resolve(trajectoryFile));
-        int layer = LayerMask.NameToLayer(layerName);
+        int layer = ResolvedLayer;
         if (layer < 0) layer = gameObject.layer;
         numberOfLocusts = data.Tracks.Length;
         for (int i = 0; i < data.Tracks.Length; i++)

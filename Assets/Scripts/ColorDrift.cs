@@ -21,6 +21,7 @@ public class ColorDrift : MonoBehaviour
     private float timer;
     private bool useMeanA = true;
     private List<string> dataBuffer;  // To batch up data before writing
+    private Material runtimeMaterial;
     
     // -- Add public read-only properties so external scripts can read them:
     public float CurrentBlue
@@ -35,6 +36,10 @@ public class ColorDrift : MonoBehaviour
 
     void Start()
     {
+        var renderer = GetComponent<Renderer>();
+        if (renderer != null)
+            runtimeMaterial = renderer.GetComponent<RuntimeMaterialOwner>() != null
+                ? renderer.sharedMaterial : RuntimeMaterialOwner.Assign(renderer);
         currentBlue = meanBlueA;
         timer = 0f;
 
@@ -76,8 +81,8 @@ public class ColorDrift : MonoBehaviour
         float green = 254f - currentBlue;
 
         // 5) Assign the color (R=0)
-        GetComponent<Renderer>().material.color 
-            = new Color(0f, green / 255f, currentBlue / 255f);
+        if (runtimeMaterial != null)
+            runtimeMaterial.color = new Color(0f, green / 255f, currentBlue / 255f);
 
         // 6) Optionally buffer data for logging
         if (logDataToFile)

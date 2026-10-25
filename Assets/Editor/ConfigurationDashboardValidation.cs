@@ -25,7 +25,7 @@ public static class ConfigurationDashboardValidation
     private static double deadline;
     private static RenderTexture target;
     private static Rect navigation;
-    private static string originalSystem,originalSequence;
+    private static string originalSystem,originalSequence,originalExperiment;
     private static ConfigDocument experiment;
     private static void Check(bool ok,string text) { if(!ok) throw new Exception(text); checks.Add(text); }
     private static void Call(object obj,string method,params object[] args)=>obj.GetType().GetMethod(method,Private).Invoke(obj,args);
@@ -49,6 +49,15 @@ public static class ConfigurationDashboardValidation
         ConfigurationSchemaBuilder.Generate();
         var system=JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath,"Templates/system_config.template.json")));
         system["targetDisplay"]=0; system.Remove("telemetry"); system.Remove("statusOverlay");
+        var animals=new AnimalData {ExperimentName="Bogong night sky",ExperimenterName="Validation",Comments="Synthetic preview session"};
+        int animalNumber=0;
+        foreach(var rig in ((JArray)system["configs"]).OfType<JObject>())
+        {
+            rig["speciesName"]="Agrotis infusa";
+            animals.Animals.Add(new AnimalMetadata {VR=(string)rig["vrId"],AnimalID="Animal "+(++animalNumber).ToString("00"),SpeciesName="Agrotis infusa",Sex="Unspecified",AgeDays=""});
+        }
+        string backup=Path.Combine(RuntimePaths.RunDataRoot,"Backup");Directory.CreateDirectory(backup);
+        File.WriteAllText(Path.Combine(backup,"AnimalMetadata.json"),JsonConvert.SerializeObject(animals,Formatting.Indented));
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath,"system_config.json"),system.ToString());
         var sequence=JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath,"Examples/Swarm/selwyn-milky-way-swarm-cycle.sequence.json")));
         sequence["autoStart"]=false;
@@ -89,17 +98,29 @@ public static class ConfigurationDashboardValidation
             if(stage==0)
             {
                 target=new RenderTexture(1920,1080,24);target.Create();ui.Document.panelSettings.targetTexture=target;
-                originalSystem=ui.Workspace.System.Root.ToString(Formatting.None);originalSequence=ui.Workspace.Sequence.Root.ToString(Formatting.None);Next(1);
+                originalSystem=ui.Workspace.System.Root.ToString(Formatting.None);originalSequence=ui.Workspace.Sequence.Root.ToString(Formatting.None);Next(1,90);
             }
             else if(stage==1)
             {
                 navigation=root.Q<VisualElement>("setup-navigation").worldBound;Layout(ui,"Session");
                 Capture("session-1920");
                 Check(root.Query<VisualElement>(className:"subject-card").ToList().Select(e=>e.worldBound.y).Distinct().Count()==1,"All four subject cards fit on one Full HD row");
+                Check(root.Query<VisualElement>(className:"subject-heading").ToList().All(heading=>heading.Q<Label>(className:"pill").resolvedStyle.whiteSpace==WhiteSpace.NoWrap),"Animal input-mode badges remain on one line");
                 Check(root.Q<ListView>("session-plan").worldBound.yMax<root.Q<VisualElement>(className:"footer").worldBound.y,"Complete four-block plan fits above the footer in Full HD");
                 foreach(var card in root.Query<VisualElement>(className:"subject-card").ToList())
                     foreach(var input in card.Query<TextField>().ToList())
                         Check(input.Q<VisualElement>(className:"unity-base-field__input").worldBound.yMax<=input.worldBound.yMax+.1f,"Subject input not clipped: "+input.name+" (field "+input.worldBound+", input "+input.Q<VisualElement>(className:"unity-base-field__input").worldBound+")");
+                Check(root.Q<TextField>("subject-id-VR1").label=="Animal ID","Real animal ID uses neutral terminology");
+                var species=root.Q<TextField>("subject-species-VR1");
+                Check(species!=null && species.value=="Agrotis infusa","Species from system JSON appears on the animal card");
+                species.value="Agrotis infusa / pilot";
+                Check((string)ui.Workspace.System.Root["configs"][0]["speciesName"]==species.value,"Species field edits the shared system JSON document");
+                ui.Workspace.System.Undo();species.SetValueWithoutNotify("Agrotis infusa");Call(ui,"EnsureMetadata");
+                Check(ui.Workspace.System.Root.ToString(Formatting.None)==originalSystem,"Species edit Undo restores the exact system document");
+                root.Q<TextField>("subject-id-VR1").value="Animal A / β 001";Call(ui,"SaveMetadata");
+                var saved=JObject.Parse(File.ReadAllText(Path.Combine(RuntimePaths.RunDataRoot,"Backup/AnimalMetadata.json")));
+                Check((string)saved["Animals"][0]["AnimalID"]=="Animal A / β 001" && (string)saved["Animals"][0]["SpeciesName"]=="Agrotis infusa","Actual session controls save canonical animal ID and species");
+                Check(JToken.DeepEquals(saved["Animals"],saved["Flies"]) && (string)saved["Flies"][0]["FlyID"]=="Animal A / β 001","Actual session save retains equivalent legacy metadata aliases");
                 Capture("session-1920"); Submit(root.Q<Button>("open-sequence"));Next(2);
             }
             else if(stage==2)
@@ -134,6 +155,7 @@ public static class ConfigurationDashboardValidation
             {
                 Layout(ui,"Experiment library");Capture("experiments-1920");
                 var step=ui.Workspace.Sequence.Root["sequences"][2];experiment=ui.Workspace.Open((string)step["parameters"]["configFile"],"choice");
+                originalExperiment=experiment.Root.ToString(Formatting.None);
                 Call(ui,"Select",experiment);Put(ui,"settingsTab","Motion");Call(ui,"BuildContent");Next(7);
             }
             else if(stage==7)
@@ -154,8 +176,53 @@ public static class ConfigurationDashboardValidation
                 Submit(root.Q<Button>("open-system"));root.Q<Toggle>("flag-telemetry-enabled").value=false;
                 Check((bool)ui.Workspace.System.Root["telemetry"]["enabled"]==false && ui.Workspace.System.Root["telemetry"]["port"]==null,"Editing inherited flag writes only selected field");
                 ui.Workspace.System.Undo();Check(ui.Workspace.System.Root.ToString(Formatting.None)==originalSystem,"Inherited edit Undo restores exact original JSON");
-                foreach(var schema in ui.Workspace.Schemas.Catalog.Properties()) HelpCoverage((JObject)schema.Value,new string[0]);
-                Finish(null);
+                Call(ui,"Select",experiment);Put(ui,"jsonMode",true);Call(ui,"BuildContent");
+                var draft=(JObject)experiment.Root.DeepClone();draft["futureExactData"]=new JRaw("1.2345678901234567890123456789");
+                root.Q<TextField>(className:"raw-json").value=draft.ToString(Formatting.Indented);Next(9);
+            }
+            else if(stage==9)
+            {
+                float footer=root.Q<VisualElement>(className:"footer").worldBound.y;
+                foreach(string action in new[]{"apply-raw-json","discard-raw-json"})
+                {
+                    var button=root.Q<Button>(action);
+                    Check(button.worldBound.height>0 && button.worldBound.y>=64 && button.worldBound.yMax<=footer,"Long JSON keeps its action visible above the footer: "+action);
+                }
+                Check(root.Q<TextField>("raw-json-editor").verticalScrollerVisibility==ScrollerVisibility.Auto,"Raw JSON scrolls inside a bounded editor");
+                string draft=root.Q<TextField>("raw-json-editor").value;
+                Submit(root.Query<Button>().ToList().First(button=>button.text=="Reload disk (undoable)"));
+                Check(root.Q<TextField>("raw-json-editor").value==draft && experiment.Root["futureExactData"]==null,"Disk reload cannot discard an unapplied JSON text draft");
+                Capture("raw-json-1920");
+                Submit(root.Query<Button>().ToList().First(button=>button.text=="Apply JSON"));
+                Check(experiment.Root["futureExactData"].ToString()=="1.2345678901234567890123456789","Actual raw JSON Apply preserves unknown exact numeric text");
+                Put(ui,"jsonMode",false);Put(ui,"advancedMode",true);Call(ui,"BuildContent");
+                var rows=(List<string>)typeof(ConfigWorkbench).GetField("rows",Private).GetValue(ui);
+                Check(rows.Contains("futureExactData"),"All fields exposes extensions added in raw JSON");
+                root.Q<ListView>(className:"fields").ScrollToItem(rows.IndexOf("futureExactData"));Next(10);
+            }
+            else if(stage==10)
+            {
+                Capture("all-fields-1920");Put(ui,"advancedMode",false);Call(ui,"BuildContent");Call(ui,"ShowEditorTools");
+                Submit(root.Query<Button>().ToList().First(button=>button.Query<Label>().ToList().Any(label=>label.text=="Revert to saved JSON")));
+                Check(experiment.Root["futureExactData"]==null,"Actual Revert tool restores saved JSON");
+                Submit(root.Query<Button>().ToList().First(button=>button.text=="Undo"));
+                Check(experiment.Root["futureExactData"].ToString()=="1.2345678901234567890123456789","Actual Undo restores the reverted exact JSON draft");
+                Submit(root.Query<Button>().ToList().First(button=>button.text=="Undo"));
+                Check(experiment.Root.ToString(Formatting.None)==originalExperiment,"Raw JSON and Revert round trip leaves original experiment unchanged");
+                Next(11);
+            }
+            else if(stage==11)
+            {
+                Check(root.Q<Button>("open-recorded-replay")!=null,"Recorded-run replay is visible in setup navigation");Call(ui,"ShowReplayLauncher");
+                Check(root.Query<Button>().ToList().Any(button=>button.Query<Label>().ToList().Any(label=>label.text=="Save setup and open replay")),"Replay navigation offers save-before-leaving");
+                Next(12);
+            }
+            else if(stage==12)
+            {
+                Capture("replay-launcher-1920");
+                Submit(root.Query<Button>().ToList().First(button=>button.Query<Label>().ToList().Any(label=>label.text=="Keep editing")));
+                Check(SceneManager.GetActiveScene().name=="ControlScene" && !MainController.Instance.SequenceRunning,"Cancel replay launch keeps setup open");
+                foreach(var schema in ui.Workspace.Schemas.Catalog.Properties()) HelpCoverage((JObject)schema.Value,new string[0]);Finish(null);
             }
         }
         catch(Exception error) { Finish(error.ToString()); }

@@ -164,6 +164,19 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         var detailsLabelRect=detailsLabel.GetComponent<RectTransform>();detailsLabelRect.anchorMin=Vector2.zero;detailsLabelRect.anchorMax=Vector2.one;detailsLabelRect.offsetMin=detailsLabelRect.offsetMax=Vector2.zero;
         var detailsText=detailsLabel.GetComponent<Text>();detailsText.font=label.font;detailsText.fontSize=13;detailsText.alignment=TextAnchor.MiddleCenter;detailsText.color=new Color(.72f,.83f,.9f);detailsText.raycastTarget=false;detailsText.text="More details";
         detailsButton.onClick.AddListener(()=>{showDetails=!showDetails;detailsText.text=showDetails?"Less details":"More details";layoutLineCount=-1;nextRefresh=0;});
+        var nextAnimal = new GameObject("Next animal", typeof(RectTransform), typeof(Image), typeof(Button));
+        nextAnimal.transform.SetParent(panel.transform, false);
+        var nextRect = nextAnimal.GetComponent<RectTransform>();
+        nextRect.anchorMin = nextRect.anchorMax = nextRect.pivot = Vector2.zero;
+        nextRect.anchoredPosition = new Vector2(124, 10); nextRect.sizeDelta = new Vector2(72, 28);
+        var nextButton = nextAnimal.GetComponent<Button>(); nextButton.targetGraphic = nextAnimal.GetComponent<Image>();
+        nextButton.targetGraphic.color = new Color(.13f, .18f, .24f);
+        var nextLabel = new GameObject("Label", typeof(RectTransform), typeof(Text)); nextLabel.transform.SetParent(nextAnimal.transform, false);
+        var nextLabelRect = nextLabel.GetComponent<RectTransform>(); nextLabelRect.anchorMin = Vector2.zero; nextLabelRect.anchorMax = Vector2.one;
+        nextLabelRect.offsetMin = nextLabelRect.offsetMax = Vector2.zero;
+        var nextText = nextLabel.GetComponent<Text>(); nextText.font = label.font; nextText.fontSize = 11;
+        nextText.alignment = TextAnchor.MiddleCenter; nextText.color = new Color(.72f, .83f, .9f); nextText.raycastTarget = false; nextText.text = "Next animal";
+        nextButton.onClick.AddListener(() => { MainController.Instance?.SelectNextAnimal(); nextRefresh = 0; });
         Configure();
     }
 
@@ -231,7 +244,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     public string BuildText()
     {
         var main = MainController.Instance;
-        var text = new StringBuilder("<size=19><b><color=#E8EEF3>FLIGHT</color></b></size>   <size=12><color=#8898AA>[Tab] hide · [1–4] select · [ / ] DC</color></size>\n");
+        var text = new StringBuilder("<size=19><b><color=#E8EEF3>EXPERIMENT</color></b></size>   <size=12><color=#8898AA>[Tab] hide · [1–9] select · [0] next · [ / ] DC</color></size>\n");
         text.Append(SceneManager.GetActiveScene().name);
         if (main != null)
         {

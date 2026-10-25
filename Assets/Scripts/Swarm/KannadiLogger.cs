@@ -43,15 +43,7 @@ public class KannadiLogger : MonoBehaviour
         }
 
         // Extract VR index from GameObject name (e.g., "VR1 Kannadi" -> 1)
-        string objName = gameObject.name;
-        if (objName.Contains("VR1"))
-            vrIndex = 1;
-        else if (objName.Contains("VR2"))
-            vrIndex = 2;
-        else if (objName.Contains("VR3"))
-            vrIndex = 3;
-        else if (objName.Contains("VR4"))
-            vrIndex = 4;
+        vrIndex = RuntimeRigRegistry.ParseIndex(gameObject.name);
 
         // Initialize the log file
         string date = DateTime.Now.ToString("yyyy-MM-dd");
@@ -98,12 +90,15 @@ public class KannadiLogger : MonoBehaviour
         }
     }
 
-    void OnDestroy()
+    void OnDestroy() => CloseForArchive();
+
+    public void CloseForArchive()
     {
         if (logFile != null)
         {
             logFile.Flush();
             logFile.Dispose();
+            logFile = null;
         }
     }
 }

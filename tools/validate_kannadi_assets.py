@@ -9,9 +9,11 @@ ids = defaultdict(list)
 errors = []
 paths = defaultdict(list)
 for meta in (ROOT / "Assets").rglob("*.meta"):
-    match = re.search(r"^guid: ([0-9a-f]{32})", meta.read_text(errors="ignore"), re.M)
+    match = re.search(r"^guid: ([0-9a-f]{32})\s*$", meta.read_text(errors="ignore"), re.M)
     if match:
         ids[match[1]].append(Path(str(meta)[:-5]))
+    else:
+        errors.append(f"Malformed or missing GUID in {meta.relative_to(ROOT)}")
     paths[str(meta.relative_to(ROOT)).casefold()].append(meta)
 for guid, assets in ids.items():
     if len(assets) > 1:

@@ -192,6 +192,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         rigStates.Clear();
     }
 
+    private void OnDestroy() => CleanupScene();
+
     public void AdvanceStep(Dictionary<string, object> parameters)
     {
         if (ExperimentPhases.IsPhase(parameters)) InitializeScene(parameters);
@@ -237,8 +239,13 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
     private void CachePlayers()
     {
+        players.Clear();
         foreach (var dl in FindObjectsOfType<DataLogger>())
-            players[dl.name] = dl.transform;
+        {
+            int index=RuntimeRigRegistry.ParseIndex(dl.name);
+            if(index>0 && dl.gameObject.scene==gameObject.scene && dl.GetComponent<ClosedLoop>()!=null)
+                players["VR"+index] = dl.transform;
+        }
     }
 
     private void InitRigStates()
@@ -389,9 +396,11 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                 continue;
             }
 
-            int vrIndex = int.Parse(vrId.Substring(2));
+            int vrIndex = RuntimeRigRegistry.ParseIndex(vrId);
             string layerName = $"ChoiceVR{vrIndex}";
             int layerId = LayerMask.NameToLayer(layerName);
+            if(layerId<0)layerId=RuntimeRigRegistry.StimulusLayer(vrIndex);
+            if(layerId<0)throw new InvalidOperationException("No isolated stimulus layer is allocated for "+vrId);
 
             Vector3 position = obj.polar != null ? PolarToXZ(obj.polar) : ToVector3(obj.pos);
             Quaternion rotation = obj.randomInitialRotation
@@ -408,9 +417,12 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                     StimulusHeadingReference.RotateStimulus(instance.transform, observer.position, reference);
                 }
             }
-            instance.tag = layerName;
-            if (layerId != -1)
-                SetLayerRecursively(instance, layerId);
+            if(vrIndex>=1 && vrIndex<=4)
+            {
+                try{instance.tag=layerName;}catch(UnityException){instance.tag="Untagged";}
+            }
+            else instance.tag="Untagged";
+            SetLayerRecursively(instance, layerId);
 
             Vector3 scale = obj.scale != null
                 ? new Vector3(obj.scale.x, obj.scale.y, obj.scale.z)
@@ -423,15 +435,17 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             if (instance.TryGetComponent<Renderer>(out rend))
             {
                 string matName = !string.IsNullOrEmpty(obj.material) ? obj.material : obj.mat;
-                if (!string.IsNullOrEmpty(matName) && materialDict.TryGetValue(matName, out var mat))
-                    rend.material = new Material(mat);
-
-                if (obj.color != null && obj.color.Length >= 3 && rend.material != null)
-                    rend.material.color = ToColor(obj.color);
+                materialDict.TryGetValue(matName ?? "", out var mat);
+                Material instanceMaterial = RuntimeMaterialOwner.Assign(rend, mat);
+                if (obj.color != null && obj.color.Length >= 3 && instanceMaterial != null)
+                    instanceMaterial.color = ToColor(obj.color);
             }
 
             if (instance.TryGetComponent<ScaleWithDistance>(out var swd))
+            {
                 swd.visualAngleDegrees = obj.visualAngleDegrees;
+                if(players.TryGetValue(vrId,out var owningAnimal))swd.playerCamera=owningAnimal;
+            }
 
             spawned.Add(new SpawnedObject
             {
@@ -591,7 +605,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                     ? state.id
                     : step.trigger.vrId;
 
-                if (c && c.transform.root && c.transform.root.name == targetVr)
+                int targetIndex=RuntimeRigRegistry.ParseIndex(targetVr);
+                if (targetIndex>0 && c && c.transform.root && RuntimeRigRegistry.ParseIndex(c.transform.root.name) == targetIndex)
                 {
                     result.Triggered = true;
                     result.TriggeredObjectIndex = localIndex;

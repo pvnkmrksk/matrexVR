@@ -219,10 +219,10 @@ public class BuildGrayShadeAngleSweepChoiceDesign
 
         // 4) write to StreamingAssets
         string path = Path.Combine(
-            Application.streamingAssetsPath,
+            RuntimePaths.ConfigRoot,
             "sequenceDesign_grayShades_angleSweep_0.0.json"
         );
-        Directory.CreateDirectory(Application.streamingAssetsPath);
+        Directory.CreateDirectory(RuntimePaths.ConfigRoot);
         File.WriteAllText(path, JsonConvert.SerializeObject(design, Formatting.Indented));
 
         Debug.Log($"Wrote design → {path}");
