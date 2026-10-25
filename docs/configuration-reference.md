@@ -57,7 +57,7 @@ The base VR prefab and its standard, Swarm, Kannadi and Cube variants now contai
 
 Viewport slot `i`: x=(startCol + i if horizontal)×width; y=screenHeight−(startRow+1 + i if vertical)×height. Ensure these rectangles fit the physical display. An unavailable display disables its cameras. Configuring VR10 does not accidentally match VR1. Configured letters do not create a camera absent from the prefab. Camera disabling does not delete the rig or stop its sensor logging.
 
-The top-right HUD refreshes at 2 Hz and shows measured FPS, frame mean/peak milliseconds, the software-cap budget, and CPU main/render, GPU and presentation/target-FPS wait times. A dash means unavailable, not zero work. It remains visible when Tab hides the flight dashboard. The same captured summary appears in telemetry as `frameTiming`; see [diagnostics](diagnostics-performance.md#workstation-frame-pacing).
+The FPS HUD refreshes at 2 Hz and shows measured FPS, frame mean/peak milliseconds, the software-cap budget, and CPU main/render, GPU and presentation/target-FPS wait times. A dash means unavailable, not zero work. Tab hides/restores it with the other operator graphics; collection and telemetry `frameTiming` continue. Status, FPS and overview panels reserve free display space outside calibrated LED rectangles and are omitted when none fits. See [diagnostics](diagnostics-performance.md#workstation-frame-pacing) and [overlay validation](operator-overlay-validation-results.json).
 
 No viewport component changes frame timing. For a 60 Hz LED output, use top-level `"targetFrameRate":60, "vSyncCount":1`, or start from `Examples/System/kinefly-six-cameras-60hz.example.json` and retain your actual display mapping and tracker addresses. VSync follows the output's actual refresh rate: `/1` gives 120 FPS on a 120 Hz output; `/2` gives 60 FPS there. For a numeric software cap use `vSyncCount:0`. A 58–60 FPS readout under a 60 FPS software cap does not establish low compute headroom. Unity recommends hardware synchronization for smooth desktop pacing because [software targets can microstutter](https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Application-targetFrameRate.html).
 
@@ -88,7 +88,7 @@ No viewport component changes frame timing. For a 60 Hz LED output, use top-leve
 | `trailWidthPixels` | 1.5 | Screen-space trail width. |
 | `trailBreakDistance` | 50 | World-unit jump that breaks a trail at reset/wrap. |
 
-Numbered arrows track active `VR<number>` roots and their headings. Overlapping animals keep overlapping labels. Right drag orbits, middle drag pans, wheel zooms, Reset view returns overhead. Hide disables both overview cameras and tracking updates and releases the render texture; showing starts a fresh trail. FPS remains visible. The overview can discover additional numbered rigs, but Kannadi's mirror routing currently supports only VR1–VR4.
+Numbered arrows track active `VR<number>` roots and their headings. Overlapping animals keep overlapping labels. Right drag orbits, middle drag pans, wheel zooms, Reset view returns overhead. Hide disables both overview cameras and tracking updates and releases the render texture; showing starts a fresh trail. Tab hides/restores the overview with the other operator graphics. The overview can discover additional numbered rigs, but Kannadi's mirror routing currently supports only VR1–VR4.
 
 ## Sequence configuration
 

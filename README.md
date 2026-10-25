@@ -17,11 +17,11 @@
 
 MATREX VR turns measured animal movement into a controlled visual world: Choice tasks, forest and terrain, astronomical night sky, Optomotor, generated or recorded swarms, and **Kannadi** — ಕನ್ನಡಿ, “mirror” in Kannada — a matrix of mirrored animal poses. Configure an experiment visually, inspect the same JSON, and keep the evidence for analysis and replay.
 
-> **Current desktop preview: source/local build.** Native fullscreen and Retina-aware UI, the Flying/Walking start screen, bundled native trackers and the latest replay fixes are current source. Public **0.1–0.3 downloads remain archival** and do not contain this new desktop experience. No new signed release is implied.
+> **Current desktop preview: source/local build.** Native fullscreen and Retina-aware UI, the demo/Configure workflow, bundled native trackers and the latest replay fixes are current source. Public **0.1–0.3 downloads remain archival** and do not contain this new desktop experience. No new signed release is implied.
 
 [![Current MATREX VR start screen with Flying and Walking, Night sky and Forest, and a clearly labelled hardware-free demo](docs/images/desktop-ui/quickstart-retina-3024.png)](docs/images/desktop-ui/quickstart-retina-3024.png)
 
-*Actual Unity UI render at 2× scale, with synthetic profile data. [Sequence editor](docs/images/desktop-ui/sequence-1920.png) · [Experiment controls](docs/images/desktop-ui/motion-1920.png) · [Tooltips](docs/images/desktop-ui/hover-help-1920.png) · [Capture provenance](docs/images/desktop-ui/provenance.json).*
+*Earlier Unity UI capture at 2× scale, with synthetic profile data; the current workflow is described below. [Sequence editor](docs/images/desktop-ui/sequence-1920.png) · [Experiment controls](docs/images/desktop-ui/motion-1920.png) · [Tooltips](docs/images/desktop-ui/hover-help-1920.png) · [Capture provenance](docs/images/desktop-ui/provenance.json).*
 
 ## Try the current desktop preview
 
@@ -31,13 +31,15 @@ For a local Mac build, install and activate **Unity 6000.3.16f1** with its deskt
 python3 tools/build_local_desktop.py
 ```
 
-The [local builder](tools/build_local_desktop.py) produces **`.local/MATREX VR.app`**, including checksum-verified native companion packages. It builds your current workspace and publishes no release. [Bundled apps, installation and signing](docs/bundled-companions.md) explains the pinned versions and independent process lifetimes.
+The [local builder](tools/build_local_desktop.py) produces **`.local/MATREX VR.app`**, including checksum-verified native companion packages. Apple Silicon builds require the reviewed dashboard archive described in [local companion builds](tools/native_patches/README.md). It builds your current workspace and publishes no release. [Bundled apps, installation and signing](docs/bundled-companions.md) explains the pinned versions and independent process lifetimes.
 
-1. **Open the app.** Flying and a hardware-free demo are the starting choices. Pick **Night sky** or **Forest**.
-2. **Press Start demo.** The native tracker opens independently and feeds the experiment. Demonstrations use labelled simulated or prerecorded input; they are not a new live animal measurement.
-3. **Make it yours.** Edit the sequence and each block's settings. When moving to real acquisition, select **Live camera**, calibrate in the tracker window and configure the apparatus once.
+1. **Open the app and press Start demo.** Without a configured apparatus, the default is a flying **Night sky** demo; **Forest** and walking are available. The native tracker opens independently with labelled simulated or prerecorded input. No animal or hardware is required.
+2. **Configure your apparatus.** Set species, walking/flying input, VR count, displays, LED dimensions, face order and tracker ports. The graphical map uses the same pixel geometry as the stimulus cameras. Calibrate real acquisition in the tracker window, then save the configuration.
+3. **Run daily experiments.** The configured home puts the sequence, block parameters and animal/session labels first. Hardware and species remain under **Configure**. Gain sliders span **0–50**; exact text entry also accepts negative or larger values.
 
 The app starts fullscreen at the selected display's native resolution. Apparatus setup stays out of the daily workflow; sequence editing, experimental parameters and contextual help stay within reach. Existing custom JSON and calibrated apparatus files are preserved. Read the [desktop workflow and validation notes](docs/desktop-experience.md).
+
+**Tab** hides or restores operator graphics together. Status, FPS and overview panels use free display pixels and never cover configured LED rectangles; a display fully occupied by LED output omits these panels.
 
 ## Build an experiment
 
@@ -123,14 +125,14 @@ Focus the Game/player view. Experiment hotkeys are suppressed while typing into 
 | **Arrow keys; A / D** | Manual translation; positive / negative yaw, when manual controls are enabled. |
 | **Ctrl+Space** | Toggle forward autopilot at the active config's `autopilotSpeed`. |
 | **Shift+Up/Down; Shift+W/S** | Adjust manual translation speed; adjust turn speed. |
-| **Tab** | Show/hide the live status dashboard during a run; navigate fields during setup. |
+| **Tab** | Hide/restore operator graphics together during a run; navigate fields during setup. |
 | **Escape, on release** | Stop and return to Control; from Control, exit the standalone player. |
 | **Right / middle drag; wheel** | Orbit / pan; zoom inside the operator overview. |
 | **Space; Left/Right; N/M** | Replay play/pause; seek (Shift for 10 seconds); previous/next step. |
 
 Kinefly controls retain **+/−** for yaw gain, **Ctrl+Y** for yaw-rate mode, **1–9** for matching rig IDs, **0** or the HUD’s **Next animal** button to cycle all configured IDs (including `VR10`), and held **[/]** for DC offset. Optional vertical/pitch/roll and gamepad bindings are covered in the [full controls guide](docs/unity6-controls.md). Autopilot retains steering/reverse input; Optomotor disables it.
 
-The in-app dashboard reports tracking freshness, flight and trim state, gains/DC offsets, heading measurements, phase/sequence state, frame timing and errors. New runtime errors can reopen a hidden panel. Outbound **ZMQ PUB telemetry** is separate from tracking inputs: default `127.0.0.1:9880`, 20 Hz, topic `matrex.telemetry.v2`, schema version 2. A static website cannot consume raw ZMQ directly. See [telemetry](docs/heading-reference-telemetry.md), [auto trim](docs/kinefly-auto-trim.md) and [data formats](docs/data-formats.md).
+The in-app dashboard reports tracking freshness, flight and trim state, gains/DC offsets, heading measurements, phase/sequence state, frame timing and errors. Error capture and telemetry continue while graphics are hidden. Outbound **ZMQ PUB telemetry** is separate from tracking inputs: default `127.0.0.1:9880`, 20 Hz, topic `matrex.telemetry.v2`, schema version 2. A static website cannot consume raw ZMQ directly. See [telemetry](docs/heading-reference-telemetry.md), [auto trim](docs/kinefly-auto-trim.md) and [data formats](docs/data-formats.md).
 
 ![Flight dashboard](docs/images/ux/flight-hud.png)
 

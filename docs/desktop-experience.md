@@ -4,13 +4,17 @@ This is the current source/local desktop build. Published 0.1–0.3 archives ret
 
 ## Everyday workflow
 
-Open the app, leave **Flying** and **Demo** selected, pick **Night sky** or **Forest**, and press **Start demo**. The bundled native tracker starts independently and supplies clearly labelled demonstration input. Flying uses a generated source. Walking uses HejjéTrac’s attributed short recorded sample; after it finishes, use **More → Rig manager… → Start all** in the same tracker window to replay it. Manual movement remains available.
+Without a configured apparatus, open the app and press **Start demo** to try the default flying **Night sky**. **Forest** and walking remain available; secondary choices live under **Demo options & tracker windows**. The bundled native tracker starts independently and supplies clearly labelled demonstration input. Flying uses a generated source. Walking uses HejjéTrac’s attributed short recorded sample; after it finishes, use **More → Rig manager… → Start all** in the same tracker window to replay it. Manual movement remains available.
 
-The start screen puts movement, world and sequence first. Edit sequence blocks and their parameters directly; apparatus setup is remembered separately. Animal metadata is optional while exploring. Hover help explains fields, and advanced/raw JSON editing remains available. The lossless editor document is unchanged by the temporary typed conversion used at the native launch boundary.
+Use **Configure** to set species, walking/flying tracker mode, VR count, LED panels or desktop preview, display routing, panel dimensions/order and tracker hosts/ports. The face net uses **D/R/B/L/F/U** and the display map shows exact pixel positions. Choose **Use this configuration** when the apparatus is ready. Imported calibration and custom JSON remain available for review; the multi-face high-resolution monitor wizard is deferred.
+
+The configured home puts sequences, block parameters and animal/session labels first. Hardware and species stay in **Configure**. Editing a rig preserves its expanded card and scroll position. Gain sliders cover **0–50**, while exact text entry retains negative and larger values. Hover help explains fields, and advanced/raw JSON editing remains available. The lossless editor document is unchanged by the temporary typed conversion used at the native launch boundary.
 
 Each movement/world/input combination has separate editable files under `Config/QuickStart/`. Switching away and back retains edits. An existing system or sequence file is never overwritten to create a new profile. A normal desktop launch remembers the last prepared workspace in `Config/Desktop/workspace.json`; an explicit `--config-dir` respects that directory’s root selection.
 
 During an experiment, the compact bar shows whether input is fresh, toggles forward motion, opens optional live plots, displays controls and returns to setup. **Tracker input** means a publisher is connected; transport freshness alone cannot prove a physical animal or camera. Verify the source, calibration and quality in the native tracker. Demo recordings are labelled simulated or prerecorded.
+
+**Tab** hides/restores status, FPS, overview, desktop controls and replay controls together; in setup it retains ordinary field navigation. Status, FPS and overview panels reserve free space around calibrated LED rectangles. If none fits, the panel is omitted. The brief hide washout runs before stimulus cameras, preserving LED output. [Framebuffer validation](operator-overlay-validation-results.json) covers seven layouts and actual Tab input; acquisition and telemetry continue while UI is hidden.
 
 ## Native display and text
 
@@ -36,6 +40,8 @@ Keep high-frequency stimulus rendering and tracking in their native applications
 
 The server survives Unity exit. There is no automatic restart loop or repeated extraction on every click. Its stable installation is keyed by the pinned archive digest. Private launch receipts are written atomically; stale or malformed older receipts do not permanently block a new launch. The bundled local server binds to loopback. For another computer, run the viewer/bridge there and configure the experimental telemetry address explicitly; see [live monitoring](manual/live-monitoring.md).
 
+Live trajectories and signed heading plots use the saved-data dashboard's renderers, palette and controls. Choose a 30/60/120-second window, pan/zoom manually or use **Fit & follow**. **Pause view** freezes the displayed charts while acquisition continues; histories remain bounded.
+
 ## Local build and evidence
 
 ```sh
@@ -45,6 +51,8 @@ python3 tools/build_local_desktop.py
 The Mac helper copies the current workspace to a marked disposable project, builds `.local/MATREX VR.app`, stages native companions and the optional viewer, and seals the parent app after embedding. Calibration and recordings live outside the app. Local signing is ad hoc; it is not Developer ID signing or notarization.
 
 Apple Silicon maintainer builds also use a current stable Rust toolchain to build a pinned, reviewed Rekkefly camera correction. Source is read from an available sibling clone or fetched at its exact locked revision into a disposable directory. The installed application needs no compiler or Python installation. Other platform entries retain their explicit capabilities; an older bundled flight app that cannot enforce camera-only acquisition refuses managed camera mode instead of substituting a sample. See [native camera validation](bundled-native-camera-validation-results.json).
+
+The current Mac arm64 dashboard also uses a reviewed local archive, with its source revision and hashes locked in `tools/native_patches/dashboard-macos.lock.json`. Prepare the cache using [local companion build instructions](../tools/native_patches/README.md); an absent or mismatched archive stops the build. Other platform viewer packages retain their published lock.
 
 The physical camera test subsequently passed **987 checks** across a fresh two-scene recording and actual ReplayScene, including forward/reverse precise seeking. Camera-source packets were verified before and after the run; the maximum mean absolute rendered-pixel difference was 0.0002461 (about 0.025%). No animal calibration or camera video recording was involved. [Actual player and camera evidence](desktop-player-validation-results.json) records the tested scope.
 
