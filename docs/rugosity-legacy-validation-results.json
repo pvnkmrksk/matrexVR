@@ -1,0 +1,89 @@
+{
+  "passed": true,
+  "checks": 2391,
+  "unity": "6000.3.16f1",
+  "records": [
+    {
+      "file": "Examples/Rugosity/traditional-rs.json",
+      "minimumY": 1.010932,
+      "maximumY": 4.807766,
+      "maximumTiltDegrees": 18.54036
+    },
+    {
+      "file": "Examples/Rugosity/visual-rs-level-agl.json",
+      "minimumY": 1.010932,
+      "maximumY": 4.807766,
+      "maximumTiltDegrees": 0.0
+    },
+    {
+      "file": "Examples/Rugosity/visual-flat-hidden-rs.json",
+      "minimumY": 1.010932,
+      "maximumY": 4.807766,
+      "maximumTiltDegrees": 18.54036
+    },
+    {
+      "file": "Examples/Rugosity/flat-control.json",
+      "minimumY": 1.0,
+      "maximumY": 1.0,
+      "maximumTiltDegrees": 0.0
+    },
+    {
+      "file": "Examples/Rugosity/visual-rs-fixed-height.json",
+      "minimumY": 5.0,
+      "maximumY": 5.0,
+      "maximumTiltDegrees": 0.0
+    },
+    {
+      "file": "Examples/Rugosity/visual-flat-tilt-only.json",
+      "minimumY": 5.0,
+      "maximumY": 5.0,
+      "maximumTiltDegrees": 18.54036
+    }
+  ],
+  "scope": "Disposable Unity Editor Play mode, Choice config loading, numerical geometry checks, frame-by-frame movement through LateUpdate, native camera renders. No hardware.",
+  "traversals": [
+    {
+      "condition": "Examples/Rugosity/traditional-rs.json",
+      "frames": 60,
+      "minY": 1.00693452,
+      "maxY": 4.95089626,
+      "maxTilt": 24.1483479
+    },
+    {
+      "condition": "Examples/Rugosity/visual-rs-level-agl.json",
+      "frames": 60,
+      "minY": 1.00693452,
+      "maxY": 4.95089626,
+      "maxTilt": 0.0
+    },
+    {
+      "condition": "Examples/Rugosity/visual-flat-hidden-rs.json",
+      "frames": 60,
+      "minY": 1.00693452,
+      "maxY": 4.95089626,
+      "maxTilt": 24.1483479
+    },
+    {
+      "condition": "Examples/Rugosity/flat-control.json",
+      "frames": 60,
+      "minY": 1.0,
+      "maxY": 1.0,
+      "maxTilt": 0.0
+    },
+    {
+      "condition": "Examples/Rugosity/visual-rs-fixed-height.json",
+      "frames": 60,
+      "minY": 5.0,
+      "maxY": 5.0,
+      "maxTilt": 0.0
+    },
+    {
+      "condition": "Examples/Rugosity/visual-flat-tilt-only.json",
+      "frames": 60,
+      "minY": 5.0,
+      "maxY": 5.0,
+      "maxTilt": 24.1483479
+    }
+  ],
+  "keepPlaySettingsAfterStop": true
+}

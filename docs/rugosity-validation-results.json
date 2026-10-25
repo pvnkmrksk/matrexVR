@@ -1,88 +1,101 @@
 {
   "passed": true,
-  "checks": 2390,
+  "checks": 4570,
   "unity": "6000.3.16f1",
   "records": [
     {
-      "file": "Examples/Rugosity/traditional-rs.json",
-      "minimumY": 1.010932,
-      "maximumY": 4.807766,
-      "maximumTiltDegrees": 18.54036
+      "file": "Examples/Rugosity/matched-terrain.json",
+      "minimumY": 1.009569,
+      "maximumY": 1.51652169,
+      "maximumTiltDegrees": 9.18885
     },
     {
-      "file": "Examples/Rugosity/visual-rs-level-agl.json",
-      "minimumY": 1.010932,
-      "maximumY": 4.807766,
-      "maximumTiltDegrees": 0.0
-    },
-    {
-      "file": "Examples/Rugosity/visual-flat-hidden-rs.json",
-      "minimumY": 1.010932,
-      "maximumY": 4.807766,
-      "maximumTiltDegrees": 18.54036
-    },
-    {
-      "file": "Examples/Rugosity/flat-control.json",
+      "file": "Examples/Rugosity/visual-terrain_navigation-flat.json",
       "minimumY": 1.0,
       "maximumY": 1.0,
       "maximumTiltDegrees": 0.0
     },
     {
-      "file": "Examples/Rugosity/visual-rs-fixed-height.json",
-      "minimumY": 5.0,
-      "maximumY": 5.0,
+      "file": "Examples/Rugosity/visual-flat_navigation-terrain.json",
+      "minimumY": 1.009569,
+      "maximumY": 1.51652169,
+      "maximumTiltDegrees": 9.18885
+    },
+    {
+      "file": "Examples/Rugosity/matched-flat.json",
+      "minimumY": 1.0,
+      "maximumY": 1.0,
       "maximumTiltDegrees": 0.0
     },
     {
-      "file": "Examples/Rugosity/visual-flat-tilt-only.json",
-      "minimumY": 5.0,
-      "maximumY": 5.0,
-      "maximumTiltDegrees": 18.54036
+      "file": "Examples/Rugosity/control-height-only.json",
+      "minimumY": 1.009569,
+      "maximumY": 1.51652169,
+      "maximumTiltDegrees": 0.0
+    },
+    {
+      "file": "Examples/Rugosity/control-tilt-only.json",
+      "minimumY": 1.0,
+      "maximumY": 1.0,
+      "maximumTiltDegrees": 9.18885
+    },
+    {
+      "file": "Examples/Rugosity/control-fixed-pose.json",
+      "minimumY": 1.0,
+      "maximumY": 1.0,
+      "maximumTiltDegrees": 0.0
     }
   ],
   "scope": "Disposable Unity Editor Play mode, Choice config loading, numerical geometry checks, frame-by-frame movement through LateUpdate, native camera renders. No hardware.",
   "traversals": [
     {
-      "condition": "Examples/Rugosity/traditional-rs.json",
+      "condition": "Examples/Rugosity/matched-terrain.json",
       "frames": 60,
-      "minY": 1.00693452,
-      "maxY": 4.95089626,
-      "maxTilt": 24.1483479
+      "minY": 1.00181341,
+      "maxY": 1.79870379,
+      "maxTilt": 9.525388
     },
     {
-      "condition": "Examples/Rugosity/visual-rs-level-agl.json",
-      "frames": 60,
-      "minY": 1.00693452,
-      "maxY": 4.95089626,
-      "maxTilt": 0.0
-    },
-    {
-      "condition": "Examples/Rugosity/visual-flat-hidden-rs.json",
-      "frames": 60,
-      "minY": 1.00693452,
-      "maxY": 4.95089626,
-      "maxTilt": 24.1483479
-    },
-    {
-      "condition": "Examples/Rugosity/flat-control.json",
+      "condition": "Examples/Rugosity/visual-terrain_navigation-flat.json",
       "frames": 60,
       "minY": 1.0,
       "maxY": 1.0,
       "maxTilt": 0.0
     },
     {
-      "condition": "Examples/Rugosity/visual-rs-fixed-height.json",
+      "condition": "Examples/Rugosity/visual-flat_navigation-terrain.json",
       "frames": 60,
-      "minY": 5.0,
-      "maxY": 5.0,
+      "minY": 1.00181341,
+      "maxY": 1.79870379,
+      "maxTilt": 9.525388
+    },
+    {
+      "condition": "Examples/Rugosity/matched-flat.json",
+      "frames": 60,
+      "minY": 1.0,
+      "maxY": 1.0,
       "maxTilt": 0.0
     },
     {
-      "condition": "Examples/Rugosity/visual-flat-tilt-only.json",
+      "condition": "Examples/Rugosity/control-height-only.json",
       "frames": 60,
-      "minY": 5.0,
-      "maxY": 5.0,
-      "maxTilt": 24.1483479
+      "minY": 1.00181353,
+      "maxY": 1.79870379,
+      "maxTilt": 0.0
+    },
+    {
+      "condition": "Examples/Rugosity/control-tilt-only.json",
+      "frames": 60,
+      "minY": 1.0,
+      "maxY": 1.0,
+      "maxTilt": 9.525388
+    },
+    {
+      "condition": "Examples/Rugosity/control-fixed-pose.json",
+      "frames": 60,
+      "minY": 1.0,
+      "maxY": 1.0,
+      "maxTilt": 0.0
     }
   ],
   "keepPlaySettingsAfterStop": true

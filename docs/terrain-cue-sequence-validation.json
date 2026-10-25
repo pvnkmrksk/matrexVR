@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "checks": 43,
+  "unity": "6000.3.16f1",
+  "conditions": [
+    "Examples/Rugosity/control-fixed-pose.json",
+    "Examples/Rugosity/control-height-only.json",
+    "Examples/Rugosity/control-tilt-only.json",
+    "Examples/Rugosity/matched-flat.json",
+    "Examples/Rugosity/matched-terrain.json",
+    "Examples/Rugosity/visual-flat_navigation-terrain.json",
+    "Examples/Rugosity/visual-terrain_navigation-flat.json"
+  ],
+  "scope": "Actual ControlScene auto-start and seven in-place transitions; only durations and loop shortened in disposable copy. No hardware."
+}
