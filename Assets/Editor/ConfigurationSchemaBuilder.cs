@@ -264,7 +264,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(owner==typeof(DynamicSequenceController.Trigger) && name=="type") child["enum"]=new JArray("time","area");
         if(ui.HasValues) child["x-ui"]=ui;
         var ranges=new Dictionary<string,double[]> {
-            ["duration"]=new[]{1d,3600,1},["durationSeconds"]=new[]{1d,3600,1},["gain"]=new[]{-10d,10,.1},
+            ["duration"]=new[]{1d,3600,1},["durationSeconds"]=new[]{1d,3600,1},["gain"]=new[]{0d,50,.1},
             ["autopilotSpeed"]=new[]{0d,30,.1},["locustSpeed"]=new[]{0d,30,.1},["agentSpeed"]=new[]{0d,30,.1},["locoSpeed"]=new[]{0d,30,.1},["windSpeed"]=new[]{0d,20,.1},["windDirection"]=new[]{0d,360,1},["aglHeight"]=new[]{0d,1000,1},
             ["locustSpeedStdDev"]=new[]{0d,10,.01},["agentSpeedStdDev"]=new[]{0d,10,.01},["volumeHalfExtentMetres"]=new[]{.1d,10,.1},
             ["closedLoopPosition"]=new[]{0d,5,.1},["closedLoopOrientation"]=new[]{0d,5,.1},

@@ -186,7 +186,14 @@ public static class ConfigurationStudioValidation
                 Put(ui,"activeBlock",1); Call(ui,"BuildContent");
                 var gain=ui.Document.rootVisualElement.Q<TextField>("number-gain"); gain.value="1.12345678901234567890123456789";
                 Check(ui.Workspace.Sequence.Root["sequences"][1]["gain"].ToString()=="1.12345678901234567890123456789","Exact number entry retains precision beyond slider float precision");
-                var slider=ui.Document.rootVisualElement.Q<Slider>("slider-gain"); slider.value=2.3f; Call(ui,"FlushNumbers");
+                var slider=ui.Document.rootVisualElement.Q<Slider>("slider-gain");
+                Check(slider.lowValue==0 && slider.highValue==50,"Gain slider offers the routine 0–50 range");
+                gain.value="-12.34567890123456789";
+                Check(ui.Workspace.Sequence.Root["sequences"][1]["gain"].ToString()=="-12.34567890123456789" && slider.value==0,"Negative exact gain survives the slider's lower bound");
+                gain.value="250";
+                Check(ui.Workspace.Sequence.Root["sequences"][1]["gain"].ToString()=="250" && slider.value==50,"Exact gain above50 survives the recommended slider range");
+                gain.value="1.12345678901234567890123456789";
+                slider.value=2.3f; Call(ui,"FlushNumbers");
                 Check(ui.Workspace.Sequence.Root["sequences"][1]["gain"].ToString()=="2.3","Slider and exact entry synchronize on explicit edits");
                 ui.Workspace.Sequence.Undo(); Check(ui.Workspace.Sequence.Root["sequences"][1]["gain"].ToString()=="1.12345678901234567890123456789","Undo slider edit restores the exact previous number");
                 Call(ui,"EditBlock",0); Put(ui,"settingsTab","Motion"); Call(ui,"BuildContent"); Render(ui); Later(2);
