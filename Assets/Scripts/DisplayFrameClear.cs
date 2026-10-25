@@ -1,12 +1,10 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>Clear a retained HUD display once; no camera continues rendering after the washout.</summary>
 public sealed class DisplayFrameClear : MonoBehaviour
 {
     private Camera clearCamera;
-    private GameObject cover;
     private int startedFrame;
     public int PresentedFrames { get; private set; }
     public static int Requests { get; private set; }
@@ -21,19 +19,15 @@ public sealed class DisplayFrameClear : MonoBehaviour
     public static void Cancel(int display)
     {
         foreach(var clear in FindObjectsByType<DisplayFrameClear>(FindObjectsSortMode.None))
-            if(clear.clearCamera!=null && clear.clearCamera.targetDisplay==display) {clear.clearCamera.enabled=false; if(clear.cover!=null) clear.cover.SetActive(false);Destroy(clear.gameObject);}
+            if(clear.clearCamera!=null && clear.clearCamera.targetDisplay==display) {clear.clearCamera.enabled=false;Destroy(clear.gameObject);}
     }
     private void Initialize(int display)
     {
         startedFrame=Time.frameCount;
         clearCamera=gameObject.AddComponent<Camera>();clearCamera.targetDisplay=display;clearCamera.cullingMask=0;
         clearCamera.clearFlags=CameraClearFlags.SolidColor;clearCamera.backgroundColor=Color.black;
-        clearCamera.depth=10000;clearCamera.allowHDR=false;clearCamera.allowMSAA=false;
-        cover=new GameObject("Black washout canvas",typeof(RectTransform),typeof(Canvas));cover.transform.SetParent(transform,false);
-        var canvas=cover.GetComponent<Canvas>();canvas.renderMode=RenderMode.ScreenSpaceOverlay;canvas.targetDisplay=display;canvas.sortingOrder=32767;
-        var fill=new GameObject("Black",typeof(RectTransform),typeof(Image));fill.transform.SetParent(cover.transform,false);
-        var rect=fill.GetComponent<RectTransform>();rect.anchorMin=Vector2.zero;rect.anchorMax=Vector2.one;rect.offsetMin=rect.offsetMax=Vector2.zero;
-        var image=fill.GetComponent<Image>();image.color=Color.black;image.raycastTarget=false;
+        // Clear before stimulus cameras, so hiding UI never presents a black LED frame.
+        clearCamera.depth=-10000;clearCamera.allowHDR=false;clearCamera.allowMSAA=false;
         StartCoroutine(ReleaseAfterFrame());
     }
     private void OnPostRender() {PresentedFrames++;clearCamera.enabled=false;}
@@ -41,9 +35,8 @@ public sealed class DisplayFrameClear : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
         if(clearCamera!=null) clearCamera.enabled=false;
-        if(cover!=null) cover.SetActive(false);
         Destroy(gameObject);
     }
     // End-of-frame coroutines can be suspended by editor/batch focus; never keep clearing in that case.
-    private void LateUpdate() {if(Time.frameCount>startedFrame+1) {if(clearCamera!=null) clearCamera.enabled=false;if(cover!=null) cover.SetActive(false);Destroy(gameObject);}}
+    private void LateUpdate() {if(Time.frameCount>startedFrame+1) {if(clearCamera!=null) clearCamera.enabled=false;Destroy(gameObject);}}
 }

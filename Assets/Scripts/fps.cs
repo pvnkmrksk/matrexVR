@@ -17,6 +17,9 @@ public class fps : MonoBehaviour
     private static fps instance;
     private Text label;
     private Canvas displayCanvas;
+    private RectTransform displayBox;
+    private int layoutVersion=-1,lastWidth,lastHeight;
+    private Vector2 lastSize;
     private readonly FrameTiming[] timings = new FrameTiming[1];
     private double previousTime, elapsed, peakInterval;
     private double cpuMain, cpuRender, gpu, presentWait;
@@ -46,6 +49,7 @@ public class fps : MonoBehaviour
         displayCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
         displayCanvas.sortingOrder = 2000;
         RectTransform box = new GameObject("FPS", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
+        displayBox=box;
         box.SetParent(canvasObject.transform, false);
         box.anchorMin = box.anchorMax = box.pivot = Vector2.one;
         box.anchoredPosition = new Vector2(-12, -12);
@@ -56,9 +60,9 @@ public class fps : MonoBehaviour
         label.transform.SetParent(box, false);
         label.rectTransform.anchorMin = Vector2.zero; label.rectTransform.anchorMax = Vector2.one;
         label.rectTransform.offsetMin = label.rectTransform.offsetMax = Vector2.zero;
-        label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        label.font = Resources.Load<Font>("ConfigurationUI/Fonts/Inter-Regular")??Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         label.fontSize = 16;
-        label.color = Color.yellow;
+        label.color = new Color(.71f,.79f,.85f);
         label.alignment = TextAnchor.MiddleCenter;
         label.raycastTarget = false;
         label.text = "— FPS";
@@ -68,15 +72,30 @@ public class fps : MonoBehaviour
     private void ApplyDisplay()
     {
         if (displayCanvas == null) return;
+        OperatorOverlayLayout.Invalidate();layoutVersion=-1;
         int display = MainController.Instance != null ? MainController.Instance.GetSystemConfig("VR1").targetDisplay : 0;
         displayCanvas.targetDisplay = display >= 0 && display < Display.displays.Length ? display : 0;
+    }
+    private void LateUpdate()
+    {
+        if(displayCanvas==null||displayBox==null)return;
+        if(ConfigurationUI.ConfigWorkbench.IsOpen||OperatorOverlayVisibility.Hidden)
+        {displayCanvas.enabled=false;OperatorOverlayLayout.Release("fps");return;}
+        var screen=OperatorOverlayLayout.DisplaySize(displayCanvas.targetDisplay);float scale=DesktopDisplay.UiScale;
+        var size=new Vector2(310,58)*scale;displayBox.sizeDelta=size;label.fontSize=Mathf.RoundToInt(12*scale);
+        if(layoutVersion!=OperatorOverlayLayout.Revision||lastWidth!=(int)screen.x||lastHeight!=(int)screen.y||lastSize!=size)
+        {
+            displayCanvas.enabled=OperatorOverlayLayout.Reserve("fps",displayCanvas.targetDisplay,new Rect(screen.x-size.x-12,screen.y-size.y-12,size.x,size.y),out var placed);
+            if(displayCanvas.enabled){displayBox.anchorMin=displayBox.anchorMax=displayBox.pivot=Vector2.zero;displayBox.anchoredPosition=placed.position;}
+            lastWidth=(int)screen.x;lastHeight=(int)screen.y;lastSize=size;layoutVersion=OperatorOverlayLayout.Revision;
+        }
     }
     private void Update()
     {
         if (instance != this) return;
         // Setup owns the frame readout. Keep the same timing collector for telemetry,
         // and restore the standalone readout when the workbench closes.
-        displayCanvas.enabled = !ConfigurationUI.ConfigWorkbench.IsOpen;
+        if(ConfigurationUI.ConfigWorkbench.IsOpen||OperatorOverlayVisibility.Hidden)displayCanvas.enabled=false;
         double now = Time.realtimeSinceStartupAsDouble;
         double interval = now - previousTime;
         previousTime = now;
@@ -129,6 +148,7 @@ public class fps : MonoBehaviour
     private static string Ms(double? value) => value.HasValue ? value.Value.ToString("F1", System.Globalization.CultureInfo.InvariantCulture) : "—";
     private void OnDestroy()
     {
+        OperatorOverlayLayout.Release("fps");
         MainController.SystemConfigurationChanged -= ApplyDisplay;
         if (instance == this) { instance = null; Latest = null; }
     }

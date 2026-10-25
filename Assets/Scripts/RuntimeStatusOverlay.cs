@@ -38,8 +38,11 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private UnityEngine.InputSystem.InputAction dashboardToggle;
     private int lastToggleFrame=-1;
     private bool showDetails;
-    public bool Visible => visible;
-    public bool ShouldDisplay => visible && !ConfigurationUI.ConfigWorkbench.IsOpen;
+    private bool layoutAvailable;
+    private int layoutVersion=-1,lastWidth,lastHeight;
+    private Vector2 lastPanelSize;
+    public bool Visible => visible&&!OperatorOverlayVisibility.Hidden;
+    public bool ShouldDisplay => Visible && layoutAvailable && !ConfigurationUI.ConfigWorkbench.IsOpen;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetErrors()
@@ -86,7 +89,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         if (lastToggleFrame!=Time.frameCount && ((MainController.Instance != null && MainController.Instance.SequenceRunning) || !ExperimentInput.IsEditingText))
         {
             lastToggleFrame=Time.frameCount;
-            SetVisible(!visible);
+            OperatorOverlayVisibility.Toggle();
         }
     }
 
@@ -102,7 +105,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1600, 900);
         scaler.matchWidthOrHeight = 0.5f;
-        panel = new GameObject("Status panel", typeof(RectTransform), typeof(Image));
+        panel = new GameObject("Status panel", typeof(RectTransform), typeof(Image), typeof(RectMask2D));
         panel.transform.SetParent(ui.transform, false);
         var rect = panel.GetComponent<RectTransform>();
         rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(1, 0);
@@ -116,7 +119,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
         rect.offsetMin = new Vector2(12, 48); rect.offsetMax = new Vector2(-12, -10);
         label = textObject.GetComponent<Text>();
-        label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        label.font = Resources.Load<Font>("ConfigurationUI/Fonts/Inter-Regular") ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         label.fontSize = 14; label.color = new Color(.84f,.88f,.92f); label.supportRichText = true;
         label.raycastTarget = false;
         var buttonObject = new GameObject("Auto trim toggle", typeof(RectTransform), typeof(Image), typeof(Button));
@@ -183,6 +186,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private void Configure()
     {
         if (canvas == null) return;
+        OperatorOverlayLayout.Invalidate();layoutVersion=-1;
         var settings = MainController.Instance != null ? MainController.Instance.StatusOverlaySettings : new StatusOverlayConfig();
         canvas.targetDisplay = settings.targetDisplay >= 0 && settings.targetDisplay < Display.displays.Length ? settings.targetDisplay : 0;
         if (canvas.targetDisplay > 0) Display.displays[canvas.targetDisplay].Activate();
@@ -207,7 +211,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         long revision;
         lock (errorLock) revision = errorRevision;
         if (revision != shownRevision) { shownRevision = revision; ApplyVisibility(true); nextRefresh = 0; }
-        if (!visible || label == null || Time.realtimeSinceStartupAsDouble < nextRefresh) return;
+        if (!Visible || label == null || Time.realtimeSinceStartupAsDouble < nextRefresh) return;
         nextRefresh = Time.realtimeSinceStartupAsDouble + .5;
         if (UnityEngine.EventSystems.EventSystem.current == null)
             new GameObject("Dashboard EventSystem", typeof(UnityEngine.EventSystems.EventSystem), typeof(UnityEngine.InputSystem.UI.InputSystemUIInputModule));
@@ -227,6 +231,21 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         RefreshLayout();
     }
 
+    private void LateUpdate()
+    {
+        if(canvas==null||panel==null)return;
+        if(!Visible||ConfigurationUI.ConfigWorkbench.IsOpen)
+        {OperatorOverlayLayout.Release("status");layoutAvailable=false;panel.SetActive(false);return;}
+        var rect=panel.GetComponent<RectTransform>();float scale=Mathf.Max(.01f,canvas.scaleFactor);
+        var screen=OperatorOverlayLayout.DisplaySize(canvas.targetDisplay);var size=rect.sizeDelta*scale;
+        if(layoutVersion!=OperatorOverlayLayout.Revision||lastWidth!=(int)screen.x||lastHeight!=(int)screen.y||lastPanelSize!=size)
+        {
+            layoutAvailable=OperatorOverlayLayout.Reserve("status",canvas.targetDisplay,new Rect(12,12,size.x,size.y),out var placed);
+            if(layoutAvailable){rect.anchorMin=rect.anchorMax=rect.pivot=Vector2.zero;rect.anchoredPosition=placed.position/scale;}
+            lastWidth=(int)screen.x;lastHeight=(int)screen.y;lastPanelSize=size;layoutVersion=OperatorOverlayLayout.Revision;
+        }
+        panel.SetActive(ShouldDisplay);
+    }
     private void RefreshLayout()
     {
         // Only remeasure the rich-text layout when rows or errors change. Numeric refreshes
@@ -347,6 +366,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     public static ErrorEntry[] RecentErrors() { lock (errorLock) return errors.ToArray(); }
     private void OnDestroy()
     {
+        OperatorOverlayLayout.Release("status");
         dashboardToggle?.Dispose();
         if (instance != this) return;
         Application.logMessageReceivedThreaded -= CaptureError;

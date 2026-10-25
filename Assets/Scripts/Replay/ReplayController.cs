@@ -367,6 +367,7 @@ public class ReplayController : MonoBehaviour
 
     private void OnGUI()
     {
+        if(OperatorOverlayVisibility.Hidden)return;
         if(titleStyle==null){titleStyle=new GUIStyle(GUI.skin.label){fontSize=18,fontStyle=FontStyle.Bold};smallStyle=new GUIStyle(GUI.skin.label){fontSize=12,wordWrap=true};}
         Matrix4x4 previousMatrix=GUI.matrix;float scale=Mathf.Min(1,Screen.width/1120f);
         GUI.matrix=Matrix4x4.TRS(Vector3.zero,Quaternion.identity,Vector3.one*scale);

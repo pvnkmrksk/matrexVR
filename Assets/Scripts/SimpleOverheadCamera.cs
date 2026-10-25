@@ -32,7 +32,12 @@ public class SimpleOverheadCamera : MonoBehaviour
     private RawImage displayImage;
     private OverheadTrackOverlay trackOverlay;
     private OverheadCameraController controller;
-    private bool visible;
+    private bool visible,shown,layoutAvailable;
+    private Canvas canvas;
+    private RectTransform panelRect;
+    private OverheadCameraConfig configuration;
+    private int outputDisplay,layoutVersion=-1,lastWidth,lastHeight;
+    private string Reservation => "overview-"+GetInstanceID();
 
     public static void EnsureInScene()
     {
@@ -48,10 +53,12 @@ public class SimpleOverheadCamera : MonoBehaviour
             y = viewportOffset.y, width = viewportSize, height = viewportSize, resolution = renderTextureResolution
         };
         if (!settings.enabled) yield break;
+        configuration=settings;
         int display = settings.targetDisplay >= 0 ? settings.targetDisplay : (main != null ? main.GetSystemConfig("VR1").targetDisplay : 0);
         if (display < 0 || display >= Display.displays.Length) display = 0;
         else if (display > 0) Display.displays[display].Activate();
 
+        outputDisplay=display;
         // Own all generated objects so scene transitions and component removal clean up fully.
         backgroundObject = new GameObject("Overview Background");
         Camera background = backgroundObject.AddComponent<Camera>();
@@ -74,14 +81,15 @@ public class SimpleOverheadCamera : MonoBehaviour
         controller.distance = cameraHeight;
 
         uiCanvas = new GameObject("Overhead Camera Canvas", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
-        Canvas canvas = uiCanvas.GetComponent<Canvas>();
+        canvas = uiCanvas.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.targetDisplay = display;
         canvas.sortingOrder = 1000;
         if (FindObjectOfType<EventSystem>() == null)
             new GameObject("Overview EventSystem", typeof(EventSystem), typeof(UnityEngine.InputSystem.UI.InputSystemUIInputModule)).transform.SetParent(uiCanvas.transform);
 
-        RectTransform panel = new GameObject("Overview Panel", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
+        RectTransform panel = new GameObject("Overview Panel", typeof(RectTransform), typeof(Image), typeof(RectMask2D)).GetComponent<RectTransform>();
+        panelRect=panel;
         panel.SetParent(uiCanvas.transform, false);
         float x = Mathf.Clamp(settings.x, 0f, 0.9f), y = Mathf.Clamp(settings.y, 0f, 0.9f);
         panel.anchorMin = new Vector2(x, y);
@@ -105,7 +113,9 @@ public class SimpleOverheadCamera : MonoBehaviour
         controller.inputDisplay = display;
         AddButton(panel, "Reset view", 0, () => controller.ResetToSkyView());
         AddButton(panel, "Show / hide", 108, ToggleCamera);
-        visible = true;
+        visible = true;shown=true;
+        OperatorOverlayVisibility.Changed+=RefreshVisibility;
+        PlaceOverview();RefreshVisibility();
         yield return null; // Rigs and band members have now completed Start.
         controller.CalculateTargetFromLocusts();
     }
@@ -122,28 +132,45 @@ public class SimpleOverheadCamera : MonoBehaviour
         textRect.SetParent(rect, false); textRect.anchorMin = Vector2.zero; textRect.anchorMax = Vector2.one;
         textRect.offsetMin = textRect.offsetMax = Vector2.zero;
         Text text = textRect.GetComponent<Text>();
-        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        text.font = Resources.Load<Font>("ConfigurationUI/Fonts/Inter-Regular") ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         text.text = label; text.fontSize = 14; text.alignment = TextAnchor.MiddleCenter; text.raycastTarget = false;
     }
 
-    public void ToggleCamera()
+    public void ToggleCamera(){visible=!visible;RefreshVisibility();}
+    private void PlaceOverview()
     {
-        visible = !visible;
-        if (visible && renderTexture != null && !renderTexture.IsCreated()) renderTexture.Create();
-        if (overheadCam != null) overheadCam.enabled = visible;
-        if (cameraObject != null) cameraObject.SetActive(visible);
-        if (backgroundObject != null) backgroundObject.SetActive(visible);
-        if (displayImage != null) displayImage.enabled = visible;
-        if (trackOverlay != null) trackOverlay.SetVisible(visible);
-        if (!visible && renderTexture != null) renderTexture.Release();
+        if(panelRect==null||configuration==null)return;
+        var size=OperatorOverlayLayout.DisplaySize(outputDisplay);
+        if(layoutVersion==OperatorOverlayLayout.Revision&&lastWidth==(int)size.x&&lastHeight==(int)size.y)return;
+        float x=Mathf.Clamp(configuration.x,0,.9f),y=Mathf.Clamp(configuration.y,0,.9f);
+        var desired=new Rect(x*size.x,y*size.y,Mathf.Clamp(configuration.width,.1f,1-x)*size.x,Mathf.Clamp(configuration.height,.1f,1-y)*size.y);
+        layoutAvailable=OperatorOverlayLayout.Reserve(Reservation,outputDisplay,desired,out var placed);
+        if(layoutAvailable){panelRect.anchorMin=panelRect.anchorMax=panelRect.pivot=Vector2.zero;panelRect.anchoredPosition=placed.position;panelRect.sizeDelta=placed.size;}
+        lastWidth=(int)size.x;lastHeight=(int)size.y;layoutVersion=OperatorOverlayLayout.Revision;
+    }
+    private void RefreshVisibility()
+    {
+        bool active=visible&&!OperatorOverlayVisibility.Hidden&&layoutAvailable;
+        if(canvas!=null)canvas.enabled=active;
+        if(shown==active)return;shown=active;
+        if(active&&renderTexture!=null&&!renderTexture.IsCreated())renderTexture.Create();
+        if(overheadCam!=null)overheadCam.enabled=active;
+        if(cameraObject!=null)cameraObject.SetActive(active);
+        if(backgroundObject!=null)backgroundObject.SetActive(active);
+        if(displayImage!=null)displayImage.enabled=active;
+        if(trackOverlay!=null)trackOverlay.SetVisible(active);
+        if(!active&&renderTexture!=null)renderTexture.Release();
     }
     private void LateUpdate()
     {
-        if (visible && overheadCam != null && displayImage != null && displayImage.rectTransform.rect.height > 0)
-            overheadCam.aspect = displayImage.rectTransform.rect.width / displayImage.rectTransform.rect.height;
+        if(!visible||OperatorOverlayVisibility.Hidden)OperatorOverlayLayout.Release(Reservation);else PlaceOverview();
+        RefreshVisibility();
+        if(shown&&overheadCam!=null&&displayImage!=null&&displayImage.rectTransform.rect.height>0)
+            overheadCam.aspect=displayImage.rectTransform.rect.width/displayImage.rectTransform.rect.height;
     }
     private void OnDestroy()
     {
+        OperatorOverlayVisibility.Changed-=RefreshVisibility;OperatorOverlayLayout.Release(Reservation);
         if (cameraObject != null) Destroy(cameraObject);
         if (backgroundObject != null) Destroy(backgroundObject);
         if (uiCanvas != null) Destroy(uiCanvas);

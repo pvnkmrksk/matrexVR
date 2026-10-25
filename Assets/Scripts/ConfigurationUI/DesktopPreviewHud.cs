@@ -15,7 +15,7 @@ namespace ConfigurationUI
         internal const string WalkingDemoTooltip="Short recorded walking sample. Replay in HejjéTrac: More → Rig manager… → Start all. Manual exploration remains available.";
         private PanelSettings panel;
         private Label input;
-        private VisualElement help;
+        private VisualElement help,hudRoot;
         private Button forward;
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Reset() { SceneManager.sceneLoaded -= Loaded; }
@@ -30,10 +30,10 @@ namespace ConfigurationUI
         private void Start()
         {
             panel=ScriptableObject.CreateInstance<PanelSettings>();panel.name="Desktop preview controls";
-            panel.scaleMode=PanelScaleMode.ConstantPixelSize;panel.scale=DesktopDisplay.UiScale;panel.sortingOrder=700;panel.targetDisplay=0;
+            panel.scaleMode=PanelScaleMode.ConstantPixelSize;panel.scale=DesktopDisplay.UiScale;panel.sortingOrder=700;panel.targetDisplay=MainController.Instance.SystemConfigs.Values.First(r=>r.desktopPreview).targetDisplay;
             panel.themeStyleSheet=Resources.Load<ThemeStyleSheet>("ConfigurationUI/runtime");
             var document=gameObject.AddComponent<UIDocument>();document.panelSettings=panel;
-            var root=document.rootVisualElement;root.AddToClassList("desktop-preview-hud");root.pickingMode=PickingMode.Ignore;
+            var root=document.rootVisualElement;hudRoot=root;root.AddToClassList("desktop-preview-hud");root.pickingMode=PickingMode.Ignore;
             root.styleSheets.Add(Resources.Load<StyleSheet>("ConfigurationUI/workbench"));WorkbenchTypography.Apply(root);
             JObject marker=null;
             try{marker=JObject.Parse(ExperimentConfigFiles.ReadAllText(ExperimentConfigFiles.Resolve(MainController.Instance.SystemConfigurationFileName)))["desktopQuickStart"] as JObject;}catch(Exception){ }
@@ -55,6 +55,7 @@ namespace ConfigurationUI
             help.Add(new Label("Arrow keys  Move    ·    A / D  Turn    ·    Z / C  Down / up (flight)"));
             help.Add(new Label("Ctrl+Space  Auto forward    ·    R  Reset pose    ·    Esc  Return to setup"));
             help.Add(new Label(walkingDemo?WalkingDemoHelp:demo?"Demo input is simulated or prerecorded and labeled in the recording. Tracker windows run independently.":"Tracker input is connected over the configured transport. Verify camera source, calibration and tracking quality in its window."));
+            OperatorOverlayVisibility.Changed+=Refresh;
             root.schedule.Execute(Refresh).Every(500);Refresh();
         }
         private Button ActionButton(string title, Action action)
@@ -63,6 +64,11 @@ namespace ConfigurationUI
         }
         private void Refresh()
         {
+            // A mixed preview/LED configuration must protect the LED pixels too.
+            var size=OperatorOverlayLayout.DisplaySize(panel.targetDisplay);
+            bool hidden=OperatorOverlayVisibility.Hidden||OperatorOverlayLayout.ProtectedRects(panel.targetDisplay,(int)size.x,(int)size.y).Count>0;
+            hudRoot.style.display=hidden?DisplayStyle.None:DisplayStyle.Flex;
+            if(hidden)return;
             int expected=0,fresh=0;
             foreach(var rig in MainController.Instance.SystemConfigs.Values.Where(r=>r.desktopPreview))
             {
@@ -78,6 +84,6 @@ namespace ConfigurationUI
             forward.text="Auto forward "+(on?"on":"off");
             if(Mathf.Abs(panel.scale-DesktopDisplay.UiScale)>.01f)panel.scale=DesktopDisplay.UiScale;
         }
-        private void OnDestroy(){if(panel!=null)Destroy(panel);}
+        private void OnDestroy(){OperatorOverlayVisibility.Changed-=Refresh;if(panel!=null)Destroy(panel);}
     }
 }
