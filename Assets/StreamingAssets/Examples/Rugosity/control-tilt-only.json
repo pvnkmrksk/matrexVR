@@ -1,0 +1,41 @@
+{
+  "objects": [],
+  "closedLoopPosition": false,
+  "closedLoopOrientation": false,
+  "initialPosition": {
+    "x": -60,
+    "y": 1,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0,
+    "y": 90,
+    "z": 0
+  },
+  "resetPositionOnStart": true,
+  "resetRotationOnStart": true,
+  "randomInitialRotation": false,
+  "backgroundColor": {
+    "r": 0.56,
+    "g": 0.71,
+    "b": 0.86,
+    "a": 1
+  },
+  "autopilotEnabled": true,
+  "rugosity": {
+    "enabled": true,
+    "visualSurface": "Flat",
+    "collisionSurface": "RoughSmooth",
+    "heightSurface": "",
+    "normalSurface": "",
+    "heightMode": "Absolute",
+    "orientationMode": "SurfaceNormal",
+    "centimetersPerUnit": 1,
+    "clearanceCm": 1,
+    "absoluteHeight": 1,
+    "normalRadiusCm": 0,
+    "normalSamples": 5,
+    "tiltResponse": 0
+  },
+  "autopilotSpeed": 5
+}

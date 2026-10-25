@@ -21,7 +21,7 @@ for names in paths.values():
         errors.append(f"Case collision: {names}")
 settings = (ROOT / "ProjectSettings/EditorBuildSettings.asset").read_text()
 pending = [ROOT / "Assets/Resources/KannadiPrefabCatalog.asset"]
-for scene in ("Kannadi", "Swarm"):
+for scene in ("Kannadi", "Swarm", "Rugosity_RS", "TerrainCueLab"):
     path = ROOT / f"Assets/Scenes/{scene}.unity"
     if f"enabled: 1\n    path: Assets/Scenes/{scene}.unity" not in settings:
         errors.append(f"{scene} is not enabled in build settings")

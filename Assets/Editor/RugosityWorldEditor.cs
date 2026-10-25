@@ -33,7 +33,7 @@ public sealed class RugosityWorldEditor : Editor
     public override void OnInspectorGUI()
     {
         var world = (RugosityWorld)target;
-        EditorGUILayout.HelpBox("RS is a mixed rough/smooth landscape. Visual geometry, physical collision, camera height and tilt can use different surfaces. Edit settings live; JSON is applied only at trial boundaries.", MessageType.Info);
+        EditorGUILayout.HelpBox("Visual surface controls appearance. Navigation uses the collision surface for both height and tilt unless explicitly overridden. RoughSmooth / SmoothRough describe spatial patterns, not visual/navigation pairings. Edit live; JSON is applied only at trial boundaries.", MessageType.Info);
         EditorGUI.BeginChangeCheck();
         serializedObject.Update();
         EditorGUILayout.PropertyField(serializedObject.FindProperty("configurationPolicy"));

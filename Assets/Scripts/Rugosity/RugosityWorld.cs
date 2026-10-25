@@ -55,7 +55,7 @@ public sealed class RugosityWorld : MonoBehaviour
         var worlds = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<RugosityWorld>(true)).ToArray();
         if (worlds.Length == 0 && (config?.enabled == true || overrides?.Value<bool?>("enabled") == true))
             throw new InvalidOperationException("rugosity is enabled but the scene has no RugosityWorld with assigned surfaces.");
-        foreach (var world in worlds) world.ApplyConfiguration(config, overrides);
+        foreach (var world in worlds.Where(w => w.isActiveAndEnabled)) world.ApplyConfiguration(config, overrides);
     }
 
     private RugositySurface Resolve(string id)
@@ -81,6 +81,7 @@ public sealed class RugosityWorld : MonoBehaviour
 
     public void ApplyLiveSettings()
     {
+        if (!isActiveAndEnabled) { IsReady = false; return; }
         CaptureDefaults(); dirty = false;
         try
         {

@@ -42,13 +42,15 @@ public sealed class RugosityRig : MonoBehaviour
             normal = sum.normalized;
         }
         GroundNormal = normal;
+        // Smooth the up vector, then reconstruct the heading. Slerping complete
+        // rotations introduces yaw drift when pitch and roll change together.
+        Vector3 appliedNormal = snap || s.orientationMode == RugosityOrientationMode.WorldUp || s.tiltResponse == 0
+            ? normal : Vector3.Slerp(transform.up, normal, 1 - Mathf.Exp(-s.tiltResponse * seconds)).normalized;
         Vector3 forward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
         if (forward.sqrMagnitude < .00001f) forward = Vector3.forward;
         // Preserve horizontal heading exactly while making forward tangent to the ground.
-        forward.y = -(normal.x * forward.x + normal.z * forward.z) / Mathf.Max(normal.y, .0001f);
-        var rotation = Quaternion.LookRotation(forward, normal);
-        transform.rotation = snap || s.orientationMode == RugosityOrientationMode.WorldUp || s.tiltResponse == 0
-            ? rotation : Quaternion.Slerp(transform.rotation, rotation, 1 - Mathf.Exp(-s.tiltResponse * seconds));
+        forward.y = -(appliedNormal.x * forward.x + appliedNormal.z * forward.z) / Mathf.Max(appliedNormal.y, .0001f);
+        transform.rotation = Quaternion.LookRotation(forward, appliedNormal);
         return true;
     }
 }

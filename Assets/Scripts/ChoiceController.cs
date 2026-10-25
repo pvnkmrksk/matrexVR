@@ -170,7 +170,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         }
         SpawnConfiguredObjects(config, closedLoopComponents);
         // Retain the legacy delayed initialization only for old full-reset configs.
-        if (!phased && config.headingReference?.enabled != true && config.resetPositionOnStart && config.resetRotationOnStart)
+        if (!phased && config.rugosity?.enabled != true && config.headingReference?.enabled != true && config.resetPositionOnStart && config.resetRotationOnStart)
             StartCoroutine(DelayedOnLoaded(0.05f));
         if (config.uniformSkyColor != null)
             NightSkyController.Apply(gameObject, null, null, config.uniformSkyColor);

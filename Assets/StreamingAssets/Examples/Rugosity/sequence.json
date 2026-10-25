@@ -4,51 +4,59 @@
   "randomise": false,
   "sequences": [
     {
-      "sceneName": "Rugosity_RS",
+      "sceneName": "TerrainCueLab",
       "duration": 30,
       "reloadScene": false,
       "parameters": {
-        "configFile": "Examples/Rugosity/traditional-rs.json"
+        "configFile": "Examples/Rugosity/matched-terrain.json"
       }
     },
     {
-      "sceneName": "Rugosity_RS",
+      "sceneName": "TerrainCueLab",
       "duration": 30,
       "reloadScene": false,
       "parameters": {
-        "configFile": "Examples/Rugosity/visual-rs-level-agl.json"
+        "configFile": "Examples/Rugosity/visual-terrain_navigation-flat.json"
       }
     },
     {
-      "sceneName": "Rugosity_RS",
+      "sceneName": "TerrainCueLab",
       "duration": 30,
       "reloadScene": false,
       "parameters": {
-        "configFile": "Examples/Rugosity/visual-flat-hidden-rs.json"
+        "configFile": "Examples/Rugosity/visual-flat_navigation-terrain.json"
       }
     },
     {
-      "sceneName": "Rugosity_RS",
+      "sceneName": "TerrainCueLab",
       "duration": 30,
       "reloadScene": false,
       "parameters": {
-        "configFile": "Examples/Rugosity/flat-control.json"
+        "configFile": "Examples/Rugosity/matched-flat.json"
       }
     },
     {
-      "sceneName": "Rugosity_RS",
+      "sceneName": "TerrainCueLab",
       "duration": 30,
       "reloadScene": false,
       "parameters": {
-        "configFile": "Examples/Rugosity/visual-rs-fixed-height.json"
+        "configFile": "Examples/Rugosity/control-height-only.json"
       }
     },
     {
-      "sceneName": "Rugosity_RS",
+      "sceneName": "TerrainCueLab",
       "duration": 30,
       "reloadScene": false,
       "parameters": {
-        "configFile": "Examples/Rugosity/visual-flat-tilt-only.json"
+        "configFile": "Examples/Rugosity/control-tilt-only.json"
+      }
+    },
+    {
+      "sceneName": "TerrainCueLab",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/control-fixed-pose.json"
       }
     }
   ]

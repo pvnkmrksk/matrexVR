@@ -179,8 +179,9 @@ public class ClosedLoop : MonoBehaviour
         {
             // Use _ficTracRotationOffset to correctly transform the position delta
             // This accounts for both the initial FicTrac orientation and any random initial rotation
-            Vector3 positionDelta = _ficTracRotationOffset * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius;
-            if (GetComponent<RugosityRig>()?.ControlsPose ?? false) positionDelta.y = 0;
+            var movementFrame = (GetComponent<RugosityRig>()?.ControlsPose ?? false)
+                ? Quaternion.Euler(0, _ficTracRotationOffset.eulerAngles.y, 0) : _ficTracRotationOffset;
+            Vector3 positionDelta = movementFrame * new Vector3(ficTracDelta.x, 0, ficTracDelta.y) * sphereRadius;
             if (useLocustGains) positionDelta *= locustPositionGain;
             transform.Translate(positionDelta, Space.World);
         }

@@ -1,0 +1,55 @@
+{
+  "autoStart": true,
+  "loop": true,
+  "randomise": false,
+  "sequences": [
+    {
+      "sceneName": "Rugosity_RS",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/traditional-rs.json"
+      }
+    },
+    {
+      "sceneName": "Rugosity_RS",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/visual-rs-level-agl.json"
+      }
+    },
+    {
+      "sceneName": "Rugosity_RS",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/visual-flat-hidden-rs.json"
+      }
+    },
+    {
+      "sceneName": "Rugosity_RS",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/flat-control.json"
+      }
+    },
+    {
+      "sceneName": "Rugosity_RS",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/visual-rs-fixed-height.json"
+      }
+    },
+    {
+      "sceneName": "Rugosity_RS",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/visual-flat-tilt-only.json"
+      }
+    }
+  ]
+}

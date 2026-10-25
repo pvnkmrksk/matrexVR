@@ -1,0 +1,39 @@
+{
+  "autoStart": true,
+  "loop": true,
+  "randomise": false,
+  "sequences": [
+    {
+      "sceneName": "TerrainCueLab",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/matched-terrain.json"
+      }
+    },
+    {
+      "sceneName": "TerrainCueLab",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/visual-terrain_navigation-flat.json"
+      }
+    },
+    {
+      "sceneName": "TerrainCueLab",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/visual-flat_navigation-terrain.json"
+      }
+    },
+    {
+      "sceneName": "TerrainCueLab",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/matched-flat.json"
+      }
+    }
+  ]
+}
