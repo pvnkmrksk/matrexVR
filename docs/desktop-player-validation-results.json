@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-25",
+  "scope": "Actual local Mac player and actual Unity record/replay using uncalibrated physical-camera input; no animal-tracking accuracy or LED-timing claim",
+  "unity": "6000.3.16f1",
+  "platform": "Mac arm64",
+  "display": {
+    "screen": {
+      "width": 3024,
+      "height": 1898,
+      "mode": "FullScreenWindow",
+      "dpi": 255.0
+    },
+    "native": {
+      "width": 3024,
+      "height": 1898
+    },
+    "display": {
+      "name": "Built-in Retina Display",
+      "width": 3024,
+      "height": 1898
+    },
+    "ui": {
+      "scale": 2.0,
+      "panelScale": 2.0,
+      "directFramebuffer": true,
+      "logicalWidth": 1512.0,
+      "logicalHeight": 949.0
+    }
+  },
+  "actualPlayer": {
+    "flyingDemo": "Bundled native tracker launched and delivered input; night sky rendered at approximately120FPS",
+    "walkingDemo": "Native recorded sample delivered FT25 input then reached end-of-file; explicit same-window restart documented",
+    "dashboard": "One packaged viewer process received telemetry and context at localhost8060; no Python installation needed by app",
+    "independentLifetime": "Unity exited while both native walking tracker and dashboard remained running"
+  },
+  "physicalCamera": {
+    "device": "Built-in FaceTime HD Camera",
+    "beforeReplay": {
+      "frames": 30,
+      "firstFrame": 1117,
+      "lastFrame": 1146,
+      "sourceKinds": [
+        "camera"
+      ],
+      "sourceFallbacks": [
+        false
+      ]
+    },
+    "afterReplay": {
+      "received": 10,
+      "firstFrame": 3723,
+      "lastFrame": 3732,
+      "source_kind": "camera",
+      "source_fallback": false
+    },
+    "nativeExecutableSha256": "19353afdaaea489f3108aacca937e15ae5ed869a3d43d27d0dfb177ff03191f3",
+    "videoRecordingEnabled": false,
+    "cameraReleasedAfterTest": true
+  },
+  "cameraRecordReplay": {
+    "passed": true,
+    "checks": 987,
+    "errors": [],
+    "comparisons": [
+      {
+        "seek": 0,
+        "scene": "Choice",
+        "unityFrame": 36,
+        "colorsSwapped": false,
+        "pixelMeanAbsoluteError": 0.00024609534569035947
+      },
+      {
+        "seek": 1,
+        "scene": "Choice",
+        "unityFrame": 275,
+        "colorsSwapped": false,
+        "pixelMeanAbsoluteError": 8.457158905228759e-06
+      },
+      {
+        "seek": 2,
+        "scene": "Choice_desync",
+        "unityFrame": 513,
+        "colorsSwapped": false,
+        "pixelMeanAbsoluteError": 0.0
+      },
+      {
+        "seek": 3,
+        "scene": "Choice_desync",
+        "unityFrame": 753,
+        "colorsSwapped": true,
+        "pixelMeanAbsoluteError": 0.0
+      },
+      {
+        "seek": 4,
+        "scene": "Choice_desync",
+        "unityFrame": 513,
+        "colorsSwapped": false,
+        "pixelMeanAbsoluteError": 0.0
+      },
+      {
+        "seek": 5,
+        "scene": "Choice",
+        "unityFrame": 36,
+        "colorsSwapped": false,
+        "pixelMeanAbsoluteError": 0.00024609534569035947
+      }
+    ],
+    "maximumMeanAbsolutePixelDifference": 0.00024609534569035947,
+    "cameraSourceVerifiedBeforeAndAfter": true
+  },
+  "limits": [
+    "Camera view was not calibrated to an animal; angle estimates only exercised transport/closed-loop/recording/replay.",
+    "Other OS payload integrity was checked; these native player and physical-camera checks ran on one Mac.",
+    "Some legacy stimulus evidence was never recorded and cannot be reconstructed retroactively."
+  ],
+  "finalManagedCameraLaunch": {
+    "startedFromFinalUnityUI": true,
+    "nativeAppLaunch": "macOS Launch Services",
+    "finalBuildExecutableSha256": "631ce45f37bf9af9969abad1e00997d2b8b208ccffb2236c7ea1e8cd771bb644",
+    "cameraFramesVerified": 30,
+    "sourceKinds": [
+      "camera"
+    ],
+    "sourceFallbacks": [
+      false
+    ],
+    "strictCameraFallback": true,
+    "ownedProcessIdentityVerified": true,
+    "matchingCalibrationSnapshotVerified": true,
+    "configSha256": "82c120eb4dedee57c16fbbfc4855db03161d0675a34539a4a1fc89dda2d0140a",
+    "physicalCalibrationPerformed": false
+  }
+}

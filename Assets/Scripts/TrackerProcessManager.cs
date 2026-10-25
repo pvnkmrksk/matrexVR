@@ -3,8 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 [Serializable]
@@ -14,110 +19,221 @@ public sealed class TrackerLaunchConfig
     public string configFile = "";
     public string device = "";
     public bool headless;
+    public bool strictCameraFallback;
 }
 
-/// <summary>Explicit, opt-in tracker launches. Never discovers, downloads or stops unrelated processes.</summary>
+/// <summary>Independent native apps. A crash, scene change or Unity quit never closes a tracker.</summary>
 public sealed class TrackerProcessManager : MonoBehaviour
 {
-    private sealed class Owned { public Process process; public bool walking; public string backend; public string detail; }
-    private readonly Dictionary<string,Owned> owned = new Dictionary<string,Owned>(StringComparer.Ordinal);
+    private sealed class Receipt
+    {
+        public string vrId,backend,executable,configFile,releaseTag,executableSha256;
+        public int processId,port;
+        public long startUtcTicks;
+        public bool demo,strictCameraFallback;
+        [JsonIgnore] public bool unverified;
+    }
     private static TrackerProcessManager instance;
+    private static string StateRoot => Path.Combine(Application.persistentDataPath,"Companions","processes");
     public static TrackerProcessManager Instance
     {
         get { if(instance==null) { var host=new GameObject("Tracker apps"); DontDestroyOnLoad(host); instance=host.AddComponent<TrackerProcessManager>(); } return instance; }
     }
-    public static string Status(string vrId)
+    private static string Key(string id)
+    { using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(id??""))).Replace("-","").ToLowerInvariant(); }
+    private static string ReceiptPath(string id)=>Path.Combine(StateRoot,Key(id)+".json");
+    private static Receipt Read(string id)
     {
-        if(instance==null || !instance.owned.TryGetValue(vrId,out var app)) return "Tracker not launched by MATREX";
-        try { return app.process.HasExited?app.backend+" exited ("+app.process.ExitCode+")"+(string.IsNullOrWhiteSpace(app.detail)?"":" · "+app.detail): app.backend+" running · PID "+app.process.Id; }
-        catch(InvalidOperationException) { return "Tracker stopped"; }
+        try { string file=ReceiptPath(id);return File.Exists(file)?JsonConvert.DeserializeObject<Receipt>(File.ReadAllText(file)):null; }
+        catch(IOException) { return null; } catch(JsonException) { return null; } catch(UnauthorizedAccessException) { return null; }
     }
-    public static bool IsRunning(string vrId)
+    private static Process Match(Receipt receipt,bool requireExecutable)
     {
-        if(instance==null || !instance.owned.TryGetValue(vrId,out var app)) return false;
-        try { return !app.process.HasExited; } catch(InvalidOperationException) { return false; }
-    }
-    private void OnEnable() => MainController.SystemConfigurationChanged += ReconcileConfiguredRigs;
-    private void OnDisable() => MainController.SystemConfigurationChanged -= ReconcileConfiguredRigs;
-    private void ReconcileConfiguredRigs()
-    {
-        if(MainController.Instance!=null) StopRemovedRigs(MainController.Instance.SystemConfigs.Keys);
-    }
-    public void StopRemovedRigs(IEnumerable<string> configuredRigIds)
-    {
-        var retained=new HashSet<string>(configuredRigIds??Array.Empty<string>(),StringComparer.Ordinal);
-        foreach(string id in new List<string>(owned.Keys))
-            if(!retained.Contains(id))
-            {
-                try { Stop(id); }
-                catch(Exception error) { UnityEngine.Debug.LogWarning("Removed rig tracker stop failed for "+id+": "+error.Message); }
-            }
-    }
-    public static string[] Arguments(SystemConfig rig)
-    {
-        if(rig==null || rig.tracker==null) throw new ArgumentException("Configure this rig's tracker executable and config first.");
-        if(!TrackerBackend.IsFlight(rig.closedLoopMode) && !TrackerBackend.IsWalking(rig.closedLoopMode)) throw new ArgumentException("Optional launch supports Rekkefly and HejjéTrac.");
-        if(rig.zmqPort<1 || rig.zmqPort>65535 || string.IsNullOrWhiteSpace(rig.vrId)) throw new ArgumentException("A rig ID and valid tracking port are required.");
-        if(!Loopback(rig.zmqAddress)) throw new ArgumentException("Local tracker launch requires a localhost/127.0.0.1 tracking address.");
-        string config=ResolveConfig(rig.tracker.configFile);
-        if(!File.Exists(config)) throw new FileNotFoundException("Tracker calibration/config file does not exist.",config);
-        if(TrackerBackend.IsFlight(rig.closedLoopMode))
-        {
-            var args=new List<string>{"--config",config,"--label",rig.vrId,"--zmq-port",rig.zmqPort.ToString(CultureInfo.InvariantCulture),"--supervised"};
-            if(!string.IsNullOrWhiteSpace(rig.tracker.device)) { args.Add("--device");args.Add(rig.tracker.device); }
-            if(rig.tracker.headless) args.Add("--headless");
-            return args.ToArray();
-        }
-        if(rig.tracker.headless || !string.IsNullOrWhiteSpace(rig.tracker.device)) throw new ArgumentException("HejjéTrac device/source belongs in its calibration config; headless is a Rekkefly launch option.");
-        var text=File.ReadAllText(config);
-        string port=ConfigField(text,"zmq_port"), host=ConfigField(text,"zmq_host");
-        if(!int.TryParse(port,NumberStyles.Integer,CultureInfo.InvariantCulture,out int configured) || configured!=rig.zmqPort)
-            throw new ArgumentException("HejjéTrac config zmq_port must match this rig's tracking port ("+rig.zmqPort+"). MATREX does not rewrite calibration files.");
-        if(!Loopback(string.IsNullOrWhiteSpace(host)?"127.0.0.1":host)) throw new ArgumentException("HejjéTrac config zmq_host must be loopback for local launch.");
-        return new[]{"--config",config,"--windows","1","--control-stdio"};
-    }
-    public void Launch(SystemConfig rig)
-    {
-        if(rig==null) throw new ArgumentException("Select a configured rig first.");
-        if(IsRunning(rig.vrId)) throw new InvalidOperationException("MATREX already owns a running tracker for "+rig.vrId+".");
-        string[] args=Arguments(rig);
-        string executable=rig.tracker.executablePath??"";
-        if(!Path.IsPathFullyQualified(executable) || !File.Exists(executable)) throw new ArgumentException("Select an absolute installed tracker executable path. On macOS select the binary inside Contents/MacOS, rather than the .app folder.");
-        string extension=Path.GetExtension(executable).ToLowerInvariant();
-        if(extension==".bat" || extension==".cmd" || extension==".ps1" || extension==".sh") throw new ArgumentException("Select the native tracker executable directly; shell scripts are not launched.");
-        if(owned.TryGetValue(rig.vrId,out var previous)) { previous.process.Dispose();owned.Remove(rig.vrId); }
-        var start=new ProcessStartInfo { FileName=executable,Arguments=JoinArguments(args),WorkingDirectory=Path.GetDirectoryName(executable),UseShellExecute=false,RedirectStandardInput=true,RedirectStandardOutput=true,RedirectStandardError=true,CreateNoWindow=true };
-        var process=new Process { StartInfo=start,EnableRaisingEvents=true };
-        var app=new Owned { process=process,walking=TrackerBackend.IsWalking(rig.closedLoopMode),backend=TrackerBackend.DisplayName(rig.closedLoopMode) };
-        process.OutputDataReceived+=(_,e)=>{ if(e.Data!=null) app.detail=e.Data.Length>512?e.Data.Substring(0,512):e.Data; };
-        process.ErrorDataReceived+=(_,e)=>{ if(e.Data!=null) app.detail=e.Data.Length>512?e.Data.Substring(0,512):e.Data; };
+        if(receipt==null||receipt.processId<=0||receipt.startUtcTicks<=0) return null;
+        Process process=null;
         try
         {
-            if(!process.Start()) throw new InvalidOperationException("Tracker process did not start.");
-            owned.Add(rig.vrId,app);process.BeginOutputReadLine();process.BeginErrorReadLine();
-            // Native desktop starts paused under its typed stdio bridge. This queues start on session 1.
-            if(app.walking) { process.StandardInput.WriteLine("{\"id\":1,\"command\":\"start\",\"session\":1}");process.StandardInput.Flush(); }
+            process=Process.GetProcessById(receipt.processId);
+            if(process.HasExited||process.StartTime.ToUniversalTime().Ticks!=receipt.startUtcTicks) { process.Dispose();return null; }
+            if(!requireExecutable)return process; // UI liveness never reads/hashes a large executable.
+            try
+            {
+                string actual=process.MainModule?.FileName;
+                if(!string.IsNullOrEmpty(actual)&&!SameExecutable(actual,receipt.executable,receipt.executableSha256)) { process.Dispose();return null; }
+                if(requireExecutable&&string.IsNullOrEmpty(actual)) { process.Dispose();return null; }
+            }
+            catch(Exception error) when(error is System.ComponentModel.Win32Exception || error is NotSupportedException)
+            { if(requireExecutable) { process.Dispose();return null; } }
+            return process;
         }
-        catch { if(owned.ContainsKey(rig.vrId)) Stop(rig.vrId);else process.Dispose();throw; }
+        catch(Exception error) when(error is System.ComponentModel.Win32Exception || error is NotSupportedException)
+        { if(process!=null&&!requireExecutable) { receipt.unverified=true;return process; }process?.Dispose();return null; }
+        catch(Exception error) when(error is ArgumentException || error is InvalidOperationException)
+        { process?.Dispose();return null; }
+    }
+    private static bool SameExecutable(string actual,string expected,string sha)
+    {
+        if(string.Equals(Path.GetFullPath(actual),expected,RuntimeInformation.IsOSPlatform(OSPlatform.Windows)?StringComparison.OrdinalIgnoreCase:StringComparison.Ordinal))return true;
+        // macOS /var aliases and symlinked installations can expose another canonical path.
+        return !string.IsNullOrEmpty(sha)&&File.Exists(actual)&&HashFile(actual)==sha;
+    }
+    private static string HashFile(string path) { using(var file=File.OpenRead(path))using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(file)).Replace("-","").ToLowerInvariant(); }
+    public static string Status(string vrId)
+    {
+        var receipt=Read(vrId);using(var process=Match(receipt,false))
+            return process==null?"Tracker window is not running":receipt.unverified?"Existing tracker process cannot be verified; inspect or close its own window":receipt.backend+(string.IsNullOrEmpty(receipt.releaseTag)?"":" "+receipt.releaseTag)+" running independently · PID "+receipt.processId+(receipt.demo?" · demo input":"");
+    }
+    public static bool IsRunning(string vrId) { using(var process=Match(Read(vrId),false))return process!=null; }
+    public bool Show(string vrId)
+    {
+        using(var process=Match(Read(vrId),true))
+        {
+            if(process==null)return false;
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))return MacAppLauncher.Activate(process.Id);
+            return false; // The operator can use the OS app switcher on other platforms.
+        }
+    }
+    /// <summary>Startup-only provenance for a tracker this manager explicitly launched.
+    /// Process ownership is not evidence of a physical camera or valid animal measurement.</summary>
+    public static JObject RecordingProvenance(string vrId)
+    {
+        var receipt=Read(vrId);
+        var result=new JObject { ["vrId"]=vrId,["observedUtc"]=DateTimeOffset.UtcNow,
+            ["identityVerified"]=false,["processRunning"]=false,["actualInputSource"]="unverified" };
+        if(receipt==null) { result["state"]="unmanaged-or-no-owned-launch";return result; }
+        result["backend"]=receipt.backend;result["releaseTag"]=receipt.releaseTag;
+        result["executableSha256"]=receipt.executableSha256;result["executable"]=receipt.executable;
+        result["processId"]=receipt.processId;result["startUtcTicks"]=receipt.startUtcTicks;
+        result["port"]=receipt.port;result["configFile"]=receipt.configFile;
+        result["demoRequested"]=receipt.demo;result["strictCameraFallback"]=receipt.strictCameraFallback;
+        using(var live=Match(receipt,false))result["processRunning"]=live!=null;
+        using(var verified=Match(receipt,true))result["identityVerified"]=verified!=null&&!receipt.unverified;
+        result["state"]=(bool)result["identityVerified"]?"owned-process-identity-verified":
+            (bool)result["processRunning"]?"owned-process-identity-unverified":"owned-launch-no-longer-running";
+        return result;
+    }
+    public static string BundledAvailability(SystemConfig rig)=>CompanionCatalog.Availability(rig);
+    public static bool CanLaunchBundled(SystemConfig rig)=>CompanionCatalog.IsAvailable(rig);
+    public void LaunchPrepared(CompanionCatalog.Prepared prepared)
+    {
+        if(prepared==null||prepared.rig==null)throw new ArgumentException("Prepare the bundled tracker first.");
+        LaunchInternal(prepared.rig,prepared);
+    }
+    public void LaunchBundled(SystemConfig rig,bool demo)
+    {
+        // Resolve/copy a version once. The resulting executable and configuration paths
+        // stay stable across starts and Unity versions, including macOS privacy identity.
+        var prepared=CompanionCatalog.Prepare(rig,demo);
+        LaunchPrepared(prepared);
+    }
+    // Deliberately no subscription which stops apps on system/scene changes.
+    private void OnEnable() { }
+    private void OnDisable() { }
+    public void StopRemovedRigs(IEnumerable<string> configuredRigIds) { }
+    public static string[] Arguments(SystemConfig rig)
+    {
+        if(rig==null||rig.tracker==null)throw new ArgumentException("Configure this rig's tracker executable and config first.");
+        if(!TrackerBackend.IsFlight(rig.closedLoopMode)&&!TrackerBackend.IsWalking(rig.closedLoopMode))throw new ArgumentException("Launch supports Rekkefly and HejjéTrac.");
+        if(rig.zmqPort<1||rig.zmqPort>65535||string.IsNullOrWhiteSpace(rig.vrId))throw new ArgumentException("A rig ID and valid tracking port are required.");
+        if(!Loopback(rig.zmqAddress))throw new ArgumentException("Local launch requires a loopback tracking address.");
+        string config=ResolveConfig(rig.tracker.configFile);
+        if(!File.Exists(config))throw new FileNotFoundException("Tracker calibration/config file does not exist.",config);
+        if(TrackerBackend.IsFlight(rig.closedLoopMode))
+        {
+            var args=new List<string>{"--config",config,"--label",rig.vrId,"--zmq-port",rig.zmqPort.ToString(CultureInfo.InvariantCulture)};
+            if(!string.IsNullOrWhiteSpace(rig.tracker.device)) { args.Add("--device");args.Add(rig.tracker.device); }
+            if(rig.tracker.headless)args.Add("--headless");
+            if(rig.tracker.strictCameraFallback)args.Add("--no-camera-fallback");
+            return args.ToArray();
+        }
+        if(rig.tracker.headless||!string.IsNullOrWhiteSpace(rig.tracker.device))throw new ArgumentException("HejjéTrac device/source belongs in its calibration config; headless is a Rekkefly option.");
+        string text=File.ReadAllText(config),port=ConfigField(text,"zmq_port"),host=ConfigField(text,"zmq_host");
+        if(!int.TryParse(port,NumberStyles.Integer,CultureInfo.InvariantCulture,out int configured)||configured!=rig.zmqPort)
+            throw new ArgumentException("HejjéTrac config zmq_port must match rig port "+rig.zmqPort+".");
+        if(!Loopback(string.IsNullOrWhiteSpace(host)?"127.0.0.1":host))throw new ArgumentException("HejjéTrac zmq_host must be loopback.");
+        // The native desktop starts its explicit config immediately. Stdio bridge mode
+        // pauses it and couples its lifetime to the pipe, so it is intentionally absent.
+        return new[]{"--config",config,"--windows","1"};
+    }
+    public void Launch(SystemConfig rig)=>LaunchInternal(rig,null);
+    private void LaunchInternal(SystemConfig rig,CompanionCatalog.Prepared prepared)
+    {
+        if(rig==null||string.IsNullOrWhiteSpace(rig.vrId))throw new ArgumentException("Select a configured rig first.");
+        Directory.CreateDirectory(StateRoot);
+        using(var launchLock=new FileStream(ReceiptPath(rig.vrId)+".lock",FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None))
+        {
+            var previous=Read(rig.vrId);
+            using(var existing=Match(previous,false))
+                if(existing!=null)
+                {
+                    if(previous.unverified)throw new InvalidOperationException("An existing tracker process cannot be verified. Close its own window before trying Start again; another copy will not be spawned.");
+                    string requestedConfig=rig.tracker!=null&&!string.IsNullOrWhiteSpace(rig.tracker.configFile)?ResolveConfig(rig.tracker.configFile):previous.configFile;
+                    if(previous.port!=rig.zmqPort||previous.backend!=TrackerBackend.DisplayName(rig.closedLoopMode)||requestedConfig!=previous.configFile||previous.strictCameraFallback!=(rig.tracker?.strictCameraFallback??false)||(prepared!=null&&previous.executableSha256!=prepared.executableSha256))
+                        throw new InvalidOperationException("This rig already has an independent tracker window using another source/configuration. Close it or choose Stop tracker before switching.");
+                    return; // Start is idempotent, including after restarting Unity.
+                }
+            string[] args=Arguments(rig);string executable=rig.tracker.executablePath??"";
+            if(!Path.IsPathFullyQualified(executable)||!File.Exists(executable))throw new ArgumentException("Select an absolute native tracker executable (inside Contents/MacOS for a Mac app).");
+            string extension=Path.GetExtension(executable).ToLowerInvariant();
+            if(extension==".bat"||extension==".cmd"||extension==".ps1"||extension==".sh")throw new ArgumentException("Select the native executable directly; shell scripts are not launched.");
+            executable=Path.GetFullPath(executable);
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows)&&extension!=".exe")throw new ArgumentException("Choose the native .exe, rather than a shortcut or command file.");
+            string log=Path.Combine(StateRoot,"logs",Key(rig.vrId)+".log");
+            bool macBundle=RuntimeInformation.IsOSPlatform(OSPlatform.OSX)&&MacAppLauncher.BundlePath(executable)!=null;
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX)&&rig.tracker.strictCameraFallback&&!macBundle)
+                throw new ArgumentException("Camera-only tracking on macOS requires the complete native .app bundle so camera permission belongs to the tracker.");
+            using(var process=macBundle?MacAppLauncher.Launch(executable,args):Process.Start(DetachedStart(executable,args,Path.GetDirectoryName(executable),log)))
+            {
+                if(process==null)throw new InvalidOperationException("Tracker process did not start.");
+                var receipt=new Receipt{vrId=rig.vrId,backend=TrackerBackend.DisplayName(rig.closedLoopMode),executable=executable,configFile=ResolveConfig(rig.tracker.configFile),port=rig.zmqPort,processId=process.Id,startUtcTicks=process.StartTime.ToUniversalTime().Ticks,demo=prepared?.demo??false,strictCameraFallback=rig.tracker.strictCameraFallback,releaseTag=prepared?.releaseTag,executableSha256=prepared?.executableSha256??HashFile(executable)};
+                string file=ReceiptPath(rig.vrId),temporary=file+".writing";
+                File.WriteAllText(temporary,JsonConvert.SerializeObject(receipt,Formatting.Indented));
+                if(File.Exists(file))File.Delete(file);File.Move(temporary,file);
+            }
+        }
+    }
+    public static ProcessStartInfo DetachedStart(string executable,IEnumerable<string> arguments,string workingDirectory,string logPath)
+    {
+        if(!Path.IsPathFullyQualified(executable)||!File.Exists(executable))throw new ArgumentException("Choose an existing absolute native executable.");
+        string[] args=arguments.ToArray();
+        if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            return new ProcessStartInfo{FileName=executable,Arguments=JoinArguments(args),WorkingDirectory=workingDirectory,UseShellExecute=true};
+        if(!Path.IsPathFullyQualified(logPath))throw new ArgumentException("Detached native output needs an absolute diagnostic log path.");
+        Directory.CreateDirectory(Path.GetDirectoryName(logPath));
+        if(File.Exists(logPath)&&new FileInfo(logPath).Length>4*1024*1024)
+        { string old=logPath+".previous";if(File.Exists(old))File.Delete(old);File.Move(logPath,old); }
+        // The fixed POSIX program only redirects streams and execs positional argv.
+        // User values are never interpolated/evaluated as shell source. Exec preserves
+        // the native PID, with no inherited Unity pipe or terminal hangup lifetime.
+        string[] launchArgs=new[]{"-c","trap '' HUP; exec \"$@\" </dev/null >>\"$MATREX_NATIVE_LOG\" 2>&1","matrex-native",executable}.Concat(args).ToArray();
+        var start=new ProcessStartInfo{FileName="/bin/sh",Arguments=JoinArguments(launchArgs),WorkingDirectory=workingDirectory,UseShellExecute=false,CreateNoWindow=false};
+        start.EnvironmentVariables["MATREX_NATIVE_LOG"]=logPath;
+        return start;
     }
     public void Stop(string vrId)
     {
-        if(!owned.TryGetValue(vrId,out var app)) return;
-        var process=app.process;
-        try
-        {
-            if(!process.HasExited)
-            {
-                try { process.StandardInput.WriteLine(app.walking?"{\"id\":2,\"command\":\"close\",\"session\":1}":"");process.StandardInput.Flush(); } catch(IOException) { } catch(InvalidOperationException) { }
-                // Only the process explicitly launched for this rig is eligible for termination.
-                if(!process.WaitForExit(750)) { process.Kill();process.WaitForExit(750); }
-            }
-        }
-        finally { process.Dispose();owned.Remove(vrId); }
+        if(!Directory.Exists(StateRoot))return;
+        using(var stopLock=new FileStream(ReceiptPath(vrId)+".lock",FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None))
+            StopLocked(vrId);
     }
-    private void OnApplicationQuit() => StopAll();
-    private void OnDestroy() { StopAll();if(instance==this) instance=null; }
-    private void StopAll() { foreach(string id in new List<string>(owned.Keys)) { try { Stop(id); } catch(Exception error) { UnityEngine.Debug.LogWarning("Tracker stop failed for "+id+": "+error.Message); } } }
+    private static void StopLocked(string vrId)
+    {
+        var receipt=Read(vrId);using(var process=Match(receipt,true))
+        {
+            if(process==null)
+            {
+                if(IsRunning(vrId))throw new InvalidOperationException("Cannot safely verify this tracker process. Close its own window instead.");
+                return;
+            }
+            bool closing=false;
+            try { closing=process.CloseMainWindow(); }
+            catch(Exception error) when(error is InvalidOperationException || error is NotSupportedException || error is NotImplementedException) { }
+            if(!closing||!process.WaitForExit(1000)) { if(!process.HasExited)process.Kill();process.WaitForExit(1000); }
+        }
+        string file=ReceiptPath(vrId);if(File.Exists(file))File.Delete(file);
+    }
+    private void OnApplicationQuit() { }
+    private void OnDestroy() { if(instance==this)instance=null; }
     public static string ResolveConfig(string file)
     { if(string.IsNullOrWhiteSpace(file)) throw new ArgumentException("Select a tracker calibration/config file.");return Path.GetFullPath(Path.IsPathRooted(file)?file:Path.Combine(RuntimePaths.ConfigRoot,file)); }
     private static bool Loopback(string host) => string.Equals(host,"localhost",StringComparison.OrdinalIgnoreCase) || host=="127.0.0.1" || host=="::1" || host=="[::1]";

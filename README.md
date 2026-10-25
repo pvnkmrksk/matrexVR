@@ -1,12 +1,87 @@
-# MATREX VR
+<p align="center">
+  <img src="docs/site/assets/favicon.svg" width="72" height="72" alt="MATREX VR app icon">
+</p>
 
-Unity experiments for tracked **animals** and LED-panel virtual environments: Choice tasks, Bogong night sky, generated and recorded swarms, **Kannadi** (ಕನ್ನಡಿ, mirror) populations, Optomotor and independent visual/navigation rugosity.
+<h1 align="center">MATREX VR</h1>
 
-[**Download a standalone application**](https://github.com/pvnkmrksk/matrexVR/releases) · [**Website and OS downloads**](https://pvnkmrksk.github.io/matrexVR/) · [**Complete documentation site**](https://pvnkmrksk.github.io/matrexVR/manual/) · [**Getting started and controls**](docs/getting-started.md) · [**Release history**](docs/releases.md)
+<p align="center"><strong>Animal movement. Controlled worlds.</strong><br>Configurable Unity environments for flight, walking and collective-behaviour experiments.</p>
 
-[![Complete online manual](docs/site/assets/docs-badge.svg)](https://pvnkmrksk.github.io/matrexVR/manual/) [![Cite MATREX VR](docs/site/assets/cite-badge.svg)](CITATION.cff)
+<p align="center">
+  <a href="https://github.com/pvnkmrksk/matrexVR/releases"><img src="https://img.shields.io/github/v/release/pvnkmrksk/matrexVR?label=archived%20downloads&amp;color=425a66" alt="Published archival downloads"></a>
+  <a href="https://pvnkmrksk.github.io/matrexVR/manual/"><img src="docs/site/assets/docs-badge.svg" alt="Complete online manual"></a>
+  <a href="tools/build_local_desktop.py"><img src="https://img.shields.io/badge/build-local%20desktop-1f5c66" alt="Build the current desktop preview"></a>
+  <a href="CITATION.cff"><img src="docs/site/assets/cite-badge.svg" alt="Cite MATREX VR"></a>
+</p>
 
-The [navigable manual](https://pvnkmrksk.github.io/matrexVR/manual/) includes local section search, runtime architecture, every major component, scenes, ViewportSetter, ClosedLoop, tracker contracts, configuration/UI, saving, telemetry, replay, extensions and hardware boundaries. The [native gallery](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html) shows genuine Unity capability captures. **Kannadi — ಕನ್ನಡಿ — means mirror in Kannada** and presents a full matrix of mirrored animal poses.
+<p align="center"><b><a href="#try-the-current-desktop-preview">Try the desktop preview</a> · <a href="https://pvnkmrksk.github.io/matrexVR/manual/">Documentation</a> · <a href="https://pvnkmrksk.github.io/matrexVR/manual/gallery.html">Scene gallery</a> · <a href="https://github.com/pvnkmrksk/matrexVR/releases">Archived downloads</a></b></p>
+
+MATREX VR turns measured animal movement into a controlled visual world: Choice tasks, forest and terrain, astronomical night sky, Optomotor, generated or recorded swarms, and **Kannadi** — ಕನ್ನಡಿ, “mirror” in Kannada — a matrix of mirrored animal poses. Configure an experiment visually, inspect the same JSON, and keep the evidence for analysis and replay.
+
+> **Current desktop preview: source/local build.** Native fullscreen and Retina-aware UI, the Flying/Walking start screen, bundled native trackers and the latest replay fixes are current source. Public **0.1–0.3 downloads remain archival** and do not contain this new desktop experience. No new signed release is implied.
+
+[![Current MATREX VR start screen with Flying and Walking, Night sky and Forest, and a clearly labelled hardware-free demo](docs/images/desktop-ui/quickstart-retina-3024.png)](docs/images/desktop-ui/quickstart-retina-3024.png)
+
+*Actual Unity UI render at 2× scale, with synthetic profile data. [Sequence editor](docs/images/desktop-ui/sequence-1920.png) · [Experiment controls](docs/images/desktop-ui/motion-1920.png) · [Tooltips](docs/images/desktop-ui/hover-help-1920.png) · [Capture provenance](docs/images/desktop-ui/provenance.json).*
+
+## Try the current desktop preview
+
+For a local Mac build, install and activate **Unity 6000.3.16f1** with its desktop build support. Apple Silicon maintainer builds also need a current stable **Rust** toolchain for the pinned native camera correction; the finished app needs neither Unity nor Rust installed. Then run:
+
+```sh
+python3 tools/build_local_desktop.py
+```
+
+The [local builder](tools/build_local_desktop.py) produces **`.local/MATREX VR.app`**, including checksum-verified native companion packages. It builds your current workspace and publishes no release. [Bundled apps, installation and signing](docs/bundled-companions.md) explains the pinned versions and independent process lifetimes.
+
+1. **Open the app.** Flying and a hardware-free demo are the starting choices. Pick **Night sky** or **Forest**.
+2. **Press Start demo.** The native tracker opens independently and feeds the experiment. Demonstrations use labelled simulated or prerecorded input; they are not a new live animal measurement.
+3. **Make it yours.** Edit the sequence and each block's settings. When moving to real acquisition, select **Live camera**, calibrate in the tracker window and configure the apparatus once.
+
+The app starts fullscreen at the selected display's native resolution. Apparatus setup stays out of the daily workflow; sequence editing, experimental parameters and contextual help stay within reach. Existing custom JSON and calibrated apparatus files are preserved. Read the [desktop workflow and validation notes](docs/desktop-experience.md).
+
+## Build an experiment
+
+- **Choose and arrange blocks.** Reuse Choice, sky, terrain, swarm, Kannadi and Optomotor recipes; change their motion and stimulus parameters.
+- **Reveal the details when needed.** Hover help explains fields; advanced settings and raw JSON remain available. Unknown fields, untouched numbers and omitted values survive editing. Undo/Redo and external-file conflict checks protect the workflow.
+- **Record and revisit.** Keep the complete run folder, configuration snapshots and sky assets. Replay animal poses and saved stimulus evidence with a timeline and an overview camera.
+
+[Configuration studio](docs/configuration-ui.md) · [Templates and examples](Assets/StreamingAssets/Examples/README.md) · [Recording formats](docs/data-formats.md) · [Replay guide](docs/replay.md)
+
+## See the environments
+
+| Forest source example | Terrain + Milky Way | Kannadi · ಕನ್ನಡಿ |
+| --- | --- | --- |
+| [![Choice_Forrest with the bundled Landscape prefab](docs/site/assets/gallery/forest-choice.jpg)](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html#forest-choice) | [![Actual Selwyn terrain beneath the generated Milky Way](docs/site/assets/gallery/milky-way-terrain.jpg)](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html#milky-way-terrain) | [![Actual Kannadi hexagonal mirror matrix](docs/site/assets/gallery/kannadi.jpg)](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html#kannadi) |
+
+Actual Unity renders of synthetic demonstrations. The forest image is **Choice_Forrest + Landscape**, an optional source customization; the desktop Forest starter is a separate terrain/tree preset. The [nine-capability gallery](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html) also shows bars, stripe fixation, objects, Optomotor, locust swarm and custom panorama terrain, with [exact configs and provenance](docs/site/assets/gallery/provenance.json).
+
+## One connected software path
+
+| Component | Its job |
+| --- | --- |
+| [**Rekkefly**](https://github.com/pvnkmrksk/rekkefly) / [**HejjéTrac**](https://github.com/pvnkmrksk/hejjetrak) | Native flight/wing tracking or spherical-treadmill walking input. |
+| **MATREX VR** | Closed-loop visual environments, experimental sequencing and recording. |
+| [**Daari Deepa**](https://pvnkmrksk.github.io/trajectory-dashboard/) | Optional live browser plots and saved-trajectory analysis; standalone downloads for Windows, Linux and both Mac architectures. |
+
+Tracker windows run independently; closing Unity does not automatically close them. Unity keeps lightweight run status. The external plotting dashboard can run locally or on another computer, so it can stay out of the rendering workload. Read the [tracker connection guide](docs/tracker-integration.md), [bundled companion guide](docs/bundled-companions.md) and [live monitoring setup](https://pvnkmrksk.github.io/matrexVR/manual/live-monitoring.html).
+
+## Documentation and evidence
+
+The [searchable manual](https://pvnkmrksk.github.io/matrexVR/manual/) covers the architecture, components, scenes, viewports, closed loop, every configuration family, saving, telemetry and replay.
+
+| Start here | Go deeper |
+| --- | --- |
+| [Getting started and controls](docs/getting-started.md) | [Exact configuration reference](docs/configuration-reference.md) |
+| [Scene gallery](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html) | [Viewports and rig routing](https://pvnkmrksk.github.io/matrexVR/manual/viewports.html) |
+| [Recording and data](docs/data-formats.md) | [Run snapshots and provenance](docs/run-config-snapshots.md) |
+| [Replay](docs/replay.md) | [Full system manual](https://pvnkmrksk.github.io/matrexVR/manual/) |
+
+Current software evidence includes [3,023 native UI checks](docs/desktop-ui-validation-results.json), [native companion installation/lifecycle checks](docs/bundled-companion-validation-results.json), and [992 record→replay checks with paired renders](docs/replay-roundtrip-validation.md). Tests use simulated or prerecorded data; physical tracking calibration and LED timing remain apparatus-specific. The [scene-reset investigation](docs/diagnostics.md) isolates listener resource growth and material ownership defects without claiming that the original native crash was captured.
+
+The [actual Mac player test](docs/desktop-player-validation-results.json) additionally verified camera-only acquisition launched from Unity, live dashboard input, native fullscreen and calibration snapshots. A separate physical-camera record→replay run passed 987 checks; its uncalibrated camera view tested the software path, rather than animal-tracking accuracy.
+
+<details>
+<summary><strong>Archived versions and their startup behaviour</strong></summary>
 
 ## Choose a version
 
@@ -18,7 +93,7 @@ The [navigable manual](https://pvnkmrksk.github.io/matrexVR/manual/) includes lo
 
 Download the ZIP for your operating system, extract the **whole archive**, and launch the application. Unity Editor is needed only to modify or build the source. Each release includes `START-HERE.txt` with its exact startup behavior, configuration/data paths and shortcuts. Published download availability is listed on [GitHub Releases](https://github.com/pvnkmrksk/matrexVR/releases); the website resolves actual uploaded OS archives.
 
-## Configure and run
+### Archived 0.3 workflow
 
 1. Open **ControlScene** in Unity **6000.3.16f1**, or launch a standalone player. Use `-configure` to open setup when a sequence has auto-start enabled. Escape returns a running experiment to Control.
 2. In **System config**, configure each rig's tracker endpoint/mode, physical display, panel geometry, camera order and sphere diameter. The complete [system template](Assets/StreamingAssets/Templates/system_config.template.json) is a starting point for your apparatus. Keep `closedLoopMode: "Kinefly"` for flight; [walking examples](Assets/StreamingAssets/Examples/System) select their own input contract.
@@ -30,24 +105,12 @@ The configuration studio and JSON share one lossless document model. No-op saves
 
 A fresh 0.3 profile opens setup by default. Its supplied demonstration is **TerrainCueLab**: four visual/navigation mesh combinations followed by height-only, tilt-only and fixed-pose controls, 30 seconds each, with `reloadScene: false`. The previous Selwyn cycle is preserved in `Examples/Sequences/selwyn-before-rugosity.json`. Configuration JSON is authoritative; old branch guides may describe their historical default sequence.
 
-![Current-source MATREX VR session setup with animal IDs, species and modern tracker labels](docs/images/dashboard-ecosystem/session-1920.jpg)
 
-*Current-source Unity studio after 0.3, with synthetic animals and metadata. [Sequence](docs/images/dashboard-ecosystem/sequence-1920.jpg) · [Raw JSON](docs/images/dashboard-ecosystem/raw-json-1920.jpg) · [Replay launcher](docs/images/dashboard-ecosystem/replay-launcher-1920.jpg) · [capture provenance](docs/images/dashboard-ecosystem/provenance.json). These source additions do not alter archived 0.3 binaries.*
 
-## Native scene previews
+</details>
 
-| Choice_Forrest + Landscape | Selwyn terrain + Milky Way | Kannadi · ಕನ್ನಡಿ |
-| --- | --- | --- |
-| [![Choice_Forrest with bundled Landscape prefab](docs/site/assets/gallery/forest-choice.jpg)](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html#forest-choice) | [![Actual Selwyn terrain beneath generated Milky Way](docs/site/assets/gallery/milky-way-terrain.jpg)](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html#milky-way-terrain) | [![Actual Kannadi hexagonal mirror matrix](docs/site/assets/gallery/kannadi.jpg)](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html#kannadi) |
-| Optional source customization: the native fixture adds the bundled Landscape prefab; this is not the default compact-player environment. | Core Choice_Selwyn scene with generated astronomical sky. | Core mirror scene: animal poses replicated across a hexagonal matrix. |
-
-Actual Unity renders of synthetic demonstrations. The [full nine-capability gallery](https://pvnkmrksk.github.io/matrexVR/manual/gallery.html) includes bars, stripe fixation, objects, Optomotor, locust swarm and explicit panorama terrain, with [exact configurations and provenance](docs/site/assets/gallery/provenance.json).
-
-## Current source integration
-
-Current source after 0.3 adds native **Rekkefly** flight and **HejjéTrac** walking modes, optional owned tracker Launch/Stop controls, and periodic experiment context for live browser plots. [Daari Deepa](https://pvnkmrksk.github.io/trajectory-dashboard/) has self-contained Windows, Linux and both Mac downloads; viewing computers only need a browser. Read the [connection guide](docs/tracker-integration.md) and [live monitoring manual](https://pvnkmrksk.github.io/matrexVR/manual/live-monitoring.html). These changes do not alter archived 0.3 binaries.
-
-The [scene reload investigation](docs/diagnostics.md) documents the isolated historical listener resource leak and the separately corrected material ownership regression, with matched stress-test evidence. It distinguishes those results from a captured native Unity crash.
+<details>
+<summary><strong>Controls, paradigms, data compatibility and source reference</strong></summary>
 
 ## Controls and live monitoring
 
@@ -89,7 +152,7 @@ See [night-sky configuration and audit files](docs/night-sky.md), [Selwyn cycle]
 
 ![Four measured terrain conditions](docs/terrain-cue-four-conditions.svg)
 
-The compact build contains ten scenes: **ControlScene, Choice, Choice_desync, Choice_Selwyn, Swarm, Kannadi, Optomotor, TerrainCueLab, Rugosity_RS and ReplayScene**. Optional forest/two-tree examples are marked `sourceBuildOnly`; enable their scenes and rebuild to run them. Add custom scenes, assets and controllers in Unity, enable them in the build scene list, and rebuild. See [experiment workflow](docs/experiment-workflow.md); this project does not provide a general level editor.
+The compact build contains ten scenes: **ControlScene, Choice, Choice_desync, Choice_Selwyn, Swarm, Kannadi, Optomotor, TerrainCueLab, Rugosity_RS and ReplayScene**. The current desktop Forest starter uses Choice_Selwyn terrain with grounded tree objects. Separate legacy forest/two-tree examples are marked `sourceBuildOnly`; enable their scenes and rebuild to run those examples. Add custom scenes, assets and controllers in Unity, enable them in the build scene list, and rebuild. See [experiment workflow](docs/experiment-workflow.md); this project does not provide a general level editor.
 
 ## Compatibility and saved runs
 
@@ -116,11 +179,13 @@ Replay reads saved animal poses and recorded stimulus evidence. Preserve the com
 
 Packages are pinned in `Packages/manifest.json` and `packages-lock.json`. After pulling an input-backend change into an open Editor, restart it. For optional Linux/FicTrac acquisition setup, see the [source installation guide](docs/getting-started.md#source-and-tracker-setup).
 
-Software verification includes [1,293 Unity lifecycle/replay checks](docs/lifecycle-replay-validation-results.json), with **150 actual Choice↔Swarm scene loads** at accelerated 0.1-second durations and 150 native resource teardown cycles; [43 JSON compatibility contracts](docs/config-compatibility-validation-results.json); [71 rig isolation checks](docs/release-readiness-results.json); and [2,946 fresh 0.3 GUI checks/captures](docs/configuration-dashboard-v0.3-validation-results.json). [Release verification](docs/releases.md#software-verification) gives the scope, including 630 offline replay checks. This does not establish a cure for the historical crash during 30-second hardware acquisition.
+Archived 0.3 verification includes [1,293 Unity lifecycle/replay checks](docs/lifecycle-replay-validation-results.json), with **150 actual Choice↔Swarm scene loads** at accelerated 0.1-second durations and 150 native resource teardown cycles; [43 JSON compatibility contracts](docs/config-compatibility-validation-results.json); [71 rig isolation checks](docs/release-readiness-results.json); and [2,946 fresh 0.3 GUI checks/captures](docs/configuration-dashboard-v0.3-validation-results.json). [Release verification](docs/releases.md#software-verification) gives the scope, including 630 offline replay checks. This does not establish a cure for the historical crash during 30-second hardware acquisition.
 
 Run `python3 tools/validate_kannadi_assets.py` and `python3 tools/validate_config_templates.py` for static checks. Unity regression runners under `Assets/Editor` require a disposable copy containing the `KANNADI_VALIDATION_COPY` sentinel. Historical reports document synthetic/rendered software checks; physical LED timing, tracker calibration and display mapping require a bench check on the actual apparatus.
 
 The prior README identifies MIT licensing, but this checkout has no root LICENSE file. Third-party assets retain their own license terms. Engine: [Unity](https://unity.com/). Tracking transport: [NetMQ](https://github.com/zeromq/netmq). Astronomical orientation: bundled Astronomy Engine with its retained MIT notice.
+
+</details>
 
 ## Citation
 

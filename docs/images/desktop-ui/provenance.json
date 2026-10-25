@@ -1,0 +1,39 @@
+{
+  "source": "Actual Unity offscreen UI renders. Synthetic session/profile data. Retina images use a 3024×1964 physical target with a 2× native UI scale, representing 1512×982 logical points. This is UI rendering evidence, not a photograph of a physical Mac window.",
+  "unity": "6000.3.16f1",
+  "checks": 3006,
+  "failure": null,
+  "images": [
+    {
+      "file": "start-1920.png",
+      "sha256": "7e4d047e9939972ef24c113d8e05ad6f18dd6e5df283eaea975efdd90ef835ec"
+    },
+    {
+      "file": "quickstart-retina-3024.png",
+      "sha256": "fb61f35bb90d75c6fd798f2d8a1e898387a5e1270bb47ce208dc30157d3b4b38"
+    },
+    {
+      "file": "forest-retina-3024.png",
+      "sha256": "8a67477c0bcc94f8ba0b7e330a62a62dff9f0fb2d1a49b1f6b09f68111fe2ad4"
+    },
+    {
+      "file": "sequence-1920.png",
+      "sha256": "16fcc34d0fa46882d9da010523aeaeeada387b9abbbfe11d4405362210f439f3"
+    },
+    {
+      "file": "system-1920.png",
+      "sha256": "42b3a783bf7e9578803c9ae3e719997f62363a967cb82d5bb6fd7773c175c1ef"
+    },
+    {
+      "file": "motion-1920.png",
+      "sha256": "5a77aa890d847d3e0bb63ea7a0ab06ed2e11e8924451a6d61d29a989e392861b"
+    },
+    {
+      "file": "hover-help-1920.png",
+      "sha256": "45ad8fd110fddec5b3e5c3b83096d99e97caeb28a029033bf9f78509dfcc3527"
+    }
+  ],
+  "postCaptureNotes": [
+    "After the 3023-check native validation, walking-demo wording was clarified to identify the finite recorded sample and its same-window replay action (More → Rig manager… → Start all). This contextual text change was compile-checked; no new GPU capture or full native validation was run."
+  ]
+}

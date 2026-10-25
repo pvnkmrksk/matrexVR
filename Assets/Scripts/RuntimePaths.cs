@@ -28,6 +28,10 @@ public static class RuntimePaths
         string bundled = Path.GetFullPath(Application.streamingAssetsPath).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
         if (!Application.isEditor && Path.GetFullPath(configs).StartsWith(bundled, StringComparison.OrdinalIgnoreCase))
             throw new ArgumentException("The writable configuration directory must be outside the bundled StreamingAssets folder.");
+        // An incomplete existing profile can still contain an operator's sequence.
+        // Only a wholly new profile gets the ready-to-run desktop defaults.
+        bool freshProfile = !File.Exists(Path.Combine(configs, "system_config.json")) &&
+            !File.Exists(Path.Combine(configs, "sequenceConfig.json"));
         Directory.CreateDirectory(configs);
         Directory.CreateDirectory(data);
         if (!Application.isEditor && Path.GetFullPath(configs) != Path.GetFullPath(Application.streamingAssetsPath))
@@ -47,5 +51,6 @@ public static class RuntimePaths
         if (!File.Exists(system) && File.Exists(template)) File.Copy(template, system, false);
         runDataRoot = data;
         configRoot = configs;
+        if (!Application.isEditor && freshProfile) DesktopQuickStart.SeedFreshProfile(configs);
     }
 }

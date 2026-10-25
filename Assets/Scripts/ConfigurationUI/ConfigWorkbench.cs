@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -33,6 +34,16 @@ namespace ConfigurationUI
         private Toggle omitted,inapplicable;
         private Button save,start,undo,redo;
         private bool jsonMode,rawPending,metadataMode,homeMode=true,experimentIndexMode;
+        private bool preparing;
+        private string preparationStatus;
+        private int preparationVersion;
+        public bool IsPreparing => preparing;
+#if UNITY_EDITOR
+        // Native UI tests exercise Start without launching a camera or native app.
+        private Func<SystemConfig,bool,System.Threading.Tasks.Task<CompanionCatalog.Prepared>> prepareCompanionForValidation;
+        private Action<CompanionCatalog.Prepared> launchCompanionForValidation;
+        private Action startExperimentForValidation;
+#endif
         private Label pageLocation,frameRate;
         private VisualElement hoverHelp;
         private Label hoverHelpText;
@@ -64,10 +75,10 @@ namespace ConfigurationUI
                 Workspace=new ConfigWorkspace(MainController.Instance.SystemConfigurationFileName,MainController.Instance.SequenceConfigurationFileName,ConfigSchema.Load());
                 selected=Workspace.Sequence;
                 panel=ScriptableObject.CreateInstance<PanelSettings>(); panel.name="Setup only";
-                panel.scaleMode=PanelScaleMode.ConstantPixelSize; panel.scale=1; panel.targetDisplay=0; panel.sortingOrder=500;
+                panel.scaleMode=PanelScaleMode.ConstantPixelSize; panel.scale=DesktopDisplay.UiScale; panel.targetDisplay=0; panel.sortingOrder=500;
                 panel.themeStyleSheet=Resources.Load<ThemeStyleSheet>("ConfigurationUI/runtime");
                 Document=gameObject.AddComponent<UIDocument>(); Document.panelSettings=panel;
-                root=Document.rootVisualElement; root.AddToClassList("workbench");
+                root=Document.rootVisualElement; root.AddToClassList("workbench"); WorkbenchTypography.Apply(root);
                 root.styleSheets.Add(Resources.Load<StyleSheet>("ConfigurationUI/workbench"));
                 root.RegisterCallback<GeometryChangedEvent>(evt=>{
                     ApplyResponsiveLayout(evt.newRect.width);
@@ -108,12 +119,16 @@ namespace ConfigurationUI
             undo=Button("Undo",()=>{ RequireApplied(); selected.Undo(); BuildContent(); }); footer.Add(undo);
             redo=Button("Redo",()=>{ RequireApplied(); selected.Redo(); BuildContent(); }); footer.Add(redo);
             save=StudioButton("Save setup","file",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); UpdateStatus("Setup and session details saved."); }); footer.Add(save);
-            start=StudioButton("Start experiment","play",StartExperiment,"primary"); footer.Add(start);
+            start=StudioButton("Start experiment","play",StartExperiment,"primary"); start.name="start-experiment"; footer.Add(start);
             save.tooltip="Save the system, sequence, edited experiment files and subject metadata. Omitted values and unknown JSON fields are preserved.";
             start.tooltip="Validate and save this setup, archive the run's configuration files, then start the experiment.";
             undo.tooltip="Undo the last change in the current configuration file."; redo.tooltip="Redo the last undone change in the current configuration file.";
             InstallHoverHelp();
             root.schedule.Execute(UpdateFrameRate).Every(500); UpdateFrameRate();
+            root.schedule.Execute(()=>{
+                if(!Application.isEditor&&panel!=null&&Mathf.Abs(panel.scale-DesktopDisplay.UiScale)>.01f)
+                    panel.scale=DesktopDisplay.UiScale;
+            }).Every(1000);
         }
         private void BuildNavigation() { Workspace.RefreshReferences(); BuildStudioNavigation(); }
         private void Select(ConfigDocument doc)
@@ -155,8 +170,9 @@ namespace ConfigurationUI
             body.EnableInClassList("session-body",homeMode || experimentIndexMode);
             side.style.display=DisplayStyle.Flex;
             inspector.style.display=homeMode || experimentIndexMode || root.resolvedStyle.width<1220?DisplayStyle.None:DisplayStyle.Flex;
-            pageLocation.text=homeMode?"Session / Setup":experimentIndexMode?"Experiment configs / Library":selected==Workspace.System?"System config / Hardware":selected==Workspace.Sequence?"Sequence config / Run plan":"Experiment configs / "+ExperimentBlocks.Title(selected.Path);
+            pageLocation.text=homeMode?"Start":experimentIndexMode?"Experiment settings":selected==Workspace.System?"Apparatus setup":selected==Workspace.Sequence?"Experiment sequence":ExperimentBlocks.Title(selected.Path);
             undo.style.display=redo.style.display=homeMode?DisplayStyle.None:DisplayStyle.Flex;
+            RefreshStartCaption();
             if(homeMode) { BuildSessionHome(); return; }
             if(experimentIndexMode) { BuildExperimentConfigs(); return; }
             if(metadataMode) { BuildMetadata(); return; }
@@ -297,6 +313,11 @@ namespace ConfigurationUI
         { return value is JObject obj?(string)(obj["vrId"]??obj["sceneName"]??obj["name"]??obj["type"])??"Item "+(index+1):"Item "+(index+1); }
         private void UpdateStatus(string message=null)
         {
+            if(preparing)
+            {
+                status.text=preparationStatus;status.RemoveFromClassList("error");status.RemoveFromClassList("warning");
+                start.SetEnabled(false);save.SetEnabled(false);undo.SetEnabled(false);redo.SetEnabled(false);return;
+            }
             List<string> errors=Workspace.Validate();
             var warnings=new List<string>();
             if(errors.Count==0) foreach(var step in BuilderSteps.OfType<JObject>())
@@ -379,20 +400,136 @@ namespace ConfigurationUI
         }
         public void StartExperiment()
         {
-            RequireApplied(); var errors=Workspace.Validate();
-            if(errors.Count>0) throw new InvalidOperationException(string.Join("\n",errors));
+            if(preparing)return;
+            RequireApplied();var errors=Workspace.Validate();
+            if(errors.Count>0)throw new InvalidOperationException(string.Join("\n",errors));
             Workspace.SaveAll();
+            if(DesktopQuickStart.IsQuickStart(Workspace))
+            {
+                BeginCompanionPreparation(true);return;
+            }
+            StartExperimentCore();
+        }
+        private void OpenQuickTracker()
+        {if(preparing)return;RequireApplied();BeginCompanionPreparation(false);}
+        private void BeginCompanionPreparation(bool startAfter)
+        {
+            preparing=true;preparationStatus="Preparing the native tracker…";
+            body.SetEnabled(false);side.SetEnabled(false);RefreshPreparingCaption();UpdateStatus();
+            StartCoroutine(PrepareQuickStartRun(++preparationVersion,startAfter));
+        }
+        private void RefreshPreparingCaption()
+        {var caption=start?.Q<Label>();if(caption!=null)caption.text="Preparing…";}
+        private IEnumerator PrepareQuickStartRun(int version,bool startAfter)
+        {
+            var operation=PrepareQuickStartRunCore(version,startAfter);
+            try
+            {
+                while(true)
+                {
+                    bool more=false;object current=null;Exception failure=null;
+                    try { more=operation.MoveNext();if(more)current=operation.Current; }
+                    catch(Exception error) { failure=error; }
+                    if(failure!=null) { PreparationFailed(failure);yield break; }
+                    if(!more)yield break;
+                    yield return current;
+                }
+            }
+            finally
+            {
+                (operation as IDisposable)?.Dispose();
+                if(version==preparationVersion&&preparing)
+                {
+                    preparing=false;
+                    if(isActiveAndEnabled&&Document!=null&&Document.enabled)
+                    {body.SetEnabled(true);side.SetEnabled(true);RefreshStartCaption();UpdateStatus();}
+                }
+            }
+        }
+        private IEnumerator PrepareQuickStartRunCore(int version,bool startAfter)
+        {
+            // Paint the first progress frame before verifying or installing any companion.
+            yield return null;
+            if(!isActiveAndEnabled||version!=preparationVersion)yield break;
+            bool demo=CurrentDemo;
+            var rigs=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().Select(LosslessJson.ToRuntime<SystemConfig>).ToList();
+            foreach(var rig in rigs)
+            {
+                preparationStatus="Preparing "+TrackerBackend.DisplayName(rig.closedLoopMode)+" for "+rig.vrId+"…";UpdateStatus();
+                System.Threading.Tasks.Task<CompanionCatalog.Prepared> task;
+                try{
+#if UNITY_EDITOR
+                    task=prepareCompanionForValidation!=null?prepareCompanionForValidation(rig,demo):CompanionCatalog.PrepareAsync(rig,demo);
+#else
+                    task=CompanionCatalog.PrepareAsync(rig,demo);
+#endif
+                }
+                catch(Exception error){PreparationFailed(error);yield break;}
+                while(!task.IsCompleted)
+                {
+                    if(!isActiveAndEnabled||version!=preparationVersion)yield break;
+                    yield return null;
+                }
+                if(!isActiveAndEnabled||version!=preparationVersion)yield break;
+                if(task.IsFaulted||task.IsCanceled){PreparationFailed(task.Exception?.GetBaseException()??new OperationCanceledException("Tracker preparation was cancelled."));yield break;}
+                try{
+                    var prepared=task.GetAwaiter().GetResult();
+#if UNITY_EDITOR
+                    if(launchCompanionForValidation!=null)launchCompanionForValidation(prepared);else
+#endif
+                    TrackerProcessManager.Instance.LaunchPrepared(prepared);
+                    if(!startAfter)TrackerProcessManager.Instance.Show(rig.vrId);
+                }
+                catch(Exception error){PreparationFailed(error);yield break;}
+            }
+            if(!startAfter)
+            {
+                preparing=false;body.SetEnabled(true);side.SetEnabled(true);RefreshStartCaption();
+                UpdateStatus("Tracker opened independently. Check its input, then start when ready.");yield break;
+            }
+            try
+            {
+                EnsureMetadata();
+                string world=CurrentWorld=="forest"?"Forest":"Night sky";
+                bool automaticDemoName=metadata.ExperimentName=="Demo · Forest"||metadata.ExperimentName=="Demo · Night sky";
+                if(string.IsNullOrWhiteSpace(metadata.ExperimentName)||automaticDemoName)metadata.ExperimentName=(demo?"Demo · ":"")+world;
+                const string demoComment="Demonstration input (simulated or prerecorded); not a new live animal measurement.";
+                if(demo&&string.IsNullOrWhiteSpace(metadata.Comments))metadata.Comments=demoComment;
+                else if(!demo&&metadata.Comments==demoComment)metadata.Comments="";
+                preparationStatus="Opening your experiment…";UpdateStatus();
+            }
+            catch(Exception error){PreparationFailed(error);yield break;}
+            yield return null;
+            if(!isActiveAndEnabled||version!=preparationVersion)yield break;
+            try{StartExperimentCore();}
+            catch(Exception error){PreparationFailed(error);}
+        }
+        private void PreparationFailed(Exception error)
+        {
+            preparing=false;body.SetEnabled(true);side.SetEnabled(true);RefreshStartCaption();
+            UpdateStatus(error.GetBaseException().Message);status.AddToClassList("error");
+        }
+        private void StartExperimentCore()
+        {
+#if UNITY_EDITOR
+            if(startExperimentForValidation!=null){startExperimentForValidation();return;}
+#endif
             var main=MainController.Instance;
             main.PrepareConfiguredRun(Workspace.System.Path,Workspace.Sequence.Path);
             string metadataJson=SaveMetadata();
             File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"AnimalMetadata.json"),metadataJson);
             File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"FlyMetaData.json"),metadataJson);
-            // Detach immediately; Destroy alone is deferred until end of frame.
-            Document.enabled=false; root.Clear(); enabled=false;
+            Document.enabled=false;root.Clear();enabled=false;
             main.StartSequence();
-            if(!main.SequenceRunning) { enabled=true; Document.enabled=true; root=Document.rootVisualElement; root.AddToClassList("workbench"); root.styleSheets.Add(Resources.Load<StyleSheet>("ConfigurationUI/workbench")); BuildShell(); BuildNavigation(); BuildContent(); return; }
+            if(!main.SequenceRunning)
+            {
+                preparing=false;enabled=true;Document.enabled=true;root=Document.rootVisualElement;root.AddToClassList("workbench");
+                WorkbenchTypography.Apply(root);root.styleSheets.Add(Resources.Load<StyleSheet>("ConfigurationUI/workbench"));BuildShell();BuildNavigation();BuildContent();return;
+            }
             Destroy(gameObject);
         }
+        private void OnDisable()
+        {if(preparing){preparing=false;preparationVersion++;}}
         private void OnDestroy()
         {
             foreach(var raycaster in legacyRaycasters) if(raycaster!=null) raycaster.enabled=true;

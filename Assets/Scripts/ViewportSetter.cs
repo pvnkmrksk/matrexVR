@@ -14,6 +14,7 @@ public class ViewportSetter : MonoBehaviour
     [SerializeField] private int targetDisplay = 1;
     private int lastWidth, lastHeight;
     private bool configured;
+    private bool desktopPreview;
     private bool applying;
 
     private void Awake() => DisableCameras();
@@ -58,6 +59,7 @@ public class ViewportSetter : MonoBehaviour
         horizontal = config.horizontal;
         displayOrder = config.displayOrder;
         targetDisplay = config.targetDisplay;
+        desktopPreview = config.desktopPreview;
         ApplyViewports();
     }
 
@@ -81,6 +83,7 @@ public class ViewportSetter : MonoBehaviour
 
     public static Rect PanelRect(int slot, SystemConfig config, int width, int height)
     {
+        if (config.desktopPreview) return new Rect(0, 0, 1, 1);
         float w = (float)config.ledPanelWidth / width;
         float h = (float)config.ledPanelHeight / height;
         return new Rect((config.startCol + (config.horizontal ? slot : 0)) * w,
@@ -109,8 +112,9 @@ public class ViewportSetter : MonoBehaviour
             string order = NormalizeDisplayOrder(displayOrder);
             var layout = new SystemConfig {
                 ledPanelWidth = ledPanelWidth, ledPanelHeight = ledPanelHeight,
-                startRow = startRow, startCol = startCol, horizontal = horizontal
+                startRow = startRow, startCol = startCol, horizontal = horizontal, desktopPreview = desktopPreview
             };
+            if (desktopPreview && order.Length != 1) return;
             for (int slot = 0; slot < order.Length; slot++)
             {
                 foreach (Camera camera in cameras)

@@ -1,0 +1,614 @@
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -6,6 +6,16 @@
+ change behaviour; such changes are listed under **Changed**).
+ 
+ ## [Unreleased]
++
++### Fixed
++- Local MATREX integration patch: independent `--no-camera-fallback` camera
++  startup fails on acquisition/output errors without stdin supervision.
++- Camera-fallback previews disable all outputs instead of publishing sample
++  motion as if it came from the requested camera.
++
++### Added
++- Engine ZMQ messages append actual `source_kind` and `source_fallback`
++  metadata; legacy pose fields and the standalone bridge encoder are unchanged.
+ 
+ ### Documentation
+ - Link the MATREX VR experiment manual and the companion HejjéTrac/Daari Deepa toolchain, keeping tracker input distinct from experiment telemetry.
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2585,6 +2585,7 @@
+  "image",
+  "jpeg-encoder",
+  "nokhwa",
++ "nokhwa-bindings-macos",
+  "serde",
+  "serde_json",
+  "tempfile",
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -14,7 +14,7 @@
+ [features]
+ default = ["gui", "camera"]
+ gui = ["dep:eframe"]
+-camera = ["dep:nokhwa", "dep:v4l"]
++camera = ["dep:nokhwa", "dep:v4l", "dep:nokhwa-bindings-macos"]
+ 
+ [dependencies]
+ anyhow = "1"
+@@ -34,6 +34,9 @@
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
+ v4l = { version = "0.14", optional = true }
++
++[target.'cfg(target_os = "macos")'.dependencies]
++nokhwa-bindings-macos = { version = "0.2.4", optional = true }
+ 
+ # A second, independent ZMTP 3 implementation for testing the ZMQ output.
+ [dev-dependencies]
+--- a/book/src/guide/cameras.md
++++ b/book/src/guide/cameras.md
+@@ -74,6 +74,12 @@
+ connecting one. Headless runs and rigs started from a manifest stop with an
+ error instead.
+ 
++Use `--no-camera-fallback` when launching an independent camera window for an
++experiment. A camera or output startup failure remains an error; sample and
++simulated input are never substituted. This option does not enable process
++supervision or depend on the launcher's stdin/lifetime. The ordinary GUI's
++no-camera sample is preview only, with UDP, ZMQ, JSONL and recording disabled.
++
+ ## Network streams
+ 
+ `source.kind = "network"` reads an RTSP, HTTP or other stream through FFmpeg:
+--- a/book/src/guide/outputs.md
++++ b/book/src/guide/outputs.md
+@@ -16,9 +16,9 @@
+ 
+ Each rig binds a ZMQ PUB socket (`output.zmq_bind`, default `tcp://*:9871`; the
+ second rig `9872`). Subscribe to everything (`b""`) and receive **one UTF-8 JSON
+-frame** per camera frame, byte for byte as the
++frame** per acquired frame. Its numerical fields retain the format of the
+ [Kinefly Docker bridge](https://github.com/pvnkmrksk/Kinefly_Docker/blob/main/ros_zmq_bridge.py)
+-sends it:
++sends it, with additive source metadata in current engine output:
+ 
+ ```json
+ {"timestamp_unix": 1700000000.125, "pitch": 0.0, "y": -0.5, "x": 0.25, "yaw": 0.75, "z": 0.0, "roll": 0.0, "frame_number": 77}
+@@ -32,6 +32,14 @@
+ | `z`, `pitch`, `roll` | Always `0.0`, as in the bridge |
+ | `frame_number` | The source's frame sequence number |
+ | `timestamp_unix` | When the frame arrived, seconds since 1970 |
++| `source_kind` | Actual opened input: `camera`, `video`, `demo` or `network` |
++| `source_fallback` | Whether the requested source was replaced; current GUI fallbacks suppress all outputs |
++
++Explicit video and simulated-demo runs are identified as such. A camera name
++in a requested configuration alone is not proof of camera acquisition. Legacy
++publishers can omit the metadata; consumers must treat that identity as
++unknown. Existing JSON readers can ignore these additive fields. The standalone
++legacy bridge encoder retains its original eight-field representation.
+ 
+ A missing angle is sent as `0.0`, as the bridge did. Use the full measurements
+ when you need to tell a missing angle from a real zero.
+--- a/book/src/reference/cli-help.txt
++++ b/book/src/reference/cli-help.txt
+@@ -59,6 +59,9 @@
+ 
+       --record
+           Record video to this instance's recording directory
++
++      --no-camera-fallback
++          Fail if the requested camera cannot open; never substitute sample/demo input. Independent of supervision: closing the launcher does not stop this app
+ 
+       --init
+           Create a sample configuration at --config and exit (never overwrites)
+--- a/src/camera.rs
++++ b/src/camera.rs
+@@ -108,12 +108,14 @@
+ mod native {
+     use super::*;
+     use crate::frame::{GrayFrame, unix_ns};
++    #[cfg(not(target_os = "macos"))]
++    use nokhwa::utils::Resolution;
+     use nokhwa::{
+         Camera,
+         pixel_format::RgbFormat,
+         utils::{
+             CameraFormat, CameraIndex, FrameFormat, RequestedFormat, RequestedFormatType,
+-            Resolution, frame_formats,
++            frame_formats,
+         },
+     };
+     use std::sync::atomic::{AtomicBool, Ordering};
+@@ -222,6 +224,58 @@
+         ranked.dedup();
+         ranked
+     }
++    /// Each candidate includes construction: a rejected backend default must not
++    /// prevent trying valid advertised modes. In particular, AVFoundation's
++    /// first advertised FPS can be a range minimum that Nokhwa cannot apply.
++    pub fn attempt_formats<T>(
++        formats: impl IntoIterator<Item = CameraFormat>,
++        mut attempt: impl FnMut(CameraFormat) -> Result<T>,
++    ) -> Result<T> {
++        let mut errors = Vec::new();
++        for format in formats {
++            match attempt(format) {
++                Ok(opened) => return Ok(opened),
++                Err(error) => errors.push(format!("{format}: {error:#}")),
++            }
++        }
++        ensure!(!errors.is_empty(), "Camera advertised no usable modes");
++        bail!("{}", errors.join("; "))
++    }
++
++    #[cfg(target_os = "macos")]
++    fn open_one(
++        entry: &CameraEntry,
++        width: u32,
++        height: u32,
++        fps: u32,
++    ) -> Result<(Camera, CameraFormat)> {
++        let index = if entry.id.is_empty() {
++            CameraIndex::Index(entry.backend_index)
++        } else {
++            CameraIndex::String(entry.id.clone())
++        };
++        // Enumerating descriptors does not configure a camera or open a stream.
++        // Camera::new(None) configures the first descriptor immediately, before
++        // compatible_camera_formats() can be reached; on FaceTime cameras this
++        // can select 1920x1080@15 although the binding accepts only its 30 Hz
++        // range endpoint. Construct each exact ranked mode inside the retry.
++        let formats = nokhwa_bindings_macos::AVCaptureDevice::new(&index)
++            .and_then(|device| device.supported_formats())
++            .map_err(|error| anyhow::anyhow!("Enumerate camera formats: {error}"))?;
++        attempt_formats(rank(&formats, width, height, fps), |format| {
++            let request =
++                RequestedFormat::with_formats(RequestedFormatType::Exact(format), frame_formats());
++            let mut camera = Camera::new(index.clone(), request)
++                .map_err(|error| anyhow::anyhow!("Construct camera: {error}"))?;
++            camera
++                .open_stream()
++                .map_err(|error| anyhow::anyhow!("Open camera stream: {error}"))?;
++            let actual = camera.camera_format();
++            Ok((camera, actual))
++        })
++    }
++
++    #[cfg(not(target_os = "macos"))]
+     fn open_one(
+         entry: &CameraEntry,
+         width: u32,
+@@ -242,8 +296,7 @@
+                 .map(|f| CameraFormat::new(Resolution::new(width, height), f, fps))
+                 .to_vec();
+         }
+-        let mut errors = Vec::new();
+-        for format in ranked.into_iter().take(4) {
++        attempt_formats(ranked.into_iter().take(4), |format| {
+             // All formats, including GRAY (RgbFormat's own list excludes it);
+             // decoding to RGB handles every one of them.
+             let request =
+@@ -254,12 +307,12 @@
+             match result {
+                 Ok(()) => {
+                     let actual = camera.camera_format();
+-                    return Ok((camera, actual));
+-                }
+-                Err(e) => errors.push(format!("{format}: {e}")),
+-            }
+-        }
+-        bail!("{}", errors.join("; "))
++                    Ok(actual)
++                }
++                Err(e) => Err(anyhow::anyhow!("{e}")),
++            }
++        })
++        .map(|actual| (camera, actual))
+     }
+     pub fn open(
+         device: &str,
+@@ -513,4 +566,24 @@
+         let ranked = native::rank(&modes, 800, 600, 60);
+         assert_eq!(ranked[0].resolution(), Resolution::new(1280, 720));
+     }
+-}
++
++    #[cfg(feature = "camera")]
++    #[test]
++    fn rejected_constructor_does_not_prevent_a_supported_exact_mode() {
++        use nokhwa::utils::{CameraFormat, FrameFormat, Resolution};
++        let rejected = CameraFormat::new(Resolution::new(1920, 1080), FrameFormat::YUYV, 15);
++        let supported = CameraFormat::new(Resolution::new(640, 480), FrameFormat::YUYV, 30);
++        let mut attempts = Vec::new();
++        let selected = native::attempt_formats([rejected, supported], |format| {
++            attempts.push(format);
++            if format == rejected {
++                anyhow::bail!("constructor rejected range minimum");
++            }
++            Ok(format)
++        })
++        .unwrap();
++        assert_eq!(attempts, [rejected, supported]);
++        assert_eq!(selected, supported);
++        assert!(native::attempt_formats::<()>([], |_| Ok(())).is_err());
++    }
++}
+--- a/src/engine.rs
++++ b/src/engine.rs
+@@ -5,6 +5,7 @@
+     recording::{Recorder, RecordingState},
+     source::{self, AviSource, ChildControl, DemoSource, Opened},
+     tracker::{Measurement, Tracker},
++    zmq_output::SourceKind,
+ };
+ use anyhow::{Context, Result, ensure};
+ use std::{
+@@ -295,6 +296,12 @@
+     fallback: bool,
+ ) -> Result<()> {
+     let (w, h, _) = config.source.dimensions();
++    let mut source_kind = match &config.source {
++        SourceConfig::Camera { .. } => SourceKind::Camera,
++        SourceConfig::Video { .. } => SourceKind::Video,
++        SourceConfig::Demo { .. } => SourceKind::Demo,
++        SourceConfig::Network { .. } => SourceKind::Network,
++    };
+     let opened = match source::open(&config, &path, child) {
+         Ok(opened) => opened,
+         Err(error) if fallback && matches!(config.source, SourceConfig::Camera { .. }) => {
+@@ -307,6 +314,7 @@
+             let opened = source::sample_video()
+                 .and_then(|video| {
+                     let s = AviSource::open(&video, w, h, true, true).ok()?;
++                    source_kind = SourceKind::Video;
+                     example =
+                         source::sample_config(&video).and_then(|e| config.with_geometry_of(&e));
+                     let name = video.file_name().unwrap_or_default().to_string_lossy();
+@@ -319,9 +327,12 @@
+                         },
+                     })
+                 })
+-                .unwrap_or_else(|| Opened {
+-                    source: Box::new(DemoSource::new(w, h, 60, 0.8)),
+-                    description: "Simulated fly".into(),
++                .unwrap_or_else(|| {
++                    source_kind = SourceKind::Demo;
++                    Opened {
++                        source: Box::new(DemoSource::new(w, h, 60, 0.8)),
++                        description: "Simulated fly".into(),
++                    }
+                 });
+             if let Some(example) = &example {
+                 config = example.clone();
+@@ -335,6 +346,11 @@
+     };
+     let mut source = opened.source;
+     let sample = state.lock().unwrap().fallback.is_some();
++    if sample {
++        publisher.disable()?;
++    } else {
++        publisher.set_source_provenance(source_kind, false);
++    }
+     state.lock().unwrap().source = opened.description;
+     let mut tracker = Tracker::new(&config, w, h);
+     let mut recorder = if config.recording.enabled && !sample {
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -74,6 +74,10 @@
+     record: bool,
+     #[arg(long, hide = true)]
+     supervised: bool,
++    /// Fail if the requested camera cannot open; never substitute sample/demo input.
++    /// Independent of supervision: closing the launcher does not stop this app.
++    #[arg(long)]
++    no_camera_fallback: bool,
+     /// Create a sample configuration at --config and exit (never overwrites).
+     #[arg(long)]
+     init: bool,
+@@ -565,8 +569,8 @@
+             limit: args.frames,
+             // A rig launched for an experiment must show its camera error,
+             // never a sample that could be mistaken for live data.
+-            fallback: !args.supervised,
+-            degrade_output: !args.supervised,
++            fallback: !args.supervised && !args.no_camera_fallback,
++            degrade_output: !args.supervised && !args.no_camera_fallback,
+             ..Default::default()
+         };
+         let result = rekkefly::gui::launch(rekkefly::gui::Launch {
+@@ -626,6 +630,13 @@
+         let a = Args::try_parse_from(["rekkefly", "--device", "1", "--zmq-port", "9900"]).unwrap();
+         assert_eq!(a.device.as_deref(), Some("1"));
+         assert_eq!(a.zmq_port, Some(9900));
++        let a =
++            Args::try_parse_from(["rekkefly", "--device", "0", "--no-camera-fallback"]).unwrap();
++        assert!(a.no_camera_fallback);
++        assert!(
++            !a.supervised,
++            "strict camera selection must not imply stdin supervision"
++        );
+         let a = Args::try_parse_from(["rekkefly", "clip", "in.avi", "out.avi", "--duration", "30"])
+             .unwrap();
+         assert!(matches!(a.command, Some(Tool::Clip { duration: Some(d), .. }) if d == 30.0));
+--- a/src/output.rs
++++ b/src/output.rs
+@@ -2,7 +2,7 @@
+     config::{Config, OutputConfig},
+     measurement_log::MeasurementLog,
+     tracker::Measurement,
+-    zmq_output::ZmqPublisher,
++    zmq_output::{SourceKind, ZmqPublisher},
+ };
+ use anyhow::{Context, Result};
+ use std::{
+@@ -82,6 +82,20 @@
+ 
+         Ok(sent)
+     }
++    pub fn set_source_provenance(&mut self, kind: SourceKind, fallback: bool) {
++        if let Some(zmq) = &mut self.zmq {
++            zmq.set_source_provenance(kind, fallback);
++        }
++    }
++    /// A GUI camera fallback is a preview only, never experimental output.
++    pub fn disable(&mut self) -> Result<()> {
++        self.flush()?;
++        self.socket = None;
++        self.target = None;
++        self.recording = None;
++        self.zmq = None;
++        Ok(())
++    }
+     pub fn flush(&mut self) -> Result<()> {
+         if let Some(w) = &mut self.recording {
+             w.finish()?;
+--- a/src/zmq_output.rs
++++ b/src/zmq_output.rs
+@@ -9,10 +9,11 @@
+ //! ZMTP 3.0 (RFC 23, NULL mechanism) or fall back to ZMTP 2.0 (RFC 15) or,
+ //! for libzmq 2.x peers, ZMTP 1.0 (RFC 13).
+ //!
+-//! Each message is one frame of JSON, byte for byte what the bridge's
++//! Each message is one frame of JSON. The legacy numerical fields match what the bridge's
+ //! `json.dumps` produced under Python 2: the same key order, `", "` and
+ //! `": "` separators and Python's number format. Subscribers' topic
+-//! prefixes are honoured. Tracking never waits: like a libzmq PUB socket, a
++//! prefixes are honoured. Engine messages append explicit source identity;
++//! the legacy encoder remains available unchanged. Tracking never waits: like a libzmq PUB socket, a
+ //! subscriber more than `HIGH_WATER_MARK` messages behind misses messages.
+ use crate::tracker::Measurement;
+ use anyhow::{Context, Result, ensure};
+@@ -50,6 +51,31 @@
+     pub roll: f64,
+     pub frame_number: u64,
+     pub timestamp_unix: f64,
++}
++
++/// Identity of the source actually opened, rather than the requested camera.
++#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
++#[serde(rename_all = "snake_case")]
++pub enum SourceKind {
++    Camera,
++    Video,
++    Demo,
++    Network,
++}
++impl SourceKind {
++    fn as_str(self) -> &'static str {
++        match self {
++            Self::Camera => "camera",
++            Self::Video => "video",
++            Self::Demo => "demo",
++            Self::Network => "network",
++        }
++    }
++}
++#[derive(Clone, Copy, Debug)]
++struct SourceProvenance {
++    kind: SourceKind,
++    fallback: bool,
+ }
+ impl From<&Measurement> for KineflyMessage {
+     fn from(m: &Measurement) -> Self {
+@@ -199,6 +225,7 @@
+     shared: Arc<Shared>,
+     acceptor: Option<JoinHandle<()>>,
+     address: SocketAddr,
++    source: Option<SourceProvenance>,
+     /// Messages a subscriber missed because it fell behind.
+     pub dropped: u64,
+ }
+@@ -228,6 +255,7 @@
+             shared,
+             acceptor: Some(acceptor),
+             address,
++            source: None,
+             dropped: 0,
+         })
+     }
+@@ -236,8 +264,23 @@
+         self.address
+     }
+     pub fn send(&mut self, measurement: &Measurement) -> Result<()> {
+-        self.send_bytes(KineflyMessage::from(measurement).to_json().into_bytes());
++        let mut json = KineflyMessage::from(measurement).to_json();
++        if let Some(source) = self.source {
++            use std::fmt::Write;
++            json.pop(); // Replace the legacy closing brace with additive metadata.
++            write!(
++                json,
++                ", \"source_kind\": \"{}\", \"source_fallback\": {}}}",
++                source.kind.as_str(),
++                source.fallback
++            )?;
++        }
++        self.send_bytes(json.into_bytes());
+         Ok(())
++    }
++    /// Set once after acquisition opened; absence retains the exact legacy wire JSON.
++    pub fn set_source_provenance(&mut self, kind: SourceKind, fallback: bool) {
++        self.source = Some(SourceProvenance { kind, fallback });
+     }
+     /// Queues one message for every subscriber whose topics match; never blocks.
+     pub fn send_bytes(&mut self, message: Vec<u8>) {
+--- a/tests/sources.rs
++++ b/tests/sources.rs
+@@ -146,6 +146,84 @@
+     engine.wait();
+ }
+ #[test]
++fn camera_fallback_is_preview_only_and_closes_all_outputs() {
++    let dir = tempfile::tempdir().unwrap();
++    let receiver = std::net::UdpSocket::bind("127.0.0.1:0").unwrap();
++    receiver
++        .set_read_timeout(Some(Duration::from_millis(100)))
++        .unwrap();
++    let port = std::net::TcpListener::bind("127.0.0.1:0")
++        .unwrap()
++        .local_addr()
++        .unwrap()
++        .port();
++    let mut config = Config::default();
++    config.source = camera_source(&config, "/nonexistent/rekkefly-test-camera");
++    config.output.enabled = true;
++    config.output.bind = std::net::UdpSocket::bind("127.0.0.1:0")
++        .unwrap()
++        .local_addr()
++        .unwrap()
++        .to_string();
++    config.output.target = receiver.local_addr().unwrap().to_string();
++    config.output.zmq_enabled = true;
++    config.output.zmq_bind = format!("tcp://127.0.0.1:{port}");
++    let jsonl = dir.path().join("measurements.jsonl");
++    config.output.jsonl_path = jsonl.to_string_lossy().into_owned();
++    let engine = Engine::start_with(
++        config,
++        dir.path().join("rig.toml"),
++        StartOptions {
++            fallback: true,
++            ..Default::default()
++        },
++    )
++    .unwrap();
++    let state = wait(&engine, |s| s.frames >= 3);
++    assert!(state.error.is_none(), "{:?}", state.error);
++    assert!(state.fallback.is_some());
++    assert!(state.frames >= 3, "fallback preview should still advance");
++    // The preview must not produce UDP, JSONL or a still-listening ZMQ endpoint.
++    assert!(receiver.recv(&mut [0u8; 1024]).is_err());
++    assert_eq!(std::fs::read(&jsonl).unwrap(), Vec::<u8>::new());
++    let released = std::net::TcpListener::bind(("127.0.0.1", port))
++        .expect("camera fallback must close its ZMQ publisher");
++    drop(released);
++    engine.wait();
++}
++#[test]
++fn strict_camera_flag_does_not_enable_stdin_supervision() {
++    let dir = tempfile::tempdir().unwrap();
++    let path = dir.path().join("demo.toml");
++    let mut config = Config::demo();
++    config.output.enabled = false;
++    config.output.zmq_enabled = false;
++    config.save(&path).unwrap();
++    let output = std::process::Command::new(env!("CARGO_BIN_EXE_rekkefly"))
++        .arg("--config")
++        .arg(path)
++        .args([
++            "--headless",
++            "--no-camera-fallback",
++            "--frames",
++            "8",
++            "--json",
++        ])
++        .stdin(std::process::Stdio::null())
++        .output()
++        .unwrap();
++    assert!(
++        output.status.success(),
++        "{}",
++        String::from_utf8_lossy(&output.stderr)
++    );
++    let summary: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
++    assert_eq!(
++        summary["frames"], 8,
++        "stdin EOF must not stop an independent app"
++    );
++}
++#[test]
+ fn a_busy_output_port_turns_outputs_off_in_the_gui_but_fails_headless() {
+     let busy = std::net::UdpSocket::bind("127.0.0.1:0").unwrap();
+     let mut config = Config::demo();
+--- a/tests/zmq.rs
++++ b/tests/zmq.rs
+@@ -3,7 +3,7 @@
+     frame::GrayFrame,
+     output::Publisher,
+     tracker::Tracker,
+-    zmq_output::{KineflyMessage, ZmqPublisher},
++    zmq_output::{KineflyMessage, SourceKind, ZmqPublisher},
+ };
+ use std::{
+     io::{Read, Write},
+@@ -89,6 +89,59 @@
+         assert_eq!(value.yaw, 0.0);
+     });
+     publisher.flush().unwrap();
++}
++
++#[test]
++fn additive_source_provenance_keeps_all_legacy_numerical_fields_unchanged() {
++    let runtime = tokio::runtime::Builder::new_current_thread()
++        .enable_all()
++        .build()
++        .unwrap();
++    runtime.block_on(async {
++        for (kind, expected) in [
++            (SourceKind::Camera, "camera"),
++            (SourceKind::Video, "video"),
++            (SourceKind::Demo, "demo"),
++            (SourceKind::Network, "network"),
++        ] {
++            let (mut publisher, port) = publisher();
++            publisher.set_source_provenance(kind, false);
++            let mut subscriber = zeromq::SubSocket::new();
++            subscriber
++                .connect(&format!("tcp://127.0.0.1:{port}"))
++                .await
++                .unwrap();
++            subscriber.subscribe("").await.unwrap();
++            let config = Config::demo();
++            let frame = GrayFrame::new(640, 480, vec![0; 640 * 480], 123_000_000_000, 17).unwrap();
++            let measurement = Tracker::new(&config, 640, 480)
++                .process(&frame, None, 0)
++                .unwrap();
++            let legacy = KineflyMessage::from(&measurement);
++            let mut received = None;
++            for _ in 0..20 {
++                publisher.send(&measurement).unwrap();
++                if let Ok(Ok(message)) =
++                    tokio::time::timeout(Duration::from_millis(100), subscriber.recv()).await
++                {
++                    received = Some(message);
++                    break;
++                }
++            }
++            let message = received.expect("source-annotated packet");
++            assert_eq!(message.len(), 1);
++            let bytes = message.get(0).unwrap();
++            assert_eq!(
++                serde_json::from_slice::<KineflyMessage>(bytes).unwrap(),
++                legacy
++            );
++            let metadata: serde_json::Value = serde_json::from_slice(bytes).unwrap();
++            assert_eq!(metadata["source_kind"], expected);
++            assert_eq!(metadata["source_fallback"], false);
++            assert_eq!(metadata.as_object().unwrap().len(), 10);
++            publisher.finish().unwrap();
++        }
++    });
+ }
+ 
+ /// The publisher and its port, for tests that speak the wire protocol.

@@ -1,0 +1,10 @@
+{
+  "actualNativePidVerified": true,
+  "literalArgumentsVerified": true,
+  "literalEnvironmentVerified": true,
+  "independentParentVerified": true,
+  "survivesLauncherExit": true,
+  "fixtureHasNoWindowsOrCamera": true,
+  "api": "NSWorkspace launchApplicationAtURL:options:configuration:error:",
+  "coreContractsPassed": 85
+}

@@ -25,8 +25,13 @@ public static class ConfigurationDashboardValidation
     private static double deadline;
     private static RenderTexture target;
     private static Rect navigation;
-    private static string originalSystem,originalSequence,originalExperiment;
+    private static string originalSystem,originalSequence,originalExperiment,originalSystemPath,originalSequencePath;
     private static ConfigDocument experiment;
+    private static System.Threading.Tasks.TaskCompletionSource<CompanionCatalog.Prepared> preparation;
+    private static int prepareCalls,launchCalls,startCalls;
+    private static string preparationSystemJson;
+    private static bool trackerWasRunning;
+    private static JToken originalTargetDisplay;
     private static void Check(bool ok,string text) { if(!ok) throw new Exception(text); checks.Add(text); }
     private static void Call(object obj,string method,params object[] args)=>obj.GetType().GetMethod(method,Private).Invoke(obj,args);
     private static void Put(object obj,string field,object value)=>obj.GetType().GetField(field,Private).SetValue(obj,value);
@@ -97,8 +102,22 @@ public static class ConfigurationDashboardValidation
             var ui=ConfigWorkbench.Instance;if(ui?.Document==null)return;var root=ui.Document.rootVisualElement;
             if(stage==0)
             {
-                target=new RenderTexture(1920,1080,24);target.Create();ui.Document.panelSettings.targetTexture=target;
-                originalSystem=ui.Workspace.System.Root.ToString(Formatting.None);originalSequence=ui.Workspace.Sequence.Root.ToString(Formatting.None);Next(1,90);
+                target=new RenderTexture(1920,1080,24);target.Create();ui.Document.panelSettings.scale=1;ui.Document.panelSettings.targetTexture=target;
+                originalSystem=ui.Workspace.System.Root.ToString(Formatting.None);originalSequence=ui.Workspace.Sequence.Root.ToString(Formatting.None);originalSystemPath=ui.Workspace.System.Path;originalSequencePath=ui.Workspace.Sequence.Path;Next(20,90);
+            }
+            else if(stage==20)
+            {
+                Check(root.Q<Button>("quickstart-mode-flying")!=null && root.Q<Button>("quickstart-mode-walking")!=null,"Landing presents flying and walking directly");
+                Check(root.Q<Button>("quickstart-world-night-sky")!=null && root.Q<Button>("quickstart-world-forest")!=null,"Landing presents native starter worlds");
+                Check(!root.Q<Foldout>("recording-details").value,"Optional animal metadata starts collapsed");
+                Check(root.Q<Foldout>("navigation-library")!=null && !root.Q<Foldout>("navigation-library").value,"File tools stay progressively disclosed");
+                Check(root.Q<Button>("open-system").Q<Label>().text=="Apparatus setup","One-time hardware is described as apparatus setup");
+                Check(root.Q<Label>(className:"start-title").resolvedStyle.fontSize>=30,"Landing has a clear readable typographic hierarchy");
+                Check(root.Q<Button>("quickstart-mode-flying").worldBound.width>=170,"Movement cards are usable full-size targets");
+                Check(root.Query<Image>(className:"world-image").ToList().All(i=>i.image!=null&&i.image.width>=512),"Starter images retain genuine high-resolution scene previews");
+                Check(root.style.unityFontDefinition.value.fontAsset!=null && root.style.unityFontDefinition.value.fontAsset.name.Contains("Inter"),"Bundled Inter uses a native TextCore SDF font asset");
+                Capture("start-1920");
+                root.Q<Foldout>("recording-details").value=true;Next(1,8);
             }
             else if(stage==1)
             {
@@ -239,7 +258,88 @@ public static class ConfigurationDashboardValidation
                 Capture("replay-launcher-1920");
                 Submit(root.Query<Button>().ToList().First(button=>button.Query<Label>().ToList().Any(label=>label.text=="Keep editing")));
                 Check(SceneManager.GetActiveScene().name=="ControlScene" && !MainController.Instance.SequenceRunning,"Cancel replay launch keeps setup open");
-                foreach(var schema in ui.Workspace.Schemas.Catalog.Properties()) HelpCoverage((JObject)schema.Value,new string[0]);Finish(null);
+                Put(ui,"sessionDetailsOpen",false);Call(ui,"ShowSessionHome");
+                target.Release();Object.Destroy(target);target=new RenderTexture(3024,1964,24);target.Create();
+                ui.Document.panelSettings.targetTexture=target;ui.Document.panelSettings.scale=2;Next(13,45);
+            }
+            else if(stage==13)
+            {
+                Check(Mathf.Abs(root.resolvedStyle.width-1512)<2 && Mathf.Abs(root.resolvedStyle.height-982)<2,"Retina backing maps 3024×1964 physical pixels to 1512×982 logical UI points");
+                Check(root.Q<Label>(className:"start-title").resolvedStyle.fontSize>=30,"Retina text retains its logical point size");
+                Check(root.Q<Button>("start-experiment").worldBound.yMax<=982,"Primary action remains visible at native Mac logical size");
+                Check(root.Q<Button>("quickstart-mode-flying").worldBound.width>=170,"Retina movement choices retain usable logical targets");
+                Check(root.Q<Button>("quickstart-world-forest").worldBound.xMax<=1512,"Retina world cards stay within the logical viewport");
+                Capture("start-retina-3024");
+                bool running=TrackerProcessManager.IsRunning("VR1");Submit(root.Q<Button>("quickstart-world-night-sky"));
+                Check(DesktopQuickStart.IsQuickStart(ui.Workspace)&&DesktopQuickStart.IsDemo(ui.Workspace),"Choosing a starter world opens its explicit demo workspace");
+                Check((bool)ui.Workspace.System.Root["configs"][0]["desktopPreview"]&&((JArray)ui.Workspace.System.Root["configs"]).Count==1,"Starter uses one native-window front viewport rather than the LED tile atlas");
+                Check(TrackerProcessManager.IsRunning("VR1")==running,"Viewing a starter never spawns a tracker process");Next(14,8);
+            }
+            else if(stage==14)
+            {
+                Check(root.Q<Button>("start-experiment").Q<Label>().text=="Start demo","Demo action is visibly labeled instead of pretending to measure an animal");
+                Check(root.Q<DropdownField>("quickstart-input").value.StartsWith("Demo"),"Demo input is clearly selected");
+                Check(root.Q<Button>("quickstart-open-tracker")!=null&&root.Q<Button>("quickstart-stop-tracker")!=null,"Native companion has direct independent app controls");
+                Capture("quickstart-retina-3024");Submit(root.Q<Button>("quickstart-mode-walking"));
+                Check(DesktopQuickStart.Mode(ui.Workspace)=="walking"&&(string)ui.Workspace.System.Root["configs"][0]["closedLoopMode"]=="Hejjetrac","Walking selector opens the canonical walking starter");
+                Submit(root.Q<Button>("quickstart-world-forest"));Check(DesktopQuickStart.Scene(ui.Workspace)=="forest","Forest selector opens its own ready sequence");
+                Check(ui.Workspace.Documents.First(d=>d.Path==originalSystemPath).Root.ToString(Formatting.None)==originalSystem&&ui.Workspace.Documents.First(d=>d.Path==originalSequencePath).Root.ToString(Formatting.None)==originalSequence,"Starter choices preserve exact custom system and sequence documents");
+                Submit(root.Q<Button>("quickstart-mode-flying"));Next(15,8);
+            }
+            else if(stage==15)
+            {
+                Capture("forest-retina-3024");foreach(var schema in ui.Workspace.Schemas.Catalog.Properties())HelpCoverage((JObject)schema.Value,new string[0]);
+                var source=ui.Workspace.System.Root["configs"][0];
+                var reopened=new ConfigWorkspace(ui.Workspace.System.Path,ui.Workspace.Sequence.Path,ui.Workspace.Schemas);
+                Check(DesktopQuickStart.IsQuickStart(reopened)&&DesktopQuickStart.IsDemo(reopened)&&root.Q<DropdownField>("quickstart-input").value.StartsWith("Demo"),"Reopened starter files preserve explicit Demo selection in the native workspace");
+                Check(source["targetDisplay"] is JRaw && source["sphereDiameter"] is JRaw,"Start regression uses real lossless integer and fractional workspace tokens");
+                preparationSystemJson=ui.Workspace.System.Root.ToString(Formatting.None);trackerWasRunning=TrackerProcessManager.IsRunning("VR1");
+                preparation=new System.Threading.Tasks.TaskCompletionSource<CompanionCatalog.Prepared>();prepareCalls=launchCalls=startCalls=0;
+                Put(ui,"prepareCompanionForValidation",new Func<SystemConfig,bool,System.Threading.Tasks.Task<CompanionCatalog.Prepared>>((rig,demo)=>{
+                    prepareCalls++;
+                    Check(rig.targetDisplay==0&&Mathf.Abs(rig.sphereDiameter-2.6f)<.001f&&rig.zmqPort==9871,"Actual Start converts lossless integer and float fields to the runtime tracker model");
+                    Check(rig.desktopPreview&&rig.closedLoopMode==ClosedLoopMode.Rekkefly&&demo,"Actual Start preserves backend, desktop preview and explicit demo mode");
+                    return preparation.Task;
+                }));
+                Put(ui,"launchCompanionForValidation",new Action<CompanionCatalog.Prepared>(_=>launchCalls++));
+                Put(ui,"startExperimentForValidation",new Action(()=>startCalls++));
+                Submit(root.Q<Button>("start-experiment"));
+                Check(ui.IsPreparing&&!root.Q<Button>("start-experiment").enabledSelf,"Actual Start immediately paints a guarded preparation state");
+                ui.StartExperiment();Next(16,5);
+            }
+            else if(stage==16)
+            {
+                Check(prepareCalls==1&&launchCalls==0&&startCalls==0&&ui.IsPreparing,"Repeated Start stays one pending preparation and does not launch early");
+                preparation.SetResult(new CompanionCatalog.Prepared());Next(17,5);
+            }
+            else if(stage==17)
+            {
+                Check(launchCalls==1&&startCalls==1&&!ui.IsPreparing,"Successful preparation launches and starts once, then clears the busy state");
+                Check(root.Q<Button>("start-experiment").enabledSelf&&root.Q<VisualElement>(className:"body").enabledSelf&&root.Q("setup-navigation").enabledSelf,"Completed preparation restores setup controls in the native test harness");
+                Check(ui.Workspace.System.Root.ToString(Formatting.None)==preparationSystemJson&&ui.Workspace.System.Root["configs"][0]["targetDisplay"] is JRaw,"Runtime conversion leaves lossless workspace JSON unchanged");
+                Put(ui,"prepareCompanionForValidation",new Func<SystemConfig,bool,System.Threading.Tasks.Task<CompanionCatalog.Prepared>>((rig,demo)=>System.Threading.Tasks.Task.FromException<CompanionCatalog.Prepared>(new InvalidOperationException("Synthetic preparation failure"))));
+                Submit(root.Q<Button>("start-experiment"));Next(18,5);
+            }
+            else if(stage==18)
+            {
+                Check(!ui.IsPreparing&&root.Q<Button>("start-experiment").enabledSelf&&root.Q<VisualElement>(className:"body").enabledSelf,"Failed asynchronous preparation restores the Start button and workspace");
+                Check(root.Q<Label>(className:"status").text=="Synthetic preparation failure"&&root.Q<Label>(className:"status").ClassListContains("error"),"Preparation failure has an actionable visible error");
+                Check(launchCalls==1&&startCalls==1,"Failed preparation never launches a tracker or experiment");
+                originalTargetDisplay=ui.Workspace.System.Root["configs"][0]["targetDisplay"].DeepClone();
+                ui.Workspace.System.Root["configs"][0]["targetDisplay"]=new JRaw("2147483648");
+                Call(ui,"BeginCompanionPreparation",true);Next(19,5);
+            }
+            else if(stage==19)
+            {
+                Check(!ui.IsPreparing&&root.Q<VisualElement>(className:"body").enabledSelf&&root.Q("setup-navigation").enabledSelf,"Conversion exceptions before awaiting also restore every disabled workspace region");
+                Check(root.Q<Label>(className:"status").ClassListContains("error")&&launchCalls==1&&startCalls==1,"Invalid runtime integer reports failure without launching");
+                ui.Workspace.System.Root["configs"][0]["targetDisplay"]=originalTargetDisplay;
+                Call(ui,"UpdateStatus",(object)null);
+                Check(root.Q<Button>("start-experiment").enabledSelf,"Correcting a failed conversion makes Start available again");
+                Put(ui,"prepareCompanionForValidation",null);Put(ui,"launchCompanionForValidation",null);Put(ui,"startExperimentForValidation",null);
+                Check(TrackerProcessManager.IsRunning("VR1")==trackerWasRunning&&!MainController.Instance.SequenceRunning,"Start-path validation uses no tracker, camera or experimental scene");
+                Check(ui.Workspace.System.Root.ToString(Formatting.None)==preparationSystemJson,"Start failure regression restores the exact original lossless system document");
+                Finish(null);
             }
         }
         catch(Exception error) { Finish(error.ToString()); }

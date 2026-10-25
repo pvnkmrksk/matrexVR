@@ -34,6 +34,8 @@ public class ReplayController : MonoBehaviour
     public bool showOverviewOnStart = true;
     public bool loadRecordedAgents = true;
     public bool interpolateAnimalPoses = true;
+    [Tooltip("Preserve the saved panel camera projection and letterbox it instead of stretching the animal's view.")]
+    public bool matchRecordedCamera = true;
     [Tooltip("Never interpolate a larger position jump; resets and periodic wrapping stay discontinuous.")]
     public float maximumInterpolationDistance = 50f;
 
@@ -152,6 +154,7 @@ public class ReplayController : MonoBehaviour
                             if(stream==null)continue;
                             run.agents.Add(stream);
                             if(!stream.HasRotations)run.archive.Warn(Path.GetFileName(file)+": historical agent positions have no orientation; heading/wing animation cannot be reconstructed exactly.");
+                            if(stream.Kind=="Band" && !stream.HasVisibility)run.archive.Warn(Path.GetFileName(file)+": historical visibility phase did not capture the actual per-agent timer; exact blinking cannot be recovered and bodies are shown continuously.");
                             if(stream.HasDuplicateNames)run.archive.Warn(Path.GetFileName(file)+": duplicate agent names are distinguished by row order within each frame.");
                         }
                         catch(Exception error){run.archive.Warn("Population recording unavailable: "+Path.GetFileName(file)+" — "+error.Message);}
@@ -165,9 +168,11 @@ public class ReplayController : MonoBehaviour
         if(pendingLoad.IsFaulted)
         {LoadError=pendingLoad.Exception?.GetBaseException().Message;loading=false;pendingLoad=null;yield break;}
         var loaded=pendingLoad.Result;pendingLoad=null;
+        // Finish the preceding additive scene operation before replacing its archive.
+        while(environmentLoader!=null && environmentLoader.Loading)yield return null;
         ClearSessionVisuals();archive=loaded.archive;
         foreach(var stream in loaded.agents)populations.Add(new Population{stream=stream});
-        absoluteSessionPath=archive.DirectoryPath;folderInput=absoluteSessionPath;replayTime=0;referenceSample=null;
+        absoluteSessionPath=archive.DirectoryPath;folderInput=absoluteSessionPath;replayTime=archive.FirstExperimentTime;referenceSample=null;
         BuildMarkers();BuildStepTimeline();
         environmentLoader.BeginSession(archive,rigOrder);
         FitOverview();ApplyView();RenderFrame();
@@ -182,7 +187,7 @@ public class ReplayController : MonoBehaviour
             string id=pair.Key;rigOrder.Add(id);
             GameObject marker=rigMarkerPrefab!=null?Instantiate(rigMarkerPrefab,generatedRoot):GameObject.CreatePrimitive(PrimitiveType.Sphere);
             marker.transform.SetParent(generatedRoot,false);marker.name="Recorded animal "+id;ReplayEnvironmentLoader.FreezeVisual(marker);
-            markerByRig[id]=marker;
+            SetOverlayLayer(marker);markerByRig[id]=marker;
             foreach(var sample in pair.Value)
             {if(first){trajectoryBounds=new Bounds(sample.position,Vector3.zero);first=false;}else trajectoryBounds.Encapsulate(sample.position);}
             if(createRigCameras)
@@ -200,7 +205,7 @@ public class ReplayController : MonoBehaviour
         foreach(var pair in archive.Rigs)
         {
             var path=new GameObject("Recorded path "+pair.Key,typeof(LineRenderer));path.transform.SetParent(generatedRoot,false);
-            var line=path.GetComponent<LineRenderer>();line.useWorldSpace=true;
+            SetOverlayLayer(path);var line=path.GetComponent<LineRenderer>();line.useWorldSpace=true;
             int stride=Math.Max(1,(pair.Value.Count+4999)/5000);var points=new List<Vector3>();
             for(int i=0;i<pair.Value.Count;i+=stride)points.Add(pair.Value[i].position);
             line.positionCount=points.Count;line.SetPositions(points.ToArray());line.widthMultiplier=Mathf.Max(.015f,size*.12f);
@@ -264,7 +269,11 @@ public class ReplayController : MonoBehaviour
         if(archive==null)return;
         if(environmentLoader!=null && !environmentLoader.Loading && cameraLayoutVersion!=environmentLoader.ContextVersion)
         {
-            foreach(var pair in camerasByRig)pair.Value.cullingMask=AnimalCameraMask(pair.Key);
+            foreach(var pair in camerasByRig)
+            {
+                pair.Value.cullingMask=AnimalCameraMask(pair.Key);
+                if(matchRecordedCamera)environmentLoader.ConfigureAnimalCamera(pair.Key,pair.Value);
+            }
             cameraLayoutVersion=environmentLoader.ContextVersion;
         }
         referenceSample=null;
@@ -281,6 +290,7 @@ public class ReplayController : MonoBehaviour
             marker.transform.SetPositionAndRotation(position,rotation);
             environmentLoader?.DriveRecordedRig(id,position,rotation);
             environmentLoader?.ApplyAsynchronousSample(a);
+            if(matchRecordedCamera && camerasByRig.TryGetValue(id,out var animalCamera))environmentLoader?.ConfigureAnimalCamera(id,animalCamera,a);
             if(environmentSample==null)environmentSample=a;
             if(referenceSample==null || (selectedView>=0 && rigOrder[selectedView]==id))referenceSample=a;
         }
@@ -302,7 +312,7 @@ public class ReplayController : MonoBehaviour
                     visual=environmentLoader.CreateAgentVisual(population.stream.Kind,pose.name,pose.layer,populationRoot,fallbackSize);
                     population.visuals[pose.id]=visual;
                 }
-                visual.SetActive(true);visual.transform.SetPositionAndRotation(pose.position,Quaternion.Euler(pose.rotation));population.active.Add(pose.id);
+                visual.SetActive(pose.visible);visual.transform.SetPositionAndRotation(pose.position,Quaternion.Euler(pose.rotation));population.active.Add(pose.id);
             }
             foreach(var pair in population.visuals)if(pair.Value!=null && !population.active.Contains(pair.Key))pair.Value.SetActive(false);
         }
@@ -319,7 +329,13 @@ public class ReplayController : MonoBehaviour
         int index=RuntimeRigRegistry.ParseIndex(ReplayEnvironmentLoader.CanonicalRig(id));
         int own=RuntimeRigRegistry.StimulusLayer(index),objects=ReplayEnvironmentLoader.ObjectLayerForRig(id);
         int visible=(own>=0?1<<own:0)|(objects>=0?1<<objects:0);
-        return ~isolated|visible;
+        return (~isolated|visible)&~LayerMask.GetMask("OverheadCameraMarkers","UI");
+    }
+    private static void SetOverlayLayer(GameObject target)
+    {
+        int layer=LayerMask.NameToLayer("OverheadCameraMarkers");
+        if(layer<0)return;
+        target.layer=layer;foreach(var child in target.GetComponentsInChildren<Transform>(true))child.gameObject.layer=layer;
     }
     private void Seek(double seconds)
     {
@@ -327,6 +343,7 @@ public class ReplayController : MonoBehaviour
         if(pauseOnSeek && !autoResumeAfterSeek)isPlaying=false;
         RenderFrame();
     }
+    public void SeekSeconds(double seconds)=>Seek(seconds);
     public void SetScrubNormalized(float normalized){if(archive!=null)Seek(Mathf.Clamp01(normalized)*Duration);}
     public void SetPlaying(bool playing)=>isPlaying=playing;
     private void BuildStepTimeline()

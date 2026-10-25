@@ -77,7 +77,7 @@ namespace ConfigurationUI
                 }
                 else if(settingsTab=="Motion")
                 {
-                    Section(scroll,"Closed loop","motion",payload,schema,prefix,present.Where(k=>k.StartsWith("closedLoop")));
+                    Section(scroll,"Closed loop","motion",payload,schema,prefix,present.Where(k=>k.StartsWith("closedLoop") || k.StartsWith("walking")));
                     Section(scroll,"Forward motion & altitude","motion",payload,schema,prefix,present.Where(k=>k.StartsWith("autopilot") || k.StartsWith("wind") || new[]{"aglHeight","groundLayerMask","durationSeconds"}.Contains(k)));
                     Section(scroll,"Starting pose & resets","settings",payload,schema,prefix,present.Where(k=>k.StartsWith("initial") || k.StartsWith("reset") || k=="randomInitialRotation"));
                 }
@@ -96,7 +96,7 @@ namespace ConfigurationUI
         }
         private static string Group(string key)
         {
-            if(key.StartsWith("initial") || key.StartsWith("reset") || key.StartsWith("closedLoop") || key.StartsWith("autopilot") || key.StartsWith("wind") || new[]{"randomInitialRotation","aglHeight","groundLayerMask","durationSeconds"}.Contains(key)) return "Motion";
+            if(key.StartsWith("initial") || key.StartsWith("reset") || key.StartsWith("closedLoop") || key.StartsWith("walking") || key.StartsWith("autopilot") || key.StartsWith("wind") || new[]{"randomInitialRotation","aglHeight","groundLayerMask","durationSeconds"}.Contains(key)) return "Motion";
             if(new[]{"backgroundColor","uniformSkyColor","nightSky","skyboxPath","skybox"}.Contains(key)) return "Sky";
             if(key.StartsWith("autoTrim") || key=="headingReference" || key=="adaptiveDecision" || key=="useHeadingReference") return "Tuning";
             if(new[]{"preStimulus","stimulus","postStimulus"}.Contains(key)) return "Other";
@@ -278,6 +278,15 @@ namespace ConfigurationUI
         {
             var scroll=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; scroll.AddToClassList("settings-scroll"); body.Add(scroll);
             var obj=(JObject)selected.Root; var schema=Workspace.Schemas.Get("system");
+            var presentation=new VisualElement();presentation.AddToClassList("desktop-presentation");scroll.Add(presentation);
+            presentation.Add(SessionHeading("Application display","system","Native fullscreen. This is separate from your LED viewport layout."));
+            var displayNames=DesktopDisplay.DisplayNames.ToList();
+            if(displayNames.Count>0)
+            {
+                var display=new DropdownField("Open MATREX on",displayNames,Mathf.Clamp(DesktopDisplay.SelectedDisplay,0,displayNames.Count-1)){name="application-display"};
+                display.tooltip="One-time application monitor choice, remembered on this computer. The window uses that monitor’s native resolution. This does not change the experiment’s calibrated LED rectangles.";
+                display.RegisterValueChangedCallback(evt=>DesktopDisplay.SelectDisplay(displayNames.IndexOf(evt.newValue)));presentation.Add(display);
+            }
             Section(scroll,"Rendering & timing","system",obj,schema,Array.Empty<string>(),new[]{"targetDisplay","targetFrameRate","vSyncCount"});
             if(obj["configs"] is JArray rigs)
             {

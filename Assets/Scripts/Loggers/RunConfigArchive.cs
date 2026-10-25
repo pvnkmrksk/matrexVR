@@ -23,6 +23,7 @@ public sealed class RunConfigArchive
     private readonly Dictionary<string,Snapshot> snapshots=new Dictionary<string,Snapshot>();
     private readonly Dictionary<string,string> errors=new Dictionary<string,string>();
     private readonly SortedSet<string> unavailableOptional=new SortedSet<string>();
+    private JArray companionProvenance;
     private readonly object gate=new object();
     public string ManifestPath => Path.Combine(directory,"config_manifest.json");
 
@@ -58,6 +59,47 @@ public sealed class RunConfigArchive
                 TryWriteManifest();
                 throw new IOException("Cannot archive loaded "+role+" file '"+reference+"': "+error.Message,error);
             }
+        }
+    }
+    /// <summary>Capture only explicitly owned, matching native tracker configuration text.
+    /// These are on-disk bytes at Unity run startup, not proof of a native app's in-memory state.</summary>
+    public void CaptureCompanions(IEnumerable<JObject> launches,string scene)
+    {
+        lock(gate)
+        {
+            if(companionProvenance!=null)return;
+            companionProvenance=new JArray();
+            foreach(var launch in launches??Enumerable.Empty<JObject>())
+            {
+                var evidence=(JObject)launch.DeepClone();
+                evidence["configurationScope"]="on-disk config at Unity run startup; native in-memory edits and sidecars are not inferred";
+                evidence["snapshotAvailable"]=false;
+                companionProvenance.Add(evidence);
+                if((bool?)evidence["identityVerified"]!=true || (bool?)evidence["matchesConfiguredRig"]!=true)
+                { evidence["configurationStatus"]="not-captured-unverified-or-mismatched-launch";continue; }
+                try
+                {
+                    string path=(string)evidence["configFile"];
+                    if(string.IsNullOrEmpty(path)||!Path.IsPathFullyQualified(path))throw new IOException("Owned tracker configuration path is unavailable.");
+                    string extension=Path.GetExtension(path),kind=extension.ToLowerInvariant();
+                    if(kind!=".toml"&&kind!=".txt"&&kind!=".json")throw new IOException("Only native tracker configuration text is archived; media and executables are excluded.");
+                    if(new FileInfo(path).Length>16*1024*1024)throw new IOException("Native tracker configuration exceeds the 16 MiB snapshot limit.");
+                    byte[] bytes=File.ReadAllBytes(path);string hash=Hash(bytes);
+                    CaptureBytes(path,path,"tracker-calibration",bytes,false,scene,new HashSet<string>(),false);
+                    evidence["snapshotAvailable"]=true;evidence["configurationStatus"]="captured-on-disk-at-startup";
+                    evidence["configSha256"]=hash;evidence["configBytes"]=bytes.LongLength;
+                    evidence["configSnapshotPath"]=Path.Combine("Configs","Snapshots",hash+extension);
+                }
+                catch(Exception error)
+                {
+                    evidence["configurationStatus"]="unavailable";evidence["configurationError"]=error.Message;
+                    unavailableOptional.Add("Owned native tracker "+(string)evidence["vrId"]+": "+error.Message);
+                }
+            }
+            WriteManifest();
+            WriteImmutable(Path.Combine(directory,"companion_provenance.json"),Encoding.UTF8.GetBytes(new JObject {
+                ["schemaVersion"]=1,["capturedUtc"]=DateTimeOffset.UtcNow,["trackers"]=companionProvenance.DeepClone()
+            }.ToString(Formatting.Indented)));
         }
     }
     public string ReadText(string reference,string role,string scene) => Decode(ReadBytes(reference,role,scene));
@@ -133,7 +175,7 @@ public sealed class RunConfigArchive
                 aliasPath=Path.Combine(directory,timestamp+"_"+SafeName(scene)+"_"+hash.Substring(0,12)+"_"+name);
             WriteImmutable(aliasPath,bytes);
         }
-        if(string.Equals(extension,".json",StringComparison.OrdinalIgnoreCase))
+        if(role!="tracker-calibration"&&string.Equals(extension,".json",StringComparison.OrdinalIgnoreCase))
             CaptureReferences(JToken.Parse(Decode(bytes)),scene,visited,required);
         if(role=="trajectory")
         {
@@ -187,7 +229,8 @@ public sealed class RunConfigArchive
         Directory.CreateDirectory(directory);
         string json=JsonConvert.SerializeObject(new {schemaVersion=1,updatedUtc=DateTimeOffset.UtcNow,
             unityVersion=engineVersion,complete=errors.Count==0,files=snapshots.Values.OrderBy(f=>f.sourcePath).ThenBy(f=>f.sha256),
-            errors=errors.OrderBy(p=>p.Key).Select(p=>new {source=p.Key,error=p.Value}),unavailableOptionalReferences=unavailableOptional},Formatting.Indented);
+            errors=errors.OrderBy(p=>p.Key).Select(p=>new {source=p.Key,error=p.Value}),unavailableOptionalReferences=unavailableOptional,
+            companionProvenance},Formatting.Indented);
         string temporary=ManifestPath+".tmp";
         File.WriteAllText(temporary,json,new UTF8Encoding(false));
         // Atomic replacement preserves the previous manifest if the write fails.

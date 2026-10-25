@@ -65,7 +65,7 @@ def prepare(ref, project):
         subprocess.run(['cp', '-cR', str(ROOT / 'Library'), str(project / 'Library')], check=True)
     (project / 'SOURCE-REVISION.txt').write_text(git('rev-parse', ref).decode())
 
-def package(build, output, version, platform, revision, project, quickstart):
+def package(build, output, version, platform, revision, project, quickstart, with_companions=True, with_dashboard=True):
     label = 'macOS-universal' if platform == 'macOS' else platform
     name = f'MATREX-VR-{version}-{label}'
     stage = output / name
@@ -82,6 +82,21 @@ def package(build, output, version, platform, revision, project, quickstart):
             shutil.rmtree(p)
     if platform == 'Linux':
         (stage / 'MATREX VR.x86_64').chmod(0o755)
+    companion_root = stage / 'MATREX VR.app' / 'Contents' / 'Companions' if platform == 'macOS' else stage / 'Companions'
+    if with_companions:
+        # Install/download during packaging only. Runtime is fully offline and reuses
+        # stable per-user app identities rather than extracting a new copy per Start.
+        import companion_bundles
+        platforms = ['macos-arm64', 'macos-x64'] if platform == 'macOS' else ['windows-x64' if platform == 'Windows' else 'linux-x64']
+        companion_bundles.stage(platforms, companion_root, ROOT / '.release-work/companion-cache')
+    dashboard_entries = []
+    if with_dashboard:
+        import stage_local_dashboard
+        dashboard_entries = stage_local_dashboard.stage(stage_local_dashboard.platforms_for_target(platform), companion_root, ROOT / '.release-work/dashboard-cache')
+    if (with_companions or with_dashboard) and platform == 'macOS' and sys.platform == 'darwin':
+        # Seal the parent after all payloads are embedded. Nested native app
+        # signatures and their catalog digests remain unchanged.
+        subprocess.run(['/usr/bin/codesign', '--force', '--sign', '-', '--timestamp=none', str(stage / 'MATREX VR.app')], check=True)
     shutil.copy2(quickstart, stage / 'START-HERE.txt')
     for relative in ('Assets/ThirdParty/AstronomyEngine/LICENSE.txt', 'Assets/Resources/NightSky/source.txt'):
         source = project / relative
@@ -93,7 +108,8 @@ def package(build, output, version, platform, revision, project, quickstart):
     if report['result'] != 'Succeeded' or report['errors']:
         raise RuntimeError('Refusing to package an unsuccessful Unity build')
     manifest = dict(version=version, sourceRevision=revision, unityVersion='6000.3.16f1', platform=label,
-                    publicSystemTemplate=True, builderSha256=hashlib.sha256((ROOT / 'Assets/Editor/MatrexReleaseBuilder.cs').read_bytes()).hexdigest(), build=report)
+                    publicSystemTemplate=True, companionsBundled=with_companions, dashboardBundled=with_dashboard,
+                    dashboardPackages=dashboard_entries, builderSha256=hashlib.sha256((ROOT / 'Assets/Editor/MatrexReleaseBuilder.cs').read_bytes()).hexdigest(), build=report)
     (stage / 'release-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     archive = output / (name + '.zip')
     if platform == 'macOS' and sys.platform == 'darwin':
@@ -125,6 +141,8 @@ def main():
     parser.add_argument('--ref', default='HEAD')
     parser.add_argument('--version', required=True)
     parser.add_argument('--platform', choices=[*TARGETS, 'all'], default='all')
+    parser.add_argument('--without-companions', action='store_true', help='Advanced/source-only build: omit pinned native tracker packages')
+    parser.add_argument('--without-dashboard', action='store_true', help='Advanced/source-only build: omit the pinned offline dashboard package')
     parser.add_argument('--unity', type=Path)
     parser.add_argument('--workspace', type=Path)
     parser.add_argument('--quickstart', type=Path, default=ROOT / 'docs/release-quickstart.txt')
@@ -147,7 +165,8 @@ def main():
         subprocess.run([str(editor), '-batchmode', '-nographics', '-quit', '-projectPath', str(project), '-buildTarget', switch,
                         '-executeMethod', 'MatrexReleaseBuilder.Build', '-releaseVersion', args.version, '-releaseTarget', target,
                         '-releaseOutput', str(build / executable), '-logFile', str(log)], check=True)
-        package(build, workspace, args.version, platform, revision, project, args.quickstart)
+        package(build, workspace, args.version, platform, revision, project, args.quickstart,
+                with_companions=not args.without_companions, with_dashboard=not args.without_dashboard)
 
 if __name__ == '__main__':
     main()

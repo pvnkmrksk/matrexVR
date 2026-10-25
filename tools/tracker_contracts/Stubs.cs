@@ -4,6 +4,7 @@ public sealed class ManualControlConfig { }
 public static class RuntimePaths { public static string ConfigRoot=System.IO.Path.GetTempPath(); }
 namespace UnityEngine
 {
+    public static class Application { public static string persistentDataPath=System.IO.Path.GetTempPath();public static string dataPath=System.IO.Path.GetTempPath(); }
     public class MonoBehaviour { protected static void DontDestroyOnLoad(object value){} }
     public class GameObject { public GameObject(string name){} public T AddComponent<T>() where T:new()=>new T(); }
     public static class Debug { public static void LogWarning(string value) => Console.Error.WriteLine(value); }

@@ -49,3 +49,11 @@ Versions **0.1/0.2** contain the older rig-trajectory viewer, with inspector fie
 0.3 Swarm position logs append `RotationX`, `RotationY`, `RotationZ` after the existing `experimentPhase` column. The old nine-column prefix remains, and old recordings remain readable, but headings that were not recorded cannot be recovered as measurements. [Data formats](data-formats.md) documents the schemas and clocks.
 
 The [lifecycle/replay report](lifecycle-replay-validation-results.json) records actual ReplayScene loading, archived sky/geometry/population, scrubbing and overview tests. See [release verification](releases.md#software-verification) for the tested scope.
+
+## Current source recording/replay verification
+
+The [round-trip validation](replay-roundtrip-validation.md) records two actual scenes and reopens the resulting folder in ReplayScene. It compares the saved frame poses and rendered animal-camera images before/after a dynamic color swap, then seeks backward across the swap and scene boundary. The measured mean RGB error is at most 0.0158% in the six tested 256 px views. Inputs are explicitly synthetic, sent through a real native-format PUB; this does not claim physical camera or LED validation.
+
+Current source starts replay at the first experiment row instead of leaving the playhead in a long initial ControlScene wait. Saved camera projection/panel aspect is preserved where available, with letterboxing rather than stretching; God's-eye markers and paths are excluded from the animal camera. Replay preview lights are suspended while the imported scene supplies its original lighting.
+
+Logged dynamic swap and adaptive black/gray onset decisions are restored without rerunning random choices. Legacy timestamp/scene-prefixed configuration copies are resolved by suffix only when their saved content is unambiguous. Missing or conflicting evidence remains an explicit fidelity warning. New Band records preserve actual visible/hidden state; older phase-only records cannot prove exact blinking.

@@ -94,7 +94,7 @@ public static class ConfigurationStudioValidation
                 InputSystem.settings.backgroundBehavior=InputSettings.BackgroundBehavior.IgnoreFocus;
                 var root=ui.Document.rootVisualElement;
                 Check(root.Query<VisualElement>(className:"subject-card").ToList().Count==4,"Landing screen displays all four configured VR subjects");
-                Check(root.Query<DropdownField>().ToList().All(d=>d.value=="Unspecified") && root.Q<TextField>("subject-age-VR1").value=="","New subject sex and age default to unspecified");
+                Check(root.Query<DropdownField>().ToList().Where(d=>d.name!=null&&d.name.StartsWith("subject-sex-")).All(d=>d.value=="Unspecified") && root.Q<TextField>("subject-age-VR1").value=="","New subject sex and age default to unspecified");
                 string beforeHome=ui.Workspace.Sequence.Root.ToString(Formatting.None); Call(ui,"BuildContent");
                 Check(ui.Workspace.Sequence.Root.ToString(Formatting.None)==beforeHome,"Displaying session overview leaves sequence JSON untouched");
                 root.Q<TextField>("session-experiment-name").value="Flight response / pilot";

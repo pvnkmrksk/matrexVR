@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "selection": "Latest stable release at explicit lock refresh; runtime never updates/downloads itself",
+  "trackers": {
+    "rekkefly": {
+      "repository": "https://github.com/pvnkmrksk/rekkefly",
+      "releaseTag": "v0.6.1",
+      "releaseUrl": "https://github.com/pvnkmrksk/rekkefly/releases/tag/v0.6.1",
+      "platforms": {
+        "macos-arm64": {
+          "asset": "Rekkefly-0.6.0-macos-arm64.zip",
+          "url": "https://github.com/pvnkmrksk/rekkefly/releases/download/v0.6.1/Rekkefly-0.6.0-macos-arm64.zip",
+          "sha256": "f7a7248582cb03977f47003712a4ea30deea42cfdb040ca02041dbe9a8c74ae6",
+          "sizeBytes": 27497670
+        },
+        "macos-x64": {
+          "asset": "Rekkefly-0.6.0-macos-x64.zip",
+          "url": "https://github.com/pvnkmrksk/rekkefly/releases/download/v0.6.1/Rekkefly-0.6.0-macos-x64.zip",
+          "sha256": "850ad4ffdcdcc2a83380fd972ef3cdb5c1b527c9c6535652ab1f40f7057f3c04",
+          "sizeBytes": 28019246
+        },
+        "windows-x64": {
+          "asset": "Rekkefly-0.6.0-windows-x64.zip",
+          "url": "https://github.com/pvnkmrksk/rekkefly/releases/download/v0.6.1/Rekkefly-0.6.0-windows-x64.zip",
+          "sha256": "a9eaf5bc63dfbe015067e12c49ba4cba3cf2ce3ebb911a52cd3bc613b6b68a25",
+          "sizeBytes": 13674190
+        },
+        "linux-x64": {
+          "asset": "Rekkefly-0.6.0-linux-x64.zip",
+          "url": "https://github.com/pvnkmrksk/rekkefly/releases/download/v0.6.1/Rekkefly-0.6.0-linux-x64.zip",
+          "sha256": "bd6dfdfdec7db601ea2baf8023c85321c437c3664603e60659ba89e2935cc040",
+          "sizeBytes": 14762680
+        }
+      }
+    },
+    "hejjetrac": {
+      "repository": "https://github.com/pvnkmrksk/hejjetrak",
+      "releaseTag": "v0.1.4",
+      "releaseUrl": "https://github.com/pvnkmrksk/hejjetrak/releases/tag/v0.1.4",
+      "platforms": {
+        "macos-arm64": {
+          "asset": "hejjetrac-macos-arm64.zip",
+          "url": "https://github.com/pvnkmrksk/hejjetrak/releases/download/v0.1.4/hejjetrac-macos-arm64.zip",
+          "sha256": "ea22e1f7d4081475d7b6349518423dccdda14117fc55bea89a755f61b43b6692",
+          "sizeBytes": 21963615
+        },
+        "macos-x64": {
+          "asset": "hejjetrac-macos-x86_64.zip",
+          "url": "https://github.com/pvnkmrksk/hejjetrak/releases/download/v0.1.4/hejjetrac-macos-x86_64.zip",
+          "sha256": "1a63a88cb0e2e9962bbc136e1bd1743da1e2e36a04fc0abbdff03e6081be66d2",
+          "sizeBytes": 22812679
+        },
+        "windows-x64": {
+          "asset": "hejjetrac-windows-amd64.zip",
+          "url": "https://github.com/pvnkmrksk/hejjetrak/releases/download/v0.1.4/hejjetrac-windows-amd64.zip",
+          "sha256": "36078bcd19d9bcc4619e43dd9148987715f7acb0f310754c5d293722f7fe574a",
+          "sizeBytes": 32500293
+        },
+        "linux-x64": {
+          "asset": "hejjetrac-linux-x86_64.tar.gz",
+          "url": "https://github.com/pvnkmrksk/hejjetrak/releases/download/v0.1.4/hejjetrac-linux-x86_64.tar.gz",
+          "sha256": "98658a477920926f781d4f1704426515b50ac397681cc07fad3a6819bab6afaf",
+          "sizeBytes": 23280186
+        }
+      }
+    }
+  }
+}

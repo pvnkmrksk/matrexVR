@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Globalization;
 using System.IO.Compression;
 using System.Text;
 
@@ -19,6 +20,7 @@ using System.Text;
 /// 2. Call AddColumns() in Start() to define your custom columns
 /// 3. Override CollectAdditionalData() to populate your custom data
 /// </summary>
+[DefaultExecutionOrder(1200)]
 public class DataLogger : MonoBehaviour
 {
     // Path to the directory where the log file will be saved
@@ -189,7 +191,7 @@ public class DataLogger : MonoBehaviour
             AddColumns("autoTrimEnabled", "autoTrimState", "flightDetected", "flightVarianceRadiansSquared", "autoTrimMedianDegPerSecond", "autoTrimPasses");
             AddColumns("flightCheckEnabled", "flightThresholdRadiansSquared", "flightSamples");
             AddColumns("yawDCOffsetDegrees", "yawDCCompensationDegPerSecond", "autoTrimMeanDegPerSecond", "autoTrimUncertaintyDegPerSecond", "autoTrimMeasurementSeconds");
-            AddColumns("experimentPhase");
+            AddColumns("experimentPhase", "unityFrame");
 
             // Enable logging
             isLogging = true;
@@ -250,9 +252,9 @@ public class DataLogger : MonoBehaviour
 
     protected virtual string BuildHeader()
     {
-        string header = string.Join(",", baseColumns);
-        if (includeZmqData) header += "," + string.Join(",", zmqColumns);
-        if (additionalHeaders.Count > 0) header += "," + string.Join(",", additionalHeaders);
+        string header = RecordedCsv.Join(baseColumns);
+        if (includeZmqData) header += "," + RecordedCsv.Join(zmqColumns);
+        if (additionalHeaders.Count > 0) header += "," + RecordedCsv.Join(additionalHeaders);
         return header;
     }
 
@@ -261,13 +263,13 @@ public class DataLogger : MonoBehaviour
     /// </summary>
     public void UpdateLogger()
     {
-        Update();
+        LateUpdate();
     }
 
     /// <summary>
-    /// Called every frame to log the current data.
+    /// Capture after movement Update callbacks so recorded poses describe the rendered frame.
     /// </summary>
-    protected virtual void Update()
+    protected virtual void LateUpdate()
     {
         if (!isLogging || logFile == null)
         {
@@ -295,6 +297,7 @@ public class DataLogger : MonoBehaviour
         SetData("loopIndex", loopIndex);
         SetData("cumulativeStep", cumulativeStep);
         // Build base data
+        SetData("unityFrame", Time.frameCount);
         SetData("skyboxId", NightSkyController.CurrentId);
         ClosedLoop tracking = GetComponent<ClosedLoop>();
         if (tracking != null)
@@ -331,7 +334,7 @@ public class DataLogger : MonoBehaviour
             }
         }
         SetData("skyboxSampleUtc", NightSkyController.CurrentSampleUtc);
-        string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
         string vr = this.gameObject.name;
         string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
         Vector3 position = this.transform.position;
@@ -359,8 +362,12 @@ public class DataLogger : MonoBehaviour
         }
 
         // Create base line
-        line = $"\n{currentTime},{vr},{scene},{currentSequenceScene},{configFileName},{currentTrial},{currentStep},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z}";
-        rowBuilder.Clear(); rowBuilder.Append(line);
+        rowBuilder.Clear(); rowBuilder.Append('\n');
+        RecordedCsv.Append(rowBuilder, currentTime);
+        AppendCsv(vr); AppendCsv(scene); AppendCsv(currentSequenceScene); AppendCsv(configFileName);
+        AppendCsv(currentTrial); AppendCsv(currentStep);
+        AppendCsv(position.x); AppendCsv(position.y); AppendCsv(position.z);
+        AppendCsv(rotation.x); AppendCsv(rotation.y); AppendCsv(rotation.z);
 
         // Add ZMQ data
         if (includeZmqData && zmq != null)
@@ -384,8 +391,13 @@ public class DataLogger : MonoBehaviour
                 sensPos = sample.position;
                 sensRot = sample.rotation.eulerAngles;
             }
-            rowBuilder.Append(',').Append(sensPos.x).Append(',').Append(sensPos.y).Append(',').Append(sensPos.z)
-                .Append(',').Append(sensRot.x).Append(',').Append(sensRot.y).Append(',').Append(sensRot.z);
+            AppendCsv(sensPos.x); AppendCsv(sensPos.y); AppendCsv(sensPos.z);
+            AppendCsv(sensRot.x); AppendCsv(sensRot.y); AppendCsv(sensRot.z);
+        }
+        else if (includeZmqData)
+        {
+            // Keep the declared sensor columns aligned even on a logger without a receiver.
+            rowBuilder.Append(",,,,,,");
         }
 
         // Allow subclasses to add additional data
@@ -411,10 +423,16 @@ public class DataLogger : MonoBehaviour
             rowBuilder.Append(',');
             if (additionalData.TryGetValue(header, out object value))
             {
-                rowBuilder.Append(value);
+                RecordedCsv.Append(rowBuilder, value);
             }
         }
         line = rowBuilder.ToString();
+    }
+
+    private void AppendCsv(object value)
+    {
+        rowBuilder.Append(',');
+        RecordedCsv.Append(rowBuilder, value);
     }
 
     /// <summary>

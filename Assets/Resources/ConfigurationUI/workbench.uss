@@ -255,3 +255,119 @@ Button.mini { height: 29px; padding: 3px 6px; font-size: 11px; }
 .narrow-layout .subject-card { flex-basis: 45%; }
 .narrow-layout .badge { display: none; }
 .narrow-layout .page-location { margin-left: 12px; }
+
+/* Desktop experience: readable logical pixels, native-resolution backing, task-first hierarchy. */
+.workbench { background-color: rgb(18, 23, 29); color: rgb(232, 239, 246); font-size: 14px; letter-spacing: 0; }
+.header { height: 72px; padding-left: 24px; padding-right: 28px; background-color: rgb(22, 28, 35); }
+.brand { font-size: 20px; letter-spacing: .5px; }
+.brand-detail { font-size: 10px; letter-spacing: .6px; color: rgb(143, 158, 172); }
+.page-location { font-size: 13px; margin-left: 26px; }
+.sidebar { width: 228px; padding: 22px 14px; background-color: rgb(20, 26, 33); }
+.sidebar .unity-scroll-view__content-container { min-height: 100%; }
+.sidebar .studio-button { min-height: 44px; padding: 10px 12px; margin-top: 2px; margin-bottom: 2px; }
+.sidebar .studio-button Label { font-size: 13px; }
+.sidebar .nav-heading { font-size: 10px; letter-spacing: .6px; margin: 18px 12px 10px; color: rgb(139, 155, 170); }
+.nav-spacer { flex-grow: 1; min-height: 24px; }
+.nav-foldout { margin: 18px 0 0; }
+.nav-foldout > .unity-foldout__toggle { color: rgb(151, 168, 184); min-height: 32px; padding-left: 9px; font-size: 11px; }
+.nav-foldout > .unity-foldout__content { margin-left: 0; }
+.body { padding: 30px 32px 22px; }
+.title { font-size: 29px; letter-spacing: -.3px; margin-bottom: 8px; }
+.studio-subtitle { font-size: 13px; color: rgb(158, 176, 193); margin-bottom: 24px; }
+.studio-icon { width: 20px; height: 20px; min-width: 20px; min-height: 20px; align-self: center; margin-top: 0; margin-bottom: 0; }
+.studio-button { min-height: 38px; }
+.studio-button > Label { padding: 0; margin: 0; -unity-text-align: middle-left; }
+Button { font-size: 13px; height: 38px; padding: 8px 12px; border-radius: 6px; }
+Button.primary { background-color: rgb(158, 213, 198); border-color: rgb(158, 213, 198); color: rgb(18, 46, 43); }
+Button.primary:hover { background-color: rgb(184, 231, 218); border-color: rgb(184, 231, 218); }
+Button.primary .studio-icon { color: rgb(24, 67, 58); }
+Button.icon-button { width: 34px; height: 34px; min-height: 34px; padding: 7px; }
+Button.text-link { background-color: rgba(0,0,0,0); border-width: 0; color: rgb(170, 205, 228); padding: 4px 0; margin: 0 18px 0 0; height: 30px; min-height: 30px; font-size: 11px; }
+.text-link .studio-icon { width: 15px; height: 15px; min-width: 15px; min-height: 15px; margin-right: 7px; }
+.footer { height: 76px; padding: 14px 28px; }
+.footer .status { font-size: 12px; color: rgb(165, 183, 199); }
+.footer .primary { min-width: 188px; height: 44px; font-size: 14px; }
+.footer > Button { height: 40px; }
+.start-welcome { margin-bottom: 26px; }
+.eyebrow { font-size: 10px; letter-spacing: 1.2px; color: rgb(143, 195, 181); margin-bottom: 8px; }
+.start-title { font-size: 35px; -unity-font-style: bold; letter-spacing: -.7px; margin-bottom: 9px; }
+.start-subtitle { font-size: 14px; white-space: normal; color: rgb(163, 181, 197); }
+.launch-workspace { align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; }
+.launch-choices { flex-grow: 1; flex-basis: 440px; min-width: 320px; margin-right: 30px; margin-bottom: 10px; }
+.world-choices { flex-grow: 1.3; flex-basis: 520px; min-width: 320px; }
+.session-section-heading { min-height: 34px; margin: 0 0 12px; flex-wrap: wrap; }
+.session-section-title { font-size: 15px; letter-spacing: -.1px; }
+.session-hint { font-size: 12px; color: rgb(156, 174, 191); }
+.movement-choices { align-items: stretch; margin: 0 0 14px; }
+Button.movement-card { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; height: 98px; align-items: center; justify-content: flex-start; padding: 16px 12px; margin: 0 10px 0 0; background-color: rgb(27, 36, 45); border-color: rgb(59, 76, 91); }
+.movement-card > .studio-icon { width: 24px; height: 24px; min-width: 24px; min-height: 24px; margin-right: 12px; }
+.movement-title { font-size: 17px; -unity-font-style: bold; margin-bottom: 6px; color: rgb(230, 240, 247); }
+.movement-detail { font-size: 11px; white-space: normal; color: rgb(160, 180, 198); }
+Button.movement-card.is-selected { background-color: rgb(29, 53, 53); border-color: rgb(117, 190, 171); border-width: 2px; padding: 15px 11px; }
+.movement-card.is-selected .studio-icon { color: rgb(159, 215, 195); }
+.tracking-choice { margin-bottom: 7px; }
+.tracking-choice > DropdownField { flex-grow: 1; flex-direction: column; margin: 0 10px 0 0; }
+.tracking-choice .unity-base-field__label { font-size: 11px; margin-bottom: 5px; color: rgb(161, 181, 198); }
+.tracking-choice .unity-base-field__input { min-height: 36px; }
+.tracking-explanation { font-size: 11px; white-space: normal; color: rgb(155, 175, 192); margin: 3px 8px 3px 0; min-height: 30px; }
+.tracker-links { flex-wrap: wrap; }
+.world-previews { align-items: stretch; }
+Button.world-card { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; height: auto; min-height: 206px; flex-direction: column; align-items: stretch; padding: 0; margin: 0 12px 0 0; overflow: hidden; background-color: rgb(28, 37, 46); border-color: rgb(58, 75, 90); border-radius: 8px; }
+Button.world-card.is-selected { border-color: rgb(117, 190, 171); border-width: 2px; }
+.world-image { width: 100%; height: 112px; flex-shrink: 0; }
+.world-caption { min-height: 24px; margin: 12px 12px 6px; }
+.world-caption .studio-icon { width: 17px; height: 17px; min-width: 17px; min-height: 17px; margin-right: 8px; }
+.world-title { font-size: 14px; -unity-font-style: bold; color: rgb(227, 239, 247); }
+.world-detail { font-size: 11px; white-space: normal; color: rgb(159, 180, 197); margin: 0 12px 14px; }
+.session-plan { margin-bottom: 20px; }
+.session-plan-holder { height: 64px; padding-bottom: 7px; }
+.session-plan-row { height: 57px; padding: 8px 14px; background-color: rgb(27, 36, 46); border-width: 1px; border-color: rgb(45, 61, 76); border-radius: 6px; }
+.session-plan-title { font-size: 13px; }
+.session-plan-description { font-size: 11px; margin-top: 4px; }
+.recording-details { border-top-width: 1px; border-top-color: rgb(49, 65, 78); padding-top: 10px; margin-top: 2px; margin-bottom: 8px; }
+.recording-details > .unity-foldout__toggle { min-height: 44px; font-size: 13px; color: rgb(172, 192, 207); }
+.recording-details > .unity-foldout__content { margin-left: 0; padding-top: 14px; }
+.apparatus-summary { min-height: 36px; border-top-width: 1px; border-top-color: rgb(40, 54, 67); padding-top: 12px; margin-top: 6px; flex-wrap: wrap; }
+.apparatus-summary .session-hint { font-size: 11px; margin-right: 20px; }
+.session-details { height: auto; min-height: 100px; padding: 14px; }
+.session-field > .unity-base-field__label, .subject-traits > .unity-base-field > .unity-base-field__label { font-size: 12px; height: auto; min-height: 18px; margin-bottom: 7px; }
+.session-field .unity-text-field__input, .subject-traits .unity-base-popup-field__input { min-height: 36px; padding: 7px 9px; font-size: 13px; }
+.subject-card { min-width: 250px; padding: 16px; }
+.subject-card > .session-field { height: 66px; }
+.subject-traits { height: 66px; }
+.subject-traits > .unity-base-field { height: 66px; min-height: 66px; }
+.subject-card > .session-comments { height: 82px; }
+.unity-base-field__input { min-height: 32px; font-size: 13px; padding: 6px 8px; }
+.setting-title { font-size: 13px; }
+.studio-setting { min-height: 54px; padding: 11px 13px; border-radius: 6px; }
+.section-heading > Label { font-size: 14px; }
+.studio-dialog { background-color: rgb(22, 31, 41); border-radius: 10px; padding: 28px; }
+.studio-dialog > Label { font-size: 13px; }
+.hover-help Label { font-size: 13px; }
+.compact-layout .body { padding: 26px 24px 18px; }
+.narrow-layout .body { padding: 24px 20px 16px; }
+.narrow-layout .launch-choices { flex-basis: 100%; margin-right: 0; }
+.narrow-layout .world-choices { flex-basis: 100%; }
+.narrow-layout .start-title { font-size: 30px; }
+
+.quick-tracker-status { flex-wrap: wrap; min-height: 34px; margin-top: 4px; }
+.tracker-app-state { font-size: 10px; color: rgb(149, 174, 190); margin-right: 12px; white-space: normal; flex-grow: 1; flex-basis: 100%; }
+.desktop-preview-hud { position: absolute; left: 0; right: 0; top: 0; bottom: 0; color: rgb(232, 240, 245); font-size: 12px; }
+.desktop-run-bar { position: absolute; left: 20px; top: 18px; flex-direction: row; align-items: center; padding: 9px 12px; border-width: 1px; border-color: rgba(139, 181, 173, .45); border-radius: 9px; background-color: rgba(14, 23, 29, .90); }
+.desktop-input-badge { font-size: 10px; -unity-font-style: bold; letter-spacing: .5px; color: rgb(169, 221, 198); margin-right: 14px; }
+.desktop-input-status { font-size: 11px; color: rgb(173, 204, 192); margin-right: 18px; }
+.desktop-input-status.input-stale { color: rgb(230, 197, 137); }
+Button.desktop-run-button { height: 31px; min-height: 31px; font-size: 11px; margin: 0 3px; padding: 5px 9px; background-color: rgb(38, 51, 62); border-color: rgb(67, 88, 104); }
+Button.desktop-back-button { background-color: rgb(175, 218, 201); color: rgb(19, 48, 40); border-color: rgb(175, 218, 201); margin-left: 10px; }
+.desktop-control-help { position: absolute; left: 20px; top: 84px; padding: 15px 18px; background-color: rgba(14, 23, 29, .94); border-radius: 8px; }
+.desktop-control-help > Label { font-size: 12px; color: rgb(206, 224, 235); margin-bottom: 8px; white-space: normal; }
+
+.movement-card .movement-detail, Button.world-card .world-detail { white-space: normal; }
+.movement-card > VisualElement { min-width: 0; flex-basis: 0; }
+.desktop-presentation { margin-bottom: 25px; padding-bottom: 18px; border-bottom-width: 1px; border-bottom-color: rgb(51, 67, 81); }
+.desktop-presentation .unity-base-field { max-width: 480px; margin-left: 0; }
+.viewer-launch-state { font-size: 11px; color: rgb(180, 199, 213); white-space: normal; margin-top: 5px; }
+.session-field { min-height: 74px; }
+.subject-card > .session-field { height: 74px; }
+.subject-traits, .subject-traits > .unity-base-field { height: 74px; min-height: 74px; }
+.subject-card > .session-comments { height: 90px; }

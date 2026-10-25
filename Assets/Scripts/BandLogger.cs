@@ -1,8 +1,11 @@
 using System;
+using System.Globalization;
+using System.Text;
 using System.IO;
 using System.IO.Compression;
 using UnityEngine;
 
+[DefaultExecutionOrder(1200)]
 public class BandLogger : MonoBehaviour
 {
     public LayerMask targetLayerMask; // Renamed from locustLayerMask
@@ -55,25 +58,12 @@ public class BandLogger : MonoBehaviour
         );
 
         // Write header
-        logFile.WriteLine(
-            "Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase,experimentPhase," +
-            $"SpawnLengthX:{bandSpawner.spawnLengthX}," +
-            $"SpawnLengthZ:{bandSpawner.spawnLengthZ}," +
-            $"GridType:{bandSpawner.gridType}," +
-            $"Mu:{bandSpawner.mu}," +
-            $"Kappa:{bandSpawner.kappa}," +
-            $"Speed:{bandSpawner.speed}," +
-            $"VisibleOffDuration:{bandSpawner.visibleOffDuration}," +
-            $"VisibleOnDuration:{bandSpawner.visibleOnDuration}," +
-            $"BoundaryLengthX:{bandSpawner.boundaryLengthX}," +
-            $"BoundaryLengthZ:{bandSpawner.boundaryLengthZ}," +
-            $"RotationAngle:{bandSpawner.rotationAngle}"
-        );
+        logFile.WriteLine(FormattableString.Invariant($"Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase,experimentPhase,Visible,UnityFrame,SpawnLengthX:{bandSpawner.spawnLengthX},SpawnLengthZ:{bandSpawner.spawnLengthZ},GridType:{bandSpawner.gridType},Mu:{bandSpawner.mu},Kappa:{bandSpawner.kappa},Speed:{bandSpawner.speed},VisibleOffDuration:{bandSpawner.visibleOffDuration},VisibleOnDuration:{bandSpawner.visibleOnDuration},BoundaryLengthX:{bandSpawner.boundaryLengthX},BoundaryLengthZ:{bandSpawner.boundaryLengthZ},RotationAngle:{bandSpawner.rotationAngle},VisibilityPhaseClock:local-timer"));
 
         LogAllInstances();
     }
 
-    void Update()
+    void LateUpdate()
     {
         LogAllInstances();
     }
@@ -81,7 +71,7 @@ public class BandLogger : MonoBehaviour
     void LogAllInstances()
     {
         if (bandSpawner == null || logFile == null) return;
-        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffffff",CultureInfo.InvariantCulture);
         // Unlocked agents are spawned without a parent, so transform children omit them.
         foreach (GameObject instance in bandSpawner.Instances)
         {
@@ -104,8 +94,10 @@ public class BandLogger : MonoBehaviour
         VisibilityScript visibility = instance.GetComponent<VisibilityScript>();
         float visibilityPhase = visibility ? visibility.GetCurrentPhase() : 0f;
 
-        string data = FormattableString.Invariant($"{timestamp},{instance.name},{RuntimeRigRegistry.LayerLabel(instance.layer)},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z},{speed},{visibilityPhase},{MainController.RecordedExperimentPhase}");
-        logFile.WriteLine(data);
+        var data=new StringBuilder(192);
+        object[] values={timestamp,instance.name,RuntimeRigRegistry.LayerLabel(instance.layer),position.x,position.y,position.z,rotation.x,rotation.y,rotation.z,speed,visibilityPhase,MainController.RecordedExperimentPhase,visibility==null||visibility.IsVisible,Time.frameCount};
+        for(int i=0;i<values.Length;i++){if(i>0)data.Append(',');RecordedCsv.Append(data,values[i]);}
+        logFile.WriteLine(data.ToString());
     }
 
     string GetLayerNames(LayerMask layerMask)

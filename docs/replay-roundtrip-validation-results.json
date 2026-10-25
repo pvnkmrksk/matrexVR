@@ -1,0 +1,75 @@
+{
+  "passed": true,
+  "checks": 992,
+  "failure": null,
+  "errors": [],
+  "comparisons": [
+    {
+      "seek": 0,
+      "scene": "Choice",
+      "unityFrame": 39,
+      "colorsSwapped": false,
+      "pixelMeanAbsoluteError": 0.00010421852660334967
+    },
+    {
+      "seek": 1,
+      "scene": "Choice",
+      "unityFrame": 279,
+      "colorsSwapped": false,
+      "pixelMeanAbsoluteError": 0.00015807307623570262
+    },
+    {
+      "seek": 2,
+      "scene": "Choice_desync",
+      "unityFrame": 518,
+      "colorsSwapped": false,
+      "pixelMeanAbsoluteError": 0.0
+    },
+    {
+      "seek": 3,
+      "scene": "Choice_desync",
+      "unityFrame": 758,
+      "colorsSwapped": true,
+      "pixelMeanAbsoluteError": 0.0
+    },
+    {
+      "seek": 4,
+      "scene": "Choice_desync",
+      "unityFrame": 518,
+      "colorsSwapped": false,
+      "pixelMeanAbsoluteError": 0.0
+    },
+    {
+      "seek": 5,
+      "scene": "Choice",
+      "unityFrame": 39,
+      "colorsSwapped": false,
+      "pixelMeanAbsoluteError": 0.00010421852660334967
+    }
+  ],
+  "unity": "6000.3.16f1",
+  "scope": "Actual MainController recording \u2192 actual ReplayScene, external synthetic native-format JSON PUB at120Hz. Tests saved-frame poses, shared timeline, static sky/scene lighting, dynamic explicit swaps and reverse seeks. No physical camera, LED display or full arbitrary-animation fidelity claim.",
+  "publisher": "Explicit synthetic native-format JSON PUB at120Hz (no camera claim)",
+  "recordingScenes": [
+    "Choice",
+    "Choice_desync"
+  ],
+  "sampledViews": 6,
+  "imageSize": [
+    256,
+    256
+  ],
+  "maximumPixelMeanAbsoluteError": 0.00015807307623570262,
+  "images": {
+    "Choice-2.png": "5f4a2cd28673ca65d2b3d74c9e29b5aecb4145584f58936980e56422ce10f925",
+    "Choice-1.png": "48a31bff8c892e7580e952f9abd7343bb771a9f7837c4e94a159cbd4eca6f39e",
+    "replay-2.png": "b66e20f35bee1cf8fd331d3410bb2318c4cbde18fb71446bc94346f4e370c2ac",
+    "replay-3.png": "e59162edd6e66edb46cd116e76bc59767a2acae281df3765a495d62bc098676f",
+    "replay-1.png": "c91416af35445138127d0791be3d3a6d34aea160803dc5b1f6d32dba821e0506",
+    "replay-0.png": "b152bbb1f65ba5b889c697c1750e777bb9e6b840e1fa3dbba39ea4c0ec7510b4",
+    "replay-4.png": "b66e20f35bee1cf8fd331d3410bb2318c4cbde18fb71446bc94346f4e370c2ac",
+    "replay-5.png": "b152bbb1f65ba5b889c697c1750e777bb9e6b840e1fa3dbba39ea4c0ec7510b4",
+    "Choice_desync-2.png": "e59162edd6e66edb46cd116e76bc59767a2acae281df3765a495d62bc098676f",
+    "Choice_desync-1.png": "b66e20f35bee1cf8fd331d3410bb2318c4cbde18fb71446bc94346f4e370c2ac"
+  }
+}

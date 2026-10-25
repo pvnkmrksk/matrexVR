@@ -11,6 +11,10 @@ namespace ConfigurationUI
     {
         private static readonly Regex Number = new Regex(@"\G-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?", RegexOptions.CultureInvariant);
         public static JToken Parse(string text) => new Parser(text).ReadDocument();
+        // JRaw preserves source numeric lexemes for editing, but JTokenReader cannot
+        // convert Raw directly to typed numeric fields. Cross the runtime boundary
+        // through JSON text without replacing or normalizing the editor document.
+        public static T ToRuntime<T>(JToken value) => JsonConvert.DeserializeObject<T>(value.ToString(Formatting.None));
         public static string Kind(JToken value)
         {
             if (value == null) return "missing";

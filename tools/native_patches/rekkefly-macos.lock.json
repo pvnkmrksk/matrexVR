@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/pvnkmrksk/rekkefly",
+  "sourceRevision": "f9a9ba71619b86becf0fb1ce1fc2cf5aa3d851bb",
+  "sourceUrl": "https://github.com/pvnkmrksk/rekkefly/commit/f9a9ba71619b86becf0fb1ce1fc2cf5aa3d851bb",
+  "sourceVersion": "0.6.2",
+  "patch": "tools/native_patches/rekkefly-macos.patch",
+  "patchSha256": "f99e4216da896bbe429aba97ba96943bdb12b0a191ca15a0e47b5a87bde5c658",
+  "platform": "macos-arm64",
+  "capabilities": [
+    "native_exact_camera_negotiation",
+    "no_camera_fallback",
+    "source_provenance"
+  ],
+  "purpose": "Local source correction only; not a new official release or a claim about unbuilt other platform binaries",
+  "changedFiles": [
+    "CHANGELOG.md",
+    "Cargo.lock",
+    "Cargo.toml",
+    "book/src/guide/cameras.md",
+    "book/src/guide/outputs.md",
+    "book/src/reference/cli-help.txt",
+    "src/camera.rs",
+    "src/engine.rs",
+    "src/main.rs",
+    "src/output.rs",
+    "src/zmq_output.rs",
+    "tests/sources.rs",
+    "tests/zmq.rs"
+  ]
+}

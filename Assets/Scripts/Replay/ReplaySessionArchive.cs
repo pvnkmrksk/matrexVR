@@ -18,6 +18,12 @@ public sealed class ReplaySessionArchive
         public Vector3 position, rotation;
         public string rig, recordedRigName, scene, configFile, stepName, phase, skyboxId;
         public int sequenceStep, stepIndex, trial,loopIndex,cumulativeStep;
+        public int unityFrame = -1;
+        public bool colorsSwapped;
+        public float? grayAtTrialStart;
+        public string blackSideAtTrialStart;
+        internal bool swapEvent;
+        public string StimulusKey => ContextKey + "|swap:" + colorsSwapped + "|gray:" + grayAtTrialStart?.ToString(CultureInfo.InvariantCulture) + "|black:" + blackSideAtTrialStart;
         public string ContextKey => scene + "|" + sequenceStep + "|" + trial + "|" + loopIndex + "|" + cumulativeStep + "|" + configFile + "|" + stepName + "|" + phase;
     }
 
@@ -26,6 +32,7 @@ public sealed class ReplaySessionArchive
     public List<string> Warnings { get; } = new List<string>();
     public long OriginTicks { get; private set; }
     public double Duration { get; private set; }
+    public double FirstExperimentTime { get; private set; }
     public JObject Sequence { get; private set; }
     public JObject SystemConfiguration { get; private set; }
     private readonly JObject manifest;
@@ -53,7 +60,7 @@ public sealed class ReplaySessionArchive
         {
             using (var reader = OpenCsv(file))
             {
-                string first = reader.ReadLine();
+                string first = ReadCsvRecord(reader);
                 if (first == null) continue;
                 var header = Csv(first.TrimStart('\ufeff'));
                 int time = Array.IndexOf(header, "Current Time"), rig = Array.IndexOf(header, "VR");
@@ -61,12 +68,14 @@ public sealed class ReplaySessionArchive
                 int[] pose = { Array.IndexOf(header,"GameObjectPosX"), Array.IndexOf(header,"GameObjectPosY"), Array.IndexOf(header,"GameObjectPosZ"),
                     Array.IndexOf(header,"GameObjectRotX"), Array.IndexOf(header,"GameObjectRotY"), Array.IndexOf(header,"GameObjectRotZ") };
                 if (pose.Any(i => i < 0)) { Warnings.Add("Missing pose columns: " + Path.GetFileName(file)); continue; }
-                int max = Math.Max(Math.Max(time, rig), pose.Max()), rejected = 0;
+                int max = Math.Max(Math.Max(time, rig), pose.Max()), rejected = 0, misaligned = 0;
                 string line;
-                while ((line = reader.ReadLine()) != null)
+                while ((line = ReadCsvRecord(reader)) != null)
                 {
                     if (string.IsNullOrWhiteSpace(line)) continue;
-                    string[] cells = Csv(line);
+                    string[] cells;
+                    try { cells = Csv(line); } catch (InvalidDataException) { rejected++; continue; }
+                    if (cells.Length != header.Length) { rejected++; misaligned++; continue; }
                     if (cells.Length <= max || string.IsNullOrWhiteSpace(cells[rig]) || !TryTimestamp(cells[time], out long ticks)) { rejected++; continue; }
                     float[] values = new float[6]; bool valid = true;
                     for (int i = 0; i < pose.Length; i++) valid &= TryNumber(cells[pose[i]], out values[i]);
@@ -75,21 +84,37 @@ public sealed class ReplaySessionArchive
                         position = new Vector3(values[0], values[1], values[2]), rotation = new Vector3(values[3], values[4], values[5]),
                         scene = Cell(header,cells,"Scene"), configFile = Cell(header,cells,"ConfigFile"), stepName = Cell(header,cells,"stepName"),
                         phase = Cell(header,cells,"experimentPhase"), skyboxId = Cell(header,cells,"skyboxId"),
+                        unityFrame = Integer(Cell(header,cells,"unityFrame"),-1),
+                        swapEvent = TryNumber(Cell(header,cells,"swapElapsedSec"), out _),
+                        grayAtTrialStart = TryNumber(Cell(header,cells,"grayAtTrialStart"), out float gray) ? gray : (float?)null,
+                        blackSideAtTrialStart = Cell(header,cells,"blackSideAtTrialStart"),
                         sequenceStep = Integer(Cell(header,cells,"CurrentStep"),-1), stepIndex = Integer(Cell(header,cells,"stepIndex"),-1),
                         trial = Integer(Cell(header,cells,"CurrentTrial"),0),loopIndex=Integer(Cell(header,cells,"loopIndex")),cumulativeStep=Integer(Cell(header,cells,"cumulativeStep")) };
                     if (!Rigs.TryGetValue(sample.rig, out var samples)) Rigs[sample.rig] = samples = new List<Sample>();
                     samples.Add(sample); OriginTicks = Math.Min(OriginTicks,ticks);
                 }
                 if (rejected > 0) Warnings.Add(Path.GetFileName(file) + ": skipped " + rejected + " malformed pose rows.");
+                if (misaligned > 0) Warnings.Add(Path.GetFileName(file) + ": " + misaligned + " rows have a different column count; legacy decimal-comma numbers or unquoted delimiters cannot be reconstructed safely.");
             }
         }
-        if (Rigs.Count == 0) throw new InvalidDataException("This folder contains no readable animal pose CSVs (Current Time, VR and six GameObject pose columns).");
-        foreach (var samples in Rigs.Values)
+        if (Rigs.Count == 0) throw new InvalidDataException("This folder contains no readable animal pose CSV rows (Current Time, VR and six GameObject pose columns). " + string.Join(" ",Warnings.Take(4)));
+        foreach (string id in Rigs.Keys.ToArray())
         {
-            samples.Sort((a,b) => a.timestampTicks.CompareTo(b.timestampTicks));
-            foreach (var sample in samples) sample.time = (sample.timestampTicks - OriginTicks) / (double)TimeSpan.TicksPerSecond;
+            // Stable sorting preserves explicit onset/swap rows written in the same timestamp tick.
+            var samples = Rigs[id].OrderBy(sample => sample.timestampTicks).ToList(); Rigs[id] = samples;
+            string context = null; bool swapped = false; float? gray = null; string black = "";
+            foreach (var sample in samples)
+            {
+                sample.time = (sample.timestampTicks - OriginTicks) / (double)TimeSpan.TicksPerSecond;
+                if (sample.ContextKey != context) { context = sample.ContextKey; swapped = false; gray = null; black = ""; }
+                if (sample.swapEvent) swapped = true;
+                if (sample.grayAtTrialStart.HasValue) gray = sample.grayAtTrialStart;
+                if (!string.IsNullOrEmpty(sample.blackSideAtTrialStart)) black = sample.blackSideAtTrialStart;
+                sample.colorsSwapped = swapped; sample.grayAtTrialStart = gray; sample.blackSideAtTrialStart = black;
+            }
             Duration = Math.Max(Duration,samples[samples.Count-1].time);
         }
+        FirstExperimentTime = Rigs.Values.SelectMany(samples => samples).Where(sample => sample.scene != "ControlScene" && sample.scene != "ReplayScene").Select(sample => sample.time).DefaultIfEmpty(0).Min();
         Warnings.Add("Historical rig clocks are local wall time. Clock changes, unlogged animation, and tracker validity cannot be recovered from these CSVs.");
     }
 
@@ -142,6 +167,16 @@ public sealed class ReplaySessionArchive
         {
             string path = SafePath(candidate);
             if (File.Exists(path)) return path;
+        }
+        // Pre-manifest loggers saved configs as <session>_<scene>_<original filename>.
+        // Accept only a unique saved content version; never consult the live Config directory.
+        string basename=Path.GetFileName(reference);
+        var legacy=Directory.GetFiles(DirectoryPath,"*.json").Where(path=>Path.GetFileName(path).EndsWith("_"+basename,StringComparison.Ordinal)).ToArray();
+        if(legacy.Length>0)
+        {
+            if(legacy.Select(path=>RunConfigArchive.Hash(File.ReadAllBytes(path))).Distinct().Count()>1)
+                throw new InvalidDataException("Multiple saved legacy versions of '"+reference+"' exist; exact version is ambiguous.");
+            return legacy.OrderBy(path=>path,StringComparer.Ordinal).First();
         }
         return null;
     }
@@ -207,11 +242,11 @@ public sealed class ReplaySessionArchive
                 {
                     using(var input=OpenCsv(file))
                     {
-                        string first=input.ReadLine();if(first==null)continue;
+                        string first=ReadCsvRecord(input);if(first==null)continue;
                         string[] header=Csv(first.TrimStart('\ufeff'));
                         if(!header.Contains("Current Time") || !header.Contains("VR") || !header.Contains("GameObjectPosX") || !header.Contains("GameObjectRotY"))continue;
                         string row;
-                        while((row=input.ReadLine())!=null)
+                        while((row=ReadCsvRecord(input))!=null)
                         {
                             if(string.IsNullOrWhiteSpace(row))continue;
                             string[] values=Csv(row);
@@ -249,7 +284,29 @@ public sealed class ReplaySessionArchive
         ticks = timestamp.Ticks; return ok;
     }
     public static bool TryNumber(string value,out float number) => float.TryParse(value,NumberStyles.Float,CultureInfo.InvariantCulture,out number) && !float.IsNaN(number) && !float.IsInfinity(number);
-    public static int Integer(string value,int fallback=0) => int.TryParse(value,NumberStyles.Integer,CultureInfo.InvariantCulture,out int parsed)?parsed:fallback;
+    public static int Integer(string value,int fallback=0)
+    {
+        if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed)) return parsed;
+        return double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double numeric) &&
+            numeric >= int.MinValue && numeric <= int.MaxValue && numeric == Math.Truncate(numeric) ? (int)numeric : fallback;
+    }
+    public static string ReadCsvRecord(StreamReader reader)
+    {
+        string line = reader.ReadLine();
+        if (line == null || line.IndexOf('"') < 0) return line;
+        var record = new StringBuilder(line); bool quoted = false;
+        while (true)
+        {
+            for (int i = 0; i < line.Length; i++)
+                if (line[i] == '"')
+                {
+                    if (quoted && i + 1 < line.Length && line[i + 1] == '"') i++;
+                    else quoted = !quoted;
+                }
+            if (!quoted || (line = reader.ReadLine()) == null) return record.ToString();
+            record.Append('\n').Append(line);
+        }
+    }
     public static string Cell(string[] header,string[] values,string key)
     { int index = Array.IndexOf(header,key); return index >= 0 && index < values.Length ? values[index] : ""; }
     public static string[] Csv(string row)

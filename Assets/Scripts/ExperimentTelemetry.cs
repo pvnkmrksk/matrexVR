@@ -265,7 +265,7 @@ public sealed class ExperimentTelemetry : MonoBehaviour
         var main = MainController.Instance;
         var step = main != null ? main.GetCurrentSequenceStep() : null;
         var scene = SceneManager.GetActiveScene();
-        return new { sessionId = MasterDataLogger.Instance?.timestamp, configFile = PublicReference(step, "configFile"),
+        return new { sessionId = MasterDataLogger.Instance?.timestamp, inputKind = main?.InputKind ?? "tracker", configFile = PublicReference(step, "configFile"),
             design = PublicReference(step, "design"), worldUnitsPerMetre = Terrain.activeTerrains.Any(t => t.gameObject.scene == scene) ? 1 : 100 };
     }
 
@@ -289,7 +289,7 @@ public sealed class ExperimentTelemetry : MonoBehaviour
             }
         return new { schemaVersion = 1, kind = "matrex.context", sequence = heartbeatSequence,
             timestampUtc = DateTime.UtcNow.ToString("O"), sessionId = MasterDataLogger.Instance?.timestamp,
-            experimentName = metadata?.ExperimentName,
+            experimentName = metadata?.ExperimentName, inputKind = main?.InputKind ?? "tracker",
             experiment = new { running = main != null && main.SequenceRunning, sceneName = scene.name,
                 sceneNumber = main != null && main.SequenceRunning ? main.currentStep + 1 : 0,
                 trialNumber = main != null ? main.currentTrial + 1 : 0,

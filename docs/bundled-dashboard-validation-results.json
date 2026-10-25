@@ -1,0 +1,61 @@
+{
+  "sourceRevision": "b0f36d231424af6ad19ce264376515fdaf2e78c6",
+  "validation": "Archive SHA-256 and extracted executable identity/path checks only; binaries were not executed",
+  "platforms": [
+    {
+      "schemaVersion": 1,
+      "repository": "https://github.com/pvnkmrksk/trajectory-dashboard",
+      "sourceRevision": "b0f36d231424af6ad19ce264376515fdaf2e78c6",
+      "sourceUrl": "https://github.com/pvnkmrksk/trajectory-dashboard/commit/b0f36d231424af6ad19ce264376515fdaf2e78c6",
+      "platform": "linux-x64",
+      "archiveUrl": "https://pvnkmrksk.github.io/trajectory-dashboard/DaariDeepa-linux-x64.zip",
+      "archiveSha256": "3e16e9ce81d2006c4b2693be86f919a1f1a4d82d18f7bba35346fb2bf79c48a1",
+      "checksumManifestUrl": "https://pvnkmrksk.github.io/trajectory-dashboard/SHA256SUMS.txt",
+      "checksumManifestSha256": "cf7aee2c760156ac6490073ec0d421f77086fef7e6d20da5b29130bf0fe69fc8",
+      "executable": "DaariDeepa/DaariDeepa",
+      "executableSha256": "2c7927513eaa2d212d0bee3a029bc55c6bd559406d285742797e43a4bc05d23a"
+    },
+    {
+      "schemaVersion": 1,
+      "repository": "https://github.com/pvnkmrksk/trajectory-dashboard",
+      "sourceRevision": "b0f36d231424af6ad19ce264376515fdaf2e78c6",
+      "sourceUrl": "https://github.com/pvnkmrksk/trajectory-dashboard/commit/b0f36d231424af6ad19ce264376515fdaf2e78c6",
+      "platform": "macos-arm64",
+      "archiveUrl": "https://pvnkmrksk.github.io/trajectory-dashboard/DaariDeepa-macos-arm64.zip",
+      "archiveSha256": "a8c6b436fb03b72f64ade157a3eed5759ec8ae42bb21cde8f651ab499c59c6b1",
+      "checksumManifestUrl": "https://pvnkmrksk.github.io/trajectory-dashboard/SHA256SUMS.txt",
+      "checksumManifestSha256": "cf7aee2c760156ac6490073ec0d421f77086fef7e6d20da5b29130bf0fe69fc8",
+      "executable": "DaariDeepa/DaariDeepa",
+      "executableSha256": "d97f2c20af87f9ecf9c145372019b76a3dd944ac86005ae2c9fc41a934f4890f"
+    },
+    {
+      "schemaVersion": 1,
+      "repository": "https://github.com/pvnkmrksk/trajectory-dashboard",
+      "sourceRevision": "b0f36d231424af6ad19ce264376515fdaf2e78c6",
+      "sourceUrl": "https://github.com/pvnkmrksk/trajectory-dashboard/commit/b0f36d231424af6ad19ce264376515fdaf2e78c6",
+      "platform": "macos-x64",
+      "archiveUrl": "https://pvnkmrksk.github.io/trajectory-dashboard/DaariDeepa-macos-x64.zip",
+      "archiveSha256": "1cd22a85e166f4a18020ba87a787abee62268f02e2cf77cc34bbd42808e99e42",
+      "checksumManifestUrl": "https://pvnkmrksk.github.io/trajectory-dashboard/SHA256SUMS.txt",
+      "checksumManifestSha256": "cf7aee2c760156ac6490073ec0d421f77086fef7e6d20da5b29130bf0fe69fc8",
+      "executable": "DaariDeepa/DaariDeepa",
+      "executableSha256": "f11397a4110a85d071c523fb8bd09a3f9416c54f26d0f8b0e662f7230df7bed7"
+    },
+    {
+      "schemaVersion": 1,
+      "repository": "https://github.com/pvnkmrksk/trajectory-dashboard",
+      "sourceRevision": "b0f36d231424af6ad19ce264376515fdaf2e78c6",
+      "sourceUrl": "https://github.com/pvnkmrksk/trajectory-dashboard/commit/b0f36d231424af6ad19ce264376515fdaf2e78c6",
+      "platform": "windows-x64",
+      "archiveUrl": "https://pvnkmrksk.github.io/trajectory-dashboard/DaariDeepa-windows-x64.zip",
+      "archiveSha256": "2c9e31993a508b7565641aeb9af45d8ced11e9fe09a323a53777952ef1953d4f",
+      "checksumManifestUrl": "https://pvnkmrksk.github.io/trajectory-dashboard/SHA256SUMS.txt",
+      "checksumManifestSha256": "cf7aee2c760156ac6490073ec0d421f77086fef7e6d20da5b29130bf0fe69fc8",
+      "executable": "DaariDeepa/DaariDeepa.exe",
+      "executableSha256": "8dbdb91bc8c95738931e01985caf28781ccc51ada6f5e666cf2ddd8c09469d73"
+    }
+  ],
+  "fixtureTestsPassed": 6,
+  "existingCompanionPackagingTestsPassed": 4,
+  "pinnedBuildPrepareTestsPassed": 1
+}

@@ -1,0 +1,40 @@
+{
+  "sourceRevision": "f9a9ba71619b86becf0fb1ce1fc2cf5aa3d851bb",
+  "patchSha256": "f99e4216da896bbe429aba97ba96943bdb12b0a191ca15a0e47b5a87bde5c658",
+  "buildType": "Local Apple Silicon source correction; not an official release",
+  "signedExecutableSha256": "19353afdaaea489f3108aacca937e15ae5ed869a3d43d27d0dfb177ff03191f3",
+  "nativeRegressionSuites": {
+    "matrex-native-camera-tests.log": {
+      "passed": 118,
+      "failed": 0,
+      "ignored": 17
+    },
+    "matrex-native-camera-no-default-tests.log": {
+      "passed": 112,
+      "failed": 0,
+      "ignored": 17
+    }
+  },
+  "strictClippy": [
+    "default all-targets passed",
+    "no-default all-targets passed"
+  ],
+  "runtimeContractsWithPatchedCatalogPassed": 103,
+  "runtimeContractsWithOldUnsafeCatalogPassed": 96,
+  "nativePackagingFixtureTestsPassed": 2,
+  "physicalCamera": {
+    "device": "FaceTime HD Camera",
+    "received": 30,
+    "firstFrame": 1117,
+    "lastFrame": 1146,
+    "timestampSpanSeconds": 0.970308,
+    "sourceKinds": [
+      "camera"
+    ],
+    "sourceFallbacks": [
+      false
+    ],
+    "scope": "Real-camera acquisition, pixel decoding, finite numerical output and ZMQ transport only; no physical animal calibration or biological accuracy validation"
+  },
+  "otherPlatformCameraCoverage": "Unverified; unchanged official flight packages cannot be launched as camera-only input by the bundled launcher"
+}

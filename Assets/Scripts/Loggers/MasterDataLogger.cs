@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.IO.Compression;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 // Manages all data loggers in the scene
 [DefaultExecutionOrder(-10000)]
@@ -55,7 +57,11 @@ public class MasterDataLogger : MonoBehaviour
         Application.logMessageReceivedThreaded += HandleLogMessage;
         ConfigArchive=new RunConfigArchive(directoryPath,RuntimePaths.ConfigRoot,timestamp,Application.unityVersion);
         var main=MainController.Instance!=null?MainController.Instance:FindFirstObjectByType<MainController>();
-        try {ConfigArchive.CaptureStartup(startingScene,main!=null?main.SystemConfigurationFileName:"system_config.json");}
+        try {
+            string systemReference=main!=null?main.SystemConfigurationFileName:"system_config.json";
+            ConfigArchive.CaptureStartup(startingScene,systemReference);
+            CaptureNativeCompanions(systemReference,startingScene);
+        }
         catch(Exception error) {Debug.LogError("Cannot initialize run config archive: "+error.Message);}
     }
     // d at the start of the scene
@@ -83,8 +89,37 @@ public class MasterDataLogger : MonoBehaviour
             Directory.CreateDirectory(directoryPath);
             ConfigArchive = new RunConfigArchive(directoryPath, RuntimePaths.ConfigRoot, timestamp, Application.unityVersion);
             ConfigArchive.CaptureStartup("ControlScene", systemReference, sequenceReference);
+            CaptureNativeCompanions(systemReference,"ControlScene");
             ConfigArchive.RequireComplete();
         }
+    }
+
+    private void CaptureNativeCompanions(string systemReference,string scene)
+    {
+        try
+        {
+            // Read the selected archived document: Main's runtime rigs are loaded
+            // after BeginConfiguredSession and may still describe the previous run.
+            var system=JObject.Parse(ConfigArchive.ReadText(systemReference,"system",scene));
+            var launches=new List<JObject>();
+            foreach(var rig in (system["configs"] as JArray??new JArray()).OfType<JObject>())
+            {
+                string id=(string)rig["vrId"];if(string.IsNullOrWhiteSpace(id))continue;
+                var evidence=TrackerProcessManager.RecordingProvenance(id);
+                string backend=TrackerBackend.TryParse(rig["closedLoopMode"]?.ToString()??"FicTrac",out var mode)?TrackerBackend.DisplayName(mode):"unknown";
+                int port=(int?)rig["zmqPort"]??9872;
+                string address=(string)rig["zmqAddress"]??"localhost";
+                bool local=address=="127.0.0.1"||address=="::1"||address=="[::1]"||string.Equals(address,"localhost",StringComparison.OrdinalIgnoreCase);
+                bool? requestedDemo=(bool?)system["desktopQuickStart"]?["demo"];
+                evidence["configuredBackend"]=backend;evidence["configuredPort"]=port;evidence["configuredAddress"]=address;
+                evidence["configuredDemoRequested"]=requestedDemo;
+                evidence["matchesConfiguredRig"]=local&&(string)evidence["backend"]==backend&&(int?)evidence["port"]==port&&
+                    (!requestedDemo.HasValue||(bool?)evidence["demoRequested"]==requestedDemo.Value);
+                launches.Add(evidence);
+            }
+            ConfigArchive.CaptureCompanions(launches,scene);
+        }
+        catch(Exception error) {Debug.LogWarning("Native tracker provenance is unavailable for this run: "+error.Message);}
     }
 
 

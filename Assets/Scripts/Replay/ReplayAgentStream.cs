@@ -10,6 +10,7 @@ public sealed class ReplayAgentStream : IDisposable
     public struct Pose
     {
         public int id;
+        public bool visible;
         public string name, layer;
         public Vector3 position, rotation;
     }
@@ -24,6 +25,7 @@ public sealed class ReplayAgentStream : IDisposable
     public string SourceFile { get; }
     public bool HasRotations { get; }
     public string Kind { get; }
+    public bool HasVisibility { get; }
     public long RowCount { get; private set; }
     public int FrameCount => frames.Count;
     public bool HasDuplicateNames { get; private set; }
@@ -33,6 +35,9 @@ public sealed class ReplayAgentStream : IDisposable
         SourceFile = source;
         HasRotations = Array.IndexOf(header,"RotationX") >= 0 && Array.IndexOf(header,"RotationY") >= 0 && Array.IndexOf(header,"RotationZ") >= 0;
         Kind = header.Contains("CloneIndex") ? "Kannadi" : header.Contains("VisibilityPhase") ? "Band" : "Swarm";
+        // Older VisibilityPhase used global Unity time, while actual rendering used
+        // a per-agent local timer. It cannot establish historical visibility exactly.
+        HasVisibility=header.Contains("Visible");
         Directory.CreateDirectory(cacheDirectory);
         cachePath = Path.Combine(cacheDirectory,Guid.NewGuid().ToString("N")+".frames");
         try
@@ -43,7 +48,7 @@ public sealed class ReplayAgentStream : IDisposable
                 var occurrences = new Dictionary<string,int>(StringComparer.Ordinal);
                 Frame frame = default; long frameTicks = long.MinValue; string row;
                 string xKey = Kind == "Kannadi" ? "PositionX" : "X", yKey = Kind == "Kannadi" ? "PositionY" : "Y", zKey = Kind == "Kannadi" ? "PositionZ" : "Z";
-                while ((row=input.ReadLine()) != null)
+                while ((row=ReplaySessionArchive.ReadCsvRecord(input)) != null)
                 {
                     if (string.IsNullOrWhiteSpace(row)) continue;
                     string[] values=ReplaySessionArchive.Csv(row);
@@ -72,6 +77,15 @@ public sealed class ReplayAgentStream : IDisposable
                             output.Write(angle);
                         }
                     }
+                    bool visible=true;
+                    if(HasVisibility)
+                    {
+                        string flag=Cell("Visible");
+                        if(bool.TryParse(flag,out bool boolean))visible=boolean;
+                        else if(flag=="1" || flag=="0")visible=flag=="1";
+                        else throw new InvalidDataException("Malformed recorded visibility in "+Path.GetFileName(source));
+                    }
+                    output.Write(visible);
                     frame.count++;RowCount++;
                 }
                 if(frame.count>0)frames.Add(frame);
@@ -86,7 +100,7 @@ public sealed class ReplayAgentStream : IDisposable
     {
         using(var input=ReplaySessionArchive.OpenCsv(source))
         {
-            string first=input.ReadLine();if(first==null)return null;
+            string first=ReplaySessionArchive.ReadCsvRecord(input);if(first==null)return null;
             string[] header=ReplaySessionArchive.Csv(first.TrimStart('\ufeff'));
             if(!header.Contains("Timestamp") || !(header.Contains("Name") || header.Contains("CloneName")))return null;
             return new ReplayAgentStream(source,cacheDirectory,originTicks,header,input);
@@ -111,7 +125,7 @@ public sealed class ReplayAgentStream : IDisposable
             int id=reader.ReadInt32();var identity=identities[id];
             var pose=new Pose {id=id,name=identity.name,layer=identity.layer,position=new Vector3(reader.ReadSingle(),reader.ReadSingle(),reader.ReadSingle())};
             if(HasRotations)pose.rotation=new Vector3(reader.ReadSingle(),reader.ReadSingle(),reader.ReadSingle());
-            current.Add(pose);
+            pose.visible=reader.ReadBoolean();current.Add(pose);
         }
         return current;
     }

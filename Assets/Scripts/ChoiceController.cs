@@ -113,6 +113,15 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             );
             cl.SetClosedLoopOrientation(config.closedLoopOrientation);
             cl.SetClosedLoopPosition(config.closedLoopPosition);
+            var system = MainController.Instance?.GetSystemConfigForGameObject(cl.gameObject);
+            if (system != null && TrackerBackend.IsWalking(system.closedLoopMode) &&
+                (config.walkingPositionGain.HasValue || config.walkingOrientationGain.HasValue))
+            {
+                cl.SetLocustGains(config.walkingPositionGain ?? cl.PositionGain, config.walkingOrientationGain ?? cl.OrientationGain);
+                cl.SetClosedLoopPosition(config.closedLoopPosition);
+                cl.SetClosedLoopOrientation(config.closedLoopOrientation);
+            }
+
             var migration = cl.GetComponent<MigrationMotion>();
             if (migration == null && (config.windSpeed > 0 || config.aglHeight > 0))
                 migration = cl.gameObject.AddComponent<MigrationMotion>();
@@ -300,6 +309,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
     private void ConfigureRegularObjectInstance(GameObject instance, SceneObject obj)
     {
+        if (obj.groundOnTerrain) instance.transform.position = DesktopQuickStart.GroundPosition(instance.transform.position);
         Debug.Log("Instance position: " + instance.transform.position);
 
         if (obj.speed != 0)
@@ -647,6 +657,8 @@ public class SceneConfig
     public Vector3 initialRotation;
 
     public bool randomInitialRotation;
+    public float? walkingPositionGain;
+    public float? walkingOrientationGain;
     public ColorConfig backgroundColor;
 
     public string skyboxPath;
@@ -662,6 +674,7 @@ public class SceneConfig
 [System.Serializable]
 public class SceneObject
 {
+    public bool groundOnTerrain = false;
     public bool useHeadingReference = false;
     public string type;
     public Position position;

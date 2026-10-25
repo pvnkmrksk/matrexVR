@@ -15,6 +15,9 @@ public static class MatrexReleaseBuilder
   BuildTarget target=(BuildTarget)Enum.Parse(typeof(BuildTarget),Arg("-releaseTarget","StandaloneOSX"));
   if(!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Standalone,target)) throw new Exception("Missing build module: "+target);
   PlayerSettings.productName="MATREX VR";PlayerSettings.bundleVersion=version;
+  PlayerSettings.fullScreenMode=FullScreenMode.FullScreenWindow;PlayerSettings.defaultIsNativeResolution=true;
+  PlayerSettings.macRetinaSupport=true;PlayerSettings.resizableWindow=true;PlayerSettings.allowFullscreenSwitch=false;
+  if(Array.IndexOf(args,"-localDesktopBuild")>=0) PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Standalone,"org.pvnkmrksk.matrexvr.local");
   PlayerSettings.SetScriptingBackend(UnityEditor.Build.NamedBuildTarget.Standalone,ScriptingImplementation.Mono2x);
   if(target==BuildTarget.StandaloneOSX)EditorUserBuildSettings.SetPlatformSettings("Standalone","OSXUniversal","Architecture","x64ARM64");
   string[] scenes=EditorBuildSettings.scenes.Where(s=>s.enabled).Select(s=>s.path).Distinct().ToArray();

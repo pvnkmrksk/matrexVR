@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/pvnkmrksk/trajectory-dashboard",
+  "sourceRevision": "b0f36d231424af6ad19ce264376515fdaf2e78c6",
+  "sourceUrl": "https://github.com/pvnkmrksk/trajectory-dashboard/commit/b0f36d231424af6ad19ce264376515fdaf2e78c6",
+  "selection": "Pinned official continuous build; download URLs may move, so changed bytes fail checksum verification until an explicit reviewed lock update",
+  "checksumManifestUrl": "https://pvnkmrksk.github.io/trajectory-dashboard/SHA256SUMS.txt",
+  "checksumManifestSha256": "cf7aee2c760156ac6490073ec0d421f77086fef7e6d20da5b29130bf0fe69fc8",
+  "checksumManifest": "2c9e31993a508b7565641aeb9af45d8ced11e9fe09a323a53777952ef1953d4f  DaariDeepa-windows-x64.zip\na8c6b436fb03b72f64ade157a3eed5759ec8ae42bb21cde8f651ab499c59c6b1  DaariDeepa-macos-arm64.zip\n1cd22a85e166f4a18020ba87a787abee62268f02e2cf77cc34bbd42808e99e42  DaariDeepa-macos-x64.zip\n3e16e9ce81d2006c4b2693be86f919a1f1a4d82d18f7bba35346fb2bf79c48a1  DaariDeepa-linux-x64.zip\n",
+  "platforms": {
+    "windows-x64": {
+      "asset": "DaariDeepa-windows-x64.zip",
+      "url": "https://pvnkmrksk.github.io/trajectory-dashboard/DaariDeepa-windows-x64.zip",
+      "sha256": "2c9e31993a508b7565641aeb9af45d8ced11e9fe09a323a53777952ef1953d4f",
+      "executable": "DaariDeepa/DaariDeepa.exe"
+    },
+    "macos-arm64": {
+      "asset": "DaariDeepa-macos-arm64.zip",
+      "url": "https://pvnkmrksk.github.io/trajectory-dashboard/DaariDeepa-macos-arm64.zip",
+      "sha256": "a8c6b436fb03b72f64ade157a3eed5759ec8ae42bb21cde8f651ab499c59c6b1",
+      "executable": "DaariDeepa/DaariDeepa"
+    },
+    "macos-x64": {
+      "asset": "DaariDeepa-macos-x64.zip",
+      "url": "https://pvnkmrksk.github.io/trajectory-dashboard/DaariDeepa-macos-x64.zip",
+      "sha256": "1cd22a85e166f4a18020ba87a787abee62268f02e2cf77cc34bbd42808e99e42",
+      "executable": "DaariDeepa/DaariDeepa"
+    },
+    "linux-x64": {
+      "asset": "DaariDeepa-linux-x64.zip",
+      "url": "https://pvnkmrksk.github.io/trajectory-dashboard/DaariDeepa-linux-x64.zip",
+      "sha256": "3e16e9ce81d2006c4b2693be86f919a1f1a4d82d18f7bba35346fb2bf79c48a1",
+      "executable": "DaariDeepa/DaariDeepa"
+    }
+  }
+}

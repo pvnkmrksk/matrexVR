@@ -30,9 +30,13 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private readonly Dictionary<string,GameObject> prefabDict = new Dictionary<string,GameObject>();
     private readonly Dictionary<string,Material> materialDict = new Dictionary<string,Material>();
     private readonly Dictionary<string,Transform> importedRigs = new Dictionary<string,Transform>();
+    private readonly Dictionary<string,Camera> importedFrontCameras = new Dictionary<string,Camera>();
+    private readonly Dictionary<string,string> cameraStateKeys = new Dictionary<string,string>();
     private readonly List<string> rigIds = new List<string>();
+    private readonly Dictionary<Light,bool> previewLights = new Dictionary<Light,bool>();
     private readonly Dictionary<string,JObject> legacySteps = new Dictionary<string,JObject>();
     private readonly Dictionary<string,string> asynchronousKeys = new Dictionary<string,string>();
+    private readonly Dictionary<string,ReplaySessionArchive.Sample> latestAsynchronousSamples = new Dictionary<string,ReplaySessionArchive.Sample>();
     private readonly Dictionary<string,Transform> asynchronousRoots = new Dictionary<string,Transform>();
     private ReplaySessionArchive archive;
     private ReplaySessionArchive.Sample requested;
@@ -42,6 +46,11 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private Material skyMaterial, previousSky;
     private Texture2D skyTexture;
     private string currentSky;
+    private Material importedDefaultSky;
+    private Color importedAmbientLight, importedAmbientSky, importedAmbientEquator, importedAmbientGround, importedFogColor;
+    private UnityEngine.Rendering.AmbientMode importedAmbientMode;
+    private bool importedFog;
+    private float importedFogDensity, importedFogStart, importedFogEnd;
 
     private void Awake()
     {
@@ -52,11 +61,13 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             environmentRoot.SetParent(transform,false);
         }
         previousSky=RenderSettings.skybox;
+        foreach(var root in gameObject.scene.GetRootGameObjects())
+            foreach(var light in root.GetComponentsInChildren<Light>(true))previewLights[light]=light.enabled;
     }
 
     public void BeginSession(ReplaySessionArchive session,IEnumerable<string> ids)
     {
-        archive=session;SetRigIds(ids);requested=null;appliedKey=null;currentConfig=null;
+        archive=session;SetRigIds(ids);requested=null;appliedKey=null;currentConfig=null;importedName=null;cameraStateKeys.Clear();latestAsynchronousSamples.Clear();
         ClearEnvironment();ReleaseSky();
         FidelityStatus="Saved configurations loaded; waiting for recorded scene";
     }
@@ -81,7 +92,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             var target=requested;
             if(importedName!=target.scene)
             {
-                ClearEnvironment();importedRigs.Clear();
+                ClearEnvironment();importedRigs.Clear();importedFrontCameras.Clear();cameraStateKeys.Clear();
                 if(importedScene.IsValid() && importedScene.isLoaded)yield return SceneManager.UnloadSceneAsync(importedScene);
                 importedScene=default;importedName=target.scene;
                 foreach(string key in prefabDict.Where(p=>p.Value==null).Select(p=>p.Key).ToArray())prefabDict.Remove(key);
@@ -106,6 +117,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                     ClearEnvironment();
                     currentConfig=archive?.ExperimentFor(target);
                     if(!(currentConfig?["steps"] is JArray))RestoreObjects(currentConfig,target);
+                    else foreach(var sample in latestAsynchronousSamples.Values.Where(sample=>sample.scene==target.scene).ToArray())RestoreAsynchronousSample(sample);
                     RestoreRugosity(currentConfig);
                     currentSky=null;
                     ContextVersion++;
@@ -136,12 +148,29 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             var configurations=savedRigs.ToObject<SystemConfig[]>().ToDictionary(c=>c.vrId,c=>c);
             RuntimeRigRegistry.Configure(scene,configurations);
         }
+        // The replay scene's convenience light must not illuminate an imported experiment a second time.
+        foreach(var light in previewLights.Keys)if(light!=null)light.enabled=false;
+        Scene previous=SceneManager.GetActiveScene();
+        if(SceneManager.SetActiveScene(scene))
+        {
+            importedDefaultSky=RenderSettings.skybox;importedAmbientMode=RenderSettings.ambientMode;
+            importedAmbientLight=RenderSettings.ambientLight;importedAmbientSky=RenderSettings.ambientSkyColor;
+            importedAmbientEquator=RenderSettings.ambientEquatorColor;importedAmbientGround=RenderSettings.ambientGroundColor;
+            importedFog=RenderSettings.fog;importedFogColor=RenderSettings.fogColor;importedFogDensity=RenderSettings.fogDensity;
+            importedFogStart=RenderSettings.fogStartDistance;importedFogEnd=RenderSettings.fogEndDistance;
+            SceneManager.SetActiveScene(previous);
+        }
         // sceneLoaded runs before Start: networking, recording, autoplay and random spawning stay dormant.
         foreach(var root in scene.GetRootGameObjects())
         {
             foreach(var choice in root.GetComponentsInChildren<ChoiceController>(true))IndexAssets(choice.prefabs,choice.materials);
             foreach(var dynamic in root.GetComponentsInChildren<DynamicSequenceController>(true))IndexAssets(dynamic.prefabs,dynamic.materials);
-            foreach(var rig in root.GetComponentsInChildren<ClosedLoop>(true))importedRigs[CanonicalRig(rig.name)]=rig.transform;
+            foreach(var rig in root.GetComponentsInChildren<ClosedLoop>(true))
+            {
+                string id=CanonicalRig(rig.name);importedRigs[id]=rig.transform;
+                var front=rig.GetComponentsInChildren<Camera>(true).FirstOrDefault(camera=>camera.name=="Main Camera F");
+                if(front!=null)importedFrontCameras[id]=front;
+            }
             foreach(var script in root.GetComponentsInChildren<MonoBehaviour>(true))script.enabled=false;
             foreach(var camera in root.GetComponentsInChildren<Camera>(true))camera.enabled=false;
             foreach(var listener in root.GetComponentsInChildren<AudioListener>(true))listener.enabled=false;
@@ -156,13 +185,46 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         if(importedRigs.TryGetValue(CanonicalRig(id),out var rig) && rig!=null)rig.SetPositionAndRotation(position,rotation);
     }
 
+    public void ConfigureAnimalCamera(string id,Camera target,ReplaySessionArchive.Sample sample=null)
+    {
+        id=CanonicalRig(id);
+        if(target==null || !importedFrontCameras.TryGetValue(id,out var source) || source==null || !importedRigs.TryGetValue(id,out var rig))return;
+        target.transform.localPosition=rig.InverseTransformPoint(source.transform.position);
+        target.transform.localRotation=Quaternion.Inverse(rig.rotation)*source.transform.rotation;
+        target.fieldOfView=source.fieldOfView;target.nearClipPlane=source.nearClipPlane;target.farClipPlane=source.farClipPlane;
+        target.allowHDR=source.allowHDR;target.allowMSAA=source.allowMSAA;target.renderingPath=source.renderingPath;
+        var saved=(archive?.SystemConfiguration?["configs"] as JArray)?.OfType<JObject>().FirstOrDefault(config=>(string)config["vrId"]==id);
+        float aspect=Mathf.Max(.01f,((float?)saved?["ledPanelWidth"]??128)/Mathf.Max(1,(float?)saved?["ledPanelHeight"]??128));
+        target.aspect=aspect;
+        float available=Mathf.Max(.01f,Screen.width/(Screen.height*.8f));
+        target.rect=aspect<=available?new Rect((1-aspect/available)*.5f,.20f,aspect/available,.80f):new Rect(0,.20f+(.80f-.80f*available/aspect)*.5f,1,.80f*available/aspect);
+        string key=ContextVersion+"|"+sample?.StimulusKey;
+        if(cameraStateKeys.TryGetValue(id,out string previous) && previous==key)return;
+        cameraStateKeys[id]=key;target.clearFlags=source.clearFlags;target.backgroundColor=source.backgroundColor;
+        JObject step=sample!=null?ReplayStimulusState.Step(currentConfig,sample,out _):currentConfig;
+        if(step?["backgroundColor"] is JObject background)
+            target.backgroundColor=new Color((float?)background["r"]??0,(float?)background["g"]??0,(float?)background["b"]??0,(float?)background["a"]??1);
+        if(step?["camera"] is JArray cameras)
+            foreach(var camera in cameras.OfType<JObject>().Where(camera=>(string)camera["vrId"]==id))
+            {
+                if(camera["clearFlags"]!=null)target.clearFlags=camera["clearFlags"].ToObject<CameraClearFlags>();
+                if(camera["bgColor"] is JArray color && color.Count>=3)target.backgroundColor=ColorValue(color);
+            }
+        if(skyTexture!=null)target.clearFlags=CameraClearFlags.Skybox;
+    }
+
     public void ApplyAsynchronousSample(ReplaySessionArchive.Sample sample)
     {
+        latestAsynchronousSamples[sample.rig]=sample;
         if(Loading || !(currentConfig?["steps"] is JArray) || sample.scene!=importedName)return;
-        if(asynchronousKeys.TryGetValue(sample.rig,out string previous) && previous==sample.ContextKey)return;
+        RestoreAsynchronousSample(sample);
+    }
+    private void RestoreAsynchronousSample(ReplaySessionArchive.Sample sample)
+    {
+        if(asynchronousKeys.TryGetValue(sample.rig,out string previous) && previous==sample.StimulusKey)return;
         if(asynchronousRoots.TryGetValue(sample.rig,out var old) && old!=null){old.gameObject.SetActive(false);Destroy(old.gameObject);}
         var root=new GameObject("Recorded condition "+sample.rig).transform;root.SetParent(environmentRoot,false);
-        asynchronousRoots[sample.rig]=root;asynchronousKeys[sample.rig]=sample.ContextKey;
+        asynchronousRoots[sample.rig]=root;asynchronousKeys[sample.rig]=sample.StimulusKey;
         try{RestoreObjects(currentConfig,sample,root);}
         catch(Exception error){Warn("Recorded asynchronous condition: "+error.Message);}
     }
@@ -185,6 +247,17 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         }
         return Vector(specification["pos"]);
     }
+    private static Vector3 GroundRecordedPosition(Vector3 position)
+    {
+        foreach(Terrain terrain in Terrain.activeTerrains)
+        {
+            if(terrain==null || terrain.terrainData==null)continue;
+            Vector3 local=position-terrain.transform.position,size=terrain.terrainData.size;
+            if(local.x>=0 && local.z>=0 && local.x<=size.x && local.z<=size.z)
+            {position.y+=terrain.SampleHeight(position)+terrain.transform.position.y;break;}
+        }
+        return position;
+    }
     private static Vector3 PolarPosition(JObject position)
     {
         double angle=((double?)position["angle"]??0)*Mathf.Deg2Rad,radius=(double?)position["radius"]??0;
@@ -194,14 +267,10 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private void RestoreObjects(JObject config,ReplaySessionArchive.Sample sample,Transform destination=null)
     {
         if(config==null)return;
-        JObject step=config;
-        if(config["steps"] is JArray steps)
-        {
-            step=steps.OfType<JObject>().FirstOrDefault(s=>(string)s["name"]==sample.stepName);
-            if(step==null && config["intertrial"] is JObject intertrial && (string)intertrial["name"]==sample.stepName)step=intertrial;
-            if(step==null){Warn("Saved dynamic step unavailable: "+sample.stepName);return;}
-        }
-        if(!(step["objects"] is JArray objects))return;
+        JObject step=ReplayStimulusState.Step(config,sample,out string decisionWarning);
+        if(decisionWarning!=null)Warn(decisionWarning);
+        if(step==null || !(step["objects"] is JArray objects))return;
+        var rendered = new Dictionary<string,List<KeyValuePair<Renderer,JObject>>>();
         foreach(var spec in objects.OfType<JObject>())
         {
             string prefabName=(string)spec["type"]??(string)spec["prefab"];
@@ -215,6 +284,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                 var go=Instantiate(prefab,destination??environmentRoot);go.name="Replay "+prefabName+" "+rig;
                 FreezeVisual(go);
                 go.transform.position=ResolveRecordedPosition(spec);
+                if((bool?)spec["groundOnTerrain"]==true)go.transform.position=GroundRecordedPosition(go.transform.position);
                 Vector3 rotation=spec["rotation"] is JObject r && r["x"]?.Type!=null && r["x"].Type!=JTokenType.Null && r["y"]?.Type!=null && r["y"].Type!=JTokenType.Null && r["z"]?.Type!=null && r["z"].Type!=JTokenType.Null?
                     new Vector3((float)r["x"],(float)r["y"],(float)r["z"]):new Vector3(0,(float?)spec["mu"]??0,0);
                 go.transform.rotation=Quaternion.Euler(rotation);
@@ -228,12 +298,30 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                     materialDict.TryGetValue(materialName??"",out var material);
                     var owned=RuntimeMaterialOwner.Assign(renderer,material);
                     if(owned!=null && spec["color"] is JArray color && color.Count>=3)owned.color=ColorValue(color);
+                    if(!rendered.TryGetValue(rig,out var ordered))rendered[rig]=ordered=new List<KeyValuePair<Renderer,JObject>>();
+                    ordered.Add(new KeyValuePair<Renderer,JObject>(renderer,spec));
                 }
                 if((bool?)spec["randomInitialRotation"]==true || (bool?)spec["useHeadingReference"]==true)
                     Warn("Randomized/heading-relative object onsets are not fully specified by static JSON. Refer to recorded onset logs; object reconstruction is approximate.");
             }
         }
-        if(step["swapAfterSeconds"]!=null)Warn("Dynamic color swaps require recorded swap-event reconstruction; static saved colors are shown.");
+        if(sample.colorsSwapped)
+            foreach(var rig in rendered.Values)
+            {
+                bool explicitColors=rig.Any(pair=>pair.Value["swapColor"] is JArray color && color.Count>=3);
+                if(explicitColors)
+                {
+                    foreach(var pair in rig)
+                        if(pair.Key!=null && pair.Key.sharedMaterial!=null && pair.Value["swapColor"] is JArray color && color.Count>=3)
+                            pair.Key.sharedMaterial.color=ColorValue(color);
+                }
+                else if(rig.Count>=2 && rig[0].Key!=null && rig[1].Key!=null)
+                {
+                    Color first=rig[0].Key.sharedMaterial.color;
+                    rig[0].Key.sharedMaterial.color=rig[1].Key.sharedMaterial.color;
+                    rig[1].Key.sharedMaterial.color=first;
+                }
+            }
     }
 
     private void RestoreRugosity(JObject config)
@@ -249,6 +337,11 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     {
         if(currentSky==id && (skyTexture!=null || string.IsNullOrEmpty(id)))return;
         ReleaseSky();
+        RenderSettings.ambientMode=importedAmbientMode;RenderSettings.ambientLight=importedAmbientLight;
+        RenderSettings.ambientSkyColor=importedAmbientSky;RenderSettings.ambientEquatorColor=importedAmbientEquator;
+        RenderSettings.ambientGroundColor=importedAmbientGround;RenderSettings.fog=importedFog;
+        RenderSettings.fogColor=importedFogColor;RenderSettings.fogDensity=importedFogDensity;
+        RenderSettings.fogStartDistance=importedFogStart;RenderSettings.fogEndDistance=importedFogEnd;
         string path=!string.IsNullOrEmpty(id)?archive?.SkyImage(id):null;
         if(path==null && string.IsNullOrEmpty(id) && config?["skyboxPath"]?.Type==JTokenType.String)path=archive?.Resolve((string)config["skyboxPath"]);
         if(path!=null)
@@ -263,7 +356,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         }
         else
         {
-            RenderSettings.skybox=null;
+            RenderSettings.skybox=string.IsNullOrEmpty(id)?importedDefaultSky:null;
             if(!string.IsNullOrEmpty(id))Warn("The recorded sky could not be restored; no current-time sky is substituted.");
         }
     }
@@ -290,7 +383,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             return agent;
         }
         var catalog=Resources.Load<KannadiPrefabCatalog>("KannadiPrefabCatalog");
-        string selection=kind=="Kannadi"?(string)currentConfig?["kannadiTilePrefab"]:(string)currentConfig?["swarm"]?["locustPrefab"];
+        string selection=kind=="Kannadi"?(string)currentConfig?["kannadiTilePrefab"]:(string)swarm?["locustPrefab"];
         GameObject prefab=!string.IsNullOrEmpty(selection)?catalog?.Find(selection):catalog?.Find("SimulatedLocust");
         GameObject go=prefab!=null?Instantiate(prefab,parent):GameObject.CreatePrimitive(PrimitiveType.Capsule);
         if(prefab==null){go.transform.SetParent(parent,false);go.transform.localScale=Vector3.one*fallbackSize;Warn("An agent model was unavailable; pose markers are shown.");}
@@ -341,6 +434,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private void OnDestroy()
     {
         SceneManager.sceneLoaded-=FreezeLoadedScene;ReleaseSky();
+        foreach(var light in previewLights)if(light.Key!=null)light.Key.enabled=light.Value;
         if(importedScene.IsValid() && importedScene.isLoaded)SceneManager.UnloadSceneAsync(importedScene);
     }
 }

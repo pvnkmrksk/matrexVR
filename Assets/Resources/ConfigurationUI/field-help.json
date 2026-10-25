@@ -306,10 +306,14 @@
   "normalRadiusCm": "Radius in centimetres used to sample nearby terrain normals. Zero samples the local normal directly, without spatial smoothing.",
   "normalSamples": "Number of surrounding terrain-normal samples, from 1 to 32, in addition to the centre sample. Set normalRadiusCm to zero to disable spatial averaging.",
   "tiltResponse": "Tilt response rate in inverse seconds. Zero follows the sampled normal immediately; positive values smooth orientation over time.",
-  "tracker": "Optional local tracker app launch. Nothing launches automatically. Choose an installed native executable and its existing calibration file; MATREX only stops processes it launches. Save tracker calibration edits before Stop.",
-  "executablePath": "Absolute installed native tracker executable path. On macOS select the binary inside the app Contents/MacOS folder. No shell, download, or automatic executable discovery.",
+  "tracker": "Native tracker app settings. The ready-to-run starters launch a bundled tracker with Start; custom experiments can launch a configured app explicitly. Apps run independently and remain open when MATREX closes. Save calibration before Stop; stop the active tracker before changing its backend or input source.",
+  "executablePath": "Optional override for an installed native tracker executable. Bundled starters resolve the matching offline companion automatically. On macOS select the binary inside the app Contents/MacOS folder. The command runs directly without a shell.",
   "device": "Optional Rekkefly camera/device override. HejjéTrac source selection remains in its calibration config.",
   "headless": "Launch Rekkefly without its native window. HejjéTrac optional launch uses its desktop app.",
   "contextIntervalSeconds": "Seconds between compact session context heartbeats. A late-joining dashboard learns active rig/species/backend and experiment phase without exposing raw config paths.",
-  "configFile": "Choice, Optomotor, Kannadi or Swarm file relative to StreamingAssets."
+  "configFile": "Choice, Optomotor, Kannadi or Swarm file relative to StreamingAssets.",
+  "desktopPreview": "Desktop preview: render this rig’s front view across the native application window. Off keeps calibrated LED panel rectangles. Use apparatus setup for physical panel geometry.",
+  "walkingPositionGain": "Optional walking displacement multiplier. The tracker position is scaled by sphere radius into centimetres; use 0.01 for a terrain scene measured in metres. Omitted keeps the existing walking gain.",
+  "walkingOrientationGain": "Optional signed multiplier for walking heading changes. 1 keeps the measured turn, negative reverses it, and 0 disables heading response. Omitted keeps the existing walking gain.",
+  "groundOnTerrain": "Place this object on the active terrain at its X/Z position. Its configured Y becomes an extra height above terrain. Off uses the explicit world position."
 }

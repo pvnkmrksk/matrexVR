@@ -14,12 +14,29 @@ public static class Regression
     private static void Reject(Action action,string description)
     {try{action();}catch(InvalidDataException){checks++;return;}throw new Exception(description);}
     private const string Header="Current Time,VR,Scene,CurrentStep,ConfigFile,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ,stepIndex,stepName,experimentPhase,skyboxId";
+    private static void InspectRun(string directory,string report)
+    {
+        var archive=new ReplaySessionArchive(directory);archive.LoadRigSamples();
+        var contexts=archive.Rigs.Values.SelectMany(samples=>samples).GroupBy(sample=>sample.ContextKey).Select(group=>group.First()).ToArray();
+        int restored=contexts.Count(sample=>archive.ExperimentFor(sample)!=null);
+        string population=ReplaySessionArchive.CsvFiles(directory).FirstOrDefault(path=>path.EndsWith(".gz",StringComparison.OrdinalIgnoreCase));
+        object agents=null;string cache=Path.Combine(Path.GetTempPath(),"matrex-legacy-inspect-"+Guid.NewGuid().ToString("N"));
+        try
+        {
+            if(population!=null)using(var stream=ReplayAgentStream.TryOpen(population,cache,archive.OriginTicks))
+                if(stream!=null)agents=new{stream.Kind,stream.RowCount,stream.FrameCount,stream.HasRotations,stream.HasVisibility};
+        }
+        finally {if(Directory.Exists(cache))Directory.Delete(cache,true);}
+        string json=Newtonsoft.Json.JsonConvert.SerializeObject(new{rigs=archive.Rigs.Count,rows=archive.Rigs.Values.Sum(samples=>samples.Count),archive.Duration,archive.FirstExperimentTime,contexts=contexts.Length,restoredConfigurations=restored,representativePopulation=agents,warnings=archive.Warnings},Newtonsoft.Json.Formatting.Indented);
+        if(report!=null)File.WriteAllText(report,json);Console.WriteLine(json);
+    }
     private static string Row(string time,string rig,string scene,int step,int x,int yaw,string config="choice.json")=>
         "2026-01-01 "+time+","+rig+","+scene+","+step+","+config+","+x+",0,0,0,"+yaw+",0,0,condition,stimulus,";
     private static void Gzip(string path,string text)
     {using(var stream=new StreamWriter(new GZipStream(File.Create(path),CompressionLevel.Fastest)))stream.Write(text);}
-    public static void Main()
+    public static void Main(string[] arguments)
     {
+        if(arguments.Length>0){InspectRun(arguments[0],arguments.Length>1?arguments[1]:null);return;}
         string root=Path.Combine(Path.GetTempPath(),"matrex-replay-fixture-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
         try
         {
@@ -41,6 +58,51 @@ public static class Regression
             Reject(()=>archive.SafePath("../outside.json"),"traversal accepted");
             Reject(()=>archive.SafePath("Configs/Files/../../../outside.json"),"nested traversal accepted");
             Check(ReplaySessionArchive.Csv("a,\"b,c\",\"say \"\"hello\"\"\"").SequenceEqual(new[]{"a","b,c","say \"hello\""}),"CSV quoting/double quote parsing");
+            var previousCulture=CultureInfo.CurrentCulture;
+            try
+            {
+                CultureInfo.CurrentCulture=CultureInfo.GetCultureInfo("de-DE");
+                var csv=new StringBuilder();RecordedCsv.Append(csv,1.25f);csv.Append(',');RecordedCsv.Append(csv,"config, quoted\nline");
+                csv.Append(',');RecordedCsv.Append(csv,"say \"hello\"");
+                Check(csv.ToString().StartsWith("1.25,"),"recorded numeric fields use invariant culture on a decimal-comma Mac");
+                string multiline=Path.Combine(root,"multiline-record.csv");File.WriteAllText(multiline,csv.ToString());
+                using(var input=ReplaySessionArchive.OpenCsv(multiline))
+                {
+                    var fields=ReplaySessionArchive.Csv(ReplaySessionArchive.ReadCsvRecord(input));
+                    Check(fields.Length==3 && fields[1]=="config, quoted\nline" && fields[2]=="say \"hello\"","quoted multiline CSV roundtrips without shifting pose columns");
+                }
+            }
+            finally {CultureInfo.CurrentCulture=previousCulture;}
+            Check(ReplaySessionArchive.Integer("3.0",-1)==3 && ReplaySessionArchive.Integer("3.5",-1)==-1,"historical integer-valued float step fields are accepted without rounding");
+            string invalid=Path.Combine(root,"misaligned-run");Directory.CreateDirectory(invalid);
+            File.WriteAllText(Path.Combine(invalid,"valid.csv"),Header+"\n"+Row("10:00:00.000","VR1","Choice",0,0,0)+"\n"+Row("10:00:01.000","VR1","Choice",0,1,0)+",shifted\n");
+            var invalidArchive=new ReplaySessionArchive(invalid);invalidArchive.LoadRigSamples();
+            Check(invalidArchive.Rigs["VR1"].Count==1 && invalidArchive.Warnings.Any(w=>w.Contains("column count")),"misaligned legacy locale/delimiter rows are not silently interpreted as different poses");
+            string swaps=Path.Combine(root,"swap-evidence");Directory.CreateDirectory(swaps);
+            string swapHeader=Header+",swapElapsedSec,grayAtTrialStart,blackSideAtTrialStart";
+            File.WriteAllText(Path.Combine(swaps,"evidence.csv"),swapHeader+"\n"+
+                Row("10:00:00.000","VR1","Choice_desync",0,0,0)+",,0.35,left\n"+
+                Row("10:00:01.000","VR1","Choice_desync",0,1,0)+",1,,\n"+
+                Row("10:00:02.000","VR1","Choice_desync",0,2,0)+",,,\n");
+            var evidence=new ReplaySessionArchive(swaps);evidence.LoadRigSamples();
+            Check(!evidence.Rigs["VR1"][0].colorsSwapped && evidence.Rigs["VR1"][1].colorsSwapped && evidence.Rigs["VR1"][2].colorsSwapped,"recorded swap event persists in later samples but reverses when seeking before it");
+            Check(evidence.Rigs["VR1"][2].grayAtTrialStart==.35f && evidence.Rigs["VR1"][2].blackSideAtTrialStart=="left","adaptive onset evidence survives sparse event rows");
+            var adaptive=JObject.Parse("{\"steps\":[{\"name\":\"template\",\"objects\":[{\"polar\":{\"angle\":-20,\"radius\":60}},{\"polar\":{\"angle\":20,\"radius\":60}}]}]}");
+            var adaptiveSample=new ReplaySessionArchive.Sample{stepName="AdaptiveDecision_Normal_0001_blackL",grayAtTrialStart=.35f,blackSideAtTrialStart="left"};
+            var resolved=ReplayStimulusState.Step(adaptive,adaptiveSample,out string adaptiveWarning);
+            Check(adaptiveWarning==null && (float)resolved["objects"][0]["color"][0]==0 && (float)resolved["objects"][1]["color"][0]==.35f,"adaptive condition restores logged black side and learned gray instead of rerandomizing");
+            adaptiveSample.stepName="AdaptiveDecision_Control_noBar_0005";
+            Check(((JArray)ReplayStimulusState.Step(adaptive,adaptiveSample,out _)["objects"]).Count==0,"adaptive no-bar control reconstructs an empty field");
+            adaptiveSample.stepName="AdaptiveDecision_Control_singleBlack0deg_0005";
+            resolved=ReplayStimulusState.Step(adaptive,adaptiveSample,out _);
+            Check(((JArray)resolved["objects"]).Count==1 && (float)resolved["objects"][0]["polar"]["angle"]==0,"adaptive center-bar control restores exact recorded condition kind");
+            string prefixed=Path.Combine(root,"legacy-prefixed");Directory.CreateDirectory(prefixed);
+            File.WriteAllText(Path.Combine(prefixed,"20250101_100000_ControlScene_sequenceConfig.json"),"{\"sequences\":[{\"parameters\":{\"configFile\":\"Choice_00.json\"}}]}");
+            File.WriteAllText(Path.Combine(prefixed,"20250101_100000_ControlScene_Choice_00.json"),"{\"objects\":[]}");
+            var legacyPrefixed=new ReplaySessionArchive(prefixed);
+            Check(legacyPrefixed.Resolve("Choice_00.json")==Path.Combine(prefixed,"20250101_100000_ControlScene_Choice_00.json"),"pre-manifest timestamp/scene-prefixed experiment copies resolve inside the recording");
+            File.WriteAllText(Path.Combine(prefixed,"20250101_100001_ControlScene_Choice_00.json"),"{\"objects\":[],\"changed\":true}");
+            Reject(()=>new ReplaySessionArchive(prefixed).Resolve("Choice_00.json"),"ambiguous differing legacy config versions accepted");
             string aliases=Path.Combine(root,"rig-aliases");Directory.CreateDirectory(aliases);
             File.WriteAllText(Path.Combine(aliases,"a.csv"),Header+"\n"+Row("10:00:00.000","VR1","Choice",0,0,0)+"\n");
             File.WriteAllText(Path.Combine(aliases,"b.csv"),Header+"\n"+Row("10:00:03.000","VR1 Swarm","Swarm",1,3,0)+"\n");
@@ -75,6 +137,15 @@ public static class Regression
                 Check(stream.Sample(3).Count==0,"population vanishes outside recording");
             }
             Check(!Directory.GetFiles(cache).Any(),"disk cache removed on disposal");
+            string band=Path.Combine(root,"band-visibility.csv.gz");
+            Gzip(band,"Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,VisibilityPhase,Visible,VisibleOnDuration:0.1,VisibleOffDuration:0.2\n"+
+                "2026-01-01 10:00:00.000,band,SimulatedLocustsVR1,1,2,3,0,0,0,0.05,true\n"+
+                "2026-01-01 10:00:01.000,band,SimulatedLocustsVR1,1,2,3,0,0,0,0.25,false\n");
+            using(var stream=ReplayAgentStream.TryOpen(band,cache,archive.OriginTicks))
+            {
+                Check(stream.Kind=="Band" && stream.HasVisibility && stream.Sample(0)[0].visible,"band's recorded on phase is visible");
+                Check(!stream.Sample(1)[0].visible && stream.Sample(0)[0].visible,"band's recorded off phase and backward seek preserve visibility");
+            }
             string old=Path.Combine(root,"legacy-agents.csv.gz");
             Gzip(old,"Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase\n2026-01-01 10:00:00.000,old,SimulatedLocustsVR1,1,2,3,,,stimulus\n");
             using(var stream=ReplayAgentStream.TryOpen(old,cache,archive.OriginTicks))Check(!stream.HasRotations && stream.Sample(0).Count==1,"legacy nine-column population still loads");
@@ -93,6 +164,46 @@ public static class Regression
             entry["snapshotPath"]="../outside.json";
             File.WriteAllText(Path.Combine(root,"config_manifest.json"),new JObject{["files"]=new JArray(entry)}.ToString());
             Reject(()=>new ReplaySessionArchive(root).Resolve("choice.json"),"manifest path traversal accepted");
+            string profile=Path.Combine(root,"native-profile"),native=Path.Combine(root,"native-app-config"),nativeRun=Path.Combine(root,"native-recording");
+            Directory.CreateDirectory(profile);Directory.CreateDirectory(native);
+            byte[] originalSystem=Encoding.UTF8.GetBytes("{\"configs\":[{\"vrId\":\"VR1\"}]}\r\n");
+            File.WriteAllBytes(Path.Combine(profile,"system_config.json"),originalSystem);
+            File.WriteAllText(Path.Combine(profile,"sequenceConfig.json"),"{\"sequences\":[]}");
+            string calibration=Path.Combine(native,"calibration.JSON"),sidecar=Path.Combine(native,"unrelated-secret.txt"),stale=Path.Combine(native,"stale.toml"),media=Path.Combine(native,"camera.avi");
+            File.WriteAllText(sidecar,"must not be copied");File.WriteAllText(stale,"stale = true");File.WriteAllText(media,"not a text configuration");
+            byte[] calibrationBytes=new byte[]{0xef,0xbb,0xbf}.Concat(Encoding.UTF8.GetBytes(new JObject{["precision"]="1.0000000000000000000001",["configFile"]=sidecar}.ToString()+"\r\n")).ToArray();
+            File.WriteAllBytes(calibration,calibrationBytes);
+            var nativeArchive=new RunConfigArchive(nativeRun,profile,"20260101_100000","test");nativeArchive.CaptureStartup("ControlScene");
+            nativeArchive.CaptureCompanions(new[]{
+                new JObject{["vrId"]="VR1",["backend"]="Rekkefly",["identityVerified"]=true,["matchesConfiguredRig"]=true,["configFile"]=calibration,["releaseTag"]="local-test",["executableSha256"]=new string('a',64),["demoRequested"]=false,["strictCameraFallback"]=true,["actualInputSource"]="unverified"},
+                new JObject{["vrId"]="VR2",["identityVerified"]=false,["matchesConfiguredRig"]=true,["configFile"]=sidecar},
+                new JObject{["vrId"]="VR3",["identityVerified"]=true,["matchesConfiguredRig"]=false,["configFile"]=stale},
+                new JObject{["vrId"]="VR4",["identityVerified"]=true,["matchesConfiguredRig"]=true,["configFile"]=Path.Combine(native,"missing.toml")},
+                new JObject{["vrId"]="VR5",["identityVerified"]=true,["matchesConfiguredRig"]=true,["configFile"]=media},
+                new JObject{["vrId"]="VR6",["state"]="unmanaged-or-no-owned-launch",["identityVerified"]=false}
+            },"ControlScene");
+            nativeArchive.RequireComplete();
+            var nativeManifest=JObject.Parse(File.ReadAllText(nativeArchive.ManifestPath));
+            var nativeEvidence=(JArray)nativeManifest["companionProvenance"];
+            Check(nativeEvidence.Count==6 && (bool)nativeEvidence[0]["snapshotAvailable"],"native run records only supplied owned launches and captures matching calibration");
+            Check((string)nativeEvidence[0]["actualInputSource"]=="unverified" && (bool)nativeEvidence[0]["strictCameraFallback"],"process ownership and strict launch policy never fabricate observed physical source");
+            Check((string)nativeEvidence[0]["releaseTag"]=="local-test" && (string)nativeEvidence[0]["executableSha256"]==new string('a',64),"native release and executable identity are retained");
+            string nativeSnapshot=Path.Combine(nativeRun,(string)nativeEvidence[0]["configSnapshotPath"]);
+            Check(nativeSnapshot.EndsWith(".JSON",StringComparison.Ordinal),"native snapshot references retain extension case on case-sensitive filesystems");
+            Check(File.ReadAllBytes(nativeSnapshot).SequenceEqual(calibrationBytes),"native configuration snapshot preserves BOM, CRLF and exact bytes");
+            Check((string)nativeEvidence[0]["configSha256"]==RunConfigArchive.Hash(calibrationBytes),"native calibration snapshot has a verifiable SHA-256 digest");
+            Check(nativeManifest["files"].Count(file=>((JArray)file["roles"]).Any(role=>(string)role=="tracker-calibration"))==1,"only one verified matching text calibration enters file archive");
+            Check(!nativeManifest["files"].Any(file=>(string)file["sourcePath"]==sidecar || (string)file["sourcePath"]==stale || (string)file["sourcePath"]==media),"native calibration references, stale rigs and camera media are never recursively archived");
+            Check(!(bool)nativeEvidence[1]["snapshotAvailable"] && !(bool)nativeEvidence[2]["snapshotAvailable"],"unverified and mismatched process identities cannot authorize configuration capture");
+            Check((string)nativeEvidence[3]["configurationStatus"]=="unavailable" && (string)nativeEvidence[4]["configurationStatus"]=="unavailable","missing calibration and nontext input are explicitly unavailable");
+            Check((bool)nativeManifest["complete"] && ((JArray)nativeManifest["unavailableOptionalReferences"]).Count==2,"missing optional native evidence is transparent without corrupting the main experiment archive");
+            Check(((string)nativeEvidence[0]["configurationScope"]).Contains("in-memory"),"snapshot scope distinguishes on-disk text from native in-memory settings");
+            byte[] startupEvidence=File.ReadAllBytes(Path.Combine(nativeRun,"companion_provenance.json"));
+            File.WriteAllText(calibration,"changed after run startup");nativeArchive.CaptureCompanions(new JObject[0],"Choice");
+            Check(File.ReadAllBytes(nativeSnapshot).SequenceEqual(calibrationBytes) && File.ReadAllBytes(Path.Combine(nativeRun,"companion_provenance.json")).SequenceEqual(startupEvidence),"subsequent native config edits cannot rewrite run startup evidence");
+            Check(File.ReadAllBytes(Path.Combine(profile,"system_config.json")).SequenceEqual(originalSystem),"native provenance never inserts launch details into the lossless primary system file");
+            var replayWithNative=new ReplaySessionArchive(nativeRun);
+            Check(replayWithNative.Resolve("system_config.json")!=null,"native provenance remains compatible with manifest-based replay");
             for(int i=0;i<150;i++)
             {
                 string path=Path.Combine(root,"writer-"+i+".csv.gz");

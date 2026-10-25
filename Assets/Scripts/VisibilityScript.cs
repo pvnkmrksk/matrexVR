@@ -12,6 +12,7 @@ public class VisibilityScript : MonoBehaviour
 
     private Renderer[] renderers;
     private float timer;
+    public bool IsVisible { get; private set; } = true;
 
     void Start()
     {
@@ -48,6 +49,7 @@ public class VisibilityScript : MonoBehaviour
 
     void SetVisibility(bool isVisible)
     {
+        IsVisible = isVisible;
         foreach (Renderer rend in renderers)
         {
             rend.enabled = isVisible;
@@ -56,6 +58,6 @@ public class VisibilityScript : MonoBehaviour
 
     public float GetCurrentPhase()
     {
-        return (Time.time + phaseOffset) % (visibleOffDuration + visibleOnDuration);
+        return timer; // Report the same local phase that actually controls the renderers.
     }
 }

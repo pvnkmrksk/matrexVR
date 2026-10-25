@@ -123,3 +123,6 @@ tools/__pycache__/
 
 # Bundled Lucide artwork for the native setup UI.
 !Assets/Resources/ConfigurationUI/Icons/*.png
+
+# Stable local desktop build and test profile.
+/.local/

@@ -17,6 +17,7 @@ public class MainController : MonoBehaviour
     public static MainController Instance { get; private set; }
     public static event System.Action SystemConfigurationChanged;
     public bool SequenceRunning => sequenceStarted;
+    public string InputKind { get; private set; } = "tracker";
     public float RemainingStepSeconds => phaseRunner != null && phaseRunner.Active ? (float)phaseRunner.RemainingSeconds : Mathf.Max(0,timer);
     private ExperimentPhases phaseRunner;
     public string ExperimentPhase => phaseRunner != null && phaseRunner.Active ? phaseRunner.CurrentPhase : AssessmentPending ? "assessment" : "stimulus";
@@ -107,6 +108,7 @@ public class MainController : MonoBehaviour
         if (sequenceStarted) throw new System.InvalidOperationException("Stop the experiment before changing its configuration.");
         systemConfigFileName = systemFile;
         sequenceConfigFileName = sequenceFile;
+        DesktopQuickStart.RememberWorkspace(systemFile, sequenceFile);
         masterDataLogger = MasterDataLogger.Instance;
         masterDataLogger.BeginConfiguredSession(systemFile, sequenceFile);
         SequenceError = null;
@@ -179,6 +181,8 @@ public class MainController : MonoBehaviour
         }
 
         // Load system configurations first
+        if (DesktopQuickStart.InitialSelection(out string desktopSystem, out string desktopSequence))
+        { systemConfigFileName = desktopSystem; sequenceConfigFileName = desktopSequence; }
         LoadSystemConfigurations();
         LoadAnimalMetadata();
 
@@ -260,6 +264,7 @@ public class MainController : MonoBehaviour
 
             // Parse the JSON using JObject instead of dynamic
             JObject fullConfig = JObject.Parse(jsonText);
+            InputKind = fullConfig["desktopQuickStart"] is JObject preview && (bool?)preview["demo"] == true ? "demonstration" : "tracker";
             ApplyFrameTiming(fullConfig);
             LoadDiagnosticsConfigurations(fullConfig);
             OverheadCameraSettings = fullConfig["overheadCamera"]?.ToObject<OverheadCameraConfig>() ?? new OverheadCameraConfig();
@@ -958,6 +963,7 @@ public enum ClosedLoopMode { FicTrac = 0, Kinefly = 1, Tirbala = 2, Hejjetrac = 
 [System.Serializable]
 public class SystemConfig
 {
+    public bool desktopPreview = false; // One front view fills its native-resolution desktop window.
     public ClosedLoopMode closedLoopMode = ClosedLoopMode.FicTrac;
     public ManualControlConfig manualControls;
     public float sphereDiameter = 1.0f;
