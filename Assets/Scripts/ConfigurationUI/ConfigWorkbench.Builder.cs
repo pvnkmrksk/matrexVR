@@ -41,7 +41,7 @@ namespace ConfigurationUI
         {
             side.Clear();side.AddToClassList("studio-sidebar");
             side.Add(new Label("EXPERIMENT") {name="navigation-title"});
-            var session=StudioButton("Start","home",ShowSessionHome,homeMode?"nav-active":null);session.name="back-to-session";session.tooltip="Choose movement and a starter world, review your sequence, then start.";side.Add(session);
+            var session=StudioButton("Start","home",ShowSessionHome,homeMode?"nav-active":null);session.name="back-to-session";session.tooltip="Review and start your experiment sequence, or explore the demonstration before configuring hardware.";side.Add(session);
             var sequence=StudioButton("Sequence","sequence",()=>Select(Workspace.Sequence),!homeMode&&!experimentIndexMode&&selected==Workspace.Sequence?"nav-active":null);sequence.name="open-sequence";sequence.tooltip="Arrange blocks, timing and repetitions. Open a block to change its parameters.";side.Add(sequence);
             var experiments=StudioButton("Experiment settings","settings",ShowExperimentConfigs,experimentIndexMode||!homeMode&&selected!=Workspace.Sequence&&selected!=Workspace.System?"nav-active":null);experiments.name="open-experiments";experiments.tooltip="Reusable stimulus, movement and scene parameters for the current sequence.";side.Add(experiments);
             var replay=StudioButton("Replay a recording","play",ShowReplayLauncher);replay.name="open-recorded-replay";replay.tooltip="Open a recorded session and inspect its timeline and overview.";side.Add(replay);
@@ -55,8 +55,8 @@ namespace ConfigurationUI
             var library=new Foldout {name="navigation-library",text="Files & library",value=false};library.AddToClassList("nav-foldout");side.Add(library);
             library.Add(StudioButton("Add a block","plus",()=>ShowBlockLibrary()));library.Add(StudioButton("Open JSON file","file",ShowOpenFile));library.Add(StudioButton("Save a variation","copy",()=>ShowVariation(null)));
             var spacer=new VisualElement();spacer.AddToClassList("nav-spacer");side.Add(spacer);
-            side.Add(new Label("SET ONCE, REMEMBERED"));
-            var system=StudioButton("Apparatus setup","system",()=>Select(Workspace.System),!homeMode&&!experimentIndexMode&&selected==Workspace.System?"nav-active":null);system.name="open-system";system.tooltip="One-time display, rig, input and monitoring setup. Saved between sessions.";side.Add(system);
+            side.Add(new Label("APPLICATION"));
+            var system=StudioButton("Configure","system",()=>Select(Workspace.System),!homeMode&&!experimentIndexMode&&selected==Workspace.System?"nav-active":null);system.name="open-system";system.tooltip="Configure hardware, panel layouts, tracking inputs and species. Your apparatus is saved between sessions.";side.Add(system);
             side.Add(StudioButton("Documentation","help",()=>Application.OpenURL("https://pvnkmrksk.github.io/matrexVR/manual/"),"quiet"));
             side.Add(StudioButton("Quit","stop",()=>Application.Quit(),"quiet"));
             foreach(var heading in side.Children().OfType<Label>())heading.AddToClassList("nav-heading");
@@ -66,7 +66,7 @@ namespace ConfigurationUI
             body.AddToClassList("studio-body"); inspector.AddToClassList("studio-inspector");
             var top=Row("studio-title-row"); body.Add(top);
             var titles=new VisualElement(); titles.style.flexGrow=1; top.Add(titles);
-            var title=new Label(selected==Workspace.Sequence?"Your experiment sequence":selected==Workspace.System?"Apparatus setup":ExperimentBlocks.Title(selected.Path)); title.AddToClassList("title"); titles.Add(title);
+            var title=new Label(selected==Workspace.Sequence?"Your experiment sequence":selected==Workspace.System?"Configure apparatus":ExperimentBlocks.Title(selected.Path)); title.AddToClassList("title"); titles.Add(title);
             var subtitle=new Label(selected==Workspace.Sequence?"Combine reusable configs. Drag to reorder. Open a block to edit its stimulus.":Path.GetRelativePath(RuntimePaths.ConfigRoot,selected.Path).Replace('\\','/')); subtitle.AddToClassList("studio-subtitle"); titles.Add(subtitle);
             top.Add(StudioButton("More","settings",ShowEditorTools,"quiet"));
             if(selected==Workspace.Sequence) BuildSequenceBuilder();

@@ -274,50 +274,6 @@ namespace ConfigurationUI
             var display=inspector.Q<Label>("system-display"); if(display!=null) display.text=SystemDisplaySummary();
             if(blockList!=null) root.schedule.Execute(()=>blockList?.RefreshItems());
         }
-        private void BuildSystemEditor()
-        {
-            var scroll=new ScrollView { name="settings-editor-scroll",horizontalScrollerVisibility=ScrollerVisibility.Hidden }; scroll.AddToClassList("settings-scroll"); body.Add(scroll);
-            var obj=(JObject)selected.Root; var schema=Workspace.Schemas.Get("system");
-            var presentation=new VisualElement();presentation.AddToClassList("desktop-presentation");scroll.Add(presentation);
-            presentation.Add(SessionHeading("Application display","system","Native fullscreen. This is separate from your LED viewport layout."));
-            var displayNames=DesktopDisplay.DisplayNames.ToList();
-            if(displayNames.Count>0)
-            {
-                var display=new DropdownField("Open MATREX on",displayNames,Mathf.Clamp(DesktopDisplay.SelectedDisplay,0,displayNames.Count-1)){name="application-display"};
-                display.tooltip="One-time application monitor choice, remembered on this computer. The window uses that monitor’s native resolution. This does not change the experiment’s calibrated LED rectangles.";
-                display.RegisterValueChangedCallback(evt=>DesktopDisplay.SelectDisplay(displayNames.IndexOf(evt.newValue)));presentation.Add(display);
-            }
-            Section(scroll,"Rendering & timing","system",obj,schema,Array.Empty<string>(),new[]{"targetDisplay","targetFrameRate","vSyncCount"});
-            if(obj["configs"] is JArray rigs)
-            {
-                var title=Row("section-heading"); title.Add(new WorkbenchIcon("system")); title.Add(new Label("VR rigs · "+rigs.Count));
-                title.Add(StudioButton("Add rig","plus",()=>StudioEdit(selected,r=>{
-                    var array=(JArray)r["configs"];
-                    var rig=array.OfType<JObject>().LastOrDefault()?.DeepClone() as JObject??ConfigSchema.NewValue((JObject)schema["properties"]["configs"]["items"]) as JObject;
-                    int next=1; while(array.OfType<JObject>().Any(o=>(string)o["vrId"]=="VR"+next)) next++;
-                    rig["vrId"]="VR"+next;
-                    var ports=new HashSet<int>(array.OfType<JObject>().Select(o=>(int?)o["zmqPort"]??9872));
-                    int port=9871; while(port<=65535 && ports.Contains(port)) port++;
-                    if(port>65535) throw new ArgumentException("No unused tracking port is available.");
-                    rig["zmqPort"]=port;
-                    bool horizontal=(bool?)rig["horizontal"]??true;
-                    string coordinate=horizontal?"startRow":"startCol";
-                    rig[coordinate]=array.OfType<JObject>().Select(o=>(int?)o[coordinate]??0).DefaultIfEmpty(-1).Max()+1;
-                    array.Add(rig);
-                }),"quiet")); scroll.Add(title);
-                for(int i=0;i<rigs.Count;i++)
-                {
-                    int index=i; var rig=rigs[i] as JObject; if(rig==null) continue; var rigSchema=(JObject)schema["properties"]["configs"]["items"];
-                    var fold=new Foldout { name="rig-"+(string)rig["vrId"],text=(string)rig["vrId"]+" · "+RigMode(rig)+" · "+rig["zmqAddress"]+":"+rig["zmqPort"],value=i==0 }; fold.AddToClassList("rig-card"); scroll.Add(fold);
-                    var grid=new VisualElement(); grid.AddToClassList("settings-grid"); fold.Add(grid);
-                    foreach(string key in new[]{"vrId","speciesName","closedLoopMode","zmqAddress","zmqPort","displayOrder","ledPanelWidth","ledPanelHeight","startRow","startCol","horizontal","sphereDiameter","manualControls","tracker"})
-                        if(ConfigSchema.Visible(rig,rigSchema,key,Context)) grid.Add(Setting(selected,new[]{"configs",i.ToString(),key},ConfigSchema.Child(rigSchema,key),rig,rigSchema));
-                    AddTrackerControls(fold,rig);
-                    fold.Add(StudioButton("Remove rig","trash",()=>StudioEdit(selected,r=>((JArray)r["configs"]).RemoveAt(index)),"quiet"));
-                }
-            }
-            Section(scroll,"Monitoring & operator view","settings",obj,schema,Array.Empty<string>(),new[]{"telemetry","statusOverlay","overheadCamera"});
-            scroll.Add(new Label("One row per real animal. Add or remove rigs to match your setup. New rows receive a free tracking port and a separate panel row/column; verify the physical display layout before starting."));
-        }
+        private void BuildSystemEditor() { BuildApparatusEditor(); }
     }
 }

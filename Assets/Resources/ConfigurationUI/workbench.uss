@@ -371,3 +371,11 @@ Button.desktop-back-button { background-color: rgb(175, 218, 201); color: rgb(19
 .subject-card > .session-field { height: 74px; }
 .subject-traits, .subject-traits > .unity-base-field { height: 74px; min-height: 74px; }
 .subject-card > .session-comments { height: 90px; }
+
+/* The same labelled actions become a compact icon rail when requested. */
+.navigation-toggle { margin-right: 14px; }
+.navigation-collapsed .sidebar { width: 68px; padding-left: 10px; padding-right: 10px; }
+.navigation-collapsed .sidebar .studio-button { justify-content: center; padding: 10px; }
+.navigation-collapsed .sidebar .studio-button Label { display: none; }
+.navigation-collapsed .sidebar .studio-icon { margin-right: 0; }
+.navigation-collapsed .sidebar .nav-heading, .navigation-collapsed .sidebar .nav-foldout { display: none; }

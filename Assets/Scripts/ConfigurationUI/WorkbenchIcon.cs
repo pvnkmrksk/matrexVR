@@ -12,7 +12,7 @@ namespace ConfigurationUI
             {"play","play"},{"sequence","list-ordered"},{"system","monitor"},{"motion","move-right"},
             {"sky","sun"},{"swarm","network"},{"file","file-text"},{"plus","plus"},{"copy","copy"},
             {"trash","trash"},{"grip","grip-vertical"},{"settings","sliders-horizontal"},{"stop","square"},
-            {"camera","camera"},{"radio","radio"},{"pause","pause"},
+            {"camera","camera"},{"radio","radio"},{"pause","pause"},{"navigation","panel-left"},
             {"flying","bird"},{"walking","footprints"},{"forest","trees"},{"night","moon-star"},{"help","circle-help"},{"external","external-link"},{"next","chevron-right"}
         };
         private static readonly Dictionary<string,Texture2D> Textures=new Dictionary<string,Texture2D>();

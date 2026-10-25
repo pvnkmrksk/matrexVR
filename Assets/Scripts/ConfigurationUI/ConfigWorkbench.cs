@@ -111,6 +111,11 @@ namespace ConfigurationUI
         private void BuildShell()
         {
             var header=Row("header");
+            var navigation=IconButton("navigation","Collapse navigation",()=>{
+                navigationCollapsed=!navigationCollapsed;root.EnableInClassList("navigation-collapsed",navigationCollapsed);
+                root.Q<Button>("toggle-navigation").tooltip=navigationCollapsed?"Expand navigation":"Collapse navigation";
+            });navigation.name="toggle-navigation";navigation.AddToClassList("navigation-toggle");header.Add(navigation);
+            root.EnableInClassList("navigation-collapsed",navigationCollapsed);
             var identity=new VisualElement(); identity.AddToClassList("identity"); header.Add(identity);
             var brand=new Label("MATREX"); brand.AddToClassList("brand"); identity.Add(brand);
             var descriptor=new Label("EXPERIMENT CONTROL"); descriptor.AddToClassList("brand-detail"); identity.Add(descriptor);
@@ -126,7 +131,7 @@ namespace ConfigurationUI
             status=new Label(); status.AddToClassList("status"); footer.Add(status);
             undo=Button("Undo",()=>{ RequireApplied(); selected.Undo(); RebuildPreservingView(); }); footer.Add(undo);
             redo=Button("Redo",()=>{ RequireApplied(); selected.Redo(); RebuildPreservingView(); }); footer.Add(redo);
-            save=StudioButton("Save setup","file",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); UpdateStatus("Setup and session details saved."); }); footer.Add(save);
+            save=StudioButton("Save changes","file",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); UpdateStatus("Setup and session details saved."); }); footer.Add(save);
             start=StudioButton("Start experiment","play",StartExperiment,"primary"); start.name="start-experiment"; footer.Add(start);
             save.tooltip="Save the system, sequence, edited experiment files and subject metadata. Omitted values and unknown JSON fields are preserved.";
             start.tooltip="Validate and save this setup, archive the run's configuration files, then start the experiment.";
@@ -169,6 +174,7 @@ namespace ConfigurationUI
                 return schema;
             }
         }
+        private bool navigationCollapsed;
         private int viewGeneration;
         private void BuildContent()
         {
@@ -411,14 +417,42 @@ namespace ConfigurationUI
         public void StartExperiment()
         {
             if(preparing)return;
-            RequireApplied();var errors=Workspace.Validate();
+            RequireApplied();
+            bool configured=DesktopApparatusProfile.IsConfigured(Workspace.System.Root);
+            if(!configured&&!DesktopQuickStart.IsQuickStart(Workspace))
+                throw new InvalidOperationException("Finish Configure before using this apparatus, or return to Start to explore the demo.");
+            var errors=Workspace.Validate();
+            if(configured)
+            {
+                errors.AddRange(DesktopApparatusProfile.Validate(Workspace.System.Root));
+                errors.AddRange(ConnectedOutputErrors());
+            }
             if(errors.Count>0)throw new InvalidOperationException(string.Join("\n",errors));
-            Workspace.SaveAll();
-            if(DesktopQuickStart.IsQuickStart(Workspace))
+            PrepareRunMetadata();Workspace.SaveAll();
+            if(DesktopQuickStart.IsQuickStart(Workspace)||DesktopApparatusProfile.ShouldPrepareCompanions(Workspace.System.Root))
             {
                 BeginCompanionPreparation(true);return;
             }
             StartExperimentCore();
+        }
+        private IEnumerable<string> ConnectedOutputErrors()
+        {
+            foreach(var rig in DesktopApparatusProfile.Rigs(Workspace.System.Root))
+            {
+                int display=DesktopApparatusProfile.Integer(rig["targetDisplay"],0);
+                string id=(string)rig["vrId"];
+                if(display<0||display>=Display.displays.Length)
+                {yield return id+": output display "+(display+1)+" is not connected. Connect it or change its display in Configure.";continue;}
+                if(DesktopApparatusProfile.Flag(rig["desktopPreview"]))continue;
+                int width=display==0?Screen.width:Display.displays[display].systemWidth;
+                int height=display==0?Screen.height:Display.displays[display].systemHeight;
+                int faces=ViewportSetter.NormalizeDisplayOrder((string)rig["displayOrder"]).Length;
+                bool horizontal=rig["horizontal"]==null||DesktopApparatusProfile.Flag(rig["horizontal"]);
+                long right=((long)DesktopApparatusProfile.Integer(rig["startCol"],0)+(horizontal?faces:1))*DesktopApparatusProfile.Integer(rig["ledPanelWidth"],128);
+                long bottom=((long)DesktopApparatusProfile.Integer(rig["startRow"],0)+(horizontal?1:faces))*DesktopApparatusProfile.Integer(rig["ledPanelHeight"],128);
+                if(right>width||bottom>height)
+                    yield return id+": LED layout needs "+right+" × "+bottom+" pixels on display "+(display+1)+", which currently provides "+width+" × "+height+". Adjust the panel map in Configure.";
+            }
         }
         private void OpenQuickTracker()
         {if(preparing)return;RequireApplied();BeginCompanionPreparation(false);}
@@ -462,7 +496,10 @@ namespace ConfigurationUI
             yield return null;
             if(!isActiveAndEnabled||version!=preparationVersion)yield break;
             bool demo=CurrentDemo;
-            var rigs=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().Select(LosslessJson.ToRuntime<SystemConfig>).ToList();
+            bool configured=DesktopApparatusProfile.IsConfigured(Workspace.System.Root);
+            var rigs=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>()
+                .Where(r=>!configured||DesktopApparatusProfile.ShouldLaunchBundledForRig(Workspace.System.Root,r))
+                .Select(LosslessJson.ToRuntime<SystemConfig>).ToList();
             foreach(var rig in rigs)
             {
                 preparationStatus="Preparing "+TrackerBackend.DisplayName(rig.closedLoopMode)+" for "+rig.vrId+"…";UpdateStatus();
@@ -499,13 +536,7 @@ namespace ConfigurationUI
             }
             try
             {
-                EnsureMetadata();
-                string world=CurrentWorld=="forest"?"Forest":"Night sky";
-                bool automaticDemoName=metadata.ExperimentName=="Demo · Forest"||metadata.ExperimentName=="Demo · Night sky";
-                if(string.IsNullOrWhiteSpace(metadata.ExperimentName)||automaticDemoName)metadata.ExperimentName=(demo?"Demo · ":"")+world;
-                const string demoComment="Demonstration input (simulated or prerecorded); not a new live animal measurement.";
-                if(demo&&string.IsNullOrWhiteSpace(metadata.Comments))metadata.Comments=demoComment;
-                else if(!demo&&metadata.Comments==demoComment)metadata.Comments="";
+                PrepareRunMetadata();
                 preparationStatus="Opening your experiment…";UpdateStatus();
             }
             catch(Exception error){PreparationFailed(error);yield break;}
@@ -513,6 +544,17 @@ namespace ConfigurationUI
             if(!isActiveAndEnabled||version!=preparationVersion)yield break;
             try{StartExperimentCore();}
             catch(Exception error){PreparationFailed(error);}
+        }
+        private void PrepareRunMetadata()
+        {
+            EnsureMetadata();bool demo=CurrentDemo;
+            string title=DesktopQuickStart.IsQuickStart(Workspace)?(CurrentWorld=="forest"?"Forest":"Night sky"):
+                ExperimentBlocks.Title(BlockReference(BuilderSteps.OfType<JObject>().FirstOrDefault())??"Experiment");
+            bool automatic=metadata.ExperimentName=="Demo · Forest"||metadata.ExperimentName=="Demo · Night sky";
+            if(string.IsNullOrWhiteSpace(metadata.ExperimentName)||automatic)metadata.ExperimentName=(demo?"Demo · ":"")+title;
+            const string comment="Demonstration input (simulated or prerecorded); not a new live animal measurement.";
+            if(demo&&string.IsNullOrWhiteSpace(metadata.Comments))metadata.Comments=comment;
+            else if(!demo&&metadata.Comments==comment)metadata.Comments="";
         }
         private void PreparationFailed(Exception error)
         {
