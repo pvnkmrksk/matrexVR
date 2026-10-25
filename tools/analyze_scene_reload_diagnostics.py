@@ -55,6 +55,8 @@ def main():
     metrics = lines(root/'metrics.jsonl')
     process = lines(root/'process.jsonl')
     errors = lines(root/'errors.jsonl')
+    publisher = lines(root/'publisher.jsonl')
+    completion = json.loads((root/'completion.json').read_text()) if (root/'completion.json').exists() else {}
     summary = json.loads((root/'summary.json').read_text()) if (root/'summary.json').exists() else None
     late = [row for row in metrics if row.get('kind') == 'active-after-Start' and row.get('elapsedInSceneSeconds', 0) > 1]
     process_times = [(timestamp(row['utc']), row) for row in process if row.get('osThreadCount')]
@@ -64,7 +66,8 @@ def main():
             nearest_time, nearest = min(process_times, key=lambda item: abs(item[0]-moment))
             if abs(nearest_time-moment) <= 3:
                 row['externalOsThreads'] = nearest['osThreadCount']
-    keys = ['rssBytes', 'managedBytes', 'monoUsedBytes', 'monoHeapBytes', 'unityAllocatedBytes', 'unityReservedBytes', 'unityUnusedReservedBytes', 'graphicsDriverBytes', 'fileDescriptors', 'externalOsThreads', 'activeTrackingWorkers', 'activeAsyncWriters', 'ownedTrialMaterials', 'gameObjects', 'materials.nonPersistentCount', 'materials.nonPersistentBytes', 'meshes.nonPersistentCount', 'meshes.nonPersistentBytes', 'textures.nonPersistentCount', 'textures.nonPersistentBytes', 'renderTextures.nonPersistentCount', 'renderTextures.nonPersistentBytes', 'diagnosticRenderTargets']
+                row['externalNativeTracker'] = nearest.get('nativeTracker')
+    keys = ['rssBytes', 'managedBytes', 'monoUsedBytes', 'monoHeapBytes', 'unityAllocatedBytes', 'unityReservedBytes', 'unityUnusedReservedBytes', 'graphicsDriverBytes', 'fileDescriptors', 'externalOsThreads', 'activeTrackingWorkers', 'activeAsyncWriters', 'ownedTrialMaterials', 'gameObjects', 'materials.nonPersistentCount', 'materials.nonPersistentBytes', 'meshes.nonPersistentCount', 'meshes.nonPersistentBytes', 'textures.nonPersistentCount', 'textures.nonPersistentBytes', 'renderTextures.nonPersistentCount', 'renderTextures.nonPersistentBytes', 'diagnosticRenderTargets', 'externalNativeTracker.rssBytes', 'externalNativeTracker.osThreadCount', 'externalNativeTracker.fileDescriptorCount']
     groups = {}
     for name in sorted({row['scene'] for row in late}):
         all_rows = [row for row in late if row['scene'] == name]
@@ -78,14 +81,32 @@ def main():
     teardown = next((row['utc'] for row in metrics if row.get('kind') == 'last-scene-before-teardown'), None)
     runtime_errors = [row for row in errors if not row.get('editorIndex')]
     active_errors = [row for row in runtime_errors if row.get('duringExperiment') is True or ('duringExperiment' not in row and teardown and row['utc'] < teardown)]
+    native_packets = [row for row in publisher if 'nativeFrame' in row]
+    cleanup = [row for row in metrics if row.get('kind', '').startswith('after-')]
+    native = completion.get('nativeTracker')
+    native_evidence = None
+    if native:
+        native_evidence = dict(executableSha256=native.get('executableSha256'), configSha256=native.get('configSha256'),
+            singleNativePid=native.get('pid'), observedPids=sorted({row.get('nativePid') for row in native_packets}),
+            observedSourceKinds=sorted({row.get('sourceKind') for row in native_packets}),
+            fallbackEverObserved=any(row.get('sourceFallback') is not False for row in native_packets),
+            firstNativeFrame=native_packets[0]['nativeFrame'] if native_packets else None,
+            lastNativeFrame=native_packets[-1]['nativeFrame'] if native_packets else None,
+            observedPackets=native_packets[-1].get('observedPackets', 0) if native_packets else 0,
+            nativeExitCode=native.get('exitCode'), finalNativeSummary=native.get('finalSummary'),
+            sourceScope='Real native Rekkefly acquisition/tracking/publisher process using its explicit generated demo, not a camera or animal measurement.')
+    cleanup_keys = ('activeTrackingWorkers', 'activeAsyncWriters', 'ownedTrialMaterials', 'diagnosticRenderTargets')
+    clean_teardown = bool(cleanup) and all(row.get(key) == 0 for row in cleanup for key in cleanup_keys)
     report = dict(summary=summary, warmupLoads=args.warmup_loads, groups=groups,
                   coverage=dict(activeSamples=len(active), minimumLiveInputComponents=minimum_inputs, minimumInputComponents=minimum_components, staleOrNonprogressingInputObservations=stale,
                                 renderedFaces=sorted(set(row.get('renderedFaceCameraIds', 0) for row in active)), naturalCameraRenders=sum(row.get('naturalCameraRenders', 0) for row in late), forcedCameraRenders=sum(row.get('forcedCameraRenders', 0) for row in late)),
                   stimulusCoverage=dict(terrainComponentCounts=sorted({row['terrainComponents'] for row in active if 'terrainComponents' in row}), skyImageSizes=sorted({(row['skyImageWidth'], row['skyImageHeight']) for row in active if row.get('skyImageWidth')}), samplesWithRecordedSky=sum(bool(row.get('nightSkyId')) for row in active)),
                   durations=dict(minimum=min(durations), median=statistics.median(durations), maximum=max(durations), totalSceneSeconds=sum(durations)) if durations else None,
-                  cleanup=[row for row in metrics if row.get('kind', '').startswith('after-')], runtimeErrors=runtime_errors, runtimeErrorsDuringActiveProtocol=active_errors, runtimeErrorsOutsideActiveProtocol=[row for row in runtime_errors if row not in active_errors], excludedEditorIndexErrors=[row for row in errors if row.get('editorIndex')],
+                  cleanup=cleanup, ownedResourceTeardownPassed=clean_teardown, nativeTracker=native_evidence,
+                  supervisor=dict(unityExitCode=completion.get('unityExitCode'), failure=completion.get('supervisorFailure'), publisherErrors=completion.get('publisherErrors'), newCrashReports=completion.get('newCrashReports')),
+                  runtimeErrors=runtime_errors, runtimeErrorsDuringActiveProtocol=active_errors, runtimeErrorsOutsideActiveProtocol=[row for row in runtime_errors if row not in active_errors], excludedEditorIndexErrors=[row for row in errors if row.get('editorIndex')],
                   externalProcess=dict(samples=len(process), peakRssBytes=max((row.get('rssBytes', 0) for row in process), default=0), minimumThreads=min((row.get('osThreadCount', 9999) for row in process), default=None), maximumThreads=max((row.get('osThreadCount', 0) for row in process), default=None), maxFileDescriptors=max((row.get('fileDescriptorCount', 0) for row in process), default=None)),
-                  interpretation='Compare the same scene at the same active phase after warm-up. RSS/heap reservation can reflect allocator or Editor caches; rising native live counts/threads/FDs need independent attribution. A non-crashing200-load run does not identify the historical crash cause. Explicit diagnostic render targets are separately counted.')
+                  interpretation='Compare the same scene at the same active phase after warm-up. RSS/heap reservation can reflect allocator or Editor caches; rising native live counts/threads/FDs need independent attribution. A non-crashing bounded reload run does not identify the historical crash cause. Explicit diagnostic render targets are separately counted.')
     (root/'analysis.json').write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps({key: report[key] for key in ['coverage', 'durations', 'externalProcess']}, indent=2))
     for name, group in groups.items():
