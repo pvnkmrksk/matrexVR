@@ -76,6 +76,13 @@ public class fps : MonoBehaviour
         int display = MainController.Instance != null ? MainController.Instance.GetSystemConfig("VR1").targetDisplay : 0;
         displayCanvas.targetDisplay = display >= 0 && display < Display.displays.Length ? display : 0;
     }
+    private void OnEnable(){if(instance==this)layoutVersion=-1;}
+    private void OnDisable()
+    {
+        if(instance!=this)return;
+        if(displayCanvas!=null)displayCanvas.enabled=false;
+        OperatorOverlayLayout.Release("fps");layoutVersion=-1;
+    }
     private void LateUpdate()
     {
         if(displayCanvas==null||displayBox==null)return;
@@ -148,8 +155,9 @@ public class fps : MonoBehaviour
     private static string Ms(double? value) => value.HasValue ? value.Value.ToString("F1", System.Globalization.CultureInfo.InvariantCulture) : "—";
     private void OnDestroy()
     {
+        if(instance!=this)return;
         OperatorOverlayLayout.Release("fps");
         MainController.SystemConfigurationChanged -= ApplyDisplay;
-        if (instance == this) { instance = null; Latest = null; }
+        instance = null; Latest = null;
     }
 }

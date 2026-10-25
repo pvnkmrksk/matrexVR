@@ -150,7 +150,7 @@ public class SimpleOverheadCamera : MonoBehaviour
     }
     private void RefreshVisibility()
     {
-        bool active=visible&&!OperatorOverlayVisibility.Hidden&&layoutAvailable;
+        bool active=isActiveAndEnabled&&visible&&!OperatorOverlayVisibility.Hidden&&layoutAvailable;
         if(canvas!=null)canvas.enabled=active;
         if(shown==active)return;shown=active;
         if(active&&renderTexture!=null&&!renderTexture.IsCreated())renderTexture.Create();
@@ -168,6 +168,8 @@ public class SimpleOverheadCamera : MonoBehaviour
         if(shown&&overheadCam!=null&&displayImage!=null&&displayImage.rectTransform.rect.height>0)
             overheadCam.aspect=displayImage.rectTransform.rect.width/displayImage.rectTransform.rect.height;
     }
+    private void OnEnable(){layoutVersion=-1;}
+    private void OnDisable(){OperatorOverlayLayout.Release(Reservation);layoutVersion=-1;RefreshVisibility();}
     private void OnDestroy()
     {
         OperatorOverlayVisibility.Changed-=RefreshVisibility;OperatorOverlayLayout.Release(Reservation);

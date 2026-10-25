@@ -42,7 +42,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private int layoutVersion=-1,lastWidth,lastHeight;
     private Vector2 lastPanelSize;
     public bool Visible => visible&&!OperatorOverlayVisibility.Hidden;
-    public bool ShouldDisplay => Visible && layoutAvailable && !ConfigurationUI.ConfigWorkbench.IsOpen;
+    public bool ShouldDisplay => isActiveAndEnabled && Visible && layoutAvailable && !ConfigurationUI.ConfigWorkbench.IsOpen;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetErrors()
@@ -71,6 +71,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private void OnEnable()
     {
         if (instance != this) return;
+        layoutVersion=-1;
         if (dashboardToggle == null)
         {
             dashboardToggle = new UnityEngine.InputSystem.InputAction("Toggle flight dashboard", UnityEngine.InputSystem.InputActionType.Button, "<Keyboard>/tab");
@@ -78,7 +79,13 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         }
         dashboardToggle.Enable();
     }
-    private void OnDisable() { dashboardToggle?.Disable(); }
+    private void OnDisable()
+    {
+        dashboardToggle?.Disable();
+        if(instance!=this)return;
+        if(panel!=null)panel.SetActive(false);
+        OperatorOverlayLayout.Release("status");layoutVersion=-1;
+    }
     private void ToggleDashboard(UnityEngine.InputSystem.InputAction.CallbackContext context)
     { TryToggleDashboard(); }
     private void TryToggleDashboard()
@@ -366,9 +373,9 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     public static ErrorEntry[] RecentErrors() { lock (errorLock) return errors.ToArray(); }
     private void OnDestroy()
     {
-        OperatorOverlayLayout.Release("status");
         dashboardToggle?.Dispose();
         if (instance != this) return;
+        OperatorOverlayLayout.Release("status");
         Application.logMessageReceivedThreaded -= CaptureError;
         MainController.SystemConfigurationChanged -= Configure;
         instance = null;
