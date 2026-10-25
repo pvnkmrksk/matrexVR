@@ -54,9 +54,11 @@ static class Regression {
   Check(DesktopApparatusProfile.Order(rows[0])=="RBLF","four-face order normalization wrong");
   bool rejected=false;try{DesktopApparatusProfile.SetOrder(rows[0],"FF");}catch(ArgumentException){rejected=true;}
   Check(rejected&&DesktopApparatusProfile.Order(rows[0])=="RBLF","invalid order changed renderer layout");
-  rows[1]["zmqPort"]=9871;
-  Check(DesktopApparatusProfile.Validate(copy).Any(e=>e.Contains("same tracker endpoint")),"localhost aliases hid duplicate ports");
-  rows[1]["zmqAddress"]="192.0.2.1";
+  rows[2]["zmqPort"]=9872;
+  Check(DesktopApparatusProfile.Validate(copy).Any(e=>e.Contains("same tracker endpoint")),"localhost aliases hid duplicate native bindings");
+  copy[DesktopApparatusProfile.MarkerName]["launchBundledTrackers"]=false;
+  Check(!DesktopApparatusProfile.Validate(copy).Any(e=>e.Contains("same tracker endpoint"))&&DesktopApparatusProfile.SharedInputWarnings(copy).Count>0,"intentional external shared input was rejected or hidden");
+  copy[DesktopApparatusProfile.MarkerName]["launchBundledTrackers"]=true;rows[2]["zmqAddress"]="192.0.2.1";
   Check(!DesktopApparatusProfile.Validate(copy).Any(e=>e.Contains("same tracker endpoint")),"independent remote host incorrectly collides");
   DesktopApparatusProfile.ResizeRigs(copy,2);
   Check(DesktopApparatusProfile.Rigs(copy).Count()==2&&(string)copy["configs"][0]["tracker"]["configFile"]=="native-calibration.toml","resize lost retained calibration");
@@ -67,6 +69,11 @@ static class Regression {
   Check(!DesktopApparatusProfile.ShouldPrepareCompanions(imported),"imported external workflow auto-launches apps");
   DesktopApparatusProfile.SetPresentation(copy,"desktop");
   Check(DesktopApparatusProfile.Rigs(copy).All(r=>(bool)r["desktopPreview"]&&(string)r["displayOrder"]=="F"),"single-monitor preview does not render a single full view");
+  Check(DesktopApparatusProfile.Validate(copy).Any(e=>e.Contains("separate output displays")),"multiple desktop VRs share a full-screen output without warning");
+  copy["configs"][1]["targetDisplay"]=1;
+  Check(DesktopApparatusProfile.Validate(copy).Any(e=>e.Contains("exceeds the configured display count")),"output index ignores declared display count");
+  copy[DesktopApparatusProfile.MarkerName]["monitorCount"]=2;
+  Check(!DesktopApparatusProfile.Validate(copy).Any(e=>e.Contains("separate output displays")||e.Contains("exceeds the configured display count")),"separate declared desktop outputs rejected");
   var mixed=Demo();DesktopApparatusProfile.Begin(mixed,"led",true);mixed["configs"][0]["ledPanelHeight"]=128;DesktopApparatusProfile.ResizeRigs(mixed,2);mixed["configs"][1]["ledPanelHeight"]=64;mixed["configs"][1]["startRow"]=2;DesktopApparatusProfile.ResizeRigs(mixed,3);
   Check((int)mixed["configs"][2]["startRow"]>=3,"mixed panel sizes overlap after adding rig");
   Check(DesktopApparatusProfile.FaceName('U')=="Up"&&DesktopApparatusProfile.FaceName('D')=="Down","face labels differ from renderer letters");

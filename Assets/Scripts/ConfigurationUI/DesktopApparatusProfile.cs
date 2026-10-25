@@ -23,13 +23,20 @@ namespace ConfigurationUI
         }
         public static int MonitorCount(JToken root) => Math.Max(1,Integer(Profile(root)?["monitorCount"],Rigs(root).Select(r=>Integer(r["targetDisplay"],0)+1).DefaultIfEmpty(1).Max()));
         public static bool ShouldPrepareCompanions(JToken root) => IsConfigured(root)&&Flag(Profile(root)?["launchBundledTrackers"]);
-        public static bool ShouldLaunchBundledForRig(JToken root,JObject rig)
+        public static bool ShouldLaunchBundledForRig(JToken root,JObject rig) => ShouldPrepareCompanions(root)&&EligibleForBundled(rig);
+        private static bool EligibleForBundled(JObject rig)
         {
-            if(!ShouldPrepareCompanions(root)||rig==null||!string.IsNullOrWhiteSpace((string)rig["tracker"]?["executablePath"])||!string.IsNullOrWhiteSpace((string)rig["tracker"]?["configFile"]))return false;
+            if(rig==null||!string.IsNullOrWhiteSpace((string)rig["tracker"]?["executablePath"])||!string.IsNullOrWhiteSpace((string)rig["tracker"]?["configFile"]))return false;
             string mode=(rig["closedLoopMode"]?.ToString()??"").ToLowerInvariant();
-            if(mode!="rekkefly"&&mode!="hejjetrac"&&mode!="hejjé trac"&&mode!="hejjétrac"&&mode!="hejjetrak")return false;
-            return LocalAddress((string)rig["zmqAddress"]);
+            return (mode=="rekkefly"||mode=="hejjetrac"||mode=="hejjétrac"||mode=="hejjetrak")&&LocalAddress((string)rig["zmqAddress"]);
         }
+        private static string Endpoint(JObject rig)
+        {
+            string host=((string)rig["zmqAddress"]??"").Trim();
+            return (LocalAddress(host)?"localhost":host)+":"+Integer(rig["zmqPort"],0);
+        }
+        public static List<string> SharedInputWarnings(JToken root) => Rigs(root).GroupBy(Endpoint,StringComparer.OrdinalIgnoreCase).Where(g=>g.Count()>1)
+            .Select(g=>"Shared input: "+string.Join(", ",g.Select(r=>(string)r["vrId"]))+" subscribe to "+g.Key+". Verify that sharing one publisher and its input contract is intentional.").ToList();
         public static bool LocalAddress(string address)
         {
             string host=(address??"localhost").Trim().Trim('[',']').ToLowerInvariant();
@@ -131,7 +138,7 @@ namespace ConfigurationUI
             var errors=new List<string>();var rigs=Rigs(root).ToList();
             if(!(root?["configs"] is JArray array)||rigs.Count!=array.Count||rigs.Count<1||rigs.Count>MaximumRigCount)
                 errors.Add("Configure 1–"+MaximumRigCount+" valid VR entries.");
-            var ids=new HashSet<string>(StringComparer.Ordinal);var inputs=new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var ids=new HashSet<string>(StringComparer.Ordinal);
             foreach(var rig in rigs)
             {
                 string id=(string)rig["vrId"]??"";
@@ -141,12 +148,18 @@ namespace ConfigurationUI
                 if(Flag(rig["desktopPreview"])&&order.Length!=1)errors.Add(id+": desktop preview uses one face per display.");
                 if(Integer(rig["ledPanelWidth"],0)<=0||Integer(rig["ledPanelHeight"],0)<=0)errors.Add(id+": panel pixel dimensions must be positive.");
                 if(Integer(rig["startRow"],-1)<0||Integer(rig["startCol"],-1)<0)errors.Add(id+": panel row and column must be zero or greater.");
-                if(Integer(rig["targetDisplay"],-1)<0)errors.Add(id+": choose an output display index of zero or greater.");
+                int display=Integer(rig["targetDisplay"],-1);
+                if(display<0)errors.Add(id+": choose an output display index of zero or greater.");
+                else if(display>=MonitorCount(root))errors.Add(id+": output display "+(display+1)+" exceeds the configured display count "+MonitorCount(root)+".");
                 int port=Integer(rig["zmqPort"],0);string host=((string)rig["zmqAddress"]??"").Trim();
                 if(string.IsNullOrEmpty(host)||port<1||port>65535)errors.Add(id+": enter a host and a tracker port from 1–65535.");
-                string input=(LocalAddress(host)?"localhost":host)+":"+port;
-                if(!inputs.Add(input))errors.Add(id+": another rig uses the same tracker endpoint.");
+
             }
+            if(Flag(Profile(root)?["launchBundledTrackers"]))
+                foreach(var group in rigs.Where(EligibleForBundled).GroupBy(Endpoint,StringComparer.OrdinalIgnoreCase))
+                    if(group.Count()>1)errors.Add("Multiple bundled native trackers would bind the same tracker endpoint "+group.Key+". Use separate ports or select external/manual input to share one publisher.");
+            foreach(var group in rigs.Where(r=>Flag(r["desktopPreview"])).GroupBy(r=>Integer(r["targetDisplay"],0)))
+                if(group.Count()>1)errors.Add("Desktop preview rigs need separate output displays; multiple full-screen views cannot share display "+(group.Key+1)+".");
             return errors;
         }
         public static int Integer(JToken token,int fallback)
