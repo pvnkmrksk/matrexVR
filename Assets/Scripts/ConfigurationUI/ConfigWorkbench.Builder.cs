@@ -151,9 +151,9 @@ namespace ConfigurationUI
         }
         public void ReorderBlock(int from,int to) { Workspace.Sequence.Edit(root=>ExperimentBlocks.Move(root,from,to)); activeBlock=to; BuildContent(); }
         public void DuplicateBlock(int index)
-        { StudioEdit(Workspace.Sequence,root=>ExperimentBlocks.Steps(root).Insert(index+1,ExperimentBlocks.Steps(root)[index].DeepClone())); activeBlock=index+1; }
+        { activeBlock=index+1; StudioEdit(Workspace.Sequence,root=>ExperimentBlocks.Steps(root).Insert(index+1,ExperimentBlocks.Steps(root)[index].DeepClone())); }
         public void RemoveBlock(int index)
-        { StudioEdit(Workspace.Sequence,root=>ExperimentBlocks.Steps(root).RemoveAt(index)); activeBlock=Math.Max(0,Math.Min(index,BuilderSteps.Count-1)); }
+        { activeBlock=Math.Max(0,Math.Min(index,BuilderSteps.Count-2)); StudioEdit(Workspace.Sequence,root=>ExperimentBlocks.Steps(root).RemoveAt(index)); }
         private void EditBlock(int index)
         { var doc=BlockDocument(index); if(doc==null) throw new IOException("Choose a readable configuration for this block."); activeBlock=index; Select(doc); }
         private void StudioEdit(ConfigDocument doc,Action<JToken> change,bool rebuild=true)
