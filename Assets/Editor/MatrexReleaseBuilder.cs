@@ -21,9 +21,15 @@ public static class MatrexReleaseBuilder
   PlayerSettings.SetScriptingBackend(UnityEditor.Build.NamedBuildTarget.Standalone,ScriptingImplementation.Mono2x);
   if(target==BuildTarget.StandaloneOSX)EditorUserBuildSettings.SetPlatformSettings("Standalone","OSXUniversal","Architecture","x64ARM64");
   string[] scenes=EditorBuildSettings.scenes.Where(s=>s.enabled).Select(s=>s.path).Distinct().ToArray();
+  // Keep old-tag builder injection working: this method does not depend on a new runtime type.
+  string identityPath="Assets/StreamingAssets/player_build_info.json";
+  var identity=File.Exists(identityPath)?Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(identityPath)):new Newtonsoft.Json.Linq.JObject { ["schemaVersion"]=1,["sourceRevision"]=null,["sourceState"]="unknown" };
+  identity["applicationVersion"]=version;identity["unityVersion"]=Application.unityVersion;identity["buildTarget"]=target.ToString();
+  Directory.CreateDirectory(Path.GetDirectoryName(identityPath));File.WriteAllText(identityPath,identity.ToString(Newtonsoft.Json.Formatting.Indented)+"\n");
+  AssetDatabase.ImportAsset(identityPath,ImportAssetOptions.ForceSynchronousImport);
   Directory.CreateDirectory(Path.GetDirectoryName(output));
   var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=scenes,locationPathName=output,target=target,options=BuildOptions.None});
-  var summary=new {version,target=target.ToString(),result=report.summary.result.ToString(),errors=report.summary.totalErrors,warnings=report.summary.totalWarnings,bytes=report.summary.totalSize,scenes=scenes};
+  var summary=new {version,target=target.ToString(),result=report.summary.result.ToString(),errors=report.summary.totalErrors,warnings=report.summary.totalWarnings,bytes=report.summary.totalSize,buildGuid=report.summary.guid.ToString(),scenes=scenes};
   File.WriteAllText(Path.Combine(Path.GetDirectoryName(output),"build-report.json"),Newtonsoft.Json.JsonConvert.SerializeObject(summary,Newtonsoft.Json.Formatting.Indented));
   if(report.summary.result!=BuildResult.Succeeded)throw new Exception("Build failed: "+report.summary.result);
  }

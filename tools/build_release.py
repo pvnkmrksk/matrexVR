@@ -65,6 +65,11 @@ def prepare(ref, project):
     if sys.platform == 'darwin' and (ROOT / 'Library').is_dir():
         subprocess.run(['cp', '-cR', str(ROOT / 'Library'), str(project / 'Library')], check=True)
     (project / 'SOURCE-REVISION.txt').write_text(git('rev-parse', ref).decode())
+    try:
+        import build_identity
+    except ModuleNotFoundError:
+        from tools import build_identity
+    build_identity.write(project, git('rev-parse', ref).decode().strip(), 'pinned-git-snapshot')
 
 def validate_local_payload_options(platform, with_companions, with_dashboard,
                                    local_native_camera_fix, local_dashboard_archive):

@@ -42,6 +42,11 @@ def prepare(project, library):
     assets = project / 'Assets/StreamingAssets'
     shutil.copy2(assets / 'Templates/system_config.template.json', assets / 'system_config.json')
     (assets / 'sequenceConfig.json').write_text('{"autoStart":false,"loop":false,"sequences":[]}\n')
+    import build_identity
+    revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    dirty = subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=all', '--', 'Assets', 'Packages', 'ProjectSettings'], cwd=ROOT, text=True).splitlines()
+    (project / 'SOURCE-REVISION.txt').write_text(revision + '\n')
+    build_identity.write(project, revision, 'working-tree-snapshot', dirty)
 
 
 def main():
@@ -49,6 +54,7 @@ def main():
     parser.add_argument('--prepare-only', action='store_true')
     parser.add_argument('--project', type=Path, default=ROOT / '.local/project')
     parser.add_argument('--app', type=Path, default=ROOT / '.local/MATREX VR.app')
+    parser.add_argument('--version', default='0.3.1-dev', help='Application version embedded in the local player and its recordings')
     parser.add_argument('--library', type=Path, default=ROOT / '.release-work/project-v0.3/Library')
     parser.add_argument('--skip-companions', action='store_true', help='Advanced development-only opt-out')
     parser.add_argument('--skip-native-camera-fix', action='store_true', help='Advanced development-only opt-out; bundled flight camera input then remains unavailable')
@@ -65,7 +71,7 @@ def main():
     args.app.parent.mkdir(parents=True, exist_ok=True)
     run(UNITY, '-batchmode', '-quit', '-projectPath', args.project,
         '-executeMethod', 'MatrexReleaseBuilder.Build', '-releaseTarget', 'StandaloneOSX',
-        '-releaseVersion', '0.3.0', '-releaseOutput', args.app, '-localDesktopBuild',
+        '-releaseVersion', args.version, '-releaseOutput', args.app, '-localDesktopBuild',
         '-logFile', ROOT / '.local/build.log')
     if not args.skip_companions:
         payload = args.app / 'Contents/Companions'
