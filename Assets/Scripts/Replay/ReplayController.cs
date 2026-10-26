@@ -457,19 +457,19 @@ public class ReplayController : MonoBehaviour
         evt.mousePosition=ReplayMousePosition(mouse.position.ReadValue(),height);
     }
 
-    private static void NormalizeReplayClipPointer(Event evt,UnityEngine.InputSystem.Mouse mouse,float height,
-        Rect clip,EventType entryType,bool ownsCapture)
+    private static Rect ReplayControlRect(ref float x,float y,float width,float height)
     {
-        if(evt==null || evt.type==EventType.Used || mouse==null ||
-            !UsesModernMousePosition(entryType,evt.pointerType,mouse.added && mouse.enabled))return;
-        if(evt.type!=entryType && evt.type!=EventType.Ignore)return;
-        Vector2 position=ReplayMousePosition(mouse.position.ReadValue(),height);
-        evt.mousePosition=new Vector2(position.x-clip.x,position.y-clip.y);
-        bool capturedDrag=ownsCapture && (entryType==EventType.MouseDrag || entryType==EventType.MouseUp);
-        // BeginArea can turn a valid event into Ignore using the stale legacy
-        // cursor. Recover that suppression, never an event consumed with Use().
-        if(evt.type==EventType.Ignore && entryType!=EventType.Repaint && (clip.Contains(position) || capturedDrag))
-            evt.type=entryType;
+        var rect=new Rect(x,y,width,height);x+=width+4;return rect;
+    }
+    private void ClearPathFocus(){GUI.FocusControl(null);pathFocused=false;}
+    private bool ReplayButton(Rect rect,string text)
+    {
+        bool clicked=GUI.Button(rect,text);if(clicked)ClearPathFocus();return clicked;
+    }
+    private float ReplaySlider(Rect rect,float value,float minimum,float maximum)
+    {
+        if(Event.current.type==EventType.MouseDown && rect.Contains(Event.current.mousePosition))ClearPathFocus();
+        return GUI.HorizontalSlider(rect,value,minimum,maximum);
     }
 
     private void TraceReplayButton(string stage,Rect rect,bool clicked=false)
@@ -490,7 +490,6 @@ public class ReplayController : MonoBehaviour
             replayPointerControl=0;return;
         }
         EventType entryType=Event.current!=null?Event.current.type:EventType.Ignore;
-        bool ownsCapture=replayPointerControl!=0 && GUIUtility.hotControl==replayPointerControl;
         Vector2 legacyPosition=Event.current!=null?Event.current.mousePosition:Vector2.zero;
         NormalizeReplayPointer(Event.current,UnityEngine.InputSystem.Mouse.current,Screen.height);
         float scale=ReplayUiScale(DesktopDisplay.UiScale,Screen.width);
@@ -517,70 +516,93 @@ public class ReplayController : MonoBehaviour
             smallStyle.font=replaySkin.font;smallStyle.fontSize=Mathf.Max(1,Mathf.RoundToInt(13*scale));
         }
         GUISkin previousSkin=GUI.skin;GUI.skin=replaySkin;
-        // Keep drawing and pointer hit-testing in the same native pixel space.
+        // All interactive controls stay in the native root clip. A moving
+        // BeginArea can suppress events using the platform's stale legacy cursor.
         Matrix4x4 previousMatrix=GUI.matrix;GUI.matrix=Matrix4x4.identity;
+        NormalizeReplayPointer(Event.current,UnityEngine.InputSystem.Mouse.current,Screen.height);
         float screenWidth=Screen.width,screenHeight=Screen.height;
         float height=Mathf.Max(152*scale,screenHeight*.20f);var area=ReplayToolbarRect(screenWidth,screenHeight,scale);
-        var controlsArea=new Rect(area.x+10*scale,area.y+6*scale,area.width-20*scale,area.height-12*scale);
-        GUI.Box(area,GUIContent.none);GUILayout.BeginArea(controlsArea);
-        TraceReplayButton("area-clipped",new Rect(0,0,controlsArea.width,controlsArea.height));
-        NormalizeReplayClipPointer(Event.current,UnityEngine.InputSystem.Mouse.current,Screen.height,controlsArea,entryType,ownsCapture);
-        TraceReplayButton("area-routed",new Rect(0,0,controlsArea.width,controlsArea.height));
-        GUILayout.BeginHorizontal();GUILayout.Label("Experiment replay",titleStyle,GUILayout.Width(185*scale));
-        if(GUILayout.Button(new GUIContent("Back to setup","Return to experiment setup. Shortcut: Esc."),GUILayout.Width(120*scale)))
+        GUI.Box(area,GUIContent.none);
+        float left=area.x+10*scale,top=area.y+6*scale,width=area.width-20*scale,rowHeight=30*scale,x=left;
+        TraceReplayButton("root-toolbar",area);
+        GUI.Label(ReplayControlRect(ref x,top,185*scale,rowHeight),"Experiment replay",titleStyle);
+        if(GUI.Button(ReplayControlRect(ref x,top,120*scale,rowHeight),new GUIContent("Back to setup","Return to experiment setup. Shortcut: Esc.")))
         {
             GUI.matrix=previousMatrix;GUI.skin=previousSkin;
             if(MainController.Instance!=null)MainController.Instance.HandleEscape();else SceneManager.LoadScene("ControlScene");
             GUIUtility.ExitGUI();
         }
-        GUI.SetNextControlName("Replay run folder");folderInput=GUILayout.TextField(folderInput,GUILayout.MinWidth(100*scale));pathFocused=GUI.GetNameOfFocusedControl()=="Replay run folder";
+        float openX=left+width-125*scale,browseX=openX-4-80*scale;
+        GUI.SetNextControlName("Replay run folder");
+        folderInput=GUI.TextField(new Rect(x,top,Mathf.Max(100*scale,browseX-4-x),rowHeight),folderInput);
+        pathFocused=GUI.GetNameOfFocusedControl()=="Replay run folder";
         GUI.enabled=!loading && folderPicker==null;
-        if(GUILayout.Button("Browse…",GUILayout.Width(80*scale))){GUI.FocusControl(null);pathFocused=false;folderPicker=ReplayFolderPicker.ChooseAsync();}
-        if(GUILayout.Button("Open run folder",GUILayout.Width(125*scale))){GUI.FocusControl(null);pathFocused=false;LoadSession(folderInput);}GUI.enabled=true;
-        GUILayout.EndHorizontal();
-        if(loading)GUILayout.Label("Indexing recorded frames on disk… "+loadProgress,smallStyle);
-        else if(!string.IsNullOrEmpty(LoadError))GUILayout.Label(LoadError,smallStyle);
-        else if(archive==null)GUILayout.Label("Paste a saved run folder, or launch with --replay-session <folder>. In Unity Editor, drop a folder anywhere in this window.",smallStyle);
+        if(ReplayButton(new Rect(browseX,top,80*scale,rowHeight),"Browse…"))folderPicker=ReplayFolderPicker.ChooseAsync();
+        if(ReplayButton(new Rect(openX,top,125*scale,rowHeight),"Open run folder"))LoadSession(folderInput);
+        GUI.enabled=true;
+        top+=rowHeight+4;
+        if(loading)GUI.Label(new Rect(left,top,width,60*scale),"Indexing recorded frames on disk… "+loadProgress,smallStyle);
+        else if(!string.IsNullOrEmpty(LoadError))GUI.Label(new Rect(left,top,width,60*scale),LoadError,smallStyle);
+        else if(archive==null)GUI.Label(new Rect(left,top,width,60*scale),"Paste a saved run folder, or launch with --replay-session <folder>. In Unity Editor, drop a folder anywhere in this window.",smallStyle);
         else
         {
-            GUILayout.BeginHorizontal();
-            playContent.text=isPlaying?"Pause":"Play";
-            Rect playRect=GUILayoutUtility.GetRect(playContent,GUI.skin.button,GUILayout.Width(64*scale));
+            x=left;playContent.text=isPlaying?"Pause":"Play";
+            Rect playRect=ReplayControlRect(ref x,top,64*scale,rowHeight);
             TraceReplayButton("pause-before",playRect);
             bool playClicked=GUI.Button(playRect,playContent);
             TraceReplayButton("pause-after",playRect,playClicked);
-            if(playClicked)isPlaying=!isPlaying;
-            if(GUILayout.Button("−10s",GUILayout.Width(52*scale)))Seek(replayTime-10);
-            if(GUILayout.Button("+10s",GUILayout.Width(52*scale)))Seek(replayTime+10);
-            if(GUILayout.Button("Previous",GUILayout.Width(78*scale)))JumpToStep(-1);
-            if(GUILayout.Button("Next",GUILayout.Width(55*scale)))JumpToStep(1);
-            GUILayout.Label(Clock(replayTime)+" / "+Clock(Duration),GUILayout.Width(180*scale));
-            GUILayout.Label("Speed",GUILayout.Width(56*scale));playbackSpeed=GUILayout.HorizontalSlider(playbackSpeed,.1f,4,GUILayout.Width(80*scale));GUILayout.Label(playbackSpeed.ToString("0.0")+"×",GUILayout.Width(38*scale));
-            if(GUILayout.Button(selectedView<0?"God's-eye view":"Animal "+rigOrder[selectedView],GUILayout.Width(130*scale)))CycleView();
-            if(GUILayout.Button("Fit",GUILayout.Width(44*scale))){ShowOverview();FitOverview();}
-            showDetails=GUILayout.Toggle(showDetails,"Fidelity ("+archive.Warnings.Count+")",GUILayout.Width(106*scale));
-            GUILayout.EndHorizontal();
+            if(playClicked){ClearPathFocus();isPlaying=!isPlaying;}
+            if(ReplayButton(ReplayControlRect(ref x,top,52*scale,rowHeight),"−10s"))Seek(replayTime-10);
+            if(ReplayButton(ReplayControlRect(ref x,top,52*scale,rowHeight),"+10s"))Seek(replayTime+10);
+            if(ReplayButton(ReplayControlRect(ref x,top,78*scale,rowHeight),"Previous"))JumpToStep(-1);
+            if(ReplayButton(ReplayControlRect(ref x,top,55*scale,rowHeight),"Next"))JumpToStep(1);
+            GUI.Label(ReplayControlRect(ref x,top,180*scale,rowHeight),Clock(replayTime)+" / "+Clock(Duration));
+            GUI.Label(ReplayControlRect(ref x,top,56*scale,rowHeight),"Speed");
+            Rect speedRect=ReplayControlRect(ref x,top,80*scale,rowHeight);speedRect.y+=6*scale;speedRect.height=18*scale;
+            playbackSpeed=ReplaySlider(speedRect,playbackSpeed,.1f,4);
+            GUI.Label(ReplayControlRect(ref x,top,38*scale,rowHeight),playbackSpeed.ToString("0.0")+"×");
+            if(ReplayButton(ReplayControlRect(ref x,top,130*scale,rowHeight),selectedView<0?"God's-eye view":"Animal "+rigOrder[selectedView]))CycleView();
+            if(ReplayButton(ReplayControlRect(ref x,top,44*scale,rowHeight),"Fit")){ShowOverview();FitOverview();}
+            bool details=GUI.Toggle(ReplayControlRect(ref x,top,106*scale,rowHeight),showDetails,"Fidelity ("+archive.Warnings.Count+")");
+            if(details!=showDetails){ClearPathFocus();showDetails=details;}
+            top+=rowHeight+8;
             float normalized=Duration>0?(float)(replayTime/Duration):0;
-            float changed=GUILayout.HorizontalSlider(normalized,0,1);
-            Rect timeline=GUILayoutUtility.GetLastRect();Color oldColor=GUI.color;GUI.color=new Color(.3f,.8f,.9f,.8f);
+            Rect timeline=new Rect(left,top,width,18*scale);
+            float changed=ReplaySlider(timeline,normalized,0,1);
+            Color oldColor=GUI.color;GUI.color=new Color(.3f,.8f,.9f,.8f);
             foreach(var step in stepChanges)if(Duration>0)GUI.DrawTexture(new Rect(timeline.x+(float)(step.time/Duration)*timeline.width,timeline.y+2*scale,Mathf.Max(1,scale),8*scale),Texture2D.whiteTexture);
             GUI.color=oldColor;
             if(Mathf.Abs(changed-normalized)>.000001f)SetScrubNormalized(changed);
+            top+=timeline.height+8;
             string context=referenceSample==null?"No animal sample at this time":referenceSample.scene+" · trial "+referenceSample.trial+" · sequence "+referenceSample.sequenceStep+" · "+referenceSample.stepName+" · "+referenceSample.phase;
-            GUILayout.Label(context+"   |   "+(environmentLoader?.FidelityStatus??""),smallStyle);
-            GUILayout.Label("Space: play/pause · ←/→: 1s · Shift+←/→: 10s · N/M: previous/next condition · mouse wheel: zoom · Esc: setup",smallStyle);
+            string contextText=context+"   |   "+(environmentLoader?.FidelityStatus??"");
+            float contextHeight=smallStyle.CalcHeight(new GUIContent(contextText),width);
+            GUI.Label(new Rect(left,top,width,contextHeight),contextText,smallStyle);
+            top+=contextHeight+4;
+            GUI.Label(new Rect(left,top,width,40*scale),"Space: play/pause · ←/→: 1s · Shift+←/→: 10s · N/M: previous/next condition · mouse wheel: zoom · Esc: setup",smallStyle);
         }
-        GUILayout.EndArea();
         if(showDetails && archive!=null)
         {
-            var details=new Rect(12*scale,12*scale,Mathf.Min(700*scale,screenWidth-24*scale),Mathf.Max(100*scale,screenHeight-height-32*scale));GUI.Box(details,GUIContent.none);
-            var detailsArea=new Rect(details.x+10*scale,details.y+8*scale,details.width-20*scale,details.height-16*scale);
-            GUILayout.BeginArea(detailsArea);
-            NormalizeReplayClipPointer(Event.current,UnityEngine.InputSystem.Mouse.current,Screen.height,detailsArea,entryType,ownsCapture);
-            GUILayout.Label("Replay fidelity and saved evidence",titleStyle);
-            GUILayout.Label(archive.DirectoryPath,smallStyle);detailScroll=GUILayout.BeginScrollView(detailScroll);
-            foreach(string warning in archive.Warnings)GUILayout.Label("• "+warning,smallStyle);
-            GUILayout.EndScrollView();GUILayout.EndArea();
+            var details=new Rect(12*scale,12*scale,Mathf.Min(700*scale,screenWidth-24*scale),Mathf.Max(100*scale,screenHeight-height-32*scale));
+            GUI.Box(details,GUIContent.none);float detailX=details.x+10*scale,detailY=details.y+8*scale,detailWidth=details.width-20*scale;
+            GUI.Label(new Rect(detailX,detailY,detailWidth,rowHeight),"Replay fidelity and saved evidence",titleStyle);detailY+=rowHeight+4;
+            float pathHeight=smallStyle.CalcHeight(new GUIContent(archive.DirectoryPath),detailWidth);
+            GUI.Label(new Rect(detailX,detailY,detailWidth,pathHeight),archive.DirectoryPath,smallStyle);detailY+=pathHeight+8;
+            var viewport=new Rect(detailX,detailY,detailWidth-22*scale,Mathf.Max(20*scale,details.yMax-detailY-10*scale));
+            float contentHeight=0;
+            foreach(string warning in archive.Warnings)contentHeight+=smallStyle.CalcHeight(new GUIContent("• "+warning),viewport.width)+4*scale;
+            float maximum=Mathf.Max(0,contentHeight-viewport.height);detailScroll.y=Mathf.Clamp(detailScroll.y,0,maximum);
+            if(maximum>0)detailScroll.y=GUI.VerticalScrollbar(new Rect(viewport.xMax+4*scale,viewport.y,18*scale,viewport.height),detailScroll.y,viewport.height,0,contentHeight);
+            if(Event.current.type==EventType.ScrollWheel && viewport.Contains(Event.current.mousePosition))
+            {detailScroll.y=Mathf.Clamp(detailScroll.y+Event.current.delta.y*20*scale,0,maximum);Event.current.Use();}
+            // Only read-only text is clipped; no input control is inside this clip.
+            GUI.BeginClip(viewport);float warningY=-detailScroll.y;
+            foreach(string warning in archive.Warnings)
+            {
+                string text="• "+warning;float warningHeight=smallStyle.CalcHeight(new GUIContent(text),viewport.width);
+                GUI.Label(new Rect(0,warningY,viewport.width,warningHeight),text,smallStyle);warningY+=warningHeight+4*scale;
+            }
+            GUI.EndClip();
         }
 #if UNITY_EDITOR
         Event evt=Event.current;
