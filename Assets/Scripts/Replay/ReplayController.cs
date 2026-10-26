@@ -80,6 +80,7 @@ public class ReplayController : MonoBehaviour
     private ReplaySessionArchive.Sample referenceSample;
     private Bounds trajectoryBounds;
     private GUIStyle titleStyle, smallStyle;
+    private GUISkin replaySkin;
     private Task<string> folderPicker;
     private int cameraLayoutVersion=-1;
 
@@ -368,13 +369,32 @@ public class ReplayController : MonoBehaviour
     private void OnGUI()
     {
         if(OperatorOverlayVisibility.Hidden)return;
-        if(titleStyle==null){titleStyle=new GUIStyle(GUI.skin.label){fontSize=18,fontStyle=FontStyle.Bold};smallStyle=new GUIStyle(GUI.skin.label){fontSize=12,wordWrap=true};}
-        Matrix4x4 previousMatrix=GUI.matrix;float scale=Mathf.Min(1,Screen.width/1120f);
+        if(replaySkin==null)
+        {
+            replaySkin=Instantiate(GUI.skin);replaySkin.name="Replay controls";
+            replaySkin.font=Resources.Load<Font>("ConfigurationUI/Fonts/Inter-Regular")??GUI.skin.font;
+            foreach(var style in new[]{replaySkin.label,replaySkin.button,replaySkin.toggle,replaySkin.textField})
+            {style.font=replaySkin.font;style.fontSize=14;}
+            replaySkin.button.fixedHeight=30;replaySkin.button.padding=new RectOffset(8,8,5,5);
+            replaySkin.textField.fixedHeight=30;replaySkin.textField.padding=new RectOffset(8,8,5,5);
+            replaySkin.toggle.fixedHeight=30;replaySkin.toggle.alignment=TextAnchor.MiddleLeft;
+            replaySkin.label.alignment=TextAnchor.MiddleLeft;
+            titleStyle=new GUIStyle(replaySkin.label){fontSize=19,fontStyle=FontStyle.Bold};
+            smallStyle=new GUIStyle(replaySkin.label){fontSize=13,wordWrap=true};
+        }
+        GUISkin previousSkin=GUI.skin;GUI.skin=replaySkin;
+        Matrix4x4 previousMatrix=GUI.matrix;float scale=Mathf.Min(DesktopDisplay.UiScale,Mathf.Max(1,Screen.width)/1120f);
         GUI.matrix=Matrix4x4.TRS(Vector3.zero,Quaternion.identity,Vector3.one*scale);
         float screenWidth=Screen.width/scale,screenHeight=Screen.height/scale;
         float height=Mathf.Max(152,screenHeight*.20f);var area=new Rect(8,screenHeight-height,screenWidth-16,height-8);
         GUI.Box(area,GUIContent.none);GUILayout.BeginArea(new Rect(area.x+10,area.y+6,area.width-20,area.height-12));
         GUILayout.BeginHorizontal();GUILayout.Label("Experiment replay",titleStyle,GUILayout.Width(185));
+        if(GUILayout.Button(new GUIContent("Back to setup","Return to experiment setup. Shortcut: Esc."),GUILayout.Width(120)))
+        {
+            GUI.matrix=previousMatrix;GUI.skin=previousSkin;
+            if(MainController.Instance!=null)MainController.Instance.HandleEscape();else SceneManager.LoadScene("ControlScene");
+            GUIUtility.ExitGUI();
+        }
         GUI.SetNextControlName("Replay run folder");folderInput=GUILayout.TextField(folderInput,GUILayout.MinWidth(100));pathFocused=GUI.GetNameOfFocusedControl()=="Replay run folder";
         GUI.enabled=!loading && folderPicker==null;
         if(GUILayout.Button("Browse…",GUILayout.Width(80))){GUI.FocusControl(null);pathFocused=false;folderPicker=ReplayFolderPicker.ChooseAsync();}
@@ -386,16 +406,16 @@ public class ReplayController : MonoBehaviour
         else
         {
             GUILayout.BeginHorizontal();
-            if(GUILayout.Button(isPlaying?"Pause":"Play",GUILayout.Width(65)))isPlaying=!isPlaying;
-            if(GUILayout.Button("−10s",GUILayout.Width(55)))Seek(replayTime-10);
-            if(GUILayout.Button("+10s",GUILayout.Width(55)))Seek(replayTime+10);
-            if(GUILayout.Button("Previous",GUILayout.Width(70)))JumpToStep(-1);
-            if(GUILayout.Button("Next",GUILayout.Width(50)))JumpToStep(1);
+            if(GUILayout.Button(isPlaying?"Pause":"Play",GUILayout.Width(64)))isPlaying=!isPlaying;
+            if(GUILayout.Button("−10s",GUILayout.Width(52)))Seek(replayTime-10);
+            if(GUILayout.Button("+10s",GUILayout.Width(52)))Seek(replayTime+10);
+            if(GUILayout.Button("Previous",GUILayout.Width(78)))JumpToStep(-1);
+            if(GUILayout.Button("Next",GUILayout.Width(55)))JumpToStep(1);
             GUILayout.Label(Clock(replayTime)+" / "+Clock(Duration),GUILayout.Width(150));
-            GUILayout.Label("Speed",GUILayout.Width(40));playbackSpeed=GUILayout.HorizontalSlider(playbackSpeed,.1f,4,GUILayout.Width(90));GUILayout.Label(playbackSpeed.ToString("0.0")+"×",GUILayout.Width(38));
-            if(GUILayout.Button(selectedView<0?"God's-eye view":"Animal "+rigOrder[selectedView],GUILayout.Width(135)))CycleView();
-            if(GUILayout.Button("Fit",GUILayout.Width(40))){ShowOverview();FitOverview();}
-            showDetails=GUILayout.Toggle(showDetails,"Fidelity ("+archive.Warnings.Count+")",GUILayout.Width(100));
+            GUILayout.Label("Speed",GUILayout.Width(40));playbackSpeed=GUILayout.HorizontalSlider(playbackSpeed,.1f,4,GUILayout.Width(80));GUILayout.Label(playbackSpeed.ToString("0.0")+"×",GUILayout.Width(38));
+            if(GUILayout.Button(selectedView<0?"God's-eye view":"Animal "+rigOrder[selectedView],GUILayout.Width(130)))CycleView();
+            if(GUILayout.Button("Fit",GUILayout.Width(44))){ShowOverview();FitOverview();}
+            showDetails=GUILayout.Toggle(showDetails,"Fidelity ("+archive.Warnings.Count+")",GUILayout.Width(106));
             GUILayout.EndHorizontal();
             float normalized=Duration>0?(float)(replayTime/Duration):0;
             float changed=GUILayout.HorizontalSlider(normalized,0,1);
@@ -405,7 +425,7 @@ public class ReplayController : MonoBehaviour
             if(Mathf.Abs(changed-normalized)>.000001f)SetScrubNormalized(changed);
             string context=referenceSample==null?"No animal sample at this time":referenceSample.scene+" · trial "+referenceSample.trial+" · sequence "+referenceSample.sequenceStep+" · "+referenceSample.stepName+" · "+referenceSample.phase;
             GUILayout.Label(context+"   |   "+(environmentLoader?.FidelityStatus??""),smallStyle);
-            GUILayout.Label("Space: play/pause · ←/→: 1s · Shift+←/→: 10s · N/M: previous/next condition · mouse wheel: overview zoom",smallStyle);
+            GUILayout.Label("Space: play/pause · ←/→: 1s · Shift+←/→: 10s · N/M: previous/next condition · mouse wheel: zoom · Esc: setup",smallStyle);
         }
         GUILayout.EndArea();
         if(showDetails && archive!=null)
@@ -429,7 +449,7 @@ public class ReplayController : MonoBehaviour
             }
         }
 #endif
-        GUI.matrix=previousMatrix;
+        GUI.matrix=previousMatrix;GUI.skin=previousSkin;
     }
     private static string Clock(double seconds)=>TimeSpan.FromSeconds(Math.Max(0,seconds)).ToString(@"hh\:mm\:ss\.f");
     private void ClearSessionVisuals()
@@ -440,6 +460,7 @@ public class ReplayController : MonoBehaviour
     }
     private void OnDestroy()
     {
+        if(replaySkin!=null)Destroy(replaySkin);
         foreach(var population in populations)population.stream.Dispose();populations.Clear();
         if(pendingLoad!=null)
             pendingLoad.ContinueWith(task=>{if(task.Status==TaskStatus.RanToCompletion)foreach(var stream in task.Result.agents)stream.Dispose();});
