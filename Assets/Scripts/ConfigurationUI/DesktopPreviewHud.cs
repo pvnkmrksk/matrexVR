@@ -23,6 +23,7 @@ namespace ConfigurationUI
         private static void Install() { SceneManager.sceneLoaded -= Loaded; SceneManager.sceneLoaded += Loaded; }
         private static void Loaded(Scene scene, LoadSceneMode mode)
         {
+            if(mode==LoadSceneMode.Additive && FindFirstObjectByType<ReplayController>()!=null)return;
             if(scene.name=="ControlScene" || scene.name=="ReplayScene" || MainController.Instance==null ||
                 !MainController.Instance.SystemConfigs.Values.Any(r=>r.desktopPreview)) return;
             new GameObject("Desktop preview controls").AddComponent<DesktopPreviewHud>();

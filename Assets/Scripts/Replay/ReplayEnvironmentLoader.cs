@@ -143,41 +143,76 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private void FreezeLoadedScene(Scene scene,LoadSceneMode mode)
     {
         if(scene.name!=importedName || scene==gameObject.scene)return;
-        if(archive?.SystemConfiguration?["configs"] is JArray savedRigs)
+        var roots=scene.GetRootGameObjects().Where(root=>root!=null).ToArray();
+        var active=roots.ToDictionary(root=>root,root=>root.activeSelf);
+        // Missing scripts and optional archived metadata must never leave a later
+        // rig alive long enough to start acquisition in the replay scene.
+        foreach(var root in roots)root.SetActive(false);
+        bool isolated=false;
+        try
         {
-            var configurations=savedRigs.ToObject<SystemConfig[]>().ToDictionary(c=>c.vrId,c=>c);
-            RuntimeRigRegistry.Configure(scene,configurations);
-        }
-        // The replay scene's convenience light must not illuminate an imported experiment a second time.
-        foreach(var light in previewLights.Keys)if(light!=null)light.enabled=false;
-        Scene previous=SceneManager.GetActiveScene();
-        if(SceneManager.SetActiveScene(scene))
-        {
-            importedDefaultSky=RenderSettings.skybox;importedAmbientMode=RenderSettings.ambientMode;
-            importedAmbientLight=RenderSettings.ambientLight;importedAmbientSky=RenderSettings.ambientSkyColor;
-            importedAmbientEquator=RenderSettings.ambientEquatorColor;importedAmbientGround=RenderSettings.ambientGroundColor;
-            importedFog=RenderSettings.fog;importedFogColor=RenderSettings.fogColor;importedFogDensity=RenderSettings.fogDensity;
-            importedFogStart=RenderSettings.fogStartDistance;importedFogEnd=RenderSettings.fogEndDistance;
-            SceneManager.SetActiveScene(previous);
-        }
-        // sceneLoaded runs before Start: networking, recording, autoplay and random spawning stay dormant.
-        foreach(var root in scene.GetRootGameObjects())
-        {
-            foreach(var choice in root.GetComponentsInChildren<ChoiceController>(true))IndexAssets(choice.prefabs,choice.materials);
-            foreach(var dynamic in root.GetComponentsInChildren<DynamicSequenceController>(true))IndexAssets(dynamic.prefabs,dynamic.materials);
-            foreach(var rig in root.GetComponentsInChildren<ClosedLoop>(true))
+            foreach(var root in roots)FreezeHierarchy(root,false);
+            try
             {
-                string id=CanonicalRig(rig.name);importedRigs[id]=rig.transform;
-                var front=rig.GetComponentsInChildren<Camera>(true).FirstOrDefault(camera=>camera.name=="Main Camera F");
-                if(front!=null)importedFrontCameras[id]=front;
+                if(archive?.SystemConfiguration?["configs"] is JArray savedRigs)
+                {
+                    var configurations=savedRigs.ToObject<SystemConfig[]>().Where(config=>config!=null).ToDictionary(config=>config.vrId,config=>config);
+                    RuntimeRigRegistry.Configure(scene,configurations);
+                    foreach(var root in roots)if(root.GetComponent<ClosedLoop>()!=null)active[root]=root.activeSelf;
+                }
             }
-            foreach(var script in root.GetComponentsInChildren<MonoBehaviour>(true))script.enabled=false;
-            foreach(var camera in root.GetComponentsInChildren<Camera>(true))camera.enabled=false;
-            foreach(var listener in root.GetComponentsInChildren<AudioListener>(true))listener.enabled=false;
-            foreach(var animator in root.GetComponentsInChildren<Animator>(true))animator.enabled=false;
-            foreach(var body in root.GetComponentsInChildren<Rigidbody>(true))body.isKinematic=true;
-            foreach(var collider in root.GetComponentsInChildren<Collider>(true))collider.enabled=false;
+            catch(Exception error){Warn("Recorded rig layout unavailable: "+error.Message);}
+            // Registry configuration can clone rigs. Templates were already
+            // frozen, and this second pass also covers every generated child.
+            foreach(var root in scene.GetRootGameObjects())FreezeHierarchy(root,false);
+            isolated=true;
+            foreach(var light in previewLights.Keys)if(light!=null)light.enabled=false;
+            Scene previous=SceneManager.GetActiveScene();
+            if(SceneManager.SetActiveScene(scene))
+            {
+                try
+                {
+                    importedDefaultSky=RenderSettings.skybox;importedAmbientMode=RenderSettings.ambientMode;
+                    importedAmbientLight=RenderSettings.ambientLight;importedAmbientSky=RenderSettings.ambientSkyColor;
+                    importedAmbientEquator=RenderSettings.ambientEquatorColor;importedAmbientGround=RenderSettings.ambientGroundColor;
+                    importedFog=RenderSettings.fog;importedFogColor=RenderSettings.fogColor;importedFogDensity=RenderSettings.fogDensity;
+                    importedFogStart=RenderSettings.fogStartDistance;importedFogEnd=RenderSettings.fogEndDistance;
+                }
+                finally{if(previous.IsValid() && previous.isLoaded)SceneManager.SetActiveScene(previous);}
+            }
+            foreach(var root in scene.GetRootGameObjects())
+            {
+                if(root==null)continue;
+                foreach(var choice in root.GetComponentsInChildren<ChoiceController>(true))if(choice!=null)IndexAssets(choice.prefabs,choice.materials);
+                foreach(var dynamic in root.GetComponentsInChildren<DynamicSequenceController>(true))if(dynamic!=null)IndexAssets(dynamic.prefabs,dynamic.materials);
+                foreach(var rig in root.GetComponentsInChildren<ClosedLoop>(true))
+                {
+                    if(rig==null)continue;
+                    string id=CanonicalRig(rig.name);importedRigs[id]=rig.transform;
+                    var front=rig.GetComponentsInChildren<Camera>(true).FirstOrDefault(camera=>camera!=null && camera.name=="Main Camera F");
+                    if(front!=null)importedFrontCameras[id]=front;
+                }
+            }
         }
+        catch(Exception error){Warn("Recorded scene isolation/reconstruction: "+error.Message);}
+        finally
+        {
+            if(isolated){foreach(var root in roots)if(root!=null)root.SetActive(active[root]);}
+            else foreach(var root in scene.GetRootGameObjects())if(root!=null)root.SetActive(false);
+        }
+    }
+
+    private static void FreezeHierarchy(GameObject root,bool visual)
+    {
+        if(root==null)return;
+        foreach(var script in root.GetComponentsInChildren<MonoBehaviour>(true))
+            if(script!=null && (!visual || !(script is RuntimeMaterialOwner)))script.enabled=false;
+        foreach(var camera in root.GetComponentsInChildren<Camera>(true))if(camera!=null)camera.enabled=false;
+        foreach(var listener in root.GetComponentsInChildren<AudioListener>(true))if(listener!=null)listener.enabled=false;
+        foreach(var animator in root.GetComponentsInChildren<Animator>(true))if(animator!=null)animator.enabled=false;
+        foreach(var body in root.GetComponentsInChildren<Rigidbody>(true))if(body!=null)body.isKinematic=true;
+        foreach(var collider in root.GetComponentsInChildren<Collider>(true))if(collider!=null)collider.enabled=false;
+        if(visual)foreach(var renderer in root.GetComponentsInChildren<Renderer>(true))if(renderer!=null)renderer.enabled=true;
     }
 
     public void DriveRecordedRig(string id,Vector3 position,Quaternion rotation)
@@ -398,14 +433,8 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         if(label!=null && label.StartsWith("AgentsVR",StringComparison.Ordinal) && int.TryParse(label.Substring(8),out int index))return RuntimeRigRegistry.StimulusLayer(index);
         return -1;
     }
-    public static void FreezeVisual(GameObject visual)
-    {
-        foreach(var script in visual.GetComponentsInChildren<MonoBehaviour>(true))if(!(script is RuntimeMaterialOwner))script.enabled=false;
-        foreach(var body in visual.GetComponentsInChildren<Rigidbody>(true))body.isKinematic=true;
-        foreach(var collider in visual.GetComponentsInChildren<Collider>(true))collider.enabled=false;
-        foreach(var animator in visual.GetComponentsInChildren<Animator>(true))animator.enabled=false;
-        foreach(var renderer in visual.GetComponentsInChildren<Renderer>(true))renderer.enabled=true;
-    }
+    public static void FreezeVisual(GameObject visual) => FreezeHierarchy(visual,true);
+
     private static void SetLayer(GameObject root,int layer){root.layer=layer;foreach(Transform child in root.transform)SetLayer(child.gameObject,layer);}
     private static Vector3 Vector(JToken value) => value is JArray array && array.Count>=3?new Vector3((float)array[0],(float)array[1],(float)array[2]):Vector3.zero;
     private static Color ColorValue(JArray array)=>new Color((float)array[0],(float)array[1],(float)array[2],array.Count>3?(float)array[3]:1);

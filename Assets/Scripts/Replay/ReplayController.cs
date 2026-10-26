@@ -412,7 +412,7 @@ public class ReplayController : MonoBehaviour
             if(GUILayout.Button("Previous",GUILayout.Width(78)))JumpToStep(-1);
             if(GUILayout.Button("Next",GUILayout.Width(55)))JumpToStep(1);
             GUILayout.Label(Clock(replayTime)+" / "+Clock(Duration),GUILayout.Width(150));
-            GUILayout.Label("Speed",GUILayout.Width(40));playbackSpeed=GUILayout.HorizontalSlider(playbackSpeed,.1f,4,GUILayout.Width(80));GUILayout.Label(playbackSpeed.ToString("0.0")+"×",GUILayout.Width(38));
+            GUILayout.Label("Speed",GUILayout.Width(56));playbackSpeed=GUILayout.HorizontalSlider(playbackSpeed,.1f,4,GUILayout.Width(80));GUILayout.Label(playbackSpeed.ToString("0.0")+"×",GUILayout.Width(38));
             if(GUILayout.Button(selectedView<0?"God's-eye view":"Animal "+rigOrder[selectedView],GUILayout.Width(130)))CycleView();
             if(GUILayout.Button("Fit",GUILayout.Width(44))){ShowOverview();FitOverview();}
             showDetails=GUILayout.Toggle(showDetails,"Fidelity ("+archive.Warnings.Count+")",GUILayout.Width(106));
