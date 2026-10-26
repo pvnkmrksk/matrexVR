@@ -62,10 +62,11 @@ namespace ConfigurationUI
             libraryBrowse=StudioButton("Browse…","file",BrowseLibraryFolder,"quiet");libraryBrowse.name="recording-library-browse";tools.Add(libraryBrowse);
             var back=StudioButton("Back to Start","back",ShowSessionHome,"quiet");back.name="recording-library-back";tools.Add(back);
             libraryState=SessionLabel(libraryMessage??"Scanning local recordings…","recording-library-state");libraryState.name="recording-library-state";body.Add(libraryState);
-            var split=Row("recording-library-split");body.Add(split);
+            var split=Row("recording-library-split");split.style.alignItems=Align.FlexStart;body.Add(split);
             var local=new VisualElement();local.AddToClassList("recording-library-local");split.Add(local);
             local.Add(SessionLabel("LOCAL RUN DATA","apparatus-eyebrow"));
-            var location=SessionLabel(libraryRoot??RuntimePaths.RunDataRoot,"recording-library-root");location.tooltip="The configured RunData directory; --data-dir overrides the default location.";local.Add(location);
+            string rootDirectory=libraryRoot??RuntimePaths.RunDataRoot;
+            var location=SessionLabel(rootDirectory,"recording-library-root");location.tooltip=rootDirectory+"\nThe configured RunData directory; --data-dir overrides the default location.";local.Add(location);
             libraryEmpty=SessionLabel("No recordings found yet. Start an experiment, or Browse to a saved run folder.","recording-library-empty");local.Add(libraryEmpty);
             libraryList=new ListView(libraryVisible,90,()=>new VisualElement(),BindLibraryRow){name="recording-library-list",selectionType=SelectionType.Single,virtualizationMethod=CollectionVirtualizationMethod.FixedHeight};libraryList.style.flexGrow=1;local.Add(libraryList);
             libraryList.selectionChanged+=selection=>{var entry=selection.OfType<RecordingLibrary.Entry>().FirstOrDefault();if(entry!=null){librarySelected=entry.DirectoryPath;RefreshLibraryDetails();RefreshLibraryFooter();}};
@@ -233,8 +234,8 @@ namespace ConfigurationUI
             evidence.Add(SessionLabel("Span is elapsed local-wall-clock time, including acquisition gaps; it is not active stimulus exposure. Sequence cycles are distinct recorded CurrentTrial values, not a sum across parallel animals.","recording-library-copy"));
             foreach(var warning in warnings)evidence.Add(SessionLabel(warning.ToString(),"recording-library-warning"));
             evidence.Add(SessionLabel("Planned sequence scenes · "+JoinLibraryValues(summary?["metadata"]?["plannedSceneNames"]),"recording-library-copy"));
-            evidence.Add(SessionLabel("Folder · "+entry.DirectoryPath,"recording-library-root"));
-            var replay=StudioButton("Save setup and replay","play",OpenLibrarySelection,"primary");replay.name="recording-library-open";replay.SetEnabled(LibrarySelectionReady);libraryDetails.Add(replay);
+            var folder=SessionLabel("Folder · "+entry.DirectoryPath,"recording-library-root");folder.tooltip=entry.DirectoryPath;evidence.Add(folder);
+            libraryDetails.Add(SessionLabel("Replay selected saves your setup before opening this recording. Original recording files stay unchanged.","recording-library-copy"));
             state?.Restore(libraryDetails,()=>replayLibraryMode&&ReferenceEquals(libraryDetailEntry,entry));
         }
         private void OpenLibrarySelection()
@@ -253,7 +254,6 @@ namespace ConfigurationUI
             if(start!=null){var label=start.Q<Label>();if(label!=null)label.text="Replay selected";start.tooltip="Save this setup, then open the selected recording. Original recording files are read without modification.";start.SetEnabled(LibrarySelectionReady);}
             save?.SetEnabled(true);undo?.SetEnabled(false);redo?.SetEnabled(false);
             libraryBrowse?.SetEnabled(libraryPicker==null);libraryRefresh?.SetEnabled(!libraryRunning&&libraryPicker==null);
-            libraryDetails?.Q<Button>("recording-library-open")?.SetEnabled(LibrarySelectionReady);
         }
         private void AddLibraryFact(VisualElement parent,string name,string value)
         {var box=new VisualElement();box.AddToClassList("recording-library-fact");box.Add(SessionLabel(name,"recording-library-date"));box.Add(SessionLabel(value,"recording-library-fact-value"));parent.Add(box);}

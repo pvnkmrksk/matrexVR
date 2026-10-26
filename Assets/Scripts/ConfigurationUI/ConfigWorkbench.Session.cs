@@ -218,12 +218,14 @@ namespace ConfigurationUI
                 SessionField(card,"Comments","subject-comments-"+id,fly.Comments,v=>fly.Comments=v,"Notes for "+id,true);
                 if(TrackerBackend.TryParse(rig["closedLoopMode"]?.ToString(),out var videoMode)&&(videoMode==ClosedLoopMode.Rekkefly||videoMode==ClosedLoopMode.Hejjetrac))
                 {
-                    var video=new Toggle("Save tracker video") {name="recording-save-video-"+id,value=DesktopApparatusProfile.Flag(rig["tracker"]?["saveVideo"])};
-                    video.tooltip="Save native camera video alongside tracker frame/configuration logs. Uses additional disk space. Recording options preserve calibration. A running tracker using another profile must be closed explicitly before changing this option. Media remains pending until the native recorder closes cleanly; archival never stops your tracker.";
-                    video.RegisterValueChangedCallback(e=>StudioEdit(Workspace.System,r=>{
+                    var videoRow=Row("recording-video-option");videoRow.style.marginTop=8;videoRow.style.marginBottom=8;
+                    var videoLabel=SessionLabel("Save tracker video","session-hint");videoLabel.style.flexGrow=1;videoLabel.style.flexBasis=0;videoRow.Add(videoLabel);
+                    var video=StateSwitch(DesktopApparatusProfile.Flag(rig["tracker"]?["saveVideo"]),enabled=>StudioEdit(Workspace.System,r=>{
                         var current=(r["configs"] as JArray).OfType<JObject>().First(row=>(string)row["vrId"]==id);
-                        if(!(current["tracker"] is JObject tracker)){tracker=new JObject();current["tracker"]=tracker;}tracker["saveVideo"]=e.newValue;
-                    },false));card.Add(video);
+                        if(!(current["tracker"] is JObject tracker)){tracker=new JObject();current["tracker"]=tracker;}tracker["saveVideo"]=enabled;
+                    },false),"recording-save-video-"+id);
+                    video.tooltip="Save native camera video alongside tracker frame/configuration logs. Uses additional disk space. Recording options preserve calibration. A running tracker using another profile must be closed explicitly before changing this option. Media remains pending until the native recorder closes cleanly; archival never stops your tracker.";
+                    videoLabel.tooltip=video.tooltip;videoLabel.RegisterCallback<ClickEvent>(_=>video.value=!video.value);videoRow.Add(video);card.Add(videoRow);
                 }
                 AddTrackerControls(card,rig);
             }

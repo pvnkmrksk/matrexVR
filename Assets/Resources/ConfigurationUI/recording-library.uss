@@ -1,16 +1,16 @@
 .recording-library-tools { align-items: center; margin: 10px 0; flex-wrap: wrap; }
 #recording-library-search { flex-grow: 1; min-width: 200px; max-width: 520px; margin-right: 12px; }
 .recording-library-state { color: rgb(151, 178, 193); font-size: 12px; white-space: normal; margin: 3px 0 14px; }
-.recording-library-split { flex-grow: 1; min-height: 220px; align-items: stretch; }
-.recording-library-local { width: 42%; min-width: 260px; margin-right: 20px; }
-.recording-library-root { color: rgb(122, 148, 167); font-size: 10px; white-space: normal; margin: 5px 0 10px; }
+.row.recording-library-split { flex-grow: 1; min-height: 220px; align-items: flex-start; }
+.recording-library-local { width: 42%; height: 100%; min-width: 260px; min-height: 0; margin-right: 20px; align-self: flex-start; }
+.recording-library-root { color: rgb(122, 148, 167); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 100%; flex-shrink: 1; margin: 5px 0 10px; }
 #recording-library-list { min-height: 200px; border-width: 1px; border-color: rgb(48, 64, 79); background-color: rgb(19, 27, 35); }
 .recording-library-row { padding: 10px 12px; border-bottom-width: 1px; border-bottom-color: rgb(45, 61, 75); }
 .recording-library-name { font-size: 14px; color: rgb(215, 232, 239); -unity-font-style: bold; margin-bottom: 4px; }
 .recording-library-date { font-size: 11px; color: rgb(147, 173, 192); margin-bottom: 4px; }
 .recording-library-row-meta { font-size: 11px; color: rgb(171, 191, 202); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .recording-library-empty { white-space: normal; color: rgb(148, 170, 185); margin: 20px 0; }
-.recording-library-details { flex-grow: 1; flex-basis: 0; min-width: 260px; border-width: 1px; border-color: rgb(48, 64, 79); padding: 16px; background-color: rgb(24, 33, 42); }
+.recording-library-details { flex-grow: 1; flex-basis: 0; min-width: 260px; align-self: stretch; border-width: 1px; border-color: rgb(48, 64, 79); padding: 16px; background-color: rgb(24, 33, 42); }
 .recording-library-detail-title { font-size: 23px; color: rgb(218, 234, 240); margin-bottom: 8px; -unity-font-style: bold; white-space: normal; }
 .recording-library-copy { font-size: 12px; color: rgb(169, 188, 202); white-space: normal; margin: 5px 0 9px; }
 .recording-library-facts { flex-wrap: wrap; margin: 12px 0; }
@@ -18,8 +18,7 @@
 .recording-library-fact-value { font-size: 18px; color: rgb(185, 220, 211); }
 .recording-library-file-name { font-size: 12px; color: rgb(192, 218, 226); margin-top: 8px; white-space: normal; }
 .recording-library-warning { color: rgb(220, 178, 137); font-size: 11px; white-space: normal; margin: 6px 0; }
-#recording-library-open { align-self: flex-start; margin: 18px 0 8px; min-width: 190px; }
 #recording-library-external-path { margin-top: 12px; color: rgb(148, 171, 190); }
-.compact .recording-library-split { flex-direction: column; }
-.compact .recording-library-local { width: 100%; min-height: 220px; max-height: 320px; margin-right: 0; margin-bottom: 12px; }
-.compact .recording-library-details { min-height: 200px; }
+.narrow-layout .recording-library-split { flex-direction: column; }
+.narrow-layout .recording-library-local { width: 100%; height: 260px; min-height: 220px; max-height: 280px; margin-right: 0; margin-bottom: 12px; }
+.narrow-layout .recording-library-details { min-height: 200px; }
