@@ -19,7 +19,7 @@ namespace ConfigurationUI
             var focused=root.panel?.focusController.focusedElement as VisualElement;
             while(focused!=null && focused!=root)
             {
-                if(focused is TextField || focused is DropdownField || focused is Toggle || focused is Button)
+                if(focused is TextField || focused is IntegerField || focused is DropdownField || focused is Toggle || focused is Button)
                 { focus=Key(focused,root);break; }
                 focused=focused.parent;
             }
@@ -31,7 +31,7 @@ namespace ConfigurationUI
         {
             var parts=new List<string>();
             for(var item=element;item!=null && item!=root;item=item.parent)
-                parts.Add(!string.IsNullOrEmpty(item.name)?"#"+item.name:item.GetType().Name+":"+(item.parent?.IndexOf(item)??0));
+                parts.Add(!string.IsNullOrEmpty(item.viewDataKey)?"@"+item.viewDataKey:!string.IsNullOrEmpty(item.name)?"#"+item.name:item.GetType().Name+":"+(item.parent?.IndexOf(item)??0));
             parts.Reverse();return string.Join("/",parts);
         }
         public void Restore(VisualElement root,Func<bool> current)

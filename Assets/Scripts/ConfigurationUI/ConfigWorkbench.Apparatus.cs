@@ -213,6 +213,12 @@ namespace ConfigurationUI
             var rigSchema=(JObject)Workspace.Schemas.Get("system")["properties"]["configs"]["items"];
             foreach(string key in new[]{"sphereDiameter","manualControls","tracker"})advanced.Add(Setting(Workspace.System,RigPath(key),ConfigSchema.Child(rigSchema,key),rig,rigSchema));
             AddTrackerControls(advanced,rig);
+            // A hardware label may change while editing. View identity follows its
+            // array slot so renaming VR2 does not close its form or lose focus.
+            fold.viewDataKey="apparatus-rig-slot-"+index;
+            foreach(var element in fold.Query<VisualElement>().ToList())
+                if(!string.IsNullOrEmpty(element.name)&&element.name.Contains("-"+id))
+                    element.viewDataKey=element.name.Replace("-"+id,"-slot-"+index);
         }
         private void BuildFaceNet(VisualElement parent,JObject rig,int index,string id)
         {
@@ -237,6 +243,7 @@ namespace ConfigurationUI
             }
             var strip=new VisualElement();strip.AddToClassList("apparatus-strip-preview");previews.Add(strip);strip.Add(SessionLabel("Output order","apparatus-eyebrow"));
             var tiles=Row("apparatus-strip-tiles");strip.Add(tiles);
+            tiles.style.flexDirection=rig["horizontal"]==null||DesktopApparatusProfile.Flag(rig["horizontal"])?FlexDirection.Row:FlexDirection.Column;
             for(int slot=0;slot<order.Length;slot++){var tile=new VisualElement();tile.AddToClassList("apparatus-strip-tile");tile.Add(new Label(order[slot].ToString()));tile.Add(SessionLabel((slot+1).ToString(),"apparatus-face-slot"));tiles.Add(tile);}
             strip.Add(SessionLabel((rig["horizontal"]==null||DesktopApparatusProfile.Flag(rig["horizontal"])?"Left → right":"Top → bottom")+" · "+rig["ledPanelWidth"]+" × "+rig["ledPanelHeight"]+" pixels per face","apparatus-note"));
         }
@@ -253,6 +260,12 @@ namespace ConfigurationUI
                 if(estimated){width=Math.Max(1920,rigs.Where(r=>DesktopApparatusProfile.Integer(r["targetDisplay"],0)==display).Select(r=>PixelBounds(r).Item3).DefaultIfEmpty(1920).Max());height=Math.Max(1080,rigs.Where(r=>DesktopApparatusProfile.Integer(r["targetDisplay"],0)==display).Select(r=>PixelBounds(r).Item4).DefaultIfEmpty(1080).Max());}
                 section.Add(SessionLabel("Display "+(display+1)+" · "+width+" × "+height+" px"+(attached?"":" · not connected")+(estimated?" · preview extent":""),"apparatus-map-label"));
                 var map=new VisualElement {name="apparatus-display-map-"+display};map.AddToClassList("apparatus-display-map");section.Add(map);
+                float aspect=(float)width/height;
+                map.style.width=210f*aspect;
+                map.RegisterCallback<GeometryChangedEvent>(e=>{
+                    float scaledHeight=e.newRect.width/aspect;
+                    if(Mathf.Abs(e.newRect.height-scaledHeight)>.5f)map.style.height=scaledHeight;
+                });
                 foreach(var rig in rigs.Where(r=>DesktopApparatusProfile.Integer(r["targetDisplay"],0)==display))
                 {
                     string id=(string)rig["vrId"];string order=DesktopApparatusProfile.Order(rig);bool horizontal=rig["horizontal"]==null||DesktopApparatusProfile.Flag(rig["horizontal"]);int pw=Math.Max(1,DesktopApparatusProfile.Integer(rig["ledPanelWidth"],128)),ph=Math.Max(1,DesktopApparatusProfile.Integer(rig["ledPanelHeight"],128));

@@ -17,7 +17,7 @@
 .apparatus-map-section { padding: 16px; border-width: 1px; border-color: rgb(50, 67, 80); background-color: rgb(25, 33, 42); border-radius: 5px; margin-bottom: 18px; }
 .apparatus-map-section .session-section-heading { margin-top: 0; margin-bottom: 8px; }
 .apparatus-map-label { color: rgb(183, 200, 215); font-size: 11px; margin: 12px 0 7px; }
-.apparatus-display-map { height: 210px; min-height: 210px; position: relative; background-color: rgb(12, 18, 24); border-width: 1px; border-color: rgb(55, 69, 81); overflow: hidden; }
+.apparatus-display-map { height: 210px; min-height: 0; max-width: 100%; flex-shrink: 0; position: relative; background-color: rgb(12, 18, 24); border-width: 1px; border-color: rgb(55, 69, 81); overflow: hidden; }
 .apparatus-pixel-cell { position: absolute; background-color: rgb(49, 91, 92); border-width: 1px; border-color: rgb(143, 200, 191); color: rgb(233, 244, 244); font-size: 10px; -unity-text-align: middle-center; overflow: hidden; }
 .apparatus-map-legend { color: rgb(158, 185, 202); font-size: 10px; white-space: normal; margin-top: 6px; }
 .apparatus-rig { border-width: 1px; border-color: rgb(52, 68, 81); border-radius: 5px; background-color: rgb(29, 37, 46); margin: 0 0 12px; padding: 10px 14px; }
