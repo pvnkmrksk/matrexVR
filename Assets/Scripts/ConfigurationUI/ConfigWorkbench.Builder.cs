@@ -86,7 +86,7 @@ namespace ConfigurationUI
         {
             var stats=Row("sequence-stats"); body.Add(stats);
             stats.Add(Pill(BuilderSteps.Count+" blocks","accent"));
-            stats.Add(Pill(SequenceDuration()+" total"));
+            var total=Pill(SequenceDuration()+" total");total.name="sequence-total-duration";stats.Add(total);
             stats.Add(Pill(ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])?"Shuffled order":"Listed order"));
             stats.Add(Pill(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass"));
             body.Add(BuildSequenceFlags());
@@ -175,6 +175,10 @@ namespace ConfigurationUI
         private int pendingPointerGeneration;
         private ConfigDocument pendingPointerSelection;
         private IVisualElementScheduledItem pendingPointerRebuild;
+        private IVisualElementScheduledItem pendingBlockRefresh;
+        private ListView pendingBlockRefreshList;
+        private int pendingBlockRefreshGeneration;
+        private ConfigDocument pendingBlockRefreshSelection;
         private void InstallEditPointerTracking()
         {
             root.RegisterCallback<PointerDownEvent>(e=>{if(e.button==0)editPointerHeld=true;},TrickleDown.TrickleDown);
@@ -198,6 +202,19 @@ namespace ConfigurationUI
                 // The clicked control may have opened a foldout or moved focus.
                 // Preserve its completed action, rather than the pre-blur state.
                 RebuildEditedView(WorkbenchViewState.Capture(root));
+            }).Every(1);
+        }
+        private void ScheduleBlockItemsRefresh()
+        {
+            var list=blockList;if(list==null)return;
+            if(pendingBlockRefresh!=null&&pendingBlockRefreshList==list&&pendingBlockRefreshGeneration==viewGeneration&&pendingBlockRefreshSelection==selected)return;
+            pendingBlockRefresh?.Pause();pendingBlockRefreshList=list;
+            pendingBlockRefreshGeneration=viewGeneration;pendingBlockRefreshSelection=selected;
+            pendingBlockRefresh=root.schedule.Execute(()=>{
+                if(!isActiveAndEnabled||preparing||root.panel==null||pendingBlockRefreshGeneration!=viewGeneration||pendingBlockRefreshSelection!=selected||blockList!=list)
+                {pendingBlockRefresh?.Pause();pendingBlockRefresh=null;return;}
+                if(editPointerHeld)return;
+                pendingBlockRefresh.Pause();pendingBlockRefresh=null;list.RefreshItems();
             }).Every(1);
         }
         private Toggle StateSwitch(bool value,Action<bool> changed,string name=null)

@@ -586,6 +586,7 @@ namespace ConfigurationUI
         private void OnDestroy()
         {
             pendingPointerRebuild?.Pause();
+            pendingBlockRefresh?.Pause();
             foreach(var raycaster in legacyRaycasters) if(raycaster!=null) raycaster.enabled=true;
             if(panel!=null) Destroy(panel);
             if(Instance==this) Instance=null;

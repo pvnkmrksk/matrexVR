@@ -267,12 +267,17 @@ namespace ConfigurationUI
         private void RefreshStudioValues()
         {
             var timing=body.Q<VisualElement>("timing-warnings");if(timing!=null) PopulateTimingWarnings(timing,selected);
-            var duration=inspector.Q<Label>(className:"overview-duration"); if(duration!=null) duration.text=SequenceDuration();
+            var duration=inspector.Q<Label>(className:"overview-duration");
+            var total=body.Q<Label>("sequence-total-duration");
+            if(duration!=null||total!=null)
+            {
+                string value=SequenceDuration();if(duration!=null)duration.text=value;if(total!=null)total.text=value+" total";
+            }
             var effects=inspector.Q<Label>("config-effects"); if(effects!=null) effects.text=ExperimentBlocks.Describe(EditingPayload());
             foreach(var update in enableUpdates.ToArray()) update();
             var sync=inspector.Q<Label>("system-sync"); if(sync!=null) sync.text=SystemSyncSummary();
             var display=inspector.Q<Label>("system-display"); if(display!=null) display.text=SystemDisplaySummary();
-            if(blockList!=null) root.schedule.Execute(()=>blockList?.RefreshItems());
+            ScheduleBlockItemsRefresh();
         }
         private void BuildSystemEditor() { BuildApparatusEditor(); }
     }
