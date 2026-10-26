@@ -65,6 +65,14 @@ public class ReplayController : MonoBehaviour
     private static string pendingSessionPath;
     private readonly Dictionary<string,GameObject> markerByRig = new Dictionary<string,GameObject>();
     private readonly Dictionary<string,Camera> camerasByRig = new Dictionary<string,Camera>();
+    private sealed class RecordedPath
+    {
+        public LineRenderer line;
+        public int start=-1,end=-1;
+        public Bounds bounds;
+        public readonly List<Vector3> points=new List<Vector3>(5000);
+    }
+    private readonly Dictionary<string,RecordedPath> pathsByRig = new Dictionary<string,RecordedPath>();
     private readonly List<string> rigOrder = new List<string>();
     private readonly List<ReplaySessionArchive.Sample> stepChanges = new List<ReplaySessionArchive.Sample>();
     private readonly List<Population> populations = new List<Population>();
@@ -185,7 +193,6 @@ public class ReplayController : MonoBehaviour
 
     private void BuildMarkers()
     {
-        bool first=true;
         foreach(var pair in archive.Rigs.OrderBy(p=>p.Key,StringComparer.Ordinal))
         {
             string id=pair.Key;rigOrder.Add(id);
@@ -202,8 +209,6 @@ public class ReplayController : MonoBehaviour
             }
             ReplayEnvironmentLoader.FreezeVisual(marker);
             SetOverlayLayer(marker);markerByRig[id]=marker;
-            foreach(var sample in pair.Value)
-            {if(first){trajectoryBounds=new Bounds(sample.position,Vector3.zero);first=false;}else trajectoryBounds.Encapsulate(sample.position);}
             if(createRigCameras)
             {
                 var camera=new GameObject("Replay animal view "+id,typeof(Camera)).GetComponent<Camera>();
@@ -214,15 +219,10 @@ public class ReplayController : MonoBehaviour
                 camerasByRig[id]=camera;
             }
         }
-        float size=Mathf.Max(.15f,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z)*.008f);
-        foreach(var marker in markerByRig.Values)if(rigMarkerPrefab==null)marker.transform.localScale=Vector3.one*size;
         foreach(var pair in archive.Rigs)
         {
             var path=new GameObject("Recorded path "+pair.Key,typeof(LineRenderer));path.transform.SetParent(generatedRoot,false);
             SetOverlayLayer(path);var line=path.GetComponent<LineRenderer>();line.useWorldSpace=true;
-            int stride=Math.Max(1,(pair.Value.Count+4999)/5000);var points=new List<Vector3>();
-            for(int i=0;i<pair.Value.Count;i+=stride)points.Add(pair.Value[i].position);
-            line.positionCount=points.Count;line.SetPositions(points.ToArray());line.widthMultiplier=Mathf.Max(.015f,size*.12f);
             Shader shader=Shader.Find("Sprites/Default");
             if(shader!=null)
             {
@@ -230,7 +230,48 @@ public class ReplayController : MonoBehaviour
                 RuntimeMaterialOwner.Assign(line,sourceMaterial);Destroy(sourceMaterial);
             }
             line.startColor=line.endColor=new Color(.3f,.7f,.85f,.45f);
+            var recordedPath=new RecordedPath{line=line};pathsByRig[pair.Key]=recordedPath;
+            line.enabled=replayTime>=pair.Value[0].time && replayTime<=pair.Value[pair.Value.Count-1].time+.05;
+            UpdateRecordedPath(recordedPath,pair.Value,AtOrBefore(pair.Value,replayTime));
         }
+        RefreshTrajectoryBounds();
+    }
+
+    private static void ReplayPathRange(List<ReplaySessionArchive.Sample> samples,int cursor,float maximumJump,out int start,out int end)
+    {
+        start=end=-1;if(samples==null || samples.Count==0)return;
+        start=end=Math.Max(0,Math.Min(samples.Count-1,cursor));
+        string context=samples[start].ContextKey;
+        bool Connected(int a,int b)=>samples[b].ContextKey==context &&
+            (maximumJump<=0 || Vector3.Distance(samples[a].position,samples[b].position)<=maximumJump);
+        while(start>0 && Connected(start,start-1))start--;
+        while(end+1<samples.Count && Connected(end,end+1))end++;
+    }
+    private bool UpdateRecordedPath(RecordedPath path,List<ReplaySessionArchive.Sample> samples,int cursor)
+    {
+        if(path.start>=0 && cursor>=path.start && cursor<=path.end)return false;
+        ReplayPathRange(samples,cursor,maximumInterpolationDistance,out path.start,out path.end);
+        path.points.Clear();path.bounds=new Bounds(samples[path.start].position,Vector3.zero);
+        for(int i=path.start;i<=path.end;i++)path.bounds.Encapsulate(samples[i].position);
+        int stride=Math.Max(1,(path.end-path.start+4998)/4999);
+        for(int i=path.start;i<=path.end;i+=stride)path.points.Add(samples[i].position);
+        if((path.end-path.start)%stride!=0)path.points.Add(samples[path.end].position);
+        path.line.positionCount=path.points.Count;path.line.SetPositions(path.points.ToArray());
+        return true;
+    }
+    private void RefreshTrajectoryBounds()
+    {
+        bool first=true;
+        foreach(var path in pathsByRig.Values)
+        {
+            if(!path.line.enabled || path.start<0)continue;
+            if(first){trajectoryBounds=path.bounds;first=false;}
+            else{trajectoryBounds.Encapsulate(path.bounds.min);trajectoryBounds.Encapsulate(path.bounds.max);}
+        }
+        if(first)trajectoryBounds=new Bounds(Vector3.zero,Vector3.one);
+        float size=Mathf.Max(.15f,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z)*.008f);
+        foreach(var marker in markerByRig.Values)if(rigMarkerPrefab==null)marker.transform.localScale=Vector3.one*size;
+        foreach(var path in pathsByRig.Values)path.line.widthMultiplier=Mathf.Max(.015f,size*.12f);
     }
 
     public void FitOverview()
@@ -246,6 +287,7 @@ public class ReplayController : MonoBehaviour
     {
         if(selectedView>=rigOrder.Count || !createRigCameras)selectedView=-1;
         if(overview!=null)overview.enabled=selectedView<0;
+        if(selectedView<0)FitOverview();
         for(int i=0;i<rigOrder.Count;i++)if(camerasByRig.TryGetValue(rigOrder[i],out var camera))camera.enabled=selectedView==i;
     }
     public void ShowOverview(){selectedView=-1;ApplyView();}
@@ -295,11 +337,18 @@ public class ReplayController : MonoBehaviour
         }
         referenceSample=null;
         ReplaySessionArchive.Sample environmentSample=null;
+        bool pathsChanged=false;
         foreach(string id in rigOrder)
         {
             var samples=archive.Rigs[id];int cursor=AtOrBefore(samples,replayTime);var a=samples[cursor];
             bool visible=replayTime>=samples[0].time && replayTime<=samples[samples.Count-1].time+.05;
-            var marker=markerByRig[id];marker.SetActive(visible);if(!visible)continue;
+            var marker=markerByRig[id];marker.SetActive(visible);
+            if(pathsByRig.TryGetValue(id,out var path))
+            {
+                if(path.line.enabled!=visible){path.line.enabled=visible;pathsChanged=true;}
+                if(visible)pathsChanged|=UpdateRecordedPath(path,samples,cursor);
+            }
+            if(!visible)continue;
             var b=cursor+1<samples.Count?samples[cursor+1]:a;
             float amount=interpolateAnimalPoses && a.ContextKey==b.ContextKey && Vector3.Distance(a.position,b.position)<=maximumInterpolationDistance && b.time>a.time?(float)Math.Max(0,Math.Min(1,(replayTime-a.time)/(b.time-a.time))):0;
             Vector3 position=Vector3.Lerp(a.position,b.position,amount);
@@ -311,6 +360,7 @@ public class ReplayController : MonoBehaviour
             if(environmentSample==null)environmentSample=a;
             if(referenceSample==null || (selectedView>=0 && rigOrder[selectedView]==id))referenceSample=a;
         }
+        if(pathsChanged){RefreshTrajectoryBounds();if(selectedView<0)FitOverview();}
         if(environmentSample!=null)environmentLoader?.ApplyRecordedSample(environmentSample);
         float fallbackSize=Mathf.Max(.1f,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z)*.002f);
         foreach(var population in populations)
@@ -389,12 +439,30 @@ public class ReplayController : MonoBehaviour
         return new Rect(8*scale,height-barHeight,width-16*scale,barHeight-8*scale);
     }
 
+    private static bool UsesModernMousePosition(EventType type,PointerType pointerType,bool mouseAvailable)
+    {
+        return mouseAvailable && pointerType==PointerType.Mouse &&
+            (type==EventType.MouseDown || type==EventType.MouseUp || type==EventType.MouseMove ||
+             type==EventType.MouseDrag || type==EventType.ScrollWheel || type==EventType.Repaint);
+    }
+    private static Vector2 ReplayMousePosition(Vector2 position,float height)=>new Vector2(position.x,height-position.y);
+    private static void NormalizeReplayPointer(Event evt,UnityEngine.InputSystem.Mouse mouse,float height)
+    {
+        if(evt==null || mouse==null || !UsesModernMousePosition(evt.type,evt.pointerType,mouse.added && mouse.enabled))return;
+        // Input System reports native pixels from bottom-left. IMGUI expects
+        // top-left, and its legacy event position can be stale on native input.
+        // Repaint uses the same position so hover and click targets agree.
+        evt.mousePosition=ReplayMousePosition(mouse.position.ReadValue(),height);
+    }
+
     private void OnGUI()
     {
         if(OperatorOverlayVisibility.Hidden)return;
+        Vector2 legacyPosition=Event.current!=null?Event.current.mousePosition:Vector2.zero;
+        NormalizeReplayPointer(Event.current,UnityEngine.InputSystem.Mouse.current,Screen.height);
         float scale=ReplayUiScale(DesktopDisplay.UiScale,Screen.width);
         if(pointerTrace && Event.current!=null && (Event.current.type==EventType.MouseDown || Event.current.type==EventType.MouseUp))
-            Debug.Log("[Replay pointer] IMGUI frame="+Time.frameCount+" type="+Event.current.type+" position="+Event.current.mousePosition+" screen="+Screen.width+"x"+Screen.height+" scale="+scale);
+            Debug.Log("[Replay pointer] IMGUI frame="+Time.frameCount+" type="+Event.current.type+" position="+Event.current.mousePosition+" legacyPosition="+legacyPosition+" screen="+Screen.width+"x"+Screen.height+" scale="+scale);
         if(replaySkin==null)
         {
             replaySkin=Instantiate(GUI.skin);replaySkin.name="Replay controls";
@@ -489,7 +557,7 @@ public class ReplayController : MonoBehaviour
     {
         foreach(var population in populations){foreach(var visual in population.visuals.Values)if(visual!=null)Destroy(visual);population.stream.Dispose();}populations.Clear();
         foreach(Transform child in generatedRoot)if(child!=populationRoot){child.gameObject.SetActive(false);Destroy(child.gameObject);}
-        markerByRig.Clear();camerasByRig.Clear();rigOrder.Clear();stepChanges.Clear();archive=null;
+        markerByRig.Clear();camerasByRig.Clear();pathsByRig.Clear();rigOrder.Clear();stepChanges.Clear();archive=null;
     }
     private void OnDestroy()
     {
