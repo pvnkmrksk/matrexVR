@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Newtonsoft.Json.Linq;
 
 /// <summary>Saved-run viewer with one acquisition timeline, disk-indexed agent frames and a default God's-eye view.</summary>
 public class ReplayController : MonoBehaviour
@@ -103,6 +104,10 @@ public class ReplayController : MonoBehaviour
     private bool overviewUserAdjusted,overviewPerspective;
     private int overviewDragButton=-1;
     private Vector2 overviewDragPosition;
+    private ReplayMediaPanel mediaPanel;
+    private RenderTexture animalPreviewTexture;
+    private Camera previewCamera;
+    private RecordedDashboardLink recordedDashboard;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()=>pendingSessionPath=null;
@@ -160,6 +165,15 @@ public class ReplayController : MonoBehaviour
     private IEnumerator LoadRun(string directory)
     {
         loading=true;LoadError=null;loadProgress="Reading saved configurations and animal logs…";
+        var saving=MasterDataLogger.Instance;
+        string selectedPath=null;
+        try {selectedPath=Path.GetFullPath(directory.Trim().Trim('"'));}catch(Exception failure){LoadError=failure.Message;}
+        if(LoadError!=null){loading=false;yield break;}
+        if(saving!=null && saving.IsFinalizing && string.Equals(selectedPath,Path.GetFullPath(saving.directoryPath),Application.platform==RuntimePlatform.WindowsPlayer || Application.platform==RuntimePlatform.OSXPlayer?StringComparison.OrdinalIgnoreCase:StringComparison.Ordinal))
+        {
+            loadProgress="Finishing this recording before replay…";
+            while(saving!=null && saving.IsFinalizing)yield return null;
+        }
         string cache=cacheDirectory??Path.Combine(Application.temporaryCachePath,"MatrexReplay",Guid.NewGuid().ToString("N"));
         bool includeAgents=loadRecordedAgents;
         pendingLoad=Task.Run(()=>
@@ -198,6 +212,7 @@ public class ReplayController : MonoBehaviour
         absoluteSessionPath=archive.DirectoryPath;folderInput=absoluteSessionPath;replayTime=archive.FirstExperimentTime;referenceSample=null;
         BuildMarkers();BuildStepTimeline();
         environmentLoader.BeginSession(archive,rigOrder);
+        mediaPanel=new ReplayMediaPanel(this,()=>isPlaying=false);mediaPanel.SetRigs(rigOrder);mediaPanel.Load(archive.DirectoryPath,archive.OriginTicks);
         FitOverview();ApplyView();RenderFrame();
         loading=false;loadProgress="";
     }
@@ -303,7 +318,7 @@ public class ReplayController : MonoBehaviour
         if(overview!=null)overview.enabled=selectedView<0;
         if(selectedView<0 && !overviewUserAdjusted)FitOverview();
         if(selectedView>=0)overviewDragButton=-1;
-        for(int i=0;i<rigOrder.Count;i++)if(camerasByRig.TryGetValue(rigOrder[i],out var camera))camera.enabled=selectedView==i;
+        for(int i=0;i<rigOrder.Count;i++)if(camerasByRig.TryGetValue(rigOrder[i],out var camera)){camera.targetTexture=null;camera.enabled=selectedView==i;}
     }
     public void ShowOverview(){selectedView=-1;ApplyView();}
     private void CycleView(){selectedView++;if(selectedView>=rigOrder.Count)selectedView=-1;ApplyView();}
@@ -326,11 +341,11 @@ public class ReplayController : MonoBehaviour
     }
     private void UpdateOverviewControls(UnityEngine.InputSystem.Mouse mouse)
     {
-        if(selectedView>=0 || overview==null || !Application.isFocused || pathFocused || showDetails)
+        if(selectedView>=0 || overview==null || !Application.isFocused || pathFocused || showDetails || mediaPanel?.HasModal==true)
         {overviewDragButton=-1;return;}
         if(mouse==null)overviewDragButton=-1;
         Vector2 position=mouse!=null?mouse.position.ReadValue():Vector2.zero;
-        bool inImage=mouse!=null && position.y>Screen.height*.2f && position.x>=0 && position.x<Screen.width && position.y<Screen.height;
+        bool inImage=mouse!=null && position.y>Screen.height*.2f && position.x>=0 && position.x<Screen.width && position.y<Screen.height && mediaPanel?.ContainsPointer(position)!=true;
         if(overviewDragButton<0 && inImage)
         {
             if(mouse.middleButton.wasPressedThisFrame)overviewDragButton=2;
@@ -392,7 +407,14 @@ public class ReplayController : MonoBehaviour
         }
         bool scrubbing=UpdateTimelineScrub(mouse);
         if(archive==null || loading)return;
-        if(!pathFocused)
+        if(recordedDashboard!=null)
+            while(recordedDashboard.TryTakeCommand(out var command))
+            {
+                if(command.Kind=="seek")Seek(command.Seconds);
+                else if(command.Kind=="play")isPlaying=true;
+                else if(command.Kind=="pause")isPlaying=false;
+            }
+        if(!pathFocused && mediaPanel?.HasModal!=true && mediaPanel?.TextFocused!=true)
         {
             if(ExperimentInput.Pressed(togglePlayKey,KeyCode.Space,"Pause"))isPlaying=!isPlaying;
             float step=ExperimentInput.Held("SpeedModifier")?largeStepSeconds:smallStepSeconds;
@@ -471,6 +493,39 @@ public class ReplayController : MonoBehaviour
             foreach(var pair in population.visuals)if(pair.Value!=null && !population.active.Contains(pair.Key))pair.Value.SetActive(false);
         }
         if(scrubSlider!=null && Duration>0)scrubSlider.SetValueWithoutNotify((float)(replayTime/Duration));
+        UpdateAnimalPreview();
+        mediaPanel?.Tick(replayTime,isPlaying && !timelineMouseCaptured && environmentLoader?.Loading!=true,playbackSpeed);
+        if(mediaPanel!=null)
+        {
+            foreach(string warning in mediaPanel.Warnings)archive.Warn("Tracker video: "+warning);
+            if(!string.IsNullOrEmpty(mediaPanel.Error))archive.Warn("Tracker video: "+mediaPanel.Error);
+        }
+        recordedDashboard?.UpdateClock(replayTime,isPlaying && environmentLoader?.Loading!=true,playbackSpeed,Duration);
+    }
+    private void UpdateAnimalPreview()
+    {
+        if(mediaPanel==null)return;
+        if(selectedView>=0 || !mediaPanel.Expanded || OperatorOverlayVisibility.Hidden)
+        {
+            if(previewCamera!=null){previewCamera.targetTexture=null;if(selectedView<0)previewCamera.enabled=false;previewCamera=null;}
+            mediaPanel.SetAnimalPreview(null,null);return;
+        }
+        string id=mediaPanel.PreviewRig;
+        if(id==null || !camerasByRig.TryGetValue(id,out var camera))return;
+        if(previewCamera!=null && previewCamera!=camera){previewCamera.targetTexture=null;previewCamera.enabled=false;}
+        var saved=(archive?.SystemConfiguration?["configs"] as JArray)?.OfType<JObject>().FirstOrDefault(config=>(string)config["vrId"]==id);
+        bool desktop=(bool?)saved?["desktopPreview"]==true;
+        int width=desktop?512:Mathf.Clamp((int?)saved?["ledPanelWidth"]??128,1,1024);
+        int height=desktop?Mathf.Max(1,Mathf.RoundToInt(width/Mathf.Max(.01f,camera.aspect))):Mathf.Clamp((int?)saved?["ledPanelHeight"]??128,1,1024);
+        height=Mathf.Clamp(height,1,1024);
+        if(animalPreviewTexture==null || animalPreviewTexture.width!=width || animalPreviewTexture.height!=height)
+        {
+            if(previewCamera!=null)previewCamera.targetTexture=null;
+            if(animalPreviewTexture!=null){animalPreviewTexture.Release();Destroy(animalPreviewTexture);}
+            animalPreviewTexture=new RenderTexture(width,height,24){name="Replay front panel preview",filterMode=desktop?FilterMode.Bilinear:FilterMode.Point};animalPreviewTexture.Create();
+        }
+        previewCamera=camera;camera.targetTexture=animalPreviewTexture;camera.rect=new Rect(0,0,1,1);camera.enabled=environmentLoader?.Loading!=true;
+        mediaPanel.SetAnimalPreview(animalPreviewTexture,"Animal "+id+" · front"+(environmentLoader?.Loading==true?" · restoring scene":""));
     }
     public static int AtOrBefore(List<ReplaySessionArchive.Sample> samples,double time)
     {
@@ -500,6 +555,7 @@ public class ReplayController : MonoBehaviour
     public void SeekSeconds(double seconds)=>Seek(seconds);
     public void SetScrubNormalized(float normalized){if(archive!=null)Seek(Mathf.Clamp01(normalized)*Duration);}
     public void SetPlaying(bool playing)=>isPlaying=playing;
+    public bool TryCloseModal()=>folderPicker!=null || mediaPanel?.CancelModal()==true;
     private void BuildStepTimeline()
     {
         stepChanges.Clear();if(rigOrder.Count==0)return;
@@ -555,7 +611,7 @@ public class ReplayController : MonoBehaviour
     private bool UpdateTimelineScrub(UnityEngine.InputSystem.Mouse mouse)
     {
         if(!timelineMouseCaptured)return false;
-        if(archive==null || loading || OperatorOverlayVisibility.Hidden || !Application.isFocused ||
+        if(archive==null || loading || mediaPanel?.HasModal==true || OperatorOverlayVisibility.Hidden || !Application.isFocused ||
             mouse==null || !mouse.added || !mouse.enabled)
         {timelineMouseCaptured=timelineMouseUpSeen=false;return false;}
         bool released=mouse.leftButton.wasReleasedThisFrame || (timelineMouseUpSeen && !mouse.leftButton.isPressed);
@@ -574,7 +630,7 @@ public class ReplayController : MonoBehaviour
     {
         if(Event.current.type==EventType.MouseDown && rect.Contains(Event.current.mousePosition))ClearPathFocus();
         var mouse=UnityEngine.InputSystem.Mouse.current;
-        if(timeline && Event.current.pointerType==PointerType.Mouse && Event.current.button==0 && mouse!=null && mouse.added && mouse.enabled)
+        if(GUI.enabled && timeline && Event.current.pointerType==PointerType.Mouse && Event.current.button==0 && mouse!=null && mouse.added && mouse.enabled)
         {
             if(Event.current.type==EventType.MouseDown && rect.Contains(Event.current.mousePosition))
             {timelineMouseCaptured=true;timelineMouseUpSeen=false;timelineMouseRect=rect;timelineMouseFrame=Time.frameCount;}
@@ -639,6 +695,7 @@ public class ReplayController : MonoBehaviour
         float left=area.x+10*scale,top=area.y+6*scale,width=area.width-20*scale,rowHeight=30*scale,x=left;
         TraceReplayButton("root-toolbar",area);
         GUI.Label(ReplayControlRect(ref x,top,185*scale,rowHeight),"Experiment replay",titleStyle);
+        GUI.enabled=mediaPanel?.HasModal!=true;
         if(GUI.Button(ReplayControlRect(ref x,top,120*scale,rowHeight),new GUIContent("Back to setup","Return to experiment setup. Shortcut: Esc.")))
         {
             GUI.matrix=previousMatrix;GUI.skin=previousSkin;
@@ -649,7 +706,7 @@ public class ReplayController : MonoBehaviour
         GUI.SetNextControlName("Replay run folder");
         folderInput=GUI.TextField(new Rect(x,top,Mathf.Max(100*scale,browseX-4-x),rowHeight),folderInput);
         pathFocused=GUI.GetNameOfFocusedControl()=="Replay run folder";
-        GUI.enabled=!loading && folderPicker==null;
+        GUI.enabled=!loading && folderPicker==null && mediaPanel?.HasModal!=true;
         if(ReplayButton(new Rect(browseX,top,80*scale,rowHeight),"Browse…"))folderPicker=ReplayFolderPicker.ChooseAsync();
         if(ReplayButton(new Rect(openX,top,125*scale,rowHeight),"Open run folder"))LoadSession(folderInput);
         GUI.enabled=true;
@@ -659,6 +716,7 @@ public class ReplayController : MonoBehaviour
         else if(archive==null)GUI.Label(new Rect(left,top,width,60*scale),"Paste a saved run folder, or launch with --replay-session <folder>. In Unity Editor, drop a folder anywhere in this window.",smallStyle);
         else
         {
+            GUI.enabled=mediaPanel?.HasModal!=true;
             x=left;playContent.text=isPlaying?"Pause":"Play";
             Rect playRect=ReplayControlRect(ref x,top,64*scale,rowHeight);
             TraceReplayButton("pause-before",playRect);
@@ -692,9 +750,12 @@ public class ReplayController : MonoBehaviour
             float contextHeight=smallStyle.CalcHeight(new GUIContent(contextText),width);
             GUI.Label(new Rect(left,top,width,contextHeight),contextText,smallStyle);
             top+=contextHeight+4;
-            float projectionWidth=selectedView<0?130*scale:0;
-            GUI.Label(new Rect(left,top,width-projectionWidth-8*scale,40*scale),"Space: play/pause · ←/→: seek · N/M: condition · drag right/middle: orbit/pan · WASD/QE: move · IJKL: look · wheel: zoom",smallStyle);
+            float projectionWidth=selectedView<0?130*scale:0,plotsWidth=145*scale;
+            GUI.Label(new Rect(left,top,width-projectionWidth-plotsWidth-16*scale,40*scale),"Space: play/pause · ←/→: seek · N/M: condition · drag right/middle: orbit/pan · WASD/QE: move · IJKL: look · wheel: zoom",smallStyle);
             if(selectedView<0 && ReplayButton(new Rect(left+width-projectionWidth,top,projectionWidth,rowHeight),overviewPerspective?"Top-down view":"Perspective"))ToggleOverviewProjection();
+            if(ReplayButton(new Rect(left+width-projectionWidth-plotsWidth-6*scale,top,plotsWidth,rowHeight),"Trajectory plots"))recordedDashboard=RecordedDashboardLink.Open(archive.DirectoryPath,archive.OriginTicks);
+            GUI.enabled=true;
+            if(recordedDashboard!=null)GUI.Label(new Rect(left,area.yMax-24*scale,width,22*scale),recordedDashboard.Error??recordedDashboard.Status,smallStyle);
         }
         if(showDetails && archive!=null)
         {
@@ -732,6 +793,7 @@ public class ReplayController : MonoBehaviour
             }
         }
 #endif
+        mediaPanel?.Draw(scale,smallStyle,!loading);
         if(GUIUtility.hotControl==0)replayPointerControl=0;
         else if(entryType==EventType.MouseDown && Event.current.type==EventType.Used)replayPointerControl=GUIUtility.hotControl;
         GUI.matrix=previousMatrix;GUI.skin=previousSkin;
@@ -741,12 +803,18 @@ public class ReplayController : MonoBehaviour
     {
         timelineMouseCaptured=timelineMouseUpSeen=false;
         overviewUserAdjusted=false;overviewDragButton=-1;
+        mediaPanel?.Dispose();mediaPanel=null;recordedDashboard?.CloseSession();recordedDashboard=null;
+        if(previewCamera!=null){previewCamera.targetTexture=null;previewCamera=null;}
+        if(animalPreviewTexture!=null){animalPreviewTexture.Release();Destroy(animalPreviewTexture);animalPreviewTexture=null;}
         foreach(var population in populations){foreach(var visual in population.visuals.Values)if(visual!=null)Destroy(visual);population.stream.Dispose();}populations.Clear();
         foreach(Transform child in generatedRoot)if(child!=populationRoot){child.gameObject.SetActive(false);Destroy(child.gameObject);}
         markerByRig.Clear();camerasByRig.Clear();pathsByRig.Clear();rigOrder.Clear();stepChanges.Clear();archive=null;
     }
     private void OnDestroy()
     {
+        mediaPanel?.Dispose();recordedDashboard?.CloseSession();
+        if(previewCamera!=null)previewCamera.targetTexture=null;
+        if(animalPreviewTexture!=null){animalPreviewTexture.Release();Destroy(animalPreviewTexture);}
         if(replaySkin!=null)Destroy(replaySkin);
         foreach(var population in populations)population.stream.Dispose();populations.Clear();
         if(pendingLoad!=null)

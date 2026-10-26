@@ -229,8 +229,13 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         target.fieldOfView=source.fieldOfView;target.nearClipPlane=source.nearClipPlane;target.farClipPlane=source.farClipPlane;
         target.allowHDR=source.allowHDR;target.allowMSAA=source.allowMSAA;target.renderingPath=source.renderingPath;
         var saved=(archive?.SystemConfiguration?["configs"] as JArray)?.OfType<JObject>().FirstOrDefault(config=>(string)config["vrId"]==id);
-        float aspect=Mathf.Max(.01f,((float?)saved?["ledPanelWidth"]??128)/Mathf.Max(1,(float?)saved?["ledPanelHeight"]??128));
+        // The configured source camera also covers desktop previews and custom
+        // projections; panel dimensions alone would turn a monitor view square.
+        float aspect=source.aspect;
+        if(float.IsNaN(aspect) || float.IsInfinity(aspect) || aspect<=0)
+            aspect=Mathf.Max(.01f,((float?)saved?["ledPanelWidth"]??128)/Mathf.Max(1,(float?)saved?["ledPanelHeight"]??128));
         target.aspect=aspect;
+        target.projectionMatrix=source.projectionMatrix;
         float available=Mathf.Max(.01f,Screen.width/(Screen.height*.8f));
         target.rect=aspect<=available?new Rect((1-aspect/available)*.5f,.20f,aspect/available,.80f):new Rect(0,.20f+(.80f-.80f*available/aspect)*.5f,1,.80f*available/aspect);
         string key=ContextVersion+"|"+sample?.StimulusKey;

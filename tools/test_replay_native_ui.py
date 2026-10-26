@@ -30,6 +30,7 @@ class Event{public EventType type;public PointerType pointerType;public Vector2 
 class Time{public static int frameCount=100;}static class Application{public static bool isFocused=true;}static class OperatorOverlayVisibility{public static bool Hidden;}
 namespace UnityEngine.InputSystem{class ButtonControl{public bool isPressed,wasPressedThisFrame,wasReleasedThisFrame;}class PositionControl{public Vector2 value;public Vector2 ReadValue()=>value;}class Mouse{public bool added=true,enabled=true;public PositionControl position=new PositionControl();public ButtonControl leftButton=new ButtonControl();}}
 class LineRenderer{public static int instances;public int positionCount,writes;public Vector3[] positions;public LineRenderer(){instances++;}public void SetPositions(Vector3[] p){writes++;positions=p;}}
+class ReplayMediaPanel{public bool HasModal;}
 class ReplaySessionArchive{public class Sample{public string ContextKey;public Vector3 position;}}
 struct Rect {public float x,y,width,height;public Rect(float a,float b,float c,float d){x=a;y=b;width=c;height=d;}public bool Contains(float a,float b)=>a>=x&&a<x+width&&b>=y&&b<y+height;public bool Contains(Vector2 p)=>Contains(p.x,p.y);}
 static class Mathf{public static float Min(float a,float b)=>Math.Min(a,b);public static float Max(float a,float b)=>Math.Max(a,b);public static float Clamp01(float v)=>Math.Clamp(v,0,1);}
@@ -39,6 +40,8 @@ class Actual{
  private Rect timelineMouseRect;
  private int timelineMouseFrame,timelineMouseUpFrame;
  private ReplaySessionArchive archive=new ReplaySessionArchive();
+ private ReplayMediaPanel mediaPanel;
+ public void Modal(bool value){mediaPanel=new ReplayMediaPanel{HasModal=value};}
  private double replayTime;private double Duration=>200;
  public int seeks;public double Seconds=>replayTime;public bool Captured=>timelineMouseCaptured;
  private void SetScrubNormalized(float n){replayTime=n*Duration;seeks++;}
@@ -78,6 +81,7 @@ static class Regression{
   mouse.leftButton.wasReleasedThisFrame=false;mouse.leftButton.wasPressedThisFrame=false;var late=new Actual();late.Capture(timelineRect);late.GuiRelease();Time.frameCount++;mouse.position.value=new Vector2(900,218);Check(late.Scrub(mouse)&&!late.Captured&&late.seeks==1,"observed GUI release must complete if update flags have already cleared");
   var stale=new Actual();stale.Capture(timelineRect);Time.frameCount+=3;Check(!stale.Scrub(mouse)&&!stale.Captured&&stale.seeks==0,"lost gesture must cancel before an unrelated future release");mouse.leftButton.wasReleasedThisFrame=true;Check(!stale.Scrub(mouse)&&stale.seeks==0,"later random click must not complete stale capture");
   foreach(int unavailable in new[]{0,1,2,3,4}){var a=new Actual();a.Capture(timelineRect);var m=unavailable==0?null:new UnityEngine.InputSystem.Mouse();if(m!=null){m.leftButton.wasReleasedThisFrame=true;m.position.value=new Vector2(900,218);}if(unavailable==1)m.enabled=false;if(unavailable==2)m.added=false;if(unavailable==3)Application.isFocused=false;if(unavailable==4)OperatorOverlayVisibility.Hidden=true;Check(!a.Scrub(m)&&!a.Captured&&a.seeks==0,"inactive/hidden/unavailable input must cancel scrub");Application.isFocused=true;OperatorOverlayVisibility.Hidden=false;}
+  var modal=new Actual();modal.Capture(timelineRect);modal.Modal(true);Check(!modal.Scrub(mouse)&&!modal.Captured&&modal.seeks==0,"camera import modal must cancel timeline capture");
   var samples=new List<ReplaySessionArchive.Sample>();foreach(var v in new[]{("A",0f),("A",7f),("A",14f),("B",0f),("B",7f),("C",1000f),("C",1007f)})samples.Add(new ReplaySessionArchive.Sample{ContextKey=v.Item1,position=new Vector3(v.Item2,0,0)});
   Check(Actual.Range(samples,1,50)==(0,2),"first condition must not connect to reset");Check(Actual.Range(samples,3,50)==(3,4),"second condition must exclude other worlds");Check(Actual.Range(samples,6,50)==(5,6),"new world must have independent path");Check(Actual.Range(samples,-10,50)==(0,2)&&Actual.Range(samples,100,50)==(5,6),"path cursor must clamp");Check(Actual.Range(null,0,50)==(-1,-1)&&Actual.Range(new List<ReplaySessionArchive.Sample>(),0,50)==(-1,-1),"empty paths must be safe");
   var jumps=new List<ReplaySessionArchive.Sample>();foreach(float x in new[]{0f,7f,200f,207f})jumps.Add(new ReplaySessionArchive.Sample{ContextKey="same",position=new Vector3(x,0,0)});Check(Actual.Range(jumps,0,50)==(0,1)&&Actual.Range(jumps,3,50)==(2,3),"large unlogged jumps must not create false chords");Check(Actual.Range(jumps,2,0)==(0,3),"disabled jump threshold must retain context grouping");

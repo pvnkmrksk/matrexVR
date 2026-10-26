@@ -623,6 +623,7 @@ public class MainController : MonoBehaviour
 
     public void HandleEscape()
     {
+        if(SceneManager.GetActiveScene().name=="ReplayScene" && FindFirstObjectByType<ReplayController>()?.TryCloseModal()==true)return;
         if (SceneManager.GetActiveScene().name == "ControlScene")
         {
             Application.Quit();
