@@ -1,4 +1,4 @@
-MATREX VR 0.3 — CONFIGURATION STUDIO, ANIMALS AND SAVED-RUN REPLAY
+MATREX VR 0.3.1 — CONFIGURATION STUDIO, ANIMALS AND SAVED-RUN REPLAY
 Engine: Unity 6000.3.16f1
 https://github.com/pvnkmrksk/matrexVR
 https://pvnkmrksk.github.io/matrexVR/
@@ -11,17 +11,37 @@ required for the player. macOS is ad hoc signed but not notarized; use Finder Op
 Privacy & Security option if prompted. Linux requires a graphical desktop and a
 compatible graphics driver; restore executable permission if extraction loses it.
 
-A fresh profile opens setup by default (autoStart:false). Existing user sequences
-retain their own startup flags. Use -configure to force the experiment setup screen if an existing user sequence
-auto-starts. On macOS: open "/path/to/MATREX VR.app" --args -configure
-Press Escape during a running experiment to return to Control/setup.
+A fresh profile opens Home, full screen at the display's native resolution. Choose
+Night sky or Forest, then Start demo. No camera, animal or LED hardware is needed.
+Flying uses simulated input; Demo options also offers a walking recorded sample.
+Use Configure for a real apparatus. Existing sequences keep their startup flags.
+Use -configure to open setup if an existing sequence auto-starts. On macOS:
+  open "/path/to/MATREX VR.app" --args -configure
+Press Escape during an experiment or replay to return to setup.
 
 2. CONFIGURE THE APPARATUS AND ANIMALS
 
-System config: set actual tracker address/port/mode, display, LED panel layout,
-camera order and sphere diameter. The bundled public starter is not a hardware
-calibration. Use closedLoopMode Kinefly for flight input; FicTrac walking has a
-separate cumulative-displacement contract.
+Configure: choose walking/flying, LED panels or desktop preview, rig count,
+panel dimensions/order, display, tracker endpoint, species and sphere diameter.
+Save with Use this configuration. Daily work then centers on the experiment
+sequence and animal details. The public starter is not a hardware calibration.
+Modern modes are Rekkefly (flight) and HejjéTrac (walking). Legacy Kinefly/FicTrac
+publishers remain available; walking uses cumulative displacement, not flight yaw.
+
+Launch bundled native trackers with Start can start eligible local modern inputs.
+Review camera selection and calibration in the tracker before using real animals.
+Trackers run independently; quitting Unity does not quit their windows. Start the
+dashboard from its UI action to open the separate bundled browser viewer; Python
+is not required. Reuse an existing tracker/dashboard instead of starting copies.
+For remote telemetry, explicitly configure its bind/subscriber address and network.
+
+The release manifest records exact companion sources, hashes and local corrections.
+The reviewed strict-camera correction and newest dashboard are Mac arm64 builds;
+Intel Mac, Windows and Linux retain their pinned official companion builds. The
+older bundled Rekkefly camera path is blocked because it cannot guarantee camera-only
+input. Hardware-free demos work; use an externally verified compatible tracker for
+live flight on those platforms. Live walking still needs apparatus calibration and
+testing on its acquisition workstation. No live camera fallback is presented as data.
 
 Session: enter experimenter/comments and one Animal ID/Species per configured rig.
 VR1, VR2, etc. are hardware routing keys; Animal ID labels the real animal. Species
@@ -34,8 +54,9 @@ Sequence config: arrange blocks. Experiment configs: choose/edit complete recipe
 for Choice, night sky, Swarm, Kannadi, Optomotor and rugosity. Auto start affects the
 next launch. Save setup, then Start experiment. Each run gets its own data folder.
 Included scenes: ControlScene, Choice, Choice_desync, Choice_Selwyn, Swarm,
-Kannadi, Optomotor, TerrainCueLab, Rugosity_RS, ReplayScene. Optional forest/tree
-examples marked sourceBuildOnly need those scenes enabled in a custom Unity build.
+Kannadi, Optomotor, TerrainCueLab, Rugosity_RS, ReplayScene. The starter Forest uses
+Choice_Selwyn with tree objects. Other sourceBuildOnly scene examples require a
+custom Unity build.
 
 3. WRITABLE CONFIGURATION AND RECORDINGS
 
@@ -108,7 +129,7 @@ Telemetry is a separate outbound PUB, not the tracking SUB stream:
 
 Keep/extract the complete run folder with rig CSVs, population gzip logs, saved
 sequence/system/experiment snapshots, config_manifest.json and Skyboxes/.
-Choose Replay a recorded run in setup, or launch:
+Choose Replay in setup, or launch:
   "./MATREX VR.x86_64" --replay-session "/path/to/session-folder"
   open "/path/to/MATREX VR.app" --args --replay-session "/path/to/session-folder"
 
@@ -118,7 +139,9 @@ Open run folder loads the chosen path. Editor folder drag/drop works; native
 standalone OS-drop is not implemented. Use Browse, the folder input or CLI.
 God's-eye view is enabled by default; fit/zoom and animal views help inspect the
 run. Space plays/pauses, Left/Right seeks 1s (Shift: 10s), N/M jumps steps, timeline
-scrubs forward/back, and speed ranges 0.1–4x. Animal-view cameras are analysis views,
+scrubs forward/back, speed ranges 0.1–4x, and Back to setup leaves replay. The path
+shows the current recorded condition rather than joining different resets/worlds.
+Animal-view cameras are analysis views,
 not calibrated LED-panel reproductions.
 
 Replay uses saved evidence and verifies snapshot hashes. It restores supported
