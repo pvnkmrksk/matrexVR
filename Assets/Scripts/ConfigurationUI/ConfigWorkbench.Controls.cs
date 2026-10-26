@@ -12,7 +12,7 @@ namespace ConfigurationUI
         private void ApplyResponsiveLayout(float width)
         {
             root.EnableInClassList("compact-layout",width<1220);root.EnableInClassList("narrow-layout",width<1020);
-            if(inspector!=null) inspector.style.display=homeMode || experimentIndexMode || width<1220?DisplayStyle.None:DisplayStyle.Flex;
+            if(inspector!=null) inspector.style.display=homeMode || experimentIndexMode || replayLibraryMode || width<1220?DisplayStyle.None:DisplayStyle.Flex;
         }
         private void AddTimingWarnings(VisualElement target,ConfigDocument doc)
         {

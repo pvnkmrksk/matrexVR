@@ -86,7 +86,7 @@ public class fps : MonoBehaviour
     private void LateUpdate()
     {
         if(displayCanvas==null||displayBox==null)return;
-        if(ConfigurationUI.ConfigWorkbench.IsOpen||OperatorOverlayVisibility.Hidden)
+        if(ConfigurationUI.ConfigWorkbench.IsOpen||OperatorOverlayVisibility.Hidden||UnityEngine.SceneManagement.SceneManager.GetActiveScene().name=="ReplayScene")
         {displayCanvas.enabled=false;OperatorOverlayLayout.Release("fps");return;}
         var screen=OperatorOverlayLayout.DisplaySize(displayCanvas.targetDisplay);float scale=DesktopDisplay.UiScale;
         var size=new Vector2(310,58)*scale;displayBox.sizeDelta=size;label.fontSize=Mathf.RoundToInt(12*scale);
@@ -102,7 +102,7 @@ public class fps : MonoBehaviour
         if (instance != this) return;
         // Setup owns the frame readout. Keep the same timing collector for telemetry,
         // and restore the standalone readout when the workbench closes.
-        if(ConfigurationUI.ConfigWorkbench.IsOpen||OperatorOverlayVisibility.Hidden)displayCanvas.enabled=false;
+        if(ConfigurationUI.ConfigWorkbench.IsOpen||OperatorOverlayVisibility.Hidden||UnityEngine.SceneManagement.SceneManager.GetActiveScene().name=="ReplayScene")displayCanvas.enabled=false;
         double now = Time.realtimeSinceStartupAsDouble;
         double interval = now - previousTime;
         previousTime = now;

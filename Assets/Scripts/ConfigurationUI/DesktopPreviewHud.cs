@@ -24,7 +24,7 @@ namespace ConfigurationUI
         private static void Loaded(Scene scene, LoadSceneMode mode)
         {
             if(mode==LoadSceneMode.Additive && FindFirstObjectByType<ReplayController>()!=null)return;
-            if(scene.name=="ControlScene" || scene.name=="ReplayScene" || MainController.Instance==null ||
+            if(scene.name=="ControlScene" || scene.name=="ReplayScene" || ConfigWorkbench.IsOpen || MainController.Instance==null || !MainController.Instance.SequenceRunning ||
                 !MainController.Instance.SystemConfigs.Values.Any(r=>r.desktopPreview)) return;
             new GameObject("Desktop preview controls").AddComponent<DesktopPreviewHud>();
         }
@@ -67,7 +67,9 @@ namespace ConfigurationUI
         {
             // A mixed preview/LED configuration must protect the LED pixels too.
             var size=OperatorOverlayLayout.DisplaySize(panel.targetDisplay);
-            bool hidden=OperatorOverlayVisibility.Hidden||OperatorOverlayLayout.ProtectedRects(panel.targetDisplay,(int)size.x,(int)size.y).Count>0;
+            var main=MainController.Instance;
+            bool hidden=ConfigWorkbench.IsOpen||main==null||!main.SequenceRunning||OperatorOverlayVisibility.Hidden||
+                SceneManager.GetActiveScene().name=="ReplayScene"||OperatorOverlayLayout.ProtectedRects(panel.targetDisplay,(int)size.x,(int)size.y).Count>0;
             hudRoot.style.display=hidden?DisplayStyle.None:DisplayStyle.Flex;
             if(hidden)return;
             int expected=0,fresh=0;
