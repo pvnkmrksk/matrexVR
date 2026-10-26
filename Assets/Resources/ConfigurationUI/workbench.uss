@@ -246,7 +246,19 @@ Button.mini { height: 29px; padding: 3px 6px; font-size: 11px; }
 .studio-setting:disabled { opacity: 0.55; }
 .footer Button:disabled { opacity: 0.4; }
 .unity-collection-view__item--selected { background-color: rgb(42, 58, 74); }
-.block-list .unity-collection-view__item--selected { background-color: rgba(0,0,0,0); }
+/* Sequence cards own selection/focus chrome, including when the list itself is focused. */
+.workbench .block-list .unity-collection-view__item,
+.workbench .block-list .unity-collection-view__item:focus,
+.workbench .block-list .unity-collection-view__item--selected,
+.workbench .block-list .unity-collection-view__item--selected:focus,
+.workbench .block-list:focus .unity-collection-view__item--selected {
+    background-color: rgba(0,0,0,0);
+    border-color: rgba(0,0,0,0);
+}
+.workbench .block-list .unity-collection-view__item:focus .block-card {
+    border-color: rgb(128, 174, 215);
+    background-color: rgb(35, 46, 60);
+}
 .compact-layout .inspector { display: none; }
 .compact-layout .body { padding: 22px 20px 14px; }
 .compact-layout .sidebar { width: 204px; }
