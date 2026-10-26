@@ -128,8 +128,10 @@ public class MainController : MonoBehaviour
     [Range(0, 4)]
     private int logLevel = 0; // 0: All, 1: Error, 2: Warning, 3: Info, 4: Debug
 
-    // Add this flag to control single window mode
+    // Serialized compatibility switch for eagerly activating configured outputs.
+    // Per-rig routing is always owned by ViewportSetter.
     [SerializeField]
+    [Tooltip("Activate configured outputs at startup. Each rig retains its own output display.")]
     private bool preventMultipleWindows = true;
 
     // Add global display target property
@@ -196,34 +198,33 @@ public class MainController : MonoBehaviour
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    // Handle display setup - simplified to use a single display for all VR setups
+    // Activate requested outputs without overwriting per-rig or operator cameras.
     private void HandleDisplaySetup()
     {
-        // Check if a display argument was provided via command line
-        string[] args = System.Environment.GetCommandLineArgs();
-        for (int i = 0; i < args.Length - 1; i++)
+        foreach (int display in systemConfigs.Values.Select(config => config.targetDisplay).Distinct())
         {
-            if (args[i].ToLower() == "-display" && int.TryParse(args[i + 1], out int display))
-            {
-                globalTargetDisplay = display;
-                Debugger.Log($"Using command line specified display: {globalTargetDisplay}", 3);
-                break;
-            }
+            if (display <= 0 || display >= Display.displays.Length) continue;
+            Display.displays[display].Activate();
+            Debugger.Log($"Activated configured display {display}", 3);
         }
+    }
 
-        // Activate the target display if it exists
-        if (globalTargetDisplay > 0 && Display.displays.Length > globalTargetDisplay)
-        {
-            Display.displays[globalTargetDisplay].Activate();
-            Debugger.Log($"Activated display {globalTargetDisplay}", 3);
+    public static int DefaultTargetDisplay(JObject root, string[] arguments, int fallback = 1)
+    {
+        int display = root["targetDisplay"]?.Value<int>() ?? fallback;
+        for (int i = 0; i < arguments.Length - 1; i++)
+            if (string.Equals(arguments[i], "-display", System.StringComparison.OrdinalIgnoreCase) && int.TryParse(arguments[i + 1], out int requested))
+                return requested;
+        return display;
+    }
 
-            // Apply this display to all cameras in the scene
-            Camera[] allCameras = FindObjectsOfType<Camera>();
-            foreach (Camera cam in allCameras)
-            {
-                cam.targetDisplay = globalTargetDisplay;
-            }
-        }
+    public static SystemConfig[] ParseSystemConfigurations(JArray source, int fallbackDisplay)
+    {
+        var configs = source.ToObject<SystemConfig[]>();
+        for (int i = 0; i < configs.Length; i++)
+            if (configs[i] != null && source[i] is JObject rig && rig.Property("targetDisplay") == null)
+                configs[i].targetDisplay = fallbackDisplay;
+        return configs;
     }
 
     void Start()
@@ -269,18 +270,14 @@ public class MainController : MonoBehaviour
             LoadDiagnosticsConfigurations(fullConfig);
             OverheadCameraSettings = fullConfig["overheadCamera"]?.ToObject<OverheadCameraConfig>() ?? new OverheadCameraConfig();
 
-            // Extract global target display if it exists
-            if (fullConfig["targetDisplay"] != null)
-            {
-                globalTargetDisplay = fullConfig["targetDisplay"].Value<int>();
-                Debugger.Log($"Found global targetDisplay: {globalTargetDisplay}", 3);
-            }
+            // Legacy global/CLI output is a fallback; explicit rig routing wins.
+            globalTargetDisplay = DefaultTargetDisplay(fullConfig, System.Environment.GetCommandLineArgs());
 
             // Parse the configs array
             JArray configsArray = (JArray)fullConfig["configs"];
             if (configsArray != null)
             {
-                SystemConfig[] loadedConfigs = configsArray.ToObject<SystemConfig[]>();
+                SystemConfig[] loadedConfigs = ParseSystemConfigurations(configsArray, globalTargetDisplay);
 
                 // Clear existing configs
                 systemConfigs.Clear();
@@ -288,9 +285,7 @@ public class MainController : MonoBehaviour
                 // Add each config to dictionary with VR ID as key
                 foreach (SystemConfig config in loadedConfigs)
                 {
-                    // Set target display from global setting
                     if (config == null) throw new System.ArgumentException("Null rig configuration.");
-                    config.targetDisplay = globalTargetDisplay;
                     if (config == null || RuntimeRigRegistry.ParseIndex(config.vrId) < 1 || config.vrId != "VR" + RuntimeRigRegistry.ParseIndex(config.vrId))
                         throw new System.ArgumentException("Every rig needs an ID such as VR1 or VR10.");
                     if (systemConfigs.ContainsKey(config.vrId)) throw new System.ArgumentException("Duplicate rig ID: " + config.vrId);
