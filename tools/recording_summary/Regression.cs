@@ -30,8 +30,20 @@ static class Regression
         summary["lifecycle"] = new JObject { ["status"]="finalized", ["writersDrained"]=true };
         File.WriteAllText(Path.Combine(directory,RecordingSummary.ManifestName),summary.ToString());
     }
-    static void Main()
+    static void Main(string[] args)
     {
+        if(args.Length>0)
+        {
+            string directory=Path.GetFullPath(args[0]);
+            var before=Directory.GetFiles(directory,"*",SearchOption.AllDirectories).ToDictionary(path=>path,path=>RecordingSummary.HashFile(path));
+            var scanned=RecordingSummary.Scan(directory,true);
+            var after=Directory.GetFiles(directory,"*",SearchOption.AllDirectories);
+            Check(after.Length==before.Count&&after.All(path=>before.TryGetValue(path,out var hash)&&hash==RecordingSummary.HashFile(path)),"read-only run inspection changed original files");
+            scanned["auditOriginalFileCount"]=before.Count;scanned["auditOriginalHashesUnchanged"]=true;
+            if(args.Length>1)File.WriteAllText(args[1],scanned.ToString());
+            Console.WriteLine(new JObject{["poseRows"]=scanned["poseRows"].DeepClone(),["wallClockSpanSeconds"]=scanned["wallClockSpanSeconds"].DeepClone(),["observed"]=scanned["observed"].DeepClone(),["originalFilesUnchanged"]=before.Count}.ToString());
+            return;
+        }
         string root=Path.Combine(Path.GetTempPath(),"recording-summary-fixture-"+Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
         try

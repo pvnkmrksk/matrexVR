@@ -69,7 +69,9 @@ public static class RecordingLibrary
                     if((bool?)summary["changedDuringScan"]!=true)WriteCache(entry.DirectoryPath,cacheDirectory,fingerprint,summary);
                 }
             }
+            cancellation.ThrowIfCancellationRequested();
             entry.Summary=(JObject)summary.DeepClone();
+            if(fingerprint!=Fingerprint(entry.DirectoryPath,cancellation)){entry.Summary["changedDuringScan"]=true;entry.Finalized=false;}
             string title=(string)summary["metadata"]?["experimentName"];
             if(!string.IsNullOrWhiteSpace(title))entry.Title=title;
             string first=(string)summary["wallClockStartLocal"];
