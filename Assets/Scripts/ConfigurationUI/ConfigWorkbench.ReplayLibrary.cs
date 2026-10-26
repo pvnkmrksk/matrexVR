@@ -202,6 +202,15 @@ namespace ConfigurationUI
         }
         private bool LibrarySelectionReady => SelectedLibraryEntry?.CanReplay==true&&libraryChecked.Contains(librarySelected)&&libraryPicker==null&&!LibrarySelectionFinishing;
         private RecordingLibrary.Entry SelectedLibraryEntry => librarySelected!=null&&libraryEntries.TryGetValue(librarySelected,out var entry)?entry:null;
+        private static string LibraryFinalizationCaption(RecordingLibrary.Entry entry)
+        {
+            if(entry.Finalized)return "Finalized recording summary";
+            if(entry.ChangedDuringScan)return "Changing recording · refresh before replay";
+            if(entry.RecordingState=="error")return "Finalization reported an error · review the saved evidence";
+            if(entry.RecordingState=="open")return "Recording summary is open · completion not established";
+            if(entry.RecordingState=="finalized")return "Recording finalized · summary reindexed from current files";
+            return "Summary from recorded files · finalization not established";
+        }
         private void RefreshLibraryDetails()
         {
             if(libraryDetails==null)return;var entry=SelectedLibraryEntry;
@@ -214,7 +223,7 @@ namespace ConfigurationUI
             if(!entry.Indexed){libraryDetails.Add(SessionLabel("Reading recorded metadata and pose rows. Your experiment files are not changed.","recording-library-copy"));return;}
             var summary=entry.Summary;var facts=Row("recording-library-facts");libraryDetails.Add(facts);
             AddLibraryFact(facts,"Recorded span",LibrarySpan(entry));AddLibraryFact(facts,"Sequence cycles",LibraryCycles(entry,false));AddLibraryFact(facts,"Observed rigs",JoinLibraryValues(summary?["observed"]?["rigIds"]));
-            libraryDetails.Add(SessionLabel(entry.Finalized?"Finalized recording summary":entry.ChangedDuringScan?"Changing recording · refresh before replay":entry.RecordingState=="error"?"Finalization reported an error · review the saved evidence":entry.RecordingState=="open"?"Recording summary is open · completion not established":"Summary from recorded files · finalization not established","recording-library-copy"));
+            libraryDetails.Add(SessionLabel(LibraryFinalizationCaption(entry),"recording-library-copy"));
             libraryFinalizationState=SessionLabel("Finishing recording… Waiting for this run’s remaining data and media files before replay.","recording-library-warning");libraryFinalizationState.name="recording-library-finalization";libraryDetails.Add(libraryFinalizationState);
             libraryDetails.Add(SessionHeading("Recorded scenes","sequence"));libraryDetails.Add(SessionLabel(LibraryScenes(entry),"recording-library-copy"));
             libraryDetails.Add(SessionHeading("Animals & input","person"));

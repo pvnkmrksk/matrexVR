@@ -10,6 +10,7 @@ namespace UnityEngine {public static class Time {public static int frameCount;} 
 namespace UnityEngine.InputSystem {public sealed class ButtonState {public bool isPressed;}public sealed class Mouse {public static Mouse current=new Mouse();public ButtonState leftButton=new ButtonState();}}
 public enum DisplayStyle {None,Flex}public sealed class Styles {public DisplayStyle display;}public sealed class Widget {public string text,value;public Styles style=new Styles();}
 public sealed class Entry {public string DirectoryPath;public bool Omit;}
+public static class RecordingLibrary {public sealed class Entry {public bool Finalized,ChangedDuringScan;public string RecordingState;}}
 public sealed class ConfigWorkbench {
  private bool replayLibraryMode=true,libraryRunning=true,editPointerHeld=true,editPointerUsesMouse=true,libraryFreshnessRunning;
  private int editPointerDownFrame=10,libraryGeneration=1,libraryPickerGeneration;private Task<string> libraryPicker;
@@ -41,7 +42,13 @@ TESTS=r'''
   panel.libraryRunning=false;panel.RefreshLibraryEmptyState();Check(panel.libraryEmpty.text.StartsWith("No recordings found"),"completed empty scan lacks useful empty state");
   panel.librarySearch.value="missing";panel.RefreshLibraryEmptyState();Check(panel.libraryEmpty.text=="No recordings match your search.","search empty state suggests there are no recordings");
   panel.libraryVisible.Add(new Entry());panel.RefreshLibraryEmptyState();Check(panel.libraryEmpty.style.display==DisplayStyle.None&&panel.libraryList.style.display==DisplayStyle.Flex,"discovered rows stayed hidden after indexing");
-  Console.WriteLine("PASS: "+checks+" production library poll/pointer/empty-state checks; no Unity/native/UI launch.");
+  Check(LibraryFinalizationCaption(new RecordingLibrary.Entry{Finalized=true,RecordingState="finalized"})=="Finalized recording summary","fresh finalized summary caption changed");
+  Check(LibraryFinalizationCaption(new RecordingLibrary.Entry{RecordingState="finalized"})=="Recording finalized · summary reindexed from current files","collected media falsely erased finalized lifecycle");
+  Check(LibraryFinalizationCaption(new RecordingLibrary.Entry{RecordingState="finalized",ChangedDuringScan=true}).StartsWith("Changing recording"),"changing finalized file hid refresh warning");
+  Check(LibraryFinalizationCaption(new RecordingLibrary.Entry{RecordingState="error"}).StartsWith("Finalization reported an error"),"failed finalization caption lost");
+  Check(LibraryFinalizationCaption(new RecordingLibrary.Entry{RecordingState="open"}).Contains("completion not established"),"open run was mislabeled finalized");
+  Check(LibraryFinalizationCaption(new RecordingLibrary.Entry()).Contains("finalization not established"),"legacy run received invented finalized lifecycle");
+  Console.WriteLine("PASS: "+checks+" production library poll/pointer/empty-state/lifecycle-caption checks; no Unity/native/UI launch.");
  }
 }
 '''
@@ -51,7 +58,7 @@ def main():
  version=max(map(int,re.findall(r'^(\d+)\.',subprocess.check_output([dotnet,'--list-sdks'],text=True),re.M)))
  ui=(ROOT/'Assets/Scripts/ConfigurationUI/ConfigWorkbench.ReplayLibrary.cs').read_text()
  builder=(ROOT/'Assets/Scripts/ConfigurationUI/ConfigWorkbench.Builder.cs').read_text()
- production='\n'.join([declaration(builder,'private bool IsEditPointerHeld()'),declaration(ui,'private void PollRecordingLibrary()'),declaration(ui,'private void RefreshLibraryEmptyState()')])
+ production='\n'.join([declaration(builder,'private bool IsEditPointerHeld()'),declaration(ui,'private void PollRecordingLibrary()'),declaration(ui,'private void RefreshLibraryEmptyState()'),declaration(ui,'private static string LibraryFinalizationCaption(RecordingLibrary.Entry entry)')])
  with tempfile.TemporaryDirectory(prefix='matrex-library-poll-') as folder:
   temp=Path(folder);(temp/'Program.cs').write_text(PRELUDE+production+TESTS);(temp/'NuGet.Config').write_text('<configuration><packageSources><clear /></packageSources></configuration>')
   project=temp/'Regression.csproj';project.write_text(f'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net{version}.0</TargetFramework></PropertyGroup></Project>')
