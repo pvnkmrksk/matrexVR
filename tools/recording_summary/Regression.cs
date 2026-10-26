@@ -4,8 +4,17 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+namespace UnityEngine
+{
+    public static class Application
+    {
+        public static string version="0.3.1-dev", unityVersion="fixture-unity", buildGUID="actual-player-guid", streamingAssetsPath;
+    }
+}
 
 static class Regression
 {
@@ -73,6 +82,58 @@ static class Regression
             File.WriteAllText(Path.Combine(legacy,"legacy.csv"),RecordedCsv.Join(noTrial)+"\n"+RecordedCsv.Join(cells.Where((value,index)=>index!=5))+"\n");
             var old=RecordingSummary.Scan(legacy);Check(old["observed"]["sequenceCycleCount"].Type==JTokenType.Null,"legacy missing trial count stays unknown");
             Check((long)old["poseRows"]["playable"]==1,"legacy pose is preserved without invented exclusion evidence");
+            UnityEngine.Application.streamingAssetsPath=configs;
+            var identity=PlayerBuildIdentity.Capture();
+            Check(identity["sourceRevision"].Type==JTokenType.Null&&(string)identity["buildGuid"]=="actual-player-guid","legacy build keeps actual buildGUID but unknown revision");
+            string identityFile=Path.Combine(configs,"player_build_info.json");
+            File.WriteAllText(identityFile,new JObject{["schemaVersion"]=1,["applicationVersion"]="0.3.1-dev",["sourceRevision"]=new string('f',40),["sourceState"]="working-tree-snapshot",["sourceTreeDirty"]=true}.ToString());
+            identity=PlayerBuildIdentity.Capture();Check((string)identity["sourceRevision"]==new string('f',40)&&(bool)identity["sourceTreeDirty"],"source state is preserved without pretending dirty snapshot is clean");
+            File.WriteAllText(identityFile,new JObject{["schemaVersion"]=1,["applicationVersion"]="old-version",["sourceRevision"]=new string('f',40)}.ToString());
+            Check(PlayerBuildIdentity.Capture()["sourceRevision"].Type==JTokenType.Null,"mismatched embedded build info is not attributed to current player");
+            string failurePath=Path.Combine(run,"directory-instead-of-file.csv.gz");Directory.CreateDirectory(failurePath);
+            var failed=new AsyncSwarmWriter(failurePath,"Timestamp,Name");failed.WaitForCompletion();
+            Check(AsyncSwarmWriter.ActiveWriterCount==0,"failed writer leaves active registry");
+            var completions=AsyncSwarmWriter.CompletionsForDirectory(run);
+            Check(completions.Length==1&&!string.IsNullOrEmpty(completions[0].Failure),"completed failed writer evidence survives until run finalization");
+            string writtenPath=Path.Combine(run,"successful.csv.gz");
+            var asyncWriter=new AsyncSwarmWriter(writtenPath,"Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase,RotationX,RotationY,RotationZ");
+            var frame=asyncWriter.Rent(1);frame.timestamp=DateTime.Now;frame.count=1;frame.agents[0]=new AsyncSwarmWriter.Agent{name="a",layer="AgentsVR1"};
+            Check(asyncWriter.Submit(frame),"fixture frame accepted");asyncWriter.WaitForCompletion();
+            using(var reader=ReplaySessionArchive.OpenCsv(writtenPath))Check(reader.ReadToEnd().Split('\n').Length>=3,"writer completion includes gzip trailer and buffered row");
+            completions=AsyncSwarmWriter.CompletionsForDirectory(run,true);
+            Check(completions.Length==2&&completions.Any(item=>item.WrittenRows==1&&item.Failure==null),"successful and historical failed writer summaries remain distinct");
+            Check(AsyncSwarmWriter.CompletionsForDirectory(run).Length==0,"finalization can release compact per-run writer evidence");
+            string finalRun=Path.Combine(root,"final"), zip=Path.Combine(root,"final.zip");Directory.CreateDirectory(finalRun);
+            File.WriteAllText(Path.Combine(finalRun,"pose.csv"),RecordedCsv.Join(Header)+"\n"+Row(0)+"\n"+Row(2)+"\n");
+            string preserved=RecordingSummary.HashFile(Path.Combine(finalRun,"pose.csv"));
+            var finalizer=new RecordingSessionFinalizer(finalRun,zip,identity);
+            var drainGate=new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var mediaGate=new TaskCompletionSource<JObject>(TaskCreationOptions.RunContinuationsAsynchronously);int visited=0;
+            var finishing=finalizer.FinalizeAsync("stopped",token=>drainGate.Task,token=>mediaGate.Task,()=>new JArray(),(f,h,c)=>Interlocked.Increment(ref visited));
+            Check(ReferenceEquals(finishing,finalizer.FinalizeAsync("completed",token=>Task.CompletedTask,token=>Task.FromResult(new JObject()),()=>new JArray())),"finalization is idempotent and preserves original end reason");
+            Check(!finishing.IsCompleted&&!File.Exists(zip),"summary/archive cannot finish ahead of writer barrier");
+            drainGate.SetResult(true);Check(SpinWait.SpinUntil(()=>Volatile.Read(ref visited)==2,10000),"scan begins only after writer drain");
+            Check(!finishing.IsCompleted&&!File.Exists(zip),"media barrier completes before final manifest/ZIP");
+            mediaGate.SetResult(new JObject{["complete"]=false,["pending"]=true});var finalized=finishing.GetAwaiter().GetResult();
+            Check((string)finalized["lifecycle"]["status"]=="finalized"&&(bool)finalized["lifecycle"]["writersDrained"],"CSV finalization truthfully reflects completed drain");
+            Check((string)finalized["lifecycle"]["endReason"]=="stopped"&&(string)finalized["lifecycle"]["sequenceOutcome"]=="stopped","manual stop does not become completed protocol");
+            Check((bool)finalized["media"]["pending"]&&!(bool)finalized["media"]["complete"],"pending independent camera stays explicitly incomplete");
+            Check(RecordingSummary.TryReadFinalized(finalRun,out _,out _),"finalized output passes freshness policy");
+            using(var zipped=ZipFile.OpenRead(zip))using(var reader=new StreamReader(zipped.GetEntry(RecordingSummary.ManifestName).Open()))
+                Check((string)JObject.Parse(reader.ReadToEnd())["lifecycle"]["status"]=="finalized","ZIP includes finalized summary, not its opening placeholder");
+            Check(preserved==RecordingSummary.HashFile(Path.Combine(finalRun,"pose.csv")),"finalization preserves original CSV bytes");
+            string failedRun=Path.Combine(root,"failed-final");Directory.CreateDirectory(failedRun);
+            var failedFinalizer=new RecordingSessionFinalizer(failedRun,Path.Combine(root,"failed.zip"),identity);
+            var failedResult=failedFinalizer.FinalizeAsync("error",token=>Task.CompletedTask,token=>Task.FromResult(new JObject()),
+                ()=>new JArray(new JObject{["failure"]="earlier disk write failed",["droppedFrames"]=2})).GetAwaiter().GetResult();
+            Check((string)failedResult["lifecycle"]["status"]=="error"&&!(bool)failedResult["lifecycle"]["writersDrained"]&&!File.Exists(Path.Combine(root,"failed.zip")),"historical completed writer failure prevents successful drain/archive claim");
+            string interrupted=Path.Combine(root,"interrupted");Directory.CreateDirectory(interrupted);
+            var interruptedFinalizer=new RecordingSessionFinalizer(interrupted,Path.Combine(root,"interrupted.zip"),identity);
+            var never=new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var waiting=interruptedFinalizer.FinalizeAsync("stopped",token=>never.Task,token=>Task.FromResult(new JObject()),()=>new JArray());
+            interruptedFinalizer.MarkShutdown(false,new JObject{["pending"]=true,["complete"]=false});never.SetResult(true);waiting.GetAwaiter().GetResult();
+            var onDisk=JObject.Parse(File.ReadAllText(Path.Combine(interrupted,RecordingSummary.ManifestName)));
+            Check((string)onDisk["lifecycle"]["status"]=="open"&&!(bool)onDisk["lifecycle"]["writersDrained"]&&!File.Exists(Path.Combine(root,"interrupted.zip")),"shutdown cannot promise pending media/summary/archive completion");
             Console.WriteLine("PASS: "+checks+" production recording-summary checks; read-only scans and no Unity rendering claim.");
         }
         finally {Directory.Delete(root,true);}

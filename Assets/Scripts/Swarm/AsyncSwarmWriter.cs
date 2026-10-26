@@ -30,14 +30,35 @@ public sealed class AsyncSwarmWriter
     private long droppedFrames, writtenRows;
     private static readonly object activeLock = new object();
     private static readonly HashSet<AsyncSwarmWriter> active = new HashSet<AsyncSwarmWriter>();
+    public sealed class CompletionSummary
+    {
+        public string Path, Failure;
+        public long WrittenRows, DroppedFrames;
+    }
+    // Retain only compact evidence, never the writer/thread/frame pool, across scene reloads.
+    private static readonly Dictionary<string, CompletionSummary> completed = new Dictionary<string, CompletionSummary>(StringComparer.Ordinal);
     public int PendingFrames => Volatile.Read(ref pendingCount);
     public long DroppedFrames => Interlocked.Read(ref droppedFrames);
     public long WrittenRows => Interlocked.Read(ref writtenRows);
     public string Failure => failure;
     public static int ActiveWriterCount { get { lock (activeLock) return active.Count; } }
 
+    public static CompletionSummary[] CompletionsForDirectory(string directory, bool remove = false)
+    {
+        directory = System.IO.Path.GetFullPath(directory);
+        lock (activeLock)
+        {
+            var result = new List<CompletionSummary>();
+            foreach (var pair in completed)
+                if (System.IO.Path.GetDirectoryName(pair.Key) == directory) result.Add(pair.Value);
+            if (remove) foreach (var item in result) completed.Remove(item.Path);
+            return result.ToArray();
+        }
+    }
+
     public AsyncSwarmWriter(string path, string header)
     {
+        path = System.IO.Path.GetFullPath(path); // Invalid paths fail on the caller, not an unhandled worker finally block.
         lock (activeLock) active.Add(this);
         worker = new Thread(() => Write(path, header)) { IsBackground = true, Name = "Swarm CSV writer" };
         worker.Start();
@@ -113,7 +134,13 @@ public sealed class AsyncSwarmWriter
         {
             while (pending.TryDequeue(out _)) { Interlocked.Decrement(ref pendingCount); Interlocked.Increment(ref droppedFrames); }
             lock (signalGate) { signal.Dispose(); signalDisposed = true; }
-            lock (activeLock) active.Remove(this);
+            lock (activeLock)
+            {
+                string fullPath = System.IO.Path.GetFullPath(path);
+                completed[fullPath] = new CompletionSummary { Path = fullPath, Failure = failure,
+                    WrittenRows = WrittenRows, DroppedFrames = DroppedFrames };
+                active.Remove(this);
+            }
         }
     }
     private static string Csv(string value)

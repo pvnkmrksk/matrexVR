@@ -188,7 +188,7 @@ public static class RecordingSummary
     public static JArray MetadataInventory(string directory)
     {
         var result = new JArray();
-        foreach (string name in new[] { "AnimalMetadata.json", "FlyMetaData.json", "config_manifest.json", "companion_provenance.json", "system_config.json", "sequenceConfig.json" })
+        foreach (string name in new[] { "AnimalMetadata.json", "FlyMetaData.json", "config_manifest.json", "companion_provenance.json", "system_config.json", "sequenceConfig.json", "media_manifest.json" })
         {
             var file = new FileInfo(Path.Combine(directory, name));
             if (file.Exists) result.Add(new JObject { ["relativePath"] = name, ["bytes"] = file.Length, ["lastWriteUtcTicks"] = file.LastWriteTimeUtc.Ticks });

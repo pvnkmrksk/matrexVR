@@ -11,6 +11,7 @@ public class SwarmLogger : MonoBehaviour
     private AsyncSwarmWriter writer;
     private int cachedRevision = -1, cachedMask;
     private long reportedDrops;
+    private bool closed;
     private readonly List<Transform> agents = new List<Transform>();
     private readonly List<string> names = new List<string>(), layers = new List<string>();
     private static readonly Unity.Profiling.ProfilerMarker captureMarker = new Unity.Profiling.ProfilerMarker("SwarmLogger.Capture");
@@ -41,7 +42,7 @@ public class SwarmLogger : MonoBehaviour
     private void LateUpdate() => CaptureFrame();
     public void CaptureFrame()
     {
-        if (writer == null || spawner == null || writer.Failure != null) return;
+        if (closed || writer == null || spawner == null || writer.Failure != null) return;
         long start = System.Diagnostics.Stopwatch.GetTimestamp();
         using (captureMarker.Auto())
         {
@@ -76,5 +77,6 @@ public class SwarmLogger : MonoBehaviour
                 Debug.LogError($"Swarm log backlog exceeded 240 frames on {name}; {reportedDrops} frames dropped. Check recording disk speed/space.");
         }
     }
-    private void OnDestroy() { writer?.Complete(); }
+    public void CloseForArchive() { closed = true; writer?.Complete(); }
+    private void OnDestroy() => CloseForArchive();
 }

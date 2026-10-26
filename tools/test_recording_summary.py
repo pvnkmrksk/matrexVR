@@ -17,6 +17,8 @@ def main():
     paths = ['Assets/Scripts/Replay/ReplaySessionArchive.cs', 'Assets/Scripts/Replay/RecordedPosePolicy.cs',
              'Assets/Scripts/Loggers/RunConfigArchive.cs', 'Assets/Scripts/Loggers/RecordedCsv.cs',
              'Assets/Scripts/Loggers/RecordingSummary.cs', 'tools/replay_compatibility/Stubs.cs',
+             'Assets/Scripts/Loggers/PlayerBuildIdentity.cs', 'Assets/Scripts/Swarm/AsyncSwarmWriter.cs',
+             'Assets/Scripts/Loggers/RecordingSessionFinalizer.cs',
              'tools/recording_summary/Regression.cs']
     with tempfile.TemporaryDirectory(prefix='matrex-recording-summary-') as temporary:
         root = Path(temporary)
