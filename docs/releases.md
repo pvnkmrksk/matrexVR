@@ -62,6 +62,26 @@ Keep the whole extracted player directory together. Versions 0.1/0.2 require a w
 
 Each version is pinned separately so archive, integrated baseline and new improvements can be compared without moving an older tag. Build status, actual uploaded assets, hashes and runtime test evidence belong to the release itself. Tests using synthetic tracker data do not establish physical LED scanout timing or animal-tracking calibration.
 
+## 0.3.1 — native desktop workflow
+
+Release tag: [`v0.3.1`](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.3.1). This freezes the desktop workflow accepted in the [manual Mac test](manual-mac-workflow-validation.md), before the subsequent recording-library and synchronized video work.
+
+The player opens fullscreen at native resolution with Retina-aware controls. A fresh apparatus profile offers Start demo and Configure; daily sequence and animal/session editing remain separate from hardware setup. Gain sliders span 0–50 with unrestricted numeric entry. The replay toolbar supports bidirectional timeline dragging, view switching, and an app-owned Mac folder picker that remains visible over fullscreen.
+
+Bundled trackers and Daari Deepa launch independently, with stable per-user installations. Apple Silicon includes the reviewed Rekkefly source correction (`f9a9ba71` plus the checked-in patch) and Daari Deepa `f122518a`. Their exact source revisions, patches and executable hashes accompany the packages. Other architectures retain pinned upstream companions; the strict live-camera Rekkefly path requires the correction and is unavailable there. Demo input and manual/external tracker workflows remain available. No new upstream tracker release is implied.
+
+The [manual Mac workflow report](manual-mac-workflow-validation.md) records Configure, Start, physical webcam input, live plots, acquisition, replay and 43 two-second scene transitions. An earlier build passed 300 full two-second reloads; the original historical native crash was not reproduced, and these results do not establish its sole cause or eliminate every hardware-specific failure. Windows/Linux are cross-built and not manually tested on those operating systems.
+
+For this release's tested Apple Silicon payloads, build with:
+
+```sh
+python3 tools/build_release.py --ref v0.3.1 --version 0.3.1 --platform all \
+  --local-native-camera-fix \
+  --local-dashboard-archive .integration/local-dashboard/DaariDeepa-macos-arm64.zip
+```
+
+See [local companion build provenance](../tools/native_patches/README.md) for reproducing the reviewed dashboard archive. Omit those flags only for an explicit upstream-companion build; it does not reproduce the tested Apple Silicon package.
+
 ## Software verification
 
 | Evidence | Result and scope |

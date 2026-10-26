@@ -7,7 +7,7 @@
 <p align="center"><strong>Animal movement. Controlled worlds.</strong><br>Configurable Unity environments for flight, walking and collective-behaviour experiments.</p>
 
 <p align="center">
-  <a href="https://github.com/pvnkmrksk/matrexVR/releases"><img src="https://img.shields.io/github/v/release/pvnkmrksk/matrexVR?label=archived%20downloads&amp;color=425a66" alt="Published archival downloads"></a>
+  <a href="https://github.com/pvnkmrksk/matrexVR/releases"><img src="https://img.shields.io/github/v/release/pvnkmrksk/matrexVR?label=downloads&amp;color=425a66" alt="Published desktop downloads"></a>
   <a href="https://pvnkmrksk.github.io/matrexVR/manual/"><img src="docs/site/assets/docs-badge.svg" alt="Complete online manual"></a>
   <a href="tools/build_local_desktop.py"><img src="https://img.shields.io/badge/build-local%20desktop-1f5c66" alt="Build the current desktop preview"></a>
   <a href="CITATION.cff"><img src="docs/site/assets/cite-badge.svg" alt="Cite MATREX VR"></a>
@@ -17,7 +17,7 @@
 
 MATREX VR turns measured animal movement into a controlled visual world: Choice tasks, forest and terrain, astronomical night sky, Optomotor, generated or recorded swarms, and **Kannadi** — ಕನ್ನಡಿ, “mirror” in Kannada — a matrix of mirrored animal poses. Configure an experiment visually, inspect the same JSON, and keep the evidence for analysis and replay.
 
-> **Current desktop preview: source/local build.** Native fullscreen and Retina-aware UI, the demo/Configure workflow, bundled native trackers and the latest replay fixes are current source. Public **0.1–0.3 downloads remain archival** and do not contain this new desktop experience. No new signed release is implied.
+> **Desktop release 0.3.1.** [Download for your operating system](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.3.1), extract the whole ZIP, and open MATREX VR. Native fullscreen, the demo/Configure workflow and replay controls are included. Apple Silicon packages include the tested native camera correction and updated live dashboard; see the release notes for platform-specific companion limits. macOS is ad hoc signed and is not notarized.
 
 [![MATREX VR native Mac start screen with a hardware-free Night sky demo and separate Configure workspace](docs/images/desktop-ui/start-native-3024.png)](docs/images/desktop-ui/start-native-3024.png)
 
