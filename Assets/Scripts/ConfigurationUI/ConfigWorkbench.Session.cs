@@ -219,7 +219,7 @@ namespace ConfigurationUI
                 if(TrackerBackend.TryParse(rig["closedLoopMode"]?.ToString(),out var videoMode)&&(videoMode==ClosedLoopMode.Rekkefly||videoMode==ClosedLoopMode.Hejjetrac))
                 {
                     var video=new Toggle("Save tracker video") {name="recording-save-video-"+id,value=DesktopApparatusProfile.Flag(rig["tracker"]?["saveVideo"])};
-                    video.tooltip="Save native camera video alongside tracker frame/configuration logs. Uses additional disk space. A separate recording profile preserves calibration. A running tracker using another profile must be closed explicitly before changing this option. Media remains pending until the native recorder closes cleanly; archival never stops your tracker.";
+                    video.tooltip="Save native camera video alongside tracker frame/configuration logs. Uses additional disk space. Recording options preserve calibration. A running tracker using another profile must be closed explicitly before changing this option. Media remains pending until the native recorder closes cleanly; archival never stops your tracker.";
                     video.RegisterValueChangedCallback(e=>StudioEdit(Workspace.System,r=>{
                         var current=(r["configs"] as JArray).OfType<JObject>().First(row=>(string)row["vrId"]==id);
                         if(!(current["tracker"] is JObject tracker)){tracker=new JObject();current["tracker"]=tracker;}tracker["saveVideo"]=e.newValue;
