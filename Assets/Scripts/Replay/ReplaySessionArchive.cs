@@ -35,6 +35,7 @@ public sealed class ReplaySessionArchive
     public double FirstExperimentTime { get; private set; }
     public JObject Sequence { get; private set; }
     public JObject SystemConfiguration { get; private set; }
+    public RecordedPosePolicy PosePolicy { get; }
     private readonly JObject manifest;
     private readonly HashSet<string> verified = new HashSet<string>(StringComparer.Ordinal);
 
@@ -51,6 +52,7 @@ public sealed class ReplaySessionArchive
         else Warnings.Add("Legacy recording: no hashed config manifest. Only files actually saved in this run can be restored.");
         Sequence = ReadRole("sequence", "sequenceConfig.json");
         SystemConfiguration = ReadRole("system", "system_config.json");
+        PosePolicy=RecordedPosePolicy.FromSavedSequence(Sequence,manifest!=null&&Sequence!=null);
     }
 
     public void LoadRigSamples()
@@ -76,8 +78,9 @@ public sealed class ReplaySessionArchive
                     string[] cells;
                     try { cells = Csv(line); } catch (InvalidDataException) { rejected++; continue; }
                     if (cells.Length != header.Length) { rejected++; misaligned++; continue; }
-                    if (IsNonExperimentPose(Cell(header,cells,"Scene"),file)) { nonExperiment++; continue; }
-                    if (IsVerifiedIdleOrHandoff(header,cells)) { handoff++; continue; }
+                    var exclusion=PosePolicy.Classify(file,header,cells);
+                    if(exclusion==RecordedPoseExclusion.SetupOrReplay){nonExperiment++;continue;}
+                    if(exclusion==RecordedPoseExclusion.VerifiedIdleOrHandoff){handoff++;continue;}
                     if (cells.Length <= max || string.IsNullOrWhiteSpace(cells[rig]) || !TryTimestamp(cells[time], out long ticks)) { rejected++; continue; }
                     float[] values = new float[6]; bool valid = true;
                     for (int i = 0; i < pose.Length; i++) valid &= TryNumber(cells[pose[i]], out values[i]);
@@ -256,7 +259,7 @@ public sealed class ReplaySessionArchive
                             string[] values=Csv(row);
                             if(string.IsNullOrWhiteSpace(Cell(header,values,"VR")) || !TryTimestamp(Cell(header,values,"Current Time"),out _))continue;
                             string scene=Cell(header,values,"Scene");
-                            if(IsNonExperimentPose(scene,file))continue;
+                            if(RecordedPosePolicy.IsNonExperimentScene(scene,file))continue;
                             return folder;
                         }
                     }
@@ -265,29 +268,6 @@ public sealed class ReplaySessionArchive
             }
         }
         return null;
-    }
-    private bool IsVerifiedIdleOrHandoff(string[] header,string[] cells)
-    {
-        // Only a checksummed sequence and explicit modern columns establish this
-        // mismatch. Historical aliases or missing context remain untouched.
-        if(manifest==null || !(Sequence?["sequences"] is JArray steps) ||
-            !new[]{"unityFrame","experimentPhase","Scene","CurrentSequenceScene","CurrentStep"}.All(header.Contains))return false;
-        if(Integer(Cell(header,cells,"unityFrame"),-1)<0)return false;
-        int step=Integer(Cell(header,cells,"CurrentStep"),-1);
-        if(step<0 || step>=steps.Count)return false;
-        var declared=steps[step] as JObject;if(declared==null)return false;
-        string scene=Cell(header,cells,"Scene"),logical=Cell(header,cells,"CurrentSequenceScene"),phase=Cell(header,cells,"experimentPhase");
-        if(string.IsNullOrEmpty(phase) || logical!=(string)declared["sceneName"] ||
-            !steps.OfType<JObject>().Any(item=>(string)item["sceneName"]==scene))return false;
-        return scene!=logical || phase=="idle";
-    }
-    private static bool IsNonExperimentPose(string scene,string file)
-    {
-        scene=(scene??"").Trim();
-        if(string.Equals(scene,"ControlScene",StringComparison.OrdinalIgnoreCase) || string.Equals(scene,"ReplayScene",StringComparison.OrdinalIgnoreCase))return true;
-        if(scene.Length>0)return false;
-        string name=Path.GetFileName(file);
-        return name.IndexOf("_ControlScene_",StringComparison.OrdinalIgnoreCase)>=0 || name.IndexOf("_ReplayScene_",StringComparison.OrdinalIgnoreCase)>=0;
     }
     public static string CanonicalRig(string name)
     {
