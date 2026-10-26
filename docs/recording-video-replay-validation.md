@@ -26,7 +26,7 @@ A read-only production-parser audit passed **37 checks** on the separately acqui
 
 This association means the software consumed that tracker frame for that pose. It does not establish camera exposure, physical animal-tracking accuracy or LED presentation timing. The remaining pose rows have no consumed-input anchor; synchronization is not invented for them.
 
-An earlier fresh recording also exercised the recorded trajectory dashboard: seeking to **18 s** in its GUI set Unity's replay clock to **18.0 s**. Final visual confirmation of the newly styled dashboard remains outside this report until the final walkthrough is added.
+The final bundled Daari Deepa viewer (`1486b81e`) displayed all **2,836 trajectory points** with a heading cursor. Seeking to **6 s** in its GUI set Unity to **6.0 s** and the linked video to displayed frame **379**, anchored at **5.997 s**. Dashboard Play/Pause controlled the same Unity clock. The browser walkthrough also verified the repaired typography, control sizing and trajectory layout. An earlier fresh recording separately passed an **18 s** dashboard-to-Unity seek.
 
 ## Preservation and limits
 
@@ -37,3 +37,5 @@ Native computer-control window routing was intermittent. Restarts and CLI replay
 No physical camera/animal, LED scanout, multi-monitor apparatus, Windows or Linux walkthrough was validated here. No new 300-reload endurance result is claimed; [the frozen-release Editor endurance test](release-0.3.1-native-reset-validation.md) has its own scope. The historical scene-reset crash's root cause remains unproven. Monitor setup remains deferred.
 
 The tested player identifies itself as `0.3.1-dev`, Unity `6000.3.16f1`, a dirty working-tree snapshot based on `44dad0b0`. Its prepared non-Editor C# fingerprint is `2b776e823986dc69d42de7c9acaf5e3aa2a210e6a5029ee15f1dad94fbc99b41` across 220 files; this fingerprint excludes packages, scenes and settings.
+
+The final local player reopened the collected recording after rebuild, retained its finalized/reindexed library status, and cleared the resolved pending-recorder message on repeated collection while retaining the valid older-ZIP warning. The final read-only audit again passed 37 checks and all 69 + 4 source-file preservation checks. Its runtime fingerprint is `6232ffc1a16dfe322b34c5d3eabbc2e7be2155050a7676f4be45cd440df79bab`; its source snapshot is `7c93f988`. Acquisition above remains attributed to the earlier player that actually produced the data.

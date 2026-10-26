@@ -50,7 +50,8 @@
     "productionLibraryDiscoveredFreshRun": true,
     "productionLibraryCanReplayFreshRun": true,
     "postCollectionMetadataRequiresFreshSummary": true,
-    "postCollectionSummaryBehavior": "Media collection changes recording metadata; the library rescans rather than trusting a stale finalized summary."
+    "postCollectionSummaryBehavior": "Media collection changes recording metadata; the library rescans rather than trusting a stale finalized summary.",
+    "finalizedReindexedCaptionObserved": true
   },
   "recorderCollection": {
     "independentTrackerLifetime": true,
@@ -64,7 +65,8 @@
     "videoFrameCount": 1709,
     "nominalFramesPerSecond": 60.0,
     "originalZipPreserved": true,
-    "originalZipIncludesLaterCollectedMedia": false
+    "originalZipIncludesLaterCollectedMedia": false,
+    "resolvedPendingWarningClearedOnRepeatCollection": true
   },
   "linkedReplay": {
     "defaultGodsEyeViewObserved": true,
@@ -87,12 +89,20 @@
     "actualConsumedInputAnchors": 2822,
     "exactPoseIdentityJoins": 2822,
     "firstMiddleLastFrameResolutionAndNativeJpegComparisonPassed": true,
-    "productionParserResolverChecksPassed": 37
+    "productionParserResolverChecksPassed": 37,
+    "finalPostCleanupProductionChecksPassed": 37
   },
   "recordedDashboard": {
     "earlierFreshRunGuiSeekSeconds": 18.0,
     "unityClockObservedAfterDashboardSeekSeconds": 18.0,
-    "styledDashboardFinalVisualStatus": "Pending final root walkthrough; not counted as validated here."
+    "styledDashboardFinalVisualStatus": "Passed native bundled viewer browser walkthrough.",
+    "sourceRevision": "1486b81e4a02189edd59388cb72c8f2ae56c07a4",
+    "freshRunTrajectoryPoints": 2836,
+    "freshRunDashboardSeekSeconds": 6.0,
+    "freshRunUnitySeekSeconds": 6.0,
+    "displayedVideoFrameOneBasedAtSeek": 379,
+    "inputAnchorSecondsAtSeek": 5.997,
+    "playPauseRoundTripObserved": true
   },
   "preservation": {
     "priorRecordingFilesChecked": 69,
@@ -108,5 +118,15 @@
     "No new 300-reload endurance result is claimed. Earlier frozen-release Editor endurance evidence has its own report.",
     "The cause of the historical Unity scene-reset crash has not been established.",
     "Nominal video frame rate and pose wall-clock spans are not measured hardware exposure or stimulus timing."
-  ]
+  ],
+  "finalReplayPlayer": {
+    "sourceRevision": "7c93f988e82a1340fdab039f6cd425e2b245b79b",
+    "runtimeSourceFingerprintSha256": "6232ffc1a16dfe322b34c5d3eabbc2e7be2155050a7676f4be45cd440df79bab",
+    "runtimeSourceFileCount": 220,
+    "applicationVersion": "0.3.1-dev",
+    "unityVersion": "6000.3.16f1",
+    "buildGuid": "590b93a6c0e945ba85f0ea7bf92a6388",
+    "buildErrors": 0,
+    "strictAdHocSignatureVerified": true
+  }
 }
