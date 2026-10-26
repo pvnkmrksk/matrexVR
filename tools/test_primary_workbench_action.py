@@ -22,6 +22,9 @@ public static class DesktopQuickStart {
 public sealed class ConfigWorkbench {
  private WorkspaceState Workspace=new WorkspaceState();
  private bool ApparatusConfigured=>Workspace.configured;
+ private bool replayLibraryMode;private int replays;
+ private void OpenLibrarySelection(){replays++;}
+ private void RefreshLibraryFooter(){start.label.text="Replay selected";}
  private Button start=new Button();private int saved,started;private bool home;
  private List<string> hardwareErrors=new List<string>();
  private List<string> ApparatusConfigurationErrors()=>new List<string>(hardwareErrors);
@@ -32,6 +35,7 @@ TESTS = r'''
  static int checks;
  static void Check(bool condition,string message){checks++;if(!condition)throw new Exception(message);}
  public static void Main(){
+  var library=new ConfigWorkbench();library.replayLibraryMode=true;library.RefreshStartCaption();library.RunPrimaryAction();Check(library.start.label.text=="Replay selected"&&library.replays==1&&library.started==0&&library.saved==0,"recording library footer started acquisition or completed hardware");
   var draft=new ConfigWorkbench();draft.RefreshStartCaption();
   draft.Workspace.errors.Add("empty sequence");Check(draft.PrimaryActionErrors().Count==0&&draft.Workspace.validationCalls==0,"empty sequence disabled hardware completion");
   draft.Workspace.errors.Clear();draft.Workspace.errors.Add("unavailable experiment");Check(draft.PrimaryActionErrors().Count==0&&draft.Workspace.validationCalls==0,"missing experiment disabled hardware completion");

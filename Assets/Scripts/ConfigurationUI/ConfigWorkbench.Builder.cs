@@ -42,10 +42,10 @@ namespace ConfigurationUI
             side.Clear();side.AddToClassList("studio-sidebar");
             side.Add(new Label("EXPERIMENT") {name="navigation-title"});
             var session=StudioButton("Start","home",ShowSessionHome,homeMode?"nav-active":null);session.name="back-to-session";session.tooltip="Review and start your experiment sequence, or explore the demonstration before configuring hardware.";side.Add(session);
-            var sequence=StudioButton("Sequence","sequence",()=>Select(Workspace.Sequence),!homeMode&&!experimentIndexMode&&selected==Workspace.Sequence?"nav-active":null);sequence.name="open-sequence";sequence.tooltip="Arrange blocks, timing and repetitions. Open a block to change its parameters.";side.Add(sequence);
-            var experiments=StudioButton("Experiment settings","settings",ShowExperimentConfigs,experimentIndexMode||!homeMode&&selected!=Workspace.Sequence&&selected!=Workspace.System?"nav-active":null);experiments.name="open-experiments";experiments.tooltip="Reusable stimulus, movement and scene parameters for the current sequence.";side.Add(experiments);
-            var replay=StudioButton("Replay a recording","play",ShowReplayLauncher);replay.name="open-recorded-replay";replay.tooltip="Open a recorded session and inspect its timeline and overview.";side.Add(replay);
-            var files=new Foldout {name="navigation-files",text="In this sequence",value=!homeMode};files.AddToClassList("nav-foldout");side.Add(files);
+            var sequence=StudioButton("Sequence","sequence",()=>Select(Workspace.Sequence),!homeMode&&!experimentIndexMode&&!replayLibraryMode&&selected==Workspace.Sequence?"nav-active":null);sequence.name="open-sequence";sequence.tooltip="Arrange blocks, timing and repetitions. Open a block to change its parameters.";side.Add(sequence);
+            var experiments=StudioButton("Experiment settings","settings",ShowExperimentConfigs,experimentIndexMode||!homeMode&&!replayLibraryMode&&selected!=Workspace.Sequence&&selected!=Workspace.System?"nav-active":null);experiments.name="open-experiments";experiments.tooltip="Reusable stimulus, movement and scene parameters for the current sequence.";side.Add(experiments);
+            var replay=StudioButton("Replay recordings","play",ShowReplayLauncher,replayLibraryMode?"nav-active":null);replay.name="open-recorded-replay";replay.tooltip="Open a recorded session and inspect its timeline and overview.";side.Add(replay);
+            var files=new Foldout {name="navigation-files",text="In this sequence",value=!homeMode&&!replayLibraryMode};files.AddToClassList("nav-foldout");side.Add(files);
             var linked=new HashSet<string>(BuilderSteps.OfType<JObject>().Select(BlockReference).Where(r=>!string.IsNullOrEmpty(r)).Select(r=>Path.GetFullPath(ExperimentConfigFiles.Resolve(r))));
             foreach(var doc in Workspace.Documents.Where(d=>d.SchemaId!="sequence"&&d.SchemaId!="system"&&linked.Contains(d.Path)))
             {
@@ -58,7 +58,7 @@ namespace ConfigurationUI
             side.Add(new Label("APPLICATION"));
             var system=StudioButton("Configure","system",()=>Select(Workspace.System),!homeMode&&!experimentIndexMode&&selected==Workspace.System?"nav-active":null);system.name="open-system";system.tooltip="Configure hardware, panel layouts, tracking inputs and species. Your apparatus is saved between sessions.";side.Add(system);
             side.Add(StudioButton("Documentation","help",()=>Application.OpenURL("https://pvnkmrksk.github.io/matrexVR/manual/"),"quiet"));
-            side.Add(StudioButton("Quit","stop",()=>Application.Quit(),"quiet"));
+            side.Add(StudioButton("Quit","power",()=>Application.Quit(),"quiet"));
             foreach(var heading in side.Children().OfType<Label>())heading.AddToClassList("nav-heading");
         }
         private void BuildStudio()

@@ -123,7 +123,7 @@ namespace ConfigurationUI
             pageLocation=new Label(); pageLocation.AddToClassList("page-location"); header.Add(pageLocation);
             var badge=new Label("●  SETUP"); badge.AddToClassList("badge"); badge.tooltip="Setup is open. The experiment starts when you choose Start experiment."; header.Add(badge);
             frameRate=new Label("— FPS"){name="setup-frame-rate"}; frameRate.AddToClassList("frame-rate"); header.Add(frameRate);
-            root.Add(header);
+            root.Add(header);AddRecordingFinalizationBanner();
             var main=Row("main"); root.Add(main);
             side=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; side.name="setup-navigation"; side.AddToClassList("sidebar"); main.Add(side);
             body=new VisualElement(); body.AddToClassList("body"); main.Add(body);
@@ -146,7 +146,7 @@ namespace ConfigurationUI
         }
         private void BuildNavigation() { Workspace.RefreshReferences(); BuildStudioNavigation(); }
         private void Select(ConfigDocument doc)
-        { RequireApplied(); if(selected!=doc) { activePhase="stimulus"; settingsTab="Essentials"; } selected=doc; path.Clear(); homeMode=false; experimentIndexMode=false; metadataMode=false; jsonMode=false; advancedMode=false; filter=""; BuildNavigation(); BuildContent(); }
+        { RequireApplied(); LeaveRecordingLibrary(); if(selected!=doc) { activePhase="stimulus"; settingsTab="Essentials"; } selected=doc; path.Clear(); homeMode=false; experimentIndexMode=false; metadataMode=false; jsonMode=false; advancedMode=false; filter=""; BuildNavigation(); BuildContent(); }
         private void RequireApplied() { FlushNumbers(); if(rawPending) throw new InvalidOperationException("Apply the JSON draft or discard it before saving, navigating or starting."); }
         private JToken Current => ConfigDocument.At(selected.Root,path);
         private JObject Context => new JObject { ["flight"]=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().Any(r=>TrackerBackend.TryParse(r["closedLoopMode"]?.ToString()??"FicTrac",out var mode) && TrackerBackend.IsFlight(mode)) };
@@ -184,12 +184,14 @@ namespace ConfigurationUI
             enableUpdates.Clear();
             body.Clear(); inspector.Clear(); rawPending=false;
             HideHoverHelp();
-            body.EnableInClassList("session-body",homeMode || experimentIndexMode);
+            body.EnableInClassList("session-body",homeMode || experimentIndexMode || replayLibraryMode);
             side.style.display=DisplayStyle.Flex;
-            inspector.style.display=homeMode || experimentIndexMode || root.resolvedStyle.width<1220?DisplayStyle.None:DisplayStyle.Flex;
-            pageLocation.text=homeMode?"Start":experimentIndexMode?"Experiment settings":selected==Workspace.System?"Apparatus setup":selected==Workspace.Sequence?"Experiment sequence":ExperimentBlocks.Title(selected.Path);
-            undo.style.display=redo.style.display=homeMode?DisplayStyle.None:DisplayStyle.Flex;
+            inspector.style.display=homeMode || experimentIndexMode || replayLibraryMode || root.resolvedStyle.width<1220?DisplayStyle.None:DisplayStyle.Flex;
+            pageLocation.text=replayLibraryMode?"Recording library":homeMode?"Start":experimentIndexMode?"Experiment settings":selected==Workspace.System?"Apparatus setup":selected==Workspace.Sequence?"Experiment sequence":ExperimentBlocks.Title(selected.Path);
+            save.style.display=replayLibraryMode?DisplayStyle.None:DisplayStyle.Flex;
+            undo.style.display=redo.style.display=homeMode||replayLibraryMode?DisplayStyle.None:DisplayStyle.Flex;
             RefreshStartCaption();
+            if(replayLibraryMode) { BuildRecordingLibrary(); return; }
             if(homeMode) { BuildSessionHome(); return; }
             if(experimentIndexMode) { BuildExperimentConfigs(); return; }
             if(metadataMode) { BuildMetadata(); return; }
@@ -330,6 +332,7 @@ namespace ConfigurationUI
         { return value is JObject obj?(string)(obj["vrId"]??obj["sceneName"]??obj["name"]??obj["type"])??"Item "+(index+1):"Item "+(index+1); }
         private void UpdateStatus(string message=null)
         {
+            if(replayLibraryMode){RefreshLibraryFooter(message);return;}
             if(preparing)
             {
                 status.text=preparationStatus;status.RemoveFromClassList("error");status.RemoveFromClassList("warning");
@@ -585,6 +588,7 @@ namespace ConfigurationUI
         {if(preparing){preparing=false;preparationVersion++;}}
         private void OnDestroy()
         {
+            LeaveRecordingLibrary();
             pendingPointerRebuild?.Pause();
             pendingBlockRefresh?.Pause();
             foreach(var raycaster in legacyRaycasters) if(raycaster!=null) raycaster.enabled=true;

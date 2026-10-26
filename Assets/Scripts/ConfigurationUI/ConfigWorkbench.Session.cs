@@ -10,13 +10,13 @@ namespace ConfigurationUI
     {
         private void ShowSessionHome()
         {
-            RequireApplied(); CloseModal(); selected=Workspace.Sequence; path.Clear();
+            RequireApplied(); CloseModal(); LeaveRecordingLibrary(); selected=Workspace.Sequence; path.Clear();
             homeMode=true; experimentIndexMode=false; metadataMode=jsonMode=advancedMode=false;
             BuildNavigation(); BuildContent();
         }
         private void ShowExperimentConfigs()
         {
-            RequireApplied(); CloseModal(); path.Clear(); homeMode=false; experimentIndexMode=true;
+            RequireApplied(); CloseModal(); LeaveRecordingLibrary(); path.Clear(); homeMode=false; experimentIndexMode=true;
             metadataMode=jsonMode=advancedMode=false; BuildNavigation(); BuildContent();
         }
         private VisualElement BuildSequenceFlags()
@@ -72,7 +72,7 @@ namespace ConfigurationUI
         }
         private void RunPrimaryAction()
         {
-            if(ApparatusDraft)FinishApparatusConfiguration();else StartExperiment();
+            if(replayLibraryMode)OpenLibrarySelection();else if(ApparatusDraft)FinishApparatusConfiguration();else StartExperiment();
         }
         private void ChooseQuickStart(string mode,string world,bool demo)
         {
@@ -184,6 +184,7 @@ namespace ConfigurationUI
         }
         private void RefreshStartCaption()
         {
+            if(replayLibraryMode){RefreshLibraryFooter();return;}
             if(start==null)return;var label=start.Q<Label>();if(label!=null)label.text=ApparatusDraft?"Use configuration":CurrentDemo?"Start demo":"Start experiment";
             start.tooltip=ApparatusDraft?"Validate and save the apparatus, then return to the experiment workspace. The experiment does not start.":CurrentDemo?"Start this clearly marked demo, including the native tracker companion. No hardware is required.":"Save and validate the current sequence, connect its configured tracking input and start recording.";
         }
@@ -215,6 +216,15 @@ namespace ConfigurationUI
                 sexField.RegisterValueChangedCallback(e=>fly.Sex=e.newValue);
                 SessionField(traits,"Age (days)","subject-age-"+id,fly.AgeDays,v=>fly.AgeDays=v,"Unspecified");
                 SessionField(card,"Comments","subject-comments-"+id,fly.Comments,v=>fly.Comments=v,"Notes for "+id,true);
+                if(TrackerBackend.TryParse(rig["closedLoopMode"]?.ToString(),out var videoMode)&&(videoMode==ClosedLoopMode.Rekkefly||videoMode==ClosedLoopMode.Hejjetrac))
+                {
+                    var video=new Toggle("Save tracker video") {name="recording-save-video-"+id,value=DesktopApparatusProfile.Flag(rig["tracker"]?["saveVideo"])};
+                    video.tooltip="Save native camera video alongside tracker frame/configuration logs. Uses additional disk space. A separate recording profile preserves calibration. A running tracker using another profile must be closed explicitly before changing this option. Media remains pending until the native recorder closes cleanly; archival never stops your tracker.";
+                    video.RegisterValueChangedCallback(e=>StudioEdit(Workspace.System,r=>{
+                        var current=(r["configs"] as JArray).OfType<JObject>().First(row=>(string)row["vrId"]==id);
+                        if(!(current["tracker"] is JObject tracker)){tracker=new JObject();current["tracker"]=tracker;}tracker["saveVideo"]=e.newValue;
+                    },false));card.Add(video);
+                }
                 AddTrackerControls(card,rig);
             }
 
@@ -295,18 +305,7 @@ namespace ConfigurationUI
             UpdateStatus();
         }
         private Label SessionLabel(string text,string css) { var label=new Label(text); label.AddToClassList(css); return label; }
-        private void ShowReplayLauncher()
-        {
-            RequireApplied();
-            if(!UnityEngine.Application.CanStreamedLevelBeLoaded("ReplayScene"))
-                throw new InvalidOperationException("ReplayScene is not included in this build.");
-            var dialog=OpenModal("Replay a recorded run","Save this setup before leaving, then choose the recorded session folder in replay. Your JSON files and session details will be available when you return to setup.");
-            dialog.Add(StudioButton("Save setup and open replay","play",()=>{
-                RequireApplied(); Workspace.SaveAll(); SaveMetadata();
-                UnityEngine.SceneManagement.SceneManager.LoadScene("ReplayScene");
-            },"primary"));
-            dialog.Add(StudioButton("Keep editing","settings",CloseModal,"quiet"));
-        }
+        private void ShowReplayLauncher()=>ShowRecordingLibrary();
         private void ShowEditorTools()
         {
             var dialog=OpenModal("Config tools","Every JSON value remains accessible, including custom extensions.");
