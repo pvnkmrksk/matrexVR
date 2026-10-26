@@ -4,9 +4,15 @@ The 0.3 replay path loads evidence from a **saved run folder**: animal poses, sa
 
 ## Open a run
 
-Keep the complete session directory, including `config_manifest.json`, `Configs`, `Skyboxes`, rig CSVs and population CSV/gzip logs. Extract a session ZIP before opening it.
+Keep the complete session directory, including `config_manifest.json`, `Configs`, `Skyboxes`, rig CSVs, population CSV/gzip logs and any `media` directory. Extract a session ZIP before opening it. The folder is the portable unit; copying only a CSV loses the saved environment and optional video evidence.
 
-From the setup sidebar, choose **Replay a recorded run**. The setup/session can be saved before entering ReplayScene. You can also launch a player with:
+**Development source following 0.3.1** adds the recording library, tracker video controls and linked recorded trajectories described below. These additions are not part of the frozen 0.3.1 download. Its existing replay still opens a saved folder with Browse, a path or the launch argument.
+
+In current development builds, choose **Replay recordings** from the setup sidebar. The library automatically lists recordings under this installation's RunData directory, newest first. It shows the recorded span, observed rigs, animal metadata, tracker backend, sequence cycles and per-rig condition presentations. These are derived from saved rows; planned steps are not counted as completed trials. Setup-only folders and duplicate ZIP snapshots are not presented as experiment recordings.
+
+Select a recording to inspect **Recorded files** and **Saved evidence & limitations**, then choose **Replay selected**. This saves the current setup draft before opening the saved run. A finishing recording remains unavailable until its data writers have closed; other recordings can still be opened. Use **Refresh** to rescan or search by name, animal, backend or recorded scene. **Browse…** and **Open an external folder path → Inspect folder** open a recording on another drive or computer without moving it into the local library.
+
+You can also launch a player with:
 
 ```sh
 "./MATREX VR.x86_64" --replay-session "/path/to/RunData/session-folder"
@@ -26,11 +32,35 @@ This loads `ReplayScene`. Use **Browse…** to choose a folder, or paste its pat
 - **Left/Right** seek one second; hold **Shift** for ten seconds.
 - **N/M** jump to the previous/next recorded step marker.
 - Choose a playback speed from **0.1× to 4×**.
-- The **God's-eye view** is the default. Use fit/zoom and the animal views to inspect movement at different scales.
+- The **God's-eye view** is the default. **Fit** frames the recorded trajectory and returns to the overview.
+- In current development builds, right-drag or **I/J/K/L** turns the overview; middle-drag pans; the wheel zooms. **W/A/S/D** moves horizontally and **Q/E** moves down/up; hold **Shift** to move faster. **Perspective / Top-down view** changes the overview projection. These controls are inactive while editing a path or media form.
+- Click **God's-eye view / Animal VR…** to cycle the main view. The **Recording views** panel can show the saved front-camera reconstruction beside the tracker video while the main image stays overhead. **Hide** collapses that panel.
 
-Animal-view cameras are analysis views; they do not reproduce calibrated LED-panel viewports.
+Where saved camera data is available, the animal reconstruction preserves its projection and panel aspect with letterboxing. This is an analysis view of saved evidence; it does not establish physical LED scanout or pixel-for-pixel historical output.
 
 All animal timestamps use a common session origin so independent rigs do not each start at their first row. A backward seek updates animals, recorded populations and applicable saved stimulus context together. Replay controls operate on recorded time; they never restart live tracking or the acquisition sequence.
+
+## Record and replay tracker video
+
+The following controls are in development source following 0.3.1. Video is optional: pose recording and replay work without it.
+
+1. Before starting, expand **Animal & recording details** on Start and enable **Save tracker video** for the relevant rig. This requests native MJPEG AVI plus frame/configuration logs from bundled Rekkefly or HejjéTrac. A tracker already running with another recording option must be closed explicitly before changing it; calibration stays in its shared native configuration.
+2. Start the experiment or labeled demo. The tracker remains an independent application. For real experiments, inspect its camera, calibration and tracking quality before presenting stimuli. Demonstration input is simulated or prerecorded, not a new animal measurement.
+3. End the experiment with **Back to setup / Esc**, or let its configured sequence finish. Wait for **Finishing recording…** to clear before opening that run. Data writers are drained and the saved context and recording summary are finalized in the background.
+4. Close the native tracker normally when its video recording is finished. Unity never stops it as part of archival. If it closes cleanly while Unity is still running, the app can acknowledge the completed recorder. If the tracker is still open when the experiment finalizes, camera media stays **pending** while the poses remain replayable.
+5. Open the run and choose **Collect media** to gather completed app-launched footage. **Refresh videos** reloads media already present in the run. The original tracker recording stays at its source; copied media and sidecars are preserved under the run's `media` directory with integrity hashes.
+
+A linked clip follows the same replay clock as the trajectory, including pause, playback speed and forward/backward scrubbing. **Software consumed-input frame association** means a saved pose used the tracker input frame matched to that video frame; it is not an exposure or display synchronization measurement. Gaps or unavailable coverage remain visible rather than being filled with guessed frames.
+
+For another finished tracker recording, choose **Import video folder…**, select its folder and confirm **The tracker has finished saving this recording**. Leave the optional offset blank to preserve unknown timing. To align it approximately, enter an explicit offset using `replay time = video time + offset`; a positive offset means the video began later. **Set offset…** changes that alignment metadata without rewriting raw footage. Importing old video does not recover frame associations that were never recorded. Unsupported media may be archived without a playable or synchronized native preview.
+
+Collecting media or changing an offset updates the run folder. A ZIP created earlier remains its original snapshot and is not silently replaced. Transfer the complete updated folder when sharing a run with newly collected footage. See the [recorded-media contract](recorded-media-contract.md) for clocks, manifests, import checks and synchronization limits.
+
+## Linked recorded trajectories
+
+In current development builds, **Trajectory plots** opens the independent Daari Deepa recorded viewer. Unity remains the replay clock: the plots receive its time, speed and paused state, while seek/play/pause requests from the viewer return to Unity. The recorded viewer uses loopback port **8061**; acquisition **Live plots** remains separate on **8060**. Closing a replay session disconnects its controls without terminating the independent viewer.
+
+The linked native viewer currently ships in the reviewed **local macOS Apple Silicon development bundle**. Older Intel macOS, Windows and Linux dashboard payloads do not contain this replay bridge; an explicit capability message is shown instead of spawning repeated copies. This does not prevent Unity replay. An ordinary standalone analysis view can still inspect the saved data independently.
 
 ## What is restored
 
