@@ -882,7 +882,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sessionFolder: 
   absoluteSessionPath:
-  rigMarkerPrefab: {fileID: 1274570263506488403, guid: eed7da0dd105843ff8b63e74c2eb7805, type: 3}
+  rigMarkerPrefab: {fileID: 0}
   createRigCameras: 1
   targetHorizontalFov: 110
   playbackSpeed: 1
