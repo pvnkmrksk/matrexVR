@@ -92,6 +92,7 @@ public sealed class ExperimentTelemetry : MonoBehaviour
             if (!reportedWorkerFailure) { reportedWorkerFailure = true; Debug.LogError("Telemetry publisher failed: " + worker.Failure); }
             return;
         }
+        if (!CanPublishScene(SceneManager.GetActiveScene().name)) return;
         double now = Time.realtimeSinceStartupAsDouble;
         if (now < nextPublish && now < nextContext) return;
         try
@@ -113,6 +114,11 @@ public sealed class ExperimentTelemetry : MonoBehaviour
             Debug.LogError("Telemetry send failed: " + error);
         }
     }
+
+    // Replay is a viewer, not a live experiment. Keep the worker bound for return
+    // to setup, but suppress both pose snapshots and context heartbeats here.
+    private static bool CanPublishScene(string sceneName) =>
+        !string.Equals((sceneName ?? "").Trim(), "ReplayScene", StringComparison.OrdinalIgnoreCase);
 
     // A slow subscriber or encoder never builds a queue on the frame thread. NetMQ sockets
     // are created, used and disposed on the same worker, including after config changes.
