@@ -91,6 +91,7 @@ public class ReplayController : MonoBehaviour
     private GUISkin replaySkin;
     private float replaySkinScale;
     private bool pointerTrace;
+    private readonly GUIContent playContent=new GUIContent();
     private Task<string> folderPicker;
     private int cameraLayoutVersion=-1;
 
@@ -455,6 +456,16 @@ public class ReplayController : MonoBehaviour
         evt.mousePosition=ReplayMousePosition(mouse.position.ReadValue(),height);
     }
 
+    private void TraceReplayButton(string stage,Rect rect,bool clicked=false)
+    {
+        var evt=Event.current;
+        if(!pointerTrace || evt==null || (evt.rawType!=EventType.MouseDown && evt.rawType!=EventType.MouseUp))return;
+        Debug.Log("[Replay button] "+stage+" frame="+Time.frameCount+" type="+evt.type+" raw="+evt.rawType+
+            " pointer="+evt.pointerType+" button="+evt.button+" position="+evt.mousePosition+" rect="+rect+
+            " contains="+rect.Contains(evt.mousePosition)+" enabled="+GUI.enabled+" hot="+GUIUtility.hotControl+
+            " keyboard="+GUIUtility.keyboardControl+" screenOrigin="+GUIUtility.GUIToScreenPoint(Vector2.zero)+" clicked="+clicked);
+    }
+
     private void OnGUI()
     {
         if(OperatorOverlayVisibility.Hidden)return;
@@ -489,6 +500,7 @@ public class ReplayController : MonoBehaviour
         float screenWidth=Screen.width,screenHeight=Screen.height;
         float height=Mathf.Max(152*scale,screenHeight*.20f);var area=ReplayToolbarRect(screenWidth,screenHeight,scale);
         GUI.Box(area,GUIContent.none);GUILayout.BeginArea(new Rect(area.x+10*scale,area.y+6*scale,area.width-20*scale,area.height-12*scale));
+        TraceReplayButton("area",new Rect(0,0,area.width-20*scale,area.height-12*scale));
         GUILayout.BeginHorizontal();GUILayout.Label("Experiment replay",titleStyle,GUILayout.Width(185*scale));
         if(GUILayout.Button(new GUIContent("Back to setup","Return to experiment setup. Shortcut: Esc."),GUILayout.Width(120*scale)))
         {
@@ -507,7 +519,12 @@ public class ReplayController : MonoBehaviour
         else
         {
             GUILayout.BeginHorizontal();
-            if(GUILayout.Button(isPlaying?"Pause":"Play",GUILayout.Width(64*scale)))isPlaying=!isPlaying;
+            playContent.text=isPlaying?"Pause":"Play";
+            Rect playRect=GUILayoutUtility.GetRect(playContent,GUI.skin.button,GUILayout.Width(64*scale));
+            TraceReplayButton("pause-before",playRect);
+            bool playClicked=GUI.Button(playRect,playContent);
+            TraceReplayButton("pause-after",playRect,playClicked);
+            if(playClicked)isPlaying=!isPlaying;
             if(GUILayout.Button("−10s",GUILayout.Width(52*scale)))Seek(replayTime-10);
             if(GUILayout.Button("+10s",GUILayout.Width(52*scale)))Seek(replayTime+10);
             if(GUILayout.Button("Previous",GUILayout.Width(78*scale)))JumpToStep(-1);
