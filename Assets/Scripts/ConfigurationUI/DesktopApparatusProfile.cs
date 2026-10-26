@@ -21,7 +21,8 @@ namespace ConfigurationUI
             if(saved=="led"||saved=="desktop")return saved;
             return Rigs(root).Any()&&Rigs(root).All(r=>Flag(r["desktopPreview"]))?"desktop":"led";
         }
-        public static int MonitorCount(JToken root) => Math.Max(1,Integer(Profile(root)?["monitorCount"],Rigs(root).Select(r=>Integer(r["targetDisplay"],0)+1).DefaultIfEmpty(1).Max()));
+        public static int OutputDisplay(JToken root,JObject rig,int? fallback=null) => Integer(rig?["targetDisplay"],fallback??Integer(root?["targetDisplay"],1));
+        public static int MonitorCount(JToken root) => Math.Max(1,Integer(Profile(root)?["monitorCount"],Rigs(root).Select(r=>OutputDisplay(root,r)+1).DefaultIfEmpty(1).Max()));
         public static bool ShouldPrepareCompanions(JToken root) => IsConfigured(root)&&Flag(Profile(root)?["launchBundledTrackers"]);
         public static bool ShouldLaunchBundledForRig(JToken root,JObject rig) => ShouldPrepareCompanions(root)&&EligibleForBundled(rig);
         private static bool EligibleForBundled(JObject rig)
@@ -51,7 +52,7 @@ namespace ConfigurationUI
         {
             if(presentation!="led"&&presentation!="desktop")throw new ArgumentException("Choose LED panels or desktop preview.");
             var marker=Marker(root);marker["version"]=1;marker["configured"]=false;marker["presentation"]=presentation;
-            if(marker["monitorCount"]==null)marker["monitorCount"]=Math.Max(1,Rigs(root).Select(r=>Integer(r["targetDisplay"],0)+1).DefaultIfEmpty(1).Max());
+            if(marker["monitorCount"]==null)marker["monitorCount"]=Math.Max(1,Rigs(root).Select(r=>OutputDisplay(root,r)+1).DefaultIfEmpty(1).Max());
             if(marker["launchBundledTrackers"]==null)marker["launchBundledTrackers"]=fromDemo;
             root.Remove("desktopQuickStart");
             foreach(var rig in Rigs(root))
@@ -93,9 +94,9 @@ namespace ConfigurationUI
                 int port=9871;while(port<=65535&&ports.Contains(port))port++;
                 if(port>65535)throw new ArgumentException("No unused local tracker port is available.");
                 rig["zmqPort"]=port;
-                int display=Integer(rig["targetDisplay"],0);bool horizontal=rig["horizontal"]==null||Flag(rig["horizontal"]);
+                int display=OutputDisplay(root,rig);bool horizontal=rig["horizontal"]==null||Flag(rig["horizontal"]);
                 int width=Math.Max(1,Integer(rig["ledPanelWidth"],128)),height=Math.Max(1,Integer(rig["ledPanelHeight"],128));
-                var same=rigs.OfType<JObject>().Where(r=>Integer(r["targetDisplay"],0)==display).ToList();
+                var same=rigs.OfType<JObject>().Where(r=>OutputDisplay(root,r)==display).ToList();
                 if(horizontal)
                 {
                     int edge=same.Select(r=>(Integer(r["startRow"],0)+(r["horizontal"]==null||Flag(r["horizontal"])?1:Order(r).Length))*Math.Max(1,Integer(r["ledPanelHeight"],128))).DefaultIfEmpty(0).Max();
@@ -148,7 +149,7 @@ namespace ConfigurationUI
                 if(Flag(rig["desktopPreview"])&&order.Length!=1)errors.Add(id+": desktop preview uses one face per display.");
                 if(Integer(rig["ledPanelWidth"],0)<=0||Integer(rig["ledPanelHeight"],0)<=0)errors.Add(id+": panel pixel dimensions must be positive.");
                 if(Integer(rig["startRow"],-1)<0||Integer(rig["startCol"],-1)<0)errors.Add(id+": panel row and column must be zero or greater.");
-                int display=Integer(rig["targetDisplay"],-1);
+                int display=OutputDisplay(root,rig);
                 if(display<0)errors.Add(id+": choose an output display index of zero or greater.");
                 else if(display>=MonitorCount(root))errors.Add(id+": output display "+(display+1)+" exceeds the configured display count "+MonitorCount(root)+".");
                 int port=Integer(rig["zmqPort"],0);string host=((string)rig["zmqAddress"]??"").Trim();
@@ -158,7 +159,7 @@ namespace ConfigurationUI
             if(Flag(Profile(root)?["launchBundledTrackers"]))
                 foreach(var group in rigs.Where(EligibleForBundled).GroupBy(Endpoint,StringComparer.OrdinalIgnoreCase))
                     if(group.Count()>1)errors.Add("Multiple bundled native trackers would bind the same tracker endpoint "+group.Key+". Use separate ports or select external/manual input to share one publisher.");
-            foreach(var group in rigs.Where(r=>Flag(r["desktopPreview"])).GroupBy(r=>Integer(r["targetDisplay"],0)))
+            foreach(var group in rigs.Where(r=>Flag(r["desktopPreview"])).GroupBy(r=>OutputDisplay(root,r)))
                 if(group.Count()>1)errors.Add("Desktop preview rigs need separate output displays; multiple full-screen views cannot share display "+(group.Key+1)+".");
             return errors;
         }

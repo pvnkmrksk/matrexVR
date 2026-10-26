@@ -19,6 +19,7 @@ namespace ConfigurationUI
             var sheet=Resources.Load<StyleSheet>("ConfigurationUI/apparatus");
             if(sheet!=null&&!root.styleSheets.Contains(sheet))root.styleSheets.Add(sheet);
         }
+        private int ApparatusOutputDisplay(JObject rig) => DesktopApparatusProfile.OutputDisplay(Workspace.System.Root,rig,MainController.DefaultTargetDisplay((JObject)Workspace.System.Root,Environment.GetCommandLineArgs()));
         private bool ApparatusConfigured => DesktopApparatusProfile.IsConfigured(Workspace.System.Root);
         private void EnsureDailyWorkspace()
         {
@@ -190,7 +191,7 @@ namespace ConfigurationUI
             var transport=Row("apparatus-grid");fold.Add(transport);
             transport.Add(ApparatusText("Tracker host","apparatus-host-"+id,(string)rig["zmqAddress"]??"localhost",value=>set("zmqAddress",value,true),"Host running the tracker publisher. Use localhost for bundled native apps; a remote host remains externally managed."));
             transport.Add(ApparatusInteger("Tracker port","apparatus-port-"+id,DesktopApparatusProfile.Integer(rig["zmqPort"],9871),value=>set("zmqPort",value,true),"ZeroMQ tracking input port. Each rig on the same host requires its own port.",1,65535));
-            transport.Add(ApparatusInteger("Output display","apparatus-display-"+id,DesktopApparatusProfile.Integer(rig["targetDisplay"],0)+1,value=>set("targetDisplay",value-1,true),"Physical output display, numbered from1 here. System JSON stores display0 for the first output. The preview below shows every configured rectangle on that display.",1,32));
+            transport.Add(ApparatusInteger("Output display","apparatus-display-"+id,ApparatusOutputDisplay(rig)+1,value=>set("targetDisplay",value-1,true),"Physical output display, numbered from1 here. System JSON stores display0 for the first output. The preview below shows every configured rectangle on that display.",1,32));
             if(presentation=="led")
             {
                 var pixels=Row("apparatus-grid");fold.Add(pixels);
@@ -251,13 +252,13 @@ namespace ConfigurationUI
         {
             var section=new VisualElement();section.AddToClassList("apparatus-map-section");parent.Add(section);section.Add(SessionHeading("Display layout","system","Exact stimulus pixels, separate from the operator UI."));
             var rigs=DesktopApparatusProfile.Rigs(system).ToList();
-            foreach(int display in rigs.Select(r=>DesktopApparatusProfile.Integer(r["targetDisplay"],0)).Distinct().OrderBy(n=>n))
+            foreach(int display in rigs.Select(r=>ApparatusOutputDisplay(r)).Distinct().OrderBy(n=>n))
             {
                 bool attached=display>=0&&display<Display.displays.Length;
                 int width=attached?Display.displays[display].systemWidth:0,height=attached?Display.displays[display].systemHeight:0;
                 if(display==0){width=Screen.width;height=Screen.height;}
                 bool estimated=width<=0||height<=0;
-                if(estimated){width=Math.Max(1920,rigs.Where(r=>DesktopApparatusProfile.Integer(r["targetDisplay"],0)==display).Select(r=>PixelBounds(r).Item3).DefaultIfEmpty(1920).Max());height=Math.Max(1080,rigs.Where(r=>DesktopApparatusProfile.Integer(r["targetDisplay"],0)==display).Select(r=>PixelBounds(r).Item4).DefaultIfEmpty(1080).Max());}
+                if(estimated){width=Math.Max(1920,rigs.Where(r=>ApparatusOutputDisplay(r)==display).Select(r=>PixelBounds(r).Item3).DefaultIfEmpty(1920).Max());height=Math.Max(1080,rigs.Where(r=>ApparatusOutputDisplay(r)==display).Select(r=>PixelBounds(r).Item4).DefaultIfEmpty(1080).Max());}
                 section.Add(SessionLabel("Display "+(display+1)+" · "+width+" × "+height+" px"+(attached?"":" · not connected")+(estimated?" · preview extent":""),"apparatus-map-label"));
                 var map=new VisualElement {name="apparatus-display-map-"+display};map.AddToClassList("apparatus-display-map");section.Add(map);
                 float aspect=(float)width/height;
@@ -266,7 +267,7 @@ namespace ConfigurationUI
                     float scaledHeight=e.newRect.width/aspect;
                     if(Mathf.Abs(e.newRect.height-scaledHeight)>.5f)map.style.height=scaledHeight;
                 });
-                foreach(var rig in rigs.Where(r=>DesktopApparatusProfile.Integer(r["targetDisplay"],0)==display))
+                foreach(var rig in rigs.Where(r=>ApparatusOutputDisplay(r)==display))
                 {
                     string id=(string)rig["vrId"];string order=DesktopApparatusProfile.Order(rig);bool horizontal=rig["horizontal"]==null||DesktopApparatusProfile.Flag(rig["horizontal"]);int pw=Math.Max(1,DesktopApparatusProfile.Integer(rig["ledPanelWidth"],128)),ph=Math.Max(1,DesktopApparatusProfile.Integer(rig["ledPanelHeight"],128));
                     bool desktop=DesktopApparatusProfile.Flag(rig["desktopPreview"]);

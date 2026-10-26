@@ -21,6 +21,13 @@ static class Regression {
  static void Main(){
   Check(!DesktopApparatusProfile.IsConfigured(null),"null treated configured");
   Check(!DesktopApparatusProfile.IsConfigured(JObject.Parse("{\"apparatusConfiguration\":\"unknown future value\"}")),"malformed marker accepted");
+  var legacyDisplay=Demo();((JObject)legacyDisplay["configs"][0]).Remove("targetDisplay");legacyDisplay["targetDisplay"]=2;
+  Check(DesktopApparatusProfile.OutputDisplay(legacyDisplay,(JObject)legacyDisplay["configs"][0])==2&&DesktopApparatusProfile.MonitorCount(legacyDisplay)==3,"legacy display fallback differs between model and inventory");
+  Check(DesktopApparatusProfile.OutputDisplay(legacyDisplay,(JObject)legacyDisplay["configs"][0],4)==4,"resolved CLI fallback ignored");
+  legacyDisplay["configs"][0]["targetDisplay"]=0;
+  Check(DesktopApparatusProfile.OutputDisplay(legacyDisplay,(JObject)legacyDisplay["configs"][0],4)==0,"explicit primary display loses to fallback");
+  ((JObject)legacyDisplay["configs"][0]).Remove("targetDisplay");DesktopApparatusProfile.Begin(legacyDisplay,"led",false);DesktopApparatusProfile.ResizeRigs(legacyDisplay,2);
+  Check(DesktopApparatusProfile.MonitorCount(legacyDisplay)==3&&DesktopApparatusProfile.Validate(legacyDisplay).Count==0&&(int)legacyDisplay["configs"][1]["startRow"]==1,"legacy omitted display differs in setup validation or resize packing");
   var original=Demo();var copy=(JObject)original.DeepClone();var before=original.ToString();
   DesktopApparatusProfile.Begin(copy,"led",true);
   Check(original.ToString()==before,"source demo changed by clone transaction");

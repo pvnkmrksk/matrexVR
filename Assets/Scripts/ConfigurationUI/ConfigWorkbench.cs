@@ -439,7 +439,7 @@ namespace ConfigurationUI
         {
             foreach(var rig in DesktopApparatusProfile.Rigs(Workspace.System.Root))
             {
-                int display=DesktopApparatusProfile.Integer(rig["targetDisplay"],0);
+                int display=DesktopApparatusProfile.OutputDisplay(Workspace.System.Root,rig,MainController.DefaultTargetDisplay((JObject)Workspace.System.Root,System.Environment.GetCommandLineArgs()));
                 string id=(string)rig["vrId"];
                 if(display<0||display>=Display.displays.Length)
                 {yield return id+": output display "+(display+1)+" is not connected. Connect it or change its display in Configure.";continue;}
