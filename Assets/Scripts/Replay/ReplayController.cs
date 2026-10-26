@@ -93,6 +93,9 @@ public class ReplayController : MonoBehaviour
     private bool pointerTrace;
     private readonly GUIContent playContent=new GUIContent();
     private int replayPointerControl;
+    private bool timelineMouseCaptured,timelineMouseUpSeen;
+    private Rect timelineMouseRect;
+    private int timelineMouseFrame,timelineMouseUpFrame;
     private Task<string> folderPicker;
     private int cameraLayoutVersion=-1;
 
@@ -146,6 +149,7 @@ public class ReplayController : MonoBehaviour
     public void LoadSession(string directory)
     {
         if(loading)return;
+        timelineMouseCaptured=timelineMouseUpSeen=false;
         StartCoroutine(LoadRun(directory));
     }
     private IEnumerator LoadRun(string directory)
@@ -306,6 +310,7 @@ public class ReplayController : MonoBehaviour
             else if(!string.IsNullOrWhiteSpace(folderPicker.Result)){folderInput=folderPicker.Result;LoadSession(folderInput);}
             folderPicker=null;
         }
+        bool scrubbing=UpdateTimelineScrub(mouse);
         if(archive==null || loading)return;
         if(!pathFocused)
         {
@@ -318,7 +323,7 @@ public class ReplayController : MonoBehaviour
             if(selectedView<0 && overview!=null && !showDetails && ExperimentInput.MousePosition.y>Screen.height*.2f)
                 overview.orthographicSize=Mathf.Clamp(overview.orthographicSize*Mathf.Exp(-ExperimentInput.Scroll),.01f,100000);
         }
-        if(isPlaying && (environmentLoader==null || !environmentLoader.Loading))
+        if(isPlaying && !scrubbing && (environmentLoader==null || !environmentLoader.Loading))
         {
             replayTime+=Time.unscaledDeltaTime*Mathf.Max(.01f,playbackSpeed);
             if(replayTime>Duration){if(loop && Duration>0)replayTime%=Duration;else{replayTime=Duration;isPlaying=false;}}
@@ -466,9 +471,36 @@ public class ReplayController : MonoBehaviour
     {
         bool clicked=GUI.Button(rect,text);if(clicked)ClearPathFocus();return clicked;
     }
-    private float ReplaySlider(Rect rect,float value,float minimum,float maximum)
+    private static float TimelinePointerValue(Rect rect,float x)=>Mathf.Clamp01((x-rect.x)/Mathf.Max(1,rect.width));
+    private bool UpdateTimelineScrub(UnityEngine.InputSystem.Mouse mouse)
+    {
+        if(!timelineMouseCaptured)return false;
+        if(archive==null || loading || OperatorOverlayVisibility.Hidden || !Application.isFocused ||
+            mouse==null || !mouse.added || !mouse.enabled)
+        {timelineMouseCaptured=timelineMouseUpSeen=false;return false;}
+        bool released=mouse.leftButton.wasReleasedThisFrame || (timelineMouseUpSeen && !mouse.leftButton.isPressed);
+        if(!released && ((timelineMouseUpSeen && Time.frameCount>timelineMouseUpFrame+1) ||
+            (!timelineMouseUpSeen && !mouse.leftButton.isPressed && !mouse.leftButton.wasPressedThisFrame && Time.frameCount>timelineMouseFrame+1)))
+        {timelineMouseCaptured=timelineMouseUpSeen=false;return false;}
+        if(mouse.leftButton.isPressed || released)
+        {
+            float normalized=TimelinePointerValue(timelineMouseRect,mouse.position.ReadValue().x);
+            if(Math.Abs(replayTime-normalized*Duration)>.000001)SetScrubNormalized(normalized);
+        }
+        if(released)timelineMouseCaptured=timelineMouseUpSeen=false;
+        return true;
+    }
+    private float ReplaySlider(Rect rect,float value,float minimum,float maximum,bool timeline=false)
     {
         if(Event.current.type==EventType.MouseDown && rect.Contains(Event.current.mousePosition))ClearPathFocus();
+        var mouse=UnityEngine.InputSystem.Mouse.current;
+        if(timeline && Event.current.pointerType==PointerType.Mouse && Event.current.button==0 && mouse!=null && mouse.added && mouse.enabled)
+        {
+            if(Event.current.type==EventType.MouseDown && rect.Contains(Event.current.mousePosition))
+            {timelineMouseCaptured=true;timelineMouseUpSeen=false;timelineMouseRect=rect;timelineMouseFrame=Time.frameCount;}
+            if(timelineMouseCaptured && Event.current.rawType==EventType.MouseUp)
+            {timelineMouseUpSeen=true;timelineMouseUpFrame=Time.frameCount;}
+        }
         return GUI.HorizontalSlider(rect,value,minimum,maximum);
     }
 
@@ -487,6 +519,7 @@ public class ReplayController : MonoBehaviour
         if(OperatorOverlayVisibility.Hidden)
         {
             if(replayPointerControl!=0 && GUIUtility.hotControl==replayPointerControl)GUIUtility.hotControl=0;
+            timelineMouseCaptured=timelineMouseUpSeen=false;
             replayPointerControl=0;return;
         }
         EventType entryType=Event.current!=null?Event.current.type:EventType.Ignore;
@@ -568,11 +601,11 @@ public class ReplayController : MonoBehaviour
             top+=rowHeight+8;
             float normalized=Duration>0?(float)(replayTime/Duration):0;
             Rect timeline=new Rect(left,top,width,18*scale);
-            float changed=ReplaySlider(timeline,normalized,0,1);
+            float changed=ReplaySlider(timeline,normalized,0,1,true);
             Color oldColor=GUI.color;GUI.color=new Color(.3f,.8f,.9f,.8f);
             foreach(var step in stepChanges)if(Duration>0)GUI.DrawTexture(new Rect(timeline.x+(float)(step.time/Duration)*timeline.width,timeline.y+2*scale,Mathf.Max(1,scale),8*scale),Texture2D.whiteTexture);
             GUI.color=oldColor;
-            if(Mathf.Abs(changed-normalized)>.000001f)SetScrubNormalized(changed);
+            if(!timelineMouseCaptured && Mathf.Abs(changed-normalized)>.000001f)SetScrubNormalized(changed);
             top+=timeline.height+8;
             string context=referenceSample==null?"No animal sample at this time":referenceSample.scene+" · trial "+referenceSample.trial+" · sequence "+referenceSample.sequenceStep+" · "+referenceSample.stepName+" · "+referenceSample.phase;
             string contextText=context+"   |   "+(environmentLoader?.FidelityStatus??"");
@@ -624,6 +657,7 @@ public class ReplayController : MonoBehaviour
     private static string Clock(double seconds)=>TimeSpan.FromSeconds(Math.Max(0,seconds)).ToString(@"hh\:mm\:ss\.f");
     private void ClearSessionVisuals()
     {
+        timelineMouseCaptured=timelineMouseUpSeen=false;
         foreach(var population in populations){foreach(var visual in population.visuals.Values)if(visual!=null)Destroy(visual);population.stream.Dispose();}populations.Clear();
         foreach(Transform child in generatedRoot)if(child!=populationRoot){child.gameObject.SetActive(false);Destroy(child.gameObject);}
         markerByRig.Clear();camerasByRig.Clear();pathsByRig.Clear();rigOrder.Clear();stepChanges.Clear();archive=null;

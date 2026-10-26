@@ -27,13 +27,24 @@ struct Bounds{public Vector3 min,max;public Bounds(Vector3 center,Vector3 size){
 enum EventType{MouseDown,MouseUp,MouseMove,MouseDrag,ScrollWheel,Repaint,Layout,KeyDown,Used,Ignore}
 enum PointerType{Mouse,Touch,Pen}
 class Event{public EventType type;public PointerType pointerType;public Vector2 mousePosition,delta;public int button;}
-namespace UnityEngine.InputSystem{class PositionControl{public Vector2 value;public Vector2 ReadValue()=>value;}class Mouse{public bool added=true,enabled=true;public PositionControl position=new PositionControl();}}
+class Time{public static int frameCount=100;}static class Application{public static bool isFocused=true;}static class OperatorOverlayVisibility{public static bool Hidden;}
+namespace UnityEngine.InputSystem{class ButtonControl{public bool isPressed,wasPressedThisFrame,wasReleasedThisFrame;}class PositionControl{public Vector2 value;public Vector2 ReadValue()=>value;}class Mouse{public bool added=true,enabled=true;public PositionControl position=new PositionControl();public ButtonControl leftButton=new ButtonControl();}}
 class LineRenderer{public static int instances;public int positionCount,writes;public Vector3[] positions;public LineRenderer(){instances++;}public void SetPositions(Vector3[] p){writes++;positions=p;}}
 class ReplaySessionArchive{public class Sample{public string ContextKey;public Vector3 position;}}
 struct Rect {public float x,y,width,height;public Rect(float a,float b,float c,float d){x=a;y=b;width=c;height=d;}public bool Contains(float a,float b)=>a>=x&&a<x+width&&b>=y&&b<y+height;public bool Contains(Vector2 p)=>Contains(p.x,p.y);}
-static class Mathf{public static float Min(float a,float b)=>Math.Min(a,b);public static float Max(float a,float b)=>Math.Max(a,b);}
+static class Mathf{public static float Min(float a,float b)=>Math.Min(a,b);public static float Max(float a,float b)=>Math.Max(a,b);public static float Clamp01(float v)=>Math.Clamp(v,0,1);}
 class Actual{
  private float maximumInterpolationDistance=50;
+ private bool timelineMouseCaptured,timelineMouseUpSeen,loading;
+ private Rect timelineMouseRect;
+ private int timelineMouseFrame,timelineMouseUpFrame;
+ private ReplaySessionArchive archive=new ReplaySessionArchive();
+ private double replayTime;private double Duration=>200;
+ public int seeks;public double Seconds=>replayTime;public bool Captured=>timelineMouseCaptured;
+ private void SetScrubNormalized(float n){replayTime=n*Duration;seeks++;}
+ public void Capture(Rect rect){timelineMouseCaptured=true;timelineMouseUpSeen=false;timelineMouseRect=rect;timelineMouseFrame=Time.frameCount;}
+ public void GuiRelease(){timelineMouseUpSeen=true;timelineMouseUpFrame=Time.frameCount;}
+ public bool Scrub(UnityEngine.InputSystem.Mouse mouse)=>UpdateTimelineScrub(mouse);
  __PRODUCTION__
  public static float Scale(float backing,float width)=>ReplayUiScale(backing,width);
  public static Rect Toolbar(float width,float height,float scale)=>ReplayToolbarRect(width,height,scale);
@@ -58,6 +69,15 @@ static class Regression{
   foreach(var type in new[]{EventType.Layout,EventType.KeyDown,EventType.Used}){var e=new Event{type=type,pointerType=PointerType.Mouse,mousePosition=new Vector2(858,1366)};Actual.Route(e,mouse,1898);Check(Near(e.mousePosition.x,858),"non-pointer input must remain untouched");}
   foreach(int device in new[]{0,1,2}){var e=new Event{type=EventType.MouseDown,pointerType=PointerType.Mouse,mousePosition=new Vector2(858,1366)};var m=device==0?null:new UnityEngine.InputSystem.Mouse();if(device==1)m.enabled=false;if(device==2)m.added=false;Actual.Route(e,m,1898);Check(Near(e.mousePosition.x,858),"unavailable mouse must preserve legacy fallback");}Actual.Route(null,mouse,1898);
   float controlX=36;var nativePause=Actual.Next(ref controlX,1594.4f,128,60);Check(nativePause.Contains(96,1625),"actual native Pause click must hit the root-level rectangle");Check(Near(nativePause.x,36)&&Near(nativePause.y,1594.4f)&&Near(controlX,168),"root toolbar control layout must retain native coordinates");var nativeNext=Actual.Next(ref controlX,1594.4f,104,60);Check(Near(nativeNext.x,168)&&Near(controlX,276),"adjacent root controls must have stable native gaps");Check(new Rect(0,0,3024,1898).Contains(858,1366),"observed stale legacy point must remain inside the unchanged native root clip");
+  var timelineRect=new Rect(36,1662.4f,2952,36);
+  var scrub=new Actual();scrub.Capture(timelineRect);mouse.position.value=new Vector2(900,218);mouse.leftButton.wasPressedThisFrame=true;mouse.leftButton.wasReleasedThisFrame=true;mouse.leftButton.isPressed=false;
+  Check(scrub.Scrub(mouse)&&!scrub.Captured&&scrub.seeks==1&&Near((float)scrub.Seconds,200f*(900-36)/2952),"same-frame press/release must seek once to final900 not stale2780");Check(!scrub.Scrub(mouse)&&scrub.seeks==1,"release must not double-seek or rearm capture");
+  var unrelated=new Actual();Check(!unrelated.Scrub(mouse)&&unrelated.seeks==0,"unrelated release must never seek");
+  foreach(float endpoint in new[]{-200f,5000f}){var a=new Actual();a.Capture(timelineRect);mouse.position.value=new Vector2(endpoint,-2000);Check(a.Scrub(mouse)&&Near((float)a.Seconds,endpoint<0?0:200),"release outside must clamp to timeline endpoints");}
+  mouse.position.value=new Vector2(1000,218);mouse.leftButton.wasReleasedThisFrame=false;mouse.leftButton.wasPressedThisFrame=true;mouse.leftButton.isPressed=true;var drag=new Actual();drag.Capture(timelineRect);Check(drag.Scrub(mouse)&&drag.Captured&&drag.seeks==1,"held drag must preview modern position");Check(drag.Scrub(mouse)&&drag.seeks==1,"stationary held gesture must not repeat seek");mouse.position.value=new Vector2(1200,218);Check(drag.Scrub(mouse)&&drag.seeks==2,"moving drag updates once for its new target");mouse.leftButton.wasReleasedThisFrame=true;mouse.leftButton.isPressed=false;Check(drag.Scrub(mouse)&&!drag.Captured&&drag.seeks==2,"unchanged final release must not duplicate its seek");
+  mouse.leftButton.wasReleasedThisFrame=false;mouse.leftButton.wasPressedThisFrame=false;var late=new Actual();late.Capture(timelineRect);late.GuiRelease();Time.frameCount++;mouse.position.value=new Vector2(900,218);Check(late.Scrub(mouse)&&!late.Captured&&late.seeks==1,"observed GUI release must complete if update flags have already cleared");
+  var stale=new Actual();stale.Capture(timelineRect);Time.frameCount+=3;Check(!stale.Scrub(mouse)&&!stale.Captured&&stale.seeks==0,"lost gesture must cancel before an unrelated future release");mouse.leftButton.wasReleasedThisFrame=true;Check(!stale.Scrub(mouse)&&stale.seeks==0,"later random click must not complete stale capture");
+  foreach(int unavailable in new[]{0,1,2,3,4}){var a=new Actual();a.Capture(timelineRect);var m=unavailable==0?null:new UnityEngine.InputSystem.Mouse();if(m!=null){m.leftButton.wasReleasedThisFrame=true;m.position.value=new Vector2(900,218);}if(unavailable==1)m.enabled=false;if(unavailable==2)m.added=false;if(unavailable==3)Application.isFocused=false;if(unavailable==4)OperatorOverlayVisibility.Hidden=true;Check(!a.Scrub(m)&&!a.Captured&&a.seeks==0,"inactive/hidden/unavailable input must cancel scrub");Application.isFocused=true;OperatorOverlayVisibility.Hidden=false;}
   var samples=new List<ReplaySessionArchive.Sample>();foreach(var v in new[]{("A",0f),("A",7f),("A",14f),("B",0f),("B",7f),("C",1000f),("C",1007f)})samples.Add(new ReplaySessionArchive.Sample{ContextKey=v.Item1,position=new Vector3(v.Item2,0,0)});
   Check(Actual.Range(samples,1,50)==(0,2),"first condition must not connect to reset");Check(Actual.Range(samples,3,50)==(3,4),"second condition must exclude other worlds");Check(Actual.Range(samples,6,50)==(5,6),"new world must have independent path");Check(Actual.Range(samples,-10,50)==(0,2)&&Actual.Range(samples,100,50)==(5,6),"path cursor must clamp");Check(Actual.Range(null,0,50)==(-1,-1)&&Actual.Range(new List<ReplaySessionArchive.Sample>(),0,50)==(-1,-1),"empty paths must be safe");
   var jumps=new List<ReplaySessionArchive.Sample>();foreach(float x in new[]{0f,7f,200f,207f})jumps.Add(new ReplaySessionArchive.Sample{ContextKey="same",position=new Vector3(x,0,0)});Check(Actual.Range(jumps,0,50)==(0,1)&&Actual.Range(jumps,3,50)==(2,3),"large unlogged jumps must not create false chords");Check(Actual.Range(jumps,2,0)==(0,3),"disabled jump threshold must retain context grouping");
@@ -75,10 +95,12 @@ def main():
     assert 'GUI.matrix=Matrix4x4.identity' in on_gui and 'Matrix4x4.TRS' not in on_gui,'Replay controls must use default native coordinates.'
     assert 'GUILayout.' not in on_gui,'Interactive replay controls must not enter a moving GUILayout clip.'
     assert on_gui.rindex('NormalizeReplayPointer(')>on_gui.index('GUI.matrix=Matrix4x4.identity'),'Normalize after matrix state has been applied.'
+    assert 'ReplaySlider(timeline,normalized,0,1,true)' in on_gui and 'if(!timelineMouseCaptured &&' in on_gui,'Only captured modern timeline gestures may bypass the ordinary GUI seek path.'
+    assert 'if(isPlaying && !scrubbing' in source,'Autoplay must not move the exact final scrub target during its release frame.'
     read_only=on_gui.split('GUI.BeginClip(viewport);',1)[1].split('GUI.EndClip();',1)[0]
     assert not re.search(r'GUI\.(?:Button|TextField|HorizontalSlider|VerticalScrollbar|Toggle)\(',read_only),'Only read-only text may enter the fidelity clip.'
     assert 'rigMarkerPrefab: {fileID: 0}' in (ROOT/'Assets/Scenes/ReplayScene.unity').read_text(),'Default replay marker must not be the Lemon prefab.'
-    production=''.join(declaration(source,signature) for signature in ('private static float ReplayUiScale(','private static Rect ReplayToolbarRect(','private static bool UsesModernMousePosition(','private static Vector2 ReplayMousePosition(','private static void NormalizeReplayPointer(','private static Rect ReplayControlRect(','private static void ReplayPathRange(','private sealed class RecordedPath','private bool UpdateRecordedPath('))
+    production=''.join(declaration(source,signature) for signature in ('private static float ReplayUiScale(','private static Rect ReplayToolbarRect(','private static bool UsesModernMousePosition(','private static Vector2 ReplayMousePosition(','private static void NormalizeReplayPointer(','private static Rect ReplayControlRect(','private static float TimelinePointerValue(','private bool UpdateTimelineScrub(','private static void ReplayPathRange(','private sealed class RecordedPath','private bool UpdateRecordedPath('))
     dotnet=shutil.which('dotnet')
     if not dotnet:raise SystemExit('A local .NET SDK is required.')
     version=max(map(int,re.findall(r'^(\d+)\.',subprocess.check_output([dotnet,'--list-sdks'],text=True),re.M)))
