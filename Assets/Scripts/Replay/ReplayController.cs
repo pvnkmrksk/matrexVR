@@ -92,6 +92,7 @@ public class ReplayController : MonoBehaviour
     private float replaySkinScale;
     private bool pointerTrace;
     private readonly GUIContent playContent=new GUIContent();
+    private int replayPointerControl;
     private Task<string> folderPicker;
     private int cameraLayoutVersion=-1;
 
@@ -456,6 +457,21 @@ public class ReplayController : MonoBehaviour
         evt.mousePosition=ReplayMousePosition(mouse.position.ReadValue(),height);
     }
 
+    private static void NormalizeReplayClipPointer(Event evt,UnityEngine.InputSystem.Mouse mouse,float height,
+        Rect clip,EventType entryType,bool ownsCapture)
+    {
+        if(evt==null || evt.type==EventType.Used || mouse==null ||
+            !UsesModernMousePosition(entryType,evt.pointerType,mouse.added && mouse.enabled))return;
+        if(evt.type!=entryType && evt.type!=EventType.Ignore)return;
+        Vector2 position=ReplayMousePosition(mouse.position.ReadValue(),height);
+        evt.mousePosition=new Vector2(position.x-clip.x,position.y-clip.y);
+        bool capturedDrag=ownsCapture && (entryType==EventType.MouseDrag || entryType==EventType.MouseUp);
+        // BeginArea can turn a valid event into Ignore using the stale legacy
+        // cursor. Recover that suppression, never an event consumed with Use().
+        if(evt.type==EventType.Ignore && entryType!=EventType.Repaint && (clip.Contains(position) || capturedDrag))
+            evt.type=entryType;
+    }
+
     private void TraceReplayButton(string stage,Rect rect,bool clicked=false)
     {
         var evt=Event.current;
@@ -468,7 +484,13 @@ public class ReplayController : MonoBehaviour
 
     private void OnGUI()
     {
-        if(OperatorOverlayVisibility.Hidden)return;
+        if(OperatorOverlayVisibility.Hidden)
+        {
+            if(replayPointerControl!=0 && GUIUtility.hotControl==replayPointerControl)GUIUtility.hotControl=0;
+            replayPointerControl=0;return;
+        }
+        EventType entryType=Event.current!=null?Event.current.type:EventType.Ignore;
+        bool ownsCapture=replayPointerControl!=0 && GUIUtility.hotControl==replayPointerControl;
         Vector2 legacyPosition=Event.current!=null?Event.current.mousePosition:Vector2.zero;
         NormalizeReplayPointer(Event.current,UnityEngine.InputSystem.Mouse.current,Screen.height);
         float scale=ReplayUiScale(DesktopDisplay.UiScale,Screen.width);
@@ -499,8 +521,11 @@ public class ReplayController : MonoBehaviour
         Matrix4x4 previousMatrix=GUI.matrix;GUI.matrix=Matrix4x4.identity;
         float screenWidth=Screen.width,screenHeight=Screen.height;
         float height=Mathf.Max(152*scale,screenHeight*.20f);var area=ReplayToolbarRect(screenWidth,screenHeight,scale);
-        GUI.Box(area,GUIContent.none);GUILayout.BeginArea(new Rect(area.x+10*scale,area.y+6*scale,area.width-20*scale,area.height-12*scale));
-        TraceReplayButton("area",new Rect(0,0,area.width-20*scale,area.height-12*scale));
+        var controlsArea=new Rect(area.x+10*scale,area.y+6*scale,area.width-20*scale,area.height-12*scale);
+        GUI.Box(area,GUIContent.none);GUILayout.BeginArea(controlsArea);
+        TraceReplayButton("area-clipped",new Rect(0,0,controlsArea.width,controlsArea.height));
+        NormalizeReplayClipPointer(Event.current,UnityEngine.InputSystem.Mouse.current,Screen.height,controlsArea,entryType,ownsCapture);
+        TraceReplayButton("area-routed",new Rect(0,0,controlsArea.width,controlsArea.height));
         GUILayout.BeginHorizontal();GUILayout.Label("Experiment replay",titleStyle,GUILayout.Width(185*scale));
         if(GUILayout.Button(new GUIContent("Back to setup","Return to experiment setup. Shortcut: Esc."),GUILayout.Width(120*scale)))
         {
@@ -549,7 +574,10 @@ public class ReplayController : MonoBehaviour
         if(showDetails && archive!=null)
         {
             var details=new Rect(12*scale,12*scale,Mathf.Min(700*scale,screenWidth-24*scale),Mathf.Max(100*scale,screenHeight-height-32*scale));GUI.Box(details,GUIContent.none);
-            GUILayout.BeginArea(new Rect(details.x+10*scale,details.y+8*scale,details.width-20*scale,details.height-16*scale));GUILayout.Label("Replay fidelity and saved evidence",titleStyle);
+            var detailsArea=new Rect(details.x+10*scale,details.y+8*scale,details.width-20*scale,details.height-16*scale);
+            GUILayout.BeginArea(detailsArea);
+            NormalizeReplayClipPointer(Event.current,UnityEngine.InputSystem.Mouse.current,Screen.height,detailsArea,entryType,ownsCapture);
+            GUILayout.Label("Replay fidelity and saved evidence",titleStyle);
             GUILayout.Label(archive.DirectoryPath,smallStyle);detailScroll=GUILayout.BeginScrollView(detailScroll);
             foreach(string warning in archive.Warnings)GUILayout.Label("• "+warning,smallStyle);
             GUILayout.EndScrollView();GUILayout.EndArea();
@@ -567,6 +595,8 @@ public class ReplayController : MonoBehaviour
             }
         }
 #endif
+        if(GUIUtility.hotControl==0)replayPointerControl=0;
+        else if(entryType==EventType.MouseDown && Event.current.type==EventType.Used)replayPointerControl=GUIUtility.hotControl;
         GUI.matrix=previousMatrix;GUI.skin=previousSkin;
     }
     private static string Clock(double seconds)=>TimeSpan.FromSeconds(Math.Max(0,seconds)).ToString(@"hh\:mm\:ss\.f");

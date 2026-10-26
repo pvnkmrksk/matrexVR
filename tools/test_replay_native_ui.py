@@ -24,13 +24,13 @@ using System;using System.Collections.Generic;
 struct Vector2{public float x,y;public Vector2(float a,float b){x=a;y=b;}}
 struct Vector3{public float x,y,z;public Vector3(float a,float b,float c){x=a;y=b;z=c;}public static Vector3 zero=>new Vector3();public static float Distance(Vector3 a,Vector3 b)=>(float)Math.Sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y)+(a.z-b.z)*(a.z-b.z));}
 struct Bounds{public Vector3 min,max;public Bounds(Vector3 center,Vector3 size){min=new Vector3(center.x-size.x/2,center.y-size.y/2,center.z-size.z/2);max=new Vector3(center.x+size.x/2,center.y+size.y/2,center.z+size.z/2);}public void Encapsulate(Vector3 p){min=new Vector3(Math.Min(min.x,p.x),Math.Min(min.y,p.y),Math.Min(min.z,p.z));max=new Vector3(Math.Max(max.x,p.x),Math.Max(max.y,p.y),Math.Max(max.z,p.z));}}
-enum EventType{MouseDown,MouseUp,MouseMove,MouseDrag,ScrollWheel,Repaint,Layout,KeyDown,Used}
+enum EventType{MouseDown,MouseUp,MouseMove,MouseDrag,ScrollWheel,Repaint,Layout,KeyDown,Used,Ignore}
 enum PointerType{Mouse,Touch,Pen}
 class Event{public EventType type;public PointerType pointerType;public Vector2 mousePosition,delta;public int button;}
 namespace UnityEngine.InputSystem{class PositionControl{public Vector2 value;public Vector2 ReadValue()=>value;}class Mouse{public bool added=true,enabled=true;public PositionControl position=new PositionControl();}}
 class LineRenderer{public static int instances;public int positionCount,writes;public Vector3[] positions;public LineRenderer(){instances++;}public void SetPositions(Vector3[] p){writes++;positions=p;}}
 class ReplaySessionArchive{public class Sample{public string ContextKey;public Vector3 position;}}
-struct Rect {public float x,y,width,height;public Rect(float a,float b,float c,float d){x=a;y=b;width=c;height=d;}public bool Contains(float a,float b)=>a>=x&&a<x+width&&b>=y&&b<y+height;}
+struct Rect {public float x,y,width,height;public Rect(float a,float b,float c,float d){x=a;y=b;width=c;height=d;}public bool Contains(float a,float b)=>a>=x&&a<x+width&&b>=y&&b<y+height;public bool Contains(Vector2 p)=>Contains(p.x,p.y);}
 static class Mathf{public static float Min(float a,float b)=>Math.Min(a,b);public static float Max(float a,float b)=>Math.Max(a,b);}
 class Actual{
  private float maximumInterpolationDistance=50;
@@ -38,6 +38,7 @@ class Actual{
  public static float Scale(float backing,float width)=>ReplayUiScale(backing,width);
  public static Rect Toolbar(float width,float height,float scale)=>ReplayToolbarRect(width,height,scale);
  public static void Route(Event e,UnityEngine.InputSystem.Mouse m,float height)=>NormalizeReplayPointer(e,m,height);
+ public static void Clip(Event e,UnityEngine.InputSystem.Mouse m,float height,Rect clip,EventType entry,bool owns=false)=>NormalizeReplayClipPointer(e,m,height,clip,entry,owns);
  public static (int,int) Range(List<ReplaySessionArchive.Sample> samples,int cursor,float jump){ReplayPathRange(samples,cursor,jump,out int start,out int end);return(start,end);}
  public object Path()=>new RecordedPath{line=new LineRenderer()};
  public bool Update(object path,List<ReplaySessionArchive.Sample> samples,int cursor)=>UpdateRecordedPath((RecordedPath)path,samples,cursor);
@@ -56,6 +57,16 @@ static class Regression{
   foreach(var pointer in new[]{PointerType.Touch,PointerType.Pen}){var e=new Event{type=EventType.MouseDown,pointerType=pointer,mousePosition=new Vector2(858,1366)};Actual.Route(e,mouse,1898);Check(Near(e.mousePosition.x,858)&&Near(e.mousePosition.y,1366),"touch/pen must keep their own coordinates");}
   foreach(var type in new[]{EventType.Layout,EventType.KeyDown,EventType.Used}){var e=new Event{type=type,pointerType=PointerType.Mouse,mousePosition=new Vector2(858,1366)};Actual.Route(e,mouse,1898);Check(Near(e.mousePosition.x,858),"non-pointer input must remain untouched");}
   foreach(int device in new[]{0,1,2}){var e=new Event{type=EventType.MouseDown,pointerType=PointerType.Mouse,mousePosition=new Vector2(858,1366)};var m=device==0?null:new UnityEngine.InputSystem.Mouse();if(device==1)m.enabled=false;if(device==2)m.added=false;Actual.Route(e,m,1898);Check(Near(e.mousePosition.x,858),"unavailable mouse must preserve legacy fallback");}Actual.Route(null,mouse,1898);
+  var clip=new Rect(36,1530.4f,2952,355.6f);var pauseRect=new Rect(0,64,128,60);
+  foreach(var entry in new[]{EventType.MouseDown,EventType.MouseUp,EventType.MouseMove,EventType.MouseDrag,EventType.ScrollWheel}){var e=new Event{type=EventType.Ignore,pointerType=PointerType.Mouse,mousePosition=new Vector2(822,-164.4f)};Actual.Clip(e,mouse,1898,clip,entry);Check(e.type==entry&&Near(e.mousePosition.x,60)&&Near(e.mousePosition.y,94.6f)&&pauseRect.Contains(e.mousePosition),"actual BeginArea Ignore must recover correct local hit "+entry);}
+  var consumed=new Event{type=EventType.Used,pointerType=PointerType.Mouse,mousePosition=new Vector2(822,-164.4f)};Actual.Clip(consumed,mouse,1898,clip,EventType.MouseDown);Check(consumed.type==EventType.Used&&Near(consumed.mousePosition.x,822),"consumed events must never resurrect");
+  var ignoredEntry=new Event{type=EventType.Ignore,pointerType=PointerType.Mouse,mousePosition=new Vector2(822,-164.4f)};Actual.Clip(ignoredEntry,mouse,1898,clip,EventType.Ignore);Check(ignoredEntry.type==EventType.Ignore&&Near(ignoredEntry.mousePosition.x,822),"only a captured original pointer event may recover");
+  foreach(var pointer in new[]{PointerType.Touch,PointerType.Pen}){var e=new Event{type=EventType.Ignore,pointerType=pointer,mousePosition=new Vector2(822,-164.4f)};Actual.Clip(e,mouse,1898,clip,EventType.MouseDown);Check(e.type==EventType.Ignore&&Near(e.mousePosition.x,822),"clip routing must preserve nonmouse devices");}
+  var hover=new Event{type=EventType.Repaint,pointerType=PointerType.Mouse};Actual.Clip(hover,mouse,1898,clip,EventType.Repaint);Check(pauseRect.Contains(hover.mousePosition),"hover must use same local point as clicks");
+  mouse.position.value=new Vector2(-10,8);
+  foreach(var entry in new[]{EventType.MouseDown,EventType.MouseUp,EventType.MouseDrag,EventType.ScrollWheel}){var e=new Event{type=EventType.Ignore,pointerType=PointerType.Mouse};Actual.Clip(e,mouse,1898,clip,entry);Check(e.type==EventType.Ignore,"outside uncaptured events must remain ignored");}
+  foreach(var entry in new[]{EventType.MouseDrag,EventType.MouseUp}){var e=new Event{type=EventType.Ignore,pointerType=PointerType.Mouse};Actual.Clip(e,mouse,1898,clip,entry,true);Check(e.type==entry&&e.mousePosition.x<0,"owned drag/up must continue outside and release capture");}
+  var outsideDown=new Event{type=EventType.Ignore,pointerType=PointerType.Mouse};Actual.Clip(outsideDown,mouse,1898,clip,EventType.MouseDown,true);Check(outsideDown.type==EventType.Ignore,"old capture must not admit an outside mouse down");
   var samples=new List<ReplaySessionArchive.Sample>();foreach(var v in new[]{("A",0f),("A",7f),("A",14f),("B",0f),("B",7f),("C",1000f),("C",1007f)})samples.Add(new ReplaySessionArchive.Sample{ContextKey=v.Item1,position=new Vector3(v.Item2,0,0)});
   Check(Actual.Range(samples,1,50)==(0,2),"first condition must not connect to reset");Check(Actual.Range(samples,3,50)==(3,4),"second condition must exclude other worlds");Check(Actual.Range(samples,6,50)==(5,6),"new world must have independent path");Check(Actual.Range(samples,-10,50)==(0,2)&&Actual.Range(samples,100,50)==(5,6),"path cursor must clamp");Check(Actual.Range(null,0,50)==(-1,-1)&&Actual.Range(new List<ReplaySessionArchive.Sample>(),0,50)==(-1,-1),"empty paths must be safe");
   var jumps=new List<ReplaySessionArchive.Sample>();foreach(float x in new[]{0f,7f,200f,207f})jumps.Add(new ReplaySessionArchive.Sample{ContextKey="same",position=new Vector3(x,0,0)});Check(Actual.Range(jumps,0,50)==(0,1)&&Actual.Range(jumps,3,50)==(2,3),"large unlogged jumps must not create false chords");Check(Actual.Range(jumps,2,0)==(0,3),"disabled jump threshold must retain context grouping");
@@ -73,7 +84,7 @@ def main():
     assert 'GUI.matrix=Matrix4x4.identity' in on_gui and 'Matrix4x4.TRS' not in on_gui,'Replay controls must use default native coordinates.'
     assert not re.search(r'GUILayout\.(?:Width|MinWidth)\(\d+\)',on_gui),'An unscaled control width remains.'
     assert 'rigMarkerPrefab: {fileID: 0}' in (ROOT/'Assets/Scenes/ReplayScene.unity').read_text(),'Default replay marker must not be the Lemon prefab.'
-    production=''.join(declaration(source,signature) for signature in ('private static float ReplayUiScale(','private static Rect ReplayToolbarRect(','private static bool UsesModernMousePosition(','private static Vector2 ReplayMousePosition(','private static void NormalizeReplayPointer(','private static void ReplayPathRange(','private sealed class RecordedPath','private bool UpdateRecordedPath('))
+    production=''.join(declaration(source,signature) for signature in ('private static float ReplayUiScale(','private static Rect ReplayToolbarRect(','private static bool UsesModernMousePosition(','private static Vector2 ReplayMousePosition(','private static void NormalizeReplayPointer(','private static void NormalizeReplayClipPointer(','private static void ReplayPathRange(','private sealed class RecordedPath','private bool UpdateRecordedPath('))
     dotnet=shutil.which('dotnet')
     if not dotnet:raise SystemExit('A local .NET SDK is required.')
     version=max(map(int,re.findall(r'^(\d+)\.',subprocess.check_output([dotnet,'--list-sdks'],text=True),re.M)))
