@@ -31,3 +31,9 @@ archive stops the local desktop builder instead of silently bundling the older
 plots. `--local-dashboard-archive` selects a different location for the same
 reviewed bytes; `--skip-local-dashboard` explicitly opts into the older published
 viewer during development.
+
+The development source now pins Daari Deepa `a5456e33`, adding the independent
+recorded trajectory viewer and a session-bound replay clock. It was built from
+an isolated source archive and passed native live/analysis and recorded-control
+smokes before pinning. Published MATREX VR 0.3.1 keeps its earlier `f122518a`
+payload; updating this development lock does not change that release.
