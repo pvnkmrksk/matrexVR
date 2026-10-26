@@ -68,6 +68,28 @@ public static class Regression
             File.WriteAllText(Path.Combine(legacyScenes,"20260101_130000_ReplayScene_VR1_.csv"),noSceneHeader+"\n"+noSceneRow+"\n");
             var legacySceneArchive=new ReplaySessionArchive(legacyScenes);legacySceneArchive.LoadRigSamples();
             Check(legacySceneArchive.Rigs["VR1"].Count==1 && legacySceneArchive.Duration==0 && legacySceneArchive.Rigs["VR1"][0].position.x==1,"blank/missing Scene uses reserved legacy filename fallback without dropping ordinary legacy experiment rows");
+            string handoff=Path.Combine(root,"modern-handoff");Directory.CreateDirectory(handoff);
+            byte[] sequenceBytes=Encoding.UTF8.GetBytes("{\"sequences\":[{\"sceneName\":\"Choice_Selwyn\"},{\"sceneName\":\"Choice\"}]}");string sequenceHash=RunConfigArchive.Hash(sequenceBytes);
+            File.WriteAllBytes(Path.Combine(handoff,"saved-sequence.json"),sequenceBytes);
+            File.WriteAllText(Path.Combine(handoff,"config_manifest.json"),new JObject{["complete"]=true,["files"]=new JArray(new JObject{["sourceRelativePath"]="sequenceConfig.json",["snapshotPath"]="saved-sequence.json",["sha256"]=sequenceHash,["roles"]=new JArray("sequence")})}.ToString());
+            string modernHeader=Header+",CurrentSequenceScene,unityFrame";
+            string modernRows=string.Join("\n",new[]{
+                Row("10:00:00.000","VR1","Choice_Selwyn",0,0,0).Replace(",condition,stimulus,",",condition,preStimulus,")+",Choice_Selwyn,100",
+                Row("10:00:01.000","VR1","Choice_Selwyn",0,1,0).Replace(",condition,stimulus,",",condition,postStimulus,")+",Choice_Selwyn,101",
+                Row("10:00:02.000","VR1","Choice_Selwyn",0,2,0).Replace(",condition,stimulus,",",condition,assessment,")+",Choice_Selwyn,102",
+                Row("10:00:03.000","VR1","Choice_Selwyn",0,3,0)+",Choice_Selwyn,103",
+                Row("10:00:04.000","VR1","Choice_Selwyn",1,999,0)+",Choice,104",
+                Row("10:00:05.000","VR1","Choice",1,999,0).Replace(",condition,stimulus,",",condition,idle,")+",Choice,105",
+                Row("10:00:06.000","VR1","Choice",1,6,0)+",Choice,106",
+                Row("10:00:07.000","VR1","Choice historical alias",1,7,0)+",Choice,107"});
+            string modernFile=Path.Combine(handoff,"poses.csv");File.WriteAllText(modernFile,modernHeader+"\n"+modernRows+"\n");byte[] modernOriginal=File.ReadAllBytes(modernFile);
+            var handoffArchive=new ReplaySessionArchive(handoff);handoffArchive.LoadRigSamples();
+            Check(handoffArchive.Rigs["VR1"].Count==6&&!handoffArchive.Rigs["VR1"].Any(sample=>sample.unityFrame==104||sample.unityFrame==105),"verified handoff and idle rows are excluded");
+            Check(new[]{"preStimulus","postStimulus","assessment"}.All(phase=>handoffArchive.Rigs["VR1"].Any(sample=>sample.phase==phase)),"same-scene pre/post/assessment exposures remain replayable");
+            Check(handoffArchive.Rigs["VR1"].Any(sample=>sample.scene=="Choice historical alias")&&handoffArchive.Warnings.Any(w=>w.Contains("excluded 2 verified idle/scene-handoff")),"legacy aliases are not guessed and exclusions are disclosed");
+            Check(File.ReadAllBytes(modernFile).SequenceEqual(modernOriginal),"handoff filtering preserves exact recording bytes");
+            File.Delete(Path.Combine(handoff,"config_manifest.json"));var legacyHandoff=new ReplaySessionArchive(handoff);legacyHandoff.LoadRigSamples();
+            Check(legacyHandoff.Rigs["VR1"].Count==8,"unverified legacy context is not discarded as modern handoff data");
             Check(archive.ExperimentFor(archive.Rigs["VR1"][0])?["objects"] is JArray,"legacy run's own config is loaded");
             Reject(()=>archive.SafePath("../outside.json"),"traversal accepted");
             Reject(()=>archive.SafePath("Configs/Files/../../../outside.json"),"nested traversal accepted");

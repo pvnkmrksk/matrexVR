@@ -68,7 +68,7 @@ public sealed class ReplaySessionArchive
                 int[] pose = { Array.IndexOf(header,"GameObjectPosX"), Array.IndexOf(header,"GameObjectPosY"), Array.IndexOf(header,"GameObjectPosZ"),
                     Array.IndexOf(header,"GameObjectRotX"), Array.IndexOf(header,"GameObjectRotY"), Array.IndexOf(header,"GameObjectRotZ") };
                 if (pose.Any(i => i < 0)) { Warnings.Add("Missing pose columns: " + Path.GetFileName(file)); continue; }
-                int max = Math.Max(Math.Max(time, rig), pose.Max()), rejected = 0, misaligned = 0, nonExperiment = 0;
+                int max = Math.Max(Math.Max(time, rig), pose.Max()), rejected = 0, misaligned = 0, nonExperiment = 0, handoff = 0;
                 string line;
                 while ((line = ReadCsvRecord(reader)) != null)
                 {
@@ -77,6 +77,7 @@ public sealed class ReplaySessionArchive
                     try { cells = Csv(line); } catch (InvalidDataException) { rejected++; continue; }
                     if (cells.Length != header.Length) { rejected++; misaligned++; continue; }
                     if (IsNonExperimentPose(Cell(header,cells,"Scene"),file)) { nonExperiment++; continue; }
+                    if (IsVerifiedIdleOrHandoff(header,cells)) { handoff++; continue; }
                     if (cells.Length <= max || string.IsNullOrWhiteSpace(cells[rig]) || !TryTimestamp(cells[time], out long ticks)) { rejected++; continue; }
                     float[] values = new float[6]; bool valid = true;
                     for (int i = 0; i < pose.Length; i++) valid &= TryNumber(cells[pose[i]], out values[i]);
@@ -97,6 +98,7 @@ public sealed class ReplaySessionArchive
                 if (rejected > 0) Warnings.Add(Path.GetFileName(file) + ": skipped " + rejected + " malformed pose rows.");
                 if (misaligned > 0) Warnings.Add(Path.GetFileName(file) + ": " + misaligned + " rows have a different column count; legacy decimal-comma numbers or unquoted delimiters cannot be reconstructed safely.");
                 if (nonExperiment > 0) Warnings.Add(Path.GetFileName(file) + ": excluded " + nonExperiment + " setup/replay pose rows from experiment playback.");
+                if (handoff > 0) Warnings.Add(Path.GetFileName(file) + ": excluded " + handoff + " verified idle/scene-handoff rows; acquisition gaps remain unchanged.");
             }
         }
         if (Rigs.Count == 0) throw new InvalidDataException("This folder contains no readable animal pose CSV rows (Current Time, VR and six GameObject pose columns). " + string.Join(" ",Warnings.Take(4)));
@@ -263,6 +265,21 @@ public sealed class ReplaySessionArchive
             }
         }
         return null;
+    }
+    private bool IsVerifiedIdleOrHandoff(string[] header,string[] cells)
+    {
+        // Only a checksummed sequence and explicit modern columns establish this
+        // mismatch. Historical aliases or missing context remain untouched.
+        if(manifest==null || !(Sequence?["sequences"] is JArray steps) ||
+            !new[]{"unityFrame","experimentPhase","Scene","CurrentSequenceScene","CurrentStep"}.All(header.Contains))return false;
+        if(Integer(Cell(header,cells,"unityFrame"),-1)<0)return false;
+        int step=Integer(Cell(header,cells,"CurrentStep"),-1);
+        if(step<0 || step>=steps.Count)return false;
+        var declared=steps[step] as JObject;if(declared==null)return false;
+        string scene=Cell(header,cells,"Scene"),logical=Cell(header,cells,"CurrentSequenceScene"),phase=Cell(header,cells,"experimentPhase");
+        if(string.IsNullOrEmpty(phase) || logical!=(string)declared["sceneName"] ||
+            !steps.OfType<JObject>().Any(item=>(string)item["sceneName"]==scene))return false;
+        return scene!=logical || phase=="idle";
     }
     private static bool IsNonExperimentPose(string scene,string file)
     {
