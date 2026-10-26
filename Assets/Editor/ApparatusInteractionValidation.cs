@@ -106,14 +106,16 @@ public static class ApparatusInteractionValidation
                     ownedSystem=ui.Workspace.System.Path;
                     Check(ownedSystem.Replace('\\','/').EndsWith("/Apparatus/system.json"),"new hardware uses its own system JSON");
                     Check(!DesktopApparatusProfile.IsConfigured(ui.Workspace.System.Root),"draft apparatus is not prematurely completed");
+                    Check(root.Q<Button>("start-experiment").Q<Label>().text=="Use configuration","draft footer completes configuration instead of offering Start");
                     Check(ui.Workspace.Documents.Any(d=>d.Root.ToString(Formatting.None)==originalDemo),"creating apparatus retains the exact source demo document");
                     Check(root.Q<IntegerField>("apparatus-vr-count")!=null&&root.Q<DropdownField>("apparatus-mode-VR1")!=null,"VR count and movement belong in Configure");
                     Check(root.Q<TextField>("apparatus-species-VR1")!=null,"species belongs in Configure");
                     Check(ui.Workspace.Sequence.Path.Replace('\\','/').EndsWith("/Apparatus/sequence.json")&&((string)ui.Workspace.Sequence.Root["sequences"][0]["parameters"]["configFile"]).StartsWith("Apparatus/Experiments/"),"hardware creation forks sequence and experiment away from demo files");
                     root.Q<IntegerField>("apparatus-vr-count").value=4;Check(((JArray)ui.Workspace.System.Root["configs"]).Count==4,"native VR-count control adds four rigs");
                     root.Q<IntegerField>("apparatus-vr-count").value=1;Check(((JArray)ui.Workspace.System.Root["configs"]).Count==1,"native VR-count control removes rigs reversibly");
-                    root.Q<DropdownField>("apparatus-mode-VR1").value="Walking · HejjéTrac";Submit(root.Q<Button>("apparatus-complete"));Next(103);break;
+                    root.Q<DropdownField>("apparatus-mode-VR1").value="Walking · HejjéTrac";Submit(root.Q<Button>("start-experiment"));Next(103);break;
                 case 103:
+                    Check(!MainController.Instance.SequenceRunning,"draft footer saves configuration without starting an experiment");
                     string walkingFile=(string)ui.Workspace.Sequence.Root["sequences"][0]["parameters"]["configFile"];
                     var walking=ui.Workspace.Open(walkingFile,"choice").Root;
                     Check((bool)walking["closedLoopPosition"]&&!(bool)walking["autopilotEnabled"]&&Mathf.Abs((float)walking["walkingPositionGain"]-.01f)<.00001f,"walking hardware receives ready closed-loop walking starter motion");

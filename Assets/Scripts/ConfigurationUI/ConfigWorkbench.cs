@@ -132,7 +132,7 @@ namespace ConfigurationUI
             undo=Button("Undo",()=>{ RequireApplied(); selected.Undo(); RebuildPreservingView(); }); footer.Add(undo);
             redo=Button("Redo",()=>{ RequireApplied(); selected.Redo(); RebuildPreservingView(); }); footer.Add(redo);
             save=StudioButton("Save changes","file",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); UpdateStatus("Setup and session details saved."); }); footer.Add(save);
-            start=StudioButton("Start experiment","play",StartExperiment,"primary"); start.name="start-experiment"; footer.Add(start);
+            start=StudioButton("Start experiment","play",RunPrimaryAction,"primary"); start.name="start-experiment"; footer.Add(start);
             save.tooltip="Save the system, sequence, edited experiment files and subject metadata. Omitted values and unknown JSON fields are preserved.";
             start.tooltip="Validate and save this setup, archive the run's configuration files, then start the experiment.";
             undo.tooltip="Undo the last change in the current configuration file."; redo.tooltip="Redo the last undone change in the current configuration file.";
@@ -335,6 +335,7 @@ namespace ConfigurationUI
                 start.SetEnabled(false);save.SetEnabled(false);undo.SetEnabled(false);redo.SetEnabled(false);return;
             }
             List<string> errors=Workspace.Validate();
+            if(ApparatusDraft)errors.AddRange(DesktopApparatusProfile.Validate(Workspace.System.Root));
             var warnings=new List<string>();
             if(errors.Count==0) foreach(var step in BuilderSteps.OfType<JObject>())
             {
@@ -343,8 +344,8 @@ namespace ConfigurationUI
                 var doc=Workspace.Documents.FirstOrDefault(d=>d.Path==Path.GetFullPath(ExperimentConfigFiles.Resolve(file)));
                 if(doc?.Root is JObject payload) warnings.AddRange(ExperimentBlocks.TimingWarnings(payload,ExperimentBlocks.Number(step["duration"])));
             }
-            if(summary!=null) summary.text=errors.Count==0?"✓  Configuration ready\n\n"+Workspace.Documents.Count+" files loaded\n"+(Workspace.System.Root["configs"] as JArray)?.Count+" VR entries\n"+(Workspace.Sequence.Root["sequences"] as JArray)?.Count+" sequence steps":string.Join("\n\n",errors.Take(12));
-            status.text=message??(errors.Count>0?string.Join(" · ",errors.Take(2)):warnings.Count>0?warnings[0]:Workspace.Documents.Any(d=>d.Dirty)?"Unsaved config changes · saved when you start":"Ready to run · session details saved when you start");
+            if(summary!=null) summary.text=errors.Count==0?(ApparatusDraft?"Review apparatus configuration\n\nChoose Use configuration to save this setup and return to the experiment workspace. This does not start an experiment.\n\n":"✓  Configuration ready\n\n")+Workspace.Documents.Count+" files loaded\n"+(Workspace.System.Root["configs"] as JArray)?.Count+" VR entries\n"+(Workspace.Sequence.Root["sequences"] as JArray)?.Count+" sequence steps":string.Join("\n\n",errors.Take(12));
+            status.text=message??(errors.Count>0?string.Join(" · ",errors.Take(2)):ApparatusDraft?"Review hardware settings, then choose Use configuration to save and continue.":warnings.Count>0?warnings[0]:Workspace.Documents.Any(d=>d.Dirty)?"Unsaved config changes · saved when you start":"Ready to run · session details saved when you start");
             status.EnableInClassList("error",errors.Count>0);
             status.EnableInClassList("warning",errors.Count==0 && warnings.Count>0);
             start.SetEnabled(errors.Count==0 && !rawPending); save.SetEnabled(!rawPending); undo.SetEnabled(selected.CanUndo && !rawPending); redo.SetEnabled(selected.CanRedo && !rawPending);

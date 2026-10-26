@@ -65,6 +65,11 @@ namespace ConfigurationUI
             (Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().All(r=>TrackerBackend.TryParse(r["closedLoopMode"]?.ToString(),out var mode)&&TrackerBackend.IsWalking(mode))?"walking":"flying";
         private string CurrentWorld => DesktopQuickStart.IsQuickStart(Workspace)?DesktopQuickStart.Scene(Workspace):"night-sky";
         private bool CurrentDemo => DesktopQuickStart.IsQuickStart(Workspace)&&DesktopQuickStart.IsDemo(Workspace);
+        private bool ApparatusDraft => !ApparatusConfigured&&!DesktopQuickStart.IsQuickStart(Workspace);
+        private void RunPrimaryAction()
+        {
+            if(ApparatusDraft)FinishApparatusConfiguration();else StartExperiment();
+        }
         private void ChooseQuickStart(string mode,string world,bool demo)
         {
             RequireApplied();
@@ -175,8 +180,8 @@ namespace ConfigurationUI
         }
         private void RefreshStartCaption()
         {
-            if(start==null)return;var label=start.Q<Label>();if(label!=null)label.text=CurrentDemo?"Start demo":"Start experiment";
-            start.tooltip=CurrentDemo?"Start this clearly marked demo, including the native tracker companion. No hardware is required.":"Save and validate the current sequence, connect its configured tracking input and start recording.";
+            if(start==null)return;var label=start.Q<Label>();if(label!=null)label.text=ApparatusDraft?"Use configuration":CurrentDemo?"Start demo":"Start experiment";
+            start.tooltip=ApparatusDraft?"Validate and save the apparatus, then return to the experiment workspace. The experiment does not start.":CurrentDemo?"Start this clearly marked demo, including the native tracker companion. No hardware is required.":"Save and validate the current sequence, connect its configured tracking input and start recording.";
         }
         private void BuildSessionDetails(VisualElement parent)
         {
