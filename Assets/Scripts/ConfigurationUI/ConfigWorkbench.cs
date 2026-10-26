@@ -335,10 +335,9 @@ namespace ConfigurationUI
                 status.text=preparationStatus;status.RemoveFromClassList("error");status.RemoveFromClassList("warning");
                 start.SetEnabled(false);save.SetEnabled(false);undo.SetEnabled(false);redo.SetEnabled(false);return;
             }
-            List<string> errors=Workspace.Validate();
-            if(ApparatusDraft)errors.AddRange(DesktopApparatusProfile.Validate(Workspace.System.Root));
+            List<string> errors=PrimaryActionErrors();
             var warnings=new List<string>();
-            if(errors.Count==0) foreach(var step in BuilderSteps.OfType<JObject>())
+            if(errors.Count==0&&!ApparatusDraft) foreach(var step in BuilderSteps.OfType<JObject>())
             {
                 var parameters=step["parameters"] as JObject;string file=(string)parameters?["configFile"];
                 if(file==null) continue;
@@ -426,7 +425,7 @@ namespace ConfigurationUI
             var errors=Workspace.Validate();
             if(configured)
             {
-                errors.AddRange(DesktopApparatusProfile.Validate(Workspace.System.Root));
+                errors.AddRange(DesktopApparatusProfile.Validate(Workspace.System.Root,ApparatusDisplayFallback));
                 errors.AddRange(ConnectedOutputErrors());
             }
             if(errors.Count>0)throw new InvalidOperationException(string.Join("\n",errors));
@@ -441,7 +440,7 @@ namespace ConfigurationUI
         {
             foreach(var rig in DesktopApparatusProfile.Rigs(Workspace.System.Root))
             {
-                int display=DesktopApparatusProfile.OutputDisplay(Workspace.System.Root,rig,MainController.DefaultTargetDisplay((JObject)Workspace.System.Root,System.Environment.GetCommandLineArgs()));
+                int display=DesktopApparatusProfile.OutputDisplay(Workspace.System.Root,rig,ApparatusDisplayFallback);
                 string id=(string)rig["vrId"];
                 if(display<0||display>=Display.displays.Length)
                 {yield return id+": output display "+(display+1)+" is not connected. Connect it or change its display in Configure.";continue;}

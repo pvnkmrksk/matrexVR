@@ -28,6 +28,16 @@ static class Regression {
   Check(DesktopApparatusProfile.OutputDisplay(legacyDisplay,(JObject)legacyDisplay["configs"][0],4)==0,"explicit primary display loses to fallback");
   ((JObject)legacyDisplay["configs"][0]).Remove("targetDisplay");DesktopApparatusProfile.Begin(legacyDisplay,"led",false);DesktopApparatusProfile.ResizeRigs(legacyDisplay,2);
   Check(DesktopApparatusProfile.MonitorCount(legacyDisplay)==3&&DesktopApparatusProfile.Validate(legacyDisplay).Count==0&&(int)legacyDisplay["configs"][1]["startRow"]==1,"legacy omitted display differs in setup validation or resize packing");
+  var cliDisplay=Demo();((JObject)cliDisplay["configs"][0]).Remove("targetDisplay");cliDisplay["targetDisplay"]=1;
+  DesktopApparatusProfile.Begin(cliDisplay,"led",false,0);
+  Check(DesktopApparatusProfile.MonitorCount(cliDisplay,0)==1&&DesktopApparatusProfile.Validate(cliDisplay,0).Count==0,"CLI primary output rejected against global second-display fallback");
+  Check(DesktopApparatusProfile.Validate(cliDisplay).Any(e=>e.Contains("exceeds the configured display count")),"CLI regression fixture no longer distinguishes the root fallback");
+  cliDisplay["configs"][0]["targetDisplay"]=1;
+  Check(DesktopApparatusProfile.Validate(cliDisplay,0).Any(e=>e.Contains("exceeds the configured display count")),"explicit per-rig output was hidden by CLI fallback during validation");
+  ((JObject)cliDisplay["configs"][0]).Remove("targetDisplay");DesktopApparatusProfile.Complete(cliDisplay,0);
+  Check(DesktopApparatusProfile.IsConfigured(cliDisplay),"hardware completion revalidated against the wrong display fallback");
+  ((JObject)cliDisplay[DesktopApparatusProfile.MarkerName]).Remove("monitorCount");
+  Check(DesktopApparatusProfile.MonitorCount(cliDisplay,3)==4,"display inventory ignored effective CLI fallback");
   var original=Demo();var copy=(JObject)original.DeepClone();var before=original.ToString();
   DesktopApparatusProfile.Begin(copy,"led",true);
   Check(original.ToString()==before,"source demo changed by clone transaction");

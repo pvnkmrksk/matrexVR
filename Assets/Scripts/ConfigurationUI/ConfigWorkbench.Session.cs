@@ -66,6 +66,10 @@ namespace ConfigurationUI
         private string CurrentWorld => DesktopQuickStart.IsQuickStart(Workspace)?DesktopQuickStart.Scene(Workspace):"night-sky";
         private bool CurrentDemo => DesktopQuickStart.IsQuickStart(Workspace)&&DesktopQuickStart.IsDemo(Workspace);
         private bool ApparatusDraft => !ApparatusConfigured&&!DesktopQuickStart.IsQuickStart(Workspace);
+        private List<string> PrimaryActionErrors()
+        {
+            return ApparatusDraft?ApparatusConfigurationErrors():Workspace.Validate();
+        }
         private void RunPrimaryAction()
         {
             if(ApparatusDraft)FinishApparatusConfiguration();else StartExperiment();

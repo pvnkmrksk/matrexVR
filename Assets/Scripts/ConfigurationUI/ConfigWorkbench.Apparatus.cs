@@ -19,7 +19,8 @@ namespace ConfigurationUI
             var sheet=Resources.Load<StyleSheet>("ConfigurationUI/apparatus");
             if(sheet!=null&&!root.styleSheets.Contains(sheet))root.styleSheets.Add(sheet);
         }
-        private int ApparatusOutputDisplay(JObject rig) => DesktopApparatusProfile.OutputDisplay(Workspace.System.Root,rig,MainController.DefaultTargetDisplay((JObject)Workspace.System.Root,Environment.GetCommandLineArgs()));
+        private int ApparatusDisplayFallback => MainController.DefaultTargetDisplay((JObject)Workspace.System.Root,Environment.GetCommandLineArgs());
+        private int ApparatusOutputDisplay(JObject rig) => DesktopApparatusProfile.OutputDisplay(Workspace.System.Root,rig,ApparatusDisplayFallback);
         private bool ApparatusConfigured => DesktopApparatusProfile.IsConfigured(Workspace.System.Root);
         private void EnsureDailyWorkspace()
         {
@@ -41,7 +42,7 @@ namespace ConfigurationUI
             {
                 string mode=CurrentMovement,world=CurrentWorld;
                 var sourceSystem=Workspace.System;var sourceSequence=Workspace.Sequence;
-                var system=(JObject)sourceSystem.Root.DeepClone();DesktopApparatusProfile.Begin(system,presentation,true);
+                var system=(JObject)sourceSystem.Root.DeepClone();DesktopApparatusProfile.Begin(system,presentation,true,ApparatusDisplayFallback);
                 var fork=ApparatusStarterFiles.Fork((JObject)sourceSequence.Root,RuntimePaths.ConfigRoot,(reference,scene)=>(JObject)Workspace.Open(reference,ConfigSchema.ForScene(scene)).Root,
                     DesktopQuickStart.SequenceDefaults(mode,world,true),DesktopQuickStart.EnvironmentDefaults(mode,world));
                 var marker=DesktopApparatusProfile.Marker(system);marker["createdFromDemo"]=true;marker["starterWorld"]=world;
@@ -67,7 +68,8 @@ namespace ConfigurationUI
             string expectedSequence=(string)marker["starterSequenceFingerprint"],reference=(string)marker["starterExperiment"];
             string savedSequence=(string)marker["starterSequence"];
             if(string.IsNullOrEmpty(reference)||string.IsNullOrEmpty(savedSequence)||Workspace.Sequence.Path!=Path.GetFullPath(Path.Combine(RuntimePaths.ConfigRoot,savedSequence))||ApparatusStarterFiles.Fingerprint(Workspace.Sequence.Root)!=expectedSequence)return;
-            var experiment=Workspace.Open(reference,"choice");
+            var experiment=Workspace.Documents.FirstOrDefault(d=>d.Path==Path.GetFullPath(ExperimentConfigFiles.Resolve(reference)));
+            if(experiment==null||!File.Exists(experiment.Path))return; // Missing/invalid experiment files do not prevent hardware completion.
             if(ApparatusStarterFiles.Fingerprint(experiment.Root)!=(string)marker["starterExperimentFingerprint"])return;
             var modes=DesktopApparatusProfile.Rigs(system).Select(r=>TrackerBackend.TryParse(r["closedLoopMode"]?.ToString(),out var value)?TrackerBackend.IsWalking(value)?"walking":TrackerBackend.IsFlight(value)?"flying":"other":"other").Distinct().ToList();
             if(modes.Count!=1||modes[0]=="other")return;
@@ -82,16 +84,21 @@ namespace ConfigurationUI
             if(!string.IsNullOrEmpty(sequence)&&File.Exists(sequence))Workspace.SelectPrimary("sequence",sequence);
             Select(Workspace.System);
         }
+        private List<string> ApparatusConfigurationErrors()
+        {
+            var errors=DesktopApparatusProfile.Validate(Workspace.System.Root,ApparatusDisplayFallback);
+            errors.AddRange(ConfigSchema.Validate(Workspace.System.Root,Workspace.Schemas.Get("system")));
+            return errors;
+        }
         private void FinishApparatusConfiguration()
         {
             RequireApplied();
-            var errors=DesktopApparatusProfile.Validate(Workspace.System.Root);
-            errors.AddRange(ConfigSchema.Validate(Workspace.System.Root,Workspace.Schemas.Get("system")));
+            var errors=ApparatusConfigurationErrors();
             if(errors.Count>0)throw new InvalidOperationException(string.Join("\n",errors));
             ApplyUntouchedStarterMotion();
-            Workspace.System.Edit(r=>DesktopApparatusProfile.Complete((JObject)r));Workspace.SaveAll();
+            Workspace.System.Edit(r=>DesktopApparatusProfile.Complete((JObject)r,ApparatusDisplayFallback));Workspace.SaveAll();
             DesktopQuickStart.RememberWorkspace(Workspace.System.Path,Workspace.Sequence.Path);
-            ShowSessionHome();UpdateStatus("Configuration saved. Your experiment sequence is ready to edit and run.");
+            ShowSessionHome();UpdateStatus("Configuration saved. Review your experiment sequence before starting.");
         }
         private void BuildApparatusEditor()
         {
@@ -125,9 +132,9 @@ namespace ConfigurationUI
             scroll.Add(SessionLabel("Hardware, species and tracker routing. These settings are kept with the system JSON.","apparatus-copy"));
             var overview=Row("apparatus-overview-controls");scroll.Add(overview);
             overview.Add(ApparatusInteger("VR count","apparatus-vr-count",DesktopApparatusProfile.Rigs(system).Count(),value=>{
-                StudioEdit(Workspace.System,r=>DesktopApparatusProfile.ResizeRigs((JObject)r,value));
+                StudioEdit(Workspace.System,r=>DesktopApparatusProfile.ResizeRigs((JObject)r,value,ApparatusDisplayFallback));
             },"Number of real animals/VR rigs. Adding a rig assigns a unique tracker port and a separate LED strip; existing calibration files are retained. Removing rigs is undoable.",1,DesktopApparatusProfile.MaximumRigCount));
-            overview.Add(ApparatusInteger("Display count","apparatus-monitor-count",DesktopApparatusProfile.MonitorCount(system),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.Marker((JObject)r)["monitorCount"]=value),"Displays used by the apparatus, including any operator display. Rig output display numbers below are 1-based here and zero-based in JSON. Unattached outputs can be planned before connecting hardware.",1,32));
+            overview.Add(ApparatusInteger("Display count","apparatus-monitor-count",DesktopApparatusProfile.MonitorCount(system,ApparatusDisplayFallback),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.Marker((JObject)r)["monitorCount"]=value),"Displays used by the apparatus, including any operator display. Rig output display numbers below are 1-based here and zero-based in JSON. Unattached outputs can be planned before connecting hardware.",1,32));
             string output=DesktopApparatusProfile.Presentation(system);
             var presentation=new DropdownField("Output",new List<string>{"LED panels","Desktop preview"},output=="led"?0:1){name="apparatus-presentation"};
             presentation.tooltip="LED panels use exact small pixel rectangles. Desktop preview uses one full-screen face per rig. The automatic three-/four-monitor prism/cuboid wizard is deferred.";
@@ -151,7 +158,7 @@ namespace ConfigurationUI
             Section(monitorOptions,"Telemetry & overview","radio",system,schema,Array.Empty<string>(),new[]{"telemetry","statusOverlay","overheadCamera"});
             foreach(string warning in DesktopApparatusProfile.SharedInputWarnings(system))scroll.Add(SessionLabel(warning,"apparatus-validation"));
             if(DesktopApparatusProfile.Rigs(system).Select(RigMode).Distinct().Count()>1)scroll.Add(SessionLabel("Mixed input contracts: review motion settings in each experiment block. A shared block can apply different walking/flight gains, but its movement options are not guessed from one rig.","apparatus-validation"));
-            var errors=DesktopApparatusProfile.Validate(system);
+            var errors=DesktopApparatusProfile.Validate(system,ApparatusDisplayFallback);
             if(errors.Count>0){var validation=SessionLabel(string.Join("\n",errors),"apparatus-validation");validation.AddToClassList("error");scroll.Add(validation);}
             var complete=StudioButton(ApparatusConfigured?"Save configuration":"Use this configuration","system",FinishApparatusConfiguration,"primary");complete.name="apparatus-complete";scroll.Add(complete);
             complete.tooltip="Validate and save this system JSON, then return to the experiment workspace. Unknown JSON fields and untouched calibration settings are retained.";
