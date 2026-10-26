@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 /// <summary>Decode tracker transports without changing the upstream numeric conventions.</summary>
@@ -12,6 +13,8 @@ public static class TrackerWireDecoder
         public Quaternion orientation;
         public bool ficTracRow;
         public string format;
+        // Optional upstream identity. Never substitute the receiver packet counter.
+        public string sourceFrame, sourceSequence, sourceTimestamp, sourceClock, sourceSessionId;
     }
     private sealed class LegacyPose
     {
@@ -38,7 +41,8 @@ public static class TrackerWireDecoder
             if(!ulong.TryParse(fields[1].Trim(),NumberStyles.None,CultureInfo.InvariantCulture,out _) || !ulong.TryParse(fields[23].Trim(),NumberStyles.None,CultureInfo.InvariantCulture,out _))
                 throw new FormatException("FicTrac frame and sequence columns must be nonnegative integers.");
             float forward=CheckedFloat(numbers[14]),east=CheckedFloat(numbers[15]),heading=CheckedFloat(numbers[16]);
-            return new Sample {position=new Vector3(forward,east,0),rotation=new Vector3(0,heading,0),orientation=Quaternion.Euler(0,heading*Mathf.Rad2Deg,0),ficTracRow=true,format="FicTrac FT25"};
+            return new Sample {position=new Vector3(forward,east,0),rotation=new Vector3(0,heading,0),orientation=Quaternion.Euler(0,heading*Mathf.Rad2Deg,0),ficTracRow=true,format="FicTrac FT25",
+                sourceFrame=fields[1].Trim(),sourceSequence=fields[23].Trim(),sourceTimestamp=fields[25].Trim(),sourceClock="tracker-source-milliseconds"};
         }
         if(!value.StartsWith("{",StringComparison.Ordinal)) throw new FormatException("Expected JSON tracker pose or a FicTrac FT row.");
         var pose=JsonConvert.DeserializeObject<LegacyPose>(value);
@@ -46,7 +50,16 @@ public static class TrackerWireDecoder
             throw new FormatException("Tracking pose must contain finite numbers.");
         // Kinefly/Rekkefly yaw is deliberately retained in radians for the flight
         // controller. Legacy walking JSON keeps its historical degree quaternion.
-        return new Sample {position=new Vector3(pose.x,pose.y,pose.z),rotation=new Vector3(pose.pitch,pose.yaw,pose.roll),orientation=Quaternion.Euler(pose.pitch,pose.yaw,pose.roll),format="JSON pose"};
+        var document=JObject.Parse(value);
+        string frame=Unsigned(document["frame_number"]),timestamp=FiniteTimestamp(document["timestamp_unix"]);
+        return new Sample {position=new Vector3(pose.x,pose.y,pose.z),rotation=new Vector3(pose.pitch,pose.yaw,pose.roll),orientation=Quaternion.Euler(pose.pitch,pose.yaw,pose.roll),format="JSON pose",
+            sourceFrame=frame,sourceTimestamp=timestamp,sourceClock=timestamp==null?null:"unix-host-receive-seconds",sourceSessionId=document["session_id"]?.Type==JTokenType.String?(string)document["session_id"]:null};
+    }
+    private static string Unsigned(JToken token) => token!=null && ulong.TryParse(token.ToString(),NumberStyles.None,CultureInfo.InvariantCulture,out ulong value)?value.ToString(CultureInfo.InvariantCulture):null;
+    private static string FiniteTimestamp(JToken token)
+    {
+        string value=token==null?null:token.Type==JTokenType.String?(string)token:token.ToString(Formatting.None);
+        return double.TryParse(value,NumberStyles.Float,CultureInfo.InvariantCulture,out double number)&&!double.IsNaN(number)&&!double.IsInfinity(number)?value:null;
     }
     private static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
     private static float CheckedFloat(double value)

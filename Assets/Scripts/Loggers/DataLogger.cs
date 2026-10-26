@@ -192,6 +192,7 @@ public class DataLogger : MonoBehaviour
             AddColumns("flightCheckEnabled", "flightThresholdRadiansSquared", "flightSamples");
             AddColumns("yawDCOffsetDegrees", "yawDCCompensationDegPerSecond", "autoTrimMeanDegPerSecond", "autoTrimUncertaintyDegPerSecond", "autoTrimMeasurementSeconds");
             AddColumns("experimentPhase", "unityFrame");
+            AddColumns("poseWallTicks", "trackerAppliedThisFrame", "trackerInputSessionId", "trackerReceiverSessionId", "trackerInputEpoch", "trackerInputFrame", "trackerInputSequence", "trackerInputTimestamp", "trackerInputClock", "trackerReceiveSequence", "trackerReceivedUtcTicks");
 
             // Enable logging
             isLogging = true;
@@ -343,7 +344,21 @@ public class DataLogger : MonoBehaviour
             }
         }
         SetData("skyboxSampleUtc", NightSkyController.CurrentSampleUtc);
-        string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
+        DateTime poseWallTime=DateTime.Now;
+        string currentTime = poseWallTime.ToString("yyyy-MM-dd HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
+        SetData("poseWallTicks",poseWallTime.Ticks.ToString(CultureInfo.InvariantCulture));
+        if(tracking!=null)
+        {
+            var consumed=tracking.LastConsumedSample;
+            SetData("trackerAppliedThisFrame",tracking.AppliedTrackingThisFrame);
+            if(consumed.hasPose)
+            {
+                SetData("trackerInputSessionId",consumed.sourceSessionId);SetData("trackerReceiverSessionId",consumed.receiverSessionId);
+                SetData("trackerInputEpoch",consumed.sourceEpoch);SetData("trackerInputFrame",consumed.sourceFrame);SetData("trackerInputSequence",consumed.sourceSequence);
+                SetData("trackerInputTimestamp",consumed.sourceTimestamp);SetData("trackerInputClock",consumed.sourceClock);
+                SetData("trackerReceiveSequence",consumed.sequence.ToString(CultureInfo.InvariantCulture));SetData("trackerReceivedUtcTicks",consumed.receivedUtcTicks.ToString(CultureInfo.InvariantCulture));
+            }
+        }
         string vr = this.gameObject.name;
         string scene = gameObject.scene.name;
         Vector3 position = this.transform.position;

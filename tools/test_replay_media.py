@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+"""Offline tests of production camera import, frame association and tracker decoding.
+
+Builds exact C# sources with small Unity numeric stubs. Synthetic RIFF frames
+test indexing/integrity, not JPEG pixels, native VideoPlayer or camera exposure.
+No Unity, GUI or tracker process is launched.
+"""
+from pathlib import Path
+from xml.sax.saxutils import escape
+import os
+import re
+import shutil
+import subprocess
+import tempfile
+
+ROOT = Path(__file__).resolve().parents[1]
+PROGRAM = r'''
+using System;using System.IO;using System.Text;using System.Linq;using System.Globalization;using System.Collections.Generic;using System.Threading;using System.Threading.Tasks;using Newtonsoft.Json.Linq;
+namespace UnityEngine {public struct Quaternion{public static Quaternion Euler(float a,float b,float c)=>new Quaternion();}public static class Mathf{public const float Rad2Deg=57.2957795f;}}
+public enum ClosedLoopMode{Kinefly,FicTrac}public static class TrackerBackend{public static bool IsWalking(ClosedLoopMode mode)=>mode==ClosedLoopMode.FicTrac;}
+class Regression {
+ static int checks;static long origin=new DateTime(2026,10,26,10,0,0).Ticks;
+ static void Check(bool value,string label){checks++;if(!value)throw new Exception(label);}
+ static void Near(double a,double b,string label)=>Check(Math.Abs(a-b)<.000001,label);
+ static byte[] Chunk(string tag,byte[] bytes){using(var m=new MemoryStream())using(var w=new BinaryWriter(m)){w.Write(Encoding.ASCII.GetBytes(tag));w.Write((uint)bytes.Length);w.Write(bytes);if(bytes.Length%2!=0)w.Write((byte)0);return m.ToArray();}}
+ static byte[] List(string type,params byte[][] chunks)=>Chunk("LIST",Encoding.ASCII.GetBytes(type).Concat(chunks.SelectMany(x=>x)).ToArray());
+ static void Avi(string path,int count=3){var avih=new byte[56];BitConverter.GetBytes(100000u).CopyTo(avih,0);BitConverter.GetBytes((uint)count).CopyTo(avih,16);BitConverter.GetBytes(1u).CopyTo(avih,24);BitConverter.GetBytes(2u).CopyTo(avih,32);BitConverter.GetBytes(2u).CopyTo(avih,36);var strh=new byte[56];Encoding.ASCII.GetBytes("vidsMJPG").CopyTo(strh,0);BitConverter.GetBytes(1u).CopyTo(strh,20);BitConverter.GetBytes(10u).CopyTo(strh,24);BitConverter.GetBytes((uint)count).CopyTo(strh,32);var strf=new byte[40];BitConverter.GetBytes(40u).CopyTo(strf,0);BitConverter.GetBytes(2).CopyTo(strf,4);BitConverter.GetBytes(2).CopyTo(strf,8);BitConverter.GetBytes((ushort)1).CopyTo(strf,12);BitConverter.GetBytes((ushort)24).CopyTo(strf,14);Encoding.ASCII.GetBytes("MJPG").CopyTo(strf,16);var header=List("hdrl",Chunk("avih",avih),List("strl",Chunk("strh",strh),Chunk("strf",strf)));var movie=List("movi",Enumerable.Range(0,count).Select(i=>Chunk("00dc",new byte[]{255,216,(byte)i,255,217})).ToArray());File.WriteAllBytes(path,Chunk("RIFF",Encoding.ASCII.GetBytes("AVI ").Concat(header).Concat(movie).ToArray()));}
+ static string[] header={"Current Time","VR","Scene","GameObjectPosX","GameObjectPosY","GameObjectPosZ","GameObjectRotX","GameObjectRotY","GameObjectRotZ","poseWallTicks","trackerAppliedThisFrame","trackerInputFrame","trackerInputTimestamp","trackerInputClock","trackerInputEpoch","unityFrame"};
+ static string[] Row(double seconds,string frame,string stamp,bool applied=true,string rig="VR1") {long ticks=origin+(long)(seconds*TimeSpan.TicksPerSecond);return new[]{new DateTime(ticks).ToString("yyyy-MM-dd HH:mm:ss.fffffff",CultureInfo.InvariantCulture),rig,"Choice", "0","0","0","0","0","0",ticks.ToString(),applied?"true":"false",frame,stamp,"unix-host-receive-seconds","0",((int)(seconds*60)).ToString()};}
+ static string Run(string root,string name){string run=Path.Combine(root,name);Directory.CreateDirectory(run);using(var w=new StreamWriter(Path.Combine(run,"poses.csv"))){w.WriteLine(string.Join(",",header));w.WriteLine(string.Join(",",Row(0,"","",false)));w.WriteLine(string.Join(",",Row(1,"101","1700000000.1")));w.WriteLine(string.Join(",",Row(2,"102","1700000000.2")));}return run;}
+ static string Source(string root,string name){string source=Path.Combine(root,name);Directory.CreateDirectory(source);Avi(Path.Combine(source,"video-0000.avi"));using(var w=new StreamWriter(Path.Combine(source,"frames.jsonl")))for(int i=0;i<3;i++)w.WriteLine(new JObject{["segment"]=0,["frame_in_segment"]=i,["sequence"]=100+i,["timestamp_ns"]=(1700000000m+i*.1m)*1000000000m}.ToString(Newtonsoft.Json.Formatting.None));File.WriteAllText(Path.Combine(source,"config.toml"),"[recording]\nformat=\"mjpeg\"\n");return source;}
+ static MediaImportRequest Request(string run,string source,string mode="consumed-frame-id")=>new MediaImportRequest{RunDirectory=run,SourceDirectory=source,RigId="VR1",ExpectedBackend="Rekkefly",SyncMode=mode,SourceClosed=true};
+ static async Task Main(){string root=Path.Combine(Path.GetTempPath(),"matrex-media-fixtures-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);try{
+  var pose=TrackerWireDecoder.Decode("{\"yaw\":0.5,\"frame_number\":18446744073709551615,\"timestamp_unix\":1700000000.125,\"session_id\":\"capture-a\"}",ClosedLoopMode.Kinefly);Check(pose.sourceFrame==ulong.MaxValue.ToString(),"upstream u64 frame must not round through double");Check(pose.sourceTimestamp=="1700000000.125"&&pose.sourceClock=="unix-host-receive-seconds","source host clock retained explicitly");Check(pose.sourceSessionId=="capture-a","source supplied session");Check(pose.rotation.y==.5f,"legacy radians retained");
+  pose=TrackerWireDecoder.Decode("{\"yaw\":1}",ClosedLoopMode.Kinefly);Check(pose.sourceFrame==null&&pose.sourceTimestamp==null,"old wire format stays usable without invented IDs");pose=TrackerWireDecoder.Decode("{\"frame_number\":1.5,\"timestamp_unix\":\"NaN\"}",ClosedLoopMode.Kinefly);Check(pose.sourceFrame==null&&pose.sourceTimestamp==null,"invalid optional identity cannot masquerade as valid clock");
+  var ft=Enumerable.Repeat("0",25).ToArray();ft[0]="12345";ft[22]="7";ft[24]="42.125";pose=TrackerWireDecoder.Decode("FT,"+string.Join(",",ft),ClosedLoopMode.FicTrac);Check(pose.sourceFrame=="12345"&&pose.sourceSequence=="7"&&pose.sourceTimestamp=="42.125"&&pose.sourceClock=="tracker-source-milliseconds","FT counter/epoch-relative sequence/source timestamp retained without UTC fiction");
+  string run=Run(root,"run"),source=Source(root,"native");var observer=new CompanionMediaArchiveSession(run,"test");RecordingSummary.Scan(run,false,default,observer.ObservePose);Check(observer.SnapshotAnchors().Count==2,"shared scanner produced source anchors: "+observer.SnapshotAnchors().Count);using(var avi=ReplayAviFrameSource.Open(Path.Combine(source,"video-0000.avi")))Check(avi.FrameCount==3,"AVI verified frames");var receipt=await MediaArchive.ImportAsync(Request(run,source));Check(receipt.Complete&&!receipt.Pending&&receipt.ImportedClips==1,"closed import receipt");Check(File.Exists(Path.Combine(source,"video-0000.avi")),"originals retained");var archive=await ReplayMediaArchive.LoadAsync(run,origin);Check(archive.Clips.Count==1&&archive.Clips[0].Complete,"hashed archive load");var clip=archive.Clips[0];Check(clip.FrameCount==3&&clip.Codec=="mjpeg","verified AVI source metadata");Near(clip.NominalFps,10,"encoded fps retained");Check(clip.SyncMode=="consumed-frame-id","consumed source mapping produced");Check(!archive.TryResolveFrame(clip,.99,out _),"no extrapolation before first input anchor");Check(archive.TryResolveFrame(clip,1.5,out var target)&&target.LocalFrame==1,"clip-local zero-based preceding consumed input frame");Near(target.MediaSeconds,.1,"media seconds use encoded fps not capture clock");Near(target.AgeSeconds,.5,"association gap age exposed");Check(archive.TryResolveFrame(clip,2,out target)&&target.LocalFrame==2,"last exact frame");Check(!archive.TryResolveFrame(clip,2.001,out _),"no extrapolation after coverage");Check(!archive.TryResolveFrame(clip,double.NaN,out _),"nonfinite seek rejected");
+  bool failed=false;try{await ReplayMediaArchive.LoadAsync(run,origin+1);}catch(InvalidDataException){failed=true;}Check(failed,"mismatched wall-clock origin refused");
+  var doc=JObject.Parse(File.ReadAllText(Path.Combine(run,"media_manifest.json")));string index=Path.Combine(run,(string)doc["clips"][0]["indexPath"]);string originalIndex=File.ReadAllText(index);var rows=originalIndex.Split('\n').Where(x=>x.Length>0).Select(JObject.Parse).ToList();rows.Add((JObject)rows[0].DeepClone());rows[2]["mediaFrame"]=2;File.WriteAllText(index,string.Join("\n",rows.Select(x=>x.ToString(Newtonsoft.Json.Formatting.None))));doc["clips"][0]["indexSha256"]=ReplayMediaArchive.Hash(index);File.WriteAllText(Path.Combine(run,"media_manifest.json"),doc.ToString());archive=await ReplayMediaArchive.LoadAsync(run,origin);Check(!archive.Clips[0].Complete,"backward replay clock rejected");
+  rows=originalIndex.Split('\n').Where(x=>x.Length>0).Select(JObject.Parse).ToList();rows[1]["replaySeconds"]=rows[0]["replaySeconds"];File.WriteAllText(index,string.Join("\n",rows.Select(x=>x.ToString(Newtonsoft.Json.Formatting.None))));doc["clips"][0]["indexSha256"]=ReplayMediaArchive.Hash(index);File.WriteAllText(Path.Combine(run,"media_manifest.json"),doc.ToString());archive=await ReplayMediaArchive.LoadAsync(run,origin);Check(!archive.Clips[0].Complete,"same time different frames is ambiguous");
+  rows=originalIndex.Split('\n').Where(x=>x.Length>0).Select(JObject.Parse).ToList();rows[1]["mediaFrame"]=0;File.WriteAllText(index,string.Join("\n",rows.Select(x=>x.ToString(Newtonsoft.Json.Formatting.None))));doc["clips"][0]["indexSha256"]=ReplayMediaArchive.Hash(index);File.WriteAllText(Path.Combine(run,"media_manifest.json"),doc.ToString());archive=await ReplayMediaArchive.LoadAsync(run,origin);Check(!archive.Clips[0].Complete,"backward local media frame rejected");
+  File.WriteAllText(index,originalIndex);doc["clips"][0]["indexSha256"]=ReplayMediaArchive.Hash(index);File.WriteAllText(Path.Combine(run,"media_manifest.json"),doc.ToString());File.AppendAllText(clip.AbsolutePath,"tamper");archive=await ReplayMediaArchive.LoadAsync(run,origin);Check(!archive.Clips[0].Complete&&archive.Warnings.Any(w=>w.Contains("checksum")),"changed video cannot be replayed as verified");
+  string manualRun=Run(root,"manual");var request=Request(manualRun,source,"operator-offset");request.ManualOffsetSeconds=-.1;receipt=await MediaArchive.ImportAsync(request);archive=await ReplayMediaArchive.LoadAsync(manualRun,origin);clip=archive.Clips[0];Check(clip.SyncMode=="operator-offset","manual mode explicit");Check(archive.TryResolveFrame(clip,0,out target)&&target.LocalFrame==1&&target.AssociationLabel.Contains("Approximate"),"manual negative offset supported and labeled approximate");
+  string unknownRun=Run(root,"unknown");await MediaArchive.ImportAsync(Request(unknownRun,source,"unavailable"));archive=await ReplayMediaArchive.LoadAsync(unknownRun,origin);Check(archive.Clips[0].Complete&&!archive.TryResolveFrame(archive.Clips[0],1,out _),"unknown historical media available but never auto synchronized");
+  request=Request(Run(root,"open"),source);request.SourceClosed=false;receipt=await MediaArchive.ImportAsync(request);Check(receipt.Pending&&!receipt.Complete&&receipt.ImportedClips==0,"unacknowledged source stays pending");
+  string partial=Source(root,"partial");File.WriteAllText(Path.Combine(partial,"video-0001.avi.partial"),"open");receipt=await MediaArchive.ImportAsync(Request(Run(root,"partial-run"),partial));Check(receipt.Pending&&!receipt.Complete,"partial encoder outputs never labeled finalized");
+  var session=CompanionMediaArchive.BeginSession(Run(root,"empty-session"),"empty");var done=session.FinalizeAsync();Check(done.IsCompleted&&(await done).Complete,"no sources finalizes immediately");Check(object.ReferenceEquals(done,session.FinalizeAsync()),"finalization idempotent task");
+  session=CompanionMediaArchive.BeginSession(Run(root,"pending-session"),"pending");session.RegisterSource(new MediaRecordingSource{RigId="VR1",DirectoryPath=source});session.ObservePose("poses.csv",header,Row(0,"","",false));receipt=await session.FinalizeAsync();Check(receipt.Pending&&!receipt.Complete&&receipt.ToJson().Value<bool>("pending"),"independent recorder untouched and transparently pending");
+  doc=JObject.Parse(File.ReadAllText(Path.Combine(unknownRun,"media_manifest.json")));doc["clips"][0]["path"]="../native/video-0000.avi";File.WriteAllText(Path.Combine(unknownRun,"media_manifest.json"),doc.ToString());archive=await ReplayMediaArchive.LoadAsync(unknownRun,origin);Check(!archive.Clips[0].Complete,"manifest path escape rejected");
+  using(var cancel=new CancellationTokenSource()){cancel.Cancel();failed=false;try{await ReplayMediaArchive.LoadAsync(run,origin,cancel.Token);}catch(OperationCanceledException){failed=true;}Check(failed,"canceled archive load obeys cancellation");}
+  Console.WriteLine("PASS: "+checks+" production media archive and tracker source-ID checks. RIFF indexing/clock policy only; no Unity rendering or camera exposure claims.");
+ }finally{Directory.Delete(root,true);}}
+}
+'''
+
+
+def main():
+    dotnet = shutil.which("dotnet")
+    if not dotnet:
+        raise SystemExit("A local .NET SDK is required.")
+    version = max(map(int, re.findall(r"^(\d+)\.", subprocess.check_output([dotnet, "--list-sdks"], text=True), re.M)))
+    dll = next((ROOT / "Library/PackageCache").glob("com.unity.nuget.newtonsoft-json@*/Runtime/Newtonsoft.Json.dll"))
+    sources = ["Assets/Scripts/Replay/ReplayMediaArchive.cs", "Assets/Scripts/Replay/CompanionMediaArchive.cs", "Assets/Scripts/Replay/ReplayAviFrameSource.cs", "Assets/Scripts/Replay/ReplaySessionArchive.cs", "Assets/Scripts/Replay/RecordedPosePolicy.cs", "Assets/Scripts/Loggers/RecordingSummary.cs", "Assets/Scripts/Loggers/RunConfigArchive.cs", "Assets/Scripts/TrackerWireDecoder.cs", "tools/replay_compatibility/Stubs.cs"]
+    with tempfile.TemporaryDirectory(prefix="matrex-media-regression-") as folder:
+        temporary = Path(folder)
+        env = dict(os.environ, DOTNET_CLI_HOME=folder, DOTNET_CLI_TELEMETRY_OPTOUT="1", DOTNET_SKIP_FIRST_TIME_EXPERIENCE="1")
+        (temporary / "NuGet.Config").write_text("<configuration><packageSources><clear /></packageSources></configuration>")
+        (temporary / "Program.cs").write_text(PROGRAM)
+        includes = "".join(f'<Compile Include="{escape(str(ROOT / path))}" />' for path in sources)
+        (temporary / "Regression.csproj").write_text(f'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net{version}.0</TargetFramework></PropertyGroup><ItemGroup><Reference Include="Newtonsoft.Json"><HintPath>{escape(str(dll.resolve()))}</HintPath></Reference>{includes}</ItemGroup></Project>')
+        result = subprocess.run([dotnet, "build", str(temporary / "Regression.csproj"), "--configfile", str(temporary / "NuGet.Config"), "-p:UseSharedCompilation=false", "-v:q"], env=env, capture_output=True, text=True)
+        if result.returncode:
+            raise SystemExit(result.stdout + result.stderr)
+        subprocess.run([dotnet, str(temporary / f"bin/Debug/net{version}.0/Regression.dll")], env=env, check=True)
+    logger = (ROOT / "Assets/Scripts/Loggers/DataLogger.cs").read_text()
+    assert 'DateTime poseWallTime=DateTime.Now;' in logger
+    assert 'poseWallTime.ToString(' in logger and 'SetData("poseWallTicks",poseWallTime.Ticks.' in logger
+    assert 'var consumed=tracking.LastConsumedSample;' in logger
+    print("PASS: 3 source guards keep logged wall time and consumed-input metadata atomic.")
+
+
+if __name__ == "__main__":
+    main()

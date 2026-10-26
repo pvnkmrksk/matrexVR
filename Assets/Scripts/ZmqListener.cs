@@ -41,11 +41,15 @@ public class ZmqListener : MonoBehaviour
         public long sequence, receivedUtcTicks;
         public bool hasPose;
         public bool ficTracRow;
+        public string sourceFrame,sourceSequence,sourceTimestamp,sourceClock,sourceSessionId,receiverSessionId;
+        public int sourceEpoch;
     }
     public RawSample ReadRawSample()
     {
         lock (poseLock) return new RawSample { position = latestPose.position, rotation = latestRawRotation, convertedRotation = latestPose.rotation,
-            sequence = receivedSequence, receivedUtcTicks = lastPoseTicksUtc, hasPose = hasPose, ficTracRow=isFicTracRow };
+            sequence = receivedSequence, receivedUtcTicks = lastPoseTicksUtc, hasPose = hasPose, ficTracRow=isFicTracRow,
+            sourceFrame=sourceFrame,sourceSequence=sourceSequence,sourceTimestamp=sourceTimestamp,sourceClock=sourceClock,
+            sourceSessionId=sourceSessionId,receiverSessionId=receiverSessionId,sourceEpoch=sourceEpoch };
     }
     private bool hasPose;
     private bool isFicTracRow;
@@ -72,6 +76,8 @@ public class ZmqListener : MonoBehaviour
     }
 
     private long lastPoseTicksUtc, receivedSequence;
+    private string sourceFrame,sourceSequence,sourceTimestamp,sourceClock,sourceSessionId,receiverSessionId;
+    private int sourceEpoch;
 
     // Keep legacy missing-field defaults (zero) for trackers that only send yaw.
     private class ZmqMessage
@@ -102,6 +108,7 @@ public class ZmqListener : MonoBehaviour
             return;
         }
         ApplySystemConfig();
+        lock(poseLock) {receiverSessionId=Guid.NewGuid().ToString("N");sourceEpoch=0;sourceFrame=sourceSequence=sourceTimestamp=sourceClock=sourceSessionId=null;hasPose=false;}
         string endpoint = $"tcp://{address}:{port}";
         Endpoint = endpoint;
         workerState = "starting";
@@ -150,6 +157,8 @@ public class ZmqListener : MonoBehaviour
                         var decoded=TrackerWireDecoder.Decode(json,interpretation);
                         lock(poseLock)
                         {
+                            if(ulong.TryParse(sourceFrame,out ulong previousFrame)&&ulong.TryParse(decoded.sourceFrame,out ulong nextFrame)&&nextFrame<previousFrame)sourceEpoch++;
+                            sourceFrame=decoded.sourceFrame;sourceSequence=decoded.sourceSequence;sourceTimestamp=decoded.sourceTimestamp;sourceClock=decoded.sourceClock;sourceSessionId=decoded.sourceSessionId;
                             latestRawRotation=decoded.rotation;latestPose=new Pose(decoded.position,decoded.orientation);
                             isFicTracRow=decoded.ficTracRow;hasPose=true;lastPoseTicksUtc=DateTime.UtcNow.Ticks;receivedSequence++;
                         }
