@@ -11,30 +11,32 @@ using System.Text;
 /// <summary>Native folder dialogs using OS facilities already installed on the experiment computer.</summary>
 public static class ReplayFolderPicker
 {
-    public static Task<string> ChooseAsync()
+    public static Task<string> ChooseAsync()=>ChooseFolderAsync("Open saved experiment run","Open run");
+    public static Task<string> ChooseMediaAsync()=>ChooseFolderAsync("Import tracker recording","Choose recording");
+    private static Task<string> ChooseFolderAsync(string title,string prompt)
     {
 #if UNITY_EDITOR
-        return Task.FromResult(UnityEditor.EditorUtility.OpenFolderPanel("Open saved experiment run",RuntimePaths.RunDataRoot,""));
+        return Task.FromResult(UnityEditor.EditorUtility.OpenFolderPanel(title,RuntimePaths.RunDataRoot,""));
 #elif UNITY_STANDALONE_WIN
         var result=new TaskCompletionSource<string>();
         var thread=new Thread(()=>
         {
-            try{result.SetResult(ChooseWindows());}catch(Exception error){result.SetException(error);}
+            try{result.SetResult(ChooseWindows(title));}catch(Exception error){result.SetException(error);}
         }){IsBackground=true,Name="Replay run folder picker"};
         thread.SetApartmentState(ApartmentState.STA);thread.Start();return result.Task;
 #elif UNITY_STANDALONE_OSX
         lock(macPickerGate)
         {
             if(macPickerTask!=null&&!macPickerTask.IsCompleted)return macPickerTask;
-            return macPickerTask=ChooseOnContext(macMainContext,ChooseMac);
+            return macPickerTask=ChooseOnContext(macMainContext,()=>ChooseMac(title,prompt));
         }
 #elif UNITY_STANDALONE_LINUX
         return Task.Run(()=>
         {
             foreach(string path in new[]{"/usr/bin/zenity","/bin/zenity"})
-                if(File.Exists(path))return Run(path,"--file-selection --directory --title=\"Open saved experiment run\"");
+                if(File.Exists(path))return Run(path,"--file-selection --directory --title=\""+title+"\"");
             foreach(string path in new[]{"/usr/bin/kdialog","/bin/kdialog"})
-                if(File.Exists(path))return Run(path,"--getexistingdirectory . --title \"Open saved experiment run\"");
+                if(File.Exists(path))return Run(path,"--getexistingdirectory . --title \""+title+"\"");
             throw new InvalidOperationException("No system folder picker is installed (zenity or kdialog). Paste the run folder path instead.");
         });
 #else
@@ -75,7 +77,7 @@ public static class ReplayFolderPicker
     private static Task<string> macPickerTask;
     [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void CaptureMacMainContext(){macMainContext=SynchronizationContext.Current;macPickerTask=null;}
-    private static string ChooseMac()
+    private static string ChooseMac(string title,string prompt)
     {
         var pool=MacSend(MacSend(MacClass("NSAutoreleasePool"),MacSel("alloc")),MacSel("init"));
         IntPtr owner=IntPtr.Zero,panel=IntPtr.Zero;
@@ -89,8 +91,8 @@ public static class ReplayFolderPicker
             MacSetObject(owner,MacSel("makeKeyAndOrderFront:"),IntPtr.Zero);
             panel=MacSend(MacClass("NSOpenPanel"),MacSel("openPanel"));
             if(panel==IntPtr.Zero)throw new InvalidOperationException("macOS could not create a folder picker.");
-            MacSetObject(panel,MacSel("setTitle:"),MacString("Open saved experiment run"));
-            MacSetObject(panel,MacSel("setPrompt:"),MacString("Open run"));
+            MacSetObject(panel,MacSel("setTitle:"),MacString(title));
+            MacSetObject(panel,MacSel("setPrompt:"),MacString(prompt));
             MacBool(panel,MacSel("setCanChooseDirectories:"),true);
             MacBool(panel,MacSel("setCanChooseFiles:"),false);
             MacBool(panel,MacSel("setAllowsMultipleSelection:"),false);
@@ -153,12 +155,12 @@ public static class ReplayFolderPicker
     [DllImport("shell32.dll",CharSet=CharSet.Unicode)]private static extern bool SHGetPathFromIDListW(IntPtr item,StringBuilder path);
     [DllImport("ole32.dll")]private static extern int OleInitialize(IntPtr reserved);
     [DllImport("ole32.dll")]private static extern void OleUninitialize();
-    private static string ChooseWindows()
+    private static string ChooseWindows(string title)
     {
         int initialized=OleInitialize(IntPtr.Zero);IntPtr display=Marshal.AllocHGlobal(32768*2),item=IntPtr.Zero;
         try
         {
-            var info=new BrowseInfo{displayName=display,title="Open saved experiment run",flags=0x0001|0x0040};
+            var info=new BrowseInfo{displayName=display,title=title,flags=0x0001|0x0040};
             item=SHBrowseForFolderW(ref info);if(item==IntPtr.Zero)return null;
             var path=new StringBuilder(32768);return SHGetPathFromIDListW(item,path)?path.ToString():null;
         }

@@ -388,7 +388,9 @@ public class MainController : MonoBehaviour
         Debugger.Log($"Loaded new system config file: {fileName}", 3);
     }
 
-    public void StopSequence()
+    public void StopSequence()=>StopSequence("stopped");
+
+    public void StopSequence(string endReason)
     {
         sequenceStarted = false;
         savedHeadings.Clear();
@@ -400,6 +402,13 @@ public class MainController : MonoBehaviour
                 rig.GetComponent<StimulusHeadingReference>()?.Cancel();
                 rig.AutoTrim.Disable();
             }
+        FinalizeRecording(endReason);
+    }
+
+    private static void FinalizeRecording(string endReason)
+    {
+        try { _=MasterDataLogger.Instance?.FinalizeSessionAsync(endReason); }
+        catch(System.Exception error) {Debug.LogError("Could not finalize the recording: "+error.Message);}
     }
 
     public void StartSequence()
@@ -764,6 +773,7 @@ private void FailExperiment(System.Exception error)
     foreach (ClosedLoop rig in vrClosedLoops.Values)
         if (rig != null) rig.AutoTrim.Disable();
     Debug.LogException(error);
+    FinalizeRecording("failed");
 }
 
 private void InitializeStep(System.Action initialize)
@@ -840,9 +850,10 @@ void ManageTimerAndTransitions()
         }
         else
         {
+            Debugger.Log("Sequence completed and looping disabled.", 3);
+            StopSequence("completed");
             if (ReturnToSetupAfterSequence)
             {
-                StopSequence();
                 SceneManager.LoadScene("ControlScene");
                 return;
             }
