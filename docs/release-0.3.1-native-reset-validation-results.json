@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "passed": true,
+  "sourceRevision": "72baaf2f22cd2b89451afd6cb1e8026c87375f3a",
+  "runtimeFingerprintSha256": "8aa939f7c0f1fb69898d28611ff93f09c16feff574b899e6a1f10d91cf4e382a",
+  "runtimeFingerprintDefinition": "SHA-256 of compact UTF-8 JSON mapping sorted tracked Assets/Scripts/*.cs paths to file SHA-256 values. Every file was compared byte-for-byte with the frozen Git revision before launch and checked unchanged afterward.",
+  "runtimeScriptCount": 126,
+  "runtimeScriptsStillMatchFrozenCopy": true,
+  "diagnosticsSha256": "8da9cc24388f177d18528e621caeb4dc80ae2305f835da29f38da37a6b738913",
+  "unity": "6000.3.16f1",
+  "gpu": "Apple M2 Pro",
+  "graphicsApi": "Metal",
+  "startedUtc": "2026-10-26T08:06:19.335794+00:00",
+  "completedUtc": "2026-10-26T08:17:59.902347+00:00",
+  "protocol": {
+    "scene": "Choice_desync",
+    "fullReloads": 300,
+    "uniqueSceneHandles": 300,
+    "configuredDurationSeconds": 2,
+    "VRs": 4,
+    "requestedFacesPerVR": 6,
+    "allRequestedFacesRenderedEveryActiveSample": true
+  },
+  "coverage": {
+    "activeSamples": 600,
+    "minimumLiveInputComponents": 4,
+    "minimumInputComponents": 4,
+    "staleOrNonprogressingInputObservations": 0,
+    "renderedFaces": [
+      24
+    ],
+    "naturalCameraRenders": 337932,
+    "forcedCameraRenders": 675840
+  },
+  "durations": {
+    "minimum": 2.0147097910000866,
+    "median": 2.2083927290000247,
+    "maximum": 2.355852125000002,
+    "totalSceneSeconds": 662.981742125
+  },
+  "nativeTracker": {
+    "executableSha256": "631ce45f37bf9af9969abad1e00997d2b8b208ccffb2236c7ea1e8cd771bb644",
+    "sourceRevision": "f9a9ba71619b86becf0fb1ce1fc2cf5aa3d851bb",
+    "patchSha256": "f99e4216da896bbe429aba97ba96943bdb12b0a191ca15a0e47b5a87bde5c658",
+    "configurationSha256": "9a10f7ce0f5550e954ff6db7371c7fcbcd565ef44a1d06bb053809861a3c23a1",
+    "observedProcessCount": 1,
+    "sourceKinds": [
+      "demo"
+    ],
+    "fallbackEverObserved": false,
+    "firstObservedFrame": 4,
+    "lastObservedFrame": 84001,
+    "observedPackets": 83810,
+    "exitCode": 0,
+    "finalSummary": {
+      "frames": 83881,
+      "frames_per_second": 119.7250414603229,
+      "recording": {
+        "accepted": 0,
+        "directory": null,
+        "error": null,
+        "written": 0
+      },
+      "seconds": 700.61366425,
+      "source": "Simulated fly",
+      "udp_dropped": 0,
+      "zmq_dropped": 0
+    }
+  },
+  "after20WarmupLoads": {
+    "rssBytes": {
+      "first": 1631764480,
+      "last": 839155712,
+      "minimum": 802881536,
+      "maximum": 1631764480
+    },
+    "managedBytes": {
+      "first": 769093632,
+      "last": 774234112,
+      "minimum": 761282560,
+      "maximum": 774234112
+    },
+    "unityAllocatedBytes": {
+      "first": 406665449,
+      "last": 414025298,
+      "minimum": 406665449,
+      "maximum": 414025298
+    },
+    "fileDescriptors": {
+      "first": 112,
+      "last": 111,
+      "minimum": 111,
+      "maximum": 112
+    },
+    "externalOsThreads": {
+      "first": 129,
+      "last": 136,
+      "minimum": 125,
+      "maximum": 136
+    },
+    "activeTrackingWorkers": {
+      "first": 4,
+      "last": 4,
+      "minimum": 4,
+      "maximum": 4
+    },
+    "activeAsyncWriters": {
+      "first": 0,
+      "last": 0,
+      "minimum": 0,
+      "maximum": 0
+    },
+    "ownedTrialMaterials": {
+      "first": 8,
+      "last": 8,
+      "minimum": 8,
+      "maximum": 8
+    },
+    "diagnosticRenderTargets": {
+      "first": 24,
+      "last": 24,
+      "minimum": 24,
+      "maximum": 24
+    },
+    "gameObjects": {
+      "first": 64,
+      "last": 64,
+      "minimum": 64,
+      "maximum": 64
+    },
+    "materials.nonPersistentCount": {
+      "first": 45,
+      "last": 45,
+      "minimum": 45,
+      "maximum": 45
+    },
+    "meshes.nonPersistentCount": {
+      "first": 1,
+      "last": 1,
+      "minimum": 1,
+      "maximum": 1
+    },
+    "textures.nonPersistentCount": {
+      "first": 96,
+      "last": 96,
+      "minimum": 96,
+      "maximum": 96
+    },
+    "renderTextures.nonPersistentCount": {
+      "first": 28,
+      "last": 28,
+      "minimum": 28,
+      "maximum": 28
+    },
+    "externalNativeTracker.rssBytes": {
+      "first": 22085632,
+      "last": 21430272,
+      "minimum": 20758528,
+      "maximum": 22708224
+    },
+    "externalNativeTracker.osThreadCount": {
+      "first": 15,
+      "last": 15,
+      "minimum": 7,
+      "maximum": 15
+    },
+    "externalNativeTracker.fileDescriptorCount": {
+      "first": 10,
+      "last": 10,
+      "minimum": 6,
+      "maximum": 10
+    }
+  },
+  "teardown": [
+    {
+      "kind": "after-scene-teardown-no-forced-GC",
+      "activeTrackingWorkers": 0,
+      "activeAsyncWriters": 0,
+      "ownedTrialMaterials": 0,
+      "diagnosticRenderTargets": 0,
+      "fileDescriptors": 95
+    },
+    {
+      "kind": "after-explicit-GC-and-UnloadUnusedAssets",
+      "activeTrackingWorkers": 0,
+      "activeAsyncWriters": 0,
+      "ownedTrialMaterials": 0,
+      "diagnosticRenderTargets": 0,
+      "fileDescriptors": 95
+    }
+  ],
+  "ownedResourceTeardownPassed": true,
+  "runtimeFailureCount": 0,
+  "runtimeErrors": [],
+  "editorSearchStartupExceptionCount": 1,
+  "editorSearchStartupExceptions": [
+    {
+      "message": "ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.\nParameter name: index",
+      "stackTrace": "System.Collections.Generic.List`1[T].get_Item (System.Int32 index) (at <c5eeda5e65d44b388e164c6c5cfe0702>:0)\nUnityEditor.Search.SearchDatabase+<EnumerateAll>d__80.MoveNext () (at /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/Indexing/SearchDatabase.cs:445)\nSystem.Linq.Enumerable.TryGetFirst[TSource] (System.Collections.Generic.IEnumerable`1[T] source, System.Boolean& found) (at <8203c5af529241e2a5cc4b3c5a3dc69a>:0)\nSystem.Linq.Enumerable.First[TSource] (System.Collections.Generic.IEnumerable`1[T] source) (at <8203c5af529241e2a5cc4b3c5a3dc69a>:0)\nUnityEditor.Search.SearchDatabase.GetDefaultSearchDatabase () (at /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/Indexing/SearchDatabase.cs:420)\nUnityEditor.Search.SearchInit.IndexationOnStartup () (at /Users/bokken/build/output/unity/unity/Modules/QuickSearch/Editor/SearchInit.cs:109)\nUnityEditor.EditorApplication.Internal_CallDelayFunctions () (at /Users/bokken/build/output/unity/unity/Editor/Mono/EditorApplication.cs:407)\n",
+      "load": 0,
+      "scope": "UnityEditor.Search indexing startup exception; retained separately from experiment runtime failures."
+    }
+  ],
+  "supervisor": {
+    "unityExitCode": 0,
+    "failure": null,
+    "publisherErrors": [],
+    "newCrashReports": []
+  },
+  "externalProcess": {
+    "samples": 333,
+    "peakRssBytes": 2144731136,
+    "minimumThreads": 2,
+    "maximumThreads": 136,
+    "maxFileDescriptors": 115
+  },
+  "scope": "Actual Unity Editor Metal rendering with a native Rekkefly process using explicit generated demo input. Not a physical-camera, animal, LED scanout, or standalone-release-player endurance test. Choice_desync does not exercise the asynchronous Swarm population-writer path. A bounded non-crashing run does not identify the historical crash cause. Public release archives were unchanged.",
+  "rawLocalDirectory": ".release-work/scene-reload-diagnostics/release031-72baaf2f-native-rekkefly-300x2s"
+}
