@@ -151,7 +151,7 @@ public sealed class CompanionMediaArchiveSession
                 token.ThrowIfCancellationRequested();
                 if(!source.Finalized)
                 {
-                    receipt.Complete=false;receipt.Pending=true;receipt.Warnings.Add(source.RigId+": independent camera recorder has no acknowledged stop; footage remains pending at its original location.");
+                    receipt.Complete=false;receipt.Pending=true;receipt.Warnings.Add(MediaArchive.PendingRecorderWarning(source.RigId));
                     continue;
                 }
                 string[] directories=source.ChildDirectoryPrefix==null?new[]{source.DirectoryPath}:Directory.Exists(source.DirectoryPath)?Directory.GetDirectories(source.DirectoryPath)
@@ -205,6 +205,7 @@ public static class MediaArchive
                 var receipt=new MediaArchiveReceipt{Complete=true};WarnExistingZip(run,receipt);return receipt;
             }
         },token);
+    internal static string PendingRecorderWarning(string rigId)=>rigId+": independent camera recorder has no acknowledged stop; footage remains pending at its original location.";
     public static async Task<MediaArchiveReceipt> CollectPendingAsync(string runDirectory,CancellationToken token=default)
     {
         string run=Path.GetFullPath(runDirectory),path=Path.Combine(run,"media_manifest.json");
@@ -224,7 +225,14 @@ public static class MediaArchive
         {
             lock(manifestGate)
             {
-                var current=JObject.Parse(File.ReadAllText(path));foreach(var source in (current["sources"] as JArray??new JArray()).OfType<JObject>())source["state"]="collected";WriteManifest(run,current);
+                var current=JObject.Parse(File.ReadAllText(path));
+                var resolved=new HashSet<string>(StringComparer.Ordinal);
+                foreach(var source in (current["sources"] as JArray??new JArray()).OfType<JObject>())
+                {source["state"]="collected";resolved.Add(PendingRecorderWarning((string)source["rigId"]));}
+                // This exact status is resolved only after every pending source was collected.
+                // Other evidence, including the preserved older ZIP snapshot, remains visible.
+                current["warnings"]=new JArray((current["warnings"] as JArray??new JArray()).Where(w=>w.Type!=JTokenType.String||!resolved.Contains((string)w)));
+                WriteManifest(run,current);
             }
         }
         return receipt;
