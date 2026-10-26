@@ -98,6 +98,11 @@ public class ReplayController : MonoBehaviour
     private int timelineMouseFrame,timelineMouseUpFrame;
     private Task<string> folderPicker;
     private int cameraLayoutVersion=-1;
+    private Vector3 overviewPivot;
+    private float overviewDistance=20,overviewYaw,overviewPitch=90;
+    private bool overviewUserAdjusted,overviewPerspective;
+    private int overviewDragButton=-1;
+    private Vector2 overviewDragPosition;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()=>pendingSessionPath=null;
@@ -284,20 +289,95 @@ public class ReplayController : MonoBehaviour
     {
         if(overview==null)return;
         float span=Mathf.Max(5,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z));
-        overview.transform.SetPositionAndRotation(trajectoryBounds.center+Vector3.up*(trajectoryBounds.extents.y+span*2+10),Quaternion.Euler(90,0,0));
+        overviewPivot=trajectoryBounds.center;overviewYaw=0;overviewPitch=90;
+        overviewDistance=trajectoryBounds.extents.y+span*2+10;overviewUserAdjusted=false;overviewDragButton=-1;
         float aspect=Mathf.Max(.1f,Screen.width/(Screen.height*.8f));
         overview.orthographicSize=Mathf.Max(2,Mathf.Max(trajectoryBounds.extents.z,trajectoryBounds.extents.x/aspect))*1.15f;
+        if(overviewPerspective)overviewDistance=overview.orthographicSize/Mathf.Tan(25*Mathf.Deg2Rad);
+        ApplyOverviewPose();
         overview.nearClipPlane=.01f;overview.farClipPlane=span*5+trajectoryBounds.size.y+1000;
     }
     private void ApplyView()
     {
         if(selectedView>=rigOrder.Count || !createRigCameras)selectedView=-1;
         if(overview!=null)overview.enabled=selectedView<0;
-        if(selectedView<0)FitOverview();
+        if(selectedView<0 && !overviewUserAdjusted)FitOverview();
+        if(selectedView>=0)overviewDragButton=-1;
         for(int i=0;i<rigOrder.Count;i++)if(camerasByRig.TryGetValue(rigOrder[i],out var camera))camera.enabled=selectedView==i;
     }
     public void ShowOverview(){selectedView=-1;ApplyView();}
     private void CycleView(){selectedView++;if(selectedView>=rigOrder.Count)selectedView=-1;ApplyView();}
+
+    private void ApplyOverviewPose()
+    {
+        if(overview==null)return;
+        overview.orthographic=!overviewPerspective;overview.fieldOfView=50;
+        var rotation=Quaternion.Euler(overviewPitch,overviewYaw,0);
+        overview.transform.SetPositionAndRotation(overviewPivot-rotation*Vector3.forward*overviewDistance,rotation);
+        overview.farClipPlane=Mathf.Max(overview.farClipPlane,overviewDistance+trajectoryBounds.extents.magnitude*3+1000);
+    }
+    private void ToggleOverviewProjection()
+    {
+        if(overview==null)return;
+        overviewPerspective=!overviewPerspective;
+        if(overviewPerspective)overviewDistance=Mathf.Max(.01f,overview.orthographicSize/Mathf.Tan(25*Mathf.Deg2Rad));
+        else {overview.orthographicSize=Mathf.Max(.01f,overviewDistance*Mathf.Tan(25*Mathf.Deg2Rad));overviewPitch=90;overviewYaw=0;}
+        overviewUserAdjusted=true;ApplyOverviewPose();
+    }
+    private void UpdateOverviewControls(UnityEngine.InputSystem.Mouse mouse)
+    {
+        if(selectedView>=0 || overview==null || !Application.isFocused || pathFocused || showDetails)
+        {overviewDragButton=-1;return;}
+        if(mouse==null)overviewDragButton=-1;
+        Vector2 position=mouse!=null?mouse.position.ReadValue():Vector2.zero;
+        bool inImage=mouse!=null && position.y>Screen.height*.2f && position.x>=0 && position.x<Screen.width && position.y<Screen.height;
+        if(overviewDragButton<0 && inImage)
+        {
+            if(mouse.middleButton.wasPressedThisFrame)overviewDragButton=2;
+            else if(mouse.rightButton.wasPressedThisFrame)overviewDragButton=1;
+            if(overviewDragButton>=0)overviewDragPosition=position;
+        }
+        if(overviewDragButton>=0)
+        {
+            bool held=overviewDragButton==2?mouse.middleButton.isPressed:mouse.rightButton.isPressed;
+            Vector2 delta=position-overviewDragPosition;overviewDragPosition=position;
+            if(delta.sqrMagnitude>0)
+            {
+                if(overviewDragButton==1)
+                {overviewYaw+=delta.x*.2f;overviewPitch=Mathf.Clamp(overviewPitch-delta.y*.2f,10,90);}
+                else
+                {
+                    float height=overviewPerspective?2*overviewDistance*Mathf.Tan(25*Mathf.Deg2Rad):2*overview.orthographicSize;
+                    overviewPivot-=(overview.transform.right*delta.x+overview.transform.up*delta.y)*(height/Mathf.Max(1,Screen.height*.8f));
+                }
+                overviewUserAdjusted=true;ApplyOverviewPose();
+            }
+            if(!held)overviewDragButton=-1;
+        }
+        if(inImage && Mathf.Abs(ExperimentInput.Scroll)>.00001f)
+        {
+            float factor=Mathf.Exp(-ExperimentInput.Scroll);
+            if(overviewPerspective)overviewDistance=Mathf.Clamp(overviewDistance*factor,.01f,1000000);
+            else overview.orthographicSize=Mathf.Clamp(overview.orthographicSize*factor,.01f,100000);
+            overviewUserAdjusted=true;ApplyOverviewPose();
+        }
+        var keyboard=UnityEngine.InputSystem.Keyboard.current;
+        if(keyboard!=null)
+        {
+            float Horizontal(UnityEngine.InputSystem.Controls.KeyControl positive,UnityEngine.InputSystem.Controls.KeyControl negative)=>(positive.isPressed?1:0)-(negative.isPressed?1:0);
+            Vector3 movement=new Vector3(Horizontal(keyboard.dKey,keyboard.aKey),Horizontal(keyboard.eKey,keyboard.qKey),Horizontal(keyboard.wKey,keyboard.sKey));
+            float yaw=Horizontal(keyboard.lKey,keyboard.jKey),pitch=Horizontal(keyboard.kKey,keyboard.iKey);
+            if(movement.sqrMagnitude>0 || yaw!=0 || pitch!=0)
+            {
+                float dt=Mathf.Min(.1f,Time.unscaledDeltaTime),height=overviewPerspective?2*overviewDistance*Mathf.Tan(25*Mathf.Deg2Rad):2*overview.orthographicSize;
+                Vector3 right=Quaternion.Euler(0,overviewYaw,0)*Vector3.right,forward=Quaternion.Euler(0,overviewYaw,0)*Vector3.forward;
+                float boost=keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed?3:1;
+                overviewPivot+=(right*movement.x+Vector3.up*movement.y+forward*movement.z)*(height*.5f*boost*dt);
+                overviewYaw+=yaw*45*dt;overviewPitch=Mathf.Clamp(overviewPitch+pitch*45*dt,10,90);
+                overviewUserAdjusted=true;ApplyOverviewPose();
+            }
+        }
+    }
 
     private void Update()
     {
@@ -320,9 +400,9 @@ public class ReplayController : MonoBehaviour
             if(ExperimentInput.Pressed(forwardKey,KeyCode.RightArrow,"Forward"))Seek(replayTime+step);
             if(ExperimentInput.Pressed(prevStepKey,KeyCode.N,"PreviousStep"))JumpToStep(-1);
             if(ExperimentInput.Pressed(nextStepKey,KeyCode.M,"NextStep"))JumpToStep(1);
-            if(selectedView<0 && overview!=null && !showDetails && ExperimentInput.MousePosition.y>Screen.height*.2f)
-                overview.orthographicSize=Mathf.Clamp(overview.orthographicSize*Mathf.Exp(-ExperimentInput.Scroll),.01f,100000);
+            UpdateOverviewControls(mouse);
         }
+        else overviewDragButton=-1;
         if(isPlaying && !scrubbing && (environmentLoader==null || !environmentLoader.Loading))
         {
             replayTime+=Time.unscaledDeltaTime*Mathf.Max(.01f,playbackSpeed);
@@ -367,7 +447,7 @@ public class ReplayController : MonoBehaviour
             if(environmentSample==null)environmentSample=a;
             if(referenceSample==null || (selectedView>=0 && rigOrder[selectedView]==id))referenceSample=a;
         }
-        if(pathsChanged){RefreshTrajectoryBounds();if(selectedView<0)FitOverview();}
+        if(pathsChanged){RefreshTrajectoryBounds();if(selectedView<0 && !overviewUserAdjusted)FitOverview();}
         if(environmentSample!=null)environmentLoader?.ApplyRecordedSample(environmentSample);
         float fallbackSize=Mathf.Max(.1f,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z)*.002f);
         foreach(var population in populations)
@@ -612,7 +692,9 @@ public class ReplayController : MonoBehaviour
             float contextHeight=smallStyle.CalcHeight(new GUIContent(contextText),width);
             GUI.Label(new Rect(left,top,width,contextHeight),contextText,smallStyle);
             top+=contextHeight+4;
-            GUI.Label(new Rect(left,top,width,40*scale),"Space: play/pause · ←/→: 1s · Shift+←/→: 10s · N/M: previous/next condition · mouse wheel: zoom · Esc: setup",smallStyle);
+            float projectionWidth=selectedView<0?130*scale:0;
+            GUI.Label(new Rect(left,top,width-projectionWidth-8*scale,40*scale),"Space: play/pause · ←/→: seek · N/M: condition · drag right/middle: orbit/pan · WASD/QE: move · IJKL: look · wheel: zoom",smallStyle);
+            if(selectedView<0 && ReplayButton(new Rect(left+width-projectionWidth,top,projectionWidth,rowHeight),overviewPerspective?"Top-down view":"Perspective"))ToggleOverviewProjection();
         }
         if(showDetails && archive!=null)
         {
@@ -658,6 +740,7 @@ public class ReplayController : MonoBehaviour
     private void ClearSessionVisuals()
     {
         timelineMouseCaptured=timelineMouseUpSeen=false;
+        overviewUserAdjusted=false;overviewDragButton=-1;
         foreach(var population in populations){foreach(var visual in population.visuals.Values)if(visual!=null)Destroy(visual);population.stream.Dispose();}populations.Clear();
         foreach(Transform child in generatedRoot)if(child!=populationRoot){child.gameObject.SetActive(false);Destroy(child.gameObject);}
         markerByRig.Clear();camerasByRig.Clear();pathsByRig.Clear();rigOrder.Clear();stepChanges.Clear();archive=null;
