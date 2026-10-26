@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import platform as host_platform
 import re
 import shutil
 import subprocess
@@ -65,7 +66,30 @@ def prepare(ref, project):
         subprocess.run(['cp', '-cR', str(ROOT / 'Library'), str(project / 'Library')], check=True)
     (project / 'SOURCE-REVISION.txt').write_text(git('rev-parse', ref).decode())
 
-def package(build, output, version, platform, revision, project, quickstart, with_companions=True, with_dashboard=True):
+def validate_local_payload_options(platform, with_companions, with_dashboard,
+                                   local_native_camera_fix, local_dashboard_archive):
+    """Reject unsupported opt-ins before preparing a project or invoking Unity."""
+    if (local_native_camera_fix or local_dashboard_archive) and platform not in ('macOS', 'all'):
+        raise ValueError('Local payload corrections apply only to macOS (or --platform all)')
+    if local_native_camera_fix:
+        if not with_companions:
+            raise ValueError('--local-native-camera-fix requires bundled companions')
+        if sys.platform != 'darwin' or host_platform.machine() != 'arm64':
+            raise ValueError('The reviewed native camera correction can be built only on Mac arm64')
+        import build_local_rekkefly
+        build_local_rekkefly.load_lock()  # Verify the reviewed patch before any expensive build.
+    if local_dashboard_archive:
+        if not with_dashboard:
+            raise ValueError('--local-dashboard-archive requires the bundled dashboard')
+        import companion_bundles
+        import stage_local_dashboard
+        lock = json.loads(stage_local_dashboard.LOCAL_LOCK.read_text())
+        if companion_bundles.digest(Path(local_dashboard_archive)) != lock['archiveSha256']:
+            raise ValueError('Local dashboard archive differs from its reviewed lock')
+
+
+def package(build, output, version, platform, revision, project, quickstart, with_companions=True, with_dashboard=True,
+            local_native_camera_fix=False, local_dashboard_archive=None):
     label = 'macOS-universal' if platform == 'macOS' else platform
     name = f'MATREX-VR-{version}-{label}'
     stage = output / name
@@ -83,22 +107,39 @@ def package(build, output, version, platform, revision, project, quickstart, wit
     if platform == 'Linux':
         (stage / 'MATREX VR.x86_64').chmod(0o755)
     companion_root = stage / 'MATREX VR.app' / 'Contents' / 'Companions' if platform == 'macOS' else stage / 'Companions'
+    companion_catalog = {}
     if with_companions:
         # Install/download during packaging only. Runtime is fully offline and reuses
         # stable per-user app identities rather than extracting a new copy per Start.
         import companion_bundles
         platforms = ['macos-arm64', 'macos-x64'] if platform == 'macOS' else ['windows-x64' if platform == 'Windows' else 'linux-x64']
         companion_bundles.stage(platforms, companion_root, ROOT / '.release-work/companion-cache')
+        if local_native_camera_fix and platform == 'macOS':
+            # Reuse the reviewed source/toolchain cache. The helper preserves the
+            # official Intel entry, signs its new arm64 app and updates the catalog.
+            subprocess.run([sys.executable, str(ROOT / 'tools/build_local_rekkefly.py'),
+                            '--companions', str(companion_root)], check=True)
+        companion_catalog = json.loads((companion_root / 'catalog.json').read_text())
+        if local_native_camera_fix and platform == 'macOS' and not companion_catalog.get('localNativeCorrection'):
+            raise RuntimeError('The requested local native correction is absent from the staged catalog')
     dashboard_entries = []
     if with_dashboard:
         import stage_local_dashboard
-        dashboard_entries = stage_local_dashboard.stage(stage_local_dashboard.platforms_for_target(platform), companion_root, ROOT / '.release-work/dashboard-cache')
+        platforms = stage_local_dashboard.platforms_for_target(platform)
+        if local_dashboard_archive and platform == 'macOS':
+            # Never stage the older official arm64 archive over the accepted local
+            # build. Keep the official Intel package and its own provenance.
+            platforms.remove('macos-arm64')
+        dashboard_entries = stage_local_dashboard.stage(platforms, companion_root, ROOT / '.release-work/dashboard-cache')
+        if local_dashboard_archive and platform == 'macOS':
+            dashboard_entries.append(stage_local_dashboard.stage_local(local_dashboard_archive, companion_root))
     if (with_companions or with_dashboard) and platform == 'macOS' and sys.platform == 'darwin':
         # Seal the parent after all payloads are embedded. Nested native app
         # signatures and their catalog digests remain unchanged.
         subprocess.run(['/usr/bin/codesign', '--force', '--sign', '-', '--timestamp=none', str(stage / 'MATREX VR.app')], check=True)
     shutil.copy2(quickstart, stage / 'START-HERE.txt')
-    for relative in ('Assets/ThirdParty/AstronomyEngine/LICENSE.txt', 'Assets/Resources/NightSky/source.txt'):
+    for relative in ('Assets/ThirdParty/AstronomyEngine/LICENSE.txt', 'Assets/Resources/NightSky/source.txt',
+                     'Assets/ThirdParty/Inter/LICENSE.txt', 'Assets/StreamingAssets/ThirdPartyNotices/Lucide.txt'):
         source = project / relative
         if source.exists():
             target = stage / 'ThirdPartyNotices' / source.parent.name / source.name
@@ -109,7 +150,11 @@ def package(build, output, version, platform, revision, project, quickstart, wit
         raise RuntimeError('Refusing to package an unsuccessful Unity build')
     manifest = dict(version=version, sourceRevision=revision, unityVersion='6000.3.16f1', platform=label,
                     publicSystemTemplate=True, companionsBundled=with_companions, dashboardBundled=with_dashboard,
-                    dashboardPackages=dashboard_entries, builderSha256=hashlib.sha256((ROOT / 'Assets/Editor/MatrexReleaseBuilder.cs').read_bytes()).hexdigest(), build=report)
+                    companionCatalogId=companion_catalog.get('catalogId'), companionPackages=companion_catalog.get('entries', []),
+                    localNativeCameraCorrection=companion_catalog.get('localNativeCorrection'), dashboardPackages=dashboard_entries,
+                    builderSha256=hashlib.sha256((ROOT / 'Assets/Editor/MatrexReleaseBuilder.cs').read_bytes()).hexdigest(),
+                    packagingScriptSha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                    quickstartSha256=hashlib.sha256(Path(quickstart).read_bytes()).hexdigest(), build=report)
     (stage / 'release-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     archive = output / (name + '.zip')
     if platform == 'macOS' and sys.platform == 'darwin':
@@ -143,12 +188,21 @@ def main():
     parser.add_argument('--platform', choices=[*TARGETS, 'all'], default='all')
     parser.add_argument('--without-companions', action='store_true', help='Advanced/source-only build: omit pinned native tracker packages')
     parser.add_argument('--without-dashboard', action='store_true', help='Advanced/source-only build: omit the pinned offline dashboard package')
+    parser.add_argument('--local-native-camera-fix', action='store_true',
+                        help='Opt in to the reviewed local Mac arm64 Rekkefly correction; other platforms keep official packages')
+    parser.add_argument('--local-dashboard-archive', type=Path,
+                        help='Opt in to the reviewed local Mac arm64 dashboard ZIP; other platforms keep official packages')
     parser.add_argument('--unity', type=Path)
     parser.add_argument('--workspace', type=Path)
     parser.add_argument('--quickstart', type=Path, default=ROOT / 'docs/release-quickstart.txt')
     args = parser.parse_args()
     if not re.fullmatch(r'\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?', args.version):
         parser.error('--version must be a semantic version such as 0.3.0')
+    try:
+        validate_local_payload_options(args.platform, not args.without_companions, not args.without_dashboard,
+                                       args.local_native_camera_fix, args.local_dashboard_archive)
+    except (ValueError, OSError) as error:
+        parser.error(str(error))
     revision = git('rev-parse', '--verify', args.ref + '^{commit}').decode().strip()
     editor = args.unity or Path('/Applications/Unity/Hub/Editor/6000.3.16f1/Unity.app/Contents/MacOS/Unity')
     if not editor.is_file() or not args.quickstart.is_file():
@@ -166,7 +220,8 @@ def main():
                         '-executeMethod', 'MatrexReleaseBuilder.Build', '-releaseVersion', args.version, '-releaseTarget', target,
                         '-releaseOutput', str(build / executable), '-logFile', str(log)], check=True)
         package(build, workspace, args.version, platform, revision, project, args.quickstart,
-                with_companions=not args.without_companions, with_dashboard=not args.without_dashboard)
+                with_companions=not args.without_companions, with_dashboard=not args.without_dashboard,
+                local_native_camera_fix=args.local_native_camera_fix, local_dashboard_archive=args.local_dashboard_archive)
 
 if __name__ == '__main__':
     main()

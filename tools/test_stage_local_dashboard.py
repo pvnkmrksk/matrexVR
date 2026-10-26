@@ -146,6 +146,7 @@ class DashboardPackagingTests(unittest.TestCase):
                 def trackers(platforms, output, cache):
                     events.append(('trackers', platforms, output))
                     output.mkdir(parents=True)
+                    (output / 'catalog.json').write_text(json.dumps({'catalogId': 'fixture', 'entries': []}))
                 def viewer(platforms, output, cache):
                     self.assertTrue(output.is_dir())
                     events.append(('dashboard', platforms, output))
@@ -188,6 +189,116 @@ class DashboardPackagingTests(unittest.TestCase):
             self.assertFalse(manifest['dashboardBundled'])
             self.assertFalse(manifest['companionsBundled'])
             self.assertEqual(manifest['dashboardPackages'], [])
+
+    def test_release_local_opt_ins_preserve_payloads_before_signing_and_describe_each_platform(self):
+        """Exercise the real offline viewer extraction and final ZIP, not just flag plumbing."""
+        for platform in ('macOS', 'Windows', 'Linux'):
+            with self.subTest(platform=platform), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                official, cache = self.fixture_lock(root)
+                local_archive = root / 'reviewed-local.zip'
+                local_bytes = b'reviewed newer local native fixture'
+                with zipfile.ZipFile(local_archive, 'w') as z:
+                    info = zipfile.ZipInfo('DaariDeepa/DaariDeepa')
+                    info.create_system = 3
+                    info.external_attr = (stat.S_IFREG | 0o755) << 16
+                    z.writestr(info, local_bytes)
+                local_lock = json.loads(dashboard.LOCAL_LOCK.read_text())
+                local_lock['archiveSha256'] = companion_bundles.digest(local_archive)
+                local_lock['executableSha256'] = hashlib.sha256(local_bytes).hexdigest()
+                build = root / 'build'
+                build.mkdir()
+                player = build / build_release.TARGETS[platform][2]
+                if platform == 'macOS':
+                    (player / 'Contents').mkdir(parents=True)
+                else:
+                    player.write_bytes(b'Unity fixture')
+                (build / 'build-report.json').write_text('{"result":"Succeeded","errors":0}')
+                quickstart = root / 'quickstart.txt'
+                quickstart.write_text('fixture')
+                events = []
+                catalog = {'catalogId': 'official', 'entries': [{'backend': 'rekkefly', 'platform': p,
+                            'releaseTag': 'official', 'executableSha256': 'official-fixture'}
+                            for p in dashboard.platforms_for_target(platform)]}
+                def trackers(platforms, output, ignored_cache):
+                    events.append('trackers')
+                    output.mkdir(parents=True)
+                    (output / 'catalog.json').write_text(json.dumps(catalog))
+                real_viewer, real_local, real_run = dashboard.stage, dashboard.stage_local, build_release.subprocess.run
+                def viewer(platforms, output, ignored_cache):
+                    events.append('dashboard')
+                    if platform == 'macOS':
+                        self.assertEqual(platforms, ['macos-x64'])
+                    return real_viewer(platforms, output, cache, official)
+                def local(archive, output):
+                    events.append('local-dashboard')
+                    return real_local(archive, output, local_lock)
+                def run(arguments, **kwargs):
+                    if arguments[0] == sys.executable and arguments[1].endswith('build_local_rekkefly.py'):
+                        self.assertEqual(platform, 'macOS')
+                        events.append('local-native')
+                        destination = Path(arguments[3]) / 'catalog.json'
+                        corrected = json.loads(destination.read_text())
+                        corrected['catalogId'] = 'corrected'
+                        corrected['localNativeCorrection'] = {'sourceRevision': 'pinned-native', 'patchSha256': 'pinned-patch'}
+                        corrected['entries'][0].update(localSourceBuild=True, executableSha256='corrected-fixture')
+                        destination.write_text(json.dumps(corrected))
+                        return
+                    if arguments[0] == '/usr/bin/codesign':
+                        self.assertEqual(events, ['trackers', 'local-native', 'dashboard', 'local-dashboard'])
+                        events.append('sign')
+                        return
+                    return real_run(arguments, **kwargs)
+                with patch.object(companion_bundles, 'stage', side_effect=trackers), \
+                     patch.object(companion_bundles, 'urlopen', side_effect=AssertionError('unexpected network')), \
+                     patch.object(dashboard, 'stage', side_effect=viewer), \
+                     patch.object(dashboard, 'stage_local', side_effect=local), \
+                     patch.object(build_release.subprocess, 'run', side_effect=run):
+                    build_release.package(build, root, '0.3.1', platform, 'frozen-runtime', root, quickstart,
+                                          local_native_camera_fix=True, local_dashboard_archive=local_archive)
+                label = 'macOS-universal' if platform == 'macOS' else platform
+                stage = root / ('MATREX-VR-0.3.1-' + label)
+                manifest = json.loads((stage / 'release-manifest.json').read_text())
+                self.assertEqual(manifest['sourceRevision'], 'frozen-runtime')
+                self.assertEqual(manifest['quickstartSha256'], hashlib.sha256(b'fixture').hexdigest())
+                self.assertEqual(manifest['packagingScriptSha256'], companion_bundles.digest(Path(build_release.__file__)))
+                viewers = {e['platform']: e for e in manifest['dashboardPackages']}
+                if platform == 'macOS':
+                    self.assertEqual(manifest['companionCatalogId'], 'corrected')
+                    self.assertEqual(manifest['localNativeCameraCorrection']['patchSha256'], 'pinned-patch')
+                    self.assertTrue(manifest['companionPackages'][0]['localSourceBuild'])
+                    self.assertFalse(manifest['companionPackages'][1].get('localSourceBuild', False))
+                    self.assertEqual(viewers['macos-arm64']['sourceRevision'], local_lock['sourceRevision'])
+                    self.assertFalse(viewers['macos-arm64']['published'])
+                    self.assertEqual(viewers['macos-x64']['sourceRevision'], official['sourceRevision'])
+                else:
+                    self.assertEqual(events, ['trackers', 'dashboard'])
+                    self.assertIsNone(manifest['localNativeCameraCorrection'])
+                    self.assertEqual(manifest['companionCatalogId'], 'official')
+                    self.assertEqual(next(iter(viewers.values()))['sourceRevision'], official['sourceRevision'])
+                with zipfile.ZipFile(root / (stage.name + '.zip')) as archive:
+                    embedded = json.loads(archive.read(stage.name + '/release-manifest.json'))
+                    self.assertEqual(embedded, manifest)
+                    if platform == 'macOS':
+                        self.assertEqual(archive.read(stage.name + '/MATREX VR.app/Contents/Companions/dashboard/macos-arm64/DaariDeepa/DaariDeepa'), local_bytes)
+
+    def test_release_local_opt_ins_reject_invalid_requests_before_unity(self):
+        validate = build_release.validate_local_payload_options
+        for target in ('Linux', 'Windows'):
+            with self.assertRaisesRegex(ValueError, 'only to macOS'):
+                validate(target, True, True, True, None)
+        with self.assertRaisesRegex(ValueError, 'requires bundled companions'):
+            validate('macOS', False, True, True, None)
+        with self.assertRaisesRegex(ValueError, 'requires the bundled dashboard'):
+            validate('macOS', True, False, False, Path('/unused'))
+        with tempfile.TemporaryDirectory() as temp:
+            archive = Path(temp) / 'tampered.zip'
+            archive.write_bytes(b'not the reviewed dashboard')
+            with self.assertRaisesRegex(ValueError, 'differs from its reviewed lock'):
+                validate('macOS', True, True, False, archive)
+        with patch.object(build_release.sys, 'platform', 'linux'):
+            with self.assertRaisesRegex(ValueError, 'only on Mac arm64'):
+                validate('macOS', True, True, True, None)
 
 
 if __name__ == '__main__':
