@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 /// <summary>Launch a Mac .app through Launch Services with its own privacy identity.</summary>
 public static class MacAppLauncher
@@ -77,6 +78,59 @@ public static class MacAppLauncher
         }
         finally { SendVoid(pool,Sel("drain")); }
     }
+    /// <summary>Observe a Launch Services nonchild using Darwin's actual wait status.
+    /// Process.ExitCode cannot reliably reap these independent applications.</summary>
+    internal static bool TryObserveExit(int pid,long startUtcTicks,Action<int> exited)
+    {
+        if(!RuntimeInformation.IsOSPlatform(OSPlatform.OSX)||pid<=0||startUtcTicks<=0||exited==null)return false;
+        if(!MatchesProcess(pid,startUtcTicks))return false;
+        int queue=kqueue();if(queue<0)return false;
+        bool handedOff=false;
+        try
+        {
+            var change=new ProcessEvent { ident=(ulong)pid,filter=-5,flags=0x15,fflags=0x84000000 }; // EVFILT_PROC; ADD|ENABLE|ONESHOT; EXIT|EXITSTATUS.
+            if(RegisterProcessEvent(queue,ref change,1,IntPtr.Zero,0,0,IntPtr.Zero)<0)return false;
+            // Reject PID reuse during registration; no old receipt may watch a new app.
+            if(!MatchesProcess(pid,startUtcTicks))return false;
+            var thread=new Thread(()=>
+            {
+                int status=-1;
+                try
+                {
+                    ProcessEvent observed;int count;
+                    do { count=WaitProcessEvent(queue,IntPtr.Zero,0,out observed,1,0,IntPtr.Zero); }
+                    while(count<0&&Marshal.GetLastWin32Error()==4); // EINTR.
+                    // A missing exit-status flag, kernel error, nonzero exit or signal is never clean success.
+                    if(count==1&&observed.ident==(ulong)pid&&observed.filter==-5&&(observed.flags&0x4000)==0&&
+                        (observed.fflags&0x84000000)==0x84000000&&observed.data>=0&&observed.data<=int.MaxValue)
+                        status=(int)observed.data;
+                }
+                catch(Exception) { /* An unverifiable recorder stays pending; never infer success from disappearance. */ }
+                finally
+                {
+                    CloseDescriptor(queue);
+                    try { exited(status); } catch(Exception) { /* Observer cleanup must not terminate the player. */ }
+                }
+            }) { IsBackground=true,Name="Native tracker exit status" };
+            thread.Start();handedOff=true;return true;
+        }
+        finally { if(!handedOff)CloseDescriptor(queue); }
+    }
+    private static bool MatchesProcess(int pid,long startUtcTicks)
+    {
+        try { using(var process=Process.GetProcessById(pid))return !process.HasExited&&process.StartTime.ToUniversalTime().Ticks==startUtcTicks; }
+        catch(Exception error) when(error is ArgumentException||error is InvalidOperationException||error is System.ComponentModel.Win32Exception||error is NotSupportedException){return false;}
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    private struct ProcessEvent
+    {
+        public ulong ident;public short filter;public ushort flags;public uint fflags;
+        public long data;public ulong udata,extension0,extension1;
+    }
+    [DllImport(System,SetLastError=true)] private static extern int kqueue();
+    [DllImport(System,EntryPoint="close")] private static extern int CloseDescriptor(int descriptor);
+    [DllImport(System,EntryPoint="kevent64",SetLastError=true)] private static extern int RegisterProcessEvent(int queue,ref ProcessEvent changes,int changeCount,IntPtr events,int eventCount,uint flags,IntPtr timeout);
+    [DllImport(System,EntryPoint="kevent64",SetLastError=true)] private static extern int WaitProcessEvent(int queue,IntPtr changes,int changeCount,out ProcessEvent observed,int eventCount,uint flags,IntPtr timeout);
     private static IntPtr Sel(string name)=>sel_registerName(name);
     private static IntPtr String(string value)
     {

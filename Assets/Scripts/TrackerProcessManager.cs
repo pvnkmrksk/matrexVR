@@ -229,9 +229,20 @@ public sealed class TrackerProcessManager : MonoBehaviour
         lock(recordingWatchGate)if(!recordingWatches.Add(identity))return;
         try
         {
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                // Launch Services apps are not Unity children. Darwin can report their
+                // real wait status; Mono Process.ExitCode cannot safely establish it.
+                if(!MacAppLauncher.TryObserveExit(receipt.processId,receipt.startUtcTicks,status=>
+                {
+                    try { if(status==0)CompanionMediaArchive.AcknowledgeStopped(receipt.vrId,identity); }
+                    finally { lock(recordingWatchGate)recordingWatches.Remove(identity); }
+                }))lock(recordingWatchGate)recordingWatches.Remove(identity);
+                return;
+            }
             var process=Process.GetProcessById(receipt.processId);
-            process.EnableRaisingEvents=true;
             process.Exited+=(sender,args)=>{try{if(process.ExitCode==0)CompanionMediaArchive.AcknowledgeStopped(receipt.vrId,identity);}catch(InvalidOperationException){}finally{process.Dispose();lock(recordingWatchGate)recordingWatches.Remove(identity);}};
+            process.EnableRaisingEvents=true;
             if(process.HasExited){try{if(process.ExitCode==0)CompanionMediaArchive.AcknowledgeStopped(receipt.vrId,identity);}finally{process.Dispose();lock(recordingWatchGate)recordingWatches.Remove(identity);}}
         }
         catch(Exception error) when(error is ArgumentException||error is InvalidOperationException||error is System.ComponentModel.Win32Exception) {lock(recordingWatchGate)recordingWatches.Remove(identity);}
