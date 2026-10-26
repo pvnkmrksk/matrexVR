@@ -17,6 +17,7 @@ public class MainController : MonoBehaviour
     public static MainController Instance { get; private set; }
     public static event System.Action SystemConfigurationChanged;
     public bool SequenceRunning => sequenceStarted;
+    public bool SceneTransitionPending { get; private set; }
     public string InputKind { get; private set; } = "tracker";
     public float RemainingStepSeconds => phaseRunner != null && phaseRunner.Active ? (float)phaseRunner.RemainingSeconds : Mathf.Max(0,timer);
     private ExperimentPhases phaseRunner;
@@ -472,6 +473,7 @@ public class MainController : MonoBehaviour
         Debugger.Log("MainController.OnSceneLoaded()", 3);
         // Saved replay system/layout owns its additive environment, including its rig count.
         if (mode == LoadSceneMode.Additive && FindFirstObjectByType<ReplayController>() != null) return;
+        if (mode == LoadSceneMode.Single) SceneTransitionPending = false;
         try { RuntimeRigRegistry.Configure(scene, systemConfigs); }
         catch (System.Exception error) { FailExperiment(error); return; }
 
@@ -623,6 +625,7 @@ public class MainController : MonoBehaviour
 
     void LoadScene(SequenceStep step)
     {
+        SceneTransitionPending = true;
         phaseRunner?.Cancel();
         Debugger.Log("MainController.LoadScene()", 3);
         SyncTimestamp();

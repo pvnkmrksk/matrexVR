@@ -276,8 +276,17 @@ public class DataLogger : MonoBehaviour
             return;
         }
 
+        if (mainController != null && !CanCaptureContext(mainController.SequenceRunning,
+            mainController.SceneTransitionPending,gameObject.scene.name,mainController.GetCurrentSequenceStep()?.sceneName)) return;
+
         PrepareLogData();
         LogData(line);
+    }
+
+    private static bool CanCaptureContext(bool running,bool transitionPending,string actualScene,string sequenceScene)
+    {
+        return running && !transitionPending && !string.IsNullOrEmpty(actualScene) &&
+            string.Equals(actualScene,sequenceScene,StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -336,7 +345,7 @@ public class DataLogger : MonoBehaviour
         SetData("skyboxSampleUtc", NightSkyController.CurrentSampleUtc);
         string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
         string vr = this.gameObject.name;
-        string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        string scene = gameObject.scene.name;
         Vector3 position = this.transform.position;
         Vector3 rotation = this.transform.rotation.eulerAngles;
 
