@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "captureDate": "2026-10-26",
-  "status": "partial-manual-validation-final-replay-controls-pending-device-unlock",
-  "candidateSourceCommit": "2494d882",
+  "status": "accepted-manual-software-workflow-validation",
+  "candidateSourceCommit": "75169a2c",
   "unityVersion": "6000.3.16f1",
   "recordingBuildRevision": "not-completely-recorded-in-run-manifest",
   "scope": {
@@ -31,7 +31,8 @@
       "imageObservation": "almost black; no animal",
       "claim": "Live native camera input reached the tracking pipeline; no biological tracking accuracy is established.",
       "archiveLabelRemains": "actualInputSource=unverified in the saved recordings"
-    }
+    },
+    "physicalLedHardwareValidation": false
   },
   "runs": [
     {
@@ -264,17 +265,20 @@
       },
       "currentSourceComparison": {
         "run": "20261026_031046",
-        "checkedUtc": "2026-10-26T03:56:52.368970+00:00",
-        "candidateSourceCommit": "2494d882",
-        "checkedFiles": 23,
-        "coreFilesChecked": 23,
-        "coreFilesChanged": [],
+        "sourceCommit": "75169a2c",
+        "phase": "after-final-replay-returned-home",
+        "checkedUtc": "2026-10-26T06:46:56.403596+00:00",
+        "baselineFiles": 23,
+        "byteIdenticalFiles": 23,
+        "acquisitionFilesChecked": 21,
+        "changedAcquisitionFiles": [],
+        "manifestUnchanged": true,
         "changed": [],
         "missing": [],
         "added": [],
+        "unstableDuringRead": [],
         "allSourceFilesByteIdentical": true,
-        "noAddedSourceFiles": true,
-        "scope": "Read-only source comparison; final current native-root replay interactions pending device unlock."
+        "noAddedFiles": true
       }
     },
     {
@@ -364,19 +368,35 @@
           }
         ],
         "stableDuringCapture": true,
-        "finalSameProcessManualReplayComparison": "pending",
-        "currentReplayComparison": {
-          "candidateSourceCommit": "8b3287a0",
-          "checkedUtc": "2026-10-26T03:29:27.115435+00:00",
-          "coreFilesUnchanged": 21,
+        "finalReplaySourcePreservation": "passed-scoped-comparison",
+        "finalReplayComparison": {
+          "run": "20261026_035227",
+          "sourceCommit": "75169a2c",
+          "phase": "after-final-replay-returned-home",
+          "checkedUtc": "2026-10-26T06:46:56.418872+00:00",
+          "baselineFiles": 23,
+          "byteIdenticalFiles": 22,
+          "acquisitionFilesChecked": 21,
+          "changedAcquisitionFiles": [],
           "manifestUnchanged": true,
+          "changed": [
+            {
+              "path": "runtime_trace.log",
+              "scope": "diagnostic-appendable",
+              "baselineBytes": 63851,
+              "currentBytes": 63912,
+              "baselineSha256": "1fd73d74dcb287cdb48addafe42e3d2af3fb7b6c9adc339419eec29f8a31e078",
+              "currentSha256": "98e9ad38ba8470d4da0e0fd725b5026c13fe047dddf102095df1a01c63dfe771",
+              "originalPrefixHashMatches": true,
+              "appendedBytes": 61,
+              "appendedText": "[2026-10-26 04:04:15.646] [Log] MainController was disabled.\n"
+            }
+          ],
+          "missing": [],
+          "added": [],
+          "unstableDuringRead": [],
           "allSourceFilesByteIdentical": false,
-          "addedFiles": 0,
-          "missingFiles": 0,
-          "diagnosticLogAppendBytes": 61,
-          "originalLogPrefixHashMatches": true,
-          "description": "Only shutdown diagnostic line appended; source acquisition/config/sky bytes preserved.",
-          "finalAfterReplayExit": "pending"
+          "noAddedFiles": true
         }
       },
       "files": [
@@ -444,11 +464,14 @@
       "operatorReportedSourceCommit": "dab56e82",
       "currentSourceComparison": {
         "run": "20261026_035227",
-        "checkedUtc": "2026-10-26T03:56:52.384739+00:00",
-        "candidateSourceCommit": "2494d882",
-        "checkedFiles": 23,
-        "coreFilesChecked": 21,
-        "coreFilesChanged": [],
+        "sourceCommit": "75169a2c",
+        "phase": "after-final-replay-returned-home",
+        "checkedUtc": "2026-10-26T06:46:56.418872+00:00",
+        "baselineFiles": 23,
+        "byteIdenticalFiles": 22,
+        "acquisitionFilesChecked": 21,
+        "changedAcquisitionFiles": [],
+        "manifestUnchanged": true,
         "changed": [
           {
             "path": "runtime_trace.log",
@@ -464,9 +487,9 @@
         ],
         "missing": [],
         "added": [],
+        "unstableDuringRead": [],
         "allSourceFilesByteIdentical": false,
-        "noAddedSourceFiles": true,
-        "scope": "Read-only source comparison; final current native-root replay interactions pending device unlock."
+        "noAddedFiles": true
       }
     }
   ],
@@ -531,7 +554,7 @@
     {
       "finding": "replay-IMGUI-and-InputSystem-coordinate-mismatch",
       "commit": "8b3287a0",
-      "manualConfirmation": "Earlier candidate observations only; superseded by2494d882 root-clip layout."
+      "manualConfirmation": "Earlier approach; final combined75169a2c actual manual workflow passed."
     },
     {
       "finding": "exclude-ReplayScene-from-live-experimental-telemetry",
@@ -541,11 +564,26 @@
     {
       "finding": "replace-event-type-restoration-with-controls-in-native-root-clip",
       "commit": "2494d882",
-      "manualConfirmation": "pending-device-unlock"
+      "manualConfirmation": "Earlier approach; final combined75169a2c actual manual workflow passed."
+    },
+    {
+      "finding": "synchronous-row-selection-before-refresh",
+      "commit": "ee4be416",
+      "manualConfirmation": "passed-on75169a2c"
+    },
+    {
+      "finding": "complete-coalesced-replay-scrubs-from-final-pointer-state",
+      "commit": "4847175a",
+      "manualConfirmation": "passed-on75169a2c"
+    },
+    {
+      "finding": "app-owned-macos-native-folder-panel",
+      "commit": "75169a2c",
+      "manualConfirmation": "passed-on75169a2c"
     }
   ],
   "supportingOfflineChecks": {
-    "total": 1002,
+    "total": 1034,
     "tenScriptBatch": {
       "scripts": 10,
       "assertions": 880,
@@ -557,81 +595,27 @@
       "status": "passed"
     },
     "replayUiTests": {
-      "assertions": 55,
-      "status": "passed",
-      "qualification": "Supporting UI tests; final actual native-root button interaction has not yet been confirmed."
+      "assertions": 72,
+      "status": "passed"
     },
-    "qualification": "1002=880+67+55. Passing offline/native-UI supporting tests do not replace the pending actual pointer check on the unlocked Mac."
+    "nativeFolderPickerTests": {
+      "assertions": 15,
+      "status": "passed"
+    },
+    "qualification": "1034=880+67+72+15. Supporting tests are separate from the actual75169a2c manual pointer observations below."
   },
-  "pending": [
-    {
-      "id": "final-pointer-replay-workflow",
-      "status": "pending-device-unlock",
-      "actions": [
-        "Play/Pause",
-        "forward/backward scrub",
-        "Browse",
-        "Back",
-        "readability and unobstructed view"
-      ],
-      "observed": "Final native-root interaction pending; neither a passed test nor a newly reproduced failure.",
-      "passedSeparately": [
-        "sequence duplicate/remove/totals/selection",
-        "native dashboard launch/reopen",
-        "dashboard Pause/Resume",
-        "native camera packet source",
-        "independent companion lifetime"
-      ],
-      "candidate": "2494d882",
-      "nativeUiCount": "pending",
-      "nativeUiSupportingChecks": 55
-    },
-    {
-      "id": "source-run-immutability-after-manual-replay",
-      "status": "current-scoped-check-passed",
-      "run": "20261026_035227",
-      "coreFilesUnchanged": 21,
-      "manifestUnchanged": true,
-      "diagnosticLogAppendBytes": 61,
-      "addedFiles": 0,
-      "finalAfterReplayExit": "pending",
-      "candidate": "2494d882",
-      "checkedRuns": [
-        "20261026_031046",
-        "20261026_035227"
-      ],
-      "details": "031046 all23 byte-identical;035227 core21+manifest unchanged, only earlier61-byte shutdown append in trace; no additions/missing files."
-    },
-    {
-      "id": "fresh-recording-after-handoff-producer-fix",
-      "status": "passed",
-      "requiredCommit": "039b2303",
-      "run": "20261026_035227",
-      "verifiedRawRows": 10219,
-      "sceneSequenceMismatches": 0,
-      "idleRows": 0,
-      "readerExcludedRows": 0
-    },
-    {
-      "id": "physical-camera-packet-device-verification",
-      "status": "passed-separate-live-operator-observation",
-      "packetSequence": 57980,
-      "source_kind": "camera",
-      "source_fallback": false,
-      "archivedLabelUnchanged": "unverified",
-      "animalMeasurement": false
-    }
-  ],
   "replayPointerDiagnostic": {
-    "currentCandidate": "2494d882",
-    "currentStatus": "pending-device-unlock",
-    "currentApproach": "Interactive controls outside moving clips, in the native root GUI clip; only read-only fidelity text is clipped.",
+    "currentCandidate": "75169a2c",
+    "currentStatus": "passed-actual-native-pointer-workflow",
+    "currentApproach": "Interactive controls in the native root GUI clip; captured scrubs complete from final mouse state; app-owned native folder panel.",
     "previousCandidates": {
-      "coordinateObservation": "Legacy IMGUI coordinates were stale while Input System coordinates were correct.",
-      "eventRestorationObservation": "In the prior clip-local restoration attempt, point(60,94.6) was inside but native Event.type stayed Ignore despite setter; that approach was disproved and replaced."
+      "coordinateObservation": "Earlier legacy IMGUI coordinates were stale while Input System coordinates were correct.",
+      "eventRestorationObservation": "A prior clip-local event-type restoration attempt did not restore native events and was replaced.",
+      "fastScrubObservation": "A prior coalesced down/up sequence missed final pointer motion; fixed by4847175a.",
+      "folderDialogObservation": "An earlier unparented osascript dialog remained hidden in fullscreen; replaced by app-owned NSOpenPanel in75169a2c."
     },
     "currentNativeInteractionFailureReproduced": false,
-    "currentNativeInteractionSuccessProven": false
+    "currentNativeInteractionSuccessProven": true
   },
   "manualWorkflowEvidence": [
     {
@@ -650,9 +634,9 @@
     },
     {
       "action": "final candidate replay Play/Pause, scrub, Browse, Back",
-      "status": "pending-device-unlock",
-      "observed": "Final build/launch completed, then Mac locked; final native-root interaction has not been exercised.",
-      "candidate": "2494d882"
+      "status": "passed-actual-native-pointer-test",
+      "observed": "Pause/Play, forward/reverse seek, view switches, fidelity notes, native Browse/Open/Cancel and Back all completed.",
+      "candidate": "75169a2c"
     },
     {
       "action": "sequence duplicate/remove on candidate8b3287a0",
@@ -725,36 +709,101 @@
     },
     {
       "action": "replay does not publish live experimental telemetry",
-      "status": "bounded-operator-observation",
+      "status": "passed-actual-bounded-operator-observation",
       "sourceCommit": "55ecc76c",
       "sourceChange": "suppress ReplayScene pose and context publication",
-      "viewerObservation": "While the new replay player ran, the browser remained stale on the prior043609 session; no new Replay publisher was observed.",
-      "qualification": "This is the observed interval, not a lifetime or universal network proof."
+      "viewerObservation": "During final replay, stale prior071158 session remained; Back resumed receiving new20261026_073154 ControlScene idle context with120.0FPS and576 displayed samples.",
+      "qualification": "Observed suppression/resumption in this tested session; no biological or hardware-performance claim.",
+      "acceptedSourceCommit": "75169a2c"
+    },
+    {
+      "action": "final replay pause/play and bidirectional scrub",
+      "candidate": "75169a2c",
+      "status": "passed-actual-native-pointer-test",
+      "forward": {
+        "fromSeconds": 41.0,
+        "toSeconds": 83.0,
+        "context": "trial16 Choice_Selwyn"
+      },
+      "reverse": {
+        "toSeconds": 32.4,
+        "context": "trial6 Choice_Selwyn"
+      },
+      "resumedSeconds": 32.9
+    },
+    {
+      "action": "final replay view and evidence controls",
+      "candidate": "75169a2c",
+      "status": "passed-actual-native-pointer-test",
+      "defaultView": "God-eye",
+      "viewSwitches": [
+        "AnimalVR1",
+        "Fit to God-eye"
+      ],
+      "fidelityNotesVisible": true
+    },
+    {
+      "action": "final app-owned native run-folder selection",
+      "candidate": "75169a2c",
+      "status": "passed-actual-native-pointer-test",
+      "visibleInFullscreen": true,
+      "navigation": "Cmd+Shift+G to saved031046 run, then Open",
+      "loadedDurationSecondsDisplayed": 205.3,
+      "cancelPreserved": [
+        "folder",
+        "time",
+        "paused state"
+      ],
+      "buttonsReenabledAfterCancel": true
+    },
+    {
+      "action": "final Back and live telemetry resume",
+      "candidate": "75169a2c",
+      "status": "passed-actual-operator-observation",
+      "backDestination": "Home",
+      "duringReplay": "stale prior071158 context",
+      "afterBack": {
+        "receiving": true,
+        "session": "20261026_073154",
+        "scene": "ControlScene",
+        "block": "\u2014",
+        "trial": 1,
+        "phase": "idle",
+        "fpsDisplayed": 120.0,
+        "samplesDisplayed": 576
+      },
+      "publisherWorkerResumed": true
     }
   ],
-  "operatorObservationSource": "Root agent actual manual UI/device observations supplied directly; these conclusions are not inferred from pose CSVs.",
+  "operatorObservationSource": "Direct native UI/device observations and recorded-data audits; interactive conclusions are not inferred from CSVs.",
   "currentSourceComparisons": [
     {
       "run": "20261026_031046",
-      "checkedUtc": "2026-10-26T03:56:52.368970+00:00",
-      "candidateSourceCommit": "2494d882",
-      "checkedFiles": 23,
-      "coreFilesChecked": 23,
-      "coreFilesChanged": [],
+      "sourceCommit": "75169a2c",
+      "phase": "after-final-replay-returned-home",
+      "checkedUtc": "2026-10-26T06:46:56.403596+00:00",
+      "baselineFiles": 23,
+      "byteIdenticalFiles": 23,
+      "acquisitionFilesChecked": 21,
+      "changedAcquisitionFiles": [],
+      "manifestUnchanged": true,
       "changed": [],
       "missing": [],
       "added": [],
+      "unstableDuringRead": [],
       "allSourceFilesByteIdentical": true,
-      "noAddedSourceFiles": true,
-      "scope": "Read-only source comparison; final current native-root replay interactions pending device unlock."
+      "noAddedFiles": true
     },
     {
       "run": "20261026_035227",
-      "checkedUtc": "2026-10-26T03:56:52.384739+00:00",
-      "candidateSourceCommit": "2494d882",
-      "checkedFiles": 23,
-      "coreFilesChecked": 21,
-      "coreFilesChanged": [],
+      "sourceCommit": "75169a2c",
+      "phase": "after-final-replay-returned-home",
+      "checkedUtc": "2026-10-26T06:46:56.418872+00:00",
+      "baselineFiles": 23,
+      "byteIdenticalFiles": 22,
+      "acquisitionFilesChecked": 21,
+      "changedAcquisitionFiles": [],
+      "manifestUnchanged": true,
       "changed": [
         {
           "path": "runtime_trace.log",
@@ -770,16 +819,78 @@
       ],
       "missing": [],
       "added": [],
+      "unstableDuringRead": [],
       "allSourceFilesByteIdentical": false,
-      "noAddedSourceFiles": true,
-      "scope": "Read-only source comparison; final current native-root replay interactions pending device unlock."
+      "noAddedFiles": true
     }
   ],
   "localBuild": {
-    "runtimeSourceCommit": "2494d882",
+    "runtimeSourceCommit": "75169a2c",
     "platform": "macOS arm64",
-    "status": "built-and-launched",
+    "status": "built-and-manually-accepted",
     "signing": "local ad-hoc; build script signature verification passed",
-    "manualAcceptance": "final pointer interaction pending device unlock"
+    "manualAcceptance": "All requested75169a2c replay pointer controls, native folder picker, source preservation and Home telemetry resume passed.",
+    "acceptedReplayScreenshotAvailableLocally": true,
+    "acceptedReplayScreenshotPublished": false
+  },
+  "acceptedRuntimeSourceCommit": "75169a2c",
+  "completedChecks": [
+    {
+      "id": "final-pointer-replay-workflow",
+      "status": "passed-actual-native-pointer-test",
+      "candidate": "75169a2c",
+      "actions": [
+        "Play/Pause",
+        "forward/reverse timeline scrub",
+        "God-eye default and AnimalVR1/Fit switches",
+        "visible fidelity notes",
+        "Browse/Open via app-owned native panel",
+        "Cancel preserving folder/time/paused state and reenabling buttons",
+        "Back to Home"
+      ]
+    },
+    {
+      "id": "source-run-immutability-after-manual-replay",
+      "status": "passed-scoped-post-replay-comparison",
+      "candidate": "75169a2c",
+      "checkedRuns": [
+        "20261026_031046",
+        "20261026_035227"
+      ],
+      "result": "031046 all23 byte-identical;035227 all21 acquisition files and manifest unchanged, only earlier61-byte shutdown trace append; no added/missing files.",
+      "reportPhase": "after-final-replay-returned-home"
+    },
+    {
+      "id": "fresh-recording-after-handoff-producer-fix",
+      "status": "passed",
+      "requiredCommit": "039b2303",
+      "run": "20261026_035227",
+      "verifiedRawRows": 10219,
+      "sceneSequenceMismatches": 0,
+      "idleRows": 0,
+      "readerExcludedRows": 0
+    },
+    {
+      "id": "physical-camera-packet-device-verification",
+      "status": "passed-separate-live-operator-observation",
+      "packetSequence": 57980,
+      "source_kind": "camera",
+      "source_fallback": false,
+      "archivedLabelUnchanged": "unverified",
+      "animalMeasurement": false
+    }
+  ],
+  "remainingManualChecks": [],
+  "acceptedRuntimeLog": {
+    "name": "replay-combined-accepted.log",
+    "lines": 221,
+    "exceptionErrorAssertFailedFatalCrashTimeoutMatches": 0,
+    "knownWarnings": "Existing missing-Behaviour references in legacy scene assets remain warnings.",
+    "evidenceSource": "Root actual accepted combined-run log review"
+  },
+  "finalObservedState": {
+    "nativePlayer": "open at Home",
+    "cameraActive": false,
+    "dashboard": "independent process receiving setup status"
   }
 }
