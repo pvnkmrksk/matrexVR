@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "validationDate": "2026-10-26",
+  "scope": "Fresh native macOS GUI acquisition with generated Rekkefly demo input, natural experiment completion, recording-library discovery, independent recorder close/collection, and linked pose/video replay. This is software integration QA, not physical-animal or display-timing validation.",
+  "releaseModified": false,
+  "player": {
+    "applicationVersion": "0.3.1-dev",
+    "unityVersion": "6000.3.16f1",
+    "sourceRevision": "44dad0b0b3d9e13dedde9a44770163882ba80776",
+    "sourceState": "working-tree-snapshot",
+    "sourceTreeDirty": true,
+    "runtimeSourceFingerprintSha256": "2b776e823986dc69d42de7c9acaf5e3aa2a210e6a5029ee15f1dad94fbc99b41",
+    "runtimeSourceFileCount": 220,
+    "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint."
+  },
+  "fixes": [
+    {
+      "commit": "c62c4bd9",
+      "behavior": "Finalized recording sessions reject late logger and sidecar writes."
+    },
+    {
+      "commit": "e96b2724",
+      "behavior": "Independent Mac recorder clean exits use Darwin wait status; failed, killed and unverifiable exits remain pending."
+    }
+  ],
+  "freshAcquisition": {
+    "startedThroughGui": true,
+    "saveTrackerVideoEnabledThroughGui": true,
+    "input": "generated native flying demo",
+    "scene": "Night sky (Choice_Selwyn)",
+    "plannedDurationSeconds": 24,
+    "measuredPoseWallClockSpanSeconds": 23.879249,
+    "wallClockSpanIsExposureDuration": false,
+    "rigCount": 1,
+    "configuredSequenceCycles": 1,
+    "storedPoseRows": 2836,
+    "playablePoseRows": 2836,
+    "rejectedPoseRows": 0,
+    "poseRowsAuthoredByTestProbe": false,
+    "naturalCompletion": true,
+    "writersDrained": true,
+    "finalizationError": null,
+    "earlierFreshRunPoseRows": 2804,
+    "earlierRunExposedDetachedExitAcknowledgmentBug": true
+  },
+  "recordingLibrary": {
+    "actualGuiRecordingsListed": 2,
+    "newestAutomaticallySelected": true,
+    "selectedReplayStartedThroughGui": true,
+    "productionLibraryDiscoveredFreshRun": true,
+    "productionLibraryCanReplayFreshRun": true,
+    "postCollectionMetadataRequiresFreshSummary": true,
+    "postCollectionSummaryBehavior": "Media collection changes recording metadata; the library rescans rather than trusting a stale finalized summary."
+  },
+  "recorderCollection": {
+    "independentTrackerLifetime": true,
+    "closedThroughNativeCmdQ": true,
+    "persistedDarwinCleanExitMarkerObserved": true,
+    "collectedAfterUnityRestart": true,
+    "archivedClips": 1,
+    "videoCodec": "MJPG",
+    "videoWidth": 640,
+    "videoHeight": 480,
+    "videoFrameCount": 1709,
+    "nominalFramesPerSecond": 60.0,
+    "originalZipPreserved": true,
+    "originalZipIncludesLaterCollectedMedia": false
+  },
+  "linkedReplay": {
+    "defaultGodsEyeViewObserved": true,
+    "fullAnimalViewToggleObserved": true,
+    "playPauseObserved": true,
+    "guiScrubs": [
+      {
+        "direction": "forward",
+        "replaySeconds": 19.762,
+        "displayedVideoFrameOneBased": 1204
+      },
+      {
+        "direction": "backward",
+        "replaySeconds": 4.963,
+        "displayedVideoFrameOneBased": 316
+      }
+    ],
+    "associationMode": "consumed-frame-id",
+    "associationMeaning": "Recorded software-consumed tracker frame identity and source-clock timestamp; not a hardware exposure or LED presentation timestamp.",
+    "actualConsumedInputAnchors": 2822,
+    "exactPoseIdentityJoins": 2822,
+    "firstMiddleLastFrameResolutionAndNativeJpegComparisonPassed": true,
+    "productionParserResolverChecksPassed": 37
+  },
+  "recordedDashboard": {
+    "earlierFreshRunGuiSeekSeconds": 18.0,
+    "unityClockObservedAfterDashboardSeekSeconds": 18.0,
+    "styledDashboardFinalVisualStatus": "Pending final root walkthrough; not counted as validated here."
+  },
+  "preservation": {
+    "priorRecordingFilesChecked": 69,
+    "priorRecordingFilesUnchanged": 69,
+    "freshPoseAndNativeSourceFilesChecked": 4,
+    "freshPoseAndNativeSourceFilesUnchanged": 4,
+    "privateRawDataPublished": false
+  },
+  "validationLimits": [
+    "Computer-control window routing was intermittent and required restarts and CLI replay bootstrapping before returning to the GUI library. A seamless uninterrupted walkthrough is not claimed.",
+    "No physical camera, animal, multi-monitor setup or LED scanout was validated in this fresh-run exercise.",
+    "No Windows or Linux player walkthrough was performed for these changes.",
+    "No new 300-reload endurance result is claimed. Earlier frozen-release Editor endurance evidence has its own report.",
+    "The cause of the historical Unity scene-reset crash has not been established.",
+    "Nominal video frame rate and pose wall-clock spans are not measured hardware exposure or stimulus timing."
+  ]
+}
