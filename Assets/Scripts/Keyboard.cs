@@ -36,11 +36,11 @@ public class Keyboard : MonoBehaviour
 
     public void ApplyInput(float deltaTime)
     {
-        if (!manualEnabled || ExperimentInput.IsEditingText) return;
-        if (ExperimentInput.ControlHeld && ExperimentInput.Pressed("Pause"))
+        bool manualInput = manualEnabled && !ExperimentInput.IsEditingText;
+        if (manualInput && ExperimentInput.ControlHeld && ExperimentInput.Pressed("Pause"))
             autopilotEnabled = !autopilotEnabled;
         // One adjustment per press, independent of frame rate. No simultaneous movement.
-        if (ExperimentInput.Held("SpeedModifier"))
+        if (manualInput && ExperimentInput.Held("SpeedModifier"))
         {
             if (ExperimentInput.Pressed("SpeedUp")) translateSpeed += 1f;
             if (ExperimentInput.Pressed("SpeedDown")) translateSpeed -= 1f;
@@ -50,7 +50,9 @@ public class Keyboard : MonoBehaviour
             rotateSpeed = Mathf.Clamp(rotateSpeed, 0, maxRotateSpeed);
             return;
         }
-        Vector2 move = ExperimentInput.Move;
+        // Hardware configurations may disable operator keys without disabling
+        // the experiment's configured forward motion.
+        Vector2 move = manualInput ? ExperimentInput.Move : Vector2.zero;
         // Autopilot supplies a constant forward velocity while retaining lateral,
         // reverse and yaw input for Mario Kart-style steering.
         float manualForward = move.y * translateSpeed;
@@ -58,10 +60,11 @@ public class Keyboard : MonoBehaviour
         float forward = (autopilotEnabled ? autopilotSpeed : 0f) + manualForward;
         bool terrainControlled = GetComponent<RugosityRig>()?.ControlsPose ?? false;
         Vector3 translation = new Vector3(move.x * translateSpeed,
-            allowVerticalTranslation && !terrainControlled ? ExperimentInput.Axis("Vertical") * translateSpeed : 0,
+            manualInput && allowVerticalTranslation && !terrainControlled ? ExperimentInput.Axis("Vertical") * translateSpeed : 0,
             forward) * deltaTime;
         if (terrainControlled) transform.position += Quaternion.Euler(0, transform.eulerAngles.y, 0) * translation;
         else transform.Translate(translation, Space.Self);
+        if (!manualInput) return;
         Quaternion before = transform.rotation;
         transform.Rotate(new Vector3(allowPitchAndRoll && !terrainControlled ? ExperimentInput.Axis("Pitch") : 0,
             ExperimentInput.Axis("Yaw"), allowPitchAndRoll && !terrainControlled ? ExperimentInput.Axis("Roll") : 0) * (rotateSpeed * deltaTime),
