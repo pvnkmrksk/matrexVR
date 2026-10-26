@@ -146,6 +146,19 @@ static class Regression
             interruptedFinalizer.MarkShutdown(false,new JObject{["pending"]=true,["complete"]=false});never.SetResult(true);waiting.GetAwaiter().GetResult();
             var onDisk=JObject.Parse(File.ReadAllText(Path.Combine(interrupted,RecordingSummary.ManifestName)));
             Check((string)onDisk["lifecycle"]["status"]=="open"&&!(bool)onDisk["lifecycle"]["writersDrained"]&&!File.Exists(Path.Combine(root,"interrupted.zip")),"shutdown cannot promise pending media/summary/archive completion");
+            for(int mask=0;mask<16;mask++)
+            {
+                var rig=new JObject{["tracker"]=new JObject{["saveVideo"]=(mask&1)!=0}};
+                var evidence=new JObject{["identityVerified"]=(mask&2)!=0,["matchesConfiguredRig"]=(mask&4)!=0,["savedVideoRequested"]=(mask&8)!=0};
+                Check(ActualMediaOwnership.ShouldRetainMediaSource(rig,evidence)==(mask==15),"media source requires configured request, matching owned identity and launch request: "+mask);
+            }
+            var ownedRig=new JObject{["tracker"]=new JObject{["saveVideo"]=true}};
+            var ownedEvidence=new JObject{["identityVerified"]=true,["matchesConfiguredRig"]=true,["savedVideoRequested"]=true};
+            Check(!ActualMediaOwnership.ShouldRetainMediaSource(null,ownedEvidence)&&!ActualMediaOwnership.ShouldRetainMediaSource(ownedRig,null),"missing media ownership stays unavailable");
+            Check(!ActualMediaOwnership.ShouldRetainMediaSource(new JObject{["tracker"]="invalid"},ownedEvidence),"malformed tracker object cannot retain source");
+            ownedRig["tracker"]["saveVideo"]="true";Check(!ActualMediaOwnership.ShouldRetainMediaSource(ownedRig,ownedEvidence),"string request is not boolean recording evidence");
+            ownedRig["tracker"]["saveVideo"]=true;ownedEvidence["savedVideoRequested"]=null;
+            Check(!ActualMediaOwnership.ShouldRetainMediaSource(ownedRig,ownedEvidence),"legacy launch without recorder request is not promoted to video evidence");
             Console.WriteLine("PASS: "+checks+" production recording-summary checks; read-only scans and no Unity rendering claim.");
         }
         finally {Directory.Delete(root,true);}

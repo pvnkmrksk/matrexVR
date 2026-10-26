@@ -28,6 +28,14 @@ def main():
     with tempfile.TemporaryDirectory(prefix='matrex-recording-summary-') as temporary:
         root = Path(temporary)
         includes = ''.join(f'<Compile Include="{escape(str(repo / path))}"/>' for path in paths)
+        source=(repo/'Assets/Scripts/Loggers/MasterDataLogger.cs').read_text()
+        start=source.index('internal static bool ShouldRetainMediaSource(')
+        opening=source.index('{',start);depth=1;end=opening+1
+        while depth:
+            depth+=(source[end]=='{')-(source[end]=='}');end+=1
+        ownership=root/'ActualMediaOwnership.cs'
+        ownership.write_text('using Newtonsoft.Json.Linq;\nstatic class ActualMediaOwnership {\n'+source[start:end]+'\n}\n')
+        includes+=f'<Compile Include="{escape(str(ownership))}"/>'
         project = root / 'RecordingSummary.csproj'
         project.write_text(f'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net{max(versions)}.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup><ItemGroup><Reference Include="Newtonsoft.Json"><HintPath>{escape(str(dll.resolve()))}</HintPath></Reference>{includes}</ItemGroup></Project>')
         config = root / 'NuGet.Config'

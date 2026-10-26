@@ -109,13 +109,14 @@ public class MasterDataLogger : MonoBehaviour
 
     private void CaptureNativeCompanions(string systemReference,string scene)
     {
+        bool mediaRigsResolved = false;
         try
         {
             // Read the selected archived document: Main's runtime rigs are loaded
             // after BeginConfiguredSession and may still describe the previous run.
             var system=JObject.Parse(ConfigArchive.ReadText(systemReference,"system",scene));
-            mediaSession?.RetainRigs((system["configs"] as JArray ?? new JArray()).OfType<JObject>().Select(rig => (string)rig["vrId"]).Where(id => !string.IsNullOrWhiteSpace(id)));
             var launches=new List<JObject>();
+            var retainedMediaRigs = new List<string>();
             foreach(var rig in (system["configs"] as JArray??new JArray()).OfType<JObject>())
             {
                 string id=(string)rig["vrId"];if(string.IsNullOrWhiteSpace(id))continue;
@@ -129,11 +130,25 @@ public class MasterDataLogger : MonoBehaviour
                 evidence["configuredDemoRequested"]=requestedDemo;
                 evidence["matchesConfiguredRig"]=local&&(string)evidence["backend"]==backend&&(int?)evidence["port"]==port&&
                     (!requestedDemo.HasValue||(bool?)evidence["demoRequested"]==requestedDemo.Value);
+                if (ShouldRetainMediaSource(rig, evidence)) retainedMediaRigs.Add(id);
                 launches.Add(evidence);
             }
+            mediaSession?.RetainRigs(retainedMediaRigs); mediaRigsResolved = true;
             ConfigArchive.CaptureCompanions(launches,scene);
         }
-        catch(Exception error) {Debug.LogWarning("Native tracker provenance is unavailable for this run: "+error.Message);}
+        catch(Exception error)
+        {
+            if (!mediaRigsResolved) mediaSession?.RetainRigs(Array.Empty<string>());
+            Debug.LogWarning("Native tracker provenance is unavailable for this run: "+error.Message);
+        }
+    }
+
+    // Identity and requested configuration are evidence of ownership, not camera/recorder success.
+    internal static bool ShouldRetainMediaSource(JObject rig, JObject evidence)
+    {
+        bool True(JToken value) => value?.Type == JTokenType.Boolean && value.Value<bool>();
+        return rig?["tracker"] is JObject tracker && True(tracker["saveVideo"]) &&
+            True(evidence?["identityVerified"]) && True(evidence?["matchesConfiguredRig"]) && True(evidence?["savedVideoRequested"]);
     }
 
 
