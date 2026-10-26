@@ -47,6 +47,9 @@ public static class Regression
             File.WriteAllText(Path.Combine(root,"z-earlier.csv"),Header+"\n"+Row("10:00:00.000","VR1","Choice",0,0,0)+"\n"+Row("10:00:01.000","VR1","Choice",0,1,1)+"\n");
             Gzip(Path.Combine(root,"second-rig.csv.gz"),Header+"\n"+Row("10:00:02.000","VR5","Choice",0,2,10,"\"Choice, quoted.json\"")+"\n");
             File.WriteAllText(Path.Combine(root,"unrelated.csv"),"Timestamp,skyboxId\n2026-01-01 10:00:00.000,foo\n");
+            string setup=Path.Combine(root,"setup-and-replay.csv");
+            File.WriteAllText(setup,Header+"\n"+Row("09:00:00.000","VR99","ControlScene",0,999,0)+"\n"+Row("12:00:00.000","VR99","ReplayScene",0,999,0)+"\n");
+            byte[] setupBytes=File.ReadAllBytes(setup);
             var archive=new ReplaySessionArchive(root);archive.LoadRigSamples();
             Check(archive.Rigs.Count==2,"both animal IDs load, including VR5");
             Check(archive.Rigs["VR1"].Count==4,"all scene CSVs append to the animal track");
@@ -54,6 +57,17 @@ public static class Regression
             Check(archive.Rigs["VR5"][0].time==2,"different animals share acquisition origin");
             Check(archive.Rigs["VR5"][0].configFile=="Choice, quoted.json","quoted CSV names survive");
             Check(archive.Rigs["VR1"][2].position.x==19,"shuffled rows are sorted");
+            Check(!archive.Rigs.ContainsKey("VR99") && archive.Warnings.Any(w=>w.Contains("excluded 2 setup/replay pose rows")),"setup/replay rows neither create animal tracks nor silently enter playback");
+            Check(File.ReadAllBytes(setup).SequenceEqual(setupBytes),"filtering never rewrites original recordings");
+            string legacyScenes=Path.Combine(root,"legacy-blank-scenes");Directory.CreateDirectory(legacyScenes);
+            File.WriteAllText(Path.Combine(legacyScenes,"20260101_100000_Choice_VR1_.csv"),Header+"\n"+Row("10:00:00.000","VR1","",0,1,0)+"\n");
+            File.WriteAllText(Path.Combine(legacyScenes,"20260101_090000_ControlScene_VR1_.csv"),Header+"\n"+Row("09:00:00.000","VR1","",0,999,0)+"\n");
+            Gzip(Path.Combine(legacyScenes,"20260101_120000_ReplayScene_VR1_.csv.gz"),Header+"\n"+Row("12:00:00.000","VR1","",0,999,0)+"\n");
+            string noSceneHeader=Header.Replace(",Scene","");
+            string noSceneRow=string.Join(",",Row("13:00:00.000","VR1","",0,999,0).Split(',').Where((_,index)=>index!=2));
+            File.WriteAllText(Path.Combine(legacyScenes,"20260101_130000_ReplayScene_VR1_.csv"),noSceneHeader+"\n"+noSceneRow+"\n");
+            var legacySceneArchive=new ReplaySessionArchive(legacyScenes);legacySceneArchive.LoadRigSamples();
+            Check(legacySceneArchive.Rigs["VR1"].Count==1 && legacySceneArchive.Duration==0 && legacySceneArchive.Rigs["VR1"][0].position.x==1,"blank/missing Scene uses reserved legacy filename fallback without dropping ordinary legacy experiment rows");
             Check(archive.ExperimentFor(archive.Rigs["VR1"][0])?["objects"] is JArray,"legacy run's own config is loaded");
             Reject(()=>archive.SafePath("../outside.json"),"traversal accepted");
             Reject(()=>archive.SafePath("Configs/Files/../../../outside.json"),"nested traversal accepted");
