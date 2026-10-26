@@ -71,7 +71,7 @@ public static class Regression
                     var owned=TrackerProcessManager.RecordingProvenance(rig.vrId);
                     Check((bool)owned["identityVerified"]&&(bool)owned["processRunning"]&&(string)owned["backend"]==TrackerBackend.DisplayName(mode)&&(string)owned["configFile"]==config&&((string)owned["executableSha256"]).Length==64,"Run provenance captures exact owned process and config: "+mode);
                     Check((string)owned["actualInputSource"]=="unverified","Process ownership never claims a measured camera source: "+mode);
-                    string before=TrackerProcessManager.Status(rig.vrId);manager.Launch(rig);Check(TrackerProcessManager.Status(rig.vrId)==before,"Repeated Start reuses the same native process: "+mode);
+                    rig.tracker.saveVideo=true;Reject(()=>CompanionCatalog.Prepare(rig,true),"Running recorder transition rejects before native calibration is touched: "+mode);rig.tracker.saveVideo=false;string before=TrackerProcessManager.Status(rig.vrId);manager.Launch(rig);Check(TrackerProcessManager.Status(rig.vrId)==before,"Repeated Start reuses the same native process: "+mode);
                     string backend=TrackerBackend.DisplayName(mode);
                     rig.closedLoopMode=mode==ClosedLoopMode.Rekkefly?ClosedLoopMode.Hejjetrac:ClosedLoopMode.Rekkefly;
                     Check(TrackerProcessManager.Status(rig.vrId).StartsWith(backend+" running"),"Owned process status retains its original backend after selection edits: "+mode);
@@ -113,15 +113,15 @@ public static class Regression
                 foreach(var mode in new[]{ClosedLoopMode.Rekkefly,ClosedLoopMode.Hejjetrac})
                 {
                     var cameraRig=new SystemConfig{vrId="VR-VIDEO-"+mode,closedLoopMode=mode,zmqPort=9894,zmqAddress="localhost",tracker=new TrackerLaunchConfig()};
-                    var canonical=CompanionCatalog.Prepare(cameraRig,true);string canonicalText=File.ReadAllText(canonical.rig.tracker.configFile);
+                    var canonical=CompanionCatalog.Prepare(cameraRig,true);File.AppendAllText(canonical.rig.tracker.configFile,"\n# shared calibration sentinel\n");string canonicalText=File.ReadAllText(canonical.rig.tracker.configFile);
                     Check(!canonical.rig.tracker.saveVideo,"Video defaults off: "+mode);cameraRig.tracker.saveVideo=true;var video=CompanionCatalog.Prepare(cameraRig,true);
-                    Check(video.rig.tracker.saveVideo&&video.rig.tracker.configFile!=canonical.rig.tracker.configFile,"Opt-in video uses separate calibration profile: "+mode);
-                    Check(File.ReadAllText(canonical.rig.tracker.configFile)==canonicalText,"Opt-in video preserves canonical calibration bytes: "+mode);
+                    Check(video.rig.tracker.saveVideo&&video.rig.tracker.configFile==canonical.rig.tracker.configFile,"Opt-in video keeps one canonical calibration profile: "+mode);
+                    Check(File.ReadAllText(canonical.rig.tracker.configFile).Contains("shared calibration sentinel"),"Recording option changes preserve canonical calibration edits: "+mode);
                     string recording=File.ReadAllText(video.rig.tracker.configFile);
                     Check(mode==ClosedLoopMode.Rekkefly?recording.Contains("\"mjpeg\"")&&recording.Contains("enabled = true"):recording.Contains("save_raw : y")&&recording.Contains("vid_codec : mjpg"),"Both bundled recorders prefer directly readable intra-frame AVI: "+mode);
                     Check(Path.IsPathFullyQualified(video.rig.tracker.recordingDirectory),"Native recording root is explicit for later collection: "+mode);
                     File.AppendAllText(video.rig.tracker.configFile,"\n# video calibration edit\n");var again=CompanionCatalog.Prepare(cameraRig,true);
-                    Check(File.ReadAllText(again.rig.tracker.configFile).Contains("video calibration edit"),"Repeated preparation keeps operator recording calibration: "+mode);
+                    Check(File.ReadAllText(again.rig.tracker.configFile).Contains("video calibration edit"),"Repeated preparation keeps operator recording calibration: "+mode);cameraRig.tracker.saveVideo=false;var off=CompanionCatalog.Prepare(cameraRig,true);Check(off.rig.tracker.configFile==again.rig.tracker.configFile&&File.ReadAllText(off.rig.tracker.configFile).Contains("video calibration edit"),"Switching recording off retains the same newly edited calibration: "+mode);
                 }
             }
             finally{Environment.SetEnvironmentVariable("MATREX_COMPANION_DIR",originalBundle);}

@@ -124,6 +124,13 @@ public sealed class TrackerProcessManager : MonoBehaviour
     }
     public static string BundledAvailability(SystemConfig rig)=>CompanionCatalog.Availability(rig);
     public static bool CanLaunchBundled(SystemConfig rig)=>CompanionCatalog.IsAvailable(rig);
+    public static void RequireRecordingTransitionReady(SystemConfig rig)
+    {
+        if(rig==null||string.IsNullOrWhiteSpace(rig.vrId))return;
+        var receipt=Read(rig.vrId);
+        using(var process=Match(receipt,false))if(process!=null&&receipt.saveVideo!=(rig.tracker?.saveVideo??false))
+            throw new InvalidOperationException("Close this independent tracker explicitly before changing Save tracker video; its calibration and current recorder were left unchanged.");
+    }
     public void LaunchPrepared(CompanionCatalog.Prepared prepared)
     {
         if(prepared==null||prepared.rig==null)throw new ArgumentException("Prepare the bundled tracker first.");
@@ -208,7 +215,9 @@ public sealed class TrackerProcessManager : MonoBehaviour
     }
     private static void RegisterMedia(Receipt receipt)
     {
-        if(receipt==null||!receipt.saveVideo||string.IsNullOrWhiteSpace(receipt.recordingDirectory))return;
+        if(receipt==null)return;
+        if(!receipt.saveVideo){CompanionMediaArchive.ClearLaunchedSource(receipt.vrId);return;}
+        if(string.IsNullOrWhiteSpace(receipt.recordingDirectory))return;
         CompanionMediaArchive.RegisterLaunchedSource(new MediaRecordingSource{RigId=receipt.vrId,Backend=receipt.backend,DirectoryPath=receipt.recordingDirectory,
             ChildDirectoryPrefix=receipt.recordingPrefix??"",NotBeforeUtcTicks=receipt.startUtcTicks,TrackerSessionId=receipt.processId+"-"+receipt.startUtcTicks,
             ExecutableSha256=receipt.executableSha256,State="pending"});

@@ -68,12 +68,14 @@ public static class CompanionCatalog
     }
     public static Prepared Prepare(SystemConfig source,bool demo)
     {
+        TrackerProcessManager.RequireRecordingTransitionReady(source);
         string bundleRoot;var entry=Find(source,out bundleRoot);
         var clone=JsonConvert.DeserializeObject<SystemConfig>(JsonConvert.SerializeObject(source));
         return PrepareCore(clone,demo,entry,bundleRoot,Application.persistentDataPath,RuntimePaths.ConfigRoot);
     }
     public static Task<Prepared> PrepareAsync(SystemConfig source,bool demo)
     {
+        TrackerProcessManager.RequireRecordingTransitionReady(source);
         // Every Unity path/property is captured on the caller's main thread. Only
         // hashing, copying and plain configuration I/O run on the worker.
         string bundleRoot;var entry=Find(source,out bundleRoot);
@@ -112,30 +114,30 @@ public static class CompanionCatalog
         }
         bool saveVideo=source.tracker?.saveVideo??false;
         string recordingDirectory="",recordingPrefix="";
-        if(saveVideo)
+        string recordingText=File.ReadAllText(config),updatedRecording=recordingText;
+        if(entry.backend=="rekkefly")
         {
-            // A separate opt-in profile keeps canonical calibration/config text intact.
-            string recordingConfig=Path.Combine(Path.GetDirectoryName(config),Path.GetFileNameWithoutExtension(config)+".video"+Path.GetExtension(config));
-            if(!File.Exists(recordingConfig))
+            updatedRecording=Toml(recordingText,"recording","enabled",saveVideo?"true":"false");
+            if(saveVideo)
             {
-                string text=File.ReadAllText(config);
-                if(entry.backend=="rekkefly")
-                {
-                    recordingDirectory=Path.Combine(persistent,"Companions","recordings","rekkefly",id);
-                    text=Toml(Toml(Toml(text,"recording","enabled","true"),"recording","format",Quote("mjpeg")),"recording","directory",Quote(recordingDirectory));
-                }
-                else text=Field(Field(Field(text,"save_raw","y"),"save_debug","n"),"vid_codec","mjpg");
-                WriteAtomic(recordingConfig,text,createOnly:true);
+                recordingDirectory=Path.Combine(persistent,"Companions","recordings","rekkefly",id);
+                updatedRecording=Toml(Toml(updatedRecording,"recording","format",Quote("mjpeg")),"recording","directory",Quote(recordingDirectory));
             }
-            config=recordingConfig;
-            if(entry.backend=="rekkefly")recordingDirectory=Path.Combine(persistent,"Companions","recordings","rekkefly",id);
-            else
+        }
+        else
+        {
+            updatedRecording=Field(Field(recordingText,"save_raw",saveVideo?"y":"n"),"save_debug","n");
+            if(saveVideo)
             {
+                updatedRecording=Field(updatedRecording,"vid_codec","mjpg");
                 string user=Environment.GetEnvironmentVariable("USERPROFILE")??Environment.GetEnvironmentVariable("HOME");
                 recordingDirectory=string.IsNullOrEmpty(user)?Path.Combine(Directory.GetCurrentDirectory(),"hejjetrak-recordings"):Path.Combine(user,RuntimeInformation.IsOSPlatform(OSPlatform.OSX)?"Movies":"Videos","hejjetrak");
                 recordingPrefix=id+".hejjetrac.output-";
             }
         }
+        // One calibration per rig/source mode. Only recording fields change; native
+        // calibration edits never diverge between recording and non-recording copies.
+        if(updatedRecording!=recordingText)WriteAtomic(config,updatedRecording,expected:recordingText);
         if(entry.backend=="hejjetrac")
         {
             // This generated profile's transport follows its rig; geometry and calibration text stay untouched.
