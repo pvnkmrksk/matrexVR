@@ -164,10 +164,41 @@ namespace ConfigurationUI
             doc.Edit(change);
             if(rebuild)
             {
-                BuildNavigation(); BuildContent();
-                int version=viewGeneration;state.Restore(root,()=>version==viewGeneration);
+                // A delayed field commits during the next control's pointer-down.
+                // Keep that control alive through pointer-up so its click still runs.
+                if(editPointerHeld)DeferPointerEditRebuild();
+                else RebuildEditedView(state);
             }
             else { RefreshStudioValues(); UpdateStatus(); }
+        }
+        private bool editPointerHeld;
+        private int pendingPointerGeneration;
+        private ConfigDocument pendingPointerSelection;
+        private IVisualElementScheduledItem pendingPointerRebuild;
+        private void InstallEditPointerTracking()
+        {
+            root.RegisterCallback<PointerDownEvent>(e=>{if(e.button==0)editPointerHeld=true;},TrickleDown.TrickleDown);
+            root.RegisterCallback<PointerUpEvent>(e=>{if(e.button==0)editPointerHeld=false;},TrickleDown.TrickleDown);
+            root.RegisterCallback<PointerCancelEvent>(_=>editPointerHeld=false,TrickleDown.TrickleDown);
+        }
+        private void RebuildEditedView(WorkbenchViewState state)
+        {
+            BuildNavigation();BuildContent();
+            int version=viewGeneration;state.Restore(root,()=>version==viewGeneration);
+        }
+        private void DeferPointerEditRebuild()
+        {
+            if(pendingPointerRebuild!=null&&pendingPointerGeneration==viewGeneration&&pendingPointerSelection==selected)return;
+            pendingPointerRebuild?.Pause();pendingPointerGeneration=viewGeneration;pendingPointerSelection=selected;
+            pendingPointerRebuild=root.schedule.Execute(()=>{
+                if(!isActiveAndEnabled||preparing||root.panel==null||pendingPointerGeneration!=viewGeneration||pendingPointerSelection!=selected)
+                {pendingPointerRebuild?.Pause();pendingPointerRebuild=null;return;}
+                if(editPointerHeld)return;
+                pendingPointerRebuild.Pause();pendingPointerRebuild=null;
+                // The clicked control may have opened a foldout or moved focus.
+                // Preserve its completed action, rather than the pre-blur state.
+                RebuildEditedView(WorkbenchViewState.Capture(root));
+            }).Every(1);
         }
         private Toggle StateSwitch(bool value,Action<bool> changed,string name=null)
         {

@@ -83,6 +83,7 @@ namespace ConfigurationUI
                 root.RegisterCallback<GeometryChangedEvent>(evt=>{
                     ApplyResponsiveLayout(evt.newRect.width);
                 });
+                InstallEditPointerTracking();
                 BuildShell(); BuildNavigation(); BuildContent();
                 // Cover the previous form and stop its raycasts; metadata is generated for the actual rig list.
                 foreach(var raycaster in FindObjectsByType<UnityEngine.UI.GraphicRaycaster>(FindObjectsSortMode.None))
@@ -585,9 +586,11 @@ namespace ConfigurationUI
         {if(preparing){preparing=false;preparationVersion++;}}
         private void OnDestroy()
         {
+            pendingPointerRebuild?.Pause();
             foreach(var raycaster in legacyRaycasters) if(raycaster!=null) raycaster.enabled=true;
             if(panel!=null) Destroy(panel);
             if(Instance==this) Instance=null;
         }
+        private void OnApplicationFocus(bool focused){if(!focused)editPointerHeld=false;}
     }
 }
