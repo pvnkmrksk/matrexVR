@@ -9,6 +9,7 @@ using UnityEngine;
 public sealed class DesktopDisplay : MonoBehaviour
 {
     private const string Preference = "Matrex.ApplicationDisplay";
+    private const double WindowMoveTimeoutSeconds = 5;
     private static DesktopDisplay instance;
     private readonly List<DisplayInfo> displays = new List<DisplayInfo>();
     private bool changing;
@@ -63,30 +64,39 @@ public sealed class DesktopDisplay : MonoBehaviour
     private IEnumerator Apply()
     {
         changing = true;
-        Screen.GetDisplayLayout(displays);
-        int index = Mathf.Clamp(SelectedDisplay, 0, Math.Max(0, displays.Count - 1));
-        if (displays.Count > 0)
+        try
         {
-            DisplayInfo destination = displays[index];
-            var move = Screen.MoveMainWindowTo(destination, Vector2Int.zero);
-            if (move != null) yield return move;
-        }
+            Screen.GetDisplayLayout(displays);
+            int index = Mathf.Clamp(SelectedDisplay, 0, Math.Max(0, displays.Count - 1));
+            // The player already opens on a display. Reissuing an asynchronous native
+            // move to that same monitor during Cocoa/fullscreen startup is unnecessary.
+            if (displays.Count > 1 && !displays[index].Equals(Screen.mainWindowDisplayInfo))
+            {
+                AsyncOperation move = null;
+                try { move = Screen.MoveMainWindowTo(displays[index], Vector2Int.zero); }
+                catch (Exception error) { Debug.LogWarning("[DesktopDisplay] Cannot move application window: " + error.Message); }
+                double deadline = Time.realtimeSinceStartupAsDouble + WindowMoveTimeoutSeconds;
+                while (move != null && !move.isDone && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+                if (move != null && !move.isDone)
+                    Debug.LogWarning("[DesktopDisplay] Application display move timed out; continuing fullscreen on the current display.");
+            }
 #if MATREX_ALLOW_WINDOWED
-        // A source build may opt out; production players do not expose a low-resolution window mode.
-        if (Array.IndexOf(Environment.GetCommandLineArgs(), "--windowed") >= 0)
-        { Screen.fullScreenMode = FullScreenMode.Windowed; changing = false; yield break; }
+            // A source build may opt out; production players do not expose a low-resolution window mode.
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "--windowed") >= 0)
+            { Screen.fullScreenMode = FullScreenMode.Windowed; yield break; }
 #endif
-        var native = Screen.currentResolution;
-        int width = native.width, height = native.height;
-        if (width <= 0 || height <= 0)
-        {
-            var display = Screen.mainWindowDisplayInfo;
-            width = display.width; height = display.height;
+            var native = Screen.currentResolution;
+            int width = native.width, height = native.height;
+            if (width <= 0 || height <= 0)
+            {
+                var display = Screen.mainWindowDisplayInfo;
+                width = display.width; height = display.height;
+            }
+            Screen.SetResolution(Math.Max(1, width), Math.Max(1, height), FullScreenMode.FullScreenWindow);
+            yield return null; yield return null;
+            Debug.Log("[DesktopDisplay] Native fullscreen " + Screen.width + "×" + Screen.height + "; UI backing scale " + UiScale + "; " + Screen.mainWindowDisplayInfo.name);
         }
-        Screen.SetResolution(Math.Max(1, width), Math.Max(1, height), FullScreenMode.FullScreenWindow);
-        yield return null; yield return null;
-        Debug.Log("[DesktopDisplay] Native fullscreen " + Screen.width + "×" + Screen.height + "; UI backing scale " + UiScale + "; " + Screen.mainWindowDisplayInfo.name);
-        changing = false;
+        finally { changing = false; }
     }
     private void Update()
     {
