@@ -131,7 +131,7 @@ namespace ConfigurationUI
             }
             // Metadata arriving while a row is being clicked must not recycle it
             // before the pointer-up completes the selection.
-            if(editPointerHeld)return;bool changed=false;
+            if(IsEditPointerHeld())return;bool changed=false;
             while(libraryUpdates.TryDequeue(out var update))
             {
                 if(update.Version!=libraryGeneration)continue;
@@ -171,7 +171,16 @@ namespace ConfigurationUI
             libraryList.RefreshItems();int selectedIndex=libraryVisible.FindIndex(entry=>entry.DirectoryPath==librarySelected);
             if(selectedIndex<0&&libraryVisible.Count>0){selectedIndex=0;librarySelected=libraryVisible[0].DirectoryPath;}
             if(selectedIndex>=0)libraryList.SetSelectionWithoutNotify(new[]{selectedIndex});else libraryList.ClearSelection();
-            libraryEmpty.style.display=libraryVisible.Count==0?DisplayStyle.Flex:DisplayStyle.None;
+            RefreshLibraryEmptyState();
+        }
+        private void RefreshLibraryEmptyState()
+        {
+            if(libraryEmpty==null||libraryList==null)return;
+            bool empty=libraryVisible.Count==0;
+            libraryEmpty.text=libraryRunning?"Reading saved recordings…":!string.IsNullOrWhiteSpace(librarySearch?.value)?"No recordings match your search.":"No recordings found yet. Start an experiment, or Browse to a saved run folder.";
+            libraryEmpty.style.display=empty?DisplayStyle.Flex:DisplayStyle.None;
+            // Hide ListView's built-in 'List is empty' placeholder during indexing.
+            libraryList.style.display=empty?DisplayStyle.None:DisplayStyle.Flex;
         }
         private static bool MatchesLibrarySearch(RecordingLibrary.Entry entry,string search)
         {
@@ -236,6 +245,7 @@ namespace ConfigurationUI
         private void RefreshLibraryFooter(string message=null)
         {
             if(!replayLibraryMode)return;if(message!=null)libraryMessage=message;
+            RefreshLibraryEmptyState();
             bool finishing=LibrarySelectionFinishing;string messageText=finishing?"Finishing recording… This run will be available when its data and media files are complete. Other recordings can still be opened.":libraryMessage??"Choose a recording.";
             if(libraryState!=null)libraryState.text=messageText;
             if(libraryFinalizationState!=null)libraryFinalizationState.style.display=finishing?DisplayStyle.Flex:DisplayStyle.None;
