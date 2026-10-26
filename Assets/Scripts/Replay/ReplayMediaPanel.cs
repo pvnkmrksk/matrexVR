@@ -256,7 +256,7 @@ public sealed class ReplayMediaPanel : IDisposable
             float buttonsY=visibleRect.yMax-62*scale,captionHeight=Mathf.Max(20*scale,buttonsY-y-4*scale);
             GUI.Label(new Rect(x,y,w,captionHeight),caption,textStyle);
             GUI.enabled=interactable && !HasModal && pendingOperation==null && pendingArchive==null;
-            if(GUI.Button(new Rect(x,buttonsY,w*.48f,row),new GUIContent("Import video folder…","Copy finished tracker footage and its logs into this run. Original files are preserved."))){pickerRun=runDirectory;folderPicker=ReplayFolderPicker.ChooseMediaAsync();}
+            if(GUI.Button(new Rect(x,buttonsY,w*.48f,row),new GUIContent("Import video folder…","Copy finished tracker footage and its logs into this run. Original files are preserved.")))ChooseImportFolder();
             if(GUI.Button(new Rect(x+w*.50f,buttonsY,w*.50f,row),new GUIContent("Collect media","Collect app-launched tracker footage once its recorder has closed cleanly. Running trackers are never stopped here.")))RunOperation(token=>MediaArchive.CollectPendingAsync(runDirectory,token));
             buttonsY+=row+3*scale;
             if(GUI.Button(new Rect(x,buttonsY,w*.48f,row),"Refresh videos"))Load(runDirectory,originTicks);
@@ -266,6 +266,12 @@ public sealed class ReplayMediaPanel : IDisposable
             GUI.enabled=true;
         }
         GUI.enabled=true;if(formOpen)DrawImportForm(scale);
+    }
+    private void ChooseImportFolder()
+    {
+        // AppKit runs its native panel modally. Pause before posting it, so the
+        // first Unity frame after it closes cannot add the dialog's elapsed time.
+        pause?.Invoke();pickerRun=runDirectory;folderPicker=ReplayFolderPicker.ChooseMediaAsync();
     }
     private static void DrawImage(Rect rect,Texture image)
     {

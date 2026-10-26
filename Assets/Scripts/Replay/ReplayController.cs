@@ -341,7 +341,7 @@ public class ReplayController : MonoBehaviour
     }
     private void UpdateOverviewControls(UnityEngine.InputSystem.Mouse mouse)
     {
-        if(selectedView>=0 || overview==null || !Application.isFocused || pathFocused || showDetails || mediaPanel?.HasModal==true)
+        if(selectedView>=0 || overview==null || !Application.isFocused || pathFocused || showDetails || folderPicker!=null || mediaPanel?.HasModal==true)
         {overviewDragButton=-1;return;}
         if(mouse==null)overviewDragButton=-1;
         Vector2 position=mouse!=null?mouse.position.ReadValue():Vector2.zero;
@@ -396,6 +396,9 @@ public class ReplayController : MonoBehaviour
 
     private void Update()
     {
+        // Retain the blocked state for the frame that consumes a native picker.
+        bool modalOpen=folderPicker!=null || mediaPanel?.HasModal==true;
+        if(modalOpen)isPlaying=false;
         var mouse=UnityEngine.InputSystem.Mouse.current;
         if(pointerTrace && mouse!=null && (mouse.leftButton.wasPressedThisFrame || mouse.leftButton.wasReleasedThisFrame))
             Debug.Log("[Replay pointer] InputSystem frame="+Time.frameCount+" position="+mouse.position.ReadValue()+" down="+mouse.leftButton.wasPressedThisFrame);
@@ -407,14 +410,8 @@ public class ReplayController : MonoBehaviour
         }
         bool scrubbing=UpdateTimelineScrub(mouse);
         if(archive==null || loading)return;
-        if(recordedDashboard!=null)
-            while(recordedDashboard.TryTakeCommand(out var command))
-            {
-                if(command.Kind=="seek")Seek(command.Seconds);
-                else if(command.Kind=="play")isPlaying=true;
-                else if(command.Kind=="pause")isPlaying=false;
-            }
-        if(!pathFocused && mediaPanel?.HasModal!=true && mediaPanel?.TextFocused!=true)
+        ApplyRecordedDashboardCommands(modalOpen);
+        if(!pathFocused && !modalOpen && mediaPanel?.TextFocused!=true)
         {
             if(ExperimentInput.Pressed(togglePlayKey,KeyCode.Space,"Pause"))isPlaying=!isPlaying;
             float step=ExperimentInput.Held("SpeedModifier")?largeStepSeconds:smallStepSeconds;
@@ -425,12 +422,25 @@ public class ReplayController : MonoBehaviour
             UpdateOverviewControls(mouse);
         }
         else overviewDragButton=-1;
-        if(isPlaying && !scrubbing && (environmentLoader==null || !environmentLoader.Loading))
+        if(isPlaying && !scrubbing && !modalOpen && (environmentLoader==null || !environmentLoader.Loading))
         {
             replayTime+=Time.unscaledDeltaTime*Mathf.Max(.01f,playbackSpeed);
             if(replayTime>Duration){if(loop && Duration>0)replayTime%=Duration;else{replayTime=Duration;isPlaying=false;}}
         }
         RenderFrame();
+    }
+    private void ApplyRecordedDashboardCommands(bool modalOpen)
+    {
+        if(recordedDashboard==null)return;
+        while(recordedDashboard.TryTakeCommand(out var command))
+        {
+            // Taking the command acknowledges it. Discard blocked requests so a
+            // browser click during an import cannot resume or seek after Cancel.
+            if(modalOpen)continue;
+            if(command.Kind=="seek")Seek(command.Seconds);
+            else if(command.Kind=="play")isPlaying=true;
+            else if(command.Kind=="pause")isPlaying=false;
+        }
     }
     private void RenderFrame()
     {
@@ -611,7 +621,7 @@ public class ReplayController : MonoBehaviour
     private bool UpdateTimelineScrub(UnityEngine.InputSystem.Mouse mouse)
     {
         if(!timelineMouseCaptured)return false;
-        if(archive==null || loading || mediaPanel?.HasModal==true || OperatorOverlayVisibility.Hidden || !Application.isFocused ||
+        if(archive==null || loading || folderPicker!=null || mediaPanel?.HasModal==true || OperatorOverlayVisibility.Hidden || !Application.isFocused ||
             mouse==null || !mouse.added || !mouse.enabled)
         {timelineMouseCaptured=timelineMouseUpSeen=false;return false;}
         bool released=mouse.leftButton.wasReleasedThisFrame || (timelineMouseUpSeen && !mouse.leftButton.isPressed);
@@ -695,7 +705,7 @@ public class ReplayController : MonoBehaviour
         float left=area.x+10*scale,top=area.y+6*scale,width=area.width-20*scale,rowHeight=30*scale,x=left;
         TraceReplayButton("root-toolbar",area);
         GUI.Label(ReplayControlRect(ref x,top,185*scale,rowHeight),"Experiment replay",titleStyle);
-        GUI.enabled=mediaPanel?.HasModal!=true;
+        GUI.enabled=folderPicker==null && mediaPanel?.HasModal!=true;
         if(GUI.Button(ReplayControlRect(ref x,top,120*scale,rowHeight),new GUIContent("Back to setup","Return to experiment setup. Shortcut: Esc.")))
         {
             GUI.matrix=previousMatrix;GUI.skin=previousSkin;
@@ -707,7 +717,7 @@ public class ReplayController : MonoBehaviour
         folderInput=GUI.TextField(new Rect(x,top,Mathf.Max(100*scale,browseX-4-x),rowHeight),folderInput);
         pathFocused=GUI.GetNameOfFocusedControl()=="Replay run folder";
         GUI.enabled=!loading && folderPicker==null && mediaPanel?.HasModal!=true;
-        if(ReplayButton(new Rect(browseX,top,80*scale,rowHeight),"Browse…"))folderPicker=ReplayFolderPicker.ChooseAsync();
+        if(ReplayButton(new Rect(browseX,top,80*scale,rowHeight),"Browse…")){isPlaying=false;folderPicker=ReplayFolderPicker.ChooseAsync();}
         if(ReplayButton(new Rect(openX,top,125*scale,rowHeight),"Open run folder"))LoadSession(folderInput);
         GUI.enabled=true;
         top+=rowHeight+4;
@@ -716,7 +726,7 @@ public class ReplayController : MonoBehaviour
         else if(archive==null)GUI.Label(new Rect(left,top,width,60*scale),"Paste a saved run folder, or launch with --replay-session <folder>. In Unity Editor, drop a folder anywhere in this window.",smallStyle);
         else
         {
-            GUI.enabled=mediaPanel?.HasModal!=true;
+            GUI.enabled=folderPicker==null && mediaPanel?.HasModal!=true;
             x=left;playContent.text=isPlaying?"Pause":"Play";
             Rect playRect=ReplayControlRect(ref x,top,64*scale,rowHeight);
             TraceReplayButton("pause-before",playRect);
@@ -793,7 +803,7 @@ public class ReplayController : MonoBehaviour
             }
         }
 #endif
-        mediaPanel?.Draw(scale,smallStyle,!loading);
+        mediaPanel?.Draw(scale,smallStyle,!loading && folderPicker==null);
         if(GUIUtility.hotControl==0)replayPointerControl=0;
         else if(entryType==EventType.MouseDown && Event.current.type==EventType.Used)replayPointerControl=GUIUtility.hotControl;
         GUI.matrix=previousMatrix;GUI.skin=previousSkin;
