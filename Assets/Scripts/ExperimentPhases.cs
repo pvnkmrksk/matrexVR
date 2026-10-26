@@ -102,7 +102,7 @@ public sealed class ExperimentPhases : MonoBehaviour
             step = MainController.Instance?.currentStep, skyId = NightSkyController.CurrentId,
             rigs = references.Where(r => r != null).Select(r => new { rig = r.name, reference = r.Result }) });
         Debug.Log("Experiment phase: " + record);
-        if (MasterDataLogger.Instance != null)
+        if (MasterDataLogger.Instance != null && MasterDataLogger.Instance.AcceptingWrites)
             File.AppendAllText(Path.Combine(MasterDataLogger.Instance.directoryPath, "experiment_phases.jsonl"), record + "\n");
     }
 

@@ -41,6 +41,7 @@ public class DataLogger : MonoBehaviour
     /// </summary>
     protected StreamWriter logFile;
     protected bool logInitialized;
+    private bool closedForArchive;
 
     /// <summary>
     /// Buffer for lines to be written to the log file
@@ -172,6 +173,7 @@ public class DataLogger : MonoBehaviour
     /// </summary>
     protected virtual void Start()
     {
+        if (closedForArchive) return;
         // Find dependencies
         mainController = FindObjectOfType<MainController>();
         zmq = GetComponent<ZmqListener>();
@@ -180,6 +182,7 @@ public class DataLogger : MonoBehaviour
         MasterDataLogger masterDataLogger = FindObjectOfType<MasterDataLogger>();
         if (masterDataLogger != null)
         {
+            if (!masterDataLogger.AcceptingWrites) { closedForArchive = true; return; }
             directoryPath = masterDataLogger.directoryPath;
             bufferedLines = new List<string>();
             AddColumns("stepIndex", "stepName", "loopIndex", "cumulativeStep"); 
@@ -215,6 +218,7 @@ public class DataLogger : MonoBehaviour
     /// </summary>
     public virtual void InitLog()
     {
+        if (closedForArchive) return;
         if (logInitialized && logFile != null)
         {
             return;
@@ -228,6 +232,8 @@ public class DataLogger : MonoBehaviour
             return;
         }
 
+        if (!masterDataLogger.AcceptingWrites) { closedForArchive = true; return; }
+        directoryPath = masterDataLogger.directoryPath;
         string timestamp = masterDataLogger.timestamp;
         string gameObjectName = this.gameObject.name;
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
@@ -483,6 +489,7 @@ public class DataLogger : MonoBehaviour
     /// <param name="line">The line to log</param>
     protected virtual void LogData(string line)
     {
+        if (closedForArchive || !isLogging || logFile == null) return;
         if (isBuffering)
         {
             if (isFirstLine)
@@ -508,6 +515,7 @@ public class DataLogger : MonoBehaviour
 
     public void CloseForArchive()
     {
+        closedForArchive = true;
         isLogging = false;
         isBuffering = false;
         FlushBufferedLinesImmediate();

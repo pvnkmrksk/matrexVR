@@ -172,7 +172,7 @@ public sealed class StimulusHeadingReference : MonoBehaviour
                 step = main != null ? main.currentStep : 0, savedAs = config.saveAs,
                 measureDuringPresentation = config.measureDuringPresentation, reference = Result });
             Debug.Log("Heading reference presented: " + record);
-            if (MasterDataLogger.Instance != null)
+            if (MasterDataLogger.Instance != null && MasterDataLogger.Instance.AcceptingWrites)
                 File.AppendAllText(Path.Combine(MasterDataLogger.Instance.directoryPath, "heading_reference.jsonl"), record + "\n");
         }
         catch (Exception error)

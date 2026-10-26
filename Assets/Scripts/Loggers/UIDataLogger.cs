@@ -107,6 +107,9 @@ public class UIDataLogger : MonoBehaviour
 
     private void SaveNormalData(string jsonContent)
     {
+        var master = MasterDataLogger.Instance;
+        // The legacy form may survive a stop/rotation; its cached run must stay sealed.
+        if (master == null || !master.AcceptingWrites || directoryPath != master.directoryPath) return;
         string fileName = GenerateFileName();
         try
         {

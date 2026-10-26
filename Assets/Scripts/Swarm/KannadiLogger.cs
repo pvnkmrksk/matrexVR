@@ -15,15 +15,18 @@ public class KannadiLogger : MonoBehaviour
     private string directoryPath;
     private string logPath;
     private StreamWriter logFile;
+    private bool closedForArchive;
     private Kannadi kannadi;
     private int vrIndex = 0; // Will be extracted from GameObject name (VR1, VR2, etc.)
 
     void Start()
     {
+        if (closedForArchive) return;
         // Access directoryPath from MasterDataLogger
         MasterDataLogger masterDataLogger = FindObjectOfType<MasterDataLogger>();
         if (masterDataLogger != null)
         {
+            if (!masterDataLogger.AcceptingWrites) { closedForArchive = true; return; }
             directoryPath = masterDataLogger.directoryPath;
         }
         else
@@ -94,6 +97,7 @@ public class KannadiLogger : MonoBehaviour
 
     public void CloseForArchive()
     {
+        closedForArchive = true;
         if (logFile != null)
         {
             logFile.Flush();

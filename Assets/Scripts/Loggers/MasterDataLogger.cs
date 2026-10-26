@@ -27,6 +27,8 @@ public class MasterDataLogger : MonoBehaviour
     public Task<JObject> FinalizationTask => recording?.FinalizationTask;
     public bool IsFinalizing => FinalizationTask != null && !FinalizationTask.IsCompleted;
     public string FinalizationError => recording?.Error;
+    /// <summary>Scene loggers may open files only until this session starts finalizing.</summary>
+    public bool AcceptingWrites { get; private set; }
 
     // Create timestamp variable that can be publicly accessed but not changed with get methods only
     public string timestamp { get; private set; }
@@ -105,6 +107,7 @@ public class MasterDataLogger : MonoBehaviour
     {
         recording = new RecordingSessionFinalizer(directoryPath, Path.Combine(RuntimePaths.RunDataRoot, timestamp + ".zip"), PlayerBuildIdentity.Capture());
         mediaSession = CompanionMediaArchive.BeginSession(directoryPath, timestamp);
+        AcceptingWrites = true;
     }
 
     private void CaptureNativeCompanions(string systemReference,string scene)
@@ -155,6 +158,8 @@ public class MasterDataLogger : MonoBehaviour
     /// <summary>Call on Unity's main thread. Closing scene writers is immediate; drain, analysis, media and ZIP run off-thread.</summary>
     public Task<JObject> FinalizeSessionAsync(string endReason)
     {
+        // Close the gate before discovering writers: inactive components can Start later.
+        AcceptingWrites = false;
         if (recording == null) return Task.FromResult<JObject>(null);
         if (FinalizationTask != null) return FinalizationTask;
         var errors = CloseWriters();
@@ -170,6 +175,7 @@ public class MasterDataLogger : MonoBehaviour
 
     private List<string> CloseWriters()
     {
+        AcceptingWrites = false;
         var errors = new List<string>();
         lock (runtimeTraceLock)
         {
@@ -220,6 +226,7 @@ public class MasterDataLogger : MonoBehaviour
     void OnDestroy()
     {
         if (Instance != this) return;
+        AcceptingWrites = false;
         Application.logMessageReceivedThreaded -= HandleLogMessage;
         Application.wantsToQuit -= WantsToQuit;
         try

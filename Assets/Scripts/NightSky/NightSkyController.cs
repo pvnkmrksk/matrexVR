@@ -23,7 +23,7 @@ public sealed class NightSkyController : MonoBehaviour
     private Texture2D texture;
     private DateTimeOffset startUtc, lastSample;
     private double startRealtime;
-    private string currentId = "", sampleUtc = "", archiveDirectory;
+    private string currentId = "", sampleUtc = "", archiveDirectory, archiveSessionDirectory;
     private bool advancing;
     private readonly Dictionary<Camera, CameraClearFlags> cameraFlags = new Dictionary<Camera, CameraClearFlags>();
     private readonly Dictionary<Skybox, bool> cameraSkyboxes = new Dictionary<Skybox, bool>();
@@ -179,6 +179,11 @@ public sealed class NightSkyController : MonoBehaviour
         byte[] png = next.EncodeToPNG();
         string imageHash = Hash(png);
         string id = Hash(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(description) + "\n" + imageHash));
+        // A sky can outlive Stop for a frame or be displayed in a setup preview.
+        // Never let a cached archive path reopen the completed experiment.
+        var recorder = MasterDataLogger.Instance;
+        if (archiveSessionDirectory != null && (recorder == null || !recorder.AcceptingWrites || recorder.directoryPath != archiveSessionDirectory))
+            archiveDirectory = ResolveArchiveDirectory(false);
         Directory.CreateDirectory(archiveDirectory);
         // Save the exact texture shown, not just a path to an external mutable source.
         File.WriteAllBytes(Path.Combine(archiveDirectory, id + ".png"), png);
@@ -214,13 +219,19 @@ public sealed class NightSkyController : MonoBehaviour
             (sample.HasValue ? "; sky time " + sampledLocal + " (" + sampleUtc + ")" : " (explicit image)"));
     }
 
-    private string ResolveArchiveDirectory()
+    private string ResolveArchiveDirectory(bool useCurrentRun = true)
     {
         MasterDataLogger logger = MasterDataLogger.Instance;
-        if (logger != null && !string.IsNullOrEmpty(logger.directoryPath)) return Path.Combine(logger.directoryPath, "Skyboxes");
+        if (useCurrentRun && logger != null && logger.AcceptingWrites && !string.IsNullOrEmpty(logger.directoryPath))
+        {
+            archiveSessionDirectory = logger.directoryPath;
+            return Path.Combine(logger.directoryPath, "Skyboxes");
+        }
+        archiveSessionDirectory = null;
         // Direct scene play without the experiment runner still leaves an audit trail.
-        string path = Path.Combine(Application.persistentDataPath, "NightSkyRuns", Guid.NewGuid().ToString("N"), "Skyboxes");
-        Debug.LogWarning("No MasterDataLogger: night-sky audit saved to " + path);
+        string root = logger == null ? Application.persistentDataPath : Application.temporaryCachePath;
+        string path = Path.Combine(root, "NightSkyRuns", Guid.NewGuid().ToString("N"), "Skyboxes");
+        Debug.LogWarning("Outside an open recording: night-sky audit saved to " + path);
         return path;
     }
 

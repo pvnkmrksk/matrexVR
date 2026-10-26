@@ -12,14 +12,17 @@ public class BandLogger : MonoBehaviour
     private string directoryPath;
     private string logPath;
     private StreamWriter logFile;
+    private bool closedForArchive;
     private BandSpawner bandSpawner;
 
     void Start()
     {
+        if (closedForArchive) return;
         // Access directoryPath from MasterDataLogger
         MasterDataLogger masterDataLogger = FindObjectOfType<MasterDataLogger>();
         if (masterDataLogger != null)
         {
+            if (!masterDataLogger.AcceptingWrites) { closedForArchive = true; return; }
             directoryPath = masterDataLogger.directoryPath;
         }
         else
@@ -130,6 +133,7 @@ public class BandLogger : MonoBehaviour
 
     public void CloseForArchive()
     {
+        closedForArchive = true;
         logFile?.Dispose();
         logFile = null;
     }

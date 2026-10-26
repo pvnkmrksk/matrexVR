@@ -27,9 +27,11 @@ public class SwarmLogger : MonoBehaviour
 
     private void Start()
     {
+        if (closed) return;
         var master = MasterDataLogger.Instance;
         spawner = GetComponent<LocustSpawner>();
         if (master == null || spawner == null || string.IsNullOrEmpty(master.directoryPath)) return;
+        if (!master.AcceptingWrites) { closed = true; return; }
         string layerNames = "";
         for (int i = 0; i < 32; i++) if ((locustLayerMask.value & (1 << i)) != 0) layerNames += RuntimeRigRegistry.LayerLabel(i) + "_";
         string path = Path.Combine(master.directoryPath,
