@@ -1,0 +1,785 @@
+{
+  "schemaVersion": 1,
+  "captureDate": "2026-10-26",
+  "status": "partial-manual-validation-final-replay-controls-pending-device-unlock",
+  "candidateSourceCommit": "2494d882",
+  "unityVersion": "6000.3.16f1",
+  "recordingBuildRevision": "not-completely-recorded-in-run-manifest",
+  "scope": {
+    "platform": "macOS",
+    "inputExercise": "local webcam/software integration with Rekkefly",
+    "animalMeasurement": false,
+    "recordedActualInputSource": "unverified",
+    "verifiedEvidence": [
+      "owned executable/process identity",
+      "matching configured rig",
+      "startup native configuration snapshot"
+    ],
+    "limitations": [
+      "process identity and strict camera-required launch policy do not prove physical input source",
+      "CSV wall clocks are local and do not encode a timezone",
+      "unlogged animation, acquisition gaps and tracker validity are not reconstructed",
+      "uncertain legacy scene aliases are retained"
+    ],
+    "liveCameraEvidence": {
+      "kind": "operator-observed live native packet and app state",
+      "packetSequence": 57980,
+      "source_kind": "camera",
+      "source_fallback": false,
+      "trackerPort": 9874,
+      "nativeCameraTitleFps": 29.9,
+      "imageObservation": "almost black; no animal",
+      "claim": "Live native camera input reached the tracking pipeline; no biological tracking accuracy is established.",
+      "archiveLabelRemains": "actualInputSource=unverified in the saved recordings"
+    }
+  },
+  "runs": [
+    {
+      "id": "20261026_022145",
+      "rawExperimentRows": 214769,
+      "rawReplaySidecarRows": 3480,
+      "rawExperimentSpanSeconds": 1811.909276,
+      "poseColumns": 55,
+      "malformedRows": 0,
+      "nonfiniteValues": 0,
+      "timestampReversals": 0,
+      "frameReversals": 0,
+      "archive": {
+        "snapshots": 4,
+        "allSnapshotReadableHashesAndSizesMatch": true,
+        "manifestComplete": true,
+        "skyboxCount": 1,
+        "allSkyboxImageHashesMatch": true,
+        "skyboxDimensions": [
+          4096,
+          2048
+        ]
+      },
+      "filteredProductionReplay": {
+        "rows": 214768,
+        "durationSeconds": 1811.897717,
+        "contexts": 4,
+        "restoredConfigurations": 4,
+        "warnings": [
+          "20261026_022145_Choice_Selwyn_VR1_.csv: excluded 1 verified idle/scene-handoff rows; acquisition gaps remain unchanged.",
+          "20261026_022145_ReplayScene_VR1_.csv: excluded 3480 setup/replay pose rows from experiment playback.",
+          "Historical rig clocks are local wall time. Clock changes, unlogged animation, and tracker validity cannot be recovered from these CSVs."
+        ]
+      },
+      "files": [
+        {
+          "name": "20261026_022145_Choice_Selwyn_VR1_.csv",
+          "rows": 214769,
+          "poseRanges": {
+            "GameObjectPosX": [
+              0.0,
+              0.0
+            ],
+            "GameObjectPosY": [
+              -209.5321,
+              -209.5321
+            ],
+            "GameObjectPosZ": [
+              0.0,
+              0.0
+            ],
+            "GameObjectRotX": [
+              0.0,
+              0.0
+            ],
+            "GameObjectRotY": [
+              -0.00536656473,
+              359.994141
+            ],
+            "GameObjectRotZ": [
+              0.0,
+              0.0
+            ]
+          },
+          "wireYawRadians": [
+            -2.22146082,
+            2.21196842
+          ],
+          "yawGain": [
+            35.0,
+            35.0
+          ]
+        }
+      ],
+      "motionFinding": "rotation-only; no translation",
+      "experimentUnityFrameOmissions": 0,
+      "experimentMedianFrameIntervalSeconds": 0.008362,
+      "experimentMaximumFrameIntervalSeconds": 1.168574
+    },
+    {
+      "id": "20261026_031046",
+      "rawExperimentRows": 23606,
+      "rawReplaySidecarRows": 0,
+      "rawExperimentSpanSeconds": 205.373206,
+      "poseColumns": 55,
+      "malformedRows": 0,
+      "nonfiniteValues": 0,
+      "timestampReversals": 0,
+      "frameReversals": 0,
+      "archive": {
+        "snapshots": 4,
+        "allSnapshotReadableHashesAndSizesMatch": true,
+        "manifestComplete": true,
+        "skyboxCount": 1,
+        "allSkyboxImageHashesMatch": true,
+        "skyboxDimensions": [
+          4096,
+          2048
+        ]
+      },
+      "filteredProductionReplay": {
+        "rows": 23596,
+        "durationSeconds": 205.363811,
+        "contexts": 10,
+        "restoredConfigurations": 10,
+        "warnings": [
+          "20261026_031046_Choice_Selwyn_VR1_.csv: excluded 5 verified idle/scene-handoff rows; acquisition gaps remain unchanged.",
+          "20261026_031046_Choice_VR1_.csv: excluded 5 verified idle/scene-handoff rows; acquisition gaps remain unchanged.",
+          "Historical rig clocks are local wall time. Clock changes, unlogged animation, and tracker validity cannot be recovered from these CSVs."
+        ]
+      },
+      "files": [
+        {
+          "name": "20261026_031046_Choice_Selwyn_VR1_.csv",
+          "rows": 11882,
+          "poseRanges": {
+            "GameObjectPosX": [
+              -24.81914,
+              22.3329182
+            ],
+            "GameObjectPosY": [
+              -210.7395,
+              -209.125122
+            ],
+            "GameObjectPosZ": [
+              -14.5361032,
+              40.7875061
+            ],
+            "GameObjectRotX": [
+              0.0,
+              0.0
+            ],
+            "GameObjectRotY": [
+              0.0,
+              359.989319
+            ],
+            "GameObjectRotZ": [
+              0.0,
+              0.0
+            ]
+          },
+          "wireYawRadians": [
+            -2.155007,
+            2.12652731
+          ],
+          "yawGain": [
+            3.0,
+            3.0
+          ]
+        },
+        {
+          "name": "20261026_031046_Choice_VR1_.csv",
+          "rows": 11724,
+          "poseRanges": {
+            "GameObjectPosX": [
+              -60.16714,
+              62.5619354
+            ],
+            "GameObjectPosY": [
+              100.0,
+              100.0
+            ],
+            "GameObjectPosZ": [
+              -19.9597778,
+              60.1402359
+            ],
+            "GameObjectRotX": [
+              0.0,
+              0.0
+            ],
+            "GameObjectRotY": [
+              0.0,
+              359.985626
+            ],
+            "GameObjectRotZ": [
+              0.0,
+              0.0
+            ]
+          },
+          "wireYawRadians": [
+            -2.06956577,
+            1.78476381
+          ],
+          "yawGain": [
+            3.0,
+            3.0
+          ]
+        }
+      ],
+      "motionFinding": "translated and rotated with manual keys disabled",
+      "autopilotSpeed": 7,
+      "measuredWithinContextMeanXZSpeed": 7.001073334475667,
+      "measuredWithinContextMedianFrameXZSpeed": 6.999468647679217,
+      "measuredWithinContextXZTravel": 1399.2740446883533,
+      "measuredWithinContextSeconds": 199.86564600000003,
+      "actualBlocks": 10,
+      "trials": 5,
+      "blockDurationSeconds": 20,
+      "combinedFrameOmissions": 9,
+      "allOmissionsAtSceneTransitions": true,
+      "sceneLoadingGapSeconds": [
+        0.506443,
+        0.714853
+      ],
+      "combinedMaximumFrameIntervalSeconds": 1.012266,
+      "legacyHandoffStimulusRows": 9,
+      "legacyIdleTailRows": 1,
+      "replaySceneCsvPresentAtBaseline": false,
+      "baseline": {
+        "fileCount": 23,
+        "readOnlyAuditChangedFiles": 0,
+        "readOnlyAuditAddedFiles": 0,
+        "csvHashes": [
+          {
+            "path": "20261026_031046_Choice_Selwyn_VR1_.csv",
+            "bytes": 5364476,
+            "sha256": "8b1984729df3d336e21ad94058daf73e87fb8ae77025a78f95abc3874ec5a94c"
+          },
+          {
+            "path": "20261026_031046_Choice_VR1_.csv",
+            "bytes": 5037415,
+            "sha256": "da81d6441c81078b8c3cd1b68a6d7965c3b450b62f494dfdeb01f0eed52c255d"
+          },
+          {
+            "path": "Skyboxes/loads.csv",
+            "bytes": 2758,
+            "sha256": "afe9fe0f4c51d26439508c60dc8e9cf3cc48ed14d98c2e47cc6af98c5d88a499"
+          }
+        ]
+      },
+      "currentSourceComparison": {
+        "run": "20261026_031046",
+        "checkedUtc": "2026-10-26T03:56:52.368970+00:00",
+        "candidateSourceCommit": "2494d882",
+        "checkedFiles": 23,
+        "coreFilesChecked": 23,
+        "coreFilesChanged": [],
+        "changed": [],
+        "missing": [],
+        "added": [],
+        "allSourceFilesByteIdentical": true,
+        "noAddedSourceFiles": true,
+        "scope": "Read-only source comparison; final current native-root replay interactions pending device unlock."
+      }
+    },
+    {
+      "id": "20261026_035227",
+      "requiredProducerFix": "039b2303",
+      "rawExperimentRows": 10219,
+      "rawReplaySidecarRows": 0,
+      "rawExperimentSpanSeconds": 110.776208,
+      "poseColumns": 55,
+      "malformedRows": 0,
+      "nonfiniteValues": 0,
+      "timestampReversals": 0,
+      "timestampDuplicates": 0,
+      "frameReversals": 0,
+      "frameDuplicates": 0,
+      "actualBlocks": 44,
+      "trials": 22,
+      "blockDurationSeconds": 2,
+      "transitions": 43,
+      "sceneSequenceMismatchRows": 0,
+      "idleTailRows": 0,
+      "phaseCounts": {
+        "stimulus": 10219
+      },
+      "combinedFrameOmissions": 86,
+      "allOmissionsAtSceneTransitions": true,
+      "sceneLoadingGapSeconds": [
+        0.511374,
+        0.615807
+      ],
+      "combinedMaximumFrameIntervalSeconds": 1.215693,
+      "motionFinding": "translation and rotation in both scenes; median in-context frame speed matches nominal autopilot 7",
+      "autopilotSpeed": 7,
+      "measuredWithinContextMedianFrameXZSpeed": 7.000301560465783,
+      "measuredWithinContextMeanXZSpeed": 7.164214013191769,
+      "measuredWithinContextXZTravel": 622.6919893845891,
+      "measuredWithinContextSeconds": 86.91700000000002,
+      "archive": {
+        "snapshots": 4,
+        "allSnapshotReadableHashesAndSizesMatch": true,
+        "manifestComplete": true,
+        "allSkyboxImageHashesMatch": true,
+        "skyboxDimensions": [
+          4096,
+          2048
+        ],
+        "skyboxApplications": 44
+      },
+      "filteredProductionReplay": {
+        "rows": 10219,
+        "durationSeconds": 110.776208,
+        "contexts": 44,
+        "restoredConfigurations": 44,
+        "excludedRows": 0,
+        "warnings": [
+          "Historical rig clocks are local wall time. Clock changes, unlogged animation, and tracker validity cannot be recovered from these CSVs."
+        ]
+      },
+      "baseline": {
+        "fileCount": 23,
+        "coreFileCount": 21,
+        "appendableOrHistoryFiles": [
+          "runtime_trace.log",
+          "config_manifest.json"
+        ],
+        "coreCsvHashes": [
+          {
+            "path": "20261026_035227_Choice_Selwyn_VR1_.csv",
+            "bytes": 2183126,
+            "sha256": "188853fdc7705080325c5f46be1ca228b5e642dd6c3aaf865a9a0c3802970b62",
+            "scope": "core-recording",
+            "stableDuringRead": true
+          },
+          {
+            "path": "20261026_035227_Choice_VR1_.csv",
+            "bytes": 2071910,
+            "sha256": "72429161712c6299be50753765881a88bb366e23c180d49f1febe62237f42338",
+            "scope": "core-recording",
+            "stableDuringRead": true
+          },
+          {
+            "path": "Skyboxes/loads.csv",
+            "bytes": 11836,
+            "sha256": "d0c2d7e7a4dd255689648685a8dcbd19af7ac682ef215ae7030780435ad476d6",
+            "scope": "core-recording",
+            "stableDuringRead": true
+          }
+        ],
+        "stableDuringCapture": true,
+        "finalSameProcessManualReplayComparison": "pending",
+        "currentReplayComparison": {
+          "candidateSourceCommit": "8b3287a0",
+          "checkedUtc": "2026-10-26T03:29:27.115435+00:00",
+          "coreFilesUnchanged": 21,
+          "manifestUnchanged": true,
+          "allSourceFilesByteIdentical": false,
+          "addedFiles": 0,
+          "missingFiles": 0,
+          "diagnosticLogAppendBytes": 61,
+          "originalLogPrefixHashMatches": true,
+          "description": "Only shutdown diagnostic line appended; source acquisition/config/sky bytes preserved.",
+          "finalAfterReplayExit": "pending"
+        }
+      },
+      "files": [
+        {
+          "name": "20261026_035227_Choice_Selwyn_VR1_.csv",
+          "rows": 5113,
+          "poseRanges": {
+            "GameObjectPosX": [
+              -9.360585,
+              2.02348113
+            ],
+            "GameObjectPosY": [
+              -209.893311,
+              -209.5321
+            ],
+            "GameObjectPosZ": [
+              0.0,
+              13.1384621
+            ],
+            "GameObjectRotX": [
+              0.0,
+              0.0
+            ],
+            "GameObjectRotY": [
+              0.0,
+              359.979767
+            ],
+            "GameObjectRotZ": [
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "name": "20261026_035227_Choice_VR1_.csv",
+          "rows": 5106,
+          "poseRanges": {
+            "GameObjectPosX": [
+              -10.7178078,
+              6.47411776
+            ],
+            "GameObjectPosY": [
+              100.0,
+              100.0
+            ],
+            "GameObjectPosZ": [
+              0.0,
+              13.34009
+            ],
+            "GameObjectRotX": [
+              0.0,
+              0.0
+            ],
+            "GameObjectRotY": [
+              -0.00102358882,
+              359.977264
+            ],
+            "GameObjectRotZ": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      ],
+      "operatorReportedSourceCommit": "dab56e82",
+      "currentSourceComparison": {
+        "run": "20261026_035227",
+        "checkedUtc": "2026-10-26T03:56:52.384739+00:00",
+        "candidateSourceCommit": "2494d882",
+        "checkedFiles": 23,
+        "coreFilesChecked": 21,
+        "coreFilesChanged": [],
+        "changed": [
+          {
+            "path": "runtime_trace.log",
+            "scope": "diagnostic-appendable",
+            "baselineBytes": 63851,
+            "currentBytes": 63912,
+            "baselineSha256": "1fd73d74dcb287cdb48addafe42e3d2af3fb7b6c9adc339419eec29f8a31e078",
+            "currentSha256": "98e9ad38ba8470d4da0e0fd725b5026c13fe047dddf102095df1a01c63dfe771",
+            "originalPrefixHashMatches": true,
+            "appendedBytes": 61,
+            "appendedText": "[2026-10-26 04:04:15.646] [Log] MainController was disabled.\n"
+          }
+        ],
+        "missing": [],
+        "added": [],
+        "allSourceFilesByteIdentical": false,
+        "noAddedSourceFiles": true,
+        "scope": "Read-only source comparison; final current native-root replay interactions pending device unlock."
+      }
+    }
+  ],
+  "fixes": [
+    {
+      "finding": "avoid-redundant-fullscreen-window-geometry-requests",
+      "commit": "ca95c288",
+      "pointerRootCauseEstablished": false
+    },
+    {
+      "finding": "delayed-field-first-click",
+      "commit": "38e3efbb"
+    },
+    {
+      "finding": "captured-pointer-release",
+      "commit": "41517bb5"
+    },
+    {
+      "finding": "draft-primary-action",
+      "commit": "11322654"
+    },
+    {
+      "finding": "hardware-validation-and-effective-display",
+      "commit": "8bb9e355"
+    },
+    {
+      "finding": "per-rig-routing",
+      "commit": "7e7f1cc7"
+    },
+    {
+      "finding": "legacy-display-preview",
+      "commit": "b98d3389"
+    },
+    {
+      "finding": "autopilot-without-manual-keys",
+      "commit": "b738fb05"
+    },
+    {
+      "finding": "replay-fail-closed-isolation",
+      "commit": "891880f9"
+    },
+    {
+      "finding": "setup-replay-sidecar-filter",
+      "commit": "ee86c6ea"
+    },
+    {
+      "finding": "handoff-producer-gate",
+      "commit": "039b2303"
+    },
+    {
+      "finding": "verified-handoff-reader-filter",
+      "commit": "ef9bba78"
+    },
+    {
+      "finding": "sequence-derived-ui",
+      "commit": "381fe9a5"
+    },
+    {
+      "finding": "replay-native-pixels-and-marker",
+      "commit": "dab56e82"
+    },
+    {
+      "finding": "replay-IMGUI-and-InputSystem-coordinate-mismatch",
+      "commit": "8b3287a0",
+      "manualConfirmation": "Earlier candidate observations only; superseded by2494d882 root-clip layout."
+    },
+    {
+      "finding": "exclude-ReplayScene-from-live-experimental-telemetry",
+      "commit": "55ecc76c",
+      "validation": "67 offline policy checks and bounded stale-view operator observation"
+    },
+    {
+      "finding": "replace-event-type-restoration-with-controls-in-native-root-clip",
+      "commit": "2494d882",
+      "manualConfirmation": "pending-device-unlock"
+    }
+  ],
+  "supportingOfflineChecks": {
+    "total": 1002,
+    "tenScriptBatch": {
+      "scripts": 10,
+      "assertions": 880,
+      "writerLifecyclesIncluded": 150,
+      "status": "passed"
+    },
+    "telemetryReplayPolicy": {
+      "assertions": 67,
+      "status": "passed"
+    },
+    "replayUiTests": {
+      "assertions": 55,
+      "status": "passed",
+      "qualification": "Supporting UI tests; final actual native-root button interaction has not yet been confirmed."
+    },
+    "qualification": "1002=880+67+55. Passing offline/native-UI supporting tests do not replace the pending actual pointer check on the unlocked Mac."
+  },
+  "pending": [
+    {
+      "id": "final-pointer-replay-workflow",
+      "status": "pending-device-unlock",
+      "actions": [
+        "Play/Pause",
+        "forward/backward scrub",
+        "Browse",
+        "Back",
+        "readability and unobstructed view"
+      ],
+      "observed": "Final native-root interaction pending; neither a passed test nor a newly reproduced failure.",
+      "passedSeparately": [
+        "sequence duplicate/remove/totals/selection",
+        "native dashboard launch/reopen",
+        "dashboard Pause/Resume",
+        "native camera packet source",
+        "independent companion lifetime"
+      ],
+      "candidate": "2494d882",
+      "nativeUiCount": "pending",
+      "nativeUiSupportingChecks": 55
+    },
+    {
+      "id": "source-run-immutability-after-manual-replay",
+      "status": "current-scoped-check-passed",
+      "run": "20261026_035227",
+      "coreFilesUnchanged": 21,
+      "manifestUnchanged": true,
+      "diagnosticLogAppendBytes": 61,
+      "addedFiles": 0,
+      "finalAfterReplayExit": "pending",
+      "candidate": "2494d882",
+      "checkedRuns": [
+        "20261026_031046",
+        "20261026_035227"
+      ],
+      "details": "031046 all23 byte-identical;035227 core21+manifest unchanged, only earlier61-byte shutdown append in trace; no additions/missing files."
+    },
+    {
+      "id": "fresh-recording-after-handoff-producer-fix",
+      "status": "passed",
+      "requiredCommit": "039b2303",
+      "run": "20261026_035227",
+      "verifiedRawRows": 10219,
+      "sceneSequenceMismatches": 0,
+      "idleRows": 0,
+      "readerExcludedRows": 0
+    },
+    {
+      "id": "physical-camera-packet-device-verification",
+      "status": "passed-separate-live-operator-observation",
+      "packetSequence": 57980,
+      "source_kind": "camera",
+      "source_fallback": false,
+      "archivedLabelUnchanged": "unverified",
+      "animalMeasurement": false
+    }
+  ],
+  "replayPointerDiagnostic": {
+    "currentCandidate": "2494d882",
+    "currentStatus": "pending-device-unlock",
+    "currentApproach": "Interactive controls outside moving clips, in the native root GUI clip; only read-only fidelity text is clipped.",
+    "previousCandidates": {
+      "coordinateObservation": "Legacy IMGUI coordinates were stale while Input System coordinates were correct.",
+      "eventRestorationObservation": "In the prior clip-local restoration attempt, point(60,94.6) was inside but native Event.type stayed Ignore despite setter; that approach was disproved and replaced."
+    },
+    "currentNativeInteractionFailureReproduced": false,
+    "currentNativeInteractionSuccessProven": false
+  },
+  "manualWorkflowEvidence": [
+    {
+      "action": "Configure typed VR count, expanded rig rename VR2 to VR5, port9892, vertical packing",
+      "status": "observed in earlier actual pointer pass",
+      "result": "foldout expansion and scroll position retained"
+    },
+    {
+      "action": "Start experiment and recording",
+      "status": "observed",
+      "evidenceRuns": [
+        "20261026_022145",
+        "20261026_031046",
+        "20261026_035227"
+      ]
+    },
+    {
+      "action": "final candidate replay Play/Pause, scrub, Browse, Back",
+      "status": "pending-device-unlock",
+      "observed": "Final build/launch completed, then Mac locked; final native-root interaction has not been exercised.",
+      "candidate": "2494d882"
+    },
+    {
+      "action": "sequence duplicate/remove on candidate8b3287a0",
+      "status": "passed-actual-pointer-test",
+      "duplicate": {
+        "blocksBefore": 2,
+        "blocksAfter": 3,
+        "durationSeconds": 6,
+        "selectedRow": "03 Choice",
+        "headerAndOverviewAgree": true
+      },
+      "remove": {
+        "blocksAfter": 2,
+        "durationSeconds": 4,
+        "selectedRow": "02 Choice",
+        "headerAndOverviewAgree": true
+      }
+    },
+    {
+      "action": "Live plots native dashboard launch and reopen",
+      "status": "passed-operator-observation",
+      "application": "DaariDeepa",
+      "pid": 54224,
+      "parentPid": 1,
+      "duplicateOnReopen": false
+    },
+    {
+      "action": "live dashboard content",
+      "status": "passed-operator-observation",
+      "surface": "in-app browser",
+      "visible": [
+        "heading arrow",
+        "signed heading",
+        "experiment context",
+        "units"
+      ]
+    },
+    {
+      "action": "dashboard Pause/Resume independent of acquisition",
+      "status": "passed-operator-observation",
+      "pausedSamples": 75,
+      "frozenAcrossNextTrial": true,
+      "acquisitionAndMetadataContinued": true,
+      "resumedSamples": 116,
+      "resumedContext": "current",
+      "staleStatusAfterUnityStopped": true
+    },
+    {
+      "action": "native camera through actual Start",
+      "status": "passed-operator-observation",
+      "port": 9874,
+      "titleFps": 29.9,
+      "packetSequence": 57980,
+      "source_kind": "camera",
+      "source_fallback": false,
+      "imageAlmostBlack": true,
+      "animalPresent": false
+    },
+    {
+      "action": "independent application lifetime",
+      "status": "passed-operator-observation",
+      "quitUnity": [
+        "native tracker remained running",
+        "native dashboard remained running"
+      ],
+      "quitTracker": [
+        "Unity remained running",
+        "dashboard remained running"
+      ]
+    },
+    {
+      "action": "replay does not publish live experimental telemetry",
+      "status": "bounded-operator-observation",
+      "sourceCommit": "55ecc76c",
+      "sourceChange": "suppress ReplayScene pose and context publication",
+      "viewerObservation": "While the new replay player ran, the browser remained stale on the prior043609 session; no new Replay publisher was observed.",
+      "qualification": "This is the observed interval, not a lifetime or universal network proof."
+    }
+  ],
+  "operatorObservationSource": "Root agent actual manual UI/device observations supplied directly; these conclusions are not inferred from pose CSVs.",
+  "currentSourceComparisons": [
+    {
+      "run": "20261026_031046",
+      "checkedUtc": "2026-10-26T03:56:52.368970+00:00",
+      "candidateSourceCommit": "2494d882",
+      "checkedFiles": 23,
+      "coreFilesChecked": 23,
+      "coreFilesChanged": [],
+      "changed": [],
+      "missing": [],
+      "added": [],
+      "allSourceFilesByteIdentical": true,
+      "noAddedSourceFiles": true,
+      "scope": "Read-only source comparison; final current native-root replay interactions pending device unlock."
+    },
+    {
+      "run": "20261026_035227",
+      "checkedUtc": "2026-10-26T03:56:52.384739+00:00",
+      "candidateSourceCommit": "2494d882",
+      "checkedFiles": 23,
+      "coreFilesChecked": 21,
+      "coreFilesChanged": [],
+      "changed": [
+        {
+          "path": "runtime_trace.log",
+          "scope": "diagnostic-appendable",
+          "baselineBytes": 63851,
+          "currentBytes": 63912,
+          "baselineSha256": "1fd73d74dcb287cdb48addafe42e3d2af3fb7b6c9adc339419eec29f8a31e078",
+          "currentSha256": "98e9ad38ba8470d4da0e0fd725b5026c13fe047dddf102095df1a01c63dfe771",
+          "originalPrefixHashMatches": true,
+          "appendedBytes": 61,
+          "appendedText": "[2026-10-26 04:04:15.646] [Log] MainController was disabled.\n"
+        }
+      ],
+      "missing": [],
+      "added": [],
+      "allSourceFilesByteIdentical": false,
+      "noAddedSourceFiles": true,
+      "scope": "Read-only source comparison; final current native-root replay interactions pending device unlock."
+    }
+  ],
+  "localBuild": {
+    "runtimeSourceCommit": "2494d882",
+    "platform": "macOS arm64",
+    "status": "built-and-launched",
+    "signing": "local ad-hoc; build script signature verification passed",
+    "manualAcceptance": "final pointer interaction pending device unlock"
+  }
+}

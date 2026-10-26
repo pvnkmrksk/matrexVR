@@ -82,6 +82,8 @@ Current software evidence includes [3,023 native UI checks](docs/desktop-ui-vali
 
 The [actual Mac player test](docs/desktop-player-validation-results.json) additionally verified camera-only acquisition launched from Unity, live dashboard input, native fullscreen and calibration snapshots. A separate physical-camera record→replay run passed 987 checks; its uncalibrated camera view tested the software path, rather than animal-tracking accuracy.
 
+The [26 October manual Mac workflow test](docs/manual-mac-workflow-validation.md) exercises Configure, Start, Rekkefly, live plots and three recordings, including 43 two-second scene transitions. It documents the resulting UI/recording fixes and the final replay mouse checks still awaiting an unlocked screen.
+
 <details>
 <summary><strong>Archived versions and their startup behaviour</strong></summary>
 
