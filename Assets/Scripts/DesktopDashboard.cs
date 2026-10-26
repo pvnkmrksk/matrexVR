@@ -100,6 +100,11 @@ public sealed class DesktopDashboard : MonoBehaviour
         string folder = Path.Combine(Application.dataPath, relative);
         return Directory.Exists(folder) ? folder : Path.GetFullPath(Path.Combine(Application.dataPath, "..", relative));
     }
+    internal static Task<string> PrepareBundledExecutableAsync()
+    {
+        string bundled=BundleFolder(),persistent=Application.persistentDataPath;
+        return Task.Run(()=>InstallViewer(bundled,persistent));
+    }
     private static string Hash(string path)
     {
         using (var stream = File.OpenRead(path))
