@@ -20,6 +20,9 @@ public sealed class TrackerLaunchConfig
     public string device = "";
     public bool headless;
     public bool strictCameraFallback;
+    public bool saveVideo;
+    public string recordingDirectory="";
+    public string recordingPrefix="";
 }
 
 /// <summary>Independent native apps. A crash, scene change or Unity quit never closes a tracker.</summary>
@@ -31,9 +34,13 @@ public sealed class TrackerProcessManager : MonoBehaviour
         public int processId,port;
         public long startUtcTicks;
         public bool demo,strictCameraFallback;
+        public bool saveVideo;
+        public string recordingDirectory,recordingPrefix;
         [JsonIgnore] public bool unverified;
     }
     private static TrackerProcessManager instance;
+    private static readonly object recordingWatchGate=new object();
+    private static readonly HashSet<string> recordingWatches=new HashSet<string>(StringComparer.Ordinal);
     private static string StateRoot => Path.Combine(Application.persistentDataPath,"Companions","processes");
     public static TrackerProcessManager Instance
     {
@@ -44,6 +51,7 @@ public sealed class TrackerProcessManager : MonoBehaviour
     private static string ReceiptPath(string id)=>Path.Combine(StateRoot,Key(id)+".json");
     private static Receipt Read(string id)
     {
+        CompanionMediaArchive.ConfigureReceiptRoot(StateRoot);
         try { string file=ReceiptPath(id);return File.Exists(file)?JsonConvert.DeserializeObject<Receipt>(File.ReadAllText(file)):null; }
         catch(IOException) { return null; } catch(JsonException) { return null; } catch(UnauthorizedAccessException) { return null; }
     }
@@ -106,6 +114,8 @@ public sealed class TrackerProcessManager : MonoBehaviour
         result["processId"]=receipt.processId;result["startUtcTicks"]=receipt.startUtcTicks;
         result["port"]=receipt.port;result["configFile"]=receipt.configFile;
         result["demoRequested"]=receipt.demo;result["strictCameraFallback"]=receipt.strictCameraFallback;
+        result["savedVideoRequested"]=receipt.saveVideo;result["recordingDirectory"]=receipt.recordingDirectory;
+        result["mediaState"]=receipt.saveVideo?"independent-recorder-stop-not-acknowledged":"not-requested";
         using(var live=Match(receipt,false))result["processRunning"]=live!=null;
         using(var verified=Match(receipt,true))result["identityVerified"]=verified!=null&&!receipt.unverified;
         result["state"]=(bool)result["identityVerified"]?"owned-process-identity-verified":
@@ -144,6 +154,7 @@ public sealed class TrackerProcessManager : MonoBehaviour
             if(!string.IsNullOrWhiteSpace(rig.tracker.device)) { args.Add("--device");args.Add(rig.tracker.device); }
             if(rig.tracker.headless)args.Add("--headless");
             if(rig.tracker.strictCameraFallback)args.Add("--no-camera-fallback");
+            if(rig.tracker.saveVideo)args.Add("--record");
             return args.ToArray();
         }
         if(rig.tracker.headless||!string.IsNullOrWhiteSpace(rig.tracker.device))throw new ArgumentException("HejjéTrac device/source belongs in its calibration config; headless is a Rekkefly option.");
@@ -168,8 +179,9 @@ public sealed class TrackerProcessManager : MonoBehaviour
                 {
                     if(previous.unverified)throw new InvalidOperationException("An existing tracker process cannot be verified. Close its own window before trying Start again; another copy will not be spawned.");
                     string requestedConfig=rig.tracker!=null&&!string.IsNullOrWhiteSpace(rig.tracker.configFile)?ResolveConfig(rig.tracker.configFile):previous.configFile;
-                    if(previous.port!=rig.zmqPort||previous.backend!=TrackerBackend.DisplayName(rig.closedLoopMode)||requestedConfig!=previous.configFile||previous.strictCameraFallback!=(rig.tracker?.strictCameraFallback??false)||(prepared!=null&&previous.executableSha256!=prepared.executableSha256))
+                    if(previous.port!=rig.zmqPort||previous.backend!=TrackerBackend.DisplayName(rig.closedLoopMode)||requestedConfig!=previous.configFile||previous.strictCameraFallback!=(rig.tracker?.strictCameraFallback??false)||previous.saveVideo!=(rig.tracker?.saveVideo??false)||(prepared!=null&&previous.executableSha256!=prepared.executableSha256))
                         throw new InvalidOperationException("This rig already has an independent tracker window using another source/configuration. Close it or choose Stop tracker before switching.");
+                    RegisterMedia(previous);MonitorRecordingExit(previous);
                     return; // Start is idempotent, including after restarting Unity.
                 }
             string[] args=Arguments(rig);string executable=rig.tracker.executablePath??"";
@@ -185,12 +197,35 @@ public sealed class TrackerProcessManager : MonoBehaviour
             using(var process=macBundle?MacAppLauncher.Launch(executable,args):Process.Start(DetachedStart(executable,args,Path.GetDirectoryName(executable),log)))
             {
                 if(process==null)throw new InvalidOperationException("Tracker process did not start.");
-                var receipt=new Receipt{vrId=rig.vrId,backend=TrackerBackend.DisplayName(rig.closedLoopMode),executable=executable,configFile=ResolveConfig(rig.tracker.configFile),port=rig.zmqPort,processId=process.Id,startUtcTicks=process.StartTime.ToUniversalTime().Ticks,demo=prepared?.demo??false,strictCameraFallback=rig.tracker.strictCameraFallback,releaseTag=prepared?.releaseTag,executableSha256=prepared?.executableSha256??HashFile(executable)};
+                var receipt=new Receipt{vrId=rig.vrId,backend=TrackerBackend.DisplayName(rig.closedLoopMode),executable=executable,configFile=ResolveConfig(rig.tracker.configFile),port=rig.zmqPort,processId=process.Id,startUtcTicks=process.StartTime.ToUniversalTime().Ticks,demo=prepared?.demo??false,strictCameraFallback=rig.tracker.strictCameraFallback,releaseTag=prepared?.releaseTag,executableSha256=prepared?.executableSha256??HashFile(executable),
+                    saveVideo=rig.tracker.saveVideo,recordingDirectory=rig.tracker.recordingDirectory,recordingPrefix=rig.tracker.recordingPrefix};
                 string file=ReceiptPath(rig.vrId),temporary=file+".writing";
                 File.WriteAllText(temporary,JsonConvert.SerializeObject(receipt,Formatting.Indented));
                 if(File.Exists(file))File.Delete(file);File.Move(temporary,file);
+                RegisterMedia(receipt);MonitorRecordingExit(receipt);
             }
         }
+    }
+    private static void RegisterMedia(Receipt receipt)
+    {
+        if(receipt==null||!receipt.saveVideo||string.IsNullOrWhiteSpace(receipt.recordingDirectory))return;
+        CompanionMediaArchive.RegisterLaunchedSource(new MediaRecordingSource{RigId=receipt.vrId,Backend=receipt.backend,DirectoryPath=receipt.recordingDirectory,
+            ChildDirectoryPrefix=receipt.recordingPrefix??"",NotBeforeUtcTicks=receipt.startUtcTicks,TrackerSessionId=receipt.processId+"-"+receipt.startUtcTicks,
+            ExecutableSha256=receipt.executableSha256,State="pending"});
+    }
+    private static void MonitorRecordingExit(Receipt receipt)
+    {
+        if(!receipt.saveVideo)return;
+        string identity=receipt.processId+"-"+receipt.startUtcTicks;
+        lock(recordingWatchGate)if(!recordingWatches.Add(identity))return;
+        try
+        {
+            var process=Process.GetProcessById(receipt.processId);
+            process.EnableRaisingEvents=true;
+            process.Exited+=(sender,args)=>{try{if(process.ExitCode==0)CompanionMediaArchive.AcknowledgeStopped(receipt.vrId,identity);}catch(InvalidOperationException){}finally{process.Dispose();lock(recordingWatchGate)recordingWatches.Remove(identity);}};
+            if(process.HasExited){try{if(process.ExitCode==0)CompanionMediaArchive.AcknowledgeStopped(receipt.vrId,identity);}finally{process.Dispose();lock(recordingWatchGate)recordingWatches.Remove(identity);}}
+        }
+        catch(Exception error) when(error is ArgumentException||error is InvalidOperationException||error is System.ComponentModel.Win32Exception) {lock(recordingWatchGate)recordingWatches.Remove(identity);}
     }
     public static ProcessStartInfo DetachedStart(string executable,IEnumerable<string> arguments,string workingDirectory,string logPath)
     {
@@ -228,7 +263,9 @@ public sealed class TrackerProcessManager : MonoBehaviour
             bool closing=false;
             try { closing=process.CloseMainWindow(); }
             catch(Exception error) when(error is InvalidOperationException || error is NotSupportedException || error is NotImplementedException) { }
-            if(!closing||!process.WaitForExit(1000)) { if(!process.HasExited)process.Kill();process.WaitForExit(1000); }
+            bool graceful=closing&&process.WaitForExit(1000);
+            if(!graceful) { if(!process.HasExited)process.Kill();process.WaitForExit(1000); }
+            if(graceful&&process.HasExited&&process.ExitCode==0)CompanionMediaArchive.AcknowledgeStopped(vrId,receipt.processId+"-"+receipt.startUtcTicks);
         }
         string file=ReceiptPath(vrId);if(File.Exists(file))File.Delete(file);
     }

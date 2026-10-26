@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System;
 public sealed class ManualControlConfig { }
+// Recorder process boundary is tested here; actual archive/import semantics have their own suite.
+public sealed class MediaRecordingSource {public string RigId,Backend,DirectoryPath,SourceRevision,ExecutableSha256,TrackerSessionId,SourceClock,ChildDirectoryPrefix,State;public long NotBeforeUtcTicks;}
+public static class CompanionMediaArchive {public static void ConfigureReceiptRoot(string root){}public static void RegisterLaunchedSource(MediaRecordingSource source){}public static void AcknowledgeStopped(string rig,string session=null){}}
 public static class RuntimePaths { public static string ConfigRoot=System.IO.Path.GetTempPath(); }
 namespace UnityEngine
 {

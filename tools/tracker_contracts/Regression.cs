@@ -50,6 +50,9 @@ public static class Regression
             rig.tracker.strictCameraFallback=true;
             Check(TrackerProcessManager.Arguments(rig).Last()=="--no-camera-fallback"&&!TrackerProcessManager.Arguments(rig).Contains("--supervised"),"Camera-only launch disables fallback without stdin supervision");
             rig.tracker.strictCameraFallback=false;
+            rig.tracker.saveVideo=true;
+            Check(TrackerProcessManager.Arguments(rig).Last()=="--record","Saved camera video is explicit opt-in on detached flight launch");
+            rig.tracker.saveVideo=false;
             rig.closedLoopMode=ClosedLoopMode.Hejjetrac;rig.tracker.device="";rig.tracker.headless=false;
             Check(TrackerProcessManager.Arguments(rig).SequenceEqual(new[]{"--config",config,"--windows","1"}),"HejjéTrac native acquisition starts without stdin control");
             rig.zmqPort=9872;Reject(()=>TrackerProcessManager.Arguments(rig),"HejjéTrac calibration port mismatch rejected without rewriting");rig.zmqPort=9871;
@@ -94,6 +97,34 @@ public static class Regression
                 typeof(TrackerProcessManager).GetMethod("OnDisable",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic).Invoke(manager,null);
                 unrelated.Kill();Check(unrelated.WaitForExit(2000),"Fixture unrelated process shuts down cleanly");
             }
+            string originalBundle=Environment.GetEnvironmentVariable("MATREX_COMPANION_DIR");
+            try
+            {
+                string fixtureBundle=Path.Combine(temp,"recording-catalog");Directory.CreateDirectory(fixtureBundle);var entries=new JArray();
+                foreach(string backend in new[]{"rekkefly","hejjetrac"})
+                {
+                    string package=Path.Combine(fixtureBundle,backend);Directory.CreateDirectory(package);File.Copy(args[0],Path.Combine(package,"tracker"));
+                    string template=backend=="rekkefly"?"[recording]\nenabled = false\nformat = \"png\"\ndirectory = \"original\"\n[output]\nzmq_enabled = true\n":"save_raw : n\nsave_debug : n\nvid_codec : h264\nzmq_port : 9871\n";
+                    File.WriteAllText(Path.Combine(package,"demo.txt"),template);File.WriteAllText(Path.Combine(package,"camera.txt"),template);
+                    string hash;using(var sha=System.Security.Cryptography.SHA256.Create())using(var input=File.OpenRead(args[0]))hash=BitConverter.ToString(sha.ComputeHash(input)).Replace("-","").ToLowerInvariant();
+                    entries.Add(new JObject{["backend"]=backend,["platform"]=CompanionCatalog.Platform,["releaseTag"]="fixture",["packageRoot"]=backend,["executable"]="tracker",["executableSha256"]=hash,["demoConfig"]="demo.txt",["cameraConfig"]="camera.txt",["sampleVideo"]="sample.avi",["supportsNoCameraFallback"]=true});
+                }
+                File.WriteAllText(Path.Combine(fixtureBundle,"catalog.json"),new JObject{["schemaVersion"]=1,["entries"]=entries}.ToString());Environment.SetEnvironmentVariable("MATREX_COMPANION_DIR",fixtureBundle);
+                foreach(var mode in new[]{ClosedLoopMode.Rekkefly,ClosedLoopMode.Hejjetrac})
+                {
+                    var cameraRig=new SystemConfig{vrId="VR-VIDEO-"+mode,closedLoopMode=mode,zmqPort=9894,zmqAddress="localhost",tracker=new TrackerLaunchConfig()};
+                    var canonical=CompanionCatalog.Prepare(cameraRig,true);string canonicalText=File.ReadAllText(canonical.rig.tracker.configFile);
+                    Check(!canonical.rig.tracker.saveVideo,"Video defaults off: "+mode);cameraRig.tracker.saveVideo=true;var video=CompanionCatalog.Prepare(cameraRig,true);
+                    Check(video.rig.tracker.saveVideo&&video.rig.tracker.configFile!=canonical.rig.tracker.configFile,"Opt-in video uses separate calibration profile: "+mode);
+                    Check(File.ReadAllText(canonical.rig.tracker.configFile)==canonicalText,"Opt-in video preserves canonical calibration bytes: "+mode);
+                    string recording=File.ReadAllText(video.rig.tracker.configFile);
+                    Check(mode==ClosedLoopMode.Rekkefly?recording.Contains("\"mjpeg\"")&&recording.Contains("enabled = true"):recording.Contains("save_raw : y")&&recording.Contains("vid_codec : mjpg"),"Both bundled recorders prefer directly readable intra-frame AVI: "+mode);
+                    Check(Path.IsPathFullyQualified(video.rig.tracker.recordingDirectory),"Native recording root is explicit for later collection: "+mode);
+                    File.AppendAllText(video.rig.tracker.configFile,"\n# video calibration edit\n");var again=CompanionCatalog.Prepare(cameraRig,true);
+                    Check(File.ReadAllText(again.rig.tracker.configFile).Contains("video calibration edit"),"Repeated preparation keeps operator recording calibration: "+mode);
+                }
+            }
+            finally{Environment.SetEnvironmentVariable("MATREX_COMPANION_DIR",originalBundle);}
             if(!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MATREX_COMPANION_DIR")))
             {
                 foreach(var mode in new[]{ClosedLoopMode.Rekkefly,ClosedLoopMode.Hejjetrac})

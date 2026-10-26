@@ -110,6 +110,32 @@ public static class CompanionCatalog
             }
             WriteAtomic(config,"# Created once by MATREX VR. Native tracker owns calibration edits.\n"+text,createOnly:true);
         }
+        bool saveVideo=source.tracker?.saveVideo??false;
+        string recordingDirectory="",recordingPrefix="";
+        if(saveVideo)
+        {
+            // A separate opt-in profile keeps canonical calibration/config text intact.
+            string recordingConfig=Path.Combine(Path.GetDirectoryName(config),Path.GetFileNameWithoutExtension(config)+".video"+Path.GetExtension(config));
+            if(!File.Exists(recordingConfig))
+            {
+                string text=File.ReadAllText(config);
+                if(entry.backend=="rekkefly")
+                {
+                    recordingDirectory=Path.Combine(persistent,"Companions","recordings","rekkefly",id);
+                    text=Toml(Toml(Toml(text,"recording","enabled","true"),"recording","format",Quote("mjpeg")),"recording","directory",Quote(recordingDirectory));
+                }
+                else text=Field(Field(Field(text,"save_raw","y"),"save_debug","n"),"vid_codec","mjpg");
+                WriteAtomic(recordingConfig,text,createOnly:true);
+            }
+            config=recordingConfig;
+            if(entry.backend=="rekkefly")recordingDirectory=Path.Combine(persistent,"Companions","recordings","rekkefly",id);
+            else
+            {
+                string user=Environment.GetEnvironmentVariable("USERPROFILE")??Environment.GetEnvironmentVariable("HOME");
+                recordingDirectory=string.IsNullOrEmpty(user)?Path.Combine(Directory.GetCurrentDirectory(),"hejjetrak-recordings"):Path.Combine(user,RuntimeInformation.IsOSPlatform(OSPlatform.OSX)?"Movies":"Videos","hejjetrak");
+                recordingPrefix=id+".hejjetrac.output-";
+            }
+        }
         if(entry.backend=="hejjetrac")
         {
             // This generated profile's transport follows its rig; geometry and calibration text stay untouched.
@@ -117,7 +143,7 @@ public static class CompanionCatalog
             if(text!=updated) WriteAtomic(config,updated,expected:text);
         }
         var clone=source; // Snapshot was already cloned on the caller's main thread.
-        clone.tracker=new TrackerLaunchConfig{executablePath=Child(installed,entry.executable),configFile=config,headless=false,strictCameraFallback=entry.supportsNoCameraFallback&&!demo};
+        clone.tracker=new TrackerLaunchConfig{executablePath=Child(installed,entry.executable),configFile=config,headless=false,strictCameraFallback=entry.supportsNoCameraFallback&&!demo,saveVideo=saveVideo,recordingDirectory=recordingDirectory,recordingPrefix=recordingPrefix};
         return new Prepared{rig=clone,backend=entry.backend,releaseTag=entry.releaseTag,executableSha256=entry.executableSha256,demo=demo,supportsNoCameraFallback=entry.supportsNoCameraFallback,supportsSourceProvenance=entry.supportsSourceProvenance};
     }
     private static void WriteAtomic(string path,string text,string expected=null,bool createOnly=false)
