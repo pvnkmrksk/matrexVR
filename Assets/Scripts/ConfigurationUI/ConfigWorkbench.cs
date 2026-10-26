@@ -437,7 +437,7 @@ namespace ConfigurationUI
             {
                 BeginCompanionPreparation(true);return;
             }
-            StartExperimentCore();
+            StartAfterPreviousRecording();
         }
         private IEnumerable<string> ConnectedOutputErrors()
         {
@@ -546,8 +546,7 @@ namespace ConfigurationUI
             catch(Exception error){PreparationFailed(error);yield break;}
             yield return null;
             if(!isActiveAndEnabled||version!=preparationVersion)yield break;
-            try{StartExperimentCore();}
-            catch(Exception error){PreparationFailed(error);}
+            StartAfterPreviousRecording();
         }
         private void PrepareRunMetadata()
         {
@@ -564,6 +563,52 @@ namespace ConfigurationUI
         {
             preparing=false;body.SetEnabled(true);side.SetEnabled(true);RefreshStartCaption();
             UpdateStatus(error.GetBaseException().Message);status.AddToClassList("error");
+        }
+        private string acknowledgedFinalizationErrorDirectory;
+        private void StartAfterPreviousRecording()
+        {
+#if UNITY_EDITOR
+            if(startExperimentForValidation!=null){StartExperimentCore();return;}
+#endif
+            // The new coroutine owns preparation from here. Advancing the token
+            // prevents the companion wrapper's finally from re-enabling Start.
+            preparing=true;preparationVersion++;body.SetEnabled(false);side.SetEnabled(false);RefreshStartCaption();
+            StartCoroutine(FinishPreviousRecordingAndStart(preparationVersion));
+        }
+        private System.Collections.IEnumerator FinishPreviousRecordingAndStart(int version)
+        {
+            preparationStatus="Finishing previous recording…";UpdateStatus();
+            System.Threading.Tasks.Task<JObject> task;
+            var logger=MasterDataLogger.Instance;
+            try
+            {
+                if(logger==null)throw new InvalidOperationException("The recording service is unavailable. Return to Start and try again.");
+                task=logger.FinalizeSessionAsync("session-rotation");
+            }
+            catch(Exception error){PreparationFailed(error);yield break;}
+            while(!task.IsCompleted)
+            {
+                if(!isActiveAndEnabled || version!=preparationVersion)yield break;
+                yield return null;
+            }
+            if(!isActiveAndEnabled || version!=preparationVersion)yield break;
+            if(task.IsFaulted || task.IsCanceled)
+            {
+                PreparationFailed(task.Exception?.GetBaseException()??new InvalidOperationException("Recording finalization was cancelled."));yield break;
+            }
+            if(!string.IsNullOrEmpty(logger.FinalizationError) && acknowledgedFinalizationErrorDirectory!=logger.directoryPath)
+            {
+                preparing=false;body.SetEnabled(true);side.SetEnabled(true);RefreshStartCaption();
+                UpdateStatus("The previous recording needs attention; its original folder is preserved.");
+                string failedDirectory=logger.directoryPath;
+                var dialog=OpenModal("Previous recording needs attention",logger.FinalizationError);
+                dialog.Add(new Label("Its original folder is preserved: "+failedDirectory));
+                dialog.Add(StudioButton("Keep reviewing","back",()=>CloseModal(),"quiet"));
+                dialog.Add(StudioButton("Start a new recording","play",()=>{acknowledgedFinalizationErrorDirectory=failedDirectory;CloseModal();StartAfterPreviousRecording();},"primary"));
+                yield break;
+            }
+            try{StartExperimentCore();}
+            catch(Exception error){PreparationFailed(error);}
         }
         private void StartExperimentCore()
         {
