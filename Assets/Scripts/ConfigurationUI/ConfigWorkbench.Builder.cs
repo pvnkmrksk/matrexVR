@@ -166,12 +166,14 @@ namespace ConfigurationUI
             {
                 // A delayed field commits during the next control's pointer-down.
                 // Keep that control alive through pointer-up so its click still runs.
-                if(editPointerHeld)DeferPointerEditRebuild();
+                if(IsEditPointerHeld())DeferPointerEditRebuild();
                 else RebuildEditedView(state);
             }
             else { RefreshStudioValues(); UpdateStatus(); }
         }
         private bool editPointerHeld;
+        private bool editPointerUsesMouse;
+        private int editPointerDownFrame=-1;
         private int pendingPointerGeneration;
         private ConfigDocument pendingPointerSelection;
         private IVisualElementScheduledItem pendingPointerRebuild;
@@ -181,9 +183,23 @@ namespace ConfigurationUI
         private ConfigDocument pendingBlockRefreshSelection;
         private void InstallEditPointerTracking()
         {
-            root.RegisterCallback<PointerDownEvent>(e=>{if(e.button==0)editPointerHeld=true;},TrickleDown.TrickleDown);
+            root.RegisterCallback<PointerDownEvent>(e=>{
+                if(e.button!=0)return;
+                editPointerHeld=true;editPointerUsesMouse=e.pointerType==UnityEngine.UIElements.PointerType.mouse;editPointerDownFrame=Time.frameCount;
+            },TrickleDown.TrickleDown);
             root.RegisterCallback<PointerUpEvent>(e=>{if(e.button==0)editPointerHeld=false;},TrickleDown.TrickleDown);
             root.RegisterCallback<PointerCancelEvent>(_=>editPointerHeld=false,TrickleDown.TrickleDown);
+        }
+        private bool IsEditPointerHeld()
+        {
+            // Captured ListView/button releases need not reach the root callback.
+            // Read physical state on a later frame; never change input device state.
+            if(editPointerHeld&&editPointerUsesMouse&&Time.frameCount>editPointerDownFrame)
+            {
+                var mouse=UnityEngine.InputSystem.Mouse.current;
+                if(mouse!=null&&!mouse.leftButton.isPressed)editPointerHeld=false;
+            }
+            return editPointerHeld;
         }
         private void RebuildEditedView(WorkbenchViewState state)
         {
@@ -197,7 +213,7 @@ namespace ConfigurationUI
             pendingPointerRebuild=root.schedule.Execute(()=>{
                 if(!isActiveAndEnabled||preparing||root.panel==null||pendingPointerGeneration!=viewGeneration||pendingPointerSelection!=selected)
                 {pendingPointerRebuild?.Pause();pendingPointerRebuild=null;return;}
-                if(editPointerHeld)return;
+                if(IsEditPointerHeld())return;
                 pendingPointerRebuild.Pause();pendingPointerRebuild=null;
                 // The clicked control may have opened a foldout or moved focus.
                 // Preserve its completed action, rather than the pre-blur state.
@@ -213,7 +229,7 @@ namespace ConfigurationUI
             pendingBlockRefresh=root.schedule.Execute(()=>{
                 if(!isActiveAndEnabled||preparing||root.panel==null||pendingBlockRefreshGeneration!=viewGeneration||pendingBlockRefreshSelection!=selected||blockList!=list)
                 {pendingBlockRefresh?.Pause();pendingBlockRefresh=null;return;}
-                if(editPointerHeld)return;
+                if(IsEditPointerHeld())return;
                 pendingBlockRefresh.Pause();pendingBlockRefresh=null;list.RefreshItems();
             }).Every(1);
         }
