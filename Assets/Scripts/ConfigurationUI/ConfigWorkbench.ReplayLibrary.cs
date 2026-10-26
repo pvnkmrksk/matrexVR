@@ -262,7 +262,7 @@ namespace ConfigurationUI
         private static string LibraryDuration(double seconds)
         {var span=TimeSpan.FromSeconds(Math.Max(0,seconds));return ((long)span.TotalHours).ToString("00",CultureInfo.InvariantCulture)+span.ToString(@"\:mm\:ss",CultureInfo.InvariantCulture);}
         private static string LibraryCycles(RecordingLibrary.Entry entry,bool suffix=true)
-        {var value=entry.Summary?["observed"]?["sequenceCycleCount"];return value==null||value.Type==JTokenType.Null?"Cycles unknown":value+(suffix?" sequence cycles":"");}
+        {var value=entry.Summary?["observed"]?["sequenceCycleCount"];return value==null||value.Type==JTokenType.Null?"Cycles unknown":value+(suffix?((long?)value==1?" sequence cycle":" sequence cycles"):"");}
         private static string LibraryScenes(RecordingLibrary.Entry entry)=>JoinLibraryValues(entry.Summary?["observed"]?["sceneNames"]);
         private static string JoinLibraryValues(JToken values,bool backends=false)
         {var text=(values as JArray??new JArray()).Select(v=>backends&&TrackerBackend.TryParse(v.ToString(),out var mode)?TrackerBackend.DisplayName(mode):v.ToString()).Where(v=>!string.IsNullOrWhiteSpace(v)).ToArray();return text.Length==0?"Unavailable":string.Join(" · ",text);}
