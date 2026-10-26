@@ -33,6 +33,19 @@ public static class RecordingLibrary
         public bool CanReplay => Indexed&&PlayableRows>0&&string.IsNullOrEmpty(Error)&&!ChangedDuringScan;
         public bool Omit => Indexed&&Summary!=null&&PlayableRows==0&&(long?)Summary["poseRows"]?["rejected"]==0;
     }
+    /// <summary>Only the active source waits for its writer/media barrier; older runs remain available.</summary>
+    public static bool IsFinalizingRecording(string selectedDirectory,string activeDirectory,bool isFinalizing)
+    {
+        if(!isFinalizing||string.IsNullOrWhiteSpace(selectedDirectory)||string.IsNullOrWhiteSpace(activeDirectory))return false;
+        try
+        {
+            string selected=Path.GetFullPath(selectedDirectory).TrimEnd(Path.DirectorySeparatorChar,Path.AltDirectorySeparatorChar);
+            string active=Path.GetFullPath(activeDirectory).TrimEnd(Path.DirectorySeparatorChar,Path.AltDirectorySeparatorChar);
+            return selected.Equals(active,Path.DirectorySeparatorChar=='\\'?StringComparison.OrdinalIgnoreCase:StringComparison.Ordinal);
+        }
+        catch(ArgumentException){return false;}
+        catch(NotSupportedException){return false;}
+    }
     public static IReadOnlyList<Entry> Discover(string root,CancellationToken cancellation=default)
     {
         root=Path.GetFullPath(root);if(!Directory.Exists(root))return Array.Empty<Entry>();

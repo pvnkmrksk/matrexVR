@@ -34,7 +34,7 @@ namespace ConfigurationUI
         private ScrollView libraryDetails;
         private RecordingLibrary.Entry libraryDetailEntry;
         private string libraryDetailPath;
-        private Label libraryState,libraryEmpty;
+        private Label libraryState,libraryEmpty,libraryFinalizationState;
         private TextField librarySearch;
         private Button libraryBrowse,libraryRefresh;
         private void LeaveRecordingLibrary()
@@ -148,7 +148,7 @@ namespace ConfigurationUI
                 if(update.Message!=null)libraryMessage=update.Message;if(update.Done)libraryRunning=false;changed=true;
             }
             if(changed){RefreshLibraryRows();RefreshLibraryDetails();RefreshLibraryFooter();}
-            CheckLibraryFreshness();
+            RefreshLibraryFooter();CheckLibraryFreshness();
         }
         private static string LibraryDirectoryToken(string directory)
         {try{return string.Join("|",Directory.EnumerateDirectories(directory).OrderBy(p=>p,StringComparer.Ordinal).Select(p=>Path.GetFileName(p)+":"+Directory.GetLastWriteTimeUtc(p).Ticks));}catch{return "unavailable";}}
@@ -186,14 +186,18 @@ namespace ConfigurationUI
             string detail=entry.Error!=null?"Unavailable · "+entry.Error:!entry.Indexed?"Indexing saved recording…":entry.ChangedDuringScan?"Recording changed during indexing · Refresh to retry":LibrarySpan(entry)+" · "+LibraryCycles(entry)+" · "+LibraryScenes(entry);
             holder.Add(SessionLabel(detail,"recording-library-row-meta"));holder.tooltip=entry.DirectoryPath;
         }
-        private bool LibrarySelectionReady => SelectedLibraryEntry?.CanReplay==true&&libraryChecked.Contains(librarySelected)&&libraryPicker==null;
+        private bool LibrarySelectionFinishing
+        {
+            get{var recorder=MasterDataLogger.Instance;return recorder!=null&&RecordingLibrary.IsFinalizingRecording(librarySelected,recorder.directoryPath,recorder.IsFinalizing);}
+        }
+        private bool LibrarySelectionReady => SelectedLibraryEntry?.CanReplay==true&&libraryChecked.Contains(librarySelected)&&libraryPicker==null&&!LibrarySelectionFinishing;
         private RecordingLibrary.Entry SelectedLibraryEntry => librarySelected!=null&&libraryEntries.TryGetValue(librarySelected,out var entry)?entry:null;
         private void RefreshLibraryDetails()
         {
             if(libraryDetails==null)return;var entry=SelectedLibraryEntry;
             if(ReferenceEquals(libraryDetailEntry,entry)&&libraryDetails.childCount>0)return;
             var state=entry!=null&&libraryDetailPath==entry.DirectoryPath?WorkbenchViewState.Capture(libraryDetails):null;
-            libraryDetailEntry=entry;libraryDetailPath=entry?.DirectoryPath;libraryDetails.Clear();
+            libraryDetailEntry=entry;libraryDetailPath=entry?.DirectoryPath;libraryDetails.Clear();libraryFinalizationState=null;
             if(entry==null){libraryDetails.Add(SessionLabel("Select a recording","recording-library-name"));return;}
             libraryDetails.Add(SessionLabel(entry.Title,"recording-library-detail-title"));libraryDetails.Add(SessionLabel(entry.DateLabel+" · "+entry.Id,"recording-library-date"));
             if(entry.Error!=null){libraryDetails.Add(SessionLabel(entry.Error,"recording-library-warning"));return;}
@@ -201,6 +205,7 @@ namespace ConfigurationUI
             var summary=entry.Summary;var facts=Row("recording-library-facts");libraryDetails.Add(facts);
             AddLibraryFact(facts,"Recorded span",LibrarySpan(entry));AddLibraryFact(facts,"Sequence cycles",LibraryCycles(entry,false));AddLibraryFact(facts,"Observed rigs",JoinLibraryValues(summary?["observed"]?["rigIds"]));
             libraryDetails.Add(SessionLabel(entry.Finalized?"Finalized recording summary":entry.ChangedDuringScan?"Changing recording · refresh before replay":entry.RecordingState=="error"?"Finalization reported an error · review the saved evidence":entry.RecordingState=="open"?"Recording summary is open · completion not established":"Summary from recorded files · finalization not established","recording-library-copy"));
+            libraryFinalizationState=SessionLabel("Finishing recording… Waiting for this run’s remaining data and media files before replay.","recording-library-warning");libraryFinalizationState.name="recording-library-finalization";libraryDetails.Add(libraryFinalizationState);
             libraryDetails.Add(SessionHeading("Recorded scenes","sequence"));libraryDetails.Add(SessionLabel(LibraryScenes(entry),"recording-library-copy"));
             libraryDetails.Add(SessionHeading("Animals & input","person"));
             var animals=summary?["metadata"]?["configuredAnimals"] as JArray??new JArray();
@@ -231,8 +236,10 @@ namespace ConfigurationUI
         private void RefreshLibraryFooter(string message=null)
         {
             if(!replayLibraryMode)return;if(message!=null)libraryMessage=message;
-            if(libraryState!=null)libraryState.text=libraryMessage??"Choose a recording.";
-            if(status!=null){status.text=libraryMessage??"Choose a recording.";status.RemoveFromClassList("error");status.RemoveFromClassList("warning");}
+            bool finishing=LibrarySelectionFinishing;string messageText=finishing?"Finishing recording… This run will be available when its data and media files are complete. Other recordings can still be opened.":libraryMessage??"Choose a recording.";
+            if(libraryState!=null)libraryState.text=messageText;
+            if(libraryFinalizationState!=null)libraryFinalizationState.style.display=finishing?DisplayStyle.Flex:DisplayStyle.None;
+            if(status!=null){status.text=messageText;status.RemoveFromClassList("error");status.RemoveFromClassList("warning");}
             if(start!=null){var label=start.Q<Label>();if(label!=null)label.text="Replay selected";start.tooltip="Save this setup, then open the selected recording. Original recording files are read without modification.";start.SetEnabled(LibrarySelectionReady);}
             save?.SetEnabled(true);undo?.SetEnabled(false);redo?.SetEnabled(false);
             libraryBrowse?.SetEnabled(libraryPicker==null);libraryRefresh?.SetEnabled(!libraryRunning&&libraryPicker==null);

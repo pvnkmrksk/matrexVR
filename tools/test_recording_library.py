@@ -23,6 +23,11 @@ static class Regression {
   Check((double)first.Summary["wallClockSpanSeconds"]==3,"planned duration was substituted for observed span");Check(((JArray)first.Summary["metadata"]["identifiedAnimalIds"]).Single().ToString()=="animal A","animal identity metadata lost");
   Check(!first.Finalized&&first.Summary["lifecycle"]==null,"read-only legacy scan invented finalized lifecycle");
   Check(RecordingLibrary.Inspect(setup,cache).Omit,"setup-only rows clutter final library");Check(Snapshot(runs)==original,"library discovery/indexing changed original dataset files");
+  Check(RecordingLibrary.IsFinalizingRecording(a,a,true),"active source was replayable before writer/media finalization");
+  Check(RecordingLibrary.IsFinalizingRecording(Path.Combine(a,"..",Path.GetFileName(a))+Path.DirectorySeparatorChar,a,true),"external browse alias bypassed active source finalization");
+  Check(!RecordingLibrary.IsFinalizingRecording(setup,a,true),"finalizing current source blocked an older recording");
+  Check(!RecordingLibrary.IsFinalizingRecording(a,a,false),"completed finalization did not re-enable the selected source");
+  Check(!RecordingLibrary.IsFinalizingRecording(a,null,true),"missing active source blocked a readable external recording");
   var again=RecordingLibrary.Inspect(a,cache);Check(again.Cached&&again.CanReplay,"unchanged source did not use external summary cache");
   File.AppendAllText(csv,Row("04.000","VR1",2));var grown=RecordingLibrary.Inspect(a,cache);Check(!grown.Cached&&grown.PlayableRows==5&&(int)grown.Summary["observed"]["sequenceCycleCount"]==3,"appended recording did not invalidate cached summary");
   File.WriteAllText(Path.Combine(a,"AnimalMetadata.json"),"{\"ExperimentName\":\"Updated recording\"}");Check(RecordingLibrary.Inspect(a,cache).Title=="Updated recording","updated metadata did not invalidate cached title");
