@@ -17,6 +17,8 @@ public sealed class ReplayMediaClip
     public string AbsolutePath { get; internal set; }
     public string Container { get; internal set; }
     public string Codec { get; internal set; }
+    public string OriginalCodec { get; internal set; }
+    public string FrameMetadataBasis { get; internal set; }
     public long FrameCount { get; internal set; }
     public double NominalFps { get; internal set; }
     public string SyncMode { get; internal set; }
@@ -73,6 +75,7 @@ public sealed class ReplayMediaArchive
         {
             token.ThrowIfCancellationRequested();
             var clip=new ReplayMediaClip{Id=(string)entry["id"],RigId=(string)entry["rigId"],RelativePath=(string)entry["path"],Container=(string)entry["container"]??"unknown",Codec=(string)entry["codec"]??"unknown",
+                OriginalCodec=(string)entry["originalCodec"]??(string)entry["codec"],FrameMetadataBasis=(string)entry["frameMetadataBasis"]??"unknown",
                 FrameCount=(long?)entry["frameCount"]??0,NominalFps=(double?)entry["nominalFps"]??0,Complete=(bool?)entry["complete"]==true,State=(string)entry["state"]??"unavailable",SyncMode=(string)entry["sync"]?["mode"]??"unavailable",
                 SourceClock=(string)entry["tracker"]?["sourceClock"],AssociationLabel=(string)entry["sync"]?["association"]??"Unsynchronized camera footage"};
             result.clips.Add(clip);

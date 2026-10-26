@@ -48,6 +48,7 @@ public static class CompanionMediaArchive
 {
     private static readonly object gate=new object();
     private static readonly Dictionary<string,MediaRecordingSource> launched=new Dictionary<string,MediaRecordingSource>(StringComparer.Ordinal);
+    private static readonly Dictionary<string,MediaRecordingSource> ownedSessions=new Dictionary<string,MediaRecordingSource>(StringComparer.Ordinal);
     private static string receiptRoot;
     public static void ConfigureReceiptRoot(string root){lock(gate)receiptRoot=Path.GetFullPath(root);}
     public static void RegisterLaunchedSource(MediaRecordingSource source)
@@ -58,17 +59,22 @@ public static class CompanionMediaArchive
             // Existing run sessions retain this same source instance through idempotent Start.
             if(launched.TryGetValue(source.RigId,out var existing)&&existing.TrackerSessionId==source.TrackerSessionId)return;
             launched[source.RigId]=source;
+            if(!string.IsNullOrEmpty(source.TrackerSessionId))ownedSessions[source.TrackerSessionId]=source;
         }
     }
+    public static void ClearLaunchedSource(string rigId){lock(gate)launched.Remove(rigId);}
     public static void AcknowledgeStopped(string rigId,string sessionId=null)
     {
-        lock(gate)if(launched.TryGetValue(rigId,out var source)&&(sessionId==null||sessionId==source.TrackerSessionId))
+        lock(gate)
         {
+            MediaRecordingSource source;
+            if(sessionId!=null){if(!ownedSessions.TryGetValue(sessionId,out source)||source.RigId!=rigId)return;}
+            else if(!launched.TryGetValue(rigId,out source))return;
             source.Finalized=true;source.State="closed-after-graceful-exit";
             if(receiptRoot!=null)
             {
                 try{Directory.CreateDirectory(receiptRoot);var evidence=JObject.FromObject(source);evidence["exitCode"]=0;evidence["closedUtc"]=DateTimeOffset.UtcNow;File.WriteAllText(MarkerPath(source.TrackerSessionId),evidence.ToString(Formatting.Indented));}
-                catch(IOException){source.State="closed-marker-not-persisted";}
+                catch(Exception error) when(error is IOException||error is UnauthorizedAccessException){source.State="closed-marker-not-persisted";}
             }
         }
     }
@@ -80,7 +86,7 @@ public static class CompanionMediaArchive
     {
         lock(gate)
         {
-            if(launched.TryGetValue(rigId,out var source)&&source.TrackerSessionId==sessionId)return source;
+            if(sessionId!=null&&ownedSessions.TryGetValue(sessionId,out var source)&&source.RigId==rigId)return source;
             if(receiptRoot==null)return null;
             string marker=MarkerPath(sessionId);
             if(!File.Exists(marker)||new FileInfo(marker).Length>65536)return null;
@@ -91,7 +97,7 @@ public static class CompanionMediaArchive
     }
     public static CompanionMediaArchiveSession BeginSession(string runDirectory,string runId)
     {
-        var result=new CompanionMediaArchiveSession(runDirectory,runId);
+        var result=new CompanionMediaArchiveSession(runDirectory,runId,false);
         lock(gate)foreach(var source in launched.Values)result.RegisterSource(source);
         return result;
     }
@@ -103,10 +109,11 @@ public sealed class CompanionMediaArchiveSession
     private readonly List<MediaRecordingSource> sources=new List<MediaRecordingSource>();
     private readonly List<MediaPoseAnchor> anchors=new List<MediaPoseAnchor>();
     private readonly List<string> warnings=new List<string>();
+    private readonly bool collectWithoutSources;
     private long origin=long.MaxValue;
     private Task<MediaArchiveReceipt> finalization;
     private const int MaximumAnchors=2000000;
-    internal CompanionMediaArchiveSession(string directory,string runId){this.directory=Path.GetFullPath(directory);this.runId=runId;}
+    internal CompanionMediaArchiveSession(string directory,string runId,bool collectWithoutSources=true){this.directory=Path.GetFullPath(directory);this.runId=runId;this.collectWithoutSources=collectWithoutSources;}
     public void RegisterSource(MediaRecordingSource source){if(source!=null&&!sources.Contains(source))sources.Add(source);}
     public void RetainRigs(IEnumerable<string> configuredRigIds)
     {
@@ -121,6 +128,7 @@ public sealed class CompanionMediaArchiveSession
         string Cell(string key)=>ReplaySessionArchive.Cell(header,cells,key);
         if(!ReplaySessionArchive.TryTimestamp(Cell("Current Time"),out long ticks))return;
         origin=Math.Min(origin,ticks);
+        if(sources.Count==0&&!collectWithoutSources)return;
         string frame=Cell("trackerInputFrame");
         if(!ulong.TryParse(frame,NumberStyles.None,CultureInfo.InvariantCulture,out _)||!string.Equals(Cell("trackerAppliedThisFrame"),"true",StringComparison.OrdinalIgnoreCase))return;
         if(anchors.Count>=MaximumAnchors){if(warnings.Count==0)warnings.Add("Input-frame anchor limit reached; some camera associations are unavailable.");return;}
@@ -190,10 +198,11 @@ public static class MediaArchive
                 var clip=matches[0];ReplayMediaArchive.SafePath(run,(string)clip["path"]);
                 if((bool?)clip["complete"]!=true)throw new InvalidDataException("Pending footage cannot be linked as a completed clip.");
                 if(frameCount.HasValue){clip["frameCount"]=frameCount.Value;clip["nominalFps"]=nominalFps.Value;clip["frameMetadataBasis"]="native-decoder-prepared";}
-                if((long?)clip["frameCount"]<=0||(double?)clip["nominalFps"]<=0)throw new InvalidDataException("An explicit encoded frame count and frame rate are required; no default FPS is guessed.");
+                double rate=(double?)clip["nominalFps"]??0;
+                if(((long?)clip["frameCount"]??0)<=0||rate<=0||!ReplayMediaArchive.Finite(rate))throw new InvalidDataException("An explicit encoded frame count and frame rate are required; no default FPS is guessed.");
                 clip["sync"]=new JObject{["mode"]="operator-offset",["manualOffsetSeconds"]=offset,["association"]="Approximate operator offset",["mediaTimeBasis"]=frameCount.HasValue?"native-decoder-frame-rate":"encoded-frame-rate",["modifiedUtc"]=DateTimeOffset.UtcNow};
                 token.ThrowIfCancellationRequested();WriteManifest(run,document);
-                return new MediaArchiveReceipt{Complete=true};
+                var receipt=new MediaArchiveReceipt{Complete=true};WarnExistingZip(run,receipt);return receipt;
             }
         },token);
     public static async Task<MediaArchiveReceipt> CollectPendingAsync(string runDirectory,CancellationToken token=default)
@@ -228,10 +237,13 @@ public static class MediaArchive
         if(request.SyncMode=="operator-offset"&&(!request.ManualOffsetSeconds.HasValue||!ReplayMediaArchive.Finite(request.ManualOffsetSeconds.Value)))throw new ArgumentException("An explicit finite manual offset is required.");
         string run=Path.GetFullPath(request.RunDirectory),source=Path.GetFullPath(request.SourceDirectory);
         if(!Directory.Exists(run)||!Directory.Exists(source))throw new DirectoryNotFoundException("The run and camera recording folders must both exist.");
-        if(source==run||source.StartsWith(run+Path.DirectorySeparatorChar,StringComparison.Ordinal))throw new ArgumentException("Import an original external recording, not this run's own media folder.");
+        if(string.Equals(source,run,StringComparison.OrdinalIgnoreCase)||source.StartsWith(run+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)||run.StartsWith(source+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))throw new ArgumentException("Camera source and run folders must be separate; neither may contain the other.");
         var receipt=new MediaArchiveReceipt{Complete=request.SourceClosed,Pending=!request.SourceClosed};
         if(!request.SourceClosed){receipt.Warnings.Add("Camera source is still open or not confirmed closed; no files were copied.");return receipt;}
-        if(Directory.GetFiles(source,"*.partial",SearchOption.AllDirectories).Length>0){receipt.Complete=false;receipt.Pending=true;receipt.Warnings.Add("Native .partial media exists; close/finalize the recorder before import.");return receipt;}
+        WarnExistingZip(run,receipt);
+        var inputFiles=EnumerateSafe(source).Take(50001).ToArray();
+        if(inputFiles.Length>50000)throw new InvalidDataException("Camera recording contains too many files.");
+        if(inputFiles.Any(path=>path.EndsWith(".partial",StringComparison.OrdinalIgnoreCase))){receipt.Complete=false;receipt.Pending=true;receipt.Warnings.Add("Native .partial media exists; close/finalize the recorder before import.");return receipt;}
         var anchors=request.Anchors;
         long origin=request.ReplayOriginTicks;
         if(anchors==null)
@@ -247,7 +259,7 @@ public static class MediaArchive
         try
         {
             var artifacts=new JArray();var copies=new List<string>();
-            foreach(string input in EnumerateSafe(source))
+            foreach(string input in inputFiles)
             {
                 token.ThrowIfCancellationRequested();if(!allowed.Contains(Path.GetExtension(input)))continue;
                 if(copies.Count>=50000)throw new InvalidDataException("Camera recording contains too many files.");
@@ -265,9 +277,9 @@ public static class MediaArchive
             var clips=new JArray();
             foreach(string child in copies.Where(IsVideo))
             {
-                string full=ReplayMediaArchive.SafePath(temporary,child);var info=ReadVideoInfo(full);
+                string full=ReplayMediaArchive.SafePath(temporary,child);var info=ReadVideoInfo(full,token);
                 string backend=request.ExpectedBackend??(copies.Any(p=>Path.GetFileName(p)=="frames.jsonl")?"Rekkefly":"unknown");
-                var clip=new JObject{["id"]=rig+"-"+session+"-"+clips.Count,["rigId"]=request.RigId,["path"]=relative+"/"+child,["container"]=Path.GetExtension(child).TrimStart('.').ToLowerInvariant(),["codec"]=info.codec,
+                var clip=new JObject{["id"]=rig+"-"+session+"-"+clips.Count,["rigId"]=request.RigId,["path"]=relative+"/"+child,["container"]=Path.GetExtension(child).TrimStart('.').ToLowerInvariant(),["codec"]=info.codec,["originalCodec"]=info.originalCodec,["frameMetadataBasis"]=info.verified?"validated-intra-frame-index":info.frames>0?"container-header-only":"unknown",
                     ["frameCount"]=info.frames,["nominalFps"]=info.fps,["complete"]=true,["state"]="ready",["byteLength"]=new FileInfo(full).Length,["sha256"]=ReplayMediaArchive.Hash(full,token),
                     ["tracker"]=new JObject{["backend"]=backend,["sourceRevision"]=request.Source?.SourceRevision,["executableSha256"]=request.Source?.ExecutableSha256,["sessionId"]=request.Source?.TrackerSessionId,["sourceClock"]=request.Source?.SourceClock},
                     ["sync"]=new JObject{["mode"]="unavailable",["association"]="Unsynchronized camera footage",["mediaTimeBasis"]=info.fps>0?"encoded-frame-rate":"unknown"}};
@@ -299,24 +311,29 @@ public static class MediaArchive
 
     private static IEnumerable<string> EnumerateSafe(string root)
     {
-        var pending=new Stack<string>();pending.Push(root);
+        var pending=new Stack<string>();pending.Push(root);int visited=0;
         while(pending.Count>0)
         {
             string directory=pending.Pop();
+            if(++visited>50000)throw new InvalidDataException("Camera recording contains too many folders.");
             if((File.GetAttributes(directory)&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException("Camera imports cannot follow symbolic links.");
             foreach(string file in Directory.GetFiles(directory)){if((File.GetAttributes(file)&FileAttributes.ReparsePoint)!=0)throw new InvalidDataException("Camera imports cannot follow symbolic links.");yield return file;}
             foreach(string child in Directory.GetDirectories(directory))pending.Push(child);
         }
     }
+    private static void WarnExistingZip(string run,MediaArchiveReceipt receipt)
+    {
+        if(File.Exists(run.TrimEnd(Path.DirectorySeparatorChar)+".zip"))receipt.Warnings.Add("The run folder now contains updated camera metadata/media. Its existing ZIP is an older snapshot and was preserved; it does not include these updates.");
+    }
     private static bool IsVideo(string path)=>new[]{".avi",".mp4",".webm"}.Contains(Path.GetExtension(path),StringComparer.OrdinalIgnoreCase);
     private static string SafeName(string value)=>new string((value??"unknown").Select(c=>char.IsLetterOrDigit(c)||c=='-'||c=='_'?c:'_').ToArray());
-    private sealed class VideoInfo{internal long frames;internal double fps;internal string codec="unknown";internal bool verified;}
-    private static VideoInfo ReadVideoInfo(string path)
+    private sealed class VideoInfo{internal long frames;internal double fps;internal string codec="unknown",originalCodec="unknown";internal bool verified;}
+    private static VideoInfo ReadVideoInfo(string path,CancellationToken token)
     {
         var info=new VideoInfo();if(!path.EndsWith(".avi",StringComparison.OrdinalIgnoreCase))return info;
         try
         {
-            using(var native=ReplayAviFrameSource.Open(path))return new VideoInfo{frames=native.FrameCount,fps=native.NominalFramesPerSecond,codec=native.Codec.Equals("MJPG",StringComparison.OrdinalIgnoreCase)?"mjpeg":native.Codec.ToLowerInvariant(),verified=true};
+            using(var native=ReplayAviFrameSource.Open(path,token))return new VideoInfo{frames=native.FrameCount,fps=native.NominalFramesPerSecond,codec=native.Codec.Equals("MJPG",StringComparison.OrdinalIgnoreCase)?"mjpeg":native.Codec.ToLowerInvariant(),originalCodec=native.Codec,verified=true};
         }
         catch(InvalidDataException) { /* Other codecs remain importable for the platform VideoPlayer, with no verified frame join. */ }
         using(var reader=new BinaryReader(File.OpenRead(path)))
@@ -335,7 +352,7 @@ public static class MediaArchive
             if(next>end||next<start)break;
             if(id=="LIST"&&size>=4){string kind=new string(reader.ReadChars(4));if(kind=="movi")return;ReadChunks(reader,start+size,info,depth+1);}
             else if(id=="avih"&&size>=40){uint micros=reader.ReadUInt32();reader.BaseStream.Position=start+16;info.frames=reader.ReadUInt32();if(micros>0)info.fps=1000000.0/micros;}
-            else if(id=="strh"&&size>=36){string type=new string(reader.ReadChars(4)),codec=new string(reader.ReadChars(4));if(type=="vids"){reader.BaseStream.Position=start+20;uint scale=reader.ReadUInt32(),rate=reader.ReadUInt32();reader.ReadUInt32();info.frames=reader.ReadUInt32();if(scale>0)info.fps=rate/(double)scale;info.codec=codec.Trim().Equals("MJPG",StringComparison.OrdinalIgnoreCase)?"mjpeg":codec.Trim().ToLowerInvariant();}}
+            else if(id=="strh"&&size>=36){string type=new string(reader.ReadChars(4)),codec=new string(reader.ReadChars(4));if(type=="vids"){reader.BaseStream.Position=start+20;uint scale=reader.ReadUInt32(),rate=reader.ReadUInt32();reader.ReadUInt32();info.frames=reader.ReadUInt32();if(scale>0)info.fps=rate/(double)scale;info.originalCodec=codec.Trim();info.codec=codec.Trim().Equals("MJPG",StringComparison.OrdinalIgnoreCase)?"mjpeg":codec.Trim().ToLowerInvariant();}}
             reader.BaseStream.Position=next;
         }
     }
