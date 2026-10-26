@@ -8,7 +8,7 @@ namespace ConfigurationUI
     public sealed class WorkbenchIcon : VisualElement
     {
         private static readonly Dictionary<string,string> Names=new Dictionary<string,string> {
-            {"home","house"},{"person","user"},{"auto","zap"},{"loop","repeat"},{"shuffle","shuffle"},
+            {"power","power"},{"back","arrow-left"},{"home","house"},{"person","user"},{"auto","zap"},{"loop","repeat"},{"shuffle","shuffle"},
             {"play","play"},{"sequence","list-ordered"},{"system","monitor"},{"motion","move-right"},
             {"sky","sun"},{"swarm","network"},{"file","file-text"},{"plus","plus"},{"copy","copy"},
             {"trash","trash"},{"grip","grip-vertical"},{"settings","sliders-horizontal"},{"stop","square"},
