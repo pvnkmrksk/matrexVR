@@ -1,0 +1,1079 @@
+{
+  "date": "2026-10-27",
+  "status": "Investigation completed; razor-sharp60 has not been achieved or claimed. Product pacing policy unchanged.",
+  "system": {
+    "cpuGpu": "Apple M2 Pro",
+    "os": "macOS27.0.1",
+    "display": "Built-in Color LCD3024x1964; logical1512x982 at120Hz",
+    "unity": "6000.3.16f1",
+    "refreshRatio": {
+      "numerator": 24000000,
+      "denominator": 199999
+    }
+  },
+  "scope": "Isolated diagnostic apps and generated test sources only; main prepared user build and all real tracker processes left open and untouched. No other benchmark Editor ran during native measurements.",
+  "findings": {
+    "probeBias": "Old opt-in RuntimePerformanceProbe includes a first partial LateUpdate interval and divides frame count by a coroutine window extending one last interval beyond sampled data. Final prior result120/2.012381584=59.63084; sampled intervals sum1.99640175. Neither number alone establishes exact60. Diagnostic version skips the first LateUpdate and computes full-interval count divided by exact interval sum.",
+    "actualFpsDisplay": "Existing fps.cs uses consecutive Update intervals/count correctly after startup. A different agent owns startup priming/frame-start timing refinement; no display changes made here.",
+    "matrexOrEngine": "Minimal cube reproduces legacyVSync jitter and~57.3FPS with documentedMetalDisplayLink when targeting60 or VSync2, so those phenomena are not caused by MATREX terrain/tracking C# code. MATREX+four native encoders has wider legacy software60 tails than the cube; further controlled capped-workload isolation is required to attribute that increment.",
+    "noWorkaround": "Enabling legacyVSync2 or MetalDisplayLink indiscriminately is not justified by measurements. Explicit user timing config remains authoritative.",
+    "resolution": "The CLI1920x1080/windowed attempt was returned to native FullScreenWindow by existing DesktopDisplay policy, so it is explicitly NOT evidence from an actual1920x1080 window."
+  },
+  "cases": [
+    {
+      "artifact": "/Users/pavan/src/ledpanelVR/.local/frame-pacing-20261027/ab/metal-display-link-off/results.json",
+      "sha256": "37980e5f7d612f821b1aa85ad4d772d7572255132cc6a71ea7775046203188ff",
+      "scope": "MATREX terrain four rigs/24 configured128x128 cameras, four generated native recorders; user preview remains open",
+      "phases": [
+        {
+          "phase": "all-60",
+          "scene": "TerrainChoice_RoughLeft_SmoothRight",
+          "requestedRigs": 4,
+          "observedRigs": 4,
+          "observedDataLoggers": 4,
+          "layout": "LED-six-128",
+          "seconds": 10.004595541999999,
+          "frames": 588,
+          "fps": 58.871965337691016,
+          "phaseBoundaryFps": 58.772990625311586,
+          "completeIntervalSeconds": 9.987775958000006,
+          "frameMs": {
+            "samples": 588,
+            "mean": 16.986013534013615,
+            "minimum": 7.185208999999304,
+            "median": 16.86199999999971,
+            "p95": 18.202291999999787,
+            "p99": 20.95512499999863,
+            "maximum": 28.97920799999909,
+            "standardDeviation": 1.3337415198224336
+          },
+          "cpuMainMs": {
+            "samples": 588,
+            "mean": 14.401113967687085,
+            "minimum": 3.205041,
+            "median": 15.614459,
+            "p95": 16.742333,
+            "p99": 20.967749,
+            "maximum": 32.421667,
+            "standardDeviation": 3.385018867730672
+          },
+          "cpuRenderMs": {
+            "samples": 588,
+            "mean": 2.60696456292517,
+            "minimum": 1.073042,
+            "median": 2.529791,
+            "p95": 4.039708,
+            "p99": 4.908333,
+            "maximum": 6.169375,
+            "standardDeviation": 0.7582132584579546
+          },
+          "gpuMs": {
+            "samples": 588,
+            "mean": 2.6198357428832106,
+            "minimum": 1.450791663955897,
+            "median": 2.260458335513249,
+            "p95": 4.327666669269092,
+            "p99": 5.659624999680091,
+            "maximum": 8.137125005305279,
+            "standardDeviation": 0.9852776635757665
+          },
+          "presentWaitMs": {
+            "samples": 588,
+            "mean": 2.5833517312925176,
+            "minimum": 0.002,
+            "median": 1.085541,
+            "p95": 10.879168,
+            "p99": 13.426709,
+            "maximum": 14.371375,
+            "standardDeviation": 3.3734661214116044
+          },
+          "processCpuMs": 6601.915799999999,
+          "processCpuPercentOfOneCore": 65.98883255484633,
+          "processCpuMsPerFrame": 11.227747959183672,
+          "allocationCounterAvailable": false,
+          "mainThreadAllocatedBytes": null,
+          "mainThreadAllocatedBytesPerFrame": null,
+          "collections": [
+            11,
+            11,
+            11
+          ],
+          "focused": false,
+          "target": 60,
+          "vsync": 0,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "fullScreen": "FullScreenWindow",
+          "metalDisplayLink": "0",
+          "frameTimingAvailable": true,
+          "listenersEnabled": true,
+          "trackingFresh": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "recordingEnabled": true,
+          "telemetryEnabled": true,
+          "overlayHidden": false,
+          "intervals": 588,
+          "effectiveBudgetMs": 16.666666666666668,
+          "intervalsOverBudgetByMs": {
+            "0.25": 270,
+            "0.5": 176,
+            "1": 66,
+            "2": 22,
+            "4": 7,
+            "8": 4
+          }
+        },
+        {
+          "phase": "vsync-1",
+          "scene": "TerrainChoice_RoughLeft_SmoothRight",
+          "requestedRigs": 4,
+          "observedRigs": 4,
+          "observedDataLoggers": 4,
+          "layout": "LED-six-128",
+          "seconds": 10.003053958000002,
+          "frames": 1179,
+          "fps": 117.95932124722587,
+          "phaseBoundaryFps": 117.86400482795433,
+          "completeIntervalSeconds": 9.994971042000017,
+          "frameMs": {
+            "samples": 1179,
+            "mean": 8.477498763358794,
+            "minimum": 3.833874999997988,
+            "median": 8.356124999998826,
+            "p95": 9.465750000000384,
+            "p99": 13.288875000000644,
+            "maximum": 22.502166999998963,
+            "standardDeviation": 1.0858367444063108
+          },
+          "cpuMainMs": {
+            "samples": 1179,
+            "mean": 7.60455347582698,
+            "minimum": 3.271918,
+            "median": 7.706749,
+            "p95": 8.132417,
+            "p99": 13.368667,
+            "maximum": 24.441625,
+            "standardDeviation": 1.2390310407285736
+          },
+          "cpuRenderMs": {
+            "samples": 1179,
+            "mean": 2.200078236641222,
+            "minimum": 1.087375,
+            "median": 2.412083,
+            "p95": 2.929459,
+            "p99": 3.441542,
+            "maximum": 5.219246,
+            "standardDeviation": 0.5987404416024616
+          },
+          "gpuMs": {
+            "samples": 1179,
+            "mean": 2.0184344783315433,
+            "minimum": 1.4044999988982454,
+            "median": 1.857791663496755,
+            "p95": 3.2287499998346902,
+            "p99": 4.239416666678153,
+            "maximum": 5.3699999989476055,
+            "standardDeviation": 0.5481721646036277
+          },
+          "presentWaitMs": {
+            "samples": 1179,
+            "mean": 0.8666434851569128,
+            "minimum": 0.043168,
+            "median": 0.624666,
+            "p95": 2.686458,
+            "p99": 4.207334,
+            "maximum": 5.900749,
+            "standardDeviation": 0.8087090998733603
+          },
+          "processCpuMs": 11849.9091,
+          "processCpuPercentOfOneCore": 118.46291292393724,
+          "processCpuMsPerFrame": 10.05081348600509,
+          "allocationCounterAvailable": false,
+          "mainThreadAllocatedBytes": null,
+          "mainThreadAllocatedBytesPerFrame": null,
+          "collections": [
+            12,
+            12,
+            12
+          ],
+          "focused": false,
+          "target": -1,
+          "vsync": 1,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "fullScreen": "FullScreenWindow",
+          "metalDisplayLink": "0",
+          "frameTimingAvailable": true,
+          "listenersEnabled": true,
+          "trackingFresh": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "recordingEnabled": true,
+          "telemetryEnabled": true,
+          "overlayHidden": false,
+          "intervals": 1179,
+          "effectiveBudgetMs": 8.333291666666666,
+          "intervalsOverBudgetByMs": {
+            "0.25": 341,
+            "0.5": 173,
+            "1": 70,
+            "2": 35,
+            "4": 18,
+            "8": 5
+          }
+        },
+        {
+          "phase": "vsync-2",
+          "scene": "TerrainChoice_RoughLeft_SmoothRight",
+          "requestedRigs": 4,
+          "observedRigs": 4,
+          "observedDataLoggers": 4,
+          "layout": "LED-six-128",
+          "seconds": 10.005755667000003,
+          "frames": 593,
+          "fps": 59.36607518375552,
+          "phaseBoundaryFps": 59.26588852811729,
+          "completeIntervalSeconds": 9.98886987499999,
+          "frameMs": {
+            "samples": 593,
+            "mean": 16.844637225969628,
+            "minimum": 6.136417000000449,
+            "median": 16.76070900000326,
+            "p95": 17.68549999999891,
+            "p99": 21.073708000002966,
+            "maximum": 26.883832999999413,
+            "standardDeviation": 1.049205231023076
+          },
+          "cpuMainMs": {
+            "samples": 593,
+            "mean": 15.01179473693087,
+            "minimum": 3.858833,
+            "median": 15.830084,
+            "p95": 16.47725,
+            "p99": 19.91396,
+            "maximum": 24.697042,
+            "standardDeviation": 2.4277817017483505
+          },
+          "cpuRenderMs": {
+            "samples": 593,
+            "mean": 2.6479257807757177,
+            "minimum": 1.136001,
+            "median": 2.595541,
+            "p95": 3.565333,
+            "p99": 4.857834,
+            "maximum": 6.736166,
+            "standardDeviation": 0.597252393364507
+          },
+          "gpuMs": {
+            "samples": 593,
+            "mean": 1.9830708264310029,
+            "minimum": 1.4928750024409965,
+            "median": 1.8322499963687733,
+            "p95": 2.9950833340990357,
+            "p99": 3.8780000031692907,
+            "maximum": 5.704750001314096,
+            "standardDeviation": 0.4902255739112903
+          },
+          "presentWaitMs": {
+            "samples": 593,
+            "mean": 1.8211272512647556,
+            "minimum": 0.069167,
+            "median": 0.833082,
+            "p95": 8.071251,
+            "p99": 12.125792,
+            "maximum": 13.700417,
+            "standardDeviation": 2.5399711855233296
+          },
+          "processCpuMs": 7050.277000000002,
+          "processCpuPercentOfOneCore": 70.46221429584305,
+          "processCpuMsPerFrame": 11.889168634064085,
+          "allocationCounterAvailable": false,
+          "mainThreadAllocatedBytes": null,
+          "mainThreadAllocatedBytesPerFrame": null,
+          "collections": [
+            10,
+            10,
+            10
+          ],
+          "focused": false,
+          "target": -1,
+          "vsync": 2,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "fullScreen": "FullScreenWindow",
+          "metalDisplayLink": "0",
+          "frameTimingAvailable": true,
+          "listenersEnabled": true,
+          "trackingFresh": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "recordingEnabled": true,
+          "telemetryEnabled": true,
+          "overlayHidden": false,
+          "intervals": 593,
+          "effectiveBudgetMs": 16.66658333333333,
+          "intervalsOverBudgetByMs": {
+            "0.25": 203,
+            "0.5": 119,
+            "1": 31,
+            "2": 15,
+            "4": 7,
+            "8": 1
+          }
+        },
+        {
+          "phase": "all-60-repeat",
+          "scene": "TerrainChoice_RoughLeft_SmoothRight",
+          "requestedRigs": 4,
+          "observedRigs": 4,
+          "observedDataLoggers": 4,
+          "layout": "LED-six-128",
+          "seconds": 10.015362416999999,
+          "frames": 590,
+          "fps": 59.009815049428354,
+          "phaseBoundaryFps": 58.90950076839342,
+          "completeIntervalSeconds": 9.998336708999997,
+          "frameMs": {
+            "samples": 590,
+            "mean": 16.94633340508474,
+            "minimum": 11.444750000002557,
+            "median": 16.85729099999378,
+            "p95": 18.29541699999737,
+            "p99": 20.043083000004458,
+            "maximum": 24.626790999995762,
+            "standardDeviation": 0.9212366806425878
+          },
+          "cpuMainMs": {
+            "samples": 590,
+            "mean": 14.06475311525424,
+            "minimum": 2.947457,
+            "median": 15.637833,
+            "p95": 16.696332,
+            "p99": 19.815084,
+            "maximum": 20.343292,
+            "standardDeviation": 3.334479068819806
+          },
+          "cpuRenderMs": {
+            "samples": 590,
+            "mean": 2.766288442372883,
+            "minimum": 1.111624,
+            "median": 2.749042,
+            "p95": 4.008166,
+            "p99": 4.70475,
+            "maximum": 6.476792,
+            "standardDeviation": 0.6778020830634074
+          },
+          "gpuMs": {
+            "samples": 590,
+            "mean": 1.9935274717912979,
+            "minimum": 1.4642500027548522,
+            "median": 1.803624996682629,
+            "p95": 3.2652083318680525,
+            "p99": 4.292749996238854,
+            "maximum": 5.739874999562744,
+            "standardDeviation": 0.5866180622466326
+          },
+          "presentWaitMs": {
+            "samples": 590,
+            "mean": 2.871853537288135,
+            "minimum": 0.002875,
+            "median": 1.058876,
+            "p95": 11.150584,
+            "p99": 13.630332,
+            "maximum": 14.661251,
+            "standardDeviation": 3.5307279678253063
+          },
+          "processCpuMs": 7086.265999999996,
+          "processCpuPercentOfOneCore": 70.75396480882033,
+          "processCpuMsPerFrame": 12.010620338983044,
+          "allocationCounterAvailable": false,
+          "mainThreadAllocatedBytes": null,
+          "mainThreadAllocatedBytesPerFrame": null,
+          "collections": [
+            10,
+            10,
+            10
+          ],
+          "focused": false,
+          "target": 60,
+          "vsync": 0,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "fullScreen": "FullScreenWindow",
+          "metalDisplayLink": "0",
+          "frameTimingAvailable": true,
+          "listenersEnabled": true,
+          "trackingFresh": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "recordingEnabled": true,
+          "telemetryEnabled": true,
+          "overlayHidden": false,
+          "intervals": 590,
+          "effectiveBudgetMs": 16.666666666666668,
+          "intervalsOverBudgetByMs": {
+            "0.25": 278,
+            "0.5": 171,
+            "1": 78,
+            "2": 19,
+            "4": 2,
+            "8": 0
+          }
+        }
+      ]
+    },
+    {
+      "artifact": "/Users/pavan/src/ledpanelVR/.local/frame-pacing-20261027/windowed-ab/metal-display-link-on/results.json",
+      "sha256": "79972c900078254dd53fe62f79bc48c222b0a755f52a42263c2049447f57e4a5",
+      "scope": "MATREX terrain four rigs/24 configured128x128 cameras, four generated native recorders; user preview remains open",
+      "phases": [
+        {
+          "phase": "all-60",
+          "scene": "TerrainChoice_RoughLeft_SmoothRight",
+          "requestedRigs": 4,
+          "observedRigs": 4,
+          "observedDataLoggers": 4,
+          "layout": "LED-six-128",
+          "seconds": 5.005992625000001,
+          "frames": 286,
+          "fps": 57.333431613793934,
+          "phaseBoundaryFps": 57.13152643727675,
+          "completeIntervalSeconds": 4.988363542000002,
+          "frameMs": {
+            "samples": 286,
+            "mean": 17.441830566433573,
+            "minimum": 12.315083000000726,
+            "median": 17.481082999999842,
+            "p95": 18.56945899999829,
+            "p99": 20.709582999998588,
+            "maximum": 26.098042000000987,
+            "standardDeviation": 0.9583649645780027
+          },
+          "cpuMainMs": {
+            "samples": 286,
+            "mean": 41.009271174825166,
+            "minimum": 1.848042,
+            "median": 4.2805,
+            "p95": 7.771251,
+            "p99": 13.546626,
+            "maximum": 10355.136916,
+            "standardDeviation": 610.95992479195
+          },
+          "cpuRenderMs": {
+            "samples": 286,
+            "mean": 2.42501174825175,
+            "minimum": 0.998292,
+            "median": 2.518208,
+            "p95": 3.078582,
+            "p99": 4.680459,
+            "maximum": 5.031,
+            "standardDeviation": 0.5828167953008814
+          },
+          "gpuMs": {
+            "samples": 286,
+            "mean": 2.247355769366397,
+            "minimum": 1.51591666508466,
+            "median": 2.0076250002603047,
+            "p95": 3.5235416653449647,
+            "p99": 5.892499997571576,
+            "maximum": 6.718416669173166,
+            "standardDeviation": 0.7504275148382564
+          },
+          "presentWaitMs": {
+            "samples": 286,
+            "mean": 12.585698374125876,
+            "minimum": 0.003374,
+            "median": 13.140875,
+            "p95": 15.170125,
+            "p99": 15.515874,
+            "maximum": 15.720666,
+            "standardDeviation": 2.0178922430904427
+          },
+          "processCpuMs": 3158.5751,
+          "processCpuPercentOfOneCore": 63.09588001041051,
+          "processCpuMsPerFrame": 11.04396888111888,
+          "allocationCounterAvailable": false,
+          "mainThreadAllocatedBytes": null,
+          "mainThreadAllocatedBytesPerFrame": null,
+          "collections": [
+            6,
+            6,
+            6
+          ],
+          "focused": true,
+          "target": 60,
+          "vsync": 0,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "fullScreen": "FullScreenWindow",
+          "metalDisplayLink": "1",
+          "frameTimingAvailable": true,
+          "listenersEnabled": true,
+          "trackingFresh": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "recordingEnabled": true,
+          "telemetryEnabled": true,
+          "overlayHidden": false,
+          "intervals": 286,
+          "effectiveBudgetMs": 16.666666666666668,
+          "intervalsOverBudgetByMs": {
+            "0.25": 237,
+            "0.5": 217,
+            "1": 80,
+            "2": 11,
+            "4": 3,
+            "8": 1
+          }
+        },
+        {
+          "phase": "vsync-2",
+          "scene": "TerrainChoice_RoughLeft_SmoothRight",
+          "requestedRigs": 4,
+          "observedRigs": 4,
+          "observedDataLoggers": 4,
+          "layout": "LED-six-128",
+          "seconds": 5.005003667,
+          "frames": 287,
+          "fps": 57.54126524470737,
+          "phaseBoundaryFps": 57.34261532959631,
+          "completeIntervalSeconds": 4.987724875000001,
+          "frameMs": {
+            "samples": 287,
+            "mean": 17.378832317073176,
+            "minimum": 14.812917000000425,
+            "median": 17.42083299999919,
+            "p95": 18.3582919999985,
+            "p99": 19.172208000000523,
+            "maximum": 19.496624999998602,
+            "standardDeviation": 0.6436241922243242
+          },
+          "cpuMainMs": {
+            "samples": 287,
+            "mean": 4.6535159024390245,
+            "minimum": 1.824624,
+            "median": 4.38,
+            "p95": 7.154417,
+            "p99": 10.112708,
+            "maximum": 12.040125,
+            "standardDeviation": 1.44930332399209
+          },
+          "cpuRenderMs": {
+            "samples": 287,
+            "mean": 2.384018770034843,
+            "minimum": 1.068959,
+            "median": 2.566083,
+            "p95": 3.154999,
+            "p99": 3.546959,
+            "maximum": 3.638959,
+            "standardDeviation": 0.5741622542014976
+          },
+          "gpuMs": {
+            "samples": 287,
+            "mean": 2.2571265971481163,
+            "minimum": 1.5334999989136122,
+            "median": 2.018749997660052,
+            "p95": 3.61858333053533,
+            "p99": 4.870875003689434,
+            "maximum": 4.992625006707385,
+            "standardDeviation": 0.686478690159211
+          },
+          "presentWaitMs": {
+            "samples": 287,
+            "mean": 12.72843326480836,
+            "minimum": 4.820833,
+            "median": 12.937793,
+            "p95": 15.209209,
+            "p99": 15.497291,
+            "maximum": 15.774668,
+            "standardDeviation": 1.5270865438971384
+          },
+          "processCpuMs": 3227.6760000000013,
+          "processCpuPercentOfOneCore": 64.4889837200593,
+          "processCpuMsPerFrame": 11.24625783972126,
+          "allocationCounterAvailable": false,
+          "mainThreadAllocatedBytes": null,
+          "mainThreadAllocatedBytesPerFrame": null,
+          "collections": [
+            5,
+            5,
+            5
+          ],
+          "focused": true,
+          "target": -1,
+          "vsync": 2,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "fullScreen": "FullScreenWindow",
+          "metalDisplayLink": "1",
+          "frameTimingAvailable": true,
+          "listenersEnabled": true,
+          "trackingFresh": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "recordingEnabled": true,
+          "telemetryEnabled": true,
+          "overlayHidden": false,
+          "intervals": 287,
+          "effectiveBudgetMs": 16.66658333333333,
+          "intervalsOverBudgetByMs": {
+            "0.25": 235,
+            "0.5": 194,
+            "1": 84,
+            "2": 6,
+            "4": 0,
+            "8": 0
+          }
+        }
+      ]
+    },
+    {
+      "artifact": "/Users/pavan/src/ledpanelVR/.local/frame-pacing-20261027/windowed-ab/metal-display-link-off/results.json",
+      "sha256": "0f9bb7ef5a785f3dc53802dd69ce8c556dc53f1be40c05602f86344f3e7a2bbd",
+      "scope": "MATREX terrain four rigs/24 configured128x128 cameras, four generated native recorders; user preview remains open",
+      "phases": [
+        {
+          "phase": "all-60",
+          "scene": "TerrainChoice_RoughLeft_SmoothRight",
+          "requestedRigs": 4,
+          "observedRigs": 4,
+          "observedDataLoggers": 4,
+          "layout": "LED-six-128",
+          "seconds": 5.0090104580000006,
+          "frames": 296,
+          "fps": 59.29426404054322,
+          "phaseBoundaryFps": 59.09350808546465,
+          "completeIntervalSeconds": 4.992051167000001,
+          "frameMs": {
+            "samples": 296,
+            "mean": 16.865037726351357,
+            "minimum": 6.532625000000181,
+            "median": 16.782375000000016,
+            "p95": 18.21937499999926,
+            "p99": 21.18845800000102,
+            "maximum": 27.05333399999965,
+            "standardDeviation": 1.3033651939344681
+          },
+          "cpuMainMs": {
+            "samples": 296,
+            "mean": 14.57016069932433,
+            "minimum": 3.019,
+            "median": 15.831125,
+            "p95": 16.642709,
+            "p99": 20.218832,
+            "maximum": 21.489458,
+            "standardDeviation": 3.1453457648050636
+          },
+          "cpuRenderMs": {
+            "samples": 296,
+            "mean": 2.374983851351351,
+            "minimum": 1.136125,
+            "median": 2.489958,
+            "p95": 2.847793,
+            "p99": 3.428999,
+            "maximum": 3.500583,
+            "standardDeviation": 0.46530808618693087
+          },
+          "gpuMs": {
+            "samples": 296,
+            "mean": 1.991462837616603,
+            "minimum": 1.4559999981429428,
+            "median": 1.8811249974532984,
+            "p95": 3.240208337956574,
+            "p99": 4.032999997434672,
+            "maximum": 4.291249999369029,
+            "standardDeviation": 0.4886521401267533
+          },
+          "presentWaitMs": {
+            "samples": 296,
+            "mean": 2.3110234189189183,
+            "minimum": 0.004583,
+            "median": 0.845958,
+            "p95": 10.596251,
+            "p99": 13.579084,
+            "maximum": 14.576,
+            "standardDeviation": 3.315556626371954
+          },
+          "processCpuMs": 3310.6849999999995,
+          "processCpuPercentOfOneCore": 66.09459149186706,
+          "processCpuMsPerFrame": 11.18474662162162,
+          "allocationCounterAvailable": false,
+          "mainThreadAllocatedBytes": null,
+          "mainThreadAllocatedBytesPerFrame": null,
+          "collections": [
+            5,
+            5,
+            5
+          ],
+          "focused": true,
+          "target": 60,
+          "vsync": 0,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "fullScreen": "FullScreenWindow",
+          "metalDisplayLink": "0",
+          "frameTimingAvailable": true,
+          "listenersEnabled": true,
+          "trackingFresh": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "recordingEnabled": true,
+          "telemetryEnabled": true,
+          "overlayHidden": false,
+          "intervals": 296,
+          "effectiveBudgetMs": 16.666666666666668,
+          "intervalsOverBudgetByMs": {
+            "0.25": 116,
+            "0.5": 74,
+            "1": 29,
+            "2": 12,
+            "4": 4,
+            "8": 1
+          }
+        },
+        {
+          "phase": "vsync-2",
+          "scene": "TerrainChoice_RoughLeft_SmoothRight",
+          "requestedRigs": 4,
+          "observedRigs": 4,
+          "observedDataLoggers": 4,
+          "layout": "LED-six-128",
+          "seconds": 5.004036624999998,
+          "frames": 296,
+          "fps": 59.34935313382592,
+          "phaseBoundaryFps": 59.15224491387493,
+          "completeIntervalSeconds": 4.987417459000004,
+          "frameMs": {
+            "samples": 296,
+            "mean": 16.849383307432447,
+            "minimum": 12.853583999998364,
+            "median": 16.756958999998517,
+            "p95": 18.44054200000045,
+            "p99": 21.02404200000052,
+            "maximum": 22.270834000000406,
+            "standardDeviation": 1.0333533195800344
+          },
+          "cpuMainMs": {
+            "samples": 296,
+            "mean": 13.866543087837835,
+            "minimum": 3.472667,
+            "median": 15.556834,
+            "p95": 16.480541,
+            "p99": 20.553374,
+            "maximum": 21.998958,
+            "standardDeviation": 3.1665700353172763
+          },
+          "cpuRenderMs": {
+            "samples": 296,
+            "mean": 2.2204704459459443,
+            "minimum": 1.02725,
+            "median": 2.444501,
+            "p95": 2.952584,
+            "p99": 3.185167,
+            "maximum": 3.518876,
+            "standardDeviation": 0.5666140890158909
+          },
+          "gpuMs": {
+            "samples": 296,
+            "mean": 2.216088682379868,
+            "minimum": 1.4538750037900172,
+            "median": 1.9716666647582315,
+            "p95": 3.644083335530013,
+            "p99": 4.3516250007087365,
+            "maximum": 4.568500000459608,
+            "standardDeviation": 0.6106398507926504
+          },
+          "presentWaitMs": {
+            "samples": 296,
+            "mean": 2.98703914189189,
+            "minimum": 0.117042,
+            "median": 1.211,
+            "p95": 10.827416,
+            "p99": 13.249749,
+            "maximum": 13.792583,
+            "standardDeviation": 3.2177359599778486
+          },
+          "processCpuMs": 3347.4588999999996,
+          "processCpuPercentOfOneCore": 66.89517185538188,
+          "processCpuMsPerFrame": 11.30898277027027,
+          "allocationCounterAvailable": false,
+          "mainThreadAllocatedBytes": null,
+          "mainThreadAllocatedBytesPerFrame": null,
+          "collections": [
+            5,
+            5,
+            5
+          ],
+          "focused": true,
+          "target": -1,
+          "vsync": 2,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "fullScreen": "FullScreenWindow",
+          "metalDisplayLink": "0",
+          "frameTimingAvailable": true,
+          "listenersEnabled": true,
+          "trackingFresh": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "recordingEnabled": true,
+          "telemetryEnabled": true,
+          "overlayHidden": false,
+          "intervals": 296,
+          "effectiveBudgetMs": 16.66658333333333,
+          "intervalsOverBudgetByMs": {
+            "0.25": 114,
+            "0.5": 78,
+            "1": 36,
+            "2": 10,
+            "4": 5,
+            "8": 0
+          }
+        }
+      ]
+    },
+    {
+      "artifact": "/Users/pavan/src/ledpanelVR/.local/frame-pacing-20261027/minimal-ab/metal-off/results.json",
+      "sha256": "95173ac95036967f5d009f1a6eea19d686cdd3a2cd2416c708392b66a531e117",
+      "scope": "one cube, one camera, no MATREX runtime scripts or tracker processes",
+      "phases": [
+        {
+          "sync": 0,
+          "target": 60,
+          "fps": 59.90122283546304,
+          "mean": 16.694150013377936,
+          "median": 16.685083999998795,
+          "p95": 16.943292000000554,
+          "p99": 17.48304200000028,
+          "maximum": 17.916042000001298,
+          "minimum": 16.071290999999377,
+          "focused": true,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "screen": [
+            3024,
+            1898
+          ],
+          "mode": "FullScreenWindow",
+          "metal": "0",
+          "intervals": 598,
+          "effectiveBudgetMs": 16.666666666666668,
+          "intervalsOverBudgetByMs": {
+            "0.25": 39,
+            "0.5": 14,
+            "1": 3,
+            "2": 0,
+            "4": 0,
+            "8": 0
+          }
+        },
+        {
+          "sync": 1,
+          "target": -1,
+          "fps": 112.85652607578913,
+          "mean": 8.860807919326234,
+          "median": 8.379250000000837,
+          "p95": 12.514749999997576,
+          "p99": 15.448834000000744,
+          "maximum": 21.612791999999104,
+          "minimum": 4.928041999999522,
+          "focused": true,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "screen": [
+            3024,
+            1898
+          ],
+          "mode": "FullScreenWindow",
+          "metal": "0",
+          "intervals": 1128,
+          "effectiveBudgetMs": 8.333291666666666,
+          "intervalsOverBudgetByMs": {
+            "0.25": 381,
+            "0.5": 286,
+            "1": 190,
+            "2": 117,
+            "4": 61,
+            "8": 10
+          }
+        },
+        {
+          "sync": 2,
+          "target": -1,
+          "fps": 59.57553483165922,
+          "mean": 16.78541372436974,
+          "median": 16.696499999994785,
+          "p95": 17.671374999999045,
+          "p99": 19.432416000000785,
+          "maximum": 25.404791999996235,
+          "minimum": 13.07266700000298,
+          "focused": true,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "screen": [
+            3024,
+            1898
+          ],
+          "mode": "FullScreenWindow",
+          "metal": "0",
+          "intervals": 595,
+          "effectiveBudgetMs": 16.66658333333333,
+          "intervalsOverBudgetByMs": {
+            "0.25": 133,
+            "0.5": 82,
+            "1": 30,
+            "2": 10,
+            "4": 2,
+            "8": 1
+          }
+        }
+      ]
+    },
+    {
+      "artifact": "/Users/pavan/src/ledpanelVR/.local/frame-pacing-20261027/minimal-ab/metal-on/results.json",
+      "sha256": "eb89e7a66307af189c3023583e84dd8293d6eac10763b9d20fc7ea17e422e879",
+      "scope": "one cube, one camera, no MATREX runtime scripts or tracker processes",
+      "phases": [
+        {
+          "sync": 0,
+          "target": 60,
+          "fps": 57.23813085222067,
+          "mean": 17.47087099300698,
+          "median": 17.57512500000047,
+          "p95": 17.79866700000099,
+          "p99": 17.877625000000563,
+          "maximum": 17.938209000000427,
+          "minimum": 16.444583999998486,
+          "focused": true,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "screen": [
+            3024,
+            1898
+          ],
+          "mode": "FullScreenWindow",
+          "metal": "1",
+          "intervals": 572,
+          "effectiveBudgetMs": 16.666666666666668,
+          "intervalsOverBudgetByMs": {
+            "0.25": 526,
+            "0.5": 486,
+            "1": 94,
+            "2": 0,
+            "4": 0,
+            "8": 0
+          }
+        },
+        {
+          "sync": 1,
+          "target": -1,
+          "fps": 119.85369095381945,
+          "mean": 8.343506086811358,
+          "median": 8.33558299999737,
+          "p95": 8.659542000000187,
+          "p99": 8.861874999997355,
+          "maximum": 21.022584000000677,
+          "minimum": 5.168417000000147,
+          "focused": true,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "screen": [
+            3024,
+            1898
+          ],
+          "mode": "FullScreenWindow",
+          "metal": "1",
+          "intervals": 1198,
+          "effectiveBudgetMs": 8.333291666666666,
+          "intervalsOverBudgetByMs": {
+            "0.25": 134,
+            "0.5": 15,
+            "1": 6,
+            "2": 5,
+            "4": 1,
+            "8": 1
+          }
+        },
+        {
+          "sync": 2,
+          "target": -1,
+          "fps": 57.342472376565865,
+          "mean": 17.43908064223387,
+          "median": 17.56095799999713,
+          "p95": 17.767875000004096,
+          "p99": 17.859624999999824,
+          "maximum": 18.039499999993325,
+          "minimum": 16.362041999997246,
+          "focused": true,
+          "refreshNumerator": 24000000,
+          "refreshDenominator": 199999,
+          "screen": [
+            3024,
+            1898
+          ],
+          "mode": "FullScreenWindow",
+          "metal": "1",
+          "intervals": 573,
+          "effectiveBudgetMs": 16.66658333333333,
+          "intervalsOverBudgetByMs": {
+            "0.25": 511,
+            "0.5": 468,
+            "1": 87,
+            "2": 0,
+            "4": 0,
+            "8": 0
+          }
+        }
+      ]
+    }
+  ],
+  "failedAttempt": {
+    "scope": "First MetalDisplayLink-on launch, native fullscreen initialization",
+    "log": "/Users/pavan/src/ledpanelVR/.local/frame-pacing-20261027/ab/metal-display-link-on/player.log",
+    "stackSample": "/Users/pavan/src/ledpanelVR/.local/frame-pacing-20261027/metal-display-link-startup-hang.txt",
+    "result": "No managed startup results. After bounded inspection only diagnostic app PID60306 was terminated; its generated native recorders finalized normally. Subsequent launch with initial windowed CLI did start, then product policy restored fullscreen. Not a reproducible managed-code deadlock claim."
+  },
+  "sources": {
+    "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Application-targetFrameRate.html": "Unity explicitly distinguishes software targetFPS with potential microstutter from hardwareVSync.",
+    "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/QualitySettings-vSyncCount.html": "VSync uses display refresh/divisor and ignores targetFrameRate when enabled; native refresh may change.",
+    "https://unity.com/releases/editor/whats-new/6000.3.11f1": "Backported supportedCAMetalDisplayLink opt-in and UNITY_USE_METAL_DISPLAY_LINK=1.",
+    "https://developer.apple.com/documentation/quartzcore/cametaldisplaylink/preferredframeraterange": "Display-link callback frequency is best effort and depends on system policies and preferences."
+  },
+  "nextSteps": [
+    "Retain both cached engine-frame-start intervals and independent wall-clock/presentation counters; no integerFPS snapping or smoothing that hides missed frames.",
+    "Controlled capped60 runs with identical24 terrain cameras: native video off/on, pose logging off/on, tracking listener off/on, overlays/telemetry off/on; log GC/profiler timing so outliers are attributable. Existing uncapped controls establish throughput but cannot isolate capped tail jitter.",
+    "Measure actual present/exposure cadence on a true60Hz target display. The Mac120Hz built-in/ProMotion desktop is not evidence of LED hardware timing.",
+    "Any optional Auto policy must honor explicit vSyncCount, query observed refresh, select an integral1..4 divisor only when supported, and re-evaluate refresh/display changes. CurrentA/B does not establish such a policy as the fix."
+  ],
+  "diagnosticSourceSha256": {
+    ".local/frame-pacing-20261027/project/Assets/Scripts/RuntimePerformanceProbe.cs": "2e525d4c93acb0913ce06b77c474d2b4ff7fa0c5aed6f7a989c59368ba819747",
+    ".local/frame-pacing-20261027/minimal-project/Assets/MinimalPacingProbe.cs": "e71bd69b7c68e64bcd2aa3ecb44539acf3e0c3526f35176908932c26454e1a03",
+    ".local/frame-pacing-20261027/minimal-project/Assets/Editor/MinimalPacingBuilder.cs": "b18ec078997016b10de2b7dd12fe30cbfb7ef2edfdeee7733c38c9fc470f12c6",
+    ".local/frame-pacing-20261027/minimal-project/Packages/manifest.json": "90841e3ecad04fd0a62a66edab0d216cae5a960ebdfbf47459fad42f32d0da97"
+  }
+}
