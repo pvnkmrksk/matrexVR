@@ -127,7 +127,8 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         rect.offsetMin = new Vector2(12, 48); rect.offsetMax = new Vector2(-12, -10);
         label = textObject.GetComponent<Text>();
         label.font = Resources.Load<Font>("ConfigurationUI/Fonts/Inter-Regular") ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        label.fontSize = 14; label.color = new Color(.84f,.88f,.92f); label.supportRichText = true;
+        label.fontSize = 13; label.color = new Color(.84f,.88f,.92f); label.supportRichText = true;
+        label.horizontalOverflow=HorizontalWrapMode.Wrap;label.verticalOverflow=VerticalWrapMode.Overflow;
         label.raycastTarget = false;
         var buttonObject = new GameObject("Auto trim toggle", typeof(RectTransform), typeof(Image), typeof(Button));
         buttonObject.transform.SetParent(panel.transform, false);
@@ -227,10 +228,12 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         if (main != null && main.SequenceRunning)
             foreach (var rig in main.VRClosedLoops.Values) if (rig != null && rig.SupportsAutoTrim) { available = true; break; }
         autoTrimButton.interactable = available;
+        autoTrimButton.gameObject.SetActive(showDetails&&available);
         bool enabled = main != null && main.CurrentAutoTrimEnabled;
         autoTrimButtonText.text = enabled ? "Auto-trim on · stop" : "Auto-trim off · start";
         autoTrimButton.targetGraphic.color = !available ? new Color(.1f,.13f,.16f) : enabled ? new Color(.08f,.28f,.23f) : new Color(.13f,.18f,.24f);
         flightCheckButton.interactable = available;
+        flightCheckButton.gameObject.SetActive(showDetails&&available);
         bool flightCheck = main == null || main.CurrentFlightCheckEnabled;
         flightCheckButtonText.text = flightCheck ? "Flight check on · bypass" : "Flight bypassed · restore check";
         flightCheckButton.targetGraphic.color = !available ? new Color(.1f,.13f,.16f) : flightCheck ? new Color(.13f,.18f,.24f) : new Color(.3f,.22f,.12f);
@@ -247,7 +250,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         var screen=OperatorOverlayLayout.DisplaySize(canvas.targetDisplay);var size=rect.sizeDelta*scale;
         if(layoutVersion!=OperatorOverlayLayout.Revision||lastWidth!=(int)screen.x||lastHeight!=(int)screen.y||lastPanelSize!=size)
         {
-            layoutAvailable=OperatorOverlayLayout.Reserve("status",canvas.targetDisplay,new Rect(12,12,size.x,size.y),out var placed);
+            layoutAvailable=OperatorOverlayLayout.Reserve("status",canvas.targetDisplay,new Rect(screen.x-size.x-12,12,size.x,size.y),out var placed);
             if(layoutAvailable){rect.anchorMin=rect.anchorMax=rect.pivot=Vector2.zero;rect.anchoredPosition=placed.position/scale;}
             lastWidth=(int)screen.x;lastHeight=(int)screen.y;lastPanelSize=size;layoutVersion=OperatorOverlayLayout.Revision;
         }
@@ -263,21 +266,92 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         {
             layoutLineCount = lines; layoutErrorRevision = shownRevision;
             var panelRect = panel.GetComponent<RectTransform>();
-            panelRect.sizeDelta = new Vector2(650, Mathf.Clamp(label.preferredHeight + 62, 180, 780));
+            float width=showDetails?650:480;
+            panelRect.sizeDelta = new Vector2(width, panelRect.sizeDelta.y);
+            Canvas.ForceUpdateCanvases();
+            panelRect.sizeDelta = new Vector2(width, Mathf.Clamp(label.preferredHeight + 62, 180, 780));
         }
     }
 
-    public string BuildText()
+    public string BuildText() => showDetails ? BuildDetailedText() : BuildCompactText();
+
+    private string BuildCompactText()
+    {
+        var main=MainController.Instance;
+        var text=new StringBuilder("<size=17><b><color=#E8EEF3>RUN STATUS</color></b></size>   <size=11><color=#99ADBD>Tab hides overlays</color></size>\n");
+        AppendRunContext(text,main);
+        if(main!=null)
+        {
+            RugosityWorld terrain=null;
+            foreach(var rig in main.VRClosedLoops.Values)
+                if(rig!=null&&rig.TryGetComponent<RugosityRig>(out var surfaceRig)&&surfaceRig.ControlsPose){terrain=surfaceRig.world;break;}
+            if(terrain!=null)
+                text.AppendLine($"<color=#A8C6D9>Terrain L/R · visual {SurfaceLabel(terrain.settings.visualSurface)} · navigation {SurfaceLabel(terrain.settings.collisionSurface)}</color>");
+            foreach(var entry in main.SystemConfigs)
+            {
+                main.VRClosedLoops.TryGetValue(entry.Key,out var rig);
+                var listener=rig!=null?rig.GetComponent<ZmqListener>():null;
+                string endpoint=listener!=null&&!string.IsNullOrEmpty(listener.Endpoint)?listener.Endpoint:$"tcp://{entry.Value.zmqAddress}:{entry.Value.zmqPort}";
+                text.Append($"\n<b>{EscapeRich(entry.Key)}</b> · {EscapeRich(main.GetBackendDisplayName(entry.Value))} · <color=#A8C6D9>{EscapeRich(endpoint)}</color>");
+                if(rig!=null&&rig.name!=entry.Key)text.Append(" · "+EscapeRich(rig.name));
+                text.AppendLine();
+                if(rig==null){text.AppendLine("<color=#BBC8D5>INACTIVE · configured input</color>");continue;}
+                string state=listener==null?"missing listener":listener.State;
+                double age=listener!=null?listener.SecondsSinceLastPose:double.PositiveInfinity;
+                string ageLabel=double.IsInfinity(age)?"no pose received":$"age {Math.Max(0,age):F2} s";
+                string color=state=="receiving"?"88D8BD":state=="error"?"FFADAD":"E9CA8D";
+                text.Append($"<color=#{color}>{EscapeRich(state)} · {ageLabel}</color>  ");
+                if(rig.SupportsAutoTrim)
+                {
+                    var flight=rig.AutoTrim;
+                    text.Append(Badge(flight.Flying?"FLYING":flight.FlightReady?"NOT FLYING":"ACQUIRING",flight.Flying?"88D8BD":"BBC8D5"));
+                }
+                text.AppendLine();
+                if(rig.SupportsAutoTrim)text.Append($"DC {Signed(rig.GetYawDCOffset()*KineflyAutoTrim.RadToDeg)}° · ");
+                text.Append(Badge(rig.OrientationTrackingEnabled?"YAW CLOSED":"YAW OPEN",rig.OrientationTrackingEnabled?"88D8BD":"BBC8D5"));
+                text.Append(Badge(rig.PositionTrackingEnabled?"POS CLOSED":"POS OPEN",rig.PositionTrackingEnabled?"88D8BD":"BBC8D5"));
+                if(entry.Key=="VR"+main.SelectedVRIndex)text.Append("<color=#FFD166>SELECTED</color>");
+                text.AppendLine();
+            }
+        }
+        AppendErrors(text);
+        return text.ToString();
+    }
+
+    private static string SurfaceLabel(string surface)
+    {
+        switch(surface)
+        {
+            case "RoughSmooth":return "rough / smooth";
+            case "SmoothRough":return "smooth / rough";
+            case "SmoothSmooth":return "smooth / smooth";
+            case "RoughRough":return "rough / rough";
+            case "Flat":return "flat / flat";
+            default:return EscapeRich(surface);
+        }
+    }
+    private static void AppendRunContext(StringBuilder text,MainController main)
+    {
+        text.Append("<b>"+EscapeRich(SceneManager.GetActiveScene().name)+"</b>\n");
+        if(main==null){text.AppendLine("Idle · no experiment controller");return;}
+        int count=main.executionOrder.Count>0?main.executionOrder.Count:main.sequenceSteps.Count;
+        text.AppendLine($"Trial {main.currentTrial+1} · Step {Math.Min(main.currentStep+1,Math.Max(1,count))} / {count} · "+
+            (main.SceneTransitionPending?"loading":main.SequenceError!=null?"ERROR":main.AssessmentFailed?"assessment failed":!main.SequenceRunning?"Idle":main.ExperimentPhase));
+        if(main.SequenceRunning)
+        {
+            text.AppendLine($"Elapsed {main.CurrentStepElapsedSeconds:F1} / {main.CurrentStepDurationSeconds:F1} s · Remaining {main.RemainingStepSeconds:F1} s");
+            if(main.AssessmentPending)text.AppendLine("Heading assessment active");
+        }
+        if(main.SequenceError!=null)text.AppendLine("<color=#FFADAD>"+EscapeRich(main.SequenceError)+"</color>");
+    }
+
+    private string BuildDetailedText()
     {
         var main = MainController.Instance;
         var text = new StringBuilder("<size=19><b><color=#E8EEF3>EXPERIMENT</color></b></size>   <size=12><color=#8898AA>[Tab] hide · [1–9] select · [0] next · [ / ] DC</color></size>\n");
-        text.Append(SceneManager.GetActiveScene().name);
+        AppendRunContext(text,main);
         if (main != null)
         {
-            text.Append($" | Trial {main.currentTrial + 1} | Scene {main.currentStep + 1}\n");
-            text.Append(main.SequenceError != null ? "ERROR: " + main.SequenceError :
-                main.AssessmentFailed ? "ERROR: heading measurement failed" : !main.SequenceRunning ? "Idle" : $"{main.ExperimentPhase}: {main.RemainingPhaseSeconds:F1}s (cycle {main.RemainingStepSeconds:F1}s)");
-            text.AppendLine();
             foreach (var entry in main.SystemConfigs)
             {
                 text.Append($"\n<b>{entry.Key}</b> ");
@@ -339,6 +413,12 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         foreach (var logger in FindObjectsByType<SwarmLogger>(FindObjectsSortMode.None))
         { pending += logger.PendingFrames; dropped += logger.DroppedFrames; capture += logger.CaptureMilliseconds; loggers++; }
         if (loggers > 0) text.AppendLine($"Swarm log: worker / capture {capture:F2} ms / queued {pending} / dropped {dropped}");
+        AppendErrors(text);
+        return text.ToString();
+    }
+
+    private static void AppendErrors(StringBuilder text)
+    {
         ErrorEntry[] recent = RecentErrors();
         if (recent.Length > 0)
         {
@@ -347,7 +427,6 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
             text.Append(EscapeRich(Shorten(latest.message, 420)));
             text.Append("\nFull details: runtime_trace.log / telemetry errors");
         }
-        return text.ToString();
     }
 
     private static string Badge(string value, string color) => $"<color=#{color}><b>[{value}]</b></color> ";

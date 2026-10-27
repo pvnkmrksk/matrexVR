@@ -1,0 +1,73 @@
+{
+  "checks": 25,
+  "failure": null,
+  "errors": [],
+  "passed": [
+    "production experiment controller exists",
+    "basic HUD identifies the actual active scene",
+    "basic HUD reports execution step and current trial cycle",
+    "basic HUD reports elapsed, total and remaining step seconds",
+    "basic HUD includes rig, backend and actual endpoint for VR1",
+    "basic HUD includes rig, backend and actual endpoint for VR2",
+    "basic HUD includes rig, backend and actual endpoint for VR3",
+    "basic HUD includes rig, backend and actual endpoint for VR4",
+    "walking basic HUD omits irrelevant flight tuning",
+    "live listener endpoint wins over stale configured port",
+    "basic HUD exposes stale input",
+    "basic HUD distinguishes absent input from fresh input",
+    "inactive rigs retain their configured input port",
+    "unphased timing getters follow the actual countdown",
+    "phased timing uses actual phase total rather than sequence fallback duration",
+    "real Game view framebuffer is Full HD",
+    "basic status panel is visibly enabled",
+    "capture uses the unchanged production overlay canvas",
+    "status prefers bottom-right free space",
+    "four-rig basic HUD remains compact at Full HD",
+    "status never overlaps calibrated LED rectangles",
+    "basic walking HUD has no disabled flight-control clutter",
+    "an explicit false statusOverlay.visible remains respected",
+    "enabling statusOverlay.visible restores diagnostics",
+    "More details retains listener diagnostics"
+  ],
+  "scope": "Production HUD and real Full HD Game-view overlay; disabled no-socket listener fixtures and controlled controller clocks, no camera acquisition or physical LED timing",
+  "changes": [
+    "Compact run status includes actual scene, execution step/count, trial cycle, elapsed/total/remaining seconds, terrain visual/navigation roles and each VR backend/live endpoint/freshness/closed-loop state.",
+    "Requested anchor is bottom right; calibrated LED rectangles still have priority.",
+    "More details retains advanced flight diagnostics and controls.",
+    "Explicit statusOverlay.visible=false remains respected. The local preview profile must enable it to show the requested debugging state."
+  ],
+  "sourceHashes": {
+    "Assets/Scripts/RuntimeStatusOverlay.cs": {
+      "sourceSha256": "508bdee52f8982d30a955fe71f0afbbdc82613a964b744240de836a080fe48ea",
+      "validatedSha256": "508bdee52f8982d30a955fe71f0afbbdc82613a964b744240de836a080fe48ea",
+      "matches": true
+    },
+    "Assets/Scripts/MainController.cs": {
+      "sourceSha256": "e9fe2467bfb009d2bd3f09f3efb5d4ab50ec9dbc94d48e3cd5dbc7a84a4c352b",
+      "validatedSha256": "e9fe2467bfb009d2bd3f09f3efb5d4ab50ec9dbc94d48e3cd5dbc7a84a4c352b",
+      "matches": true
+    },
+    "Assets/Scripts/ExperimentPhases.cs": {
+      "sourceSha256": "57965f3ee81b35cd029ff450a3988a031c3342de683b54a6b683554f62b69f12",
+      "validatedSha256": "57965f3ee81b35cd029ff450a3988a031c3342de683b54a6b683554f62b69f12",
+      "matches": true
+    },
+    "Assets/Editor/RuntimeStatusHudValidation.cs": {
+      "sourceSha256": "ed4ad802fd4a9c2729ca143139297da68d3707871eddd03796f6f271f5f67b6c",
+      "validatedSha256": "ed4ad802fd4a9c2729ca143139297da68d3707871eddd03796f6f271f5f67b6c",
+      "matches": true
+    }
+  },
+  "capture": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/hud/four-rig-basic-full-hd.png",
+  "captureSha256": "223748c703ce61eb007b36e7bd12a7124f8182eb6b2ad557356916147a93145f",
+  "visualReview": "All four input endpoints and input freshness states are readable; explicit three-line rig summaries avoid clipping on Full HD. Capture uses synthetic colored LED areas and controlled no-socket fixtures; it does not establish physical LED timing or acquisition.",
+  "overlayRegression": {
+    "checks": 190,
+    "failure": null,
+    "errors": [],
+    "cases": 7,
+    "ledPixelsChangedAcrossAllCases": 0,
+    "scope": "Natural Game-view framebuffer ScreenCapture at end-of-frame, unchanged ScreenSpaceOverlay status/FPS/overview canvases, actual queued Tab keyboard input; production duplicate/disable/re-enable lifecycle checks; synthetic solid-color stimulus only, no tracker/camera acquisition or experiment",
+    "results": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/hud/overlay-regression-results.json"
+  }
+}

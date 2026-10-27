@@ -20,6 +20,8 @@ public class MainController : MonoBehaviour
     public bool SceneTransitionPending { get; private set; }
     public string InputKind { get; private set; } = "tracker";
     public float RemainingStepSeconds => phaseRunner != null && phaseRunner.Active ? (float)phaseRunner.RemainingSeconds : Mathf.Max(0,timer);
+    public double CurrentStepDurationSeconds => phaseRunner != null && phaseRunner.Active ? phaseRunner.TotalSeconds : System.Math.Max(0, GetCurrentSequenceStep()?.duration ?? 0);
+    public double CurrentStepElapsedSeconds => System.Math.Max(0, CurrentStepDurationSeconds - RemainingStepSeconds);
     private ExperimentPhases phaseRunner;
     public string ExperimentPhase => phaseRunner != null && phaseRunner.Active ? phaseRunner.CurrentPhase : AssessmentPending ? "assessment" : "stimulus";
     // Shared by recorded rows and live telemetry; do not label idle/error rows as stimulus.

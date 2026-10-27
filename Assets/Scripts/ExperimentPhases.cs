@@ -60,6 +60,7 @@ public sealed class ExperimentPhases : MonoBehaviour
     private double phaseStarted;
     public bool Active => phases != null;
     public bool Finished { get; private set; }
+    public double TotalSeconds => Active ? phases.Sum(phase => phase.Duration) : 0;
     public string CurrentPhase => Active ? phases[index].Name : "stimulus";
     public double RemainingPhaseSeconds => Active && !Finished ? Math.Max(0, phases[index].Duration - (Time.timeAsDouble - phaseStarted)) : 0;
     public double RemainingSeconds => Active && !Finished ? RemainingPhaseSeconds + phases.Skip(index + 1).Sum(p => p.Duration) : 0;
