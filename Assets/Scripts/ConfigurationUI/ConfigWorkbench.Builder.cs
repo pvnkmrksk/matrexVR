@@ -336,7 +336,7 @@ namespace ConfigurationUI
             var head=Row(); dialog.Add(head); var text=new Label(title); text.AddToClassList("title"); head.Add(text); text.style.flexGrow=1;
             var close=Button("Close",CloseModal,"quiet");head.Add(close);dialog.Add(new Label(subtitle));close.schedule.Execute(()=>close.Focus());return dialog;
         }
-        private void CloseModal() { modal?.RemoveFromHierarchy(); modal=null; }
+        private void CloseModal() { modal?.RemoveFromHierarchy(); modal=null; ScheduleKeyboardFocus(); }
         private void ShowBlockLibrary(int? replace=null)
         {
             RequireApplied(); presets=ExperimentBlocks.Catalog(RuntimePaths.ConfigRoot);

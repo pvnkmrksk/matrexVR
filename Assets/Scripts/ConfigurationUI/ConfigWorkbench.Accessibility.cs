@@ -9,8 +9,26 @@ namespace ConfigurationUI
 {
     public sealed partial class ConfigWorkbench
     {
+        private IVisualElementScheduledItem keyboardFocusFallback;
+        // A page change replaces the clicked navigation button. Keep a real
+        // keyboard target after that detach without taking focus from inputs.
+        private void ScheduleKeyboardFocus()
+        {
+            keyboardFocusFallback?.Pause();
+            if(root!=null)keyboardFocusFallback=root.schedule.Execute(RestoreKeyboardFocus);
+        }
+        private void RestoreKeyboardFocus()
+        {
+            if(!isActiveAndEnabled||root?.panel==null||modal!=null)return;
+            var focused=root.panel.focusController.focusedElement as VisualElement;
+            if(focused!=null&&(focused==root||root.Contains(focused))&&focused.panel==root.panel&&focused.enabledInHierarchy&&
+                focused.resolvedStyle.display!=DisplayStyle.None&&focused.resolvedStyle.visibility!=Visibility.Hidden)return;
+            root.Focus();
+        }
         private void InstallKeyboardNavigation()
         {
+            // Programmatic fallback only; Tab traverses the actual controls.
+            root.focusable=true;root.tabIndex=-1;
             root.RegisterCallback<KeyDownEvent>(evt=>{
                 if(preparing)return;
                 bool command=evt.ctrlKey||evt.commandKey;

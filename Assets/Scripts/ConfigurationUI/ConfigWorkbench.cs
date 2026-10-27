@@ -180,6 +180,7 @@ namespace ConfigurationUI
         private int viewGeneration;
         private void BuildContent()
         {
+            ScheduleKeyboardFocus();
             viewGeneration++;
             numberFlushes.Clear(); blockList=null;
             enableUpdates.Clear();
@@ -640,6 +641,7 @@ namespace ConfigurationUI
         private void OnDestroy()
         {
             LeaveRecordingLibrary();
+            keyboardFocusFallback?.Pause();
             pendingPointerRebuild?.Pause();
             pendingBlockRefresh?.Pause();
             foreach(var raycaster in legacyRaycasters) if(raycaster!=null) raycaster.enabled=true;

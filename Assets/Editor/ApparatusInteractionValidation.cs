@@ -58,6 +58,11 @@ public static class ApparatusInteractionValidation
         if(text!="No backup data file found.")errors.Add(text);
     }
     private static void Check(bool value,string message){if(!value)throw new Exception(message);checks.Add(message);}
+    private static bool HasLiveKeyboardFocus(VisualElement root)
+    {
+        var focused=root.panel?.focusController.focusedElement as VisualElement;
+        return focused!=null&&focused.panel==root.panel&&(focused==root||root.Contains(focused));
+    }
     private static object Call(object owner,string name,params object[] args)=>owner.GetType().GetMethod(name,Hidden).Invoke(owner,args);
     private static void Put(object owner,string name,object value)=>owner.GetType().GetField(name,Hidden).SetValue(owner,value);
     private static void Submit(Button button){Check(button!=null,"requested native button exists");using(var evt=NavigationSubmitEvent.GetPooled()){evt.target=button;button.SendEvent(evt);}}
@@ -93,6 +98,8 @@ public static class ApparatusInteractionValidation
                     demoFiles=new[]{ui.Workspace.System.Path,ui.Workspace.Sequence.Path,ExperimentConfigFiles.Resolve((string)ui.Workspace.Sequence.Root["sequences"][0]["parameters"]["configFile"])}.ToDictionary(path=>path,path=>Convert.ToBase64String(File.ReadAllBytes(path)));
                     Next(1,60);break;
                 case 1:
+                    Check(root.focusable&&root.tabIndex<0,"workbench has a programmatic keyboard target outside the Tab ring");
+                    Check(HasLiveKeyboardFocus(root),"initial setup owns keyboard focus before any text field is clicked");
                     Check(DesktopQuickStart.IsDemo(ui.Workspace)&&!DesktopApparatusProfile.IsConfigured(ui.Workspace.System.Root),"unset hardware opens an explicit demo");
                     Check(root.Q<Button>("quickstart-mode-flying")==null&&root.Q<DropdownField>("quickstart-input")==null,"daily landing does not expose hardware movement/input controls");
                     Check(root.Q<Button>("quickstart-world-night-sky")!=null&&root.Q<Button>("quickstart-world-forest")!=null,"unconfigured demo has real starter worlds");
@@ -205,13 +212,19 @@ public static class ApparatusInteractionValidation
                     Check((string)ui.Workspace.System.Root["configs"][0]["tracker"]["configFile"]=="retain-native-calibration.txt"&&(int)ui.Workspace.System.Root["configs"][0]["tracker"]["extension"]==17,"imported native calibration and unknown data survive review");
                     Check(!DesktopApparatusProfile.ShouldPrepareCompanions(ui.Workspace.System.Root),"imported/manual native workflow is not silently auto-launched");
                     Check(!MainController.Instance.SequenceRunning,"all apparatus cases complete without scene or camera acquisition");
-                    KeyPress(ui,KeyCode.F1);Next(17);break;
+                    Check(HasLiveKeyboardFocus(root),"replacing a clicked navigation control restores workbench keyboard focus");
+                    KeyPress(ui,KeyCode.F1,EventModifiers.None,root.panel.focusController.focusedElement as VisualElement);Next(17);break;
                 case 17:
                     Check(root.Q<VisualElement>(className:"modal-shade")!=null,"F1 opens keyboard help in the native UI");
+                    var modalFocus=root.panel.focusController.focusedElement;
+                    Check(root.Q<VisualElement>(className:"modal-shade").Contains(modalFocus as VisualElement),"keyboard help places focus inside its dialog");
+                    Call(ui,"RestoreKeyboardFocus");
+                    Check(root.panel.focusController.focusedElement==modalFocus,"page focus fallback never steals modal keyboard focus");
                     Check(ui.TryHandleSetupEscape()&&root.Q<VisualElement>(className:"modal-shade")==null,"Escape closes setup dialogs without quitting");
                     KeyPress(ui,KeyCode.Alpha2,EventModifiers.Alt);Next(18);break;
                 case 18:
                     Check(root.Q<ListView>(className:"block-list")!=null,"Alt+2 opens the sequence using the native event path");
+                    Check(HasLiveKeyboardFocus(root),"keyboard page navigation restores a live keyboard target");
                     KeyPress(ui,KeyCode.J,EventModifiers.Control|EventModifiers.Shift);Next(19);break;
                 case 19:
                     var raw=root.Q<TextField>("raw-json-editor");Check(raw!=null,"Ctrl+Shift+J opens the current JSON editor");
@@ -225,6 +238,10 @@ public static class ApparatusInteractionValidation
                     string fallback=ConfigSchema.EffectiveValue(current.Root["autopilotSpeed"],ConfigSchema.Child(ui.Workspace.Schemas.Get("choice"),"autopilotSpeed")).ToString();
                     Check(speed!=null&&speed.value==fallback,"invalid numeric JSON displays the runtime default in its numeric control");
                     Check((string)current.Root["autopilotSpeed"]=="invalid","viewing the fallback leaves invalid source available for repair");
+                    speed.Focus();var inputFocus=root.panel.focusController.focusedElement;
+                    Check(inputFocus==speed||speed.Contains(inputFocus as VisualElement),"numeric input obtains keyboard focus");
+                    Call(ui,"RestoreKeyboardFocus");
+                    Check(root.panel.focusController.focusedElement==inputFocus,"page focus fallback preserves the active text input and caret");
                     Call(ui,"ShowEffectiveConfiguration");Next(21);break;
                 case 21:
                     Check(root.Q<TextField>("effective-json-preview")?.isReadOnly==true,"effective JSON is inspectable without editing the source");
