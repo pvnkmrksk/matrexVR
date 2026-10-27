@@ -44,6 +44,10 @@
           ],
           "additionalProperties": true,
           "properties": {
+            "desktopPreview": {
+              "type": "boolean",
+              "default": false
+            },
             "closedLoopMode": {
               "type": [
                 "string",
@@ -247,6 +251,40 @@
                   "x-ui": {
                     "help": "Optional headless Rekkefly launch. HejjéTrac uses its native desktop window."
                   }
+                },
+                "strictCameraFallback": {
+                  "type": "boolean",
+                  "default": false,
+                  "x-ui": {
+                    "help": "Optional headless Rekkefly launch. HejjéTrac uses its native desktop window."
+                  }
+                },
+                "saveVideo": {
+                  "type": "boolean",
+                  "default": false,
+                  "x-ui": {
+                    "help": "Optional headless Rekkefly launch. HejjéTrac uses its native desktop window."
+                  }
+                },
+                "recordingDirectory": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": "",
+                  "x-ui": {
+                    "help": "Optional headless Rekkefly launch. HejjéTrac uses its native desktop window."
+                  }
+                },
+                "recordingPrefix": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": "",
+                  "x-ui": {
+                    "help": "Optional headless Rekkefly launch. HejjéTrac uses its native desktop window."
+                  }
                 }
               },
               "default": null
@@ -265,7 +303,7 @@
               "default": 1,
               "x-ui": {
                 "readOnly": true,
-                "help": "The top-level targetDisplay overrides this legacy field."
+                "help": "An explicit rig display takes precedence. Omission inherits the top-level or command-line display; effective JSON preserves that inheritance."
               }
             }
           },
@@ -2245,6 +2283,10 @@
           ],
           "additionalProperties": true,
           "properties": {
+            "groundOnTerrain": {
+              "type": "boolean",
+              "default": false
+            },
             "useHeadingReference": {
               "type": "boolean",
               "default": false
@@ -2647,6 +2689,24 @@
       "randomInitialRotation": {
         "type": "boolean",
         "default": false
+      },
+      "walkingPositionGain": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": -3.40282347E+38,
+        "maximum": 3.40282347E+38,
+        "default": null
+      },
+      "walkingOrientationGain": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": -3.40282347E+38,
+        "maximum": 3.40282347E+38,
+        "default": null
       },
       "backgroundColor": {
         "type": [
@@ -4310,6 +4370,10 @@
               ],
               "additionalProperties": true,
               "properties": {
+                "groundOnTerrain": {
+                  "type": "boolean",
+                  "default": false
+                },
                 "useHeadingReference": {
                   "type": "boolean",
                   "default": false
@@ -4712,6 +4776,24 @@
           "randomInitialRotation": {
             "type": "boolean",
             "default": false
+          },
+          "walkingPositionGain": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null
+          },
+          "walkingOrientationGain": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null
           },
           "backgroundColor": {
             "type": [
@@ -6395,6 +6477,10 @@
               ],
               "additionalProperties": true,
               "properties": {
+                "groundOnTerrain": {
+                  "type": "boolean",
+                  "default": false
+                },
                 "useHeadingReference": {
                   "type": "boolean",
                   "default": false
@@ -6797,6 +6883,24 @@
           "randomInitialRotation": {
             "type": "boolean",
             "default": false
+          },
+          "walkingPositionGain": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null
+          },
+          "walkingOrientationGain": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null
           },
           "backgroundColor": {
             "type": [
@@ -8480,6 +8584,10 @@
               ],
               "additionalProperties": true,
               "properties": {
+                "groundOnTerrain": {
+                  "type": "boolean",
+                  "default": false
+                },
                 "useHeadingReference": {
                   "type": "boolean",
                   "default": false
@@ -8882,6 +8990,24 @@
           "randomInitialRotation": {
             "type": "boolean",
             "default": false
+          },
+          "walkingPositionGain": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null
+          },
+          "walkingOrientationGain": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null
           },
           "backgroundColor": {
             "type": [
@@ -9530,6 +9656,38 @@
       "randomInitialRotation": {
         "type": "boolean",
         "default": false
+      },
+      "initialHeadingDistribution": {
+        "type": [
+          "string",
+          "integer"
+        ],
+        "enum": [
+          "Continuous",
+          "Cardinal",
+          0,
+          1
+        ],
+        "default": "Continuous",
+        "x-ui": {
+          "enabledWhen": {
+            "all": [
+              {
+                "property": "randomInitialRotation",
+                "oneOf": [
+                  true
+                ]
+              },
+              {
+                "property": "resetRotationOnStart",
+                "oneOf": [
+                  true
+                ]
+              }
+            ]
+          },
+          "help": "Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled."
+        }
       },
       "uniformSkyColor": {
         "type": [
@@ -11248,6 +11406,38 @@
             "type": "boolean",
             "default": false
           },
+          "initialHeadingDistribution": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "enum": [
+              "Continuous",
+              "Cardinal",
+              0,
+              1
+            ],
+            "default": "Continuous",
+            "x-ui": {
+              "enabledWhen": {
+                "all": [
+                  {
+                    "property": "randomInitialRotation",
+                    "oneOf": [
+                      true
+                    ]
+                  },
+                  {
+                    "property": "resetRotationOnStart",
+                    "oneOf": [
+                      true
+                    ]
+                  }
+                ]
+              },
+              "help": "Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled."
+            }
+          },
           "uniformSkyColor": {
             "type": [
               "object",
@@ -13914,6 +14104,38 @@
             "type": "boolean",
             "default": false
           },
+          "initialHeadingDistribution": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "enum": [
+              "Continuous",
+              "Cardinal",
+              0,
+              1
+            ],
+            "default": "Continuous",
+            "x-ui": {
+              "enabledWhen": {
+                "all": [
+                  {
+                    "property": "randomInitialRotation",
+                    "oneOf": [
+                      true
+                    ]
+                  },
+                  {
+                    "property": "resetRotationOnStart",
+                    "oneOf": [
+                      true
+                    ]
+                  }
+                ]
+              },
+              "help": "Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled."
+            }
+          },
           "uniformSkyColor": {
             "type": [
               "object",
@@ -16579,6 +16801,38 @@
           "randomInitialRotation": {
             "type": "boolean",
             "default": false
+          },
+          "initialHeadingDistribution": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "enum": [
+              "Continuous",
+              "Cardinal",
+              0,
+              1
+            ],
+            "default": "Continuous",
+            "x-ui": {
+              "enabledWhen": {
+                "all": [
+                  {
+                    "property": "randomInitialRotation",
+                    "oneOf": [
+                      true
+                    ]
+                  },
+                  {
+                    "property": "resetRotationOnStart",
+                    "oneOf": [
+                      true
+                    ]
+                  }
+                ]
+              },
+              "help": "Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled."
+            }
           },
           "uniformSkyColor": {
             "type": [
@@ -20355,6 +20609,38 @@
         "type": "boolean",
         "default": false
       },
+      "initialHeadingDistribution": {
+        "type": [
+          "string",
+          "integer"
+        ],
+        "enum": [
+          "Continuous",
+          "Cardinal",
+          0,
+          1
+        ],
+        "default": "Continuous",
+        "x-ui": {
+          "enabledWhen": {
+            "all": [
+              {
+                "property": "randomInitialRotation",
+                "oneOf": [
+                  true
+                ]
+              },
+              {
+                "property": "resetRotationOnStart",
+                "oneOf": [
+                  true
+                ]
+              }
+            ]
+          },
+          "help": "Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled."
+        }
+      },
       "uniformSkyColor": {
         "type": [
           "object",
@@ -22071,6 +22357,38 @@
           "randomInitialRotation": {
             "type": "boolean",
             "default": false
+          },
+          "initialHeadingDistribution": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "enum": [
+              "Continuous",
+              "Cardinal",
+              0,
+              1
+            ],
+            "default": "Continuous",
+            "x-ui": {
+              "enabledWhen": {
+                "all": [
+                  {
+                    "property": "randomInitialRotation",
+                    "oneOf": [
+                      true
+                    ]
+                  },
+                  {
+                    "property": "resetRotationOnStart",
+                    "oneOf": [
+                      true
+                    ]
+                  }
+                ]
+              },
+              "help": "Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled."
+            }
           },
           "uniformSkyColor": {
             "type": [
@@ -23809,6 +24127,38 @@
             "type": "boolean",
             "default": false
           },
+          "initialHeadingDistribution": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "enum": [
+              "Continuous",
+              "Cardinal",
+              0,
+              1
+            ],
+            "default": "Continuous",
+            "x-ui": {
+              "enabledWhen": {
+                "all": [
+                  {
+                    "property": "randomInitialRotation",
+                    "oneOf": [
+                      true
+                    ]
+                  },
+                  {
+                    "property": "resetRotationOnStart",
+                    "oneOf": [
+                      true
+                    ]
+                  }
+                ]
+              },
+              "help": "Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled."
+            }
+          },
           "uniformSkyColor": {
             "type": [
               "object",
@@ -25545,6 +25895,38 @@
           "randomInitialRotation": {
             "type": "boolean",
             "default": false
+          },
+          "initialHeadingDistribution": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "enum": [
+              "Continuous",
+              "Cardinal",
+              0,
+              1
+            ],
+            "default": "Continuous",
+            "x-ui": {
+              "enabledWhen": {
+                "all": [
+                  {
+                    "property": "randomInitialRotation",
+                    "oneOf": [
+                      true
+                    ]
+                  },
+                  {
+                    "property": "resetRotationOnStart",
+                    "oneOf": [
+                      true
+                    ]
+                  }
+                ]
+              },
+              "help": "Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled."
+            }
           },
           "uniformSkyColor": {
             "type": [

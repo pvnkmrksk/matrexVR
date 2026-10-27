@@ -70,6 +70,9 @@ public static class ReplayRoundtripValidation
             if(stage==0)
             {
                 Check(MainController.Instance!=null&&MasterDataLogger.Instance!=null,"Control controller/logger available");
+                var logger=MasterDataLogger.Instance;
+                if(logger.AcceptingWrites){_=logger.FinalizeSessionAsync("validation-setup-rotation");return;}
+                if(logger.IsFinalizing)return;
                 MainController.Instance.PrepareConfiguredRun("__roundtrip-system.json","__roundtrip-sequence.json");
                 runFolder=MasterDataLogger.Instance.directoryPath;
                 MainController.Instance.StartSequence();stage=1;return;

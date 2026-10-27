@@ -206,6 +206,7 @@ Kinefly explicitly selected in the system config uses the historical raw-radian 
 | Kannadi field | Omitted behavior | Meaning |
 |---|---|---|
 | `numberOfRings` | Keep scene/current value (3 initially) | Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 100. |
+| `initialHeadingDistribution` | `Continuous` | Swarm/Kannadi random yaw distribution: `Cardinal` independently draws 0°, 90°, 180° or 270° for each rig. Requires `randomInitialRotation:true` and `resetRotationOnStart:true`. |
 | `hexRadius` | Keep scene/current value (10 initially) | Positive grid spacing in world units. |
 | `spacing` | null | Legacy alias, overridden by hexRadius. |
 | `kannadiTilePrefab` | Keep scene prefab | Catalog name, e.g. SimulatedLocust or LocustBand_black. Catalog is a build-safe Resources asset. |

@@ -626,6 +626,7 @@ public class MainController : MonoBehaviour
         if(SceneManager.GetActiveScene().name=="ReplayScene" && FindFirstObjectByType<ReplayController>()?.TryCloseModal()==true)return;
         if (SceneManager.GetActiveScene().name == "ControlScene")
         {
+            if(ConfigurationUI.ConfigWorkbench.Instance?.TryHandleSetupEscape()==true)return;
             Application.Quit();
             return;
         }

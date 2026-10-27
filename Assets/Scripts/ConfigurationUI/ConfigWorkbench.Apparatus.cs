@@ -19,7 +19,7 @@ namespace ConfigurationUI
             var sheet=Resources.Load<StyleSheet>("ConfigurationUI/apparatus");
             if(sheet!=null&&!root.styleSheets.Contains(sheet))root.styleSheets.Add(sheet);
         }
-        private int ApparatusDisplayFallback => MainController.DefaultTargetDisplay((JObject)Workspace.System.Root,Environment.GetCommandLineArgs());
+        private int ApparatusDisplayFallback => MainController.DefaultTargetDisplay((JObject)ConfigSchema.EffectiveValue(Workspace.System.Root,Workspace.Schemas.Get("system"),true),Environment.GetCommandLineArgs());
         private int ApparatusOutputDisplay(JObject rig) => DesktopApparatusProfile.OutputDisplay(Workspace.System.Root,rig,ApparatusDisplayFallback);
         private bool ApparatusConfigured => DesktopApparatusProfile.IsConfigured(Workspace.System.Root);
         private void EnsureDailyWorkspace()
@@ -87,6 +87,7 @@ namespace ConfigurationUI
         private List<string> ApparatusConfigurationErrors()
         {
             var errors=DesktopApparatusProfile.Validate(Workspace.System.Root,ApparatusDisplayFallback);
+            if(Workspace.System.LoadError!=null)errors.Add("Repair the system JSON before saving: "+Workspace.System.LoadError);
             errors.AddRange(ConfigSchema.Validate(Workspace.System.Root,Workspace.Schemas.Get("system")));
             return errors;
         }

@@ -45,6 +45,21 @@ public static class Regression {
     static void Check(bool value,string message) { if(!value)throw new Exception(message); }
     public static void Main(string[] args) {
         string profile=args[1], assets=args[5], kind=args[6];
+        string installations=Path.Combine(Path.GetDirectoryName(profile),"installations-"+kind);
+        string macData=Path.Combine(installations,"first","MATREX VR.app","Contents");
+        string macRuns=RuntimePaths.DefaultRecordingRoot(macData,profile,false);
+        Check(macRuns==Path.Combine(installations,"first","MATREX VR RunData"),"Mac data must be beside the bundle");
+        string secondRuns=RuntimePaths.DefaultRecordingRoot(Path.Combine(installations,"second","MATREX VR.app","Contents"),profile,false);
+        Check(macRuns!=secondRuns,"two installations must not share recording libraries");
+        string windowsRuns=RuntimePaths.DefaultRecordingRoot(Path.Combine(installations,"windows","MATREX VR_Data"),profile,false);
+        Check(windowsRuns==Path.Combine(installations,"windows","MATREX VR RunData"),"Windows/Linux data must be beside player data directory");
+        string protectedParent=Path.Combine(installations,"protected");Directory.CreateDirectory(protectedParent);
+        File.WriteAllText(Path.Combine(protectedParent,"MATREX VR RunData"),"read-only-install simulation");
+        string protectedData=Path.Combine(protectedParent,"MATREX VR.app","Contents");
+        string fallback=RuntimePaths.DefaultRecordingRoot(protectedData,profile,false);
+        Check(fallback.StartsWith(Path.Combine(profile,"Installations")),"unwritable installation must have a scoped fallback");
+        Check(fallback==RuntimePaths.DefaultRecordingRoot(protectedData,profile,false),"fallback installation identity must be stable");
+        Check(RuntimePaths.DefaultRecordingRoot(macData,profile,true)==Path.Combine(macData,"RunData"),"Editor recording path must stay unchanged");
         UnityEngine.Application.isEditor=kind=="editor";
         UnityEngine.Application.streamingAssetsPath=assets;
         UnityEngine.Application.persistentDataPath=Path.GetDirectoryName(profile);

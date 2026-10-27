@@ -315,5 +315,6 @@
   "desktopPreview": "Desktop preview: render this rig’s front view across the native application window. Off keeps calibrated LED panel rectangles. Use apparatus setup for physical panel geometry.",
   "walkingPositionGain": "Optional walking displacement multiplier. The tracker position is scaled by sphere radius into centimetres; use 0.01 for a terrain scene measured in metres. Omitted keeps the existing walking gain.",
   "walkingOrientationGain": "Optional signed multiplier for walking heading changes. 1 keeps the measured turn, negative reverses it, and 0 disables heading response. Omitted keeps the existing walking gain.",
-  "groundOnTerrain": "Place this object on the active terrain at its X/Z position. Its configured Y becomes an extra height above terrain. Off uses the explicit world position."
+  "groundOnTerrain": "Place this object on the active terrain at its X/Z position. Its configured Y becomes an extra height above terrain. Off uses the explicit world position.",
+  "initialHeadingDistribution": "For Swarm and Kannadi random starting yaw: Cardinal draws 0, 90, 180 or 270 degrees independently per animal; Continuous preserves 0–360 degrees. Requires randomInitialRotation and resetRotationOnStart."
 }

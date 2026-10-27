@@ -138,6 +138,7 @@ namespace ConfigurationUI
             start.tooltip="Validate and save this setup, archive the run's configuration files, then start the experiment.";
             undo.tooltip="Undo the last change in the current configuration file."; redo.tooltip="Redo the last undone change in the current configuration file.";
             InstallHoverHelp();
+            InstallKeyboardNavigation();
             root.schedule.Execute(UpdateFrameRate).Every(500); UpdateFrameRate();
             root.schedule.Execute(()=>{
                 if(!Application.isEditor&&panel!=null&&Mathf.Abs(panel.scale-DesktopDisplay.UiScale)>.01f)
@@ -205,7 +206,8 @@ namespace ConfigurationUI
             toolbar.Add(Button("Reload disk (undoable)",()=>{ RequireApplied(); selected.Reload(true); path.Clear(); BuildContent(); BuildNavigation(); }));
             if(jsonMode)
             {
-                raw=new TextField { name="raw-json-editor",multiline=true,verticalScrollerVisibility=ScrollerVisibility.Auto,value=selected.Root.ToString(Formatting.Indented) }; raw.AddToClassList("raw-json"); body.Add(raw);
+                if(selected.LoadError!=null)body.Add(WarningStrip("Invalid JSON: "+selected.LoadError+". Defaults remain visible in the form. Repair this draft before saving or running."));
+                raw=new TextField { name="raw-json-editor",multiline=true,verticalScrollerVisibility=ScrollerVisibility.Auto,value=selected.LoadError!=null?selected.SourceText:selected.Root.ToString(Formatting.Indented) }; raw.AddToClassList("raw-json"); body.Add(raw);
                 raw.RegisterValueChangedCallback(e=>{ rawPending=true; status.text="JSON draft — apply to synchronize the form."; save.SetEnabled(false); start.SetEnabled(false); });
                 var actions=Row("json-actions");
                 var apply=Button("Apply JSON",()=>{ selected.ApplyJson(raw.value); rawPending=false; Workspace.RefreshReferences(); BuildNavigation(); UpdateStatus(); }); apply.name="apply-raw-json";actions.Add(apply);
@@ -529,7 +531,11 @@ namespace ConfigurationUI
                     if(launchCompanionForValidation!=null)launchCompanionForValidation(prepared);else
 #endif
                     TrackerProcessManager.Instance.LaunchPrepared(prepared);
-                    if(!startAfter)TrackerProcessManager.Instance.Show(rig.vrId);
+                    if(!startAfter
+#if UNITY_EDITOR
+                        && launchCompanionForValidation==null
+#endif
+                    )TrackerProcessManager.Instance.Show(rig.vrId);
                 }
                 catch(Exception error){PreparationFailed(error);yield break;}
             }

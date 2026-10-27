@@ -1,0 +1,60 @@
+{
+  "_comment": "Terrain cue treatment: matched-terrain. Four spatial patterns share TerrainCueLab and terrain-treatment.json; only surface roles change. Pattern names are recorded on each row.",
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "sequences": [
+    {
+      "_comment": "RoughSmooth",
+      "sceneName": "TerrainCueLab",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/terrain-treatment.json",
+        "rugosity": {
+          "visualSurface": "RoughSmooth",
+          "collisionSurface": "RoughSmooth"
+        }
+      }
+    },
+    {
+      "_comment": "SmoothRough",
+      "sceneName": "TerrainCueLab",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/terrain-treatment.json",
+        "rugosity": {
+          "visualSurface": "SmoothRough",
+          "collisionSurface": "SmoothRough"
+        }
+      }
+    },
+    {
+      "_comment": "SmoothSmooth",
+      "sceneName": "TerrainCueLab",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/terrain-treatment.json",
+        "rugosity": {
+          "visualSurface": "SmoothSmooth",
+          "collisionSurface": "SmoothSmooth"
+        }
+      }
+    },
+    {
+      "_comment": "RoughRough",
+      "sceneName": "TerrainCueLab",
+      "duration": 30,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Rugosity/terrain-treatment.json",
+        "rugosity": {
+          "visualSurface": "RoughRough",
+          "collisionSurface": "RoughRough"
+        }
+      }
+    }
+  ]
+}

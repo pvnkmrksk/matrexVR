@@ -59,6 +59,7 @@ namespace ConfigurationUI
             foreach(var doc in Documents.Where(d=>active.Contains(d.Path)))
             {
                 string label=Path.GetFileName(doc.Path);
+                if(doc.LoadError!=null)errors.Add(label+": invalid JSON; inherited defaults are displayed. Repair the JSON before running. "+doc.LoadError);
                 errors.AddRange(ConfigSchema.Validate(doc.Root,Schemas.Get(doc.SchemaId)).Select(e=>label+": "+e));
                 try
                 {

@@ -90,7 +90,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         var rig=system["properties"]["configs"]["items"];
         rig["required"]=new JArray("vrId");
         rig["properties"]["sphereDiameter"]["x-ui"]=new JObject { ["visibleWhen"]=Rule("closedLoopMode","FicTrac","Hejjetrac","HejjéTrac","hejjetrak",0,3),["help"]="Walking ball diameter in centimetres. Hidden in wing-angle flight mode." };
-        rig["properties"]["targetDisplay"]["x-ui"]=new JObject { ["readOnly"]=true,["help"]="The top-level targetDisplay overrides this legacy field." };
+        rig["properties"]["targetDisplay"]["x-ui"]=new JObject { ["readOnly"]=true,["help"]="An explicit rig display takes precedence. Omission inherits the top-level or command-line display; effective JSON preserves that inheritance." };
         schemas["sequence"]["required"]=new JArray("sequences");
         schemas["sequence"]["properties"]["sequences"]["type"]="array";
         schemas["swarm"]["properties"]["swarm"]=Schema(typeof(SwarmConfig));
@@ -182,6 +182,11 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(name=="initialPosition" && owner.GetField("resetPositionOnStart")!=null) ui["enabledWhen"]=Rule("resetPositionOnStart",true);
         if(name=="initialRotation" && owner.GetField("randomInitialRotation")!=null)
             ui["enabledWhen"]=owner.GetField("resetRotationOnStart")!=null?new JObject { ["all"]=new JArray(Rule("randomInitialRotation",false),Rule("resetRotationOnStart",true)) }:Rule("randomInitialRotation",false);
+        if(name=="initialHeadingDistribution")
+        {
+            ui["enabledWhen"]=new JObject { ["all"]=new JArray(Rule("randomInitialRotation",true),Rule("resetRotationOnStart",true)) };
+            ui["help"]="Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled.";
+        }
         if(name=="playback") ui["enabledWhen"]=new JObject { ["property"]="trajectoryFile",["nonEmpty"]=true };
         if(name=="speciesName") ui["help"]="Common or scientific name of the real animal controlling this rig. Saved with its AnimalID in run metadata.";
         if(owner==typeof(TelemetryConfig) && name=="contextIntervalSeconds")

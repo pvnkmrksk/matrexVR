@@ -42,6 +42,7 @@ public sealed class ReplayMediaPanel : IDisposable
     private bool clearFocus;
     private double seconds,lastSeconds=double.NaN;
     private float speed;
+    private float previewScale=1;
     private Rect visibleRect,formRect;
     private readonly List<string> rigs=new List<string>();
     private int selectedRig;
@@ -212,14 +213,17 @@ public sealed class ReplayMediaPanel : IDisposable
         if(disposed || string.IsNullOrEmpty(runDirectory))return;
         if(clearFocus){GUI.FocusControl(null);clearFocus=false;}
         if(textStyle==null)textStyle=new GUIStyle(smallStyle){wordWrap=true};textStyle.fontSize=smallStyle.fontSize;textStyle.font=smallStyle.font;
-        float width=Mathf.Min(420*scale,Screen.width*.44f),margin=12*scale,row=28*scale;
-        float imageHeight=Mathf.Min(150*scale,Screen.height*.15f);
+        float width=Mathf.Min(420*scale*previewScale,Screen.width*.48f),margin=12*scale,row=28*scale;
+        width=Mathf.Max(Mathf.Min(320*scale,Screen.width*.48f),width);
+        float imageHeight=Mathf.Min(150*scale*previewScale,Screen.height*.23f);
         float videoHeight=clip!=null || pendingArchive!=null?imageHeight:0;
         float height=expanded?row+videoHeight+(animalPreview!=null?row+imageHeight:0)+170*scale:row+12*scale;
         height=Mathf.Min(height,Screen.height*.8f-margin*2);visibleRect=new Rect(Screen.width-width-margin,margin,width,height);
         GUI.Box(visibleRect,GUIContent.none);float x=visibleRect.x+10*scale,y=visibleRect.y+6*scale,w=width-20*scale;
         GUI.enabled=interactable && !HasModal && pendingOperation==null;
-        GUI.Label(new Rect(x,y,w-76*scale,row),"Recording views",textStyle);
+        GUI.Label(new Rect(x,y,w-144*scale,row),"Recording views",textStyle);
+        if(GUI.Button(new Rect(x+w-140*scale,y,30*scale,row),new GUIContent("−","Make the animal and tracker previews smaller.")))previewScale=Mathf.Max(.75f,previewScale-.25f);
+        if(GUI.Button(new Rect(x+w-106*scale,y,30*scale,row),new GUIContent("+","Make the animal and tracker previews larger.")))previewScale=Mathf.Min(1.5f,previewScale+.25f);
         if(GUI.Button(new Rect(x+w-70*scale,y,70*scale,row),expanded?"Hide":"Show"))expanded=!expanded;
         y+=row+4*scale;
         if(expanded)

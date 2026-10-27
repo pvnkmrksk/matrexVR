@@ -25,6 +25,7 @@ public static class ApparatusInteractionValidation
     private static double deadline;
     private static RenderTexture target;
     private static string ownedSystem,originalDemo,importedFile;
+    private static string preflightDirectory;
     private static Dictionary<string,string> demoFiles;
     private static float scrollPosition;
     private static List<Tuple<int,int,int,string,bool>> cases;
@@ -60,6 +61,8 @@ public static class ApparatusInteractionValidation
     private static object Call(object owner,string name,params object[] args)=>owner.GetType().GetMethod(name,Hidden).Invoke(owner,args);
     private static void Put(object owner,string name,object value)=>owner.GetType().GetField(name,Hidden).SetValue(owner,value);
     private static void Submit(Button button){Check(button!=null,"requested native button exists");using(var evt=NavigationSubmitEvent.GetPooled()){evt.target=button;button.SendEvent(evt);}}
+    private static void KeyPress(ConfigWorkbench ui,KeyCode key,EventModifiers modifiers=EventModifiers.None,VisualElement target=null)
+    {target=target??ui.Document.rootVisualElement;using(var evt=KeyDownEvent.GetPooled(new Event {type=EventType.KeyDown,keyCode=key,modifiers=modifiers})){evt.target=target;target.SendEvent(evt);}}
     private static void Next(int value,int wait=4){stage=value;nextFrame=Time.frameCount+wait;}
     private static void Capture(string name)
     {
@@ -177,6 +180,15 @@ public static class ApparatusInteractionValidation
                     prepared=launched=started=0;
                     Put(ui,"prepareCompanionForValidation",new Func<SystemConfig,bool,System.Threading.Tasks.Task<CompanionCatalog.Prepared>>((rig,demo)=>{prepared++;Check(!demo,"configured tracker launch never claims demo input");return System.Threading.Tasks.Task.FromResult(new CompanionCatalog.Prepared{rig=rig});}));
                     Put(ui,"launchCompanionForValidation",new Action<CompanionCatalog.Prepared>(_=>launched++));Put(ui,"startExperimentForValidation",new Action(()=>started++));
+                    Check(root.Q<Button>("initialize-tracking")!=null,"daily home exposes tracking initialization before Start experiment");
+                    preflightDirectory=MasterDataLogger.Instance.directoryPath;
+                    Submit(root.Q<Button>("initialize-tracking"));Next(120,12);break;
+                case 120:
+                    Check(prepared==4&&launched==4&&started==0,"Initialize tracking prepares all eligible inputs without starting the experiment");
+                    Check(!MainController.Instance.SequenceRunning&&!ui.IsPreparing,"tracking preflight returns to idle setup without an experimental scene");
+                    Check(MasterDataLogger.Instance.directoryPath==preflightDirectory,"tracking initialization does not allocate a new experiment run directory");
+                    Check(root.Q<Button>("start-experiment").enabledSelf,"Start experiment stays available after tracking initialization");
+                    prepared=launched=started=0;
                     ui.StartExperiment();Next(13,12);break;
                 case 13:
                     Check(prepared==4&&launched==4&&started==1,"configured Start prepares each eligible rig once and starts once via safe callbacks");
@@ -192,7 +204,56 @@ public static class ApparatusInteractionValidation
                     Check(ui.Workspace.System.Path==Path.GetFullPath(importedFile)&&(int)ui.Workspace.System.Root["configs"][0]["ledPanelWidth"]==96,"reviewing imported geometry does not replace it with128px defaults");
                     Check((string)ui.Workspace.System.Root["configs"][0]["tracker"]["configFile"]=="retain-native-calibration.txt"&&(int)ui.Workspace.System.Root["configs"][0]["tracker"]["extension"]==17,"imported native calibration and unknown data survive review");
                     Check(!DesktopApparatusProfile.ShouldPrepareCompanions(ui.Workspace.System.Root),"imported/manual native workflow is not silently auto-launched");
-                    Check(!MainController.Instance.SequenceRunning,"all apparatus cases complete without scene or camera acquisition");Finish(null);break;
+                    Check(!MainController.Instance.SequenceRunning,"all apparatus cases complete without scene or camera acquisition");
+                    KeyPress(ui,KeyCode.F1);Next(17);break;
+                case 17:
+                    Check(root.Q<VisualElement>(className:"modal-shade")!=null,"F1 opens keyboard help in the native UI");
+                    Check(ui.TryHandleSetupEscape()&&root.Q<VisualElement>(className:"modal-shade")==null,"Escape closes setup dialogs without quitting");
+                    KeyPress(ui,KeyCode.Alpha2,EventModifiers.Alt);Next(18);break;
+                case 18:
+                    Check(root.Q<ListView>(className:"block-list")!=null,"Alt+2 opens the sequence using the native event path");
+                    KeyPress(ui,KeyCode.J,EventModifiers.Control|EventModifiers.Shift);Next(19);break;
+                case 19:
+                    var raw=root.Q<TextField>("raw-json-editor");Check(raw!=null,"Ctrl+Shift+J opens the current JSON editor");
+                    raw.value=raw.value+" ";Check(ui.TryHandleSetupEscape()&&root.Q<TextField>("raw-json-editor")!=null,"Escape keeps an unapplied JSON draft visible");
+                    Submit(root.Q<Button>("discard-raw-json"));
+                    string inherited=Path.Combine(Application.streamingAssetsPath,"apparatus-effective-invalid.json");File.WriteAllText(inherited,"{\"autopilotEnabled\":true,\"autopilotSpeed\":\"invalid\"}");
+                    var doc=ui.Workspace.Open(inherited,"choice");Call(ui,"Select",doc);Put(ui,"settingsTab","Motion");Call(ui,"BuildContent");Next(20);break;
+                case 20:
+                    var current=(ConfigDocument)typeof(ConfigWorkbench).GetField("selected",Hidden).GetValue(ui);
+                    var speed=root.Q<TextField>("number-autopilotSpeed");
+                    string fallback=ConfigSchema.EffectiveValue(current.Root["autopilotSpeed"],ConfigSchema.Child(ui.Workspace.Schemas.Get("choice"),"autopilotSpeed")).ToString();
+                    Check(speed!=null&&speed.value==fallback,"invalid numeric JSON displays the runtime default in its numeric control");
+                    Check((string)current.Root["autopilotSpeed"]=="invalid","viewing the fallback leaves invalid source available for repair");
+                    Call(ui,"ShowEffectiveConfiguration");Next(21);break;
+                case 21:
+                    Check(root.Q<TextField>("effective-json-preview")?.isReadOnly==true,"effective JSON is inspectable without editing the source");
+                    var preview=root.Q<TextField>("effective-json-preview");preview.Focus();KeyPress(ui,KeyCode.Tab,EventModifiers.None,preview);
+                    var focus=root.panel.focusController.focusedElement as VisualElement;
+                    Check(focus!=preview&&!preview.Contains(focus)&&root.Q<VisualElement>(className:"modal-shade").Contains(focus),"Tab advances to the next action while retaining modal focus");
+                    Check(ui.TryHandleSetupEscape(),"effective JSON dialog closes by Escape");
+                    string blankPath=Path.Combine(Application.streamingAssetsPath,"apparatus-effective-blank.json");File.WriteAllText(blankPath," \n");
+                    var blank=ui.Workspace.Open(blankPath,"choice");Call(ui,"Select",blank);Put(ui,"settingsTab","Motion");Call(ui,"BuildContent");Next(22);break;
+                case 22:
+                    Check(root.Q<TextField>("number-autopilotSpeed")!=null,"blank JSON immediately exposes inherited numeric controls");
+                    var blankCurrent=(ConfigDocument)typeof(ConfigWorkbench).GetField("selected",Hidden).GetValue(ui);
+                    Check(File.ReadAllText(blankCurrent.Path)==" \n","showing blank-file defaults leaves source bytes unchanged");
+                    string brokenPath=Path.Combine(Application.streamingAssetsPath,"apparatus-effective-broken.json");File.WriteAllText(brokenPath,"{broken");
+                    var broken=ui.Workspace.Open(brokenPath,"choice");Call(ui,"Select",broken);Put(ui,"settingsTab","Motion");Call(ui,"BuildContent");Next(23);break;
+                case 23:
+                    var damaged=(ConfigDocument)typeof(ConfigWorkbench).GetField("selected",Hidden).GetValue(ui);
+                    Check(damaged.LoadError!=null&&root.Q<TextField>("number-autopilotSpeed")!=null,"malformed JSON keeps inherited default controls inspectable");
+                    Check(File.ReadAllText(damaged.Path)=="{broken","opening malformed JSON does not change source bytes");
+                    KeyPress(ui,KeyCode.J,EventModifiers.Control|EventModifiers.Shift);Next(24);break;
+                case 24:
+                    var repair=root.Q<TextField>("raw-json-editor");Check(repair.value=="{broken","JSON editor preserves the exact malformed source for repair");
+                    repair.value="{\"autopilotEnabled\":true,\"autopilotSpeed\":5}";Submit(root.Q<Button>("apply-raw-json"));
+                    KeyPress(ui,KeyCode.S,EventModifiers.Control);Next(25);break;
+                case 25:
+                    var repaired=(ConfigDocument)typeof(ConfigWorkbench).GetField("selected",Hidden).GetValue(ui);
+                    Check(repaired.LoadError==null&&!repaired.Dirty&&(double)JObject.Parse(File.ReadAllText(repaired.Path))["autopilotSpeed"]==5,"Apply JSON then Ctrl+S repairs and saves the same authoritative document");
+                    Check(File.ReadAllText(repaired.Path+".bak")=="{broken","repair keeps original malformed input as a recoverable backup");
+                    Check(!MainController.Instance.SequenceRunning,"keyboard and inherited-default checks leave experiment idle");Finish(null);break;
             }
         }
         catch(Exception error){Finish(error.ToString());}

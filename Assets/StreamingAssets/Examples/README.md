@@ -8,6 +8,7 @@ Each JSON file is a complete example that can be copied and edited independently
 | `Flight` | Selwyn live sampled sky, fixed date/time sky, historical Adaminaby panorama, migration AGL 10/100/1000; the active 240 s stars → 240 s leftward dorsal swarm recipe. |
 | `Swarm` | Physical generated moths in a moving 4 m cube, speeds 6.17 ± 1.24 m/s; per-rig mean-heading aligned (0°), crossed (+90°) and opposed (180°) presentations; dispersed 3D directions; angular flickering Bogong dots; recorded Selwyn moth playback. |
 | `Choice` | Empty control, two cylinders at ±45°, moving band. |
+| `Kannadi` | Social coupling with one tracked representation per animal by default; one ring-count field controls additional copies. |
 | `DynamicChoice` | Time trigger, area trigger with timeout, independent per-rig sequences, adaptive gray discrimination. |
 | `Optomotor` | Yaw, pitch, roll, and a frequency/speed sweep. |
 | `Sequences` | Heading-angle comparisons; migration heights; grating axes; dynamic design; Choice scene environments; historical panorama; Bogong sky; all-paradigm wiring. |
@@ -19,6 +20,8 @@ Flat experiments retain their sequence presentation timer after heading measurem
 `Flight/selwyn-live-sky.example.json` samples a new image every 30 minutes. The image is static between samples. The fixed-sky example disables advancing time. The panorama example uses the existing image asset.
 
 The preserved Kannadi recipes remain under `Kannadi/`; this collection does not replace or rewrite them.
+
+For an ordered walking-swarm entrainment followed by all-to-all tracked social interaction, load `Sequences/swarm-entrainment-social.sequence.json`; `Sequences/social-coupling-control.sequence.json` provides the matched direct social control. Both share `Kannadi/social-coupling.example.json`, with `numberOfRings: 0` for no additional clones. The swarm is periodic and follows each observer, and both presentations use random cardinal yaw starts. [Setup and parameters](../../../docs/social-swarm-experiment.md).
 
 `Sequences/kinefly-auto-trim.example.json` runs a 240-second Kinefly calibration over Selwyn terrain with the live Milky Way star sky. Its provisional flight threshold and bounded corrections are tuned from six past recordings. See [auto trim](../../../docs/kinefly-auto-trim.md) for controls, units, replay results and continuation with trimming off.
 

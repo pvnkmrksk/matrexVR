@@ -83,6 +83,16 @@ public static class Regression
         rigs.Validate(); Check(true, "Kannadi config supports positive rig indexes beyond four");
         rigs.vrConfigs = new[] { new VRConfig { vrIndex = 10 }, new VRConfig { vrIndex = 10 } };
         Reject(rigs.Validate, "Duplicate Kannadi rig indexes are rejected");
+        var headings = JsonConvert.DeserializeObject<KannadiConfig>("{\"randomInitialRotation\":true,\"initialHeadingDistribution\":\"Cardinal\",\"numberOfRings\":0}");
+        headings.Validate();
+        foreach (var sample in new[] { (0f,0f),(.24999f,0f),(.25f,90f),(.5f,180f),(.75f,270f),(1f,270f) })
+            Check(headings.SampleInitialYaw(sample.Item1)==sample.Item2,"Cardinal quarter/end point maps to exact heading: "+sample.Item1);
+        var continuous=new KannadiConfig();
+        Check(continuous.initialHeadingDistribution==RandomInitialHeadingDistribution.Continuous && continuous.SampleInitialYaw(.125f)==45f,"Omitted heading mode preserves continuous historical distribution");
+        Check(JObject.FromObject(headings)["initialHeadingDistribution"].ToString()=="Cardinal","Heading distribution round-trips as readable JSON enum");
+        headings.initialHeadingDistribution=(RandomInitialHeadingDistribution)99;
+        Reject(headings.Validate,"Invalid heading enum cannot start an experiment");
+        Reject(()=>continuous.SampleInitialYaw(float.NaN),"Nonfinite random heading sample is rejected");
     }
     private static void Documents(string scratch)
     {

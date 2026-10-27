@@ -1,0 +1,13 @@
+{
+  "source": "~/Downloads/nav_rug_rr.blend",
+  "sourceSha256": "c735cd4668f5b55a613f0f0ead75843225b6cd06ffdf50158c1328cac4168ba7",
+  "asset": "Assets/TerrainCueLab/ForestFloorAlbedo.jpg",
+  "assetSha256": "aefecd7e32eb9ea1ac7685e6e0717ed09ef5cf7d9cf0e8d97d771c19dcfcd557",
+  "sizePixels": [
+    4096,
+    4096
+  ],
+  "extraction": "Original packed JPEG bytes from Blender DATA block; no resampling, generation or image edits.",
+  "usage": "Albedo only, shared by all surface modes; packed normal map is deliberately unused so flat visual conditions stay geometrically flat.",
+  "legacyScene": "Existing Rugosity_RS assets/material remain unchanged."
+}

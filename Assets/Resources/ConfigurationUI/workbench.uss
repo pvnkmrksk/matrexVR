@@ -3,7 +3,7 @@
 .row { flex-direction: row; align-items: center; min-height: 32px; }
 .header, .footer { flex-shrink: 0; background-color: rgb(29, 33, 39); }
 .header { height: 64px; padding: 0 22px; border-bottom-width: 1px; border-bottom-color: rgb(51, 56, 64); }
-.identity { width: 204px; flex-shrink: 0; }
+.identity { width: 164px; flex-shrink: 0; }
 .brand { font-size: 19px; -unity-font-style: bold; letter-spacing: 1px; }
 .brand-detail { color: rgb(126, 137, 150); font-size: 9px; letter-spacing: 1px; margin-top: 3px; }
 .page-location { flex-grow: 1; flex-basis: 0; color: rgb(167, 178, 191); font-size: 12px; margin-left: 24px; overflow: hidden; text-overflow: ellipsis; }
@@ -31,7 +31,7 @@
 .studio-button Label { white-space: nowrap; }
 Button { background-color: rgb(44, 50, 59); color: rgb(218, 226, 235); border-width: 1px; border-color: rgb(65, 74, 85); border-radius: 4px; padding: 6px 10px; margin: 3px; height: 32px; font-size: 12px; }
 Button:hover { background-color: rgb(56, 66, 79); border-color: rgb(127, 169, 208); }
-Button:focus { border-color: rgb(136, 182, 224); }
+Button:focus { border-color: rgb(160, 205, 247); background-color: rgb(47, 64, 81); }
 Button.primary { background-color: rgb(156, 196, 230); border-color: rgb(156, 196, 230); color: rgb(23, 42, 58); -unity-font-style: bold; }
 .primary .studio-icon { color: rgb(37, 70, 96); }
 Button.quiet { background-color: rgb(35, 40, 47); }
@@ -69,7 +69,7 @@ Button.tab-active { background-color: rgb(42, 59, 77); color: rgb(196, 220, 243)
 .block-reference { flex-grow: 1; flex-basis: 0; color: rgb(130, 150, 173); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .builder-add-row { margin-top: 7px; }
 .builder-add-row > Label { flex-grow: 1; flex-basis: 0; font-size: 11px; color: rgb(140, 156, 174); margin-left: 12px; white-space: normal; }
-.inspector { width: 268px; flex-shrink: 0; padding: 26px 18px; background-color: rgb(27, 30, 36); border-left-width: 1px; border-left-color: rgb(48, 53, 61); }
+.inspector { width: 244px; flex-shrink: 0; padding: 24px 16px; background-color: rgb(27, 30, 36); border-left-width: 1px; border-left-color: rgb(48, 53, 61); }
 .inspector Label { white-space: normal; }
 .inspector .unity-scroll-view__content-container > Label { color: rgb(149, 165, 183); font-size: 11px; margin-bottom: 13px; }
 .inspector #overview-title { font-size: 9px; letter-spacing: 1px; color: rgb(124, 140, 158); }
@@ -98,7 +98,7 @@ Button.tab-active { background-color: rgb(42, 59, 77); color: rgb(196, 220, 243)
 .settings-tabs Button { padding: 5px 12px; margin: 0 5px 3px 0; }
 .settings-scroll { flex-grow: 1; min-height: 0; }
 .settings-scroll .unity-scroll-view__content-container { min-width: 0; }
-.settings-section { margin: 0 0 22px; }
+.settings-section { margin: 0 0 18px; }
 .section-heading { min-height: 28px; margin-bottom: 8px; }
 .section-heading .studio-icon { width: 17px; height: 17px; }
 .section-heading > Label { flex-grow: 1; font-size: 13px; -unity-font-style: bold; color: rgb(188, 202, 218); }
@@ -109,8 +109,8 @@ Button.tab-active { background-color: rgb(42, 59, 77); color: rgb(196, 220, 243)
 .setting-title { font-size: 12px; color: rgb(206, 216, 229); white-space: normal; }
 .numeric-setting, .boolean-setting, .color-setting { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; }
 .numeric-setting > .setting-label, .boolean-setting > .setting-label, .color-setting > .setting-label { flex-grow: 1; flex-basis: 130px; margin: 0 8px 0 0; }
-.boolean-setting { width: 286px; }
-.boolean-setting > .setting-label { flex-basis: 158px; }
+.boolean-setting { width: 260px; }
+.boolean-setting > .setting-label { flex-basis: 130px; }
 .container-setting { width: 100%; margin-right: 0; padding: 12px; background-color: rgb(29, 35, 42); }
 .container-setting > .setting-label { margin-right: 12px; }
 .container-setting > .setting-label > .setting-title { flex-grow: 1; }
@@ -152,14 +152,15 @@ Button.tab-active { background-color: rgb(42, 59, 77); color: rgb(196, 220, 243)
 .feature-card .row > Label { flex-grow: 1; font-size: 12px; -unity-font-style: bold; }
 .feature-card > .pill { margin-top: 7px; margin-bottom: 7px; }
 .feature-card Button { margin: 0; }
-.studio-switch { min-height: 22px; margin: 0; flex-shrink: 0; }
+.studio-switch { min-height: 24px; margin: 0; flex-shrink: 0; padding: 2px; border-width: 1px; border-color: rgba(0,0,0,0); border-radius: 4px; }
+.studio-switch:focus { border-color: rgb(160, 205, 247); }
 .studio-switch .unity-toggle__checkmark { display: none; }
 .studio-switch .unity-toggle__input { background-color: rgba(0,0,0,0); padding: 0; border-width: 0; flex-direction: row; align-items: center; }
 .switch-track { width: 32px; height: 18px; border-radius: 10px; background-color: rgb(54, 63, 76); border-width: 1px; border-color: rgb(81, 95, 111); }
 .switch-knob { position: absolute; left: 3px; top: 3px; width: 10px; height: 10px; border-radius: 7px; background-color: rgb(151, 166, 183); }
 .is-on .switch-track { background-color: rgb(56, 97, 88); border-color: rgb(91, 147, 122); }
 .is-on .switch-knob { left: 18px; background-color: rgb(174, 220, 193); }
-.switch-indicator { font-size: 9px; color: rgb(146, 163, 181); margin-left: 7px; min-width: 22px; }
+.switch-indicator { font-size: 10px; color: rgb(146, 163, 181); margin-left: 7px; min-width: 22px; }
 .is-on .switch-indicator { color: rgb(160, 208, 184); }
 .rig-card { margin: 6px 0 10px; padding: 12px; border-width: 1px; border-color: rgb(53, 63, 77); border-radius: 5px; background-color: rgb(29, 35, 43); }
 .rig-card > .unity-foldout__toggle { -unity-font-style: bold; margin-bottom: 9px; }
@@ -268,47 +269,48 @@ Button.mini { height: 29px; padding: 3px 6px; font-size: 11px; }
 .narrow-layout .badge { display: none; }
 .narrow-layout .page-location { margin-left: 12px; }
 
-/* Desktop experience: readable logical pixels, native-resolution backing, task-first hierarchy. */
-.workbench { background-color: rgb(18, 23, 29); color: rgb(232, 239, 246); font-size: 14px; letter-spacing: 0; }
-.header { height: 72px; padding-left: 24px; padding-right: 28px; background-color: rgb(22, 28, 35); }
-.brand { font-size: 20px; letter-spacing: .5px; }
-.brand-detail { font-size: 10px; letter-spacing: .6px; color: rgb(143, 158, 172); }
-.page-location { font-size: 13px; margin-left: 26px; }
-.sidebar { width: 228px; padding: 22px 14px; background-color: rgb(20, 26, 33); }
+/* Desktop theme: 8 px rhythm, compact native controls, natural font spacing.
+   These values target a 1920 × 1080 operator display; the panel handles DPI scaling. */
+.workbench { background-color: rgb(18, 23, 29); color: rgb(232, 239, 246); font-size: 13px; letter-spacing: 0; word-spacing: 0; }
+.header { height: 64px; padding-left: 20px; padding-right: 24px; background-color: rgb(22, 28, 35); }
+.brand { font-size: 19px; letter-spacing: 0; }
+.brand-detail { font-size: 10px; letter-spacing: 0; color: rgb(143, 158, 172); }
+.page-location { font-size: 12px; margin-left: 16px; }
+.sidebar { width: 208px; padding: 16px 12px; background-color: rgb(20, 26, 33); }
 .sidebar .unity-scroll-view__content-container { min-height: 100%; }
-.sidebar .studio-button { min-height: 44px; padding: 10px 12px; margin-top: 2px; margin-bottom: 2px; }
+.sidebar .studio-button { min-height: 38px; padding: 8px 10px; margin-top: 2px; margin-bottom: 2px; }
 .sidebar .studio-button Label { font-size: 13px; }
-.sidebar .nav-heading { font-size: 10px; letter-spacing: .6px; margin: 18px 12px 10px; color: rgb(139, 155, 170); }
+.sidebar .nav-heading { font-size: 10px; letter-spacing: 0; margin: 20px 10px 8px; color: rgb(139, 155, 170); }
 .nav-spacer { flex-grow: 1; min-height: 24px; }
 .nav-foldout { margin: 18px 0 0; }
 .nav-foldout > .unity-foldout__toggle { color: rgb(151, 168, 184); min-height: 32px; padding-left: 9px; font-size: 11px; }
 .nav-foldout > .unity-foldout__content { margin-left: 0; }
-.body { padding: 30px 32px 22px; }
-.title { font-size: 29px; letter-spacing: -.3px; margin-bottom: 8px; }
-.studio-subtitle { font-size: 13px; color: rgb(158, 176, 193); margin-bottom: 24px; }
-.studio-icon { width: 20px; height: 20px; min-width: 20px; min-height: 20px; align-self: center; margin-top: 0; margin-bottom: 0; }
-.studio-button { min-height: 38px; }
-.studio-button > Label { padding: 0; margin: 0; -unity-text-align: middle-left; }
-Button { font-size: 13px; height: 38px; padding: 8px 12px; border-radius: 6px; }
+.body { padding: 24px 24px 16px; }
+.title { font-size: 26px; letter-spacing: 0; margin-bottom: 6px; }
+.studio-subtitle { font-size: 12px; color: rgb(158, 176, 193); margin-bottom: 20px; }
+.studio-icon { width: 18px; height: 18px; min-width: 18px; min-height: 18px; align-self: center; margin-top: 0; margin-bottom: 0; }
+.studio-button { min-height: 32px; }
+.studio-button > Label { padding: 0; margin: 0; letter-spacing: 0; -unity-text-align: middle-left; }
+Button { font-size: 13px; height: 32px; min-height: 28px; padding: 5px 10px; border-radius: 5px; flex-shrink: 0; }
 Button.primary { background-color: rgb(158, 213, 198); border-color: rgb(158, 213, 198); color: rgb(18, 46, 43); }
 Button.primary:hover { background-color: rgb(184, 231, 218); border-color: rgb(184, 231, 218); }
 Button.primary .studio-icon { color: rgb(24, 67, 58); }
 Button.icon-button { width: 34px; height: 34px; min-height: 34px; padding: 7px; }
 Button.text-link { background-color: rgba(0,0,0,0); border-width: 0; color: rgb(170, 205, 228); padding: 4px 0; margin: 0 18px 0 0; height: 30px; min-height: 30px; font-size: 11px; }
 .text-link .studio-icon { width: 15px; height: 15px; min-width: 15px; min-height: 15px; margin-right: 7px; }
-.footer { height: 76px; padding: 14px 28px; }
+.footer { height: 64px; padding: 10px 24px; }
 .footer .status { font-size: 12px; color: rgb(165, 183, 199); }
-.footer .primary { min-width: 188px; height: 44px; font-size: 14px; }
-.footer > Button { height: 40px; }
-.start-welcome { margin-bottom: 26px; }
-.eyebrow { font-size: 10px; letter-spacing: 1.2px; color: rgb(143, 195, 181); margin-bottom: 8px; }
-.start-title { font-size: 35px; -unity-font-style: bold; letter-spacing: -.7px; margin-bottom: 9px; }
-.start-subtitle { font-size: 14px; white-space: normal; color: rgb(163, 181, 197); }
+.footer .primary { min-width: 176px; height: 38px; font-size: 13px; }
+.footer > Button { height: 34px; }
+.start-welcome { margin-bottom: 20px; }
+.eyebrow { font-size: 10px; letter-spacing: 0; color: rgb(143, 195, 181); margin-bottom: 8px; }
+.start-title { font-size: 30px; -unity-font-style: bold; letter-spacing: 0; margin-bottom: 8px; }
+.start-subtitle { font-size: 13px; white-space: normal; color: rgb(163, 181, 197); }
 .launch-workspace { align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; }
 .launch-choices { flex-grow: 1; flex-basis: 440px; min-width: 320px; margin-right: 30px; margin-bottom: 10px; }
 .world-choices { flex-grow: 1.3; flex-basis: 520px; min-width: 320px; }
-.session-section-heading { min-height: 34px; margin: 0 0 12px; flex-wrap: wrap; }
-.session-section-title { font-size: 15px; letter-spacing: -.1px; }
+.session-section-heading { min-height: 28px; margin: 0 0 10px; flex-wrap: wrap; }
+.session-section-title { font-size: 14px; letter-spacing: 0; }
 .session-hint { font-size: 12px; color: rgb(156, 174, 191); }
 .movement-choices { align-items: stretch; margin: 0 0 14px; }
 Button.movement-card { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; height: 98px; align-items: center; justify-content: flex-start; padding: 16px 12px; margin: 0 10px 0 0; background-color: rgb(27, 36, 45); border-color: rgb(59, 76, 91); }
@@ -341,7 +343,7 @@ Button.world-card.is-selected { border-color: rgb(117, 190, 171); border-width: 
 .recording-details > .unity-foldout__content { margin-left: 0; padding-top: 14px; }
 .apparatus-summary { min-height: 36px; border-top-width: 1px; border-top-color: rgb(40, 54, 67); padding-top: 12px; margin-top: 6px; flex-wrap: wrap; }
 .apparatus-summary .session-hint { font-size: 11px; margin-right: 20px; }
-.session-details { height: auto; min-height: 100px; padding: 14px; }
+.session-details { height: auto; min-height: 88px; padding: 12px; }
 .session-field > .unity-base-field__label, .subject-traits > .unity-base-field > .unity-base-field__label { font-size: 12px; height: auto; min-height: 18px; margin-bottom: 7px; }
 .session-field .unity-text-field__input, .subject-traits .unity-base-popup-field__input { min-height: 36px; padding: 7px 9px; font-size: 13px; }
 .subject-card { min-width: 250px; padding: 16px; }
@@ -349,15 +351,15 @@ Button.world-card.is-selected { border-color: rgb(117, 190, 171); border-width: 
 .subject-traits { height: 66px; }
 .subject-traits > .unity-base-field { height: 66px; min-height: 66px; }
 .subject-card > .session-comments { height: 82px; }
-.unity-base-field__input { min-height: 32px; font-size: 13px; padding: 6px 8px; }
+.unity-base-field__input { min-height: 30px; font-size: 13px; letter-spacing: 0; padding: 5px 8px; }
 .setting-title { font-size: 13px; }
-.studio-setting { min-height: 54px; padding: 11px 13px; border-radius: 6px; }
-.section-heading > Label { font-size: 14px; }
+.studio-setting { min-height: 48px; padding: 8px 10px; border-radius: 5px; }
+.section-heading > Label { font-size: 13px; }
 .studio-dialog { background-color: rgb(22, 31, 41); border-radius: 10px; padding: 28px; }
 .studio-dialog > Label { font-size: 13px; }
 .hover-help Label { font-size: 13px; }
-.compact-layout .body { padding: 26px 24px 18px; }
-.narrow-layout .body { padding: 24px 20px 16px; }
+.compact-layout .body { padding: 20px 20px 14px; }
+.narrow-layout .body { padding: 18px 16px 12px; }
 .narrow-layout .launch-choices { flex-basis: 100%; margin-right: 0; }
 .narrow-layout .world-choices { flex-basis: 100%; }
 .narrow-layout .start-title { font-size: 30px; }
@@ -379,10 +381,10 @@ Button.desktop-back-button { background-color: rgb(175, 218, 201); color: rgb(19
 .desktop-presentation { margin-bottom: 25px; padding-bottom: 18px; border-bottom-width: 1px; border-bottom-color: rgb(51, 67, 81); }
 .desktop-presentation .unity-base-field { max-width: 480px; margin-left: 0; }
 .viewer-launch-state { font-size: 11px; color: rgb(180, 199, 213); white-space: normal; margin-top: 5px; }
-.session-field { min-height: 74px; }
-.subject-card > .session-field { height: 74px; }
-.subject-traits, .subject-traits > .unity-base-field { height: 74px; min-height: 74px; }
-.subject-card > .session-comments { height: 90px; }
+.session-field { min-height: 64px; }
+.subject-card > .session-field { height: 64px; }
+.subject-traits, .subject-traits > .unity-base-field { height: 64px; min-height: 64px; }
+.subject-card > .session-comments { height: 82px; }
 
 /* The same labelled actions become a compact icon rail when requested. */
 .navigation-toggle { margin-right: 14px; }
@@ -391,3 +393,16 @@ Button.desktop-back-button { background-color: rgb(175, 218, 201); color: rgb(19
 .navigation-collapsed .sidebar .studio-button Label { display: none; }
 .navigation-collapsed .sidebar .studio-icon { margin-right: 0; }
 .navigation-collapsed .sidebar .nav-heading, .navigation-collapsed .sidebar .nav-foldout { display: none; }
+
+/* Acquisition preparation is available before the experiment starts. */
+Button#initialize-tracking { align-self: flex-start; flex-grow: 0; height: 34px; background-color: rgb(33, 49, 63); border-color: rgb(86, 126, 156); color: rgb(205, 229, 247); margin-left: 0; margin-right: 10px; }
+Button#initialize-tracking:hover { background-color: rgb(42, 65, 83); border-color: rgb(137, 184, 220); }
+.effective-json-dialog { width: 860px; max-width: 90%; }
+.effective-json-dialog .raw-json { margin: 10px 0; }
+
+.sequence-starter-dialog { width: 640px; }
+.sequence-starter-dialog > DropdownField { flex-direction: column; margin: 4px 0 14px; }
+.sequence-starter-dialog > DropdownField > .unity-base-field__label { margin-bottom: 6px; }
+.sequence-starter-timing { color: rgb(159, 215, 195); font-size: 12px; margin: 4px 0 8px; }
+.sequence-starter-reference { color: rgb(143, 163, 180); font-size: 11px; white-space: normal; margin-bottom: 18px; }
+.sequence-starter-actions { justify-content: flex-end; flex-wrap: wrap; }

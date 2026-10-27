@@ -84,10 +84,10 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
         hexRadius = next.hexRadius ?? next.spacing ?? hexRadius;
         VRConfig vr = next.vrConfigs?.FirstOrDefault(v => v.vrIndex == VRIndex);
         watchIndex = vr?.watchIndex;
-        Vector3 position = vr?.initialPosition != null ? vr.initialPosition.ToVector3() : transform.position;
-        Quaternion rotation = vr?.initialRotation != null ? Quaternion.Euler(vr.initialRotation.ToVector3()) : transform.rotation;
+        Vector3 position = (vr?.initialPosition ?? next.initialPosition)?.ToVector3() ?? transform.position;
+        Quaternion rotation = Quaternion.Euler((vr?.initialRotation ?? next.initialRotation)?.ToVector3() ?? transform.eulerAngles);
         if (next.randomInitialRotation && next.resetRotationOnStart)
-            rotation = Quaternion.Euler(rotation.eulerAngles.x, UnityEngine.Random.Range(0f, 360f), rotation.eulerAngles.z);
+            rotation = Quaternion.Euler(rotation.eulerAngles.x, next.SampleInitialYaw(UnityEngine.Random.value), rotation.eulerAngles.z);
         ClosedLoop closedLoop = GetComponent<ClosedLoop>();
         if (closedLoop != null)
         {

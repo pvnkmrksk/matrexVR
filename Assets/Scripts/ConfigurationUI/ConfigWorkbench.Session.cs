@@ -90,6 +90,7 @@ namespace ConfigurationUI
             string order=(ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])?"Random order":"Listed order")+
                 " · "+(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass");
             var planHeading=SessionHeading("Experiment sequence","sequence",BuilderSteps.Count+(BuilderSteps.Count==1?" block · ":" blocks · ")+SequenceDuration()+" · "+order);
+            var load=StudioButton("Load sequence","file",ShowSequenceLibrary,"quiet");load.name="session-load-sequence";load.tooltip="Choose a prepared terrain treatment or swarm/social sequence. The current apparatus and other drafts are retained.";planHeading.Add(load);
             var edit=StudioButton("Edit sequence","settings",()=>Select(Workspace.Sequence),"quiet");edit.name="session-edit-sequence";planHeading.Add(edit);scroll.Add(planHeading);
             var summaryIndices=Enumerable.Range(0,BuilderSteps.Count).ToList();
             var plan=new ListView(summaryIndices,64,()=>new VisualElement(),BindSessionBlock)
@@ -116,6 +117,7 @@ namespace ConfigurationUI
             movement.RegisterValueChangedCallback(e=>ChooseQuickStart(e.newValue.StartsWith("Walking",StringComparison.Ordinal)?"walking":"flying",CurrentWorld,true));options.Add(movement);
             if(CurrentMovement=="walking")options.Add(SessionLabel(DesktopPreviewHud.WalkingDemoHelp,"apparatus-note"));
             AddQuickTrackerControls(options);
+            var preparation=StudioButton("Initialize tracking","camera",OpenQuickTracker,"quiet");preparation.name="initialize-tracking";preparation.tooltip="Open tracking now to check input and calibration. This keeps the setup open and does not start an experiment or create a run recording.";parent.Add(preparation);
             var links=Row("tracker-links");options.Add(links);AddSessionPlotLink(links);
             links.Add(StudioButton(CurrentMovement=="walking"?"About HejjéTrac":"About Rekkefly","external",()=>UnityEngine.Application.OpenURL(CurrentMovement=="walking"?"https://github.com/pvnkmrksk/hejjetrak":"https://github.com/pvnkmrksk/rekkefly"),"text-link"));
             var configure=Row("demo-configure");parent.Add(configure);configure.Add(new WorkbenchIcon("system"));
@@ -133,9 +135,9 @@ namespace ConfigurationUI
             var links=Row("tracker-links");parent.Add(links);AddSessionPlotLink(links);
             if(DesktopApparatusProfile.ShouldPrepareCompanions(Workspace.System.Root))
             {
-                var open=StudioButton("Open tracker windows","camera",OpenQuickTracker,"text-link");open.name="session-open-trackers";open.tooltip="Open or show the independent native tracker windows for eligible local rigs. Camera calibration stays in those windows.";links.Add(open);
+                var open=StudioButton("Initialize tracking","camera",OpenQuickTracker,"quiet");open.name="initialize-tracking";open.tooltip="Open or show the independent native tracker windows to check input before starting. This does not start the experiment or create a run recording. Camera calibration stays in those windows.";links.Add(open);
             }
-            var state=new Foldout {name="session-tracker-windows",text="Tracker windows",value=false};state.AddToClassList("apparatus-advanced");parent.Add(state);
+            var state=new Foldout {name="session-tracker-windows",text="Tracking status & windows",value=false};state.AddToClassList("apparatus-advanced");parent.Add(state);
             foreach(var rig in rigs)
             {
                 string id=(string)rig["vrId"];
@@ -313,6 +315,8 @@ namespace ConfigurationUI
             var dialog=OpenModal("Config tools","Every JSON value remains accessible, including custom extensions.");
             dialog.Add(StudioButton("All parameters","settings",()=>{ CloseModal(); advancedMode=true; BuildContent(); }));
             dialog.Add(StudioButton("Edit JSON","file",()=>{ CloseModal(); jsonMode=true; BuildContent(); }));
+            dialog.Add(StudioButton("Effective JSON & defaults","file",ShowEffectiveConfiguration));
+            dialog.Add(StudioButton("Keyboard shortcuts","help",ShowKeyboardHelp));
             dialog.Add(StudioButton("Open another file","file",()=>{ CloseModal(); ShowOpenFile(); }));
             dialog.Add(StudioButton("Save a variation","copy",()=>{ CloseModal(); ShowVariation(null); }));
             var revert=StudioButton("Revert to saved JSON","loop",()=>{ selected.RevertToSaved(); CloseModal(); BuildNavigation(); BuildContent(); });

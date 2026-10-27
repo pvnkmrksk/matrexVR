@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Build the pinned local Mac camera correction, then replace only its catalog entry.
 
-This does not publish or relabel an official release. Requires a Rust toolchain
-and a local clone containing the pinned upstream source commit.
+This does not publish or relabel an official release. Building requires a Rust
+toolchain and the pinned upstream source. An explicitly selected cached binary
+can instead be reused with its matching prior build-provenance receipt; source
+and patch integrity are still checked before staging.
 """
 import argparse
 import hashlib
@@ -91,6 +93,26 @@ def build(source, cargo, target, environment):
     return target / 'release/rekkefly'
 
 
+def verified_binary(binary, provenance_file, lock):
+    """Accept only bytes explicitly paired with a matching locked build receipt.
+
+    The receipt is evidence from a previous local build, not a substitute for
+    source verification: main also runs prepare_source before this path.
+    """
+    binary = binary.resolve(strict=True)
+    if not binary.is_file():
+        raise ValueError('The verified native binary must be a regular file')
+    provenance = json.loads(provenance_file.read_text())
+    if not isinstance(provenance, dict):
+        raise ValueError('Native binary provenance must be a JSON object')
+    for field in ('repository', 'sourceRevision', 'patchSha256', 'platform', 'sourceVersion'):
+        if provenance.get(field) != lock[field]:
+            raise ValueError('Cached native binary provenance does not match the pinned ' + field)
+    if provenance.get('unsignedBuildExecutableSha256') != companion_bundles.digest(binary):
+        raise ValueError('Cached native binary bytes do not match the supplied build provenance')
+    return binary
+
+
 def stage(companions, binary, lock, patch):
     catalog_file = companions / 'catalog.json'
     catalog = json.loads(catalog_file.read_text())
@@ -165,7 +187,11 @@ def main():
     parser.add_argument('--source-repo', type=Path, default=ROOT.parent / 'rekkefly')
     parser.add_argument('--cargo', type=Path, default=Path(shutil.which('cargo') or '/private/tmp/fictrac-cargo/bin/cargo'))
     parser.add_argument('--target-dir', type=Path, default=ROOT / '.release-work/native-target/rekkefly')
+    parser.add_argument('--verified-binary', type=Path, help='Explicit previously built unsigned executable; requires --binary-provenance and skips Cargo only after source/provenance verification')
+    parser.add_argument('--binary-provenance', type=Path, help='Prior MATREX-NATIVE-PROVENANCE.json matching the selected binary and the pinned source/patch lock')
     args = parser.parse_args()
+    if (args.verified_binary is None) != (args.binary_provenance is None):
+        parser.error('--verified-binary and --binary-provenance must be supplied together')
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':
         parser.error('The local correction is built and tested only for Mac arm64; official other-platform entries remain unchanged')
     lock, patch = load_lock()
@@ -178,7 +204,7 @@ def main():
     for variable, candidate in [('CARGO_HOME', '/private/tmp/matrex-rekkefly-cargo'), ('RUSTUP_HOME', '/private/tmp/fictrac-rustup')]:
         if variable not in environment and Path(candidate).is_dir():
             environment[variable] = candidate
-    binary = build(source, args.cargo, args.target_dir.resolve(), environment)
+    binary = verified_binary(args.verified_binary, args.binary_provenance, lock) if args.verified_binary is not None else build(source, args.cargo, args.target_dir.resolve(), environment)
     result = stage(args.companions.resolve(), binary, lock, patch)
     print(json.dumps(result, indent=2))
 

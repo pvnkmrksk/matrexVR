@@ -54,6 +54,21 @@ Select any pattern independently for visual and navigation surfaces. To reverse 
 
 `Examples/Rugosity/sequence-spatial-patterns.json` demonstrates all four non-flat spatial patterns. Each assignment is a surface ID registered on this scene's RugosityWorld, not an asset filename or a global object-name search.
 
+## Load one treatment and run all four spatial patterns
+
+The four ready-to-load treatment sequences below each run **RoughSmooth → SmoothRough → SmoothSmooth → RoughRough**, for 30 seconds each. They all use the same `TerrainCueLab` scene and the same `terrain-treatment.json` base configuration. There are no duplicated scenes, colliders, or navigation meshes to maintain. Choose one sequence file in the app, then press **Start experiment**; loading it does not start automatically. Each sequence stops after the fourth trial.
+
+| Sequence file under `Examples/Rugosity/` | Visible surface | Navigation/collision surface |
+| --- | --- | --- |
+| `sequence-treatment-matched-terrain.json` | Current spatial pattern | Current spatial pattern |
+| `sequence-treatment-visual-terrain_navigation-flat.json` | Current spatial pattern | Flat |
+| `sequence-treatment-visual-flat_navigation-terrain.json` | Flat | Current spatial pattern |
+| `sequence-treatment-matched-flat.json` | Flat | Flat |
+
+The first three treatments retain all four meaningful spatial patterns. In the both-flat treatment, the four trials intentionally have identical geometry: the spatial pattern is a counterbalancing label, preserved in each row's `_comment` in the recorded sequence snapshot. This does not silently add invisible bumps to a flat-navigation condition.
+
+Change shared motion, clearance, orientation, or stimulus defaults once in `terrain-treatment.json`. Each sequence overrides only the two surface assignments; empty `heightSurface` and `normalSurface` inherit the selected collision surface. Change a trial's `duration` in its sequence as needed. The treatment presets use real tracking by default: `closedLoopPosition` and `closedLoopOrientation` are enabled and `autopilotEnabled` is disabled. Initialize and verify the tracker before starting. For a hardware-free walkthrough, temporarily enable autopilot and disable both closed-loop flags in that shared file, or use the older `sequence-spatial-patterns.json` bench example.
+
 ## Press Play or tune in the Editor
 
 **Open ControlScene and press Play** for the active sequence. It runs the four main conditions followed by three isolation controls, 30 seconds each, looping. Each condition starts at X = −60, Z = 0, facing +X, and moves at 5 cm/s. This crosses the rough/smooth boundary automatically. Arrow keys and A/D allow movement and steering; Ctrl+Space toggles autopilot. Turning or reverse input changes the route.
@@ -76,7 +91,7 @@ For direct authoring, use **Tools → Rugosity → Open terrain cue lab**, or op
 
 Opening the lab directly starts a manual walkthrough without a MainController. Its authored scene pose is the canonical condition. In Edit mode, changing the Inspector updates visibility/collider roles; **Preview pose at current rig positions** applies height and orientation and supports Undo. Existing RS scenes do not acquire this component automatically.
 
-The checker pattern provides depth and motion cues. A rendered surround extends the visible ground to 1 km so a nearby square boundary does not produce a false kink in a flat horizon. This surround has no collider and does not extend the 200 × 200 cm navigation footprint.
+The shared ground material now uses the original 4096 × 4096 forest-floor albedo recovered from the packed images in `~/Downloads/nav_rug_rr.blend`. The JPEG bytes are preserved in `Assets/TerrainCueLab/ForestFloorAlbedo.jpg`; provenance and checksums are in [terrain-texture-provenance.json](terrain-texture-provenance.json). The packed normal map is deliberately unused so it cannot add apparent normal-map bumps to a flat visual condition. The earlier checker texture remains available as `GroundPattern.asset`, and legacy `Rugosity_RS` materials are unchanged. A rendered surround extends the visible ground to 1 km so a nearby square boundary does not produce a false kink in a flat horizon. This surround has no collider and does not extend the 200 × 200 cm navigation footprint.
 
 ## Configuration and isolation controls
 

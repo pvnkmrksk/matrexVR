@@ -21,7 +21,7 @@ public class SwarmController : MonoBehaviour, IInSceneSequencer
                                   vr?.closedLoopOrientation ?? config.closedLoopOrientation ?? 1);
                 Vector3 position = (vr?.initialPosition ?? config.initialPosition)?.ToVector3() ?? rig.transform.position;
                 Vector3 rotation = (vr?.initialRotation ?? config.initialRotation)?.ToVector3() ?? rig.transform.eulerAngles;
-                if (config.randomInitialRotation && config.resetRotationOnStart) rotation.y = Random.Range(0f, 360f);
+                if (config.randomInitialRotation && config.resetRotationOnStart) rotation.y = config.SampleInitialYaw(Random.value);
                 if (vr != null || config.initialPosition != null || config.initialRotation != null || config.randomInitialRotation)
                     rig.ApplyStartPose(position,
                         Quaternion.Euler(rotation), config.resetPositionOnStart, config.resetRotationOnStart);

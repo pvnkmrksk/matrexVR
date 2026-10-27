@@ -1,0 +1,18 @@
+{
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "returnToSetup": true,
+  "sequences": [
+    {
+      "sceneName": "Kannadi",
+      "duration": 300,
+      "gain": 1,
+      "autoTrim": false,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Kannadi/social-coupling.example.json"
+      }
+    }
+  ]
+}

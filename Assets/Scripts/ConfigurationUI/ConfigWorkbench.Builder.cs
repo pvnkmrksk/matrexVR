@@ -319,8 +319,17 @@ namespace ConfigurationUI
         {
             CloseModal(); modal=new VisualElement(); modal.AddToClassList("modal-shade"); root.Add(modal);
             var dialog=new VisualElement(); dialog.AddToClassList("studio-dialog"); modal.Add(dialog);
+            modal.RegisterCallback<KeyDownEvent>(evt=>{
+                if(evt.keyCode!=KeyCode.Tab)return;
+                var controls=dialog.Query<VisualElement>().ToList().Where(element=>element.focusable&&element.enabledInHierarchy&&element.resolvedStyle.display!=DisplayStyle.None&&
+                    (element is Button || element is TextField || element is IntegerField || element is DropdownField || element is Toggle || element is Slider)).ToList();
+                if(controls.Count==0)return;
+                var focused=root.panel?.focusController.focusedElement as VisualElement;
+                int index=controls.FindIndex(element=>element==focused || focused!=null&&element.Contains(focused));
+                controls[(index+(evt.shiftKey?-1:1)+controls.Count)%controls.Count].Focus();evt.PreventDefault();evt.StopPropagation();
+            },TrickleDown.TrickleDown);
             var head=Row(); dialog.Add(head); var text=new Label(title); text.AddToClassList("title"); head.Add(text); text.style.flexGrow=1;
-            head.Add(Button("Close",CloseModal,"quiet")); dialog.Add(new Label(subtitle)); return dialog;
+            var close=Button("Close",CloseModal,"quiet");head.Add(close);dialog.Add(new Label(subtitle));close.schedule.Execute(()=>close.Focus());return dialog;
         }
         private void CloseModal() { modal?.RemoveFromHierarchy(); modal=null; }
         private void ShowBlockLibrary(int? replace=null)

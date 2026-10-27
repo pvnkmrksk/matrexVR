@@ -8,7 +8,6 @@ from pathlib import Path
 import subprocess
 import threading
 import time
-import zmq
 
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--project',type=Path,required=True)
@@ -31,6 +30,7 @@ def publish():
  finally:pub.close();context.term()
 thread=None
 if not args.external_publisher:
+ import zmq
  thread=threading.Thread(target=publish);thread.start();time.sleep(.1)
  if failure:raise SystemExit(failure[0])
 command=[args.unity,'-batchmode','-projectPath',str(args.project.resolve()),'-executeMethod','ReplayRoundtripValidation.Run','-replay-output',str(args.output.resolve()),'-replay-port',str(args.port),'-replay-backend',args.backend,'-replay-require-motion','false' if args.external_publisher else 'true','--data-dir',str((args.output/'RunData').resolve()),'-logFile',str((args.output/'unity.log').resolve())]

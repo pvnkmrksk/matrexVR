@@ -31,6 +31,49 @@ namespace ConfigurationUI
             }
         }
         public static IEnumerable<string> Types(JObject schema) => schema?["type"] is JArray a?a.Select(v=>v.ToString()):schema?["type"]!=null?new[]{schema["type"].ToString()}:Array.Empty<string>();
+        // Resolve a separate display/export value. The lossless source DOM is never
+        // changed by inspecting defaults, and invalid explicit input remains a
+        // validation error until the operator edits or replaces it.
+        public static JToken EffectiveValue(JToken value,JObject schema,bool documentRoot=false)
+        {
+            var types=Types(schema).ToList();
+            string kind=LosslessJson.Kind(value);
+            bool valid=value!=null && (types.Count==0 || types.Contains(kind) || kind=="integer" && types.Contains("number"));
+            if(valid && schema["enum"] is JArray options) valid=options.Any(v=>LosslessJson.Equivalent(v,value));
+            if(valid && (kind=="number" || kind=="integer"))
+            {
+                valid=double.TryParse(value.ToString(),System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out double n) && !double.IsNaN(n) && !double.IsInfinity(n);
+                if(valid && schema["minimum"]!=null)valid=n>=(double)schema["minimum"];
+                if(valid && schema["maximum"]!=null)valid=n<=(double)schema["maximum"];
+                if(valid && schema["exclusiveMinimum"]!=null)valid=n>(double)schema["exclusiveMinimum"];
+            }
+            JToken shown=valid?value:!documentRoot?schema["default"]:null;
+            if(shown==null && documentRoot && types.Contains("object"))shown=new JObject();
+            if(shown is JObject obj)
+            {
+                var result=(JObject)obj.DeepClone();
+                foreach(var property in (schema["properties"] as JObject??new JObject()).Properties())
+                {
+                    var child=(JObject)property.Value;
+                    // A top-level template describes a starter file, not runtime
+                    // defaults. Only declared per-field defaults are inherited.
+                    if(obj[property.Name]==null && child["default"]==null)continue;
+                    JToken resolved=EffectiveValue(obj[property.Name],child);
+                    if(resolved!=null)result[property.Name]=resolved;
+                }
+                // Omitted rig outputs inherit the system/command-line display at
+                // the runtime boundary. SystemConfig's field initializer is not
+                // that contextual default; writing it would change output routing.
+                if(documentRoot && (string)schema["$id"]=="urn:matrex:config:system" &&
+                    obj["configs"] is JArray sourceRigs && result["configs"] is JArray effectiveRigs)
+                    for(int i=0;i<sourceRigs.Count;i++)
+                        if(sourceRigs[i] is JObject sourceRig && sourceRig.Property("targetDisplay")==null && effectiveRigs[i] is JObject effectiveRig)
+                            effectiveRig.Remove("targetDisplay");
+                return result;
+            }
+            if(shown is JArray array)return new JArray(array.Select(item=>EffectiveValue(item,Child(schema,"",true))??item.DeepClone()));
+            return shown?.DeepClone();
+        }
         public static bool RuleMatches(JToken owner,JToken rule,JObject context=null)
         {
             if(!(rule is JObject r)) return true;
@@ -60,7 +103,7 @@ namespace ConfigurationUI
         }
         private static bool? Flag(JObject owner,JObject schema,string key)
         {
-            JToken value=owner[key]??schema?["properties"]?[key]?["default"];
+            JToken value=EffectiveValue(owner[key],Child(schema,key));
             return value?.Type==JTokenType.Boolean?(bool?)value:null;
         }
         public static bool Visible(JToken owner,JObject schema,string key,JObject context=null) => MatchesWithDefaults(owner,schema,Child(schema,key)["x-ui"]?["visibleWhen"],context);

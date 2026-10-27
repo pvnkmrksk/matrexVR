@@ -60,7 +60,7 @@ namespace ConfigurationUI
                         string key=name; var card=new VisualElement(); card.AddToClassList("feature-card"); features.Add(card); var line=Row(); card.Add(line); line.Add(new WorkbenchIcon(key=="nightSky"?"sky":key=="swarm"?"swarm":"settings")); line.Add(new Label(Pretty(key)));
                         JToken value=payload[key]; bool active=value.Type!=JTokenType.Null && (!(value is JObject o) || ExperimentBlocks.Flag(o["enabled"],true));
                         card.Add(Pill(value is JArray a?a.Count+" items":active?"ON":"OFF",active?"accent":"muted-pill"));
-                        card.Add(Button("Configure",()=>{ settingsTab=key=="nightSky"?"Sky":key=="headingReference"?"Tuning":"Stimulus"; expandedSections.Add(selected.Path+"|"+string.Join("/",prefix.Concat(new[]{key}))); BuildContent(); },"quiet"));
+                        card.Add(Button("Edit parameters",()=>{ settingsTab=key=="nightSky"?"Sky":key=="headingReference"?"Tuning":"Stimulus"; expandedSections.Add(selected.Path+"|"+string.Join("/",prefix.Concat(new[]{key}))); BuildContent(); },"quiet"));
                     }
             }
             else
@@ -127,7 +127,11 @@ namespace ConfigurationUI
             { var inherited=Pill("Inherited","muted-pill"); inherited.tooltip="Not explicitly set in this file. The displayed value comes from the runtime/schema default."; label.Add(inherited); }
             setting.tooltip=ConfigParameterHelp.Description(key,parts,schema); caption.tooltip=setting.tooltip;
             Action<JToken,bool> assign=(v,rebuild)=>StudioEdit(doc,root=>AssignAt(root,parts,v),rebuild);
-            JToken shown=value??schema["default"];
+            JToken shown=ConfigSchema.EffectiveValue(value,schema);
+            if(value!=null && ConfigSchema.Validate(value,schema).Count>0)
+            {
+                var fallback=Pill("Check JSON","muted-pill");fallback.tooltip="This file contains an invalid value. The control displays its default; edit the value to repair it. Starting stays disabled until validation passes.";label.Add(fallback);
+            }
             if(shown?.Type==JTokenType.Boolean)
             {
                 setting.AddToClassList("boolean-setting");
@@ -137,7 +141,7 @@ namespace ConfigurationUI
             {
                 setting.AddToClassList("vector-setting");
                 var vector=Row("vector-controls"); setting.Add(vector);
-                foreach(string axis in new[]{"x","y","z"}) { string component=axis; var field=NumberControl(obj[axis],ConfigSchema.Child(schema,axis),axis,v=>StudioEdit(doc,r=>{ if(ConfigDocument.At(r,parts)==null) AssignAt(r,parts,obj.DeepClone()); ConfigDocument.At(r,parts)[component]=v; },false),false); field.tooltip=ConfigParameterHelp.Description(axis,parts.Concat(new[]{axis}).ToArray(),ConfigSchema.Child(schema,axis)); vector.Add(new Label(axis.ToUpperInvariant())); vector.Add(field); }
+                foreach(string axis in new[]{"x","y","z"}) { string component=axis; var field=NumberControl(obj[axis],ConfigSchema.Child(schema,axis),axis,v=>StudioEdit(doc,r=>{ if(!(ConfigDocument.At(r,parts) is JObject)) AssignAt(r,parts,obj.DeepClone()); ConfigDocument.At(r,parts)[component]=v; },false),false); field.tooltip=ConfigParameterHelp.Description(axis,parts.Concat(new[]{axis}).ToArray(),ConfigSchema.Child(schema,axis)); vector.Add(new Label(axis.ToUpperInvariant())); vector.Add(field); }
             }
             else if(shown is JObject color && new[]{"r","g","b"}.All(k=>color[k]!=null))
             {
@@ -168,10 +172,10 @@ namespace ConfigurationUI
                 fold.RegisterValueChangedCallback(e=>{ if(e.target!=fold) return; disclosure.text=e.newValue?"Parameters ▾":"Parameters ▸"; if(e.newValue) { expandedSections.Add(id); populate(); } else { expandedSections.Remove(id); fold.Clear(); } });
                 setting.AddToClassList("container-setting");
             }
-            else if(value is JArray array)
+            else if(shown is JArray array)
             {
                 var controls=Row(); controls.Add(Pill(array.Count+" items","accent")); controls.Add(StudioButton("Edit items","settings",()=>{ selected=doc; advancedMode=true; path.Clear(); path.AddRange(parts); BuildContent(); },"quiet"));
-                controls.Add(IconButton("plus","Add item",()=>StudioEdit(doc,r=>((JArray)ConfigDocument.At(r,parts)).Add(ConfigSchema.NewValue(ConfigSchema.Child(schema,"",true)))))); setting.Add(controls);
+                controls.Add(IconButton("plus","Add item",()=>StudioEdit(doc,r=>{if(!(ConfigDocument.At(r,parts) is JArray))AssignAt(r,parts,array.DeepClone());((JArray)ConfigDocument.At(r,parts)).Add(ConfigSchema.NewValue(ConfigSchema.Child(schema,"",true)));}))); setting.Add(controls);
             }
             else if(shown==null || shown.Type==JTokenType.Null)
             {
@@ -206,7 +210,7 @@ namespace ConfigurationUI
                 if(key.EndsWith("File") || key.EndsWith("Path") || key=="design" || key=="configFile") setting.AddToClassList("path-setting");
                 var input=new TextField { value=shown.ToString(),isDelayed=true }; setting.Add(input); input.RegisterValueChangedCallback(e=>Guard(()=>assign(new JValue(e.newValue),false)));
             }
-            Action enable=()=>setting.SetEnabled(ConfigSchema.Enabled(ConfigDocument.At(doc.Root,parts.Take(parts.Length-1).ToArray()),ownerSchema,key,Context));
+            Action enable=()=>setting.SetEnabled(ConfigSchema.Enabled(ConfigSchema.EffectiveValue(ConfigDocument.At(doc.Root,parts.Take(parts.Length-1).ToArray()),ownerSchema,true),ownerSchema,key,Context));
             enableUpdates.Add(enable); setting.RegisterCallback<DetachFromPanelEvent>(_=>enableUpdates.Remove(enable)); enable(); return setting;
         }
         private VisualElement NumberControl(JToken value,JObject schema,string key,Action<JToken> commit,bool allowSlider=true)

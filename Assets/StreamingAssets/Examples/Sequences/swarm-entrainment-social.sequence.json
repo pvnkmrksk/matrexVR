@@ -1,0 +1,28 @@
+{
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "returnToSetup": true,
+  "sequences": [
+    {
+      "sceneName": "Swarm",
+      "duration": 120,
+      "gain": 1,
+      "autoTrim": false,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Swarm/ordered-entrainment.example.json"
+      }
+    },
+    {
+      "sceneName": "Kannadi",
+      "duration": 300,
+      "gain": 1,
+      "autoTrim": false,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Kannadi/social-coupling.example.json"
+      }
+    }
+  ]
+}

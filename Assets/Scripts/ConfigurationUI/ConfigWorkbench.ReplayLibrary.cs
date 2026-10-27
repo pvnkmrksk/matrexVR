@@ -64,9 +64,9 @@ namespace ConfigurationUI
             libraryState=SessionLabel(libraryMessage??"Scanning local recordings…","recording-library-state");libraryState.name="recording-library-state";body.Add(libraryState);
             var split=Row("recording-library-split");split.style.alignItems=Align.FlexStart;body.Add(split);
             var local=new VisualElement();local.AddToClassList("recording-library-local");split.Add(local);
-            local.Add(SessionLabel("LOCAL RUN DATA","apparatus-eyebrow"));
+            local.Add(SessionLabel("THIS INSTALLATION · RUN DATA","apparatus-eyebrow"));
             string rootDirectory=libraryRoot??RuntimePaths.RunDataRoot;
-            var location=SessionLabel(rootDirectory,"recording-library-root");location.tooltip=rootDirectory+"\nThe configured RunData directory; --data-dir overrides the default location.";local.Add(location);
+            var location=SessionLabel(rootDirectory,"recording-library-root");location.name="recording-library-root";location.tooltip=rootDirectory+"\nRecordings from this installation. --data-dir overrides the location; Browse opens saved recordings elsewhere.";local.Add(location);
             libraryEmpty=SessionLabel("No recordings found yet. Start an experiment, or Browse to a saved run folder.","recording-library-empty");local.Add(libraryEmpty);
             libraryList=new ListView(libraryVisible,90,()=>new VisualElement(),BindLibraryRow){name="recording-library-list",selectionType=SelectionType.Single,virtualizationMethod=CollectionVirtualizationMethod.FixedHeight};libraryList.style.flexGrow=1;local.Add(libraryList);
             libraryList.selectionChanged+=selection=>{var entry=selection.OfType<RecordingLibrary.Entry>().FirstOrDefault();if(entry!=null){librarySelected=entry.DirectoryPath;RefreshLibraryDetails();RefreshLibraryFooter();}};

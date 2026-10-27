@@ -2,10 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 // Kept separate from Choice's schema so numeric locust gains do not change other experiments.
+[JsonConverter(typeof(StringEnumConverter))]
+public enum RandomInitialHeadingDistribution { Continuous, Cardinal }
+
 [Serializable]
 public class KannadiConfig : SwarmConfig
 {
@@ -13,6 +17,7 @@ public class KannadiConfig : SwarmConfig
     public bool resetPositionOnStart = true;
     public bool resetRotationOnStart = true;
     public bool randomInitialRotation;
+    public RandomInitialHeadingDistribution initialHeadingDistribution = RandomInitialHeadingDistribution.Continuous;
     public ColorConfig uniformSkyColor;
     public int? numberOfRings;
     public float? hexRadius;
@@ -77,6 +82,8 @@ public class KannadiConfig : SwarmConfig
 
     public void Validate()
     {
+        if (!Enum.IsDefined(typeof(RandomInitialHeadingDistribution), initialHeadingDistribution))
+            throw new ArgumentException("initialHeadingDistribution must be Continuous or Cardinal.");
         headingReference?.Validate();
         float radius = hexRadius ?? spacing ?? 10f;
         if (!Finite(radius) || radius <= 0) throw new ArgumentException("Kannadi hexRadius/spacing must be positive and finite.");
@@ -96,6 +103,15 @@ public class KannadiConfig : SwarmConfig
                 throw new ArgumentException("watchIndex must be a positive configured rig index, or omitted to see the other animals.");
             ValidateGain(vr.closedLoopPosition); ValidateGain(vr.closedLoopOrientation);
         }
+    }
+    // A uniform draw is supplied by the scene so legacy files consume the same one
+    // random value per reset. The inclusive upper endpoint remains the fourth cardinal.
+    public float SampleInitialYaw(float uniformSample)
+    {
+        if (float.IsNaN(uniformSample) || float.IsInfinity(uniformSample)) throw new ArgumentException("Initial heading sample must be finite.");
+        float sample = Math.Max(0, Math.Min(1, uniformSample));
+        return initialHeadingDistribution == RandomInitialHeadingDistribution.Cardinal
+            ? Math.Min(3, (int)Math.Floor(sample * 4)) * 90f : sample * 360f;
     }
     private static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
     private static void ValidateGain(float? gain)

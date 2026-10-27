@@ -2,8 +2,8 @@
 .apparatus-scroll { flex-grow: 1; min-height: 0; }
 .apparatus-copy { color: rgb(169, 185, 199); font-size: 12px; white-space: normal; margin: 4px 0 10px; }
 .apparatus-note { color: rgb(135, 155, 173); font-size: 11px; white-space: normal; margin: 8px 0; }
-.apparatus-eyebrow { color: rgb(135, 163, 176); font-size: 10px; letter-spacing: 1px; margin: 0 0 8px; }
-.apparatus-intro { max-width: 900px; padding: 24px; background-color: rgb(29, 38, 47); border-width: 1px; border-color: rgb(58, 75, 88); border-radius: 6px; }
+.apparatus-eyebrow { color: rgb(135, 163, 176); font-size: 10px; letter-spacing: 0; margin: 0 0 8px; }
+.apparatus-intro { max-width: 900px; padding: 20px; background-color: rgb(29, 38, 47); border-width: 1px; border-color: rgb(58, 75, 88); border-radius: 6px; }
 .apparatus-intro .session-section-heading { margin-top: 0; }
 .apparatus-type-choices { flex-wrap: wrap; margin: 12px 0; }
 .apparatus-type-choices > Button { margin-left: 0; margin-right: 10px; }
@@ -17,7 +17,7 @@
 .apparatus-map-section { padding: 16px; border-width: 1px; border-color: rgb(50, 67, 80); background-color: rgb(25, 33, 42); border-radius: 5px; margin-bottom: 18px; }
 .apparatus-map-section .session-section-heading { margin-top: 0; margin-bottom: 8px; }
 .apparatus-map-label { color: rgb(183, 200, 215); font-size: 11px; margin: 12px 0 7px; }
-.apparatus-display-map { height: 210px; min-height: 0; max-width: 100%; flex-shrink: 0; position: relative; background-color: rgb(12, 18, 24); border-width: 1px; border-color: rgb(55, 69, 81); overflow: hidden; }
+.apparatus-display-map { height: 210px; min-height: 0; max-width: 100%; padding: 0; border-width: 0; flex-shrink: 0; position: relative; background-color: rgb(12, 18, 24); overflow: hidden; }
 .apparatus-pixel-cell { position: absolute; background-color: rgb(49, 91, 92); border-width: 1px; border-color: rgb(143, 200, 191); color: rgb(233, 244, 244); font-size: 10px; -unity-text-align: middle-center; overflow: hidden; }
 .apparatus-map-legend { color: rgb(158, 185, 202); font-size: 10px; white-space: normal; margin-top: 6px; }
 .apparatus-rig { border-width: 1px; border-color: rgb(52, 68, 81); border-radius: 5px; background-color: rgb(29, 37, 46); margin: 0 0 12px; padding: 10px 14px; }
@@ -31,9 +31,9 @@
 .apparatus-order-row > .apparatus-input { flex-grow: 0; flex-basis: 240px; }
 .apparatus-order-row Button { margin-bottom: 7px; }
 .apparatus-face-previews { flex-wrap: wrap; align-items: flex-start; margin: 5px 0 15px; }
-.apparatus-face-net { margin-right: 24px; }
+.apparatus-face-net { margin-right: 24px; flex-shrink: 0; }
 .apparatus-net-row { min-height: 0; }
-.apparatus-net-blank, Button.apparatus-face { width: 64px; min-width: 64px; height: 66px; flex-shrink: 0; margin: 2px; }
+.apparatus-net-blank, Button.apparatus-face { width: 64px; min-width: 64px; height: 64px; flex-shrink: 0; margin: 2px; }
 Button.apparatus-face { flex-direction: column; padding: 4px; background-color: rgb(28, 34, 42); border-color: rgb(57, 70, 83); }
 Button.apparatus-face > Label { flex-grow: 0; font-size: 18px; color: rgb(113, 132, 147); }
 Button.apparatus-face.is-enabled { background-color: rgb(36, 65, 66); border-color: rgb(100, 165, 155); }
@@ -42,7 +42,7 @@ Button.apparatus-face > .apparatus-face-name { font-size: 10px; color: rgb(141, 
 Button.apparatus-face > .apparatus-face-slot { font-size: 9px; color: rgb(115, 139, 157); }
 .apparatus-strip-preview { flex-grow: 1; min-width: 220px; max-width: 400px; margin-top: 4px; }
 .apparatus-strip-tiles { flex-wrap: wrap; }
-.apparatus-strip-tile { width: 42px; height: 52px; align-items: center; justify-content: center; border-width: 1px; border-color: rgb(83, 128, 132); border-radius: 3px; margin: 2px; background-color: rgb(31, 51, 61); }
+.apparatus-strip-tile { width: 48px; height: 48px; align-items: center; justify-content: center; border-width: 1px; border-color: rgb(83, 128, 132); border-radius: 3px; margin: 2px; background-color: rgb(31, 51, 61); }
 .apparatus-strip-tile > Label { font-size: 17px; color: rgb(188, 219, 220); }
 .apparatus-strip-tile > .apparatus-face-slot { font-size: 9px; color: rgb(134, 160, 179); }
 .apparatus-advanced { margin: 12px 0; padding: 8px 0; border-top-width: 1px; border-top-color: rgb(48, 63, 76); }

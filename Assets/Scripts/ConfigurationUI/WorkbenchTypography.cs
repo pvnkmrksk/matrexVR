@@ -27,6 +27,13 @@ namespace ConfigurationUI
             if (source == null) return null;
             var asset = FontAsset.CreateFontAsset(source, 48, 5, GlyphRenderMode.SDFAA, 1024, 1024, AtlasPopulationMode.Dynamic, true);
             asset.name = "MATREX " + file + " SDF";
+            // Retain the face's OpenType positioning when dynamic glyphs are
+            // added later (file names and participant labels included).
+            asset.getFontFeatures = true;
+            // TextCore defaults to 7% extra synthetic-bold spacing. We provide
+            // the real semibold face, so keep its designed advances instead.
+            asset.regularStyleSpacing = 0;
+            asset.boldStyleSpacing = 0;
             // Warm common UI text once; input-specific Unicode is added dynamically.
             string characters = "";
             for (int c = 32; c < 127; c++) characters += (char)c;
