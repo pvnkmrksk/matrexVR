@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Bounded local terrain profiling with independent real native tracker processes.
 
+Use --cap 60 to compare each workload toggle at the same target rather than
+mixing capped and uncapped phases. Raw frame-start/wall/profiler samples are
+retained by the opt-in player probe. Foreground/focus and physical display
+validation remain explicit in the resulting report.
+
 This drives the opt-in performance API, never a camera or an animal. Native video
 is finalized with the tracker's normal SIGINT handler; source code/configuration
 and existing recordings remain untouched.
@@ -26,12 +31,13 @@ def main():
     parser.add_argument('--native-config', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--seconds', type=float, default=4)
+    parser.add_argument('--cap', type=int, choices=(60, 120), help='Keep all workload-isolation phases at the same explicit software cap')
     parser.add_argument('--phases', default='all-60,all-uncapped,tracking-off,logging-off,all-60-repeat')
     args = parser.parse_args()
-    allowed_phases = {'all-60', 'all-uncapped', 'tracking-off', 'logging-off', 'all-60-repeat'}
+    allowed_phases = {'all-60', 'all-uncapped', 'tracking-off', 'logging-off', 'listeners-off', 'telemetry-off', 'overlays-off', 'vsync-1', 'vsync-2', 'all-60-repeat'}
     phases = args.phases.split(',')
-    if not 1 <= args.seconds <= 10 or not 1 <= len(phases) <= 5 or any(phase not in allowed_phases for phase in phases):
-        parser.error('Use 1–10 seconds and at most five supported performance phases.')
+    if not 1 <= args.seconds <= 10 or not 1 <= len(phases) <= 12 or any(phase not in allowed_phases for phase in phases):
+        parser.error('Use 1–10 seconds and at most twelve supported performance phases.')
     args.app = args.app.resolve(); args.output = args.output.resolve()
     args.native_binary = args.native_binary.resolve(); args.native_config = args.native_config.resolve()
     if args.output.exists():
@@ -42,7 +48,7 @@ def main():
     identity = json.loads((args.app / 'Contents/Resources/Data/StreamingAssets/player_build_info.json').read_text())
     evidence = {'scope': 'Standalone software measurements with independent native generated Rekkefly input, no physical acquisition. Engine FPS is not physical LED timing. Focus is reported per phase. Native recording starts before Unity and is stopped after it; this does not implement run-scoped recording control.',
                 'app': str(args.app), 'identity': identity, 'nativeBinary': str(args.native_binary),
-                'nativeSha256': sha(args.native_binary), 'configSha256': sha(args.native_config), 'cases': []}
+                'nativeSha256': sha(args.native_binary), 'configSha256': sha(args.native_config), 'requestedCap': args.cap, 'cases': []}
     for count in (1, 4):
         for record in (False, True):
             name = f'{count}-rig-video-{"on" if record else "off"}'
@@ -71,8 +77,10 @@ def main():
                            '--performance-layout', 'led', '--performance-rigs', str(count),
                            '--performance-seconds', str(args.seconds), '--performance-phases', args.phases,
                            '-logFile', str(folder / 'player.log')]
+                if args.cap is not None:
+                    command.extend(['--performance-cap', str(args.cap)])
                 print('RUNNING ' + name, flush=True)
-                result = subprocess.run(command, timeout=150)
+                result = subprocess.run(command, timeout=240)
                 if result.returncode:
                     raise RuntimeError('Local player launch failed: ' + str(result.returncode))
             finally:

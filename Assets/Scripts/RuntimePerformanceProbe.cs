@@ -20,8 +20,8 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
         public object Summary()
         {
             if(values.Count==0)return null;
-            values.Sort();int n=values.Count;
-            return new {samples=n,mean=values.Average(),median=values[n/2],p95=values[Math.Min(n-1,(int)(n*.95))],maximum=values[n-1]};
+            var sorted=values.OrderBy(value=>value).ToArray();int n=sorted.Length;double mean=values.Average();
+            return new {samples=n,mean=values.Average(),minimum=sorted[0],median=sorted[n/2],p95=sorted[Math.Min(n-1,(int)(n*.95))],p99=sorted[Math.Min(n-1,(int)(n*.99))],maximum=sorted[n-1],standardDeviation=Math.Sqrt(values.Select(value=>Math.Pow(value-mean,2)).Average())};
         }
     }
     private sealed class Counter : IDisposable
@@ -47,7 +47,21 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
     private readonly List<string> failures=new List<string>();
     private string output,scene;
     private bool measuring;
-    private double previous;
+    private double previous,previousFrameStart;
+    private long previousAllocated;
+    private int gc0,gc1,gc2;
+    private readonly List<FrameSample> rawSamples=new List<FrameSample>(16384);
+    private struct FrameSample
+    {
+        public int frame,gc0,gc1,gc2;
+        public double frameStartMs,wallLateUpdateMs;
+        public long mainThreadAllocatedBytes;
+        // Recorder.LastValue is the last completed profiler frame, not necessarily this callback's frame.
+        public long lastProfilerMainNs,lastProfilerWaitNs,lastProfilerPresentNs,lastProfilerScriptsNs;
+        public ulong timingFrameStartTimestamp;
+        public double timingCpuMainMs,timingCpuRenderMs,timingGpuMs,timingPresentWaitMs;
+    }
+    private Counter mainCounter,waitCounter,presentCounter,scriptsCounter;
     private Series intervals,cpuMain,cpuRender,gpu,present;
     private List<Counter> counters;
     private readonly FrameTiming[] timing=new FrameTiming[1];
@@ -109,7 +123,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             if(failures.Count>0){Finish();yield break;}
         }
         float measureSeconds=float.Parse(Arg("--performance-seconds","5"),System.Globalization.CultureInfo.InvariantCulture);
-        string[] phases={"all-60","all-120","all-uncapped","tracking-off","logging-off","telemetry-off","overlays-off","minimal-rendering","no-cameras","offscreen-128","all-uncapped-repeat","vsync-1","all-60-repeat"};
+        string[] phases={"all-60","all-120","all-uncapped","tracking-off","listeners-off","logging-off","telemetry-off","overlays-off","minimal-rendering","no-cameras","offscreen-128","all-uncapped-repeat","vsync-1","vsync-2","all-60-repeat"};
         string requestedPhases=Arg("--performance-phases");
         if(!string.IsNullOrWhiteSpace(requestedPhases))
         {
@@ -121,7 +135,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
         {
             bool minimal=phase=="minimal-rendering"||phase=="no-cameras"||phase=="offscreen-128";
             bool tracking=!minimal&&phase!="tracking-off",logging=!minimal&&phase!="logging-off",publish=!minimal&&phase!="telemetry-off";
-            foreach(var item in listeners)item.enabled=tracking;
+            foreach(var item in listeners)item.enabled=tracking&&phase!="listeners-off";
             foreach(var item in loops)item.enabled=tracking;
             foreach(var item in loggers)item.enabled=logging;
             foreach(var item in telemetry)item.enabled=publish;
@@ -133,30 +147,36 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
                 if(phase=="offscreen-128")
                 {var texture=new RenderTexture(128,128,24);texture.Create();textures.Add(texture);camera.targetTexture=texture;}
             }
-            QualitySettings.vSyncCount=phase=="vsync-1"?1:0;Application.targetFrameRate=phase=="all-60"||phase=="all-60-repeat"?60:phase=="all-120"?120:-1;
+            QualitySettings.vSyncCount=phase=="vsync-1"?1:phase=="vsync-2"?2:0;Application.targetFrameRate=phase=="all-60"||phase=="all-60-repeat"?60:phase=="all-120"?120:-1;
+            // Explicit probe-only cap allows genuine identical capped workload comparisons.
+            string cap=Arg("--performance-cap");
+            if(cap!=null&&phase!="vsync-1"&&phase!="vsync-2")Application.targetFrameRate=int.Parse(cap);
             yield return new WaitForSecondsRealtime(2);
             intervals=new Series();cpuMain=new Series();cpuRender=new Series();gpu=new Series();present=new Series();lastTiming=0;
-            counters=new List<Counter>{new Counter(ProfilerCategory.Internal,"Main Thread"),new Counter(ProfilerCategory.Internal,"Render Thread"),
-                new Counter(ProfilerCategory.Internal,"WaitForTargetFPS"),new Counter(ProfilerCategory.Render,"Gfx.WaitForPresentOnGfxThread"),
-                new Counter(ProfilerCategory.Scripts,"BehaviourUpdate"),new Counter(ProfilerCategory.Scripts,"BehaviourLateUpdate"),
+            counters=new List<Counter>{(mainCounter=new Counter(ProfilerCategory.Internal,"Main Thread")),new Counter(ProfilerCategory.Internal,"Render Thread"),
+                (waitCounter=new Counter(ProfilerCategory.Internal,"WaitForTargetFPS")),(presentCounter=new Counter(ProfilerCategory.Render,"Gfx.WaitForPresentOnGfxThread")),
+                (scriptsCounter=new Counter(ProfilerCategory.Scripts,"BehaviourUpdate")),new Counter(ProfilerCategory.Scripts,"BehaviourLateUpdate"),
                 new Counter(ProfilerCategory.Memory,"GC Allocated In Frame"),new Counter(ProfilerCategory.Render,"Batches Count"),new Counter(ProfilerCategory.Render,"Triangles Count")};
             double cpuStarted=System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds;
             long allocatedStarted=GC.GetAllocatedBytesForCurrentThread();
             int[] collectionsStarted={GC.CollectionCount(0),GC.CollectionCount(1),GC.CollectionCount(2)};
-            previous=Time.realtimeSinceStartupAsDouble;double started=previous;measuring=true;
+            previous=0;previousFrameStart=0;rawSamples.Clear();
+            previousAllocated=GC.GetAllocatedBytesForCurrentThread();gc0=GC.CollectionCount(0);gc1=GC.CollectionCount(1);gc2=GC.CollectionCount(2);
+            double started=Time.realtimeSinceStartupAsDouble;measuring=true;
             yield return new WaitForSecondsRealtime(measureSeconds);measuring=false;
+            int endedGc0=GC.CollectionCount(0),endedGc1=GC.CollectionCount(1),endedGc2=GC.CollectionCount(2);
             double seconds=Time.realtimeSinceStartupAsDouble-started;
             double processCpuMs=System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds-cpuStarted;
             long allocatedBytes=GC.GetAllocatedBytesForCurrentThread()-allocatedStarted;
             results.Add(new {phase,scene,requestedRigs=rigs,observedRigs=loops.Length,observedDataLoggers=loggers.Length,layout=desktop?"desktop":"LED-six-128",seconds,frames=intervals.values.Count,
-                fps=intervals.values.Count/seconds,frameMs=intervals.Summary(),cpuMainMs=cpuMain.Summary(),cpuRenderMs=cpuRender.Summary(),gpuMs=gpu.Summary(),presentWaitMs=present.Summary(),
+                fps=1000*intervals.values.Count/intervals.values.Sum(),phaseBoundaryFps=intervals.values.Count/seconds,completeIntervalSeconds=intervals.values.Sum()/1000,rawFrameMs=intervals.values.ToArray(),rawSamples=rawSamples.ToArray(),frameStartMs=SummarizeFrameStarts(),frameMs=intervals.Summary(),cpuMainMs=cpuMain.Summary(),cpuRenderMs=cpuRender.Summary(),gpuMs=gpu.Summary(),presentWaitMs=present.Summary(),
                 processCpuMs,processCpuPercentOfOneCore=processCpuMs/(seconds*10),processCpuMsPerFrame=processCpuMs/Math.Max(1,intervals.values.Count),
                 allocationCounterAvailable,mainThreadAllocatedBytes=allocationCounterAvailable?(long?)allocatedBytes:null,
                 mainThreadAllocatedBytesPerFrame=allocationCounterAvailable?(double?)(allocatedBytes/(double)Math.Max(1,intervals.values.Count)):null,
-                collections=Enumerable.Range(0,3).Select(i=>GC.CollectionCount(i)-collectionsStarted[i]).ToArray(),focused=Application.isFocused,
-                target=Application.targetFrameRate,vsync=QualitySettings.vSyncCount,frameTimingAvailable=FrameTimingManager.IsFeatureEnabled(),
+                collections=new[]{endedGc0-collectionsStarted[0],endedGc1-collectionsStarted[1],endedGc2-collectionsStarted[2]},focused=Application.isFocused,
+                target=Application.targetFrameRate,vsync=QualitySettings.vSyncCount,refreshNumerator=Screen.currentResolution.refreshRateRatio.numerator,refreshDenominator=Screen.currentResolution.refreshRateRatio.denominator,fullScreen=Screen.fullScreenMode.ToString(),metalDisplayLink=Environment.GetEnvironmentVariable("UNITY_USE_METAL_DISPLAY_LINK"),frameTimingAvailable=FrameTimingManager.IsFeatureEnabled(),
                 cameras=cameras.Select(c=>new {c.name,enabled=c.enabled,rect=new[]{c.rect.x,c.rect.y,c.rect.width,c.rect.height},c.targetDisplay,offscreen=c.targetTexture!=null,c.pixelWidth,c.pixelHeight}).ToArray(),
-                listenersEnabled=tracking,trackingFresh=listeners.Select(l=>l.HasFreshPose()).ToArray(),trackingSequences=listeners.Select(l=>l.ReadRawSample().sequence).ToArray(),
+                listenersEnabled=tracking&&phase!="listeners-off",closedLoopsEnabled=tracking,trackingFresh=listeners.Select(l=>l.HasFreshPose()).ToArray(),trackingSequences=listeners.Select(l=>l.ReadRawSample().sequence).ToArray(),
                 recordingEnabled=logging,telemetryEnabled=publish,overlayHidden=OperatorOverlayVisibility.Hidden,counters=counters.Select(c=>c.Report()).ToArray()});
             foreach(var counter in counters)counter.Dispose();counters=null;
             foreach(var camera in cameras)camera.targetTexture=null;
@@ -170,17 +190,28 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
     private void LateUpdate()
     {
         if(!measuring)return;
-        double now=Time.realtimeSinceStartupAsDouble;intervals.Add((now-previous)*1000);previous=now;
+        double now=Time.realtimeSinceStartupAsDouble,frameStart=Time.unscaledTimeAsDouble;
+        long allocated=GC.GetAllocatedBytesForCurrentThread();int g0=GC.CollectionCount(0),g1=GC.CollectionCount(1),g2=GC.CollectionCount(2);
+        if(previous==0){previous=now;previousFrameStart=frameStart;previousAllocated=allocated;gc0=g0;gc1=g1;gc2=g2;return;}
+        var sample=new FrameSample{frame=Time.frameCount,frameStartMs=(frameStart-previousFrameStart)*1000,wallLateUpdateMs=(now-previous)*1000,
+            mainThreadAllocatedBytes=allocationCounterAvailable?allocated-previousAllocated:-1,gc0=g0-gc0,gc1=g1-gc1,gc2=g2-gc2,
+            lastProfilerMainNs=Last(mainCounter),lastProfilerWaitNs=Last(waitCounter),lastProfilerPresentNs=Last(presentCounter),lastProfilerScriptsNs=Last(scriptsCounter)};
+        intervals.Add(sample.wallLateUpdateMs);previous=now;previousFrameStart=frameStart;previousAllocated=allocated;gc0=g0;gc1=g1;gc2=g2;
         foreach(var counter in counters)counter.Capture();
         FrameTimingManager.CaptureFrameTimings();
-        if(FrameTimingManager.GetLatestTimings(1,timing)==0||timing[0].frameStartTimestamp==lastTiming)return;
+        if(FrameTimingManager.GetLatestTimings(1,timing)==0||timing[0].frameStartTimestamp==lastTiming){rawSamples.Add(sample);return;}
         var frame=timing[0];lastTiming=frame.frameStartTimestamp;
+        sample.timingFrameStartTimestamp=frame.frameStartTimestamp;sample.timingCpuMainMs=frame.cpuMainThreadFrameTime;
+        sample.timingCpuRenderMs=frame.cpuRenderThreadFrameTime;sample.timingGpuMs=frame.gpuFrameTime;sample.timingPresentWaitMs=frame.cpuMainThreadPresentWaitTime;
+        rawSamples.Add(sample);
         cpuMain.Add(frame.cpuMainThreadFrameTime);cpuRender.Add(frame.cpuRenderThreadFrameTime);gpu.Add(frame.gpuFrameTime);present.Add(frame.cpuMainThreadPresentWaitTime);
     }
+    private static long Last(Counter counter)=>counter.recorder.Valid&&counter.recorder.Count>0?counter.recorder.LastValue:0;
+    private object SummarizeFrameStarts(){var series=new Series();foreach(var sample in rawSamples)series.Add(sample.frameStartMs);return series.Summary();}
     private void Log(string text,string stack,LogType type){if(type==LogType.Exception||type==LogType.Error)failures.Add(text);}
     private void Save()
     {File.WriteAllText(Path.Combine(output,"results.json"),JsonConvert.SerializeObject(new {unity=Application.unityVersion,os=SystemInfo.operatingSystem,cpu=SystemInfo.processorType,gpu=SystemInfo.graphicsDeviceName,
         width=Screen.width,height=Screen.height,quality=QualitySettings.names[QualitySettings.GetQualityLevel()],failures,results,
-        note="Explicit standalone software probe; no animal measurement. On-screen Metal presentation, CPU callbacks, target-FPS pacing and GPU workload are different limits. Unavailable counters remain explicit; this is not a guarantee of LED timing."},Formatting.Indented));}
+        note="Explicit standalone software probe; no animal measurement. On-screen Metal presentation, CPU callbacks, target-FPS pacing and GPU workload are different limits. Raw profiler LastValue belongs to the last completed profiler frame; FrameTiming timestamps identify delayed timing samples. Zero timing timestamp means unavailable/duplicate, not zero work. Raw samples retain frame-start, wall intervals, allocations and GC deltas. Unavailable counters remain explicit; this is not a guarantee of LED timing."},Formatting.Indented));}
     private void Finish(){Save();Application.logMessageReceived-=Log;Application.Quit(failures.Count==0?0:1);}
 }
