@@ -236,6 +236,8 @@ class DashboardPackagingTests(unittest.TestCase):
                 def run(arguments, **kwargs):
                     if arguments[0] == sys.executable and arguments[1].endswith('build_local_rekkefly.py'):
                         self.assertEqual(platform, 'macOS')
+                        self.assertEqual(arguments[4:], ['--verified-binary', str(root / 'unsigned-native'),
+                                                        '--binary-provenance', str(root / 'native-provenance.json')])
                         events.append('local-native')
                         destination = Path(arguments[3]) / 'catalog.json'
                         corrected = json.loads(destination.read_text())
@@ -255,7 +257,9 @@ class DashboardPackagingTests(unittest.TestCase):
                      patch.object(dashboard, 'stage_local', side_effect=local), \
                      patch.object(build_release.subprocess, 'run', side_effect=run):
                     build_release.package(build, root, '0.3.1', platform, 'frozen-runtime', root, quickstart,
-                                          local_native_camera_fix=True, local_dashboard_archive=local_archive)
+                                          local_native_camera_fix=True, local_dashboard_archive=local_archive,
+                                          verified_native_binary=root / 'unsigned-native',
+                                          native_binary_provenance=root / 'native-provenance.json')
                 label = 'macOS-universal' if platform == 'macOS' else platform
                 stage = root / ('MATREX-VR-0.3.1-' + label)
                 manifest = json.loads((stage / 'release-manifest.json').read_text())

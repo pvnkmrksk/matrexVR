@@ -72,8 +72,13 @@ def prepare(ref, project):
     build_identity.write(project, git('rev-parse', ref).decode().strip(), 'pinned-git-snapshot')
 
 def validate_local_payload_options(platform, with_companions, with_dashboard,
-                                   local_native_camera_fix, local_dashboard_archive):
+                                   local_native_camera_fix, local_dashboard_archive,
+                                   verified_native_binary=None, native_binary_provenance=None):
     """Reject unsupported opt-ins before preparing a project or invoking Unity."""
+    if (verified_native_binary is None) != (native_binary_provenance is None):
+        raise ValueError('--verified-native-binary and --native-binary-provenance must be supplied together')
+    if verified_native_binary is not None and not local_native_camera_fix:
+        raise ValueError('Verified native reuse requires --local-native-camera-fix')
     if (local_native_camera_fix or local_dashboard_archive) and platform not in ('macOS', 'all'):
         raise ValueError('Local payload corrections apply only to macOS (or --platform all)')
     if local_native_camera_fix:
@@ -82,7 +87,9 @@ def validate_local_payload_options(platform, with_companions, with_dashboard,
         if sys.platform != 'darwin' or host_platform.machine() != 'arm64':
             raise ValueError('The reviewed native camera correction can be built only on Mac arm64')
         import build_local_rekkefly
-        build_local_rekkefly.load_lock()  # Verify the reviewed patch before any expensive build.
+        lock, _ = build_local_rekkefly.load_lock()  # Verify the reviewed patch before any expensive build.
+        if verified_native_binary is not None:
+            build_local_rekkefly.verified_binary(Path(verified_native_binary), Path(native_binary_provenance), lock)
     if local_dashboard_archive:
         if not with_dashboard:
             raise ValueError('--local-dashboard-archive requires the bundled dashboard')
@@ -94,7 +101,8 @@ def validate_local_payload_options(platform, with_companions, with_dashboard,
 
 
 def package(build, output, version, platform, revision, project, quickstart, with_companions=True, with_dashboard=True,
-            local_native_camera_fix=False, local_dashboard_archive=None):
+            local_native_camera_fix=False, local_dashboard_archive=None,
+            verified_native_binary=None, native_binary_provenance=None):
     label = 'macOS-universal' if platform == 'macOS' else platform
     name = f'MATREX-VR-{version}-{label}'
     stage = output / name
@@ -122,8 +130,9 @@ def package(build, output, version, platform, revision, project, quickstart, wit
         if local_native_camera_fix and platform == 'macOS':
             # Reuse the reviewed source/toolchain cache. The helper preserves the
             # official Intel entry, signs its new arm64 app and updates the catalog.
+            native_args = ['--verified-binary', str(verified_native_binary), '--binary-provenance', str(native_binary_provenance)] if verified_native_binary is not None else []
             subprocess.run([sys.executable, str(ROOT / 'tools/build_local_rekkefly.py'),
-                            '--companions', str(companion_root)], check=True)
+                            '--companions', str(companion_root), *native_args], check=True)
         companion_catalog = json.loads((companion_root / 'catalog.json').read_text())
         if local_native_camera_fix and platform == 'macOS' and not companion_catalog.get('localNativeCorrection'):
             raise RuntimeError('The requested local native correction is absent from the staged catalog')
@@ -197,6 +206,10 @@ def main():
                         help='Opt in to the reviewed local Mac arm64 Rekkefly correction; other platforms keep official packages')
     parser.add_argument('--local-dashboard-archive', type=Path,
                         help='Opt in to the reviewed local Mac arm64 dashboard ZIP; other platforms keep official packages')
+    parser.add_argument('--verified-native-binary', type=Path,
+                        help='Reuse a previously built unsigned Mac correction after verifying its matching provenance; requires --local-native-camera-fix')
+    parser.add_argument('--native-binary-provenance', type=Path,
+                        help='Matching MATREX-NATIVE-PROVENANCE.json for --verified-native-binary')
     parser.add_argument('--unity', type=Path)
     parser.add_argument('--workspace', type=Path)
     parser.add_argument('--quickstart', type=Path, default=ROOT / 'docs/release-quickstart.txt')
@@ -205,7 +218,8 @@ def main():
         parser.error('--version must be a semantic version such as 0.3.0')
     try:
         validate_local_payload_options(args.platform, not args.without_companions, not args.without_dashboard,
-                                       args.local_native_camera_fix, args.local_dashboard_archive)
+                                       args.local_native_camera_fix, args.local_dashboard_archive,
+                                       args.verified_native_binary, args.native_binary_provenance)
     except (ValueError, OSError) as error:
         parser.error(str(error))
     revision = git('rev-parse', '--verify', args.ref + '^{commit}').decode().strip()
@@ -226,7 +240,8 @@ def main():
                         '-releaseOutput', str(build / executable), '-logFile', str(log)], check=True)
         package(build, workspace, args.version, platform, revision, project, args.quickstart,
                 with_companions=not args.without_companions, with_dashboard=not args.without_dashboard,
-                local_native_camera_fix=args.local_native_camera_fix, local_dashboard_archive=args.local_dashboard_archive)
+                local_native_camera_fix=args.local_native_camera_fix, local_dashboard_archive=args.local_dashboard_archive,
+                verified_native_binary=args.verified_native_binary, native_binary_provenance=args.native_binary_provenance)
 
 if __name__ == '__main__':
     main()
