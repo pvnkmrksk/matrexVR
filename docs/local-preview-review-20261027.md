@@ -2,7 +2,9 @@
 
 This review follows the operator feedback on the first local preview. Work is on `codex/seamless-desktop-experience`, with local commits only. No release, push, or Windows/Linux build was made.
 
-The current Mac player is **open on Ready to run** with the saved **four-rig HejjéTrac LED apparatus** and **Terrain · matched relief** loaded: four 30-second blocks, listed order, one pass. Tracking and the experiment have not been started. The saved apparatus, original social sequence, terrain sequence, and shared terrain defaults remain byte-identical to their pre-check files.
+The current Mac player is **open on Ready to run** with the saved **four-rig HejjéTrac LED apparatus** and **Terrain · matched relief** loaded: four 30-second blocks, listed order, one pass. Tracking and the experiment have not been started. The original social sequence, terrain sequence, and shared terrain defaults remain unchanged; the preview's status-panel flag is enabled as described below.
+
+The follow-up [terrain visual review](terrain-matrix-visual-review-20261027.md) records the current `f276f818` player. `statusOverlay.visible` is now enabled in the preview's root and saved apparatus profiles, with backups. No calibration or sequence fields changed. The review includes all sixteen actual-camera screenshot sets, documents the weak visual relief cue, restores bottom-right run diagnostics, and rejects incompatible legacy-scene/new-config pairs before Start. Earlier build identities and capture results below remain historical evidence.
 
 ## Open the app
 
@@ -44,7 +46,7 @@ Native coordinate navigation and numeric text entry worked. The duration field w
 
 ## Unlocked native interaction check and current build
 
-The current `0.3.1-local-review` player was built from `50dd1bb0` with zero errors and 55 warnings, and passed `codesign --verify --strict`. Commit `fa50886a` restores focus after page navigation or closing a modal while preserving active text inputs. Native F1 worked immediately after startup and page navigation; Alt+1/2/5 navigation, Escape, and visible Tab focus were accepted.
+The keyboard-review `0.3.1-local-review` player was built from `50dd1bb0` with zero errors and 55 warnings, and passed `codesign --verify --strict`. Commit `fa50886a` restores focus after page navigation or closing a modal while preserving active text inputs. Native F1 worked immediately after startup and page navigation; Alt+1/2/5 navigation, Escape, and visible Tab focus were accepted.
 
 The native check exposed a second bug that the original editor test missed: Unity InputForUI emits a Tab KeyDown and a separate Next/Previous navigation event, causing two focus moves. Commit `50dd1bb0` assigns the move to the navigation event and traps it at the document while a modal is open. The corrected test reproduces the old skip and passes **452 checks** with the fix. The rebuilt native player then passed Close → Sequence dropdown → Open custom JSON → Load sequence → Close, reverse traversal, wraparound, and Return on Load. Return loaded the four terrain blocks, and Alt+1 returned to the requested Ready to run page.
 

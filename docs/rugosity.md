@@ -2,6 +2,8 @@
 
 Use the four **TerrainChoice** spatial layouts and the treatment sequences below for the choice experiment. Scene identity, spatial terrain pattern, and experimental condition are separate concepts. Each new scene is a thin instance of the same shared environment prefab; trees, material, mesh references, controller and standard configured camera rig are edited once. Existing RS/navrug scenes are not renamed or repurposed. The earlier `Assets/Scenes/Rugosity_RS.unity`, its GUID, meshes and six choice files remain unchanged and runnable with `Examples/Rugosity/sequence-legacy-rugosity.json`.
 
+The [sixteen-case visual audit](terrain-matrix-visual-review-20261027.md) verifies the actual camera renders and mesh/navigation assignments, including exact 128×128 frames. It also documents that the photographic texture masks the small geometric relief: correct routing is not a claim of strong perceptual visual contrast. The four both-flat controls intentionally remain identical. New surface IDs paired with the stock legacy `Rugosity_RS` scene now produce a pre-start configuration error.
+
 The Bogong night-sky improvements were already inherited on this branch. The terrain work adds optional behavior; scenes without an enabled RugosityWorld keep their original movement behavior.
 
 ## The four primary conditions

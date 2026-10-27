@@ -1,0 +1,453 @@
+{
+  "date": "2026-10-27",
+  "status": "surface-routing-verified; visible-relief-salience-remains-weak",
+  "conclusion": "The sixteen assignments select the intended visible and navigation meshes and conform the real camera correctly. The photographic albedo suggests roughness even on flat geometry and masks the 0.8 cm geometric relief, especially at 128 pixels. Do not describe these textured views as sixteen clearly distinct visual cues or evidence of animal perceptual discriminability.",
+  "scope": "Disposable Unity Edit-mode Camera.Render with authored scene geometry/materials/lights and actual RugosityRig.Conform. Eye frames use the real authored VR1/Main Camera F at both 768x768 and 128x128 with verified identical projection; only targetTexture and viewport are temporarily changed and restored. The 128px frames verify rendering at panel resolution, not physical LED timing, native display presentation, tracking calibration, or the full MainController startup path. Navigation overview temporarily renders the selected collision mesh. Additional explicitly named clay-debug renders replace only the ground material and lighting with common neutral clay and one low-angle light, then restore both exactly; geometry and scale are unchanged. Clay-debug frames are never stimulus frames.",
+  "matrix": {
+    "checks": 6241,
+    "failure": null,
+    "cases": 16,
+    "rawCameraPNGs": 128,
+    "reviewScreenshots": 16,
+    "led128Frames": 32,
+    "actualStandardCamera": "VR1/Main Camera F",
+    "actualFov": 90,
+    "nearClip": 0.01,
+    "farClip": 100000,
+    "projectionIdenticalAt768And128": true,
+    "largeReviewFrames": [
+      768,
+      768
+    ],
+    "LEDResolutionFrames": [
+      128,
+      128
+    ],
+    "allPrior96RawFramesUnchangedAfterAdding128Renders": true,
+    "allOriginal64TexturedFramesUnchangedAfterAddingDebugRender": true,
+    "debugMaterialsAndLightsRestored": true,
+    "geometryAndScaleUnchanged": true,
+    "uniqueFixedVisibleImages": 5,
+    "uniquePairedEyeImages768": 13,
+    "uniquePairedEyeImages128": 13,
+    "scope": "Disposable Unity Edit-mode Camera.Render with authored scene geometry/materials/lights and actual RugosityRig.Conform. Eye frames use the real authored VR1/Main Camera F at both 768x768 and 128x128 with verified identical projection; only targetTexture and viewport are temporarily changed and restored. The 128px frames verify rendering at panel resolution, not physical LED timing, native display presentation, tracking calibration, or the full MainController startup path. Navigation overview temporarily renders the selected collision mesh. Additional explicitly named clay-debug renders replace only the ground material and lighting with common neutral clay and one low-angle light, then restore both exactly; geometry and scale are unchanged. Clay-debug frames are never stimulus frames.",
+    "testScopeExcludes": [
+      "Full MainController startup path",
+      "Native framebuffer display routing",
+      "Physical LED timing",
+      "Live tracking calibration"
+    ]
+  },
+  "measurements": {
+    "worldSplitAxis": "negative X is left; positive X is right",
+    "roughMaximumExtrusionCm": 0.8,
+    "smoothMaximumExtrusionCm": 0.025,
+    "clearanceCm": 1,
+    "probeXZCm": [
+      [
+        -53.125,
+        28.125
+      ],
+      [
+        53.125,
+        28.125
+      ]
+    ],
+    "probeHeadingsDeg": [
+      55,
+      -55
+    ],
+    "matchedRoughSmoothLeftEyeHeightCm": 1.38391149,
+    "matchedRoughSmoothLeftTiltDeg": 10.3406,
+    "startingPoseNote": "The treatment starts at X=0, along the blended center seam; these review probes deliberately examine the steep left and right regions.",
+    "evidence": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/serialized-mesh-audit.json",
+    "matchedRoughSmoothRightGroundHeightCm": 0.00643771142,
+    "matchedRoughSmoothRightTiltDeg": 0.201741189
+  },
+  "expectedDuplicates": {
+    "fixedWorldVisibleStates": 5,
+    "pairedAnimalViewStates768": 13,
+    "pairedAnimalViewStates128": 13,
+    "reason": "The four matched-flat rows intentionally use Flat for both roles and must look identical. Other modes can share the same rendered ground while navigation changes eye height and tilt."
+  },
+  "screenshots": [
+    {
+      "case": "01-01-matched-terrain-RoughSmooth",
+      "scene": "TerrainChoice_RoughLeft_SmoothRight",
+      "treatment": "matched-terrain",
+      "visualSurface": "RoughSmooth",
+      "navigationSurface": "RoughSmooth",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/01-01-matched-terrain-RoughSmooth.jpg",
+      "sha256": "7c84c04b5b65e1e15971f57f875ab018e4a0c5dae655c1b68838df3192358d7f"
+    },
+    {
+      "case": "01-02-matched-terrain-SmoothRough",
+      "scene": "TerrainChoice_SmoothLeft_RoughRight",
+      "treatment": "matched-terrain",
+      "visualSurface": "SmoothRough",
+      "navigationSurface": "SmoothRough",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/01-02-matched-terrain-SmoothRough.jpg",
+      "sha256": "d5c7142a02af4a3d6b27ca131cbadc2e55a3621ca2769c90747b058f6bc46034"
+    },
+    {
+      "case": "01-03-matched-terrain-SmoothSmooth",
+      "scene": "TerrainChoice_BothSmooth",
+      "treatment": "matched-terrain",
+      "visualSurface": "SmoothSmooth",
+      "navigationSurface": "SmoothSmooth",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/01-03-matched-terrain-SmoothSmooth.jpg",
+      "sha256": "a4a632f924a7ad37e962b3ff8e4dbb2b36cd3ef6b7940d2c8b58d2627affa09a"
+    },
+    {
+      "case": "01-04-matched-terrain-RoughRough",
+      "scene": "TerrainChoice_BothRough",
+      "treatment": "matched-terrain",
+      "visualSurface": "RoughRough",
+      "navigationSurface": "RoughRough",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/01-04-matched-terrain-RoughRough.jpg",
+      "sha256": "d6305876c5fae81e599996209d86a7b43a27ca8f56de9b47add630bf7b322715"
+    },
+    {
+      "case": "02-01-visual-terrain_navigation-flat-RoughSmooth",
+      "scene": "TerrainChoice_RoughLeft_SmoothRight",
+      "treatment": "visual-terrain_navigation-flat",
+      "visualSurface": "RoughSmooth",
+      "navigationSurface": "Flat",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/02-01-visual-terrain_navigation-flat-RoughSmooth.jpg",
+      "sha256": "a283a17e242523faaa95e14d913a4ed55e2a207d7d7101d10ae1d7334d2c8829"
+    },
+    {
+      "case": "02-02-visual-terrain_navigation-flat-SmoothRough",
+      "scene": "TerrainChoice_SmoothLeft_RoughRight",
+      "treatment": "visual-terrain_navigation-flat",
+      "visualSurface": "SmoothRough",
+      "navigationSurface": "Flat",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/02-02-visual-terrain_navigation-flat-SmoothRough.jpg",
+      "sha256": "a004df34b8fded37c98da3b26b5c0b16928748d41ed64a606e36d12a32ef5e03"
+    },
+    {
+      "case": "02-03-visual-terrain_navigation-flat-SmoothSmooth",
+      "scene": "TerrainChoice_BothSmooth",
+      "treatment": "visual-terrain_navigation-flat",
+      "visualSurface": "SmoothSmooth",
+      "navigationSurface": "Flat",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/02-03-visual-terrain_navigation-flat-SmoothSmooth.jpg",
+      "sha256": "f13c401d0b82b41c13738897f15f678054040d3f1d222def3a22496138a75a7e"
+    },
+    {
+      "case": "02-04-visual-terrain_navigation-flat-RoughRough",
+      "scene": "TerrainChoice_BothRough",
+      "treatment": "visual-terrain_navigation-flat",
+      "visualSurface": "RoughRough",
+      "navigationSurface": "Flat",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/02-04-visual-terrain_navigation-flat-RoughRough.jpg",
+      "sha256": "0bdf5d9a84ba68eacf1f7e1a8e99d204baa8ce44f3883fbe393793e11808402d"
+    },
+    {
+      "case": "03-01-visual-flat_navigation-terrain-RoughSmooth",
+      "scene": "TerrainChoice_RoughLeft_SmoothRight",
+      "treatment": "visual-flat_navigation-terrain",
+      "visualSurface": "Flat",
+      "navigationSurface": "RoughSmooth",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/03-01-visual-flat_navigation-terrain-RoughSmooth.jpg",
+      "sha256": "3ea5eeeb1e2d39afe933c7b99427be51bad2b5cbf8b97e51f3fa89e3dab7abe8"
+    },
+    {
+      "case": "03-02-visual-flat_navigation-terrain-SmoothRough",
+      "scene": "TerrainChoice_SmoothLeft_RoughRight",
+      "treatment": "visual-flat_navigation-terrain",
+      "visualSurface": "Flat",
+      "navigationSurface": "SmoothRough",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/03-02-visual-flat_navigation-terrain-SmoothRough.jpg",
+      "sha256": "9e4debc9d4f28a53523acec1f7f5a3799b9ac0b7d4ca4c5b58a5fc826f016a2b"
+    },
+    {
+      "case": "03-03-visual-flat_navigation-terrain-SmoothSmooth",
+      "scene": "TerrainChoice_BothSmooth",
+      "treatment": "visual-flat_navigation-terrain",
+      "visualSurface": "Flat",
+      "navigationSurface": "SmoothSmooth",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/03-03-visual-flat_navigation-terrain-SmoothSmooth.jpg",
+      "sha256": "ac4f314482a5d5c84f81d37fb68b09da9eedc691c0c9f81f93beeb8c7dfcf603"
+    },
+    {
+      "case": "03-04-visual-flat_navigation-terrain-RoughRough",
+      "scene": "TerrainChoice_BothRough",
+      "treatment": "visual-flat_navigation-terrain",
+      "visualSurface": "Flat",
+      "navigationSurface": "RoughRough",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/03-04-visual-flat_navigation-terrain-RoughRough.jpg",
+      "sha256": "d744bf2b1d38853479503eefb6901058aadf4d4549b81a5d940b45e4bdb47d47"
+    },
+    {
+      "case": "04-01-matched-flat-RoughSmooth",
+      "scene": "TerrainChoice_RoughLeft_SmoothRight",
+      "treatment": "matched-flat",
+      "visualSurface": "Flat",
+      "navigationSurface": "Flat",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/04-01-matched-flat-RoughSmooth.jpg",
+      "sha256": "de03a28023263e241140756a3b14db9e1e83b36733d4ee20088bebc74bf2c360"
+    },
+    {
+      "case": "04-02-matched-flat-SmoothRough",
+      "scene": "TerrainChoice_SmoothLeft_RoughRight",
+      "treatment": "matched-flat",
+      "visualSurface": "Flat",
+      "navigationSurface": "Flat",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/04-02-matched-flat-SmoothRough.jpg",
+      "sha256": "35ae7be6891accf482f81a1bb165f264d97451c67e3f39d235c7aed6961769f9"
+    },
+    {
+      "case": "04-03-matched-flat-SmoothSmooth",
+      "scene": "TerrainChoice_BothSmooth",
+      "treatment": "matched-flat",
+      "visualSurface": "Flat",
+      "navigationSurface": "Flat",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/04-03-matched-flat-SmoothSmooth.jpg",
+      "sha256": "af09c9066410ecb682bb9aba05ede35881c926f2450d4ecef830fb52110d43ac"
+    },
+    {
+      "case": "04-04-matched-flat-RoughRough",
+      "scene": "TerrainChoice_BothRough",
+      "treatment": "matched-flat",
+      "visualSurface": "Flat",
+      "navigationSurface": "Flat",
+      "path": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/screenshots/04-04-matched-flat-RoughRough.jpg",
+      "sha256": "46fadf16215c610bd20508f4d6e4fc80480d7df74f7c58664ad59f2efba92ce9"
+    }
+  ],
+  "artifacts": {
+    "gallery": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/index.html",
+    "matrix": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/terrain-16-contact-sheet.jpg",
+    "actual128PixelMatrix": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/led128-16-contact-sheet.png",
+    "archive": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/terrain-16-screenshots-and-raw-frames.zip",
+    "archiveSha256": "c624796eedb0ade5ff9713febbc5ffa92970bfed89c586939d5ba754bb6567d1",
+    "pixelComparisons": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/pixel-comparison.json",
+    "sourceHashes": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/baseline/source-hashes.json"
+  },
+  "productionChanges": {
+    "terrainAssetsOrStimulusAltered": false,
+    "notes": "No change to trial mesh heights, textures, clearance or lighting. Neutral clay and alternate lighting are diagnostic capture passes only and are restored before the next stimulus render.",
+    "legacyCompatibility": "Known new terrain IDs paired with stock Rugosity_RS are rejected during setup validation; compatible legacy RS/Flat files and custom scene extensions remain accepted. Malformed file references remain validation errors.",
+    "compatibilityChecks": {
+      "production": 82,
+      "wiring": 4
+    },
+    "diagnostics": "Compact bottom-right scene/trial/step/timing, terrain roles and each VR backend/live endpoint/input age and loop state; advanced flight controls remain under More details.",
+    "profileChanges": [
+      {
+        "path": "/Users/pavan/src/ledpanelVR/.local/Preview Config/system_config.json",
+        "backup": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/profile-before-debug-status/system_config.json",
+        "beforeVisible": false,
+        "afterVisible": true,
+        "beforeSha256": "0c510e572529a63eb69f3e674beffb114895406e284e5448a13f3dec74a0cc0c",
+        "afterSha256": "221a5ae1eae950ea9ba67d397f3048a8ea551a041278fb17c6eebc625decdbe7",
+        "onlySemanticChange": "statusOverlay.visible"
+      },
+      {
+        "path": "/Users/pavan/src/ledpanelVR/.local/Preview Config/Apparatus/system.json",
+        "backup": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/profile-before-debug-status/Apparatus/system.json",
+        "beforeVisible": false,
+        "afterVisible": true,
+        "beforeSha256": "87dedc46a5d2c224fa02f1cb3c992eb84361869560047989d5e405e66bc9d4a0",
+        "afterSha256": "382d3c2e91455a1347aeba11d0ccd843966ca316c321d600394d81985f221cca",
+        "onlySemanticChange": "statusOverlay.visible"
+      }
+    ]
+  },
+  "hudValidation": {
+    "report": "runtime-status-hud-20261027-results.json",
+    "focusedChecks": 25,
+    "overlayChecks": 190,
+    "ledPixelsChanged": 0
+  },
+  "nativePlayer": {
+    "invalid-pair": {
+      "capture": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/native-fixtures/invalid-pair/native.png",
+      "sha256": "32b66117c432d3253592a1dc11ee7feb27e25b13320ca961a45f8f7b9a508f15",
+      "display": {
+        "unity": "6000.3.16f1",
+        "os": "Mac OS X 27.0.1",
+        "paths": {
+          "application": "/Users/pavan/src/ledpanelVR/.local/MATREX VR.app/Contents",
+          "persistent": "/Users/pavan/Library/Application Support/InsectVRLab/MATREX VR",
+          "configs": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/native-fixtures/invalid-pair/Config",
+          "recordings": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/native-fixtures/invalid-pair/RunData"
+        },
+        "screen": {
+          "width": 3024,
+          "height": 1898,
+          "mode": "FullScreenWindow",
+          "dpi": 255.0
+        },
+        "native": {
+          "width": 3024,
+          "height": 1898
+        },
+        "display": {
+          "name": "Built-in Retina Display",
+          "width": 3024,
+          "height": 1898
+        },
+        "ui": {
+          "scale": 2.0,
+          "panelScale": 2.0,
+          "directFramebuffer": true,
+          "logicalWidth": 1512.0,
+          "logicalHeight": 949.0
+        },
+        "profile": null,
+        "performance": {
+          "realtimeSeconds": 7.611149626317461,
+          "windowSeconds": 0.5000054580000004,
+          "framesPerSecond": 59.99934504714942,
+          "frameMeanMs": 16.666848600000016,
+          "framePeakMs": 17.20187499999959,
+          "targetFrameRate": 60,
+          "vSyncCount": 0,
+          "timingSamples": 30,
+          "budgetMs": 16.666666666666668,
+          "cpuMainMs": 15.991417866666666,
+          "cpuRenderMs": 2.7943375,
+          "gpuMs": 4.255699999824476,
+          "presentWaitMs": 0.6738014666666666,
+          "processCpuMsPerFrame": 14.065496666666666,
+          "processCpuPercentOfOneCore": 84.39205877628633,
+          "graphicsApi": "Metal"
+        }
+      },
+      "errorsOrExceptions": [],
+      "visualReview": "Start experiment is visibly disabled. Footer identifies collisionSurface RoughSmooth as unavailable in Rugosity_RS and recommends TerrainCueLab / TerrainChoice. The fixture never starts a sequence or tracker application."
+    },
+    "live-hud": {
+      "capture": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/native-fixtures/live-hud/native.png",
+      "sha256": "87b771c4f49928a80a450dcb7f4f5b55a4f5b190e00b9e52997a803286145526",
+      "display": {
+        "unity": "6000.3.16f1",
+        "os": "Mac OS X 27.0.1",
+        "paths": {
+          "application": "/Users/pavan/src/ledpanelVR/.local/MATREX VR.app/Contents",
+          "persistent": "/Users/pavan/Library/Application Support/InsectVRLab/MATREX VR",
+          "configs": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/native-fixtures/live-hud/Config",
+          "recordings": "/Users/pavan/src/ledpanelVR/.local/terrain-review-20261027/native-fixtures/live-hud/RunData"
+        },
+        "screen": {
+          "width": 3024,
+          "height": 1898,
+          "mode": "FullScreenWindow",
+          "dpi": 255.0
+        },
+        "native": {
+          "width": 3024,
+          "height": 1898
+        },
+        "display": {
+          "name": "Built-in Retina Display",
+          "width": 3024,
+          "height": 1898
+        },
+        "ui": {
+          "scale": 2.0,
+          "panelScale": 0.0,
+          "directFramebuffer": false,
+          "logicalWidth": 0.0,
+          "logicalHeight": 0.0
+        },
+        "profile": null,
+        "performance": {
+          "realtimeSeconds": 7.3474613389024945,
+          "windowSeconds": 0.5045208749999999,
+          "framesPerSecond": 59.46235624046281,
+          "frameMeanMs": 16.817362499999994,
+          "framePeakMs": 20.154042000000594,
+          "targetFrameRate": 60,
+          "vSyncCount": 0,
+          "timingSamples": 30,
+          "budgetMs": 16.666666666666668,
+          "cpuMainMs": 15.398844466666663,
+          "cpuRenderMs": 2.755737433333333,
+          "gpuMs": 2.1205305551120546,
+          "presentWaitMs": 1.4746639000000004,
+          "processCpuMsPerFrame": 15.137400000000001,
+          "processCpuPercentOfOneCore": 90.01054713543817,
+          "graphicsApi": "Metal"
+        }
+      },
+      "errorsOrExceptions": [],
+      "visualReview": "Native 3024×1898 image shows scene TerrainChoice_RoughLeft_SmoothRight, Trial 1, Step 1 / 4, elapsed 4.1 / 30.0 s and remaining 25.9 s, visual/navigation rough-left/smooth-right, VR1–VR4 actual ports 9871–9874, and no-pose/waiting states. All 24 configured LED faces remain in the top-left area; diagnostics are bottom-right.",
+      "scope": "Actual standalone player, bounded auto-start/auto-quit terrain run with four configured LED rigs and no tracker applications or physical camera input. Separate disposable config and run-data roots."
+    }
+  },
+  "build": {
+    "version": "0.3.1-local-review",
+    "target": "StandaloneOSX",
+    "result": "Succeeded",
+    "errors": 0,
+    "warnings": 55,
+    "bytes": 450898879,
+    "buildGuid": "f9b5f1371bc641efabd1e4eaf5a73649",
+    "scenes": [
+      "Assets/Scenes/ControlScene.unity",
+      "Assets/Scenes/Optomotor.unity",
+      "Assets/Scenes/Swarm.unity",
+      "Assets/Scenes/Choice.unity",
+      "Assets/Scenes/Choice_desync.unity",
+      "Assets/Scenes/ReplayScene.unity",
+      "Assets/Scenes/Kannadi.unity",
+      "Assets/Scenes/Choice_Selwyn.unity",
+      "Assets/Scenes/Rugosity_RS.unity",
+      "Assets/Scenes/TerrainCueLab.unity",
+      "Assets/Scenes/TerrainChoice_RoughLeft_SmoothRight.unity",
+      "Assets/Scenes/TerrainChoice_SmoothLeft_RoughRight.unity",
+      "Assets/Scenes/TerrainChoice_BothSmooth.unity",
+      "Assets/Scenes/TerrainChoice_BothRough.unity"
+    ]
+  },
+  "identity": {
+    "schemaVersion": 1,
+    "sourceRevision": "f276f818acd4bc70da6e9e174ebe769c63c7365a",
+    "sourceState": "working-tree-snapshot",
+    "sourceTreeDirty": true,
+    "runtimeSourceFingerprintSha256": "1b852839def1e15498a1e22aae4b069c85ed738daba35c66615aef6544acf274",
+    "runtimeSourceFileCount": 225,
+    "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint.",
+    "dirtyPathsAtPreparation": [
+      "?? Assets/StreamingAssets/Archive/Legacy/Templates/README.md.meta",
+      "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config.py.meta",
+      "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config_choice.py.meta",
+      "?? Assets/StreamingAssets/Archive/README.md.meta"
+    ],
+    "applicationVersion": "0.3.1-local-review",
+    "unityVersion": "6000.3.16f1",
+    "buildTarget": "StandaloneOSX"
+  },
+  "signature": "codesign --verify --strict exited 0",
+  "handoff": {
+    "application": "/Users/pavan/src/ledpanelVR/.local/MATREX VR.app",
+    "configRoot": "/Users/pavan/src/ledpanelVR/.local/Preview Config",
+    "runDataRoot": "/Users/pavan/src/ledpanelVR/.local/MATREX VR RunData",
+    "system": "Apparatus/system.json",
+    "sequence": "Examples/Rugosity/sequence-treatment-matched-terrain.json",
+    "page": "Ready to run",
+    "rigs": 4,
+    "backend": "HejjéTrac",
+    "presentation": "LED",
+    "facePixels": [
+      128,
+      128
+    ],
+    "blocks": 4,
+    "secondsPerBlock": 30,
+    "statusOverlayVisible": true,
+    "trackingStarted": false,
+    "experimentStarted": false,
+    "verifiedBy": "Native CUA screenshot after loading the sequence through Shift+Tab / Return and returning to Start with Alt+1.",
+    "startupPersistence": "The existing launcher still opens the demo; this is the current open workspace. No original sequence was overwritten."
+  },
+  "limitations": [
+    "Camera matrix captures use actual authored cameras and RugosityRig.Conform in an isolated Unity Editor; they do not replace a full native all-sixteen-trial playback or physical display calibration.",
+    "The bounded native run verifies the restored HUD and LED presentation without physical camera acquisition or animal tracking.",
+    "Pixel differences establish rendering differences, not perceptual cue strength.",
+    "No push, release, or other operating-system build."
+  ]
+}
