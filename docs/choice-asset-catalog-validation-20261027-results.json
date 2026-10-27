@@ -1,0 +1,95 @@
+{
+  "checks": 54,
+  "failure": null,
+  "errors": [],
+  "passed": [
+    "catalog object names match the actual registered prefabs: Choice",
+    "catalog material names match the actual registered materials: Choice",
+    "catalog object names match the actual registered prefabs: Choice_Selwyn",
+    "catalog material names match the actual registered materials: Choice_Selwyn",
+    "catalog object names match the actual registered prefabs: Choice_desync",
+    "catalog material names match the actual registered materials: Choice_desync",
+    "catalog object names match the actual registered prefabs: Rugosity_RS",
+    "catalog material names match the actual registered materials: Rugosity_RS",
+    "catalog object names match the actual registered prefabs: TerrainChoice_BothRough",
+    "catalog material names match the actual registered materials: TerrainChoice_BothRough",
+    "catalog object names match the actual registered prefabs: TerrainChoice_BothSmooth",
+    "catalog material names match the actual registered materials: TerrainChoice_BothSmooth",
+    "catalog object names match the actual registered prefabs: TerrainChoice_RoughLeft_SmoothRight",
+    "catalog material names match the actual registered materials: TerrainChoice_RoughLeft_SmoothRight",
+    "catalog object names match the actual registered prefabs: TerrainChoice_SmoothLeft_RoughRight",
+    "catalog material names match the actual registered materials: TerrainChoice_SmoothLeft_RoughRight",
+    "catalog object names match the actual registered prefabs: TerrainCueLab",
+    "catalog material names match the actual registered materials: TerrainCueLab",
+    "compiled catalog exposes a useful set of choice prefabs without scene loading",
+    "compiled catalog exposes registered material alternatives",
+    "unknown scenes retain ordinary custom JSON fields",
+    "picker targets object fields, including phased objects",
+    "choice settings expose the available-assets action",
+    "available-assets dialog is scrollable",
+    "object and material columns align at the top",
+    "available list includes exact registered object Ant",
+    "available list includes exact registered object BrownCylinder",
+    "available list includes exact registered object Cube",
+    "available list includes exact registered object Cylinder",
+    "available list includes exact registered object Cylinder_3D_black",
+    "available list includes exact registered object Lemon",
+    "available list includes exact registered object Lemon Tree 1",
+    "available list includes exact registered object LocustBand_black",
+    "available list includes exact registered object Sphere",
+    "available list includes exact registered object Spider",
+    "available list includes exact registered object tree01",
+    "available list includes exact registered object tree01_100Bright",
+    "available list includes exact registered object tree01_100Dark",
+    "available list includes exact registered object tree01_100Sat",
+    "available list includes exact registered object tree01_noleaf",
+    "available list includes exact registered object tree01_notrunk",
+    "available list includes exact registered object tree01_swapcolor",
+    "available list includes exact registered object tree01_texturedgrey",
+    "available list includes exact registered object tree01_windy",
+    "browsing the catalog does not change JSON or materialize defaults",
+    "object type has a catalog-backed dropdown",
+    "opening a picker retains an unknown existing value without assigning it",
+    "existing custom name stays visible and editable",
+    "choosing a displayed object writes its exact runtime key to the original JSON",
+    "selection preserves unrelated object extensions",
+    "ordinary Undo restores the exact custom JSON value",
+    "catalog inspection and draft selection do not overwrite the source file",
+    "normal settings use the same authoritative picker as advanced JSON fields",
+    "catalog validation never starts an experiment or tracker"
+  ],
+  "scope": "Actual registered prefab/material inventory and production UI Toolkit selection with lossless JSON and undo; isolated no-experiment profile",
+  "sourceHashes": {
+    "Assets/Scripts/ConfigurationUI/ChoiceAssetCatalog.cs": {
+      "source": "cc6d31f96d05cc739662a9741be116d8a7ad00d40d4ec8a4ec2f41e9623a54e4",
+      "validated": "cc6d31f96d05cc739662a9741be116d8a7ad00d40d4ec8a4ec2f41e9623a54e4"
+    },
+    "Assets/Scripts/ConfigurationUI/ConfigWorkbench.ObjectCatalog.cs": {
+      "source": "f52b8200062c0d189bac08cab552e33712a5b3cdc5c81356e36a88912712a6a5",
+      "validated": "f52b8200062c0d189bac08cab552e33712a5b3cdc5c81356e36a88912712a6a5"
+    },
+    "Assets/Scripts/ConfigurationUI/ConfigWorkbench.cs": {
+      "source": "43e837975c6fd49b6a77d84a281148aabe360427d199dfabdd9fc0c82d798ccb",
+      "validated": "43e837975c6fd49b6a77d84a281148aabe360427d199dfabdd9fc0c82d798ccb"
+    },
+    "Assets/Scripts/ConfigurationUI/ConfigWorkbench.Settings.cs": {
+      "source": "cc5a93441b3aa13d35964d5a54fd1cf433af0984fddce4d6f1ddb08339421c5b",
+      "validated": "cc5a93441b3aa13d35964d5a54fd1cf433af0984fddce4d6f1ddb08339421c5b"
+    },
+    "Assets/Editor/ChoiceAssetCatalogBuilder.cs": {
+      "source": "63a8413f0be16790144cb72358ad8b940a76dc22f2e2d9ffbb37ff8952bc8643",
+      "validated": "63a8413f0be16790144cb72358ad8b940a76dc22f2e2d9ffbb37ff8952bc8643"
+    },
+    "Assets/Editor/ChoiceAssetCatalogValidation.cs": {
+      "source": "c4df4a29e5126ec0a56aa70cd7aaf0b39c06ff193e56b1ebeaa987cb0e1b5fb2",
+      "validated": "c4df4a29e5126ec0a56aa70cd7aaf0b39c06ff193e56b1ebeaa987cb0e1b5fb2"
+    },
+    "Assets/Resources/ConfigurationUI/choice-assets.json": {
+      "source": "cf9d8c0befc8baa22e7f6e0ffdb02b7457b474d85a0460140672a88d84a9a139",
+      "validated": "cf9d8c0befc8baa22e7f6e0ffdb02b7457b474d85a0460140672a88d84a9a139"
+    }
+  },
+  "capture": "/Users/pavan/src/ledpanelVR/.local/replay-recording-review-20261027/choice-catalog/available-objects-full-hd.png",
+  "generatedCatalog": "Assets/Resources/ConfigurationUI/choice-assets.json",
+  "buildBehavior": "Baked from actual registered ChoiceController and DynamicSequenceController prefab/material arrays in enabled scenes during every build. Runtime loads only metadata; no Editor APIs or bulk prefab loading."
+}

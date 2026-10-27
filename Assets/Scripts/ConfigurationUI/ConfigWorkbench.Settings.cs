@@ -36,6 +36,7 @@ namespace ConfigurationUI
                 }
             }
             JObject payload=EditingPayload(); JObject schema=phased?ConfigSchema.Child(Workspace.Schemas.Get(selected.SchemaId),activePhase):Workspace.Schemas.Get(selected.SchemaId);
+            AddChoiceCatalogAction(body);
             string[] prefix=phased?new[]{activePhase}:Array.Empty<string>();
             if(phased)
             {
@@ -133,7 +134,8 @@ namespace ConfigurationUI
             {
                 var fallback=Pill("Check JSON","muted-pill");fallback.tooltip="This file contains an invalid value. The control displays its default; edit the value to repair it. Starting stays disabled until validation passes.";label.Add(fallback);
             }
-            if(shown?.Type==JTokenType.Boolean)
+            if(TryChoiceCatalogControl(parts,value,v=>assign(v,true),out var catalogControl))setting.Add(catalogControl);
+            else if(shown?.Type==JTokenType.Boolean)
             {
                 setting.AddToClassList("boolean-setting");
                 setting.Add(StateSwitch((bool)shown,v=>assign(new JValue(v),true),"flag-"+string.Join("-",parts)));

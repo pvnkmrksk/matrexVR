@@ -286,7 +286,8 @@ namespace ConfigurationUI
             bool enabled=array || ConfigSchema.Enabled(Current,CurrentSchema,key,Context);
             edit.SetEnabled(enabled);
             Action<JToken> replace=v=>Change(node=>{ if(array) ((JArray)node)[int.Parse(key)]=v; else node[key]=v; });
-            if(value==null) edit.Add(Button("+ Set value",()=>replace(ConfigSchema.NewValue(schema)),"quiet"));
+            if(TryChoiceCatalogControl(path.Concat(new[]{key}).ToArray(),value,replace,out var catalogControl))edit.Add(catalogControl);
+            else if(value==null) edit.Add(Button("+ Set value",()=>replace(ConfigSchema.NewValue(schema)),"quiet"));
             else if(value is JContainer && !(value is JValue))
             {
                 // JRaw is a scalar JValue; object/array forms are opened lazily.
