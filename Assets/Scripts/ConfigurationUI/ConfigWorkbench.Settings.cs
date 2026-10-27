@@ -45,6 +45,7 @@ namespace ConfigurationUI
                 }),"phase-enabled"));
                 var hint=new Label("Disabled phases keep their configuration."); hint.AddToClassList("phase-hint"); enable.Add(hint); body.Add(enable);
             }
+            AddSequenceOverrideNotice(body);
             var tabs=Row("settings-tabs"); body.Add(tabs);
             foreach(string name in new[]{"Essentials","Motion","Stimulus","Sky","Tuning","All parameters"})
             { string key=name; tabs.Add(Button(name,()=>{ settingsTab=key; BuildContent(); },settingsTab==name?"tab-active":"quiet")); }
@@ -69,7 +70,7 @@ namespace ConfigurationUI
                 if(settingsTab=="All parameters")
                 {
                     var addMissing=new Toggle("Show unset optional fields") { name="show-omitted-settings",tooltip="Defaults are already shown. Also reveal optional fields whose omitted value is null or unspecified; viewing them does not write to JSON." }; scroll.Add(addMissing);
-                    scroll.Add(Button("Add parameter…",()=>ShowParameterDialog(selected,prefix),"quiet"));
+                    var addParameter=Button("Add parameter…",()=>ShowParameterDialog(selected,prefix),"quiet");addParameter.AddToClassList("add-parameter-action");scroll.Add(addParameter);
                     var content=new VisualElement(); scroll.Add(content);
                     Action render=()=>{ content.Clear(); var keys=present.ToList(); if(addMissing.value) keys.AddRange(((JObject)schema["properties"]).Properties().Select(p=>p.Name).Where(k=>!keys.Contains(k) && k!="enabled" && !new[]{"preStimulus","stimulus","postStimulus"}.Contains(k)));
                         foreach(string group in new[]{"Motion","Stimulus","Sky","Tuning","Other"}) Section(content,group,GroupIcon(group),payload,schema,prefix,keys.Where(k=>Group(k)==group),false); };
@@ -169,8 +170,9 @@ namespace ConfigurationUI
                     fold.contentContainer.SetEnabled(flag==null || ExperimentBlocks.Flag(nested[flag],ExperimentBlocks.Flag(schema["properties"]?[flag]?["default"],true)));
                 };
                 if(fold.value) populate();
-                fold.RegisterValueChangedCallback(e=>{ if(e.target!=fold) return; disclosure.text=e.newValue?"Parameters ▾":"Parameters ▸"; if(e.newValue) { expandedSections.Add(id); populate(); } else { expandedSections.Remove(id); fold.Clear(); } });
+                fold.RegisterValueChangedCallback(e=>{ if(e.target!=fold) return; setting.EnableInClassList("parameters-open",e.newValue);disclosure.text=e.newValue?"Parameters ▾":"Parameters ▸"; if(e.newValue) { expandedSections.Add(id); populate(); } else { expandedSections.Remove(id); fold.Clear(); } });
                 setting.AddToClassList("container-setting");
+                setting.EnableInClassList("parameters-open",fold.value);
             }
             else if(shown is JArray array)
             {

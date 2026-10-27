@@ -1,27 +1,27 @@
 /* Apparatus configuration and the compact daily experiment workspace. */
 .apparatus-scroll { flex-grow: 1; min-height: 0; }
-.apparatus-copy { color: rgb(169, 185, 199); font-size: 12px; white-space: normal; margin: 4px 0 10px; }
-.apparatus-note { color: rgb(135, 155, 173); font-size: 11px; white-space: normal; margin: 8px 0; }
-.apparatus-eyebrow { color: rgb(135, 163, 176); font-size: 10px; letter-spacing: 0; margin: 0 0 8px; }
-.apparatus-intro { max-width: 900px; padding: 20px; background-color: rgb(29, 38, 47); border-width: 1px; border-color: rgb(58, 75, 88); border-radius: 6px; }
+.apparatus-copy { color: rgb(72, 98, 119); font-size: 12px; white-space: normal; margin: 4px 0 10px; }
+.apparatus-note { color: rgb(91, 115, 135); font-size: 12px; white-space: normal; margin: 8px 0; }
+.apparatus-eyebrow { color: rgb(80, 111, 131); font-size: 11px; letter-spacing: 0; margin: 0 0 8px; }
+.apparatus-intro { max-width: 900px; padding: 20px; background-color: rgb(255, 255, 255); border-width: 1px; border-color: rgb(202, 217, 228); border-radius: 6px; }
 .apparatus-intro .session-section-heading { margin-top: 0; }
 .apparatus-type-choices { flex-wrap: wrap; margin: 12px 0; }
 .apparatus-type-choices > Button { margin-left: 0; margin-right: 10px; }
-.apparatus-overview-controls { flex-wrap: wrap; align-items: flex-start; margin: 12px 0 6px; }
+.apparatus-overview-controls { max-width: 1000px; flex-wrap: wrap; align-items: flex-start; margin: 12px 0 6px; }
 .apparatus-input { flex-grow: 1; flex-basis: 0; min-width: 150px; max-width: 300px; margin: 5px 12px 7px 0; flex-direction: column; align-items: stretch; }
-.apparatus-input > .unity-base-field__label { min-width: 0; margin-bottom: 6px; font-size: 11px; color: rgb(154, 174, 191); white-space: normal; }
+.apparatus-input > .unity-base-field__label { min-width: 0; margin-bottom: 6px; font-size: 12px; color: rgb(80, 104, 123); white-space: normal; }
 .apparatus-overview-controls > .unity-popup-field { flex-grow: 1; flex-basis: 0; min-width: 180px; max-width: 300px; flex-direction: column; margin: 5px 0 7px; }
-.apparatus-overview-controls > .unity-popup-field > .unity-base-field__label { min-width: 0; margin-bottom: 6px; font-size: 11px; color: rgb(154, 174, 191); }
-.apparatus-native-option { align-items: center; margin: 3px 0 16px; }
+.apparatus-overview-controls > .unity-popup-field > .unity-base-field__label { min-width: 0; margin-bottom: 6px; font-size: 12px; color: rgb(80, 104, 123); }
+.apparatus-native-option { align-items: center; max-width: 1000px; margin: 3px 0 16px; }
 .apparatus-native-option .apparatus-copy { margin-bottom: 0; margin-left: 8px; }
-.apparatus-map-section { padding: 16px; border-width: 1px; border-color: rgb(50, 67, 80); background-color: rgb(25, 33, 42); border-radius: 5px; margin-bottom: 18px; }
+.apparatus-map-section { max-width: 600px; padding: 16px; border-width: 1px; border-color: rgb(203, 219, 230); background-color: rgb(255, 255, 255); border-radius: 5px; margin-bottom: 18px; }
 .apparatus-map-section .session-section-heading { margin-top: 0; margin-bottom: 8px; }
-.apparatus-map-label { color: rgb(183, 200, 215); font-size: 11px; margin: 12px 0 7px; }
+.apparatus-map-label { color: rgb(74, 102, 124); font-size: 12px; margin: 12px 0 7px; }
 .apparatus-display-map { height: 210px; min-height: 0; max-width: 100%; padding: 0; border-width: 0; flex-shrink: 0; position: relative; background-color: rgb(12, 18, 24); overflow: hidden; }
-.apparatus-pixel-cell { position: absolute; background-color: rgb(49, 91, 92); border-width: 1px; border-color: rgb(143, 200, 191); color: rgb(233, 244, 244); font-size: 10px; -unity-text-align: middle-center; overflow: hidden; }
-.apparatus-map-legend { color: rgb(158, 185, 202); font-size: 10px; white-space: normal; margin-top: 6px; }
-.apparatus-rig { border-width: 1px; border-color: rgb(52, 68, 81); border-radius: 5px; background-color: rgb(29, 37, 46); margin: 0 0 12px; padding: 10px 14px; }
-.apparatus-rig > .unity-foldout__toggle { font-size: 13px; color: rgb(204, 222, 234); margin: 2px 0; }
+.apparatus-pixel-cell { position: absolute; background-color: rgb(49, 91, 92); border-width: 1px; border-color: rgb(143, 200, 191); color: rgb(233, 244, 244); font-size: 11px; -unity-text-align: middle-center; overflow: hidden; }
+.apparatus-map-legend { color: rgb(83, 115, 138); font-size: 11px; white-space: normal; margin-top: 6px; }
+.apparatus-rig { max-width: 1120px; border-width: 1px; border-color: rgb(205, 218, 229); border-radius: 5px; background-color: rgb(255, 255, 255); margin: 0 0 12px; padding: 10px 14px; }
+.apparatus-rig > .unity-foldout__toggle { font-size: 13px; color: rgb(38, 74, 96); margin: 2px 0; }
 .apparatus-rig > .unity-foldout__content { margin-left: 0; padding-top: 10px; }
 .apparatus-grid { align-items: flex-start; flex-wrap: wrap; }
 .apparatus-grid > .apparatus-input { min-width: 160px; }
@@ -34,33 +34,38 @@
 .apparatus-face-net { margin-right: 24px; flex-shrink: 0; }
 .apparatus-net-row { min-height: 0; }
 .apparatus-net-blank, Button.apparatus-face { width: 64px; min-width: 64px; height: 64px; flex-shrink: 0; margin: 2px; }
-Button.apparatus-face { flex-direction: column; padding: 4px; background-color: rgb(28, 34, 42); border-color: rgb(57, 70, 83); }
-Button.apparatus-face > Label { flex-grow: 0; font-size: 18px; color: rgb(113, 132, 147); }
-Button.apparatus-face.is-enabled { background-color: rgb(36, 65, 66); border-color: rgb(100, 165, 155); }
-Button.apparatus-face.is-enabled > Label { color: rgb(189, 228, 216); }
-Button.apparatus-face > .apparatus-face-name { font-size: 10px; color: rgb(141, 162, 180); }
-Button.apparatus-face > .apparatus-face-slot { font-size: 9px; color: rgb(115, 139, 157); }
+Button.apparatus-face { flex-direction: column; padding: 4px; background-color: rgb(242, 247, 250); border-color: rgb(181, 203, 219); }
+Button.apparatus-face > Label { flex-grow: 0; font-size: 18px; color: rgb(87, 117, 139); }
+Button.apparatus-face.is-enabled { background-color: rgb(225, 243, 234); border-color: rgb(73, 156, 128); }
+Button.apparatus-face.is-enabled > Label { color: rgb(31, 115, 90); }
+Button.apparatus-face > .apparatus-face-name { font-size: 11px; color: rgb(71, 109, 132); }
+Button.apparatus-face > .apparatus-face-slot { font-size: 9px; color: rgb(94, 121, 142); }
 .apparatus-strip-preview { flex-grow: 1; min-width: 220px; max-width: 400px; margin-top: 4px; }
 .apparatus-strip-tiles { flex-wrap: wrap; }
-.apparatus-strip-tile { width: 48px; height: 48px; align-items: center; justify-content: center; border-width: 1px; border-color: rgb(83, 128, 132); border-radius: 3px; margin: 2px; background-color: rgb(31, 51, 61); }
-.apparatus-strip-tile > Label { font-size: 17px; color: rgb(188, 219, 220); }
-.apparatus-strip-tile > .apparatus-face-slot { font-size: 9px; color: rgb(134, 160, 179); }
-.apparatus-advanced { margin: 12px 0; padding: 8px 0; border-top-width: 1px; border-top-color: rgb(48, 63, 76); }
-.apparatus-advanced > .unity-foldout__toggle { color: rgb(150, 173, 191); font-size: 11px; }
-.apparatus-validation { white-space: normal; color: rgb(223, 171, 128); font-size: 11px; margin: 6px 0 12px; }
+.apparatus-strip-tile { width: 48px; height: 48px; align-items: center; justify-content: center; border-width: 1px; border-color: rgb(140, 182, 186); border-radius: 3px; margin: 2px; background-color: rgb(231, 244, 245); }
+.apparatus-strip-tile > Label { font-size: 17px; color: rgb(45, 107, 117); }
+.apparatus-strip-tile > .apparatus-face-slot { font-size: 9px; color: rgb(90, 121, 143); }
+.apparatus-advanced { margin: 12px 0; padding: 8px 0; border-top-width: 1px; border-top-color: rgb(211, 224, 233); }
+.apparatus-advanced > .unity-foldout__toggle { align-self: flex-start; color: rgb(79, 110, 133); font-size: 12px; }
+.apparatus-validation { white-space: normal; color: rgb(151, 92, 31); font-size: 12px; margin: 6px 0 12px; }
 #apparatus-complete { align-self: flex-start; min-width: 200px; margin-left: 0; margin-top: 12px; }
-.demo-worlds { max-width: 1000px; margin-bottom: 12px; }
+.demo-worlds { max-width: 830px; margin-bottom: 12px; }
 .demo-worlds .world-previews { flex-grow: 1; }
-.demo-configure { padding: 13px 0; border-bottom-width: 1px; border-bottom-color: rgb(49, 63, 76); margin-bottom: 18px; }
+.demo-configure { max-width: 1120px; padding: 12px 0; border-bottom-width: 1px; border-bottom-color: rgb(213, 224, 233); margin-bottom: 18px; }
 .demo-configure .apparatus-copy { margin-bottom: 0; }
 .daily-welcome { margin-bottom: 10px; }
-.daily-welcome .start-title { font-size: 30px; }
-.daily-welcome .start-subtitle { margin-top: 8px; margin-bottom: 4px; }
+.daily-welcome .start-title { font-size: 28px; margin-bottom: 4px; }
+.daily-welcome .start-subtitle { margin-top: 4px; margin-bottom: 4px; }
 .daily-apparatus-summary { padding: 8px 0; }
 .daily-apparatus-summary .apparatus-copy { margin-bottom: 0; }
 .session-native-row { flex-wrap: wrap; }
-.session-native-row .apparatus-copy { font-size: 11px; }
+.session-native-row .apparatus-copy { font-size: 12px; }
 .session-native-row Button { height: 28px; }
 .compact .apparatus-grid > .apparatus-input { min-width: 135px; }
 .compact .apparatus-face-previews { flex-direction: column; }
 .compact .apparatus-strip-preview { margin-top: 18px; }
+
+#demo-options { max-width: 1120px; margin-top: 14px; }
+#demo-options > .unity-foldout__toggle { min-height: 32px; padding: 4px 0; font-size: 13px; }
+#demo-options > .unity-foldout__content { margin-left: 0; padding-top: 12px; }
+.apparatus-rig > .unity-foldout__toggle { padding: 6px 0; -unity-font-style: bold; min-height: 32px; }

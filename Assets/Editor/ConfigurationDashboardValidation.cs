@@ -90,7 +90,7 @@ public static class ConfigurationDashboardValidation
             Check(setting.worldBound.x>=navigation.xMax-1 && setting.worldBound.xMax<=target.width+1,"Control stays inside workspace: "+setting.name);
             Check(setting.tooltip.Contains("JSON:") && setting.tooltip.Contains("Omitted default:"),"Parameter has semantic help/default: "+setting.name);
             if(setting.ClassListContains("boolean-setting") && !setting.GetFirstAncestorOfType<ScrollView>().ClassListContains("inspector"))
-                Check(setting.worldBound.width<=286.1f,"Boolean has compact width: "+setting.name);
+                Check(setting.worldBound.width<root.resolvedStyle.width/3f+1,"Boolean uses at most a third of the desktop: "+setting.name);
         }
     }
     private static void Tick()

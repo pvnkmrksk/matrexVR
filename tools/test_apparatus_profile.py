@@ -2,6 +2,7 @@
 """Exercise the production apparatus JSON model without Unity, hardware or native apps."""
 from pathlib import Path
 from xml.sax.saxutils import escape
+from test_system_display_routing import declaration
 import os
 import re
 import shutil
@@ -26,6 +27,10 @@ static class Regression {
   Check(DesktopApparatusProfile.OutputDisplay(legacyDisplay,(JObject)legacyDisplay["configs"][0],4)==4,"resolved CLI fallback ignored");
   legacyDisplay["configs"][0]["targetDisplay"]=0;
   Check(DesktopApparatusProfile.OutputDisplay(legacyDisplay,(JObject)legacyDisplay["configs"][0],4)==0,"explicit primary display loses to fallback");
+  var summarySystem=JObject.Parse("{\"targetDisplay\":0,\"configs\":[{\"vrId\":\"VR1\",\"targetDisplay\":1,\"displayOrder\":\"DRBLFU\"},{\"vrId\":\"VR2\",\"targetDisplay\":1,\"displayOrder\":\"F\"},{\"vrId\":\"VR3\",\"displayOrder\":\"RBLF\"}]}");
+  Check(new SummaryFixture(summarySystem,0).Summary=="Display 1 · 4 configured camera faces\nDisplay 2 · 7 configured camera faces","summary does not group actual outputs/count each display's faces in human numbering");
+  Check(new SummaryFixture(summarySystem,3).Summary=="Display 2 · 7 configured camera faces\nDisplay 4 · 4 configured camera faces","summary ignores effective CLI fallback for omitted rig displays");
+  Check(new SummaryFixture(new JObject(),2).Summary=="Display 3 · no configured camera faces","empty summary misreports fallback output or uses zero-based display numbering");
   ((JObject)legacyDisplay["configs"][0]).Remove("targetDisplay");DesktopApparatusProfile.Begin(legacyDisplay,"led",false);DesktopApparatusProfile.ResizeRigs(legacyDisplay,2);
   Check(DesktopApparatusProfile.MonitorCount(legacyDisplay)==3&&DesktopApparatusProfile.Validate(legacyDisplay).Count==0&&(int)legacyDisplay["configs"][1]["startRow"]==1,"legacy omitted display differs in setup validation or resize packing");
   var cliDisplay=Demo();((JObject)cliDisplay["configs"][0]).Remove("targetDisplay");cliDisplay["targetDisplay"]=1;
@@ -128,7 +133,12 @@ def main():
         temporary = Path(folder)
         environment = dict(os.environ, DOTNET_CLI_HOME=folder, DOTNET_CLI_TELEMETRY_OPTOUT='1', DOTNET_SKIP_FIRST_TIME_EXPERIENCE='1')
         (temporary / 'NuGet.Config').write_text('<configuration><packageSources><clear /></packageSources></configuration>')
-        (temporary / 'Program.cs').write_text(PROGRAM)
+        builder=(ROOT/'Assets/Scripts/ConfigurationUI/ConfigWorkbench.Builder.cs').read_text()
+        apparatus=(ROOT/'Assets/Scripts/ConfigurationUI/ConfigWorkbench.Apparatus.cs').read_text()
+        start=apparatus.index('private int ApparatusOutputDisplay(')
+        output=apparatus[start:apparatus.index(';',start)+1]
+        summary='class SummaryFixture { class Document { public JObject Root; } class State { public Document System=new Document(); } private State Workspace=new State(); private int ApparatusDisplayFallback; public SummaryFixture(JObject root,int fallback){Workspace.System.Root=root;ApparatusDisplayFallback=fallback;} public string Summary=>SystemDisplaySummary();'+output+declaration(builder,'private string SystemDisplaySummary()')+'}'
+        (temporary / 'Program.cs').write_text(PROGRAM+summary)
         project = temporary / 'Regression.csproj'
         production = ROOT / 'Assets/Scripts/ConfigurationUI/DesktopApparatusProfile.cs'
         project.write_text(f'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net{version}.0</TargetFramework></PropertyGroup><ItemGroup><Reference Include="Newtonsoft.Json"><HintPath>{escape(str(newtonsoft))}</HintPath></Reference><Compile Include="{escape(str(production))}" /><Compile Include="{escape(str(ROOT / "Assets/Scripts/ConfigurationUI/ApparatusStarterFiles.cs"))}" /><Compile Include="{escape(str(ROOT / "Assets/Scripts/ConfigurationUI/LosslessJson.cs"))}" /></ItemGroup></Project>')

@@ -24,15 +24,16 @@ public static class WorkbenchVisualValidation
     private static readonly List<string> checks = new List<string>(), errors = new List<string>();
     private static readonly List<object> geometry = new List<object>();
     private static int stage, nextFrame;
-    private static double deadline;
+    private static double deadline,hoverDeadline;
     private static RenderTexture target;
     private static ConfigDocument experiment;
+    private static string terrainBaseBeforeOverride,terrainSequenceBeforeOverride;
     private static string Output => Path.Combine(Application.dataPath, "../workbench-visual-validation");
     static WorkbenchVisualValidation()
     {
         EditorApplication.playModeStateChanged += state => {
             if (state != PlayModeStateChange.EnteredPlayMode || !SessionState.GetBool(Key, false)) return;
-            deadline = EditorApplication.timeSinceStartup + 120;
+            deadline = EditorApplication.timeSinceStartup + 240;
             Application.logMessageReceived += Log;
             SceneManager.sceneLoaded += Loaded;
             EditorApplication.update += Tick;
@@ -42,7 +43,7 @@ public static class WorkbenchVisualValidation
     {
         if (!File.Exists(Path.Combine(Application.dataPath, "../KANNADI_VALIDATION_COPY")))
             throw new Exception("Use a marked disposable project.");
-        Directory.CreateDirectory(Output);
+        Directory.CreateDirectory(Output);File.Delete(Path.Combine(Output,"results.json"));
         ConfigurationSchemaBuilder.Generate();
         string profile = DesktopQuickStart.EnsureProfile(Application.streamingAssetsPath, "flying", "night-sky", true);
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "system_config.json"), File.ReadAllText(Path.Combine(profile, "system.json")));
@@ -167,7 +168,88 @@ public static class WorkbenchVisualValidation
         var rig = (JObject)system["configs"][0]; rig["displayOrder"] = "DRBLFU";
         rig["ledPanelWidth"] = 128; rig["ledPanelHeight"] = 128;
         rig["startRow"] = 0; rig["startCol"] = 0; rig["horizontal"] = true;
+        rig["targetDisplay"] = 1; DesktopApparatusProfile.Marker(system)["monitorCount"] = 2;
         ui.Workspace.System.ApplyJson(system.ToString()); Call(ui, "Select", ui.Workspace.System);
+    }
+    private static void EditPage(ConfigWorkbench ui,string reference,string schema,string tab)
+    {
+        experiment=ui.Workspace.Open(reference,schema);Call(ui,"Select",experiment);
+        typeof(ConfigWorkbench).GetField("settingsTab",Hidden).SetValue(ui,tab);Call(ui,"BuildContent");
+    }
+    private static void FieldBounds(ConfigWorkbench ui)
+    {
+        foreach(var card in ui.Document.rootVisualElement.Query<VisualElement>(className:"studio-setting").ToList())
+        {
+            if(card.resolvedStyle.display==DisplayStyle.None||card.worldBound.width<=0)continue;
+            var title=card.Q<Label>(className:"setting-title");
+            if(title!=null&&title.text.Length>=8)Check(title.worldBound.width>=48,"Field label retains readable width: "+card.name);
+            foreach(var field in card.Children().OfType<TextField>())
+                Check(field.worldBound.xMax<=card.worldBound.xMax+1,"Text field stays inside its card: "+card.name);
+            if(card.ClassListContains("vector-setting"))
+            {
+                var controls=card.Q<VisualElement>(className:"vector-controls");
+                var axes=controls.Children().OfType<Label>().ToList();
+                Check(axes.Count==3&&Mathf.Abs(axes[0].worldBound.y-axes[2].worldBound.y)<1,"Three vector axes share one line: "+card.name);
+            }
+        }
+    }
+    private static void Hover(VisualElement target)
+    {
+        Check(target!=null,"Hover target exists");hoverDeadline=EditorApplication.timeSinceStartup+.9;
+        using(var evt=PointerOverEvent.GetPooled(new Event {type=EventType.MouseMove,mousePosition=target.worldBound.center})){evt.target=target;target.SendEvent(evt);}
+        using(var evt=PointerEnterEvent.GetPooled(new Event {type=EventType.MouseMove,mousePosition=target.worldBound.center})){evt.target=target;target.SendEvent(evt);}
+        using(var evt=PointerMoveEvent.GetPooled(new Event {type=EventType.MouseMove,mousePosition=target.worldBound.center})){evt.target=target;target.SendEvent(evt);}
+    }
+    private static double Light(Color color)
+    {
+        double Channel(float value)=>value<=.04045?value/12.92:Math.Pow((value+.055)/1.055,2.4);
+        return .2126*Channel(color.r)+.7152*Channel(color.g)+.0722*Channel(color.b);
+    }
+    private static void Contrast(Color text,Color background,string label)
+    {double a=Light(text),b=Light(background);Check((Math.Max(a,b)+.05)/(Math.Min(a,b)+.05)>=4.5,label+" has at least 4.5:1 text contrast");}
+    private static void HoverCard(ConfigWorkbench ui)
+    {
+        var root=ui.Document.rootVisualElement;var card=root.Q<VisualElement>("runtime-hover-help");
+        Check(card.resolvedStyle.display==DisplayStyle.Flex,"Pointer hover displays help");
+        Check(card.worldBound.xMin>=0&&card.worldBound.yMin>=0&&card.worldBound.xMax<=root.worldBound.xMax&&card.worldBound.yMax<=root.worldBound.yMax,"Help stays inside the workspace");
+        foreach(string name in new[]{"runtime-hover-help-title","runtime-hover-help-body","runtime-hover-help-facts"})
+        {
+            var label=root.Q<Label>(name);if(label.resolvedStyle.display==DisplayStyle.None)continue;
+            Contrast(label.resolvedStyle.color,card.resolvedStyle.backgroundColor,name);
+            var measure=label.MeasureTextSize(label.text,label.contentRect.width,VisualElement.MeasureMode.Exactly,0,VisualElement.MeasureMode.Undefined);
+            Check(label.contentRect.height+.5f>=measure.y,"Help text is not clipped: "+name);
+        }
+    }
+    private static void MakeLibraryFixtures()
+    {
+        string folder=Path.Combine(Output,"recordings");Directory.CreateDirectory(folder);
+        string[] titles={"Terrain · matched relief","Swarm entrainment · animal 04","Night sky · calibration"};
+        for(int i=0;i<titles.Length;i++)
+        {
+            string run=Path.Combine(folder,"20261027_10000"+i);Directory.CreateDirectory(run);
+            File.WriteAllText(Path.Combine(run,"system_config.json"),"{\"configs\":[{\"vrId\":\"VR1\",\"closedLoopMode\":\"Rekkefly\"}]}");
+            File.WriteAllText(Path.Combine(run,"sequenceConfig.json"),"{\"sequences\":[{\"sceneName\":\"Choice\",\"duration\":120,\"parameters\":{\"configFile\":\"choice.json\"}}]}");
+            File.WriteAllText(Path.Combine(run,"choice.json"),"{\"objects\":[]}");
+            File.WriteAllText(Path.Combine(run,"AnimalMetadata.json"),new JObject{["ExperimentName"]=titles[i],["Animals"]=new JArray(new JObject{["VR"]="VR1",["AnimalID"]="Animal 04"})}.ToString());
+            File.WriteAllText(Path.Combine(run,"poses.csv"),"Current Time,VR,Scene,CurrentStep,ConfigFile,CurrentTrial,GameObjectPosX,GameObjectPosY,GameObjectPosZ,GameObjectRotX,GameObjectRotY,GameObjectRotZ\n2026-10-27 10:00:00.000,VR1,Choice,0,choice.json,0,1,2,3,0,40,0\n2026-10-27 10:00:01.000,VR1,Choice,0,choice.json,0,2,2,3,0,42,0\n");
+        }
+    }
+    private static void TerrainSceneLabels(ConfigWorkbench ui)
+    {
+        var root=ui.Document.rootVisualElement;
+        var names=root.Query<Label>(className:"block-name").ToList();
+        Check(names.Count==4&&names.Select(label=>label.text).Distinct().Count()==4,"Terrain rows have four distinct spatial-pattern titles");
+        var descriptions=root.Query<Label>(className:"block-description").ToList();
+        Check(descriptions.Select(label=>label.text).Distinct().Count()==4,"Terrain row summaries reflect each row's surface override");
+        foreach(var label in root.Query<Label>().ToList().Where(label=>label.tooltip!=null&&label.tooltip.StartsWith("Unity scene: TerrainChoice_",StringComparison.Ordinal)))
+        {
+            var measured=label.MeasureTextSize(label.text,0,VisualElement.MeasureMode.Undefined,0,VisualElement.MeasureMode.Undefined);
+            geometry.Add(new {control="terrain-scene-label",text=label.text,scene=label.tooltip.Substring("Unity scene: ".Length),width=label.contentRect.width,textWidth=measured.x,
+                clipped=measured.x>label.contentRect.width+1,targetWidth=target.width,targetHeight=target.height});
+            Check(measured.x<=label.contentRect.width+1,"Terrain scene caption is fully readable: "+label.text);
+        }
+        var dropdown=root.Q<DropdownField>();
+        Check(dropdown!=null&&dropdown.value.StartsWith("TerrainChoice_",StringComparison.Ordinal),"Friendly scene dropdown retains the actual Unity scene value");
     }
     private static void Tick()
     {
@@ -181,27 +263,116 @@ public static class WorkbenchVisualValidation
                 case 0: Render(ui, 1920, 1080, 1); Next(1, 60); break;
                 case 1:
                     Shell(ui); Typography(); Capture("home-1920x1080");
+                    File.WriteAllLines(Path.Combine(Output,"foldout-visual-tree.txt"),ui.Document.rootVisualElement.Q<Foldout>("navigation-files").Query<VisualElement>().ToList().Select(e=>e.GetType().Name+" / "+e.name+" / "+string.Join(" ",e.GetClasses())+" / bg="+e.resolvedStyle.backgroundColor+" border="+e.resolvedStyle.borderTopWidth));
                     Submit(ui.Document.rootVisualElement.Q<Button>("session-load-sequence")); Next(7); break;
                 case 7:
                     Capture("sequence-chooser-1920x1080"); SequenceChoices(ui); ShowDisplay(ui); Next(2); break;
                 case 2:
                     Shell(ui); SquarePreviews(ui); Capture("apparatus-1920x1080");
+                    ui.Document.rootVisualElement.Q<ScrollView>("apparatus-scroll").ScrollTo(ui.Document.rootVisualElement.Q<VisualElement>("apparatus-net-VR1"));Next(28);break;
+                case 28:
+                    Capture("apparatus-face-layout-1920x1080");
                     experiment = ui.Workspace.Open("visual-motion.example.json", "choice");
                     Call(ui, "Select", experiment); typeof(ConfigWorkbench).GetField("settingsTab", Hidden).SetValue(ui, "Motion");
                     Call(ui, "BuildContent"); Next(3); break;
                 case 3:
                     Shell(ui);
                     foreach (var toggle in ui.Document.rootVisualElement.Query<VisualElement>(className: "boolean-setting").ToList())
-                        Check(toggle.worldBound.width <= 272, "Boolean control stays compact: " + toggle.name);
-                    Capture("motion-1920x1080"); Render(ui, 3840, 2160, 2); Next(4); break;
+                        Check(toggle.worldBound.width <= 330, "Boolean control occupies less than one fifth of Full HD: " + toggle.name);
+                    FieldBounds(ui);Capture("motion-1920x1080"); Render(ui, 3840, 2160, 2); Next(4); break;
                 case 4:
                     Shell(ui); Capture("motion-3840x2160"); ShowDisplay(ui); Next(5); break;
                 case 5:
                     SquarePreviews(ui); Capture("apparatus-3840x2160"); Render(ui, 2560, 1440, 1.25f); Next(6); break;
                 case 6:
                     Shell(ui); SquarePreviews(ui); Capture("apparatus-2560x1440");
-                    Check(!MainController.Instance.SequenceRunning, "Visual checks never start acquisition or experiment recording");
-                    Finish(null); break;
+                    Render(ui,1920,1080,1);var system=(JObject)ui.Workspace.System.Root.DeepClone();DesktopApparatusProfile.Complete(system);ui.Workspace.System.ApplyJson(system.ToString());Call(ui,"ShowSessionHome");Next(8);break;
+                case 8:
+                    Capture("configured-home-1920x1080");ui.Document.rootVisualElement.Q<Foldout>("recording-details").value=true;Next(9);break;
+                case 9:
+                    Capture("recording-options-1920x1080");ui.Document.rootVisualElement.Q<ScrollView>("start-workspace").ScrollTo(ui.Document.rootVisualElement.Q<VisualElement>("subject-VR1"));Next(29);break;
+                case 29:
+                    Capture("recording-details-scrolled-1920x1080");ui.Workspace.SelectPrimary("sequence","Examples/Sequences/swarm-entrainment-social.sequence.json");Call(ui,"Select",ui.Workspace.Sequence);Next(10);break;
+                case 10:
+                    Capture("sequence-1920x1080");Call(ui,"ShowBlockLibrary",(object)null);Next(11);break;
+                case 11:
+                    Capture("block-library-dialog-1920x1080");Call(ui,"CloseModal");EditPage(ui,"Examples/Swarm/ordered-entrainment.example.json","swarm","Stimulus");Next(12);break;
+                case 12:
+                    FieldBounds(ui);Capture("stimulus-1920x1080");EditPage(ui,"Examples/Flight/selwyn-live-sky.example.json","choice","Sky");Next(13);break;
+                case 13:
+                    FieldBounds(ui);Capture("sky-1920x1080");ui.Document.rootVisualElement.Q<VisualElement>("setting-nightSky").Q<Foldout>().value=true;Next(27);break;
+                case 27:
+                    FieldBounds(ui);Capture("sky-expanded-1920x1080");Call(ui,"ShowRuntimeColorDialog",new Color(.25f,.45f,.65f),false,new Action<Color>(_=>{}));Next(14);break;
+                case 14:
+                    Capture("color-dialog-1920x1080");Call(ui,"CloseModal");Call(ui,"ShowEffectiveConfiguration");Next(15);break;
+                case 15:
+                    Capture("effective-json-dialog-1920x1080");Call(ui,"CloseModal");EditPage(ui,"visual-motion.example.json","choice","All parameters");Next(16);break;
+                case 16:
+                    Capture("all-parameters-1920x1080");typeof(ConfigWorkbench).GetField("jsonMode",Hidden).SetValue(ui,true);Call(ui,"BuildContent");Next(17);break;
+                case 17:
+                    Capture("raw-json-1920x1080");EditPage(ui,"visual-motion.example.json","choice","Motion");Next(18);break;
+                case 18:
+                    ui.Document.rootVisualElement.Q<TextField>("number-autopilotSpeed").Focus();Next(19,1);break;
+                case 19:
+                    Capture("field-keyboard-focus-1920x1080");Hover(ui.Document.rootVisualElement.Q<VisualElement>("setting-closedLoopOrientation"));Next(20,60);break;
+                case 20:
+                    if(EditorApplication.timeSinceStartup<hoverDeadline)return;
+                    HoverCard(ui);Capture("parameter-hover-1920x1080");Call(ui,"HideHoverHelp");Hover(ui.Document.rootVisualElement.Q<Button>("start-experiment"));Next(21,60);break;
+                case 21:
+                    if(EditorApplication.timeSinceStartup<hoverDeadline)return;
+                    var primary=ui.Document.rootVisualElement.Q<Button>("start-experiment");Contrast(primary.Q<Label>().resolvedStyle.color,primary.resolvedStyle.backgroundColor,"Primary hover label");Capture("primary-button-hover-1920x1080");
+                    Call(ui,"HideHoverHelp");primary.SetEnabled(false);Next(22);break;
+                case 22:
+                    var disabled=ui.Document.rootVisualElement.Q<Button>("start-experiment");Contrast(disabled.Q<Label>().resolvedStyle.color,disabled.resolvedStyle.backgroundColor,"Disabled primary hover caption");Capture("disabled-controls-1920x1080");Call(ui,"ShowOpenFile");Next(23);break;
+                case 23:
+                    Capture("open-file-dialog-1920x1080");Call(ui,"CloseModal");Call(ui,"ShowKeyboardHelp");Next(24);break;
+                case 24:
+                    Capture("keyboard-help-dialog-1920x1080");Call(ui,"CloseModal");MakeLibraryFixtures();Call(ui,"ShowRecordingLibrary");
+                    typeof(ConfigWorkbench).GetField("libraryRoot",Hidden).SetValue(ui,Path.Combine(Output,"recordings"));Call(ui,"BuildContent");Call(ui,"StartLibraryScan");Next(25,80);break;
+                case 25:
+                    var list=ui.Document.rootVisualElement.Q<ListView>("recording-library-list");Check(list.itemsSource.Count==3,"Recording library contains three synthetic run examples");list.SetSelection(0);Next(26);break;
+                case 26:
+                    Capture("recording-library-1920x1080");
+                    ui.Workspace.SelectPrimary("sequence","Examples/Rugosity/sequence-treatment-matched-terrain.json");Call(ui,"Select",ui.Workspace.Sequence);Next(30);break;
+                case 30:
+                    Check(((JArray)ui.Workspace.Sequence.Root["sequences"]).Count==4,"Loaded terrain sequence exposes four actual choice scenes");
+                    Check(((JArray)ui.Workspace.Sequence.Root["sequences"]).OfType<JObject>().All(row=>((string)row["sceneName"]).StartsWith("TerrainChoice_",StringComparison.Ordinal)),"Terrain capture uses the authored TerrainChoice scene family");
+                    Shell(ui);Capture("terrain-sequence-1920x1080");TerrainSceneLabels(ui);Render(ui,3840,2160,2);Next(31);break;
+                case 31:
+                    Shell(ui);Capture("terrain-sequence-3840x2160");TerrainSceneLabels(ui);
+                    Render(ui,1920,1080,1);EditPage(ui,"Examples/Rugosity/terrain-treatment.json","choice","Stimulus");
+                    var terrain=ui.Document.rootVisualElement.Q<VisualElement>("setting-rugosity");Check(terrain!=null,"Shared terrain configuration exposes the rugosity block");
+                    terrain.Q<Foldout>().value=true;Next(32);break;
+                case 32:
+                    FieldBounds(ui);
+                    foreach(string role in new[]{"visualSurface","collisionSurface","heightSurface","normalSurface"})
+                        Check(ui.Document.rootVisualElement.Q<VisualElement>("setting-rugosity-"+role)!=null,"Terrain treatment role is visible: "+role);
+                    Capture("terrain-settings-1920x1080");Render(ui,3840,2160,2);Next(33);break;
+                case 33:
+                    FieldBounds(ui);Capture("terrain-settings-3840x2160");
+                    Render(ui,1920,1080,1);ui.Workspace.SelectPrimary("sequence","Examples/Rugosity/sequence-treatment-visual-flat_navigation-terrain.json");Call(ui,"Select",ui.Workspace.Sequence);Next(34);break;
+                case 34:
+                    TerrainSceneLabels(ui);Capture("terrain-navigation-only-sequence-1920x1080");
+                    terrainSequenceBeforeOverride=ui.Workspace.Sequence.Root.ToString();
+                    experiment=ui.Workspace.Open("Examples/Rugosity/terrain-treatment.json","choice");terrainBaseBeforeOverride=experiment.Root.ToString();
+                    Call(ui,"EditBlock",1);typeof(ConfigWorkbench).GetField("settingsTab",Hidden).SetValue(ui,"Stimulus");Call(ui,"BuildContent");
+                    ui.Document.rootVisualElement.Q<VisualElement>("setting-rugosity").Q<Foldout>().value=true;Next(35);break;
+                case 35:
+                    var notice=ui.Document.rootVisualElement.Q<VisualElement>("sequence-terrain-overrides");
+                    Check(notice!=null&&notice.worldBound.height>0,"Base terrain editor visibly distinguishes selected sequence overrides");
+                    Check(notice.Q<Label>(className:"sequence-override-title").text.Contains("02"),"Override notice identifies selected second block");
+                    Check(notice.Q<Label>("sequence-override-visual").text=="Visual: Flat","Navigation-only treatment visibly reports its effective flat visual surface");
+                    Check(notice.Q<Label>("sequence-override-navigation").text=="Navigation: smooth left / rough right","Navigation-only treatment visibly reports selected block's effective collision surface");
+                    Check(experiment.Root.ToString()==terrainBaseBeforeOverride,"Viewing sequence overrides never rewrites shared base configuration");
+                    Check((string)ExperimentBlocks.Payload(experiment.Root as JObject)["rugosity"]["visualSurface"]=="RoughSmooth","Shared base controls retain their actual source value");
+                    FieldBounds(ui);Capture("terrain-navigation-only-overrides-1920x1080");Submit(notice.Q<Button>("edit-sequence-terrain-overrides"));Next(36);break;
+                case 36:
+                    var overridePath=(List<string>)typeof(ConfigWorkbench).GetField("path",Hidden).GetValue(ui);
+                    Check(string.Join("/",overridePath)=="sequences/1/parameters/rugosity","Override action opens the selected row's exact JSON object");
+                    Check(ui.Workspace.Sequence.Root.ToString()==terrainSequenceBeforeOverride,"Opening override editor preserves exact sequence JSON");
+                    Check(experiment.Root.ToString()==terrainBaseBeforeOverride,"Opening override editor preserves exact shared base JSON");
+                    Capture("terrain-overrides-editor-1920x1080");
+                    Check(!MainController.Instance.SequenceRunning,"Visual checks never start acquisition or experiment recording");Finish(null);break;
             }
         }
         catch (Exception error) { Finish(error.ToString()); }

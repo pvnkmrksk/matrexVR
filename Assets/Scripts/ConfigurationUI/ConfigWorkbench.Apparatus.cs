@@ -274,6 +274,17 @@ namespace ConfigurationUI
                 map.RegisterCallback<GeometryChangedEvent>(e=>{
                     float scaledHeight=e.newRect.width/aspect;
                     if(Mathf.Abs(e.newRect.height-scaledHeight)>.5f)map.style.height=scaledHeight;
+                    // Use one pixel scale on both axes. Percentage rectangles
+                    // are independently rounded by Yoga and can turn equal
+                    // panel dimensions into 25 × 26 px rectangles.
+                    float units=e.newRect.width/width,backing=panel!=null?panel.scale:1;
+                    float Snap(double pixels)=>Mathf.Round((float)pixels*units*backing)/backing;
+                    foreach(var cell in map.Children())
+                        if(cell.userData is ApparatusPreviewCell bounds)
+                        {
+                            cell.style.left=Snap(bounds.Left);cell.style.top=Snap(bounds.Top);
+                            cell.style.width=Snap(bounds.Width);cell.style.height=Snap(bounds.Height);
+                        }
                 });
                 foreach(var rig in rigs.Where(r=>ApparatusOutputDisplay(r)==display))
                 {
@@ -287,7 +298,7 @@ namespace ConfigurationUI
                         var cell=new Label(order[slot].ToString()){name="apparatus-pixel-"+id+"-"+slot};cell.AddToClassList("apparatus-pixel-cell");
                         var colors=new[]{new Color(.20f,.43f,.42f),new Color(.23f,.38f,.57f),new Color(.48f,.37f,.20f),new Color(.39f,.29f,.48f),new Color(.49f,.27f,.28f),new Color(.22f,.43f,.49f)};
                         cell.style.backgroundColor=colors[rigs.IndexOf(rig)%colors.Length];
-                        cell.style.left=new Length((float)(left/width*100),LengthUnit.Percent);cell.style.top=new Length((float)(top/height*100),LengthUnit.Percent);cell.style.width=new Length((float)(panelWidth/width*100),LengthUnit.Percent);cell.style.height=new Length((float)(panelHeight/height*100),LengthUnit.Percent);
+                        cell.userData=new ApparatusPreviewCell {Left=left,Top=top,Width=panelWidth,Height=panelHeight};
                         cell.tooltip=id+" · "+order[slot]+" "+DesktopApparatusProfile.FaceName(order[slot])+" · slot "+(slot+1)+"\n"+panelWidth+" × "+panelHeight+" px at ("+left+", "+top+") from the top-left.";map.Add(cell);
                         if(left<0||top<0||left+panelWidth>width||top+panelHeight>height)section.Add(SessionLabel(id+" "+order[slot]+" exceeds this display’s preview bounds. Check panel size and start row/column.","apparatus-validation"));
                     }
@@ -295,6 +306,8 @@ namespace ConfigurationUI
                 }
             }
         }
+        private sealed class ApparatusPreviewCell
+        { public double Left,Top,Width,Height; }
         private static Tuple<int,int,int,int> PixelBounds(JObject rig)
         {
             int width=Math.Max(1,DesktopApparatusProfile.Integer(rig["ledPanelWidth"],128)),height=Math.Max(1,DesktopApparatusProfile.Integer(rig["ledPanelHeight"],128));

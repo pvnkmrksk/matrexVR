@@ -40,7 +40,7 @@ namespace ConfigurationUI
         }
         private void ShowKeyboardHelp()
         {
-            var dialog=OpenModal("Keyboard shortcuts","Tab / Shift+Tab moves between controls. Enter or Space activates the focused button; arrow keys change choices.");
+            var dialog=OpenModal("Keyboard shortcuts","Tab / Shift+Tab moves between controls. Enter or Space activates the focused button; arrow keys change choices.");dialog.AddToClassList("small-dialog");
             dialog.Add(new Label("⌘ / Ctrl+S   Save changes\n⌘ / Ctrl+Shift+J   Edit the current JSON\nAlt+1   Start\nAlt+2   Sequence\nAlt+3   Experiment settings\nAlt+4   Recordings\nAlt+5   Apparatus\nF1   Keyboard help\nEscape   Close a dialog or return to Start"));
             dialog.Add(new Label("Number fields: ↑ / ↓ steps the value; Shift uses larger steps, Alt smaller steps. Start experiment always requires its explicit button."));
         }

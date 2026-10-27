@@ -90,6 +90,7 @@ public class ReplayController : MonoBehaviour
     private Bounds trajectoryBounds;
     private GUIStyle titleStyle, smallStyle;
     private GUISkin replaySkin;
+    private ReplayInterfaceSkin replayInterface;
     private float replaySkinScale;
     private bool pointerTrace;
     private readonly GUIContent playContent=new GUIContent();
@@ -676,14 +677,13 @@ public class ReplayController : MonoBehaviour
             Debug.Log("[Replay pointer] IMGUI frame="+Time.frameCount+" type="+Event.current.type+" position="+Event.current.mousePosition+" legacyPosition="+legacyPosition+" screen="+Screen.width+"x"+Screen.height+" scale="+scale);
         if(replaySkin==null)
         {
-            replaySkin=Instantiate(GUI.skin);replaySkin.name="Replay controls";
-            replaySkin.font=Resources.Load<Font>("ConfigurationUI/Fonts/Inter-Regular")??GUI.skin.font;
-            titleStyle=new GUIStyle(replaySkin.label){fontStyle=FontStyle.Bold};
-            smallStyle=new GUIStyle(replaySkin.label){wordWrap=true};
+            replayInterface=new ReplayInterfaceSkin(GUI.skin);replaySkin=replayInterface.Skin;
+            titleStyle=replayInterface.Title;smallStyle=replayInterface.Small;
         }
         if(!Mathf.Approximately(replaySkinScale,scale))
         {
             replaySkinScale=scale;
+            replayInterface.ApplyScale(scale);
             foreach(var style in new[]{replaySkin.label,replaySkin.button,replaySkin.toggle,replaySkin.textField})
             {style.font=replaySkin.font;style.fontSize=Mathf.Max(1,Mathf.RoundToInt(14*scale));}
             replaySkin.button.fixedHeight=30*scale;replaySkin.button.padding=new RectOffset(Mathf.RoundToInt(8*scale),Mathf.RoundToInt(8*scale),Mathf.RoundToInt(5*scale),Mathf.RoundToInt(5*scale));
@@ -730,7 +730,7 @@ public class ReplayController : MonoBehaviour
             x=left;playContent.text=isPlaying?"Pause":"Play";
             Rect playRect=ReplayControlRect(ref x,top,64*scale,rowHeight);
             TraceReplayButton("pause-before",playRect);
-            bool playClicked=GUI.Button(playRect,playContent);
+            bool playClicked=GUI.Button(playRect,playContent,replayInterface.PrimaryButton);
             TraceReplayButton("pause-after",playRect,playClicked);
             if(playClicked){ClearPathFocus();isPlaying=!isPlaying;}
             if(ReplayButton(ReplayControlRect(ref x,top,52*scale,rowHeight),"−10s"))Seek(replayTime-10);
@@ -825,7 +825,7 @@ public class ReplayController : MonoBehaviour
         mediaPanel?.Dispose();recordedDashboard?.CloseSession();
         if(previewCamera!=null)previewCamera.targetTexture=null;
         if(animalPreviewTexture!=null){animalPreviewTexture.Release();Destroy(animalPreviewTexture);}
-        if(replaySkin!=null)Destroy(replaySkin);
+        replayInterface?.Dispose();
         foreach(var population in populations)population.stream.Dispose();populations.Clear();
         if(pendingLoad!=null)
             pendingLoad.ContinueWith(task=>{if(task.Status==TaskStatus.RanToCompletion)foreach(var stream in task.Result.agents)stream.Dispose();});

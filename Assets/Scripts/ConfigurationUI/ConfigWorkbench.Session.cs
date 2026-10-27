@@ -86,21 +86,45 @@ namespace ConfigurationUI
         {
             EnsureDailyWorkspace();EnsureMetadata();UseApparatusStyles();
             var scroll=new ScrollView {name="start-workspace",horizontalScrollerVisibility=ScrollerVisibility.Hidden};scroll.AddToClassList("session-scroll");body.Add(scroll);
-            if(ApparatusConfigured)BuildDailyRunHeader(scroll);else BuildDemoLauncher(scroll);
+            VisualElement sequenceParent=scroll;
+            if(ApparatusConfigured)BuildDailyRunHeader(scroll);
+            else
+            {
+                var overview=Row("home-overview");scroll.Add(overview);
+                var launcher=new VisualElement();launcher.AddToClassList("home-launcher");overview.Add(launcher);BuildDemoLauncher(launcher);
+                sequenceParent=new VisualElement();sequenceParent.AddToClassList("home-sequence");overview.Add(sequenceParent);
+            }
             string order=(ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])?"Random order":"Listed order")+
                 " · "+(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass");
             var planHeading=SessionHeading("Experiment sequence","sequence",BuilderSteps.Count+(BuilderSteps.Count==1?" block · ":" blocks · ")+SequenceDuration()+" · "+order);
             var load=StudioButton("Load sequence","file",ShowSequenceLibrary,"quiet");load.name="session-load-sequence";load.tooltip="Choose a prepared terrain treatment or swarm/social sequence. The current apparatus and other drafts are retained.";planHeading.Add(load);
-            var edit=StudioButton("Edit sequence","settings",()=>Select(Workspace.Sequence),"quiet");edit.name="session-edit-sequence";planHeading.Add(edit);scroll.Add(planHeading);
+            var edit=StudioButton("Edit sequence","settings",()=>Select(Workspace.Sequence),"quiet");edit.name="session-edit-sequence";planHeading.Add(edit);sequenceParent.Add(planHeading);
             var summaryIndices=Enumerable.Range(0,BuilderSteps.Count).ToList();
             var plan=new ListView(summaryIndices,64,()=>new VisualElement(),BindSessionBlock)
             {name="session-plan",selectionType=SelectionType.None,virtualizationMethod=CollectionVirtualizationMethod.FixedHeight};
-            plan.AddToClassList("session-plan");plan.style.height=Math.Min(5,Math.Max(1,BuilderSteps.Count))*64;scroll.Add(plan);
-            if(BuilderSteps.Count==0)scroll.Add(StudioButton("Add your first block","plus",()=>{Select(Workspace.Sequence);ShowBlockLibrary();},"primary"));
+            plan.AddToClassList("session-plan");plan.style.height=Math.Min(5,Math.Max(1,BuilderSteps.Count))*64;sequenceParent.Add(plan);
+            if(BuilderSteps.Count==0)sequenceParent.Add(StudioButton("Add your first block","plus",()=>{Select(Workspace.Sequence);ShowBlockLibrary();},"primary"));
+            BuildRecordingSummary(scroll);
             var recording=new Foldout {name="recording-details",text="Animal & recording details",value=sessionDetailsOpen};recording.AddToClassList("recording-details");scroll.Add(recording);
             recording.tooltip="Animal labels, experimenter and notes saved with the recording. Species and tracking hardware are configured separately.";
             recording.RegisterValueChangedCallback(e=>sessionDetailsOpen=e.newValue);BuildSessionDetails(recording);
             RefreshStartCaption();UpdateStatus();
+        }
+        private void BuildRecordingSummary(VisualElement parent)
+        {
+            var summary=Row("recording-summary");summary.name="recording-summary";parent.Add(summary);
+            summary.Add(new WorkbenchIcon("camera"));
+            var title=SessionLabel("Recording","recording-summary-title");summary.Add(title);
+            var state=SessionLabel("","recording-summary-state");state.name="recording-summary-state";summary.Add(state);
+            Action refresh=()=>{
+                var videoRigs=DesktopApparatusProfile.Rigs(Workspace.System.Root).Where(r=>TrackerBackend.TryParse(r["closedLoopMode"]?.ToString(),out var mode)&&(TrackerBackend.IsFlight(mode)||TrackerBackend.IsWalking(mode))).ToList();
+                int videoCount=videoRigs.Count(r=>{JToken value=(r["tracker"] as JObject)?["saveVideo"];return value?.Type!=JTokenType.Boolean||(bool)value;});
+                state.text="Save tracking data"+(videoRigs.Count==0?" · external video source":videoCount==videoRigs.Count?" · tracker video ON":" · tracker video "+videoCount+" / "+videoRigs.Count+" ON");
+            };refresh();state.schedule.Execute(refresh).Every(500);
+            summary.tooltip="Tracking data and configuration snapshots are saved with each experiment. Tracker video follows each rig’s saveVideo setting. Change recording options in Animal & recording details before initializing tracking.";
+            var options=StudioButton("Options","settings",()=>{
+                sessionDetailsOpen=true;var details=root.Q<Foldout>("recording-details");if(details!=null){details.value=true;details.schedule.Execute(()=>details.GetFirstAncestorOfType<ScrollView>()?.ScrollTo(details));}
+            },"quiet");options.name="recording-summary-options";summary.Add(options);
         }
         private void BuildDemoLauncher(VisualElement parent)
         {
@@ -218,11 +242,12 @@ namespace ConfigurationUI
                 sexField.RegisterValueChangedCallback(e=>fly.Sex=e.newValue);
                 SessionField(traits,"Age (days)","subject-age-"+id,fly.AgeDays,v=>fly.AgeDays=v,"Unspecified");
                 SessionField(card,"Comments","subject-comments-"+id,fly.Comments,v=>fly.Comments=v,"Notes for "+id,true);
-                if(TrackerBackend.TryParse(rig["closedLoopMode"]?.ToString(),out var videoMode)&&(videoMode==ClosedLoopMode.Rekkefly||videoMode==ClosedLoopMode.Hejjetrac))
+                if(TrackerBackend.TryParse(rig["closedLoopMode"]?.ToString(),out var videoMode)&&(TrackerBackend.IsFlight(videoMode)||TrackerBackend.IsWalking(videoMode)))
                 {
                     var videoRow=Row("recording-video-option");videoRow.style.marginTop=8;videoRow.style.marginBottom=8;
                     var videoLabel=SessionLabel("Save tracker video","session-hint");videoLabel.style.flexGrow=1;videoLabel.style.flexBasis=0;videoRow.Add(videoLabel);
-                    var video=StateSwitch(DesktopApparatusProfile.Flag(rig["tracker"]?["saveVideo"]),enabled=>StudioEdit(Workspace.System,r=>{
+                    JToken videoSetting=(rig["tracker"] as JObject)?["saveVideo"];
+                    var video=StateSwitch(videoSetting?.Type==JTokenType.Boolean?(bool)videoSetting:true,enabled=>StudioEdit(Workspace.System,r=>{
                         var current=(r["configs"] as JArray).OfType<JObject>().First(row=>(string)row["vrId"]==id);
                         if(!(current["tracker"] is JObject tracker)){tracker=new JObject();current["tracker"]=tracker;}tracker["saveVideo"]=enabled;
                     },false),"recording-save-video-"+id);
@@ -284,9 +309,9 @@ namespace ConfigurationUI
             var number=new Label((index+1).ToString("00")); number.AddToClassList("block-number"); row.Add(number);
             row.Add(new WorkbenchIcon((string)block["sceneName"]=="Swarm"?"swarm":"motion"));
             var text=new VisualElement(); text.style.flexGrow=1; text.style.flexBasis=0; row.Add(text);
-            var name=new Label(ExperimentBlocks.Title(BlockReference(block))); name.AddToClassList("session-plan-title"); text.Add(name);
+            var name=new Label(BlockCaption(block)); name.AddToClassList("session-plan-title"); text.Add(name);
             var config=BlockDocument(index)?.Root as JObject;
-            var description=new Label(ExperimentBlocks.Describe(config)); description.AddToClassList("session-plan-description"); text.Add(description);
+            var description=new Label(BlockDescription(block,config)); description.AddToClassList("session-plan-description"); text.Add(description);
             row.Add(Pill((string)block["sceneName"]));
             row.Add(Pill(ExperimentBlocks.Time(ExperimentBlocks.EffectiveDuration(config,ExperimentBlocks.Number(block["duration"])))));
             row.Add(IconButton("settings","Edit experiment "+(index+1),()=>EditBlock(index)));

@@ -114,12 +114,12 @@ namespace ConfigurationUI
             var heading=Row("block-heading"); card.Add(heading);
             var number=new Label((index+1).ToString("00")); number.AddToClassList("block-number"); heading.Add(number);
             string scene=(string)step["sceneName"]??"No scene"; heading.Add(new WorkbenchIcon(scene=="Swarm"?"swarm":scene=="Optomotor"?"settings":"motion"));
-            var name=new Label(ExperimentBlocks.Title(BlockReference(step))); name.AddToClassList("block-name"); heading.Add(name);
-            heading.Add(Pill(scene));
+            var name=new Label(BlockCaption(step)); name.AddToClassList("block-name"); heading.Add(name);
+            var sceneLabel=Pill(SceneCaption(scene));sceneLabel.tooltip="Unity scene: "+scene;heading.Add(sceneLabel);
             heading.Add(IconButton("copy","Duplicate block",()=>DuplicateBlock(index)));
             heading.Add(IconButton("trash","Remove block",()=>RemoveBlock(index)));
             var doc=BlockDocument(index); JObject config=doc?.Root as JObject;
-                var description=new Label(ExperimentBlocks.Describe(config)); description.AddToClassList("block-description"); card.Add(description);
+                var description=new Label(BlockDescription(step,config)); description.AddToClassList("block-description"); card.Add(description);
             var bottom=Row("block-bottom"); card.Add(bottom);
             bottom.Add(Pill(ExperimentBlocks.Time(ExperimentBlocks.EffectiveDuration(config,ExperimentBlocks.Number(step["duration"])))));
             if(ExperimentBlocks.Phased(config)) bottom.Add(Pill("Phase timeline","muted-pill"));
@@ -264,13 +264,13 @@ namespace ConfigurationUI
             if(selected==Workspace.Sequence && Block(activeBlock) is JObject step)
             {
                 inspector.Add(new Label("SELECTED BLOCK "+(activeBlock+1).ToString("00")));
-                inspector.Add(new Label(ExperimentBlocks.Title(BlockReference(step))) { name="selected-block-title" });
+                inspector.Add(new Label(BlockCaption(step)) { name="selected-block-title" });
                 var config=BlockDocument(activeBlock)?.Root as JObject;
-                inspector.Add(new Label(ExperimentBlocks.Describe(config)));
+                inspector.Add(new Label(BlockDescription(step,config)));
                 if(ExperimentBlocks.Phased(config)) inspector.Add(new Label("Its phase timeline owns run timing. The outer duration is retained as a fallback."));
                 var sceneChoices=ScenesFor(ConfigSchema.ForScene((string)step["sceneName"]));
                 string scene=(string)step["sceneName"]??"Choice"; if(!sceneChoices.Contains(scene)) sceneChoices.Add(scene);
-                var dropdown=new DropdownField("Environment",sceneChoices,Math.Max(0,sceneChoices.IndexOf(scene))) { tooltip="Unity scene used for this block. Its experiment file controls the stimulus and movement settings." }; inspector.Add(dropdown);
+                var dropdown=new DropdownField("Environment",sceneChoices,Math.Max(0,sceneChoices.IndexOf(scene))) { tooltip="Unity scene used for this block. Its experiment file controls the stimulus and movement settings." }; dropdown.formatSelectedValueCallback=SceneOptionCaption;dropdown.formatListItemCallback=SceneCaption;inspector.Add(dropdown);
                 dropdown.RegisterValueChangedCallback(e=>StudioEdit(Workspace.Sequence,r=>r["sequences"][activeBlock]["sceneName"]=e.newValue));
                 var schema=(JObject)Workspace.Schemas.Get("sequence")["properties"]["sequences"]["items"];
                 foreach(string key in new[]{"duration","gain","autoTrim","reloadScene"})
@@ -309,7 +309,12 @@ namespace ConfigurationUI
         }
         private string SystemSyncSummary()
         { int sync=(int)ExperimentBlocks.Number(Workspace.System.Root["vSyncCount"]); return sync>0?"vSync /"+sync+" · software FPS target overridden":"Software FPS target: "+(Workspace.System.Root["targetFrameRate"]?.ToString()??"120"); }
-        private string SystemDisplaySummary() => "Display "+(Workspace.System.Root["targetDisplay"]?.ToString()??"1")+" · "+(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().Sum(r=>(r["displayOrder"]?.ToString()??"").Length)+" configured camera faces";
+        private string SystemDisplaySummary()
+        {
+            var displays=DesktopApparatusProfile.Rigs(Workspace.System.Root).GroupBy(ApparatusOutputDisplay).OrderBy(group=>group.Key).ToList();
+            if(displays.Count==0)return "Display "+(ApparatusDisplayFallback+1)+" · no configured camera faces";
+            return string.Join("\n",displays.Select(group=>"Display "+(group.Key+1)+" · "+group.Sum(r=>(r["displayOrder"]?.ToString()??"").Length)+" configured camera faces"));
+        }
         private List<string> ScenesFor(string schema)
         {
             var list=new List<string>(); for(int i=0;i<SceneManager.sceneCountInBuildSettings;i++) { string name=Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i)); if(name!="ControlScene" && name!="ReplayScene" && ConfigSchema.ForScene(name)==schema) list.Add(name); }
@@ -340,7 +345,7 @@ namespace ConfigurationUI
             var dialog=OpenModal(replace.HasValue?"Choose a new config":"Add an experiment block","Complete configurations become reusable blocks. No parameter-by-parameter setup.");
             var controls=Row(); dialog.Add(controls);
             var find=new TextField("Search") { name="preset-search" }; find.style.flexGrow=1; controls.Add(find);
-            var category=new DropdownField(new List<string>{"All","Flight","Swarm","Walking","Optomotor","Choice","Dynamic choice","Custom","Archive"},0); controls.Add(category);
+            var category=new DropdownField(new List<string>{"All","Flight","Swarm","Walking","Optomotor","Choice","Terrain","Dynamic choice","Custom","Archive"},0); controls.Add(category);
             var layout=Row("library-layout"); dialog.Add(layout); var visible=new List<ExperimentPreset>(presets); ExperimentPreset chosen=null;
             var preview=new ScrollView(); preview.AddToClassList("library-preview");
             var scenes=new DropdownField("Environment",ScenesFor("choice"),0); scenes.name="preset-scene";
@@ -371,7 +376,7 @@ namespace ConfigurationUI
         }
         private void ShowOpenFile()
         {
-            RequireApplied(); var dialog=OpenModal("Open configuration","Choose a system, sequence, or experiment JSON file. Paths may be relative to StreamingAssets or absolute.");
+            RequireApplied(); var dialog=OpenModal("Open configuration","Choose a system, sequence, or experiment JSON file. Paths may be relative to StreamingAssets or absolute.");dialog.AddToClassList("small-dialog");
             var source=new TextField("File path"); dialog.Add(source);
             var role=new DropdownField("Configuration type",new List<string>{"sequence","system","choice","swarm","kannadi","optomotor","dynamic-choice"},0); dialog.Add(role);
             dialog.Add(StudioButton("Open file","file",()=>{ if(role.value=="sequence" || role.value=="system") { Workspace.SelectPrimary(role.value,source.value); CloseModal(); Select(role.value=="sequence"?Workspace.Sequence:Workspace.System); } else { var doc=Workspace.Open(source.value,role.value); CloseModal(); Select(doc); } },"primary"));
@@ -379,7 +384,7 @@ namespace ConfigurationUI
         private void ShowVariation(int? block)
         {
             RequireApplied(); var doc=block.HasValue?BlockDocument(block.Value):selected; if(doc==null) throw new IOException("Configuration is unavailable.");
-            var dialog=OpenModal("Create a variation","The complete JSON is copied. Other blocks keep their original config.");
+            var dialog=OpenModal("Create a variation","The complete JSON is copied. Other blocks keep their original config.");dialog.AddToClassList("small-dialog");
             var destination=new TextField("New path") { value="UserConfigs/"+Path.GetFileNameWithoutExtension(doc.Path)+"-variation.json" }; dialog.Add(destination);
             dialog.Add(StudioButton("Create variation","copy",()=>{
                 string target=Path.IsPathRooted(destination.value)?destination.value:Path.Combine(RuntimePaths.ConfigRoot,destination.value);
