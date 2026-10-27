@@ -369,15 +369,6 @@
       "zmq_dropped": 0
     }
   },
-  "nativeInteractionReview": {
-    "mouseNavigation": "Sequence page visibly opened through native coordinate click.",
-    "numericTextEntry": "Duration field accepted7; restored600beforeblur, matching original. No configuration was saved by this test.",
-    "systemQuit": "CmdQ closed the native app normally.",
-    "setupEscape": "Confirmed source gate fixed;17entrypoint regression checks passed. Final physical check not completed.",
-    "F1AndTab": "CUA attempts did not establish a visible shortcut/focus result; no unsupported claim of acceptance.",
-    "lastBlocker": "Computer-use tool reported Mac locked and automaticunlock unavailable. No attempt to bypass lock.",
-    "finalState": "Final app launched with preview profile; machine locked during final keyboardcheck."
-  },
   "offlineChecks": {
     "effectiveDefaults": 40,
     "primaryActionAndRuntimeEscape": 17,
@@ -398,5 +389,95 @@
     "/Users/pavan/src/ledpanelVR/.local/review-20261027/final-led-player/display.png": "8722515a5511b3b67c969eb77cbc9b13060a5fea13d10cf65329b76829e9da1c",
     "/Users/pavan/src/ledpanelVR/.local/review-20261027/replay-rekkefly/display.png": "4a9bf3fc9c1e7f8a3b086a57c03ce4c42610383e3842db7037f47da22a02adb1",
     "/Users/pavan/src/ledpanelVR/.local/review-20261027/replay-hejjetrac/display.png": "df4633ed16b501eb51f1f6aded8a08fc621243d8ed60d3f9e7f0427da9f9a713"
+  },
+  "historicalNativeInteractionReview": {
+    "mouseNavigation": "Sequence page visibly opened through native coordinate click.",
+    "numericTextEntry": "Duration field accepted7; restored600beforeblur, matching original. No configuration was saved by this test.",
+    "systemQuit": "CmdQ closed the native app normally.",
+    "setupEscape": "Confirmed source gate fixed;17entrypoint regression checks passed. Final physical check not completed.",
+    "F1AndTab": "CUA attempts did not establish a visible shortcut/focus result; no unsupported claim of acceptance.",
+    "lastBlocker": "Computer-use tool reported Mac locked and automaticunlock unavailable. No attempt to bypass lock.",
+    "finalState": "Final app launched with preview profile; machine locked during final keyboardcheck."
+  },
+  "latestNativeInteractionReview": {
+    "status": "passed-native-interactions-and-handoff",
+    "report": "native-interaction-review-20261027-results.json",
+    "handoff": {
+      "system": "/Users/pavan/src/ledpanelVR/.local/Preview Config/Apparatus/system.json",
+      "sequence": "/Users/pavan/src/ledpanelVR/.local/Preview Config/Examples/Rugosity/sequence-treatment-matched-terrain.json",
+      "label": "Terrain · matched relief",
+      "rigs": 4,
+      "input": "HejjéTrac",
+      "presentation": "LED panels",
+      "panelPixels": [
+        128,
+        128
+      ],
+      "terrainBlocks": 4,
+      "blockDurationSeconds": 30,
+      "trackingStarted": false,
+      "experimentStarted": false,
+      "page": "Start / Ready to run",
+      "screenBackingPixels": [
+        3024,
+        1898
+      ],
+      "uiScale": 2,
+      "totalSeconds": 120,
+      "sequenceOrder": [
+        "TerrainChoice_RoughLeft_SmoothRight",
+        "TerrainChoice_SmoothLeft_RoughRight",
+        "TerrainChoice_BothSmooth",
+        "TerrainChoice_BothRough"
+      ],
+      "trackerVideo": "ON",
+      "stateVerification": "Native screenshot visibly showed all four terrain blocks and four LED HejjéTrac rigs after Enter loaded the sequence and Alt+1 returned to Start. Neither Initialize tracking nor Start experiment was activated.",
+      "persistence": "Current open workspace. The launcher still opens the demo workspace; saved apparatus and original social sequence were not overwritten."
+    },
+    "checks": 452,
+    "note": "Earlier build, screenshots, and profiling remain historical evidence with unchanged identities."
+  },
+  "latestBuild": {
+    "version": "0.3.1-local-review",
+    "target": "StandaloneOSX",
+    "result": "Succeeded",
+    "errors": 0,
+    "warnings": 55,
+    "bytes": 450893247,
+    "buildGuid": "9f54066433d64bb1931d5b31f0f77ef4",
+    "scenes": [
+      "Assets/Scenes/ControlScene.unity",
+      "Assets/Scenes/Optomotor.unity",
+      "Assets/Scenes/Swarm.unity",
+      "Assets/Scenes/Choice.unity",
+      "Assets/Scenes/Choice_desync.unity",
+      "Assets/Scenes/ReplayScene.unity",
+      "Assets/Scenes/Kannadi.unity",
+      "Assets/Scenes/Choice_Selwyn.unity",
+      "Assets/Scenes/Rugosity_RS.unity",
+      "Assets/Scenes/TerrainCueLab.unity",
+      "Assets/Scenes/TerrainChoice_RoughLeft_SmoothRight.unity",
+      "Assets/Scenes/TerrainChoice_SmoothLeft_RoughRight.unity",
+      "Assets/Scenes/TerrainChoice_BothSmooth.unity",
+      "Assets/Scenes/TerrainChoice_BothRough.unity"
+    ]
+  },
+  "latestIdentity": {
+    "schemaVersion": 1,
+    "sourceRevision": "50dd1bb0fc3a0b23d971322f21daed5c4d40a3da",
+    "sourceState": "working-tree-snapshot",
+    "sourceTreeDirty": true,
+    "runtimeSourceFingerprintSha256": "e6b21f23431e8e694b24f9002041d203773798c99c5a3a84488fbc09877a4764",
+    "runtimeSourceFileCount": 225,
+    "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint.",
+    "dirtyPathsAtPreparation": [
+      "?? Assets/StreamingAssets/Archive/Legacy/Templates/README.md.meta",
+      "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config.py.meta",
+      "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config_choice.py.meta",
+      "?? Assets/StreamingAssets/Archive/README.md.meta"
+    ],
+    "applicationVersion": "0.3.1-local-review",
+    "unityVersion": "6000.3.16f1",
+    "buildTarget": "StandaloneOSX"
   }
 }

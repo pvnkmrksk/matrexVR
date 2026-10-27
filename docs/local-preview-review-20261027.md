@@ -2,6 +2,8 @@
 
 This review follows the operator feedback on the first local preview. Work is on `codex/seamless-desktop-experience`, with local commits only. No release, push, or Windows/Linux build was made.
 
+The current Mac player is **open on Ready to run** with the saved **four-rig HejjéTrac LED apparatus** and **Terrain · matched relief** loaded: four 30-second blocks, listed order, one pass. Tracking and the experiment have not been started. The saved apparatus, original social sequence, terrain sequence, and shared terrain defaults remain byte-identical to their pre-check files.
+
 ## Open the app
 
 Use `.local/Open MATREX Preview.command`, which opens `.local/MATREX VR.app` with the isolated `.local/Preview Config` profile. Its active recording root is `.local/MATREX VR RunData`; the recordings library displays that exact root. Existing untouched terrain example files in the preview profile were upgraded with backups under `.local/review-20261027/profile-backup`. Existing calibration and apparatus routing are retained. Video recording was enabled for the preview profile's explicitly disabled VR1 setting; omitted supported tracker settings now default to recording video.
@@ -32,12 +34,24 @@ The apparent 60 FPS ceiling was the configured frame cap. On this M2 Pro, the st
 
 The test inputs are generated or previously recorded. Physical camera calibration, animal experiments, displayed LED timing, and acceptance of mouse gestures remain operator checks unless explicitly noted in the final player capture results.
 
-## Final packaged-player verification
+## Earlier packaged-player verification
 
 `0.3.1-local-review` was built from source commit `54206323` with zero errors and 56 warnings, and its app signature passed verification. The final native setup capture is 3024×1898 with direct framebuffer rendering at 2× UI scale. The app is launched at `.local/MATREX VR.app` with `.local/Preview Config`; run data resolves to `.local/MATREX VR RunData`.
 
 Both native replay screenshots visibly show their saved tracker video together with the animal front view and overview. A separate foreground test of the packaged player, while a generated native tracker recorded MJPEG, held 59.6 FPS at its 60 FPS cap and reached 2,293 FPS uncapped. Every one of its six cameras was 128×128 on display 0, tracking input stayed fresh, and all 1,800 accepted native video frames were written without recording errors. These captures/profiling used `774ebfa2`; the final `54206323` adds only the setup Escape input correction. The full results preserve this distinction.
 
-Native coordinate navigation and numeric text entry worked. The duration field was restored to its original value before leaving; no profile settings were saved by that check. The review also fixed setup Escape being swallowed by the generic text-input guard; 17 checks now exercise the actual runtime gate. F1/Tab injection through the computer-control tool did not establish visible acceptance. The Mac then locked before the final physical keyboard check, so that check remains explicit rather than reported as passed. The app was left launched for operator review.
+Native coordinate navigation and numeric text entry worked. The duration field was restored to its original value before leaving; no profile settings were saved by that check. The review also fixed setup Escape being swallowed by the generic text-input guard; 17 checks exercise the actual runtime gate. The Mac locked before keyboard acceptance at that stage. The unlocked checks below supersede that limitation; these earlier screenshots and profiling retain their original build identities.
 
-[Structured final-player evidence](local-player-review-20261027-results.json) · [UI gallery/source hashes](ui-design-review-20261027-results.json). All screenshots and the gallery ZIP remain under `.local/review-20261027`.
+## Unlocked native interaction check and current build
+
+The current `0.3.1-local-review` player was built from `50dd1bb0` with zero errors and 55 warnings, and passed `codesign --verify --strict`. Commit `fa50886a` restores focus after page navigation or closing a modal while preserving active text inputs. Native F1 worked immediately after startup and page navigation; Alt+1/2/5 navigation, Escape, and visible Tab focus were accepted.
+
+The native check exposed a second bug that the original editor test missed: Unity InputForUI emits a Tab KeyDown and a separate Next/Previous navigation event, causing two focus moves. Commit `50dd1bb0` assigns the move to the navigation event and traps it at the document while a modal is open. The corrected test reproduces the old skip and passes **452 checks** with the fix. The rebuilt native player then passed Close → Sequence dropdown → Open custom JSON → Load sequence → Close, reverse traversal, wraparound, and Return on Load. Return loaded the four terrain blocks, and Alt+1 returned to the requested Ready to run page.
+
+Replay checks used a disposable profile and an eight-second generated/prerecorded recording. Space paused playback; Left moved one second; M/N changed sequence contexts. Forward and reverse mouse timeline drags changed the scene, animal view, and tracker video together. Wheel zoom and Fit, held W/I camera translation and tilt, preview enlargement, view switching, and Escape from the offset dialog all worked visibly. No errors or exceptions appeared in the replay player log. These checks used `fa50886a`; the final build changes only setup modal keyboard routing.
+
+Right- and middle-button held drags were not exercised because the computer-control drag API supports a left-button drag. Wheel zoom and keyboard camera transforms were exercised. Physical camera calibration, animal experiments, and displayed LED timing remain operator checks.
+
+The app remains open at `.local/MATREX VR.app`, using `.local/Preview Config` and `.local/MATREX VR RunData`. Its current workspace references `Apparatus/system.json` and `Examples/Rugosity/sequence-treatment-matched-terrain.json`. Each LED face is configured as 128×128, with six faces per rig. Restarting through the existing launcher still opens the demo workspace; the original apparatus social sequence was preserved rather than overwritten to change startup selection.
+
+[Native interaction and handoff evidence](native-interaction-review-20261027-results.json) · [Structured player evidence](local-player-review-20261027-results.json) · [UI gallery/source hashes](ui-design-review-20261027-results.json). All screenshots, native keyboard traces, and the gallery ZIP remain under `.local/review-20261027`.

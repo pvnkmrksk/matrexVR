@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-27",
+  "status": "passed-native-interactions-and-handoff",
+  "application": "/Users/pavan/src/ledpanelVR/.local/MATREX VR.app",
+  "launcher": "/Users/pavan/src/ledpanelVR/.local/Open MATREX Preview.command",
+  "scope": "Native CUA actions against signed local Mac player; generated/prerecorded diagnostic replay; saved LED profile viewed without beginning acquisition.",
+  "supersedes": "The locked-Mac keyboard limitation in the earlier local-player report is superseded by these unlocked native checks. Earlier screenshots and performance results retain their original build identities.",
+  "keyboard": [
+    {
+      "action": "F1 after startup",
+      "result": "Keyboard shortcuts dialog opened in rebuilt fa50886a player before any text-field click."
+    },
+    {
+      "action": "Escape, Alt+2, F1",
+      "result": "Dialog closed, sequence page opened, keyboard help opened again; no pointer/text focus priming."
+    },
+    {
+      "action": "Escape then Tab",
+      "result": "Visible focus outline on Auto start control."
+    },
+    {
+      "action": "Tab, Shift+Tab, Return in keyboard help",
+      "result": "Focus trapped in dialog; Return closed it."
+    },
+    {
+      "action": "Escape from sequence setup",
+      "result": "Returned to Start without quitting."
+    },
+    {
+      "action": "Alt+5 and Alt+1",
+      "result": "Opened apparatus and returned to Start."
+    },
+    {
+      "action": "Final 50dd1bb0: F1 before any click; Tab, Shift+Tab, Return; Alt+5",
+      "result": "Help opened at startup, its Close control retained focus, Return closed it, and Alt+5 opened apparatus settings."
+    },
+    {
+      "action": "Final sequence picker: Tab, Shift+Tab, forward and reverse wrap",
+      "result": "Exact Close → Sequence dropdown → Open custom JSON → Load sequence → Close traversal. Reverse steps returned Dropdown → Close and Close → Load. Native focus events and visible outlines remained inside the modal."
+    },
+    {
+      "action": "Return on focused Load sequence, then Alt+1",
+      "result": "Loaded all four matched-relief terrain blocks, closed the picker, and returned to Ready to run with the saved four LED rigs. No tracking or experiment started."
+    }
+  ],
+  "replay": [
+    {
+      "action": "Space",
+      "result": "Play/Pause changed and the replay clock stopped."
+    },
+    {
+      "action": "Left arrow",
+      "result": "Paused clock changed from 4.0 to 3.0 seconds, scene changed from Choice_desync to Choice, and video frame 264 was visible."
+    },
+    {
+      "action": "M then N",
+      "result": "Next and previous sequence contexts selected at 4.0 and 0.0 seconds. Before the first consumed-input anchor, the camera panel explicitly reported no associated frame."
+    },
+    {
+      "action": "Left-button timeline drag forward and backward",
+      "result": "Forward seek reached 5.8 seconds / frame 433 in Choice_desync; reverse seek reached 2.8 seconds / frame 254 in Choice. Animal view and tracker video followed the seek."
+    },
+    {
+      "action": "Mouse wheel in overview, then Fit",
+      "result": "Wheel zoomed out to a broad scene view; Fit restored the original framing."
+    },
+    {
+      "action": "Hold W and I",
+      "result": "Camera translated and tilted; marker position and scene geometry visibly changed while replay remained paused."
+    },
+    {
+      "action": "Preview plus",
+      "result": "Animal and video previews enlarged with preserved aspect ratio without covering the timeline."
+    },
+    {
+      "action": "Set offset, then Escape",
+      "result": "Offset modal closed while replay stayed open and paused. No offset was applied."
+    },
+    {
+      "action": "Animal view / God’s eye view selector",
+      "result": "Main camera switched between recorded animal view and overview while tracker video remained visible."
+    }
+  ],
+  "replayFixture": {
+    "path": "/Users/pavan/src/ledpanelVR/.local/replay-video-acceptance-20261027b/panel/copied-run",
+    "durationSeconds": 8,
+    "scenes": [
+      "Choice",
+      "Choice_desync"
+    ],
+    "trackerVideo": "Generated / prerecorded Rekkefly footage",
+    "configurationAndData": "Disposable native-interactions profile; no live acquisition."
+  },
+  "sourceCorrections": [
+    {
+      "revision": "fa50886a",
+      "behavior": "Restore keyboard focus after page replacement or modal close without taking focus from active inputs."
+    },
+    {
+      "revision": "50dd1bb0",
+      "behavior": "Consume the Tab KeyDown and perform exactly one modal focus move for the separate Unity InputForUI Next/Previous navigation event. A root callback also catches stale background targets; callbacks are removed when the modal closes."
+    }
+  ],
+  "openDefects": [],
+  "handoff": {
+    "status": "verified-open-ready",
+    "requested": {
+      "system": "/Users/pavan/src/ledpanelVR/.local/Preview Config/Apparatus/system.json",
+      "sequence": "/Users/pavan/src/ledpanelVR/.local/Preview Config/Examples/Rugosity/sequence-treatment-matched-terrain.json",
+      "label": "Terrain · matched relief",
+      "rigs": 4,
+      "input": "HejjéTrac",
+      "presentation": "LED panels",
+      "panelPixels": [
+        128,
+        128
+      ],
+      "terrainBlocks": 4,
+      "blockDurationSeconds": 30,
+      "trackingStarted": false,
+      "experimentStarted": false
+    },
+    "verifiedFinalWorkspace": {
+      "system": "/Users/pavan/src/ledpanelVR/.local/Preview Config/Apparatus/system.json",
+      "sequence": "/Users/pavan/src/ledpanelVR/.local/Preview Config/Examples/Rugosity/sequence-treatment-matched-terrain.json",
+      "label": "Terrain · matched relief",
+      "rigs": 4,
+      "input": "HejjéTrac",
+      "presentation": "LED panels",
+      "panelPixels": [
+        128,
+        128
+      ],
+      "terrainBlocks": 4,
+      "blockDurationSeconds": 30,
+      "trackingStarted": false,
+      "experimentStarted": false,
+      "page": "Start / Ready to run",
+      "screenBackingPixels": [
+        3024,
+        1898
+      ],
+      "uiScale": 2,
+      "totalSeconds": 120,
+      "sequenceOrder": [
+        "TerrainChoice_RoughLeft_SmoothRight",
+        "TerrainChoice_SmoothLeft_RoughRight",
+        "TerrainChoice_BothSmooth",
+        "TerrainChoice_BothRough"
+      ],
+      "trackerVideo": "ON",
+      "stateVerification": "Native screenshot visibly showed all four terrain blocks and four LED HejjéTrac rigs after Enter loaded the sequence and Alt+1 returned to Start. Neither Initialize tracking nor Start experiment was activated.",
+      "persistence": "Current open workspace. The launcher still opens the demo workspace; saved apparatus and original social sequence were not overwritten."
+    }
+  },
+  "limitations": [
+    "Right/middle-button held drags are not exposed by the current CUA drag API. Wheel zoom and keyboard camera transform paths were exercised; no native right/middle-drag acceptance claim.",
+    "No live physical camera calibration or animal experiment was run."
+  ],
+  "preservation": {
+    "files": [
+      {
+        "path": "/Users/pavan/src/ledpanelVR/.local/Preview Config/Apparatus/system.json",
+        "beforeSha256": "87dedc46a5d2c224fa02f1cb3c992eb84361869560047989d5e405e66bc9d4a0",
+        "afterSha256": "87dedc46a5d2c224fa02f1cb3c992eb84361869560047989d5e405e66bc9d4a0",
+        "unchanged": true
+      },
+      {
+        "path": "/Users/pavan/src/ledpanelVR/.local/Preview Config/Apparatus/sequence.json",
+        "beforeSha256": "f5c5d9977779d134bca7ea3b60b5a2efc13996d9211da4d196f872753117d1d4",
+        "afterSha256": "f5c5d9977779d134bca7ea3b60b5a2efc13996d9211da4d196f872753117d1d4",
+        "unchanged": true
+      },
+      {
+        "path": "/Users/pavan/src/ledpanelVR/.local/Preview Config/Examples/Rugosity/sequence-treatment-matched-terrain.json",
+        "beforeSha256": "b720010d072c69aefb0b57459973ba2913019e1a5cc0450856df892281ad1ba5",
+        "afterSha256": "b720010d072c69aefb0b57459973ba2913019e1a5cc0450856df892281ad1ba5",
+        "unchanged": true
+      },
+      {
+        "path": "/Users/pavan/src/ledpanelVR/.local/Preview Config/Examples/Rugosity/terrain-treatment.json",
+        "beforeSha256": "c58bf887cd48a6e062752b69f4e843f2925858234d69cf7215279f3096b73223",
+        "afterSha256": "c58bf887cd48a6e062752b69f4e843f2925858234d69cf7215279f3096b73223",
+        "unchanged": true
+      }
+    ],
+    "pushOrRelease": false,
+    "otherOSBuilds": false,
+    "preexistingUntrackedArchiveMetadata": "Four files retained outside commits."
+  },
+  "evidenceDirectory": "/Users/pavan/src/ledpanelVR/.local/review-20261027/native-interactions",
+  "historicalEvidence": "local-player-review-20261027-results.json",
+  "editorValidation": {
+    "checks": 452,
+    "failure": null,
+    "errors": [],
+    "scope": "Actual Unity UI Toolkit KeyDown Tab plus separate NavigationMove Next/Previous and both FocusController default passes. Exact modal traversal/wrap, stalebackgroundtargetrecovery, focusedSubmitactivation and apparatusJSONparity. No OS key delivery claim.",
+    "results": "/Users/pavan/src/ledpanelVR/.local/review-20261027/native-interactions/paired-event-ui-results.json",
+    "sourceHashes": {
+      "headAtEvidence": "50dd1bb0fc3a0b23d971322f21daed5c4d40a3da",
+      "checks": 452,
+      "files": {
+        "Assets/Scripts/ConfigurationUI/ConfigWorkbench.cs": {
+          "sourceSha256": "fa4b090e91523eb56455cc6a5db81f8fd24c9ca5fe4faa8919ed300a5d699e43",
+          "validatedSha256": "fa4b090e91523eb56455cc6a5db81f8fd24c9ca5fe4faa8919ed300a5d699e43",
+          "matches": true
+        },
+        "Assets/Scripts/ConfigurationUI/ConfigWorkbench.Accessibility.cs": {
+          "sourceSha256": "b8177036e9729638af943c177dea1d08cf770f959f3e22bd5d547eb199da1780",
+          "validatedSha256": "b8177036e9729638af943c177dea1d08cf770f959f3e22bd5d547eb199da1780",
+          "matches": true
+        },
+        "Assets/Scripts/ConfigurationUI/ConfigWorkbench.Builder.cs": {
+          "sourceSha256": "9b365e8394622c345a9b82a5908979be925fc6665dda96b991e0ba2dec383fca",
+          "validatedSha256": "9b365e8394622c345a9b82a5908979be925fc6665dda96b991e0ba2dec383fca",
+          "matches": true
+        },
+        "Assets/Scripts/ExperimentInput.cs": {
+          "sourceSha256": "93385c8fd8fa0f979557dab0f7cb1103b90df01960e355168491e80d08349718",
+          "validatedSha256": "93385c8fd8fa0f979557dab0f7cb1103b90df01960e355168491e80d08349718",
+          "matches": true
+        },
+        "Assets/Scripts/MainController.cs": {
+          "sourceSha256": "d38499c42260fd864a1a4d825d706c26fd91066a34141ef73a4bfacd0a652efc",
+          "validatedSha256": "d38499c42260fd864a1a4d825d706c26fd91066a34141ef73a4bfacd0a652efc",
+          "matches": true
+        },
+        "Assets/Editor/ApparatusInteractionValidation.cs": {
+          "sourceSha256": "8e7f549e69dc2624c61d99099c1c62611567ce564ae58e928a3709f32d0074e8",
+          "validatedSha256": "8e7f549e69dc2624c61d99099c1c62611567ce564ae58e928a3709f32d0074e8",
+          "matches": true
+        }
+      },
+      "scope": "Actual Unity UI Toolkit KeyDown Tab plus separate NavigationMove Next/Previous and both FocusController default passes. Exact modal traversal/wrap, stalebackgroundtargetrecovery, focusedSubmitactivation and apparatusJSONparity. No OS key delivery claim."
+    }
+  },
+  "regressionReproduction": {
+    "before": {
+      "sourceRevision": "656c1483",
+      "checksBeforeFailure": 435,
+      "failure": "System.Exception: Tab step 0 focuses exactly Sequence dropdown; actual=Button/sequence-starter-custom\n  at ApparatusInteractionValidation.Check (System.Boolean value, System.String message) [0x00015] in /Users/pavan/src/ledpanelVR/.local/ui-design-project/Assets/Editor/ApparatusInteractionValidation.cs:65 \n  at ApparatusInteractionValidation.CheckPickerFocus (UnityEngine.UIElements.VisualElement root, System.Int32 expected, System.String action) [0x0001e] in /Users/pavan/src/ledpanelVR/.local/ui-design-project/Assets/Editor/ApparatusInteractionValidation.cs:75 \n  at ApparatusInteractionValidation.Tick () [0x01e04] in /Users/pavan/src/ledpanelVR/.local/ui-design-project/Assets/Editor/ApparatusInteractionValidation.cs:325 ",
+      "expectedFailure": true
+    },
+    "after": {
+      "sourceRevision": "50dd1bb0",
+      "checks": 452,
+      "failure": null,
+      "errors": []
+    },
+    "scope": "Same actual UnityUI Toolkit paired TabKeyDown+NavigationMove events with both defaultfocuspasses; oldBuilderonlyinjected in guarded disposablecopy. Fixedsource restoredafterreproduction. OS native input acceptance is separate."
+  },
+  "build": {
+    "version": "0.3.1-local-review",
+    "target": "StandaloneOSX",
+    "result": "Succeeded",
+    "errors": 0,
+    "warnings": 55,
+    "bytes": 450893247,
+    "buildGuid": "9f54066433d64bb1931d5b31f0f77ef4",
+    "scenes": [
+      "Assets/Scenes/ControlScene.unity",
+      "Assets/Scenes/Optomotor.unity",
+      "Assets/Scenes/Swarm.unity",
+      "Assets/Scenes/Choice.unity",
+      "Assets/Scenes/Choice_desync.unity",
+      "Assets/Scenes/ReplayScene.unity",
+      "Assets/Scenes/Kannadi.unity",
+      "Assets/Scenes/Choice_Selwyn.unity",
+      "Assets/Scenes/Rugosity_RS.unity",
+      "Assets/Scenes/TerrainCueLab.unity",
+      "Assets/Scenes/TerrainChoice_RoughLeft_SmoothRight.unity",
+      "Assets/Scenes/TerrainChoice_SmoothLeft_RoughRight.unity",
+      "Assets/Scenes/TerrainChoice_BothSmooth.unity",
+      "Assets/Scenes/TerrainChoice_BothRough.unity"
+    ]
+  },
+  "identity": {
+    "schemaVersion": 1,
+    "sourceRevision": "50dd1bb0fc3a0b23d971322f21daed5c4d40a3da",
+    "sourceState": "working-tree-snapshot",
+    "sourceTreeDirty": true,
+    "runtimeSourceFingerprintSha256": "e6b21f23431e8e694b24f9002041d203773798c99c5a3a84488fbc09877a4764",
+    "runtimeSourceFileCount": 225,
+    "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint.",
+    "dirtyPathsAtPreparation": [
+      "?? Assets/StreamingAssets/Archive/Legacy/Templates/README.md.meta",
+      "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config.py.meta",
+      "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config_choice.py.meta",
+      "?? Assets/StreamingAssets/Archive/README.md.meta"
+    ],
+    "applicationVersion": "0.3.1-local-review",
+    "unityVersion": "6000.3.16f1",
+    "buildTarget": "StandaloneOSX"
+  },
+  "signatureVerification": "codesign --verify --strict exited 0",
+  "nativeInputEvidence": {
+    "log": "/Users/pavan/src/ledpanelVR/.local/review-20261027/native-interactions/native-keyboard-trace.log",
+    "traceLines": 58,
+    "playerExceptionsOrErrors": [],
+    "replayExceptionsOrErrors": [],
+    "replayBuild": "fa50886a; final 50dd1bb0 changes only setup modal keyboard routing."
+  }
+}
