@@ -123,8 +123,53 @@ namespace ConfigurationUI
                 catch(Exception e) { errors.Add(label+": "+e.GetBaseException().Message); }
                 if(doc.Conflict) errors.Add(label+": external edit conflict.");
             }
+            ValidateTerrainSceneCompatibility(errors);
             ValidateHeadingReferences(errors);
             return errors;
+        }
+        private void ValidateTerrainSceneCompatibility(List<string> errors)
+        {
+            if(!(Sequence.Root["sequences"] is JArray steps))return;
+            for(int index=0;index<steps.Count;index++)
+            {
+                if(!(steps[index] is JObject step))continue;
+                string scene=(string)step["sceneName"],file=(string)step["parameters"]?["configFile"];
+                if(scene!="Rugosity_RS"||string.IsNullOrWhiteSpace(file))continue;
+                string resolved;
+                try { resolved=Path.GetFullPath(ExperimentConfigFiles.Resolve(file)); }
+                catch { continue; } // RefreshReferences already reports invalid file paths.
+                var doc=Documents.FirstOrDefault(d=>d.Path==resolved);
+                if(!(doc?.Root is JObject root))continue;
+                // The document validator above reports malformed phase data.
+                IEnumerable<JObject> payloads;
+                try { payloads=ExperimentBlocks.Phased(root)?ExperimentPhase.Parse(root).Select(p=>p.Config).ToArray():new[]{root}; }
+                catch { continue; }
+                foreach(var payload in payloads)
+                {
+                    string error=TerrainSurfaceCompatibilityError(scene,payload["rugosity"] as JObject,step["parameters"]?["rugosity"] as JObject);
+                    if(error!=null)errors.Add("Sequence block "+(index+1)+" ("+scene+"), "+Path.GetFileName(file)+": "+error);
+                }
+            }
+        }
+        private static string TerrainSurfaceCompatibilityError(string scene,JObject config,JObject overrides)
+        {
+            // Only diagnose the known stock legacy/new-family mismatch. Custom
+            // scenes and custom surface IDs retain their runtime world validation.
+            if(scene!="Rugosity_RS")return null;
+            var effective=config!=null?(JObject)config.DeepClone():new JObject();
+            if(overrides!=null)effective.Merge(overrides,new JsonMergeSettings { MergeNullValueHandling=MergeNullValueHandling.Ignore });
+            if(effective["enabled"]?.Type==JTokenType.Boolean&&!(bool)effective["enabled"])return null;
+            var newSurfaces=new HashSet<string>(StringComparer.Ordinal) { "RoughSmooth","SmoothRough","SmoothSmooth","RoughRough" };
+            var incompatible=new List<string>();
+            string heightMode=effective["heightMode"]?.ToString(),orientationMode=effective["orientationMode"]?.ToString();
+            foreach(string role in new[]{"visualSurface","collisionSurface","heightSurface","normalSurface"})
+            {
+                if(role=="heightSurface"&&(string.Equals(heightMode,"Absolute",StringComparison.OrdinalIgnoreCase)||heightMode=="1"))continue;
+                if(role=="normalSurface"&&(string.Equals(orientationMode,"WorldUp",StringComparison.OrdinalIgnoreCase)||orientationMode=="0"))continue;
+                if(effective[role]?.Type==JTokenType.String&&newSurfaces.Contains((string)effective[role]))incompatible.Add(role+"='"+(string)effective[role]+"'");
+            }
+            if(incompatible.Count==0)return null;
+            return string.Join(", ",incompatible)+" is unavailable in the stock legacy Rugosity_RS scene (RS and Flat). Choose TerrainCueLab or a TerrainChoice scene for the new terrain surfaces, or retain a legacy RS configuration.";
         }
         private void ValidateHeadingReferences(List<string> errors)
         {
