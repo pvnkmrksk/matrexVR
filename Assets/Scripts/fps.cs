@@ -26,6 +26,7 @@ public class fps : MonoBehaviour
     private Vector2 lastSize;
     private readonly FrameTiming[] timings = new FrameTiming[1];
     private double previousTime, elapsed, peakInterval;
+    private bool hasPreviousFrame;
     private double cpuMain, cpuRender, gpu, presentWait;
     private int timingSamples, gpuSamples;
     private ulong previousTimestamp;
@@ -45,7 +46,6 @@ public class fps : MonoBehaviour
         if (instance != null && instance != this) { Destroy(this); return; }
         instance = this;
         Latest = null;
-        previousTime = Time.realtimeSinceStartupAsDouble;
         try { measuredProcess=System.Diagnostics.Process.GetCurrentProcess();previousProcessCpu=measuredProcess.TotalProcessorTime; }
         catch { measuredProcess?.Dispose();measuredProcess=null; }
         timingsEnabled = FrameTimingManager.IsFeatureEnabled();
@@ -111,7 +111,21 @@ public class fps : MonoBehaviour
         // Setup owns the frame readout. Keep the same timing collector for telemetry,
         // and restore the standalone readout when the workbench closes.
         if(ConfigurationUI.ConfigWorkbench.IsOpen||OperatorOverlayVisibility.Hidden||UnityEngine.SceneManagement.SceneManager.GetActiveScene().name=="ReplayScene")displayCanvas.enabled=false;
-        double now = Time.realtimeSinceStartupAsDouble;
+        // This clock is fixed at the start of the frame. Wall time read inside
+        // Update also varies with work scheduled before this particular callback.
+        double now = Time.unscaledTimeAsDouble;
+        if (!hasPreviousFrame)
+        {
+            // Awake-to-first-Update is startup work, not a completed frame.
+            previousTime = now;
+            hasPreviousFrame = true;
+            if (measuredProcess != null)
+            {
+                try { measuredProcess.Refresh(); previousProcessCpu = measuredProcess.TotalProcessorTime; }
+                catch { measuredProcess.Dispose(); measuredProcess = null; }
+            }
+            return;
+        }
         double interval = now - previousTime;
         previousTime = now;
         if (interval <= 0) return;
@@ -151,7 +165,7 @@ public class fps : MonoBehaviour
             catch { measuredProcess.Dispose();measuredProcess=null; }
         }
         Latest = new FrameStatistics {
-            realtimeSeconds = now, windowSeconds = elapsed, framesPerSecond = frames / elapsed,
+            realtimeSeconds = Time.realtimeSinceStartupAsDouble, windowSeconds = elapsed, framesPerSecond = frames / elapsed,
             frameMeanMs = elapsed * 1000 / frames, framePeakMs = peakInterval * 1000,
             targetFrameRate = Application.targetFrameRate, vSyncCount = QualitySettings.vSyncCount,
             budgetMs = QualitySettings.vSyncCount == 0 && Application.targetFrameRate > 0 ? 1000.0 / Application.targetFrameRate : (double?)null,
