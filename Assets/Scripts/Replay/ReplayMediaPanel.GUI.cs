@@ -18,6 +18,8 @@ public sealed partial class ReplayMediaPanel
         mediaFormTitle=new GUIStyle(source){fontStyle=FontStyle.Bold,fontSize=Mathf.RoundToInt(18*scale),wordWrap=false};
     }
     public Rect ScreenRect=>visibleRect;
+    public Rect AnimalPreviewRect { get; private set; }
+    public Rect TrackerVideoRect { get; private set; }
     public void Draw(float scale,GUIStyle smallStyle,bool interactable=true,float bottomLimit=0)
     {
         if(disposed || string.IsNullOrEmpty(runDirectory))return;
@@ -26,24 +28,34 @@ public sealed partial class ReplayMediaPanel
         mediaCaption.normal.textColor=smallStyle.normal.textColor;
         float margin=12*scale,row=28*scale,width=Mathf.Min(350*scale*previewScale,Screen.width*.40f);
         width=Mathf.Max(Mathf.Min(280*scale,Screen.width*.40f),width);
-        float inner=width-24*scale,imageHeight=Mathf.Min(inner*.56f,Screen.height*.19f);
-        bool hasVideo=clip!=null || pendingArchive!=null;
+        float inner=width-24*scale;
+        bool hasAnimal=animalPreview!=null,hasVideo=clip!=null || pendingArchive!=null;
         string caption=VideoCaption();
         float requestedCaption=Mathf.Clamp(textStyle.CalcHeight(new GUIContent(caption),inner),42*scale,120*scale);
-        float height=46*scale;
+        float limit=bottomLimit>0?bottomLimit:Screen.height-Mathf.Max(150*scale,Screen.height*.14f)-32*scale;
+        float availableHeight=Mathf.Max(row+20*scale,limit-margin);
+        float chrome=46*scale;
         if(expanded)
         {
-            if(animalPreview!=null)height+=24*scale+imageHeight+10*scale;
-            height+=24*scale+(hasVideo?imageHeight+8*scale:0)+requestedCaption+row+10*scale;
-            if(showMediaTools)height+=2*(row+6*scale)+6*scale;
+            if(hasAnimal)chrome+=34*scale;
+            chrome+=24*scale+(hasVideo?8*scale:0)+requestedCaption+row+10*scale;
+            if(showMediaTools)chrome+=2*(row+6*scale)+6*scale;
         }
-        float limit=bottomLimit>0?bottomLimit:Screen.height-Mathf.Max(150*scale,Screen.height*.14f)-32*scale;
-        height=Mathf.Min(height,Mathf.Max(row+20*scale,limit-margin));
+        int imageCount=(hasAnimal?1:0)+(hasVideo?1:0);
+        float requestedImageHeight=Mathf.Min(inner*.56f,Screen.height*.19f*previewScale);
+        // Grow the actual images with the preview control, then share the
+        // remaining viewport budget so neither image can cover the transport.
+        float imageHeight=imageCount>0?Mathf.Min(requestedImageHeight,Mathf.Max(0,(availableHeight-chrome)/imageCount)):0;
+        float height=Mathf.Min(availableHeight,chrome+(expanded?imageCount*imageHeight:0));
+        AnimalPreviewRect=TrackerVideoRect=Rect.zero;
         visibleRect=new Rect(Screen.width-width-margin,margin,width,height);
         GUI.Box(visibleRect,GUIContent.none);float x=visibleRect.x+12*scale,y=visibleRect.y+9*scale,w=inner;
         GUI.enabled=interactable && !HasModal && pendingOperation==null;
         GUI.Label(new Rect(x,y,w-192*scale,row),"Cameras",mediaHeading);
-        if(rigs.Count>1 && GUI.Button(new Rect(x+w-188*scale,y,54*scale,row),PreviewRig??"VR1"))selectedRig=(selectedRig+1)%rigs.Count;
+        if(rigs.Count>1)
+        {
+            if(GUI.Button(new Rect(x+w-188*scale,y,54*scale,row),PreviewRig??"VR1"))selectedRig=(selectedRig+1)%rigs.Count;
+        }
         else GUI.Label(new Rect(x+w-188*scale,y,54*scale,row),PreviewRig??"VR1",mediaHeading);
         if(GUI.Button(new Rect(x+w-128*scale,y,28*scale,row),new GUIContent("−","Make previews smaller.")))previewScale=Mathf.Max(.75f,previewScale-.25f);
         if(GUI.Button(new Rect(x+w-94*scale,y,28*scale,row),new GUIContent("+","Make previews larger.")))previewScale=Mathf.Min(1.5f,previewScale+.25f);
@@ -54,7 +66,7 @@ public sealed partial class ReplayMediaPanel
             if(animalPreview!=null)
             {
                 GUI.Label(new Rect(x,y,w,20*scale),animalLabel??"Animal · front view",mediaHeading);y+=24*scale;
-                DrawImage(new Rect(x,y,w,imageHeight),animalPreview);y+=imageHeight+10*scale;
+                AnimalPreviewRect=new Rect(x,y,w,imageHeight);DrawImage(AnimalPreviewRect,animalPreview);y+=imageHeight+10*scale;
             }
             string title=clip==null?"Tracker video":(clip.RigId??"Animal")+" · tracker video";
             GUI.Label(new Rect(x,y,w-84*scale,20*scale),title,mediaHeading);
@@ -64,7 +76,7 @@ public sealed partial class ReplayMediaPanel
                 {int next=(selectedClip+offset)%archive.Clips.Count;if(string.Equals(archive.Clips[next].RigId,PreviewRig,StringComparison.OrdinalIgnoreCase)){ChooseClip(next);break;}}
             }
             y+=24*scale;
-            if(hasVideo){DrawImage(new Rect(x,y,w,imageHeight),VisibleVideoTexture);y+=imageHeight+8*scale;}
+            if(hasVideo){TrackerVideoRect=new Rect(x,y,w,imageHeight);DrawImage(TrackerVideoRect,VisibleVideoTexture);y+=imageHeight+8*scale;}
             if(!string.IsNullOrEmpty(error))mediaCaption.normal.textColor=new Color(.66f,.20f,.16f);
             float actionsHeight=(showMediaTools?2*(row+6*scale)+6*scale:0)+row+12*scale;
             float captionHeight=Mathf.Max(24*scale,visibleRect.yMax-y-actionsHeight);
