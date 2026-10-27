@@ -1,6 +1,6 @@
 # Terrain cue lab: separate visual and navigation rugosity
 
-Use **TerrainCueLab** for this experiment. Scene identity, spatial terrain pattern, and experimental condition are separate concepts. Existing RS/navrug scenes are not renamed or repurposed. The earlier `Assets/Scenes/Rugosity_RS.unity`, its GUID, meshes and six choice files remain unchanged and runnable with `Examples/Rugosity/sequence-legacy-rugosity.json`.
+Use the four **TerrainChoice** spatial layouts and the treatment sequences below for the choice experiment. Scene identity, spatial terrain pattern, and experimental condition are separate concepts. Each new scene is a thin instance of the same shared environment prefab; trees, material, mesh references, controller and standard configured camera rig are edited once. Existing RS/navrug scenes are not renamed or repurposed. The earlier `Assets/Scenes/Rugosity_RS.unity`, its GUID, meshes and six choice files remain unchanged and runnable with `Examples/Rugosity/sequence-legacy-rugosity.json`.
 
 The Bogong night-sky improvements were already inherited on this branch. The terrain work adds optional behavior; scenes without an enabled RugosityWorld keep their original movement behavior.
 
@@ -56,7 +56,16 @@ Select any pattern independently for visual and navigation surfaces. To reverse 
 
 ## Load one treatment and run all four spatial patterns
 
-The four ready-to-load treatment sequences below each run **RoughSmooth → SmoothRough → SmoothSmooth → RoughRough**, for 30 seconds each. They all use the same `TerrainCueLab` scene and the same `terrain-treatment.json` base configuration. There are no duplicated scenes, colliders, or navigation meshes to maintain. Choose one sequence file in the app, then press **Start experiment**; loading it does not start automatically. Each sequence stops after the fourth trial.
+The four ready-to-load treatment sequences below each run **RoughSmooth → SmoothRough → SmoothSmooth → RoughRough**, for 30 seconds each. They all use the same `terrain-treatment.json` base configuration. The four named scenes are thin instances of `Assets/TerrainCueLab/TerrainChoiceWorld.prefab`, so there are no duplicated environment contents or navigation meshes to maintain. Choose one sequence file in the app, then press **Start experiment**; loading it does not start automatically. Each sequence stops after the fourth trial.
+
+| Scene | Left half (negative X) | Right half (positive X) |
+| --- | --- | --- |
+| `TerrainChoice_RoughLeft_SmoothRight` | Rough | Smooth |
+| `TerrainChoice_SmoothLeft_RoughRight` | Smooth | Rough |
+| `TerrainChoice_BothSmooth` | Smooth | Smooth |
+| `TerrainChoice_BothRough` | Rough | Rough |
+
+The animal starts at the center, facing +Z, with two identical placeholder trees at X = −40/+40 cm and Z = +60 cm. Their distance from the start is equal (about 72.1 cm), and they sit on opposite sides of the rough/smooth boundary. Edit their shared appearance once in `Assets/TerrainCueLab/TerrainChoiceTarget.prefab`; edit shared positions or geometry once in `TerrainChoiceWorld.prefab`. The named scene instances override only the authored default surface pattern. Sequence JSON independently assigns the actual visible and navigation surfaces, including the flat alternative, so four scenes cover all sixteen combinations.
 
 | Sequence file under `Examples/Rugosity/` | Visible surface | Navigation/collision surface |
 | --- | --- | --- |
@@ -71,11 +80,11 @@ Change shared motion, clearance, orientation, or stimulus defaults once in `terr
 
 ## Press Play or tune in the Editor
 
-**Open ControlScene and press Play** for the active sequence. It runs the four main conditions followed by three isolation controls, 30 seconds each, looping. Each condition starts at X = −60, Z = 0, facing +X, and moves at 5 cm/s. This crosses the rough/smooth boundary automatically. Arrow keys and A/D allow movement and steering; Ctrl+Space toggles autopilot. Turning or reverse input changes the route.
+For the older linear walkthrough, choose `Examples/Rugosity/sequence.json` through **ControlScene**. It runs the four main conditions followed by three isolation controls, 30 seconds each, looping. Each condition starts at X = −60, Z = 0, facing +X, and moves at 5 cm/s. This crosses the rough/smooth boundary automatically. Arrow keys and A/D allow movement and steering; Ctrl+Space toggles autopilot. Turning or reverse input changes the route.
 
 Files under `Assets/StreamingAssets/Examples/Rugosity/`:
 
-- `sequence.json`: seven conditions; also installed as the active `sequenceConfig.json`.
+- `sequence.json`: seven walkthrough conditions.
 - `sequence-four-conditions.json`: only the four primary mesh combinations.
 - `sequence-spatial-patterns.json`: matched visual/navigation geometry with four spatial patterns.
 - `sequence-legacy-rugosity.json`: the earlier six conditions in the unchanged Rugosity_RS scene.
@@ -89,7 +98,15 @@ For direct authoring, use **Tools → Rugosity → Open terrain cue lab**, or op
 3. **Keep current settings in scene after Stop** captures the current snapshot and restores it after Play ends. Save the scene afterward. Click again if you change more settings before stopping.
 4. **Copy effective rugosity JSON** copies the settings. **Save rugosity into choice JSON…** preserves the other choice fields; phased documents receive `stimulus.rugosity`.
 
-Opening the lab directly starts a manual walkthrough without a MainController. Its authored scene pose is the canonical condition. In Edit mode, changing the Inspector updates visibility/collider roles; **Preview pose at current rig positions** applies height and orientation and supports Undo. Existing RS scenes do not acquire this component automatically.
+The lab's authored scene pose remains the canonical linear walkthrough. Its cameras now use the standard configured rig: start through **ControlScene** so a MainController supplies the apparatus layout. A directly opened scene without a loaded system configuration keeps stimulus cameras disabled, matching other configured scenes. In Edit mode, changing the Inspector updates visibility/collider roles; **Preview pose at current rig positions** applies height and orientation and supports Undo. Existing RS scenes do not acquire this component automatically.
+
+## Apparatus routing and recordings
+
+The earlier lab used a hand-created fullscreen camera with no `ViewportSetter` and no `DataLogger`. That bypassed configured LED face order, pixel dimensions, display offsets and rig duplication, and could produce a run with no playable pose rows. `TerrainCueLab` and the four new scenes now share the ordinary `VR1` prefab, including `ViewportSetter`, `ClosedLoop` and `DataLogger`. `RuntimeRigRegistry` creates the configured number of animals; every clone is discovered by the terrain controller. Each rig therefore uses the system JSON's camera allow-list, display routing and panel rectangles. Desktop preview uses its configured single front view.
+
+The runtime test `TerrainChoiceRuntimeValidation.Run` checks real MainController transitions for all sixteen treatment/pattern combinations using one LED rig, four horizontal LED rigs, four vertical LED rigs, and one desktop rig. It reports the batch editor’s actual Game view extent and verifies normalized camera rectangles, contained panel pixel sizes, face order and target displays, shared target placement, terrain following, per-animal CSV pose rows, saved scene/surface context and replay reconstruction. It uses explicitly generated stationary input; it does not establish physical camera accuracy or animal-tracking calibration. The validator writes results into its disposable project's `terrain-choice-runtime-validation` folder. Because a batch Game view may be shorter than the real monitor, full-panel physical pixel coverage is checked separately in the native Mac player; offscreen editor panels are counted explicitly rather than claimed as a Full HD pass.
+
+**Verified 27 October 2026:** [runtime validation results](terrain-choice-runtime-validation-results.json) passed **3,193 checks** across **64 actual sequence trials**, with **22,485 playable pose rows** across the ten configured animal tracks. Every track contains all sixteen scene/treatment contexts; recorded height and orientation agree with the selected navigation mesh, and saved replay configuration restores the inline surface overrides. The run also passed 384 contained-panel pixel checks and explicitly deferred 320 offscreen batch-editor checks to native-player validation. Sixteen actual camera renders were inspected locally, including matched, visual-only, navigation-only and flat controls.
 
 The shared ground material now uses the original 4096 × 4096 forest-floor albedo recovered from the packed images in `~/Downloads/nav_rug_rr.blend`. The JPEG bytes are preserved in `Assets/TerrainCueLab/ForestFloorAlbedo.jpg`; provenance and checksums are in [terrain-texture-provenance.json](terrain-texture-provenance.json). The packed normal map is deliberately unused so it cannot add apparent normal-map bumps to a flat visual condition. The earlier checker texture remains available as `GroundPattern.asset`, and legacy `Rugosity_RS` materials are unchanged. A rendered surround extends the visible ground to 1 km so a nearby square boundary does not produce a false kink in a flat horizon. This surround has no collider and does not extend the 200 × 200 cm navigation footprint.
 

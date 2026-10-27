@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SA = ROOT / "Assets/StreamingAssets"
 FOLDER = SA / "Examples/Rugosity"
 PATTERNS = ["RoughSmooth", "SmoothRough", "SmoothSmooth", "RoughRough"]
+SCENES = ["TerrainChoice_RoughLeft_SmoothRight", "TerrainChoice_SmoothLeft_RoughRight", "TerrainChoice_BothSmooth", "TerrainChoice_BothRough"]
 MODES = {
     "matched-terrain": (True, True),
     "visual-terrain_navigation-flat": (True, False),
@@ -17,10 +18,19 @@ MODES = {
 }
 
 def main():
-    scene = (ROOT / "Assets/Scenes/TerrainCueLab.unity").read_text()
+    scene = (ROOT / "Assets/TerrainCueLab/TerrainChoiceWorld.prefab").read_text()
     registered = re.findall(r"^  surfaceId: (.+)$", scene, re.M)
     assert set(registered) == set(PATTERNS + ["Flat"])
     assert len(registered) == len(set(registered))
+    prefab_guid = re.search(r"^guid: (.+)$", (ROOT / "Assets/TerrainCueLab/TerrainChoiceWorld.prefab.meta").read_text(), re.M)[1]
+    rig_guid = re.search(r"^guid: (.+)$", (ROOT / "Assets/Prefabs/Camera Prefabs/VR1.prefab.meta").read_text(), re.M)[1]
+    assert rig_guid in scene
+    assert "rigTargets: []" in scene
+    assert "value: Left choice target" in scene and "value: Right choice target" in scene
+    for name in SCENES + ["TerrainCueLab"]:
+        thin = (ROOT / "Assets/Scenes" / (name + ".unity")).read_text()
+        assert prefab_guid in thin
+        assert "MeshFilter:" not in thin and "Camera:" not in thin
     base = json.loads((FOLDER / "terrain-treatment.json").read_text())
     assert base["rugosity"]["enabled"]
     assert base["rugosity"]["heightSurface"] == base["rugosity"]["normalSurface"] == ""
@@ -35,9 +45,9 @@ def main():
         assert sequence["randomise"] is False
         assert len(sequence["sequences"]) == 4
         checks += 3
-        for pattern, row in zip(PATTERNS, sequence["sequences"]):
+        for pattern, scene_name, row in zip(PATTERNS, SCENES, sequence["sequences"]):
             assert row["_comment"] == pattern
-            assert row["sceneName"] == "TerrainCueLab" and row["reloadScene"] is False
+            assert row["sceneName"] == scene_name and row["reloadScene"] is False
             assert row["duration"] > 0
             assert row["parameters"]["configFile"] == "Examples/Rugosity/terrain-treatment.json"
             overrides = row["parameters"]["rugosity"]

@@ -1,12 +1,12 @@
 {
-  "_comment": "Terrain cue treatment: visual-flat_navigation-terrain. Four spatial patterns share TerrainCueLab and terrain-treatment.json; only surface roles change. Pattern names are recorded on each row.",
+  "_comment": "Terrain cue treatment: visual-flat_navigation-terrain. Four spatial patterns share TerrainChoiceWorld.prefab and terrain-treatment.json; only surface roles change. Pattern names are recorded on each row.",
   "autoStart": false,
   "loop": false,
   "randomise": false,
   "sequences": [
     {
       "_comment": "RoughSmooth",
-      "sceneName": "TerrainCueLab",
+      "sceneName": "TerrainChoice_RoughLeft_SmoothRight",
       "duration": 30,
       "reloadScene": false,
       "parameters": {
@@ -19,7 +19,7 @@
     },
     {
       "_comment": "SmoothRough",
-      "sceneName": "TerrainCueLab",
+      "sceneName": "TerrainChoice_SmoothLeft_RoughRight",
       "duration": 30,
       "reloadScene": false,
       "parameters": {
@@ -32,7 +32,7 @@
     },
     {
       "_comment": "SmoothSmooth",
-      "sceneName": "TerrainCueLab",
+      "sceneName": "TerrainChoice_BothSmooth",
       "duration": 30,
       "reloadScene": false,
       "parameters": {
@@ -45,7 +45,7 @@
     },
     {
       "_comment": "RoughRough",
-      "sceneName": "TerrainCueLab",
+      "sceneName": "TerrainChoice_BothRough",
       "duration": 30,
       "reloadScene": false,
       "parameters": {

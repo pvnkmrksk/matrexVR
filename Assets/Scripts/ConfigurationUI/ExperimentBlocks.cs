@@ -93,6 +93,12 @@ namespace ConfigurationUI
             bool flight=Number(p?["aglHeight"])>0 || reference.Replace('\\','/').Contains("/Flight/");
             string scene=schema=="swarm"?"Swarm":schema=="kannadi"?"Kannadi":schema=="optomotor"?"Optomotor":schema=="dynamic-choice"?"Choice_desync":flight?"Choice_Selwyn":"Choice";
             string category=schema=="swarm"?"Swarm":schema=="optomotor"?"Optomotor":schema=="dynamic-choice"?"Dynamic choice":schema=="kannadi"?"Walking":flight?"Flight":"Choice";
+            if(p?["rugosity"] is JObject terrain && Flag(terrain["enabled"]))
+            {
+                bool legacy=(string)terrain["visualSurface"]=="RS" || (string)terrain["collisionSurface"]=="RS";
+                scene=legacy?"Rugosity_RS":reference.Replace('\\','/').EndsWith("/terrain-treatment.json",StringComparison.Ordinal)?"TerrainChoice_RoughLeft_SmoothRight":"TerrainCueLab";
+                category="Terrain";
+            }
             if(!reference.StartsWith("Templates/",StringComparison.Ordinal) && !reference.StartsWith("Examples/",StringComparison.Ordinal)) category="Custom";
             return new ExperimentPreset { Reference=reference,Title=Title(reference),Schema=schema,Scene=scene,Category=category,Config=config };
         }
@@ -112,6 +118,8 @@ namespace ConfigurationUI
         {
             JObject p=Payload(config); if(p==null) return "Configuration unavailable";
             var details=new List<string>();
+            if(p["rugosity"] is JObject terrain && Flag(terrain["enabled"]))
+                details.Add("Visual "+terrain["visualSurface"]+" · navigation "+terrain["collisionSurface"]);
             if(Flag(p["autopilotEnabled"])) details.Add("Autopilot "+p["autopilotSpeed"]+" units/s");
             else if(p["closedLoopPosition"]!=null) details.Add("Closed loop position "+(Flag(p["closedLoopPosition"],Number(p["closedLoopPosition"],1)!=0)?"ON":"OFF"));
             if(p["closedLoopOrientation"]!=null) details.Add("Closed loop orientation "+(Flag(p["closedLoopOrientation"],Number(p["closedLoopOrientation"],1)!=0)?"ON":"OFF"));

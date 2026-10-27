@@ -42,7 +42,15 @@ public static class RugosityValidation
     private static void CaptureError(string message, string trace, LogType kind)
     { if (kind == LogType.Error || kind == LogType.Exception || kind == LogType.Assert) errors.Add(message); }
     private static void DisableTracking(Scene scene, LoadSceneMode mode)
-    { foreach (var root in scene.GetRootGameObjects()) foreach (var listener in root.GetComponentsInChildren<ZmqListener>(true)) listener.enabled = false; }
+    {
+        foreach (var root in scene.GetRootGameObjects())
+        {
+            foreach (var listener in root.GetComponentsInChildren<ZmqListener>(true)) listener.enabled = false;
+            // Geometry-only runner opens the lab directly, without a recording session.
+            // TerrainChoiceRuntimeValidation separately tests the standard loggers through MainController.
+            foreach (var logger in root.GetComponentsInChildren<DataLogger>(true)) logger.enabled = false;
+        }
+    }
     public static void Run()
     {
         if (!File.Exists("KANNADI_VALIDATION_COPY")) throw new Exception("Use a disposable project copy.");
@@ -123,7 +131,7 @@ public static class RugosityValidation
                 }
                 records.Add(new { file, minimumY = min, maximumY = max, maximumTiltDegrees = maxTilt });
                 rig.transform.SetPositionAndRotation(new Vector3(-25, 0, -60), Quaternion.Euler(0, legacy ? 0 : 90, 0)); rig.Conform(0, true);
-                Render(rig.GetComponent<Camera>(), Path.GetFileNameWithoutExtension(file));
+                Render(rig.GetComponent<Camera>() ?? rig.GetComponentsInChildren<Camera>(true).First(c => c.name == "Main Camera F"), Path.GetFileNameWithoutExtension(file));
             }
             if (!legacy)
             {
@@ -399,11 +407,12 @@ public static class RugosityValidation
         string folder = legacy ? "docs/rugosity-legacy-renders" : "docs/rugosity-renders";
         Directory.CreateDirectory(folder);
         var target = new RenderTexture(960, 540, 24); var previous = RenderTexture.active;
-        camera.targetTexture = target; camera.Render(); RenderTexture.active = target;
+        var previousTarget = camera.targetTexture; var previousRect = camera.rect;
+        camera.targetTexture = target; camera.rect = new Rect(0, 0, 1, 1); camera.Render(); RenderTexture.active = target;
         var image = new Texture2D(960, 540, TextureFormat.RGB24, false);
         image.ReadPixels(new Rect(0, 0, 960, 540), 0, 0); image.Apply();
         File.WriteAllBytes(folder + "/" + name + ".png", image.EncodeToPNG());
-        camera.targetTexture = null; RenderTexture.active = previous; target.Release();
+        camera.targetTexture = previousTarget; camera.rect = previousRect; RenderTexture.active = previous; target.Release();
         Object.DestroyImmediate(target); Object.DestroyImmediate(image);
     }
     private static void Finish(int code)

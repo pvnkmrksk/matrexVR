@@ -77,5 +77,17 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TerrainCueLab.unity
     guid: 8ad5fb1118bf247c5a69ce453ea36c84
+  - enabled: 1
+    path: Assets/Scenes/TerrainChoice_RoughLeft_SmoothRight.unity
+    guid: 542741349effe4847a15e41b30f7b6fa
+  - enabled: 1
+    path: Assets/Scenes/TerrainChoice_SmoothLeft_RoughRight.unity
+    guid: 2c226a138c2d24114ad9b0123d626a87
+  - enabled: 1
+    path: Assets/Scenes/TerrainChoice_BothSmooth.unity
+    guid: fb51d5af2b5314a82abc9d6fc9192a0b
+  - enabled: 1
+    path: Assets/Scenes/TerrainChoice_BothRough.unity
+    guid: d3c81e0b0091949e58827b0f07062267
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

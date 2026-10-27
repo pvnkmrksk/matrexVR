@@ -38,18 +38,21 @@ public static class RugosityLabBuilder
         foreach (var surface in world.surfaces) surface.transform.SetParent(world.transform);
         world.settings.visualSurface = world.settings.collisionSurface = SpatialPattern.RoughSmooth.ToString();
         world.settings.normalRadiusCm = 0;
-        var camera = new GameObject("VR1 — manual tuning rig").AddComponent<Camera>();
-        camera.tag = "MainCamera";
-        camera.nearClipPlane = .01f; camera.farClipPlane = 1000; camera.fieldOfView = 75;
-        camera.clearFlags = CameraClearFlags.SolidColor; camera.backgroundColor = new Color(.56f, .71f, .86f);
-        camera.gameObject.AddComponent<AudioListener>();
-        camera.gameObject.AddComponent<Keyboard>();
-        camera.gameObject.AddComponent<ZmqListener>();
-        var tracking = camera.gameObject.AddComponent<ClosedLoop>();
+        var template = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Camera Prefabs/VR1.prefab");
+        if (template == null) throw new System.InvalidOperationException("The standard configured VR1 prefab is missing.");
+        var configuredRig = (GameObject)PrefabUtility.InstantiatePrefab(template);
+        configuredRig.name = "VR1";
+        foreach (var camera in configuredRig.GetComponentsInChildren<Camera>(true))
+        {
+            camera.nearClipPlane = .01f; camera.farClipPlane = 100000; camera.fieldOfView = 90;
+            camera.clearFlags = CameraClearFlags.SolidColor; camera.backgroundColor = new Color(.56f, .71f, .86f);
+            camera.enabled = false;
+        }
+        var tracking = configuredRig.GetComponent<ClosedLoop>();
         tracking.SetClosedLoopPosition(false); tracking.SetClosedLoopOrientation(false);
-        var rig = camera.gameObject.AddComponent<RugosityRig>(); rig.world = world;
-        world.rigTargets = new[] { camera.transform };
-        camera.transform.SetPositionAndRotation(new Vector3(-60, 1, 0), Quaternion.Euler(0, 90, 0));
+        var rig = configuredRig.AddComponent<RugosityRig>(); rig.world = world;
+        world.rigTargets = System.Array.Empty<Transform>();
+        configuredRig.transform.SetPositionAndRotation(new Vector3(-60, 1, 0), Quaternion.Euler(0, 90, 0));
         var controller = new GameObject("SceneController").AddComponent<ChoiceController>();
         controller.prefabs = new GameObject[0]; controller.materials = new Material[0];
         var light = new GameObject("Sun").AddComponent<Light>();
