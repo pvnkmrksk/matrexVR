@@ -1,0 +1,2629 @@
+{
+  "scope": "Serial Mac standalone tests on 120 Hz built-in display with generated native tracker inputs, one or four rigs, six 128x128 on-screen LED views per rig. All cases reported Application.isFocused=false; no foreground, 60 Hz output, physical LED or camera-exposure timing certification. Existing unrelated background work was not terminated. Profiler LastValue and FrameTiming may lag callback frames; GC correlation uses raw per-frame collection deltas with a +/-1 frame window. Initial isolation aggregate GC counts may include summary allocations; followup source freezes totals before reporting.",
+  "checks": 655,
+  "probeSourceSha256": "131459e6e13ef0664b254d101c5f893dfb4eb0ae04a7888c978fdc016c1f1267",
+  "passes": [
+    {
+      "name": "capped-isolation",
+      "rawSummaryPath": ".local/evening-pacing/capped-isolation/summary.json",
+      "rawSummarySha256": "deb9153d8dbd3fb24494b16670501ca32bc94631aa827a5dffc146f90a37f757",
+      "identity": {
+        "schemaVersion": 1,
+        "sourceRevision": "b118450446e8925d97a6f418ac319ef3cc54aea6",
+        "sourceState": "working-tree-snapshot",
+        "sourceTreeDirty": true,
+        "runtimeSourceFingerprintSha256": "0f5ff3527bd9075a819038a70b64c0636749791a75cb892f41aa1996184264d7",
+        "runtimeSourceFileCount": 233,
+        "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint.",
+        "dirtyPathsAtPreparation": [
+          " M Assets/Scripts/RuntimePerformanceProbe.cs",
+          "?? Assets/StreamingAssets/Archive/Legacy/Templates/README.md.meta",
+          "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config.py.meta",
+          "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config_choice.py.meta",
+          "?? Assets/StreamingAssets/Archive/README.md.meta"
+        ],
+        "applicationVersion": "0.4.1-pacing-probe",
+        "unityVersion": "6000.3.16f1",
+        "buildTarget": "StandaloneOSX"
+      },
+      "cases": [
+        {
+          "name": "1-rig-video-off",
+          "rigs": 1,
+          "saveNativeVideo": false,
+          "rawRelativePath": ".local/evening-pacing/capped-isolation/1-rig-video-off/results.json",
+          "rawSha256": "6e7d23b4da78c16b7df1e84f9d7af13c19576a3e7345750951b9dd5a702b844f",
+          "phases": [
+            {
+              "phase": "all-60",
+              "target": 60,
+              "vsync": 0,
+              "frames": 476,
+              "wallIntervalFps": 59.53540278680257,
+              "frameStartMeanMs": 16.806996489071814,
+              "p95Ms": 17.481668083899393,
+              "p99Ms": 17.679712301585937,
+              "maxMs": 20.25104166666658,
+              "over20ms": 1,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 4.778758613445377,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 476,
+              "gpuMs": {
+                "samples": 476,
+                "mean": 0.6805559351050761,
+                "minimum": 0.30699999479111284,
+                "median": 0.6133749993750826,
+                "p95": 1.3327499909792095,
+                "p99": 2.632874995470047,
+                "maximum": 2.9171250062063336,
+                "standardDeviation": 0.347571971731141
+              },
+              "presentWaitMs": {
+                "samples": 476,
+                "mean": 1.9287346407563024,
+                "minimum": 0.002751,
+                "median": 0.722375,
+                "p95": 10.077792,
+                "p99": 14.499124,
+                "maximum": 15.3135,
+                "standardDeviation": 3.192819445422458
+              }
+            },
+            {
+              "phase": "listeners-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.346607932096674,
+              "frameStartMeanMs": 16.856580329037374,
+              "p95Ms": 17.583453798188486,
+              "p99Ms": 18.53974631519506,
+              "maxMs": 19.831583049885637,
+              "over20ms": 0,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                1,
+                1,
+                1
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 4.653402953586498,
+              "focused": false,
+              "trackingFresh": [
+                false
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 0.6441793247702716,
+                "minimum": 0.27225000667385757,
+                "median": 0.6137500022305176,
+                "p95": 1.2117500009480864,
+                "p99": 2.0883750112261623,
+                "maximum": 2.3948750022100285,
+                "standardDeviation": 0.28988782375600797
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 2.511249864978902,
+                "minimum": 0.006375,
+                "median": 1.031292,
+                "p95": 11.716417,
+                "p99": 15.396208,
+                "maximum": 15.662833,
+                "standardDeviation": 3.5631325978614874
+              }
+            },
+            {
+              "phase": "logging-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 473,
+              "wallIntervalFps": 59.231145603905254,
+              "frameStartMeanMs": 16.88421511927534,
+              "p95Ms": 17.586543367343666,
+              "p99Ms": 17.92796201814184,
+              "maxMs": 19.31904761904235,
+              "over20ms": 0,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 5.41084334038055,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 473,
+              "gpuMs": {
+                "samples": 473,
+                "mean": 0.49645269589757557,
+                "minimum": 0.2653333212947473,
+                "median": 0.49287499859929085,
+                "p95": 0.8321250061271712,
+                "p99": 1.1505000002216548,
+                "maximum": 2.650750000611879,
+                "standardDeviation": 0.20747459410282346
+              },
+              "presentWaitMs": {
+                "samples": 473,
+                "mean": 2.840060524312897,
+                "minimum": 0.00475,
+                "median": 1.127085,
+                "p95": 12.722166,
+                "p99": 15.347501,
+                "maximum": 15.671001,
+                "standardDeviation": 3.8589888697984325
+              }
+            },
+            {
+              "phase": "telemetry-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.26241300872738,
+              "frameStartMeanMs": 16.875902424964366,
+              "p95Ms": 17.579542233562506,
+              "p99Ms": 17.694288548753434,
+              "maxMs": 20.737081916102795,
+              "over20ms": 1,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 5.1072700421940915,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 0.7828024790950419,
+                "minimum": 0.2670833346201107,
+                "median": 0.6234999891603366,
+                "p95": 2.4695000029169023,
+                "p99": 3.9812916656956077,
+                "maximum": 4.169249994447455,
+                "standardDeviation": 0.6965621254061456
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 2.884366706751055,
+                "minimum": 0.00525,
+                "median": 1.224418,
+                "p95": 12.494042,
+                "p99": 15.174791,
+                "maximum": 16.272917,
+                "standardDeviation": 3.815125376017205
+              }
+            },
+            {
+              "phase": "overlays-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 473,
+              "wallIntervalFps": 59.13847402860729,
+              "frameStartMeanMs": 16.911441149750942,
+              "p95Ms": 17.581753117909216,
+              "p99Ms": 18.36108276643955,
+              "maxMs": 33.09941893424195,
+              "over20ms": 1,
+              "over20msWithinOneFrameOfGc": 1,
+              "observedGcDeltas": [
+                3,
+                3,
+                3
+              ],
+              "aggregateGcDeltas": [
+                3,
+                3,
+                3
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 5.2506511627906995,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 473,
+              "gpuMs": {
+                "samples": 473,
+                "mean": 0.7487586327475529,
+                "minimum": 0.2914583310484886,
+                "median": 0.5844583356520161,
+                "p95": 2.14508333010599,
+                "p99": 3.824791667284444,
+                "maximum": 5.747708331909962,
+                "standardDeviation": 0.6255946397990197
+              },
+              "presentWaitMs": {
+                "samples": 473,
+                "mean": 2.833116369978859,
+                "minimum": 0.003833,
+                "median": 1.086667,
+                "p95": 12.717793,
+                "p99": 14.934959,
+                "maximum": 16.192542,
+                "standardDeviation": 3.8157661777029497
+              }
+            },
+            {
+              "phase": "tracking-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.333378229757464,
+              "frameStartMeanMs": 16.854031476338783,
+              "p95Ms": 17.5806689342366,
+              "p99Ms": 18.02758645124669,
+              "maxMs": 19.25079365079796,
+              "over20ms": 0,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                1,
+                1,
+                1
+              ],
+              "aggregateGcDeltas": [
+                1,
+                1,
+                1
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 4.964335654008436,
+              "focused": false,
+              "trackingFresh": [
+                false
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 0.782494725183513,
+                "minimum": 0.31183334067463875,
+                "median": 0.6162500067148358,
+                "p95": 2.3002083325991407,
+                "p99": 3.9606250065844506,
+                "maximum": 4.093249997822568,
+                "standardDeviation": 0.6188370447815008
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 2.6706736223628704,
+                "minimum": 0.006251,
+                "median": 1.006208,
+                "p95": 12.230375,
+                "p99": 14.759791,
+                "maximum": 15.770499,
+                "standardDeviation": 3.781755177774999
+              }
+            },
+            {
+              "phase": "all-60-repeat",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.31000287715834,
+              "frameStartMeanMs": 16.86125957679135,
+              "p95Ms": 17.58365929704553,
+              "p99Ms": 18.069288548758777,
+              "maxMs": 20.446704931970316,
+              "over20ms": 1,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                3,
+                3,
+                3
+              ],
+              "aggregateGcDeltas": [
+                3,
+                3,
+                3
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 5.955010337552746,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 1.1105383262490138,
+                "minimum": 0.30499999411404133,
+                "median": 0.6178333278512582,
+                "p95": 3.5084583360003307,
+                "p99": 6.790916668251157,
+                "maximum": 7.883124999352731,
+                "standardDeviation": 1.17287896629035
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 2.5661759852320682,
+                "minimum": 0.005166,
+                "median": 0.979042,
+                "p95": 11.922375,
+                "p99": 15.012917,
+                "maximum": 15.819541,
+                "standardDeviation": 3.6871678683854854
+              }
+            }
+          ],
+          "native": [
+            {
+              "frames": 4812,
+              "frames_per_second": 59.61131760944135,
+              "recording": {
+                "accepted": 0,
+                "directory": null,
+                "error": null,
+                "written": 0
+              },
+              "seconds": 80.722926333,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            }
+          ]
+        },
+        {
+          "name": "1-rig-video-on",
+          "rigs": 1,
+          "saveNativeVideo": true,
+          "rawRelativePath": ".local/evening-pacing/capped-isolation/1-rig-video-on/results.json",
+          "rawSha256": "53efb9abc447b0331fa10a7e248d79e63c352aff9c0a199e624e157d165e8953",
+          "phases": [
+            {
+              "phase": "all-60",
+              "target": 60,
+              "vsync": 0,
+              "frames": 475,
+              "wallIntervalFps": 59.411025055836724,
+              "frameStartMeanMs": 16.8436854487409,
+              "p95Ms": 17.57804705215449,
+              "p99Ms": 17.99708049886739,
+              "maxMs": 19.51620606576121,
+              "over20ms": 0,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 4.994288210526314,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 475,
+              "gpuMs": {
+                "samples": 475,
+                "mean": 0.6188847363534334,
+                "minimum": 0.30320833320729434,
+                "median": 0.6117916636867449,
+                "p95": 0.8740833291085437,
+                "p99": 2.390958325122483,
+                "maximum": 4.850708341109566,
+                "standardDeviation": 0.350403750724004
+              },
+              "presentWaitMs": {
+                "samples": 475,
+                "mean": 2.4738505873684242,
+                "minimum": 0.00575,
+                "median": 1.067917,
+                "p95": 11.73325,
+                "p99": 14.4955,
+                "maximum": 15.278708,
+                "standardDeviation": 3.4631773501360286
+              }
+            },
+            {
+              "phase": "listeners-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 475,
+              "wallIntervalFps": 59.4420410223836,
+              "frameStartMeanMs": 16.832791935195125,
+              "p95Ms": 17.579542233558954,
+              "p99Ms": 18.269458616778422,
+              "maxMs": 19.1359977324268,
+              "over20ms": 0,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 4.598250526315789,
+              "focused": false,
+              "trackingFresh": [
+                false
+              ],
+              "frameTimingSamples": 475,
+              "gpuMs": {
+                "samples": 475,
+                "mean": 0.6480618414934725,
+                "minimum": 0.30374999914783984,
+                "median": 0.6135833245934919,
+                "p95": 0.8687499939696863,
+                "p99": 3.2168333273148164,
+                "maximum": 3.7897500005783513,
+                "standardDeviation": 0.41102903587486156
+              },
+              "presentWaitMs": {
+                "samples": 475,
+                "mean": 2.268347153684213,
+                "minimum": 0.006583,
+                "median": 0.864666,
+                "p95": 10.990209,
+                "p99": 14.68375,
+                "maximum": 15.669249,
+                "standardDeviation": 3.3680435642579427
+              }
+            },
+            {
+              "phase": "logging-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 476,
+              "wallIntervalFps": 59.511762871880165,
+              "frameStartMeanMs": 16.80704045010861,
+              "p95Ms": 17.578337585035797,
+              "p99Ms": 17.64445861677899,
+              "maxMs": 19.157164115647163,
+              "over20ms": 0,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 4.894184453781515,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 476,
+              "gpuMs": {
+                "samples": 476,
+                "mean": 0.5987062327871432,
+                "minimum": 0.30283333035185933,
+                "median": 0.6147500098450109,
+                "p95": 0.6229999999050051,
+                "p99": 1.6120833315653726,
+                "maximum": 3.488333342829719,
+                "standardDeviation": 0.21522962807274623
+              },
+              "presentWaitMs": {
+                "samples": 476,
+                "mean": 2.157379493697478,
+                "minimum": 0.005583,
+                "median": 0.853875,
+                "p95": 10.775542,
+                "p99": 14.812417,
+                "maximum": 15.817541,
+                "standardDeviation": 3.339975781432259
+              }
+            },
+            {
+              "phase": "telemetry-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 475,
+              "wallIntervalFps": 59.376324210782585,
+              "frameStartMeanMs": 16.84358683912161,
+              "p95Ms": 17.57987528344529,
+              "p99Ms": 17.995415249437485,
+              "maxMs": 19.827912414960736,
+              "over20ms": 0,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 4.787166526315793,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 475,
+              "gpuMs": {
+                "samples": 475,
+                "mean": 0.9580295615045256,
+                "minimum": 0.30524999601766467,
+                "median": 0.6163749931147322,
+                "p95": 2.7888750046258792,
+                "p99": 3.7387499905889854,
+                "maximum": 3.9038749964674935,
+                "standardDeviation": 0.7635289393949957
+              },
+              "presentWaitMs": {
+                "samples": 475,
+                "mean": 2.420703682105262,
+                "minimum": 0.005583,
+                "median": 0.888792,
+                "p95": 12.033458,
+                "p99": 14.886584,
+                "maximum": 15.956208,
+                "standardDeviation": 3.625448181023502
+              }
+            },
+            {
+              "phase": "overlays-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 475,
+              "wallIntervalFps": 59.390104878391554,
+              "frameStartMeanMs": 16.84005692803438,
+              "p95Ms": 17.582171201816266,
+              "p99Ms": 17.884708049891174,
+              "maxMs": 18.35124716553338,
+              "over20ms": 0,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                3,
+                3,
+                3
+              ],
+              "aggregateGcDeltas": [
+                3,
+                3,
+                3
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 5.085138947368426,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 475,
+              "gpuMs": {
+                "samples": 475,
+                "mean": 0.5020774560245244,
+                "minimum": 0.24912500521168113,
+                "median": 0.5185000045457855,
+                "p95": 0.7307500054594129,
+                "p99": 1.2723750114673749,
+                "maximum": 1.6497500037075952,
+                "standardDeviation": 0.17364918077251926
+              },
+              "presentWaitMs": {
+                "samples": 475,
+                "mean": 2.522164568421049,
+                "minimum": 0.005875,
+                "median": 0.965874,
+                "p95": 12.196958,
+                "p99": 15.386459,
+                "maximum": 16.313583,
+                "standardDeviation": 3.6961560703490055
+              }
+            },
+            {
+              "phase": "tracking-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.311969271532746,
+              "frameStartMeanMs": 16.861603196130773,
+              "p95Ms": 17.58337585033587,
+              "p99Ms": 17.69037698412035,
+              "maxMs": 18.412124433105248,
+              "over20ms": 0,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                1,
+                1,
+                1
+              ],
+              "aggregateGcDeltas": [
+                1,
+                1,
+                1
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 4.81110147679325,
+              "focused": false,
+              "trackingFresh": [
+                false
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 0.45009309066511605,
+                "minimum": 0.2580833388492465,
+                "median": 0.3776250086957589,
+                "p95": 0.8272499981103465,
+                "p99": 1.0378750012023374,
+                "maximum": 1.285333331907168,
+                "standardDeviation": 0.1864148277229006
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 2.668820434599154,
+                "minimum": 0.006126,
+                "median": 1.031874,
+                "p95": 12.380833,
+                "p99": 15.271874,
+                "maximum": 16.280334,
+                "standardDeviation": 3.765141769606294
+              }
+            },
+            {
+              "phase": "all-60-repeat",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.33729257453868,
+              "frameStartMeanMs": 16.85492291325812,
+              "p95Ms": 17.57949971656103,
+              "p99Ms": 18.52320719955003,
+              "maxMs": 23.969664115639944,
+              "over20ms": 1,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                3,
+                3,
+                3
+              ],
+              "aggregateGcDeltas": [
+                3,
+                3,
+                3
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 5.0973312236286885,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 0.5554048874870312,
+                "minimum": 0.2724999940255657,
+                "median": 0.6054999976186082,
+                "p95": 0.8261250040959567,
+                "p99": 2.614041673950851,
+                "maximum": 3.0298749916255474,
+                "standardDeviation": 0.309834577309599
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 2.3881120843881862,
+                "minimum": 0.00379,
+                "median": 0.979417,
+                "p95": 11.642375,
+                "p99": 14.868583,
+                "maximum": 15.831125,
+                "standardDeviation": 3.4201866018792777
+              }
+            }
+          ],
+          "native": [
+            {
+              "frames": 4761,
+              "frames_per_second": 59.743267363045085,
+              "recording": {
+                "accepted": 4761,
+                "directory": "/Users/pavan/src/ledpanelVR/.local/evening-pacing/capped-isolation/1-rig-video-on/native/VR1/recordings/1-rig-video-on-VR1-1793124190806139000-1629",
+                "error": null,
+                "written": 4761
+              },
+              "seconds": 79.690987958,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            }
+          ]
+        },
+        {
+          "name": "4-rig-video-off",
+          "rigs": 4,
+          "saveNativeVideo": false,
+          "rawRelativePath": ".local/evening-pacing/capped-isolation/4-rig-video-off/results.json",
+          "rawSha256": "0ba19a8f6ef441ce38dde3c755edd84761cc6ce2631c9fd0d9c3ba54cb768de8",
+          "phases": [
+            {
+              "phase": "all-60",
+              "target": 60,
+              "vsync": 0,
+              "frames": 468,
+              "wallIntervalFps": 58.553386350090776,
+              "frameStartMeanMs": 17.08324234875574,
+              "p95Ms": 17.584793083898376,
+              "p99Ms": 29.34412556689381,
+              "maxMs": 49.973667800454535,
+              "over20ms": 9,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcDeltas": [
+                9,
+                9,
+                9
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 11.14726752136752,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 468,
+              "gpuMs": {
+                "samples": 468,
+                "mean": 2.027366541136498,
+                "minimum": 1.5036249969853088,
+                "median": 1.8827500025508925,
+                "p95": 3.5574999928940088,
+                "p99": 5.347666665329598,
+                "maximum": 9.369833336677402,
+                "standardDeviation": 0.7430012617059153
+              },
+              "presentWaitMs": {
+                "samples": 468,
+                "mean": 2.2274478354700866,
+                "minimum": 0.001874,
+                "median": 0.892042,
+                "p95": 10.231833,
+                "p99": 12.819958,
+                "maximum": 14.696251,
+                "standardDeviation": 3.1160497804120255
+              }
+            },
+            {
+              "phase": "listeners-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.25192259897799,
+              "frameStartMeanMs": 16.877974411459384,
+              "p95Ms": 17.586040249433665,
+              "p99Ms": 20.286578798184962,
+              "maxMs": 21.305335884353127,
+              "over20ms": 5,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                4,
+                4,
+                4
+              ],
+              "aggregateGcDeltas": [
+                4,
+                4,
+                4
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 10.191607594936709,
+              "focused": false,
+              "trackingFresh": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 1.7514751233943475,
+                "minimum": 1.4041250105947256,
+                "median": 1.709374992060475,
+                "p95": 2.238333341665566,
+                "p99": 2.7585833449847996,
+                "maximum": 6.041958331479691,
+                "standardDeviation": 0.38747721538145574
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 2.372717993670884,
+                "minimum": 0.006291,
+                "median": 1.052167,
+                "p95": 10.595416,
+                "p99": 13.20546,
+                "maximum": 13.69275,
+                "standardDeviation": 3.201849081774873
+              }
+            },
+            {
+              "phase": "logging-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 472,
+              "wallIntervalFps": 59.11468124760134,
+              "frameStartMeanMs": 16.91732749685325,
+              "p95Ms": 17.5861678004523,
+              "p99Ms": 20.093041383219656,
+              "maxMs": 21.871123866215925,
+              "over20ms": 5,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                7,
+                7,
+                7
+              ],
+              "aggregateGcDeltas": [
+                7,
+                7,
+                7
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 11.619756144067797,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 472,
+              "gpuMs": {
+                "samples": 472,
+                "mean": 2.104067178460339,
+                "minimum": 1.494875003118068,
+                "median": 1.8624166696099564,
+                "p95": 4.340749990660697,
+                "p99": 5.017041665269062,
+                "maximum": 7.982666662428528,
+                "standardDeviation": 0.8387374905872971
+              },
+              "presentWaitMs": {
+                "samples": 472,
+                "mean": 2.689184862288135,
+                "minimum": 0.001916,
+                "median": 1.089043,
+                "p95": 11.272583,
+                "p99": 13.576208,
+                "maximum": 14.329625,
+                "standardDeviation": 3.4462370704205463
+              }
+            },
+            {
+              "phase": "telemetry-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 472,
+              "wallIntervalFps": 59.11889148271805,
+              "frameStartMeanMs": 16.922336967096154,
+              "p95Ms": 17.580335884353815,
+              "p99Ms": 20.679003684804798,
+              "maxMs": 25.383921485257588,
+              "over20ms": 5,
+              "over20msWithinOneFrameOfGc": 1,
+              "observedGcDeltas": [
+                6,
+                6,
+                6
+              ],
+              "aggregateGcDeltas": [
+                6,
+                6,
+                6
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 12.26080084745763,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 472,
+              "gpuMs": {
+                "samples": 472,
+                "mean": 2.1726288841356585,
+                "minimum": 1.4856666675768793,
+                "median": 1.8529583467170596,
+                "p95": 4.388374989503063,
+                "p99": 6.05899999209214,
+                "maximum": 7.34483334235847,
+                "standardDeviation": 0.9277650639720391
+              },
+              "presentWaitMs": {
+                "samples": 472,
+                "mean": 2.517960516949152,
+                "minimum": 0.003832,
+                "median": 1.074958,
+                "p95": 10.754958,
+                "p99": 13.091042,
+                "maximum": 14.398959,
+                "standardDeviation": 3.308666783648095
+              }
+            },
+            {
+              "phase": "overlays-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 471,
+              "wallIntervalFps": 59.014342696370974,
+              "frameStartMeanMs": 16.95410626122352,
+              "p95Ms": 17.5916666666609,
+              "p99Ms": 19.729166666664355,
+              "maxMs": 24.83974631519459,
+              "over20ms": 4,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcDeltas": [
+                9,
+                9,
+                9
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 12.328552229299357,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 471,
+              "gpuMs": {
+                "samples": 471,
+                "mean": 2.2971861287439834,
+                "minimum": 1.4387499977601692,
+                "median": 1.8147499940823764,
+                "p95": 4.743749988847412,
+                "p99": 6.757750001270324,
+                "maximum": 7.348458326305263,
+                "standardDeviation": 1.083284118708032
+              },
+              "presentWaitMs": {
+                "samples": 471,
+                "mean": 2.671239806794054,
+                "minimum": 0.001874,
+                "median": 1.021208,
+                "p95": 11.110249,
+                "p99": 13.530875,
+                "maximum": 14.462583,
+                "standardDeviation": 3.5250147316579916
+              }
+            },
+            {
+              "phase": "tracking-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.350554365142635,
+              "frameStartMeanMs": 16.857299395672456,
+              "p95Ms": 17.580123299318018,
+              "p99Ms": 19.985877267572505,
+              "maxMs": 23.817162698406946,
+              "over20ms": 4,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                3,
+                3,
+                3
+              ],
+              "aggregateGcDeltas": [
+                3,
+                3,
+                3
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 10.125525527426163,
+              "focused": false,
+              "trackingFresh": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 2.0305902777519176,
+                "minimum": 1.4881249953759834,
+                "median": 1.8121250031981617,
+                "p95": 4.418249998707324,
+                "p99": 6.240458329557441,
+                "maximum": 7.213708333438262,
+                "standardDeviation": 0.8837333977800712
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 1.9926350654008445,
+                "minimum": 0.004291,
+                "median": 0.800249,
+                "p95": 9.48475,
+                "p99": 13.075833,
+                "maximum": 14.512624,
+                "standardDeviation": 2.936231473698728
+              }
+            },
+            {
+              "phase": "all-60-repeat",
+              "target": 60,
+              "vsync": 0,
+              "frames": 473,
+              "wallIntervalFps": 59.15702243570721,
+              "frameStartMeanMs": 16.912601034071116,
+              "p95Ms": 17.56016865080312,
+              "p99Ms": 20.477834467129696,
+              "maxMs": 47.07858560091438,
+              "over20ms": 5,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 11.423822410147993,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 473,
+              "gpuMs": {
+                "samples": 473,
+                "mean": 2.1644567474356142,
+                "minimum": 1.465041670599021,
+                "median": 1.8673750018933788,
+                "p95": 4.283249989384785,
+                "p99": 6.397583332727663,
+                "maximum": 8.678000012878329,
+                "standardDeviation": 0.9511047437497182
+              },
+              "presentWaitMs": {
+                "samples": 473,
+                "mean": 2.141904803382664,
+                "minimum": 0.003626,
+                "median": 0.866416,
+                "p95": 9.696917,
+                "p99": 13.017708,
+                "maximum": 14.555666,
+                "standardDeviation": 3.0106766115837718
+              }
+            }
+          ],
+          "native": [
+            {
+              "frames": 4787,
+              "frames_per_second": 59.71488059309931,
+              "recording": {
+                "accepted": 0,
+                "directory": null,
+                "error": null,
+                "written": 0
+              },
+              "seconds": 80.164273167,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            },
+            {
+              "frames": 4788,
+              "frames_per_second": 59.70982102581301,
+              "recording": {
+                "accepted": 0,
+                "directory": null,
+                "error": null,
+                "written": 0
+              },
+              "seconds": 80.187813625,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            },
+            {
+              "frames": 4783,
+              "frames_per_second": 59.67237725266148,
+              "recording": {
+                "accepted": 0,
+                "directory": null,
+                "error": null,
+                "written": 0
+              },
+              "seconds": 80.15433975,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            },
+            {
+              "frames": 4785,
+              "frames_per_second": 59.70044559117894,
+              "recording": {
+                "accepted": 0,
+                "directory": null,
+                "error": null,
+                "written": 0
+              },
+              "seconds": 80.150155541,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            }
+          ]
+        },
+        {
+          "name": "4-rig-video-on",
+          "rigs": 4,
+          "saveNativeVideo": true,
+          "rawRelativePath": ".local/evening-pacing/capped-isolation/4-rig-video-on/results.json",
+          "rawSha256": "072239374692d3bfb376920964f85fcbefcf19e5ec5cd7018bc98c54677990f2",
+          "phases": [
+            {
+              "phase": "all-60",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.2884167300138,
+              "frameStartMeanMs": 16.876371920955446,
+              "p95Ms": 17.570663265306763,
+              "p99Ms": 20.49199971655291,
+              "maxMs": 25.074624433106152,
+              "over20ms": 5,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 13.130607594936707,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 2.2087931611628235,
+                "minimum": 1.4738333265995607,
+                "median": 1.8966250063385814,
+                "p95": 4.201500007184222,
+                "p99": 6.62575000023935,
+                "maximum": 8.016041669179685,
+                "standardDeviation": 0.9540405891231293
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 1.9291001962025314,
+                "minimum": 0.003749,
+                "median": 0.659042,
+                "p95": 8.882417,
+                "p99": 12.108334,
+                "maximum": 13.310875,
+                "standardDeviation": 2.7936961703484022
+              }
+            },
+            {
+              "phase": "listeners-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 477,
+              "wallIntervalFps": 59.637892966985845,
+              "frameStartMeanMs": 16.77163802191037,
+              "p95Ms": 17.20267148525778,
+              "p99Ms": 17.596797052153335,
+              "maxMs": 25.18750000000125,
+              "over20ms": 3,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                4,
+                4,
+                4
+              ],
+              "aggregateGcDeltas": [
+                4,
+                4,
+                4
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 12.110058700209647,
+              "focused": false,
+              "trackingFresh": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "frameTimingSamples": 477,
+              "gpuMs": {
+                "samples": 477,
+                "mean": 2.2609177153458453,
+                "minimum": 1.476999997976236,
+                "median": 1.883291668491438,
+                "p95": 4.664624997531064,
+                "p99": 5.349458326236345,
+                "maximum": 5.649875005474314,
+                "standardDeviation": 0.9241272693492539
+              },
+              "presentWaitMs": {
+                "samples": 477,
+                "mean": 1.1864592851153046,
+                "minimum": 0.006541,
+                "median": 0.614459,
+                "p95": 5.613042,
+                "p99": 10.157543,
+                "maximum": 11.893418,
+                "standardDeviation": 1.892216512662371
+              }
+            },
+            {
+              "phase": "logging-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 472,
+              "wallIntervalFps": 59.105173962993746,
+              "frameStartMeanMs": 16.921676827510662,
+              "p95Ms": 17.585083616779684,
+              "p99Ms": 19.754457199546493,
+              "maxMs": 21.857794784580165,
+              "over20ms": 4,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                7,
+                7,
+                7
+              ],
+              "aggregateGcDeltas": [
+                7,
+                7,
+                7
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 12.657622881355934,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 472,
+              "gpuMs": {
+                "samples": 472,
+                "mean": 2.217053407070649,
+                "minimum": 1.482458334066905,
+                "median": 1.873083325335756,
+                "p95": 4.3516250007087365,
+                "p99": 5.093624989967793,
+                "maximum": 7.501250001951121,
+                "standardDeviation": 0.8822678870366921
+              },
+              "presentWaitMs": {
+                "samples": 472,
+                "mean": 2.512812493644067,
+                "minimum": 0.004876,
+                "median": 0.772251,
+                "p95": 10.909749,
+                "p99": 13.376832,
+                "maximum": 14.372332,
+                "standardDeviation": 3.396246697657496
+              }
+            },
+            {
+              "phase": "telemetry-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.25662655744179,
+              "frameStartMeanMs": 16.877798602739265,
+              "p95Ms": 17.565539965985977,
+              "p99Ms": 20.879747732422516,
+              "maxMs": 27.242750850341224,
+              "over20ms": 6,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                6,
+                6,
+                6
+              ],
+              "aggregateGcDeltas": [
+                6,
+                6,
+                6
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 11.160533755274255,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 1.970521185177728,
+                "minimum": 1.4793749869568273,
+                "median": 1.8563749908935279,
+                "p95": 3.2357916643377393,
+                "p99": 4.25037500099279,
+                "maximum": 8.454333335976116,
+                "standardDeviation": 0.633577535688004
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 1.8477360189873415,
+                "minimum": 0.003875,
+                "median": 0.736791,
+                "p95": 8.765583,
+                "p99": 11.959458,
+                "maximum": 13.3505,
+                "standardDeviation": 2.7572225460055253
+              }
+            },
+            {
+              "phase": "overlays-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.256532721635686,
+              "frameStartMeanMs": 16.885869374120947,
+              "p95Ms": 17.579464285716995,
+              "p99Ms": 20.819749149666222,
+              "maxMs": 25.74421060090515,
+              "over20ms": 6,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 13.006429957805908,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 1.9794477848950105,
+                "minimum": 1.394875012920238,
+                "median": 1.801458332920447,
+                "p95": 3.6471666680881754,
+                "p99": 5.070124985650182,
+                "maximum": 5.64012500399258,
+                "standardDeviation": 0.6727719251065388
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 1.7582056793248952,
+                "minimum": 0.005666,
+                "median": 0.179249,
+                "p95": 9.734541,
+                "p99": 13.111459,
+                "maximum": 14.172292,
+                "standardDeviation": 3.025250798470567
+              }
+            },
+            {
+              "phase": "tracking-off",
+              "target": 60,
+              "vsync": 0,
+              "frames": 475,
+              "wallIntervalFps": 59.40302244766747,
+              "frameStartMeanMs": 16.84048500716075,
+              "p95Ms": 17.581583049889105,
+              "p99Ms": 19.728911564619978,
+              "maxMs": 21.757624716556734,
+              "over20ms": 3,
+              "over20msWithinOneFrameOfGc": 1,
+              "observedGcDeltas": [
+                4,
+                4,
+                4
+              ],
+              "aggregateGcDeltas": [
+                4,
+                4,
+                4
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 10.63892842105262,
+              "focused": false,
+              "trackingFresh": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "frameTimingSamples": 475,
+              "gpuMs": {
+                "samples": 475,
+                "mean": 1.8141538596797833,
+                "minimum": 1.4301666669780388,
+                "median": 1.7930416652234271,
+                "p95": 2.191958323237486,
+                "p99": 2.8334583330433816,
+                "maximum": 3.129333330434747,
+                "standardDeviation": 0.2196974349252199
+              },
+              "presentWaitMs": {
+                "samples": 475,
+                "mean": 1.7259291810526314,
+                "minimum": 0.005625,
+                "median": 0.498749,
+                "p95": 9.557541,
+                "p99": 12.865333,
+                "maximum": 13.857876,
+                "standardDeviation": 2.904692172048291
+              }
+            },
+            {
+              "phase": "all-60-repeat",
+              "target": 60,
+              "vsync": 0,
+              "frames": 473,
+              "wallIntervalFps": 59.24119079904531,
+              "frameStartMeanMs": 16.88553717646327,
+              "p95Ms": 17.58346088435303,
+              "p99Ms": 20.287414965991957,
+              "maxMs": 21.264625850335506,
+              "over20ms": 5,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcIncludesReportAllocations": true,
+              "processCpuMsPerFrame": 12.569188160676523,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 473,
+              "gpuMs": {
+                "samples": 473,
+                "mean": 1.697630285445146,
+                "minimum": 1.3960416690679267,
+                "median": 1.6643749986542389,
+                "p95": 2.0609583298210055,
+                "p99": 2.4733333266340196,
+                "maximum": 4.893500008620322,
+                "standardDeviation": 0.26898508120681297
+              },
+              "presentWaitMs": {
+                "samples": 473,
+                "mean": 2.2493804524312893,
+                "minimum": 0.004875,
+                "median": 0.907583,
+                "p95": 10.201083,
+                "p99": 13.119876,
+                "maximum": 14.141583,
+                "standardDeviation": 3.2397636463075026
+              }
+            }
+          ],
+          "native": [
+            {
+              "frames": 4795,
+              "frames_per_second": 59.774512774003064,
+              "recording": {
+                "accepted": 4795,
+                "directory": "/Users/pavan/src/ledpanelVR/.local/evening-pacing/capped-isolation/4-rig-video-on/native/VR1/recordings/4-rig-video-on-VR1-1793124351057744000-1819",
+                "error": null,
+                "written": 4795
+              },
+              "seconds": 80.218136083,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            },
+            {
+              "frames": 4795,
+              "frames_per_second": 59.779847279071475,
+              "recording": {
+                "accepted": 4795,
+                "directory": "/Users/pavan/src/ledpanelVR/.local/evening-pacing/capped-isolation/4-rig-video-on/native/VR2/recordings/4-rig-video-on-VR2-1793124351059090000-1820",
+                "error": null,
+                "written": 4795
+              },
+              "seconds": 80.21097775,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            },
+            {
+              "frames": 4797,
+              "frames_per_second": 59.799486506347,
+              "recording": {
+                "accepted": 4797,
+                "directory": "/Users/pavan/src/ledpanelVR/.local/evening-pacing/capped-isolation/4-rig-video-on/native/VR3/recordings/4-rig-video-on-VR3-1793124351061083000-1821",
+                "error": null,
+                "written": 4797
+              },
+              "seconds": 80.218080125,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            },
+            {
+              "frames": 4797,
+              "frames_per_second": 59.8071071803047,
+              "recording": {
+                "accepted": 4797,
+                "directory": "/Users/pavan/src/ledpanelVR/.local/evening-pacing/capped-isolation/4-rig-video-on/native/VR4/recordings/4-rig-video-on-VR4-1793124351063459000-1822",
+                "error": null,
+                "written": 4797
+              },
+              "seconds": 80.207858667,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "capped-vsync-followup",
+      "rawSummaryPath": ".local/evening-pacing/capped-vsync-followup/summary.json",
+      "rawSummarySha256": "9a4b7fb3b461252e95f833226831e797d5b958a7c9ae7f3b7fabcfadaec1413c",
+      "identity": {
+        "schemaVersion": 1,
+        "sourceRevision": "b118450446e8925d97a6f418ac319ef3cc54aea6",
+        "sourceState": "working-tree-diagnostic-snapshot",
+        "sourceTreeDirty": true,
+        "runtimeSourceFingerprintSha256": "fec0616f21396e30f6e91a2ab95777212c6ff7d0c312c67945e072e00e121365",
+        "runtimeSourceFileCount": 233,
+        "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint.",
+        "dirtyPathsAtPreparation": [
+          "Assets/Scripts/RuntimePerformanceProbe.cs"
+        ],
+        "applicationVersion": "0.4.1-pacing-probe",
+        "unityVersion": "6000.3.16f1",
+        "buildTarget": "StandaloneOSX"
+      },
+      "cases": [
+        {
+          "name": "1-rig-video-off",
+          "rigs": 1,
+          "saveNativeVideo": false,
+          "rawRelativePath": ".local/evening-pacing/capped-vsync-followup/1-rig-video-off/results.json",
+          "rawSha256": "f482b669daf89953b0aca8cdb2b01c85fc0bff3c9b31cbd9866a8d59cff28931",
+          "phases": [
+            {
+              "phase": "all-60",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.342754579869414,
+              "frameStartMeanMs": 16.86036199553661,
+              "p95Ms": 17.583786848073046,
+              "p99Ms": 18.56967120181352,
+              "maxMs": 19.376629818594893,
+              "over20ms": 0,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": false,
+              "processCpuMsPerFrame": 5.481036075949366,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 0.6024025140903921,
+                "minimum": 0.2877916704164818,
+                "median": 0.6054166733520105,
+                "p95": 0.9277500066673383,
+                "p99": 1.870916661573574,
+                "maximum": 2.520875001209788,
+                "standardDeviation": 0.22624330915247587
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 2.6784193544303814,
+                "minimum": 0.005708,
+                "median": 0.731584,
+                "p95": 12.820375,
+                "p99": 14.949625,
+                "maximum": 15.955001,
+                "standardDeviation": 3.9152378408273094
+              }
+            },
+            {
+              "phase": "vsync-2",
+              "target": -1,
+              "vsync": 2,
+              "frames": 474,
+              "wallIntervalFps": 59.26275692327885,
+              "frameStartMeanMs": 16.880940137130796,
+              "p95Ms": 17.582624716556694,
+              "p99Ms": 19.254209183671378,
+              "maxMs": 20.827246315192838,
+              "over20ms": 3,
+              "over20msWithinOneFrameOfGc": 1,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": false,
+              "processCpuMsPerFrame": 5.442455907172994,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 0.59411163867465,
+                "minimum": 0.29000001086387783,
+                "median": 0.6052499957149848,
+                "p95": 0.6625000096391886,
+                "p99": 1.1563333391677588,
+                "maximum": 1.5521666646236554,
+                "standardDeviation": 0.11292718218563298
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 2.6813696286919804,
+                "minimum": 0.056457,
+                "median": 0.858583,
+                "p95": 11.558917,
+                "p99": 14.430291,
+                "maximum": 15.461083,
+                "standardDeviation": 3.6462664627509103
+              }
+            },
+            {
+              "phase": "all-60-repeat",
+              "target": 60,
+              "vsync": 0,
+              "frames": 473,
+              "wallIntervalFps": 59.175662377900686,
+              "frameStartMeanMs": 16.906227273326525,
+              "p95Ms": 17.58420493197832,
+              "p99Ms": 18.353961167797195,
+              "maxMs": 19.247172619046182,
+              "over20ms": 0,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": false,
+              "processCpuMsPerFrame": 5.1832308668076115,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 473,
+              "gpuMs": {
+                "samples": 473,
+                "mean": 0.6167492071825255,
+                "minimum": 0.28304166335146874,
+                "median": 0.6015000108163804,
+                "p95": 0.9830416674958542,
+                "p99": 2.3038333310978487,
+                "maximum": 2.7055000100517645,
+                "standardDeviation": 0.27708017212509783
+              },
+              "presentWaitMs": {
+                "samples": 473,
+                "mean": 3.1251864883720932,
+                "minimum": 0.005834,
+                "median": 1.290334,
+                "p95": 12.500416,
+                "p99": 14.954459,
+                "maximum": 15.944167,
+                "standardDeviation": 3.9106362643042156
+              }
+            }
+          ],
+          "native": [
+            {
+              "frames": 2364,
+              "frames_per_second": 58.74927904305651,
+              "recording": {
+                "accepted": 0,
+                "directory": null,
+                "error": null,
+                "written": 0
+              },
+              "seconds": 40.238791667,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            }
+          ]
+        },
+        {
+          "name": "1-rig-video-on",
+          "rigs": 1,
+          "saveNativeVideo": true,
+          "rawRelativePath": ".local/evening-pacing/capped-vsync-followup/1-rig-video-on/results.json",
+          "rawSha256": "9ee0c2f5b27133ed08408e8815e61e68f37e764e7d6a119cd8c1fda0b43d29b3",
+          "phases": [
+            {
+              "phase": "all-60",
+              "target": 60,
+              "vsync": 0,
+              "frames": 476,
+              "wallIntervalFps": 59.583059089734334,
+              "frameStartMeanMs": 16.791584297409443,
+              "p95Ms": 17.580959467119683,
+              "p99Ms": 18.594586167798965,
+              "maxMs": 21.58103741496653,
+              "over20ms": 1,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": false,
+              "processCpuMsPerFrame": 5.304936974789917,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 476,
+              "gpuMs": {
+                "samples": 476,
+                "mean": 0.6121201856460955,
+                "minimum": 0.2867500006686896,
+                "median": 0.606666668318212,
+                "p95": 0.8580416615586728,
+                "p99": 1.5335416683228686,
+                "maximum": 1.9628750014817342,
+                "standardDeviation": 0.16577773668612317
+              },
+              "presentWaitMs": {
+                "samples": 476,
+                "mean": 1.5835910378151248,
+                "minimum": 0.00475,
+                "median": 0.444416,
+                "p95": 10.281291,
+                "p99": 14.641499,
+                "maximum": 15.751459,
+                "standardDeviation": 3.216646900979264
+              }
+            },
+            {
+              "phase": "vsync-2",
+              "target": -1,
+              "vsync": 2,
+              "frames": 475,
+              "wallIntervalFps": 59.39708798025791,
+              "frameStartMeanMs": 16.84250176035327,
+              "p95Ms": 17.5790391156454,
+              "p99Ms": 18.95991354875548,
+              "maxMs": 26.118998015874695,
+              "over20ms": 1,
+              "over20msWithinOneFrameOfGc": 1,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": false,
+              "processCpuMsPerFrame": 5.482149473684208,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 475,
+              "gpuMs": {
+                "samples": 475,
+                "mean": 0.5866015788265749,
+                "minimum": 0.2899583341786638,
+                "median": 0.605208333581686,
+                "p95": 0.6804583390476182,
+                "p99": 1.092958336812444,
+                "maximum": 1.7729166575009003,
+                "standardDeviation": 0.13442600858615505
+              },
+              "presentWaitMs": {
+                "samples": 475,
+                "mean": 2.237946054736842,
+                "minimum": 0.102916,
+                "median": 0.881792,
+                "p95": 11.301792,
+                "p99": 14.953332,
+                "maximum": 15.977084,
+                "standardDeviation": 3.4396892916290285
+              }
+            },
+            {
+              "phase": "all-60-repeat",
+              "target": 60,
+              "vsync": 0,
+              "frames": 475,
+              "wallIntervalFps": 59.47959549321063,
+              "frameStartMeanMs": 16.81885010144408,
+              "p95Ms": 17.576750283446074,
+              "p99Ms": 17.657412131519834,
+              "maxMs": 18.01266298185311,
+              "over20ms": 0,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcDeltas": [
+                2,
+                2,
+                2
+              ],
+              "aggregateGcIncludesReportAllocations": false,
+              "processCpuMsPerFrame": 5.2014547368421065,
+              "focused": false,
+              "trackingFresh": [
+                true
+              ],
+              "frameTimingSamples": 475,
+              "gpuMs": {
+                "samples": 475,
+                "mean": 0.5802900001933602,
+                "minimum": 0.29887500568293035,
+                "median": 0.6040000007487833,
+                "p95": 0.6140833284007385,
+                "p99": 0.6637083279201761,
+                "maximum": 2.0755000005010515,
+                "standardDeviation": 0.0995769028418548
+              },
+              "presentWaitMs": {
+                "samples": 475,
+                "mean": 2.2307786378947365,
+                "minimum": 0.002166,
+                "median": 0.899458,
+                "p95": 11.091958,
+                "p99": 15.072667,
+                "maximum": 16.027333,
+                "standardDeviation": 3.4254931820635095
+              }
+            }
+          ],
+          "native": [
+            {
+              "frames": 2325,
+              "frames_per_second": 59.23387624141838,
+              "recording": {
+                "accepted": 2325,
+                "directory": "/Users/pavan/src/ledpanelVR/.local/evening-pacing/capped-vsync-followup/1-rig-video-on/native/VR1/recordings/1-rig-video-on-VR1-1793124732995103000-2104",
+                "error": null,
+                "written": 2325
+              },
+              "seconds": 39.251187792,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            }
+          ]
+        },
+        {
+          "name": "4-rig-video-off",
+          "rigs": 4,
+          "saveNativeVideo": false,
+          "rawRelativePath": ".local/evening-pacing/capped-vsync-followup/4-rig-video-off/results.json",
+          "rawSha256": "602ab50aaaf37a10216690a5a4a88df008c39c0406408539f8a1c87f8557d80c",
+          "phases": [
+            {
+              "phase": "all-60",
+              "target": 60,
+              "vsync": 0,
+              "frames": 475,
+              "wallIntervalFps": 59.39779637679285,
+              "frameStartMeanMs": 16.84185666547321,
+              "p95Ms": 17.380704365079325,
+              "p99Ms": 21.4516227324264,
+              "maxMs": 30.47429138321789,
+              "over20ms": 5,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcIncludesReportAllocations": false,
+              "processCpuMsPerFrame": 12.260825473684209,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 475,
+              "gpuMs": {
+                "samples": 475,
+                "mean": 1.9237550880796717,
+                "minimum": 1.4224999904399738,
+                "median": 1.85012498695869,
+                "p95": 2.8372499946272,
+                "p99": 4.7975416673580185,
+                "maximum": 6.386416673194617,
+                "standardDeviation": 0.5591966326511617
+              },
+              "presentWaitMs": {
+                "samples": 475,
+                "mean": 1.4631382757894722,
+                "minimum": 0.002291,
+                "median": 0.356166,
+                "p95": 8.563626,
+                "p99": 11.278376,
+                "maximum": 12.493542,
+                "standardDeviation": 2.54557018777151
+              }
+            },
+            {
+              "phase": "vsync-2",
+              "target": -1,
+              "vsync": 2,
+              "frames": 473,
+              "wallIntervalFps": 59.130898307106136,
+              "frameStartMeanMs": 16.91235403692837,
+              "p95Ms": 17.58000283446748,
+              "p99Ms": 20.00303996598518,
+              "maxMs": 23.78825113378724,
+              "over20ms": 5,
+              "over20msWithinOneFrameOfGc": 1,
+              "observedGcDeltas": [
+                9,
+                9,
+                9
+              ],
+              "aggregateGcDeltas": [
+                9,
+                9,
+                9
+              ],
+              "aggregateGcIncludesReportAllocations": false,
+              "processCpuMsPerFrame": 12.600390909090915,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 473,
+              "gpuMs": {
+                "samples": 473,
+                "mean": 1.8754833512095317,
+                "minimum": 1.405375005560927,
+                "median": 1.8515000119805336,
+                "p95": 2.921999999671243,
+                "p99": 3.782666666666046,
+                "maximum": 4.950625007040799,
+                "standardDeviation": 0.4410160088279197
+              },
+              "presentWaitMs": {
+                "samples": 473,
+                "mean": 2.489017773784354,
+                "minimum": 0.062666,
+                "median": 1.000249,
+                "p95": 10.105792,
+                "p99": 12.982584,
+                "maximum": 13.973375,
+                "standardDeviation": 3.1059095180934357
+              }
+            },
+            {
+              "phase": "all-60-repeat",
+              "target": 60,
+              "vsync": 0,
+              "frames": 474,
+              "wallIntervalFps": 59.26749563876908,
+              "frameStartMeanMs": 16.883149167719132,
+              "p95Ms": 17.579705215418073,
+              "p99Ms": 19.138286564626128,
+              "maxMs": 27.55583191609645,
+              "over20ms": 4,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcIncludesReportAllocations": false,
+              "processCpuMsPerFrame": 12.361945358649795,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 474,
+              "gpuMs": {
+                "samples": 474,
+                "mean": 1.8898448489315587,
+                "minimum": 1.4677083381684497,
+                "median": 1.860083342762664,
+                "p95": 2.957999997306615,
+                "p99": 3.7987499963492155,
+                "maximum": 6.138374999864027,
+                "standardDeviation": 0.45927737077885783
+              },
+              "presentWaitMs": {
+                "samples": 474,
+                "mean": 2.3363324704641366,
+                "minimum": 0.003792,
+                "median": 0.940874,
+                "p95": 10.355709,
+                "p99": 13.2185,
+                "maximum": 14.482792,
+                "standardDeviation": 3.199748380271833
+              }
+            }
+          ],
+          "native": [
+            {
+              "frames": 2310,
+              "frames_per_second": 58.60846034148467,
+              "recording": {
+                "accepted": 0,
+                "directory": null,
+                "error": null,
+                "written": 0
+              },
+              "seconds": 39.414104833,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            },
+            {
+              "frames": 2311,
+              "frames_per_second": 58.61577688874369,
+              "recording": {
+                "accepted": 0,
+                "directory": null,
+                "error": null,
+                "written": 0
+              },
+              "seconds": 39.426245333,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            },
+            {
+              "frames": 2313,
+              "frames_per_second": 58.6696924975059,
+              "recording": {
+                "accepted": 0,
+                "directory": null,
+                "error": null,
+                "written": 0
+              },
+              "seconds": 39.424103,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            },
+            {
+              "frames": 2307,
+              "frames_per_second": 58.492024334397684,
+              "recording": {
+                "accepted": 0,
+                "directory": null,
+                "error": null,
+                "written": 0
+              },
+              "seconds": 39.441274708,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            }
+          ]
+        },
+        {
+          "name": "4-rig-video-on",
+          "rigs": 4,
+          "saveNativeVideo": true,
+          "rawRelativePath": ".local/evening-pacing/capped-vsync-followup/4-rig-video-on/results.json",
+          "rawSha256": "e03844ee71a494204b4c4b8d6afb71fcbb44f1bf0d0c8983d4ffa84f3411074b",
+          "phases": [
+            {
+              "phase": "all-60",
+              "target": 60,
+              "vsync": 0,
+              "frames": 472,
+              "wallIntervalFps": 59.0814641075255,
+              "frameStartMeanMs": 16.948594972063685,
+              "p95Ms": 17.586500850340414,
+              "p99Ms": 20.518416950112695,
+              "maxMs": 33.32337018140663,
+              "over20ms": 6,
+              "over20msWithinOneFrameOfGc": 2,
+              "observedGcDeltas": [
+                9,
+                9,
+                9
+              ],
+              "aggregateGcDeltas": [
+                9,
+                9,
+                9
+              ],
+              "aggregateGcIncludesReportAllocations": false,
+              "processCpuMsPerFrame": 13.022794491525424,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 472,
+              "gpuMs": {
+                "samples": 472,
+                "mean": 2.049884710239416,
+                "minimum": 1.4211666566552594,
+                "median": 1.8640000052982941,
+                "p95": 3.657499997643754,
+                "p99": 4.881041662883945,
+                "maximum": 6.005874995025806,
+                "standardDeviation": 0.692611336402203
+              },
+              "presentWaitMs": {
+                "samples": 472,
+                "mean": 2.397362485169492,
+                "minimum": 0.002459,
+                "median": 0.803209,
+                "p95": 10.230126,
+                "p99": 13.109124,
+                "maximum": 14.114084,
+                "standardDeviation": 3.1585141929321825
+              }
+            },
+            {
+              "phase": "vsync-2",
+              "target": -1,
+              "vsync": 2,
+              "frames": 475,
+              "wallIntervalFps": 59.39260341084535,
+              "frameStartMeanMs": 16.839946831364127,
+              "p95Ms": 17.582249149658224,
+              "p99Ms": 20.561125283446557,
+              "maxMs": 21.49066751700701,
+              "over20ms": 5,
+              "over20msWithinOneFrameOfGc": 1,
+              "observedGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcDeltas": [
+                8,
+                8,
+                8
+              ],
+              "aggregateGcIncludesReportAllocations": false,
+              "processCpuMsPerFrame": 12.699631789473688,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 475,
+              "gpuMs": {
+                "samples": 475,
+                "mean": 2.1921697371994684,
+                "minimum": 1.4619583234889433,
+                "median": 1.8737500067800283,
+                "p95": 4.021749991807155,
+                "p99": 5.59074999182485,
+                "maximum": 7.021500001428649,
+                "standardDeviation": 0.9106427659864746
+              },
+              "presentWaitMs": {
+                "samples": 475,
+                "mean": 2.1304303494736847,
+                "minimum": 0.070374,
+                "median": 0.922709,
+                "p95": 9.389084,
+                "p99": 12.455374,
+                "maximum": 13.01925,
+                "standardDeviation": 2.8591053676273015
+              }
+            },
+            {
+              "phase": "all-60-repeat",
+              "target": 60,
+              "vsync": 0,
+              "frames": 473,
+              "wallIntervalFps": 59.098096204845525,
+              "frameStartMeanMs": 16.913370684778496,
+              "p95Ms": 17.586628401360827,
+              "p99Ms": 19.74529478457754,
+              "maxMs": 21.821917517009126,
+              "over20ms": 4,
+              "over20msWithinOneFrameOfGc": 0,
+              "observedGcDeltas": [
+                9,
+                9,
+                9
+              ],
+              "aggregateGcDeltas": [
+                9,
+                9,
+                9
+              ],
+              "aggregateGcIncludesReportAllocations": false,
+              "processCpuMsPerFrame": 11.878628118393237,
+              "focused": false,
+              "trackingFresh": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "frameTimingSamples": 473,
+              "gpuMs": {
+                "samples": 473,
+                "mean": 1.8855809551517502,
+                "minimum": 1.4350416604429483,
+                "median": 1.8638750043464825,
+                "p95": 2.835083330865018,
+                "p99": 4.367249988717958,
+                "maximum": 5.339875002391636,
+                "standardDeviation": 0.4826490397978053
+              },
+              "presentWaitMs": {
+                "samples": 473,
+                "mean": 2.4097067758985222,
+                "minimum": 0.004001,
+                "median": 0.741668,
+                "p95": 10.722375,
+                "p99": 13.472666,
+                "maximum": 14.513083,
+                "standardDeviation": 3.3892485109099293
+              }
+            }
+          ],
+          "native": [
+            {
+              "frames": 2354,
+              "frames_per_second": 59.540143822799934,
+              "recording": {
+                "accepted": 2354,
+                "directory": "/Users/pavan/src/ledpanelVR/.local/evening-pacing/capped-vsync-followup/4-rig-video-on/native/VR1/recordings/4-rig-video-on-VR1-1793124811908572000-2166",
+                "error": null,
+                "written": 2354
+              },
+              "seconds": 39.536350584,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            },
+            {
+              "frames": 2349,
+              "frames_per_second": 59.45387697333476,
+              "recording": {
+                "accepted": 2349,
+                "directory": "/Users/pavan/src/ledpanelVR/.local/evening-pacing/capped-vsync-followup/4-rig-video-on/native/VR2/recordings/4-rig-video-on-VR2-1793124811908636000-2167",
+                "error": null,
+                "written": 2349
+              },
+              "seconds": 39.509618541,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            },
+            {
+              "frames": 2350,
+              "frames_per_second": 59.426807890383,
+              "recording": {
+                "accepted": 2350,
+                "directory": "/Users/pavan/src/ledpanelVR/.local/evening-pacing/capped-vsync-followup/4-rig-video-on/native/VR3/recordings/4-rig-video-on-VR3-1793124811910872000-2168",
+                "error": null,
+                "written": 2350
+              },
+              "seconds": 39.544442709,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            },
+            {
+              "frames": 2349,
+              "frames_per_second": 59.43812594354481,
+              "recording": {
+                "accepted": 2349,
+                "directory": "/Users/pavan/src/ledpanelVR/.local/evening-pacing/capped-vsync-followup/4-rig-video-on/native/VR4/recordings/4-rig-video-on-VR4-1793124811912880000-2169",
+                "error": null,
+                "written": 2349
+              },
+              "seconds": 39.520088541,
+              "source": "Simulated fly",
+              "udp_dropped": 0,
+              "zmq_dropped": 0,
+              "exitCode": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "minimalControl": {
+    "rawPath": ".local/evening-pacing/minimal-repeat.json",
+    "sha256": "5ea11b2bac0558f7eb0967565af4072df4b2b7790275a830e0e9112fbf31e383",
+    "conditions": [
+      {
+        "sync": 0,
+        "target": 60,
+        "fps": 59.51094232457409,
+        "mean": 16.80363242352938,
+        "median": 16.69804099999972,
+        "p95": 17.567499999998404,
+        "p99": 17.61104200000041,
+        "maximum": 18.242000000000758,
+        "minimum": 15.740083999999044,
+        "focused": false,
+        "refreshNumerator": 24000000,
+        "refreshDenominator": 199999,
+        "screen": [
+          3024,
+          1898
+        ],
+        "mode": "FullScreenWindow",
+        "metal": null
+      },
+      {
+        "sync": 1,
+        "target": -1,
+        "fps": 119.69511471747126,
+        "mean": 8.35455985284281,
+        "median": 8.338832999999823,
+        "p95": 8.545167000001186,
+        "p99": 8.930625000001413,
+        "maximum": 9.320999999999913,
+        "minimum": 7.3550830000002065,
+        "focused": false,
+        "refreshNumerator": 24000000,
+        "refreshDenominator": 199999,
+        "screen": [
+          3024,
+          1898
+        ],
+        "mode": "FullScreenWindow",
+        "metal": null
+      },
+      {
+        "sync": 2,
+        "target": -1,
+        "fps": 59.89936880598388,
+        "mean": 16.694666737458192,
+        "median": 16.672167000002958,
+        "p95": 16.842040999996755,
+        "p99": 17.566166999998245,
+        "maximum": 17.835375000004206,
+        "minimum": 16.18125000000248,
+        "focused": false,
+        "refreshNumerator": 24000000,
+        "refreshDenominator": 199999,
+        "screen": [
+          3024,
+          1898
+        ],
+        "mode": "FullScreenWindow",
+        "metal": null
+      }
+    ]
+  },
+  "nativeVideoValidation": {
+    "checks": 207,
+    "failure": null,
+    "decodedCases": [
+      {
+        "name": "hejjetrac-gui-take-a",
+        "encodedFrames": 45,
+        "nominalFps": 30.0,
+        "association": "Approximate operator offset"
+      },
+      {
+        "name": "hejjetrac-gui-take-b",
+        "encodedFrames": 40,
+        "nominalFps": 30.0,
+        "association": "Approximate operator offset"
+      },
+      {
+        "name": "rekkefly-mcp-take-a",
+        "encodedFrames": 55,
+        "nominalFps": 60.0,
+        "association": "Approximate operator offset"
+      },
+      {
+        "name": "rekkefly-mcp-take-b",
+        "encodedFrames": 55,
+        "nominalFps": 60.0,
+        "association": "Approximate operator offset"
+      },
+      {
+        "name": "1-rig-video-on-VR1",
+        "encodedFrames": 4761,
+        "nominalFps": 60.0,
+        "association": "Approximate operator offset"
+      },
+      {
+        "name": "4-rig-video-on-VR1",
+        "encodedFrames": 4795,
+        "nominalFps": 60.0,
+        "association": "Approximate operator offset"
+      },
+      {
+        "name": "4-rig-video-on-VR2",
+        "encodedFrames": 4795,
+        "nominalFps": 60.0,
+        "association": "Approximate operator offset"
+      },
+      {
+        "name": "4-rig-video-on-VR3",
+        "encodedFrames": 4797,
+        "nominalFps": 60.0,
+        "association": "Approximate operator offset"
+      },
+      {
+        "name": "4-rig-video-on-VR4",
+        "encodedFrames": 4797,
+        "nominalFps": 60.0,
+        "association": "Approximate operator offset"
+      }
+    ]
+  }
+}
