@@ -91,6 +91,28 @@ public static class Regression
             File.Delete(Path.Combine(handoff,"config_manifest.json"));var legacyHandoff=new ReplaySessionArchive(handoff);legacyHandoff.LoadRigSamples();
             Check(legacyHandoff.Rigs["VR1"].Count==8,"unverified legacy context is not discarded as modern handoff data");
             Check(archive.ExperimentFor(archive.Rigs["VR1"][0])?["objects"] is JArray,"legacy run's own config is loaded");
+            string terrainRun=Path.Combine(root,"terrain-inline-treatments");Directory.CreateDirectory(terrainRun);
+            var terrainBase=new JObject{["autopilotSpeed"]=1,["rugosity"]=new JObject{["enabled"]=true,["visualSurface"]="base",["collisionSurface"]="base",["normalSurface"]="inherited"}};
+            File.WriteAllText(Path.Combine(terrainRun,"terrain.json"),terrainBase.ToString());
+            var terrainRows=new JArray();
+            foreach(string treatment in new[]{"RoughSmooth","SmoothRough","SmoothSmooth","RoughRough"})terrainRows.Add(new JObject{["sceneName"]="TerrainCueLab",["parameters"]=new JObject{["configFile"]="terrain.json",["autopilotSpeed"]=99,["rugosity"]=new JObject{["visualSurface"]=treatment,["collisionSurface"]="Flat",["normalSurface"]=null}}});
+            var terrainSequence=new JObject{["randomise"]=false,["sequences"]=terrainRows};File.WriteAllText(Path.Combine(terrainRun,"sequenceConfig.json"),terrainSequence.ToString());
+            var terrainArchive=new ReplaySessionArchive(terrainRun);
+            for(int i=0;i<terrainRows.Count;i++)
+            {
+                var restored=terrainArchive.ExperimentFor(new ReplaySessionArchive.Sample{scene="TerrainCueLab",sequenceStep=i,configFile="terrain.json"});
+                Check((string)restored["rugosity"]["visualSurface"]==(string)terrainRows[i]["parameters"]["rugosity"]["visualSurface"] && (string)restored["rugosity"]["collisionSurface"]=="Flat","Replay restores per-row terrain treatment while all four rows share one base file: "+i);
+                Check((string)restored["rugosity"]["normalSurface"]=="inherited" && (int)restored["autopilotSpeed"]==1,"Terrain patch ignores null and does not merge unrelated inline parameters: "+i);
+            }
+            Check(JToken.DeepEquals(JObject.Parse(File.ReadAllText(Path.Combine(terrainRun,"terrain.json"))),terrainBase),"Treatment restoration does not rewrite saved shared base JSON");
+            var phaseBase=new JObject{["stimulus"]=terrainBase.DeepClone()};File.WriteAllText(Path.Combine(terrainRun,"terrain-phased.json"),phaseBase.ToString());
+            terrainRows.Add(new JObject{["sceneName"]="TerrainCueLab",["parameters"]=new JObject{["configFile"]="terrain-phased.json",["rugosity"]=new JObject{["visualSurface"]="phase-patch"}}});
+            File.WriteAllText(Path.Combine(terrainRun,"sequenceConfig.json"),terrainSequence.ToString());
+            var phaseArchive=new ReplaySessionArchive(terrainRun);var phaseRestored=phaseArchive.ExperimentFor(new ReplaySessionArchive.Sample{scene="TerrainCueLab",sequenceStep=4,phase="stimulus",configFile="terrain-phased.json"});
+            Check((string)phaseRestored["rugosity"]["visualSurface"]=="phase-patch" && (string)phaseRestored["rugosity"]["normalSurface"]=="inherited","Terrain override is applied after saved phase extraction");
+            terrainSequence["randomise"]=true;File.WriteAllText(Path.Combine(terrainRun,"sequenceConfig.json"),terrainSequence.ToString());
+            var ambiguousTerrain=new ReplaySessionArchive(terrainRun);
+            Check(ambiguousTerrain.ExperimentFor(new ReplaySessionArchive.Sample{scene="TerrainCueLab",sequenceStep=0,configFile="terrain.json"})==null && ambiguousTerrain.Warnings.Any(w=>w.Contains("randomized terrain treatment is ambiguous")),"Unlogged randomized source-row order cannot silently select the wrong shared-base terrain patch");
             Reject(()=>archive.SafePath("../outside.json"),"traversal accepted");
             Reject(()=>archive.SafePath("Configs/Files/../../../outside.json"),"nested traversal accepted");
             Check(ReplaySessionArchive.Csv("a,\"b,c\",\"say \"\"hello\"\"\"").SequenceEqual(new[]{"a","b,c","say \"hello\""}),"CSV quoting/double quote parsing");

@@ -154,6 +154,7 @@ static class Regression
             }
             var ownedRig=new JObject{["tracker"]=new JObject{["saveVideo"]=true}};
             var ownedEvidence=new JObject{["identityVerified"]=true,["matchesConfiguredRig"]=true,["savedVideoRequested"]=true};
+            Check(ActualMediaOwnership.ShouldRetainMediaSource(new JObject(),ownedEvidence)&&ActualMediaOwnership.ShouldRetainMediaSource(new JObject{["tracker"]=new JObject()},ownedEvidence),"Omitted saveVideo uses default-on only with positive matching owned launch evidence");
             Check(!ActualMediaOwnership.ShouldRetainMediaSource(null,ownedEvidence)&&!ActualMediaOwnership.ShouldRetainMediaSource(ownedRig,null),"missing media ownership stays unavailable");
             Check(!ActualMediaOwnership.ShouldRetainMediaSource(new JObject{["tracker"]="invalid"},ownedEvidence),"malformed tracker object cannot retain source");
             ownedRig["tracker"]["saveVideo"]="true";Check(!ActualMediaOwnership.ShouldRetainMediaSource(ownedRig,ownedEvidence),"string request is not boolean recording evidence");

@@ -53,6 +53,17 @@ public sealed class ReplayMediaPanel : IDisposable
     public bool Expanded=>expanded;
     public IReadOnlyList<string> Warnings=>archive?.Warnings??Array.Empty<string>();
     public string Error=>error;
+    // The same frame gate is used by the GUI and rendered round-trip validation.
+    public Texture VisibleVideoTexture
+    {
+        get
+        {
+            Texture image=avi!=null?frameTexture:player!=null?player.texture:null;
+            bool mapped=archive!=null && clip!=null && archive.TryResolveFrame(clip,seconds,out _);
+            return image!=null && displayedGeneration==generation && (mapped || clip?.SyncMode=="unavailable")?image:null;
+        }
+    }
+    public long DisplayedVideoFrame=>VisibleVideoTexture==null?-1:displayedFrame;
 
     public ReplayMediaPanel(MonoBehaviour owner,Action pause){this.owner=owner;this.pause=pause;}
     public void SetAnimalPreview(RenderTexture texture,string label){animalPreview=texture;animalLabel=label;}
@@ -102,10 +113,16 @@ public sealed class ReplayMediaPanel : IDisposable
             else if(!completed.IsCanceled)
             {
                 archive=completed.Result;selectedClip=0;
-                status=archive.Clips.Count==0?"No tracker video was saved.":archive.Clips.Count+" recorded video clip(s).";
-                if(archive.Clips.Count>0)ChooseClip(0);
+                status=archive.MissingVideoStatus(PreviewRig);
+                ChooseClip(archive.SelectClip(PreviewRig,seconds));
                 if(archive.Warnings.Count>0)error=string.Join("\n",archive.Warnings.Take(3));
             }
+        }
+        if(archive!=null)
+        {
+            int matching=archive.SelectClip(PreviewRig,seconds,selectedClip);
+            if(matching!=selectedClip)ChooseClip(matching);
+            else if(matching<0)status=archive.MissingVideoStatus(PreviewRig);
         }
         if(pendingAvi!=null && pendingAvi.IsCompleted)
         {
@@ -158,7 +175,8 @@ public sealed class ReplayMediaPanel : IDisposable
     }
     private void ChooseClip(int index)
     {
-        ResetClip();selectedClip=index;clip=archive?.Clips[index];if(clip==null)return;
+        ResetClip();selectedClip=index;clip=archive!=null && index>=0 && index<archive.Clips.Count?archive.Clips[index]:null;
+        if(clip==null){status=archive?.MissingVideoStatus(PreviewRig)??"No tracker video was saved.";return;}
         if(!clip.Complete || clip.State!="ready"){status="This camera recording is pending or unavailable.";return;}
         error=null;status="Opening tracker video…";clipCancellation=CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token);
         if(string.Equals(clip.Container,"avi",StringComparison.OrdinalIgnoreCase) || string.Equals(Path.GetExtension(clip.AbsolutePath),".avi",StringComparison.OrdinalIgnoreCase))
@@ -236,13 +254,16 @@ public sealed class ReplayMediaPanel : IDisposable
             }
             string title=clip==null?"Tracker video":(clip.RigId??"Animal")+" · video "+(selectedClip+1)+" / "+archive.Clips.Count;
             GUI.Label(new Rect(x,y,w-100*scale,row),title,textStyle);
-            if(archive!=null && archive.Clips.Count>1 && GUI.Button(new Rect(x+w-96*scale,y,96*scale,row),"Next video"))ChooseClip((selectedClip+1)%archive.Clips.Count);
+            if(archive!=null && archive.Clips.Count(c=>string.Equals(c.RigId,PreviewRig,StringComparison.OrdinalIgnoreCase))>1 && GUI.Button(new Rect(x+w-96*scale,y,96*scale,row),"Next video"))
+            {
+                for(int offset=1;offset<=archive.Clips.Count;offset++)
+                {int next=(selectedClip+offset)%archive.Clips.Count;if(string.Equals(archive.Clips[next].RigId,PreviewRig,StringComparison.OrdinalIgnoreCase)){ChooseClip(next);break;}}
+            }
             y+=row;
-            Texture image=avi!=null?frameTexture:player!=null?player.texture:null;
             ReplayMediaFrame target=default;
             bool mapped=archive!=null && clip!=null && archive.TryResolveFrame(clip,seconds,out target);
-            bool show=image!=null && displayedGeneration==generation && (mapped || clip?.SyncMode=="unavailable");
-            if(videoHeight>0)DrawImage(new Rect(x,y,w,videoHeight),show?image:null);y+=videoHeight+4*scale;
+            bool show=VisibleVideoTexture!=null;
+            if(videoHeight>0)DrawImage(new Rect(x,y,w,videoHeight),VisibleVideoTexture);y+=videoHeight+4*scale;
             string caption=status;
             if(clip!=null && mapped)
             {

@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-27",
+  "unity": "6000.3.16f1",
+  "cases": [
+    {
+      "backend": "Rekkefly",
+      "input": "explicit generated fly demo",
+      "acquisitionReplayPassed": true,
+      "acquisitionReplayChecks": 999,
+      "mediaPanelPassed": true,
+      "mediaPanelChecks": 41,
+      "nativeFrames": 1800,
+      "consumedSourceFrameAssociation": true,
+      "renderedFrameOrder": [
+        83,
+        334,
+        560,
+        334,
+        83
+      ],
+      "allRenderedFramesMatchNativeReference": true,
+      "renderedSizes": [
+        "640x480"
+      ],
+      "sourceRunAndNativeFilesUnchanged": true,
+      "scope": "Fresh native generated demo and actual acquired pose CSV -> production import using consumed input IDs -> actual ReplayScene + asynchronous ReplayMediaPanel -> GPU-rendered visible texture, forward/back seeks. God's-eye and animal preview active simultaneously. No physical camera, animal, exposure or LED timing claim.",
+      "localEvidence": ".local/replay-video-acceptance-20261027b/panel/results.json"
+    },
+    {
+      "backend": "HejjéTrac",
+      "input": "bundled attributed prerecorded walking sample",
+      "acquisitionReplayPassed": true,
+      "acquisitionReplayChecks": 1002,
+      "mediaPanelPassed": true,
+      "mediaPanelChecks": 41,
+      "nativeFrames": 89,
+      "consumedSourceFrameAssociation": true,
+      "renderedFrameOrder": [
+        2,
+        40,
+        75,
+        40,
+        2
+      ],
+      "allRenderedFramesMatchNativeReference": true,
+      "renderedSizes": [
+        "384x288"
+      ],
+      "sourceRunAndNativeFilesUnchanged": true,
+      "scope": "Fresh native recording from an explicitly labelled demo/sample and actual acquired pose CSV -> production import using consumed input IDs -> actual ReplayScene + asynchronous ReplayMediaPanel -> GPU-rendered visible texture, forward/back seeks. God's-eye and animal preview active simultaneously. No physical camera, new animal measurement, exposure or LED timing claim.",
+      "localEvidence": ".local/replay-video-acceptance-20261027b/hejjetrac/panel/results.json"
+    }
+  ],
+  "offlineChecks": {
+    "trackerContracts": 104,
+    "recordingSummary": 66,
+    "mediaImportSelectionAssociation": 64,
+    "atomicConsumedInputGuards": 3,
+    "replayArchivesAndWriters": 677,
+    "nativeReplayUi": 80,
+    "effectiveConfig": 40
+  },
+  "guiScreenshotStatus": "Editor batch mode did not publish a GameView screenshot. Final native player overlay inspection remains a separate required check.",
+  "excludedClaims": [
+    "physical camera calibration",
+    "new animal measurement",
+    "camera exposure synchronization",
+    "LED timing",
+    "other-platform runtime validation"
+  ]
+}

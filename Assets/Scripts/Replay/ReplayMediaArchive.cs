@@ -53,6 +53,7 @@ public sealed class ReplayMediaArchive
 {
     private readonly List<ReplayMediaClip> clips=new List<ReplayMediaClip>();
     private readonly List<string> warnings=new List<string>();
+    private readonly Dictionary<string,string> videoStatus=new Dictionary<string,string>(StringComparer.Ordinal);
     public IReadOnlyList<ReplayMediaClip> Clips => clips;
     public IReadOnlyList<string> Warnings => warnings;
     public long OriginTicks { get; private set; }
@@ -63,9 +64,12 @@ public sealed class ReplayMediaArchive
     {
         var result=new ReplayMediaArchive{OriginTicks=originTicks};
         string root=Path.GetFullPath(runDirectory),manifest=Path.Combine(root,"media_manifest.json");
+        result.ReadSavedVideoStatus(root);
         if(!File.Exists(manifest))return result;
         if(new FileInfo(manifest).Length>8*1024*1024)throw new InvalidDataException("Camera media manifest is too large.");
         var document=JObject.Parse(File.ReadAllText(manifest));
+        foreach(var source in (document["sources"] as JArray??new JArray()).OfType<JObject>())
+            if((string)source["state"]!="collected")result.videoStatus[CanonicalRig((string)source["rigId"]) ]="Tracker footage is pending. Close the independent tracker normally, then choose Collect media. If its stop could not be acknowledged, use Import video folder and confirm the source has finished saving.";
         if((int?)document["schemaVersion"]!=1)throw new InvalidDataException("Unsupported camera media manifest version.");
         string clock=(string)document["timeline"]?["clock"];
         if(clock!="recorded-wallclock-ticks" || !long.TryParse((string)document["timeline"]?["originTicks"],NumberStyles.None,CultureInfo.InvariantCulture,out long savedOrigin)||savedOrigin!=originTicks)
@@ -127,6 +131,49 @@ public sealed class ReplayMediaArchive
         }
         foreach(string warning in (document["warnings"] as JArray??new JArray()).Values<string>())result.warnings.Add(warning);
         return result;
+    }
+
+    private static string CanonicalRig(string rig)=>(rig??"").Trim().ToUpperInvariant();
+    private void ReadSavedVideoStatus(string root)
+    {
+        string path=Path.Combine(root,"companion_provenance.json");
+        if(!File.Exists(path))return;
+        try
+        {
+            if(new FileInfo(path).Length>2*1024*1024)return;
+            var saved=JObject.Parse(File.ReadAllText(path));
+            foreach(var tracker in (saved["trackers"] as JArray??new JArray()).OfType<JObject>())
+            {
+                string backend=(string)tracker["configuredBackend"]??(string)tracker["backend"]??"external tracker";
+                string id=CanonicalRig((string)tracker["vrId"]);
+                if(tracker["savedVideoRequested"]?.Type==JTokenType.Boolean)
+                    videoStatus[id]=(bool)tracker["savedVideoRequested"]
+                        ? "Tracker video was requested, but no completed clip is in this run. Close the tracker normally and choose Collect media, or import its completed video folder."
+                        : "Tracker video was switched off for this recording. Enable Save tracker video before a future run and restart an already open tracker. Existing completed footage can be added with Import video folder.";
+                else
+                    videoStatus[id]=backend+" supplied no archived camera footage. A tracking input stream alone cannot reconstruct camera video. Import an existing completed video folder; legacy footage needs an explicit offset for approximate synchronization.";
+            }
+        }
+        catch(Exception error) when(error is IOException || error is UnauthorizedAccessException || error is Newtonsoft.Json.JsonException)
+        { /* Missing provenance must never stop a valid pose or media replay. */ }
+    }
+    public string MissingVideoStatus(string rigId)
+    {
+        return videoStatus.TryGetValue(CanonicalRig(rigId),out string status)?status:
+            "No tracker footage was archived for this animal. Enable Save tracker video before a future supported bundled-tracker run, or import an existing completed video folder. Tracking data alone does not contain camera pixels.";
+    }
+
+    /// <summary>Follow the selected animal and timeline without substituting another animal's camera.</summary>
+    public int SelectClip(string rigId,double replaySeconds,int preferred=-1)
+    {
+        bool Matches(ReplayMediaClip value)=>value.Complete && value.State=="ready" &&
+            (string.IsNullOrWhiteSpace(rigId)||CanonicalRig(value.RigId)==CanonicalRig(rigId));
+        bool Covers(ReplayMediaClip value)=>value.SyncMode!="unavailable" && TryResolveFrame(value,replaySeconds,out _);
+        if(preferred>=0 && preferred<clips.Count && Matches(clips[preferred]) && Covers(clips[preferred]))return preferred;
+        for(int i=0;i<clips.Count;i++)if(Matches(clips[i]) && Covers(clips[i]))return i;
+        if(preferred>=0 && preferred<clips.Count && Matches(clips[preferred]))return preferred;
+        for(int i=0;i<clips.Count;i++)if(Matches(clips[i]))return i;
+        return -1;
     }
 
     /// <summary>Returns the preceding associated input frame; AgeSeconds exposes stale/gap association.</summary>

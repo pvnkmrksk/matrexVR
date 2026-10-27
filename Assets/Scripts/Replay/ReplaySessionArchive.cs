@@ -144,6 +144,34 @@ public sealed class ReplaySessionArchive
             if (!(config[phase] is JObject payload)) { Warn("Saved phase missing: " + phase + " in " + reference); return null; }
             config = (JObject)payload.DeepClone();
         }
+        // Choice applies the sequence's rugosity patch after extracting a phase.
+        // Reusing one base terrain config must preserve its recorded per-row treatment.
+        bool SameReference(JObject row)
+        {
+            string saved=(string)row?["parameters"]?["configFile"]??(string)row?["parameters"]?["design"];
+            string scene=(string)row?["sceneName"];
+            return string.Equals(saved?.Replace('\\','/'),reference?.Replace('\\','/'),StringComparison.Ordinal) &&
+                (string.IsNullOrEmpty(scene)||string.Equals(scene,sample.scene,StringComparison.Ordinal));
+        }
+        JObject terrainPatch=null;
+        if(Sequence?.Value<bool?>("randomise")==true)
+        {
+            var candidates=(rows??new JArray()).OfType<JObject>().Where(SameReference).ToArray();
+            if(candidates.Any(row=>row["parameters"]?["rugosity"] is JObject))
+            {
+                var patches=candidates.Select(row=>row["parameters"]?["rugosity"] as JObject).ToArray();
+                if(patches.Length>0 && patches.All(value=>JToken.DeepEquals(value,patches[0])))terrainPatch=patches[0];
+                else {Warn("Saved randomized terrain treatment is ambiguous: multiple inline rugosity patches share "+reference+". The source row was not recorded; no terrain treatment is assumed.");return null;}
+            }
+        }
+        else if(rows!=null && sample.sequenceStep>=0 && sample.sequenceStep<rows.Count && SameReference(rows[sample.sequenceStep] as JObject))
+            terrainPatch=parameters?["rugosity"] as JObject;
+        if(terrainPatch!=null)
+        {
+            var rugosity=config["rugosity"] as JObject??new JObject();
+            rugosity.Merge(terrainPatch,new JsonMergeSettings{MergeNullValueHandling=MergeNullValueHandling.Ignore});
+            config["rugosity"]=rugosity;
+        }
         return config;
     }
 

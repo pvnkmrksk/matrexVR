@@ -2,7 +2,7 @@
 
 `media_manifest.json` describes optional camera footage inside a saved run. It does not replace pose CSVs or `config_manifest.json`. A recording can have complete pose data and pending camera media independently.
 
-The opt-in `tracker.saveVideo` flag defaults to false. Bundled Rekkefly and HejjéTrac use intra-frame MJPEG AVI when requested. Recording options change atomically in the same native calibration file; calibration values and operator edits remain shared when recording is switched on or off. A running tracker using another recording option must be closed explicitly before the option changes. Tracking processes remain independent of Unity and archival never stops them.
+The current development `tracker.saveVideo` flag defaults to true for supported bundled native tracker launches, including when the optional `tracker` object is omitted. Explicit false disables video; previous builds defaulted it off, and historical missing footage is never inferred or recreated. Bundled Rekkefly and HejjéTrac use intra-frame MJPEG AVI when requested. Recording options change atomically in the same native calibration file; calibration values and operator edits remain shared when recording is switched on or off. A running tracker using another recording option must be closed explicitly before the option changes. Tracking processes remain independent of Unity and archival never stops them.
 
 Rekkefly saves segmented video and `frames.jsonl`, with zero-based clip-local frame, upstream source sequence and host-receive Unix nanoseconds. HejjéTrac saves epoch clips plus all-frames, quality and configuration logs. Its native source clock is platform-specific; it must not be reinterpreted as UTC. Original files and sidecars are preserved and hashed when imported.
 

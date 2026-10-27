@@ -389,8 +389,12 @@ public static class MediaArchive
         else
         {
             string folder=Path.GetDirectoryName(Path.Combine(root,child)),epoch=Path.GetFileName(folder);
-            if(!epoch.EndsWith("-media",StringComparison.Ordinal))return result;
-            path=Path.Combine(Path.GetDirectoryName(folder),epoch.Substring(0,epoch.Length-6)+"-all-frames.dat");if(!File.Exists(path))return result;
+            if(epoch.EndsWith("-media",StringComparison.Ordinal))
+                path=Path.Combine(Path.GetDirectoryName(folder),epoch.Substring(0,epoch.Length-6)+"-all-frames.dat");
+            else if(string.Equals(Path.GetFileNameWithoutExtension(child),"raw",StringComparison.OrdinalIgnoreCase))
+                path=Path.Combine(folder,"all-frames.dat"); // Native headless/agent recording layout.
+            else return result;
+            if(!File.Exists(path))return result;
             long local=0;
             foreach(string line in File.ReadLines(path))
             {

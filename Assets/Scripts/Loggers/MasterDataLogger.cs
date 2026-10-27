@@ -150,7 +150,11 @@ public class MasterDataLogger : MonoBehaviour
     internal static bool ShouldRetainMediaSource(JObject rig, JObject evidence)
     {
         bool True(JToken value) => value?.Type == JTokenType.Boolean && value.Value<bool>();
-        return rig?["tracker"] is JObject tracker && True(tracker["saveVideo"]) &&
+        if(rig==null)return false;
+        JToken tracker=rig["tracker"];
+        if(tracker!=null && tracker.Type!=JTokenType.Null && !(tracker is JObject))return false;
+        JToken requested=(tracker as JObject)?["saveVideo"];
+        return (requested==null || True(requested)) &&
             True(evidence?["identityVerified"]) && True(evidence?["matchesConfiguredRig"]) && True(evidence?["savedVideoRequested"]);
     }
 

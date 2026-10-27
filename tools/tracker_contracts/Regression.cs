@@ -44,14 +44,14 @@ public static class Regression
             Reject(()=>TrackerWireDecoder.Decode("{\"yaw\":\"NaN\"}",ClosedLoopMode.Kinefly),"Reject nonfinite JSON pose");
             Check(TrackerWireDecoder.IsPayload("  FT, 0")&&!TrackerWireDecoder.IsPayload("tracking-topic"),"Single-frame discriminator preserves separate legacy topic behavior");
             string config=Path.Combine(temp,"rig config β \"quoted\".txt");File.WriteAllText(config,"zmq_host : 127.0.0.1\nzmq_port : 9871\n");
-            var rig=new SystemConfig{vrId="VR10",closedLoopMode=ClosedLoopMode.Rekkefly,zmqAddress="localhost",zmqPort=9871,tracker=new TrackerLaunchConfig{executablePath=args[0],configFile=config,device="Camera β \"2\"",headless=true}};
+            var rig=new SystemConfig{vrId="VR10",closedLoopMode=ClosedLoopMode.Rekkefly,zmqAddress="localhost",zmqPort=9871,tracker=new TrackerLaunchConfig{executablePath=args[0],configFile=config,device="Camera β \"2\"",headless=true,saveVideo=false}};
             var launch=TrackerProcessManager.Arguments(rig);
             Check(launch.SequenceEqual(new[]{"--config",config,"--label","VR10","--zmq-port","9871","--device","Camera β \"2\"","--headless"}),"Rekkefly launch uses authoritative rig/port and independent lifetime");
             rig.tracker.strictCameraFallback=true;
             Check(TrackerProcessManager.Arguments(rig).Last()=="--no-camera-fallback"&&!TrackerProcessManager.Arguments(rig).Contains("--supervised"),"Camera-only launch disables fallback without stdin supervision");
             rig.tracker.strictCameraFallback=false;
             rig.tracker.saveVideo=true;
-            Check(TrackerProcessManager.Arguments(rig).Last()=="--record","Saved camera video is explicit opt-in on detached flight launch");
+            Check(TrackerProcessManager.Arguments(rig).Last()=="--record","Saved camera video requests detached flight recording");
             rig.tracker.saveVideo=false;
             rig.closedLoopMode=ClosedLoopMode.Hejjetrac;rig.tracker.device="";rig.tracker.headless=false;
             Check(TrackerProcessManager.Arguments(rig).SequenceEqual(new[]{"--config",config,"--windows","1"}),"HejjéTrac native acquisition starts without stdin control");
@@ -114,14 +114,15 @@ public static class Regression
                 {
                     var cameraRig=new SystemConfig{vrId="VR-VIDEO-"+mode,closedLoopMode=mode,zmqPort=9894,zmqAddress="localhost",tracker=new TrackerLaunchConfig()};
                     var canonical=CompanionCatalog.Prepare(cameraRig,true);File.AppendAllText(canonical.rig.tracker.configFile,"\n# shared calibration sentinel\n");string canonicalText=File.ReadAllText(canonical.rig.tracker.configFile);
-                    Check(!canonical.rig.tracker.saveVideo,"Video defaults off: "+mode);cameraRig.tracker.saveVideo=true;var video=CompanionCatalog.Prepare(cameraRig,true);
-                    Check(video.rig.tracker.saveVideo&&video.rig.tracker.configFile==canonical.rig.tracker.configFile,"Opt-in video keeps one canonical calibration profile: "+mode);
+                    Check(canonical.rig.tracker.saveVideo,"Video defaults on for bundled recorders: "+mode);cameraRig.tracker.saveVideo=true;var video=CompanionCatalog.Prepare(cameraRig,true);
+                    Check(video.rig.tracker.saveVideo&&video.rig.tracker.configFile==canonical.rig.tracker.configFile,"Default video keeps one canonical calibration profile: "+mode);
                     Check(File.ReadAllText(canonical.rig.tracker.configFile).Contains("shared calibration sentinel"),"Recording option changes preserve canonical calibration edits: "+mode);
                     string recording=File.ReadAllText(video.rig.tracker.configFile);
                     Check(mode==ClosedLoopMode.Rekkefly?recording.Contains("\"mjpeg\"")&&recording.Contains("enabled = true"):recording.Contains("save_raw : y")&&recording.Contains("vid_codec : mjpg"),"Both bundled recorders prefer directly readable intra-frame AVI: "+mode);
                     Check(Path.IsPathFullyQualified(video.rig.tracker.recordingDirectory),"Native recording root is explicit for later collection: "+mode);
                     File.AppendAllText(video.rig.tracker.configFile,"\n# video calibration edit\n");var again=CompanionCatalog.Prepare(cameraRig,true);
-                    Check(File.ReadAllText(again.rig.tracker.configFile).Contains("video calibration edit"),"Repeated preparation keeps operator recording calibration: "+mode);cameraRig.tracker.saveVideo=false;var off=CompanionCatalog.Prepare(cameraRig,true);Check(off.rig.tracker.configFile==again.rig.tracker.configFile&&File.ReadAllText(off.rig.tracker.configFile).Contains("video calibration edit"),"Switching recording off retains the same newly edited calibration: "+mode);
+                    Check(File.ReadAllText(again.rig.tracker.configFile).Contains("video calibration edit"),"Repeated preparation keeps operator recording calibration: "+mode);cameraRig.tracker.saveVideo=false;var off=CompanionCatalog.Prepare(cameraRig,true);Check(!off.rig.tracker.saveVideo&&off.rig.tracker.configFile==again.rig.tracker.configFile&&File.ReadAllText(off.rig.tracker.configFile).Contains("video calibration edit"),"Explicit video opt-out retains the same newly edited calibration: "+mode);
+                    cameraRig.tracker=null;var omitted=CompanionCatalog.Prepare(cameraRig,true);Check(omitted.rig.tracker.saveVideo,"Omitted tracker object uses the same video-on runtime default: "+mode);
                 }
             }
             finally{Environment.SetEnvironmentVariable("MATREX_COMPANION_DIR",originalBundle);}

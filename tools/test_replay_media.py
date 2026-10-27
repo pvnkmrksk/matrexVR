@@ -66,6 +66,25 @@ class Regression {
   receipt=await MediaArchive.CollectPendingAsync(collectRun);Check(receipt.Complete&&receipt.ImportedClips==0,"repeated collection does not duplicate gigabytes");Check(!((JArray)JObject.Parse(File.ReadAllText(collectManifest))["warnings"]).Values<string>().Contains(pendingWarning),"repeat collection restored stale pending status");
   archive=await ReplayMediaArchive.LoadAsync(collectRun,origin);Check(archive.Clips.Count==1&&archive.TryResolveFrame(archive.Clips[0],1.5,out _),"collected clip retains consumed source mapping");
   var filtered=CompanionMediaArchive.BeginSession(Run(root,"other-rig"),"other");filtered.RetainRigs(new[]{"VR99"});Check(filtered.FinalizeAsync().IsCompleted&&(await filtered.FinalizeAsync()).Complete,"unused previously launched rig cannot mark an unrelated run pending");
+  string multiRun=Run(root,"multi-rig-segments");
+  foreach(var part in new[]{("VR1",0d),("VR2",0d),("VR1",5d)})
+  {var segment=Request(multiRun,source,"operator-offset");segment.RigId=part.Item1;segment.ManualOffsetSeconds=part.Item2;await MediaArchive.ImportAsync(segment);}
+  var multiple=await ReplayMediaArchive.LoadAsync(multiRun,origin);
+  Check(multiple.SelectClip("VR1",0)==0&&multiple.SelectClip("vr2",0,0)==1,"video selection follows the selected animal without another rig's feed");
+  Check(multiple.SelectClip("VR1",5,0)==2&&multiple.SelectClip("VR1",0,2)==0,"forward and backward scrubs select the segment covering the shared timeline");
+  Check(multiple.SelectClip("VR3",0,0)==-1,"an animal without saved footage cannot inherit another animal's camera");
+  Check(multiple.SelectClip("VR1",2,2)==2,"a gap retains the selected source while frame resolution truthfully reports no coverage");
+  string noVideo=Run(root,"no-video-evidence");
+  File.WriteAllText(Path.Combine(noVideo,"companion_provenance.json"),"{\"trackers\":[{\"vrId\":\"VR1\",\"configuredBackend\":\"HejjéTrac\",\"savedVideoRequested\":false},{\"vrId\":\"VR2\",\"configuredBackend\":\"Rekkefly\",\"savedVideoRequested\":true},{\"vrId\":\"VR3\",\"configuredBackend\":\"Kinefly\"}]}");
+  var absent=await ReplayMediaArchive.LoadAsync(noVideo,origin);
+  Check(absent.MissingVideoStatus("VR1").Contains("switched off")&&absent.MissingVideoStatus("VR1").Contains("future"),"historical disabled recording stays honest and explains future setup");
+  Check(absent.MissingVideoStatus("VR2").Contains("requested")&&absent.MissingVideoStatus("VR2").Contains("Collect media"),"requested but absent footage explains recorder finalization and collection");
+  Check(absent.MissingVideoStatus("VR3").Contains("Kinefly")&&absent.MissingVideoStatus("VR3").Contains("Import")&&absent.MissingVideoStatus("VR3").Contains("offset"),"legacy external tracking does not claim video capture and offers explicit import/offset");
+  string hejjSource=Path.Combine(root,"native-hejj-flat");Directory.CreateDirectory(hejjSource);Avi(Path.Combine(hejjSource,"raw.avi"));
+  using(var writer=new StreamWriter(Path.Combine(hejjSource,"all-frames.dat")))for(int i=0;i<3;i++){var cells=Enumerable.Repeat("0",25).ToArray();cells[0]=(100+i).ToString();cells[24]=(1000+i*100).ToString();writer.WriteLine(string.Join(",",cells));}
+  string hejjRun=Run(root,"hejj-flat-run");using(var writer=new StreamWriter(Path.Combine(hejjRun,"poses.csv"))){writer.WriteLine(string.Join(",",header));for(int i=0;i<3;i++){var cells=Row(i,(100+i).ToString(),(1000+i*100).ToString());cells[13]="tracker-source-milliseconds";writer.WriteLine(string.Join(",",cells));}}
+  var hejjRequest=Request(hejjRun,hejjSource);hejjRequest.ExpectedBackend="Hejjetrac";await MediaArchive.ImportAsync(hejjRequest);var hejjMedia=await ReplayMediaArchive.LoadAsync(hejjRun,origin);
+  Check(hejjMedia.Clips[0].SyncMode=="consumed-frame-id"&&hejjMedia.TryResolveFrame(hejjMedia.Clips[0],1.5,out var hejjFrame)&&hejjFrame.LocalFrame==1,"Native headless HejjéTrac raw.avi/all-frames.dat uses verified IDs and source timestamps without guessed frame ordinals");
   using(var cancel=new CancellationTokenSource()){cancel.Cancel();failed=false;try{await ReplayMediaArchive.LoadAsync(run,origin,cancel.Token);}catch(OperationCanceledException){failed=true;}Check(failed,"canceled archive load obeys cancellation");}
   Console.WriteLine("PASS: "+checks+" production media archive and tracker source-ID checks. RIFF indexing/clock policy only; no Unity rendering or camera exposure claims.");
  }finally{Directory.Delete(root,true);}}

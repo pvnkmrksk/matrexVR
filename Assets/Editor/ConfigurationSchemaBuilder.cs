@@ -195,6 +195,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
             ui["unit"]="seconds";ui["help"]="Compact session context heartbeat for late-joining dashboards. Topic matrex.telemetry.v2.context uses schema 1/kind matrex.context; normal frame snapshots retain schema 2.";
         }
         if(owner==typeof(TrackerLaunchConfig)) ui["help"]=name=="executablePath"?"Absolute installed native executable. On macOS choose Contents/MacOS inside the app. Nothing launches automatically.":name=="configFile"?"Existing tracker calibration file. Relative paths resolve inside the MATREX config folder; MATREX never rewrites this file.":name=="device"?"Optional Rekkefly device override. HejjéTrac source selection stays in its calibration config.":"Optional headless Rekkefly launch. HejjéTrac uses its native desktop window.";
+        if(owner==typeof(TrackerLaunchConfig) && name=="saveVideo") ui["help"]="Save supported bundled tracker camera footage for replay; enabled when omitted. Explicit false disables it. Close an already open tracker normally before changing this option, then restart it. Footage remains pending until the independent recorder finishes saving.";
         if(owner==typeof(VRConfig) && (name=="vrIndex" || name=="watchIndex")) child["minimum"]=1;
         if(new[]{"agentSpeed","locoSpeed","agentSpeedStdDev","locustSpeedStdDev","volumeHalfExtentMetres","preserveBoundaryOvershoot"}.Contains(name))
             ui["visibleWhen"]=Rule("trajectoryFile","");

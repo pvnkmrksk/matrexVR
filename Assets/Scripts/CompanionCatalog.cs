@@ -112,7 +112,7 @@ public static class CompanionCatalog
             }
             WriteAtomic(config,"# Created once by MATREX VR. Native tracker owns calibration edits.\n"+text,createOnly:true);
         }
-        bool saveVideo=source.tracker?.saveVideo??false;
+        bool saveVideo=source.tracker?.saveVideo??true;
         string recordingDirectory="",recordingPrefix="";
         string recordingText=File.ReadAllText(config),updatedRecording=recordingText;
         if(entry.backend=="rekkefly")

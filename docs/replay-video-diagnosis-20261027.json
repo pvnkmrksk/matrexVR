@@ -1,0 +1,181 @@
+{
+  "date": "2026-10-27",
+  "scope": "Read-only audit of local preview run metadata; no source data modified",
+  "cause": "Recent human preview recordings explicitly launched native trackers with savedVideoRequested:false, so they contain no archived camera pixels. UI omission defaulted saveVideo to false and hid its control in subject details.",
+  "recordings": [
+    {
+      "run": "20261027_002333",
+      "mediaManifestPresent": false,
+      "trackers": [
+        {
+          "vrId": "VR1",
+          "backend": "Rekkefly",
+          "savedVideoRequested": true,
+          "mediaState": "independent-recorder-stop-not-acknowledged"
+        }
+      ]
+    },
+    {
+      "run": "20261027_004406",
+      "mediaManifestPresent": false,
+      "trackers": [
+        {
+          "vrId": "VR1",
+          "backend": "Rekkefly",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        }
+      ]
+    },
+    {
+      "run": "20261027_004715",
+      "mediaManifestPresent": false,
+      "trackers": [
+        {
+          "vrId": "VR1",
+          "backend": "Rekkefly",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        }
+      ]
+    },
+    {
+      "run": "20261027_004941",
+      "mediaManifestPresent": false,
+      "trackers": [
+        {
+          "vrId": "VR1",
+          "backend": "Rekkefly",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        }
+      ]
+    },
+    {
+      "run": "20261027_005228",
+      "mediaManifestPresent": false,
+      "trackers": [
+        {
+          "vrId": "VR1",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        },
+        {
+          "vrId": "VR2",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        },
+        {
+          "vrId": "VR3",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        },
+        {
+          "vrId": "VR4",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        }
+      ]
+    },
+    {
+      "run": "20261027_005338",
+      "mediaManifestPresent": false,
+      "trackers": [
+        {
+          "vrId": "VR1",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        },
+        {
+          "vrId": "VR2",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        },
+        {
+          "vrId": "VR3",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        },
+        {
+          "vrId": "VR4",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        }
+      ]
+    },
+    {
+      "run": "20261027_005558",
+      "mediaManifestPresent": false,
+      "trackers": [
+        {
+          "vrId": "VR1",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        },
+        {
+          "vrId": "VR2",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        },
+        {
+          "vrId": "VR3",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        },
+        {
+          "vrId": "VR4",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        }
+      ]
+    },
+    {
+      "run": "20261027_005726",
+      "mediaManifestPresent": false,
+      "trackers": [
+        {
+          "vrId": "VR1",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        },
+        {
+          "vrId": "VR2",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        },
+        {
+          "vrId": "VR3",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        },
+        {
+          "vrId": "VR4",
+          "backend": "HejjéTrac",
+          "savedVideoRequested": false,
+          "mediaState": "not-requested"
+        }
+      ]
+    }
+  ],
+  "fixes": [
+    "Default-on camera recording for supported bundled tracker launches; explicitfalse preserved",
+    "Keep JSON/schema/UI omission defaults consistent and retain positively owned default-on recording sources",
+    "Select saved camera by active animal and replay time, including segment changes and reverse seeks",
+    "Show actionable off/pending/external footage status rather than claiming unsaved pixels exist"
+  ]
+}

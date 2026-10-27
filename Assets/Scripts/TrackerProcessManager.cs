@@ -20,7 +20,7 @@ public sealed class TrackerLaunchConfig
     public string device = "";
     public bool headless;
     public bool strictCameraFallback;
-    public bool saveVideo;
+    public bool saveVideo = true;
     public string recordingDirectory="";
     public string recordingPrefix="";
 }
@@ -128,7 +128,7 @@ public sealed class TrackerProcessManager : MonoBehaviour
     {
         if(rig==null||string.IsNullOrWhiteSpace(rig.vrId))return;
         var receipt=Read(rig.vrId);
-        using(var process=Match(receipt,false))if(process!=null&&receipt.saveVideo!=(rig.tracker?.saveVideo??false))
+        using(var process=Match(receipt,false))if(process!=null&&receipt.saveVideo!=(rig.tracker?.saveVideo??true))
             throw new InvalidOperationException("Close this independent tracker explicitly before changing Save tracker video; its calibration and current recorder were left unchanged.");
     }
     public void LaunchPrepared(CompanionCatalog.Prepared prepared)
@@ -186,7 +186,7 @@ public sealed class TrackerProcessManager : MonoBehaviour
                 {
                     if(previous.unverified)throw new InvalidOperationException("An existing tracker process cannot be verified. Close its own window before trying Start again; another copy will not be spawned.");
                     string requestedConfig=rig.tracker!=null&&!string.IsNullOrWhiteSpace(rig.tracker.configFile)?ResolveConfig(rig.tracker.configFile):previous.configFile;
-                    if(previous.port!=rig.zmqPort||previous.backend!=TrackerBackend.DisplayName(rig.closedLoopMode)||requestedConfig!=previous.configFile||previous.strictCameraFallback!=(rig.tracker?.strictCameraFallback??false)||previous.saveVideo!=(rig.tracker?.saveVideo??false)||(prepared!=null&&previous.executableSha256!=prepared.executableSha256))
+                    if(previous.port!=rig.zmqPort||previous.backend!=TrackerBackend.DisplayName(rig.closedLoopMode)||requestedConfig!=previous.configFile||previous.strictCameraFallback!=(rig.tracker?.strictCameraFallback??false)||previous.saveVideo!=(rig.tracker?.saveVideo??true)||(prepared!=null&&previous.executableSha256!=prepared.executableSha256))
                         throw new InvalidOperationException("This rig already has an independent tracker window using another source/configuration. Close it or choose Stop tracker before switching.");
                     RegisterMedia(previous);MonitorRecordingExit(previous);
                     return; // Start is idempotent, including after restarting Unity.

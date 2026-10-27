@@ -261,9 +261,9 @@
                 },
                 "saveVideo": {
                   "type": "boolean",
-                  "default": false,
+                  "default": true,
                   "x-ui": {
-                    "help": "Optional headless Rekkefly launch. HejjéTrac uses its native desktop window."
+                    "help": "Save supported bundled tracker camera footage for replay; enabled when omitted. Explicit false disables it. Close an already open tracker normally before changing this option, then restart it. Footage remains pending until the independent recorder finishes saving."
                   }
                 },
                 "recordingDirectory": {
