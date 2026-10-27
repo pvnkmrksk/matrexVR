@@ -14,6 +14,10 @@ A **scene** supplies authored geometry, rig templates and a compatible controlle
 | `Kannadi` | Matrix of mirrored animal poses | Kannadi and its prefab catalog |
 | `Optomotor` | Rotating drum/grating stimulus | OptomotorSceneController and optomotor config |
 | `TerrainCueLab` | Independent visual/navigation geometry, height and tilt controls | Choice-compatible configuration plus RugosityWorld |
+| `TerrainChoice_RoughLeft_SmoothRight` | Rough left / smooth right spatial choice | Shared TerrainChoiceWorld; independent visual/navigation surface roles |
+| `TerrainChoice_SmoothLeft_RoughRight` | Smooth left / rough right spatial choice | Same shared world and terrain treatment config |
+| `TerrainChoice_BothSmooth` | Both-smooth spatial control | Same shared world and terrain treatment config |
+| `TerrainChoice_BothRough` | Both-rough spatial control | Same shared world and terrain treatment config |
 | `Rugosity_RS` | Preserved earlier rugosity experiment | Historical scene/config behavior retained |
 | `ReplayScene` | Saved-session timeline and inspection views | ReplayController; archived inputs rather than current live JSON |
 
@@ -45,7 +49,7 @@ Choice_Selwyn and other supported Choice/Swarm/Kannadi experiments can use `nigh
 
 `skyboxPath` supplies an explicit panorama instead. Generated sky and explicit image precedence are documented per parser. A panorama background does not define collision or navigable terrain; a terrain mesh and its scale remain separate. Homing-style environments can combine authored terrain, configured landmarks and a panoramic background without making them one file format.
 
-TerrainCueLab separates **what is rendered** from **what controls navigation**. Matching, mismatching and height/tilt isolation conditions apply explicit surfaces; “rough” is a geometry condition, not an asserted perceptual result. [Rugosity](../rugosity.md) documents actual mesh samples and precedence.
+TerrainCueLab separates **what is rendered** from **what controls navigation**. The four TerrainChoice scenes share one prefab; four treatment sequence recipes choose matching or mismatching visual/navigation roles across all four spatial patterns. Their default treatment uses 1 cm eye clearance and texture scale 4. Matching, mismatching and height/tilt isolation conditions apply explicit surfaces; “rough” is a geometry condition, not an asserted perceptual result. [Rugosity](../rugosity.md) documents actual mesh samples and precedence.
 
 ## Optomotor
 

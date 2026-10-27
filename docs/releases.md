@@ -36,6 +36,8 @@ python3 tools/build_release.py --ref v0.4.0 --version 0.4.0 --platform all \
 
 The helper emits three complete OS ZIPs, per-archive SHA-256 files and embedded build/release manifests. It never uploads them. Hosted CI currently deploys only the static website; Unity desktop archives are built locally with the installed target modules. A published stable release is discovered by the website only after its actual ZIP assets exist.
 
+When reusing a previously reviewed unsigned native executable instead of rebuilding it with Cargo, also pass the paired `--verified-native-binary /path/to/rekkefly` and `--native-binary-provenance /path/to/MATREX-NATIVE-PROVENANCE.json` options. The builder verifies the binary and receipt against the pinned source/patch before Unity starts; these options require `--local-native-camera-fix` and do not skip provenance checks. See [companion build provenance](../tools/native_patches/README.md).
+
 ## 0.1 — archived main
 
 Source: [`779926a80b02190d6dd0410f260e52bba105a04e`](https://github.com/pvnkmrksk/matrexVR/tree/779926a80b02190d6dd0410f260e52bba105a04e), release tag `v0.1.0`.

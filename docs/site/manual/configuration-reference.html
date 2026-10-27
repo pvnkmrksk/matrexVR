@@ -125,7 +125,7 @@
 </table></div>
 <p>The base VR prefab and its standard, Swarm, Kannadi and Cube variants now contain all six camera faces, including Down. Use <code>displayOrder: "DRBLFU"</code> for all six. <code>Examples/System/fictrac-six-cameras.example.json</code> provides four non-overlapping rows of six 128×128 panels (768×512 total) on display 0. Copy it to the local <code>system_config.json</code> and edit tracker addresses for your hardware. Up/Down are reactivated when requested and use Front's origin, clip planes and visibility mask. Existing <code>RBLF</code> configurations still enable only four faces. See <a href="six-camera-rig.html">six-camera-rig.md</a>.</p>
 <p>Viewport slot <code>i</code>: x=(startCol + i if horizontal)×width; y=screenHeight−(startRow+1 + i if vertical)×height. Ensure these rectangles fit the physical display. An unavailable display disables its cameras. Configuring VR10 does not accidentally match VR1. Configured letters do not create a camera absent from the prefab. Camera disabling does not delete the rig or stop its sensor logging.</p>
-<p>The top-right HUD refreshes at 2 Hz and shows measured FPS, frame mean/peak milliseconds, the software-cap budget, and CPU main/render, GPU and presentation/target-FPS wait times. A dash means unavailable, not zero work. It remains visible when Tab hides the flight dashboard. The same captured summary appears in telemetry as <code>frameTiming</code>; see <a href="diagnostics-performance.html#workstation-frame-pacing">diagnostics</a>.</p>
+<p>The FPS HUD refreshes at 2 Hz and shows measured FPS, frame mean/peak milliseconds, the software-cap budget, and CPU main/render, GPU and presentation/target-FPS wait times. A dash means unavailable, not zero work. Tab hides/restores it with the other operator graphics; collection and telemetry <code>frameTiming</code> continue. Status, FPS and overview panels reserve free display space outside calibrated LED rectangles and are omitted when none fits. See <a href="diagnostics-performance.html#workstation-frame-pacing">diagnostics</a> and <a href="assets/reference/docs/operator-overlay-validation-results.json">overlay validation</a>.</p>
 <p>No viewport component changes frame timing. For a 60 Hz LED output, use top-level <code>"targetFrameRate":60, "vSyncCount":1</code>, or start from <code>Examples/System/kinefly-six-cameras-60hz.example.json</code> and retain your actual display mapping and tracker addresses. VSync follows the output's actual refresh rate: <code>/1</code> gives 120 FPS on a 120 Hz output; <code>/2</code> gives 60 FPS there. For a numeric software cap use <code>vSyncCount:0</code>. A 58–60 FPS readout under a 60 FPS software cap does not establish low compute headroom. Unity recommends hardware synchronization for smooth desktop pacing because <a href="https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Application-targetFrameRate.html">software targets can microstutter</a>.</p>
 <h3 id="manual-controls-inside-each-rig">Manual controls (inside each rig)</h3>
 <div class="table-scroll"><table>
@@ -236,7 +236,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>Numbered arrows track active <code>VR&lt;number&gt;</code> roots and their headings. Overlapping animals keep overlapping labels. Right drag orbits, middle drag pans, wheel zooms, Reset view returns overhead. Hide disables both overview cameras and tracking updates and releases the render texture; showing starts a fresh trail. FPS remains visible. The overview can discover additional numbered rigs, but Kannadi's mirror routing currently supports only VR1–VR4.</p>
+<p>Numbered arrows track active <code>VR&lt;number&gt;</code> roots and their headings. Overlapping animals keep overlapping labels. Right drag orbits, middle drag pans, wheel zooms, Reset view returns overhead. Hide disables both overview cameras and tracking updates and releases the render texture; showing starts a fresh trail. Tab hides/restores the overview with the other operator graphics. The overview can discover additional numbered rigs, but Kannadi's mirror routing currently supports only VR1–VR4.</p>
 <h2 id="sequence-configuration">Sequence configuration</h2>
 <p>Template: <code>sequence.template.json</code>.</p>
 <div class="table-scroll"><table>
@@ -615,6 +615,11 @@
 <td><code>numberOfRings</code></td>
 <td>Keep scene/current value (3 initially)</td>
 <td>Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 100.</td>
+</tr>
+<tr>
+<td><code>initialHeadingDistribution</code></td>
+<td><code>Continuous</code></td>
+<td>Swarm/Kannadi random yaw distribution: <code>Cardinal</code> independently draws 0°, 90°, 180° or 270° for each rig. Requires <code>randomInitialRotation:true</code> and <code>resetRotationOnStart:true</code>.</td>
 </tr>
 <tr>
 <td><code>hexRadius</code></td>

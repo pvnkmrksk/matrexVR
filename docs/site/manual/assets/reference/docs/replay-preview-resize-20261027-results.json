@@ -1,0 +1,191 @@
+{
+  "checks": 48,
+  "failure": null,
+  "errors": [],
+  "cases": [
+    {
+      "width": 1920,
+      "height": 1080,
+      "backingScale": 1.0,
+      "baselineAnimalHeight": 182.56,
+      "baselineVideoHeight": 182.56,
+      "header": "Four-rig selector and single-rig label captured separately"
+    },
+    {
+      "width": 3024,
+      "height": 1898,
+      "backingScale": 2.0,
+      "baselineAnimalHeight": 360.62,
+      "baselineVideoHeight": 360.62,
+      "header": "Four-rig selector and single-rig label captured separately"
+    }
+  ],
+  "states": [
+    {
+      "width": 1920,
+      "name": "default",
+      "animalHeight": 182.56,
+      "trackerVideoHeight": 182.56,
+      "cardBottom": 569.12,
+      "transportTop": 916.8
+    },
+    {
+      "width": 1920,
+      "name": "larger",
+      "animalHeight": 231.56,
+      "trackerVideoHeight": 231.56,
+      "cardBottom": 667.12,
+      "transportTop": 916.8
+    },
+    {
+      "width": 1920,
+      "name": "maximum",
+      "animalHeight": 280.56,
+      "trackerVideoHeight": 280.56,
+      "cardBottom": 765.12,
+      "transportTop": 916.8
+    },
+    {
+      "width": 1920,
+      "name": "maximum with media tools",
+      "animalHeight": 280.56,
+      "trackerVideoHeight": 280.56,
+      "cardBottom": 839.12,
+      "transportTop": 916.8
+    },
+    {
+      "width": 3024,
+      "name": "default",
+      "animalHeight": 360.62,
+      "trackerVideoHeight": 360.62,
+      "cardBottom": 1129.24,
+      "transportTop": 1574.0
+    },
+    {
+      "width": 3024,
+      "name": "larger",
+      "animalHeight": 450.775,
+      "trackerVideoHeight": 450.775,
+      "cardBottom": 1309.55,
+      "transportTop": 1574.0
+    },
+    {
+      "width": 3024,
+      "name": "maximum",
+      "animalHeight": 540.93,
+      "trackerVideoHeight": 540.93,
+      "cardBottom": 1489.86,
+      "transportTop": 1574.0
+    },
+    {
+      "width": 3024,
+      "name": "maximum with media tools",
+      "animalHeight": 501.0,
+      "trackerVideoHeight": 501.0,
+      "cardBottom": 1558.0,
+      "transportTop": 1574.0
+    }
+  ],
+  "passed": [
+    "Production replay media panel loaded",
+    "Previously recorded native tracker video decoded",
+    "Actual recorded animal camera preview rendered",
+    "Actual framebuffer 1920\u00d71080 with supplied backing scale 1",
+    "default media card stays above transport at 1920",
+    "default both image regions are positive at 1920",
+    "default images stay distinct inside media card at 1920",
+    "Four-rig header has no duplicate label ink left of centered selector at 1920",
+    "Actual + IMGUI button raises preview scale to 1.25 at 1920",
+    "+ enlarges both animal and tracker images at 1920",
+    "larger media card stays above transport at 1920",
+    "larger both image regions are positive at 1920",
+    "larger images stay distinct inside media card at 1920",
+    "Second + reaches maximum scale at 1920",
+    "maximum media card stays above transport at 1920",
+    "maximum both image regions are positive at 1920",
+    "maximum images stay distinct inside media card at 1920",
+    "maximum with media tools media card stays above transport at 1920",
+    "maximum with media tools both image regions are positive at 1920",
+    "maximum with media tools images stay distinct inside media card at 1920",
+    "Maximum with tools retains larger images than default at 1920",
+    "Actual \u2212 IMGUI buttons restore default scale at 1920",
+    "\u2212 restores both original image sizes at 1920",
+    "Four-rig camera header button advances exactly one selected rig at 1920",
+    "Four-rig camera selector remains usable at 1920",
+    "Actual framebuffer 3024\u00d71898 with supplied backing scale 2",
+    "default media card stays above transport at 3024",
+    "default both image regions are positive at 3024",
+    "default images stay distinct inside media card at 3024",
+    "Four-rig header has no duplicate label ink left of centered selector at 3024",
+    "Actual + IMGUI button raises preview scale to 1.25 at 3024",
+    "+ enlarges both animal and tracker images at 3024",
+    "larger media card stays above transport at 3024",
+    "larger both image regions are positive at 3024",
+    "larger images stay distinct inside media card at 3024",
+    "Second + reaches maximum scale at 3024",
+    "maximum media card stays above transport at 3024",
+    "maximum both image regions are positive at 3024",
+    "maximum images stay distinct inside media card at 3024",
+    "maximum with media tools media card stays above transport at 3024",
+    "maximum with media tools both image regions are positive at 3024",
+    "maximum with media tools images stay distinct inside media card at 3024",
+    "Maximum with tools retains larger images than default at 3024",
+    "Actual \u2212 IMGUI buttons restore default scale at 3024",
+    "\u2212 restores both original image sizes at 3024",
+    "Four-rig camera header button advances exactly one selected rig at 3024",
+    "Four-rig camera selector remains usable at 3024",
+    "No rendering, decoding or interaction errors"
+  ],
+  "scope": "Actual production media Draw and injected IMGUI mouse events in graphics-enabled isolated Unity Game view at Full HD/scale1 and 3024\u00d71898/supplied scale2; recorded native tracker video and actual animal preview. Four-rig selector state supplied for header testing; no claim of native OS event dispatch or four physical recordings.",
+  "sourceHashes": {
+    "Assets/Scripts/Replay/ReplayMediaPanel.GUI.cs": "635eabc2bd165dac608bf1a32fb7a63e8dbfbf057ccd80d1e8a4b2d67d27d697",
+    "Assets/Scripts/Replay/ReplayPreviewResizeValidation.cs": "d0250a340c363f42c8e4aa950680ab5b5f3ad0b19245ae06b82a52a790aa7140"
+  },
+  "captures": [
+    {
+      "path": ".local/replay-review-20261027/preview-resize/1920-01-default-four-rig.png",
+      "sha256": "f597747be0de3d9a28ff6cbef75ecf5a2346cb096361cc19b112b6a5be6cf9c0"
+    },
+    {
+      "path": ".local/replay-review-20261027/preview-resize/1920-02-plus.png",
+      "sha256": "0027ee37b2d3519b5ceb4097b855190287572dfc0af69571b1224af7ddbf6c3a"
+    },
+    {
+      "path": ".local/replay-review-20261027/preview-resize/1920-03-maximum.png",
+      "sha256": "7d47b0fab93877d2cceacbe2ed9afd8ef8ac125e253fd9439dccfb11cf0915ec"
+    },
+    {
+      "path": ".local/replay-review-20261027/preview-resize/1920-04-maximum-tools.png",
+      "sha256": "4c7424b507ded4455f55412c3ed681dbcc8a49e4d83fdc078cb2b47b7c81aff3"
+    },
+    {
+      "path": ".local/replay-review-20261027/preview-resize/1920-05-single-rig.png",
+      "sha256": "20d2f860add7f1ff1961fdd8164770a7e8254f352ac7d57c31039559721023a8"
+    },
+    {
+      "path": ".local/replay-review-20261027/preview-resize/3024-01-default-four-rig.png",
+      "sha256": "f73d1e3bd073842158f9c2447b10cbd8571068ea64d851cef812968109829e30"
+    },
+    {
+      "path": ".local/replay-review-20261027/preview-resize/3024-02-plus.png",
+      "sha256": "8c8c72ed54ac0fb62e982f0e08639a73fa7dc2d22965f06a2bf65c82802eb96e"
+    },
+    {
+      "path": ".local/replay-review-20261027/preview-resize/3024-03-maximum.png",
+      "sha256": "55f5c0174da395252df6c4169de84dc0dbc7c1f13720ce322aa47162e1b7ae37"
+    },
+    {
+      "path": ".local/replay-review-20261027/preview-resize/3024-04-maximum-tools.png",
+      "sha256": "88543055933ffc3b70182bc712d40564673a9cfb2aa539b00953099d1f9d17bb"
+    },
+    {
+      "path": ".local/replay-review-20261027/preview-resize/3024-05-single-rig.png",
+      "sha256": "0167b77b6c6a28ce49232d74c88e854fbe4c19b03cdd7ccdc551bf3d422186fc"
+    }
+  ],
+  "visualReview": {
+    "fourRigHeader": "Single centered VR1 selector; no overlapping left label in 1920 and3024 captures, verified against blank-margin pixels.",
+    "resizing": "Both recorded camera and tracker video visibly grow; media tools at maximum stop16px before Retina transport.",
+    "inputScope": "Production IMGUI controls received injected MouseDown/MouseUp; native window input acceptance remains separate."
+  }
+}

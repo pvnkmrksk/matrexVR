@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "testedUtc": "2026-10-25T22:23:17.959429+00:00",
+  "passed": true,
+  "native": {
+    "assertions": 190,
+    "layouts": 7,
+    "unity": "6000.3.16f1",
+    "gpu": "Apple M2 Pro",
+    "resolution": [
+      1920,
+      1080
+    ],
+    "failure": null,
+    "errors": [],
+    "cases": [
+      {
+        "rigs": 1,
+        "faces": 4,
+        "pixels": 64,
+        "horizontal": true,
+        "startRow": 0,
+        "startCol": 0,
+        "fullDisplay": false,
+        "ledPixelsChanged": 0,
+        "operatorPixelsDrawn": 334059,
+        "overviewVisible": true,
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "rigs": 4,
+        "faces": 6,
+        "pixels": 128,
+        "horizontal": true,
+        "startRow": 0,
+        "startCol": 0,
+        "fullDisplay": false,
+        "ledPixelsChanged": 0,
+        "operatorPixelsDrawn": 334078,
+        "overviewVisible": true,
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "rigs": 4,
+        "faces": 6,
+        "pixels": 128,
+        "horizontal": false,
+        "startRow": 0,
+        "startCol": 0,
+        "fullDisplay": false,
+        "ledPixelsChanged": 0,
+        "operatorPixelsDrawn": 422966,
+        "overviewVisible": true,
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "rigs": 1,
+        "faces": 4,
+        "pixels": 128,
+        "horizontal": true,
+        "startRow": 7,
+        "startCol": 0,
+        "fullDisplay": false,
+        "ledPixelsChanged": 0,
+        "operatorPixelsDrawn": 423024,
+        "overviewVisible": true,
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "rigs": 1,
+        "faces": 4,
+        "pixels": 128,
+        "horizontal": true,
+        "startRow": 0,
+        "startCol": 11,
+        "fullDisplay": false,
+        "ledPixelsChanged": 0,
+        "operatorPixelsDrawn": 334100,
+        "overviewVisible": true,
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "rigs": 1,
+        "faces": 4,
+        "pixels": 128,
+        "horizontal": true,
+        "startRow": 7,
+        "startCol": 9,
+        "fullDisplay": false,
+        "ledPixelsChanged": 0,
+        "operatorPixelsDrawn": 334047,
+        "overviewVisible": true,
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "rigs": 1,
+        "faces": 1,
+        "pixels": 1920,
+        "horizontal": false,
+        "startRow": 0,
+        "startCol": 0,
+        "fullDisplay": true,
+        "ledPixelsChanged": 0,
+        "operatorPixelsDrawn": 0,
+        "overviewVisible": false,
+        "width": 1920,
+        "height": 1080
+      }
+    ],
+    "capture": "Natural Game-view ScreenCapture.CaptureScreenshotAsTexture at WaitForEndOfFrame. Real ScreenSpaceOverlay status, FPS and overview canvases stay in their production render mode. No per-camera render target substitution.",
+    "checks": [
+      "Every raster LED pixel unchanged while overlays are visible",
+      "Actual queued Tab keyboard input hides all three overlays",
+      "First presented hidden frame preserves LEDs during washout",
+      "Settled hidden frame has no retained operator pixels",
+      "Second Tab restores operator graphics without changing LEDs",
+      "Full-display LED allocation omits all operator graphics"
+    ],
+    "tolerance": "Per-channel byte difference greater than2 counts as a changed pixel; all interior and edge raster pixels whose centers fall inside calibrated LED rectangles are included.",
+    "command": "Unity -projectPath <marked-disposable-copy> -executeMethod OperatorOverlayValidation.Run -logFile <log> (graphics enabled, naturally rendering Game view)",
+    "artifactDirectory": ".integration/overlay-ui-project/operator-overlay-validation (ignored local evidence;35 PNGs)",
+    "framebufferAssertions": 172,
+    "lifecycleAssertions": 18,
+    "lifecycleChecks": [
+      "Destroying duplicate FPS/status components preserves the exact real owner reservation and layout revision",
+      "Disabling FPS/status immediately hides graphics and releases owner keys; later frames stay unreserved",
+      "Calling SetVisible(true) cannot show a disabled status component",
+      "Disabling overview hides its independent canvas/cameras and releases its render texture; shared visibility callbacks cannot revive it",
+      "Re-enabling each component reacquires layout and restores its canvas; overview cameras/background/render texture return"
+    ]
+  },
+  "offline": {
+    "assertions": 6428,
+    "ledConfigurations": 24,
+    "randomObstacleLayouts": 1500,
+    "command": "python3 tools/test_operator_overlay_layout.py",
+    "implementation": "Compiles actual production allocator and visibility source with real Unity.CoreModule Rect/Mathf. Screen/Display/controller inputs and clear calls are substituted; actual viewport order and pixel-rectangle methods are copied verbatim. No Unity process, native tracker or device launches."
+  },
+  "sourceFiles": {
+    "Assets/Scripts/OperatorOverlayLayout.cs": {
+      "sha256": "a0ad2c3f44f51e38b3ad43d31b804d7cff5ef68296f3c636ce168b6c7a78b94c",
+      "matchesCurrentWorkspace": true
+    },
+    "Assets/Scripts/DisplayFrameClear.cs": {
+      "sha256": "cbad6c9d97f0efa9b7b0858ce3235854223ce25cb76bd150423630b5da2ed9e3",
+      "matchesCurrentWorkspace": true
+    },
+    "Assets/Scripts/RuntimeStatusOverlay.cs": {
+      "sha256": "6426be48c7fef321d0dad6cfffc7a8c2c361e9f80f51a6d24c987f9538dd7142",
+      "matchesCurrentWorkspace": true
+    },
+    "Assets/Scripts/fps.cs": {
+      "sha256": "c4c9c88f595f4a6af6e752c352ffb6c2a7b8395c68c5960da4833cf608c3ad95",
+      "matchesCurrentWorkspace": true
+    },
+    "Assets/Scripts/SimpleOverheadCamera.cs": {
+      "sha256": "33da63331ff0739a65092b50c0ee6cfe371279718e0900ff7532bcc9b693a62c",
+      "matchesCurrentWorkspace": true
+    },
+    "Assets/Scripts/ViewportSetter.cs": {
+      "sha256": "6e2d057905613c463f10a86dfcd6a31706a03a57e50e62ce4572a8aa4196374d",
+      "matchesCurrentWorkspace": true
+    },
+    "Assets/Editor/OperatorOverlayValidation.cs": {
+      "sha256": "a2d87b99df624c0a2f83a239a83547520fefbed2134731c28d2802eafddec2a9",
+      "matchesCurrentWorkspace": true
+    }
+  },
+  "scope": "Synthetic solid-color stimulus and operator UI compositing only. No physical LED receiver, monitor mapping, animal, tracker camera, experiment acquisition or native-player performance measurement. Desktop preview UI Toolkit and replay IMGUI hiding are separate production paths and are not claimed by these framebuffer cases.",
+  "runtimeRevision": "87c425dd29211c6cd6192a77fa3f384e27b33937"
+}

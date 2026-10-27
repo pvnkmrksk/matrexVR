@@ -10,6 +10,6 @@ A capture establishes what that scene/configuration rendered in the documented s
 
 The forest preview is **Choice_Forrest with the bundled Landscape prefab** instantiated by the native capture fixture. The additional prefab is recorded in provenance; it is not a claim that the authored scene already contains that ground/forest or that this setup ships in the compact player.
 
-Optional forest/tree environments remain available from source and require their scenes in a custom build. The compact application still contains the [ten documented scenes](scenes.md#compact-desktop-scene-set); the gallery does not silently add a scene to an existing release.
+Optional forest/tree environments remain available from source and require their scenes in a custom build. The current 0.4 compact application contains the [fourteen documented scenes](scenes.md#compact-desktop-scene-set), including the four shared-world TerrainChoice variants; the gallery does not silently add a scene to an existing release.
 
 For the generated sky's sample time, location, source map and image hash, inspect its archived manifest. For terrain geometry, use [the measured rugosity conditions](../rugosity.md), not a visual estimate from a screenshot.

@@ -59,6 +59,26 @@
 <td>Choice-compatible configuration plus RugosityWorld</td>
 </tr>
 <tr>
+<td><code>TerrainChoice_RoughLeft_SmoothRight</code></td>
+<td>Rough left / smooth right spatial choice</td>
+<td>Shared TerrainChoiceWorld; independent visual/navigation surface roles</td>
+</tr>
+<tr>
+<td><code>TerrainChoice_SmoothLeft_RoughRight</code></td>
+<td>Smooth left / rough right spatial choice</td>
+<td>Same shared world and terrain treatment config</td>
+</tr>
+<tr>
+<td><code>TerrainChoice_BothSmooth</code></td>
+<td>Both-smooth spatial control</td>
+<td>Same shared world and terrain treatment config</td>
+</tr>
+<tr>
+<td><code>TerrainChoice_BothRough</code></td>
+<td>Both-rough spatial control</td>
+<td>Same shared world and terrain treatment config</td>
+</tr>
+<tr>
 <td><code>Rugosity_RS</code></td>
 <td>Preserved earlier rugosity experiment</td>
 <td>Historical scene/config behavior retained</td>
@@ -84,7 +104,7 @@
 <h2 id="night-sky-terrain-and-panoramas">Night sky, terrain and panoramas</h2>
 <p>Choice_Selwyn and other supported Choice/Swarm/Kannadi experiments can use <code>nightSky</code> to orient the bundled stars/Milky Way to location and time. This is a generated texture stimulus. It does not add atmosphere, planets, the Sun or the Moon.</p>
 <p><code>skyboxPath</code> supplies an explicit panorama instead. Generated sky and explicit image precedence are documented per parser. A panorama background does not define collision or navigable terrain; a terrain mesh and its scale remain separate. Homing-style environments can combine authored terrain, configured landmarks and a panoramic background without making them one file format.</p>
-<p>TerrainCueLab separates <strong>what is rendered</strong> from <strong>what controls navigation</strong>. Matching, mismatching and height/tilt isolation conditions apply explicit surfaces; “rough” is a geometry condition, not an asserted perceptual result. <a href="rugosity.html">Rugosity</a> documents actual mesh samples and precedence.</p>
+<p>TerrainCueLab separates <strong>what is rendered</strong> from <strong>what controls navigation</strong>. The four TerrainChoice scenes share one prefab; four treatment sequence recipes choose matching or mismatching visual/navigation roles across all four spatial patterns. Their default treatment uses 1 cm eye clearance and texture scale 4. Matching, mismatching and height/tilt isolation conditions apply explicit surfaces; “rough” is a geometry condition, not an asserted perceptual result. <a href="rugosity.html">Rugosity</a> documents actual mesh samples and precedence.</p>
 <h2 id="optomotor">Optomotor</h2>
 <p>The drum/grating path owns stimulus motion and disables general forward autopilot. Its config describes frequency, contrast, duty cycle, speed, axis/direction and tracked loop switches. Stimulus/drum transforms must not be interpreted as the real animal pose. Generated mesh/material/texture ownership matters when repeatedly rebuilding the scene.</p>
 <h2 id="scene-extension-boundary">Scene extension boundary</h2>
