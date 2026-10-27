@@ -6,7 +6,7 @@ Choose an operating-system ZIP from [GitHub Releases](https://github.com/pvnkmrk
 
 - **Windows:** open the `.exe`. Its adjacent `_Data` directory and DLLs are required.
 - **macOS:** open the `.app` (universal Apple silicon/Intel package). Releases are ad hoc signed but not notarized; use Finder's Open action and the corresponding Privacy & Security option if macOS requests it.
-- **Linux:** open the `.x86_64` player in a graphical desktop with a compatible graphics driver. If extraction loses the executable permission, restore it in file properties or with `chmod +x`.
+- **Linux:** open the `.x86_64` player in a graphical desktop with a compatible graphics driver. If extraction loses the executable permission, restore it in file properties or with `chmod +x`. The bundled HejjéTrac binary requires **glibc 2.39 or newer**; use an independently verified compatible external tracker on older distributions.
 
 Read the version's included `START-HERE.txt`. **0.1** starts on the historical metadata form, with a manual-start Choice_Selwyn sequence. **0.2** retains the Config UI Test branch's automatic seven-condition TerrainCueLab sequence, 30 seconds per condition. Press Escape to return to Control, or launch with `-configure` to enter setup immediately. These version defaults are preserved for provenance.
 
@@ -20,22 +20,24 @@ For example:
 open "/path/to/MATREX VR.app" --args -configure
 ```
 
-**0.3** opens setup by default for a fresh profile (`autoStart: false`). Existing user sequence flags remain authoritative.
+**0.3** opens setup by default for a fresh profile (`autoStart: false`). **0.4** opens its hardware-free demo/configuration home for a fresh profile. Existing user sequence flags remain authoritative. The [0.4 release section](releases.md#04--terrain-recording-and-replay) records publication status and known limits.
 
 In the studio, **System config** describes hardware, **Sequence config** arranges experiment blocks, and **Experiment configs** edits each referenced stimulus. Session cards describe the real animals; `VR1`, `VR2`, etc. remain hardware routing identifiers. Set tracker endpoint/mode, sphere diameter and display layout for your actual apparatus. A supplied public system template opens the application; it does not calibrate an LED array.
 
 Choose `closedLoopMode: "Kinefly"` for the historical flight yaw-rate input. FicTrac walking uses its separate cumulative-displacement contract. [System examples](../Assets/StreamingAssets/Examples/System) and [input/data documentation](data-formats.md) describe the difference. A tracking publisher is needed for closed-loop motion, not for browsing setup or using configured manual controls.
 
-Use **Save setup**, then **Start experiment**. Auto start controls the next launch. Escape returns from a run to Control; Escape from Control exits the standalone player. Each studio-started experiment gets a separate recording directory.
+Use **Initialize tracking** to open the independent tracker and inspect input/calibration while setup remains open. This does not start an experiment or create its pose recording. Then use **Save setup** and **Start experiment**. Review **Save tracker video** before initializing the tracker; a recorder started with video enabled can already be recording during preflight. Auto start controls the next launch. Escape returns from a run to Control; Escape from Control exits the standalone player. Each studio-started experiment gets a separate recording directory.
 
 ## Configuration and data locations
 
-**0.3** uses a writable user profile. The application seeds missing files into `Config` on first launch; updating the application never overwrites existing files. `RunData` contains recorded sessions.
+**0.4** keeps editable configuration in a writable user profile and recordings beside each installed player. The application seeds missing files into `Config` on first launch; updating the application never overwrites existing files. The recording library shows the actual recording root and lists its completed sessions.
 
 | Environment | Configuration | Recordings |
 | --- | --- | --- |
 | Editor | `Assets/StreamingAssets` | `Assets/RunData` |
-| 0.3 standalone | `Application.persistentDataPath/Config` | `Application.persistentDataPath/RunData` |
+| 0.4 standalone, writable player directory | `Application.persistentDataPath/Config` | `MATREX VR RunData` beside the app/executable |
+| 0.4 standalone, protected installation | `Application.persistentDataPath/Config` | `Application.persistentDataPath/Installations/<installation-id>/RunData` |
+| Archived 0.3 standalone | `Application.persistentDataPath/Config` | `Application.persistentDataPath/RunData` |
 | 0.1 / 0.2 Windows/Linux | `<application>_Data/StreamingAssets` | `<application>_Data/RunData` |
 | 0.1 / 0.2 macOS | `<application>.app/Contents/Resources/Data/StreamingAssets` | `<application>.app/Contents/RunData` |
 
@@ -47,7 +49,7 @@ Unity's profile root normally lives under `%USERPROFILE%\AppData\LocalLow\<Compa
 
 `system_config.json` is the hardware file; `sequenceConfig.json` contains ordered blocks. Each block's `parameters.configFile` identifies its experiment relative to the configuration root; `parameters.design` identifies a Dynamic Choice design. Preserve referenced subdirectories and data files. [Templates](../Assets/StreamingAssets/Templates/README.md) and [examples](../Assets/StreamingAssets/Examples/README.md) provide complete files.
 
-Back up your 0.1/0.2 editable configs and run folders before switching versions. To retain them in 0.3, copy the complete configuration tree to a chosen writable directory and use `--config-dir`; use `--data-dir` for the recordings directory. The application does not infer a prior installation or silently replace its files.
+Back up existing editable configs and run folders before switching versions. To retain 0.1/0.2 configuration, copy its complete tree to a chosen writable directory and use `--config-dir`. Use `--data-dir` to continue a previous recording root, or **Browse…** in the replay library to inspect old shared application-support recordings. The application does not move earlier runs or silently replace their files.
 
 ## Controls
 
@@ -74,13 +76,23 @@ Focus Game/the player. Metadata text entry suppresses experiment hotkeys.
 
 Kinefly/Bogong retains **+/−** yaw gain, **Ctrl+Y** yaw-rate mode, **1–9** selection for matching rig IDs, **0** or **Next animal** to cycle all configured IDs (including VR10), and held **[/]** DC offset. Dashboard trim controls affect the current sequence row. Optomotor owns its stimulus movement, disables autopilot, and pauses with Space/backslash. See the [full Input System map](unity6-controls.md) for gamepad and secondary controls.
 
-For replay, choose **Replay a recorded run** in setup, then **Browse…** to choose the saved folder, or paste its path. Windows/macOS and the Editor use their system folder dialogs; Linux uses zenity/kdialog when available, otherwise the path input remains available. Standalone OS-level folder drag/drop is not implemented. See [replay](replay.md).
+For 0.4 replay, choose **Replay recordings** in setup to see this player’s runs. Choose **Browse…** for an external saved folder, or enter its path. Windows/macOS and the Editor use their system folder dialogs; Linux uses zenity/kdialog when available, otherwise the path input remains available. Standalone OS-level folder drag/drop is not implemented. See [replay](replay.md).
 
 ## Save the evidence
 
 Retain the complete run directory, not only a rig CSV. New recordings include original system/sequence/experiment inputs, immutable snapshot versions and hashes, loaded external data, animal metadata, rig and population logs, `runtime_trace.log`, and generated `Skyboxes` with their manifests. Writers drain on clean exit; the original directory remains if ZIP creation fails.
 
-Rig CSVs use wall-clock timestamps; walking scenes use centimetres, terrain/migration scenes metres, and raw Kinefly yaw input radians. [Data formats](data-formats.md), [run snapshots](run-config-snapshots.md), and [replay](replay.md) explain interpretation and reconstruction limits.
+Rig CSVs use wall-clock timestamps. TerrainChoice/rugosity and walking scenes use centimetres; Selwyn terrain/migration scenes use metres; raw Kinefly yaw input uses radians. Interpret the exact scene and saved scale settings. [Data formats](data-formats.md), [run snapshots](run-config-snapshots.md), and [replay](replay.md) explain interpretation and reconstruction limits.
+
+## Terrain recipes and current limits
+
+Load one of the four `Examples/Rugosity/sequence-treatment-*.json` sequences for matched terrain, visible terrain with flat navigation, flat appearance with terrain navigation, or both flat. Each sequence runs the four shared TerrainChoice layouts for 30 seconds each and uses `terrain-treatment.json` for common settings. The two placeholder trees are equally distant from the start. The recipe uses real tracked motion, 1 cm clearance and texture scale 4; initialize tracking before starting. Both-flat trials intentionally have identical surfaces. See [the four treatment files](rugosity.md#load-one-treatment-and-run-all-four-spatial-patterns).
+
+Choice blocks expose **Edit config → Available objects & materials**. Under **Stimulus → Objects**, Type and Material controls offer names registered in that scene, preserving exact JSON values and existing custom names.
+
+Video recording currently follows the independently launched tracker, rather than acknowledged per-experiment Start/Stop commands. Finish the tracker normally and collect completed footage for replay. The linked external recorded-trajectory viewer is supported only by the reviewed Mac arm64 dashboard bundle; Unity’s internal pose/video replay remains independent. Older pinned strict flight-camera paths on other architectures remain blocked.
+
+Evenly paced 60 FPS is [still under investigation](frame-pacing-20261027.md). Latest standalone mouse/drag acceptance was blocked by the native automation tool; keyboard, rendering and separate Unity GUI-event checks have their recorded scope. Windows/Linux builds are cross-built and have not received native execution walkthroughs. These limits and physical calibration requirements are recorded in [release verification](releases.md#04-verification-and-known-limits).
 
 ## Source and tracker setup
 

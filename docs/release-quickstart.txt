@@ -1,4 +1,4 @@
-MATREX VR 0.3.1 — CONFIGURATION STUDIO, ANIMALS AND SAVED-RUN REPLAY
+MATREX VR 0.4.0 — TERRAIN TREATMENTS, RECORDINGS AND POSE/VIDEO REPLAY
 Engine: Unity 6000.3.16f1
 https://github.com/pvnkmrksk/matrexVR
 https://pvnkmrksk.github.io/matrexVR/
@@ -10,6 +10,8 @@ Extract the whole operating-system ZIP and keep its files together. Launch the
 required for the player. macOS is ad hoc signed but not notarized; use Finder Open and the corresponding
 Privacy & Security option if prompted. Linux requires a graphical desktop and a
 compatible graphics driver; restore executable permission if extraction loses it.
+Bundled Linux HejjéTrac requires glibc 2.39 or newer. The Unity player build and
+the native tracker have separate operating-system requirements.
 
 A fresh profile opens Home, full screen at the display's native resolution. Choose
 Night sky or Forest, then Start demo. No camera, animal or LED hardware is needed.
@@ -23,7 +25,10 @@ Press Escape during an experiment or replay to return to setup.
 
 Configure: choose walking/flying, LED panels or desktop preview, rig count,
 panel dimensions/order, display, tracker endpoint, species and sphere diameter.
-Save with Use this configuration. Daily work then centers on the experiment
+Save with Use this configuration. Use Initialize tracking to inspect input and
+calibration before starting an experiment. It creates no experiment pose recording;
+a tracker launched with video enabled may already record during preflight.
+Daily work then centers on the experiment
 sequence and animal details. The public starter is not a hardware calibration.
 Modern modes are Rekkefly (flight) and HejjéTrac (walking). Legacy Kinefly/FicTrac
 publishers remain available; walking uses cumulative displacement, not flight yaw.
@@ -53,16 +58,47 @@ layers are finite; setup reports when a configuration exceeds available capacity
 Sequence config: arrange blocks. Experiment configs: choose/edit complete recipes
 for Choice, night sky, Swarm, Kannadi, Optomotor and rugosity. Auto start affects the
 next launch. Save setup, then Start experiment. Each run gets its own data folder.
-Included scenes: ControlScene, Choice, Choice_desync, Choice_Selwyn, Swarm,
-Kannadi, Optomotor, TerrainCueLab, Rugosity_RS, ReplayScene. The starter Forest uses
+Included scenes (14): ControlScene, Choice, Choice_desync, Choice_Selwyn, Swarm,
+Kannadi, Optomotor, TerrainCueLab, Rugosity_RS, ReplayScene,
+TerrainChoice_RoughLeft_SmoothRight, TerrainChoice_SmoothLeft_RoughRight,
+TerrainChoice_BothSmooth and TerrainChoice_BothRough. The starter Forest uses
 Choice_Selwyn with tree objects. Other sourceBuildOnly scene examples require a
 custom Unity build.
 
+Terrain choice: load one of these sequence files under Examples/Rugosity/:
+  sequence-treatment-matched-terrain.json
+  sequence-treatment-visual-terrain_navigation-flat.json
+  sequence-treatment-visual-flat_navigation-terrain.json
+  sequence-treatment-matched-flat.json
+Each runs all four spatial layouts for 30 seconds each. Visual and navigation
+surfaces are independent; four shared scenes cover all sixteen combinations.
+Both-flat trials intentionally have identical geometry. Edit shared motion, eye
+clearance and texture defaults in terrain-treatment.json: centimeters, 1 cm
+clearance, texture scale 4, real tracking enabled and scripted autopilot disabled.
+The two placeholder trees are equally distant from the start.
+
+For ordered swarm entrainment followed by social interaction, load
+Examples/Sequences/swarm-entrainment-social.sequence.json. The matched direct
+control is Examples/Sequences/social-coupling-control.sequence.json. Shared
+Kannadi/social-coupling.example.json uses numberOfRings: 0 for no extra clones.
+
+Choice block: Edit config -> Available objects & materials lists registered scene
+assets. Stimulus -> Objects -> Type/Material offers exact-name dropdowns, alongside
+preserved custom JSON values.
+
 3. WRITABLE CONFIGURATION AND RECORDINGS
 
-The current player uses Unity's writable per-user application profile:
+The current player keeps configuration in Unity's writable per-user profile:
   <persistentDataPath>/Config/   — editable system, sequence, experiment files
-  <persistentDataPath>/RunData/  — recordings and setup metadata backup
+
+Recordings belong to this installed player:
+  <player directory>/MATREX VR RunData/
+The macOS directory is beside the .app, outside its signed bundle. On Windows and
+Linux it is beside the executable. A protected installation uses the stable
+fallback <persistentDataPath>/Installations/<installation-id>/RunData/.
+Replay recordings shows the exact root above its list. Archived 0.3 players used
+the shared <persistentDataPath>/RunData/; Browse can inspect those earlier runs.
+Existing recordings are not moved automatically.
 
 Unity normally places that profile under:
   Windows: %USERPROFILE%\AppData\LocalLow\<Company>\<Product>
@@ -137,12 +173,41 @@ ReplayScene Browse opens a native folder picker on Windows/macOS and in the
 Editor. Linux uses zenity/kdialog when installed; paste a folder path otherwise.
 Open run folder loads the chosen path. Editor folder drag/drop works; native
 standalone OS-drop is not implemented. Use Browse, the folder input or CLI.
-God's-eye view is enabled by default; fit/zoom and animal views help inspect the
-run. Space plays/pauses, Left/Right seeks 1s (Shift: 10s), N/M jumps steps, timeline
-scrubs forward/back, speed ranges 0.1–4x, and Back to setup leaves replay. The path
-shows the current recorded condition rather than joining different resets/worlds.
-Animal-view cameras are analysis views,
-not calibrated LED-panel reproductions.
+Choose Replay recordings in setup to list this installation's completed sessions.
+Select a run, inspect its files/evidence, then Replay selected. Browse opens another
+recording location. In loaded replay, Open run opens the folder controls.
+
+God's-eye view is enabled by default. Space plays/pauses, Left/Right seeks 1s
+(Shift: 10 s), N/M jumps conditions, timeline scrubs forward/back and speed is 0.1–4x.
+Right-drag or I/J/K/L turns the camera; middle-drag pans; wheel zooms. W/A/S/D moves
+horizontally, Q/E down/up, Shift moves faster. Fit frames all tracks; Perspective/
+Top-down changes projection. Back to setup leaves replay. These camera controls
+are inactive while entering a path or media form.
+
+Rig colors, markers, heading arrows, recent five-second tails, front-camera cones
+and offscreen VR labels help inspect orientation and movement. The faint path
+belongs to the current recorded condition, without joining different resets.
+Cameras shows the animal front view and available tracker video together; +/-
+resizes both within the space above the transport. Animal views preserve saved
+projection/aspect where available; they are analysis views, not physical LED
+scanout measurements.
+
+Review Save tracker video before initializing the native tracker. Supported
+bundled launches enable it by default unless explicitly disabled. End the VR run,
+wait for Finishing recording to clear, and finish the independent tracker normally
+when its video is complete. Media tools -> Collect media copies completed footage
+with integrity metadata; pending media stays explicit. Refresh reloads available
+media; Import footage imports a finished external recording. Set offset adds
+explicit approximate alignment without rewriting raw footage.
+
+Acknowledged per-experiment recording Start/Stop, recorder-state reconciliation
+and manual override are not implemented. A tracker recording may span preflight
+and multiple VR runs; stopping the experiment does not stop its recorder.
+
+Trajectory plots opens linked recorded analysis only with the reviewed Mac arm64
+Daari Deepa 1486b81e bundle. Older pinned Intel Mac/Windows/Linux dashboards lack
+that replay API/assets and show a capability message. Unity's internal pose/video
+replay is independent and included in all platform builds.
 
 Replay uses saved evidence and verifies snapshot hashes. It restores supported
 built scene geometry, archived skies and recorded populations, freezing live
@@ -152,13 +217,30 @@ No present-day config is substituted for a missing historical file.
 
 7. PRESERVE DATA AND CHECK THE APPARATUS
 
-Retain the entire run directory/ZIP: configuration versions/hashes, metadata,
+Retain the entire updated run directory: configuration versions/hashes, metadata,
 rig/population CSV/gzip logs, runtime_trace.log, sky PNGs/manifests and audit files.
-Quit cleanly and allow writers to drain. Walking/rugosity uses cm; Selwyn/terrain
-uses metres. Kinefly raw yaw input uses radians. Interpret units with saved configs.
+Quit cleanly and allow writers to drain. A ZIP made before later media collection
+remains its older snapshot; transfer the updated folder to include collected video.
+TerrainChoice/rugosity and walking use cm; Selwyn terrain/migration uses metres.
+Kinefly raw yaw input uses radians. Interpret units with saved scene/configs.
 
 Repeated-transition cleanup fixes identified ownership leaks/races. The existing
 reloadScene:false in-scene sequence remains available; no original crash dump proves
 all long-run Unity crashes eliminated. Check physical tracking, LED scanout, display
 layout and a representative repeated-reset workload on the acquisition workstation.
 See docs/scene-lifecycle.md, docs/data-formats.md, docs/replay.md and docs/releases.md.
+
+8. CURRENT ACCEPTANCE LIMITS
+
+Evenly paced 60 FPS remains unresolved despite high uncapped rendering throughput.
+The FPS display reports real delays and peaks; engine averages do not establish
+physical LED presentation or camera exposure timing. See docs/frame-pacing-20261027.md.
+
+Latest native Mac keyboard/rendering checks and separate actual Unity GUI-event
+checks passed within their recorded scope. Standalone mouse/drag acceptance for
+the latest UI remains incomplete because native automation returned
+noWindowsAvailable; earlier 0.3.1 pointer checks do not cover every changed control.
+Windows/Linux archives are cross-built and have not received native execution
+walkthroughs. Older pinned strict flight-camera paths remain blocked on those
+platforms and Intel Mac. Physical calibration and representative long-run
+acquisition still require the actual apparatus. See docs/releases.md.

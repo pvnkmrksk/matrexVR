@@ -2,6 +2,40 @@
 
 [GitHub Releases](https://github.com/pvnkmrksk/matrexVR/releases) is the publication record. A local build or source change is not a published binary. The [website](https://pvnkmrksk.github.io/matrexVR/) discovers real uploaded ZIPs; it never constructs a download URL for an absent asset.
 
+## 0.4 — terrain, recording and replay
+
+Release target: [`v0.4.0`](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.4.0). Publication is established by the uploaded GitHub Release assets, not by this source document or a local build. The release manifests identify the exact source revision and packaged companions. Earlier 0.3 release descriptions below retain their historical scope.
+
+- Four **TerrainChoice** spatial layouts share one environment prefab and two equidistant placeholder trees. Four ready-to-load treatment sequences independently select visible and navigation surfaces across all four layouts, covering sixteen scene/treatment combinations without sixteen scene copies. The shared centimeter recipe uses 1 cm eye clearance and texture scale 4; both-flat conditions deliberately look identical. Configured LED panel geometry and camera routing remain authoritative. See [terrain recipes](rugosity.md#load-one-treatment-and-run-all-four-spatial-patterns).
+- **Initialize tracking** opens the independent tracker for calibration/input checks before the experiment. The setup and JSON retain the same values and inherited defaults. Choice configurations expose **Available objects & materials**, with exact-name Type/Material controls.
+- Recordings default to **MATREX VR RunData beside each player**; protected installations use `Application.persistentDataPath/Installations/<installation-id>/RunData`. Configuration remains in `Application.persistentDataPath/Config`. Explicit `--data-dir` and `--config-dir` overrides remain supported. The recording library shows its root, discovers completed runs and opens external folders without moving them.
+- Replay combines saved poses, trial context, supported scene reconstruction and available tracker video on one seekable clock. A compact transport, media card, disclosed media tools, bounded preview resizing and refined dialogs accompany colored rig markers, recent recorded trails, heading arrows, front-camera cones and offscreen labels. The God’s-eye camera supports orbit, pan, translation, projection changes and adaptive clipping. Animal-camera evidence retains its saved projection/aspect.
+- The reviewed Mac arm64 Daari Deepa **1486b81e** payload adds linked recorded-trajectory plots and replay control. Older pinned Intel Mac, Windows and Linux dashboard archives lack that API/assets and report the capability limit. Unity’s internal pose/video replay is independent of the external viewer.
+
+The compact build enables **14 scenes**: ControlScene, Choice, Choice_desync, Choice_Selwyn, Swarm, Kannadi, Optomotor, TerrainCueLab, Rugosity_RS, ReplayScene, TerrainChoice_RoughLeft_SmoothRight, TerrainChoice_SmoothLeft_RoughRight, TerrainChoice_BothSmooth and TerrainChoice_BothRough. Existing scene GUIDs remain compatible. Other forest/two-tree source examples still require enabling their scenes and rebuilding.
+
+### 0.4 verification and known limits
+
+The [local Mac review](replay-recording-mac-review-20261027.md) records actual native rendering and keyboard checks. [Terrain/video verification](terrain-tracking-recording-20261027.md) includes fresh native recordings and Unity import/decode/seek checks using generated or attributed prerecorded input. [Camera checks](replay-camera-review-20261027-results.json) passed 82 assertions; [preview resize/header checks](replay-preview-resize-20261027-results.json) passed 48 assertions at Full HD and supplied Retina scale, with actual production IMGUI events. They are distinct from native window input acceptance.
+
+**Evenly paced 60 FPS remains unresolved.** High uncapped throughput does not establish uniform presentation intervals. The [pacing investigation](frame-pacing-20261027.md) reproduces engine/platform effects in minimal controls and records additional tails under the four-recorder workload. FPS measurement fixes retain real delayed frames and peaks; they do not certify LED presentation timing.
+
+**Acknowledged per-experiment tracker recording Start/Stop, state reconciliation and manual override are not implemented.** Save tracker video requests recording when an eligible bundled tracker is launched. Recorders remain independent and may span multiple experiment runs; finish them normally, then collect completed media. A VR experiment stopping does not by itself stop its video recorder. See [video workflow](replay.md#record-and-replay-tracker-video).
+
+Latest standalone pointer/drag acceptance is incomplete: native automation returned `noWindowsAvailable`, including after unlock. Native keyboard/rendering checks and injected Unity GUI-event tests passed within their separate scopes. The earlier 0.3.1 walkthrough does not establish acceptance of every changed 0.4 mouse interaction.
+
+Windows/Linux archives are cross-built on Mac and have not received native execution walkthroughs. Mac packages are universal, ad hoc signed and not notarized. Only the reviewed Mac arm64 Rekkefly correction supports the strict camera path; older pinned packages on other architectures remain blocked for that path. Bundled Linux HejjéTrac requires **glibc 2.39 or newer**. Physical tracker calibration, LED scanout/exposure synchronization, representative long-run acquisition and hardware-specific behavior remain apparatus checks.
+
+Build the pinned release source with both reviewed Mac payload options:
+
+```sh
+python3 tools/build_release.py --ref v0.4.0 --version 0.4.0 --platform all \
+  --local-native-camera-fix \
+  --local-dashboard-archive .integration/local-dashboard/DaariDeepa-macos-arm64.zip
+```
+
+The helper emits three complete OS ZIPs, per-archive SHA-256 files and embedded build/release manifests. It never uploads them. Hosted CI currently deploys only the static website; Unity desktop archives are built locally with the installed target modules. A published stable release is discovered by the website only after its actual ZIP assets exist.
+
 ## 0.1 — archived main
 
 Source: [`779926a80b02190d6dd0410f260e52bba105a04e`](https://github.com/pvnkmrksk/matrexVR/tree/779926a80b02190d6dd0410f260e52bba105a04e), release tag `v0.1.0`.
@@ -82,6 +116,8 @@ python3 tools/build_release.py --ref v0.3.1 --version 0.3.1 --platform all \
 
 See [local companion build provenance](../tools/native_patches/README.md) for reproducing the reviewed dashboard archive. Omit those flags only for an explicit upstream-companion build; it does not reproduce the tested Apple Silicon package.
 
+Run the archived 0.3.1 command from its matching checkout, including its companion locks and quickstart. Current-source locks and the 0.4 quickstart describe different payloads; they must not be substituted into a claimed reproduction of 0.3.1.
+
 ## Software verification
 
 | Evidence | Result and scope |
@@ -100,7 +136,9 @@ These accelerated software regressions establish cleanup and replay behavior und
 Use an activated Unity 6000.3.16f1 Editor with macOS, Windows Mono and Linux Mono support. The repository has no Unity license credentials configured for hosted CI. GitHub Actions can build Unity through GameCI when a suitable license is supplied; the published archives here were built locally.
 
 ```sh
-python3 tools/build_release.py --ref v0.3.0 --version 0.3.0 --platform all
+python3 tools/build_release.py --ref v0.4.0 --version 0.4.0 --platform all \
+  --local-native-camera-fix \
+  --local-dashboard-archive .integration/local-dashboard/DaariDeepa-macos-arm64.zip
 ```
 
-Supply `--unity /absolute/path/to/Unity` on another workstation. The helper creates a fresh ignored `.release-work/release-0.3.0/` folder, prepares tracked files from the requested Git revision, injects the release builder, supplies the public hardware template, and emits ZIPs, source manifests and SHA-256 files. It refuses to reuse an existing output folder. It never uploads releases. Archival tags can be rebuilt with a matching `--quickstart` text file containing their historical controls and storage locations. On macOS, copy-on-write project/cache copies keep disk use manageable; other platforms need room for a complete source checkout.
+Supply `--unity /absolute/path/to/Unity` on another workstation. The helper creates a fresh ignored `.release-work/release-0.4.0/` folder, prepares tracked files from the requested Git revision, injects the release builder, supplies the public hardware template, and emits ZIPs, source manifests and SHA-256 files. It refuses to reuse an existing output folder. It never uploads releases. Archival tags can be rebuilt with a matching `--quickstart` text file containing their historical controls and storage locations; exact companion reproduction also requires the corresponding locks and reviewed payloads. On macOS, copy-on-write project/cache copies keep disk use manageable; other platforms need room for a complete source checkout.

@@ -32,8 +32,21 @@ plots. `--local-dashboard-archive` selects a different location for the same
 reviewed bytes; `--skip-local-dashboard` explicitly opts into the older published
 viewer during development.
 
-The development source now pins Daari Deepa `a5456e33`, adding the independent
-recorded trajectory viewer and a session-bound replay clock. It was built from
-an isolated source archive and passed native live/analysis and recorded-control
-smokes before pinning. Published MATREX VR 0.3.1 keeps its earlier `f122518a`
-payload; updating this development lock does not change that release.
+The 0.4 source pins Daari Deepa `1486b81e`, including the independent recorded
+trajectory viewer and session-bound replay clock. It was built from an isolated
+source archive and passed native live/analysis and recorded-control smokes before
+pinning. Only this reviewed Mac arm64 payload includes the replay API/assets;
+older pinned Intel Mac, Windows and Linux dashboards report the capability limit.
+Unity’s internal pose/video replay does not depend on the external viewer.
+Published MATREX VR 0.3.1 keeps its earlier `f122518a` payload; updating this lock
+does not change that release.
+
+The 0.4 all-platform packaging command must include both
+`--local-native-camera-fix` and
+`--local-dashboard-archive .integration/local-dashboard/DaariDeepa-macos-arm64.zip`.
+The release manifest distinguishes the reviewed local builds from unchanged
+upstream packages. Other architectures retain their older pinned strict flight
+camera block. The pinned Linux HejjéTrac binary requires glibc 2.39 or newer;
+cross-building the Unity player does not establish native Linux execution.
+Acknowledged per-experiment tracker recording Start/Stop and manual override
+remain follow-up work; no upstream tracker source update is part of this release.
