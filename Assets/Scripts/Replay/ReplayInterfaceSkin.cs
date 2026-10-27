@@ -73,7 +73,15 @@ internal sealed class ReplayInterfaceSkin : IDisposable
         Skin.settings.cursorColor=Text;Skin.settings.selectionColor=new Color(.20f,.51f,.70f,.28f);
     }
     private static void State(GUIStyleState state,Texture2D background,Color text)
-    {state.background=background;state.scaledBackgrounds=Array.Empty<Texture2D>();state.textColor=text;}
+    {
+        state.background=background;
+#if UNITY_EDITOR
+        // Scaled backgrounds are an Editor-only API. Clear inherited artwork
+        // there; the standalone skin uses the assigned background directly.
+        state.scaledBackgrounds=Array.Empty<Texture2D>();
+#endif
+        state.textColor=text;
+    }
     private static void States(GUIStyle style,Texture2D normal,Texture2D hover,Texture2D active,Texture2D focused,Color text,Texture2D selected=null,Color? selectedText=null)
     {
         State(style.normal,normal,text);State(style.hover,hover,text);State(style.active,active,text);State(style.focused,focused,text);
