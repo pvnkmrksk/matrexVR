@@ -618,7 +618,7 @@ public class MainController : MonoBehaviour
         }
 
         // One owner for Escape: stop the experiment; Escape in Control exits the player.
-        if (ExperimentInput.Released("Cancel")) HandleEscape();
+        if (ExperimentInput.CancelReleased) HandleEscape();
     }
 
     public void HandleEscape()

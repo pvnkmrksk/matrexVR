@@ -12,6 +12,26 @@ ROOT = Path(__file__).resolve().parents[1]
 PRELUDE = r'''
 using System;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+namespace ConfigurationUI { public static class ConfigWorkbench { public static bool IsOpen; } }
+namespace UnityEngine {
+ public sealed class Canvas { public bool isActiveAndEnabled=true; }
+ public sealed class GameObject { public bool activeInHierarchy=true; public object input;public T GetComponent<T>() where T:class=>input as T;public T GetComponentInParent<T>() where T:class=>null; }
+}
+namespace UnityEngine.UI { public sealed class InputField { public bool isActiveAndEnabled=true,isFocused=true;public bool IsInteractable()=>true; } }
+namespace TMPro { public sealed class TMP_InputField { public bool isActiveAndEnabled=true,isFocused=true;public bool IsInteractable()=>true; } }
+namespace UnityEngine.EventSystems { public sealed class EventSystem { public static EventSystem current;public GameObject currentSelectedGameObject; } }
+public static class ExperimentInput {
+ public sealed class ActionState { public bool released;public bool WasReleasedThisFrame()=>released; }
+ public static readonly ActionState Cancel=new ActionState();private static ActionState Action(string name)=>Cancel;
+ INPUT_PRODUCTION
+}
+public sealed class MainController {
+ private bool sequenceStarted;public int escapes;private void HandleBogongGainInput(){}private void ManageTimerAndTransitions(){}private void HandleEscape(){escapes++;}public void Tick()=>Update();
+ CONTROLLER_PRODUCTION
+}
 public sealed class Label { public string text; }
 public sealed class Button { public string tooltip; public Label label=new Label();public T Q<T>() where T:class=>label as T; }
 public sealed class WorkspaceState { public bool configured,quick,demo; public int validationCalls; public List<string> errors=new List<string>(); public List<string> Validate(){validationCalls++;return new List<string>(errors);} }
@@ -49,6 +69,14 @@ TESTS = r'''
   Check(demo.start.label.text=="Start demo","demo caption changed");demo.RunPrimaryAction();Check(demo.started==1&&demo.saved==0,"demo tried to complete apparatus");
   var live=new ConfigWorkbench();live.Workspace.quick=true;live.RefreshStartCaption();live.RunPrimaryAction();
   Check(live.start.label.text=="Start experiment"&&live.started==1&&live.saved==0,"live QuickStart dispatch changed");
+  var dispatcher=new MainController();ConfigurationUI.ConfigWorkbench.IsOpen=true;ExperimentInput.Cancel.released=true;
+  Check(ExperimentInput.IsEditingText&&!ExperimentInput.Released("Cancel"),"regression fixture no longer reproduces the ordinary text guard during setup");
+  dispatcher.Tick();Check(dispatcher.escapes==1,"actual MainController.Update input gate swallowed setup Escape before its handler");
+  ExperimentInput.Cancel.released=false;dispatcher.Tick();Check(dispatcher.escapes==1,"setup Escape fired without a real release edge");
+  ConfigurationUI.ConfigWorkbench.IsOpen=false;ExperimentInput.Cancel.released=true;
+  EventSystem.current=new EventSystem{currentSelectedGameObject=new GameObject{input=new InputField()}};
+  dispatcher.Tick();Check(dispatcher.escapes==1,"runtime text fields lost their existing Escape guard");
+  EventSystem.current=null;dispatcher.Tick();Check(dispatcher.escapes==2,"ordinary experiment/replay Escape no longer reaches its handler");
   Console.WriteLine("PASS: "+checks+" production primary-action checks; UI/validation/action boundaries mocked, no native app launched.");
  }
 }
@@ -59,12 +87,17 @@ def main():
     if not dotnet:raise SystemExit('A local .NET SDK is required.')
     version=max(map(int,re.findall(r'^(\d+)\.',subprocess.check_output([dotnet,'--list-sdks'],text=True),re.M)))
     source=(ROOT/'Assets/Scripts/ConfigurationUI/ConfigWorkbench.Session.cs').read_text()
+    inputs=(ROOT/'Assets/Scripts/ExperimentInput.cs').read_text()
+    input_production=declaration(inputs,'public static bool IsEditingText')
+    for signature in ('public static bool Released(string name) =>','public static bool CancelReleased =>'):
+        start=inputs.index(signature);input_production+='\n'+inputs[start:inputs.index(';',start)+1]
+    controller=declaration((ROOT/'Assets/Scripts/MainController.cs').read_text(),'void Update()')
     properties=[]
     for signature in ('private bool CurrentDemo =>','private bool ApparatusDraft =>'):
         start=source.index(signature);properties.append(source[start:source.index(';',start)+1])
     production='\n'.join(properties+[declaration(source,'private List<string> PrimaryActionErrors()'),declaration(source,'private void RunPrimaryAction()'),declaration(source,'private void RefreshStartCaption()')])
     with tempfile.TemporaryDirectory(prefix='matrex-primary-action-') as folder:
-        temporary=Path(folder);(temporary/'Program.cs').write_text(PRELUDE+production+TESTS)
+        temporary=Path(folder);(temporary/'Program.cs').write_text(PRELUDE.replace('INPUT_PRODUCTION',input_production).replace('CONTROLLER_PRODUCTION',controller)+production+TESTS)
         (temporary/'NuGet.Config').write_text('<configuration><packageSources><clear /></packageSources></configuration>')
         project=temporary/'Regression.csproj';project.write_text(f'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net{version}.0</TargetFramework></PropertyGroup></Project>')
         env=dict(os.environ,DOTNET_CLI_HOME=folder,DOTNET_CLI_TELEMETRY_OPTOUT='1',DOTNET_SKIP_FIRST_TIME_EXPERIENCE='1')

@@ -62,6 +62,10 @@ public static class ExperimentInput
 
     public static bool Pressed(string name) => !IsEditingText && Action(name).WasPressedThisFrame();
     public static bool Released(string name) => !IsEditingText && Action(name).WasReleasedThisFrame();
+    // Setup owns Escape even while its fields have focus. Other experiment
+    // shortcuts retain the text-editing guard, including legacy runtime fields.
+    public static bool CancelReleased => ConfigurationUI.ConfigWorkbench.IsOpen
+        ? Action("Cancel").WasReleasedThisFrame() : Released("Cancel");
     public static bool Held(string name) => !IsEditingText && Action(name).IsPressed();
     // The historical autopilot shortcut is Ctrl+Space. Read the modifier from
     // the Input System so it remains compatible with Unity 6 input handling.
