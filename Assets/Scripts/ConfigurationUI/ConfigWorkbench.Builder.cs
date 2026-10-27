@@ -20,6 +20,10 @@ namespace ConfigurationUI
         private ListView blockList;
         private readonly List<int> blockIndices=new List<int>();
         private VisualElement modal;
+        private EventCallback<KeyDownEvent> modalTabKey;
+        private EventCallback<NavigationMoveEvent> modalTabNavigation;
+        private EventCallback<FocusInEvent> modalFocusInTrace;
+        private EventCallback<FocusOutEvent> modalFocusOutTrace;
         private readonly HashSet<string> expandedSections=new HashSet<string>();
         private static string Pretty(string key)
         {
@@ -324,22 +328,58 @@ namespace ConfigurationUI
         {
             CloseModal(); modal=new VisualElement(); modal.AddToClassList("modal-shade"); root.Add(modal);
             var dialog=new VisualElement(); dialog.AddToClassList("studio-dialog"); modal.Add(dialog);
-            modal.RegisterCallback<KeyDownEvent>(evt=>{
-                if(evt.keyCode!=KeyCode.Tab)return;
+            bool trace=Environment.GetCommandLineArgs().Contains("--trace-workbench-keyboard");
+            string Identity(VisualElement element)=>element==null?"none":element.GetType().Name+"/"+element.name;
+            void Trace(string text)
+            {
+                if(trace)Debug.Log("[Workbench keyboard] frame="+Time.frameCount+" "+text+" focus="+Identity(root.panel?.focusController.focusedElement as VisualElement));
+            }
+            void MoveFocus(bool backward)
+            {
                 var controls=dialog.Query<VisualElement>().ToList().Where(element=>element.focusable&&element.enabledInHierarchy&&element.resolvedStyle.display!=DisplayStyle.None&&
                     (element is Button || element is TextField || element is IntegerField || element is DropdownField || element is Toggle || element is Slider)).ToList();
                 if(controls.Count==0)return;
                 var focused=root.panel?.focusController.focusedElement as VisualElement;
                 int index=controls.FindIndex(element=>element==focused || focused!=null&&element.Contains(focused));
-                // The modal owns this Tab. Unity 6's focus controller otherwise
-                // applies its default move after our explicit move, skipping a control.
+                int next=index<0?(backward?controls.Count-1:0):(index+(backward?-1:1)+controls.Count)%controls.Count;
+                controls[next].Focus();Trace("modal move "+(backward?"previous":"next"));
+            }
+            // Unity 6's InputForUI sends both a Tab KeyDown and a separate
+            // Next/Previous navigation event. Give only navigation ownership of
+            // the move. Register on the document so a stale background target
+            // cannot bypass the modal's focus trap.
+            modalTabKey=evt=>{
+                Trace("KeyDown "+evt.keyCode+" target="+Identity(evt.target as VisualElement));
+                if(evt.keyCode!=KeyCode.Tab)return;
                 root.panel?.focusController.IgnoreEvent(evt);evt.StopPropagation();
-                controls[(index+(evt.shiftKey?-1:1)+controls.Count)%controls.Count].Focus();
-            },TrickleDown.TrickleDown);
+            };
+            modalTabNavigation=evt=>{
+                Trace("Navigation "+evt.direction+" target="+Identity(evt.target as VisualElement));
+                if(evt.direction!=NavigationMoveEvent.Direction.Next&&evt.direction!=NavigationMoveEvent.Direction.Previous)return;
+                root.panel?.focusController.IgnoreEvent(evt);evt.StopPropagation();MoveFocus(evt.direction==NavigationMoveEvent.Direction.Previous);
+            };
+            root.RegisterCallback(modalTabKey,TrickleDown.TrickleDown);root.RegisterCallback(modalTabNavigation,TrickleDown.TrickleDown);
+            if(trace)
+            {
+                modalFocusInTrace=evt=>Trace("FocusIn target="+Identity(evt.target as VisualElement));
+                modalFocusOutTrace=evt=>Trace("FocusOut target="+Identity(evt.target as VisualElement));
+                root.RegisterCallback(modalFocusInTrace,TrickleDown.TrickleDown);root.RegisterCallback(modalFocusOutTrace,TrickleDown.TrickleDown);
+            }
             var head=Row(); dialog.Add(head); var text=new Label(title); text.AddToClassList("title"); head.Add(text); text.style.flexGrow=1;
             var close=Button("Close",CloseModal,"quiet");head.Add(close);dialog.Add(new Label(subtitle));close.schedule.Execute(()=>close.Focus());return dialog;
         }
-        private void CloseModal() { modal?.RemoveFromHierarchy(); modal=null; ScheduleKeyboardFocus(); }
+        private void CloseModal()
+        {
+            if(root!=null)
+            {
+                if(modalTabKey!=null)root.UnregisterCallback(modalTabKey,TrickleDown.TrickleDown);
+                if(modalTabNavigation!=null)root.UnregisterCallback(modalTabNavigation,TrickleDown.TrickleDown);
+                if(modalFocusInTrace!=null)root.UnregisterCallback(modalFocusInTrace,TrickleDown.TrickleDown);
+                if(modalFocusOutTrace!=null)root.UnregisterCallback(modalFocusOutTrace,TrickleDown.TrickleDown);
+            }
+            modalTabKey=null;modalTabNavigation=null;modalFocusInTrace=null;modalFocusOutTrace=null;
+            modal?.RemoveFromHierarchy();modal=null;ScheduleKeyboardFocus();
+        }
         private void ShowBlockLibrary(int? replace=null)
         {
             RequireApplied(); presets=ExperimentBlocks.Catalog(RuntimePaths.ConfigRoot);

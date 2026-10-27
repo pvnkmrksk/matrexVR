@@ -99,6 +99,15 @@ public static class ApparatusInteractionValidation
                 var process=typeof(FocusController).GetMethod("SwitchFocusOnEvent",BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public);
                 if(process==null)throw new MissingMethodException("Unity focus-event processor is unavailable in this validator version.");
                 process.Invoke(controller,new object[]{controller.focusedElement,evt});
+                // InputSystemProvider also dispatches a separate Next/Previous
+                // navigation event for every Tab. It is not the KeyDown's
+                // default action, so verify both events and both focus passes.
+                using(var navigation=NavigationMoveEvent.GetPooled((modifiers&EventModifiers.Shift)!=0?NavigationMoveEvent.Direction.Previous:NavigationMoveEvent.Direction.Next,modifiers))
+                {
+                    var navigationTarget=controller.focusedElement as VisualElement??ui.Document.rootVisualElement;
+                    navigation.target=navigationTarget;navigationTarget.SendEvent(navigation);
+                    process.Invoke(controller,new object[]{controller.focusedElement,navigation});
+                }
             }
         }
     }
@@ -316,6 +325,10 @@ public static class ApparatusInteractionValidation
                     CheckPickerFocus(root,pickerOrder[pickerWalk],(pickerWalk>=4&&pickerWalk<=7?"Shift+Tab":"Tab")+" step "+pickerWalk);
                     pickerWalk++;
                     if(pickerWalk<pickerOrder.Length){PickerTab(ui);Next(27);break;}
+                    var backgroundFocus=root.Q<Button>("toggle-navigation");backgroundFocus.Focus();
+                    KeyPress(ui,KeyCode.Tab,EventModifiers.None,backgroundFocus);
+                    CheckPickerFocus(root,0,"Tab retargeted to a stale background control");
+                    pickerControls[3].Focus();
                     var loadFocus=root.panel.focusController.focusedElement as VisualElement;
                     using(var submit=NavigationSubmitEvent.GetPooled()){submit.target=loadFocus;loadFocus.SendEvent(submit);}
                     Next(28);break;
