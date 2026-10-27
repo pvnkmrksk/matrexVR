@@ -33,3 +33,9 @@ The initial one-rig terrain 60-FPS window contained one 1,000 ms stall: mean 48.
 Several release profiler counters were unavailable, and this Mono build returned a zero allocation count despite CSV string formatting. Allocation counts are therefore marked unavailable, not claimed as zero. The probe now checks counter support and excludes counter-initialization calls from its timed interval.
 
 The opt-in `--performance-probe <output>` runtime diagnostic is installed only when explicitly requested. Options include `--performance-scene`, `--performance-layout desktop|led`, `--performance-rigs`, `--performance-seconds`, and an optional comma-separated `--performance-phases`. Use a disposable config/data directory. An uncapped probe is a software investigation; normal experiment pacing remains controlled by system JSON.
+
+## Additional foreground test of the packaged app
+
+After the design changes, the packaged `0.3.1-local-review` player was launched in the foreground with one terrain LED rig and an independent generated native tracker recording MJPEG. The five-second capped window measured 59.6 FPS (maximum frame 20.65 ms); the uncapped window measured 2,293 FPS. All six cameras were 128×128 on the configured display and tracker samples remained fresh. The native recorder wrote all 1,800 accepted frames with no error. Its generated input averaged 40 FPS; engine FPS and tracker input rate are separate measurements.
+
+This is one additional foreground sample, not a replacement for the repeated isolation cases above. At the cap, OS process CPU measured 8.04 ms per frame across all Unity threads, compared with 1.71 ms in the uncapped sample. Foreground presentation/pacing and background behavior differ, so the earlier background CPU figures are not claimed for every operational run. The allocation counter correctly reported unavailable in the packaged player. [Final player evidence and local screenshots](local-player-review-20261027-results.json).

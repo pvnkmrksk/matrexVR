@@ -1,0 +1,402 @@
+{
+  "application": "/Users/pavan/src/ledpanelVR/.local/MATREX VR.app",
+  "launcher": "/Users/pavan/src/ledpanelVR/.local/Open MATREX Preview.command",
+  "build": {
+    "version": "0.3.1-local-review",
+    "target": "StandaloneOSX",
+    "result": "Succeeded",
+    "errors": 0,
+    "warnings": 56,
+    "bytes": 450890687,
+    "buildGuid": "f2d0f4d31f224f5e91e358544f2d9375",
+    "scenes": [
+      "Assets/Scenes/ControlScene.unity",
+      "Assets/Scenes/Optomotor.unity",
+      "Assets/Scenes/Swarm.unity",
+      "Assets/Scenes/Choice.unity",
+      "Assets/Scenes/Choice_desync.unity",
+      "Assets/Scenes/ReplayScene.unity",
+      "Assets/Scenes/Kannadi.unity",
+      "Assets/Scenes/Choice_Selwyn.unity",
+      "Assets/Scenes/Rugosity_RS.unity",
+      "Assets/Scenes/TerrainCueLab.unity",
+      "Assets/Scenes/TerrainChoice_RoughLeft_SmoothRight.unity",
+      "Assets/Scenes/TerrainChoice_SmoothLeft_RoughRight.unity",
+      "Assets/Scenes/TerrainChoice_BothSmooth.unity",
+      "Assets/Scenes/TerrainChoice_BothRough.unity"
+    ]
+  },
+  "identity": {
+    "schemaVersion": 1,
+    "sourceRevision": "54206323239e4eba8f6d6e66b1ebfd25146f83ec",
+    "sourceState": "working-tree-snapshot",
+    "sourceTreeDirty": true,
+    "runtimeSourceFingerprintSha256": "f6fdfc7da91c4afd762cfb4b7904b7664513ee091e2bae88334d5c90841b206f",
+    "runtimeSourceFileCount": 225,
+    "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint.",
+    "dirtyPathsAtPreparation": [
+      "?? Assets/StreamingAssets/Archive/Legacy/Templates/README.md.meta",
+      "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config.py.meta",
+      "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config_choice.py.meta",
+      "?? Assets/StreamingAssets/Archive/README.md.meta"
+    ],
+    "applicationVersion": "0.3.1-local-review",
+    "unityVersion": "6000.3.16f1",
+    "buildTarget": "StandaloneOSX"
+  },
+  "uiGallery": {
+    "screenshots": 34,
+    "checks": 370,
+    "errors": [],
+    "contactSheet": "/Users/pavan/src/ledpanelVR/.local/review-20261027/ui/contact-sheet.png",
+    "archive": "/Users/pavan/src/ledpanelVR/.local/review-20261027/ui-screenshots.zip"
+  },
+  "finalNativeSetup": {
+    "unity": "6000.3.16f1",
+    "os": "Mac OS X 27.0.1",
+    "paths": {
+      "application": "/Users/pavan/src/ledpanelVR/.local/MATREX VR.app/Contents",
+      "persistent": "/Users/pavan/Library/Application Support/InsectVRLab/MATREX VR",
+      "configs": "/Users/pavan/src/ledpanelVR/.local/Preview Config",
+      "recordings": "/Users/pavan/src/ledpanelVR/.local/MATREX VR RunData"
+    },
+    "screen": {
+      "width": 3024,
+      "height": 1898,
+      "mode": "FullScreenWindow",
+      "dpi": 255.0
+    },
+    "native": {
+      "width": 3024,
+      "height": 1898
+    },
+    "display": {
+      "name": "Built-in Retina Display",
+      "width": 3024,
+      "height": 1898
+    },
+    "ui": {
+      "scale": 2.0,
+      "panelScale": 2.0,
+      "directFramebuffer": true,
+      "logicalWidth": 1512.0,
+      "logicalHeight": 949.0
+    },
+    "profile": {
+      "mode": "flying",
+      "scene": "night-sky",
+      "demo": true
+    },
+    "performance": {
+      "realtimeSeconds": 7.374191463385488,
+      "windowSeconds": 0.5001135000000003,
+      "framesPerSecond": 119.9727661820766,
+      "frameMeanMs": 8.335225000000005,
+      "framePeakMs": 8.752582999999703,
+      "targetFrameRate": 120,
+      "vSyncCount": 0,
+      "timingSamples": 60,
+      "budgetMs": 8.333333333333334,
+      "cpuMainMs": 7.854423499999999,
+      "cpuRenderMs": 1.115283966666667,
+      "gpuMs": 4.3146104166226,
+      "presentWaitMs": 0.4707577166666667,
+      "processCpuMsPerFrame": 5.91143,
+      "processCpuPercentOfOneCore": 70.92106091917131,
+      "graphicsApi": "Metal"
+    }
+  },
+  "finalSetupScreenshot": "/Users/pavan/src/ledpanelVR/.local/review-20261027/final-home-native.png",
+  "nativeReplayCaptures": [
+    {
+      "backend": "Rekkefly",
+      "capture": "/Users/pavan/src/ledpanelVR/.local/review-20261027/replay-rekkefly/display.png",
+      "screen": {
+        "width": 3024,
+        "height": 1898,
+        "mode": "FullScreenWindow",
+        "dpi": 255.0
+      },
+      "visibleVideoFrame": 363,
+      "animalFrontPreviewVisible": true,
+      "overviewVisible": true,
+      "layoutPixelReview": "Readable controls and video, aspect-preserving letterboxing, media panel does not cover timeline.",
+      "revisionAtCapture": "774ebfa2; final54206323 changes only setup Escape input routing."
+    },
+    {
+      "backend": "HejjeTrac",
+      "capture": "/Users/pavan/src/ledpanelVR/.local/review-20261027/replay-hejjetrac/display.png",
+      "screen": {
+        "width": 3024,
+        "height": 1898,
+        "mode": "FullScreenWindow",
+        "dpi": 255.0
+      },
+      "visibleVideoFrame": 45,
+      "animalFrontPreviewVisible": true,
+      "overviewVisible": true,
+      "layoutPixelReview": "Readable controls and video, aspect-preserving letterboxing, media panel does not cover timeline.",
+      "revisionAtCapture": "774ebfa2; final54206323 changes only setup Escape input routing."
+    }
+  ],
+  "additionalForegroundProbe": {
+    "scope": "Packaged player774ebfa2, one LED terrain rig, actual independent generated native tracker input plus MJPEG recording, 5second windows; not a physical-camera/LED timing claim. Final54206323 changes only setupEscape.",
+    "failures": [],
+    "phases": [
+      {
+        "phase": "all-60",
+        "fps": 59.64542490896313,
+        "frameMs": {
+          "samples": 299,
+          "mean": 16.710791107023418,
+          "median": 16.732208000000526,
+          "p95": 17.731541999999934,
+          "maximum": 20.65341700000012
+        },
+        "focused": true,
+        "trackingFresh": [
+          true
+        ],
+        "observedRigs": 1,
+        "observedDataLoggers": 1,
+        "processCpuMsPerFrame": 8.040194314381274,
+        "allocationCounterAvailable": false,
+        "cameras": [
+          {
+            "name": "Main Camera B",
+            "enabled": true,
+            "rect": [
+              0.08465608,
+              0.932560563,
+              0.04232804,
+              0.06743941
+            ],
+            "targetDisplay": 0,
+            "offscreen": false,
+            "pixelWidth": 128,
+            "pixelHeight": 128
+          },
+          {
+            "name": "Main Camera D",
+            "enabled": true,
+            "rect": [
+              0.0,
+              0.932560563,
+              0.04232804,
+              0.06743941
+            ],
+            "targetDisplay": 0,
+            "offscreen": false,
+            "pixelWidth": 128,
+            "pixelHeight": 128
+          },
+          {
+            "name": "Main Camera F",
+            "enabled": true,
+            "rect": [
+              0.169312164,
+              0.932560563,
+              0.04232804,
+              0.06743941
+            ],
+            "targetDisplay": 0,
+            "offscreen": false,
+            "pixelWidth": 128,
+            "pixelHeight": 128
+          },
+          {
+            "name": "Main Camera U",
+            "enabled": true,
+            "rect": [
+              0.211640209,
+              0.932560563,
+              0.04232804,
+              0.06743941
+            ],
+            "targetDisplay": 0,
+            "offscreen": false,
+            "pixelWidth": 128,
+            "pixelHeight": 128
+          },
+          {
+            "name": "Main Camera R",
+            "enabled": true,
+            "rect": [
+              0.04232804,
+              0.932560563,
+              0.04232804,
+              0.06743941
+            ],
+            "targetDisplay": 0,
+            "offscreen": false,
+            "pixelWidth": 128,
+            "pixelHeight": 128
+          },
+          {
+            "name": "Main Camera L",
+            "enabled": true,
+            "rect": [
+              0.126984119,
+              0.932560563,
+              0.04232804,
+              0.06743941
+            ],
+            "targetDisplay": 0,
+            "offscreen": false,
+            "pixelWidth": 128,
+            "pixelHeight": 128
+          }
+        ]
+      },
+      {
+        "phase": "all-uncapped",
+        "fps": 2292.9777966373986,
+        "frameMs": {
+          "samples": 11465,
+          "mean": 0.4360816470126493,
+          "median": 0.4066250000001048,
+          "p95": 0.5257909999976107,
+          "maximum": 3.6813749999993206
+        },
+        "focused": true,
+        "trackingFresh": [
+          true
+        ],
+        "observedRigs": 1,
+        "observedDataLoggers": 1,
+        "processCpuMsPerFrame": 1.7133180113388573,
+        "allocationCounterAvailable": false,
+        "cameras": [
+          {
+            "name": "Main Camera B",
+            "enabled": true,
+            "rect": [
+              0.08465608,
+              0.932560563,
+              0.04232804,
+              0.06743941
+            ],
+            "targetDisplay": 0,
+            "offscreen": false,
+            "pixelWidth": 128,
+            "pixelHeight": 128
+          },
+          {
+            "name": "Main Camera D",
+            "enabled": true,
+            "rect": [
+              0.0,
+              0.932560563,
+              0.04232804,
+              0.06743941
+            ],
+            "targetDisplay": 0,
+            "offscreen": false,
+            "pixelWidth": 128,
+            "pixelHeight": 128
+          },
+          {
+            "name": "Main Camera F",
+            "enabled": true,
+            "rect": [
+              0.169312164,
+              0.932560563,
+              0.04232804,
+              0.06743941
+            ],
+            "targetDisplay": 0,
+            "offscreen": false,
+            "pixelWidth": 128,
+            "pixelHeight": 128
+          },
+          {
+            "name": "Main Camera U",
+            "enabled": true,
+            "rect": [
+              0.211640209,
+              0.932560563,
+              0.04232804,
+              0.06743941
+            ],
+            "targetDisplay": 0,
+            "offscreen": false,
+            "pixelWidth": 128,
+            "pixelHeight": 128
+          },
+          {
+            "name": "Main Camera R",
+            "enabled": true,
+            "rect": [
+              0.04232804,
+              0.932560563,
+              0.04232804,
+              0.06743941
+            ],
+            "targetDisplay": 0,
+            "offscreen": false,
+            "pixelWidth": 128,
+            "pixelHeight": 128
+          },
+          {
+            "name": "Main Camera L",
+            "enabled": true,
+            "rect": [
+              0.126984119,
+              0.932560563,
+              0.04232804,
+              0.06743941
+            ],
+            "targetDisplay": 0,
+            "offscreen": false,
+            "pixelWidth": 128,
+            "pixelHeight": 128
+          }
+        ]
+      }
+    ],
+    "nativeRecording": {
+      "frames": 1800,
+      "frames_per_second": 39.987801572731065,
+      "recording": {
+        "accepted": 1800,
+        "directory": "/Users/pavan/src/ledpanelVR/.local/review-20261027/final-led-player/native/recordings/final-player-video-probe-1793063252564822000-47895",
+        "error": null,
+        "written": 1800
+      },
+      "seconds": 45.013727417,
+      "source": "Simulated fly",
+      "udp_dropped": 0,
+      "zmq_dropped": 0
+    }
+  },
+  "nativeInteractionReview": {
+    "mouseNavigation": "Sequence page visibly opened through native coordinate click.",
+    "numericTextEntry": "Duration field accepted7; restored600beforeblur, matching original. No configuration was saved by this test.",
+    "systemQuit": "CmdQ closed the native app normally.",
+    "setupEscape": "Confirmed source gate fixed;17entrypoint regression checks passed. Final physical check not completed.",
+    "F1AndTab": "CUA attempts did not establish a visible shortcut/focus result; no unsupported claim of acceptance.",
+    "lastBlocker": "Computer-use tool reported Mac locked and automaticunlock unavailable. No attempt to bypass lock.",
+    "finalState": "Final app launched with preview profile; machine locked during final keyboardcheck."
+  },
+  "offlineChecks": {
+    "effectiveDefaults": 40,
+    "primaryActionAndRuntimeEscape": 17,
+    "systemDisplayRouting": 13,
+    "apparatusProfile": 55,
+    "terrainConfigurationAndTexture": 168,
+    "replayNativeSourceGuards": 80,
+    "replayMedia": 64,
+    "atomicInputMetadata": 3,
+    "verifiedNativeBuildReuse": 9,
+    "darwinRecorderExitIdentity": 20,
+    "keyboardAutopilot": 17
+  },
+  "scope": "Local Mac only. No pushes or deployment releases. Original recordings and calibrations preserved; diagnostic inputs generated/prerecorded. Four preexisting untracked archive metadata files remain outside commits.",
+  "screenshotSha256": {
+    "/Users/pavan/src/ledpanelVR/.local/review-20261027/final-home-native.png": "5411c451cdb98691005d4ccae66dc8efad8a51e67238a6f7b7dbad06ea17b9c2",
+    "/Users/pavan/src/ledpanelVR/.local/review-20261027/ui/contact-sheet.png": "f449e56a4bdd1375772412f0884f12e63b7832d43dc2cd26f33d697a81b8c889",
+    "/Users/pavan/src/ledpanelVR/.local/review-20261027/final-led-player/display.png": "8722515a5511b3b67c969eb77cbc9b13060a5fea13d10cf65329b76829e9da1c",
+    "/Users/pavan/src/ledpanelVR/.local/review-20261027/replay-rekkefly/display.png": "4a9bf3fc9c1e7f8a3b086a57c03ce4c42610383e3842db7037f47da22a02adb1",
+    "/Users/pavan/src/ledpanelVR/.local/review-20261027/replay-hejjetrac/display.png": "df4633ed16b501eb51f1f6aded8a08fc621243d8ed60d3f9e7f0427da9f9a713"
+  }
+}

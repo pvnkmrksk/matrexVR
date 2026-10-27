@@ -1,6 +1,6 @@
 # Local Mac preview — 27 October 2026
 
-The active branch is `codex/seamless-desktop-experience`. This is a local working-tree build; nothing has been pushed, released, or built for Windows/Linux in this pass.
+The active branch is `codex/seamless-desktop-experience`. This is a local development build with local commits; nothing has been pushed, released, or built for Windows/Linux in this pass. See the [follow-up review](local-preview-review-20261027.md) for the latest design, camera-routing, video and performance results.
 
 ## Open and test
 
@@ -19,7 +19,7 @@ On Start, **Initialize tracking** opens the independent tracking application bef
 | Swarm · entrainment then social coupling | 120 seconds ordered swarm, then 300 seconds Kannadi |
 | Social coupling · control | The same 300-second Kannadi without entrainment |
 
-The terrain presets share `Examples/Rugosity/terrain-treatment.json`: tracking is on, autopilot is off. The shared scene remains `TerrainCueLab`. The forest-floor albedo was recovered from the original packed Blender image; the flat appearance has no normal-map relief. The both-flat counterbalanced blocks deliberately have identical geometry.
+The terrain presets share `Examples/Rugosity/terrain-treatment.json`: tracking is on, autopilot is off. The four distinct `TerrainChoice_*` scenes share `Assets/TerrainCueLab/TerrainChoiceWorld.prefab`; each treatment sequence chooses the visible and navigation surface independently. Two identical target trees sit at equal distances on the left and right. The older `TerrainCueLab` remains compatible. The forest-floor albedo was recovered from the original packed Blender image; the flat appearance has no normal-map relief. The both-flat counterbalanced blocks deliberately have identical geometry.
 
 Both social sequences share `Examples/Kannadi/social-coupling.example.json`. Change **numberOfRings** in that one file: 0 means a center representation with no extra copies; 1 adds six copies per tracked animal. Mutual interaction requires at least two independently tracked rigs. Both stages independently sample cardinal headings and reset their presentation at the transition. See [social experiment details](social-swarm-experiment.md).
 
@@ -35,7 +35,7 @@ Replay opens overhead. Right-drag or I/J/K/L orbits, middle-drag pans, the wheel
 
 Native trackers save independently. Close a tracker normally to finish its video, then use **Collect media** in replay. Pending sources are shown as pending. Software frame association is not a measurement of camera exposure or LED timing. See [replay details](replay.md).
 
-## Verification
+## First preview verification
 
 Actual Unity checks on a guarded disposable project passed: 171 UI/render/preset checks at Full HD, 4K and 2560×1440; 425 configuration/keyboard/tracking-preflight checks; 252 terrain checks across sixteen combinations; 1,075 four-rig swarm/social checks; 42 fresh native-video import/decode/backward-seek checks; and a 999-check two-scene record/replay comparison. The maximum mean absolute RGB error of the paired 256px replay images was 0.0001791 on a 0–1 scale (about 0.018%).
 
@@ -43,6 +43,6 @@ Native generated demos wrote all 180 and 4,200 accepted video frames without rec
 
 Local test logs, JSON reports and rendered screenshots are under `.local/acceptance-20261027`. The build report is `.local/build-report.json`. The guided tutorial and other-OS builds remain deferred until this local preview is reviewed.
 
-The final signed Mac player was opened and captured at native 3024×1898, 2× backing scale, using the isolated preview profile and per-installation recording root. The build succeeded with zero errors and 56 warnings. The final 425-check interaction validation passed again after the JSON history fixes. Native coordinate input through the computer-control tool failed with `noWindowsAvailable`; native menu access and framebuffer capture worked. Final physical mouse/replay-gesture acceptance is therefore left to the operator rather than claimed as completed.
+The first preview’s signed Mac player was opened and captured at native 3024×1898, 2× backing scale, using the isolated preview profile and per-installation recording root. The build succeeded with zero errors and 56 warnings. The final 425-check interaction validation passed again after the JSON history fixes. Native coordinate input through the computer-control tool failed with `noWindowsAvailable`; native menu access and framebuffer capture worked. Final physical mouse/replay-gesture acceptance is therefore left to the operator rather than claimed as completed.
 
 The requested next-day tour follow-up was not scheduled: the automation service rejected the future schedules with “no future runs.” No automation was created. The tutorial remains deferred pending preview feedback.
