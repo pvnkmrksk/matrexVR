@@ -28,6 +28,11 @@ public static class ApparatusInteractionValidation
     private static string preflightDirectory;
     private static Dictionary<string,string> demoFiles;
     private static float scrollPosition;
+    private static VisualElement[] pickerControls;
+    private static int pickerWalk;
+    private static string pickerSystemJson,pickerPreviousSequenceJson;
+    private static ConfigDocument pickerPreviousSequence;
+    private static readonly int[] pickerOrder={1,2,3,0,3,2,1,0,1,2,3};
     private static List<Tuple<int,int,int,string,bool>> cases;
     private static string Output => Path.Combine(Application.dataPath,"../apparatus-interaction-validation");
     static ApparatusInteractionValidation()
@@ -63,11 +68,40 @@ public static class ApparatusInteractionValidation
         var focused=root.panel?.focusController.focusedElement as VisualElement;
         return focused!=null&&focused.panel==root.panel&&(focused==root||root.Contains(focused));
     }
+    private static void CheckPickerFocus(VisualElement root,int expected,string action)
+    {
+        var focused=root.panel.focusController.focusedElement as VisualElement;
+        var wanted=pickerControls[expected];
+        Check(focused==wanted||wanted.Contains(focused),action+" focuses exactly "+new[]{"Close","Sequence dropdown","Open custom JSON","Load sequence"}[expected]+
+            "; actual="+focused?.GetType().Name+"/"+focused?.name);
+    }
+    private static void PickerTab(ConfigWorkbench ui)
+    {
+        var root=ui.Document.rootVisualElement;
+        KeyPress(ui,KeyCode.Tab,pickerWalk>=4&&pickerWalk<=7?EventModifiers.Shift:EventModifiers.None,
+            root.panel.focusController.focusedElement as VisualElement);
+    }
     private static object Call(object owner,string name,params object[] args)=>owner.GetType().GetMethod(name,Hidden).Invoke(owner,args);
     private static void Put(object owner,string name,object value)=>owner.GetType().GetField(name,Hidden).SetValue(owner,value);
     private static void Submit(Button button){Check(button!=null,"requested native button exists");using(var evt=NavigationSubmitEvent.GetPooled()){evt.target=button;button.SendEvent(evt);}}
     private static void KeyPress(ConfigWorkbench ui,KeyCode key,EventModifiers modifiers=EventModifiers.None,VisualElement target=null)
-    {target=target??ui.Document.rootVisualElement;using(var evt=KeyDownEvent.GetPooled(new Event {type=EventType.KeyDown,keyCode=key,modifiers=modifiers})){evt.target=target;target.SendEvent(evt);}}
+    {
+        target=target??ui.Document.rootVisualElement;
+        using(var evt=KeyDownEvent.GetPooled(new Event {type=EventType.KeyDown,keyCode=key,modifiers=modifiers}))
+        {
+            evt.target=target;target.SendEvent(evt);
+            if(key==KeyCode.Tab)
+            {
+                // SendEvent alone bypasses the runtime input processor's final
+                // focus pass. Exercise that real Unity pass with the same event
+                // so an explicit move followed by a default move cannot pass.
+                var controller=ui.Document.rootVisualElement.panel.focusController;
+                var process=typeof(FocusController).GetMethod("SwitchFocusOnEvent",BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public);
+                if(process==null)throw new MissingMethodException("Unity focus-event processor is unavailable in this validator version.");
+                process.Invoke(controller,new object[]{controller.focusedElement,evt});
+            }
+        }
+    }
     private static void Next(int value,int wait=4){stage=value;nextFrame=Time.frameCount+wait;}
     private static void Capture(string name)
     {
@@ -270,7 +304,28 @@ public static class ApparatusInteractionValidation
                     var repaired=(ConfigDocument)typeof(ConfigWorkbench).GetField("selected",Hidden).GetValue(ui);
                     Check(repaired.LoadError==null&&!repaired.Dirty&&(double)JObject.Parse(File.ReadAllText(repaired.Path))["autopilotSpeed"]==5,"Apply JSON then Ctrl+S repairs and saves the same authoritative document");
                     Check(File.ReadAllText(repaired.Path+".bak")=="{broken","repair keeps original malformed input as a recoverable backup");
-                    Check(!MainController.Instance.SequenceRunning,"keyboard and inherited-default checks leave experiment idle");Finish(null);break;
+                    Check(!MainController.Instance.SequenceRunning,"keyboard and inherited-default checks leave experiment idle");
+                    pickerSystemJson=ui.Workspace.System.Root.ToString(Formatting.None);pickerPreviousSequence=ui.Workspace.Sequence;pickerPreviousSequenceJson=pickerPreviousSequence.Root.ToString(Formatting.None);
+                    Call(ui,"ShowSequenceLibrary");Next(26);break;
+                case 26:
+                    var shade=root.Q<VisualElement>(className:"modal-shade");
+                    pickerControls=new VisualElement[]{shade.Query<Button>().ToList().Single(b=>b.text=="Close"),root.Q<DropdownField>("sequence-starter-choice"),root.Q<Button>("sequence-starter-custom"),root.Q<Button>("sequence-starter-load")};
+                    Check(pickerControls.All(control=>control!=null),"sequence picker exposes all four intended keyboard controls");
+                    CheckPickerFocus(root,0,"opening sequence picker");pickerWalk=0;PickerTab(ui);Next(27);break;
+                case 27:
+                    CheckPickerFocus(root,pickerOrder[pickerWalk],(pickerWalk>=4&&pickerWalk<=7?"Shift+Tab":"Tab")+" step "+pickerWalk);
+                    pickerWalk++;
+                    if(pickerWalk<pickerOrder.Length){PickerTab(ui);Next(27);break;}
+                    var loadFocus=root.panel.focusController.focusedElement as VisualElement;
+                    using(var submit=NavigationSubmitEvent.GetPooled()){submit.target=loadFocus;loadFocus.SendEvent(submit);}
+                    Next(28);break;
+                case 28:
+                    Check(root.Q<VisualElement>(className:"modal-shade")==null&&ui.Workspace.Sequence.Path.Replace('\\','/').EndsWith("Examples/Rugosity/sequence-treatment-matched-terrain.json"),"submitting the keyboard-focused Load control loads the chosen sequence and closes its picker");
+                    Check(((JArray)ui.Workspace.Sequence.Root["sequences"]).Count==4,"keyboard sequence loading exposes all four terrain trials");
+                    Check(ui.Workspace.System.Root.ToString(Formatting.None)==pickerSystemJson,"keyboard sequence loading retains the apparatus JSON exactly");
+                    Check(pickerPreviousSequence.Root.ToString(Formatting.None)==pickerPreviousSequenceJson,"picker keyboard traversal and loading leave the previous sequence unchanged");
+                    Check(!MainController.Instance.SequenceRunning,"keyboard sequence loading never starts an experiment");
+                    Finish(null);break;
             }
         }
         catch(Exception error){Finish(error.ToString());}

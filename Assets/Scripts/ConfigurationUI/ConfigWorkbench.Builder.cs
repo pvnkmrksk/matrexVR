@@ -331,7 +331,10 @@ namespace ConfigurationUI
                 if(controls.Count==0)return;
                 var focused=root.panel?.focusController.focusedElement as VisualElement;
                 int index=controls.FindIndex(element=>element==focused || focused!=null&&element.Contains(focused));
-                controls[(index+(evt.shiftKey?-1:1)+controls.Count)%controls.Count].Focus();evt.PreventDefault();evt.StopPropagation();
+                // The modal owns this Tab. Unity 6's focus controller otherwise
+                // applies its default move after our explicit move, skipping a control.
+                root.panel?.focusController.IgnoreEvent(evt);evt.StopPropagation();
+                controls[(index+(evt.shiftKey?-1:1)+controls.Count)%controls.Count].Focus();
             },TrickleDown.TrickleDown);
             var head=Row(); dialog.Add(head); var text=new Label(title); text.AddToClassList("title"); head.Add(text); text.style.flexGrow=1;
             var close=Button("Close",CloseModal,"quiet");head.Add(close);dialog.Add(new Label(subtitle));close.schedule.Execute(()=>close.Focus());return dialog;
