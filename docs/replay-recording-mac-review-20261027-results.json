@@ -1,0 +1,138 @@
+{
+  "createdUtc": "2026-10-27T08:02:55.562359+00:00",
+  "app": "/Users/pavan/src/ledpanelVR/.local/MATREX VR.app",
+  "launcher": "/Users/pavan/src/ledpanelVR/.local/Open MATREX Preview.command",
+  "buildIdentity": {
+    "schemaVersion": 1,
+    "sourceRevision": "a34bbde0a6450d86e88b1153fae3151586d727f5",
+    "sourceState": "working-tree-snapshot",
+    "sourceTreeDirty": true,
+    "runtimeSourceFingerprintSha256": "d1d946dd9847fa619ad6548bfb775e45c8b31d62708fe1d2cf3bed3ed8c282b4",
+    "runtimeSourceFileCount": 233,
+    "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint.",
+    "dirtyPathsAtPreparation": [
+      "?? Assets/StreamingAssets/Archive/Legacy/Templates/README.md.meta",
+      "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config.py.meta",
+      "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config_choice.py.meta",
+      "?? Assets/StreamingAssets/Archive/README.md.meta"
+    ],
+    "applicationVersion": "0.3.1-local-review",
+    "unityVersion": "6000.3.16f1",
+    "buildTarget": "StandaloneOSX"
+  },
+  "codesignDeepStrictVerified": true,
+  "handoff": {
+    "state": "Ready to run; no experiment/tracking started",
+    "configRoot": "/Users/pavan/src/ledpanelVR/.local/Preview Config",
+    "recordingsRoot": "/Users/pavan/src/ledpanelVR/.local/MATREX VR RunData",
+    "rigs": 4,
+    "ports": [
+      9871,
+      9872,
+      9873,
+      9874
+    ],
+    "presentation": "six 128x128 LED cameras per rig",
+    "sequence": [
+      {
+        "scene": "TerrainChoice_RoughLeft_SmoothRight",
+        "seconds": 30
+      },
+      {
+        "scene": "TerrainChoice_SmoothLeft_RoughRight",
+        "seconds": 30
+      },
+      {
+        "scene": "TerrainChoice_BothSmooth",
+        "seconds": 30
+      },
+      {
+        "scene": "TerrainChoice_BothRough",
+        "seconds": 30
+      }
+    ],
+    "textureScale": 4,
+    "eyeClearanceCm": 1,
+    "physicalHeightsChanged": false,
+    "originalApparatusAndCalibrationPreserved": true,
+    "profileBackupDirectory": "/Users/pavan/src/ledpanelVR/.local/replay-recording-review-20261027/profile"
+  },
+  "nativeKeyboardObserved": [
+    "Space toggles replay play/pause",
+    "Left/Right change replay time and saved video frame",
+    "N/M switch recorded trial/step with context labels",
+    "W translates overview; I orbits overview",
+    "offscreen rig labels appear after camera movement",
+    "F1 keyboard help opens; Tab focuses Close; Return dismisses it"
+  ],
+  "nativeRenderingObserved": [
+    "saved tracker video and animal front camera simultaneously visible",
+    "four distinct rig colors, markers, heading/frustum lines",
+    "recent recorded trails and offscreen labels",
+    "clean one-label four-rig camera selector",
+    "no live run-status HUD over replay"
+  ],
+  "nativeMouseAcceptance": {
+    "complete": false,
+    "toolError": "noWindowsAvailable",
+    "note": "Coordinate click/drag delivery failed through CUA, including after unlock. Actual Unity GUI click tests passed separately; standalone mouse acceptance remains manual."
+  },
+  "checks": {
+    "choiceCatalogActualUnity": 54,
+    "initialReplayUiActualUnity": 22,
+    "previewResizeAndSelectorActualUnity": 48,
+    "cameraGeometryAndSeekActualUnity": 82,
+    "terrainUnitsTextureReplayActualUnity": 50,
+    "terrainConfigChecks": 168,
+    "nativeMediaImportDecodeSeekChecks": 161,
+    "freshPoseAssociatedReplayGpuChecks": 43,
+    "replaySourceLayoutPointerChecks": 80,
+    "fpsProductionUpdateDeterministicAssertions": 1393
+  },
+  "reports": [
+    "/Users/pavan/src/ledpanelVR/docs/choice-asset-catalog-validation-20261027-results.json",
+    "/Users/pavan/src/ledpanelVR/docs/replay-design-20261027-results.json",
+    "/Users/pavan/src/ledpanelVR/docs/replay-preview-resize-20261027-results.json",
+    "/Users/pavan/src/ledpanelVR/docs/replay-camera-review-20261027-results.json",
+    "/Users/pavan/src/ledpanelVR/docs/terrain-tracking-recording-20261027-results.json",
+    "/Users/pavan/src/ledpanelVR/docs/frame-pacing-20261027-results.json"
+  ],
+  "screenshots": {
+    "native/handoff-ready-reviewed.png": {
+      "path": "/Users/pavan/src/ledpanelVR/.local/replay-recording-review-20261027/native/handoff-ready-reviewed.png",
+      "sha256": "8b742b1ef4b520fd1fa092cacb9568d20dd69f1046b2aa2d0406735c39c0911d"
+    },
+    "native/final-video-loaded.png": {
+      "path": "/Users/pavan/src/ledpanelVR/.local/replay-recording-review-20261027/native/final-video-loaded.png",
+      "sha256": "250f2e3ec6256871204ccaead96ae4d654a5f9dc6930c032419c742a609f9f78"
+    },
+    "native/final-four-rigs-next.png": {
+      "path": "/Users/pavan/src/ledpanelVR/.local/replay-recording-review-20261027/native/final-four-rigs-next.png",
+      "sha256": "bc35f718bf8ad4c08cbb14a80d09ddb3069bcf89dfb41d36987fd0c4565aa376"
+    },
+    "native/final-camera-moved.png": {
+      "path": "/Users/pavan/src/ledpanelVR/.local/replay-recording-review-20261027/native/final-camera-moved.png",
+      "sha256": "126ddad64c39974c0e3a2c70e9ed05cfb89878e4e289cc9f2e032b5be9710cf9"
+    }
+  },
+  "fourRigRecordingRepeat": {
+    "sourceRevision": "d154f1f612c494f752bba6c56967a5cbcee50c1c",
+    "acceptedAndWrittenFrames": 6492,
+    "uncappedReportedFps": 568.3529386771171,
+    "reportedCappedFpsBeforeBenchmarkBoundaryCorrection": 59.63083788586291,
+    "scope": "generated native feeds; no physical camera/exposure claim",
+    "rawReport": "/Users/pavan/src/ledpanelVR/.local/replay-recording-review-20261027/final-performance/summary.json"
+  },
+  "unresolved": [
+    "evenly paced physical 60 FPS; minimal Unity/macOS comparator reproduces pacing issues and full workload tails need isolation",
+    "acknowledged per-experiment Start/Stop recording integration for detached HJ/Rekkefly",
+    "native standalone pointer acceptance because CUA could not deliver coordinate actions"
+  ],
+  "followup": {
+    "automationId": "connect-experiment-recording-controls",
+    "scheduledLocal": "2026-10-27 18:00 Europe/Berlin",
+    "scope": "controlled capped pacing isolation, then version-aware acknowledged recording control after published upstream changes"
+  },
+  "pushed": false,
+  "otherOsBuilds": false
+}
