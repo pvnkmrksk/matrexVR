@@ -63,6 +63,12 @@ def main():
     parser.add_argument('--local-dashboard-archive', type=Path, default=ROOT / '.integration/local-dashboard/DaariDeepa-macos-arm64.zip')
     parser.add_argument('--skip-local-dashboard', action='store_true', help='Advanced development-only opt-out; uses the older published dashboard renderer')
     args = parser.parse_args()
+    # Unity resolves relative output paths against its disposable project, rather
+    # than the shell's directory. Normalize before passing paths across processes.
+    args.project = args.project.resolve()
+    args.app = args.app.resolve()
+    args.library = args.library.resolve()
+    args.local_dashboard_archive = args.local_dashboard_archive.resolve()
     if (args.verified_native_binary is None) != (args.native_binary_provenance is None):
         parser.error('--verified-native-binary and --native-binary-provenance must be supplied together')
     if args.verified_native_binary is not None and (args.skip_companions or args.skip_native_camera_fix or platform.machine() != 'arm64'):

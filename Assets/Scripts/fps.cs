@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,9 @@ public class fps : MonoBehaviour
         public double realtimeSeconds, windowSeconds, framesPerSecond, frameMeanMs, framePeakMs;
         public int targetFrameRate, vSyncCount, timingSamples;
         public double? budgetMs, cpuMainMs, cpuRenderMs, gpuMs, presentWaitMs;
+        // OS process CPU excludes sleeping and includes all Unity threads. The
+        // platform main-thread span is retained separately for raw diagnostics.
+        public double? processCpuMsPerFrame, processCpuPercentOfOneCore;
         public string graphicsApi;
     }
     public static FrameStatistics Latest { get; private set; }
@@ -28,6 +32,8 @@ public class fps : MonoBehaviour
     private bool timingsEnabled;
     private string graphicsApi;
     private int frames;
+    private System.Diagnostics.Process measuredProcess;
+    private TimeSpan previousProcessCpu;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void EnsureVisible()
@@ -40,6 +46,8 @@ public class fps : MonoBehaviour
         instance = this;
         Latest = null;
         previousTime = Time.realtimeSinceStartupAsDouble;
+        try { measuredProcess=System.Diagnostics.Process.GetCurrentProcess();previousProcessCpu=measuredProcess.TotalProcessorTime; }
+        catch { measuredProcess?.Dispose();measuredProcess=null; }
         timingsEnabled = FrameTimingManager.IsFeatureEnabled();
         graphicsApi = SystemInfo.graphicsDeviceType.ToString();
         DontDestroyOnLoad(gameObject);
@@ -132,6 +140,16 @@ public class fps : MonoBehaviour
             }
         }
         if (elapsed < 0.5) return;
+        double? processCpuMsPerFrame=null,processCpuPercent=null;
+        if(measuredProcess!=null)
+        {
+            try
+            {
+                measuredProcess.Refresh();var total=measuredProcess.TotalProcessorTime;double consumed=(total-previousProcessCpu).TotalMilliseconds;previousProcessCpu=total;
+                if(consumed>=0){processCpuMsPerFrame=consumed/frames;processCpuPercent=consumed/(elapsed*10);}
+            }
+            catch { measuredProcess.Dispose();measuredProcess=null; }
+        }
         Latest = new FrameStatistics {
             realtimeSeconds = now, windowSeconds = elapsed, framesPerSecond = frames / elapsed,
             frameMeanMs = elapsed * 1000 / frames, framePeakMs = peakInterval * 1000,
@@ -141,13 +159,14 @@ public class fps : MonoBehaviour
             cpuMainMs = timingSamples > 0 ? cpuMain / timingSamples : (double?)null,
             cpuRenderMs = timingSamples > 0 && cpuRender > 0 ? cpuRender / timingSamples : (double?)null,
             presentWaitMs = timingSamples > 0 ? presentWait / timingSamples : (double?)null,
-            gpuMs = gpuSamples > 0 ? gpu / gpuSamples : (double?)null, graphicsApi = graphicsApi
+            gpuMs = gpuSamples > 0 ? gpu / gpuSamples : (double?)null, graphicsApi = graphicsApi,
+            processCpuMsPerFrame=processCpuMsPerFrame,processCpuPercentOfOneCore=processCpuPercent
         };
         string target = QualitySettings.vSyncCount > 0 ? $"VSync /{QualitySettings.vSyncCount}"
             : Application.targetFrameRate > 0 ? $"target {Application.targetFrameRate} | VSync OFF" : "uncapped | VSync OFF";
         label.text = $"{Latest.framesPerSecond:0} FPS | {target}\n" +
             $"Frame {Latest.frameMeanMs:F1} / peak {Latest.framePeakMs:F1} ms" + (Latest.budgetMs.HasValue ? $" | budget {Latest.budgetMs:F1} ms\n" : "\n") +
-            $"CPU {Ms(Latest.cpuMainMs)} | render {Ms(Latest.cpuRenderMs)} | GPU {Ms(Latest.gpuMs)} | wait {Ms(Latest.presentWaitMs)} ms";
+            $"CPU proc {Ms(Latest.processCpuMsPerFrame)} | GPU {Ms(Latest.gpuMs)} | present wait {Ms(Latest.presentWaitMs)} ms";
         elapsed = peakInterval = cpuMain = cpuRender = gpu = presentWait = 0;
         frames = timingSamples = gpuSamples = 0;
     }
@@ -158,6 +177,7 @@ public class fps : MonoBehaviour
         if(instance!=this)return;
         OperatorOverlayLayout.Release("fps");
         MainController.SystemConfigurationChanged -= ApplyDisplay;
+        measuredProcess?.Dispose();measuredProcess=null;
         instance = null; Latest = null;
     }
 }

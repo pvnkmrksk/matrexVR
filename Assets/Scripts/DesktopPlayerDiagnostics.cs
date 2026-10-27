@@ -38,7 +38,8 @@ public sealed class DesktopPlayerDiagnostics : MonoBehaviour
             ui = new { scale = DesktopDisplay.UiScale, panelScale = panel != null ? panel.scale : 0, directFramebuffer = panel != null && panel.targetTexture == null,
                 logicalWidth = ui != null ? ui.Document.rootVisualElement.resolvedStyle.width : 0,
                 logicalHeight = ui != null ? ui.Document.rootVisualElement.resolvedStyle.height : 0 },
-            profile = ui != null && DesktopQuickStart.IsQuickStart(ui.Workspace) ? new { mode = DesktopQuickStart.Mode(ui.Workspace), scene = DesktopQuickStart.Scene(ui.Workspace), demo = DesktopQuickStart.IsDemo(ui.Workspace) } : null
+            profile = ui != null && DesktopQuickStart.IsQuickStart(ui.Workspace) ? new { mode = DesktopQuickStart.Mode(ui.Workspace), scene = DesktopQuickStart.Scene(ui.Workspace), demo = DesktopQuickStart.IsDemo(ui.Workspace) } : null,
+            performance = fps.Latest
         }, Formatting.Indented));
         ScreenCapture.CaptureScreenshot(output + ".png");
         yield return null; yield return new WaitForSecondsRealtime(1);
