@@ -1,0 +1,164 @@
+{
+  "checks": 82,
+  "failure": null,
+  "errors": [],
+  "passed": [
+    "Actual ReplayScene loads four generated recorded rigs",
+    "Actual replay Game-view framebuffer is Full HD",
+    "Each rig has a distinct stable overview color",
+    "VR1 has a visible standard-line camera frustum",
+    "VR1 cone starts at the actual front camera",
+    "VR1 bright trail uses only recorded past positions",
+    "VR1 pose root retains unit scale independently of marker size",
+    "VR1 animal camera excludes all overview annotations",
+    "VR2 has a visible standard-line camera frustum",
+    "VR2 cone starts at the actual front camera",
+    "VR2 bright trail uses only recorded past positions",
+    "VR2 pose root retains unit scale independently of marker size",
+    "VR2 animal camera excludes all overview annotations",
+    "VR3 has a visible standard-line camera frustum",
+    "VR3 cone starts at the actual front camera",
+    "VR3 bright trail uses only recorded past positions",
+    "VR3 pose root retains unit scale independently of marker size",
+    "VR3 animal camera excludes all overview annotations",
+    "VR4 has a visible standard-line camera frustum",
+    "VR4 cone starts at the actual front camera",
+    "VR4 bright trail uses only recorded past positions",
+    "VR4 pose root retains unit scale independently of marker size",
+    "VR4 animal camera excludes all overview annotations",
+    "Resizing the operator marker never scales a saved animal-camera offset",
+    "Seek 9.5 keeps VR1 tail inside the active recorded trial",
+    "Seek 9.5 discards VR1 future trail samples",
+    "Seek 9.5 uses the bounded five-second recorded tail for VR1",
+    "Seek 9.5 keeps VR2 tail inside the active recorded trial",
+    "Seek 9.5 discards VR2 future trail samples",
+    "Seek 9.5 uses the bounded five-second recorded tail for VR2",
+    "Seek 9.5 keeps VR3 tail inside the active recorded trial",
+    "Seek 9.5 discards VR3 future trail samples",
+    "Seek 9.5 uses the bounded five-second recorded tail for VR3",
+    "Seek 9.5 keeps VR4 tail inside the active recorded trial",
+    "Seek 9.5 discards VR4 future trail samples",
+    "Seek 9.5 uses the bounded five-second recorded tail for VR4",
+    "Seek 2 keeps VR1 tail inside the active recorded trial",
+    "Seek 2 discards VR1 future trail samples",
+    "Seek 2 uses the bounded five-second recorded tail for VR1",
+    "Seek 2 keeps VR2 tail inside the active recorded trial",
+    "Seek 2 discards VR2 future trail samples",
+    "Seek 2 uses the bounded five-second recorded tail for VR2",
+    "Seek 2 keeps VR3 tail inside the active recorded trial",
+    "Seek 2 discards VR3 future trail samples",
+    "Seek 2 uses the bounded five-second recorded tail for VR3",
+    "Seek 2 keeps VR4 tail inside the active recorded trial",
+    "Seek 2 discards VR4 future trail samples",
+    "Seek 2 uses the bounded five-second recorded tail for VR4",
+    "Seek 11 keeps VR1 tail inside the active recorded trial",
+    "Seek 11 discards VR1 future trail samples",
+    "Seek 11 uses the bounded five-second recorded tail for VR1",
+    "Seek 11 keeps VR2 tail inside the active recorded trial",
+    "Seek 11 discards VR2 future trail samples",
+    "Seek 11 uses the bounded five-second recorded tail for VR2",
+    "Seek 11 keeps VR3 tail inside the active recorded trial",
+    "Seek 11 discards VR3 future trail samples",
+    "Seek 11 uses the bounded five-second recorded tail for VR3",
+    "Seek 11 keeps VR4 tail inside the active recorded trial",
+    "Seek 11 discards VR4 future trail samples",
+    "Seek 11 uses the bounded five-second recorded tail for VR4",
+    "Seek 0.5 keeps VR1 tail inside the active recorded trial",
+    "Seek 0.5 discards VR1 future trail samples",
+    "Seek 0.5 uses the bounded five-second recorded tail for VR1",
+    "Seek 0.5 keeps VR2 tail inside the active recorded trial",
+    "Seek 0.5 discards VR2 future trail samples",
+    "Seek 0.5 uses the bounded five-second recorded tail for VR2",
+    "Seek 0.5 keeps VR3 tail inside the active recorded trial",
+    "Seek 0.5 discards VR3 future trail samples",
+    "Seek 0.5 uses the bounded five-second recorded tail for VR3",
+    "Seek 0.5 keeps VR4 tail inside the active recorded trial",
+    "Seek 0.5 discards VR4 future trail samples",
+    "Seek 0.5 uses the bounded five-second recorded tail for VR4",
+    "Close insect-scale inspection uses a sub-millimeter near clip",
+    "Small-context clipping discards the preceding large scene's far range",
+    "Top-down clipping projects scene bounds along depth instead of treating horizontal terrain width as depth",
+    "Perspective clipping includes the actual current environment with finite ordered planes",
+    "Right-offscreen target gets an inside-viewport indicator pointing right",
+    "Targets behind the view also receive bounded edge indicators",
+    "Replay annotation validation starts no acquisition listeners",
+    "Showing overview markers, trails and cones changes zero pixels in the saved animal view",
+    "An actual close object clipped by the old .01 near plane is rendered by adaptive clipping",
+    "No replay camera or renderer runtime errors"
+  ],
+  "scope": "Real ReplayScene, standard Unity cameras and LineRenderer annotation geometry, actual forward/backward seeks and Full HD Game-view screenshots, with explicitly generated four-rig coordinates. No physical tracking/video acquisition claim.",
+  "sourceHashes": {
+    "headAtValidation": "16a45ce140a19ca1ffd153bb012b37ee97e0f630",
+    "files": {
+      "Assets/Scripts/Replay/ReplayController.cs": {
+        "sourceSha256": "49614c77d3241b14b8a001b740e5ad7ed97ff33bfeaf427e29a153aad30ad016",
+        "validatedSha256": "49614c77d3241b14b8a001b740e5ad7ed97ff33bfeaf427e29a153aad30ad016",
+        "matches": true
+      },
+      "Assets/Scripts/Replay/ReplayController.Visuals.cs": {
+        "sourceSha256": "f40218fd709805a357ff1b978bfa4c1b02299f33cf0b33fd4a14656588c29ae8",
+        "validatedSha256": "f40218fd709805a357ff1b978bfa4c1b02299f33cf0b33fd4a14656588c29ae8",
+        "matches": true
+      },
+      "Assets/Scripts/Replay/ReplayAgentVisuals.cs": {
+        "sourceSha256": "01eced1680d6fb75df4d975dc8a80f7d64ddc42bb0b715f9ecf93840cbc20eea",
+        "validatedSha256": "01eced1680d6fb75df4d975dc8a80f7d64ddc42bb0b715f9ecf93840cbc20eea",
+        "matches": true
+      },
+      "Assets/Scripts/Replay/ReplayCameraGeometry.cs": {
+        "sourceSha256": "47a7e40cc88bdcf943219126e1c2ea994e2d3b97422838989bf989c1e56186bf",
+        "validatedSha256": "47a7e40cc88bdcf943219126e1c2ea994e2d3b97422838989bf989c1e56186bf",
+        "matches": true
+      },
+      "Assets/Editor/ReplayCameraVisualValidation.cs": {
+        "sourceSha256": "d3f4ac861c1d70492d39f1af053fd307628f9b20ee62fc1f05b7b84d6a648be9",
+        "validatedSha256": "d3f4ac861c1d70492d39f1af053fd307628f9b20ee62fc1f05b7b84d6a648be9",
+        "matches": true
+      }
+    },
+    "capturedUIOnly": {
+      "Assets/Scripts/Replay/ReplayController.GUI.cs": "8a8309057caa8094b6daff48b6c01a1eabf67096b92e82c26ebe933ae466ed18",
+      "Assets/Scripts/Replay/ReplayMediaPanel.cs": "d603fc248041ee8de567eb9eb51609122230d5de1823625ed10f807928ec1fca",
+      "Assets/Scripts/Replay/ReplayInterfaceSkin.cs": "89b7859cf3df877fabe7f0589d303fd9bc8087c7e2b5d86e163862e4bf3dd299"
+    },
+    "note": "Camera/annotation source hashes match root exactly. Screenshot UI styling is the captured snapshot; replay_design is refining separate UI partials afterward."
+  },
+  "changes": [
+    "Dynamic near/far clipping projects current geometry bounds along camera depth and discards preceding contexts' far range.",
+    "Pose roots stay at unit scale; only the visible primitive marker body scales with screen pixels, preserving saved animal camera offsets.",
+    "Stable rig colors, screen-sized markers and pulsing halos, current recorded heading arrows, standard Camera.CalculateFrustumCorners wire frusta, faint full-trial paths and a bright five-second recent recorded tail.",
+    "On-screen rig tags and bounded directional off-screen tags avoid replay control chrome. Labels are suspended during media/file/fidelity dialogs.",
+    "Annotations are restricted to the operator layer; an actual animal-camera pixel comparison confirms zero image change when annotations are hidden."
+  ],
+  "captures": {
+    "four-rig-overview.png": {
+      "path": "/Users/pavan/src/ledpanelVR/.local/replay-camera-review-20261027/validation/four-rig-overview.png",
+      "sha256": "8af346cf57cd9181a7864573bb5070404ffbb8e1b6c48195956022b8655db983"
+    },
+    "offscreen-rig-indicators.png": {
+      "path": "/Users/pavan/src/ledpanelVR/.local/replay-camera-review-20261027/validation/offscreen-rig-indicators.png",
+      "sha256": "85ea287506e960ac4d4703bae9ba1c4426a5b2d02cd41d31e5beb38e474f66a8"
+    },
+    "near-object-old-clip.png": {
+      "path": "/Users/pavan/src/ledpanelVR/.local/replay-camera-review-20261027/validation/near-object-old-clip.png",
+      "sha256": "ac09985eaceed9a9e0220de9f380902cbbbf6f6487334d5310b0ffe1619e5196"
+    },
+    "near-object-adaptive-clip.png": {
+      "path": "/Users/pavan/src/ledpanelVR/.local/replay-camera-review-20261027/validation/near-object-adaptive-clip.png",
+      "sha256": "96a782248dc14f5ba8d36d749c33c65897224da834cfb8d7e5120ee94cefc7a9"
+    },
+    "animal-with-operator-annotations.png": {
+      "path": "/Users/pavan/src/ledpanelVR/.local/replay-camera-review-20261027/validation/animal-with-operator-annotations.png",
+      "sha256": "ae7e06fd227c2ec89b4ea33a468f35a59777fc42684e3389d3735f40b42e3764"
+    },
+    "animal-with-annotations-hidden.png": {
+      "path": "/Users/pavan/src/ledpanelVR/.local/replay-camera-review-20261027/validation/animal-with-annotations-hidden.png",
+      "sha256": "ae7e06fd227c2ec89b4ea33a468f35a59777fc42684e3389d3735f40b42e3764"
+    }
+  },
+  "limitations": [
+    "Replay coordinate fixture is generated; it does not establish tracking/calibration or native video acquisition.",
+    "Screenshots use a real Full HD Unity Game view. The Mac packaged-player UI and shader inclusion still require root integration verification.",
+    "Heading arrow indicates the saved animal orientation; it is not a predicted future trajectory."
+  ]
+}

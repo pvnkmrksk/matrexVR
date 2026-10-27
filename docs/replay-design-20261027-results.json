@@ -1,0 +1,104 @@
+{
+  "checks": 22,
+  "failure": null,
+  "errors": [],
+  "passed": [
+    "Recorded media panel exists",
+    "Actual saved tracker video is visible in redesigned panel",
+    "Default replay retains God’s-eye view",
+    "Full HD game view uses real framebuffer dimensions",
+    "Main camera stays above the transport dock",
+    "Media card stays clear of the timeline and transport",
+    "Session header stays clear of camera evidence",
+    "Transport dock uses at most sixteen percent at Full HD",
+    "Replay uses packaged interface typography",
+    "Live experiment HUD is suspended during replay",
+    "Full HD framebuffer: 01-loaded-full-hd",
+    "Full HD framebuffer: 02-fidelity-full-hd",
+    "Full HD framebuffer: 03-controls-full-hd",
+    "Full HD framebuffer: 04-media-tools-full-hd",
+    "Expanded media tools stay above transport dock",
+    "Full HD framebuffer: 05-video-offset-full-hd",
+    "Alignment dialog retains modal input gate",
+    "Alignment dialog remains cancellable",
+    "Full HD framebuffer: 06-open-run-full-hd",
+    "Full HD framebuffer: 07-play-hover-full-hd",
+    "Inspecting read-only replay evidence leaves paused playback unchanged",
+    "No replay rendering or media errors"
+  ],
+  "scope": "Actual Full HD Game-view composition using an isolated copy of previously recorded tracker footage; programmatic UI-state inspection, no native pointer or physical camera acquisition claim",
+  "changes": [
+    "Compact session header separates run identity from playback actions.",
+    "Native-coordinate transport dock reserves the camera viewport and groups playback, speed and camera controls.",
+    "Camera/video evidence uses one compact card, with advanced media import/collection/offset controls behind Media tools.",
+    "Fidelity and controls are progressively disclosed; import/alignment modals dim the underlying replay.",
+    "Trial and step numbers match the one-based live HUD while underlying saved indices remain unchanged.",
+    "Replay uses packaged Inter typography and existing Unity IMGUI controls; decoding and frame associations are unchanged."
+  ],
+  "sourceHashes": {
+    "Assets/Scripts/Replay/ReplayController.GUI.cs": {
+      "sourceSha256": "e9dc7099e6f4d0ca2590f90b3e1e79a5bdfdae0f3d3828b874dab4d4b0e02d5b",
+      "validatedSha256": "e9dc7099e6f4d0ca2590f90b3e1e79a5bdfdae0f3d3828b874dab4d4b0e02d5b",
+      "matches": true
+    },
+    "Assets/Scripts/Replay/ReplayController.GUI.cs.meta": {
+      "sourceSha256": "0dac12f31855a3a60abf027d6f42b4613bf1082d71bb79d7964989158ce8046e",
+      "validatedSha256": "0dac12f31855a3a60abf027d6f42b4613bf1082d71bb79d7964989158ce8046e",
+      "matches": true
+    },
+    "Assets/Scripts/Replay/ReplayMediaPanel.cs": {
+      "sourceSha256": "d603fc248041ee8de567eb9eb51609122230d5de1823625ed10f807928ec1fca",
+      "validatedSha256": "d603fc248041ee8de567eb9eb51609122230d5de1823625ed10f807928ec1fca",
+      "matches": true
+    },
+    "Assets/Scripts/Replay/ReplayMediaPanel.GUI.cs": {
+      "sourceSha256": "f9610404ead566c0f0e99c6cb52037929208d68723b11917c5d5f52d291797b0",
+      "validatedSha256": "f9610404ead566c0f0e99c6cb52037929208d68723b11917c5d5f52d291797b0",
+      "matches": true
+    },
+    "Assets/Scripts/Replay/ReplayMediaPanel.GUI.cs.meta": {
+      "sourceSha256": "eddabe26535f2ba0c7981d87519fffbfe4ff96de768b757e46fac6e7e441245e",
+      "validatedSha256": "eddabe26535f2ba0c7981d87519fffbfe4ff96de768b757e46fac6e7e441245e",
+      "matches": true
+    },
+    "Assets/Editor/ReplayDesignValidation.cs": {
+      "sourceSha256": "d839c86acdea82d6e5a91a3c88694e56189dd9b5d4e362384e5fb7b06efa3d49",
+      "validatedSha256": "d839c86acdea82d6e5a91a3c88694e56189dd9b5d4e362384e5fb7b06efa3d49",
+      "matches": true
+    },
+    "Assets/Editor/ReplayDesignValidation.cs.meta": {
+      "sourceSha256": "f8df63fa2364681e9d16c21d47e86e0f7ef34f08a325a3b0a1b774dc0ed33b84",
+      "validatedSha256": "f8df63fa2364681e9d16c21d47e86e0f7ef34f08a325a3b0a1b774dc0ed33b84",
+      "matches": true
+    }
+  },
+  "captures": [
+    "/Users/pavan/src/ledpanelVR/.local/replay-review-20261027/ui/01-loaded-full-hd.png",
+    "/Users/pavan/src/ledpanelVR/.local/replay-review-20261027/ui/02-fidelity-full-hd.png",
+    "/Users/pavan/src/ledpanelVR/.local/replay-review-20261027/ui/03-controls-full-hd.png",
+    "/Users/pavan/src/ledpanelVR/.local/replay-review-20261027/ui/04-media-tools-full-hd.png",
+    "/Users/pavan/src/ledpanelVR/.local/replay-review-20261027/ui/05-video-offset-full-hd.png",
+    "/Users/pavan/src/ledpanelVR/.local/replay-review-20261027/ui/06-open-run-full-hd.png",
+    "/Users/pavan/src/ledpanelVR/.local/replay-review-20261027/ui/07-play-hover-full-hd.png"
+  ],
+  "offlineNativeUiChecks": 80,
+  "nativePointerAcceptance": "Not established by this programmatic Editor capture. Final standalone keyboard/click/scrub checks remain root-agent acceptance work.",
+  "visualReview": "Full HD default, fidelity, controls, expanded media tools, offset modal and open-run drawer inspected. Clipped Back to setup / Previous trial / Controls labels were corrected and recaptured. Hover image shows a darker teal Play button with fully legible white text.",
+  "hoverFillPixels": {
+    "point": [
+      35,
+      935
+    ],
+    "normalRGB": [
+      23,
+      111,
+      99
+    ],
+    "hoverRGB": [
+      18,
+      90,
+      81
+    ]
+  },
+  "editorDiagnostics": "Unity SearchDatabase startup diagnostics excluded by stack; no application runtime or media errors captured."
+}

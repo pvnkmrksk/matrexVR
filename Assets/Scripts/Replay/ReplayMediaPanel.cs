@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.Video;
 
 /// <summary>Optional camera footage and animal preview. Media I/O never advances or blocks the pose timeline.</summary>
-public sealed class ReplayMediaPanel : IDisposable
+public sealed partial class ReplayMediaPanel : IDisposable
 {
     private readonly MonoBehaviour owner;
     private readonly Action pause;
@@ -226,106 +226,11 @@ public sealed class ReplayMediaPanel : IDisposable
         }
         frameTexture.filterMode=FilterMode.Bilinear;
     }
-    public void Draw(float scale,GUIStyle smallStyle,bool interactable=true)
-    {
-        if(disposed || string.IsNullOrEmpty(runDirectory))return;
-        if(clearFocus){GUI.FocusControl(null);clearFocus=false;}
-        if(textStyle==null)textStyle=new GUIStyle(smallStyle){wordWrap=true};textStyle.fontSize=smallStyle.fontSize;textStyle.font=smallStyle.font;
-        float width=Mathf.Min(420*scale*previewScale,Screen.width*.48f),margin=12*scale,row=28*scale;
-        width=Mathf.Max(Mathf.Min(320*scale,Screen.width*.48f),width);
-        float imageHeight=Mathf.Min(150*scale*previewScale,Screen.height*.23f);
-        float videoHeight=clip!=null || pendingArchive!=null?imageHeight:0;
-        float height=expanded?row+videoHeight+(animalPreview!=null?row+imageHeight:0)+170*scale:row+12*scale;
-        height=Mathf.Min(height,Screen.height*.8f-margin*2);visibleRect=new Rect(Screen.width-width-margin,margin,width,height);
-        GUI.Box(visibleRect,GUIContent.none);float x=visibleRect.x+10*scale,y=visibleRect.y+6*scale,w=width-20*scale;
-        GUI.enabled=interactable && !HasModal && pendingOperation==null;
-        GUI.Label(new Rect(x,y,w-144*scale,row),"Recording views",textStyle);
-        if(GUI.Button(new Rect(x+w-140*scale,y,30*scale,row),new GUIContent("−","Make the animal and tracker previews smaller.")))previewScale=Mathf.Max(.75f,previewScale-.25f);
-        if(GUI.Button(new Rect(x+w-106*scale,y,30*scale,row),new GUIContent("+","Make the animal and tracker previews larger.")))previewScale=Mathf.Min(1.5f,previewScale+.25f);
-        if(GUI.Button(new Rect(x+w-70*scale,y,70*scale,row),expanded?"Hide":"Show"))expanded=!expanded;
-        y+=row+4*scale;
-        if(expanded)
-        {
-            if(animalPreview!=null)
-            {
-                GUI.Label(new Rect(x,y,w-100*scale,row),animalLabel??"Animal view",textStyle);
-                if(rigs.Count>1 && GUI.Button(new Rect(x+w-96*scale,y,96*scale,row),"Next animal"))selectedRig=(selectedRig+1)%rigs.Count;
-                y+=row;DrawImage(new Rect(x,y,w,imageHeight),animalPreview);y+=imageHeight+4*scale;
-            }
-            string title=clip==null?"Tracker video":(clip.RigId??"Animal")+" · video "+(selectedClip+1)+" / "+archive.Clips.Count;
-            GUI.Label(new Rect(x,y,w-100*scale,row),title,textStyle);
-            if(archive!=null && archive.Clips.Count(c=>string.Equals(c.RigId,PreviewRig,StringComparison.OrdinalIgnoreCase))>1 && GUI.Button(new Rect(x+w-96*scale,y,96*scale,row),"Next video"))
-            {
-                for(int offset=1;offset<=archive.Clips.Count;offset++)
-                {int next=(selectedClip+offset)%archive.Clips.Count;if(string.Equals(archive.Clips[next].RigId,PreviewRig,StringComparison.OrdinalIgnoreCase)){ChooseClip(next);break;}}
-            }
-            y+=row;
-            ReplayMediaFrame target=default;
-            bool mapped=archive!=null && clip!=null && archive.TryResolveFrame(clip,seconds,out target);
-            bool show=VisibleVideoTexture!=null;
-            if(videoHeight>0)DrawImage(new Rect(x,y,w,videoHeight),VisibleVideoTexture);y+=videoHeight+4*scale;
-            string caption=status;
-            if(clip!=null && mapped)
-            {
-                if(!show)caption="Seeking linked video frame "+(target.LocalFrame+1)+"…";
-                else if(displayedAssociation.HasValue)
-                {
-                    var shown=displayedAssociation.Value;double age=Math.Max(0,seconds-shown.AnchorReplaySeconds);
-                    caption=shown.AssociationLabel+"\nVideo frame "+(displayedFrame+1)+" · input anchor "+shown.AnchorReplaySeconds.ToString("0.000",CultureInfo.InvariantCulture)+" s"+(age>.1?" · age "+age.ToString("0.00",CultureInfo.InvariantCulture)+" s":"")+(videoSeeking || pendingFrame!=null?" · seeking":"");
-                }
-                else caption="Decoder frame "+(displayedFrame+1)+" · linked target "+(target.LocalFrame+1)+" · aligning video";
-            }
-            else if(clip!=null && clip.Complete && clip.SyncMode=="unavailable")caption="Footage has no timing link. Use Set offset for approximate alignment.";
-            else if(clip!=null && clip.Complete && pendingAvi==null && pendingArchive==null)caption="No camera frame is associated with this replay time.";
-            if(!string.IsNullOrEmpty(error))caption=error;
-            float buttonsY=visibleRect.yMax-62*scale,captionHeight=Mathf.Max(20*scale,buttonsY-y-4*scale);
-            GUI.Label(new Rect(x,y,w,captionHeight),caption,textStyle);
-            GUI.enabled=interactable && !HasModal && pendingOperation==null && pendingArchive==null;
-            if(GUI.Button(new Rect(x,buttonsY,w*.48f,row),new GUIContent("Import video folder…","Copy finished tracker footage and its logs into this run. Original files are preserved.")))ChooseImportFolder();
-            if(GUI.Button(new Rect(x+w*.50f,buttonsY,w*.50f,row),new GUIContent("Collect media","Collect app-launched tracker footage once its recorder has closed cleanly. Running trackers are never stopped here.")))RunOperation(token=>MediaArchive.CollectPendingAsync(runDirectory,token));
-            buttonsY+=row+3*scale;
-            if(GUI.Button(new Rect(x,buttonsY,w*.48f,row),"Refresh videos"))Load(runDirectory,originTicks);
-            GUI.enabled=GUI.enabled && clip!=null && clip.Complete && clip.State=="ready";
-            if(GUI.Button(new Rect(x+w*.50f,buttonsY,w*.50f,row),"Set offset…"))
-            {offsetClipId=clip.Id;offsetFrameCount=avi!=null?avi.FrameCount:videoPrepared&&player!=null?(long)player.frameCount:clip.FrameCount;offsetFps=avi!=null?avi.NominalFramesPerSecond:videoPrepared&&player!=null?player.frameRate:clip.NominalFps;offsetForm=true;formOpen=true;offsetText="";formError=null;pause?.Invoke();}
-            GUI.enabled=true;
-        }
-        GUI.enabled=true;if(formOpen)DrawImportForm(scale);
-    }
     private void ChooseImportFolder()
     {
         // AppKit runs its native panel modally. Pause before posting it, so the
         // first Unity frame after it closes cannot add the dialog's elapsed time.
         pause?.Invoke();pickerRun=runDirectory;folderPicker=ReplayFolderPicker.ChooseMediaAsync();
-    }
-    private static void DrawImage(Rect rect,Texture image)
-    {
-        Color previous=GUI.color;GUI.color=new Color(.035f,.045f,.055f);GUI.DrawTexture(rect,Texture2D.whiteTexture);GUI.color=previous;
-        if(image!=null)GUI.DrawTexture(rect,image,ScaleMode.ScaleToFit,false);
-    }
-    private void DrawImportForm(float scale)
-    {
-        float width=Mathf.Min(620*scale,Screen.width-32*scale),height=offsetForm?300*scale:390*scale;
-        height=Mathf.Min(height,Screen.height-32*scale);formRect=new Rect((Screen.width-width)/2,(Screen.height-height)/2,width,height);
-        GUI.Box(formRect,GUIContent.none);float x=formRect.x+16*scale,y=formRect.y+12*scale,w=width-32*scale,row=30*scale;
-        GUI.Label(new Rect(x,y,w,row),offsetForm?"Link footage with an explicit offset":"Import finished tracker footage",textStyle);y+=row+8*scale;
-        GUI.Label(new Rect(x,y,w,offsetForm?42*scale:60*scale),offsetForm?"Approximate alignment: replay time = video time + offset. Use a known event visible in both recordings.":sourceFolder,textStyle);y+=offsetForm?46*scale:64*scale;
-        GUI.enabled=pendingOperation==null;
-        if(!offsetForm)
-        {
-            if(GUI.Button(new Rect(x,y,w,row),"Animal: "+(PreviewRig??"VR1")+" (click to change)"))if(rigs.Count>1)selectedRig=(selectedRig+1)%rigs.Count;
-            y+=row+6*scale;
-            sourceClosed=GUI.Toggle(new Rect(x,y,w,row),sourceClosed,"The tracker has finished saving this recording");y+=row+6*scale;
-        }
-        GUI.Label(new Rect(x,y,w,row),offsetForm?"Offset in seconds (negative values allowed)":"Optional offset in seconds; leave blank to preserve unknown timing",textStyle);y+=row;
-        GUI.SetNextControlName("Replay video offset");offsetText=GUI.TextField(new Rect(x,y,w,row),offsetText);TextFocused=GUI.GetNameOfFocusedControl()=="Replay video offset";y+=row+6*scale;
-        GUI.Label(new Rect(x,y,w,46*scale),pendingOperation!=null?"Copying and verifying tracker media…":formError??"Positive offset: video started later. Raw footage and original timestamps are preserved.",textStyle);
-        float bottom=formRect.yMax-row-14*scale;
-        GUI.enabled=true;
-        if(GUI.Button(new Rect(x,bottom,w*.30f,row),"Cancel")){operationCancellation?.Cancel();formOpen=false;TextFocused=false;GUI.FocusControl(null);}
-        GUI.enabled=pendingOperation==null && (offsetForm || sourceClosed);
-        if(GUI.Button(new Rect(x+w*.58f,bottom,w*.42f,row),offsetForm?"Apply offset":"Import recording"))SubmitForm();
-        GUI.enabled=true;
     }
     private void SubmitForm()
     {

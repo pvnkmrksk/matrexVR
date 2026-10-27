@@ -42,7 +42,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private int layoutVersion=-1,lastWidth,lastHeight;
     private Vector2 lastPanelSize;
     public bool Visible => visible&&!OperatorOverlayVisibility.Hidden;
-    public bool ShouldDisplay => isActiveAndEnabled && Visible && layoutAvailable && !ConfigurationUI.ConfigWorkbench.IsOpen;
+    public bool ShouldDisplay => isActiveAndEnabled && Visible && layoutAvailable && !ConfigurationUI.ConfigWorkbench.IsOpen && SceneManager.GetActiveScene().name!="ReplayScene";
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetErrors()
@@ -90,7 +90,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     { TryToggleDashboard(); }
     private void TryToggleDashboard()
     {
-        if (ConfigurationUI.ConfigWorkbench.IsOpen) return;
+        if (ConfigurationUI.ConfigWorkbench.IsOpen || SceneManager.GetActiveScene().name=="ReplayScene") return;
         // Display-only control stays available during a run, including stale legacy
         // metadata focus. Idle text forms retain Tab for field navigation.
         if (lastToggleFrame!=Time.frameCount && ((MainController.Instance != null && MainController.Instance.SequenceRunning) || !ExperimentInput.IsEditingText))
@@ -215,7 +215,11 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         // The setup form owns the idle screen and Tab navigation. Keep the operator's
         // dashboard preference, but suspend its canvas and refresh work between runs.
         if (panel != null && panel.activeSelf != ShouldDisplay) panel.SetActive(ShouldDisplay);
-        if (ConfigurationUI.ConfigWorkbench.IsOpen) return;
+        if (ConfigurationUI.ConfigWorkbench.IsOpen || SceneManager.GetActiveScene().name=="ReplayScene")
+        {
+            if(layoutAvailable){OperatorOverlayLayout.Release("status");layoutAvailable=false;layoutVersion=-1;}
+            return;
+        }
         long revision;
         lock (errorLock) revision = errorRevision;
         if (revision != shownRevision) { shownRevision = revision; ApplyVisibility(true); nextRefresh = 0; }

@@ -84,9 +84,9 @@ class Actual{
 static class Regression{
  static int checks;static void Check(bool yes,string label){checks++;if(!yes)throw new Exception(label);}static bool Near(float a,float b)=>Math.Abs(a-b)<.001;
  static void Main(){
-  Check(Near(Actual.Scale(2,3024),2),"Retina backing scale lost");Check(Near(Actual.Scale(1,1920),1),"standard monitor scale changed");Check(Near(Actual.Scale(3,3840),3),"three-times backing scale lost");Check(Near(Actual.Scale(2,1120),1),"minimum-width controls must fit");Check(Actual.Scale(2,0)>0,"startup width must not divide by zero");
-  var bar=Actual.Toolbar(3024,1898,2);Check(Near(bar.x,16)&&Near(bar.y,1518.4f)&&Near(bar.width,2992)&&Near(bar.height,363.6f),"Retina toolbar is not in native pixel coordinates");Check(bar.Contains(100,1626),"actual native Play pointer must lie in toolbar");Check(bar.Contains(1852,1698),"actual native timeline pointer must lie in toolbar");Check(!bar.Contains(926,849),"a second pointer scale must not be applied");
-  foreach(var screen in new[]{new[]{1920f,1080f,1f},new[]{3024f,1898f,2f},new[]{3840f,2160f,2f},new[]{1280f,720f,2f}}){float scale=Actual.Scale(screen[2],screen[0]);var r=Actual.Toolbar(screen[0],screen[1],scale);Check(screen[0]/scale>=1119.99f,"control row exceeds available width");Check(r.x>=0&&r.y>=0&&r.x+r.width<=screen[0]&&r.y+r.height<=screen[1],"toolbar escaped screen bounds");}
+  Check(Near(Actual.Scale(2,3024),2),"Retina backing scale lost");Check(Near(Actual.Scale(1,1920),1),"standard monitor scale changed");Check(Near(Actual.Scale(3,3840),3),"three-times backing scale lost");Check(Near(Actual.Scale(2,1280),1),"minimum-width controls must fit");Check(Actual.Scale(2,0)>0,"startup width must not divide by zero");
+  var bar=Actual.Toolbar(3024,1898,2);Check(Near(bar.x,24)&&Near(bar.y,1574)&&Near(bar.width,2976)&&Near(bar.height,300),"Retina toolbar is not in native pixel coordinates");Check(bar.Contains(100,1626),"actual native Play pointer must lie in toolbar");Check(bar.Contains(1852,1698),"actual native timeline pointer must lie in toolbar");Check(!bar.Contains(926,849),"a second pointer scale must not be applied");
+  foreach(var screen in new[]{new[]{1920f,1080f,1f},new[]{3024f,1898f,2f},new[]{3840f,2160f,2f},new[]{1280f,720f,2f}}){float scale=Actual.Scale(screen[2],screen[0]);var r=Actual.Toolbar(screen[0],screen[1],scale);Check(screen[0]/scale>=1279.99f,"control row exceeds available width");Check(r.x>=0&&r.y>=0&&r.x+r.width<=screen[0]&&r.y+r.height<=screen[1],"toolbar escaped screen bounds");}
   var mouse=new UnityEngine.InputSystem.Mouse();mouse.position.value=new Vector2(96,273);
   foreach(var type in new[]{EventType.MouseDown,EventType.MouseUp,EventType.MouseMove,EventType.MouseDrag,EventType.ScrollWheel,EventType.Repaint}){var e=new Event{type=type,pointerType=PointerType.Mouse,mousePosition=new Vector2(858,1366),button=1,delta=new Vector2(2,3)};Actual.Route(e,mouse,1898);Check(Near(e.mousePosition.x,96)&&Near(e.mousePosition.y,1625),"actual stale legacy coordinate must use native Input System "+type);Check(e.button==1&&Near(e.delta.x,2)&&Near(e.delta.y,3),"routing must preserve event payload "+type);}
   foreach(var pointer in new[]{PointerType.Touch,PointerType.Pen}){var e=new Event{type=EventType.MouseDown,pointerType=pointer,mousePosition=new Vector2(858,1366)};Actual.Route(e,mouse,1898);Check(Near(e.mousePosition.x,858)&&Near(e.mousePosition.y,1366),"touch/pen must keep their own coordinates");}
@@ -123,8 +123,8 @@ static class Regression{
 
 
 def main():
-    source=(ROOT/'Assets/Scripts/Replay/ReplayController.cs').read_text()
-    media_source=(ROOT/'Assets/Scripts/Replay/ReplayMediaPanel.cs').read_text()
+    source=(ROOT/'Assets/Scripts/Replay/ReplayController.cs').read_text()+'\n'+(ROOT/'Assets/Scripts/Replay/ReplayController.GUI.cs').read_text()
+    media_source=(ROOT/'Assets/Scripts/Replay/ReplayMediaPanel.cs').read_text()+'\n'+(ROOT/'Assets/Scripts/Replay/ReplayMediaPanel.GUI.cs').read_text()
     on_gui=source[source.index('private void OnGUI()'):source.index('private static string Clock')]
     update=declaration(source,'private void Update()')
     assert update.index('bool modalOpen=')<update.index('folderPicker.IsCompleted'), 'Native picker closure must keep its paused/modal state for the current frame.'
