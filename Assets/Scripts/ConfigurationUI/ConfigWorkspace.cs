@@ -181,7 +181,10 @@ namespace ConfigurationUI
                 if (index++ == (int?)Sequence.Root["loopStartIndex"] && ExperimentBlocks.Flag(Sequence.Root["loop"])) saved.Clear();
                 string file = (string)step["parameters"]?["configFile"];
                 if (string.IsNullOrWhiteSpace(file)) continue;
-                var doc = Documents.FirstOrDefault(d => d.Path == Path.GetFullPath(ExperimentConfigFiles.Resolve(file)));
+                string resolved;
+                try { resolved = Path.GetFullPath(ExperimentConfigFiles.Resolve(file)); }
+                catch { continue; } // RefreshReferences already reports invalid file paths.
+                var doc = Documents.FirstOrDefault(d => d.Path == resolved);
                 if (doc == null) continue;
                 var root = doc.Root as JObject;
                 if (root == null) continue;

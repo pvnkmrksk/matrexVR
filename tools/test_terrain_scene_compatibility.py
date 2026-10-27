@@ -40,7 +40,7 @@ static class Regression {
   string repo=args[0];ExperimentConfigFiles.Root=repo;
   var observed=Run(Read(repo,"visual-flat_navigation-terrain"));
   Check(observed.Count==1&&observed[0].Contains("collisionSurface='RoughSmooth'")&&observed[0].Contains("Sequence block 1 (Rugosity_RS)")&&observed[0].Contains("TerrainCueLab")&&observed[0].Contains("TerrainChoice"),"Reject the observed new-config/legacy-scene pair with block, role and repair guidance");
-  Check(Run(Terrain("Flat","RoughSmooth"),reference:"invalid\0experiment.json").Count==0,"Invalid file paths do not throw from the compatibility pass; the reference validator owns the diagnostic");
+  Check(Run(Terrain("Flat","RoughSmooth"),reference:"invalid\0experiment.json").Count==0,"Invalid file paths do not throw from terrain or heading passes; the reference validator owns the diagnostic");
   foreach(string file in new[]{"traditional-rs","visual-flat-hidden-rs","visual-flat-tilt-only","visual-rs-fixed-height","visual-rs-level-agl","flat-control"})
    if(File.Exists(Path.Combine(repo,"Assets/StreamingAssets/Examples/Rugosity",file+".json")))Check(Run(Read(repo,file)).Count==0,"Retain legacy configuration "+file);
   var shared=Read(repo,"terrain-treatment");
@@ -86,7 +86,8 @@ def main():
     newtonsoft = next((ROOT / 'Library/PackageCache').glob('com.unity.nuget.newtonsoft-json@*/Runtime/Newtonsoft.Json.dll'))
     source = (ROOT / 'Assets/Scripts/ConfigurationUI/ConfigWorkspace.cs').read_text()
     guard = '\n'.join(declaration(source, signature) for signature in (
-        'private void ValidateTerrainSceneCompatibility(', 'private static string TerrainSurfaceCompatibilityError('))
+        'private void ValidateTerrainSceneCompatibility(', 'private static string TerrainSurfaceCompatibilityError(',
+        'private void ValidateHeadingReferences('))
     blocks = (ROOT / 'Assets/Scripts/ConfigurationUI/ExperimentBlocks.cs').read_text()
     # Include the real expression-bodied flag/phase predicates, not test copies.
     predicates = '\n'.join(line.strip() for line in blocks.splitlines()
@@ -94,6 +95,7 @@ def main():
     phase = declaration((ROOT / 'Assets/Scripts/ExperimentPhases.cs').read_text(), 'public sealed class ExperimentPhase')
     lifecycle = declaration(source, 'public List<string> Validate(')
     assert 'ValidateTerrainSceneCompatibility(errors);' in lifecycle
+    assert 'ValidateHeadingReferences(errors);' in lifecycle
     workbench = (ROOT / 'Assets/Scripts/ConfigurationUI/ConfigWorkbench.cs').read_text()
     start = declaration(workbench, 'public void StartExperiment()')
     assert start.index('var errors=Workspace.Validate();') < start.index('BeginCompanionPreparation(true)')
@@ -106,7 +108,7 @@ public class ConfigDocument {public string Path;public JToken Root;}
 public class ConfigWorkspace {
  public ConfigDocument Sequence;public List<ConfigDocument> Documents=new List<ConfigDocument>();
  public ConfigWorkspace(JObject sequence,JObject config){Sequence=new ConfigDocument{Root=sequence};Documents.Add(new ConfigDocument{Path=Path.GetFullPath(ExperimentConfigFiles.Resolve("experiment.json")),Root=config});}
- public List<string> TerrainErrors(){var errors=new List<string>();ValidateTerrainSceneCompatibility(errors);return errors;}
+ public List<string> TerrainErrors(){var errors=new List<string>();ValidateTerrainSceneCompatibility(errors);ValidateHeadingReferences(errors);return errors;}
 ''' + guard + '\n}\npublic static class ExperimentBlocks {\n' + predicates + '\n}\n}\n' + phase
     with tempfile.TemporaryDirectory(prefix='matrex-terrain-compatibility-') as folder:
         temporary = Path(folder)
@@ -120,7 +122,7 @@ public class ConfigWorkspace {
         if result.returncode:
             raise SystemExit(result.stdout + result.stderr)
         subprocess.run([dotnet, str(temporary / f'bin/Debug/net{version}.0/Regression.dll'), str(ROOT)], env=env, check=True)
-    print('PASS: 3 source wiring guards verify GUI Start gating and validation before experiment companion preparation.')
+    print('PASS: 4 source wiring guards verify both validation passes, GUI Start gating and validation before experiment companion preparation.')
 
 
 if __name__ == '__main__':
