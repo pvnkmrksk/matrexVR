@@ -964,6 +964,20 @@
                         "unit": "cm"
                       }
                     },
+                    "textureScale": {
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "minimum": -3.40282347E+38,
+                      "maximum": 3.40282347E+38,
+                      "default": null,
+                      "exclusiveMinimum": 0,
+                      "x-ui": {
+                        "unit": "× authored tiling",
+                        "help": "Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance."
+                      }
+                    },
                     "absoluteHeight": {
                       "type": [
                         "number",
@@ -1171,6 +1185,20 @@
             "default": null,
             "x-ui": {
               "unit": "cm"
+            }
+          },
+          "textureScale": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -3.40282347E+38,
+            "maximum": 3.40282347E+38,
+            "default": null,
+            "exclusiveMinimum": 0,
+            "x-ui": {
+              "unit": "× authored tiling",
+              "help": "Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance."
             }
           },
           "absoluteHeight": {
@@ -3259,6 +3287,20 @@
                 "default": null,
                 "x-ui": {
                   "unit": "cm"
+                }
+              },
+              "textureScale": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "× authored tiling",
+                  "help": "Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance."
                 }
               },
               "absoluteHeight": {
@@ -5368,6 +5410,20 @@
                   "unit": "cm"
                 }
               },
+              "textureScale": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "× authored tiling",
+                  "help": "Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance."
+                }
+              },
               "absoluteHeight": {
                 "type": [
                   "number",
@@ -7473,6 +7529,20 @@
                 "default": null,
                 "x-ui": {
                   "unit": "cm"
+                }
+              },
+              "textureScale": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": -3.40282347E+38,
+                "maximum": 3.40282347E+38,
+                "default": null,
+                "exclusiveMinimum": 0,
+                "x-ui": {
+                  "unit": "× authored tiling",
+                  "help": "Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance."
                 }
               },
               "absoluteHeight": {
@@ -29647,6 +29717,20 @@
         "default": null,
         "x-ui": {
           "unit": "cm"
+        }
+      },
+      "textureScale": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": -3.40282347E+38,
+        "maximum": 3.40282347E+38,
+        "default": null,
+        "exclusiveMinimum": 0,
+        "x-ui": {
+          "unit": "× authored tiling",
+          "help": "Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance."
         }
       },
       "absoluteHeight": {

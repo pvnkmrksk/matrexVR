@@ -368,9 +368,15 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     {
         if(!(config?["rugosity"] is JObject rugosity) || !importedScene.IsValid())return;
         string visual=(string)rugosity["visualSurface"];
-        if(string.IsNullOrEmpty(visual))return;
         foreach(var root in importedScene.GetRootGameObjects())
-            foreach(var surface in root.GetComponentsInChildren<RugositySurface>(true))surface.SetRoles(surface.surfaceId==visual,false);
+        {
+            foreach(var surface in root.GetComponentsInChildren<RugositySurface>(true))
+            {
+                string selected=string.IsNullOrEmpty(visual)?surface.GetComponentInParent<RugosityWorld>(true)?.settings.visualSurface:visual;
+                if(!string.IsNullOrEmpty(selected))surface.SetRoles(surface.surfaceId==selected,false);
+            }
+            foreach(var world in root.GetComponentsInChildren<RugosityWorld>(true))world.ApplyReplayTextureScale((float?)rugosity["textureScale"]);
+        }
     }
 
     private void RestoreSky(string id,JObject config)

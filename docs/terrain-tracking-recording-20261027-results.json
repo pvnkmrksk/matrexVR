@@ -1,0 +1,1476 @@
+{
+  "date": "2026-10-27",
+  "scope": "Local Mac software and generated/prerecorded native inputs. No physical camera, animal, LED exposure timing, other OS or upstream tracker source changes.",
+  "performance": {
+    "scope": "Standalone software measurements with independent native generated Rekkefly input, no physical acquisition. Engine FPS is not physical LED timing. Focus is reported per phase. Native recording starts before Unity and is stopped after it; this does not implement run-scoped recording control.",
+    "buildIdentity": {
+      "schemaVersion": 1,
+      "sourceRevision": "f276f818acd4bc70da6e9e174ebe769c63c7365a",
+      "sourceState": "working-tree-snapshot",
+      "sourceTreeDirty": true,
+      "runtimeSourceFingerprintSha256": "1b852839def1e15498a1e22aae4b069c85ed738daba35c66615aef6544acf274",
+      "runtimeSourceFileCount": 225,
+      "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint.",
+      "dirtyPathsAtPreparation": [
+        "?? Assets/StreamingAssets/Archive/Legacy/Templates/README.md.meta",
+        "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config.py.meta",
+        "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config_choice.py.meta",
+        "?? Assets/StreamingAssets/Archive/README.md.meta"
+      ],
+      "applicationVersion": "0.3.1-local-review",
+      "unityVersion": "6000.3.16f1",
+      "buildTarget": "StandaloneOSX"
+    },
+    "nativeBinary": "/Users/pavan/src/ledpanelVR/.release-work/native-target/rekkefly/release/rekkefly",
+    "nativeSha256": "13403c9029bfafba38d2e2b63776f1add66a48a187ce936c140eb805302e8ee2",
+    "configSha256": "ab203148face534f53f08a82aa021e80245a6a51880f99006bcd721d8a30eb8f",
+    "scene": "TerrainChoice_RoughLeft_SmoothRight",
+    "layout": "6 actual 128x128 LED cameras per rig; 6/24 camera assertions passed in all phases",
+    "measuredBeforeChanges": "The f276f818 source build predates this textureScale and replay GUI work. Open operator preview/desktop apps remained open; benchmark focus observed true in every phase. Four-second phases follow two-second settling periods. Short local observations, not a sustained throughput certification.",
+    "cases": [
+      {
+        "name": "1-rig-video-off",
+        "rigs": 1,
+        "saveNativeVideo": false,
+        "wallSeconds": 41.60421945800044,
+        "nativeAndLauncherCpuSeconds": 7.760906,
+        "native": [
+          {
+            "frames": 2492,
+            "frames_per_second": 59.94199793871207,
+            "recording": {
+              "accepted": 0,
+              "directory": null,
+              "error": null,
+              "written": 0
+            },
+            "seconds": 41.5735225,
+            "source": "Simulated fly",
+            "udp_dropped": 0,
+            "zmq_dropped": 0,
+            "exitCode": 0
+          }
+        ],
+        "failures": [],
+        "phases": [
+          {
+            "phase": "all-60",
+            "fps": 59.60784646265778,
+            "frameMs": {
+              "samples": 239,
+              "mean": 16.70662639748954,
+              "median": 16.749208000000237,
+              "p95": 17.648458000000034,
+              "maximum": 20.670499999999592
+            },
+            "gpuMs": {
+              "samples": 239,
+              "mean": 0.651546373644797,
+              "median": 0.6579999972018413,
+              "p95": 0.7086666664690711,
+              "maximum": 1.7577500038896687
+            },
+            "processCpuMsPerFrame": 7.6678075313807526,
+            "focused": true,
+            "target": 60,
+            "vsync": 0,
+            "trackingFresh": [
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "all-uncapped",
+            "fps": 1119.723208382792,
+            "frameMs": {
+              "samples": 4479,
+              "mean": 0.8929629287787451,
+              "median": 0.5115000000017744,
+              "p95": 3.6271669999976552,
+              "maximum": 4.907459000001779
+            },
+            "gpuMs": {
+              "samples": 4479,
+              "mean": 1.389670397061054,
+              "median": 0.7620833348482847,
+              "p95": 4.450250002264511,
+              "maximum": 5.365916666050907
+            },
+            "processCpuMsPerFrame": 1.7043357669122576,
+            "focused": true,
+            "target": -1,
+            "vsync": 0,
+            "trackingFresh": [
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "tracking-off",
+            "fps": 1031.6633511109717,
+            "frameMs": {
+              "samples": 4127,
+              "mean": 0.9692059709231884,
+              "median": 0.5233750000002146,
+              "p95": 3.971707999998131,
+              "maximum": 5.363749999997225
+            },
+            "gpuMs": {
+              "samples": 4127,
+              "mean": 1.483660033449624,
+              "median": 0.7703333321842365,
+              "p95": 4.532791666861158,
+              "maximum": 5.5376249947585166
+            },
+            "processCpuMsPerFrame": 1.7280632178337774,
+            "focused": true,
+            "target": -1,
+            "vsync": 0,
+            "trackingFresh": [
+              false
+            ],
+            "listenersEnabled": false,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "logging-off",
+            "fps": 1165.9493176405983,
+            "frameMs": {
+              "samples": 4664,
+              "mean": 0.8575830207975987,
+              "median": 0.48795900000087045,
+              "p95": 3.6536670000018034,
+              "maximum": 5.148250000001298
+            },
+            "gpuMs": {
+              "samples": 4664,
+              "mean": 1.1718273835384267,
+              "median": 0.49179166671819985,
+              "p95": 4.230916667438578,
+              "maximum": 5.448124997201376
+            },
+            "processCpuMsPerFrame": 1.8349875428816467,
+            "focused": true,
+            "target": -1,
+            "vsync": 0,
+            "trackingFresh": [
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": false,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "all-60-repeat",
+            "fps": 59.644317099374206,
+            "frameMs": {
+              "samples": 239,
+              "mean": 16.69553870292888,
+              "median": 16.725749999999096,
+              "p95": 17.524166000001173,
+              "maximum": 20.101166999999975
+            },
+            "gpuMs": {
+              "samples": 239,
+              "mean": 0.6368350764338578,
+              "median": 0.6607083341805264,
+              "p95": 0.7194583304226398,
+              "maximum": 1.2356666702544317
+            },
+            "processCpuMsPerFrame": 8.340481589958179,
+            "focused": true,
+            "target": 60,
+            "vsync": 0,
+            "trackingFresh": [
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          }
+        ]
+      },
+      {
+        "name": "1-rig-video-on",
+        "rigs": 1,
+        "saveNativeVideo": true,
+        "wallSeconds": 39.573260666998976,
+        "nativeAndLauncherCpuSeconds": 9.161066,
+        "native": [
+          {
+            "frames": 2366,
+            "frames_per_second": 59.89137221299249,
+            "recording": {
+              "accepted": 2366,
+              "directory": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/performance/1-rig-video-on/native/VR1/recordings/1-rig-video-on-VR1-1793081168323652000-56108",
+              "error": null,
+              "written": 2366
+            },
+            "seconds": 39.504855417,
+            "source": "Simulated fly",
+            "udp_dropped": 0,
+            "zmq_dropped": 0,
+            "exitCode": 0
+          }
+        ],
+        "failures": [],
+        "phases": [
+          {
+            "phase": "all-60",
+            "fps": 59.60151214522644,
+            "frameMs": {
+              "samples": 239,
+              "mean": 16.71099651464436,
+              "median": 16.776874999997915,
+              "p95": 17.7977079999998,
+              "maximum": 20.20970800000299
+            },
+            "gpuMs": {
+              "samples": 239,
+              "mean": 0.6836722457889082,
+              "median": 0.6565416697412729,
+              "p95": 0.9050416701938957,
+              "maximum": 2.518749999580905
+            },
+            "processCpuMsPerFrame": 7.803933054393311,
+            "focused": true,
+            "target": 60,
+            "vsync": 0,
+            "trackingFresh": [
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "all-uncapped",
+            "fps": 1135.994260956994,
+            "frameMs": {
+              "samples": 4544,
+              "mean": 0.8795211175176073,
+              "median": 0.5030410000017582,
+              "p95": 3.590750000000753,
+              "maximum": 5.017082999998479
+            },
+            "gpuMs": {
+              "samples": 4544,
+              "mean": 1.2398771364965335,
+              "median": 0.6447083287639543,
+              "p95": 4.357291669293772,
+              "maximum": 5.700708330550697
+            },
+            "processCpuMsPerFrame": 1.7331602112676059,
+            "focused": true,
+            "target": -1,
+            "vsync": 0,
+            "trackingFresh": [
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "tracking-off",
+            "fps": 1043.079115503728,
+            "frameMs": {
+              "samples": 4175,
+              "mean": 0.9577076946107773,
+              "median": 0.5272500000010893,
+              "p95": 4.171583000001533,
+              "maximum": 4.780166999999835
+            },
+            "gpuMs": {
+              "samples": 4175,
+              "mean": 1.4712198203447704,
+              "median": 0.7893750007497147,
+              "p95": 4.629958333680406,
+              "maximum": 5.326250000507571
+            },
+            "processCpuMsPerFrame": 1.8425187784431143,
+            "focused": true,
+            "target": -1,
+            "vsync": 0,
+            "trackingFresh": [
+              false
+            ],
+            "listenersEnabled": false,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "logging-off",
+            "fps": 1159.4541653275253,
+            "frameMs": {
+              "samples": 4638,
+              "mean": 0.8623525586459677,
+              "median": 0.5257909999976107,
+              "p95": 3.3997499999998126,
+              "maximum": 5.000958000000111
+            },
+            "gpuMs": {
+              "samples": 4638,
+              "mean": 1.3756112908334825,
+              "median": 0.8085833324003033,
+              "p95": 4.149833330302499,
+              "maximum": 5.18999999621883
+            },
+            "processCpuMsPerFrame": 1.7355500431220348,
+            "focused": true,
+            "target": -1,
+            "vsync": 0,
+            "trackingFresh": [
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": false,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "all-60-repeat",
+            "fps": 59.35856091076997,
+            "frameMs": {
+              "samples": 238,
+              "mean": 16.77846883613446,
+              "median": 16.776249999999493,
+              "p95": 17.971209000002375,
+              "maximum": 20.082333000004837
+            },
+            "gpuMs": {
+              "samples": 238,
+              "mean": 0.6338380603168645,
+              "median": 0.6593333309865557,
+              "p95": 0.6916249985806644,
+              "maximum": 1.2920000008307397
+            },
+            "processCpuMsPerFrame": 7.694865966386562,
+            "focused": true,
+            "target": 60,
+            "vsync": 0,
+            "trackingFresh": [
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          }
+        ]
+      },
+      {
+        "name": "4-rig-video-off",
+        "rigs": 4,
+        "saveNativeVideo": false,
+        "wallSeconds": 40.06665554200299,
+        "nativeAndLauncherCpuSeconds": 18.966104000000005,
+        "native": [
+          {
+            "frames": 2399,
+            "frames_per_second": 59.90616912212612,
+            "recording": {
+              "accepted": 0,
+              "directory": null,
+              "error": null,
+              "written": 0
+            },
+            "seconds": 40.045959125,
+            "source": "Simulated fly",
+            "udp_dropped": 0,
+            "zmq_dropped": 0,
+            "exitCode": 0
+          },
+          {
+            "frames": 2398,
+            "frames_per_second": 59.93831964433133,
+            "recording": {
+              "accepted": 0,
+              "directory": null,
+              "error": null,
+              "written": 0
+            },
+            "seconds": 40.007794917,
+            "source": "Simulated fly",
+            "udp_dropped": 0,
+            "zmq_dropped": 0,
+            "exitCode": 0
+          },
+          {
+            "frames": 2399,
+            "frames_per_second": 59.94182750482636,
+            "recording": {
+              "accepted": 0,
+              "directory": null,
+              "error": null,
+              "written": 0
+            },
+            "seconds": 40.022136459,
+            "source": "Simulated fly",
+            "udp_dropped": 0,
+            "zmq_dropped": 0,
+            "exitCode": 0
+          },
+          {
+            "frames": 2399,
+            "frames_per_second": 59.92644466113608,
+            "recording": {
+              "accepted": 0,
+              "directory": null,
+              "error": null,
+              "written": 0
+            },
+            "seconds": 40.032409958,
+            "source": "Simulated fly",
+            "udp_dropped": 0,
+            "zmq_dropped": 0,
+            "exitCode": 0
+          }
+        ],
+        "failures": [],
+        "phases": [
+          {
+            "phase": "all-60",
+            "fps": 59.583375091556455,
+            "frameMs": {
+              "samples": 239,
+              "mean": 16.71286733054394,
+              "median": 16.783708000000175,
+              "p95": 18.102166000000253,
+              "maximum": 21.024541999999258
+            },
+            "gpuMs": {
+              "samples": 239,
+              "mean": 1.9082201883271357,
+              "median": 1.8821666672010906,
+              "p95": 2.251874997455161,
+              "maximum": 2.5323750014649704
+            },
+            "processCpuMsPerFrame": 12.59256527196653,
+            "focused": true,
+            "target": 60,
+            "vsync": 0,
+            "trackingFresh": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "all-uncapped",
+            "fps": 575.201353639719,
+            "frameMs": {
+              "samples": 2301,
+              "mean": 1.7379037735767089,
+              "median": 1.585582999997115,
+              "p95": 2.79404200000144,
+              "maximum": 5.378624999998749
+            },
+            "gpuMs": {
+              "samples": 2301,
+              "mean": 1.7134386317130603,
+              "median": 1.5930416629998945,
+              "p95": 2.2891250046086498,
+              "maximum": 3.9109999997890554
+            },
+            "processCpuMsPerFrame": 6.824995697522818,
+            "focused": true,
+            "target": -1,
+            "vsync": 0,
+            "trackingFresh": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "tracking-off",
+            "fps": 558.0985983146261,
+            "frameMs": {
+              "samples": 2233,
+              "mean": 1.7911230223914014,
+              "median": 1.59483299999863,
+              "p95": 3.2757910000000834,
+              "maximum": 5.071832999998804
+            },
+            "gpuMs": {
+              "samples": 2233,
+              "mean": 1.7858511158039434,
+              "median": 1.5933333343127742,
+              "p95": 2.6049166699522175,
+              "maximum": 3.580500000680331
+            },
+            "processCpuMsPerFrame": 6.61338866995074,
+            "focused": true,
+            "target": -1,
+            "vsync": 0,
+            "trackingFresh": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "listenersEnabled": false,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "logging-off",
+            "fps": 583.3009121074365,
+            "frameMs": {
+              "samples": 2334,
+              "mean": 1.7135935089974257,
+              "median": 1.502292000001404,
+              "p95": 2.927458000002048,
+              "maximum": 4.981250000000159
+            },
+            "gpuMs": {
+              "samples": 2334,
+              "mean": 1.7215206726279026,
+              "median": 1.59666666877456,
+              "p95": 2.3295416685868986,
+              "maximum": 3.642333329480607
+            },
+            "processCpuMsPerFrame": 6.619274678663236,
+            "focused": true,
+            "target": -1,
+            "vsync": 0,
+            "trackingFresh": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": false,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "all-60-repeat",
+            "fps": 59.513186497094175,
+            "frameMs": {
+              "samples": 239,
+              "mean": 16.733983087866097,
+              "median": 16.696334000002366,
+              "p95": 18.086958000012032,
+              "maximum": 27.26775000000714
+            },
+            "gpuMs": {
+              "samples": 239,
+              "mean": 2.0342520920966,
+              "median": 2.015291669522412,
+              "p95": 2.4181666667573154,
+              "maximum": 2.7879999979631975
+            },
+            "processCpuMsPerFrame": 12.512773640167344,
+            "focused": true,
+            "target": 60,
+            "vsync": 0,
+            "trackingFresh": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          }
+        ]
+      },
+      {
+        "name": "4-rig-video-on",
+        "rigs": 4,
+        "saveNativeVideo": true,
+        "wallSeconds": 40.20528370900138,
+        "nativeAndLauncherCpuSeconds": 29.760652999999998,
+        "native": [
+          {
+            "frames": 2405,
+            "frames_per_second": 59.91148787536584,
+            "recording": {
+              "accepted": 2405,
+              "directory": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/performance/4-rig-video-on/native/VR1/recordings/4-rig-video-on-VR1-1793081247945651000-56285",
+              "error": null,
+              "written": 2405
+            },
+            "seconds": 40.142551709,
+            "source": "Simulated fly",
+            "udp_dropped": 0,
+            "zmq_dropped": 0,
+            "exitCode": 0
+          },
+          {
+            "frames": 2404,
+            "frames_per_second": 59.94623902090337,
+            "recording": {
+              "accepted": 2404,
+              "directory": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/performance/4-rig-video-on/native/VR2/recordings/4-rig-video-on-VR2-1793081247949588000-56287",
+              "error": null,
+              "written": 2404
+            },
+            "seconds": 40.10259925,
+            "source": "Simulated fly",
+            "udp_dropped": 0,
+            "zmq_dropped": 0,
+            "exitCode": 0
+          },
+          {
+            "frames": 2405,
+            "frames_per_second": 59.9454053145847,
+            "recording": {
+              "accepted": 2405,
+              "directory": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/performance/4-rig-video-on/native/VR3/recordings/4-rig-video-on-VR3-1793081247949377000-56288",
+              "error": null,
+              "written": 2405
+            },
+            "seconds": 40.119838833,
+            "source": "Simulated fly",
+            "udp_dropped": 0,
+            "zmq_dropped": 0,
+            "exitCode": 0
+          },
+          {
+            "frames": 2404,
+            "frames_per_second": 59.89713302700905,
+            "recording": {
+              "accepted": 2404,
+              "directory": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/performance/4-rig-video-on/native/VR4/recordings/4-rig-video-on-VR4-1793081247952549000-56289",
+              "error": null,
+              "written": 2404
+            },
+            "seconds": 40.135476917,
+            "source": "Simulated fly",
+            "udp_dropped": 0,
+            "zmq_dropped": 0,
+            "exitCode": 0
+          }
+        ],
+        "failures": [],
+        "phases": [
+          {
+            "phase": "all-60",
+            "fps": 59.58516137512829,
+            "frameMs": {
+              "samples": 239,
+              "mean": 16.71616387866109,
+              "median": 16.745374999999285,
+              "p95": 17.796750000000472,
+              "maximum": 28.768499999999975
+            },
+            "gpuMs": {
+              "samples": 239,
+              "mean": 1.843984484054912,
+              "median": 1.886916666990146,
+              "p95": 2.0772499992744997,
+              "maximum": 2.4287916676257737
+            },
+            "processCpuMsPerFrame": 10.863593723849373,
+            "focused": true,
+            "target": 60,
+            "vsync": 0,
+            "trackingFresh": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "all-uncapped",
+            "fps": 588.9680238952881,
+            "frameMs": {
+              "samples": 2356,
+              "mean": 1.6973550157045856,
+              "median": 1.5333750000010582,
+              "p95": 2.5398750000000803,
+              "maximum": 4.69987500000002
+            },
+            "gpuMs": {
+              "samples": 2356,
+              "mean": 1.699113805227452,
+              "median": 1.593250002770219,
+              "p95": 2.2084166630520485,
+              "maximum": 3.1994999953894876
+            },
+            "processCpuMsPerFrame": 6.52243208828523,
+            "focused": true,
+            "target": -1,
+            "vsync": 0,
+            "trackingFresh": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "tracking-off",
+            "fps": 576.1994985627989,
+            "frameMs": {
+              "samples": 2305,
+              "mean": 1.7348430585683368,
+              "median": 1.6098749999997608,
+              "p95": 2.5507079999940174,
+              "maximum": 4.885999999999058
+            },
+            "gpuMs": {
+              "samples": 2305,
+              "mean": 1.742012635552185,
+              "median": 1.5974999987520278,
+              "p95": 2.412500005448237,
+              "maximum": 3.229083333280869
+            },
+            "processCpuMsPerFrame": 6.485189631236445,
+            "focused": true,
+            "target": -1,
+            "vsync": 0,
+            "trackingFresh": [
+              false,
+              false,
+              false,
+              false
+            ],
+            "listenersEnabled": false,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "logging-off",
+            "fps": 585.6942004742501,
+            "frameMs": {
+              "samples": 2343,
+              "mean": 1.7062988689714038,
+              "median": 1.5175420000019813,
+              "p95": 2.7206250000020304,
+              "maximum": 4.739792000002296
+            },
+            "gpuMs": {
+              "samples": 2343,
+              "mean": 1.7102280196048,
+              "median": 1.5891250004642643,
+              "p95": 2.281499997479841,
+              "maximum": 3.793458337895572
+            },
+            "processCpuMsPerFrame": 6.787385744771663,
+            "focused": true,
+            "target": -1,
+            "vsync": 0,
+            "trackingFresh": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": false,
+            "telemetryEnabled": true
+          },
+          {
+            "phase": "all-60-repeat",
+            "fps": 59.47743760577825,
+            "frameMs": {
+              "samples": 238,
+              "mean": 16.744880605042002,
+              "median": 16.77112499999822,
+              "p95": 17.71083299999532,
+              "maximum": 20.31925000000001
+            },
+            "gpuMs": {
+              "samples": 238,
+              "mean": 1.8320421919621872,
+              "median": 1.874375004263129,
+              "p95": 2.1146250001038425,
+              "maximum": 2.6386666650068946
+            },
+            "processCpuMsPerFrame": 11.47458403361345,
+            "focused": true,
+            "target": 60,
+            "vsync": 0,
+            "trackingFresh": [
+              true,
+              true,
+              true,
+              true
+            ],
+            "listenersEnabled": true,
+            "recordingEnabled": true,
+            "telemetryEnabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "blenderAudit": {
+    "file": "/Users/pavan/Downloads/nav_rug_rr.blend",
+    "units": {
+      "system": "METRIC",
+      "scale_length": 1.0,
+      "length_unit": "METERS"
+    },
+    "objects": [
+      {
+        "name": "Cube",
+        "dimensions": [
+          2.0,
+          2.0,
+          0.35215240716934204
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          0.8807914853096008
+        ],
+        "location": [
+          -1.3589860200881958,
+          -1.0362168550491333,
+          -0.7756722569465637
+        ],
+        "vertices": 8,
+        "worldBounds": {
+          "min": [
+            -2.3589859008789062,
+            -2.0362167358398438,
+            -0.24703317880630493
+          ],
+          "max": [
+            -0.3589860200881958,
+            -0.0362168550491333,
+            0.10511922836303711
+          ]
+        },
+        "uvLayers": [
+          {
+            "name": "UVMap",
+            "min": [
+              0.125,
+              0.0
+            ],
+            "max": [
+              0.875,
+              1.0
+            ]
+          }
+        ],
+        "materials": []
+      },
+      {
+        "name": "Mesh_0.001",
+        "dimensions": [
+          6.799839019775391,
+          5.660994529724121,
+          0.3886529803276062
+        ],
+        "scale": [
+          1.0,
+          -1.0,
+          -1.0
+        ],
+        "location": [
+          -0.008251607418060303,
+          0.012270957231521606,
+          0.0
+        ],
+        "vertices": 138808,
+        "worldBounds": {
+          "min": [
+            -3.408174753189087,
+            -2.8182201385498047,
+            -0.24703319370746613
+          ],
+          "max": [
+            3.3916640281677246,
+            2.8427743911743164,
+            0.14161980152130127
+          ]
+        },
+        "uvLayers": [
+          {
+            "name": "UVMap",
+            "min": [
+              3.5413224395597354e-05,
+              0.0020713210105895996
+            ],
+            "max": [
+              0.999958336353302,
+              0.994897186756134
+            ]
+          }
+        ],
+        "materials": []
+      }
+    ]
+  },
+  "terrain": {
+    "generatedTerrain": "200x200 scene units, centimetersPerUnit1; rough maximum amplitude0.8 cm; smooth maximum0.025 cm. Generated geometry, not a literal imported/scaled Blender mesh.",
+    "eyeClearanceCm": 1,
+    "movement": "Production FT column15 forward one sphere-radian -> sphereDiameter2.6/2 -> 1.3 world units=1.3 cm at default gain1. Explicit gain.01 -> .013 cm. Shared example and local Preview omit walkingPositionGain and inherit1.",
+    "texture": "Runtime and omitted JSON retain authored1. Shared terrain-treatment example explicitly opts into textureScale4. Frozen replay restores that saved scale; omitted legacy value restores authored1. No physical geometry change.",
+    "validation": {
+      "checks": 50,
+      "failure": null,
+      "observations": [
+        {
+          "multiplier": 1.0,
+          "image": "texture-1.png",
+          "sha256": "6fc84f9a82d21763ebcf56b27848e950882b1cdad9fda102a9ad987dea61f37d",
+          "position": [
+            -53.125,
+            1.38391149,
+            28.125
+          ],
+          "tiltDegrees": 10.3406,
+          "fov": 90.0,
+          "clearanceCm": 1
+        },
+        {
+          "multiplier": 2.0,
+          "image": "texture-2.png",
+          "sha256": "00948757162843f5937679f5d101a1db7e75d7423d29903b04387e03bead77e5",
+          "position": [
+            -53.125,
+            1.38391149,
+            28.125
+          ],
+          "tiltDegrees": 10.3406,
+          "fov": 90.0,
+          "clearanceCm": 1
+        },
+        {
+          "multiplier": 4.0,
+          "image": "texture-4.png",
+          "sha256": "4ee43845ce73987ec6e23e1c3f22482e89cab1200ffc9f0d293b613c6a1aaa29",
+          "position": [
+            -53.125,
+            1.38391149,
+            28.125
+          ],
+          "tiltDegrees": 10.3406,
+          "fov": 90.0,
+          "clearanceCm": 1
+        },
+        {
+          "multiplier": 8.0,
+          "image": "texture-8.png",
+          "sha256": "dc0370b711f31705397a759548077f1cd38fb35dd33478137bdb00eb43b61c59",
+          "position": [
+            -53.125,
+            1.38391149,
+            28.125
+          ],
+          "tiltDegrees": 10.3406,
+          "fov": 90.0,
+          "clearanceCm": 1
+        },
+        {
+          "multiplier": 1.0,
+          "image": "texture-1-restored.png",
+          "sha256": "6fc84f9a82d21763ebcf56b27848e950882b1cdad9fda102a9ad987dea61f37d",
+          "position": [
+            -53.125,
+            1.38391149,
+            28.125
+          ],
+          "tiltDegrees": 10.3406,
+          "fov": 90.0,
+          "clearanceCm": 1
+        }
+      ],
+      "scope": "Actual authored front camera in Unity Editor at fixed steep probe. Only albedo tiling changes; one-centimeter clearance, geometry, material asset and original property block restoration verified. Not a physical calibration claim."
+    },
+    "comparison": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/texture-scale/comparison.png",
+    "actual128PixelComparison": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/texture-scale/comparison-led128.png"
+  },
+  "nativeMedia": {
+    "totalRekkeflyFrames": 11984,
+    "hjSnippetFrameRanges": [
+      [
+        0,
+        44
+      ],
+      [
+        50,
+        89
+      ]
+    ],
+    "hjUnrecordedFrameRange": [
+      45,
+      49
+    ],
+    "hjExitCode": 0,
+    "hjInputSha256": "afdb193b1555574f9c9eba660eac8eb2531fa9db62e6876afb87fd4fe36753ad",
+    "hjExecutableSha256": "f868189ff5fb6d11df615f697ff66bf984d0465b308ac57cc1c057478be2e3b7",
+    "backendControl": "Pinned HJ agent record_start and record_stop already acknowledge/finalize two snippets. Rekkefly exposes record(enabled) through its native agent interface. Current Unity launcher lacks per-run detached-process command/ack supervision; this verification does not add it.",
+    "importAndReverseDecode": {
+      "checks": 161,
+      "failure": null,
+      "cases": [
+        {
+          "name": "1-rig-video-on-VR1",
+          "source": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/performance/1-rig-video-on/native/VR1/recordings/1-rig-video-on-VR1-1793081168323652000-56108",
+          "expectedFrames": 2366,
+          "encodedFrames": 2366,
+          "nominalFps": 60.0,
+          "AssociationLabel": "Approximate operator offset",
+          "frames": [
+            {
+              "frame": 0,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "452a91ac412040ccb44dc6a1e93aebe001e7142a280b676b0c70dc6004390a2c"
+            },
+            {
+              "frame": 1183,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "4aa647637b81fba9f5e21c4dc1080a5371f5b012613b1404a46909a779258cc3"
+            },
+            {
+              "frame": 2365,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "4abc63af0271f688431dbd044658bc1da26c75d8f2fb6b0c29cb96336cc01996"
+            },
+            {
+              "frame": 1183,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "4aa647637b81fba9f5e21c4dc1080a5371f5b012613b1404a46909a779258cc3"
+            },
+            {
+              "frame": 0,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "452a91ac412040ccb44dc6a1e93aebe001e7142a280b676b0c70dc6004390a2c"
+            }
+          ],
+          "sourceHashesBefore": {
+            "config.toml": "c20826e494d9f69d92c40c2606c2700122e460130737716b4e7af9edb01ee2e4",
+            "frames.jsonl": "bd88703c4b6f9a84cefb4b3502efa955c78a966d6938ab29d5af8aeb8410d512",
+            "video-0000.avi": "a0cd404afa32dbf017cd8a51a0f5d999a0c000b3a975f03330dcda2c2557cd32"
+          },
+          "sourceHashesAfter": {
+            "config.toml": "c20826e494d9f69d92c40c2606c2700122e460130737716b4e7af9edb01ee2e4",
+            "frames.jsonl": "bd88703c4b6f9a84cefb4b3502efa955c78a966d6938ab29d5af8aeb8410d512",
+            "video-0000.avi": "a0cd404afa32dbf017cd8a51a0f5d999a0c000b3a975f03330dcda2c2557cd32"
+          }
+        },
+        {
+          "name": "4-rig-video-on-VR1",
+          "source": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/performance/4-rig-video-on/native/VR1/recordings/4-rig-video-on-VR1-1793081247945651000-56285",
+          "expectedFrames": 2405,
+          "encodedFrames": 2405,
+          "nominalFps": 60.0,
+          "AssociationLabel": "Approximate operator offset",
+          "frames": [
+            {
+              "frame": 0,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "452a91ac412040ccb44dc6a1e93aebe001e7142a280b676b0c70dc6004390a2c"
+            },
+            {
+              "frame": 1202,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "43a6483d90f1cd81b1bdc68787d66bfe49d727d72f33df16d95a8a2a19f831ea"
+            },
+            {
+              "frame": 2404,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "08e5a9a9b3ef98d8d1809f3e7e20e4373c07e88e04237912113c75442b42e2d8"
+            },
+            {
+              "frame": 1202,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "43a6483d90f1cd81b1bdc68787d66bfe49d727d72f33df16d95a8a2a19f831ea"
+            },
+            {
+              "frame": 0,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "452a91ac412040ccb44dc6a1e93aebe001e7142a280b676b0c70dc6004390a2c"
+            }
+          ],
+          "sourceHashesBefore": {
+            "config.toml": "b2ef094fba855d202ba9c9fc7a6dcb6de36898e8e3d37f10e610b64d21b42bfb",
+            "frames.jsonl": "869a06c5f9f1daf4f7515f50358e585c9f53751484aceb06f57c383134ba965a",
+            "video-0000.avi": "8e4ea4b180559ade3437bfa5c6ef59f84433111a65424f7f0096022cd43e4f31"
+          },
+          "sourceHashesAfter": {
+            "config.toml": "b2ef094fba855d202ba9c9fc7a6dcb6de36898e8e3d37f10e610b64d21b42bfb",
+            "frames.jsonl": "869a06c5f9f1daf4f7515f50358e585c9f53751484aceb06f57c383134ba965a",
+            "video-0000.avi": "8e4ea4b180559ade3437bfa5c6ef59f84433111a65424f7f0096022cd43e4f31"
+          }
+        },
+        {
+          "name": "4-rig-video-on-VR2",
+          "source": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/performance/4-rig-video-on/native/VR2/recordings/4-rig-video-on-VR2-1793081247949588000-56287",
+          "expectedFrames": 2404,
+          "encodedFrames": 2404,
+          "nominalFps": 60.0,
+          "AssociationLabel": "Approximate operator offset",
+          "frames": [
+            {
+              "frame": 0,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "452a91ac412040ccb44dc6a1e93aebe001e7142a280b676b0c70dc6004390a2c"
+            },
+            {
+              "frame": 1202,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "43a6483d90f1cd81b1bdc68787d66bfe49d727d72f33df16d95a8a2a19f831ea"
+            },
+            {
+              "frame": 2403,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "e6b4c2b282b73098088f6c74cb4ebe17c0644f0e64b423215ac91ab74be9b320"
+            },
+            {
+              "frame": 1202,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "43a6483d90f1cd81b1bdc68787d66bfe49d727d72f33df16d95a8a2a19f831ea"
+            },
+            {
+              "frame": 0,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "452a91ac412040ccb44dc6a1e93aebe001e7142a280b676b0c70dc6004390a2c"
+            }
+          ],
+          "sourceHashesBefore": {
+            "config.toml": "69d5f0de7b3848cc0bddab3bc97582d7afbbca65f9c80572a4ccbfa434cb40c4",
+            "frames.jsonl": "9ab75502c6934f162e609e8bafa31fcc02bde79ae94798e8f402fcae6bf1c3dc",
+            "video-0000.avi": "15afcaaced0a0dbc89a610c8b0c726e11d98c05cf0479144d2193b5b5e91b7f2"
+          },
+          "sourceHashesAfter": {
+            "config.toml": "69d5f0de7b3848cc0bddab3bc97582d7afbbca65f9c80572a4ccbfa434cb40c4",
+            "frames.jsonl": "9ab75502c6934f162e609e8bafa31fcc02bde79ae94798e8f402fcae6bf1c3dc",
+            "video-0000.avi": "15afcaaced0a0dbc89a610c8b0c726e11d98c05cf0479144d2193b5b5e91b7f2"
+          }
+        },
+        {
+          "name": "4-rig-video-on-VR3",
+          "source": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/performance/4-rig-video-on/native/VR3/recordings/4-rig-video-on-VR3-1793081247949377000-56288",
+          "expectedFrames": 2405,
+          "encodedFrames": 2405,
+          "nominalFps": 60.0,
+          "AssociationLabel": "Approximate operator offset",
+          "frames": [
+            {
+              "frame": 0,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "452a91ac412040ccb44dc6a1e93aebe001e7142a280b676b0c70dc6004390a2c"
+            },
+            {
+              "frame": 1202,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "43a6483d90f1cd81b1bdc68787d66bfe49d727d72f33df16d95a8a2a19f831ea"
+            },
+            {
+              "frame": 2404,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "08e5a9a9b3ef98d8d1809f3e7e20e4373c07e88e04237912113c75442b42e2d8"
+            },
+            {
+              "frame": 1202,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "43a6483d90f1cd81b1bdc68787d66bfe49d727d72f33df16d95a8a2a19f831ea"
+            },
+            {
+              "frame": 0,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "452a91ac412040ccb44dc6a1e93aebe001e7142a280b676b0c70dc6004390a2c"
+            }
+          ],
+          "sourceHashesBefore": {
+            "config.toml": "a1f9f5398c19e076ae82dff9be4498435b656d700267bac4a056711d4628f23c",
+            "frames.jsonl": "bcabf9db3ce0e860c73bb3eaed0e334c0b16eed94287d2568ce4b244581eda4d",
+            "video-0000.avi": "8e4ea4b180559ade3437bfa5c6ef59f84433111a65424f7f0096022cd43e4f31"
+          },
+          "sourceHashesAfter": {
+            "config.toml": "a1f9f5398c19e076ae82dff9be4498435b656d700267bac4a056711d4628f23c",
+            "frames.jsonl": "bcabf9db3ce0e860c73bb3eaed0e334c0b16eed94287d2568ce4b244581eda4d",
+            "video-0000.avi": "8e4ea4b180559ade3437bfa5c6ef59f84433111a65424f7f0096022cd43e4f31"
+          }
+        },
+        {
+          "name": "4-rig-video-on-VR4",
+          "source": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/performance/4-rig-video-on/native/VR4/recordings/4-rig-video-on-VR4-1793081247952549000-56289",
+          "expectedFrames": 2404,
+          "encodedFrames": 2404,
+          "nominalFps": 60.0,
+          "AssociationLabel": "Approximate operator offset",
+          "frames": [
+            {
+              "frame": 0,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "452a91ac412040ccb44dc6a1e93aebe001e7142a280b676b0c70dc6004390a2c"
+            },
+            {
+              "frame": 1202,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "43a6483d90f1cd81b1bdc68787d66bfe49d727d72f33df16d95a8a2a19f831ea"
+            },
+            {
+              "frame": 2403,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "e6b4c2b282b73098088f6c74cb4ebe17c0644f0e64b423215ac91ab74be9b320"
+            },
+            {
+              "frame": 1202,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "43a6483d90f1cd81b1bdc68787d66bfe49d727d72f33df16d95a8a2a19f831ea"
+            },
+            {
+              "frame": 0,
+              "width": 640,
+              "height": 480,
+              "pngSha256": "452a91ac412040ccb44dc6a1e93aebe001e7142a280b676b0c70dc6004390a2c"
+            }
+          ],
+          "sourceHashesBefore": {
+            "config.toml": "5602018ec40521b2454eb1bec3e6579e50515978d7bd6040cf466551d1de477b",
+            "frames.jsonl": "092c4f7616be073fff27f82445abcbffab78b210d95fe567368c828e26aedf13",
+            "video-0000.avi": "15afcaaced0a0dbc89a610c8b0c726e11d98c05cf0479144d2193b5b5e91b7f2"
+          },
+          "sourceHashesAfter": {
+            "config.toml": "5602018ec40521b2454eb1bec3e6579e50515978d7bd6040cf466551d1de477b",
+            "frames.jsonl": "092c4f7616be073fff27f82445abcbffab78b210d95fe567368c828e26aedf13",
+            "video-0000.avi": "15afcaaced0a0dbc89a610c8b0c726e11d98c05cf0479144d2193b5b5e91b7f2"
+          }
+        },
+        {
+          "name": "hejjetrac-snippet-a",
+          "source": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/hj-native/snippet-a",
+          "expectedFrames": 45,
+          "encodedFrames": 45,
+          "nominalFps": 30.0,
+          "AssociationLabel": "Approximate operator offset",
+          "frames": [
+            {
+              "frame": 0,
+              "width": 384,
+              "height": 288,
+              "pngSha256": "9042eb22b77651c1f12e1f545f86bf91eaef61df7db21a122859a3a8f5c9a051"
+            },
+            {
+              "frame": 22,
+              "width": 384,
+              "height": 288,
+              "pngSha256": "d3ce1eaafd6b6392d28d84ccfcab6fc13a5a6daae10a753e079462bc01d9db88"
+            },
+            {
+              "frame": 44,
+              "width": 384,
+              "height": 288,
+              "pngSha256": "b07550d45858a196cbf2962144ded48c65bdc863e364cb159aced8bdb0f01594"
+            },
+            {
+              "frame": 22,
+              "width": 384,
+              "height": 288,
+              "pngSha256": "d3ce1eaafd6b6392d28d84ccfcab6fc13a5a6daae10a753e079462bc01d9db88"
+            },
+            {
+              "frame": 0,
+              "width": 384,
+              "height": 288,
+              "pngSha256": "9042eb22b77651c1f12e1f545f86bf91eaef61df7db21a122859a3a8f5c9a051"
+            }
+          ],
+          "sourceHashesBefore": {
+            "all-frames.dat": "d307d9b8437cf92a71625c866c2e8275586854f6922f86fb1aad5288e05275a1",
+            "config.txt": "4c5314e0e67e87b0607f66aca517acf36eb5b373f19bc8be6c439a1dc332ea90",
+            "quality.csv": "841bee23323885bbd2d4a788b2fae26e3aae83a714d83b5e15ea47ec82acf9b0",
+            "raw.avi": "4eb84d7464b8060b54d5e46372530d7b70820f84c492f92f22d121148f69036b",
+            "tracking.dat": "d307d9b8437cf92a71625c866c2e8275586854f6922f86fb1aad5288e05275a1"
+          },
+          "sourceHashesAfter": {
+            "all-frames.dat": "d307d9b8437cf92a71625c866c2e8275586854f6922f86fb1aad5288e05275a1",
+            "config.txt": "4c5314e0e67e87b0607f66aca517acf36eb5b373f19bc8be6c439a1dc332ea90",
+            "quality.csv": "841bee23323885bbd2d4a788b2fae26e3aae83a714d83b5e15ea47ec82acf9b0",
+            "raw.avi": "4eb84d7464b8060b54d5e46372530d7b70820f84c492f92f22d121148f69036b",
+            "tracking.dat": "d307d9b8437cf92a71625c866c2e8275586854f6922f86fb1aad5288e05275a1"
+          }
+        },
+        {
+          "name": "hejjetrac-snippet-b",
+          "source": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/hj-native/snippet-b",
+          "expectedFrames": 40,
+          "encodedFrames": 40,
+          "nominalFps": 30.0,
+          "AssociationLabel": "Approximate operator offset",
+          "frames": [
+            {
+              "frame": 0,
+              "width": 384,
+              "height": 288,
+              "pngSha256": "c510a446ebba0a4a6e07f53b363ee57dad7731bcedf97e9c421bba307bd70650"
+            },
+            {
+              "frame": 20,
+              "width": 384,
+              "height": 288,
+              "pngSha256": "cb820cf37749ded64b6722e9ef8976bcf60d69b14a543aeff072659069ed33f7"
+            },
+            {
+              "frame": 39,
+              "width": 384,
+              "height": 288,
+              "pngSha256": "90039079beb3031a7ec02811497b85e13ac5865ffb85ae36f704349a7dc4ede0"
+            },
+            {
+              "frame": 20,
+              "width": 384,
+              "height": 288,
+              "pngSha256": "cb820cf37749ded64b6722e9ef8976bcf60d69b14a543aeff072659069ed33f7"
+            },
+            {
+              "frame": 0,
+              "width": 384,
+              "height": 288,
+              "pngSha256": "c510a446ebba0a4a6e07f53b363ee57dad7731bcedf97e9c421bba307bd70650"
+            }
+          ],
+          "sourceHashesBefore": {
+            "all-frames.dat": "6d0f17fb4864f7d73e4ac06f7a2565d0476c9f27fc39f3d033d2f83d6a9465d5",
+            "config.txt": "4c5314e0e67e87b0607f66aca517acf36eb5b373f19bc8be6c439a1dc332ea90",
+            "quality.csv": "76a7ced28afbce2c16a38a90958335f6cc9f8d2318ea18bf0f61936940493feb",
+            "raw.avi": "ff3c4077f240aeeb963d4d3daea514840f87810cfa0c155f74ded7c45d2b6aba",
+            "tracking.dat": "6d0f17fb4864f7d73e4ac06f7a2565d0476c9f27fc39f3d033d2f83d6a9465d5"
+          },
+          "sourceHashesAfter": {
+            "all-frames.dat": "6d0f17fb4864f7d73e4ac06f7a2565d0476c9f27fc39f3d033d2f83d6a9465d5",
+            "config.txt": "4c5314e0e67e87b0607f66aca517acf36eb5b373f19bc8be6c439a1dc332ea90",
+            "quality.csv": "76a7ced28afbce2c16a38a90958335f6cc9f8d2318ea18bf0f61936940493feb",
+            "raw.avi": "ff3c4077f240aeeb963d4d3daea514840f87810cfa0c155f74ded7c45d2b6aba",
+            "tracking.dat": "6d0f17fb4864f7d73e4ac06f7a2565d0476c9f27fc39f3d033d2f83d6a9465d5"
+          }
+        }
+      ],
+      "scope": "Real finalized generated/prerecorded native videos -> production archive import -> indexed MJPEG -> Unity pixels and reverse seeks. Synthetic approximate timeline only; no fresh consumed-input or exposure-sync claim."
+    },
+    "freshAcquiredReplayPanel": {
+      "passed": true,
+      "checks": 43,
+      "failure": null,
+      "errors": [],
+      "sourceRun": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/performance/1-rig-video-on/RunData/20261027_070613",
+      "sourceVideo": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/performance/1-rig-video-on/native/VR1/recordings/1-rig-video-on-VR1-1793081168323652000-56108",
+      "testRun": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027/fresh-rekkefly-replay-panel/copied-run",
+      "observations": [
+        {
+          "replaySeconds": 0.016531,
+          "expectedFrame": 303,
+          "panelFrame": 303,
+          "width": 640,
+          "height": 480,
+          "gpuPngSha256": "ef47918e46ce96d55bc7087009024b2c16c24662c57bba237d07873252533d64",
+          "referenceGpuPngSha256": "ef47918e46ce96d55bc7087009024b2c16c24662c57bba237d07873252533d64",
+          "file": "panel-seek-0-frame-303.png",
+          "association": "Software consumed-input frame association"
+        },
+        {
+          "replaySeconds": 10.832543,
+          "expectedFrame": 952,
+          "panelFrame": 952,
+          "width": 640,
+          "height": 480,
+          "gpuPngSha256": "a4263b87b46df57284404ac78ab44f7844e073e20d80f58b62762dd9e3ffb061",
+          "referenceGpuPngSha256": "a4263b87b46df57284404ac78ab44f7844e073e20d80f58b62762dd9e3ffb061",
+          "file": "panel-seek-1-frame-952.png",
+          "association": "Software consumed-input frame association"
+        },
+        {
+          "replaySeconds": 33.073318,
+          "expectedFrame": 2286,
+          "panelFrame": 2286,
+          "width": 640,
+          "height": 480,
+          "gpuPngSha256": "339bdfe5b891812338fb2c00e70b5ee350ed9d159a94dfb38da24be0df9acf53",
+          "referenceGpuPngSha256": "339bdfe5b891812338fb2c00e70b5ee350ed9d159a94dfb38da24be0df9acf53",
+          "file": "panel-seek-2-frame-2286.png",
+          "association": "Software consumed-input frame association"
+        },
+        {
+          "replaySeconds": 10.832543,
+          "expectedFrame": 952,
+          "panelFrame": 952,
+          "width": 640,
+          "height": 480,
+          "gpuPngSha256": "a4263b87b46df57284404ac78ab44f7844e073e20d80f58b62762dd9e3ffb061",
+          "referenceGpuPngSha256": "a4263b87b46df57284404ac78ab44f7844e073e20d80f58b62762dd9e3ffb061",
+          "file": "panel-seek-3-frame-952.png",
+          "association": "Software consumed-input frame association"
+        },
+        {
+          "replaySeconds": 0.016531,
+          "expectedFrame": 303,
+          "panelFrame": 303,
+          "width": 640,
+          "height": 480,
+          "gpuPngSha256": "ef47918e46ce96d55bc7087009024b2c16c24662c57bba237d07873252533d64",
+          "referenceGpuPngSha256": "ef47918e46ce96d55bc7087009024b2c16c24662c57bba237d07873252533d64",
+          "file": "panel-seek-4-frame-303.png",
+          "association": "Software consumed-input frame association"
+        }
+      ],
+      "guiCapture": {
+        "available": false,
+        "note": "Editor batch GameView did not publish a screenshot; inspect the final native player overlay separately."
+      },
+      "scope": "Fresh native recording from an explicitly labelled demo/sample and actual acquired pose CSV -> production import using consumed input IDs -> actual ReplayScene + asynchronous ReplayMediaPanel -> GPU-rendered visible texture, forward/back seeks. God's-eye and animal preview active simultaneously. No physical camera, new animal measurement, exposure or LED timing claim."
+    }
+  },
+  "limitations": [
+    "Performance measured f276f818, not the later replay redesign or textureScale4 final build.",
+    "Native Rekkefly uses generated deterministic input; HJ uses its attributed bundled sample. No camera/animal acquisition claim.",
+    "The seven-clip import test uses an explicitly approximate operator-offset timeline. The separate 43-check GPU replay test uses the actual acquired pose CSV and consumed-input frame association.",
+    "Batch Editor GameView screenshot unavailable; actual panel GPU texture was verified and native final GUI is reviewed separately.",
+    "The fresh ReplayPanel validation log has a UnityEditor.Search.SearchDatabase startup ArgumentOutOfRangeException before Play; runtime errors[] and all43 assertions passed. Log retained, not hidden.",
+    "A 1 cm eye above a flat navigation plane constrains unmatched visible relief: arbitrarily increasing relief can place the camera inside the visible surface. Physical hill amplitudes were preserved."
+  ],
+  "evidenceRoot": "/Users/pavan/src/ledpanelVR/.local/recording-terrain-review-20261027",
+  "sourceSha256": {
+    "Assets/Scripts/Rugosity/RugositySettings.cs": "4ce5c994e28fcffc40ef3eaec124230bc7cc3fe27b9d73b7476b8df6837c9d40",
+    "Assets/Scripts/Rugosity/RugosityWorld.cs": "c7e28c2c0d89a57e27e64122af87cf7a55a096f1eee8c9d0a6333bddfbf6a884",
+    "Assets/Scripts/Replay/ReplayEnvironmentLoader.cs": "d5ad034d24f88035dbd3a7c9002c82d5456cd76ef072174f2cbf043c228778ff",
+    "Assets/Editor/TerrainTextureScaleValidation.cs": "34597833b05d8bef249b02367bf500c9a822db2a7b431c8653bef8a1ae926ff5",
+    "Assets/Editor/NativeRecorderSnippetValidation.cs": "0960f3a75eb98b3417a60968348cf3d3f6593a70e509d0b60302a6aa534273cd",
+    "tools/run_terrain_recording_profile.py": "a4fcc098205eae973a7853a792f3977a7eeda55084336ec756969c56ed732525",
+    "Assets/StreamingAssets/Examples/Rugosity/terrain-treatment.json": "d563dd833b7cef9f1c0c0f148d65666998543c010578c348af82adc488b30162"
+  }
+}

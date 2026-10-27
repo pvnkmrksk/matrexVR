@@ -27,6 +27,8 @@ public sealed class RugosityWorld : MonoBehaviour
     private readonly Dictionary<Behaviour, bool> originalBehaviours = new Dictionary<Behaviour, bool>();
     private readonly Dictionary<Renderer, bool> originalRenderers = new Dictionary<Renderer, bool>();
     private readonly Dictionary<Collider, bool> originalColliders = new Dictionary<Collider, bool>();
+    private readonly Dictionary<Renderer, MaterialPropertyBlock> originalTextureBlocks = new Dictionary<Renderer, MaterialPropertyBlock>();
+    private static readonly int MainTextureTransform = Shader.PropertyToID("_MainTex_ST");
 
     private void Awake() { CaptureDefaults(); ApplyLiveSettings(); }
     private void OnEnable() { dirty = true; }
@@ -71,9 +73,9 @@ public sealed class RugosityWorld : MonoBehaviour
         if (!s.enabled) return;
         if (!Finite(s.centimetersPerUnit) || s.centimetersPerUnit <= 0 || !Finite(s.clearanceCm) || s.clearanceCm < 0 ||
             !Finite(s.absoluteHeight) || !Finite(s.normalRadiusCm) || s.normalRadiusCm < 0 ||
-            !Finite(s.tiltResponse) || s.tiltResponse < 0 || s.normalSamples < 1 || s.normalSamples > 32 ||
+            !Finite(s.tiltResponse) || s.tiltResponse < 0 || !Finite(s.textureScale) || s.textureScale <= 0 || s.normalSamples < 1 || s.normalSamples > 32 ||
             !Enum.IsDefined(typeof(RugosityHeightMode), s.heightMode) || !Enum.IsDefined(typeof(RugosityOrientationMode), s.orientationMode))
-            throw new ArgumentException("Rugosity requires finite heights/radii, positive centimetersPerUnit, nonnegative clearance/response and 1–32 normal samples.");
+            throw new ArgumentException("Rugosity requires finite heights/radii, positive centimetersPerUnit and textureScale, nonnegative clearance/response and 1–32 normal samples.");
         Resolve(s.visualSurface); Resolve(s.collisionSurface);
         if (s.heightMode == RugosityHeightMode.AboveGround) Resolve(string.IsNullOrEmpty(s.heightSurface) ? s.collisionSurface : s.heightSurface);
         if (s.orientationMode == RugosityOrientationMode.SurfaceNormal) Resolve(string.IsNullOrEmpty(s.normalSurface) ? s.collisionSurface : s.normalSurface);
@@ -97,6 +99,7 @@ public sealed class RugosityWorld : MonoBehaviour
                 foreach (var r in surface.renderers) if (r != null && !originalRenderers.ContainsKey(r)) originalRenderers[r] = r.enabled;
                 foreach (var c in surface.colliders) if (c != null && !originalColliders.ContainsKey(c)) originalColliders[c] = c.enabled;
                 surface.SetRoles(surface == visual, surface == collision);
+                foreach (var renderer in surface.renderers) ApplyTextureScale(renderer);
             }
             var targets = rigTargets.Length > 0 ? rigTargets : gameObject.scene.GetRootGameObjects()
                 .SelectMany(g => g.GetComponentsInChildren<ClosedLoop>(true)).Select(r => r.transform).ToArray();
@@ -128,6 +131,41 @@ public sealed class RugosityWorld : MonoBehaviour
         foreach (var p in originalBehaviours) if (p.Key != null) p.Key.enabled = p.Value;
         foreach (var p in originalRenderers) if (p.Key != null) p.Key.enabled = p.Value;
         foreach (var p in originalColliders) if (p.Key != null) p.Key.enabled = p.Value;
+        foreach (var p in originalTextureBlocks) if (p.Key != null) p.Key.SetPropertyBlock(p.Value);
+    }
+    // Imported replay worlds stay disabled: restore appearance without activating
+    // colliders, listeners, movement or the terrain pose controller.
+    public void ApplyReplayTextureScale(float? multiplier)
+    {
+        CaptureDefaults();
+        float next = multiplier ?? (float?)defaults["textureScale"] ?? 1;
+        if (!Finite(next) || next <= 0) throw new ArgumentException("Recorded terrain textureScale must be finite and positive.");
+        settings.textureScale = next;
+        foreach (var surface in surfaces.Where(surface => surface != null))
+            foreach (var renderer in surface.renderers) ApplyTextureScale(renderer);
+    }
+    private void ApplyTextureScale(Renderer renderer)
+    {
+        if (renderer == null || renderer.sharedMaterial == null || !renderer.sharedMaterial.HasProperty("_MainTex")) return;
+        // Registered ground renderers use a shared primary albedo. Keep its asset
+        // and other property-block values intact; never instantiate a material.
+        if (!originalTextureBlocks.TryGetValue(renderer, out var original))
+        {
+            if (Mathf.Approximately(settings.textureScale, 1)) return;
+            original = new MaterialPropertyBlock(); renderer.GetPropertyBlock(original); originalTextureBlocks[renderer] = original;
+        }
+        if (Mathf.Approximately(settings.textureScale, 1)) { renderer.SetPropertyBlock(original); return; }
+        Vector4 authored;
+        if (original.HasVector(MainTextureTransform)) authored = original.GetVector(MainTextureTransform);
+        else
+        {
+            var scale = renderer.sharedMaterial.GetTextureScale("_MainTex");
+            var offset = renderer.sharedMaterial.GetTextureOffset("_MainTex");
+            authored = new Vector4(scale.x, scale.y, offset.x, offset.y);
+        }
+        var next = new MaterialPropertyBlock(); renderer.GetPropertyBlock(next);
+        next.SetVector(MainTextureTransform, new Vector4(authored.x * settings.textureScale, authored.y * settings.textureScale, authored.z, authored.w));
+        renderer.SetPropertyBlock(next);
     }
     private void RecordState()
     {

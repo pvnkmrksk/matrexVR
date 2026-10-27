@@ -20,6 +20,7 @@ public class RugositySettings
     public RugosityOrientationMode orientationMode = RugosityOrientationMode.SurfaceNormal;
     public float centimetersPerUnit = 1;
     public float clearanceCm = 1;
+    public float textureScale = 1; // Multiplies authored albedo tiling; geometry is unchanged.
     public float absoluteHeight = 1; // World Y, in scene units.
     public float normalRadiusCm = .5f;
     public int normalSamples = 5;
@@ -33,6 +34,6 @@ public class RugosityConfig
     public string visualSurface, collisionSurface, heightSurface, normalSurface;
     public RugosityHeightMode? heightMode;
     public RugosityOrientationMode? orientationMode;
-    public float? centimetersPerUnit, clearanceCm, absoluteHeight, normalRadiusCm, tiltResponse;
+    public float? centimetersPerUnit, clearanceCm, textureScale, absoluteHeight, normalRadiusCm, tiltResponse;
     public int? normalSamples;
 }

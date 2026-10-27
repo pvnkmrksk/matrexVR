@@ -32,6 +32,7 @@
     "orientationMode": "SurfaceNormal",
     "centimetersPerUnit": 1,
     "clearanceCm": 1,
+    "textureScale": 4,
     "absoluteHeight": 1,
     "normalRadiusCm": 0,
     "normalSamples": 5,

@@ -45,7 +45,7 @@ public sealed class RugosityWorldEditor : Editor
         SurfacePopup(settings.FindPropertyRelative("collisionSurface"), world, false);
         SurfacePopup(settings.FindPropertyRelative("heightSurface"), world, true);
         SurfacePopup(settings.FindPropertyRelative("normalSurface"), world, true);
-        foreach (string name in new[] { "heightMode", "orientationMode", "centimetersPerUnit", "clearanceCm", "absoluteHeight", "normalRadiusCm", "normalSamples", "tiltResponse" })
+        foreach (string name in new[] { "heightMode", "orientationMode", "centimetersPerUnit", "clearanceCm", "textureScale", "absoluteHeight", "normalRadiusCm", "normalSamples", "tiltResponse" })
             EditorGUILayout.PropertyField(settings.FindPropertyRelative(name));
         serializedObject.ApplyModifiedProperties();
         if (EditorGUI.EndChangeCheck()) world.ApplyLiveSettings();

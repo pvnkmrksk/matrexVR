@@ -250,6 +250,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
             if (name.EndsWith("Cm")) ui["unit"] = "cm";
             if (name == "absoluteHeight") ui["unit"] = "world Y (scene units)";
             if (name == "centimetersPerUnit") { child["exclusiveMinimum"] = 0; ui["help"] = "1 for centimeter scenes; 100 for meter terrain scenes."; }
+            if (name == "textureScale") { child["exclusiveMinimum"] = 0; ui["unit"] = "× authored tiling"; ui["help"] = "Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance."; }
             if (name == "normalSamples") { child["minimum"] = 1; child["maximum"] = 32; }
             if (new[] { "clearanceCm", "normalRadiusCm", "tiltResponse" }.Contains(name)) child["minimum"] = 0;
         }
