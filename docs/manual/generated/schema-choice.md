@@ -1,6 +1,6 @@
 # Choice schema fields
 
-This atlas lists **805 emitted property paths** from the current `choice` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **821 emitted property paths** from the current `choice` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -116,6 +116,20 @@ Vertical camera/animal clearance above the height surface, in centimetres. This 
 | UI unit label | cm |
 | `minimum` | `0` |
 | `maximum` | `3.40282347e+38` |
+
+### `rugosity.textureScale`
+
+Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | × authored tiling |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `rugosity.absoluteHeight`
 
@@ -1318,6 +1332,16 @@ Omitted, null or [] means environment-only flight/migration; sky and movement se
 
 ## objects[] group
 
+### `objects[].groundOnTerrain`
+
+Place this object on the active terrain at its X/Z position. Its configured Y becomes an extra height above terrain. Off uses the explicit world position.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
 ### `objects[].useHeadingReference`
 
 Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
@@ -1946,6 +1970,34 @@ Random starting yaw; Choice shares that sampled yaw across its rigs.
 | Type | `boolean` |
 | Required by parent schema | No |
 | Default | `false` |
+
+## walkingPositionGain group
+
+### `walkingPositionGain`
+
+Optional walking displacement multiplier. The tracker position is scaled by sphere radius into centimetres; use 0.01 for a terrain scene measured in metres. Omitted keeps the existing walking gain.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+## walkingOrientationGain group
+
+### `walkingOrientationGain`
+
+Optional signed multiplier for walking heading changes. 1 keeps the measured turn, negative reverses it, and 0 disables heading response. Omitted keeps the existing walking gain.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
 
 ## backgroundColor group
 
@@ -2621,6 +2673,20 @@ Vertical camera/animal clearance above the height surface, in centimetres. This 
 | UI unit label | cm |
 | `minimum` | `0` |
 | `maximum` | `3.40282347e+38` |
+
+### `preStimulus.rugosity.textureScale`
+
+Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | × authored tiling |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `preStimulus.rugosity.absoluteHeight`
 
@@ -3809,6 +3875,16 @@ Omitted, null or [] means environment-only flight/migration; sky and movement se
 | Required by parent schema | No |
 | Default | No default emitted at this path. |
 
+### `preStimulus.objects[].groundOnTerrain`
+
+Place this object on the active terrain at its X/Z position. Its configured Y becomes an extra height above terrain. Off uses the explicit world position.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
 ### `preStimulus.objects[].useHeadingReference`
 
 Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
@@ -4427,6 +4503,30 @@ Random starting yaw; Choice shares that sampled yaw across its rigs.
 | Type | `boolean` |
 | Required by parent schema | No |
 | Default | `false` |
+
+### `preStimulus.walkingPositionGain`
+
+Optional walking displacement multiplier. The tracker position is scaled by sphere radius into centimetres; use 0.01 for a terrain scene measured in metres. Omitted keeps the existing walking gain.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.walkingOrientationGain`
+
+Optional signed multiplier for walking heading changes. 1 keeps the measured turn, negative reverses it, and 0 disables heading response. Omitted keeps the existing walking gain.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
 
 ### `preStimulus.backgroundColor`
 
@@ -5105,6 +5205,20 @@ Vertical camera/animal clearance above the height surface, in centimetres. This 
 | UI unit label | cm |
 | `minimum` | `0` |
 | `maximum` | `3.40282347e+38` |
+
+### `stimulus.rugosity.textureScale`
+
+Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | × authored tiling |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `stimulus.rugosity.absoluteHeight`
 
@@ -6293,6 +6407,16 @@ Omitted, null or [] means environment-only flight/migration; sky and movement se
 | Required by parent schema | No |
 | Default | No default emitted at this path. |
 
+### `stimulus.objects[].groundOnTerrain`
+
+Place this object on the active terrain at its X/Z position. Its configured Y becomes an extra height above terrain. Off uses the explicit world position.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
 ### `stimulus.objects[].useHeadingReference`
 
 Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
@@ -6911,6 +7035,30 @@ Random starting yaw; Choice shares that sampled yaw across its rigs.
 | Type | `boolean` |
 | Required by parent schema | No |
 | Default | `false` |
+
+### `stimulus.walkingPositionGain`
+
+Optional walking displacement multiplier. The tracker position is scaled by sphere radius into centimetres; use 0.01 for a terrain scene measured in metres. Omitted keeps the existing walking gain.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.walkingOrientationGain`
+
+Optional signed multiplier for walking heading changes. 1 keeps the measured turn, negative reverses it, and 0 disables heading response. Omitted keeps the existing walking gain.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
 
 ### `stimulus.backgroundColor`
 
@@ -7589,6 +7737,20 @@ Vertical camera/animal clearance above the height surface, in centimetres. This 
 | UI unit label | cm |
 | `minimum` | `0` |
 | `maximum` | `3.40282347e+38` |
+
+### `postStimulus.rugosity.textureScale`
+
+Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | × authored tiling |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `postStimulus.rugosity.absoluteHeight`
 
@@ -8777,6 +8939,16 @@ Omitted, null or [] means environment-only flight/migration; sky and movement se
 | Required by parent schema | No |
 | Default | No default emitted at this path. |
 
+### `postStimulus.objects[].groundOnTerrain`
+
+Place this object on the active terrain at its X/Z position. Its configured Y becomes an extra height above terrain. Off uses the explicit world position.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
 ### `postStimulus.objects[].useHeadingReference`
 
 Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
@@ -9395,6 +9567,30 @@ Random starting yaw; Choice shares that sampled yaw across its rigs.
 | Type | `boolean` |
 | Required by parent schema | No |
 | Default | `false` |
+
+### `postStimulus.walkingPositionGain`
+
+Optional walking displacement multiplier. The tracker position is scaled by sphere radius into centimetres; use 0.01 for a terrain scene measured in metres. Omitted keeps the existing walking gain.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.walkingOrientationGain`
+
+Optional signed multiplier for walking heading changes. 1 keeps the measured turn, negative reverses it, and 0 disables heading response. Omitted keeps the existing walking gain.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
 
 ### `postStimulus.backgroundColor`
 

@@ -1,6 +1,6 @@
 # System schema fields
 
-This atlas lists **53 emitted property paths** from the current `system` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **58 emitted property paths** from the current `system` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -65,6 +65,16 @@ Array of per-rig entries. Use one entry for every rig that should render.
 | `minItems` | `1` |
 
 ## configs[] group
+
+### `configs[].desktopPreview`
+
+Desktop preview: render this rig’s front view across the native application window. Off keeps calibrated LED panel rectangles. Use apparatus setup for physical panel geometry.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
 
 ### `configs[].closedLoopMode`
 
@@ -285,7 +295,7 @@ Common or scientific name of the real animal controlling this rig. Saved with it
 
 ### `configs[].tracker`
 
-Optional local tracker app launch. Nothing launches automatically. Choose an installed native executable and its existing calibration file; MATREX only stops processes it launches. Save tracker calibration edits before Stop.
+Native tracker app settings. The ready-to-run starters launch a bundled tracker with Start; custom experiments can launch a configured app explicitly. Apps run independently and remain open when MATREX closes. Save calibration before Stop; stop the active tracker before changing its backend or input source.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -334,6 +344,46 @@ Optional headless Rekkefly launch. HejjéTrac uses its native desktop window.
 | Required by parent schema | No |
 | Default | `false` |
 
+### `configs[].tracker.strictCameraFallback`
+
+Optional headless Rekkefly launch. HejjéTrac uses its native desktop window.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `configs[].tracker.saveVideo`
+
+Save supported bundled tracker camera footage for replay; enabled when omitted. Explicit false disables it. Close an already open tracker normally before changing this option, then restart it. Footage remains pending until the independent recorder finishes saving.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `configs[].tracker.recordingDirectory`
+
+Optional headless Rekkefly launch. HejjéTrac uses its native desktop window.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `configs[].tracker.recordingPrefix`
+
+Optional headless Rekkefly launch. HejjéTrac uses its native desktop window.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
 ### `configs[].displayOrder`
 
 Ordered camera allow-list. R=Right, B=Back, L=Left, F=Front, U=Up, D=Down. RBLF draws those four views in that order. Omitted letters disable their cameras; an empty order renders no stimulus cameras.
@@ -346,7 +396,7 @@ Ordered camera allow-list. R=Right, B=Back, L=Left, F=Front, U=Up, D=Down. RBLF 
 
 ### `configs[].targetDisplay`
 
-The top-level targetDisplay overrides this legacy field.
+An explicit rig display takes precedence. Omission inherits the top-level or command-line display; effective JSON preserves that inheritance.
 
 | Contract | Emitted value |
 | --- | --- |

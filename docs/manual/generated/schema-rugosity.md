@@ -1,6 +1,6 @@
 # Rugosity schema fields
 
-This atlas lists **13 emitted property paths** from the current `rugosity` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **14 emitted property paths** from the current `rugosity` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -121,6 +121,22 @@ Vertical camera/animal clearance above the height surface, in centimetres. This 
 | UI unit label | cm |
 | `minimum` | `0` |
 | `maximum` | `3.40282347e+38` |
+
+## textureScale group
+
+### `textureScale`
+
+Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | × authored tiling |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ## absoluteHeight group
 

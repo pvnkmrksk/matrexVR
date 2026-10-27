@@ -1,6 +1,6 @@
 # Sequence schema fields
 
-This atlas lists **43 emitted property paths** from the current `sequence` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **44 emitted property paths** from the current `sequence` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -106,7 +106,7 @@ Historical Bogong/Kinefly signed yaw gain, applied on scene load and in-place tr
 | Default | `1.0` |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
-| UI soft slider range | `{"min":-10.0,"max":10.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+| UI soft slider range | `{"min":0.0,"max":50.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
 
 ### `sequences[].autoTrim`
 
@@ -419,6 +419,20 @@ Vertical camera/animal clearance above the height surface, in centimetres. This 
 | UI unit label | cm |
 | `minimum` | `0` |
 | `maximum` | `3.40282347e+38` |
+
+### `sequences[].parameters.rugosity.textureScale`
+
+Ground albedo texture repetition multiplier. Authored terrain scenes use 1; 4 makes texture features four times smaller. Omit to retain scene tuning. This does not change terrain height, navigation or camera clearance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | × authored tiling |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `sequences[].parameters.rugosity.absoluteHeight`
 

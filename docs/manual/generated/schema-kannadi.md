@@ -1,6 +1,6 @@
 # Kannadi schema fields
 
-This atlas lists **633 emitted property paths** from the current `kannadi` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **637 emitted property paths** from the current `kannadi` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -107,6 +107,21 @@ Random starting yaw; Choice shares that sampled yaw across its rigs.
 | Type | `boolean` |
 | Required by parent schema | No |
 | Default | `false` |
+
+## initialHeadingDistribution group
+
+### `initialHeadingDistribution`
+
+Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Continuous"` |
+| `enum` | `["Continuous","Cardinal",0,1]` |
+
+UI `enabledWhen`: `{"all":[{"property":"randomInitialRotation","oneOf":[true]},{"property":"resetRotationOnStart","oneOf":[true]}]}`. This governs the form, not removal of stored values.
 
 ## uniformSkyColor group
 
@@ -2161,6 +2176,19 @@ Random starting yaw; Choice shares that sampled yaw across its rigs.
 | Required by parent schema | No |
 | Default | `false` |
 
+### `preStimulus.initialHeadingDistribution`
+
+Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Continuous"` |
+| `enum` | `["Continuous","Cardinal",0,1]` |
+
+UI `enabledWhen`: `{"all":[{"property":"randomInitialRotation","oneOf":[true]},{"property":"resetRotationOnStart","oneOf":[true]}]}`. This governs the form, not removal of stored values.
+
 ### `preStimulus.uniformSkyColor`
 
 Uniform sky background with RGB channels in 0–1. Replaces the Milky Way when the sky configuration requests a uniform background.
@@ -4131,6 +4159,19 @@ Random starting yaw; Choice shares that sampled yaw across its rigs.
 | Required by parent schema | No |
 | Default | `false` |
 
+### `stimulus.initialHeadingDistribution`
+
+Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Continuous"` |
+| `enum` | `["Continuous","Cardinal",0,1]` |
+
+UI `enabledWhen`: `{"all":[{"property":"randomInitialRotation","oneOf":[true]},{"property":"resetRotationOnStart","oneOf":[true]}]}`. This governs the form, not removal of stored values.
+
 ### `stimulus.uniformSkyColor`
 
 Uniform sky background with RGB channels in 0–1. Replaces the Milky Way when the sky configuration requests a uniform background.
@@ -6100,6 +6141,19 @@ Random starting yaw; Choice shares that sampled yaw across its rigs.
 | Type | `boolean` |
 | Required by parent schema | No |
 | Default | `false` |
+
+### `postStimulus.initialHeadingDistribution`
+
+Random starting yaw for Swarm/Kannadi. Cardinal independently samples 0, 90, 180 or 270 degrees for each rig; Continuous preserves the historical 0–360 degree draw. Used only when random rotation and reset rotation are enabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Continuous"` |
+| `enum` | `["Continuous","Cardinal",0,1]` |
+
+UI `enabledWhen`: `{"all":[{"property":"randomInitialRotation","oneOf":[true]},{"property":"resetRotationOnStart","oneOf":[true]}]}`. This governs the form, not removal of stored values.
 
 ### `postStimulus.uniformSkyColor`
 
