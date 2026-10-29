@@ -98,9 +98,23 @@
     "recordingSeal": 16
   },
   "standalone": {
-    "status": "pending final build test",
+    "status": "passed",
+    "checks": 25,
+    "report": ".local/greenfield-native/Reports/20261029T130548Z-38fd5a5c",
     "app": "Preview/MATREX VR.app",
+    "version": "0.5.0-dev",
+    "sourceRevision": "558578c9",
     "config": "Preview/Config",
-    "data": "Preview/RunData"
+    "data": "Preview/RunData",
+    "nativeKeyboardPlayback": true,
+    "animatedTriangleObservedMoving": true,
+    "sourceAndZipUnchanged": true,
+    "pointerStressAcceptance": false,
+    "buildGuid": "6b0d18c9bff04c92b7fd8fe9621f5dac",
+    "buildErrors": 0,
+    "buildWarnings": 62,
+    "doubleClickLauncherVerified": true,
+    "normalSetupShowsCap60": true,
+    "normalMenuQuitVerified": true
   }
 }

@@ -1,7 +1,7 @@
 # Experiment and replay overhaul — requirements and delivery plan
 
 Requested 29 October 2026. Baseline: `72c772b0` (0.4 plus local pacing evidence).
-This is the implementation checklist and handoff record; unchecked items are not shipped claims.
+This is the implementation checklist and handoff record. Checked items are implemented and software-validated at the scope in the linked reports; physical apparatus acceptance remains separate. Unchecked items are not shipped claims.
 
 ## Purpose and priorities
 
@@ -20,54 +20,54 @@ An experimenter should configure and run a packaged application without rebuildi
 
 ## P0 — faithful replay and reproducibility
 
-- [ ] Restore original prefab animation during replay and scrubbing, including reverse seeks, pause and speed changes. Capture animation state/time for new recordings; clearly label approximation in legacy recordings.
-- [ ] Preserve procedural moth flap/flicker appearance using recorded experiment time/state, not replay wall time.
-- [ ] Restore world, phase, object, sky, material, dynamic event and camera configuration from archived evidence. Never substitute a current working config for an ambiguous old snapshot.
-- [ ] Fixed/random seed option, explicit integer seed, resolved seed in run output; scope stochastic initialization and document limits of determinism.
-- [ ] Keep acquisition CSV/config/model files unchanged when merely loading, playing or seeking a recording; validate hashes before/after.
-- [ ] Validate record → replay → forward/backward seek using actual Unity rendering and animation state.
+- [x] Restore original prefab animation during replay and scrubbing, including reverse seeks, pause and speed changes. Capture animation state/time for new recordings; clearly label approximation in legacy recordings.
+- [x] Preserve procedural moth flap/flicker appearance using recorded experiment time/state, not replay wall time.
+- [x] Restore world, phase, object, sky, material, dynamic event and camera configuration from archived evidence. Never substitute a current working config for an ambiguous old snapshot.
+- [x] Fixed/random seed option, explicit integer seed, resolved seed in run output; scope stochastic initialization and document limits of determinism.
+- [x] Keep acquisition CSV/config/model files unchanged when merely loading, playing or seeking a recording; validate hashes before/after.
+- [x] Validate record → replay → forward/backward seek using actual Unity rendering and animation state.
 
 ## P1 — experimenter-facing configuration and 16 VRs
 
 ### Names, sequencing and continuity
 
-- [ ] Optional human-readable paradigm/sequence-config title, sequence-row title, experiment-config title and comments. Preserve legacy filename-only JSON.
-- [ ] Show names in config editor, session overview and replay; show the immutable relative config path in faint read-only text, including nested folders beneath the config/StreamingAssets root.
-- [ ] GUI creation/editing of pre-stimulus, stimulus and post-stimulus using identical category layouts, explicit enable controls, durations and plain tooltips.
-- [ ] Shuffle/repeat a full pair/triplet as one experimental unit. Support grouped sequence rows where phases span files. Disabled phases do not execute.
-- [ ] Continue the same scene, tracked pose and population across phases when reset is false. Independent position/orientation reset true restores authored initial pose. Entrainment can serve as pre-stimulus before the Kannadi condition.
-- [ ] Preserve direct JSON operation, unknown fields, inherited values, disabled values and existing undo/redo behavior.
+- [x] Optional human-readable paradigm/sequence-config title, sequence-row title, experiment-config title and comments. Preserve legacy filename-only JSON.
+- [x] Show names in config editor, session overview and replay; show the immutable relative config path in faint read-only text, including nested folders beneath the config/StreamingAssets root.
+- [x] GUI creation/editing of pre-stimulus, stimulus and post-stimulus using identical category layouts, explicit enable controls, durations and plain tooltips.
+- [x] Shuffle/repeat a full pair/triplet as one experimental unit. Support grouped sequence rows where phases span files. Disabled phases do not execute.
+- [x] Continue the same scene, tracked pose and population across phases when reset is false. Independent position/orientation reset true restores authored initial pose. Entrainment can serve as pre-stimulus before the Kannadi condition.
+- [x] Preserve direct JSON operation, unknown fields, inherited values, disabled values and existing undo/redo behavior.
 
 ### VR and visibility
 
-- [ ] Provision 1–16 rigs in every supported example world from a shared six-camera rig. Faces retain labels and 90-degree projection; system face selection remains honored.
-- [ ] Validate unique rig identity/input/display routing, active/inactive state, culling layers and self-hidden/peers-visible Kannadi bodies at 1/2/4/8/16.
-- [ ] System GUI supports all 16 rigs, keyboard navigation and one action to advance individual identifiers by the configured population size, with undo through existing document history if practical.
-- [ ] Deprecate Swarm in new scene selectors/starters; migrate supplied population recipes to Kannadi with legacy input compatibility and documented behavioral units.
+- [x] Provision 1–16 rigs in every supported example world from a shared six-camera rig. Faces retain labels and 90-degree projection; system face selection remains honored.
+- [x] Validate unique rig identity/input/display routing, active/inactive state, culling layers and self-hidden/peers-visible Kannadi bodies at 1/2/4/8/16.
+- [x] System GUI supports all 16 rigs, keyboard navigation and one action to advance individual identifiers by the configured population size, with undo through existing document history if practical.
+- [x] Deprecate Swarm in new scene selectors/starters; migrate supplied population recipes to Kannadi with legacy input compatibility and documented behavioral units.
 
 ### External objects and world appearance
 
-- [ ] Choose built-in or external objects; set enabled, scale, position and orientation. Preserve embedded animation. Reuse existing Choice/band/mirror capabilities.
-- [ ] Archive externally loaded object bytes/dependencies and provenance in saved runs; replay uses those archived assets.
-- [ ] Organize world examples: Optomotor; flat/desert base with ground contrast; forest floor; dense forest; real-world terrain. Reuse suitable existing assets/worlds before introducing duplicates.
-- [ ] Configurable directional sun for all experiments: enabled, intensity, color/hex and orientation. Directional light position is irrelevant.
-- [ ] Four sky modes: Unity default, uniform color, custom panorama, astronomical stars. Explicit enable controls and inactive controls gray out.
-- [ ] Night sky latitude/longitude, fixed local time plus UTC offset or current time; current time disables the fixed-time field. Preserve generated sky images/provenance.
+- [x] Choose built-in or external objects; set enabled, scale, position and orientation. Preserve embedded animation. Reuse existing Choice/band/mirror capabilities.
+- [x] Archive externally loaded object bytes/dependencies and provenance in saved runs; replay uses those archived assets.
+- [x] Organize world examples: Optomotor; flat/desert base with ground contrast; forest floor; dense forest; real-world terrain. Reuse suitable existing assets/worlds before introducing duplicates.
+- [x] Configurable directional sun for all experiments: enabled, intensity, color/hex and orientation. Directional light position is irrelevant.
+- [x] Four sky modes: Unity default, uniform color, custom panorama, astronomical stars. Explicit enable controls and inactive controls gray out.
+- [x] Night sky latitude/longitude, fixed local time plus UTC offset or current time; current time disables the fixed-time field. Preserve generated sky images/provenance.
 - [ ] Optional panorama azimuth rotation, default zero; normalize bounded angles.
 
 ### Replay controls and readability
 
-- [ ] God's-eye view, original animal view, original pixel-resolution view and detail preview; aspect-preserving resize.
-- [ ] Middle-drag pan, robust near clipping, smooth forward/backward seeking and bounded media frame cache.
-- [ ] Two trail controls: duration and prominence (not a gallery of technical parameters).
-- [ ] Third-person follow selected animal; click empty background to leave follow. Placeholder body where the original world has no focal model.
-- [ ] Run/sequence/experiment titles and a screenshot thumbnail in the recording library.
+- [x] God's-eye view, original animal view, original pixel-resolution view and detail preview; aspect-preserving resize.
+- [x] Middle-drag pan, robust near clipping, smooth forward/backward seeking and bounded media frame cache.
+- [x] Two trail controls: duration and prominence (not a gallery of technical parameters).
+- [x] Third-person follow selected animal; click empty background to leave follow. Placeholder body where the original world has no focal model.
+- [x] Run/sequence/experiment titles and a screenshot thumbnail in the recording library.
 
 ### GUI and operation
 
-- [ ] Default dark palette independently of OS preference; optional explicit light selection only if implemented consistently.
-- [ ] Related controls together, category tabs/foldouts, clear enable switches, disabled controls gray, concise explanatory tooltips, spacing and legible labels.
-- [ ] Collapsible sidebar, keyboard navigation and existing AI/automation APIs retained. Document actual machine interfaces; a new general MCP service is a separate integration.
+- [x] Default dark palette independently of OS preference; optional explicit light selection only if implemented consistently.
+- [x] Related controls together, category tabs/foldouts, clear enable switches, disabled controls gray, concise explanatory tooltips, spacing and legible labels.
+- [x] Collapsible sidebar, keyboard navigation and existing AI/automation APIs retained. Document actual machine interfaces; a new general MCP service is a separate integration.
 - [ ] Double-click packaged launch, config selection, monitor mode and existing tracker connections continue to function. Do not constrain monitor count below the general 16-rig limit without an actual technical reason.
 
 ## P2 — follow-up work, ordered after core validation
