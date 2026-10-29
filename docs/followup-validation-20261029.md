@@ -19,6 +19,7 @@ tracked separately below. No physical camera or LED equivalence is claimed.
 | Appearance and visibility | 104 assertions: 1/2/4/8/16 six-face masks, enable/disable/phase restoration, rendered bodies and panorama orientation against Unity |
 | Shared sky in Optomotor | Seven assertions through actual acquisition: solid color, custom panorama, same-image azimuth changes and archived sky images |
 | Animation/serialization | 371 assertions, including original locust animation, transitions, imported GLB and read-only replay; performance agent's final safe source |
+| Final standalone app | 25 assertions: dedicated saved setup, acquisition, writer drain/ZIP, concrete build identity, byte-identical external GLB archive, forward/backward replay and unchanged source files/ZIP; only the owned test player closed |
 | Runtime GLB preflight | 22 production format/dependency/decoder/reference checks |
 | Logger and writer | 690 archive/writer assertions plus 150 lifecycle cycles; 16 logger-seal assertions |
 | Apparatus model | 58 production profile assertions; no physical display claim |
@@ -52,3 +53,9 @@ UI Toolkit checks do not replace native pointer/keyboard acceptance. Physical tr
 calibration/camera recording and LED timing, unsupported-platform native
 recording control, large-data cache budgets and further many-camera rendering
 work remain explicit in the [follow-up checklist](gui-recording-performance-followup.md).
+
+## Final local package
+
+The signed local `0.5.0-dev` Mac app was rebuilt from `297e2202`; its recorded player build GUID is `0feac85481194952b4067d28ef6ceba6`. Both packaged Mac arm64 companion entries advertise the verified recording-control capability. Signature verification and the final standalone check passed. All 1,449 pre-existing `Preview/Config` files remain byte-identical; test acquisition used a separate owned profile under `.local/followup-native`. The test player exited and user-owned windows were untouched.
+
+[Machine-readable final acceptance](followup-validation-20261029.json) records counts, exact build identity, evidence locations and remaining limits.
