@@ -60,6 +60,21 @@
       "Cmd+Q exits after recording finalization"
     ],
     "mouse": "CUA pointer action failed with noWindowsAvailable; no complete native pointer acceptance claim",
-    "physicalHardware": false
+    "physicalHardware": false,
+    "sourceRevision": "12c49ec6",
+    "buildGuid": "80b85771a7c14f9aa37d0ced1b073b2e",
+    "buildErrors": 0,
+    "buildWarnings": 61,
+    "framebuffer": {
+      "width": 3024,
+      "height": 1898,
+      "mode": "FullScreenWindow",
+      "dpi": 255.0
+    },
+    "logicalWidth": 1512.0,
+    "logicalHeight": 949.0,
+    "historicalSwarmSetupValidation": true,
+    "desktopStartupRegressionChecks": 77,
+    "overlayLayoutRegressionChecks": 6428
   }
 }

@@ -19,11 +19,15 @@ Development branch: `codex/experiment-replay-overhaul`, Unity 6000.3.16f1. The [
 
 The separate `.local/MATREX VR Overhaul.app` builds as `0.5.0-dev`, with verified existing native companions and no publication. A separate test config/data/control directory was used. Actual local MCP requests validated and started the saved configuration through the GUI workflow. The player rendered a green imported GLB triangle with its embedded vertical animation; its original bytes were archived exactly. Native keyboard input hid overlays, stopped to setup and quit normally. This establishes the runtime shader/import path on this Mac; it does not establish every glTF extension/material on every platform.
 
-CUA screenshots worked, and keyboard control worked after raising the app. Pointer actions reported `noWindowsAvailable`; a complete native pointer/drag stress test is **not** claimed. Source form/render tests and pointer geometry tests passed separately. The first native launch forced a lower render resolution through development command-line arguments; the supplied launcher leaves native resolution selection to the app.
+CUA screenshots worked, and keyboard control worked after raising the app. Pointer actions reported `noWindowsAvailable`; a complete native pointer/drag stress test is **not** claimed. Source form/render tests and pointer geometry tests passed separately.
+
+Native testing exposed a remembered low render resolution: `Screen.currentResolution` returned 1440×900 while the actual display reported 3024×1898. Startup now uses the window's display dimensions, with a current-resolution fallback when display metadata is unavailable. **77** desktop coroutine checks and **6,428** overlay-layout assertions passed. The final standalone diagnostic confirms a **3024×1898 framebuffer, 2× UI scale and 1512×949 logical setup space**. The final native MCP validator also accepted historical `Swarm` sequence JSON through the Kannadi alias. Final code build: `12c49ec6`, zero errors; warnings are retained in the local build log/report.
 
 ![Dark configuration editor](images/overhaul/configuration-sky-dark.png)
 
 ![Sixteen-rig configuration](images/overhaul/configuration-16-rigs-dark.png)
+
+![Final native Retina setup](images/overhaul/native-setup.png)
 
 ## Remaining boundaries
 
