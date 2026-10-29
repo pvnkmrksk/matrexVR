@@ -195,6 +195,7 @@ public class DataLogger : MonoBehaviour
             AddColumns("flightCheckEnabled", "flightThresholdRadiansSquared", "flightSamples");
             AddColumns("yawDCOffsetDegrees", "yawDCCompensationDegPerSecond", "autoTrimMeanDegPerSecond", "autoTrimUncertaintyDegPerSecond", "autoTrimMeasurementSeconds");
             AddColumns("experimentPhase", "unityFrame");
+            AddColumns("sequenceConfigTitle", "sequenceTitle", "experimentTitle", "resolvedRandomSeed", "sourceSequenceScene");
             AddColumns("poseWallTicks", "trackerAppliedThisFrame", "trackerInputSessionId", "trackerReceiverSessionId", "trackerInputEpoch", "trackerInputFrame", "trackerInputSequence", "trackerInputTimestamp", "trackerInputClock", "trackerReceiveSequence", "trackerReceivedUtcTicks");
 
             // Enable logging
@@ -293,7 +294,7 @@ public class DataLogger : MonoBehaviour
     private static bool CanCaptureContext(bool running,bool transitionPending,string actualScene,string sequenceScene)
     {
         return running && !transitionPending && !string.IsNullOrEmpty(actualScene) &&
-            string.Equals(actualScene,sequenceScene,StringComparison.OrdinalIgnoreCase);
+            string.Equals(actualScene,SceneCompatibility.Resolve(sequenceScene),StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -314,6 +315,11 @@ public class DataLogger : MonoBehaviour
         SetData("cumulativeStep", cumulativeStep);
         // Build base data
         SetData("unityFrame", Time.frameCount);
+        SetData("sequenceConfigTitle", mainController?.SequenceTitle);
+        SetData("sequenceTitle", mainController?.GetCurrentSequenceStep()?.title);
+        SetData("sourceSequenceScene", mainController?.GetCurrentSequenceStep()?.sceneName);
+        SetData("experimentTitle", mainController?.CurrentExperimentTitle);
+        SetData("resolvedRandomSeed", ExperimentRandom.Active ? (object)ExperimentRandom.ResolvedSeed : null);
         SetData("skyboxId", NightSkyController.CurrentId);
         ClosedLoop tracking = GetComponent<ClosedLoop>();
         if (tracking != null)
@@ -381,7 +387,7 @@ public class DataLogger : MonoBehaviour
             SequenceStep step = mainController.GetCurrentSequenceStep();
             if (step != null)
             {
-                currentSequenceScene = step.sceneName;
+                currentSequenceScene = SceneCompatibility.Resolve(step.sceneName);
                 if (step.parameters != null && step.parameters.ContainsKey("configFile"))
                 {
                     configFileName = step.parameters["configFile"].ToString();

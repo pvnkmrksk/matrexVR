@@ -52,6 +52,12 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
             schema["$schema"]="https://json-schema.org/draft/2020-12/schema";
             schema["$id"]="urn:matrex:config:"+property.Name;
             schema["title"]=property.Name;
+            if(property.Name!="system"&&property.Name!="rugosity")
+            {
+                schema["properties"]["title"]=new JObject { ["type"]="string",["default"]="",["x-ui"]=new JObject { ["help"]="Optional human-readable experiment or paradigm name. The file path remains visible separately." } };
+                schema["properties"]["comments"]=new JObject { ["type"]="string",["default"]="",["x-ui"]=new JObject { ["help"]="Optional notes retained in this configuration and the run archive." } };
+                if(property.Name!="sequence")schema["properties"]["sun"]=Schema(typeof(SunConfig));
+            }
             string template=property.Name=="system"?"system_config":property.Name;
             string path=Path.Combine(Application.streamingAssetsPath,"Templates",template+".template.json");
             if(File.Exists(path)) schema["default"]=JObject.Parse(File.ReadAllText(path));
@@ -60,6 +66,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
                 schema["properties"]["autoTrimSettings"]=Schema(typeof(AutoTrimConfig));
                 var phase=(JObject)schema.DeepClone(); phase.Remove("$id"); phase.Remove("$schema"); phase.Remove("default");
                 var props=(JObject)phase["properties"];
+                props.Remove("title");props.Remove("comments");
                 props["enabled"]=new JObject { ["type"]="boolean",["default"]=true };
                 props["durationSeconds"]=new JObject { ["type"]="number",["exclusiveMinimum"]=0,["default"]=10,["x-ui"]=new JObject { ["unit"]="seconds",["slider"]=new JObject { ["min"]=1,["max"]=3600,["step"]=1 } } };
                 props["autoTrimSettings"]=Schema(typeof(AutoTrimConfig));
@@ -228,6 +235,21 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         {
             child["minimum"]=0;
             ui["help"]="Zero-based row to restart after the final row: 0 repeats everything; 1 runs row 0 once, then repeats rows 1 onward. Requires fixed order when nonzero.";
+        }
+        if(name=="title"||name=="comments"||name=="group")child["default"]="";
+        if(name=="group")ui["help"]="Optional group name for adjacent sequence blocks. Blocks with the same group stay in order and are shuffled together. Reuse the name only within that contiguous group.";
+        if(name=="populationMode")
+        { child["enum"]=new JArray("Mirror","Swarm");ui["help"]="Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world."; }
+        if(name=="modelPath"||name=="kannadiModelPath")
+        {child["default"]="";ui["help"]="Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.";}
+        if(name=="animationClip")ui["help"]="Optional animation clip in the imported model. Leave blank to use its first clip.";
+        if(name=="animationSpeed")ui["help"]="Model animation playback multiplier. 1 uses the model's authored timing; 0 freezes it.";
+        if(owner==typeof(SunConfig))
+        {
+            if(name=="intensity"){child["minimum"]=0;ui["help"]="Brightness of the directional sun. Zero gives no direct illumination.";}
+            if(name=="color")ui["help"]="Sunlight color. Choose a color or enter its hexadecimal RGB value.";
+            if(name=="rotation")
+            {ui["help"]="Sun direction as X/Y/Z Euler angles in degrees. Position does not affect directional lighting.";foreach(string axis in new[]{"x","y","z"}){child["properties"][axis]["minimum"]=0;child["properties"][axis]["maximum"]=360;}}
         }
         if(new[]{"muElevation","kappaElevation","boundaryHeight","wrapY"}.Contains(name)) ui["visibleWhen"]=Rule("dimension","3D");
         if(name=="bogongVisual") ui["visibleWhen"]=Rule("agentVisual","Bogong");

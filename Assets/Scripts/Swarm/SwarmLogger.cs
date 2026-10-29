@@ -14,6 +14,9 @@ public class SwarmLogger : MonoBehaviour
     private bool closed;
     private readonly List<Transform> agents = new List<Transform>();
     private readonly List<string> names = new List<string>(), layers = new List<string>();
+    private readonly List<RecordedAnimationCapture> animationCaptures = new List<RecordedAnimationCapture>();
+    private readonly List<int> sourceIndices = new List<int>();
+    private BogongSwarmRenderer batchRenderer;
     private static readonly Unity.Profiling.ProfilerMarker captureMarker = new Unity.Profiling.ProfilerMarker("SwarmLogger.Capture");
     public int PendingFrames => writer?.PendingFrames ?? 0;
     public long DroppedFrames => writer?.DroppedFrames ?? 0;
@@ -37,7 +40,7 @@ public class SwarmLogger : MonoBehaviour
         string path = Path.Combine(master.directoryPath,
             $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_SimulatedLocustData_{layerNames.TrimEnd('_')}_{spawner.numberOfLocusts}_{spawner.spawnAreaSize}_{spawner.mu}_{spawner.kappa}_{spawner.locustSpeed}.csv.gz");
         LogPath = path;
-        string header = FormattableString.Invariant($"Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase,RotationX,RotationY,RotationZ,NumberOfLocusts:{spawner.numberOfLocusts},SpawnAreaSize:{spawner.spawnAreaSize},Mu:{spawner.mu},Kappa:{spawner.kappa},LocustSpeed:{spawner.locustSpeed},LocustSpeedStdDev:{spawner.locustSpeedStdDev},DirectionDistribution:{spawner.directionDistribution},KappaElevation:{spawner.kappaElevation}");
+        string header = FormattableString.Invariant($"Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase,RotationX,RotationY,RotationZ,AnimationState,NumberOfLocusts:{spawner.numberOfLocusts},SpawnAreaSize:{spawner.spawnAreaSize},Mu:{spawner.mu},Kappa:{spawner.kappa},LocustSpeed:{spawner.locustSpeed},LocustSpeedStdDev:{spawner.locustSpeedStdDev},DirectionDistribution:{spawner.directionDistribution},KappaElevation:{spawner.kappaElevation}");
         writer = new AsyncSwarmWriter(path, header);
     }
 
@@ -50,10 +53,16 @@ public class SwarmLogger : MonoBehaviour
         {
             if (cachedRevision != spawner.SpawnRevision || cachedMask != locustLayerMask.value)
             {
-                agents.Clear(); names.Clear(); layers.Clear();
+                agents.Clear(); names.Clear(); layers.Clear(); animationCaptures.Clear(); sourceIndices.Clear();
+                batchRenderer = spawner.GetComponentInChildren<BogongSwarmRenderer>(true);
+                int sourceIndex = -1;
                 foreach (var agent in spawner.Spawned)
+                {
+                    sourceIndex++;
                     if (agent != null && (locustLayerMask.value & (1 << agent.layer)) != 0)
-                    { agents.Add(agent.transform); names.Add(agent.name); layers.Add(RuntimeRigRegistry.LayerLabel(agent.layer)); }
+                    { agents.Add(agent.transform); names.Add(agent.name); layers.Add(RuntimeRigRegistry.LayerLabel(agent.layer));
+                      animationCaptures.Add(new RecordedAnimationCapture(agent)); sourceIndices.Add(sourceIndex); }
+                }
                 cachedRevision = spawner.SpawnRevision; cachedMask = locustLayerMask.value;
             }
             var frame = writer.Rent(agents.Count);
@@ -67,7 +76,8 @@ public class SwarmLogger : MonoBehaviour
                 Vector3 p = agents[i].position;
                 Vector3 rotation = agents[i].rotation.eulerAngles;
                 frame.agents[frame.count++] = new AsyncSwarmWriter.Agent { name = names[i], layer = layers[i], x = p.x, y = p.y, z = p.z,
-                    rx = rotation.x, ry = rotation.y, rz = rotation.z };
+                    rx = rotation.x, ry = rotation.y, rz = rotation.z,
+                    animationState = animationCaptures[i].Capture(batchRenderer, sourceIndices[i]) };
             }
             writer.Submit(frame);
         }

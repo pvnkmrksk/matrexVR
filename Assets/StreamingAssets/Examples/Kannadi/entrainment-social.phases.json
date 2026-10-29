@@ -1,0 +1,304 @@
+{
+  "title": "Kannadi · entrainment then social coupling",
+  "description": "One atomic 420-second experiment in the Kannadi scene: 120 s ordered swarm entrainment, then 300 s mirror/social coupling. Stimulus keeps the tracked positions and headings reached during entrainment. Optional post-stimulus is disabled. Existing 4-rig initial poses are retained; extra rigs use the shared initial pose until configured. Units are centimetres.",
+  "preStimulus": {
+    "closedLoopPosition": 1,
+    "closedLoopOrientation": 1,
+    "autopilotEnabled": false,
+    "autopilotSpeed": 2,
+    "resetPositionOnStart": true,
+    "resetRotationOnStart": true,
+    "randomInitialRotation": true,
+    "initialHeadingDistribution": "Cardinal",
+    "initialPosition": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "initialRotation": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "vrConfigs": [
+      {
+        "vrIndex": 1,
+        "initialPosition": {
+          "x": 0,
+          "y": 1,
+          "z": 5
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 2,
+        "initialPosition": {
+          "x": 5,
+          "y": 1,
+          "z": 0
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 90,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 3,
+        "initialPosition": {
+          "x": 0,
+          "y": 1,
+          "z": -5
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 180,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 4,
+        "initialPosition": {
+          "x": -5,
+          "y": 1,
+          "z": 0
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 270,
+          "z": 0
+        }
+      }
+    ],
+    "uniformSkyColor": {
+      "r": 0.65,
+      "g": 0.65,
+      "b": 0.65,
+      "a": 1
+    },
+    "nightSky": {
+      "enabled": false
+    },
+    "trajectoryFile": "",
+    "worldUnitsPerMetre": 100,
+    "nearClipMetres": 0.001,
+    "agentCount": 256,
+    "agentSpeed": 2,
+    "agentSpeedStdDev": 0,
+    "spawnRelativeToAnimal": true,
+    "followAnimalPosition": true,
+    "spawnCenter": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "volumeHalfExtentMetres": 2,
+    "dimension": "2D",
+    "directionDistribution": "VonMises",
+    "mu": 0,
+    "kappa": 100,
+    "preserveBoundaryOvershoot": true,
+    "boundaryLengthX": 400,
+    "boundaryLengthZ": 400,
+    "animateOnMove": true,
+    "animationSpeedThreshold": 0.5,
+    "agentVisual": "ScenePrefab",
+    "enabled": true,
+    "durationSeconds": 120,
+    "populationMode": "Swarm"
+  },
+  "stimulus": {
+    "closedLoopPosition": 1,
+    "closedLoopOrientation": 1,
+    "autopilotEnabled": false,
+    "autopilotSpeed": 2,
+    "resetPositionOnStart": false,
+    "resetRotationOnStart": false,
+    "randomInitialRotation": true,
+    "initialHeadingDistribution": "Cardinal",
+    "initialPosition": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "initialRotation": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "vrConfigs": [
+      {
+        "vrIndex": 1,
+        "initialPosition": {
+          "x": 0,
+          "y": 1,
+          "z": 5
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 2,
+        "initialPosition": {
+          "x": 5,
+          "y": 1,
+          "z": 0
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 90,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 3,
+        "initialPosition": {
+          "x": 0,
+          "y": 1,
+          "z": -5
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 180,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 4,
+        "initialPosition": {
+          "x": -5,
+          "y": 1,
+          "z": 0
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 270,
+          "z": 0
+        }
+      }
+    ],
+    "uniformSkyColor": {
+      "r": 0.65,
+      "g": 0.65,
+      "b": 0.65,
+      "a": 1
+    },
+    "nightSky": {
+      "enabled": false
+    },
+    "numberOfRings": 0,
+    "hexRadius": 10,
+    "kannadiTilePrefab": "SimulatedLocust",
+    "periodicBoundary": true,
+    "boundaryLengthX": 400,
+    "boundaryLengthZ": 400,
+    "animateOnMove": true,
+    "animationSpeedThreshold": 0.5,
+    "enabled": true,
+    "durationSeconds": 300,
+    "populationMode": "Mirror",
+    "worldUnitsPerMetre": 100
+  },
+  "postStimulus": {
+    "closedLoopPosition": 1,
+    "closedLoopOrientation": 1,
+    "autopilotEnabled": false,
+    "autopilotSpeed": 2,
+    "resetPositionOnStart": false,
+    "resetRotationOnStart": false,
+    "randomInitialRotation": true,
+    "initialHeadingDistribution": "Cardinal",
+    "initialPosition": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "initialRotation": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "vrConfigs": [
+      {
+        "vrIndex": 1,
+        "initialPosition": {
+          "x": 0,
+          "y": 1,
+          "z": 5
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 2,
+        "initialPosition": {
+          "x": 5,
+          "y": 1,
+          "z": 0
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 90,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 3,
+        "initialPosition": {
+          "x": 0,
+          "y": 1,
+          "z": -5
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 180,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 4,
+        "initialPosition": {
+          "x": -5,
+          "y": 1,
+          "z": 0
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 270,
+          "z": 0
+        }
+      }
+    ],
+    "uniformSkyColor": {
+      "r": 0.65,
+      "g": 0.65,
+      "b": 0.65,
+      "a": 1
+    },
+    "nightSky": {
+      "enabled": false
+    },
+    "numberOfRings": 0,
+    "hexRadius": 10,
+    "kannadiTilePrefab": "SimulatedLocust",
+    "periodicBoundary": true,
+    "boundaryLengthX": 400,
+    "boundaryLengthZ": 400,
+    "animateOnMove": true,
+    "animationSpeedThreshold": 0.5,
+    "enabled": false,
+    "durationSeconds": 30,
+    "populationMode": "Mirror",
+    "worldUnitsPerMetre": 100
+  }
+}

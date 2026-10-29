@@ -102,7 +102,25 @@ public partial class ReplayController : MonoBehaviour
     private ReplayMediaPanel mediaPanel;
     private RenderTexture animalPreviewTexture;
     private Camera previewCamera;
+    private bool pixelScaleAnimalView;
     private RecordedDashboardLink recordedDashboard;
+    private float trailSeconds = 5, trailProminence = 1;
+    private string followedRig;
+    public string FollowedRig => followedRig;
+    public void FollowRig(string id)
+    {
+        followedRig = id != null && markerByRig.ContainsKey(id) ? id : null;
+        if (followedRig == null) return;
+        selectedView = -1; overviewPerspective = true; overviewPitch = 25;
+        overviewDistance = Mathf.Clamp(trajectoryBounds.extents.magnitude * .2f, 5, 50);
+        overviewUserAdjusted = true; ApplyView(); UpdateFollowCamera();
+    }
+    private void UpdateFollowCamera()
+    {
+        if (followedRig == null || !markerByRig.TryGetValue(followedRig, out var marker)) return;
+        overviewPivot = marker.transform.position + Vector3.up * overviewDistance * .1f;
+        overviewYaw = marker.transform.eulerAngles.y; ApplyOverviewPose();
+    }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()=>pendingSessionPath=null;
@@ -121,6 +139,7 @@ public partial class ReplayController : MonoBehaviour
         if(string.IsNullOrWhiteSpace(directory))throw new ArgumentException("Choose a saved run folder.");
         pendingSessionPath=Path.GetFullPath(directory.Trim().Trim('"'));
         MainController.Instance?.StopSequence();
+        ExperimentRandom.End();
         SceneManager.LoadScene("ReplayScene");
     }
 
@@ -128,6 +147,7 @@ public partial class ReplayController : MonoBehaviour
     {
         pointerTrace=Array.IndexOf(Environment.GetCommandLineArgs(),"--replay-pointer-trace")>=0;
         MainController.Instance?.StopSequence();
+        ExperimentRandom.End();
         generatedRoot=new GameObject("Replay generated visuals").transform;generatedRoot.SetParent(transform,false);
         populationRoot=new GameObject("Recorded populations").transform;populationRoot.SetParent(generatedRoot,false);
         if(environmentLoader==null)environmentLoader=GetComponent<ReplayEnvironmentLoader>()??gameObject.AddComponent<ReplayEnvironmentLoader>();
@@ -186,6 +206,7 @@ public partial class ReplayController : MonoBehaviour
                             if(stream==null)continue;
                             run.agents.Add(stream);
                             if(!stream.HasRotations)run.archive.Warn(Path.GetFileName(file)+": historical agent positions have no orientation; heading/wing animation cannot be reconstructed exactly.");
+                            if(!stream.HasAnimationState)run.archive.Warn(Path.GetFileName(file)+": historical animation phase was not recorded. Original models animate from the replay clock; their phase is approximate.");
                             if(stream.Kind=="Band" && !stream.HasVisibility)run.archive.Warn(Path.GetFileName(file)+": historical visibility phase did not capture the actual per-agent timer; exact blinking cannot be recovered and bodies are shown continuously.");
                             if(stream.HasDuplicateNames)run.archive.Warn(Path.GetFileName(file)+": duplicate agent names are distinguished by row order within each frame.");
                         }
@@ -218,12 +239,16 @@ public partial class ReplayController : MonoBehaviour
         {
             string id=pair.Key;rigOrder.Add(id);
             var marker=new GameObject("Recorded animal "+id);marker.transform.SetParent(generatedRoot,false);
-            GameObject body=rigMarkerPrefab!=null?Instantiate(rigMarkerPrefab,marker.transform):GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            var placeholder = rigMarkerPrefab != null ? rigMarkerPrefab : Resources.Load<KannadiPrefabCatalog>("KannadiPrefabCatalog")?.Find("SimulatedLocust");
+            GameObject body=placeholder!=null?Instantiate(placeholder,marker.transform):GameObject.CreatePrimitive(PrimitiveType.Sphere);
             body.transform.SetParent(marker.transform,false);body.name="Operator marker body "+id;
+            foreach (var renderer in body.GetComponentsInChildren<Renderer>(true))
+            { renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; renderer.receiveShadows = false; }
             ReplayEnvironmentLoader.FreezeVisual(marker);
+            marker.AddComponent<ReplayAnimationDriver>();
             SetOverlayLayer(marker);markerByRig[id]=marker;
             var annotation=marker.AddComponent<ReplayAgentVisuals>();
-            annotation.Initialize(Mathf.Max(1,RuntimeRigRegistry.ParseIndex(ReplayEnvironmentLoader.CanonicalRig(id))),body.GetComponentInChildren<Renderer>());
+            annotation.Initialize(Mathf.Max(1,RuntimeRigRegistry.ParseIndex(ReplayEnvironmentLoader.CanonicalRig(id))),body.GetComponentInChildren<Renderer>(),body.transform);
             agentAnnotations[id]=annotation;
             if(createRigCameras)
             {
@@ -293,6 +318,7 @@ public partial class ReplayController : MonoBehaviour
     public void FitOverview()
     {
         if(overview==null)return;
+        followedRig = null;
         float span=Mathf.Max(5,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z));
         overviewPivot=trajectoryBounds.center;overviewYaw=0;overviewPitch=90;
         overviewDistance=trajectoryBounds.extents.y+span*2+10;overviewUserAdjusted=false;overviewDragButton=-1;
@@ -337,6 +363,19 @@ public partial class ReplayController : MonoBehaviour
         if(mouse==null)overviewDragButton=-1;
         Vector2 position=mouse!=null?mouse.position.ReadValue():Vector2.zero;
         bool inImage=mouse!=null && overview.pixelRect.Contains(position) && !ContainsReplayChrome(position);
+        if (inImage && mouse.leftButton.wasPressedThisFrame)
+        {
+            string nearest = null; float distance = 32 * DesktopDisplay.UiScale;
+            foreach (var pair in markerByRig)
+            {
+                if (!pair.Value.activeInHierarchy) continue;
+                var screen = overview.WorldToScreenPoint(pair.Value.transform.position);
+                if (screen.z <= 0) continue;
+                float pixels = Vector2.Distance(position, new Vector2(screen.x, screen.y));
+                if (pixels < distance) { distance = pixels; nearest = pair.Key; }
+            }
+            FollowRig(nearest);
+        }
         if(overviewDragButton<0 && inImage)
         {
             if(mouse.middleButton.wasPressedThisFrame)overviewDragButton=2;
@@ -349,6 +388,7 @@ public partial class ReplayController : MonoBehaviour
             Vector2 delta=position-overviewDragPosition;overviewDragPosition=position;
             if(delta.sqrMagnitude>0)
             {
+                followedRig = null;
                 if(overviewDragButton==1)
                 {overviewYaw+=delta.x*.2f;overviewPitch=Mathf.Clamp(overviewPitch-delta.y*.2f,10,90);}
                 else
@@ -375,6 +415,7 @@ public partial class ReplayController : MonoBehaviour
             float yaw=Horizontal(keyboard.lKey,keyboard.jKey),pitch=Horizontal(keyboard.kKey,keyboard.iKey);
             if(movement.sqrMagnitude>0 || yaw!=0 || pitch!=0)
             {
+                followedRig = null;
                 float dt=Mathf.Min(.1f,Time.unscaledDeltaTime),height=overviewPerspective?2*overviewDistance*Mathf.Tan(25*Mathf.Deg2Rad):2*overview.orthographicSize;
                 Vector3 right=Quaternion.Euler(0,overviewYaw,0)*Vector3.right,forward=Quaternion.Euler(0,overviewYaw,0)*Vector3.forward;
                 float boost=keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed?3:1;
@@ -465,10 +506,12 @@ public partial class ReplayController : MonoBehaviour
             Vector3 position=Vector3.Lerp(a.position,b.position,amount);
             Quaternion rotation=Quaternion.Slerp(Quaternion.Euler(a.rotation),Quaternion.Euler(b.rotation),amount);
             marker.transform.SetPositionAndRotation(position,rotation);
+            marker.GetComponent<ReplayAnimationDriver>()?.Sample(null, replayTime);
             environmentLoader?.DriveRecordedRig(id,position,rotation);
             environmentLoader?.ApplyAsynchronousSample(a);
+            if (camerasByRig.TryGetValue(id, out var visibilityCamera)) visibilityCamera.cullingMask=environmentLoader.RecordedAnimalCameraMask(id,AnimalCameraMask(id));
             if(matchRecordedCamera && camerasByRig.TryGetValue(id,out var animalCamera))
-            {environmentLoader?.ConfigureAnimalCamera(id,animalCamera,a);FitReplayAnimalViewport(animalCamera);}
+            {environmentLoader?.ConfigureAnimalCamera(id,animalCamera,a);animalCamera.cullingMask=environmentLoader.RecordedAnimalCameraMask(id,AnimalCameraMask(id));FitReplayAnimalViewport(animalCamera);}
             if(environmentSample==null)environmentSample=a;
             if(referenceSample==null || (selectedView>=0 && rigOrder[selectedView]==id))referenceSample=a;
         }
@@ -492,11 +535,20 @@ public partial class ReplayController : MonoBehaviour
                     population.visuals[pose.id]=visual;
                 }
                 visual.SetActive(pose.visible);visual.transform.SetPositionAndRotation(pose.position,Quaternion.Euler(pose.rotation));population.active.Add(pose.id);
+                var animation = visual.GetComponent<ReplayAnimationDriver>();
+                if (animation != null)
+                {
+                    animation.Sample(pose.animationState, replayTime);
+                    if (animation.TransitionApproximation) archive.Warn("An Animator transition was recorded. State, parameters and normalized time are restored; transition blending is approximate.");
+                    if (animation.Approximate && !string.IsNullOrWhiteSpace(pose.animationState)) archive.Warn("Recorded animation evidence could not be matched completely to the available model/controller hierarchy; affected animation is approximate.");
+                }
             }
             foreach(var pair in population.visuals)if(pair.Value!=null && !population.active.Contains(pair.Key))pair.Value.SetActive(false);
         }
         if(scrubSlider!=null && Duration>0)scrubSlider.SetValueWithoutNotify((float)(replayTime/Duration));
         UpdateAnimalPreview();
+        environmentLoader?.ApplyAnimationClock(replayTime);
+        UpdateFollowCamera();
         RefreshReplayAnnotations();
         mediaPanel?.Tick(replayTime,isPlaying && !timelineMouseCaptured && environmentLoader?.Loading!=true,playbackSpeed);
         if(mediaPanel!=null)
@@ -509,19 +561,20 @@ public partial class ReplayController : MonoBehaviour
     private void UpdateAnimalPreview()
     {
         if(mediaPanel==null)return;
-        if(selectedView>=0 || !mediaPanel.Expanded || OperatorOverlayVisibility.Hidden)
+        bool mainPixelView = selectedView >= 0 && pixelScaleAnimalView;
+        if((selectedView>=0 && !mainPixelView) || (!mainPixelView && !mediaPanel.Expanded) || OperatorOverlayVisibility.Hidden)
         {
             if(previewCamera!=null){previewCamera.targetTexture=null;if(selectedView<0)previewCamera.enabled=false;previewCamera=null;}
             mediaPanel.SetAnimalPreview(null,null);return;
         }
-        string id=mediaPanel.PreviewRig;
+        string id=mainPixelView?rigOrder[selectedView]:mediaPanel.PreviewRig;
         if(id==null || !camerasByRig.TryGetValue(id,out var camera))return;
         if(previewCamera!=null && previewCamera!=camera){previewCamera.targetTexture=null;previewCamera.enabled=false;}
         var saved=(archive?.SystemConfiguration?["configs"] as JArray)?.OfType<JObject>().FirstOrDefault(config=>(string)config["vrId"]==id);
         bool desktop=(bool?)saved?["desktopPreview"]==true;
-        int width=desktop?512:Mathf.Clamp((int?)saved?["ledPanelWidth"]??128,1,1024);
+        int width=desktop?(mainPixelView?Mathf.Clamp(Screen.width,128,4096):512):Mathf.Clamp((int?)saved?["ledPanelWidth"]??128,1,4096);
         int height=desktop?Mathf.Max(1,Mathf.RoundToInt(width/Mathf.Max(.01f,camera.aspect))):Mathf.Clamp((int?)saved?["ledPanelHeight"]??128,1,1024);
-        height=Mathf.Clamp(height,1,1024);
+        height=Mathf.Clamp(height,1,4096);
         if(animalPreviewTexture==null || animalPreviewTexture.width!=width || animalPreviewTexture.height!=height)
         {
             if(previewCamera!=null)previewCamera.targetTexture=null;
@@ -529,7 +582,7 @@ public partial class ReplayController : MonoBehaviour
             animalPreviewTexture=new RenderTexture(width,height,24){name="Replay front panel preview",filterMode=desktop?FilterMode.Bilinear:FilterMode.Point};animalPreviewTexture.Create();
         }
         previewCamera=camera;camera.targetTexture=animalPreviewTexture;camera.rect=new Rect(0,0,1,1);camera.enabled=environmentLoader?.Loading!=true;
-        mediaPanel.SetAnimalPreview(animalPreviewTexture,"Animal "+id+" · front"+(environmentLoader?.Loading==true?" · restoring scene":""));
+        mediaPanel.SetAnimalPreview(mainPixelView?null:animalPreviewTexture,"Animal "+id+" · front"+(environmentLoader?.Loading==true?" · restoring scene":""));
     }
     public static int AtOrBefore(List<ReplaySessionArchive.Sample> samples,double time)
     {
@@ -583,6 +636,7 @@ public partial class ReplayController : MonoBehaviour
     {
         timelineMouseCaptured=timelineMouseUpSeen=false;
         overviewUserAdjusted=false;overviewDragButton=-1;
+        followedRig = null;
         mediaPanel?.Dispose();mediaPanel=null;recordedDashboard?.CloseSession();recordedDashboard=null;
         if(previewCamera!=null){previewCamera.targetTexture=null;previewCamera=null;}
         if(animalPreviewTexture!=null){animalPreviewTexture.Release();Destroy(animalPreviewTexture);animalPreviewTexture=null;}

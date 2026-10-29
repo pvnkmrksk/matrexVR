@@ -89,7 +89,7 @@ public partial class ReplayController
             " keyboard="+GUIUtility.keyboardControl+" screenOrigin="+GUIUtility.GUIToScreenPoint(Vector2.zero)+" clicked="+clicked);
     }
 
-    private bool showRunPicker,showReplayHelp;
+    private bool showRunPicker,showReplayHelp,showReplayTrails;
     private GUIStyle replayEyebrow,replayContext,replaySession,replayClock;
     private static Rect ReplayHeaderRect(float width,float height,float scale)
         => new Rect(12*scale,12*scale,Mathf.Min(660*scale,Mathf.Max(280*scale,width-420*scale)),78*scale);
@@ -105,14 +105,14 @@ public partial class ReplayController
         var p=ReplayMousePosition(bottomLeft,Screen.height);
         if(ReplayToolbarRect(Screen.width,Screen.height,scale).Contains(p)||ReplayHeaderRect(Screen.width,Screen.height,scale).Contains(p)||mediaPanel?.ContainsPointer(bottomLeft)==true)return true;
         if((showRunPicker||archive==null)&&ReplayRunPickerRect(scale).Contains(p))return true;
-        return (showDetails||showReplayHelp)&&ReplayInfoRect(scale).Contains(p);
+        return (showDetails||showReplayHelp||showReplayTrails)&&ReplayInfoRect(scale).Contains(p);
     }
     private Rect ReplayRunPickerRect(float scale)
     {var h=ReplayHeaderRect(Screen.width,Screen.height,scale);return new Rect(h.x,h.yMax+8*scale,h.width,132*scale);}
     private Rect ReplayInfoRect(float scale)
     {
         var h=ReplayHeaderRect(Screen.width,Screen.height,scale);var toolbar=ReplayToolbarRect(Screen.width,Screen.height,scale);
-        return new Rect(h.x,h.yMax+8*scale,Mathf.Min(620*scale,Screen.width-24*scale),Mathf.Max(80*scale,Mathf.Min((showReplayHelp?350:Mathf.Min(420,100+(archive?.Warnings.Count??0)*56))*scale,toolbar.y-h.yMax-24*scale)));
+        return new Rect(h.x,h.yMax+8*scale,Mathf.Min(620*scale,Screen.width-24*scale),Mathf.Max(80*scale,Mathf.Min((showReplayTrails?190:showReplayHelp?380:Mathf.Min(420,100+(archive?.Warnings.Count??0)*56))*scale,toolbar.y-h.yMax-24*scale)));
     }
     private void EnsureReplayStyles(float scale)
     {
@@ -132,7 +132,7 @@ public partial class ReplayController
         replaySkin.horizontalSlider.fixedHeight=22*scale;replaySkin.horizontalSliderThumb.fixedWidth=12*scale;replaySkin.horizontalSliderThumb.fixedHeight=22*scale;
         titleStyle.font=replaySkin.font;titleStyle.fontSize=P(18);titleStyle.fontStyle=FontStyle.Normal;
         smallStyle.font=replaySkin.font;smallStyle.fontSize=P(12);
-        replayEyebrow=new GUIStyle(smallStyle){fontSize=P(10),fontStyle=FontStyle.Bold,wordWrap=false};replayEyebrow.normal.textColor=new Color(.12f,.43f,.39f);
+        replayEyebrow=new GUIStyle(smallStyle){fontSize=P(10),fontStyle=FontStyle.Bold,wordWrap=false};replayEyebrow.normal.textColor=new Color(.35f,.83f,.74f);
         replaySession=new GUIStyle(titleStyle){fontSize=P(16),fontStyle=FontStyle.Bold,clipping=TextClipping.Clip,wordWrap=false};
         replayContext=new GUIStyle(smallStyle){fontSize=P(12),wordWrap=false,clipping=TextClipping.Clip};
         replayClock=new GUIStyle(replaySkin.label){fontSize=P(14),alignment=TextAnchor.MiddleCenter};
@@ -154,12 +154,14 @@ public partial class ReplayController
         // Native root coordinates retain the same hit targets on Retina and Full HD.
         Matrix4x4 previousMatrix=GUI.matrix;GUI.matrix=Matrix4x4.identity;
         NormalizeReplayPointer(Event.current,UnityEngine.InputSystem.Mouse.current,Screen.height);
+        DrawPixelAnimalView();
         DrawReplayAgentLabels(scale);
         DrawReplayHeader(scale,previousSkin,previousMatrix);
         DrawReplayTransport(scale);
         if(showRunPicker || archive==null)DrawReplayRunPicker(scale);
         if(showDetails && archive!=null)DrawReplayFidelity(scale);
         if(showReplayHelp)DrawReplayHelp(scale);
+        if(showReplayTrails)DrawReplayTrails(scale);
 #if UNITY_EDITOR
         Event evt=Event.current;
         if(evt.type==EventType.DragUpdated || evt.type==EventType.DragPerform)
@@ -183,11 +185,12 @@ public partial class ReplayController
         Rect area=ReplayHeaderRect(Screen.width,Screen.height,scale);GUI.Box(area,GUIContent.none);
         float x=area.x+14*scale,y=area.y+10*scale;
         GUI.Label(new Rect(x,y,area.width-246*scale,16*scale),loading?"LOADING RECORDING":isPlaying&&archive!=null?"REPLAY · PLAYING":"REPLAY · PAUSED",replayEyebrow);
-        string name=archive!=null?Path.GetFileName(archive.DirectoryPath):"Open a saved experiment";
+        string savedTitle = (string)archive?.Sequence?["title"];
+        string name=archive!=null?(!string.IsNullOrWhiteSpace(savedTitle)?savedTitle:Path.GetFileName(archive.DirectoryPath)):"Open a saved experiment";
         GUI.Label(new Rect(x,y+17*scale,area.width-246*scale,24*scale),new GUIContent(name,archive?.DirectoryPath??"Choose a recorded run folder."),replaySession);
         GUI.Label(new Rect(x,y+42*scale,area.width-28*scale,17*scale),archive!=null?rigOrder.Count+" animal"+(rigOrder.Count==1?"":"s")+" · "+stepChanges.Count+" recorded conditions · "+Clock(Duration):"Synchronized animal poses, scene context and tracker video",replayContext);
         GUI.enabled=folderPicker==null && mediaPanel?.HasModal!=true;
-        if(ReplayButton(new Rect(area.xMax-230*scale,y+14*scale,92*scale,32*scale),"Open run…")){showRunPicker=!showRunPicker;if(showRunPicker)isPlaying=false;showDetails=showReplayHelp=false;}
+        if(ReplayButton(new Rect(area.xMax-230*scale,y+14*scale,92*scale,32*scale),"Open run…")){showRunPicker=!showRunPicker;if(showRunPicker)isPlaying=false;showDetails=showReplayHelp=showReplayTrails=false;}
         if(GUI.Button(new Rect(area.xMax-130*scale,y+14*scale,116*scale,32*scale),new GUIContent("Back to setup","Return to experiment setup. Shortcut: Esc.")))
         {
             GUI.matrix=previousMatrix;GUI.skin=previousSkin;
@@ -218,6 +221,7 @@ public partial class ReplayController
         float fitWidth=44*scale,viewWidth=140*scale,projectionWidth=selectedView<0?112*scale:0;
         if(ReplayButton(new Rect(right-fitWidth,top,fitWidth,row),"Fit")){ShowOverview();FitOverview();}right-=fitWidth+6*scale;
         if(selectedView<0){if(ReplayButton(new Rect(right-projectionWidth,top,projectionWidth,row),overviewPerspective?"Top-down":"Perspective"))ToggleOverviewProjection();right-=projectionWidth+6*scale;}
+        else { if(ReplayButton(new Rect(right-112*scale,top,112*scale,row),pixelScaleAnimalView?"Panel pixels":"Original view")){pixelScaleAnimalView=!pixelScaleAnimalView;ApplyView();}right-=118*scale; }
         if(ReplayButton(new Rect(right-viewWidth,top,viewWidth,row),selectedView<0?"God’s-eye view":"Animal "+rigOrder[selectedView]))CycleView();right-=viewWidth+18*scale;
         GUI.Label(new Rect(right-42*scale,top,42*scale,row),playbackSpeed.ToString("0.0")+"×",replayClock);right-=48*scale;
         playbackSpeed=ReplaySlider(new Rect(right-94*scale,top+5*scale,94*scale,22*scale),playbackSpeed,.1f,4);right-=102*scale;
@@ -229,15 +233,17 @@ public partial class ReplayController
         foreach(var step in stepChanges)if(Duration>0)GUI.DrawTexture(new Rect(timeline.x+(float)(step.time/Duration)*timeline.width,timeline.y+3*scale,Mathf.Max(1,scale),7*scale),Texture2D.whiteTexture);
         GUI.color=oldColor;if(!timelineMouseCaptured && Mathf.Abs(changed-normalized)>.000001f)SetScrubNormalized(changed);
         top+=timeline.height+8*scale;
-        string context=referenceSample==null?"No animal sample at this time":string.Join("   ·   ",new[]{referenceSample.scene,"Trial "+(referenceSample.trial+1),"Step "+(referenceSample.sequenceStep+1),referenceSample.stepName,referenceSample.phase}.Where(value=>!string.IsNullOrWhiteSpace(value)));
-        GUI.Label(new Rect(left,top,width-336*scale,23*scale),new GUIContent(context,context),replayContext);
+        var rowConfig = (archive.Sequence?["sequences"] as Newtonsoft.Json.Linq.JArray)?.ElementAtOrDefault(referenceSample?.sequenceStep ?? -1);
+        string context=referenceSample==null?"No animal sample at this time":string.Join("   ·   ",new[]{(string)rowConfig?["title"],environmentLoader?.ExperimentTitle,referenceSample.scene,"Trial "+(referenceSample.trial+1),referenceSample.stepName,referenceSample.phase}.Where(value=>!string.IsNullOrWhiteSpace(value)));
+        GUI.Label(new Rect(left,top,width-418*scale,23*scale),new GUIContent(context,context+"\n"+referenceSample?.configFile),replayContext);
         float toolsX=area.xMax-16*scale;
-        if(ReplayButton(new Rect(toolsX-82*scale,top,82*scale,28*scale),"Controls")){showReplayHelp=!showReplayHelp;showDetails=showRunPicker=false;}toolsX-=88*scale;
-        if(ReplayButton(new Rect(toolsX-100*scale,top,100*scale,28*scale),"Fidelity · "+archive.Warnings.Count)){showDetails=!showDetails;showReplayHelp=showRunPicker=false;}toolsX-=106*scale;
+        if(ReplayButton(new Rect(toolsX-82*scale,top,82*scale,28*scale),"Controls")){showReplayHelp=!showReplayHelp;showDetails=showRunPicker=showReplayTrails=false;}toolsX-=88*scale;
+        if(ReplayButton(new Rect(toolsX-74*scale,top,74*scale,28*scale),"Trails")){showReplayTrails=!showReplayTrails;showDetails=showRunPicker=showReplayHelp=false;}toolsX-=80*scale;
+        if(ReplayButton(new Rect(toolsX-100*scale,top,100*scale,28*scale),"Fidelity · "+archive.Warnings.Count)){showDetails=!showDetails;showReplayHelp=showRunPicker=showReplayTrails=false;}toolsX-=106*scale;
         if(ReplayButton(new Rect(toolsX-115*scale,top,115*scale,28*scale),"Trajectory plots"))recordedDashboard=RecordedDashboardLink.Open(archive.DirectoryPath,archive.OriginTicks);
         if(!string.IsNullOrEmpty(LoadError))GUI.Label(new Rect(left,area.yMax-24*scale,width-336*scale,20*scale),LoadError,smallStyle);
         else if(recordedDashboard!=null)GUI.Label(new Rect(left,area.yMax-24*scale,width-336*scale,20*scale),recordedDashboard.Error??recordedDashboard.Status,smallStyle);
-        else GUI.Label(new Rect(left,area.yMax-24*scale,width-336*scale,20*scale),"Space to play/pause   ·   Drag timeline to seek   ·   N / M to change condition",smallStyle);
+        else GUI.Label(new Rect(left,area.yMax-24*scale,width-336*scale,20*scale),followedRig!=null?"Following "+followedRig+" · click empty space to release": "Space to play/pause · Drag timeline to seek · Click an animal to follow",smallStyle);
         GUI.enabled=true;
     }
     private void DrawReplayRunPicker(float scale)
@@ -269,7 +275,7 @@ public partial class ReplayController
     {
         var area=ReplayInfoRect(scale);GUI.Box(area,GUIContent.none);float x=area.x+14*scale,y=area.y+10*scale,w=area.width-28*scale;
         GUI.Label(new Rect(x,y,w,26*scale),"Replay controls",replaySession);y+=34*scale;
-        GUI.Label(new Rect(x,y,w,340*scale),@"PLAYBACK
+        GUI.Label(new Rect(x,y,w,370*scale),@"PLAYBACK
 Space   Play / pause
 ← / →   Seek (Shift uses a larger step)
 N / M   Previous / next recorded condition
@@ -281,11 +287,24 @@ Mouse wheel   Zoom
 W A S D / Q E   Translate
 I J K L   Look around
 Fit   Return to all tracks
+Click animal / blank space   Follow / release
 
 TRACKS
-Bright tail   Last five seconds
+Trails   Adjust tail duration and prominence
 Wire cone   Front-camera field of view
-Faint line   Recorded path in this condition",smallStyle);
+Faint line   Recorded path in this condition
+Panel pixels   Original panel resolution, scaled crisply",smallStyle);
+    }
+    private void DrawReplayTrails(float scale)
+    {
+        var area=ReplayInfoRect(scale);GUI.Box(area,GUIContent.none);
+        float x=area.x+14*scale,y=area.y+10*scale,w=area.width-28*scale;
+        GUI.Label(new Rect(x,y,w,26*scale),"Trajectory trails",replaySession);y+=36*scale;
+        GUI.Label(new Rect(x,y,145*scale,28*scale),"Duration · "+trailSeconds.ToString("0.0")+" s",smallStyle);
+        trailSeconds=ReplaySlider(new Rect(x+155*scale,y+3*scale,w-155*scale,22*scale),trailSeconds,.25f,120);y+=42*scale;
+        GUI.Label(new Rect(x,y,145*scale,28*scale),"Prominence · "+trailProminence.ToString("0.0")+"×",smallStyle);
+        trailProminence=ReplaySlider(new Rect(x+155*scale,y+3*scale,w-155*scale,22*scale),trailProminence,0,3);y+=38*scale;
+        GUI.Label(new Rect(x,y,w,40*scale),"Duration keeps more or less recent history. Prominence changes trail thickness and visibility; zero hides trails.",smallStyle);
     }
     private static string Clock(double seconds)=>TimeSpan.FromSeconds(Math.Max(0,seconds)).ToString(seconds>=3600?@"hh\:mm\:ss\.f":@"mm\:ss\.f");
 }

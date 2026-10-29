@@ -1,0 +1,60 @@
+{
+  "objects": [],
+  "closedLoopPosition": true,
+  "closedLoopOrientation": true,
+  "initialPosition": {
+    "x": -25,
+    "y": 2.729565,
+    "z": -60
+  },
+  "initialRotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "resetPositionOnStart": true,
+  "resetRotationOnStart": true,
+  "randomInitialRotation": false,
+  "autopilotEnabled": false,
+  "autopilotSpeed": 1,
+  "skyboxPath": "",
+  "nightSky": {
+    "enabled": false
+  },
+  "uniformSkyColor": null,
+  "sun": {
+    "enabled": true,
+    "intensity": 1,
+    "color": {
+      "r": 1,
+      "g": 1,
+      "b": 1,
+      "a": 1
+    },
+    "rotation": {
+      "x": 50,
+      "y": 330,
+      "z": 0
+    }
+  },
+  "title": "Forest floor · rugged ground",
+  "comments": "Close-range rugged-ground example using the original packaged Rugosity_RS mesh. The same RS surface drives appearance, collision and ground-following pose. This reuses the existing forest-floor/rugosity cue asset; it does not claim a newly measured habitat. Units are centimetres; clearance is 1 cm. Add small objects through the objects list. Autopilot is off.",
+  "rugosity": {
+    "enabled": true,
+    "visualSurface": "RS",
+    "collisionSurface": "RS",
+    "heightSurface": "",
+    "normalSurface": "",
+    "heightMode": "AboveGround",
+    "orientationMode": "SurfaceNormal",
+    "centimetersPerUnit": 1,
+    "clearanceCm": 1,
+    "textureScale": 1,
+    "absoluteHeight": 1,
+    "normalRadiusCm": 0,
+    "normalSamples": 5,
+    "tiltResponse": 0
+  },
+  "windSpeed": 0,
+  "windDirection": 0
+}

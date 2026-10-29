@@ -135,6 +135,12 @@ namespace ConfigurationUI
             overview.Add(ApparatusInteger("VR count","apparatus-vr-count",DesktopApparatusProfile.Rigs(system).Count(),value=>{
                 StudioEdit(Workspace.System,r=>DesktopApparatusProfile.ResizeRigs((JObject)r,value,ApparatusDisplayFallback));
             },"Number of real animals/VR rigs. Adding a rig assigns a unique tracker port and a separate LED strip; existing calibration files are retained. Removing rigs is undoable.",1,DesktopApparatusProfile.MaximumRigCount));
+            var counts=Row("apparatus-count-presets");scroll.Add(counts);counts.Add(SessionLabel("Quick VR count","apparatus-copy"));
+            foreach(int count in new[]{1,2,4,8,16})
+            {
+                int chosen=count;var button=StudioButton(count.ToString(),null,()=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.ResizeRigs((JObject)r,chosen,ApparatusDisplayFallback)),"quiet");
+                button.name="apparatus-count-"+count;button.tooltip="Configure "+count+" VRs. Existing rigs retain their settings; new rigs get distinct tracker ports. Undo restores the previous count.";counts.Add(button);
+            }
             overview.Add(ApparatusInteger("Display count","apparatus-monitor-count",DesktopApparatusProfile.MonitorCount(system,ApparatusDisplayFallback),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.Marker((JObject)r)["monitorCount"]=value),"Displays used by the apparatus, including any operator display. Rig output display numbers below are 1-based here and zero-based in JSON. Unattached outputs can be planned before connecting hardware.",1,32));
             string output=DesktopApparatusProfile.Presentation(system);
             var presentation=new DropdownField("Output",new List<string>{"LED panels","Desktop preview"},output=="led"?0:1){name="apparatus-presentation"};
@@ -187,7 +193,7 @@ namespace ConfigurationUI
             var fold=new Foldout {name="apparatus-rig-"+id,text=id+" · "+RigMode(rig)+" · "+DesktopApparatusProfile.Order(rig).Length+" faces · "+rig["zmqAddress"]+":"+rig["zmqPort"],value=index==0};fold.AddToClassList("apparatus-rig");parent.Add(fold);
             var identity=Row("apparatus-grid");fold.Add(identity);
             identity.Add(ApparatusText("VR ID","apparatus-id-"+id,id,value=>{
-                if(!System.Text.RegularExpressions.Regex.IsMatch(value??"",@"^VR[1-9][0-9]*$")||DesktopApparatusProfile.Rigs(Workspace.System.Root).Where((r,n)=>n!=index).Any(r=>(string)r["vrId"]==value))throw new ArgumentException("Use a unique VR ID, such as VR1 or VR2.");
+                if(!System.Text.RegularExpressions.Regex.IsMatch(value??"",@"^VR([1-9]|1[0-6])$")||DesktopApparatusProfile.Rigs(Workspace.System.Root).Where((r,n)=>n!=index).Any(r=>(string)r["vrId"]==value))throw new ArgumentException("Use a unique VR ID from VR1 through VR16.");
                 set("vrId",value,true);
             },"Hardware routing identity. Animal IDs are entered separately with the experiment recording details."));
             int mode=Array.FindIndex(InputValues,m=>string.Equals(m,rig["closedLoopMode"]?.ToString(),StringComparison.OrdinalIgnoreCase));

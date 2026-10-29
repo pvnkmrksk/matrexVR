@@ -288,6 +288,7 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
 [System.Serializable]
 public class OptomotorConfig
 {
+    public SceneObject[] objects;
     public bool resetPositionOnStart = true;
     public bool resetRotationOnStart = true;
     public Vector3Config initialPosition;

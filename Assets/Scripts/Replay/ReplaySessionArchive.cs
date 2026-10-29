@@ -138,11 +138,13 @@ public sealed class ReplaySessionArchive
         string path = Resolve(reference);
         if (path == null) { Warn("Saved configuration missing: " + reference); return null; }
         JObject config = JObject.Parse(File.ReadAllText(path));
+        string title = (string)config["title"];
         if (config["preStimulus"] != null || config["stimulus"] != null || config["postStimulus"] != null)
         {
             string phase = string.IsNullOrWhiteSpace(sample.phase) || sample.phase == "assessment" ? "preStimulus" : sample.phase;
             if (!(config[phase] is JObject payload)) { Warn("Saved phase missing: " + phase + " in " + reference); return null; }
             config = (JObject)payload.DeepClone();
+            if (config["title"] == null && !string.IsNullOrWhiteSpace(title)) config["title"] = title;
         }
         // Choice applies the sequence's rugosity patch after extracting a phase.
         // Reusing one base terrain config must preserve its recorded per-row treatment.
@@ -151,7 +153,7 @@ public sealed class ReplaySessionArchive
             string saved=(string)row?["parameters"]?["configFile"]??(string)row?["parameters"]?["design"];
             string scene=(string)row?["sceneName"];
             return string.Equals(saved?.Replace('\\','/'),reference?.Replace('\\','/'),StringComparison.Ordinal) &&
-                (string.IsNullOrEmpty(scene)||string.Equals(scene,sample.scene,StringComparison.Ordinal));
+                (string.IsNullOrEmpty(scene)||string.Equals(scene == "Swarm" ? "Kannadi" : scene,sample.scene == "Swarm" ? "Kannadi" : sample.scene,StringComparison.Ordinal));
         }
         JObject terrainPatch=null;
         if(Sequence?.Value<bool?>("randomise")==true)
@@ -171,6 +173,18 @@ public sealed class ReplaySessionArchive
             var rugosity=config["rugosity"] as JObject??new JObject();
             rugosity.Merge(terrainPatch,new JsonMergeSettings{MergeNullValueHandling=MergeNullValueHandling.Ignore});
             config["rugosity"]=rugosity;
+        }
+        // New players execute legacy Swarm rows in Kannadi. The archived source
+        // filename still identifies the historical population and unit defaults.
+        var matchingRows = (rows ?? new JArray()).OfType<JObject>().Where(SameReference).ToArray();
+        foreach (string key in new[] { "populationMode", "worldUnitsPerMetre", "kannadiModelPath" })
+        {
+            JToken Effective(JObject row) => row["parameters"]?[key] ?? (key == "populationMode" && (string)row["sceneName"] == "Swarm" ? new JValue("Swarm") :
+                key == "worldUnitsPerMetre" && (string)row["sceneName"] == "Swarm" ? new JValue(100) : config[key]);
+            var values = matchingRows.Select(Effective).ToArray();
+            if (values.Length > 0 && values.All(value => JToken.DeepEquals(value, values[0])))
+            { if (values[0] != null) config[key] = values[0].DeepClone(); }
+            else if (values.Length > 1) Warn("Saved randomized population setting is ambiguous for " + reference + ": " + key);
         }
         return config;
     }

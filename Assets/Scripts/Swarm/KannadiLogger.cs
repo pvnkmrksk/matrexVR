@@ -18,6 +18,8 @@ public class KannadiLogger : MonoBehaviour
     private bool closedForArchive;
     private Kannadi kannadi;
     private int vrIndex = 0; // Will be extracted from GameObject name (VR1, VR2, etc.)
+    private GameObject[] capturedClones;
+    private RecordedAnimationCapture[] animationCaptures;
 
     void Start()
     {
@@ -64,7 +66,7 @@ public class KannadiLogger : MonoBehaviour
 
         // Write header
         logFile.WriteLine(
-            "Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius,skyboxId,skyboxSampleUtc,experimentPhase"
+            "Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius,skyboxId,skyboxSampleUtc,experimentPhase,AnimationState"
         );
     }
 
@@ -76,6 +78,11 @@ public class KannadiLogger : MonoBehaviour
         GameObject[] clones = kannadi.Clones;
         if (clones == null)
             return;
+        if (!ReferenceEquals(capturedClones, clones))
+        {
+            capturedClones = clones; animationCaptures = new RecordedAnimationCapture[clones.Length];
+            for (int i = 0; i < clones.Length; i++) if (clones[i] != null) animationCaptures[i] = new RecordedAnimationCapture(clones[i]);
+        }
 
         string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
 
@@ -88,7 +95,8 @@ public class KannadiLogger : MonoBehaviour
 
                 string data = FormattableString.Invariant($"{timestamp},{vrIndex},{i},{clones[i].name},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z},{kannadi.numberOfRings},{kannadi.hexRadius},{NightSkyController.CurrentId},{NightSkyController.CurrentSampleUtc},{MainController.RecordedExperimentPhase}");
 
-                logFile.WriteLine(data);
+                string animation = animationCaptures[i]?.Capture() ?? "";
+                logFile.WriteLine(data + ",\"" + animation.Replace("\"", "\"\"") + "\"");
             }
         }
     }

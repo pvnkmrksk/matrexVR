@@ -30,6 +30,12 @@ MATREX VR is a Unity application for flight, walking and collective-behaviour ex
 
 The next development pass is tracked in the [experiment and replay overhaul plan](docs/overhaul-0.5-plan.md), including prioritized requirements, parallel ownership, compatibility decisions and deferred validation. It is a work plan, not a list of released features.
 
+Development branch: [custom GLB models, Kannadi populations and 1–16 rigs](docs/custom-models-and-rigs.md). External models use self-contained GLB exports; vendor Unity packages need export/conversion first.
+
+[Five world starters](Assets/StreamingAssets/Examples/Worlds/README.md) and the [optional local MCP control interface](docs/ai-control.md) are available in the development branch.
+
+[Overhaul validation and remaining work](docs/overhaul-validation-20261029.md) records the actual Unity, standalone Mac and regression checks.
+
 | | Research workflow |
 | :--- | :--- |
 | **◎ Closed-loop stimuli** | Flight and walking input contracts, independent rig routing and configurable display geometry. |

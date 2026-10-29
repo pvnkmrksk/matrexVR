@@ -17,6 +17,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     public string FidelityStatus { get; private set; } = "No session loaded";
     public bool Loading { get; private set; }
     public int ContextVersion { get; private set; }
+    public string ExperimentTitle => (string)currentConfig?["title"];
     public IReadOnlyDictionary<string,Transform> RecordedRigs => importedRigs;
 
     [Serializable]
@@ -38,10 +39,12 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private readonly Dictionary<string,string> asynchronousKeys = new Dictionary<string,string>();
     private readonly Dictionary<string,ReplaySessionArchive.Sample> latestAsynchronousSamples = new Dictionary<string,ReplaySessionArchive.Sample>();
     private readonly Dictionary<string,Transform> asynchronousRoots = new Dictionary<string,Transform>();
+    private readonly Dictionary<string,string> archivedModelKeys = new Dictionary<string,string>();
+    private readonly Dictionary<ReplayAnimationDriver,double> objectAnimations = new Dictionary<ReplayAnimationDriver,double>();
     private ReplaySessionArchive archive;
     private ReplaySessionArchive.Sample requested;
     private Scene importedScene;
-    private string importedName, appliedKey;
+    private string importedName, loadedSceneName, appliedKey;
     private JObject currentConfig;
     private Material skyMaterial, previousSky;
     private Texture2D skyTexture;
@@ -68,7 +71,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     public void BeginSession(ReplaySessionArchive session,IEnumerable<string> ids)
     {
         archive=session;SetRigIds(ids);requested=null;appliedKey=null;currentConfig=null;importedName=null;cameraStateKeys.Clear();latestAsynchronousSamples.Clear();
-        ClearEnvironment();ReleaseSky();
+        ClearEnvironment();ReleaseSky();archivedModelKeys.Clear();
         FidelityStatus="Saved configurations loaded; waiting for recorded scene";
     }
     public void SetRigIds(IEnumerable<string> ids){rigIds.Clear();if(ids!=null)rigIds.AddRange(ids);}
@@ -95,20 +98,39 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                 ClearEnvironment();importedRigs.Clear();importedFrontCameras.Clear();cameraStateKeys.Clear();
                 if(importedScene.IsValid() && importedScene.isLoaded)yield return SceneManager.UnloadSceneAsync(importedScene);
                 importedScene=default;importedName=target.scene;
+                loadedSceneName = Application.CanStreamedLevelBeLoaded(target.scene) ? target.scene : SceneCompatibility.Resolve(target.scene);
                 foreach(string key in prefabDict.Where(p=>p.Value==null).Select(p=>p.Key).ToArray())prefabDict.Remove(key);
                 foreach(string key in materialDict.Where(p=>p.Value==null).Select(p=>p.Key).ToArray())materialDict.Remove(key);
-                if(!string.IsNullOrEmpty(target.scene) && target.scene!="ReplayScene" && target.scene!="ControlScene" && Application.CanStreamedLevelBeLoaded(target.scene))
+                if(!string.IsNullOrEmpty(loadedSceneName) && loadedSceneName!="ReplayScene" && loadedSceneName!="ControlScene" && Application.CanStreamedLevelBeLoaded(loadedSceneName))
                 {
                     SceneManager.sceneLoaded+=FreezeLoadedScene;
                     AsyncOperation load=null;
-                    try {load=SceneManager.LoadSceneAsync(target.scene,LoadSceneMode.Additive);}
+                    try {load=SceneManager.LoadSceneAsync(loadedSceneName,LoadSceneMode.Additive);}
                     catch(Exception error){Warn("Could not load recorded scene: "+error.Message);}
                     if(load!=null)yield return load;
                     SceneManager.sceneLoaded-=FreezeLoadedScene;
-                    importedScene=SceneManager.GetSceneByName(target.scene);
+                    importedScene=SceneManager.GetSceneByName(loadedSceneName);
                     if(importedScene.IsValid() && importedScene.isLoaded)FreezeLoadedScene(importedScene,LoadSceneMode.Additive);
+                    if (loadedSceneName != target.scene) Warn("Historical " + target.scene + " geometry is unavailable in this build; using the shared Kannadi world with recorded population poses.");
                 }
                 else if(target.scene!="ReplayScene")Warn("Recorded scene is not included in this build: "+target.scene+". Showing trajectories and available saved objects.");
+            }
+            if (appliedKey != target.ContextKey)
+            {
+                var savedConfig = archive?.ExperimentFor(target);
+                foreach (string reference in ExternalModelLibrary.CollectReferences(savedConfig).Distinct())
+                {
+                    archivedModelKeys.Remove(reference);
+                    string path = archive?.Resolve(reference);
+                    if (path == null) { Warn("Archived external model is unavailable: " + reference); continue; }
+                    System.Threading.Tasks.Task preload = null;
+                    try { preload = ExternalModelLibrary.PreloadAsync(path, File.ReadAllBytes(path)); }
+                    catch (Exception error) { Warn("Archived model: " + error.Message); }
+                    if (preload == null) continue;
+                    while (!preload.IsCompleted) yield return null;
+                    if (preload.IsFaulted) Warn("Archived model: " + preload.Exception.GetBaseException().Message);
+                    else archivedModelKeys[reference] = path;
+                }
             }
             try
             {
@@ -119,6 +141,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                     if(!(currentConfig?["steps"] is JArray))RestoreObjects(currentConfig,target);
                     else foreach(var sample in latestAsynchronousSamples.Values.Where(sample=>sample.scene==target.scene).ToArray())RestoreAsynchronousSample(sample);
                     RestoreRugosity(currentConfig);
+                    if (importedScene.IsValid() && importedScene.isLoaded) ExperimentSun.Apply(importedScene, currentConfig);
                     currentSky=null;
                     ContextVersion++;
                     appliedKey=target.ContextKey;
@@ -142,7 +165,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
 
     private void FreezeLoadedScene(Scene scene,LoadSceneMode mode)
     {
-        if(scene.name!=importedName || scene==gameObject.scene)return;
+        if(scene.name!=loadedSceneName || scene==gameObject.scene)return;
         var roots=scene.GetRootGameObjects().Where(root=>root!=null).ToArray();
         var active=roots.ToDictionary(root=>root,root=>root.activeSelf);
         // Missing scripts and optional archived metadata must never leave a later
@@ -206,10 +229,11 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     {
         if(root==null)return;
         foreach(var script in root.GetComponentsInChildren<MonoBehaviour>(true))
-            if(script!=null && (!visual || !(script is RuntimeMaterialOwner)))script.enabled=false;
+            if(script!=null && (!visual || !(script is RuntimeMaterialOwner || script is BogongMoth || script is BogongSwarmRenderer)))script.enabled=false;
         foreach(var camera in root.GetComponentsInChildren<Camera>(true))if(camera!=null)camera.enabled=false;
         foreach(var listener in root.GetComponentsInChildren<AudioListener>(true))if(listener!=null)listener.enabled=false;
         foreach(var animator in root.GetComponentsInChildren<Animator>(true))if(animator!=null)animator.enabled=false;
+        foreach(var animation in root.GetComponentsInChildren<Animation>(true))if(animation!=null)animation.enabled=false;
         foreach(var body in root.GetComponentsInChildren<Rigidbody>(true))if(body!=null)body.isKinematic=true;
         foreach(var collider in root.GetComponentsInChildren<Collider>(true))if(collider!=null)collider.enabled=false;
         if(visual)foreach(var renderer in root.GetComponentsInChildren<Renderer>(true))if(renderer!=null)renderer.enabled=true;
@@ -251,6 +275,20 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                 if(camera["bgColor"] is JArray color && color.Count>=3)target.backgroundColor=ColorValue(color);
             }
         if(skyTexture!=null)target.clearFlags=CameraClearFlags.Skybox;
+        target.cullingMask = RecordedAnimalCameraMask(id, ReplayController.AnimalCameraMask(id));
+    }
+
+    public int RecordedAnimalCameraMask(string id, int fallback)
+    {
+        bool mirror = string.Equals(importedName, "Kannadi", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals((string)currentConfig?["populationMode"], "Swarm", StringComparison.OrdinalIgnoreCase);
+        if (!mirror) return fallback;
+        int index = RuntimeRigRegistry.ParseIndex(CanonicalRig(id));
+        var own = (currentConfig?["vrConfigs"] as JArray)?.OfType<JObject>().FirstOrDefault(value => (int?)value["vrIndex"] == index);
+        int? watch = (int?)own?["watchIndex"];
+        int layer = watch.HasValue ? RuntimeRigRegistry.StimulusLayer(watch.Value) : -1;
+        int peers = watch.HasValue ? (layer >= 0 ? 1 << layer : 0) : RuntimeRigRegistry.PeerStimulusMask(index);
+        return (fallback & ~RuntimeRigRegistry.StimulusMask) | peers;
     }
 
     public void ApplyAsynchronousSample(ReplaySessionArchive.Sample sample)
@@ -313,15 +351,25 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         var rendered = new Dictionary<string,List<KeyValuePair<Renderer,JObject>>>();
         foreach(var spec in objects.OfType<JObject>())
         {
+            if ((bool?)spec["enabled"] == false) continue;
+            string modelPath = (string)spec["modelPath"];
             string prefabName=(string)spec["type"]??(string)spec["prefab"];
-            if(string.IsNullOrEmpty(prefabName))continue;
+            if(string.IsNullOrEmpty(prefabName) && string.IsNullOrEmpty(modelPath))continue;
+            GameObject prefab = null;
+            if (!string.IsNullOrEmpty(modelPath))
+            {
+                if (!archivedModelKeys.TryGetValue(modelPath, out string key)) { Warn("Archived model unavailable: " + modelPath); continue; }
+                prefab = ExternalModelLibrary.GetPrefab(key); prefabName = Path.GetFileNameWithoutExtension(modelPath);
+            }
             if(prefabName.IndexOf("band",StringComparison.OrdinalIgnoreCase)>=0)
             {Warn("Band populations use their recorded agent tracks; live random band spawning is disabled.");continue;}
-            if(!prefabDict.TryGetValue(prefabName,out var prefab) || prefab==null)
+            if(prefab==null && (!prefabDict.TryGetValue(prefabName,out prefab) || prefab==null))
             {Warn("Replay prefab not present in built scene catalog: "+prefabName);continue;}
             foreach(string rig in config["steps"] is JArray?new List<string>{sample.rig}:rigIds.Count>0?rigIds:new List<string>{"VR1"})
             {
-                var go=Instantiate(prefab,destination??environmentRoot);go.name="Replay "+prefabName+" "+rig;
+                var go=ExternalModelLibrary.InstantiatePrefab(prefab,destination??environmentRoot);go.name="Replay "+prefabName+" "+rig;
+                if (!string.IsNullOrWhiteSpace(modelPath) || !string.IsNullOrWhiteSpace((string)spec["animationClip"]) || (float?)spec["animationSpeed"] is float animationSpeed && animationSpeed != 1)
+                    ExternalModelLibrary.ConfigureAnimation(go, (string)spec["animationClip"], (float?)spec["animationSpeed"] ?? 1);
                 FreezeVisual(go);
                 go.transform.position=ResolveRecordedPosition(spec);
                 if((bool?)spec["groundOnTerrain"]==true)go.transform.position=GroundRecordedPosition(go.transform.position);
@@ -331,18 +379,29 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                 if(spec["scale"] is JObject scale)go.transform.localScale=new Vector3((float?)scale["x"]??1,(float?)scale["y"]??1,(float?)scale["z"]??1);
                 if((bool?)spec["flip"]==true){var scaleValue=go.transform.localScale;scaleValue.x*=-1;go.transform.localScale=scaleValue;}
                 int layer=ObjectLayerForRig(rig);if(layer>=0)SetLayer(go,layer);
-                var renderer=go.GetComponent<Renderer>();
+                string materialName=(string)spec["material"]??(string)spec["mat"];
+                materialDict.TryGetValue(materialName??"",out var material);
+                foreach (var childRenderer in go.GetComponentsInChildren<Renderer>(true))
+                {
+                    if (material == null && !(spec["color"] is JArray)) continue;
+                    var owned=RuntimeMaterialOwner.Assign(childRenderer, material ?? childRenderer.sharedMaterial);
+                    if(owned!=null && spec["color"] is JArray color && color.Count>=3)owned.color=ColorValue(color);
+                }
+                var renderer=go.GetComponentInChildren<Renderer>(true);
                 if(renderer!=null)
                 {
-                    string materialName=(string)spec["material"]??(string)spec["mat"];
-                    materialDict.TryGetValue(materialName??"",out var material);
-                    var owned=RuntimeMaterialOwner.Assign(renderer,material);
-                    if(owned!=null && spec["color"] is JArray color && color.Count>=3)owned.color=ColorValue(color);
                     if(!rendered.TryGetValue(rig,out var ordered))rendered[rig]=ordered=new List<KeyValuePair<Renderer,JObject>>();
                     ordered.Add(new KeyValuePair<Renderer,JObject>(renderer,spec));
                 }
                 if((bool?)spec["randomInitialRotation"]==true || (bool?)spec["useHeadingReference"]==true)
                     Warn("Randomized/heading-relative object onsets are not fully specified by static JSON. Refer to recorded onset logs; object reconstruction is approximate.");
+                if (go.GetComponentInChildren<Animator>(true) != null || go.GetComponentInChildren<Animation>(true) != null || go.GetComponentInChildren<BogongSwarmRenderer>(true) != null)
+                {
+                    var animation = go.AddComponent<ReplayAnimationDriver>();
+                    double onset = archive.Rigs.Values.SelectMany(samples => samples).Where(row => row.ContextKey == sample.ContextKey).Select(row => row.time).DefaultIfEmpty(sample.time).Min();
+                    objectAnimations[animation] = onset;
+                    Warn("Configured object animations are sampled from the saved condition clock. Historical unrecorded controller transitions or random phases may differ.");
+                }
             }
         }
         if(sample.colorsSwapped)
@@ -422,18 +481,21 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             var renderHost=new GameObject("Recorded Bogong visual");renderHost.transform.SetParent(agent.transform,false);
             int agentLayer=RecordedLayer(layer);if(agentLayer>=0){agent.layer=agentLayer;renderHost.layer=agentLayer;}
             var visual=swarm["bogongVisual"]?.ToObject<BogongVisualConfig>()??new BogongVisualConfig();
-            // Original wing/flicker phases were not recorded. Freeze them rather than invent a new history.
-            visual.flapFrequencyHz=0;visual.flickerFrequencyHz=0;
             renderHost.AddComponent<BogongSwarmRenderer>().Configure(new[]{agent},visual,(float?)swarm["worldUnitsPerMetre"]??1);
-            Warn("Recorded Bogong bodies use saved physical dimensions; historical wing/flicker phase is unavailable and is frozen.");
+            agent.AddComponent<ReplayAnimationDriver>();
             return agent;
         }
         var catalog=Resources.Load<KannadiPrefabCatalog>("KannadiPrefabCatalog");
+        string externalPath = (string)currentConfig?["kannadiModelPath"];
+        if (string.IsNullOrWhiteSpace(externalPath)) externalPath = (string)swarm?["modelPath"];
         string selection=kind=="Kannadi"?(string)currentConfig?["kannadiTilePrefab"]:(string)swarm?["locustPrefab"];
         GameObject prefab=!string.IsNullOrEmpty(selection)?catalog?.Find(selection):catalog?.Find("SimulatedLocust");
-        GameObject go=prefab!=null?Instantiate(prefab,parent):GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        if (!string.IsNullOrEmpty(externalPath) && archivedModelKeys.TryGetValue(externalPath, out string externalKey)) prefab = ExternalModelLibrary.GetPrefab(externalKey);
+        GameObject go=prefab!=null?ExternalModelLibrary.InstantiatePrefab(prefab,parent):GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        if (!string.IsNullOrWhiteSpace(externalPath) && prefab != null) ExternalModelLibrary.ConfigureAnimation(go);
         if(prefab==null){go.transform.SetParent(parent,false);go.transform.localScale=Vector3.one*fallbackSize;Warn("An agent model was unavailable; pose markers are shown.");}
         go.name="Recorded agent "+name;FreezeVisual(go);
+        go.AddComponent<ReplayAnimationDriver>();
         int layerId=RecordedLayer(layer);if(layerId>=0)SetLayer(go,layerId);
         return go;
     }
@@ -442,6 +504,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         int layer=LayerMask.NameToLayer(label);
         if(layer>=0)return layer;
         if(label!=null && label.StartsWith("AgentsVR",StringComparison.Ordinal) && int.TryParse(label.Substring(8),out int index))return RuntimeRigRegistry.StimulusLayer(index);
+        if(label!=null && label.StartsWith("SimulatedLocustsVR",StringComparison.Ordinal) && int.TryParse(label.Substring(18),out int source))return RuntimeRigRegistry.StimulusLayer(source);
         return -1;
     }
     public static void FreezeVisual(GameObject visual) => FreezeHierarchy(visual,true);
@@ -452,8 +515,14 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private void Warn(string message){archive?.Warn(message);}
     private void ClearEnvironment()
     {
+        objectAnimations.Clear();
         if(environmentRoot!=null)foreach(Transform child in environmentRoot){child.gameObject.SetActive(false);Destroy(child.gameObject);}
         asynchronousKeys.Clear();asynchronousRoots.Clear();
+    }
+    public void ApplyAnimationClock(double seconds)
+    {
+        if (Loading) return;
+        foreach (var pair in objectAnimations) if (pair.Key != null) pair.Key.Sample(null, Math.Max(0, seconds - pair.Value));
     }
 
     // Retain inspector/event integrations for older scenes; session replay reads saved JSON above.

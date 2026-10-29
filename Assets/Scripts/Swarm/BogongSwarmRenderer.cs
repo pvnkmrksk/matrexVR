@@ -20,14 +20,32 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
     private Vector2[] phases;
     private BogongMothMesh.PoseVertex[] poses;
     private float[] agentPhases;
+    private System.Random phaseRandom;
     private int drawCount = -1;
     public int AgentCount => agents?.Count ?? 0;
     public int ActiveAgentCount { get; private set; }
     public int UploadedVertexCount { get; private set; }
+    private bool recordedAnimation;
+    private float recordedClock;
+    public float AnimationClock => recordedAnimation ? recordedClock : Time.time;
+    public float AnimationPhase(int index) => moth ? agentPhases[Mathf.Clamp(index, 0, agentPhases.Length - 1)] : phases[Mathf.Clamp(index, 0, phases.Length / stride - 1) * stride].x;
+
+    /// <summary>Replay supplies both original shader clock and original per-agent phase.</summary>
+    public void SetRecordedAnimation(float seconds, float phase)
+    {
+        recordedAnimation = true; recordedClock = seconds;
+        if (material == null) return;
+        material.SetFloat("_ManualAnimation", 1); material.SetFloat("_AnimationTime", seconds);
+        if (moth) { for (int i = 0; i < agentPhases.Length; i++) agentPhases[i] = phase; }
+        else { for (int i = 0; i < phases.Length; i++) phases[i].x = phase; }
+    }
 
     public void Configure(IReadOnlyList<GameObject> source, BogongVisualConfig config, float worldUnitsPerMetre = 100f)
     {
         config = config ?? new BogongVisualConfig();
+        if (phaseRandom == null)
+            phaseRandom = ExperimentRandom.Active && gameObject.scene.name != "ReplayScene" ? ExperimentRandom.ForComponent(this, "visual-phases") :
+                new System.Random(ExperimentRandom.Derive(ExperimentRandom.ResolvedSeed, ExperimentRandom.ComponentKey(this) + ":visual-phases"));
         config.Validate(); agents = source;
         moth = string.Equals(config.shape, "Moth", System.StringComparison.OrdinalIgnoreCase);
         Shader shader = Resources.Load<Shader>(moth ? "Bogong/BatchedMoth" : "Bogong/BatchedDot");
@@ -76,7 +94,7 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
         {
             poses = new BogongMothMesh.PoseVertex[centers.Length];
             float[] old = agentPhases; agentPhases = new float[count];
-            for(int i=0;i<count;i++) agentPhases[i] = old != null && i < old.Length ? old[i] : Random.value;
+            for(int i=0;i<count;i++) agentPhases[i] = old != null && i < old.Length ? old[i] : (float)phaseRandom.NextDouble();
             drawCount = -1;
         }
         var uv = new Vector2[count * 4];
@@ -86,7 +104,7 @@ public sealed class BogongSwarmRenderer : MonoBehaviour
             int v = i * 4, t = i * 6;
             uv[v] = new Vector2(0, 0); uv[v + 1] = new Vector2(1, 0);
             uv[v + 2] = new Vector2(1, 1); uv[v + 3] = new Vector2(0, 1);
-            float phase = previousPhases != null && i * stride < previousPhases.Length ? previousPhases[i * stride].x : Random.value;
+            float phase = previousPhases != null && i * stride < previousPhases.Length ? previousPhases[i * stride].x : (float)phaseRandom.NextDouble();
             for (int j = 0; j < stride; j++) phases[i * stride + j] = new Vector2(phase, 0);
             triangles[t] = v; triangles[t + 1] = v + 1; triangles[t + 2] = v + 2;
             triangles[t + 3] = v; triangles[t + 4] = v + 2; triangles[t + 5] = v + 3;

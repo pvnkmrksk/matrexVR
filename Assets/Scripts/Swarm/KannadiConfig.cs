@@ -13,6 +13,10 @@ public enum RandomInitialHeadingDistribution { Continuous, Cardinal }
 [Serializable]
 public class KannadiConfig : SwarmConfig
 {
+    public string populationMode = "Mirror";
+    public string kannadiModelPath;
+    public SceneObject[] objects = Array.Empty<SceneObject>();
+    public SunConfig sun;
     public HeadingReferenceConfig headingReference;
     public bool resetPositionOnStart = true;
     public bool resetRotationOnStart = true;
@@ -58,7 +62,11 @@ public class KannadiConfig : SwarmConfig
             inline.Remove("headingReference"); // Experiment-file only; never a sequence override.
             json.Merge(inline, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace });
         }
+        if (ExperimentPhases.IsPhase(parameters))
+            foreach (string key in new[] { "populationMode", "worldUnitsPerMetre" })
+                if (json[key] == null && parameters.TryGetValue(key, out object value)) json[key] = JToken.FromObject(value);
         bool swarmEnabled = true;
+        readNestedSwarm |= string.Equals((string)json["populationMode"], "Swarm", StringComparison.OrdinalIgnoreCase);
         if (readNestedSwarm && json.TryGetValue("swarm", out JToken nested))
         {
             swarmEnabled = nested.Type != JTokenType.Null;
@@ -82,6 +90,9 @@ public class KannadiConfig : SwarmConfig
 
     public void Validate()
     {
+        if (!string.Equals(populationMode, "Mirror", StringComparison.OrdinalIgnoreCase) && !string.Equals(populationMode, "Swarm", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("populationMode must be Mirror or Swarm.");
+        sun?.Validate();
         if (!Enum.IsDefined(typeof(RandomInitialHeadingDistribution), initialHeadingDistribution))
             throw new ArgumentException("initialHeadingDistribution must be Continuous or Cardinal.");
         headingReference?.Validate();
@@ -97,10 +108,10 @@ public class KannadiConfig : SwarmConfig
         if (vrConfigs == null) return;
         foreach (VRConfig vr in vrConfigs)
         {
-            if (vr == null || vr.vrIndex < 1 || !ids.Add(vr.vrIndex))
-                throw new ArgumentException("vrConfigs must contain unique positive vrIndex values.");
-            if (vr.watchIndex.HasValue && vr.watchIndex < 1)
-                throw new ArgumentException("watchIndex must be a positive configured rig index, or omitted to see the other animals.");
+            if (vr == null || vr.vrIndex < 1 || vr.vrIndex > RuntimeRigRegistry.MaximumRigCount || !ids.Add(vr.vrIndex))
+                throw new ArgumentException("vrConfigs must contain unique vrIndex values from 1 through 16.");
+            if (vr.watchIndex.HasValue && (vr.watchIndex < 1 || vr.watchIndex > RuntimeRigRegistry.MaximumRigCount))
+                throw new ArgumentException("watchIndex must be a configured rig index from 1 through 16, or omitted to see the other animals.");
             ValidateGain(vr.closedLoopPosition); ValidateGain(vr.closedLoopOrientation);
         }
     }
@@ -199,6 +210,7 @@ public class LocustGainConverter : JsonConverter
 [Serializable]
 public class SwarmConfig
 {
+    public string modelPath; // Optional embedded GLB visual for generated or recorded agents.
     public string trajectoryFile = ""; // Blank retains the generated swarm.
     public SwarmPlaybackConfig playback = new SwarmPlaybackConfig();
     public float? worldUnitsPerMetre; // Omitted: scenes with active Terrain=1; legacy walking scenes=100.

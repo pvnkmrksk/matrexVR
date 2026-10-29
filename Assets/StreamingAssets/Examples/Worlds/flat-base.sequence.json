@@ -1,0 +1,23 @@
+{
+  "title": "World example · Flat world · open base",
+  "comments": "Reusable packaged-world starter. Your current apparatus is retained when loading this sequence. Inspect and edit its experiment before starting. It runs once and returns to setup.",
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "randomSeedMode": "Fixed",
+  "randomSeed": 1,
+  "sequences": [
+    {
+      "title": "Flat world · open base",
+      "comments": "World inspection block; change its duration and experiment settings as needed.",
+      "sceneName": "Choice",
+      "duration": 120,
+      "reloadScene": false,
+      "gain": 1,
+      "autoTrim": false,
+      "parameters": {
+        "configFile": "Examples/Worlds/flat-base.experiment.json"
+      }
+    }
+  ]
+}

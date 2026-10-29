@@ -22,6 +22,7 @@ public class ColorDrift : MonoBehaviour
     private bool useMeanA = true;
     private List<string> dataBuffer;  // To batch up data before writing
     private Material runtimeMaterial;
+    private System.Random random;
     
     // -- Add public read-only properties so external scripts can read them:
     public float CurrentBlue
@@ -36,6 +37,7 @@ public class ColorDrift : MonoBehaviour
 
     void Start()
     {
+        random = ExperimentRandom.ForComponent(this, "color-drift");
         var renderer = GetComponent<Renderer>();
         if (renderer != null)
             runtimeMaterial = renderer.GetComponent<RuntimeMaterialOwner>() != null
@@ -110,8 +112,9 @@ public class ColorDrift : MonoBehaviour
     // Simple normal random generator using Box-Muller transform
     private float RandomNormal()
     {
-        float u1 = 1.0f - Random.value; // uniform(0,1] 
-        float u2 = 1.0f - Random.value;
+        if (random == null) random = ExperimentRandom.ForComponent(this, "color-drift");
+        float u1 = (float)(1.0 - random.NextDouble()); // uniform(0,1]
+        float u2 = (float)(1.0 - random.NextDouble());
         return Mathf.Sqrt(-2.0f * Mathf.Log(u1)) * Mathf.Sin(2.0f * Mathf.PI * u2);
     }
 

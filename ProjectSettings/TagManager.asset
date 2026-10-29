@@ -31,18 +31,18 @@ TagManager:
   - ChoiceVR2
   - ChoiceVR3
   - ChoiceVR4
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - SimulatedLocustsVR5
+  - SimulatedLocustsVR6
+  - SimulatedLocustsVR7
+  - SimulatedLocustsVR8
+  - SimulatedLocustsVR9
+  - SimulatedLocustsVR10
+  - SimulatedLocustsVR11
+  - SimulatedLocustsVR12
+  - SimulatedLocustsVR13
+  - SimulatedLocustsVR14
+  - SimulatedLocustsVR15
+  - SimulatedLocustsVR16
   - 
   m_SortingLayers:
   - name: Default

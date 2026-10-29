@@ -11,7 +11,7 @@ public sealed class ReplayAgentStream : IDisposable
     {
         public int id;
         public bool visible;
-        public string name, layer;
+        public string name, layer, animationState;
         public Vector3 position, rotation;
     }
     private struct Frame { public double time; public long offset; public int count; }
@@ -26,6 +26,8 @@ public sealed class ReplayAgentStream : IDisposable
     public bool HasRotations { get; }
     public string Kind { get; }
     public bool HasVisibility { get; }
+    public bool HasAnimationState { get; }
+    public bool UsesMemoryCache { get; }
     public long RowCount { get; private set; }
     public int FrameCount => frames.Count;
     public bool HasDuplicateNames { get; private set; }
@@ -38,6 +40,7 @@ public sealed class ReplayAgentStream : IDisposable
         // Older VisibilityPhase used global Unity time, while actual rendering used
         // a per-agent local timer. It cannot establish historical visibility exactly.
         HasVisibility=header.Contains("Visible");
+        HasAnimationState=header.Contains("AnimationState");
         Directory.CreateDirectory(cacheDirectory);
         cachePath = Path.Combine(cacheDirectory,Guid.NewGuid().ToString("N")+".frames");
         try
@@ -86,12 +89,17 @@ public sealed class ReplayAgentStream : IDisposable
                         else throw new InvalidDataException("Malformed recorded visibility in "+Path.GetFileName(source));
                     }
                     output.Write(visible);
+                    if (HasAnimationState) output.Write(Cell("AnimationState") ?? "");
                     frame.count++;RowCount++;
                 }
                 if(frame.count>0)frames.Add(frame);
             }
             frames.Sort((a,b)=>a.time.CompareTo(b.time));
-            reader=new BinaryReader(new FileStream(cachePath,FileMode.Open,FileAccess.Read,FileShare.Read,65536));
+            // Small processed runs are cheap to retain in RAM. Large recordings
+            // keep the indexed binary stream; source CSVs are always read-only.
+            UsesMemoryCache = new FileInfo(cachePath).Length <= 64L * 1024 * 1024;
+            reader = UsesMemoryCache ? new BinaryReader(new MemoryStream(File.ReadAllBytes(cachePath), false)) :
+                new BinaryReader(new FileStream(cachePath,FileMode.Open,FileAccess.Read,FileShare.Read,65536));
         }
         catch {if(File.Exists(cachePath))File.Delete(cachePath);throw;}
     }
@@ -126,6 +134,7 @@ public sealed class ReplayAgentStream : IDisposable
             var pose=new Pose {id=id,name=identity.name,layer=identity.layer,position=new Vector3(reader.ReadSingle(),reader.ReadSingle(),reader.ReadSingle())};
             if(HasRotations)pose.rotation=new Vector3(reader.ReadSingle(),reader.ReadSingle(),reader.ReadSingle());
             pose.visible=reader.ReadBoolean();current.Add(pose);
+            if (HasAnimationState) { pose.animationState=reader.ReadString(); current[current.Count-1]=pose; }
         }
         return current;
     }

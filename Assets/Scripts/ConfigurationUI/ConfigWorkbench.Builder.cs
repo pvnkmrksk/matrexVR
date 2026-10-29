@@ -53,7 +53,7 @@ namespace ConfigurationUI
             var linked=new HashSet<string>(BuilderSteps.OfType<JObject>().Select(BlockReference).Where(r=>!string.IsNullOrEmpty(r)).Select(r=>Path.GetFullPath(ExperimentConfigFiles.Resolve(r))));
             foreach(var doc in Workspace.Documents.Where(d=>d.SchemaId!="sequence"&&d.SchemaId!="system"&&linked.Contains(d.Path)))
             {
-                var button=StudioButton(ExperimentBlocks.Title(doc.Path)+(doc.Dirty?" •":""),doc.SchemaId=="swarm"?"swarm":"file",()=>Select(doc),!homeMode&&!experimentIndexMode&&selected==doc?"file-active":null);
+                var button=StudioButton(ExperimentBlocks.Title(doc.Root as JObject,doc.Path)+(doc.Dirty?" •":""),doc.SchemaId=="swarm"?"swarm":"file",()=>Select(doc),!homeMode&&!experimentIndexMode&&selected==doc?"file-active":null);
                 button.AddToClassList("nav-file");button.tooltip="Edit "+doc.Path;files.Add(button);
             }
             var library=new Foldout {name="navigation-library",text="Files & library",value=false};library.AddToClassList("nav-foldout");side.Add(library);
@@ -70,13 +70,24 @@ namespace ConfigurationUI
             body.AddToClassList("studio-body"); inspector.AddToClassList("studio-inspector");
             var top=Row("studio-title-row"); body.Add(top);
             var titles=new VisualElement(); titles.style.flexGrow=1; top.Add(titles);
-            var title=new Label(selected==Workspace.Sequence?"Your experiment sequence":selected==Workspace.System?"Configure apparatus":ExperimentBlocks.Title(selected.Path)); title.AddToClassList("title"); titles.Add(title);
-            var subtitle=new Label(selected==Workspace.Sequence?"Combine reusable configs. Drag to reorder. Open a block to edit its stimulus.":Path.GetRelativePath(RuntimePaths.ConfigRoot,selected.Path).Replace('\\','/')); subtitle.AddToClassList("studio-subtitle"); titles.Add(subtitle);
+            var title=new Label(selected==Workspace.System?"Configure apparatus":ExperimentBlocks.Title(selected.Root as JObject,selected.Path)); title.AddToClassList("title"); titles.Add(title);
+            var subtitle=new Label(Path.GetRelativePath(RuntimePaths.ConfigRoot,selected.Path).Replace('\\','/')); subtitle.AddToClassList("studio-subtitle"); titles.Add(subtitle);
             top.Add(StudioButton("More","settings",ShowEditorTools,"quiet"));
+            if(selected!=Workspace.System)BuildConfigIdentity(body);
             if(selected==Workspace.Sequence) BuildSequenceBuilder();
             else if(selected==Workspace.System) BuildSystemEditor();
             else BuildExperimentEditor();
             BuildStudioOverview(); UpdateStatus();
+        }
+        private void BuildConfigIdentity(VisualElement parent)
+        {
+            var identity=Row("config-identity");parent.Add(identity);
+            var field=new TextField(selected==Workspace.Sequence?"Paradigm title":"Experiment title") {name="config-title",value=selected.Root["title"]?.Type==JTokenType.String?selected.Root["title"].ToString():"",isDelayed=true};
+            field.tooltip="Human-readable name stored in this JSON and the recording. Leave blank to use the file name.";field.textEdition.placeholder="Optional human-readable title";identity.Add(field);
+            field.RegisterValueChangedCallback(e=>StudioEdit(selected,r=>r["title"]=e.newValue));
+            var notes=new Foldout {name="config-comments-foldout",text="Comments",value=false};parent.Add(notes);
+            var comments=new TextField {name="config-comments",value=selected.Root["comments"]?.Type==JTokenType.String?selected.Root["comments"].ToString():"",multiline=true,isDelayed=true};comments.tooltip="Optional notes saved with this configuration and its run snapshot.";notes.Add(comments);
+            comments.RegisterValueChangedCallback(e=>StudioEdit(selected,r=>r["comments"]=e.newValue,false));
         }
         private JArray BuilderSteps => Workspace.Sequence.Root["sequences"] as JArray??new JArray();
         private JObject Block(int index) => index>=0 && index<BuilderSteps.Count?BuilderSteps[index] as JObject:null;
@@ -277,7 +288,7 @@ namespace ConfigurationUI
                 var dropdown=new DropdownField("Environment",sceneChoices,Math.Max(0,sceneChoices.IndexOf(scene))) { tooltip="Unity scene used for this block. Its experiment file controls the stimulus and movement settings." }; dropdown.formatSelectedValueCallback=SceneOptionCaption;dropdown.formatListItemCallback=SceneCaption;inspector.Add(dropdown);
                 dropdown.RegisterValueChangedCallback(e=>StudioEdit(Workspace.Sequence,r=>r["sequences"][activeBlock]["sceneName"]=e.newValue));
                 var schema=(JObject)Workspace.Schemas.Get("sequence")["properties"]["sequences"]["items"];
-                foreach(string key in new[]{"duration","gain","autoTrim","reloadScene"})
+                foreach(string key in new[]{"title","comments","group","duration","gain","autoTrim","reloadScene"})
                 {
                     var control=Setting(Workspace.Sequence,new[]{"sequences",activeBlock.ToString(),key},ConfigSchema.Child(schema,key),step,schema);
                     if(key=="duration" && ExperimentBlocks.Phased(config)) control.SetEnabled(false);
@@ -321,8 +332,9 @@ namespace ConfigurationUI
         }
         private List<string> ScenesFor(string schema)
         {
-            var list=new List<string>(); for(int i=0;i<SceneManager.sceneCountInBuildSettings;i++) { string name=Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i)); if(name!="ControlScene" && name!="ReplayScene" && ConfigSchema.ForScene(name)==schema) list.Add(name); }
-            if(list.Count==0) list.Add(schema=="swarm"?"Swarm":schema=="kannadi"?"Kannadi":schema=="optomotor"?"Optomotor":schema=="dynamic-choice"?"Choice_desync":"Choice"); return list;
+            if(schema=="swarm")schema="kannadi";
+            var list=new List<string>(); for(int i=0;i<SceneManager.sceneCountInBuildSettings;i++) { string name=Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i)); if(name!="ControlScene" && name!="ReplayScene" && name!="Swarm" && ConfigSchema.ForScene(name)==schema) list.Add(name); }
+            if(list.Count==0) list.Add(schema=="swarm"?"Kannadi":schema=="kannadi"?"Kannadi":schema=="optomotor"?"Optomotor":schema=="dynamic-choice"?"Choice_desync":"Choice"); return list;
         }
         private VisualElement OpenModal(string title,string subtitle)
         {

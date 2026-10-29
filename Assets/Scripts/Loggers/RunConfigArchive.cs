@@ -191,7 +191,8 @@ public sealed class RunConfigArchive
             foreach(var property in obj.Properties())
             {
                 string role=property.Name=="configFile"?"experiment":property.Name=="design"?"design":
-                    property.Name=="trajectoryFile"?"trajectory":property.Name=="skyboxPath"?"skybox":null;
+                    property.Name=="trajectoryFile"?"trajectory":property.Name=="skyboxPath"?"skybox":
+                    property.Name=="modelPath" || property.Name=="kannadiModelPath"?"model":null;
                 if(role!=null && property.Value.Type==JTokenType.String && !string.IsNullOrWhiteSpace((string)property.Value))
                 {
                     bool needed=required && !(role=="skybox" && obj["uniformSkyColor"]!=null && obj["uniformSkyColor"].Type!=JTokenType.Null);

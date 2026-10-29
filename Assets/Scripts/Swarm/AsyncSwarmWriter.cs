@@ -9,7 +9,7 @@ using System.Threading;
 /// <summary>Bounded, pooled snapshots. Formatting, gzip and file I/O run on one worker.</summary>
 public sealed class AsyncSwarmWriter
 {
-    public struct Agent { public string name, layer; public float x, y, z, rx, ry, rz; }
+    public struct Agent { public string name, layer, animationState; public float x, y, z, rx, ry, rz; }
     public sealed class Frame
     {
         public Agent[] agents;
@@ -114,7 +114,9 @@ public sealed class AsyncSwarmWriter
                         for (int i = 0; i < frame.count; i++)
                         {
                             Agent a = frame.agents[i];
-                            output.WriteLine(FormattableString.Invariant($"{timestamp},{Csv(a.name)},{Csv(a.layer)},{a.x},{a.y},{a.z},{Csv(frame.skyboxId)},{Csv(frame.skyboxSampleUtc)},{Csv(frame.phase)},{a.rx},{a.ry},{a.rz}"));
+                            output.Write(FormattableString.Invariant($"{timestamp},{Csv(a.name)},{Csv(a.layer)},{a.x},{a.y},{a.z},{Csv(frame.skyboxId)},{Csv(frame.skyboxSampleUtc)},{Csv(frame.phase)},{a.rx},{a.ry},{a.rz}"));
+                            if (header.IndexOf(",AnimationState", StringComparison.Ordinal) >= 0) { output.Write(','); output.Write(Csv(a.animationState)); }
+                            output.WriteLine();
                         }
                         Interlocked.Add(ref writtenRows, frame.count);
                         Interlocked.Decrement(ref pendingCount);

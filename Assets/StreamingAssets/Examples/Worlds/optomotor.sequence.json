@@ -1,0 +1,23 @@
+{
+  "title": "World example · Optomotor · yaw drum",
+  "comments": "Reusable packaged-world starter. Your current apparatus is retained when loading this sequence. Inspect and edit its experiment before starting. It runs once and returns to setup.",
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "randomSeedMode": "Fixed",
+  "randomSeed": 1,
+  "sequences": [
+    {
+      "title": "Optomotor · yaw drum",
+      "comments": "World inspection block; change its duration and experiment settings as needed.",
+      "sceneName": "Optomotor",
+      "duration": 30,
+      "reloadScene": false,
+      "gain": 1,
+      "autoTrim": false,
+      "parameters": {
+        "configFile": "Examples/Worlds/optomotor.experiment.json"
+      }
+    }
+  ]
+}

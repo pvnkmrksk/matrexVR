@@ -21,6 +21,7 @@ Shader "Bogong/BatchedDot"
             #include "UnityCG.cginc"
             float4 _Color;
             float _Radius, _Angular, _TangentHalfAngle, _FlickerFrequency, _FlickerDuty;
+            float _ManualAnimation, _AnimationTime;
             struct appdata { float4 vertex : POSITION; float2 uv : TEXCOORD0; float2 phase : TEXCOORD1; };
             struct v2f { float4 position : SV_POSITION; float2 circle : TEXCOORD0; float visible : TEXCOORD1; };
             v2f vert(appdata v)
@@ -37,7 +38,8 @@ Shader "Bogong/BatchedDot"
                 o.circle = (v.uv - .5) * 3;
                 float3 view = center + radius * (right * o.circle.x + up * o.circle.y);
                 o.position = mul(UNITY_MATRIX_P, float4(view,1));
-                o.visible = _FlickerFrequency <= 0 || frac((_Time.y + v.phase.x) * _FlickerFrequency) < _FlickerDuty ? 1 : -1;
+                float clock = _ManualAnimation > .5 ? _AnimationTime : _Time.y;
+                o.visible = _FlickerFrequency <= 0 || frac((clock + v.phase.x) * _FlickerFrequency) < _FlickerDuty ? 1 : -1;
                 if (v.phase.y < .5) o.visible = -1;
                 return o;
             }

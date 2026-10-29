@@ -189,7 +189,7 @@ namespace ConfigurationUI
             body.EnableInClassList("session-body",homeMode || experimentIndexMode || replayLibraryMode);
             side.style.display=DisplayStyle.Flex;
             inspector.style.display=homeMode || experimentIndexMode || replayLibraryMode || root.resolvedStyle.width<1220?DisplayStyle.None:DisplayStyle.Flex;
-            pageLocation.text=replayLibraryMode?"Recording library":homeMode?"Start":experimentIndexMode?"Experiment settings":selected==Workspace.System?"Apparatus setup":selected==Workspace.Sequence?"Experiment sequence":ExperimentBlocks.Title(selected.Path);
+            pageLocation.text=replayLibraryMode?"Recording library":homeMode?"Start":experimentIndexMode?"Experiment settings":selected==Workspace.System?"Apparatus setup":selected==Workspace.Sequence?"Experiment sequence":ExperimentBlocks.Title(selected.Root as JObject,selected.Path);
             save.style.display=replayLibraryMode?DisplayStyle.None:DisplayStyle.Flex;
             undo.style.display=redo.style.display=homeMode||replayLibraryMode?DisplayStyle.None:DisplayStyle.Flex;
             RefreshStartCaption();
@@ -630,12 +630,29 @@ namespace ConfigurationUI
             File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"FlyMetaData.json"),metadataJson);
             Document.enabled=false;root.Clear();enabled=false;
             main.StartSequence();
+            if(main.SequencePreparing)
+            {
+                RestoreSetupAfterStart();preparing=true;preparationStatus="Loading models… Escape cancels preparation.";
+                body.SetEnabled(false);side.SetEnabled(false);UpdateStatus();
+                StartCoroutine(WaitForSequencePreparation(main));return;
+            }
             if(!main.SequenceRunning)
             {
-                preparing=false;enabled=true;Document.enabled=true;root=Document.rootVisualElement;root.AddToClassList("workbench");
-                WorkbenchTypography.Apply(root);root.styleSheets.Add(Resources.Load<StyleSheet>("ConfigurationUI/workbench"));BuildShell();BuildNavigation();BuildContent();return;
+                RestoreSetupAfterStart();return;
             }
             Destroy(gameObject);
+        }
+        private void RestoreSetupAfterStart()
+        {
+            preparing=false;enabled=true;Document.enabled=true;root=Document.rootVisualElement;root.AddToClassList("workbench");
+            WorkbenchTypography.Apply(root);root.styleSheets.Add(Resources.Load<StyleSheet>("ConfigurationUI/workbench"));BuildShell();BuildNavigation();BuildContent();
+        }
+        private IEnumerator WaitForSequencePreparation(MainController main)
+        {
+            while(main!=null&&main.SequencePreparing)yield return null;
+            if(main!=null&&main.SequenceRunning){Destroy(gameObject);yield break;}
+            preparing=false;body.SetEnabled(true);side.SetEnabled(true);RefreshStartCaption();
+            UpdateStatus(main?.SequenceError??"Experiment preparation cancelled.");
         }
         private void OnDisable()
         {if(preparing){preparing=false;preparationVersion++;}}

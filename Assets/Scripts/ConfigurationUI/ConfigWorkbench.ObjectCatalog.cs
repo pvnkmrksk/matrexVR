@@ -20,7 +20,26 @@ namespace ConfigurationUI
         }
         private bool TryChoiceCatalogControl(string[] parts,JToken value,Action<JToken> assign,out VisualElement control)
         {
-            control=null;if(!ChoiceAssetCatalog.IsObjectField(parts))return false;
+            control=null;
+            if(parts.Last()=="modelPath"||parts.Last()=="kannadiModelPath")
+            {
+                string modelCurrent=value?.Type==JTokenType.String?value.ToString():"";
+                var modelPaths=new System.Collections.Generic.List<string>{""};
+                try
+                {
+                    if(Directory.Exists(RuntimePaths.ConfigRoot))modelPaths.AddRange(Directory.EnumerateFiles(RuntimePaths.ConfigRoot,"*.glb",SearchOption.AllDirectories)
+                        .Take(4096).Select(path=>Path.GetRelativePath(RuntimePaths.ConfigRoot,path).Replace('\\','/')).OrderBy(path=>path,StringComparer.OrdinalIgnoreCase));
+                }
+                catch(IOException){}catch(UnauthorizedAccessException){}
+                if(!modelPaths.Contains(modelCurrent))modelPaths.Add(modelCurrent);
+                var modelLabels=modelPaths.Select(path=>string.IsNullOrEmpty(path)?"Built-in model":path).ToList();
+                var modelPicker=new DropdownField(modelLabels,modelPaths.IndexOf(modelCurrent)){name="external-model-"+string.Join("-",parts),tooltip="Choose an embedded GLB file under StreamingAssets. Drop new .glb files there and reopen this editor to refresh the list."};
+                var modelRow=new VisualElement();modelRow.Add(modelPicker);
+                modelPicker.RegisterValueChangedCallback(e=>Guard(()=>assign(new JValue(modelPaths[modelLabels.IndexOf(e.newValue)]))));
+                var modelInput=new TextField {value=modelCurrent,isDelayed=true,name="external-model-path-"+string.Join("-",parts),tooltip="Model path relative to StreamingAssets, or an existing absolute GLB path. The original model is archived with the run."};modelRow.Add(modelInput);
+                modelInput.RegisterValueChangedCallback(e=>Guard(()=>assign(new JValue(e.newValue))));control=modelRow;return true;
+            }
+            if(!ChoiceAssetCatalog.IsObjectField(parts))return false;
             var entries=ChoiceAssetCatalog.Load().Entries(ChoiceCatalogScene(),parts.Last());if(entries.Count==0)return false;
             string current=value?.Type==JTokenType.String?value.ToString():"";
             var labels=entries.Select(entry=>entry.Label).ToList();labels.Insert(0,"Select from available assets…");

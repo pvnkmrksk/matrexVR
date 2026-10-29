@@ -43,6 +43,15 @@ namespace ConfigurationUI
                 loopStart.RegisterValueChangedCallback(evt=>StudioEdit(Workspace.Sequence,r=>r["loopStartIndex"]=Math.Max(0,evt.newValue-1)));
                 flags.Add(loopStart);
             }
+            var reproducibility=Row("sequence-seed");flags.Add(reproducibility);
+            string selectedMode=(string)Workspace.Sequence.Root["randomSeedMode"]??"Fixed";
+            bool randomMode=string.Equals(selectedMode,"Random",StringComparison.OrdinalIgnoreCase);
+            var mode=new DropdownField("Random seed",new List<string>{"Fixed","Random"},randomMode?1:0){name="sequence-seed-mode"};
+            mode.tooltip="Fixed repeats the configured seed. Random creates a new seed for each run and records the actual seed so replay can reconstruct it.";
+            mode.RegisterValueChangedCallback(e=>StudioEdit(Workspace.Sequence,r=>r["randomSeedMode"]=e.newValue));reproducibility.Add(mode);
+            var seed=new IntegerField("Seed") {name="sequence-random-seed",value=(int?)Workspace.Sequence.Root["randomSeed"]??1,isDelayed=true};
+            seed.tooltip="Explicit seed for experiment random choices, including shuffled block order. The effective seed is saved with the run.";seed.SetEnabled(!randomMode);
+            seed.RegisterValueChangedCallback(e=>StudioEdit(Workspace.Sequence,r=>r["randomSeed"]=e.newValue,false));reproducibility.Add(seed);
             return flags;
         }
         private TextField SessionField(VisualElement parent,string label,string name,string value,Action<string> change,string placeholder,bool multiline=false)
@@ -96,9 +105,10 @@ namespace ConfigurationUI
             }
             string order=(ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])?"Random order":"Listed order")+
                 " · "+(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass");
-            var planHeading=SessionHeading("Experiment sequence","sequence",BuilderSteps.Count+(BuilderSteps.Count==1?" block · ":" blocks · ")+SequenceDuration()+" · "+order);
+            var planHeading=SessionHeading(ExperimentBlocks.Title(Workspace.Sequence.Root as JObject,Workspace.Sequence.Path),"sequence",BuilderSteps.Count+(BuilderSteps.Count==1?" block · ":" blocks · ")+SequenceDuration()+" · "+order);
             var load=StudioButton("Load sequence","file",ShowSequenceLibrary,"quiet");load.name="session-load-sequence";load.tooltip="Choose a prepared terrain treatment or swarm/social sequence. The current apparatus and other drafts are retained.";planHeading.Add(load);
             var edit=StudioButton("Edit sequence","settings",()=>Select(Workspace.Sequence),"quiet");edit.name="session-edit-sequence";planHeading.Add(edit);sequenceParent.Add(planHeading);
+            var sequencePath=SessionLabel(System.IO.Path.GetRelativePath(RuntimePaths.ConfigRoot,Workspace.Sequence.Path).Replace('\\','/'),"config-reference");sequencePath.name="session-sequence-reference";sequenceParent.Add(sequencePath);
             var summaryIndices=Enumerable.Range(0,BuilderSteps.Count).ToList();
             var plan=new ListView(summaryIndices,64,()=>new VisualElement(),BindSessionBlock)
             {name="session-plan",selectionType=SelectionType.None,virtualizationMethod=CollectionVirtualizationMethod.FixedHeight};
@@ -221,7 +231,19 @@ namespace ConfigurationUI
             SessionField(details,"Experimenter","session-experimenter",metadata.ExperimenterName,v=>metadata.ExperimenterName=v,"Your name");
             SessionField(details,"Overall comments","session-comments",metadata.Comments,v=>metadata.Comments=v,"Notes for this session",true);
 
-            parent.Add(SessionHeading("Animals","person","Names and IDs can be any text. Empty age means unspecified."));
+            var animalHeading=SessionHeading("Animals","person","Names and IDs can be any text. Empty age means unspecified.");parent.Add(animalHeading);
+            var increment=StudioButton("Next animal IDs","next",()=>{
+                var active=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().Select(r=>(string)r["vrId"]).ToList();
+                previousAnimalIds=metadata.Animals.Where(a=>active.Contains(a.VR)).ToDictionary(a=>a.VR,a=>a.AnimalID);
+                for(int index=0;index<active.Count;index++)
+                {var animal=metadata.Animals.First(a=>a.VR==active[index]);animal.AnimalID=ExperimentBlocks.NextAnimalId(animal.AnimalID,active.Count,index+1);}
+                BuildContent();UpdateStatus("Animal IDs advanced by "+active.Count+". Labels without a trailing number are retained.");
+            },"quiet");increment.name="increment-animal-ids";increment.tooltip="Advance every numeric or numbered animal ID by the current VR count: 1–16 becomes 17–32 with 16 VRs. Empty IDs start at 1; text labels keep their prefix.";animalHeading.Add(increment);
+            if(previousAnimalIds!=null)
+                animalHeading.Add(StudioButton("Undo ID increment","back",()=>{
+                    foreach(var animal in metadata.Animals)if(previousAnimalIds.TryGetValue(animal.VR,out string id))animal.AnimalID=id;
+                    previousAnimalIds=null;BuildContent();
+                },"quiet"));
             var rigs=Row("subject-grid"); parent.Add(rigs);
             foreach(var rig in (Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>())
             {
@@ -258,6 +280,7 @@ namespace ConfigurationUI
             }
 
         }
+        private Dictionary<string,string> previousAnimalIds;
         private void ShowSubjectDetails(AnimalMetadata fly)
         {
             var details=OpenModal(fly.VR+" · subject details","Additional metadata for this subject.");
@@ -326,7 +349,7 @@ namespace ConfigurationUI
             {
                 var doc=group.First().doc; var card=StudioButton("","file",()=>Select(doc),"experiment-link"); scroll.Add(card);
                 var text=new VisualElement(); text.style.flexGrow=1; card.Add(text);
-                text.Add(SessionLabel(ExperimentBlocks.Title(doc.Path),"session-plan-title"));
+                text.Add(SessionLabel(ExperimentBlocks.Title(doc.Root as JObject,doc.Path),"session-plan-title"));
                 text.Add(SessionLabel(ExperimentBlocks.Describe(doc.Root as JObject),"session-plan-description"));
                 card.Add(Pill(group.Count()+" block"+(group.Count()==1?"":"s"))); card.Add(new Label("Configure  ›")); card.tooltip=doc.Path;
             }

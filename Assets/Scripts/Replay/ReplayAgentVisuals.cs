@@ -9,6 +9,9 @@ public sealed class ReplayAgentVisuals : MonoBehaviour
     public const double RecentHistorySeconds = 5;
     private LineRenderer recent, heading, frustum, halo;
     private Renderer body;
+    private Transform bodyGeometry;
+    private Vector3 bodyBaseScale;
+    private float bodyBaseSize = 1;
     private Color tint;
     private readonly Vector3[] corners = new Vector3[4], conePoints = new Vector3[11], arrowPoints = new Vector3[5], ringPoints = new Vector3[33];
     private readonly List<Vector3> history = new List<Vector3>(258);
@@ -16,6 +19,7 @@ public sealed class ReplayAgentVisuals : MonoBehaviour
     private double previousTime = double.NaN;
     private int previousStart = -1, previousCursor = -1;
     private Vector3 previousPosition;
+    private double historySeconds = RecentHistorySeconds, previousHistorySeconds = double.NaN;
     public int HistoryPointCount => recent != null ? recent.positionCount : 0;
     public int HistoryStartIndex { get; private set; } = -1;
     public int HistoryEndIndex { get; private set; } = -1;
@@ -37,9 +41,12 @@ public sealed class ReplayAgentVisuals : MonoBehaviour
         }
     }
 
-    public void Initialize(int number, Renderer markerBody)
+    public void Initialize(int number, Renderer markerBody, Transform geometry = null)
     {
         tint = RigColor(number); body = markerBody;
+        bodyGeometry = geometry != null ? geometry : markerBody != null ? markerBody.transform : null;
+        if (bodyGeometry != null) bodyBaseScale = bodyGeometry.localScale;
+        if (body != null) bodyBaseSize = Mathf.Max(.00001f, body.bounds.size.magnitude);
         recent = MakeLine("Last five seconds — recorded positions", .9f);
         heading = MakeLine("Current recorded heading — not a prediction", .95f);
         frustum = MakeLine("Front camera frustum — recorded projection", .5f);
@@ -85,22 +92,23 @@ public sealed class ReplayAgentVisuals : MonoBehaviour
     }
 
     public void Refresh(Camera overview, Camera front, List<ReplaySessionArchive.Sample> samples, int cursor, int continuousStart,
-        double seconds, Vector3 position, Quaternion rotation, bool show, bool resizePrimitive)
+        double seconds, Vector3 position, Quaternion rotation, bool show, bool resizePrimitive, double trailSeconds = RecentHistorySeconds, float prominence = 1)
     {
         AnnotationVisible = show;
-        if (recent != null) recent.enabled = show;
+        if (recent != null) recent.enabled = show && prominence > 0;
         if (heading != null) heading.enabled = show;
         if (frustum != null) frustum.enabled = show;
         if (halo != null) halo.enabled = show;
         if (body != null) body.enabled = show;
         if (!show || overview == null) return;
         float unit = UnitsPerPixel(overview, position);
-        if (resizePrimitive && body != null) body.transform.localScale = Vector3.one * unit * 15;
+        if (resizePrimitive && bodyGeometry != null) bodyGeometry.localScale = bodyBaseScale * (unit * 20 / bodyBaseSize);
         float pulse = .5f + .5f * Mathf.Sin(Time.unscaledTime * 3.4f);
         if (body != null && body.sharedMaterial != null) body.sharedMaterial.color = Color.Lerp(tint, Color.white, .12f + .16f * pulse);
-        recent.widthMultiplier = unit * 3;
-        recent.startColor = new Color(tint.r, tint.g, tint.b, .12f);
-        recent.endColor = new Color(tint.r, tint.g, tint.b, .8f + pulse * .2f);
+        historySeconds = System.Math.Max(.05, trailSeconds);
+        recent.widthMultiplier = unit * 3 * Mathf.Max(.1f, prominence);
+        recent.startColor = new Color(tint.r, tint.g, tint.b, Mathf.Clamp01(.12f * prominence));
+        recent.endColor = new Color(tint.r, tint.g, tint.b, Mathf.Clamp01((.8f + pulse * .2f) * prominence));
         UpdateHistory(samples, cursor, continuousStart, seconds, position);
 
         Vector3 forward = rotation * Vector3.forward, right = rotation * Vector3.right;
@@ -135,9 +143,10 @@ public sealed class ReplayAgentVisuals : MonoBehaviour
         cursor = Mathf.Clamp(cursor, 0, samples.Count - 1);
         int start = Mathf.Clamp(continuousStart, 0, cursor);
         int low = start, high = cursor;
-        while (low < high) { int mid = (low + high) / 2; if (samples[mid].time < seconds - RecentHistorySeconds) low = mid + 1; else high = mid; }
+        while (low < high) { int mid = (low + high) / 2; if (samples[mid].time < seconds - historySeconds) low = mid + 1; else high = mid; }
         start = low;
-        if (previousTime == seconds && previousStart == start && previousCursor == cursor && previousPosition == position) return;
+        if (previousTime == seconds && previousStart == start && previousCursor == cursor && previousPosition == position && previousHistorySeconds == historySeconds) return;
+        previousHistorySeconds = historySeconds;
         previousTime = seconds; previousStart = start; previousCursor = cursor; previousPosition = position;
         HistoryStartIndex = start; HistoryEndIndex = cursor; history.Clear();
         int stride = Math.Max(1, (cursor - start + 254) / 255);

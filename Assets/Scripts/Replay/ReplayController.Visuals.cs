@@ -3,6 +3,14 @@ using UnityEngine;
 
 public partial class ReplayController
 {
+    private void DrawPixelAnimalView()
+    {
+        if (selectedView < 0 || !pixelScaleAnimalView || animalPreviewTexture == null) return;
+        var viewport = CurrentReplayViewport();
+        var area = new Rect(viewport.x * Screen.width, (1 - viewport.yMax) * Screen.height, viewport.width * Screen.width, viewport.height * Screen.height);
+        var color = GUI.color; GUI.color = Color.black; GUI.DrawTexture(area, Texture2D.whiteTexture); GUI.color = color;
+        GUI.DrawTexture(area, animalPreviewTexture, ScaleMode.ScaleToFit, false);
+    }
     private readonly Dictionary<string, ReplayAgentVisuals> agentAnnotations = new Dictionary<string, ReplayAgentVisuals>();
     private readonly List<Rect> annotationLabels = new List<Rect>();
     private GUIStyle agentLabelStyle;
@@ -60,8 +68,13 @@ public partial class ReplayController
             camerasByRig.TryGetValue(id, out var front);
             int start = pathsByRig.TryGetValue(id, out var path) ? path.start : cursor;
             annotation.Refresh(overview, front, samples, cursor, start, replayTime, marker.transform.position, marker.transform.rotation,
-                show && marker.activeInHierarchy, rigMarkerPrefab == null);
-            if (path != null) path.line.widthMultiplier = ReplayAgentVisuals.UnitsPerPixel(overview, marker.transform.position) * 1.3f;
+                show && marker.activeInHierarchy, rigMarkerPrefab == null, trailSeconds, trailProminence);
+            if (path != null)
+            {
+                path.line.widthMultiplier = ReplayAgentVisuals.UnitsPerPixel(overview, marker.transform.position) * 1.3f * Mathf.Max(.1f, trailProminence);
+                var color = annotation.Tint; color.a = Mathf.Clamp01(.2f * trailProminence);
+                path.line.startColor = path.line.endColor = color;
+            }
         }
     }
 

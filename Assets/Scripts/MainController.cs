@@ -103,12 +103,18 @@ public class MainController : MonoBehaviour
     public string SystemConfigurationFileName => systemConfigFileName;
     private string sequenceConfigFileName = "sequenceConfig.json";
     public string SequenceConfigurationFileName => sequenceConfigFileName;
+    public string SequenceTitle { get; private set; }
+    public string CurrentExperimentTitle { get; private set; }
+    public bool SequencePreparing { get; private set; }
+    private string randomSeedMode = "Fixed";
+    private int randomSeed = 1;
+    private int preparationGeneration;
     public bool ReturnToSetupAfterSequence { get; private set; }
 
     // Called only from the idle setup screen, after validation and saving.
     public void PrepareConfiguredRun(string systemFile, string sequenceFile)
     {
-        if (sequenceStarted) throw new System.InvalidOperationException("Stop the experiment before changing its configuration.");
+        if (sequenceStarted || SequencePreparing) throw new System.InvalidOperationException("Stop the experiment before changing its configuration.");
         systemConfigFileName = systemFile;
         sequenceConfigFileName = sequenceFile;
         DesktopQuickStart.RememberWorkspace(systemFile, sequenceFile);
@@ -394,6 +400,9 @@ public class MainController : MonoBehaviour
 
     public void StopSequence(string endReason)
     {
+        ExperimentRandom.End();
+        preparationGeneration++;
+        SequencePreparing = false;
         sequenceStarted = false;
         savedHeadings.Clear();
         phaseRunner?.Cancel();
@@ -415,7 +424,7 @@ public class MainController : MonoBehaviour
 
     public void StartSequence()
     {
-        if (sequenceStarted) return;
+        if (sequenceStarted || SequencePreparing) return;
         if (systemConfigurationError != null) { FailExperiment(new System.ArgumentException(systemConfigurationError)); return; }
         Debugger.Log("MainController.StartSequence()", 3);
         try {MasterDataLogger.Instance.ConfigArchive.RequireComplete();}
@@ -428,6 +437,33 @@ public class MainController : MonoBehaviour
             return;
         }
 
+        SequencePreparing = true;
+        _ = PrepareAndStartSequence(++preparationGeneration);
+    }
+
+    private async System.Threading.Tasks.Task PrepareAndStartSequence(int generation)
+    {
+        try
+        {
+            // Import before starting the stimulus clock: loading a model must not shorten a trial.
+            foreach (string reference in sequenceSteps.SelectMany(step => ExternalModelLibrary.CollectReferences(
+                step.parameters != null && (step.parameters.ContainsKey("configFile") || step.parameters.ContainsKey("design"))
+                    ? ExperimentPhases.Read(step.parameters, step.parameters.ContainsKey("configFile") ? "configFile" : "design") : null)
+                .Concat(ExternalModelLibrary.CollectReferences(step.parameters != null ? JObject.FromObject(step.parameters) : null))).Distinct())
+            {
+                await ExternalModelLibrary.PreloadAsync(reference, ExperimentConfigFiles.ReadAllBytes(reference, "model"));
+                if (generation != preparationGeneration) return;
+            }
+            if (generation != preparationGeneration) return;
+            ExperimentRandom.Begin(randomSeedMode, randomSeed, MasterDataLogger.Instance.directoryPath, SequenceTitle, sequenceConfigFileName);
+            SequencePreparing = false;
+            BeginPreparedSequence();
+        }
+        catch (System.Exception error) { if (generation == preparationGeneration) { SequencePreparing = false; FailExperiment(error); } }
+    }
+
+    private void BeginPreparedSequence()
+    {
         sequenceStarted = true;
         SequenceError = null;
         savedHeadings.Clear();
@@ -455,28 +491,31 @@ public class MainController : MonoBehaviour
     void InitializeExecutionOrder()
     {
         executionOrder.Clear();
-        for (int i = 0; i < sequenceSteps.Count; i++)
-        {
-            executionOrder.Add(i);
-        }
-        // Shuffle executionOrder
-        ShuffleList(executionOrder);
+        executionOrder.AddRange(BuildExecutionOrder(sequenceSteps, ExperimentRandom.Sequence));
     }
 
-    void ShuffleList<T>(IList<T> list)
+    public static List<int> BuildExecutionOrder(IList<SequenceStep> steps, System.Random rng)
     {
-        // Implement a simple Fisher-Yates shuffle
-        System.Random rng = new System.Random();
-        int n = list.Count;
+        var units = new List<List<int>>();
+        var seen = new HashSet<string>(System.StringComparer.Ordinal);
+        for (int i = 0; i < steps.Count; i++)
+        {
+            string group = steps[i].group;
+            if (!string.IsNullOrWhiteSpace(group) && i > 0 && steps[i - 1].group == group) units[units.Count - 1].Add(i);
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(group) && !seen.Add(group)) throw new System.ArgumentException("Sequence group '" + group + "' must occupy consecutive rows.");
+                units.Add(new List<int> { i });
+            }
+        }
+        int n = units.Count;
         while (n > 1)
         {
             n--;
             int k = rng.Next(n + 1);
-            // Swap list[k] with list[n]
-            T value = list[k];
-            list[k] = list[n];
-            list[n] = value;
+            var value = units[k]; units[k] = units[n]; units[n] = value;
         }
+        return units.SelectMany(unit => unit).ToList();
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -625,6 +664,7 @@ public class MainController : MonoBehaviour
 
     public void HandleEscape()
     {
+        if (SequencePreparing) { StopSequence("cancelled-during-model-load"); return; }
         if(SceneManager.GetActiveScene().name=="ReplayScene" && FindFirstObjectByType<ReplayController>()?.TryCloseModal()==true)return;
         if (SceneManager.GetActiveScene().name == "ControlScene")
         {
@@ -646,7 +686,7 @@ public class MainController : MonoBehaviour
         // Clear the screen to black before loading the new scene
         ClearScreenToBlack();
 
-        SceneManager.LoadScene(step.sceneName);
+        SceneManager.LoadScene(SceneCompatibility.Resolve(step.sceneName));
     }
 
     void SyncTimestamp()
@@ -692,6 +732,11 @@ public class MainController : MonoBehaviour
                     loopSequence = config.loop; // Set looping based on config
                     LoopStartIndex = config.loopStartIndex;
                     autoStart = config.autoStart;
+                    SequenceTitle = config.title;
+                    randomSeedMode = config.randomSeedMode ?? "Fixed";
+                    randomSeed = config.randomSeed;
+                    if (!string.Equals(randomSeedMode, "Fixed", System.StringComparison.OrdinalIgnoreCase) && !string.Equals(randomSeedMode, "Random", System.StringComparison.OrdinalIgnoreCase))
+                        throw new System.ArgumentException("randomSeedMode must be Fixed or Random.");
 
                     foreach (SequenceItem item in config.sequences)
                     {
@@ -704,6 +749,7 @@ public class MainController : MonoBehaviour
                             item.autoTrim,
                             item.autoTrimSettings
                         );
+                        newStep.title = item.title; newStep.comments = item.comments; newStep.group = item.group;
                         sequenceSteps.Add(newStep);
                         Debugger.Log("Added sequence step: " + JsonUtility.ToJson(newStep), 3);
                     }
@@ -751,18 +797,28 @@ public class MainController : MonoBehaviour
 private void ApplyExperiment(Dictionary<string, object> parameters, System.Action<Dictionary<string, object>> apply)
 {
     if (phaseRunner == null) phaseRunner = gameObject.AddComponent<ExperimentPhases>();
-    var resolved = ExperimentConfigFiles.ResolveReferences(parameters);
+    var resolved = SceneCompatibility.Parameters(GetCurrentSequenceStep()?.sceneName, ExperimentConfigFiles.ResolveReferences(parameters));
     System.Action<Dictionary<string, object>> applyConfigured = payload => {
         var step = GetCurrentSequenceStep();
         string key = payload != null && payload.ContainsKey("configFile") ? "configFile" : "design";
         JObject document = payload != null && (ExperimentPhases.IsPhase(payload) || payload.ContainsKey(key)) ? ExperimentPhases.Read(payload, key) : null;
+        CurrentExperimentTitle = (string)document?["title"];
+        if (string.IsNullOrWhiteSpace(CurrentExperimentTitle) && payload != null && payload.TryGetValue(key, out var reference) && reference != null)
+            CurrentExperimentTitle = (string)JObject.Parse(ExperimentConfigFiles.ReadAllText(reference.ToString()))["title"];
         // Experiment/phase values take precedence; retain old sequence settings for existing recordings/configs.
         var settings = document?["autoTrimSettings"]?.ToObject<AutoTrimConfig>() ?? step?.autoTrimSettings ?? new AutoTrimConfig();
         settings.Validate();
         currentAutoTrimSettings = settings;
         flightCheckOverride = null;
         MasterDataLogger.Instance.ConfigArchive.RequireComplete();
-        apply(payload);
+        using (ExperimentRandom.Scope("trial:" + currentTrial + ":row:" + executionOrder[currentStep] + ":phase:" + ExperimentPhase))
+        {
+            apply(payload);
+            ExperimentWorldObjects.Apply(SceneManager.GetActiveScene(), document);
+            ExperimentSun.Apply(SceneManager.GetActiveScene(), document);
+            ExperimentRandom.SeedParticles(SceneManager.GetActiveScene(), "trial:" + currentTrial + ":row:" + executionOrder[currentStep] + ":phase:" + ExperimentPhase);
+        }
+        StartCoroutine(RecordingThumbnail.Capture(SceneManager.GetActiveScene(), MasterDataLogger.Instance.directoryPath));
         MasterDataLogger.Instance.ConfigArchive.RequireComplete();
         if (step != null) ApplyAutoTrimToClosedLoopComponents(step);
     };
@@ -771,6 +827,7 @@ private void ApplyExperiment(Dictionary<string, object> parameters, System.Actio
 
 private void FailExperiment(System.Exception error)
 {
+    ExperimentRandom.End();
     SequenceError = error.Message;
     sequenceStarted = false;
     phaseRunner?.Cancel();
@@ -878,7 +935,7 @@ void ManageTimerAndTransitions()
     // ❷ build the condition
     bool canMutateInPlace =
             !next.reloadScene &&
-            SceneManager.GetActiveScene().name == next.sceneName &&
+            SceneManager.GetActiveScene().name == SceneCompatibility.Resolve(next.sceneName) &&
             sequencer != null;
 
     if (canMutateInPlace)
@@ -918,6 +975,7 @@ void ManageTimerAndTransitions()
 [System.Serializable]
 public class SequenceStep
 {
+    public string title, comments, group;
     public string sceneName;
     public float duration;
     public Dictionary<string, object> parameters;
@@ -941,6 +999,9 @@ public class SequenceStep
 [System.Serializable]
 public class SequenceConfig
 {
+    public string title, comments;
+    public string randomSeedMode = "Fixed";
+    public int randomSeed = 1;
     public int loopStartIndex = 0; // Zero-based first row to revisit after the final row; preceding rows run once.
     public void ValidateLoop()
     {
@@ -948,6 +1009,16 @@ public class SequenceConfig
             throw new System.ArgumentException("loopStartIndex must identify an existing zero-based sequence row.");
         if (loopStartIndex > 0 && randomise)
             throw new System.ArgumentException("A one-time sequence prefix requires randomise=false.");
+        var seen = new HashSet<string>(System.StringComparer.Ordinal);
+        for (int i = 0; i < (sequences?.Length ?? 0); i++)
+        {
+            var row = sequences[i];
+            if (row == null) throw new System.ArgumentException("Sequence rows cannot be null.");
+            if (string.IsNullOrWhiteSpace(row.group)) continue;
+            bool continues = i > 0 && sequences[i - 1].group == row.group;
+            if (i == loopStartIndex && continues) throw new System.ArgumentException("loopStartIndex cannot split sequence group '" + row.group + "'.");
+            if (!continues && !seen.Add(row.group)) throw new System.ArgumentException("Sequence group '" + row.group + "' must occupy consecutive rows.");
+        }
     }
     public bool autoStart = false;
     public bool randomise = false; // Added field
@@ -958,6 +1029,7 @@ public class SequenceConfig
 [System.Serializable]
 public class SequenceItem
 {
+    public string title, comments, group;
     public string sceneName;
     public float duration;
     public float gain = 1f;

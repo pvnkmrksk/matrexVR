@@ -4,6 +4,8 @@ using System.Linq;
 using InSceneSequence;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 /// <summary>Kannadi (ಕನ್ನಡಿ, mirror): tracked animals replicated across a hexagonal grid.</summary>
 [DefaultExecutionOrder(100)]
@@ -19,6 +21,9 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     private KannadiConfig config = new KannadiConfig();
     private int? watchIndex;
     private bool initialized;
+    private LocustSpawner swarmSpawner;
+    private string swarmPopulationKey, mirrorPopulationKey;
+    public bool IsSwarm => string.Equals(config.populationMode, "Swarm", StringComparison.OrdinalIgnoreCase);
     protected virtual float RowSpacing => hexRadius * 2f;
 
     protected virtual void Start()
@@ -39,9 +44,9 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             NightSkyController.Apply(gameObject, null, null);
             KannadiConfig next = KannadiConfig.Load(parameters);
             Keyboard.ApplyAutopilotConfig(next.autopilotEnabled, next.autopilotSpeed);
-            Kannadi[] rigs = FindObjectsOfType<Kannadi>().Where(r => r.isActiveAndEnabled && r.gameObject.scene == gameObject.scene).ToArray();
+            Kannadi[] rigs = FindObjectsOfType<Kannadi>().Where(r => r.isActiveAndEnabled && r.gameObject.scene == gameObject.scene).OrderBy(r => r.VRIndex).ToArray();
             // Validate all prefab selections before replacing any existing grid.
-            var selected = rigs.Select(r => r.ResolvePrefab(next.kannadiTilePrefab)).ToArray();
+            var selected = rigs.Select(r => r.ResolvePrefab(next)).ToArray();
             for (int i = 0; i < rigs.Length; i++)
             {
                 var rig = rigs[i];
@@ -50,9 +55,11 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
                     StimulusHeadingReference.For(tracking).Begin(next.headingReference, result => {
                         if (result != null && next.useHeadingReference) rig.GenerateHexGrid();
                     });
-                rig.Apply(next, selected[i]);
+                using (ExperimentRandom.ScopeFor(rig, "kannadi-initialization")) rig.Apply(next, selected[i]);
             }
             NightSkyController.Apply(gameObject, next.nightSky, next.skyboxPath, next.uniformSkyColor);
+            var world = GetComponent<KannadiWorldObjects>() ?? gameObject.AddComponent<KannadiWorldObjects>();
+            world.Apply(next.objects, rigs.Select(r => r.GetComponent<ClosedLoop>()).Where(r => r != null).ToArray());
             SimpleOverheadCamera.EnsureInScene();
         }
         catch (Exception error)
@@ -62,8 +69,11 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     }
     public void AdvanceStep(Dictionary<string, object> parameters) => InitializeScene(parameters);
 
-    private GameObject ResolvePrefab(string name)
+    private GameObject ResolvePrefab(KannadiConfig settings)
     {
+        if (!string.IsNullOrWhiteSpace(settings.kannadiModelPath)) return ExternalModelLibrary.GetPrefab(settings.kannadiModelPath);
+        if (!string.IsNullOrWhiteSpace(settings.modelPath)) return ExternalModelLibrary.GetPrefab(settings.modelPath);
+        string name = settings.kannadiTilePrefab;
         if (string.IsNullOrEmpty(name))
         {
             if (tilePrefab != null) return tilePrefab;
@@ -78,6 +88,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
 
     private void Apply(KannadiConfig next, GameObject prefab)
     {
+        bool wasSwarm = IsSwarm;
         config = next;
         tilePrefab = prefab;
         numberOfRings = next.numberOfRings ?? numberOfRings;
@@ -97,9 +108,38 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
         }
         else transform.SetPositionAndRotation(next.resetPositionOnStart ? position : transform.position, next.resetRotationOnStart ? rotation : transform.rotation);
         ConfigureCameras();
-        GenerateHexGrid();
+        if (IsSwarm)
+        {
+            CleanupClones();
+            var population = new JObject();
+            foreach (var field in typeof(SwarmConfig).GetFields()) population[field.Name] = field.GetValue(next) == null ? JValue.CreateNull() : JToken.FromObject(field.GetValue(next));
+            string key = population.ToString(Formatting.None) + ":" + prefab.GetInstanceID();
+            bool preserve = initialized && wasSwarm && !next.resetPositionOnStart && swarmPopulationKey == key && swarmSpawner != null;
+            swarmSpawner = GetComponent<LocustSpawner>() ?? gameObject.AddComponent<LocustSpawner>();
+            swarmSpawner.boundaryManager = GetComponent<BoundaryManager>() ?? gameObject.AddComponent<BoundaryManager>();
+            swarmSpawner.locustPrefab = prefab;
+            swarmSpawner.RuntimeLayer = RuntimeRigRegistry.StimulusLayer(VRIndex);
+            swarmSpawner.layerName = "SimulatedLocustsVR" + VRIndex;
+            swarmSpawner.loadConfigFromJsonFile = false;
+            if (!next.SwarmEnabled) swarmSpawner.PrepareObservation();
+            else if (!preserve) SwarmConfiguration.Apply(swarmSpawner, next, closedLoop);
+            swarmPopulationKey = next.SwarmEnabled ? key : null;
+            var logger = GetComponent<SwarmLogger>() ?? gameObject.AddComponent<SwarmLogger>();
+            logger.locustLayerMask = 1 << swarmSpawner.RuntimeLayer; logger.enabled = true;
+        }
+        else
+        {
+            if (swarmSpawner != null) swarmSpawner.PrepareObservation();
+            var logger = GetComponent<SwarmLogger>(); if (logger != null) logger.enabled = false;
+            string key = JsonConvert.SerializeObject(new { numberOfRings, hexRadius, prefab = prefab.GetInstanceID(), next.animateOnMove,
+                next.animationSpeedThreshold, next.periodicBoundary, next.boundaryLengthX, next.boundaryLengthZ, next.useHeadingReference, watchIndex });
+            if (!(initialized && !wasSwarm && !next.resetPositionOnStart && mirrorPopulationKey == key)) GenerateHexGrid();
+            mirrorPopulationKey = key; swarmPopulationKey = null;
+        }
         initialized = true;
-        if (GetComponent<KannadiLogger>() == null) gameObject.AddComponent<KannadiLogger>();
+        var mirrorLogger = GetComponent<KannadiLogger>();
+        if (!IsSwarm && mirrorLogger == null) mirrorLogger = gameObject.AddComponent<KannadiLogger>();
+        if (mirrorLogger != null) mirrorLogger.enabled = !IsSwarm;
     }
 
     private void ConfigureCameras()
@@ -108,8 +148,8 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
         int ownLayer = RuntimeRigRegistry.StimulusLayer(VRIndex);
         if (watchIndex.HasValue && RuntimeRigRegistry.StimulusLayer(watchIndex.Value) < 0)
             throw new InvalidOperationException("Kannadi watchIndex has no configured stimulus layer: " + watchIndex.Value);
-        int visible = watchIndex.HasValue ? (1 << RuntimeRigRegistry.StimulusLayer(watchIndex.Value))
-                                        : swarmMask & ~(ownLayer >= 0 ? 1 << ownLayer : 0);
+        int visible = IsSwarm ? 1 << ownLayer : watchIndex.HasValue ? (1 << RuntimeRigRegistry.StimulusLayer(watchIndex.Value))
+                                        : RuntimeRigRegistry.PeerStimulusMask(VRIndex);
         int markerMask = LayerMask.GetMask("OverheadCameraMarkers");
         foreach (Camera camera in GetComponentsInChildren<Camera>(true))
         {
@@ -134,7 +174,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     public void GenerateHexGrid()
     {
         CleanupClones();
-        if (numberOfRings < 0 || tilePrefab == null) return;
+        if (IsSwarm || numberOfRings < 0 || tilePrefab == null) return;
         int layer = RuntimeRigRegistry.StimulusLayer(VRIndex);
         if (layer < 0) throw new InvalidOperationException("Missing animal layer for " + gameObject.name);
         bool skipCenter = watchIndex == VRIndex;
@@ -151,7 +191,9 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
                 Vector3 offset = new Vector3(hexRadius * Mathf.Sqrt(3f) * (q + r / 2f), tilePrefab.transform.position.y, RowSpacing * r);
                 var reference = config.useHeadingReference ? GetComponent<StimulusHeadingReference>()?.Result : null;
                 if (reference != null) offset = Quaternion.Euler(0, (float)reference.meanHeadingDegrees, 0) * offset;
-                GameObject clone = Instantiate(tilePrefab, Vector3.zero, prefabRotation);
+                GameObject clone = ExternalModelLibrary.InstantiatePrefab(tilePrefab);
+                clone.transform.SetPositionAndRotation(Vector3.zero, prefabRotation);
+                if (!string.IsNullOrWhiteSpace(config.kannadiModelPath) || !string.IsNullOrWhiteSpace(config.modelPath)) ExternalModelLibrary.ConfigureAnimation(clone);
                 clone.name = $"VR{VRIndex}_Kannadi_{copies.Count}";
                 SetLayerRecursively(clone.transform, layer);
                 clone.tag = "SimulatedLocust";
@@ -197,7 +239,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     protected virtual void LateUpdate()
     {
         if (!initialized) return;
-        transform.position = WrapPosition(transform.position);
+        if (!IsSwarm) transform.position = WrapPosition(transform.position);
         UpdateClones();
     }
     private void UpdateClones()

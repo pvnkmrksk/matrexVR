@@ -16,6 +16,16 @@ namespace ConfigurationUI
         private void BuildExperimentEditor()
         {
             bool phased=ExperimentBlocks.Phased((JObject)selected.Root);
+            if(!phased && selected.SchemaId!="dynamic-choice")
+            {
+                var addPhases=StudioButton("Add pre / stimulus / post timeline","sequence",()=>{
+                    double seconds=BuilderSteps.OfType<JObject>().Where(s=>BlockReference(s)!=null&&System.IO.Path.GetFullPath(ExperimentConfigFiles.Resolve(BlockReference(s)))==selected.Path)
+                        .Select(s=>ExperimentBlocks.Number(s["duration"],30)).FirstOrDefault();
+                    if(seconds<=0)seconds=ExperimentBlocks.FlatDuration(selected.Root as JObject);
+                    StudioEdit(selected,r=>ExperimentBlocks.AddPhaseTimeline((JObject)r,seconds));
+                },"quiet");addPhases.name="add-phase-timeline";
+                addPhases.tooltip="Keep the existing stimulus and add optional pre/post phases. An existing heading observation moves into pre-stimulus with its own duration. Shuffling and looping keep the timeline together. This change is undoable.";body.Add(addPhases);
+            }
             if(phased)
             {
                 var phases=Row("phase-tabs"); body.Add(phases);
@@ -45,6 +55,14 @@ namespace ConfigurationUI
                     if(v && r[activePhase]["durationSeconds"]==null) r[activePhase]["durationSeconds"]=schema["properties"]["durationSeconds"]["default"].DeepClone();
                 }),"phase-enabled"));
                 var hint=new Label("Disabled phases keep their configuration."); hint.AddToClassList("phase-hint"); enable.Add(hint); body.Add(enable);
+                var continuity=Row("phase-continuity");body.Add(continuity);
+                bool preserve=new[]{"stimulus","postStimulus"}.Select(k=>selected.Root[k] as JObject).Where(p=>p!=null)
+                    .All(p=>!ExperimentBlocks.Flag(p["resetPositionOnStart"],true)&&!ExperimentBlocks.Flag(p["resetRotationOnStart"],true));
+                continuity.Add(new Label("Keep pose between phases"));
+                var keep=StateSwitch(preserve,on=>StudioEdit(selected,r=>{
+                    foreach(string phase in new[]{"stimulus","postStimulus"})if(r[phase] is JObject item){item["resetPositionOnStart"]=!on;item["resetRotationOnStart"]=!on;}
+                }),"phase-keep-pose");
+                keep.tooltip="ON continues the animal's position and heading into stimulus and post-stimulus. OFF resets both to each phase's configured initial pose. Individual reset switches remain available under Motion.";continuity.Add(keep);
             }
             AddSequenceOverrideNotice(body);
             var tabs=Row("settings-tabs"); body.Add(tabs);
@@ -52,9 +70,10 @@ namespace ConfigurationUI
             { string key=name; tabs.Add(Button(name,()=>{ settingsTab=key; BuildContent(); },settingsTab==name?"tab-active":"quiet")); }
             var scroll=new ScrollView { name="settings-editor-scroll",horizontalScrollerVisibility=ScrollerVisibility.Hidden }; scroll.AddToClassList("settings-scroll"); body.Add(scroll);
             AddTimingWarnings(scroll,selected);
+            if(settingsTab=="Sky")BuildSkyChoices(scroll,payload,schema,prefix);
             if(settingsTab=="Essentials")
             {
-                Section(scroll,"Core controls","motion",payload,schema,prefix,new[]{"durationSeconds","closedLoopOrientation","closedLoopPosition","autopilotEnabled","autopilotSpeed","aglHeight",AgentCountKey(payload),AgentSpeedKey(payload),"dimension","agentVisual","numberOfRings","animateOnMove","loop","repetitions","sync"});
+                Section(scroll,"Core controls","motion",payload,schema,prefix,new[]{"durationSeconds","populationMode","closedLoopOrientation","closedLoopPosition","autopilotEnabled","autopilotSpeed","aglHeight",AgentCountKey(payload),AgentSpeedKey(payload),"dimension","agentVisual","modelPath","kannadiModelPath","numberOfRings","animateOnMove","loop","repetitions","sync"});
                 var features=Row("feature-grid"); scroll.Add(features);
                 foreach(string name in new[]{"swarm","nightSky","headingReference","objects","stimuli","steps"})
                     if(payload[name]!=null)
@@ -68,6 +87,7 @@ namespace ConfigurationUI
             else
             {
                 var present=DisplayKeys(payload,schema).Where(k=>k!="enabled" && !new[]{"preStimulus","stimulus","postStimulus"}.Contains(k)).ToList();
+                if(settingsTab=="Sky"&&schema["properties"]?["sun"]!=null&&!present.Contains("sun"))present.Add("sun");
                 if(settingsTab=="All parameters")
                 {
                     var addMissing=new Toggle("Show unset optional fields") { name="show-omitted-settings",tooltip="Defaults are already shown. Also reveal optional fields whose omitted value is null or unspecified; viewing them does not write to JSON." }; scroll.Add(addMissing);
@@ -94,12 +114,12 @@ namespace ConfigurationUI
         private static IEnumerable<string> DisplayKeys(JObject owner,JObject schema)
         {
             return owner.Properties().Select(p=>p.Name).Concat((schema["properties"] as JObject??new JObject()).Properties()
-                .Where(p=>p.Value["default"]!=null && p.Value["default"].Type!=JTokenType.Null).Select(p=>p.Name)).Distinct();
+                .Where(p=>p.Value["default"]!=null && p.Value["default"].Type!=JTokenType.Null).Select(p=>p.Name)).Where(k=>k!="title"&&k!="comments"&&k!="description").Distinct();
         }
         private static string Group(string key)
         {
             if(key.StartsWith("initial") || key.StartsWith("reset") || key.StartsWith("closedLoop") || key.StartsWith("walking") || key.StartsWith("autopilot") || key.StartsWith("wind") || new[]{"randomInitialRotation","aglHeight","groundLayerMask","durationSeconds"}.Contains(key)) return "Motion";
-            if(new[]{"backgroundColor","uniformSkyColor","nightSky","skyboxPath","skybox"}.Contains(key)) return "Sky";
+            if(new[]{"backgroundColor","uniformSkyColor","nightSky","skyboxPath","skybox","sun"}.Contains(key)) return "Sky";
             if(key.StartsWith("autoTrim") || key=="headingReference" || key=="adaptiveDecision" || key=="useHeadingReference") return "Tuning";
             if(new[]{"preStimulus","stimulus","postStimulus"}.Contains(key)) return "Other";
             if(new[]{"seed","repetitions","sync","loop"}.Contains(key)) return "Tuning";
@@ -167,7 +187,14 @@ namespace ConfigurationUI
                 label.Add(disclosure);
                 Action populate=()=>{
                     fold.Clear();
-                    foreach(string property in DisplayKeys(nested,schema).Where(p=>p!=flag && ConfigSchema.Visible(nested,schema,p,Context)))
+                    if(key=="nightSky")
+                    {
+                        var currentTime=Row("night-sky-current-time");currentTime.Add(new Label("Use current time"));
+                        bool now=string.IsNullOrWhiteSpace((string)nested["localTime"])||string.Equals((string)nested["localTime"],"now",StringComparison.OrdinalIgnoreCase);
+                        var timeSwitch=StateSwitch(now,on=>StudioEdit(doc,r=>AssignAt(r,parts.Concat(new[]{"localTime"}).ToArray(),new JValue(on?"now":"22:00:00")),true),"night-sky-use-current-time");
+                        timeSwitch.tooltip="ON samples the current UTC instant at experiment start. OFF uses the configured local date, time and UTC offset.";currentTime.Add(timeSwitch);fold.Add(currentTime);
+                    }
+                    foreach(string property in DisplayKeys(nested,schema).Concat(key=="nightSky"?new[]{"utcOffsetHours"}:Array.Empty<string>()).Distinct().Where(p=>p!=flag && ConfigSchema.Visible(nested,schema,p,Context)))
                         fold.Add(Setting(doc,parts.Concat(new[]{property}).ToArray(),ConfigSchema.Child(schema,property),nested,schema));
                     fold.contentContainer.SetEnabled(flag==null || ExperimentBlocks.Flag(nested[flag],ExperimentBlocks.Flag(schema["properties"]?[flag]?["default"],true)));
                 };
@@ -180,6 +207,14 @@ namespace ConfigurationUI
             {
                 var controls=Row(); controls.Add(Pill(array.Count+" items","accent")); controls.Add(StudioButton("Edit items","settings",()=>{ selected=doc; advancedMode=true; path.Clear(); path.AddRange(parts); BuildContent(); },"quiet"));
                 controls.Add(IconButton("plus","Add item",()=>StudioEdit(doc,r=>{if(!(ConfigDocument.At(r,parts) is JArray))AssignAt(r,parts,array.DeepClone());((JArray)ConfigDocument.At(r,parts)).Add(ConfigSchema.NewValue(ConfigSchema.Child(schema,"",true)));}))); setting.Add(controls);
+            }
+            else if(key=="utcOffsetHours")
+            {
+                double hours=ExperimentBlocks.Number(shown);var offsets=Enumerable.Range(-56,113).Select(i=>i/4d).ToList();
+                if(!offsets.Any(v=>Math.Abs(v-hours)<.000001))offsets.Add(hours);offsets.Sort();
+                Func<double,string> labelOffset=offset=>"UTC"+(offset>=0?"+":"−")+TimeSpan.FromHours(Math.Abs(offset)).ToString(@"hh\:mm",CultureInfo.InvariantCulture);
+                var choices=offsets.Select(labelOffset).ToList();choices.Insert(0,"Use named time zone");var offsetPicker=new DropdownField(choices,shown==null||shown.Type==JTokenType.Null?0:Math.Max(0,offsets.FindIndex(v=>Math.Abs(v-hours)<.000001))+1){name="night-sky-utc-offset"};
+                offsetPicker.RegisterValueChangedCallback(e=>Guard(()=>assign(choices.IndexOf(e.newValue)==0?JValue.CreateNull():new JValue(offsets[choices.IndexOf(e.newValue)-1]),true)));setting.Add(offsetPicker);
             }
             else if(shown==null || shown.Type==JTokenType.Null)
             {
@@ -212,10 +247,39 @@ namespace ConfigurationUI
             {
                 setting.AddToClassList("text-setting");
                 if(key.EndsWith("File") || key.EndsWith("Path") || key=="design" || key=="configFile") setting.AddToClassList("path-setting");
-                var input=new TextField { value=shown.ToString(),isDelayed=true }; setting.Add(input); input.RegisterValueChangedCallback(e=>Guard(()=>assign(new JValue(e.newValue),false)));
+                var input=new TextField { value=shown.ToString(),isDelayed=true,multiline=key=="comments" }; setting.Add(input); input.RegisterValueChangedCallback(e=>Guard(()=>assign(new JValue(e.newValue),false)));
             }
-            Action enable=()=>setting.SetEnabled(ConfigSchema.Enabled(ConfigSchema.EffectiveValue(ConfigDocument.At(doc.Root,parts.Take(parts.Length-1).ToArray()),ownerSchema,true),ownerSchema,key,Context));
+            Action enable=()=>{
+                bool active=ConfigSchema.Enabled(ConfigSchema.EffectiveValue(ConfigDocument.At(doc.Root,parts.Take(parts.Length-1).ToArray()),ownerSchema,true),ownerSchema,key,Context);
+                if(key=="localTime"&&parts.Contains("nightSky"))
+                {var local=ConfigDocument.At(doc.Root,parts.Take(parts.Length-1).ToArray())?["localTime"]?.ToString();active&=!string.IsNullOrWhiteSpace(local)&&!string.Equals(local,"now",StringComparison.OrdinalIgnoreCase);}
+                setting.SetEnabled(active);
+            };
             enableUpdates.Add(enable); setting.RegisterCallback<DetachFromPanelEvent>(_=>enableUpdates.Remove(enable)); enable(); return setting;
+        }
+        private void BuildSkyChoices(VisualElement target,JObject payload,JObject schema,string[] prefix)
+        {
+            var choices=new List<string>{"Default sky","Solid color","Custom panorama","Starry night sky"};
+            int mode=payload["uniformSkyColor"] is JObject?1:!string.IsNullOrWhiteSpace((string)payload["skyboxPath"])?2:ExperimentBlocks.Flag(payload["nightSky"]?["enabled"])?3:0;
+            var chooser=new DropdownField("Sky background",choices,mode){name="sky-background-mode",tooltip="Choose the sky shown by this phase. Default uses the scene's sky. A panorama uses a local image; starry night uses location and time."};target.Add(chooser);
+            Action<int,string> apply=(next,path)=>StudioEdit(selected,r=>{
+                var owner=prefix.Length==0?(JObject)r:(JObject)ConfigDocument.At(r,prefix);
+                owner["uniformSkyColor"]=next==1?(owner["uniformSkyColor"] is JObject old?old.DeepClone():new JObject{["r"]=.12,["g"]=.12,["b"]=.12,["a"]=1}):JValue.CreateNull();
+                owner["skyboxPath"]=next==2?path:"";
+                var sky=owner["nightSky"] as JObject;
+                if(next==3&&sky==null){sky=ConfigSchema.NewValue(ConfigSchema.Child(schema,"nightSky")) as JObject??new JObject();owner["nightSky"]=sky;}
+                if(sky!=null)sky["enabled"]=next==3;
+            });
+            chooser.RegisterValueChangedCallback(e=>Guard(()=>{
+                int next=choices.IndexOf(e.newValue);
+                if(next!=2){apply(next,null);return;}
+                var dialog=OpenModal("Choose panorama","Enter an image path relative to StreamingAssets. Its image is archived with the run.");dialog.AddToClassList("small-dialog");
+                var input=new TextField("Image path"){name="panorama-path",value=(string)payload["skyboxPath"]??"",isDelayed=true};dialog.Add(input);
+                dialog.Add(StudioButton("Use panorama","sky",()=>{
+                    string reference=input.value.Trim();if(string.IsNullOrEmpty(reference)||!System.IO.File.Exists(ExperimentConfigFiles.Resolve(reference)))throw new ArgumentException("Choose an existing panorama image.");
+                    apply(2,reference);CloseModal();
+                },"primary"));
+            }));
         }
         private VisualElement NumberControl(JToken value,JObject schema,string key,Action<JToken> commit,bool allowSlider=true)
         {

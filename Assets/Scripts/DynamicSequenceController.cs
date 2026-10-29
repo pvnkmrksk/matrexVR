@@ -71,6 +71,10 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     [Serializable]
     public class SceneObjectSpec
     {
+        public bool enabled = true;
+        public string modelPath;
+        public string animationClip;
+        public float animationSpeed = 1f;
         public bool useHeadingReference = false;
         public string type;
         public Polar polar;
@@ -215,7 +219,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     private List<Step> BuildOrdered(DesignFile design, int? seedOverride)
     {
         int seed = seedOverride ?? design.seed;
-        var rng = new System.Random(seed < 0 ? Environment.TickCount : seed);
+        var rng = new System.Random(seed < 0 ? ExperimentRandom.NextSeed("dynamic-choice-order") : seed);
         var list = new List<Step>();
 
         for (int rep = 0; rep < design.repetitions; ++rep)
@@ -389,8 +393,11 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
         foreach (var obj in specs)
         {
+            if (obj == null || !obj.enabled) continue;
             string prefabName = string.IsNullOrEmpty(obj.type) ? obj.prefab : obj.type;
-            if (!prefabDict.TryGetValue(prefabName, out var prefab))
+            GameObject prefab;
+            if (!string.IsNullOrWhiteSpace(obj.modelPath)) prefab = ExternalModelLibrary.GetPrefab(obj.modelPath);
+            else if (string.IsNullOrEmpty(prefabName) || !prefabDict.TryGetValue(prefabName, out prefab))
             {
                 Debug.LogWarning($"Prefab '{prefabName}' missing");
                 continue;
@@ -405,9 +412,12 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             Vector3 position = obj.polar != null ? PolarToXZ(obj.polar) : ToVector3(obj.pos);
             Quaternion rotation = obj.randomInitialRotation
                 ? Quaternion.Euler(0, UnityEngine.Random.Range(0f, 360f), 0)
-                : Quaternion.Euler(0, obj.mu, 0);
+                : obj.rot != null && obj.rot.Length >= 3 ? Quaternion.Euler(ToVector3(obj.rot)) : Quaternion.Euler(0, obj.mu, 0);
 
-            GameObject instance = Instantiate(prefab, position, rotation, parent);
+            GameObject instance = ExternalModelLibrary.InstantiatePrefab(prefab, parent);
+            instance.transform.SetPositionAndRotation(position, rotation);
+            if (!string.IsNullOrWhiteSpace(obj.modelPath) || !string.IsNullOrWhiteSpace(obj.animationClip) || obj.animationSpeed != 1)
+                ExternalModelLibrary.ConfigureAnimation(instance, obj.animationClip, obj.animationSpeed);
             if (obj.useHeadingReference && players.TryGetValue(vrId, out var observer))
             {
                 var reference = observer.GetComponent<StimulusHeadingReference>()?.Result;
@@ -431,12 +441,13 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                 scale.x *= -1;
             instance.transform.localScale = scale;
 
-            Renderer rend = null;
-            if (instance.TryGetComponent<Renderer>(out rend))
+            Renderer rend = instance.GetComponentInChildren<Renderer>(true);
+            foreach (var childRenderer in instance.GetComponentsInChildren<Renderer>(true))
             {
                 string matName = !string.IsNullOrEmpty(obj.material) ? obj.material : obj.mat;
                 materialDict.TryGetValue(matName ?? "", out var mat);
-                Material instanceMaterial = RuntimeMaterialOwner.Assign(rend, mat);
+                if (mat == null && obj.color == null) continue;
+                Material instanceMaterial = RuntimeMaterialOwner.Assign(childRenderer, mat ?? childRenderer.sharedMaterial);
                 if (obj.color != null && obj.color.Length >= 3 && instanceMaterial != null)
                     instanceMaterial.color = ToColor(obj.color);
             }
@@ -540,6 +551,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         int i = 0;
         foreach (var obj in specs)
         {
+            if (obj == null || !obj.enabled) continue;
             int localIndex = i;
             var go = new GameObject($"Trigger_{state.id}_{state.index}_{i++}");
             go.transform.parent = state.container;
@@ -919,6 +931,10 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
         return new SceneObjectSpec
         {
+            enabled = obj.enabled,
+            modelPath = obj.modelPath,
+            animationClip = obj.animationClip,
+            animationSpeed = obj.animationSpeed,
             useHeadingReference = obj.useHeadingReference,
             type = obj.type,
             polar = obj.polar == null ? null : new Polar { radius = obj.polar.radius, angle = obj.polar.angle, height = obj.polar.height },

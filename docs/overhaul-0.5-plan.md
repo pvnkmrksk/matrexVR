@@ -77,7 +77,7 @@ These remain explicit work items when they cannot be validated in this pass; thi
 3. Configurable **visibility matrix** mapping which VR sees which VR; default remains all peers, never self. This was explicitly requested as a much later feature.
 4. Read-only replay acceleration/index persistence and bounded video caching, benchmarked on large datasets before choosing memory budgets.
 5. End-to-end acknowledged bidirectional start/stop recording with **HejjéTrac and Rekkefly**, including failure/timeout behavior; requires compatible tracker implementations and physical acceptance. Preserve existing protocol limitations in docs until proven.
-6. General experiment-control MCP surface and accessibility acceptance beyond existing automation endpoints.
+6. Broader MCP-client/accessibility acceptance; the opt-in local stdio MCP surface is implemented in this pass.
 7. Native UI stress tests, screenshots, frame pacing and apparatus acceptance at all primary counts; platform walkthroughs and physical LED/tracker verification.
 8. Further visual UI overhaul after functional controls stabilize.
 
@@ -95,6 +95,23 @@ These remain explicit work items when they cannot be validated in this pass; thi
 6. Integrate all changes; regenerate relevant schemas/reference only after model changes settle. Run focused static checks, Unity compilation and targeted runtime/render checks in a disposable project.
 7. Update this checklist with verified results and explicit remaining items, then build a local test application if compilation/runtime checks pass. No publication or apparatus equivalence is implied.
 
+## Configuration implementation status
+
+Implemented in source; integrated Unity/render validation is pending unless the acceptance report below says otherwise:
+
+- Optional `title` and `comments` for the paradigm, individual sequence rows and experiment files. The editor/session overview use human titles with filename fallback; nested paths remain read-only beneath the title. Replay-library details show the saved paradigm and block titles when available.
+- Explicit flat-to-phased conversion in the experiment editor; optional phases initially remain off. Existing heading observations move into an enabled pre-stimulus phase with their observation duration. All phases use the same settings tabs; the continuity switch controls stimulus/post position and rotation resets. A phased config remains one shuffle/loop unit. Optional contiguous `group` names are editable per outer row.
+- Fixed/random seed controls with the integer field disabled in Random mode; the primary agent owns resolved-seed recording and scheduling.
+- The apparatus editor accepts 1–16 rigs, with quick choices for 1/2/4/8/16, unique identity validation and existing undoable count changes. Animal IDs can advance by the current population size (including numeric suffixes and zero padding); a dedicated Undo ID increment action restores the previous labels.
+- Setup, apparatus and recording-library styles default to dark independently of OS appearance. Existing keyboard navigation, collapsible navigation rail, native Editor/runtime color+hex pickers, category tabs and disabled feature sections remain in use.
+- Four explicit sky choices use the existing runtime fields. Panorama selection checks a local path before applying. The night-sky editor offers current/fixed time, disables the fixed-time field while current time is selected, and offers UTC offsets including fractional-hour zones. The Sky tab exposes optional sun settings.
+- External-model fields list embedded GLB files found under the config/StreamingAssets root and retain a direct path field. Generic object arrays still use the existing item editor. Runtime model importing/archiving and scientific replay fidelity are validated separately.
+- The recording library reads a saved PNG thumbnail with byte/pixel limits and releases its texture when selection changes or the library closes. It never writes into the recording.
+
+Remaining UI work: rendered object/sky picker previews; a broader visual/layout redesign; and native pointer/keyboard acceptance across all primary counts and platforms. An opt-in local MCP interface and five-world sequence catalog are now included. There is no whole-session metadata undo chain; animal-number batch changes have their own undo action. Changing sky modes is an explicit undoable configuration edit and may clear inactive panorama/color values; disabled phase and nested enabled-feature values are retained.
+
+Focused non-rendered regression checks passed during implementation: 55 apparatus profile checks; 7 sequence selection checks; 17 primary action checks; 16 pointer refresh checks; 15 recording-library UI checks; and 16 focus recovery checks plus 4 lifecycle guards. These use production helper/method code with controlled UI/native boundaries; they do not establish native input or rendering acceptance. `OverhaulConfigurationValidation.Run` supplies the new disposable-project parser/form/render checks and captures.
+
 ## Acceptance evidence
 
-Pending implementation. Record exact commands, runtime results, output paths and unresolved limitations here or in a linked validation report. Do not convert deferred or untested requirements into completed checkboxes.
+See [29 October validation and remaining limits](overhaul-validation-20261029.md) and its [machine-readable report](overhaul-validation-20261029.json). Core replay animation, GLB import/archive, seeded/grouped sequencing, dark configuration, titles, sixteen-rig setup, live phase continuity, five packaged world starters and local MCP control are implemented and checked at the scopes recorded there. This checklist remains the complete requirements inventory; composite requirements that include unverified or deferred parts remain unchecked.

@@ -15,6 +15,16 @@ namespace ConfigurationUI
             { Title=title;Reference=reference;Description=description; }
         }
         private static readonly SequenceStarter[] SequenceStarters = {
+            new SequenceStarter("World examples · Flat world / open base","Examples/Worlds/flat-base.sequence.json",
+                "A large flat textured ground for open or desert-style experiments. Add objects, a sky and sunlight without rebuilding."),
+            new SequenceStarter("World examples · Forest floor","Examples/Worlds/forest-floor.sequence.json",
+                "Close-range rugged ground using the packaged forest-floor/rugosity mesh. Appearance and navigation follow the same surface."),
+            new SequenceStarter("World examples · Dense forest","Examples/Worlds/dense-forest.sequence.json",
+                "The packaged terrain with 90 grounded trees at their original scale and an open central corridor."),
+            new SequenceStarter("World examples · Real-world terrain","Examples/Worlds/real-world-terrain.sequence.json",
+                "The packaged Selwyn terrain without added stimulus objects. Choose your sky, sun and objects in the editor."),
+            new SequenceStarter("World examples · Optomotor","Examples/Worlds/optomotor.sequence.json",
+                "A centered procedural drum: 30 seconds of moderate-contrast yaw rotation. Edit its axis, speed, frequency and colors."),
             new SequenceStarter("Terrain · matched relief","Examples/Rugosity/sequence-treatment-matched-terrain.json",
                 "Four terrain patterns. Visible relief and navigation follow the same surface."),
             new SequenceStarter("Terrain · visible relief, flat navigation","Examples/Rugosity/sequence-treatment-visual-terrain_navigation-flat.json",
@@ -23,15 +33,15 @@ namespace ConfigurationUI
                 "Four terrain patterns. The world looks flat while navigation follows the terrain relief."),
             new SequenceStarter("Terrain · matched flat","Examples/Rugosity/sequence-treatment-matched-flat.json",
                 "Four terrain patterns. Appearance and navigation are both flat."),
-            new SequenceStarter("Swarm · entrainment then social coupling","Examples/Sequences/swarm-entrainment-social.sequence.json",
-                "Ordered swarm entrainment, followed by the linked Kannadi social scene. Edit durations and clone count in the referenced configs."),
+            new SequenceStarter("Kannadi · entrainment then social coupling","Examples/Sequences/kannadi-entrainment-social.sequence.json",
+                "One Kannadi experiment: 120 seconds of entrainment, then 300 seconds of social coupling. Phases stay together and retain tracked pose without reloading."),
             new SequenceStarter("Social coupling · control","Examples/Sequences/social-coupling-control.sequence.json",
                 "The same linked Kannadi social scene without prior swarm entrainment.")
         };
         private void ShowSequenceLibrary()
         {
             RequireApplied();
-            var dialog=OpenModal("Load a sequence","Choose a prepared experiment sequence. Your current apparatus and other configuration drafts are retained.");
+            var dialog=OpenModal("Load a sequence","Choose a world example or prepared experiment sequence. Your current apparatus and other configuration drafts are retained.");
             dialog.AddToClassList("small-dialog");dialog.AddToClassList("sequence-starter-dialog");
             var chooser=new DropdownField("Sequence",SequenceStarters.Select(p=>p.Title).ToList(),0){name="sequence-starter-choice"};
             chooser.tooltip="Choose a complete sequence. Loading opens its blocks for review before you start.";dialog.Add(chooser);

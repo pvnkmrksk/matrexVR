@@ -23,11 +23,15 @@ for names in paths.values():
         errors.append(f"Case collision: {names}")
 settings = (ROOT / "ProjectSettings/EditorBuildSettings.asset").read_text()
 pending = [ROOT / "Assets/Resources/KannadiPrefabCatalog.asset"]
-for scene in ("Kannadi", "Swarm", "Rugosity_RS", "TerrainCueLab"):
+for scene in ("Kannadi", "Rugosity_RS", "TerrainCueLab"):
     path = ROOT / f"Assets/Scenes/{scene}.unity"
     if f"enabled: 1\n    path: Assets/Scenes/{scene}.unity" not in settings:
         errors.append(f"{scene} is not enabled in build settings")
     pending.append(path)
+if "enabled: 1\n    path: Assets/Scenes/Swarm.unity" in settings:
+    errors.append("Deprecated standalone Swarm scene is enabled; legacy names must resolve to Kannadi")
+if 'sceneName == "Swarm" ? "Kannadi"' not in (ROOT / "Assets/Scripts/SceneCompatibility.cs").read_text():
+    errors.append("Historical Swarm scene alias is unavailable")
 for removed in ("Assets/Scenes/Matrix.unity", "Assets/Scripts/Swarm/Vishwaroopa.cs"):
     if (ROOT / removed).exists():
         errors.append(f"Removed legacy mode still present: {removed}")
