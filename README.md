@@ -28,6 +28,8 @@ MATREX VR is a Unity application for flight, walking and collective-behaviour ex
 
 ## Capabilities
 
+The next development pass is tracked in the [experiment and replay overhaul plan](docs/overhaul-0.5-plan.md), including prioritized requirements, parallel ownership, compatibility decisions and deferred validation. It is a work plan, not a list of released features.
+
 | | Research workflow |
 | :--- | :--- |
 | **◎ Closed-loop stimuli** | Flight and walking input contracts, independent rig routing and configurable display geometry. |
