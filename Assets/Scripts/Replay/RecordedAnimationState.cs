@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -69,14 +72,25 @@ public sealed class RecordedAnimationCapture
     private BogongSwarmRenderer ownProcedural;
     private Animation[] legacy;
     private string[] legacyPaths;
+    private readonly RecordedAnimationState evidence=new RecordedAnimationState();
+    private RuntimeAnimatorController[] controllers;
+    private int[] parameterCounts;
+    private readonly StringBuilder json=new StringBuilder(256);
+    private readonly StringWriter jsonText;
+    private readonly JsonSerializer serializer=JsonSerializer.Create(new JsonSerializerSettings { NullValueHandling=NullValueHandling.Ignore });
+    private RecordedAnimationState.ProceduralPose proceduralPose;
     public RecordedAnimationCapture(GameObject source)
     {
         root = source;
+        jsonText=new StringWriter(json,CultureInfo.InvariantCulture);
         animators = root.GetComponentsInChildren<Animator>(true);
+        evidence.animators=new RecordedAnimationState.AnimatorPose[animators.Length];
+        controllers=new RuntimeAnimatorController[animators.Length];parameterCounts=new int[animators.Length];
         paths = new string[animators.Length];
         for (int i = 0; i < animators.Length; i++) paths[i] = Path(root.transform, animators[i].transform);
         ownProcedural = root.GetComponentInChildren<BogongSwarmRenderer>(true);
         legacy = root.GetComponentsInChildren<Animation>(true); legacyPaths = new string[legacy.Length];
+        evidence.legacy=new RecordedAnimationState.LegacyPose[legacy.Length];
         for (int i = 0; i < legacy.Length; i++) legacyPaths[i] = Path(root.transform, legacy[i].transform);
     }
     private static string Path(Transform root, Transform target)
@@ -90,35 +104,44 @@ public sealed class RecordedAnimationCapture
         if (root == null) return "";
         var procedural = batch != null ? batch : ownProcedural;
         if (animators.Length == 0 && legacy.Length == 0 && procedural == null) return "";
-        var evidence = new RecordedAnimationState { animators = new RecordedAnimationState.AnimatorPose[animators.Length] };
+        evidence.realizedPose=null;evidence.blendShapes=null;evidence.procedural=null;
         bool captureRealizedPose = false;
         for (int i = 0; i < animators.Length; i++)
         {
             var animator = animators[i];
-            if (animator == null || animator.runtimeAnimatorController == null) continue;
-            var pose = new RecordedAnimationState.AnimatorPose { path = paths[i], speed = animator.speed,
-                layers = new RecordedAnimationState.LayerPose[animator.layerCount] };
-            for (int layer = 0; layer < animator.layerCount; layer++)
+            var controller=animator!=null?animator.runtimeAnimatorController:null;
+            if (animator == null || controller == null) {evidence.animators[i]=null;continue;}
+            var pose=evidence.animators[i];int layerCount=animator.layerCount;
+            if(pose==null||controllers[i]!=controller||parameterCounts[i]!=animator.parameterCount||pose.layers.Length!=layerCount)
+            {
+                pose=new RecordedAnimationState.AnimatorPose {path=paths[i],layers=new RecordedAnimationState.LayerPose[layerCount]};
+                for(int layer=0;layer<layerCount;layer++)pose.layers[layer]=new RecordedAnimationState.LayerPose();
+                var parameters=new List<RecordedAnimationState.ParameterPose>();
+                foreach(var parameter in animator.parameters)
+                    if(parameter.type!=AnimatorControllerParameterType.Trigger)parameters.Add(new RecordedAnimationState.ParameterPose {hash=parameter.nameHash,type=(int)parameter.type});
+                pose.parameters=parameters.ToArray();evidence.animators[i]=pose;
+                controllers[i]=controller;parameterCounts[i]=animator.parameterCount;
+            }
+            pose.speed=animator.speed;
+            for (int layer = 0; layer < layerCount; layer++)
             {
                 var state = animator.GetCurrentAnimatorStateInfo(layer);
-                captureRealizedPose |= state.fullPathHash == 0 || animator.IsInTransition(layer);
-                pose.layers[layer] = new RecordedAnimationState.LayerPose { state = state.fullPathHash,
-                    time = state.normalizedTime, weight = animator.GetLayerWeight(layer), transitioning = animator.IsInTransition(layer) };
+                bool transitioning=animator.IsInTransition(layer);captureRealizedPose |= state.fullPathHash == 0 || transitioning;
+                var sample=pose.layers[layer];sample.state=state.fullPathHash;sample.time=state.normalizedTime;
+                sample.weight=animator.GetLayerWeight(layer);sample.transitioning=transitioning;
             }
-            var parameters = new List<RecordedAnimationState.ParameterPose>();
-            foreach (var parameter in animator.parameters)
+            foreach (var parameter in pose.parameters)
             {
                 float value;
-                switch (parameter.type)
+                switch ((AnimatorControllerParameterType)parameter.type)
                 {
-                    case AnimatorControllerParameterType.Float: value = animator.GetFloat(parameter.nameHash); break;
-                    case AnimatorControllerParameterType.Int: value = animator.GetInteger(parameter.nameHash); break;
-                    case AnimatorControllerParameterType.Bool: value = animator.GetBool(parameter.nameHash) ? 1 : 0; break;
+                    case AnimatorControllerParameterType.Float: value = animator.GetFloat(parameter.hash); break;
+                    case AnimatorControllerParameterType.Int: value = animator.GetInteger(parameter.hash); break;
+                    case AnimatorControllerParameterType.Bool: value = animator.GetBool(parameter.hash) ? 1 : 0; break;
                     default: continue; // Trigger consumption cannot be queried from the Animator API.
                 }
-                parameters.Add(new RecordedAnimationState.ParameterPose { hash = parameter.nameHash, type = (int)parameter.type, value = value });
+                parameter.value=value;
             }
-            pose.parameters = parameters.ToArray(); evidence.animators[i] = pose;
         }
         if (captureRealizedPose)
         {
@@ -142,7 +165,6 @@ public sealed class RecordedAnimationCapture
             }
             evidence.blendShapes=blends.ToArray();
         }
-        evidence.legacy = new RecordedAnimationState.LegacyPose[legacy.Length];
         for (int i = 0; i < legacy.Length; i++)
         {
             var clips = new List<RecordedAnimationState.ClipPose>();
@@ -151,9 +173,17 @@ public sealed class RecordedAnimationCapture
                 wrap = (int)clip.wrapMode, blend = (int)clip.blendMode, enabled = clip.enabled });
             evidence.legacy[i] = new RecordedAnimationState.LegacyPose { path = legacyPaths[i], clips = clips.ToArray() };
         }
-        if (procedural != null) evidence.procedural = new RecordedAnimationState.ProceduralPose {
-            time = procedural.AnimationClock, phase = procedural.AnimationPhase(batch != null ? index : 0) };
-        return JsonConvert.SerializeObject(evidence, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+        if (procedural != null)
+        {
+            if(proceduralPose==null)proceduralPose=new RecordedAnimationState.ProceduralPose();
+            proceduralPose.time=procedural.AnimationClock;proceduralPose.phase=procedural.AnimationPhase(batch!=null?index:0);
+            evidence.procedural=proceduralPose;
+        }
+        // Keep the standard extensible JSON contract; reuse serializer/text
+        // storage instead of allocating a serializer and buffers per animal/frame.
+        json.Clear();
+        using(var writer=new JsonTextWriter(jsonText){CloseOutput=false})serializer.Serialize(writer,evidence);
+        return json.ToString();
     }
 }
 

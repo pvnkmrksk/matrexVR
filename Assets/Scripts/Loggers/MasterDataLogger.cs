@@ -24,8 +24,10 @@ public class MasterDataLogger : MonoBehaviour
     private CompanionMediaArchiveSession mediaSession;
     private bool traceSealed, quitWhenFinished, quitAllowed;
     private string traceFailure;
+    private List<string> sealedCloseErrors;
     public Task<JObject> FinalizationTask => recording?.FinalizationTask;
-    public bool IsFinalizing => FinalizationTask != null && !FinalizationTask.IsCompleted;
+    public bool IsFinalizing => MainController.Instance?.SequenceStopping == true ||
+        FinalizationTask != null && !FinalizationTask.IsCompleted;
     public string FinalizationError => recording?.Error;
     /// <summary>Scene loggers may open files only until this session starts finalizing.</summary>
     public bool AcceptingWrites { get; private set; }
@@ -103,8 +105,22 @@ public class MasterDataLogger : MonoBehaviour
         }
     }
 
+    public void RegisterRecordingFailure(string message)
+    {
+        if(FinalizationTask!=null)throw new InvalidOperationException("Recording failure arrived after finalization began.");
+        SealSessionForFinalization();
+        if(!string.IsNullOrWhiteSpace(message))sealedCloseErrors.Add("Native recording: "+message);
+    }
+
+    public void RegisterCompanionSource(MediaRecordingSource source)
+    {
+        if(FinalizationTask!=null)throw new InvalidOperationException("Cannot register a native take after VR finalization started.");
+        mediaSession?.RegisterSource(source);
+    }
+
     private void BeginRecordingEvidence()
     {
+        sealedCloseErrors = null;
         recording = new RecordingSessionFinalizer(directoryPath, Path.Combine(RuntimePaths.RunDataRoot, timestamp + ".zip"), PlayerBuildIdentity.Capture());
         mediaSession = CompanionMediaArchive.BeginSession(directoryPath, timestamp);
         AcceptingWrites = true;
@@ -162,19 +178,30 @@ public class MasterDataLogger : MonoBehaviour
     /// <summary>Call on Unity's main thread. Closing scene writers is immediate; drain, analysis, media and ZIP run off-thread.</summary>
     public Task<JObject> FinalizeSessionAsync(string endReason)
     {
+        if (MainController.Instance?.SequenceStopping == true && !MainController.Instance.NativeRecordingStopSettled)
+            throw new InvalidOperationException("Wait for tracker recording stop acknowledgement before finalizing the session.");
         // Close the gate before discovering writers: inactive components can Start later.
         AcceptingWrites = false;
         if (recording == null) return Task.FromResult<JObject>(null);
         if (FinalizationTask != null) return FinalizationTask;
-        var errors = CloseWriters();
+        SealSessionForFinalization();
+        var errors = sealedCloseErrors;
         // Sealing the selected archive prevents idle setup/replay reads from appending to a finalized experiment.
-        try { ConfigArchive?.RequireComplete(); } catch (Exception error) { errors.Add(error.Message); }
-        ConfigArchive = null;
         var session = recording; var media = mediaSession; string directory = directoryPath;
         return session.FinalizeAsync(endReason,
             token => { AsyncSwarmWriter.DrainAll(); return Task.CompletedTask; },
             async token => (await media.FinalizeAsync(token).ConfigureAwait(false)).ToJson(),
             () => WriterEvidence(directory), media.ObservePose, errors.ToArray());
+    }
+
+    public void SealSessionForFinalization()
+    {
+        if (sealedCloseErrors != null) return;
+        AcceptingWrites = false;
+        sealedCloseErrors = CloseWriters();
+        try { ConfigArchive?.RequireComplete(); }
+        catch (Exception error) { sealedCloseErrors.Add(error.Message); }
+        ConfigArchive = null;
     }
 
     private List<string> CloseWriters()
@@ -218,9 +245,14 @@ public class MasterDataLogger : MonoBehaviour
     {
         if (quitAllowed || recording == null) return true;
         quitWhenFinished = true;
-        MainController.Instance?.StopSequence("application-quit");
-        FinalizeSessionAsync("application-quit");
-        return FinalizationTask.IsCompleted;
+        var main = MainController.Instance;
+        if (main != null)
+        {
+            if (!main.SequenceStopping && FinalizationTask == null) main.StopSequence("application-quit");
+            if (main.SequenceStopping) return false;
+        }
+        if (FinalizationTask == null) FinalizeSessionAsync("application-quit");
+        return FinalizationTask?.IsCompleted == true;
     }
 
     private void Update()

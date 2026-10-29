@@ -46,7 +46,7 @@ public static class ReplayRoundtripValidation
         string root=Application.streamingAssetsPath;
         foreach(string name in new[]{"system_config.json","sequenceConfig.json"})if(File.Exists(Path.Combine(root,name)))File.Copy(Path.Combine(root,name),Path.Combine(output,"original-"+name),true);
         var system=JObject.Parse(File.ReadAllText(Path.Combine(root,"Templates/system_config.template.json")));
-        var rig=(JObject)((JArray)system["configs"])[0].DeepClone();rig["vrId"]="VR1";rig["closedLoopMode"]=Arg("-replay-backend","Rekkefly");rig["zmqAddress"]="127.0.0.1";rig["zmqPort"]=int.Parse(Arg("-replay-port","29921"));rig["displayOrder"]="F";rig["targetDisplay"]=0;rig["ledPanelWidth"]=128;rig["ledPanelHeight"]=128;rig["tracker"]=null;
+        var rig=(JObject)((JArray)system["configs"])[0].DeepClone();rig["vrId"]="VR1";rig["closedLoopMode"]=Arg("-replay-backend","Rekkefly");rig["zmqAddress"]="127.0.0.1";rig["zmqPort"]=int.Parse(Arg("-replay-port","29921"));rig["displayOrder"]="F";rig["targetDisplay"]=0;rig["ledPanelWidth"]=128;rig["ledPanelHeight"]=128;rig["tracker"]=new JObject{["saveVideo"]=false,["recordingControl"]="Manual"};
         system["configs"]=new JArray(rig);system["targetDisplay"]=0;system["telemetry"]=new JObject{["enabled"]=false};system["statusOverlay"]=new JObject{["visible"]=false};system["overheadCamera"]=new JObject{["enabled"]=false};
         Write(root,"__roundtrip-system.json",system);
         var choice=new JObject{["closedLoopPosition"]=false,["closedLoopOrientation"]=true,["autopilotEnabled"]=false,["initialPosition"]=new JObject{["x"]=0,["y"]=1,["z"]=0},["initialRotation"]=new JObject{["x"]=0,["y"]=0,["z"]=0},["uniformSkyColor"]=new JObject{["r"]=.12,["g"]=.24,["b"]=.36,["a"]=1},["objects"]=new JArray(new JObject{["type"]="Cube",["material"]="Black",["position"]=new JObject{["x"]=-4,["y"]=1,["z"]=12},["scale"]=new JObject{["x"]=2,["y"]=8,["z"]=2}}),["autoTrimSettings"]=new JObject{["flightCheckEnabled"]=false}};
@@ -107,7 +107,7 @@ public static class ReplayRoundtripValidation
                     }
                     return;
                 }
-                if(main.SequenceRunning)return;
+                if(main.SequenceRunning||main.SequencePreparing||main.SequenceStopping||MasterDataLogger.Instance.IsFinalizing)return;
                 MasterDataLogger.Instance.ZipDataFolder();
                 Check(observations.Count==4,"two live observations in each actual scene");
                 var saved=new ReplaySessionArchive(runFolder);saved.LoadRigSamples();

@@ -52,6 +52,19 @@ public static class ReplayAnimationValidation
             string a = capture.Capture(); Vector3[] verticesA = Deformation(source);
             animator.Play(state, 0, .47f); animator.Update(0);
             string b = capture.Capture(); Vector3[] verticesB = Deformation(source);
+            // Reusing serializer/parameter storage must preserve all evidence,
+            // including fields that are temporarily present during transitions.
+            foreach (float phase in new[] { 0f, .15f, .5f, .99f, 1.4f, .15f })
+            {
+                animator.Play(state, 0, phase); animator.Update(0);
+                if (phase == .5f) { animator.CrossFade(state, .25f, 0, .7f); animator.Update(.05f); }
+                string cached = capture.Capture();
+                var payload = (RecordedAnimationState)typeof(RecordedAnimationCapture).GetField("evidence", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(capture);
+                string canonical = JsonConvert.SerializeObject(payload, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                Check(JToken.DeepEquals(JToken.Parse(cached), JToken.Parse(canonical)), "Reused animation JSON preserves the full standard serializer contract at " + phase);
+                Check((JObject.Parse(cached)["realizedPose"] != null) == animator.IsInTransition(0), "Reused animation evidence enters/leaves actual transitions without stale pose data at " + phase);
+            }
+
             Check(Difference(verticesA, verticesB) > .0001f, "Original prefab visibly deforms at two recorded animation times");
             var replay = Object.Instantiate(prefab); ReplayEnvironmentLoader.FreezeVisual(replay);
             var driver = replay.AddComponent<ReplayAnimationDriver>();

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityGLTF;
@@ -38,8 +39,9 @@ public static class ExternalModelLibrary
             foreach (var child in array) foreach (string path in CollectReferences(child)) yield return path;
     }
 
-    public static async Task PreloadAsync(string reference, byte[] bytes)
+    public static async Task PreloadAsync(string reference, byte[] bytes, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ValidateEmbeddedGlb(reference, bytes);
         string hash = RunConfigArchive.Hash(bytes);
         generations.TryGetValue(reference, out int previousGeneration);
@@ -60,7 +62,8 @@ public static class ExternalModelLibrary
             importer.SceneParent = root;
             try
             {
-                await importer.LoadSceneAsync(showSceneObj: false);
+                await importer.LoadSceneAsync(showSceneObj: false, cancellationToken: cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
                 loaded = importer.CreatedObject;
                 if (loaded == null) throw new InvalidDataException("The GLB contains no scene.");
                 loaded.name = Path.GetFileNameWithoutExtension(reference);
@@ -81,6 +84,8 @@ public static class ExternalModelLibrary
             }
             catch
             {
+                // Import cancellation can happen before LoadSceneAsync returns its root.
+                loaded = loaded != null ? loaded : importer.CreatedObject;
                 if (loaded != null) Release(loaded);
                 throw;
             }
@@ -137,6 +142,13 @@ public static class ExternalModelLibrary
         uint jsonLength = BitConverter.ToUInt32(bytes, 12);
         if (jsonLength > bytes.Length - 20) throw new InvalidDataException("Truncated GLB JSON chunk: " + reference);
         JObject json = JObject.Parse(Encoding.UTF8.GetString(bytes, 20, (int)jsonLength).TrimEnd('\0', ' '));
+        // These decoders are optional UnityGLTF packages and are not shipped in
+        // this player. Reject required compression before a partial import can
+        // be mistaken for the purchased/exported model's complete appearance.
+        var unavailable = new[] { "KHR_draco_mesh_compression", "KHR_texture_basisu", "EXT_meshopt_compression" };
+        foreach (string extension in (json["extensionsRequired"] as JArray ?? new JArray()).Values<string>())
+            if (unavailable.Contains(extension, StringComparer.Ordinal))
+                throw new InvalidDataException("This build cannot decode required " + extension + ". Export an uncompressed GLB with embedded PNG/JPEG textures, or build with its matching decoder package.");
         foreach (var uri in json.Descendants().OfType<JProperty>().Where(p => p.Name == "uri"))
             if (uri.Value.Type == JTokenType.String && !((string)uri.Value).StartsWith("data:", StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Embed all model buffers and textures in the .glb; external references cannot be archived reliably: " + uri.Value);

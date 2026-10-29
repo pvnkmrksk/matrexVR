@@ -296,13 +296,13 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     {
         bool mirror = string.Equals(importedName, "Kannadi", StringComparison.OrdinalIgnoreCase) &&
             !string.Equals((string)currentConfig?["populationMode"], "Swarm", StringComparison.OrdinalIgnoreCase);
-        if (!mirror) return fallback;
+        if (!mirror) return ExperimentVisibility.CameraMask(currentConfig, id, fallback);
         int index = RuntimeRigRegistry.ParseIndex(CanonicalRig(id));
         var own = (currentConfig?["vrConfigs"] as JArray)?.OfType<JObject>().FirstOrDefault(value => (int?)value["vrIndex"] == index);
         int? watch = (int?)own?["watchIndex"];
         int layer = watch.HasValue ? RuntimeRigRegistry.StimulusLayer(watch.Value) : -1;
         int peers = watch.HasValue ? (layer >= 0 ? 1 << layer : 0) : RuntimeRigRegistry.PeerStimulusMask(index);
-        return (fallback & ~RuntimeRigRegistry.StimulusMask) | peers;
+        return ExperimentVisibility.CameraMask(currentConfig, id, (fallback & ~RuntimeRigRegistry.StimulusMask) | peers);
     }
 
     public void ApplyAsynchronousSample(ReplaySessionArchive.Sample sample)
@@ -477,7 +477,13 @@ public class ReplayEnvironmentLoader : MonoBehaviour
 
     private void RestoreSky(string id,JObject config)
     {
-        if(currentSky==id && (skyTexture!=null || string.IsNullOrEmpty(id)))return;
+        if(currentSky==id && (skyTexture!=null || string.IsNullOrEmpty(id)))
+        {
+            // Two phases can reuse identical image bytes with a different
+            // azimuth; the image cache must not skip that configuration change.
+            ExperimentSky.Apply(config);
+            return;
+        }
         ReleaseSky();
         RenderSettings.ambientMode=importedAmbientMode;RenderSettings.ambientLight=importedAmbientLight;
         RenderSettings.ambientSkyColor=importedAmbientSky;RenderSettings.ambientEquatorColor=importedAmbientEquator;
@@ -495,6 +501,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             if(shader==null)throw new InvalidOperationException("Recorded sky shader is missing.");
             skyMaterial=new Material(shader){name="Recorded replay sky material"};skyMaterial.mainTexture=skyTexture;
             RenderSettings.skybox=skyMaterial;
+            ExperimentSky.Apply(config);
         }
         else
         {
@@ -607,6 +614,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys))
             using(ExperimentRandom.RestoreCheckpoint((JObject)currentPresentation["initializationRandom"]))
             {
+                ExperimentVisibility.Restore(importedScene);
                 var roots=importedScene.GetRootGameObjects();
                 var choice=roots.SelectMany(root=>root.GetComponentsInChildren<ChoiceController>(true)).FirstOrDefault();
                 var optomotor=roots.SelectMany(root=>root.GetComponentsInChildren<OptomotorSceneController>(true)).FirstOrDefault();
@@ -622,6 +630,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                 }
                 ExperimentWorldObjects.Apply(importedScene,currentConfig);
                 RestoreRugosity(currentConfig);ExperimentSun.Apply(importedScene,currentConfig);
+                ExperimentVisibility.Apply(importedScene,currentConfig);
                 importedAmbientMode=RenderSettings.ambientMode;importedAmbientLight=RenderSettings.ambientLight;
                 importedAmbientSky=RenderSettings.ambientSkyColor;importedAmbientEquator=RenderSettings.ambientEquatorColor;importedAmbientGround=RenderSettings.ambientGroundColor;
                 importedFog=RenderSettings.fog;importedFogColor=RenderSettings.fogColor;importedFogDensity=RenderSettings.fogDensity;importedFogStart=RenderSettings.fogStartDistance;importedFogEnd=RenderSettings.fogEndDistance;

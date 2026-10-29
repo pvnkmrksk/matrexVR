@@ -58,6 +58,27 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
                 schema["properties"]["title"]=new JObject { ["type"]="string",["default"]="",["x-ui"]=new JObject { ["help"]="Optional human-readable experiment or paradigm name. The file path remains visible separately." } };
                 schema["properties"]["comments"]=new JObject { ["type"]="string",["default"]="",["x-ui"]=new JObject { ["help"]="Optional notes retained in this configuration and the run archive." } };
                 if(property.Name!="sequence")schema["properties"]["sun"]=Schema(typeof(SunConfig));
+                if(property.Name!="sequence")
+                {
+                    var common=(JObject)schema["properties"];
+                    if(common["nightSky"]==null)common["nightSky"]=Schema(typeof(NightSkyConfig));
+                    if(common["uniformSkyColor"]==null)common["uniformSkyColor"]=Schema(typeof(ColorConfig));
+                    if(common["skyboxPath"]==null)common["skyboxPath"]=new JObject { ["type"]="string",["default"]="" };
+                }
+                if(property.Name!="sequence")schema["properties"][ExperimentSky.RotationField]=new JObject {
+                    ["type"]="number",["minimum"]=0,["maximum"]=360,["default"]=0,
+                    ["x-ui"]=new JObject { ["unit"]="degrees",["help"]="Rotate an imported panorama horizontally. Zero preserves its original orientation; 360 is one complete turn." }
+                };
+                if(property.Name!="sequence")
+                {
+                    var visibility=Schema(typeof(VisibilityMatrixConfig));
+                    visibility["default"]=ExperimentVisibility.Default();
+                    visibility["properties"]["enabled"]["default"]=false;
+                    visibility["properties"]["rows"]["maxItems"]=RuntimeRigRegistry.MaximumRigCount;
+                    visibility["properties"]["rows"]["items"]["maxItems"]=RuntimeRigRegistry.MaximumRigCount;
+                    visibility["x-ui"]=new JObject { ["help"]="Rows are observers VR1–VR16; columns are the VR population layers they see. The matrix changes no ground, sky, or private Choice-object layers. Disabled preserves the normal scene visibility." };
+                    schema["properties"][ExperimentVisibility.Field]=visibility;
+                }
             }
             string template=property.Name=="system"?"system_config":property.Name;
             string path=Path.Combine(Application.streamingAssetsPath,"Templates",template+".template.json");

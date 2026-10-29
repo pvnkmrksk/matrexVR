@@ -1,6 +1,10 @@
 Shader "NightSky/Panorama"
 {
-    Properties { _MainTex ("Panorama", 2D) = "black" {} }
+    Properties
+    {
+        _MainTex ("Panorama", 2D) = "black" {}
+        _Rotation ("Rotation", Range(0, 360)) = 0
+    }
     SubShader
     {
         Tags { "Queue"="Background" "RenderType"="Background" "PreviewType"="Skybox" }
@@ -13,6 +17,7 @@ Shader "NightSky/Panorama"
             #pragma fragment frag
             #include "UnityCG.cginc"
             sampler2D _MainTex;
+            float _Rotation;
             struct appdata { float4 vertex : POSITION; UNITY_VERTEX_INPUT_INSTANCE_ID };
             struct v2f { float4 vertex : SV_POSITION; float3 direction : TEXCOORD0; UNITY_VERTEX_OUTPUT_STEREO };
             v2f vert(appdata v)
@@ -27,6 +32,10 @@ Shader "NightSky/Panorama"
             float4 frag(v2f i) : SV_Target
             {
                 float3 d = normalize(i.direction);
+                float angle = radians(_Rotation);
+                float sine, cosine;
+                sincos(angle, sine, cosine);
+                d.xz = mul(float2x2(cosine, sine, -sine, cosine), d.xz);
                 float2 uv = float2(.5 - atan2(d.z, d.x) / (2 * UNITY_PI), .5 + asin(clamp(d.y,-1,1)) / UNITY_PI);
                 return float4(tex2D(_MainTex, uv).rgb, 1);
             }

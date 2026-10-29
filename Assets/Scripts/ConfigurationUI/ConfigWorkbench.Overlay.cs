@@ -21,13 +21,12 @@ namespace ConfigurationUI
                 section.Add(group);
                 var location = SessionLabel("JSON location: $." + key, "studio-subtitle"); location.tooltip = Workspace.System.Path + "\n" + location.text; group.Add(location);
                 var values = Workspace.System.Root[key] as JObject ?? new JObject();
-                bool automatic = (bool?)values["automaticPlacement"] ?? true;
                 group.Add(Setting(Workspace.System, new[] { key, "visible" }, ConfigSchema.Child(schema, "visible"), values, schema));
-                var controls = new VisualElement(); controls.SetEnabled((bool?)values["visible"] ?? true); group.Add(controls);
+                var controls = new VisualElement(); group.Add(controls); BindViewState(controls,()=>controls.SetEnabled((bool?)Workspace.System.Root[key]?["visible"]??true));
                 foreach (string field in new[] { "targetDisplay", "automaticPlacement", "x", "y" })
                 {
                     var control = Setting(Workspace.System, new[] { key, field }, ConfigSchema.Child(schema, field), values, schema);
-                    if (field == "x" || field == "y") { control.SetEnabled(!automatic); control.tooltip = (field == "x" ? "Horizontal" : "Vertical") + " preferred position in physical pixels from the display's bottom-left. LED rectangles remain protected."; }
+                    if (field == "x" || field == "y") { BindViewState(control,()=>control.SetEnabled(!((bool?)Workspace.System.Root[key]?["automaticPlacement"]??true)&&((bool?)Workspace.System.Root[key]?["visible"]??true))); control.tooltip = (field == "x" ? "Horizontal" : "Vertical") + " preferred position in physical pixels from the display's bottom-left. LED rectangles remain protected."; }
                     if (field == "targetDisplay") control.tooltip = "Output display index, starting at 0. Desktop controls also accept -1 to follow the first desktop preview rig.";
                     if (field == "automaticPlacement") control.tooltip = "ON chooses an available location near the usual corner. OFF uses your preferred X/Y coordinates and relocates only when needed to protect stimulus pixels.";
                     controls.Add(control);

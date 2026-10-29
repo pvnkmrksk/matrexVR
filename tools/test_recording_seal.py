@@ -21,12 +21,12 @@ public class BandSpawner {public GameObject instancePrefab=new GameObject();publ
 public class Kannadi {public int numberOfRings=1;public float hexRadius;}
 public class LocustSpawner {public int numberOfLocusts=1;public float spawnAreaSize,mu,kappa,locustSpeed,locustSpeedStdDev,kappaElevation;public string directionDistribution;}
 public static class RuntimeRigRegistry {public static int ParseIndex(string n)=>1;public static string LayerLabel(int i)=>"VR1";}
-public class AsyncSwarmWriter {public static int Opened;public bool Completed;public AsyncSwarmWriter(string path,string header){Opened++;File.WriteAllText(path,header);}public void Complete(){Completed=true;}}
+public class AsyncSwarmWriter {public enum RowLayout{Swarm,Kannadi}public static int Opened;public bool Completed;public AsyncSwarmWriter(string path,string header,RowLayout layout=RowLayout.Swarm){Opened++;File.WriteAllText(path,header);}public void Complete(){Completed=true;}}
 '''
 SHIMS={
 'DataLogger':r'''public class DataLogger:MonoBehaviour {protected string directoryPath,line;protected string logPath {get;private set;}protected StreamWriter logFile;protected bool logInitialized;private bool closedForArchive;protected List<string> bufferedLines;protected bool isLogging,isBuffering,isFirstLine;protected ZmqListener zmq;protected MainController mainController;public string PathWritten=>logPath;public void Begin()=>Start();public void Append()=>LogData("\npose");private void AddColumns(params string[] headers){}protected virtual string BuildHeader()=>"Time,X,Y";private IEnumerator FlushBufferedLinesRoutine(){yield break;}''',
 'BandLogger':r'''public class BandLogger:MonoBehaviour {public LayerMask targetLayerMask;private string directoryPath,logPath;private StreamWriter logFile;private BandSpawner bandSpawner;private bool closedForArchive;public void Begin()=>Start();private string GetLayerNames(LayerMask m)=>"VR1";private string GetUniqueFileName(string d,string a,string b)=>a+Guid.NewGuid().ToString("N")+b;private void LogAllInstances(){}''',
-'KannadiLogger':r'''public class KannadiLogger:MonoBehaviour {private string directoryPath,logPath;private StreamWriter logFile;private Kannadi kannadi;private int vrIndex;private bool closedForArchive;public void Begin()=>Start();''',
+'KannadiLogger':r'''public class KannadiLogger:MonoBehaviour {private string directoryPath,logPath;private AsyncSwarmWriter writer;private Kannadi kannadi;private int vrIndex;private bool closedForArchive;public void Begin()=>Start();''',
 'SwarmLogger':r'''public class SwarmLogger:MonoBehaviour {public LayerMask locustLayerMask;private LocustSpawner spawner;private AsyncSwarmWriter writer;private bool closed;public string LogPath {get;private set;}public void Begin()=>Start();'''
 }
 TESTS=r'''
@@ -61,7 +61,12 @@ static class Regression {
 def main():
  master=(ROOT/'Assets/Scripts/Loggers/MasterDataLogger.cs').read_text()
  finalize=declaration(master,'public Task<JObject> FinalizeSessionAsync(')
- assert finalize.index('AcceptingWrites = false')<finalize.index('CloseWriters()'),'Master must close the session gate before writer discovery'
+ if 'public void SealSessionForFinalization()' in master:
+  seal=declaration(master,'public void SealSessionForFinalization()')
+  assert finalize.index('AcceptingWrites = false')<finalize.index('SealSessionForFinalization()'),'Master must close the session gate before sealing writers'
+  assert seal.index('AcceptingWrites = false')<seal.index('CloseWriters()'),'Sealing must close the session gate before writer discovery'
+ else:
+  assert finalize.index('AcceptingWrites = false')<finalize.index('CloseWriters()'),'Master must close the session gate before writer discovery'
  assert 'AcceptingWrites = true' in declaration(master,'private void BeginRecordingEvidence()')
  assert 'AcceptingWrites = false' in declaration(master,'private List<string> CloseWriters()')
  source=PRELUDE

@@ -19,7 +19,8 @@ public sealed class NightSkyController : MonoBehaviour
         owner.material != null && RenderSettings.skybox == owner.material;
 
     private NightSkyConfig config;
-    private Material material, bakeMaterial, previousMaterial;
+    private Material material, previousMaterial;
+    private NightSkyImageRenderer imageRenderer;
     private Texture2D texture;
     private DateTimeOffset startUtc, lastSample;
     private double startRealtime;
@@ -121,34 +122,13 @@ public sealed class NightSkyController : MonoBehaviour
 
     private void Bake(DateTimeOffset sample)
     {
-        Texture2D source = Resources.Load<Texture2D>("NightSky/starmap_2020_4k");
         TextAsset provenance = Resources.Load<TextAsset>("NightSky/source");
-        if (source == null || provenance == null) throw new FileNotFoundException("Bundled NASA night-sky map or provenance is missing.");
-        if (config.imageWidth > SystemInfo.maxTextureSize) throw new InvalidOperationException("Night sky imageWidth exceeds this device's texture limit.");
-        Matrix4x4 matrix = NightSkyOrientation.WorldToEquatorial(config, sample);
-        if (bakeMaterial == null)
-        {
-            Shader shader = Resources.Load<Shader>("NightSky/Bake");
-            if (shader == null || !shader.isSupported) throw new InvalidOperationException("NightSky/Bake shader is unavailable on this device.");
-            bakeMaterial = new Material(shader);
-        }
-        bakeMaterial.SetMatrix("_WorldToEquatorial", matrix);
-        bakeMaterial.SetFloat("_Exposure", config.exposure);
-        bakeMaterial.SetFloat("_FaintDetailCutoff", config.faintDetailCutoff);
-        bakeMaterial.SetFloat("_MaskBelowHorizon", config.maskBelowHorizon ? 1 : 0);
-        RenderTexture target = RenderTexture.GetTemporary(config.imageWidth, config.imageWidth / 2, 0,
-            RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
-        RenderTexture previous = RenderTexture.active;
-        bool previousSrgb = GL.sRGBWrite;
-        Texture2D baked = null;
+        if (provenance == null) throw new FileNotFoundException("Bundled NASA night-sky provenance is missing.");
+        if (imageRenderer == null) imageRenderer = new NightSkyImageRenderer();
+        Texture2D baked = imageRenderer.Render(config, sample);
+        Matrix4x4 matrix = imageRenderer.WorldToEquatorial;
         try
         {
-            GL.sRGBWrite = false;
-            Graphics.Blit(source, target, bakeMaterial, 0);
-            RenderTexture.active = target;
-            baked = new Texture2D(target.width, target.height, TextureFormat.RGBA32, false, false);
-            baked.ReadPixels(new Rect(0, 0, target.width, target.height), 0, 0);
-            baked.Apply(false, false);
             float[] transform = new float[9];
             for (int row = 0; row < 3; row++)
                 for (int col = 0; col < 3; col++) transform[row * 3 + col] = matrix[row, col];
@@ -164,9 +144,6 @@ public sealed class NightSkyController : MonoBehaviour
         }
         finally
         {
-            RenderTexture.active = previous;
-            GL.sRGBWrite = previousSrgb;
-            RenderTexture.ReleaseTemporary(target);
             if (baked != null) Destroy(baked);
         }
     }
@@ -261,9 +238,9 @@ public sealed class NightSkyController : MonoBehaviour
         foreach (var entry in cameraSkyboxes) if (entry.Key != null) entry.Key.enabled = entry.Value;
         cameraFlags.Clear(); cameraSkyboxes.Clear();
         if (material != null) Destroy(material);
-        if (bakeMaterial != null) Destroy(bakeMaterial);
+        imageRenderer?.Dispose(); imageRenderer = null;
         if (texture != null) Destroy(texture);
-        material = null; bakeMaterial = null; texture = null;
+        material = null; texture = null;
         currentId = ""; sampleUtc = "";
         if (owner == this) owner = null;
     }

@@ -30,13 +30,13 @@ MATREX VR is a Unity application for flight, walking and collective-behaviour ex
 
 ## Capabilities
 
-The next development pass is tracked in the [experiment and replay overhaul plan](docs/overhaul-0.5-plan.md), including prioritized requirements, parallel ownership, compatibility decisions and deferred validation. It is a work plan, not a list of released features.
+The next development pass is tracked in the [experiment and replay overhaul plan](docs/overhaul-0.5-plan.md), including prioritized requirements, parallel ownership, compatibility decisions and deferred validation. The [GUI, recording and performance follow-up](docs/gui-recording-performance-followup.md) tracks current operator feedback and acceptance. These are work plans, not lists of released features.
 
 Development branch: [custom GLB models, Kannadi populations and 1–16 rigs](docs/custom-models-and-rigs.md). External models use self-contained GLB exports; vendor Unity packages need export/conversion first.
 
 [Five world starters](Assets/StreamingAssets/Examples/Worlds/README.md) and the [optional local MCP control interface](docs/ai-control.md) are available in the development branch.
 
-[Greenfield replay and setup validation](docs/same-build-validation-20261029.md) records the latest checks; [earlier overhaul evidence](docs/overhaul-validation-20261029.md) covers the wider world/rig feature pass.
+[GUI and recorder follow-up](docs/gui-recording-performance-followup.md) tracks the current implementation and its acceptance evidence. [Greenfield replay and setup validation](docs/same-build-validation-20261029.md) records the core replay checks; [earlier overhaul evidence](docs/overhaul-validation-20261029.md) covers the wider world/rig feature pass.
 
 The greenfield [same-build replay contract](docs/same-build-replay-contract.md) governs new recordings: preserve the creating build, complete archived configurations and realized state, and apply the original experiment controllers during replay.
 

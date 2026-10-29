@@ -8,7 +8,7 @@ namespace ConfigurationUI
     public sealed class WorkbenchIcon : VisualElement
     {
         private static readonly Dictionary<string,string> Names=new Dictionary<string,string> {
-            {"power","power"},{"back","arrow-left"},{"home","house"},{"person","user"},{"auto","zap"},{"loop","repeat"},{"shuffle","shuffle"},
+            {"visibility","eye"},{"save","save"},{"palette","palette"},{"image","image"},{"object","box"},{"code","code-xml"},{"reset","refresh-cw"},{"undo","rotate-ccw"},{"redo","rotate-ccw"},{"up","chevron-down"},{"down","chevron-down"},{"refresh","refresh-cw"},{"overview","layout-dashboard"},{"more","ellipsis"},{"power","power"},{"back","arrow-left"},{"home","house"},{"person","user"},{"auto","zap"},{"loop","repeat"},{"shuffle","shuffle"},
             {"play","play"},{"sequence","list-ordered"},{"system","monitor"},{"motion","move-right"},
             {"sky","sun"},{"swarm","network"},{"file","file-text"},{"plus","plus"},{"copy","copy"},
             {"trash","trash"},{"grip","grip-vertical"},{"settings","sliders-horizontal"},{"stop","square"},
@@ -18,9 +18,11 @@ namespace ConfigurationUI
         private static readonly Dictionary<string,Texture2D> Textures=new Dictionary<string,Texture2D>();
         private readonly Texture2D texture;
         private readonly string vectorKind;
+        private readonly bool mirror,upsideDown;
         public WorkbenchIcon(string kind)
         {
             AddToClassList("studio-icon");pickingMode=PickingMode.Ignore;
+            mirror=kind=="redo";upsideDown=kind=="up";
             if(kind=="led-panels"||kind=="monitor-array")
             {vectorKind=kind;generateVisualContent+=Draw;return;}
             string name=Names.TryGetValue(kind??"",out string mapped)?mapped:"circle-dot";
@@ -33,10 +35,10 @@ namespace ConfigurationUI
             if(texture==null || contentRect.width<=0 || contentRect.height<=0) return;
             float size=Mathf.Min(contentRect.width,contentRect.height),x=contentRect.x+(contentRect.width-size)/2,y=contentRect.y+(contentRect.height-size)/2;
             var mesh=context.Allocate(4,6,texture);Color32 tint=resolvedStyle.color;
-            mesh.SetNextVertex(new Vertex {position=new Vector3(x,y,Vertex.nearZ),tint=tint,uv=new Vector2(0,1)});
-            mesh.SetNextVertex(new Vertex {position=new Vector3(x+size,y,Vertex.nearZ),tint=tint,uv=new Vector2(1,1)});
-            mesh.SetNextVertex(new Vertex {position=new Vector3(x+size,y+size,Vertex.nearZ),tint=tint,uv=new Vector2(1,0)});
-            mesh.SetNextVertex(new Vertex {position=new Vector3(x,y+size,Vertex.nearZ),tint=tint,uv=new Vector2(0,0)});
+            mesh.SetNextVertex(new Vertex {position=new Vector3(x,y,Vertex.nearZ),tint=tint,uv=new Vector2(mirror?1:0,upsideDown?0:1)});
+            mesh.SetNextVertex(new Vertex {position=new Vector3(x+size,y,Vertex.nearZ),tint=tint,uv=new Vector2(mirror?0:1,upsideDown?0:1)});
+            mesh.SetNextVertex(new Vertex {position=new Vector3(x+size,y+size,Vertex.nearZ),tint=tint,uv=new Vector2(mirror?0:1,upsideDown?1:0)});
+            mesh.SetNextVertex(new Vertex {position=new Vector3(x,y+size,Vertex.nearZ),tint=tint,uv=new Vector2(mirror?1:0,upsideDown?1:0)});
             mesh.SetNextIndex(0);mesh.SetNextIndex(1);mesh.SetNextIndex(2);mesh.SetNextIndex(2);mesh.SetNextIndex(3);mesh.SetNextIndex(0);
         }
         private void DrawOutputIcon(MeshGenerationContext context)

@@ -53,7 +53,7 @@ An experimenter should configure and run a packaged application without rebuildi
 - [x] Configurable directional sun for all experiments: enabled, intensity, color/hex and orientation. Directional light position is irrelevant.
 - [x] Four sky modes: Unity default, uniform color, custom panorama, astronomical stars. Explicit enable controls and inactive controls gray out.
 - [x] Night sky latitude/longitude, fixed local time plus UTC offset or current time; current time disables the fixed-time field. Preserve generated sky images/provenance.
-- [ ] Optional panorama azimuth rotation, default zero; normalize bounded angles.
+- [x] Optional panorama azimuth rotation, default zero; normalize bounded angles. Actual GPU comparisons match Unity at cardinal views/rotations.
 
 ### Replay controls and readability
 
@@ -118,3 +118,5 @@ Focused non-rendered regression checks passed during implementation: 55 apparatu
 ## Acceptance evidence
 
 See [greenfield same-build validation](same-build-validation-20261029.md), plus [29 October validation and remaining limits](overhaul-validation-20261029.md) and its [machine-readable report](overhaul-validation-20261029.json). Core replay animation, GLB import/archive, seeded/grouped sequencing, dark configuration, titles, sixteen-rig setup, live phase continuity, five packaged world starters and local MCP control are implemented and checked at the scopes recorded there. This checklist remains the complete requirements inventory; composite requirements that include unverified or deferred parts remain unchecked.
+
+The [GUI, recording and performance follow-up](gui-recording-performance-followup.md) implements the rendered picker previews, optional visibility matrix, formal GLB support contract and acknowledged native recorder bridge. See its acceptance links for measured scope; the original P2 list is retained as the historical work order. Large-data cache benchmarking, other-platform/physical apparatus acceptance and further rendering work remain open.

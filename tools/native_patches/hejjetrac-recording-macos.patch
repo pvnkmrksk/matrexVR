@@ -1,0 +1,510 @@
+diff --git a/apps/fictrac-desktop/src/control.rs b/apps/fictrac-desktop/src/control.rs
+index 8132066..4ff41eb 100644
+--- a/apps/fictrac-desktop/src/control.rs
++++ b/apps/fictrac-desktop/src/control.rs
+@@ -312,6 +312,7 @@ fn status(s: &mut Session) -> Value {
+     state["window_max_inner_size"] = json!([s.max_window_inner_size.x, s.max_window_inner_size.y]);
+     state["recording_encoding"] = json!(s.recording_encoding);
+     state["media_recording"] = json!(s.snapshot.media_recording);
++    state["recording_numeric_frames"] = json!(s.snapshot.recording_numeric_frames);
+     state["recording_finalizations"] = json!(s.snapshot.recording_finalizations);
+     state["media_warnings"] = json!(s.snapshot.media_warnings);
+     state["preview_fps"] = json!(s.snapshot.preview_fps);
+@@ -948,6 +949,57 @@ fn display(error: impl std::fmt::Display) -> String {
+     error.to_string()
+ }
+ 
++/// Recording ownership fences used by the reconnectable mailbox, on the same worker as the GUI.
++pub fn execute_mailbox(app: &mut Desktop, command: &str, args: &Value) -> Result<Value> {
++    if command == "record_start" || command == "record_stop" {
++        let session = app
++            .sessions
++            .iter_mut()
++            .find(|session| session.id == 1 && !session.closed)
++            .ok_or("Native session1 is closed")?;
++        if command == "record_start" {
++            let directory = PathBuf::from(string(args, "directory")?);
++            if !directory.is_absolute() || directory.exists() {
++                return Err("Recording directory must be a new absolute path".into());
++            }
++            let document = session.document()?;
++            let options = fictrac_control::record_options(args)?
++                .unwrap_or_else(|| fictrac_control::RecordOptions::from_document(&document));
++            let tuning = fictrac_control::recording_tuning(args)?;
++            session.record_raw = options.raw;
++            session.record_debug = options.debug;
++            return send(session, Command::RecordOwned(directory, options, tuning));
++        }
++        let directory = PathBuf::from(string(args, "expected_directory")?);
++        if !directory.is_absolute() {
++            return Err("Expected take directory must be absolute".into());
++        }
++        return send(
++            session,
++            Command::StopRecordIf(directory, string(args, "stop_request_id")?.to_owned()),
++        );
++    }
++    let response = Bridge::execute(
++        app,
++        Request {
++            id: Value::Null,
++            command: command.to_owned(),
++            session: Some(1),
++            args: args.clone(),
++        },
++    );
++    if response.ok {
++        response
++            .result
++            .ok_or("Native response has no result".into())
++    } else {
++        Err(response
++            .error
++            .map(|error| error.message)
++            .unwrap_or_else(|| "Native command failed".into()))
++    }
++}
++
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+@@ -1104,6 +1156,7 @@ mod tests {
+             requested_screenshot: false,
+             last_state: std::time::Instant::now(),
+             control: None,
++            mailbox: None,
+             tile_columns: 2,
+             window_origin: crate::Pair(12., 36.),
+             window_size: crate::Pair(520., 480.),
+diff --git a/apps/fictrac-desktop/src/main.rs b/apps/fictrac-desktop/src/main.rs
+index 95a6888..4e47c3e 100644
+--- a/apps/fictrac-desktop/src/main.rs
++++ b/apps/fictrac-desktop/src/main.rs
+@@ -4,6 +4,7 @@ mod control;
+ #[cfg(any(target_os = "linux", test))]
+ mod graphics;
+ mod icons;
++mod native_mailbox;
+ mod runtime;
+ mod session;
+ mod startup;
+@@ -48,6 +49,12 @@ struct Args {
+     /// Accept agent JSONL commands on stdin and return structured responses on stdout.
+     #[arg(long)]
+     control_stdio: bool,
++    /// Reconnectable local commands for this native window; no network listener.
++    #[arg(long, requires = "control_instance")]
++    control_dir: Option<PathBuf>,
++    /// Unique32-character launch identity for --control-dir.
++    #[arg(long, requires = "control_dir")]
++    control_instance: Option<String>,
+ }
+ fn resource(relative: &str) -> Result<PathBuf, String> {
+     let mut roots = vec![];
+@@ -140,6 +147,7 @@ struct Desktop {
+     requested_screenshot: bool,
+     last_state: Instant,
+     control: Option<control::Bridge>,
++    mailbox: Option<native_mailbox::Mailbox>,
+     window_size: Pair,
+     window_origin: Pair,
+     tile_columns: usize,
+@@ -187,7 +195,8 @@ impl Desktop {
+             );
+         }
+         ui::configure_appearance(&cc.egui_ctx);
+-        let normal_startup = args.config.is_none() && !args.control_stdio;
++        let normal_startup =
++            args.config.is_none() && !args.control_stdio && args.control_dir.is_none();
+         let startup = if normal_startup {
+             startup::default_document(&default_config()?)?
+         } else {
+@@ -252,6 +261,14 @@ impl Desktop {
+         } else {
+             None
+         };
++        let mailbox = args
++            .control_dir
++            .clone()
++            .zip(args.control_instance.clone())
++            .map(|(directory, instance)| {
++                native_mailbox::Mailbox::new(directory, instance, "hejjetrac")
++            })
++            .transpose()?;
+         let monitor = cc
+             .egui_ctx
+             .input(|i| i.viewport().monitor_size)
+@@ -298,6 +315,7 @@ impl Desktop {
+             requested_screenshot: false,
+             last_state: Instant::now() - std::time::Duration::from_secs(1),
+             control,
++            mailbox,
+             window_size,
+             window_origin,
+             tile_columns: grid.0 as usize,
+@@ -549,6 +567,15 @@ impl Desktop {
+ impl eframe::App for Desktop {
+     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+         self.refresh_camera_occupancy();
++        if let Some(mut mailbox) = self.mailbox.take() {
++            if let Err(error) =
++                mailbox.poll(|command, args| control::execute_mailbox(self, command, args))
++            {
++                self.startup_notice = error;
++            }
++            self.mailbox = Some(mailbox);
++            ctx.request_repaint_after(std::time::Duration::from_millis(40));
++        }
+         if let Some(mut bridge) = self.control.take() {
+             bridge.poll(self);
+             self.control = Some(bridge);
+diff --git a/apps/fictrac-desktop/src/runtime.rs b/apps/fictrac-desktop/src/runtime.rs
+index f2bc051..836f8fb 100644
+--- a/apps/fictrac-desktop/src/runtime.rs
++++ b/apps/fictrac-desktop/src/runtime.rs
+@@ -93,6 +93,7 @@ pub struct Snapshot {
+     pub recording_directory: Option<PathBuf>,
+     /// Bounded recent history; live Stop/rotation can leave files finalizing.
+     pub recording_finalizations: Vec<RecordingFinalization>,
++    pub recording_numeric_frames: u64,
+ }
+ #[derive(Clone, serde::Serialize)]
+ pub struct RecordingFinalization {
+@@ -102,12 +103,18 @@ pub struct RecordingFinalization {
+     pub media_warnings: Vec<String>,
+     pub media_recording: Option<MediaRecordingStatus>,
+     pub completion_error: Option<String>,
++    pub control_stop_id: Option<String>,
++    pub capture_pause_count: u64,
++    pub numeric_frames: u64,
+ }
+ impl RecordingFinalization {
+     fn queued(directory: PathBuf) -> Self {
+         Self {
+             directory,
+             state: "queued",
++            control_stop_id: None,
++            capture_pause_count: 0,
++            numeric_frames: 0,
+             numeric_error: None,
+             media_warnings: vec![],
+             media_recording: None,
+@@ -284,6 +291,12 @@ pub enum Command {
+     CameraRefresh,
+     CameraControl(fictrac_camera::CameraControlRequest),
+     StopRecord,
++    StopRecordIf(PathBuf, String),
++    RecordOwned(
++        PathBuf,
++        fictrac_control::RecordOptions,
++        MediaRecordingTuning,
++    ),
+     Realtime(bool),
+     DisplayFps(u32),
+ }
+@@ -610,6 +623,17 @@ fn run(
+     let processing_result = (|| -> Result<()> {
+         'worker: while !stop.load(Ordering::Acquire) {
+             for cmd in pending_command.take().into_iter().chain(rx.try_iter()) {
++                let require_idle = matches!(&cmd, Command::RecordOwned(..));
++                let expected_take = if let Command::StopRecordIf(directory, _) = &cmd {
++                    Some(directory.clone())
++                } else {
++                    None
++                };
++                let owned_stop_id = if let Command::StopRecordIf(_, id) = &cmd {
++                    Some(id.clone())
++                } else {
++                    None
++                };
+                 match cmd {
+                     Command::Configure(next, revision) => {
+                         // A failed startup has no previously configured handles.
+@@ -655,6 +679,11 @@ fn run(
+                         needs_config = true;
+                     }
+                     Command::Pause(p) => {
++                        if p && !paused
++                            && let Some(r) = &mut recorder
++                        {
++                            r.capture_pause_count += 1;
++                        }
+                         skip_gap = true;
+                         paused = p;
+                         snapshot.paused = p;
+@@ -785,7 +814,15 @@ fn run(
+                             _ => "Camera controls require a live camera source".into(),
+                         };
+                     }
+-                    Command::RecordOptions(dir, options, tuning) => {
++                    Command::RecordOptions(dir, options, tuning)
++                    | Command::RecordOwned(dir, options, tuning) => {
++                        if require_idle && recorder.is_some() {
++                            recording_rejected(
++                                &mut snapshot,
++                                "A manual/other take is active; it was not replaced".into(),
++                            );
++                            continue;
++                        }
+                         let effective = options.recording_document(&doc)?;
+                         if let Err(error) = replace_recording(
+                             &mut recorder,
+@@ -827,10 +864,27 @@ fn run(
+                         snapshot.media_warnings.clear();
+                         recording_applied(&mut snapshot, "Recording started");
+                     }
+-                    Command::StopRecord => {
++                    Command::StopRecord | Command::StopRecordIf(..) => {
++                        if expected_take.as_ref().is_some_and(|expected| {
++                            snapshot.recording_directory.as_ref() != Some(expected)
++                        }) {
++                            recording_rejected(
++                                &mut snapshot,
++                                "Recorder belongs to another take; it was not stopped".into(),
++                            );
++                            continue;
++                        }
++                        let previous_stop_id =
++                            recorder.as_ref().and_then(|r| r.control_stop_id.clone());
++                        if let Some(r) = &mut recorder {
++                            r.control_stop_id = owned_stop_id;
++                        }
+                         if let Err(error) =
+                             retire_recording(&mut recorder, finalizer.as_ref(), &mut snapshot)
+                         {
++                            if let Some(r) = &mut recorder {
++                                r.control_stop_id = previous_stop_id;
++                            }
+                             recording_rejected(&mut snapshot, error);
+                             continue;
+                         }
+@@ -1540,6 +1594,9 @@ struct Recorder {
+     media_disabled: bool,
+     numeric_error: Option<String>,
+     completion_attempted: bool,
++    control_stop_id: Option<String>,
++    capture_pause_count: u64,
++    numeric_frames: u64,
+ }
+ impl Recorder {
+     fn automatic(
+@@ -1628,6 +1685,9 @@ impl Recorder {
+             media_disabled: false,
+             numeric_error: None,
+             completion_attempted: false,
++            control_stop_id: None,
++            capture_pause_count: 0,
++            numeric_frames: 0,
+         };
+         result.header()?;
+         Ok(result)
+@@ -1680,6 +1740,9 @@ impl Recorder {
+             )
+             .map_err(|e| e.to_string())
+         })();
++        if result.is_ok() {
++            self.numeric_frames += 1;
++        }
+         if let Err(error) = &result {
+             self.numeric_error
+                 .get_or_insert_with(|| format!("Cannot write numeric recording: {error}"));
+@@ -1796,6 +1859,9 @@ impl Recorder {
+                 "complete"
+             },
+             numeric_error,
++            control_stop_id: self.control_stop_id.clone(),
++            capture_pause_count: self.capture_pause_count,
++            numeric_frames: self.numeric_frames,
+             media_warnings: self.media_warnings.clone(),
+             media_recording: self.media_status.clone(),
+             completion_error: None,
+@@ -1815,6 +1881,7 @@ impl Recorder {
+         );
+     }
+     fn refresh_media(&mut self, snapshot: &mut Snapshot) {
++        snapshot.recording_numeric_frames = self.numeric_frames;
+         if let Some(media) = &mut self.media {
+             self.media_status = Some(media.status());
+             for warning in media.take_warnings() {
+diff --git a/docs/architecture.md b/docs/architecture.md
+index 9a8926e..c2d6dd7 100644
+--- a/docs/architecture.md
++++ b/docs/architecture.md
+@@ -108,3 +108,10 @@ remain scoped separately in [output semantics](output.md).
+ Camera capabilities and setters are typed DTOs in fictrac-camera. Format changes validate against advertised formats, update rust_camera_width/rust_camera_height/src_fps and reopen acquisition. Opted-in resolution metadata can adapt legacy pixel marks only after compatible-reference validation; other formats require calibration review. Exposure/gain setters run on the worker with native readback. Unsupported values never become fabricated controls. GUI view/camera operations are discoverable native agent actions. Transient recording options affect an effective recording-document copy, preserving canonical config and tracker state.
+ 
+ OutputSinks owns the shared transport/payload reconfiguration transaction: unchanged healthy actors are reused; changed outputs reopen with rollback. ZMQ transport has its own bounded Rust actor with staged ZMTP 2/3 negotiation, per-peer queues and deadlines, so a slow peer cannot block numerical processing or healthy subscribers. Explicit MATREX JSON framing lives entirely in I/O, derived from the exact native FT row; the shared core and recorded numeric data retain their coordinate and unit conventions. Fixed ROI-to-atlas geometry is cached per calibration. Resilient local fitting uses the complete ROI; legacy candidate generation retains subset sampling with complete final scores reserved in the configured budget. Decoder pixel oracles and declared healthy-trajectory regression gates remain fixed; the default resilient acceptance guard is a separately documented behavior change with a legacy opt-out.
++
++
++### Opt-in reconnectable native recording mailbox
++
++`fictrac-desktop --control-dir <absolute-private-directory> --control-instance <32-hex-token>` exposes a local, instance-bound filesystem mailbox for the existing native session. The adapter shares the native GUI worker and calibration, never a second tracking engine or network listener. Matching request/reply IDs and expiry bound transport ambiguity; a queued response is not recording or file-closure acknowledgement.
++
++Owned `record_start` uses a fresh absolute directory and refuses to replace an active manual take. Before acknowledging acquisition, clients must observe that directory and the first submitted raw-video frame. Owned `record_stop` requires `expected_directory` and `stop_request_id`; only the matching capture worker can stamp that ID into `completion.json`. The receipt retains writer errors, video warnings, submitted/encoded/pending counts, finalized-container state and numeric frame count. Capture pauses increment `capture_pause_count`, so even short manual overrides remain detectable. A full finalizer backlog restores the old stop ID and leaves the active take unchanged; clients can retry the same fenced stop. Native GUI recording and tracking remain independently usable between takes and after a controlling experiment exits.
+diff --git a/docs/validation.md b/docs/validation.md
+index 0e5558a..71aa5b5 100644
+--- a/docs/validation.md
++++ b/docs/validation.md
+@@ -1206,3 +1206,8 @@ The packaged desktop then ran the repository's `scripts/run_four_bridged.sh` wit
+ These short checks establish the launch/routing and measured packet compatibility on this machine. They do not add a physical motion-accuracy, long-duration recording or crash-immunity claim. The working remote VR recovery preceded the new LAN-bind build: starting the correct UDP routes made that setup work, without a payload-format change. The earlier three-window test supervisor had incorrectly treated a nonfatal UI instance-allocation warning as a capture failure and closed its own healthy sessions; its keepalive now preserves such warnings while checking actual worker state and unpaused progress.
+ 
+ The portable archive and Debian package contain source `934d9c5`, matching executable/config bytes, and 1,255 notice files for 333 dependency entries. The previous portable folder, including its locally edited configuration, is retained under `dist/previous-running-5eeca211/`; the system installation is unchanged. A compact report with binary/archive hashes is [linux-bridged-four-20261027.json](benchmarks/linux-bridged-four-20261027.json). Complete transcripts, numeric rows, packets, retained client-attempt failures and native pixels are under `runs/wire-schema-live-20261027/`.
++
++
++## Local MATREX recording adapter (not an upstream release)
++
++The local source overlay adds a reconnectable filesystem mailbox to the ordinary desktop session, retaining the existing numerical engine and finalizer. Validation uses the bundled attributed MP4 through the actual native window, separate immutable takes, first submitted frame, ownership-fenced Stop, encoder completion and a nonrecorded gap. It does not establish physical camera timing or cross-platform execution. The MATREX integration records the exact source commit, patch hash, executable hash, request/take identity and closed-artifact hashes; its native probes and results are separate from the published v0.3.2 evidence above.
+diff --git a/apps/fictrac-desktop/src/native_mailbox.rs b/apps/fictrac-desktop/src/native_mailbox.rs
+new file mode 100644
+index 0000000..fa7e1e0
+--- /dev/null
++++ b/apps/fictrac-desktop/src/native_mailbox.rs
+@@ -0,0 +1,148 @@
++//! Opt-in, reconnectable local control of the existing native window/engine.
++//! Requests carry an endpoint instance identity and expiry. No network listener.
++use serde_json::{Value, json};
++use std::{
++    collections::BTreeMap,
++    fs,
++    path::{Path, PathBuf},
++    time::{SystemTime, UNIX_EPOCH},
++};
++
++const MAX_BYTES: u64 = 65_536;
++pub struct Mailbox {
++    directory: PathBuf,
++    instance: String,
++    replies: BTreeMap<String, (u64, Value)>,
++}
++fn now_ms() -> Result<u64, String> {
++    SystemTime::now()
++        .duration_since(UNIX_EPOCH)
++        .map(|d| d.as_millis() as u64)
++        .map_err(|e| e.to_string())
++}
++fn atomic(path: &Path, value: &Value) -> Result<(), String> {
++    let temp = path.with_extension("writing");
++    fs::write(&temp, serde_json::to_vec(value).map_err(|e| e.to_string())?)
++        .map_err(|e| e.to_string())?;
++    fs::rename(temp, path).map_err(|e| e.to_string())
++}
++impl Mailbox {
++    pub fn new(directory: PathBuf, instance: String, backend: &str) -> Result<Self, String> {
++        if !directory.is_absolute()
++            || instance.len() != 32
++            || !instance.bytes().all(|b| b.is_ascii_hexdigit())
++        {
++            return Err("control directory must be absolute and control instance must be 32 hexadecimal characters".into());
++        }
++        fs::create_dir_all(&directory).map_err(|e| e.to_string())?;
++        #[cfg(unix)]
++        {
++            use std::os::unix::fs::PermissionsExt;
++            fs::set_permissions(&directory, fs::Permissions::from_mode(0o700))
++                .map_err(|e| e.to_string())?;
++        }
++        let descriptor = directory.join("endpoint.json");
++        if descriptor.exists() {
++            let old: Value =
++                serde_json::from_slice(&fs::read(&descriptor).map_err(|e| e.to_string())?)
++                    .map_err(|e| e.to_string())?;
++            if old["instance"].as_str() != Some(instance.as_str()) {
++                return Err("control directory belongs to another tracker instance; choose a fresh directory".into());
++            }
++        }
++        atomic(
++            &descriptor,
++            &json!({"protocolVersion":1,"instance":instance,"backend":backend,"processId":std::process::id(),
++            "startedUtcMilliseconds":now_ms()?,"capabilities":["native-gui-control","per-take-finalization", "owned-take-stop-v1"],
++            "commands":["status","record_start","record_stop","start","pause"],
++            "semantics":"Commands may queue native worker changes. Inspect recording state and the exact take finalization receipt; queued or inactive is not completion."}),
++        )?;
++        Ok(Self {
++            directory,
++            instance,
++            replies: BTreeMap::new(),
++        })
++    }
++    pub fn poll(
++        &mut self,
++        mut execute: impl FnMut(&str, &Value) -> Result<Value, String>,
++    ) -> Result<(), String> {
++        let current = now_ms()?;
++        self.replies.retain(|_, (expiry, _)| *expiry >= current);
++        let mut requests: Vec<_> = fs::read_dir(&self.directory)
++            .map_err(|e| e.to_string())?
++            .filter_map(Result::ok)
++            .map(|e| e.path())
++            .filter(|p| {
++                p.file_name().and_then(|n| n.to_str()).is_some_and(|n| {
++                    n.strip_suffix(".request.json").is_some_and(|id| {
++                        id.len() == 32 && id.bytes().all(|b| b.is_ascii_hexdigit())
++                    })
++                })
++            })
++            .collect();
++        requests.sort();
++        for path in requests.into_iter().take(8) {
++            let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
++                continue;
++            };
++            let id = name.trim_end_matches(".request.json");
++            if id.len() != 32 || !id.bytes().all(|b| b.is_ascii_hexdigit()) {
++                continue;
++            }
++            let response_path = self.directory.join(format!("{id}.response.json"));
++            if let Some((_, cached)) = self.replies.get(id) {
++                atomic(&response_path, cached)?;
++                let _ = fs::remove_file(&path);
++                continue;
++            }
++            let outcome = (|| {
++                if self.replies.len() >= 4096 {
++                    return Err(
++                        "control request history is full; wait for expired requests to clear"
++                            .into(),
++                    );
++                }
++                if fs::metadata(&path).map_err(|e| e.to_string())?.len() > MAX_BYTES {
++                    return Err("request exceeds 64 KiB".into());
++                }
++                let req: Value =
++                    serde_json::from_slice(&fs::read(&path).map_err(|e| e.to_string())?)
++                        .map_err(|e| e.to_string())?;
++                if req["id"].as_str() != Some(id)
++                    || req["instance"].as_str() != Some(self.instance.as_str())
++                {
++                    return Err("request does not match this endpoint instance".into());
++                }
++                let expires = req["expiresUtcMilliseconds"]
++                    .as_u64()
++                    .ok_or("request expiry is required")?;
++                let now = now_ms()?;
++                if expires < now || expires > now.saturating_add(120_000) {
++                    return Err("request expired or expiry exceeds two minutes".into());
++                }
++                let command = req["command"].as_str().ok_or("command is required")?;
++                if !matches!(
++                    command,
++                    "status" | "record_start" | "record_stop" | "start" | "pause"
++                ) {
++                    return Err("unsupported recording-control command".into());
++                }
++                let args = req.get("args").cloned().unwrap_or_else(|| json!({}));
++                if !args.is_object() {
++                    return Err("args must be an object".into());
++                }
++                execute(command, &args)
++            })();
++            let response = match outcome {
++                Ok(value) => json!({"id":id,"instance":self.instance,"ok":true,"result":value}),
++                Err(error) => json!({"id":id,"instance":self.instance,"ok":false,"error":error}),
++            };
++            atomic(&response_path, &response)?;
++            self.replies
++                .insert(id.to_owned(), (current.saturating_add(120_000), response));
++            fs::remove_file(path).map_err(|e| e.to_string())?;
++        }
++        Ok(())
++    }
++}

@@ -14,34 +14,44 @@ Explicit Hejjetrac mode uses walking interpretation. A native FT row also select
 
 MATREX bundles NetMQ 4.0.1.13, AsyncIO 0.1.69 and NaCl.Net 0.1.13. This fixes the old 4.0.0.1 client's handshake with the native HejjéTrac publisher. Exact DLL hashes/frameworks and official package sources are in [the transport manifest](../Assets/Plugins/tracker-transport-manifest.json); licenses are in [TrackerTransport](../Assets/ThirdParty/TrackerTransport/README.md). No tracker output algorithm or calibration is changed.
 
-## Optional native app buttons
+## Independent native windows and recording control
 
-In System details, expand a rig's Tracker field and choose Set value. Provide the absolute installed executable and an existing calibration/config file. MATREX never discovers/downloads executables and never launches them automatically. On macOS, use the binary inside the app's Contents/MacOS folder. Launch/Stop buttons appear for configured rigs in setup. An external tracker started by the operator continues to work normally.
+See the [current recording contract and executed validation](native-recording-control.md) for Start/Stop, cancellation, override and build details.
 
-Example optional per-rig fields (merge into a complete existing system config):
+Initialize tracking opens the rig's ordinary Rekkefly or HejjéTrac window for source selection and calibration. Tracking initialization does not record an automatic experiment take. Native windows persist across scene changes, experiment Stop and MATREX exit; explicitly closing a tracker is a separate action. The launcher checks its persisted process start time, executable identity and per-instance endpoint token. It never controls an unrelated process merely because it has the same executable name.
+
+Each rig has a `tracker.saveVideo` checkbox and a recording-control choice:
+
+- **Automatic experiment (`Experiment`)** requires a verified, control-capable native window owned by MATREX. A required recorder without a compatible endpoint blocks Start with an explanation. Start waits for a fresh take directory and the first accepted/submitted raw-video frame before presenting the stimulus. Stop seals VR writers immediately, sends ownership-fenced stops to all required recorders, waits for their exact completion receipts, then archives and creates the ZIP.
+- **Manual external (`Manual`)** leaves recording to the operator or external system. MATREX does not automatically start, stop or claim acknowledgement of that recorder. Turn off tracker video if only the input stream is needed.
+
+A native GUI pause, stop, replaced take, lost endpoint or recorder error latches an explicit override/failure; MATREX never silently restarts it. The native completion receipt retains the owned stop request ID and the number of capture pauses. This catches even short manual gaps that live polling might miss. Physical closure and a fully recorded requested interval remain distinct: safely closed partial files can be retained while the experiment is marked failed and no allegedly complete ZIP is created. A canceled preparation with no presented VR frames can retain closed, hashed native artifacts, explicitly labeled unaligned and without a playable VR timeline.
+
+Example optional fields (merge into a complete system config):
 
 ```json
 {
   "vrId": "VR1",
-  "speciesName": "Drosophila melanogaster",
   "closedLoopMode": "Rekkefly",
   "zmqAddress": "127.0.0.1",
   "zmqPort": 9871,
   "tracker": {
-    "executablePath": "/absolute/path/to/rekkefly",
+    "executablePath": "/absolute/path/to/Rekkefly.app/Contents/MacOS/rekkefly",
     "configFile": "Trackers/VR1.toml",
-    "device": "",
-    "headless": false
+    "saveVideo": true,
+    "recordingControl": "Experiment"
   }
 }
 ```
 
-The launcher uses the audited Rekkefly 0.6.2 (`2df99c3`) supervision interface and HejjéTrac `94404c64` stdio interface. Older installed trackers can be started manually if they lack those launch flags. The launcher passes argv directly, without a shell. Relative tracker config paths resolve under the MATREX config root. Rekkefly receives `--config FILE --label VRn --zmq-port PORT --supervised`, with optional `--device`/`--headless`. Supervision disables fallback and supports stdin shutdown. HejjéTrac receives `--config FILE --windows 1 --control-stdio`, then a typed session 1 start request. Installed HejjéTrac packages name the desktop executable `hejjetrac` and the CLI `hejjetrac-cli`; a Cargo source build produces `fictrac-desktop` and `fictrac`. Its calibration config must set `zmq_port` to the same rig port and `zmq_host` to loopback; there is no port CLI override and MATREX never rewrites the calibration file. Device/source selection for HejjéTrac stays in that file.
+The ordinary launcher passes direct argv without a shell and does not attach `--supervised` or `--control-stdio`. Opted-in capable adapters expose a private reconnectable filesystem mailbox with an instance token, process ID, request/reply IDs and expiry. Queued command acceptance, inactive recording state, file-size stability and elapsed delay are never treated as a file-finalization acknowledgement. Recorder completion requires the exact take's successful encoder/container drain and matching frame counts. Recording config, metadata, numeric data, video and completion receipts are copied only after closure; sources are not modified. Each take is bound to the captured MATREX run GUID and logger directory, so a late callback cannot enter a later run.
 
-Only locally bound trackers can be launched by these optional buttons. Save calibration edits in the native tracker before Stop: MATREX asks its owned process to close, then terminates it if it does not exit promptly. Unrelated processes, including another instance of the same executable, are never stopped. Owned trackers persist across experiment scene transitions and stop when MATREX quits. Stop remains available if you clear an owned tracker’s optional launch fields. Applying a system configuration that removes or renames a rig stops only the process MATREX owned for that rig; changing the selected backend does not relabel a running process.
+Relative native config paths resolve under the MATREX configuration directory. HejjéTrac's calibration file sets its source, `zmq_port` and loopback `zmq_host`; the launcher has no walking-port override. Optional custom executables must supply the same verified endpoint for automatic video. Other installed trackers remain usable in explicit Manual mode or with video disabled.
+
+The reviewed Mac arm64 adapters are source overlays with pinned commits, complete patch hashes and executable provenance in [native build instructions](../tools/native_patches/README.md). They retain native calibration, detector algorithms, attributed resources and independent window lifetimes. Other platform packages do not claim these new recording capabilities and reject automatic video with Manual/update guidance.
 
 ## Native verification
 
 [The machine-readable native report](tracker-native-validation-results.json) records the exact measured scope. On macOS arm64/Unity 6000.3.16f1, real HejjéTrac processed 300 sample-video frames and Unity received all 300, alongside 100 legacy JSON frames. Current Rekkefly 0.6.2 processed 400 synthetic frames with simultaneous Unity and libzmq subscribers: both received 391 identical stream samples, with 9 frames missed during subscription startup and 0 publisher queue drops. This demonstrates live fanout, with normal PUB startup loss rather than a recording/replay guarantee. 150 listener shutdown cycles returned the worker count to 0 and kept OS thread count bounded. The telemetry probe also tests an external libzmq subscriber, Unicode metadata, schema 2 frames, and schema 1 context heartbeats at a faster independent cadence. This is not physical camera validation or a Windows/Linux execution claim.
 
-`python3 tools/test_tracker_contracts.py` passes 66 offline backend/decoder and native owned-process checks, including removal/rename, cleared launch fields, argument quoting and leaving unrelated processes running. `tools/test_native_tracker_interop.py --help` describes the optional real Unity/HejjéTrac probe; optional --rekkefly-bin/--rekkefly-config arguments add current Rekkefly fanout; it creates a separate tiny project and leaves the source checkout and tracker calibration files untouched. Python/pyzmq are development test dependencies, not requirements for running MATREX or the native trackers.
+`python3 tools/test_tracker_contracts.py` passes 109 offline backend/decoder and native owned-process checks, including removal/rename, cleared launch fields, argument quoting and leaving unrelated processes running. `tools/test_native_tracker_interop.py --help` describes the optional real Unity/HejjéTrac probe; optional --rekkefly-bin/--rekkefly-config arguments add current Rekkefly fanout; it creates a separate tiny project and leaves the source checkout and tracker calibration files untouched. Python/pyzmq are development test dependencies, not requirements for running MATREX or the native trackers.

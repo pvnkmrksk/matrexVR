@@ -504,3 +504,64 @@ Button.desktop-run-button { height: 31px; min-height: 31px; font-size: 11px; mar
 .sequence-seed .unity-base-field__label { min-width: 48px; width: auto; margin-right: 8px; }
 .apparatus-count-presets { flex-wrap: wrap; margin-bottom: 10px; }
 .apparatus-count-presets > Label { margin-right: 10px; margin-bottom: 0; }
+
+/* Value changes keep their controls and positions. Only navigation and explicit
+   disclosure/add/remove actions change the form's structure. */
+.workbench .studio-switch .unity-toggle__checkmark { display: flex; width: 19px; height: 19px; min-width: 19px; min-height: 19px; margin-right: 6px; border-radius: 3px; }
+.workbench .studio-switch .unity-toggle__input { min-height: 24px; padding: 0; }
+.workbench .studio-switch .unity-toggle__text { font-size: 12px; color: rgb(210, 224, 235); white-space: nowrap; }
+.workbench .studio-switch:disabled { opacity: .55; }
+.workbench .studio-setting:disabled { opacity: .62; }
+.workbench .studio-setting .pill { white-space: nowrap; }
+.studio-setting.container-setting, .studio-setting.container-setting.parameters-open { width: 100%; margin-right: 0; }
+.settings-tabs { flex-wrap: wrap; align-items: stretch; }
+.settings-tabs > .studio-button { flex-direction: column; justify-content: center; width: 108px; height: 66px; padding: 7px 4px; flex-shrink: 0; }
+.settings-tabs > .studio-button > .studio-icon { width: 20px; height: 20px; margin: 0 0 5px; }
+.settings-tabs > .studio-button > Label { font-size: 11px; -unity-text-align: middle-center; }
+.phase-tabs > Button { height: 44px; min-height: 44px; min-width: 0; flex-basis: 0; }
+.phase-tabs > Button > Label { flex-shrink: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sequence-option { min-width: 130px; height: 36px; margin: 0 10px 6px 0; padding: 4px 8px; border-radius: 4px; background-color: rgb(28, 37, 47); }
+.sequence-option > .studio-icon { width: 18px; height: 18px; margin-right: 7px; }
+.sequence-flags > .unity-integer-field { width: 190px; margin: 0 12px 6px 0; }
+.sequence-seed { min-height: 36px; margin: 0 0 6px; }
+.asset-picker-control { min-height: 70px; }
+.asset-picker-control > DropdownField, .asset-picker-control > TextField { min-height: 32px; width: 100%; margin: 0 0 4px; }
+.spin-arrows > .icon-button { padding: 0 2px; }
+.spin-arrows > .icon-button > .studio-icon { width: 12px; height: 11px; margin: 0; }
+.footer > #start-experiment { width: 204px; min-width: 204px; max-width: 204px; }
+.footer > #save-changes { width: 156px; min-width: 156px; max-width: 156px; }
+.footer > Button > Label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recording-control-mode { min-height: 65px; margin: 2px 0 10px; }
+.recording-control-mode > DropdownField { flex-direction: column; }
+.recording-control-help { min-height: 34px; max-height: 48px; font-size: 11px; white-space: normal; color: rgb(179, 199, 212); }
+.recording-control-status { min-height: 28px; max-height: 40px; font-size: 11px; white-space: normal; color: rgb(160, 209, 198); }
+
+.recording-control-help { height: 48px; min-height: 48px; max-height: 48px; overflow: hidden; }
+.recording-control-status { height: 40px; min-height: 40px; max-height: 40px; overflow: hidden; }
+.sequence-seed > #sequence-seed-mode { width: 228px; min-width: 228px; max-width: 228px; flex-shrink: 0; }
+.sequence-seed > #sequence-random-seed { width: 165px; min-width: 165px; max-width: 165px; flex-shrink: 0; }
+/* The inspector is a narrow column; scalar cards must never inherit the
+   horizontal two-column field geometry from the main parameter canvas. */
+.workbench .inspector .studio-setting { flex-direction: column; align-items: stretch; width: 100%; min-width: 0; max-width: 100%; }
+.workbench .inspector .studio-setting > .setting-label { flex-grow: 0; flex-basis: auto; width: 100%; margin: 0 0 6px; }
+.workbench .inspector .setting-title { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.workbench .inspector .studio-setting > TextField,
+.workbench .inspector .studio-setting > DropdownField,
+.workbench .inspector .studio-setting > .number-control { width: 100%; max-width: 100%; }
+.workbench .inspector .studio-setting.container-setting,
+.workbench .inspector .studio-setting.vector-setting,
+.workbench .inspector .studio-setting.path-setting { width: 100%; min-width: 0; max-width: 100%; }
+.workbench .inspector .vector-controls { flex-wrap: wrap; }
+.workbench .inspector .vector-controls > Label { width: 18px; }
+.workbench .inspector .vector-controls > .number-control { width: 160px; }
+.workbench .sidebar .nav-file Label { flex-grow: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+/* Visibility remains a fixed matrix while inactive rigs and features dim. */
+.studio-setting.visibility-setting { width: 100%; min-width: 460px; }
+
+/* Thumbnails reserve geometry before async loading and never run in acquisition. */
+.edit-rendered-preview { height: 170px; min-height: 170px; max-height: 170px; margin-top: 8px; padding: 6px; background-color: rgb(14, 18, 24); border-radius: 6px; flex-shrink: 0; }
+.edit-preview-image { height: 128px; min-height: 128px; flex-shrink: 0; }
+.edit-preview-caption { font-size: 11px; color: rgb(151, 163, 181); height: 26px; min-height: 26px; max-height: 26px; white-space: normal; overflow: hidden; -unity-text-align: middle-center; }
+
+.edit-rendered-preview { width: 280px; max-width: 100%; }

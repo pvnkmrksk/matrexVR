@@ -275,6 +275,24 @@ public static class Regression
                 {stream.ReadLine();var cells=ReplaySessionArchive.Csv(stream.ReadLine());Check(cells.Length==12 && cells[1]=="agent,quoted" && cells[11]=="3","writer columns and quotation "+i);}
             }
             Check(AsyncSwarmWriter.ActiveWriterCount==0,"no retained async writer after 150 cycles");
+            string mirrorPath=Path.Combine(root,"mirror-async.csv.gz");
+            var mirrorWriter=new AsyncSwarmWriter(mirrorPath,"Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius,skyboxId,skyboxSampleUtc,experimentPhase,AnimationState,UnityFrame,ScaleX,ScaleY,ScaleZ",AsyncSwarmWriter.RowLayout.Kannadi);
+            var mirrorFrame=mirrorWriter.Rent(2);mirrorFrame.timestamp=new DateTime(2026,1,1,10,0,0);mirrorFrame.unityFrame=81;
+            mirrorFrame.vrIndex=16;mirrorFrame.numberOfRings=3;mirrorFrame.hexRadius=2.5f;mirrorFrame.phase="postStimulus";mirrorFrame.count=2;
+            mirrorFrame.agents[0]=new AsyncSwarmWriter.Agent {index=2,name="clone, \"quoted\"",x=1.25f,y=2,z=3,rx=4,ry=5,rz=6,sx=2,sy=3,sz=4,animationState="{\"version\":1}"};
+            mirrorFrame.agents[1]=new AsyncSwarmWriter.Agent {index=7,name="other",x=-2.75f,sx=1,sy=1,sz=1};
+            Check(mirrorWriter.Submit(mirrorFrame),"Kannadi pooled frame accepted");mirrorWriter.WaitForCompletion();
+            Check(mirrorWriter.Failure==null&&mirrorWriter.WrittenRows==2&&mirrorWriter.DroppedFrames==0&&mirrorWriter.PendingFrames==0,"Kannadi async writer drains every individual with no drops");
+            using(var stream=ReplaySessionArchive.OpenCsv(mirrorPath))
+            {
+                Check(ReplaySessionArchive.Csv(stream.ReadLine()).Length==20,"Kannadi keeps its exact twenty-column schema");
+                var cells=ReplaySessionArchive.Csv(stream.ReadLine());
+                Check(cells.Length==20&&cells[1]=="16"&&cells[2]=="2"&&cells[3]=="clone, \"quoted\"","Kannadi identity and CSV quoting survive asynchronous encoding");
+                Check(cells[4]=="1.25"&&cells[10]=="3"&&cells[11]=="2.5"&&cells[14]=="postStimulus","Kannadi pose/geometry/phase fields keep invariant numeric precision and order");
+                Check(cells[15]=="{\"version\":1}"&&cells[16]=="81"&&cells[17]=="2"&&cells[18]=="3"&&cells[19]=="4","Kannadi animation/frame/scale evidence survives worker encoding");
+                cells=ReplaySessionArchive.Csv(stream.ReadLine());Check(cells[2]=="7"&&cells[4]=="-2.75"&&stream.ReadLine()==null,"Kannadi preserves sparse clone IDs and writes each supplied row once");
+            }
+            Check(AsyncSwarmWriter.CompletionsForDirectory(root).Any(item=>item.Path==mirrorPath&&item.WrittenRows==2&&item.DroppedFrames==0&&item.Failure==null),"Kannadi worker contributes drained writer evidence to the normal recording finalizer");
             var strict=Path.Combine(root,"same-build");Directory.CreateDirectory(strict);
             var identity=PlayerBuildIdentity.Capture();
             File.WriteAllText(Path.Combine(strict,"replay_contract.json"),new JObject{["schemaVersion"]=1,["player"]=identity}.ToString());

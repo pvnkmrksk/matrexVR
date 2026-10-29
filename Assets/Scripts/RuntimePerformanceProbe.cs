@@ -63,6 +63,11 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
     }
     private Counter mainCounter,waitCounter,presentCounter,scriptsCounter;
     private Series intervals,cpuMain,cpuRender,gpu,present;
+    private Series populationCapture,worldCapture;
+    private SwarmLogger[] populationLoggers;
+    private KannadiLogger[] mirrorLoggers;
+    private RecordedWorldStateWriter[] worldLoggers;
+    private string sourceExperiment,sourcePhase;
     private List<Counter> counters;
     private readonly FrameTiming[] timing=new FrameTiming[1];
     private ulong lastTiming;
@@ -96,6 +101,30 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             ["autopilotEnabled"]=false,["resetPositionOnStart"]=true,["resetRotationOnStart"]=true,
             ["initialPosition"]=new JObject{["x"]=0,["y"]=1,["z"]=0},["uniformSkyColor"]=new JObject{["r"]=.3,["g"]=.3,["b"]=.3,["a"]=1},
             ["autoTrimSettings"]=new JObject{["flightCheckEnabled"]=false}};
+        sourceExperiment=Arg("--performance-experiment");
+        if(!string.IsNullOrWhiteSpace(sourceExperiment))
+        {
+            var configuredExperiment=JObject.Parse(ExperimentConfigFiles.ReadAllText(sourceExperiment));
+            sourcePhase=Arg("--performance-experiment-phase","stimulus");
+            stimulus=(JObject)(configuredExperiment[sourcePhase] is JObject phase ? phase.DeepClone() : configuredExperiment.DeepClone());
+            foreach(string key in new[]{"populationMode","worldUnitsPerMetre"})
+                if(stimulus[key]==null&&configuredExperiment[key]!=null)stimulus[key]=configuredExperiment[key].DeepClone();
+            foreach(string key in new[]{"preStimulus","stimulus","postStimulus"})stimulus.Remove(key);
+            // Profile the selected presentation itself, not an observation wait.
+            stimulus.Remove("headingReference");
+            if(stimulus["swarm"] is JObject)stimulus["populationMode"]="Swarm";
+            if(Arg("--performance-agents") is string count)
+            {
+                var population=stimulus["swarm"] as JObject??stimulus;
+                population["numberOfLocusts"]=int.Parse(count);population["density"]=null;
+            }
+            if(Arg("--performance-visual") is string visual)
+            {
+                var population=stimulus["swarm"] as JObject??stimulus;
+                population["agentVisual"]=visual;
+                if(visual=="ScenePrefab")stimulus["kannadiTilePrefab"]="SimulatedLocust";
+            }
+        }
         if(scene.IndexOf("Terrain",StringComparison.OrdinalIgnoreCase)>=0)
             stimulus["rugosity"]=new JObject{["enabled"]=true,["visualSurface"]="RoughSmooth",["collisionSurface"]="Flat",["heightMode"]="AboveGround",["orientationMode"]="WorldUp"};
         WriteConfig(experiment,stimulus);WriteConfig("PerformanceProbe/system.json",system);
@@ -108,10 +137,17 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
         var listeners=FindObjectsByType<ZmqListener>(FindObjectsSortMode.None);
         var loops=FindObjectsByType<ClosedLoop>(FindObjectsSortMode.None);
         var loggers=FindObjectsByType<DataLogger>(FindObjectsSortMode.None);
+        populationLoggers=FindObjectsByType<SwarmLogger>(FindObjectsSortMode.None);
+        mirrorLoggers=FindObjectsByType<KannadiLogger>(FindObjectsSortMode.None);
+        worldLoggers=FindObjectsByType<RecordedWorldStateWriter>(FindObjectsSortMode.None);
+        var populationEnabled=populationLoggers.Select(item=>item.enabled).ToArray();
+        var mirrorEnabled=mirrorLoggers.Select(item=>item.enabled).ToArray();
+        var animators=FindObjectsByType<Animator>(FindObjectsSortMode.None);
+        var animatorEnabled=animators.Select(item=>item.enabled).ToArray();
         var telemetry=FindObjectsByType<ExperimentTelemetry>(FindObjectsSortMode.None);
         var cameras=FindObjectsByType<Camera>(FindObjectsSortMode.None).Where(c=>c.enabled).ToArray();
         if(cameras.Length==0||loops.Length==0){failures.Add("No active stimulus camera or rig: this is not a valid rendering benchmark.");Finish();yield break;}
-        if(scene=="Choice"||scene.StartsWith("TerrainChoice_",StringComparison.Ordinal))
+        if(scene=="Choice"||scene=="Kannadi"||scene.StartsWith("TerrainChoice_",StringComparison.Ordinal))
         {
             if(cameras.Length!=rigs*(desktop?1:6))failures.Add("Configured stimulus camera count does not match the apparatus.");
             foreach(var camera in cameras)
@@ -123,7 +159,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             if(failures.Count>0){Finish();yield break;}
         }
         float measureSeconds=float.Parse(Arg("--performance-seconds","5"),System.Globalization.CultureInfo.InvariantCulture);
-        string[] phases={"all-60","all-120","all-uncapped","tracking-off","listeners-off","logging-off","telemetry-off","overlays-off","minimal-rendering","no-cameras","offscreen-128","all-uncapped-repeat","vsync-1","vsync-2","all-60-repeat"};
+        string[] phases={"all-60","all-120","all-uncapped","tracking-off","listeners-off","logging-off","population-logging-off","world-logging-off","all-evidence-off","animation-off","telemetry-off","overlays-off","minimal-rendering","no-cameras","offscreen-128","all-uncapped-repeat","vsync-1","vsync-2","all-60-repeat"};
         string requestedPhases=Arg("--performance-phases");
         if(!string.IsNullOrWhiteSpace(requestedPhases))
         {
@@ -138,6 +174,11 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             foreach(var item in listeners)item.enabled=tracking&&phase!="listeners-off";
             foreach(var item in loops)item.enabled=tracking;
             foreach(var item in loggers)item.enabled=logging;
+            for(int i=0;i<populationLoggers.Length;i++)populationLoggers[i].enabled=populationEnabled[i]&&phase!="population-logging-off"&&phase!="all-evidence-off";
+            for(int i=0;i<mirrorLoggers.Length;i++)mirrorLoggers[i].enabled=mirrorEnabled[i]&&phase!="population-logging-off"&&phase!="all-evidence-off";
+            foreach(var item in worldLoggers)item.enabled=phase!="world-logging-off"&&phase!="all-evidence-off";
+            if(phase=="all-evidence-off")foreach(var item in loggers)item.enabled=false;
+            for(int i=0;i<animators.Length;i++)if(animators[i]!=null)animators[i].enabled=phase!="animation-off"&&animatorEnabled[i];
             foreach(var item in telemetry)item.enabled=publish;
             OperatorOverlayVisibility.SetHidden(minimal||phase=="overlays-off");
             var textures=new List<RenderTexture>();
@@ -152,7 +193,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             string cap=Arg("--performance-cap");
             if(cap!=null&&phase!="vsync-1"&&phase!="vsync-2")Application.targetFrameRate=int.Parse(cap);
             yield return new WaitForSecondsRealtime(2);
-            intervals=new Series();cpuMain=new Series();cpuRender=new Series();gpu=new Series();present=new Series();lastTiming=0;
+            intervals=new Series();cpuMain=new Series();cpuRender=new Series();gpu=new Series();present=new Series();populationCapture=new Series();worldCapture=new Series();lastTiming=0;
             counters=new List<Counter>{(mainCounter=new Counter(ProfilerCategory.Internal,"Main Thread")),new Counter(ProfilerCategory.Internal,"Render Thread"),
                 (waitCounter=new Counter(ProfilerCategory.Internal,"WaitForTargetFPS")),(presentCounter=new Counter(ProfilerCategory.Render,"Gfx.WaitForPresentOnGfxThread")),
                 (scriptsCounter=new Counter(ProfilerCategory.Scripts,"BehaviourUpdate")),new Counter(ProfilerCategory.Scripts,"BehaviourLateUpdate"),
@@ -168,8 +209,9 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             double seconds=Time.realtimeSinceStartupAsDouble-started;
             double processCpuMs=System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds-cpuStarted;
             long allocatedBytes=GC.GetAllocatedBytesForCurrentThread()-allocatedStarted;
-            results.Add(new {phase,scene,requestedRigs=rigs,observedRigs=loops.Length,observedDataLoggers=loggers.Length,layout=desktop?"desktop":"LED-six-128",seconds,frames=intervals.values.Count,
+            results.Add(new {phase,scene,sourceExperiment,sourcePhase,requestedRigs=rigs,observedRigs=loops.Length,observedDataLoggers=loggers.Length,observedPopulation=FindObjectsByType<LocustSpawner>(FindObjectsSortMode.None).Select(item=>new{item.numberOfLocusts,item.agentVisual,spawned=item.Spawned.Count}).ToArray(),observedAnimators=animators.Length,layout=desktop?"desktop":"LED-six-128",seconds,frames=intervals.values.Count,
                 fps=1000*intervals.values.Count/intervals.values.Sum(),phaseBoundaryFps=intervals.values.Count/seconds,completeIntervalSeconds=intervals.values.Sum()/1000,rawFrameMs=intervals.values.ToArray(),rawSamples=rawSamples.ToArray(),frameStartMs=SummarizeFrameStarts(),frameMs=intervals.Summary(),cpuMainMs=cpuMain.Summary(),cpuRenderMs=cpuRender.Summary(),gpuMs=gpu.Summary(),presentWaitMs=present.Summary(),
+                populationCaptureMs=populationCapture.Summary(),worldCaptureMs=worldCapture.Summary(),
                 processCpuMs,processCpuPercentOfOneCore=processCpuMs/(seconds*10),processCpuMsPerFrame=processCpuMs/Math.Max(1,intervals.values.Count),
                 allocationCounterAvailable,mainThreadAllocatedBytes=allocationCounterAvailable?(long?)allocatedBytes:null,
                 mainThreadAllocatedBytesPerFrame=allocationCounterAvailable?(double?)(allocatedBytes/(double)Math.Max(1,intervals.values.Count)):null,
@@ -198,6 +240,11 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             lastProfilerMainNs=Last(mainCounter),lastProfilerWaitNs=Last(waitCounter),lastProfilerPresentNs=Last(presentCounter),lastProfilerScriptsNs=Last(scriptsCounter)};
         intervals.Add(sample.wallLateUpdateMs);previous=now;previousFrameStart=frameStart;previousAllocated=allocated;gc0=g0;gc1=g1;gc2=g2;
         foreach(var counter in counters)counter.Capture();
+        double populationMilliseconds=0,worldMilliseconds=0;
+        foreach(var item in populationLoggers)if(item!=null&&item.enabled)populationMilliseconds+=item.CaptureMilliseconds;
+        foreach(var item in mirrorLoggers)if(item!=null&&item.enabled)populationMilliseconds+=item.CaptureMilliseconds;
+        foreach(var item in worldLoggers)if(item!=null&&item.enabled)worldMilliseconds+=item.CaptureMilliseconds;
+        populationCapture.Add(populationMilliseconds);worldCapture.Add(worldMilliseconds);
         FrameTimingManager.CaptureFrameTimings();
         if(FrameTimingManager.GetLatestTimings(1,timing)==0||timing[0].frameStartTimestamp==lastTiming){rawSamples.Add(sample);return;}
         var frame=timing[0];lastTiming=frame.frameStartTimestamp;
@@ -211,7 +258,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
     private void Log(string text,string stack,LogType type){if(type==LogType.Exception||type==LogType.Error)failures.Add(text);}
     private void Save()
     {File.WriteAllText(Path.Combine(output,"results.json"),JsonConvert.SerializeObject(new {unity=Application.unityVersion,os=SystemInfo.operatingSystem,cpu=SystemInfo.processorType,gpu=SystemInfo.graphicsDeviceName,
-        width=Screen.width,height=Screen.height,quality=QualitySettings.names[QualitySettings.GetQualityLevel()],failures,results,
+        width=Screen.width,height=Screen.height,quality=QualitySettings.names[QualitySettings.GetQualityLevel()],qualitySettings=new{QualitySettings.shadows,QualitySettings.shadowDistance,QualitySettings.skinWeights,QualitySettings.pixelLightCount,QualitySettings.antiAliasing},failures,results,
         note="Explicit standalone software probe; no animal measurement. On-screen Metal presentation, CPU callbacks, target-FPS pacing and GPU workload are different limits. Raw profiler LastValue belongs to the last completed profiler frame; FrameTiming timestamps identify delayed timing samples. Zero timing timestamp means unavailable/duplicate, not zero work. Raw samples retain frame-start, wall intervals, allocations and GC deltas. Unavailable counters remain explicit; this is not a guarantee of LED timing."},Formatting.Indented));}
     private void Finish(){Save();Application.logMessageReceived-=Log;Application.Quit(failures.Count==0?0:1);}
 }

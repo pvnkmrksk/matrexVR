@@ -136,23 +136,23 @@ namespace ConfigurationUI
             overview.Add(ApparatusInteger("VR count","apparatus-vr-count",DesktopApparatusProfile.Rigs(system).Count(),value=>{
                 StudioEdit(Workspace.System,r=>DesktopApparatusProfile.ResizeRigs((JObject)r,value,ApparatusDisplayFallback));
             },"Number of real animals/VR rigs. Adding a rig assigns a unique tracker port and a separate LED strip; existing calibration files are retained. Removing rigs is undoable.",1,DesktopApparatusProfile.MaximumRigCount));
-            overview.Add(ApparatusInteger("Display count","apparatus-monitor-count",DesktopApparatusProfile.MonitorCount(system,ApparatusDisplayFallback),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.Marker((JObject)r)["monitorCount"]=value),"Displays used by the apparatus, including any operator display. Rig output display numbers below are 1-based here and zero-based in JSON. Unattached outputs can be planned before connecting hardware.",1,32));
+            overview.Add(ApparatusInteger("Display count","apparatus-monitor-count",DesktopApparatusProfile.MonitorCount(system,ApparatusDisplayFallback),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.Marker((JObject)r)["monitorCount"]=value,false),"Displays used by the apparatus, including any operator display. Rig output display numbers below are 1-based here and zero-based in JSON. Unattached outputs can be planned before connecting hardware.",1,32));
             string output=DesktopApparatusProfile.Presentation(system);
             var presentation=new VisualElement {name="apparatus-presentation"};presentation.AddToClassList("apparatus-output-choices");
             presentation.Add(SessionLabel("Output","apparatus-copy"));var outputButtons=Row("apparatus-output-buttons");presentation.Add(outputButtons);
             foreach(string mode in new[]{"led","desktop"})
             {
                 string selectedMode=mode;string caption=mode=="led"?"LED panels":"Monitors";
-                var button=StudioButton(caption,mode=="led"?"led-panels":"monitor-array",()=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.SetPresentation((JObject)r,selectedMode)),"apparatus-output-choice");
-                button.name="apparatus-output-"+mode;button.EnableInClassList("is-on",output==mode);
+                var button=StudioButton(caption,mode=="led"?"led-panels":"monitor-array",()=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.SetPresentation((JObject)r,selectedMode),false),"apparatus-output-choice");
+                button.name="apparatus-output-"+mode;BindViewState(button,()=>button.EnableInClassList("is-on",DesktopApparatusProfile.Presentation(Workspace.System.Root)==selectedMode));
                 button.tooltip=mode=="led"?"Render the configured camera faces into exact LED pixel rectangles.":"Render one full-screen camera face per rig on its assigned monitor. The icon represents a monitor arrangement; physical routing is configured below.";
                 button.Q<WorkbenchIcon>().style.width=36;button.Q<WorkbenchIcon>().style.height=30;outputButtons.Add(button);
             }
             overview.Add(presentation);
             var native=Row("apparatus-native-option");scroll.Add(native);
-            native.Add(StateSwitch(DesktopApparatusProfile.Flag((system[DesktopApparatusProfile.MarkerName] as JObject)?["launchBundledTrackers"]),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.Marker((JObject)r)["launchBundledTrackers"]=value),"apparatus-native-trackers"));
+            native.Add(StateSwitch(DesktopApparatusProfile.Flag((system[DesktopApparatusProfile.MarkerName] as JObject)?["launchBundledTrackers"]),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.Marker((JObject)r)["launchBundledTrackers"]=value,false),"apparatus-native-trackers"));
             var nativeLabel=SessionLabel("Launch bundled native trackers with Start","apparatus-copy");nativeLabel.tooltip="Only local modern Rekkefly/HejjéTrac rigs without an explicit executable/calibration override are launched. Disable this when sharing an externally started publisher. Remote and legacy endpoints remain externally managed.";native.Add(nativeLabel);
-            BuildApparatusDisplayMap(scroll,system);
+            var maps=new VisualElement {name="apparatus-map-host"};scroll.Add(maps);BindViewState(maps,()=>{maps.Clear();BuildApparatusDisplayMap(maps,(JObject)Workspace.System.Root);});
             var rigs=DesktopApparatusProfile.Rigs(system).ToList();
             for(int i=0;i<rigs.Count;i++)BuildApparatusRig(scroll,rigs[i],i,output);
             var monitorOptions=new Foldout {name="apparatus-operator-options",text="Operator display & monitoring",value=false};monitorOptions.AddToClassList("apparatus-advanced");scroll.Add(monitorOptions);
@@ -190,8 +190,9 @@ namespace ConfigurationUI
         private void BuildApparatusRig(VisualElement parent,JObject rig,int index,string presentation)
         {
             string id=(string)rig["vrId"]??"VR"+(index+1);string[] RigPath(string key)=>new[]{"configs",index.ToString(),key};
-            Action<string,JToken,bool> set=(key,value,rebuild)=>StudioEdit(Workspace.System,r=>r["configs"][index][key]=value,rebuild);
+            Action<string,JToken,bool> set=(key,value,rebuild)=>StudioEdit(Workspace.System,r=>r["configs"][index][key]=value,key=="vrId"&&rebuild);
             var fold=new Foldout {name="apparatus-rig-"+id,text=id+" · "+RigMode(rig)+" · "+DesktopApparatusProfile.Order(rig).Length+" faces · "+rig["zmqAddress"]+":"+rig["zmqPort"],value=index==0};fold.AddToClassList("apparatus-rig");parent.Add(fold);
+            BindViewState(fold,()=>{var current=(JObject)Workspace.System.Root["configs"][index];fold.text=(string)current["vrId"]+" · "+RigMode(current)+" · "+DesktopApparatusProfile.Order(current).Length+" faces · "+current["zmqAddress"]+":"+current["zmqPort"];});
             var identity=Row("apparatus-grid");fold.Add(identity);
             identity.Add(ApparatusText("VR ID","apparatus-id-"+id,id,value=>{
                 if(!System.Text.RegularExpressions.Regex.IsMatch(value??"",@"^VR([1-9]|1[0-6])$")||DesktopApparatusProfile.Rigs(Workspace.System.Root).Where((r,n)=>n!=index).Any(r=>(string)r["vrId"]==value))throw new ArgumentException("Use a unique VR ID from VR1 through VR16.");
@@ -207,24 +208,27 @@ namespace ConfigurationUI
             transport.Add(ApparatusText("Tracker host","apparatus-host-"+id,(string)rig["zmqAddress"]??"localhost",value=>set("zmqAddress",value,true),"Host running the tracker publisher. Use localhost for bundled native apps; a remote host remains externally managed."));
             transport.Add(ApparatusInteger("Tracker port","apparatus-port-"+id,DesktopApparatusProfile.Integer(rig["zmqPort"],9871),value=>set("zmqPort",value,true),"ZeroMQ tracking input port. Each rig on the same host requires its own port.",1,65535));
             transport.Add(ApparatusInteger("Output display","apparatus-display-"+id,ApparatusOutputDisplay(rig)+1,value=>set("targetDisplay",value-1,true),"Physical output display, numbered from1 here. System JSON stores display0 for the first output. The preview below shows every configured rectangle on that display.",1,32));
-            if(presentation=="led")
             {
-                var pixels=Row("apparatus-grid");fold.Add(pixels);
+                var ledControls=new VisualElement {name="apparatus-led-controls-"+id};fold.Add(ledControls);
+                BindViewState(ledControls,()=>ledControls.SetEnabled(DesktopApparatusProfile.Presentation(Workspace.System.Root)=="led"));
+                var pixels=Row("apparatus-grid");ledControls.Add(pixels);
                 pixels.Add(ApparatusInteger("Panel width (px)","apparatus-width-"+id,DesktopApparatusProfile.Integer(rig["ledPanelWidth"],128),value=>set("ledPanelWidth",value,true),"Pixels across one LED panel. Typical panels are64 or128 pixels; any positive integer can be entered.",1));
                 pixels.Add(ApparatusInteger("Panel height (px)","apparatus-height-"+id,DesktopApparatusProfile.Integer(rig["ledPanelHeight"],128),value=>set("ledPanelHeight",value,true),"Pixels down one LED panel. Square and rectangular positive dimensions are supported.",1));
                 var presets=Row("apparatus-presets");pixels.Add(presets);
-                foreach(int size in new[]{64,128}){int chosen=size;presets.Add(StudioButton(size+" × "+size,"system",()=>StudioEdit(Workspace.System,r=>{r["configs"][index]["ledPanelWidth"]=chosen;r["configs"][index]["ledPanelHeight"]=chosen;}),"quiet"));}
-                var offsets=Row("apparatus-grid");fold.Add(offsets);
+                foreach(int size in new[]{64,128}){int chosen=size;presets.Add(StudioButton(size+" × "+size,"system",()=>StudioEdit(Workspace.System,r=>{r["configs"][index]["ledPanelWidth"]=chosen;r["configs"][index]["ledPanelHeight"]=chosen;},false),"quiet"));}
+                var offsets=Row("apparatus-grid");ledControls.Add(offsets);
                 offsets.Add(ApparatusInteger("Start row","apparatus-row-"+id,DesktopApparatusProfile.Integer(rig["startRow"],0),value=>set("startRow",value,true),"Zero-based panel-cell row from the top of the output. PixelY = startRow × panelHeight.",0));
                 offsets.Add(ApparatusInteger("Start column","apparatus-col-"+id,DesktopApparatusProfile.Integer(rig["startCol"],0),value=>set("startCol",value,true),"Zero-based panel-cell column from the left. PixelX = startCol × panelWidth.",0));
                 var direction=new DropdownField("Packing",new List<string>{"Horizontal strip","Vertical strip"},rig["horizontal"]==null||DesktopApparatusProfile.Flag(rig["horizontal"])?0:1){name="apparatus-packing-"+id,tooltip="Pack faces from left to right or from top to bottom, in the exact display-order string."};direction.AddToClassList("apparatus-input");direction.RegisterValueChangedCallback(e=>set("horizontal",e.newValue=="Horizontal strip",true));offsets.Add(direction);
-                var order=Row("apparatus-order-row");fold.Add(order);
-                order.Add(ApparatusText("Face order","apparatus-order-"+id,DesktopApparatusProfile.Order(rig),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.SetOrder((JObject)r["configs"][index],value)),"The exact face sequence sent to the LED output. Valid unique letters: D/R/B/L/F/U. The numbered strip and cube net update together."));
-                order.Add(StudioButton("4 walls","system",()=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.SetOrder((JObject)r["configs"][index],"RBLF")),"quiet"));
-                order.Add(StudioButton("6 faces","system",()=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.SetOrder((JObject)r["configs"][index],"DRBLFU")),"quiet"));
-                BuildFaceNet(fold,rig,index,id);
+                var order=Row("apparatus-order-row");ledControls.Add(order);
+                order.Add(ApparatusText("Face order","apparatus-order-"+id,DesktopApparatusProfile.Order(rig),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.SetOrder((JObject)r["configs"][index],value),false),"The exact face sequence sent to the LED output. Valid unique letters: D/R/B/L/F/U. The numbered strip and cube net update together."));
+                order.Add(StudioButton("4 walls","system",()=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.SetOrder((JObject)r["configs"][index],"RBLF"),false),"quiet"));
+                order.Add(StudioButton("6 faces","system",()=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.SetOrder((JObject)r["configs"][index],"DRBLFU"),false),"quiet"));
+                var preview=new VisualElement {name="apparatus-face-preview-"+id};ledControls.Add(preview);
+                BindViewState(preview,()=>{preview.Clear();BuildFaceNet(preview,(JObject)Workspace.System.Root["configs"][index],index,id);});
+                var orderField=order.Q<TextField>("apparatus-order-"+id);BindViewState(orderField,()=>RefreshBoundText(orderField,DesktopApparatusProfile.Order((JObject)Workspace.System.Root["configs"][index])));
             }
-            else fold.Add(SessionLabel("One full-screen F (Front) camera is rendered on this rig’s output. Automatic three-/four-face monitor calibration remains deferred.","apparatus-note"));
+            var monitorNote=SessionLabel("Monitor output uses one full-screen Front camera. LED geometry is retained above and becomes editable again when LED panels are selected.","apparatus-note");fold.Add(monitorNote);BindViewState(monitorNote,()=>monitorNote.EnableInClassList("inactive-note",DesktopApparatusProfile.Presentation(Workspace.System.Root)!="desktop"));
             var advanced=new Foldout {name="apparatus-rig-advanced-"+id,text="Calibration & advanced input",value=false};advanced.AddToClassList("apparatus-advanced");fold.Add(advanced);
             var rigSchema=(JObject)Workspace.Schemas.Get("system")["properties"]["configs"]["items"];
             foreach(string key in new[]{"sphereDiameter","manualControls","tracker"})advanced.Add(Setting(Workspace.System,RigPath(key),ConfigSchema.Child(rigSchema,key),rig,rigSchema));
@@ -252,7 +256,7 @@ namespace ConfigurationUI
                     var button=StudioButton("",null,()=>StudioEdit(Workspace.System,r=>{
                         var target=(JObject)r["configs"][index];string current=DesktopApparatusProfile.Order(target);
                         DesktopApparatusProfile.SetOrder(target,current.IndexOf(chosen)>=0?current.Replace(chosen.ToString(),""):current+chosen);
-                    }),"apparatus-face");button.name="apparatus-face-"+id+"-"+face;button.EnableInClassList("is-enabled",slot>=0);
+                    },false),"apparatus-face");button.name="apparatus-face-"+id+"-"+face;button.EnableInClassList("is-enabled",slot>=0);
                     button.Add(new Label(face.ToString()){pickingMode=PickingMode.Ignore});button.Add(SessionLabel(DesktopApparatusProfile.FaceName(face),"apparatus-face-name"));button.Add(SessionLabel(slot<0?"Off":"Slot "+(slot+1),"apparatus-face-slot"));
                     button.tooltip=face+" · "+DesktopApparatusProfile.FaceName(face)+(slot<0?" is not rendered. Click to append it to the output order.":" is output slot "+(slot+1)+". Click to remove this face; at least one face remains required.");line.Add(button);
                 }
@@ -260,7 +264,7 @@ namespace ConfigurationUI
             var strip=new VisualElement();strip.AddToClassList("apparatus-strip-preview");previews.Add(strip);strip.Add(SessionLabel("Output order","apparatus-eyebrow"));
             var tiles=Row("apparatus-strip-tiles");strip.Add(tiles);
             tiles.style.flexDirection=rig["horizontal"]==null||DesktopApparatusProfile.Flag(rig["horizontal"])?FlexDirection.Row:FlexDirection.Column;
-            for(int slot=0;slot<order.Length;slot++){var tile=new VisualElement();tile.AddToClassList("apparatus-strip-tile");tile.Add(new Label(order[slot].ToString()));tile.Add(SessionLabel((slot+1).ToString(),"apparatus-face-slot"));tiles.Add(tile);}
+            for(int slot=0;slot<6;slot++){var tile=new VisualElement();tile.AddToClassList("apparatus-strip-tile");bool active=slot<order.Length;tile.EnableInClassList("inactive-tile",!active);tile.Add(new Label(active?order[slot].ToString():"—"));tile.Add(SessionLabel(active?(slot+1).ToString():"Off","apparatus-face-slot"));tiles.Add(tile);}
             strip.Add(SessionLabel((rig["horizontal"]==null||DesktopApparatusProfile.Flag(rig["horizontal"])?"Left → right":"Top → bottom")+" · "+rig["ledPanelWidth"]+" × "+rig["ledPanelHeight"]+" pixels per face","apparatus-note"));
         }
         private void BuildApparatusDisplayMap(VisualElement parent,JObject system)
@@ -279,20 +283,22 @@ namespace ConfigurationUI
                 float aspect=(float)width/height;
                 map.style.width=210f*aspect;
                 map.RegisterCallback<GeometryChangedEvent>(e=>{
-                    float scaledHeight=e.newRect.width/aspect;
-                    if(Mathf.Abs(e.newRect.height-scaledHeight)>.5f)map.style.height=scaledHeight;
+                    float drawnWidth=Mathf.Min(e.newRect.width,e.newRect.height*aspect);
+                    float drawnHeight=drawnWidth/aspect;
+                    float originX=(e.newRect.width-drawnWidth)*.5f,originY=(e.newRect.height-drawnHeight)*.5f;
                     // Use one pixel scale on both axes. Percentage rectangles
                     // are independently rounded by Yoga and can turn equal
                     // panel dimensions into 25 × 26 px rectangles.
-                    float units=e.newRect.width/width,backing=panel!=null?panel.scale:1;
+                    float units=drawnWidth/width,backing=panel!=null?panel.scale:1;
                     float Snap(double pixels)=>Mathf.Round((float)pixels*units*backing)/backing;
                     foreach(var cell in map.Children())
                         if(cell.userData is ApparatusPreviewCell bounds)
                         {
-                            cell.style.left=Snap(bounds.Left);cell.style.top=Snap(bounds.Top);
+                            cell.style.left=originX+Snap(bounds.Left);cell.style.top=originY+Snap(bounds.Top);
                             cell.style.width=Snap(bounds.Width);cell.style.height=Snap(bounds.Height);
                         }
                 });
+                var warnings=new List<string>();
                 foreach(var rig in rigs.Where(r=>ApparatusOutputDisplay(r)==display))
                 {
                     string id=(string)rig["vrId"];string order=DesktopApparatusProfile.Order(rig);bool horizontal=rig["horizontal"]==null||DesktopApparatusProfile.Flag(rig["horizontal"]);int pw=Math.Max(1,DesktopApparatusProfile.Integer(rig["ledPanelWidth"],128)),ph=Math.Max(1,DesktopApparatusProfile.Integer(rig["ledPanelHeight"],128));
@@ -307,10 +313,12 @@ namespace ConfigurationUI
                         cell.style.backgroundColor=colors[rigs.IndexOf(rig)%colors.Length];
                         cell.userData=new ApparatusPreviewCell {Left=left,Top=top,Width=panelWidth,Height=panelHeight};
                         cell.tooltip=id+" · "+order[slot]+" "+DesktopApparatusProfile.FaceName(order[slot])+" · slot "+(slot+1)+"\n"+panelWidth+" × "+panelHeight+" px at ("+left+", "+top+") from the top-left.";map.Add(cell);
-                        if(left<0||top<0||left+panelWidth>width||top+panelHeight>height)section.Add(SessionLabel(id+" "+order[slot]+" exceeds this display’s preview bounds. Check panel size and start row/column.","apparatus-validation"));
+                        if(left<0||top<0||left+panelWidth>width||top+panelHeight>height)warnings.Add(id+" "+order[slot]+" exceeds this display’s preview bounds. Check panel size and start row/column.");
                     }
                     section.Add(SessionLabel(id+" · "+order+" · "+(desktop?"full display":pw+" × "+ph+" px / face · row "+rig["startRow"]+", column "+rig["startCol"]),"apparatus-map-legend"));
                 }
+                var validation=SessionLabel(warnings.Count==0?"Panel rectangles fit this display.":warnings[0]+(warnings.Count>1?" ("+warnings.Count+" issues)":""),"apparatus-map-validation");
+                validation.EnableInClassList("has-warning",warnings.Count>0);validation.tooltip=string.Join("\n",warnings);section.Add(validation);
             }
         }
         private sealed class ApparatusPreviewCell

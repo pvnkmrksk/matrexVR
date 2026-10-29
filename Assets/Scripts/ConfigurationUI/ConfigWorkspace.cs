@@ -65,6 +65,17 @@ namespace ConfigurationUI
                 {
                     // Use the production parser too, including cross-field constraints.
                     JObject json=JObject.Parse(doc.Root.ToString());
+                    if(doc.SchemaId!="system" && doc.SchemaId!="sequence")
+                    {
+                        int largestRig=(System.Root["configs"] as JArray??new JArray()).OfType<JObject>()
+                            .Select(rig=>RuntimeRigRegistry.ParseIndex((string)rig["vrId"])).DefaultIfEmpty(0).Max();
+                        bool phasedCommon=json["stimulus"]!=null||json["preStimulus"]!=null||json["postStimulus"]!=null;
+                        foreach(var payload in phasedCommon?ExperimentPhase.Parse(json).Select(phase=>phase.Config):new[]{json}.AsEnumerable())
+                        {
+                            ExperimentSky.Rotation(payload);
+                            ExperimentVisibility.Validate(payload,largestRig);
+                        }
+                    }
                     if(doc.SchemaId=="system")
                     {
                         var ids=new HashSet<string>();

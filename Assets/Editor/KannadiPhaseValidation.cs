@@ -40,7 +40,8 @@ public static class KannadiPhaseValidation
         var configs = new JArray();
         for (int i = 1; i <= 16; i++) configs.Add(new JObject {
             ["vrId"] = "VR" + i, ["closedLoopMode"] = "Hejjetrac", ["zmqAddress"] = "127.0.0.1", ["zmqPort"] = 59000 + i,
-            ["sphereDiameter"] = 2.6, ["displayOrder"] = "", ["targetDisplay"] = 0
+            ["sphereDiameter"] = 2.6, ["displayOrder"] = "", ["targetDisplay"] = 0,
+            ["tracker"] = new JObject { ["saveVideo"] = false, ["recordingControl"] = "Manual" }
         });
         File.WriteAllText(Path.Combine(root, "system_config.json"), new JObject {
             ["configs"] = configs, ["targetDisplay"] = 0, ["targetFrameRate"] = 60,

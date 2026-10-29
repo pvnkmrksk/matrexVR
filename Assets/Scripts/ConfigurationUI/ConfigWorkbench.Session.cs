@@ -25,32 +25,29 @@ namespace ConfigurationUI
             foreach(string key in new[]{"autoStart","loop","randomise"})
             {
                 string flag=key;
-                bool on=ExperimentBlocks.Flag(Workspace.Sequence.Root[key],key=="loop");
-                string text=key=="autoStart"?"Auto start":key=="loop"?"Loop":"Randomize";
-                var button=StudioButton(text,key=="autoStart"?"auto":key=="loop"?"loop":"shuffle",
-                    ()=>StudioEdit(Workspace.Sequence,r=>r[flag]=!on),"sequence-flag");
-                button.name="sequence-"+key; button.EnableInClassList("is-on",on);
-                button.tooltip=text+": "+(on?"ON":"OFF")+". Click to turn "+(on?"off":"on")+
-                    (key=="autoStart"?". Applies to the next application launch; this session starts with Start experiment.":".");
-                var state=new Label(on?"ON":"OFF"); state.AddToClassList("flag-state"); button.Add(state);
-                flags.Add(button);
+                var item=Row("sequence-option");flags.Add(item);
+                item.Add(new WorkbenchIcon(key=="autoStart"?"auto":key=="loop"?"loop":"shuffle"));
+                string text=key=="autoStart"?"Auto start":key=="loop"?"Loop":"Shuffle";
+                var toggle=StateSwitch(ExperimentBlocks.Flag(Workspace.Sequence.Root[key],key=="loop"),
+                    on=>StudioEdit(Workspace.Sequence,r=>r[flag]=on,false),"sequence-"+key);
+                toggle.text=text;item.Add(toggle);
+                toggle.tooltip=key=="autoStart"?"Start the saved sequence on the next application launch. This session starts with Start experiment.":key=="loop"?"Repeat the sequence from the chosen block.":"Shuffle complete blocks or phase groups, retaining their internal order.";
             }
-            if(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true))
-            {
-                var loopStart=new IntegerField("Repeat from block") {
-                    name="sequence-loop-start", value=(int?)Workspace.Sequence.Root["loopStartIndex"]+1??1,
-                    tooltip="1 repeats every block. 2 runs the first block once, then repeats from the second block. Requires listed order." };
-                loopStart.RegisterValueChangedCallback(evt=>StudioEdit(Workspace.Sequence,r=>r["loopStartIndex"]=Math.Max(0,evt.newValue-1)));
-                flags.Add(loopStart);
-            }
+            var loopStart=new IntegerField("Repeat from block") {
+                name="sequence-loop-start", value=(int?)Workspace.Sequence.Root["loopStartIndex"]+1??1,isDelayed=true,
+                tooltip="1 repeats every block. 2 runs the first block once, then repeats from the second block. Available with looping and listed order." };
+            BindDelayedInteger(loopStart,number=>StudioEdit(Workspace.Sequence,r=>r["loopStartIndex"]=Math.Max(0,number-1),false));
+            flags.Add(loopStart);
+            BindViewState(loopStart,()=>loopStart.SetEnabled(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)&&!ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])));
             var reproducibility=Row("sequence-seed");flags.Add(reproducibility);
             string selectedMode=(string)Workspace.Sequence.Root["randomSeedMode"]??"Fixed";
             bool randomMode=string.Equals(selectedMode,"Random",StringComparison.OrdinalIgnoreCase);
             var mode=new DropdownField("Random seed",new List<string>{"Fixed","Random"},randomMode?1:0){name="sequence-seed-mode"};
-            mode.tooltip="Fixed repeats the configured seed. Random creates a new seed for each run and records the actual seed so replay can reconstruct it.";
-            mode.RegisterValueChangedCallback(e=>StudioEdit(Workspace.Sequence,r=>r["randomSeedMode"]=e.newValue));reproducibility.Add(mode);
+            mode.tooltip="Fixed repeats the configured seed. Random creates a new seed for each run and records it for replay.";
+            mode.RegisterValueChangedCallback(e=>StudioEdit(Workspace.Sequence,r=>r["randomSeedMode"]=e.newValue,false));reproducibility.Add(mode);
             var seed=new IntegerField("Seed") {name="sequence-random-seed",value=(int?)Workspace.Sequence.Root["randomSeed"]??1,isDelayed=true};
-            seed.tooltip="Explicit seed for experiment random choices, including shuffled block order. The effective seed is saved with the run.";seed.SetEnabled(!randomMode);
+            seed.tooltip="Explicit seed for experiment random choices, including shuffled block order. The effective seed is saved with the run.";
+            BindViewState(seed,()=>seed.SetEnabled(!string.Equals((string)Workspace.Sequence.Root["randomSeedMode"],"Random",StringComparison.OrdinalIgnoreCase)));
             BindDelayedInteger(seed,number=>StudioEdit(Workspace.Sequence,r=>r["randomSeed"]=number,false));reproducibility.Add(seed);
             return flags;
         }
@@ -273,8 +270,23 @@ namespace ConfigurationUI
                         var current=(r["configs"] as JArray).OfType<JObject>().First(row=>(string)row["vrId"]==id);
                         if(!(current["tracker"] is JObject tracker)){tracker=new JObject();current["tracker"]=tracker;}tracker["saveVideo"]=enabled;
                     },false),"recording-save-video-"+id);
-                    video.tooltip="Save native camera video alongside tracker frame/configuration logs. Uses additional disk space. Recording options preserve calibration. A running tracker using another profile must be closed explicitly before changing this option. Media remains pending until the native recorder closes cleanly; archival never stops your tracker.";
+                    video.tooltip="Save native camera video alongside tracker frame/configuration logs. Automatic experiment control requires a verified recording endpoint and waits for its acknowledgement; Manual leaves recording to the operator or external system.";
                     videoLabel.tooltip=video.tooltip;videoLabel.RegisterCallback<ClickEvent>(_=>video.value=!video.value);videoRow.Add(video);card.Add(videoRow);
+                    var recordingControls=new VisualElement {name="recording-control-"+id};recordingControls.AddToClassList("recording-control-mode");card.Add(recordingControls);
+                    var controlModes=new List<string>{"Automatic · experiment","Manual · external"};
+                    var recordingMode=new DropdownField("Recorder control",controlModes,ManualRecorder(rig["tracker"]?["recordingControl"])?1:0){name="recording-control-mode-"+id};
+                    recordingMode.tooltip="Automatic starts and stops the recorder for each experiment and verifies acknowledgement. Manual never sends recorder commands and does not promise automatic media collection.";recordingControls.Add(recordingMode);
+                    recordingMode.RegisterValueChangedCallback(evt=>StudioEdit(Workspace.System,r=>{
+                        var current=(r["configs"] as JArray).OfType<JObject>().First(row=>(string)row["vrId"]==id);
+                        if(!(current["tracker"] is JObject tracker)){tracker=new JObject();current["tracker"]=tracker;}
+                        bool manual=controlModes.IndexOf(evt.newValue)==1;tracker["recordingControl"]=tracker["recordingControl"]?.Type==JTokenType.Integer?new JValue((int)(manual?TrackerRecordingControlMode.Manual:TrackerRecordingControlMode.Experiment)):new JValue(manual?"Manual":"Experiment");
+                    },false));
+                    BindViewState(recordingControls,()=>recordingControls.SetEnabled(ExperimentBlocks.Flag((Workspace.System.Root["configs"] as JArray).OfType<JObject>().First(row=>(string)row["vrId"]==id)["tracker"]?["saveVideo"],true)));
+                    var controlHelp=SessionLabel("","recording-control-help");recordingControls.Add(controlHelp);
+                    BindViewState(controlHelp,()=>{controlHelp.text=ManualRecorder((Workspace.System.Root["configs"] as JArray).OfType<JObject>().First(row=>(string)row["vrId"]==id)["tracker"]?["recordingControl"])?"External recording is controlled by its operator. MATREX sends no recorder commands.":"Start waits for recorder acknowledgement. Stop waits for the completed recording before archival.";controlHelp.tooltip=controlHelp.text;});
+                    var recordingState=SessionLabel("","recording-control-status");recordingState.name="recording-control-status-"+id;card.Add(recordingState);
+                    Action refreshRecording=()=>{recordingState.text=TrackerProcessManager.RecordingStatus(id);recordingState.tooltip=recordingState.text;};
+                    refreshRecording();recordingState.schedule.Execute(refreshRecording).Every(300);
                 }
                 AddTrackerControls(card,rig);
             }

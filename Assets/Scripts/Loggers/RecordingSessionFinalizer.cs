@@ -108,7 +108,9 @@ public sealed class RecordingSessionFinalizer
 
     private JObject Lifecycle(string status, string reason, bool drained, string error) => new JObject {
         ["status"] = status, ["createdUtc"] = created, ["writersDrained"] = drained, ["endReason"] = reason,
-        ["sequenceOutcome"] = reason == "completed" ? "completed" : reason == "stopped" ? "stopped" : reason == "error" || reason == "failed" ? "failed" : "unknown",
+        ["sequenceOutcome"] = reason == "completed" ? "completed" : reason == "error" || reason == "failed" ? "failed" :
+            reason?.StartsWith("cancelled",StringComparison.Ordinal)==true ? "cancelled" :
+            reason == "stopped" || reason == "local-control-stop" || reason == "application-quit" ? "stopped" : "unknown",
         ["player"] = player.DeepClone(), ["error"] = error
     };
 

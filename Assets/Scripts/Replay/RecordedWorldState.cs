@@ -199,16 +199,19 @@ public sealed class RecordedWorldStateTarget : MonoBehaviour
 public sealed class RecordedWorldStateWriter : MonoBehaviour
 {
     public const string FileName = "world_state.jsonl";
+    public double CaptureMilliseconds { get; private set; }
     private StreamWriter writer;
     private string directory;
     private void LateUpdate()
     {
+        long started = System.Diagnostics.Stopwatch.GetTimestamp();
         try { CaptureRenderedFrame(); }
         catch(Exception error)
         {
             if(MainController.Instance!=null)MainController.Instance.FailRecordingEvidence(error);
             else Debug.LogException(error);
         }
+        finally { CaptureMilliseconds = 1000.0 * (System.Diagnostics.Stopwatch.GetTimestamp() - started) / System.Diagnostics.Stopwatch.Frequency; }
     }
     private void CaptureRenderedFrame()
     {
@@ -222,8 +225,7 @@ public sealed class RecordedWorldStateWriter : MonoBehaviour
         { var state=target.Capture();if(state!=null)targets.Add(state); }
         var entry=new JObject { ["presentationId"]=ReplayPresentationRecorder.CurrentPresentationId,["frame"]=Time.frameCount,
             ["unityTime"]=Time.timeAsDouble,["shaderTime"]=Time.timeSinceLevelLoad,["shaderGlobals"]=ReplayRenderClock.CaptureFrameClock(),["activeTargets"]=new JArray(live.Select(target=>target.Key)),["deltaTime"]=Time.deltaTime,["smoothDeltaTime"]=Time.smoothDeltaTime,["targets"]=targets };
-        foreach (var camera in FindObjectsByType<Camera>(FindObjectsSortMode.None))
-            (camera.GetComponent<ReplayRenderClock>() ?? camera.gameObject.AddComponent<ReplayRenderClock>()).SetClock((JObject)entry["shaderGlobals"]);
+        ReplayRenderClock.SetFrameClocks(FindObjectsByType<Camera>(FindObjectsSortMode.None),(JObject)entry["shaderGlobals"]);
         entry["sha256"]=ReplayPresentationJournal.HashEntry(entry);
         writer.WriteLine(entry.ToString(Formatting.None));
     }

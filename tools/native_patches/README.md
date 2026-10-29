@@ -48,5 +48,17 @@ The release manifest distinguishes the reviewed local builds from unchanged
 upstream packages. Other architectures retain their older pinned strict flight
 camera block. The pinned Linux HejjéTrac binary requires glibc 2.39 or newer;
 cross-building the Unity player does not establish native Linux execution.
-Acknowledged per-experiment tracker recording Start/Stop and manual override
-remain follow-up work; no upstream tracker source update is part of this release.
+The historical 0.4 release did not include acknowledged per-experiment tracker recording. The current local adapters below add it without changing that published release.
+
+
+## Experiment recording adapters (local Mac arm64)
+
+The current `rekkefly-macos.patch` combines the existing exact-camera correction with an opt-in native-GUI mailbox and per-take completion receipts. `hejjetrac-recording-macos.patch` adds the same reconnectable endpoint to the audited HejjéTrac desktop worker/finalizer. Their JSON locks pin the exact upstream commits, full patch hashes, changed-file inventory and capabilities. The flight detector and walking numerical core are unchanged. No upstream publication or user checkout mutation is required.
+
+`build_local_desktop.py` installs both adapters on Mac arm64 by default. Each helper extracts the pinned Git source into a marked disposable folder, checks/applies the locked patch, builds with locked Cargo dependencies, preserves attributed native resources, signs the resulting app and seals catalog executable hashes. HejjéTrac resources come from its checksum-pinned v0.3.2 archive. Other-platform catalog entries stay unchanged and never advertise automatic recording capability. Runtime performs no downloads.
+
+An explicit prior unsigned build can be reused only with its matching `MATREX-NATIVE-PROVENANCE.json` (or equivalent saved build receipt) through `--verified-native-binary FILE --native-binary-provenance JSON` for Rekkefly and `--verified-hejjetrac-binary FILE --hejjetrac-binary-provenance JSON` for HejjéTrac. The helpers still verify source and patch integrity before accepting matching executable bytes. New source/patch identities cannot reuse an older binary receipt. Development-only opt-outs are `--skip-native-camera-fix` and `--skip-hejjetrac-recording-control`; automatic recording then fails explicitly if a required backend is unavailable.
+
+The endpoint uses local files, instance nonces, process IDs, unique request/reply IDs and bounded expiry. A Start queue reply is followed by fresh-directory and first-video-frame verification. Stop includes the expected owned take directory and a stop ID; only the capture worker can stamp that ID into successful completion. Receipts include accepted/written or submitted/encoded/pending counts, container finalization, errors and capture pauses. Never infer closure from inactive status, stable file size or a delay. Manual overrides stay visible and never trigger an automatic restart.
+
+Validation tools: `tools/test_native_recording_control.py` (pure production client or an explicitly supplied real endpoint), `tools/test_build_local_rekkefly.py`, `tools/test_build_local_hejjetrac.py`, and the disposable Unity `NativeRecordingLifecycleValidation`. See [the integration audit](../../docs/recording-control-20261027.md) for executed scope and remaining physical-camera/platform limits.

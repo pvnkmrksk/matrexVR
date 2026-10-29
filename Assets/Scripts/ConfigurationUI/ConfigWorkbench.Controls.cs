@@ -72,6 +72,16 @@ namespace ConfigurationUI
 #if UNITY_EDITOR
             picker.RegisterValueChangedCallback(e=>hex.text="#"+ColorUtility.ToHtmlStringRGB(e.newValue));
 #endif
+            BindViewState(row,()=>{
+                var color=ConfigDocument.At(doc.Root,parts) as JObject;
+                if(color!=null)current=new Color((float)ExperimentBlocks.Number(color["r"]),(float)ExperimentBlocks.Number(color["g"]),(float)ExperimentBlocks.Number(color["b"]),(float)ExperimentBlocks.Number(color["a"],1));
+                hex.text="#"+ColorUtility.ToHtmlStringRGB(current);
+#if UNITY_EDITOR
+                picker.SetValueWithoutNotify(current);
+#else
+                picker.style.backgroundColor=current;
+#endif
+            });
             return row;
         }
         private void ShowRuntimeColorDialog(Color initial,bool alpha,Action<Color> commit)
@@ -84,7 +94,7 @@ namespace ConfigurationUI
             Action refresh=()=>{preview.style.backgroundColor=draft;hex.SetValueWithoutNotify("#"+ColorUtility.ToHtmlStringRGBA(draft));for(int i=0;i<4;i++) fields[i]?.SetValueWithoutNotify(draft[i]);};
             for(int i=0;i<(alpha?4:3);i++) {int channel=i;fields[i]=new Slider(channels[i],0,1){value=draft[i],showInputField=true};fields[i].RegisterValueChangedCallback(e=>{draft[channel]=e.newValue;refresh();});dialog.Add(fields[i]);}
             hex.RegisterValueChangedCallback(e=>Guard(()=>{if(!ColorUtility.TryParseHtmlString(e.newValue,out Color chosen)) throw new ArgumentException("Enter #RRGGBB or #RRGGBBAA.");draft=chosen;refresh();}));
-            dialog.Add(Button("Apply color",()=>{commit(draft);CloseModal();BuildContent();},"primary"));
+            dialog.Add(Button("Apply color",()=>{commit(draft);CloseModal();RefreshStudioValues();},"primary"));
         }
     }
 }

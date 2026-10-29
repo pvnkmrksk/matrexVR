@@ -131,8 +131,26 @@ namespace ConfigurationUI
         public static void SetPresentation(JObject root,string presentation)
         {
             if(presentation!="led"&&presentation!="desktop")throw new ArgumentException("Choose LED panels or desktop preview.");
-            Marker(root)["presentation"]=presentation;
-            foreach(var rig in Rigs(root)){rig["desktopPreview"]=presentation=="desktop";if(presentation=="desktop")rig["displayOrder"]="F";}
+            string previous=Presentation(root);
+            if(previous==presentation&&Rigs(root).All(rig=>Flag(rig["desktopPreview"])==(presentation=="desktop")&&(presentation!="desktop"||Order(rig)=="F")))return;
+            var marker=Marker(root);
+            var remembered=marker["ledFaceOrders"] as JArray;
+            if(remembered==null){remembered=new JArray();marker["ledFaceOrders"]=remembered;}
+            var rigs=Rigs(root).ToList();
+            for(int i=0;i<rigs.Count;i++)
+            {
+                var rig=rigs[i];
+                while(remembered.Count<=i)remembered.Add(JValue.CreateNull());
+                if(presentation=="desktop")
+                {
+                    if(previous!="desktop")remembered[i]=Order(rig);
+                    rig["displayOrder"]="F";
+                }
+                else if(previous=="desktop" && remembered[i].Type==JTokenType.String)
+                    rig["displayOrder"]=remembered[i].ToString();
+                rig["desktopPreview"]=presentation=="desktop";
+            }
+            marker["presentation"]=presentation;
         }
         public static List<string> Validate(JToken root,int? fallbackDisplay=null)
         {

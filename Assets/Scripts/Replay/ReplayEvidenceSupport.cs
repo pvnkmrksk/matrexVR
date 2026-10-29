@@ -13,14 +13,14 @@ public static class ReplayEvidenceSupport
     }
     public static void RequireSupportedScene(Scene scene)
     {
-        foreach(var root in scene.GetRootGameObjects())
-        {
-            foreach(var wind in root.GetComponentsInChildren<WindZone>(true))
-                if(wind.gameObject.activeInHierarchy&&(wind.windMain!=0||wind.windTurbulence!=0||wind.windPulseMagnitude!=0)&&!HasRecordedOwner(wind))
-                    throw new InvalidDataException("Active native wind requires a recorded seek-state owner (IReplayStateParticipant): "+wind.name+". Choose the non-windy tree asset or baked model animation.");
-            foreach(var particles in root.GetComponentsInChildren<ParticleSystem>(true))
-                if(particles.gameObject.activeInHierarchy&&!HasRecordedOwner(particles))
-                    throw new InvalidDataException("Particle systems require a recorded seek-state owner (IReplayStateParticipant): "+particles.name);
-        }
+        // Query the native component registry, rather than walking every bone
+        // of every animated population twice on every rendered frame. This is
+        // still a fresh query: newly created unsupported effects cannot evade it.
+        foreach(var wind in Object.FindObjectsByType<WindZone>(FindObjectsInactive.Include,FindObjectsSortMode.None))
+            if(wind.gameObject.scene==scene&&wind.gameObject.activeInHierarchy&&(wind.windMain!=0||wind.windTurbulence!=0||wind.windPulseMagnitude!=0)&&!HasRecordedOwner(wind))
+                throw new InvalidDataException("Active native wind requires a recorded seek-state owner (IReplayStateParticipant): "+wind.name+". Choose the non-windy tree asset or baked model animation.");
+        foreach(var particles in Object.FindObjectsByType<ParticleSystem>(FindObjectsInactive.Include,FindObjectsSortMode.None))
+            if(particles.gameObject.scene==scene&&particles.gameObject.activeInHierarchy&&!HasRecordedOwner(particles))
+                throw new InvalidDataException("Particle systems require a recorded seek-state owner (IReplayStateParticipant): "+particles.name);
     }
 }

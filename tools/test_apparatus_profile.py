@@ -96,6 +96,11 @@ static class Regression {
   Check(DesktopApparatusProfile.Validate(copy).Any(e=>e.Contains("exceeds the configured display count")),"output index ignores declared display count");
   copy[DesktopApparatusProfile.MarkerName]["monitorCount"]=2;
   Check(!DesktopApparatusProfile.Validate(copy).Any(e=>e.Contains("separate output displays")||e.Contains("exceeds the configured display count")),"separate declared desktop outputs rejected");
+  var remembered=Demo();DesktopApparatusProfile.Begin(remembered,"led",true);remembered["configs"][0]["displayOrder"]="BRFL";
+  string same=remembered.ToString();DesktopApparatusProfile.SetPresentation(remembered,"led");Check(remembered.ToString()==same,"selected presentation click creates an unintended edit");
+  DesktopApparatusProfile.SetPresentation(remembered,"desktop");DesktopApparatusProfile.SetPresentation(remembered,"desktop");DesktopApparatusProfile.SetPresentation(remembered,"led");
+  Check((string)remembered["configs"][0]["displayOrder"]=="BRFL","monitor mode erased the retained calibrated LED face order");
+  Check((string)remembered["configs"][0]["tracker"]["configFile"]=="native-calibration.toml"&&(string)remembered["configs"][0]["unknownRig"]=="keep","presentation roundtrip changed calibration or extension fields");
   var mixed=Demo();DesktopApparatusProfile.Begin(mixed,"led",true);mixed["configs"][0]["ledPanelHeight"]=128;DesktopApparatusProfile.ResizeRigs(mixed,2);mixed["configs"][1]["ledPanelHeight"]=64;mixed["configs"][1]["startRow"]=2;DesktopApparatusProfile.ResizeRigs(mixed,3);
   Check((int)mixed["configs"][2]["startRow"]>=3,"mixed panel sizes overlap after adding rig");
   Check(DesktopApparatusProfile.FaceName('U')=="Up"&&DesktopApparatusProfile.FaceName('D')=="Down","face labels differ from renderer letters");

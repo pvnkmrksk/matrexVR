@@ -44,8 +44,9 @@ Disable an object to leave its configuration in place without importing or
 rendering it. Most walking worlds use centimetres and terrain worlds use metres;
 choose the scale for the destination world. Absolute Kannadi objects stay fixed
 in the shared world. Heading-relative Kannadi objects use the mirrored
-population's visibility policy; private per-viewer world cues need the planned
-visibility editor.
+population's visibility policy. The optional observer/target visibility matrix
+described below changes population visibility; an independently routed private
+world-cue editor remains a separate extension.
 
 To use an external model for the mirrored animals, set
 `kannadiModelPath: "Models/animal.glb"`. For generated/recorded swarm agents,
@@ -61,6 +62,52 @@ saved copy; it does not need the original model file and does not write to it.
 Exported materials and animation clips remain subject to the embedded content
 and importer capabilities; preservation of the bytes is separate from a claim
 of pixel-perfect import across future Unity versions.
+
+### Runtime model support in this build
+
+The player uses the UnityGLTF revision pinned by `Packages/packages-lock.json`
+with Unity 6000.3.16f1. A vendor's source format or Unity package is not a claim
+that its shaders, components and animation will survive interchange export.
+Keep the original license and export a small test asset before a large purchase.
+
+| Content | Current contract | Verified scope |
+| --- | --- | --- |
+| GLB 2.0 scene, geometry and base-color material | Embedded, uncompressed `.glb`; choose transform and scale in the experiment | Actual Mac Unity import, rendered animation and archived-byte replay |
+| Embedded transform animation | Named clip, speed, loop; sampled from experiment/replay time | Actual GLB translation-clip round trip and edit-only preview |
+| Embedded PNG/JPEG and standard glTF material properties | Importer supported; use embedded buffer views or data URIs | Preview/material rendering checked; no comprehensive vendor material corpus |
+| Skeletal and morph-target clips | Importer capability; export to standard glTF animation | Built-in locust skeletal animation is checked separately; arbitrary external GLB skins/morphs need asset-specific acceptance |
+| Optional material extensions | Subject to this pinned importer and shader set | No blanket appearance-equivalence claim; check the exported asset |
+| Draco, Meshopt or BasisU required compression | Rejected before import; matching optional decoders are absent from this player | Production preflight regression |
+| External `.bin`/texture/URL dependencies | Rejected, including local relative paths; embed all dependencies | Production preflight regression |
+| FBX, `.gltf`, Blender project, Unity package | Convert/export to embedded GLB before copying into the config folder | Deliberate file-format boundary |
+| Asset scripts, custom Unity shaders, lights and cameras | No scripts imported; imported lights/cameras disabled; experiment owns lighting and views | Visual previews copy only rendering/animation data and never activate experiment scripts |
+| Windows/Linux import and rendering | Same source contract and archived bytes | Not established by the Mac rendering checks; validate on the acquisition build/platform |
+
+`python3 tools/test_runtime_model_contract.py` exercises 22 production preflight
+and active-reference checks. These establish file/dependency validation, not
+renderer correctness. A given acquisition build records its own identity and
+the model bytes; use that same build for scientifically faithful replay.
+
+### Appearance and visibility
+
+Custom panoramas accept `panoramaRotationDegrees` from 0 to 360. Omitted means
+zero; 360 normalizes to zero. This rotates azimuth without changing the image or
+the archived source. The Sky tab offers this field only for a custom panorama.
+
+An optional `visibilityMatrix` has `enabled` and a square boolean `rows` array
+up to 16×16. Rows are observing VRs; columns are visible population VRs, indexed
+by VR number minus one. Disabled preserves standard scene behavior. Enabling it
+replaces only population-layer bits on the six animal cameras, preserving the
+world layers and overhead camera. The editor keeps a fixed 16×16 grid and grays
+out unconfigured individuals. Defaults are all peers visible and self hidden.
+Archived configuration supplies the identical matrix to individual replay views.
+
+The object and sky editors show a bounded rendered preview while editing. They
+cancel obsolete imports when selection changes or acquisition starts. Built-in
+visual aliases are generated during the player build; for source-editor play,
+use **Tools → Experiment setup → Refresh available choice objects** once after
+changing the object catalog. Preview copies never run acquisition controllers
+or create sky/model evidence inside a recording.
 
 ## One editable rig template
 
@@ -81,7 +128,8 @@ Each rig has a deterministic stimulus layer. In standard Mirror mode every
 camera hides its own animal population and sees the other active populations;
 `watchIndex` provides the existing single-population override. In Swarm mode
 each viewer sees its own configured stimulus population. The overview can show
-all populations once. A general visibility matrix remains a future feature.
+all populations once. An enabled visibility matrix overrides those population
+bits explicitly; disabling it restores the scene's usual policy.
 
 Identical population settings with `resetPositionOnStart: false` retain the
 existing swarm/mirror instances between phases. The tracked animal pose also

@@ -108,6 +108,15 @@ public class MainController : MonoBehaviour
     public string SequenceTitle { get; private set; }
     public string CurrentExperimentTitle { get; private set; }
     public bool SequencePreparing { get; private set; }
+    public bool SequenceStopping { get; private set; }
+    public string RecordingTransitionError { get; private set; }
+    public string PreparationStatus { get; private set; }
+    public System.Threading.Tasks.Task RecordingCompletion => recordingCompletion;
+    public bool NativeRecordingStopSettled { get; private set; } = true;
+    private System.Threading.CancellationTokenSource preparationCancellation;
+    private System.Threading.Tasks.Task nativeRecordingStartTask = System.Threading.Tasks.Task.CompletedTask;
+    private System.Threading.Tasks.Task recordingCompletion = System.Threading.Tasks.Task.CompletedTask;
+    private string recordingRunId, recordingDirectory;
     private string randomSeedMode = "Fixed";
     private int randomSeed = 1;
     private int preparationGeneration;
@@ -116,12 +125,17 @@ public class MainController : MonoBehaviour
     // Called only from the idle setup screen, after validation and saving.
     public void PrepareConfiguredRun(string systemFile, string sequenceFile)
     {
-        if (sequenceStarted || SequencePreparing) throw new System.InvalidOperationException("Stop the experiment before changing its configuration.");
+        if (sequenceStarted || SequencePreparing || SequenceStopping) throw new System.InvalidOperationException("Wait for the experiment and its recorders to stop before changing configuration.");
         systemConfigFileName = systemFile;
         sequenceConfigFileName = sequenceFile;
         DesktopQuickStart.RememberWorkspace(systemFile, sequenceFile);
         masterDataLogger = MasterDataLogger.Instance;
         masterDataLogger.BeginConfiguredSession(systemFile, sequenceFile);
+        recordingRunId = null;
+        recordingDirectory = null;
+        nativeRecordingStartTask = System.Threading.Tasks.Task.CompletedTask;
+        RecordingTransitionError = null;
+        NativeRecordingStopSettled = true;
         SequenceError = null;
         currentTrial = 0;
         savedHeadings.Clear();
@@ -433,6 +447,7 @@ public class MainController : MonoBehaviour
     {
         ExperimentRandom.End();
         preparationGeneration++;
+        preparationCancellation?.Cancel();
         SequencePreparing = false;
         sequenceStarted = false;
         savedHeadings.Clear();
@@ -447,15 +462,72 @@ public class MainController : MonoBehaviour
         FinalizeRecording(endReason);
     }
 
-    private static void FinalizeRecording(string endReason)
+    public System.Threading.Tasks.Task StopSequenceAsync(string endReason = "stopped")
     {
-        try { _=MasterDataLogger.Instance?.FinalizeSessionAsync(endReason); }
-        catch(System.Exception error) {Debug.LogError("Could not finalize the recording: "+error.Message);}
+        StopSequence(endReason);
+        return recordingCompletion;
+    }
+
+    private void FinalizeRecording(string endReason)
+    {
+        var logger = MasterDataLogger.Instance;
+        if (logger == null || SequenceStopping || logger.FinalizationTask != null) return;
+        SequenceStopping = true;
+        // Pose/world writers stop immediately. The media session stays open for
+        // the matching native take's eventual completion receipt.
+        try { logger.SealSessionForFinalization(); }
+        catch (System.Exception error) { RecordTransitionFailure(logger, "Closing VR writers: " + error.Message); }
+        recordingCompletion = FinishRecordingAsync(logger, recordingRunId, endReason, nativeRecordingStartTask);
+    }
+
+    private async System.Threading.Tasks.Task FinishRecordingAsync(MasterDataLogger logger, string runId,
+        string endReason, System.Threading.Tasks.Task startTask)
+    {
+        try
+        {
+            // End owns cancellation and settles any queued start before it
+            // acknowledges that this run's native writers have finished.
+            if (!string.IsNullOrEmpty(runId))
+            {
+                PreparationStatus = "Finishing tracker recordings…";
+                try { await TrackerProcessManager.EndExperimentRecordingAsync(runId, endReason); }
+                catch (System.Exception error) { RecordTransitionFailure(logger, "Tracker recording stop: " + error.GetBaseException().Message); }
+            }
+            else
+            {
+                try { await startTask; }
+                catch (System.OperationCanceledException) { }
+                catch (System.Exception error) { RecordTransitionFailure(logger, "Tracker recording start: " + error.GetBaseException().Message); }
+            }
+            NativeRecordingStopSettled = true;
+            PreparationStatus = "Saving recording…";
+            await logger.FinalizeSessionAsync(endReason);
+            if (!string.IsNullOrEmpty(logger.FinalizationError))
+                RecordingTransitionError = logger.FinalizationError;
+        }
+        catch (System.Exception error) { RecordTransitionFailure(logger, "Recording finalization: " + error.GetBaseException().Message); }
+        finally
+        {
+            NativeRecordingStopSettled = true;
+            SequenceStopping = false;
+            PreparationStatus = null;
+            preparationCancellation?.Dispose();
+            preparationCancellation = null;
+        }
+    }
+
+    private void RecordTransitionFailure(MasterDataLogger logger, string message)
+    {
+        RecordingTransitionError = message;
+        if (string.IsNullOrEmpty(SequenceError)) SequenceError = message;
+        try { logger.RegisterRecordingFailure(message); }
+        catch (System.Exception error) { Debug.LogError("Could not retain recording failure: " + error.Message); }
+        Debug.LogError(message);
     }
 
     public void StartSequence()
     {
-        if (sequenceStarted || SequencePreparing) return;
+        if (sequenceStarted || SequencePreparing || SequenceStopping) return;
         if (systemConfigurationError != null) { FailExperiment(new System.ArgumentException(systemConfigurationError)); return; }
         Debugger.Log("MainController.StartSequence()", 3);
         try {MasterDataLogger.Instance.ConfigArchive.RequireComplete();}
@@ -468,7 +540,18 @@ public class MainController : MonoBehaviour
             return;
         }
 
+        var currentLogger = MasterDataLogger.Instance;
+        if (recordingDirectory != currentLogger.directoryPath || string.IsNullOrEmpty(recordingRunId))
+        {
+            recordingDirectory = currentLogger.directoryPath;
+            recordingRunId = System.Guid.NewGuid().ToString("N");
+            nativeRecordingStartTask = System.Threading.Tasks.Task.CompletedTask;
+            NativeRecordingStopSettled = true;
+        }
         SequencePreparing = true;
+        PreparationStatus = "Loading model assets…";
+        RecordingTransitionError = null;
+        preparationCancellation = new System.Threading.CancellationTokenSource();
         _ = PrepareAndStartSequence(++preparationGeneration);
     }
 
@@ -482,12 +565,26 @@ public class MainController : MonoBehaviour
                     ? ExperimentPhases.Read(step.parameters, step.parameters.ContainsKey("configFile") ? "configFile" : "design") : null)
                 .Concat(ExternalModelLibrary.CollectReferences(step.parameters != null ? JObject.FromObject(step.parameters) : null))).Distinct())
             {
-                await ExternalModelLibrary.PreloadAsync(reference, ExperimentConfigFiles.ReadAllBytes(reference, "model"));
+                await ExternalModelLibrary.PreloadAsync(reference, ExperimentConfigFiles.ReadAllBytes(reference, "model"),
+                    preparationCancellation.Token);
                 if (generation != preparationGeneration) return;
             }
             if (generation != preparationGeneration) return;
+            var logger = MasterDataLogger.Instance;
+            if (recordingDirectory != logger.directoryPath || string.IsNullOrEmpty(recordingRunId))
+            {
+                recordingDirectory = logger.directoryPath;
+                recordingRunId = System.Guid.NewGuid().ToString("N");
+            }
+            NativeRecordingStopSettled = false;
+            PreparationStatus = "Starting tracker recording…";
+            nativeRecordingStartTask = TrackerProcessManager.BeginExperimentRecordingAsync(
+                systemConfigs.Values, recordingDirectory, recordingRunId, preparationCancellation.Token);
+            await nativeRecordingStartTask;
+            if (generation != preparationGeneration) return;
             ExperimentRandom.Begin(randomSeedMode, randomSeed, MasterDataLogger.Instance.directoryPath, SequenceTitle, sequenceConfigFileName);
             SequencePreparing = false;
+            PreparationStatus = null;
             BeginPreparedSequence();
         }
         catch (System.Exception error) { if (generation == preparationGeneration) { SequencePreparing = false; FailExperiment(error); } }
@@ -845,9 +942,13 @@ private void ApplyExperiment(Dictionary<string, object> parameters, System.Actio
         using (ExperimentRandom.Scope("trial:" + currentTrial + ":row:" + executionOrder[currentStep] + ":phase:" + ExperimentPhase))
         {
             var presentation = ReplayPresentationRecorder.Begin(this, document, payload);
+            ExperimentVisibility.Restore(SceneManager.GetActiveScene());
             apply(payload);
             ExperimentWorldObjects.Apply(SceneManager.GetActiveScene(), document);
             ExperimentSun.Apply(SceneManager.GetActiveScene(), document);
+            ExperimentSky.ApplyScene(SceneManager.GetActiveScene(), document);
+            ExperimentSky.Apply(document);
+            ExperimentVisibility.Apply(SceneManager.GetActiveScene(), document);
             ExperimentRandom.SeedParticles(SceneManager.GetActiveScene(), "trial:" + currentTrial + ":row:" + executionOrder[currentStep] + ":phase:" + ExperimentPhase);
             ReplayPresentationRecorder.Commit(presentation, this);
         }
@@ -874,6 +975,9 @@ public void FailRecordingEvidence(System.Exception error)
 private void FailExperiment(System.Exception error)
 {
     ExperimentRandom.End();
+    preparationGeneration++;
+    preparationCancellation?.Cancel();
+    SequencePreparing = false;
     SequenceError = error.Message;
     sequenceStarted = false;
     phaseRunner?.Cancel();

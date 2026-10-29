@@ -51,7 +51,8 @@ public static class Regression
             Check(TrackerProcessManager.Arguments(rig).Last()=="--no-camera-fallback"&&!TrackerProcessManager.Arguments(rig).Contains("--supervised"),"Camera-only launch disables fallback without stdin supervision");
             rig.tracker.strictCameraFallback=false;
             rig.tracker.saveVideo=true;
-            Check(TrackerProcessManager.Arguments(rig).Last()=="--record","Saved camera video requests detached flight recording");
+            Check(!TrackerProcessManager.Arguments(rig).Contains("--record"),"Automatic experiment video never starts at tracker initialization");
+            rig.tracker.recordingControl=TrackerRecordingControlMode.Manual;Check(TrackerProcessManager.Arguments(rig).Last()=="--record","Explicit manual video requests launch-time flight recording");rig.tracker.recordingControl=TrackerRecordingControlMode.Experiment;
             rig.tracker.saveVideo=false;
             rig.closedLoopMode=ClosedLoopMode.Hejjetrac;rig.tracker.device="";rig.tracker.headless=false;
             Check(TrackerProcessManager.Arguments(rig).SequenceEqual(new[]{"--config",config,"--windows","1"}),"HejjéTrac native acquisition starts without stdin control");
@@ -97,6 +98,19 @@ public static class Regression
                 typeof(TrackerProcessManager).GetMethod("OnDisable",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic).Invoke(manager,null);
                 unrelated.Kill();Check(unrelated.WaitForExit(2000),"Fixture unrelated process shuts down cleanly");
             }
+            var unmanaged=new SystemConfig{vrId="VR-UNMANAGED",closedLoopMode=ClosedLoopMode.Rekkefly,tracker=new TrackerLaunchConfig{saveVideo=true}};
+            string unsupportedId=Guid.NewGuid().ToString("N"),unsupportedRun=Path.Combine(temp,"unmanaged-run");Directory.CreateDirectory(unsupportedRun);
+            Reject(()=>TrackerProcessManager.BeginExperimentRecordingAsync(new[]{unmanaged},unsupportedRun,unsupportedId).GetAwaiter().GetResult(),"Required automatic video rejects an unmanaged source instead of silently skipping recording");
+            Reject(()=>TrackerProcessManager.EndExperimentRecordingAsync(unsupportedId,"failed").GetAwaiter().GetResult(),"Failed native preparation retains explicit terminal failure");
+            unmanaged.tracker.recordingControl=TrackerRecordingControlMode.Manual;
+            string manualId=Guid.NewGuid().ToString("N"),manualRun=Path.Combine(temp,"manual-run");Directory.CreateDirectory(manualRun);
+            TrackerProcessManager.BeginExperimentRecordingAsync(new[]{unmanaged},manualRun,manualId).GetAwaiter().GetResult();
+            Check((string)TrackerProcessManager.RecordingState(unmanaged.vrId)["state"]=="manual"&&!(bool)TrackerProcessManager.RecordingState(unmanaged.vrId)["acknowledged"],"Explicit external Manual mode is operator-controlled without a false acknowledgement");
+            TrackerProcessManager.EndExperimentRecordingAsync(manualId,"stopped").GetAwaiter().GetResult();
+            unmanaged.tracker.saveVideo=false;
+            for(int repetition=0;repetition<120;repetition++){string id=Guid.NewGuid().ToString("N"),dir=Path.Combine(temp,"repeat-"+id);Directory.CreateDirectory(dir);TrackerProcessManager.BeginExperimentRecordingAsync(new[]{unmanaged},dir,id).GetAwaiter().GetResult();TrackerProcessManager.EndExperimentRecordingAsync(id,"stopped").GetAwaiter().GetResult();}
+            var retained=(System.Collections.IDictionary)typeof(TrackerProcessManager).GetField("recordingRuns",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic).GetValue(null);
+            Check(retained.Count==0,"120 settled repetitions retain no recording run or cancellation structures");
             string originalBundle=Environment.GetEnvironmentVariable("MATREX_COMPANION_DIR");
             try
             {
@@ -107,7 +121,7 @@ public static class Regression
                     string template=backend=="rekkefly"?"[recording]\nenabled = false\nformat = \"png\"\ndirectory = \"original\"\n[output]\nzmq_enabled = true\n":"save_raw : n\nsave_debug : n\nvid_codec : h264\nzmq_port : 9871\n";
                     File.WriteAllText(Path.Combine(package,"demo.txt"),template);File.WriteAllText(Path.Combine(package,"camera.txt"),template);
                     string hash;using(var sha=System.Security.Cryptography.SHA256.Create())using(var input=File.OpenRead(args[0]))hash=BitConverter.ToString(sha.ComputeHash(input)).Replace("-","").ToLowerInvariant();
-                    entries.Add(new JObject{["backend"]=backend,["platform"]=CompanionCatalog.Platform,["releaseTag"]="fixture",["packageRoot"]=backend,["executable"]="tracker",["executableSha256"]=hash,["demoConfig"]="demo.txt",["cameraConfig"]="camera.txt",["sampleVideo"]="sample.avi",["supportsNoCameraFallback"]=true});
+                    entries.Add(new JObject{["backend"]=backend,["platform"]=CompanionCatalog.Platform,["releaseTag"]="fixture",["packageRoot"]=backend,["executable"]="tracker",["executableSha256"]=hash,["demoConfig"]="demo.txt",["cameraConfig"]="camera.txt",["sampleVideo"]="sample.avi",["supportsNoCameraFallback"]=true,["supportsRecordingControl"]=true});
                 }
                 File.WriteAllText(Path.Combine(fixtureBundle,"catalog.json"),new JObject{["schemaVersion"]=1,["entries"]=entries}.ToString());Environment.SetEnvironmentVariable("MATREX_COMPANION_DIR",fixtureBundle);
                 foreach(var mode in new[]{ClosedLoopMode.Rekkefly,ClosedLoopMode.Hejjetrac})
@@ -118,7 +132,7 @@ public static class Regression
                     Check(video.rig.tracker.saveVideo&&video.rig.tracker.configFile==canonical.rig.tracker.configFile,"Default video keeps one canonical calibration profile: "+mode);
                     Check(File.ReadAllText(canonical.rig.tracker.configFile).Contains("shared calibration sentinel"),"Recording option changes preserve canonical calibration edits: "+mode);
                     string recording=File.ReadAllText(video.rig.tracker.configFile);
-                    Check(mode==ClosedLoopMode.Rekkefly?recording.Contains("\"mjpeg\"")&&recording.Contains("enabled = true"):recording.Contains("save_raw : y")&&recording.Contains("vid_codec : mjpg"),"Both bundled recorders prefer directly readable intra-frame AVI: "+mode);
+                    Check(mode==ClosedLoopMode.Rekkefly?recording.Contains("\"mjpeg\"")&&recording.Contains("enabled = false"):recording.Contains("save_raw : n")&&recording.Contains("vid_codec : mjpg"),"Both bundled recorders prepare AVI options without recording at initialization: "+mode);
                     Check(Path.IsPathFullyQualified(video.rig.tracker.recordingDirectory),"Native recording root is explicit for later collection: "+mode);
                     File.AppendAllText(video.rig.tracker.configFile,"\n# video calibration edit\n");var again=CompanionCatalog.Prepare(cameraRig,true);
                     Check(File.ReadAllText(again.rig.tracker.configFile).Contains("video calibration edit"),"Repeated preparation keeps operator recording calibration: "+mode);cameraRig.tracker.saveVideo=false;var off=CompanionCatalog.Prepare(cameraRig,true);Check(!off.rig.tracker.saveVideo&&off.rig.tracker.configFile==again.rig.tracker.configFile&&File.ReadAllText(off.rig.tracker.configFile).Contains("video calibration edit"),"Explicit video opt-out retains the same newly edited calibration: "+mode);
@@ -130,7 +144,7 @@ public static class Regression
             {
                 foreach(var mode in new[]{ClosedLoopMode.Rekkefly,ClosedLoopMode.Hejjetrac})
                 {
-                    var bundled=new SystemConfig{vrId="VR-BUNDLE",closedLoopMode=mode,zmqAddress="localhost",zmqPort=9893};
+                    var bundled=new SystemConfig{vrId="VR-BUNDLE",closedLoopMode=mode,zmqAddress="localhost",zmqPort=9893,tracker=new TrackerLaunchConfig{saveVideo=false}};
                     Check(CompanionCatalog.IsAvailable(bundled),"Pinned native bundle is available for host architecture: "+mode);
                     var first=CompanionCatalog.Prepare(bundled,true);string content=File.ReadAllText(first.rig.tracker.configFile);
                     File.AppendAllText(first.rig.tracker.configFile,"\n# operator calibration note β\n");

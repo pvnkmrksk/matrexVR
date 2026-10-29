@@ -54,7 +54,7 @@ namespace ConfigurationUI
             foreach(var doc in Workspace.Documents.Where(d=>d.SchemaId!="sequence"&&d.SchemaId!="system"&&linked.Contains(d.Path)))
             {
                 var button=StudioButton(ExperimentBlocks.Title(doc.Root as JObject,doc.Path)+(doc.Dirty?" •":""),doc.SchemaId=="swarm"?"swarm":"file",()=>Select(doc),!homeMode&&!experimentIndexMode&&selected==doc?"file-active":null);
-                button.AddToClassList("nav-file");button.tooltip="Edit "+doc.Path;files.Add(button);
+                button.userData=doc;button.AddToClassList("nav-file");button.tooltip="Edit "+doc.Path;files.Add(button);
             }
             var library=new Foldout {name="navigation-library",text="Files & library",value=false};library.AddToClassList("nav-foldout");side.Add(library);
             library.Add(StudioButton("Add a block","plus",()=>ShowBlockLibrary()));library.Add(StudioButton("Open JSON file","file",ShowOpenFile));library.Add(StudioButton("Save a variation","copy",()=>ShowVariation(null)));
@@ -70,7 +70,7 @@ namespace ConfigurationUI
             body.AddToClassList("studio-body"); inspector.AddToClassList("studio-inspector");
             var top=Row("studio-title-row"); body.Add(top);
             var titles=new VisualElement(); titles.style.flexGrow=1; top.Add(titles);
-            var title=new Label(selected==Workspace.System?"Configure apparatus":ExperimentBlocks.Title(selected.Root as JObject,selected.Path)); title.AddToClassList("title"); titles.Add(title);
+            var title=new Label(selected==Workspace.System?"Configure apparatus":ExperimentBlocks.Title(selected.Root as JObject,selected.Path)); title.AddToClassList("title"); titles.Add(title); BindViewState(title,()=>title.text=selected==Workspace.System?"Configure apparatus":ExperimentBlocks.Title(selected.Root as JObject,selected.Path));
             var subtitle=new Label(Path.GetRelativePath(RuntimePaths.ConfigRoot,selected.Path).Replace('\\','/')); subtitle.AddToClassList("studio-subtitle"); titles.Add(subtitle);
             top.Add(StudioButton("More","settings",ShowEditorTools,"quiet"));
             if(selected!=Workspace.System)BuildConfigIdentity(body);
@@ -84,7 +84,7 @@ namespace ConfigurationUI
             var identity=Row("config-identity");parent.Add(identity);
             var field=new TextField(selected==Workspace.Sequence?"Paradigm title":"Experiment title") {name="config-title",value=selected.Root["title"]?.Type==JTokenType.String?selected.Root["title"].ToString():"",isDelayed=true};
             field.tooltip="Human-readable name stored in this JSON and the recording. Leave blank to use the file name.";field.textEdition.placeholder="Optional human-readable title";identity.Add(field);
-            BindDelayedText(field,text=>StudioEdit(selected,r=>r["title"]=text));
+            BindDelayedText(field,text=>StudioEdit(selected,r=>r["title"]=text,false));
             var notes=new Foldout {name="config-comments-foldout",text="Comments",value=false};parent.Add(notes);
             var comments=new TextField {name="config-comments",value=selected.Root["comments"]?.Type==JTokenType.String?selected.Root["comments"].ToString():"",multiline=true,isDelayed=true};comments.tooltip="Optional notes saved with this configuration and its run snapshot.";notes.Add(comments);
             BindDelayedText(comments,text=>StudioEdit(selected,r=>r["comments"]=text,false));
@@ -102,8 +102,8 @@ namespace ConfigurationUI
             var stats=Row("sequence-stats"); body.Add(stats);
             stats.Add(Pill(BuilderSteps.Count+" blocks","accent"));
             var total=Pill(SequenceDuration()+" total");total.name="sequence-total-duration";stats.Add(total);
-            stats.Add(Pill(ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])?"Shuffled order":"Listed order"));
-            stats.Add(Pill(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass"));
+            var order=Pill(""); stats.Add(order); BindViewState(order,()=>order.text=ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])?"Shuffled order":"Listed order");
+            var repeats=Pill(""); stats.Add(repeats); BindViewState(repeats,()=>repeats.text=ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass");
             body.Add(BuildSequenceFlags());
             blockIndices.Clear(); blockIndices.AddRange(Enumerable.Range(0,BuilderSteps.Count));
             blockList=new ListView(blockIndices,156,()=>new VisualElement(),BindBlockCard) { selectionType=SelectionType.Single,reorderable=true,reorderMode=ListViewReorderMode.Animated,virtualizationMethod=CollectionVirtualizationMethod.FixedHeight };
@@ -251,10 +251,8 @@ namespace ConfigurationUI
         private Toggle StateSwitch(bool value,Action<bool> changed,string name=null)
         {
             var toggle=new Toggle { name=name }; toggle.AddToClassList("studio-switch"); toggle.SetValueWithoutNotify(value);
-            var track=new VisualElement(); track.AddToClassList("switch-track"); var knob=new VisualElement(); knob.AddToClassList("switch-knob"); track.Add(knob);
-            var input=toggle.Q<VisualElement>(className:"unity-toggle__input"); (input??toggle).Add(track);
-            var indicator=new Label(value?"ON":"OFF"); indicator.AddToClassList("switch-indicator"); (input??toggle).Add(indicator); toggle.EnableInClassList("is-on",value);
-            toggle.RegisterValueChangedCallback(e=>{ indicator.text=e.newValue?"ON":"OFF"; toggle.EnableInClassList("is-on",e.newValue); Guard(()=>changed(e.newValue)); }); return toggle;
+            toggle.EnableInClassList("is-on",value);
+            toggle.RegisterValueChangedCallback(e=>{ if(e.target!=toggle)return; toggle.EnableInClassList("is-on",e.newValue); Guard(()=>{FlushEditorDrafts();FlushNumbers();changed(e.newValue);}); }); return toggle;
         }
         private string SequenceDuration()
         {
@@ -275,7 +273,7 @@ namespace ConfigurationUI
             inspector.Clear(); inspector.Add(new Label("RUN OVERVIEW") { name="overview-title" });
             var big=new Label(SequenceDuration()); big.AddToClassList("overview-duration"); inspector.Add(big);
             inspector.Add(new Label(BuilderSteps.Count+" blocks · "+(Workspace.System.Root["configs"] as JArray)?.Count+" VR rigs"));
-            inspector.Add(Pill(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"LOOP ON · repeating":"ONE PASS","accent"));
+            var loopSummary=Pill("","accent");inspector.Add(loopSummary);BindViewState(loopSummary,()=>loopSummary.text=ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"LOOP ON · repeating":"ONE PASS");
             if(selected==Workspace.Sequence && Block(activeBlock) is JObject step)
             {
                 inspector.Add(new Label("SELECTED BLOCK "+(activeBlock+1).ToString("00")));

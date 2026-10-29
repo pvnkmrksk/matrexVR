@@ -133,8 +133,8 @@ namespace ConfigurationUI
             inspector=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; inspector.AddToClassList("inspector"); main.Add(inspector);
             var footer=Row("footer"); root.Add(footer);
             status=new Label(); status.AddToClassList("status"); footer.Add(status);
-            undo=Button("Undo",()=>{ RequireApplied(); selected.Undo(); RebuildPreservingView(); }); footer.Add(undo);
-            redo=Button("Redo",()=>{ RequireApplied(); selected.Redo(); RebuildPreservingView(); }); footer.Add(redo);
+            undo=StudioButton("Undo","undo",()=>{ RequireApplied(); selected.Undo(); RebuildPreservingView(); }); footer.Add(undo);
+            redo=StudioButton("Redo","redo",()=>{ RequireApplied(); selected.Redo(); RebuildPreservingView(); }); footer.Add(redo);
             save=StudioButton("Save changes","file",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); MainController.Instance?.ApplyIdleFrameTiming((JObject)Workspace.System.Root);UpdateStatus("Setup and session details saved."); }); save.name="save-changes";footer.Add(save);
             start=StudioButton("Start experiment","play",RunPrimaryAction,"primary"); start.name="start-experiment"; footer.Add(start);
             save.tooltip="Save the system, sequence, edited experiment files and subject metadata. Omitted values and unknown JSON fields are preserved.";
@@ -286,9 +286,12 @@ namespace ConfigurationUI
             var hint=new Label(array?"item "+key:key+(schema["x-ui"]?["unit"]!=null?" · "+schema["x-ui"]["unit"]:"")); hint.AddToClassList("key-hint"); caption.Add(hint);
             row.tooltip=ConfigParameterHelp.Description(key,path.Concat(new[]{key}).ToArray(),schema);
             var edit=Row("field-controls"); row.Add(edit);
-            bool enabled=array || ConfigSchema.Enabled(Current,CurrentSchema,key,Context);
-            edit.SetEnabled(enabled);
-            Action<JToken> replace=v=>Change(node=>{ if(array) ((JArray)node)[int.Parse(key)]=v; else node[key]=v; });
+            BindViewState(edit,()=>edit.SetEnabled(array || ConfigSchema.Enabled(Current,CurrentSchema,key,Context)));
+            Action<JToken> replace=v=>{
+                bool structural=value==null || value is JContainer || v is JContainer || value.Type==JTokenType.Null || v.Type==JTokenType.Null;
+                if(structural)Change(node=>{ if(array) ((JArray)node)[int.Parse(key)]=v; else node[key]=v; });
+                else StudioEdit(selected,_=>{var node=Current;if(array)((JArray)node)[int.Parse(key)]=v;else node[key]=v;},false);
+            };
             if(TryChoiceCatalogControl(path.Concat(new[]{key}).ToArray(),value,replace,out var catalogControl))edit.Add(catalogControl);
             else if(value==null) edit.Add(Button("+ Set value",()=>replace(ConfigSchema.NewValue(schema)),"quiet"));
             else if(value is JContainer && !(value is JValue))
@@ -298,15 +301,13 @@ namespace ConfigurationUI
             }
             else if(value.Type==JTokenType.Null)
             { edit.Add(new Label("null · unset / inherited")); edit.Add(Button("Set",()=>replace(ConfigSchema.NewValue(schema)))); }
-            else if(value.Type==JTokenType.Boolean)
+            else if(BooleanControl(value,schema))
             {
-                var toggle=new Toggle { value=(bool)value }; edit.Add(toggle);
-                toggle.RegisterValueChangedCallback(e=>replace(new JValue(e.newValue)));
+                var toggle=StateSwitch(ExperimentBlocks.Flag(value),on=>replace(BooleanValue(on,value,schema))); edit.Add(toggle);
             }
-            else if(schema["enum"] is JArray options && value.Type==JTokenType.String)
+            else if(schema["enum"] is JArray options)
             {
-                var choices=options.Where(v=>v.Type==JTokenType.String).Select(v=>v.ToString()).ToList(); if(!choices.Contains(value.ToString())) choices.Add(value.ToString());
-                var dropdown=new DropdownField(choices,choices.IndexOf(value.ToString())); edit.Add(dropdown); dropdown.RegisterValueChangedCallback(e=>replace(new JValue(e.newValue)));
+                edit.Add(EnumControl(options,value,replace));
             }
             else
             {
@@ -327,10 +328,10 @@ namespace ConfigurationUI
                 if(array)
                 {
                     int position=int.Parse(key);
-                    edit.Add(Button("Copy",()=>Change(node=>((JArray)node).Insert(position+1,node[position].DeepClone())),"mini"));
-                    edit.Add(Button("↑",()=>Move(position,-1),"mini")); edit.Add(Button("↓",()=>Move(position,1),"mini"));
+                    edit.Add(IconButton("copy","Duplicate item",()=>Change(node=>((JArray)node).Insert(position+1,node[position].DeepClone()))));
+                    edit.Add(IconButton("up","Move item up",()=>Move(position,-1))); edit.Add(IconButton("down","Move item down",()=>Move(position,1)));
                 }
-                edit.Add(Button("×",()=>Change(node=>{ if(array) ((JArray)node).RemoveAt(int.Parse(key)); else ((JObject)node).Property(key).Remove(); }),"mini"));
+                edit.Add(IconButton("trash","Remove value",()=>Change(node=>{ if(array) ((JArray)node).RemoveAt(int.Parse(key)); else ((JObject)node).Property(key).Remove(); })));
             }
         }
         private void Move(int position,int offset)
@@ -339,7 +340,7 @@ namespace ConfigurationUI
         { return value is JObject obj?(string)(obj["vrId"]??obj["sceneName"]??obj["name"]??obj["type"])??"Item "+(index+1):"Item "+(index+1); }
         private void UpdateStatus(string message=null)
         {
-            UpdateFrameRate();
+            UpdateFrameRate();RefreshNavigationLabels();
             if(replayLibraryMode){RefreshLibraryFooter(message);return;}
             if(preparing)
             {
@@ -359,7 +360,7 @@ namespace ConfigurationUI
             status.text=message??(errors.Count>0?string.Join(" · ",errors.Take(2)):ApparatusDraft?"Review hardware settings, then choose Use configuration to save and continue.":warnings.Count>0?warnings[0]:HasUnsavedChanges?"Unsaved changes · saved when you start":"Ready to run · session details saved when you start");
             status.EnableInClassList("error",errors.Count>0);
             status.EnableInClassList("warning",errors.Count==0 && warnings.Count>0);
-            start.SetEnabled(errors.Count==0 && !rawPending); save.SetEnabled(!rawPending && HasUnsavedChanges); undo.SetEnabled(selected.CanUndo && !rawPending); redo.SetEnabled(selected.CanRedo && !rawPending);
+            start.SetEnabled(errors.Count==0 && !rawPending && MainController.Instance?.SequenceStopping!=true); save.SetEnabled(!rawPending && HasUnsavedChanges); undo.SetEnabled(selected.CanUndo && !rawPending); redo.SetEnabled(selected.CanRedo && !rawPending);
         }
         private void PollFiles()
         {
@@ -641,7 +642,7 @@ namespace ConfigurationUI
             main.StartSequence();
             if(main.SequencePreparing)
             {
-                RestoreSetupAfterStart();preparing=true;preparationStatus="Loading models… Escape cancels preparation.";
+                RestoreSetupAfterStart();preparing=true;preparationStatus=(main.PreparationStatus??"Preparing experiment…")+" Escape cancels preparation.";
                 body.SetEnabled(false);side.SetEnabled(false);UpdateStatus();
                 StartCoroutine(WaitForSequencePreparation(main));return;
             }
@@ -658,7 +659,12 @@ namespace ConfigurationUI
         }
         private IEnumerator WaitForSequencePreparation(MainController main)
         {
-            while(main!=null&&main.SequencePreparing)yield return null;
+            while(main!=null&&main.SequencePreparing)
+            {
+                string current=(main.PreparationStatus??"Preparing experiment…")+" Escape cancels preparation.";
+                if(preparationStatus!=current){preparationStatus=current;RefreshPreparingCaption();UpdateStatus();}
+                yield return null;
+            }
             if(main!=null&&main.SequenceRunning){Destroy(gameObject);yield break;}
             preparing=false;body.SetEnabled(true);side.SetEnabled(true);RefreshStartCaption();
             UpdateStatus(main?.SequenceError??"Experiment preparation cancelled.");

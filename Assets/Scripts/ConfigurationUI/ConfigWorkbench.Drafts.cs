@@ -44,7 +44,7 @@ namespace ConfigurationUI
         {
             var binding=new DraftBinding<string>{Committed=field.value,Commit=commit};textDraftCommits[field]=binding;
             field.RegisterValueChangedCallback(evt=>{
-                if(evt.target!=field||binding.Committed==evt.newValue)return;
+                if(evt.target!=field||binding.Committed==evt.newValue||evt.newValue!=field.value)return;
                 Guard(()=>{try{binding.Commit(evt.newValue);binding.Committed=evt.newValue;}catch{field.SetValueWithoutNotify(binding.Committed);throw;}});
             });
             field.RegisterCallback<DetachFromPanelEvent>(_=>{textDraftCommits.Remove(field);textDrafts.Remove(field);});
@@ -53,7 +53,7 @@ namespace ConfigurationUI
         {
             var binding=new DraftBinding<int>{Committed=field.value,Commit=commit};integerDraftCommits[field]=binding;
             field.RegisterValueChangedCallback(evt=>{
-                if(evt.target!=field||binding.Committed==evt.newValue)return;
+                if(evt.target!=field||binding.Committed==evt.newValue||evt.newValue!=field.value)return;
                 Guard(()=>{try{binding.Commit(evt.newValue);binding.Committed=evt.newValue;}catch{field.SetValueWithoutNotify(binding.Committed);throw;}});
             });
             field.RegisterCallback<DetachFromPanelEvent>(_=>{integerDraftCommits.Remove(field);integerDrafts.Remove(field);});

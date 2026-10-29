@@ -81,7 +81,7 @@ public sealed class ExperimentControlEndpoint : MonoBehaviour
     private static void RequireIdle()
     {
         var main = MainController.Instance;
-        if (main?.SequenceRunning == true || main?.SequencePreparing == true || ConfigWorkbench.Instance?.IsPreparing == true)
+        if (main?.SequenceRunning == true || main?.SequencePreparing == true || main?.SequenceStopping == true || ConfigWorkbench.Instance?.IsPreparing == true)
             throw new InvalidOperationException("Return to idle setup before changing experiment configuration.");
     }
     public JObject Execute(string method, JObject args)
@@ -93,6 +93,7 @@ public sealed class ExperimentControlEndpoint : MonoBehaviour
             case "status": return new JObject {
                 ["protocolVersion"] = 1, ["scene"] = SceneManager.GetActiveScene().name,
                 ["sequenceRunning"] = main?.SequenceRunning ?? false, ["sequencePreparing"] = main?.SequencePreparing ?? false,
+                ["sequenceStopping"] = main?.SequenceStopping ?? false, ["recordingError"] = main?.RecordingTransitionError,
                 ["sequenceTitle"] = main?.SequenceTitle, ["phase"] = MainController.RecordedExperimentPhase, ["sequenceError"] = main?.SequenceError,
                 ["setupOpen"] = gui != null, ["unsavedDraft"] = gui?.ControlHasUnsavedDraft ?? false, ["setupModal"] = gui?.ControlHasModal ?? false,
                 ["replayReady"] = replay?.Ready ?? false, ["replayTime"] = replay?.ReplayTime ?? 0, ["replayDuration"] = replay?.Duration ?? 0,
@@ -115,7 +116,7 @@ public sealed class ExperimentControlEndpoint : MonoBehaviour
                 bool returnToSetup = SceneManager.GetActiveScene().name != "ControlScene" || main.SequencePreparing || gui?.IsPreparing == true;
                 main.StopSequence("local-control-stop");
                 if (returnToSetup) SceneManager.LoadScene("ControlScene");
-                return new JObject { ["accepted"] = true };
+                return new JObject { ["accepted"] = true, ["recordersFinishing"] = main.SequenceStopping };
             case "replay_open":
                 if (gui?.ControlHasUnsavedDraft == true || gui?.ControlHasModal == true) throw new InvalidOperationException("Save/discard the GUI draft and close its dialog before opening replay.");
                 string folder = RequiredPath(args, "directory");

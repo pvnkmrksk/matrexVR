@@ -81,6 +81,9 @@ def main():
     parser.add_argument('--skip-native-camera-fix', action='store_true', help='Advanced development-only opt-out; bundled flight camera input then remains unavailable')
     parser.add_argument('--verified-native-binary', type=Path, help='Explicit previously built unsigned native correction, verified against --native-binary-provenance instead of invoking Cargo')
     parser.add_argument('--native-binary-provenance', type=Path, help='Prior MATREX-NATIVE-PROVENANCE.json for --verified-native-binary; source/patch integrity is still checked')
+    parser.add_argument('--verified-hejjetrac-binary', type=Path, help='Explicit unsigned HejjéTrac adapter executable, paired with --hejjetrac-binary-provenance')
+    parser.add_argument('--hejjetrac-binary-provenance', type=Path)
+    parser.add_argument('--skip-hejjetrac-recording-control', action='store_true', help='Advanced opt-out: automatic HejjéTrac recording will be unavailable')
     parser.add_argument('--local-dashboard-archive', type=Path, default=ROOT / '.integration/local-dashboard/DaariDeepa-macos-arm64.zip')
     parser.add_argument('--skip-local-dashboard', action='store_true', help='Advanced development-only opt-out; uses the older published dashboard renderer')
     args = parser.parse_args()
@@ -94,6 +97,10 @@ def main():
         parser.error('--verified-native-binary and --native-binary-provenance must be supplied together')
     if args.verified_native_binary is not None and (args.skip_companions or args.skip_native_camera_fix or platform.machine() != 'arm64'):
         parser.error('Verified native reuse requires Apple Silicon companion packaging with the native camera correction enabled')
+    if (args.verified_hejjetrac_binary is None) != (args.hejjetrac_binary_provenance is None):
+        parser.error('--verified-hejjetrac-binary and --hejjetrac-binary-provenance must be supplied together')
+    if args.verified_hejjetrac_binary is not None and (args.skip_companions or args.skip_hejjetrac_recording_control or platform.machine() != 'arm64'):
+        parser.error('Verified HejjéTrac reuse requires the Mac arm64 recording adapter enabled')
     local_dashboard = platform.machine() == 'arm64' and not args.skip_companions and not args.skip_local_dashboard
     if local_dashboard and not args.prepare_only and not args.local_dashboard_archive.is_file():
         parser.error('Reviewed local dashboard archive is absent: '+str(args.local_dashboard_archive)+'. See tools/native_patches/README.md for the pinned source build.')
@@ -114,6 +121,9 @@ def main():
         if platform.machine() == 'arm64' and not args.skip_native_camera_fix:
             native_args = ['--verified-binary', args.verified_native_binary, '--binary-provenance', args.native_binary_provenance] if args.verified_native_binary is not None else []
             run(sys.executable, ROOT / 'tools/build_local_rekkefly.py', '--companions', args.app / 'Contents/Companions', *native_args)
+        if platform.machine() == 'arm64' and not args.skip_hejjetrac_recording_control:
+            hj_args = ['--verified-binary', args.verified_hejjetrac_binary, '--binary-provenance', args.hejjetrac_binary_provenance] if args.verified_hejjetrac_binary is not None else []
+            run(sys.executable, ROOT / 'tools/build_local_hejjetrac.py', '--companions', args.app / 'Contents/Companions', *hj_args)
         dashboard_args = ['--local-archive', args.local_dashboard_archive] if local_dashboard else []
         run(sys.executable, ROOT / 'tools/stage_local_dashboard.py', '--output', args.app / 'Contents/Companions', *dashboard_args)
     # Seal after embedding. Upstream tracker signatures are retained; no recursive re-signing.
