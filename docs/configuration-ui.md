@@ -92,7 +92,7 @@ Current desktop source uses `RuntimePaths.ConfigRoot` and `RunDataRoot`: a writa
 
 ## Stable forms and edit-time previews
 
-Changing a value or enabling a feature updates the existing controls in place. Inactive settings remain gray and retain their saved values. Repeat-from and explicit-seed fields keep their positions when their modes change; monitor output keeps LED calibration visible and restores the saved face order when returning to LED output. Save, Start and recording status have reserved geometry. Expanding a parameter disclosure, adding/removing items, selecting a tab or resizing the window deliberately changes the displayed structure.
+Changing a value or enabling a feature updates the existing controls in place. Inactive settings remain gray and retain their saved values. Repeat-from and explicit-seed fields keep their positions when their modes change; monitor output keeps LED calibration visible and restores the saved face order when returning to LED output. Per-display legend rows scroll inside a fixed-height slot, so adding rigs keeps the first calibration card in place. Apparatus editors reserve a 32px input with fully visible text. Save, Start and recording status have reserved geometry. Expanding a parameter disclosure, adding/removing items, selecting a tab or resizing the window deliberately changes the displayed structure.
 
 Booleans use checkboxes. Named enums use dropdowns even when existing JSON stores numeric enum values; changing a numeric enum retains that representation. Schema booleans stored as historical 0/1 flags display as checkboxes and are normalized to the declared boolean type when edited. Exact numbers, unknown JSON fields and pending text edits retain the shared lossless editing workflow.
 
@@ -104,7 +104,7 @@ The build automatically generates lightweight per-asset visual aliases and retai
 
 **Visibility** contains the optional observer/target matrix. It always reserves 16×16 checkbox cells; inactive VR entries remain gray. Enabling the feature or changing a cell retains geometry and keyboard focus. Disabling it restores the normal scene visibility policy.
 
-The [GUI stability and preview evidence](gui-stability-validation-results.json) records the current native UI Toolkit and real GPU checks. It separates synthetic callback/layout evidence from physical apparatus and native pointer acceptance.
+The [GUI stability and preview evidence](gui-stability-validation-results.json) records the current native UI Toolkit and real GPU checks. It includes 45 stable-form checks, 24 rendered-preview checks, 28 setup checks and 95 count/edit/history checks at 1/2/4/8/16. Native pointer acceptance was deferred at the user’s request to continue with automated checks only; physical apparatus timing is also outside these assertions.
 
 ## Validation
 

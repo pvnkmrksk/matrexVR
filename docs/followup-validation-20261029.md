@@ -9,6 +9,7 @@ tracked separately below. No physical camera or LED equivalence is claimed.
 | --- | --- |
 | GUI stability | 45 actual UI Toolkit assertions: control identity, geometry, focus, scroll, disabled fields, semantic enums, buffered edits, icons and matrix cells |
 | Edit-only rendering | 24 GPU assertions: object/material/sky rendering, import cancellation/reopen, no source mutation, no acquisition scripts or archive writes |
+| Primary-count UI stress | 95 actual UI Toolkit assertions at 1/2/4/8/16, including fixed count/card/Save geometry, legible inputs, routing, retained calibration, Save and Undo/Redo |
 | Existing setup behavior | 28 assertions, including dirty Save and cap controls |
 | Actual native recording integration | 58 assertions across four MainController runs with both ordinary owned native GUIs: two normal, canceled preparation, manual pause |
 | Native endpoint/transport | 30 actual two-take checks per backend; 20 transport/finalization checks |
@@ -45,8 +46,9 @@ The local build target is `Preview/MATREX VR.app`. Launch it with the repository
 `Preview/RunData` folders. Rebuilding preserves those folders. This is a local
 development build, not a published release.
 
-The Mac was locked when the native pointer/keyboard walkthrough was attempted.
-Automated UI Toolkit checks do not replace that acceptance. Physical tracker
+The Mac was locked when the native pointer/keyboard walkthrough was attempted,
+and the operator explicitly chose automated checks only for this pass. Automated
+UI Toolkit checks do not replace native pointer/keyboard acceptance. Physical tracker
 calibration/camera recording and LED timing, unsupported-platform native
 recording control, large-data cache budgets and further many-camera rendering
 work remain explicit in the [follow-up checklist](gui-recording-performance-followup.md).

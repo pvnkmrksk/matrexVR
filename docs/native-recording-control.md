@@ -27,6 +27,12 @@ Local request/reply files carry matching random IDs, instance identity and expir
 
 The reviewed source adapters currently ship for **Mac arm64**. The flight detector and walking numerical core are unchanged. Intel Mac, Windows and Linux packages retain their previous capabilities and reject automatic video with update/Manual guidance. Physical camera start/stop, exposure timing, attached hardware and other-platform runtime acceptance remain pending.
 
+After upgrading, an already-open tracker may still be the older executable.
+Close that tracker with the explicit tracker-window control, then initialize it
+again from the new MATREX build. Replacing the app bundle does not replace a
+running process or its calibration. Automatic recording deliberately refuses
+an older endpoint rather than assuming that a visible tracker window is capable.
+
 ## Source build and reuse
 
 The [pinned source patches and locks](../tools/native_patches/README.md) record exact upstream commits, patch hashes and capabilities. They preserve native attributed resources and distinguish local builds from upstream releases. Existing user checkouts and unpublished work were not overwritten.

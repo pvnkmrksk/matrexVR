@@ -53,7 +53,9 @@ The priorities below are ordered; unchecked acceptance is not a released claim.
   non-population camera layers and replay the archived matrix.
 - [x] Publish a precise runtime GLB support matrix separating verified behavior
   from importer capability. Reject required decoders absent from this build.
-- [ ] Complete native pointer/keyboard checks at 1/2/4/8/16 and package a visible local preview. Automated GUI coverage is recorded separately.
+- [x] Exercise the actual UI Toolkit controls at 1/2/4/8/16, including stable layout, routing, calibration retention, Save and Undo/Redo. The dedicated suite passes 95 assertions.
+- [x] Package a visible local Mac preview with both control-capable native companions.
+- [ ] Native pointer/keyboard walkthrough: operator chose automated checks only while the Mac was locked.
 
 ## Remaining acceptance and larger work
 

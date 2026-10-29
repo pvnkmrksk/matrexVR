@@ -298,6 +298,8 @@ namespace ConfigurationUI
                             cell.style.width=Snap(bounds.Width);cell.style.height=Snap(bounds.Height);
                         }
                 });
+                var legends=new ScrollView {name="apparatus-map-legends-"+display,horizontalScrollerVisibility=ScrollerVisibility.Hidden};
+                legends.AddToClassList("apparatus-map-legends");section.Add(legends);
                 var warnings=new List<string>();
                 foreach(var rig in rigs.Where(r=>ApparatusOutputDisplay(r)==display))
                 {
@@ -315,7 +317,7 @@ namespace ConfigurationUI
                         cell.tooltip=id+" · "+order[slot]+" "+DesktopApparatusProfile.FaceName(order[slot])+" · slot "+(slot+1)+"\n"+panelWidth+" × "+panelHeight+" px at ("+left+", "+top+") from the top-left.";map.Add(cell);
                         if(left<0||top<0||left+panelWidth>width||top+panelHeight>height)warnings.Add(id+" "+order[slot]+" exceeds this display’s preview bounds. Check panel size and start row/column.");
                     }
-                    section.Add(SessionLabel(id+" · "+order+" · "+(desktop?"full display":pw+" × "+ph+" px / face · row "+rig["startRow"]+", column "+rig["startCol"]),"apparatus-map-legend"));
+                    legends.Add(SessionLabel(id+" · "+order+" · "+(desktop?"full display":pw+" × "+ph+" px / face · row "+rig["startRow"]+", column "+rig["startCol"]),"apparatus-map-legend"));
                 }
                 var validation=SessionLabel(warnings.Count==0?"Panel rectangles fit this display.":warnings[0]+(warnings.Count>1?" ("+warnings.Count+" issues)":""),"apparatus-map-validation");
                 validation.EnableInClassList("has-warning",warnings.Count>0);validation.tooltip=string.Join("\n",warnings);section.Add(validation);

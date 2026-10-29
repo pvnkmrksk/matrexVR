@@ -48,6 +48,11 @@ public static class GuiRigCountValidation
     private static void Click(VisualElement element){using(var evt=NavigationSubmitEvent.GetPooled()){evt.target=element;element.SendEvent(evt);}}
     private static bool Same(Rect a,Rect b)=>Vector2.Distance(a.position,b.position)<.25f&&Vector2.Distance(a.size,b.size)<.25f;
     private static JArray Rigs(ConfigWorkbench ui)=>(JArray)ui.Workspace.System.Root["configs"];
+    private static string Dump(VisualElement element,int depth=0)
+    {
+        string result=new string(' ',depth*2)+element.GetType().Name+" #"+element.name+" ."+string.Join(".",element.GetClasses())+" bounds="+element.worldBound+" padding="+element.resolvedStyle.paddingTop+","+element.resolvedStyle.paddingBottom+"\n";
+        foreach(var child in element.Children())result+=Dump(child,depth+1);return result;
+    }
     private static void Tick()
     {
         if(Time.frameCount<afterFrame)return;
@@ -79,8 +84,15 @@ public static class GuiRigCountValidation
                 Check((string)rigs[0]["displayOrder"]=="DRBLFU"&&(int)rigs[0]["ledPanelWidth"]==16&&(string)rigs[0]["unknownRoutingParameter"]=="retain me",count+" rig edit retains the original calibration and unknown fields");
                 foreach(int id in Enumerable.Range(1,count))Check(root.Q<Foldout>("apparatus-rig-VR"+id)!=null&&root.Q<TextField>("apparatus-order-VR"+id)!=null&&root.Q<IntegerField>("apparatus-port-VR"+id)!=null,"VR"+id+" has editable calibration and tracker controls at count"+count);
                 Check(root.Query<Foldout>(className:"apparatus-rig").ToList().Count==count,count+" rig cards match the configuration count");
+                foreach(string name in new[]{"apparatus-vr-count","apparatus-monitor-count"})
+                {
+                    var field=root.Q<IntegerField>(name);var input=field.Q<VisualElement>(className:"unity-base-field__input");var text=input.Q<TextElement>();
+                    Check(input.worldBound.height>=31&&input.worldBound.height<=33&&input.worldBound.yMax<=field.worldBound.yMax+.25f,count+" rig "+name+" has a32px input fully inside its field");
+                    Check(text!=null&&text.worldBound.height>=text.resolvedStyle.fontSize&&text.worldBound.yMin>=input.worldBound.yMin&&text.worldBound.yMax<=input.worldBound.yMax,count+" rig "+name+" text fits completely inside its input");
+                }
                 Check(Same(countBounds,root.Q<IntegerField>("apparatus-vr-count").worldBound)&&Same(saveBounds,Button(ui,"save").worldBound),count+" rigs retain count and Save control geometry");
-                Check(Same(firstRigBounds,root.Q<Foldout>("apparatus-rig-VR1").worldBound),count+" rigs retain first-card geometry through reserved map space");
+                if(count==16)File.WriteAllText(Path.Combine(Output,"numeric-control-layout.txt"),Dump(root.Q<IntegerField>("apparatus-vr-count")));
+                Check(Same(firstRigBounds,root.Q<Foldout>("apparatus-rig-VR1").worldBound),count+" rigs retain first-card geometry through reserved map space; "+firstRigBounds+" => "+root.Q<Foldout>("apparatus-rig-VR1").worldBound);
                 Capture("rig-count-"+count+".png");
                 if(++index<Counts.Length){stage=2;afterFrame=Time.frameCount+2;return;}
                 Check(Button(ui,"save").enabledSelf,"A changed rig count enables Save");Click(Button(ui,"save"));stage=4;afterFrame=Time.frameCount+5;return;

@@ -89,3 +89,10 @@ Button.apparatus-face > .apparatus-face-slot { font-size: 9px; color: rgb(179, 1
 .apparatus-map-legend { height: 32px; min-height: 32px; max-height: 32px; overflow: hidden; text-overflow: ellipsis; }
 .apparatus-map-validation { height: 36px; min-height: 36px; max-height: 36px; overflow: hidden; white-space: normal; font-size: 11px; color: rgb(170, 195, 196); }
 .apparatus-map-validation.has-warning { color: rgb(229, 191, 151); }
+
+/* A new rig adds a legend row inside this slot, keeping calibration cards fixed. */
+.apparatus-map-legends { height: 70px; min-height: 70px; max-height: 70px; flex-shrink: 0; margin: 0; }
+
+/* Native single-line editors otherwise stretch beyond a column field's Yoga
+   measurement and their text is clipped by the field's65px outer bounds. */
+.apparatus-input > .unity-base-field__input { height: 32px; min-height: 32px; max-height: 32px; flex-grow: 0; flex-shrink: 0; }
