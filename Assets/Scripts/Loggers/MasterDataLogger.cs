@@ -179,6 +179,7 @@ public class MasterDataLogger : MonoBehaviour
 
     private List<string> CloseWriters()
     {
+        ReplayPresentationRecorder.End();
         AcceptingWrites = false;
         var errors = new List<string>();
         lock (runtimeTraceLock)
@@ -190,6 +191,7 @@ public class MasterDataLogger : MonoBehaviour
             finally { runtimeTraceWriter = null; }
         }
         void Close(Action close) { try { close(); } catch (Exception error) { errors.Add(error.Message); } }
+        foreach (var writer in FindObjectsByType<RecordedWorldStateWriter>(FindObjectsInactive.Include, FindObjectsSortMode.None)) Close(writer.Close);
         foreach (var logger in FindObjectsByType<DataLogger>(FindObjectsInactive.Include, FindObjectsSortMode.None)) Close(logger.CloseForArchive);
         foreach (var logger in FindObjectsByType<BandLogger>(FindObjectsInactive.Include, FindObjectsSortMode.None)) Close(logger.CloseForArchive);
         foreach (var logger in FindObjectsByType<KannadiLogger>(FindObjectsInactive.Include, FindObjectsSortMode.None)) Close(logger.CloseForArchive);

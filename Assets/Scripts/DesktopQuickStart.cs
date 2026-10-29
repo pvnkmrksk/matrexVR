@@ -77,7 +77,7 @@ public static class DesktopQuickStart
         var native = Screen.currentResolution;
         var system = new JObject {
             ["desktopQuickStart"] = new JObject { ["version"] = 1, ["mode"] = mode, ["scene"] = scene, ["demo"] = demo },
-            ["targetDisplay"] = 0, ["targetFrameRate"] = 120,
+            ["targetDisplay"] = 0, ["targetFrameRate"] = 60,
             ["telemetry"] = new JObject { ["enabled"] = true, ["bindAddress"] = "127.0.0.1", ["port"] = 9880, ["rateHz"] = 20, ["contextIntervalSeconds"] = 2, ["topic"] = "matrex.telemetry.v2" },
             ["statusOverlay"] = new JObject { ["visible"] = false, ["targetDisplay"] = 0 },
             ["overheadCamera"] = new JObject { ["enabled"] = false },

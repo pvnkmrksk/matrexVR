@@ -12,9 +12,12 @@ public sealed class ReplayAgentStream : IDisposable
         public int id;
         public bool visible;
         public string name, layer, animationState;
-        public Vector3 position, rotation;
+        public Vector3 position, rotation, scale;
     }
-    private struct Frame { public double time; public long offset; public int count; }
+    private struct Frame { public double time; public long offset; public int count, unityFrame; }
+    private readonly Dictionary<int,int> frameIndices = new Dictionary<int,int>();
+    public bool HasUnityFrames { get; private set; }
+    public bool HasScale { get; private set; }
     private struct Identity { public string name,layer; }
     private readonly List<Frame> frames = new List<Frame>();
     private readonly List<Identity> identities = new List<Identity>();
@@ -41,6 +44,8 @@ public sealed class ReplayAgentStream : IDisposable
         // a per-agent local timer. It cannot establish historical visibility exactly.
         HasVisibility=header.Contains("Visible");
         HasAnimationState=header.Contains("AnimationState");
+        HasUnityFrames=header.Contains("UnityFrame");
+        HasScale=header.Contains("ScaleX")&&header.Contains("ScaleY")&&header.Contains("ScaleZ");
         Directory.CreateDirectory(cacheDirectory);
         cachePath = Path.Combine(cacheDirectory,Guid.NewGuid().ToString("N")+".frames");
         try
@@ -49,7 +54,7 @@ public sealed class ReplayAgentStream : IDisposable
             {
                 var ids = new Dictionary<string,int>(StringComparer.Ordinal);
                 var occurrences = new Dictionary<string,int>(StringComparer.Ordinal);
-                Frame frame = default; long frameTicks = long.MinValue; string row;
+                Frame frame = default; long frameTicks = long.MinValue; int lastUnityFrame=-1; string row;
                 string xKey = Kind == "Kannadi" ? "PositionX" : "X", yKey = Kind == "Kannadi" ? "PositionY" : "Y", zKey = Kind == "Kannadi" ? "PositionZ" : "Z";
                 while ((row=ReplaySessionArchive.ReadCsvRecord(input)) != null)
                 {
@@ -59,11 +64,12 @@ public sealed class ReplayAgentStream : IDisposable
                     if (!ReplaySessionArchive.TryTimestamp(Cell("Timestamp"),out long ticks) ||
                         !ReplaySessionArchive.TryNumber(Cell(xKey),out float x) || !ReplaySessionArchive.TryNumber(Cell(yKey),out float y) || !ReplaySessionArchive.TryNumber(Cell(zKey),out float z))
                         throw new InvalidDataException("Malformed population pose in " + Path.GetFileName(source));
-                    if (ticks != frameTicks)
+                    int unityFrame=ReplaySessionArchive.Integer(Cell("UnityFrame"),-1);
+                    if (ticks != frameTicks || unityFrame != lastUnityFrame)
                     {
                         if (frame.count > 0) frames.Add(frame);
-                        frameTicks=ticks; occurrences.Clear();
-                        frame = new Frame { time=(ticks-originTicks)/(double)TimeSpan.TicksPerSecond, offset=output.BaseStream.Position };
+                        frameTicks=ticks; lastUnityFrame=unityFrame; occurrences.Clear();
+                        frame = new Frame { time=(ticks-originTicks)/(double)TimeSpan.TicksPerSecond, offset=output.BaseStream.Position, unityFrame=unityFrame };
                     }
                     string name=Cell(Kind=="Kannadi"?"CloneName":"Name");
                     string layer=Kind=="Kannadi"?"SimulatedLocustsVR"+Cell("VRIndex"):Cell("Layer");
@@ -90,11 +96,14 @@ public sealed class ReplayAgentStream : IDisposable
                     }
                     output.Write(visible);
                     if (HasAnimationState) output.Write(Cell("AnimationState") ?? "");
+                    if(HasScale)foreach(var axis in new[]{"ScaleX","ScaleY","ScaleZ"})
+                    {if(!ReplaySessionArchive.TryNumber(Cell(axis),out float scale))throw new InvalidDataException("Malformed population scale in "+source);output.Write(scale);}
                     frame.count++;RowCount++;
                 }
                 if(frame.count>0)frames.Add(frame);
             }
-            frames.Sort((a,b)=>a.time.CompareTo(b.time));
+            frames.Sort((a,b)=>HasUnityFrames?a.unityFrame.CompareTo(b.unityFrame):a.time.CompareTo(b.time));
+            if(HasUnityFrames)for(int i=0;i<frames.Count;i++)frameIndices[frames[i].unityFrame]=i;
             // Small processed runs are cheap to retain in RAM. Large recordings
             // keep the indexed binary stream; source CSVs are always read-only.
             UsesMemoryCache = new FileInfo(cachePath).Length <= 64L * 1024 * 1024;
@@ -124,6 +133,11 @@ public sealed class ReplayAgentStream : IDisposable
             while(lo<hi){int mid=(lo+hi+1)/2;if(frames[mid].time<=seconds)lo=mid;else hi=mid-1;}
             index=lo;
         }
+        return ReadFrame(index);
+    }
+    public IReadOnlyList<Pose> SampleUnityFrame(int frame) => ReadFrame(frameIndices.TryGetValue(frame,out var index)?index:-1);
+    private IReadOnlyList<Pose> ReadFrame(int index)
+    {
         if(index==lastFrame)return current;
         lastFrame=index;current.Clear();
         if(index<0)return current;
@@ -134,7 +148,9 @@ public sealed class ReplayAgentStream : IDisposable
             var pose=new Pose {id=id,name=identity.name,layer=identity.layer,position=new Vector3(reader.ReadSingle(),reader.ReadSingle(),reader.ReadSingle())};
             if(HasRotations)pose.rotation=new Vector3(reader.ReadSingle(),reader.ReadSingle(),reader.ReadSingle());
             pose.visible=reader.ReadBoolean();current.Add(pose);
-            if (HasAnimationState) { pose.animationState=reader.ReadString(); current[current.Count-1]=pose; }
+            if (HasAnimationState) pose.animationState=reader.ReadString();
+            pose.scale=HasScale?new Vector3(reader.ReadSingle(),reader.ReadSingle(),reader.ReadSingle()):Vector3.one;
+            current[current.Count-1]=pose;
         }
         return current;
     }

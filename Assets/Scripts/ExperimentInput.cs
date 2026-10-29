@@ -46,7 +46,7 @@ public static class ExperimentInput
     {
         get
         {
-            if (ConfigurationUI.ConfigWorkbench.IsOpen) return true;
+            if (ConfigurationUI.ConfigWorkbench.IsOpen || RuntimeFrameRateEditor.IsOpen) return true;
             var selected = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
             if (selected == null || !selected.activeInHierarchy) return false;
             // A selected metadata field can outlive the canvas that displayed it.

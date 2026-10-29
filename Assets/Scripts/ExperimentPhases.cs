@@ -47,7 +47,7 @@ public sealed class ExperimentPhase
 }
 
 /// <summary>Changes conditions on the existing scene, after movement and heading sampling.</summary>
-[DefaultExecutionOrder(1500)]
+[DefaultExecutionOrder(1100)]
 public sealed class ExperimentPhases : MonoBehaviour
 {
     internal const string PayloadKey = "__experimentPhase";

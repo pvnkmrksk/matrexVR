@@ -9,7 +9,7 @@ namespace ConfigurationUI
     {
         private bool ControlTextEditing => root?.panel?.focusController?.focusedElement is VisualElement focused &&
             (focused is TextField || focused.GetFirstAncestorOfType<TextField>() != null);
-        public bool ControlHasUnsavedDraft => rawPending || Workspace?.Documents.Any(document => document.Dirty) == true || ControlTextEditing;
+        public bool ControlHasUnsavedDraft => rawPending || HasUnsavedChanges || ControlTextEditing;
         public bool ControlHasModal => modal != null;
         public void StartCurrentFromControl()
         {

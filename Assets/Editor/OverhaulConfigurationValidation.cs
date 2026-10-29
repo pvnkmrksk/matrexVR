@@ -117,7 +117,8 @@ public static class OverhaulConfigurationValidation
                 Call(ui,"Select",ui.Workspace.System);
                 Check(root.Query<Foldout>(className:"apparatus-rig").ToList().Count==16,"All 16 rig editors mount");
                 Check(!ui.Workspace.Validate(false).Any(error=>error.Contains("stimulus layer")),"Named deterministic VR1–VR16 layer slots pass setup validation");
-                foreach(int count in new[]{1,2,4,8,16})Check(root.Q<Button>("apparatus-count-"+count)!=null,"Quick count control "+count+" exists");
+                Check(root.Q<IntegerField>("apparatus-vr-count")!=null&&root.Q<Button>("apparatus-count-1")==null,"VR count uses one numeric field without quick-count shortcuts");
+                Check(root.Q<Button>("apparatus-output-led")!=null&&root.Q<Button>("apparatus-output-desktop")!=null,"Output uses two icon choices");
                 stage=2;frame=Time.frameCount+8;
             }
             else if(stage==2){Capture("configuration-16-rigs-dark.png");Finish(null);}

@@ -194,8 +194,8 @@ public class DataLogger : MonoBehaviour
             AddColumns("autoTrimEnabled", "autoTrimState", "flightDetected", "flightVarianceRadiansSquared", "autoTrimMedianDegPerSecond", "autoTrimPasses");
             AddColumns("flightCheckEnabled", "flightThresholdRadiansSquared", "flightSamples");
             AddColumns("yawDCOffsetDegrees", "yawDCCompensationDegPerSecond", "autoTrimMeanDegPerSecond", "autoTrimUncertaintyDegPerSecond", "autoTrimMeasurementSeconds");
-            AddColumns("experimentPhase", "unityFrame");
-            AddColumns("sequenceConfigTitle", "sequenceTitle", "experimentTitle", "resolvedRandomSeed", "sourceSequenceScene");
+            AddColumns("experimentPhase", "unityFrame", "monotonicTime");
+            AddColumns("sequenceConfigTitle", "sequenceTitle", "experimentTitle", "resolvedRandomSeed", "sourceSequenceScene", "presentationId");
             AddColumns("poseWallTicks", "trackerAppliedThisFrame", "trackerInputSessionId", "trackerReceiverSessionId", "trackerInputEpoch", "trackerInputFrame", "trackerInputSequence", "trackerInputTimestamp", "trackerInputClock", "trackerReceiveSequence", "trackerReceivedUtcTicks");
 
             // Enable logging
@@ -267,11 +267,15 @@ public class DataLogger : MonoBehaviour
     }
 
     /// <summary>
-    /// Public method to trigger a log update manually from outside this class.
+    /// Queue metadata for the next rendered-frame snapshot. New-contract acquisition
+    /// has exactly one pose row per frame; an onset/swap callback must not create
+    /// an earlier competing pose snapshot before LateUpdate.
     /// </summary>
     public void UpdateLogger()
     {
-        LateUpdate();
+        // SetData already queues the event fields. The final LateUpdate consumes
+        // them after all phase/movement changes. Preserve legacy standalone probes.
+        if(string.IsNullOrEmpty(ReplayPresentationRecorder.CurrentPresentationId))LateUpdate();
     }
 
     /// <summary>
@@ -315,9 +319,11 @@ public class DataLogger : MonoBehaviour
         SetData("cumulativeStep", cumulativeStep);
         // Build base data
         SetData("unityFrame", Time.frameCount);
+        SetData("monotonicTime",RecordedFrameClock.MonotonicSeconds.ToString("R",CultureInfo.InvariantCulture));
         SetData("sequenceConfigTitle", mainController?.SequenceTitle);
         SetData("sequenceTitle", mainController?.GetCurrentSequenceStep()?.title);
         SetData("sourceSequenceScene", mainController?.GetCurrentSequenceStep()?.sceneName);
+        SetData("presentationId", ReplayPresentationRecorder.CurrentPresentationId);
         SetData("experimentTitle", mainController?.CurrentExperimentTitle);
         SetData("resolvedRandomSeed", ExperimentRandom.Active ? (object)ExperimentRandom.ResolvedSeed : null);
         SetData("skyboxId", NightSkyController.CurrentId);
@@ -356,7 +362,7 @@ public class DataLogger : MonoBehaviour
             }
         }
         SetData("skyboxSampleUtc", NightSkyController.CurrentSampleUtc);
-        DateTime poseWallTime=DateTime.Now;
+        DateTime poseWallTime=RecordedFrameClock.Now;
         string currentTime = poseWallTime.ToString("yyyy-MM-dd HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
         SetData("poseWallTicks",poseWallTime.Ticks.ToString(CultureInfo.InvariantCulture));
         if(tracking!=null)

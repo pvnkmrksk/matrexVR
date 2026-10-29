@@ -43,13 +43,15 @@ public partial class ReplayController : MonoBehaviour
     public double ReplayTime => replayTime;
     public double Duration => archive?.Duration ?? 0;
     public bool IsPlaying => isPlaying;
-    public bool Ready => archive != null;
+    public bool Ready => archive != null && LoadError == null;
     public bool Loading => loading;
     public bool OverviewVisible => selectedView < 0;
     public string LoadError { get; private set; }
     public ReplaySessionArchive Session => archive;
     public int AnimalCount => rigOrder.Count;
     public int PopulationRecordingCount => populations.Count;
+    public void StopForFidelityError(string message)
+    { isPlaying=false;LoadError="Same-build replay stopped: "+message; }
 
     private sealed class Population
     {
@@ -60,6 +62,7 @@ public partial class ReplayController : MonoBehaviour
     }
     private sealed class LoadedRun
     {
+        public RecordedWorldStateReader worldState;
         public ReplaySessionArchive archive;
         public readonly List<ReplayAgentStream> agents = new List<ReplayAgentStream>();
     }
@@ -85,6 +88,7 @@ public partial class ReplayController : MonoBehaviour
     private int selectedView=-1;
     private string folderInput="", loadProgress="", cacheDirectory;
     private Task<LoadedRun> pendingLoad;
+    private readonly System.Threading.CancellationTokenSource loadCancellation=new System.Threading.CancellationTokenSource();
     private ReplaySessionArchive.Sample referenceSample;
     private Bounds trajectoryBounds;
     private bool pointerTrace;
@@ -196,7 +200,12 @@ public partial class ReplayController : MonoBehaviour
             var run=new LoadedRun();
             try
             {
-                run.archive=new ReplaySessionArchive(directory);run.archive.LoadRigSamples();
+                run.archive=new ReplaySessionArchive(directory);run.archive.RequireCompatibleBuild();run.archive.LoadRigSamples();
+                if(run.archive.Presentations.IsCurrentContract)
+                {
+                    run.worldState=new RecordedWorldStateReader(run.archive.DirectoryPath,loadCancellation.Token);
+                    foreach(var rig in run.archive.Rigs.Values)foreach(var sample in rig)run.worldState.RequireFrame(sample.presentationId,sample.unityFrame);
+                }
                 if(includeAgents)
                     foreach(string file in ReplaySessionArchive.CsvFiles(run.archive.DirectoryPath))
                     {
@@ -205,29 +214,33 @@ public partial class ReplayController : MonoBehaviour
                             var stream=ReplayAgentStream.TryOpen(file,cache,run.archive.OriginTicks);
                             if(stream==null)continue;
                             run.agents.Add(stream);
+                            if(run.archive.Presentations.IsCurrentContract&&(!stream.HasUnityFrames||!stream.HasAnimationState||!stream.HasRotations||!stream.HasScale))
+                                throw new System.IO.InvalidDataException("Required population frame/orientation/scale/animation evidence is incomplete: "+Path.GetFileName(file));
                             if(!stream.HasRotations)run.archive.Warn(Path.GetFileName(file)+": historical agent positions have no orientation; heading/wing animation cannot be reconstructed exactly.");
                             if(!stream.HasAnimationState)run.archive.Warn(Path.GetFileName(file)+": historical animation phase was not recorded. Original models animate from the replay clock; their phase is approximate.");
                             if(stream.Kind=="Band" && !stream.HasVisibility)run.archive.Warn(Path.GetFileName(file)+": historical visibility phase did not capture the actual per-agent timer; exact blinking cannot be recovered and bodies are shown continuously.");
                             if(stream.HasDuplicateNames)run.archive.Warn(Path.GetFileName(file)+": duplicate agent names are distinguished by row order within each frame.");
                         }
-                        catch(Exception error){run.archive.Warn("Population recording unavailable: "+Path.GetFileName(file)+" — "+error.Message);}
+                        catch(Exception error){if(run.archive.Presentations.IsCurrentContract)throw;run.archive.Warn("Population recording unavailable: "+Path.GetFileName(file)+" — "+error.Message);}
                     }
                 if(run.agents.Count==0)run.archive.Warn("No recorded population tracks were loaded. Unrecorded agents are not resimulated as if they were the original experiment.");
                 return run;
             }
-            catch {foreach(var stream in run.agents)stream.Dispose();throw;}
+            catch {run.worldState?.Dispose();foreach(var stream in run.agents)stream.Dispose();throw;}
         });
         while(!pendingLoad.IsCompleted)yield return null;
+        if(pendingLoad.IsCanceled){loading=false;pendingLoad=null;yield break;}
         if(pendingLoad.IsFaulted)
         {LoadError=pendingLoad.Exception?.GetBaseException().Message;loading=false;pendingLoad=null;yield break;}
         var loaded=pendingLoad.Result;pendingLoad=null;
         // Finish the preceding additive scene operation before replacing its archive.
         while(environmentLoader!=null && environmentLoader.Loading)yield return null;
         ClearSessionVisuals();archive=loaded.archive;
+        if(archive.Presentations.IsCurrentContract)interpolateAnimalPoses=false;
         foreach(var stream in loaded.agents)populations.Add(new Population{stream=stream});
         absoluteSessionPath=archive.DirectoryPath;folderInput=absoluteSessionPath;replayTime=archive.FirstExperimentTime;referenceSample=null;
         BuildMarkers();BuildStepTimeline();
-        environmentLoader.BeginSession(archive,rigOrder);
+        environmentLoader.BeginSession(archive,rigOrder,loaded.worldState);
         mediaPanel=new ReplayMediaPanel(this,()=>isPlaying=false);mediaPanel.SetRigs(rigOrder);mediaPanel.Load(archive.DirectoryPath,archive.OriginTicks);
         FitOverview();ApplyView();RenderFrame();
         loading=false;loadProgress="";
@@ -476,7 +489,16 @@ public partial class ReplayController : MonoBehaviour
     }
     private void RenderFrame()
     {
-        if(archive==null)return;
+        try { RenderRecordedFrame(); }
+        catch(Exception error)
+        {
+            if(archive?.Presentations.IsCurrentContract==true)StopForFidelityError(error.Message);
+            else throw;
+        }
+    }
+    private void RenderRecordedFrame()
+    {
+        if(archive==null||LoadError!=null)return;
         if(environmentLoader!=null && !environmentLoader.Loading && cameraLayoutVersion!=environmentLoader.ContextVersion)
         {
             foreach(var pair in camerasByRig)
@@ -489,6 +511,12 @@ public partial class ReplayController : MonoBehaviour
         }
         referenceSample=null;
         ReplaySessionArchive.Sample environmentSample=null;
+        int recordedFrame=-1;
+        if(archive.Presentations.IsCurrentContract && rigOrder.Count>0)
+        {
+            var authority=archive.Rigs[rigOrder[0]];
+            recordedFrame=authority[AtOrBefore(authority,replayTime)].unityFrame;
+        }
         bool pathsChanged=false;
         foreach(string id in rigOrder)
         {
@@ -501,6 +529,16 @@ public partial class ReplayController : MonoBehaviour
                 if(visible)pathsChanged|=UpdateRecordedPath(path,samples,cursor);
             }
             if(!visible)continue;
+            if(archive.Presentations.IsCurrentContract)
+            {
+                int lo=0,hi=samples.Count-1;
+                while(lo<hi){int mid=(lo+hi)/2;if(samples[mid].unityFrame<recordedFrame)lo=mid+1;else hi=mid;}
+                if(samples[lo].unityFrame!=recordedFrame)
+                {StopForFidelityError("Missing rendered frame "+recordedFrame+" for "+id+"; rig poses cannot be mixed across frames.");return;}
+                cursor=lo;a=samples[cursor];
+                if(environmentSample!=null&&environmentSample.presentationId!=a.presentationId)
+                {StopForFidelityError("Rig presentation identifiers disagree at rendered frame "+recordedFrame+".");return;}
+            }
             var b=cursor+1<samples.Count?samples[cursor+1]:a;
             float amount=interpolateAnimalPoses && a.ContextKey==b.ContextKey && Vector3.Distance(a.position,b.position)<=maximumInterpolationDistance && b.time>a.time?(float)Math.Max(0,Math.Min(1,(replayTime-a.time)/(b.time-a.time))):0;
             Vector3 position=Vector3.Lerp(a.position,b.position,amount);
@@ -527,27 +565,37 @@ public partial class ReplayController : MonoBehaviour
                 population.visuals.Clear();population.contextVersion=environmentLoader.ContextVersion;
             }
             population.active.Clear();
-            foreach(var pose in population.stream.Sample(replayTime))
+            foreach(var pose in archive.Presentations.IsCurrentContract && environmentSample!=null ? population.stream.SampleUnityFrame(environmentSample.unityFrame) : population.stream.Sample(replayTime))
             {
                 if(!population.visuals.TryGetValue(pose.id,out var visual) || visual==null)
                 {
                     visual=environmentLoader.CreateAgentVisual(population.stream.Kind,pose.name,pose.layer,populationRoot,fallbackSize);
                     population.visuals[pose.id]=visual;
                 }
-                visual.SetActive(pose.visible);visual.transform.SetPositionAndRotation(pose.position,Quaternion.Euler(pose.rotation));population.active.Add(pose.id);
+                visual.SetActive(pose.visible);visual.transform.SetPositionAndRotation(pose.position,Quaternion.Euler(pose.rotation));
+                if(population.stream.HasScale)visual.transform.localScale=pose.scale;
+                population.active.Add(pose.id);
                 var animation = visual.GetComponent<ReplayAnimationDriver>();
                 if (animation != null)
                 {
                     animation.Sample(pose.animationState, replayTime);
+                    if(archive.Presentations.IsCurrentContract && (animation.TransitionApproximation || animation.Approximate &&
+                        (!string.IsNullOrEmpty(pose.animationState)||visual.GetComponentsInChildren<Animator>(true).Length>0||visual.GetComponentsInChildren<Animation>(true).Length>0||visual.GetComponentsInChildren<BogongSwarmRenderer>(true).Length>0)))
+                    {StopForFidelityError("Required original animation could not be restored for "+pose.name);return;}
                     if (animation.TransitionApproximation) archive.Warn("An Animator transition was recorded. State, parameters and normalized time are restored; transition blending is approximate.");
                     if (animation.Approximate && !string.IsNullOrWhiteSpace(pose.animationState)) archive.Warn("Recorded animation evidence could not be matched completely to the available model/controller hierarchy; affected animation is approximate.");
                 }
+                // Imported Legacy clips can animate their root transform. Logged
+                // global movement/scale remains authoritative after clip sampling.
+                visual.transform.SetPositionAndRotation(pose.position,Quaternion.Euler(pose.rotation));
+                if(population.stream.HasScale)visual.transform.localScale=pose.scale;
             }
             foreach(var pair in population.visuals)if(pair.Value!=null && !population.active.Contains(pair.Key))pair.Value.SetActive(false);
         }
         if(scrubSlider!=null && Duration>0)scrubSlider.SetValueWithoutNotify((float)(replayTime/Duration));
         UpdateAnimalPreview();
-        environmentLoader?.ApplyAnimationClock(replayTime);
+        if(archive?.Presentations.IsCurrentContract==true)environmentLoader?.ApplyRecordedWorldFrame(environmentSample);
+        else environmentLoader?.ApplyAnimationClock(replayTime);
         UpdateFollowCamera();
         RefreshReplayAnnotations();
         mediaPanel?.Tick(replayTime,isPlaying && !timelineMouseCaptured && environmentLoader?.Loading!=true,playbackSpeed);
@@ -652,8 +700,9 @@ public partial class ReplayController : MonoBehaviour
         if(animalPreviewTexture!=null){animalPreviewTexture.Release();Destroy(animalPreviewTexture);}
         replayInterface?.Dispose();
         foreach(var population in populations)population.stream.Dispose();populations.Clear();
+        loadCancellation.Cancel();
         if(pendingLoad!=null)
-            pendingLoad.ContinueWith(task=>{if(task.Status==TaskStatus.RanToCompletion)foreach(var stream in task.Result.agents)stream.Dispose();});
+            pendingLoad.ContinueWith(task=>{if(task.Status==TaskStatus.RanToCompletion){task.Result.worldState?.Dispose();foreach(var stream in task.Result.agents)stream.Dispose();}});
         if(overview!=null && overview.gameObject.name=="Replay overview")Destroy(overview.gameObject);
     }
 }

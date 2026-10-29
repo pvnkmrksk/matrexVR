@@ -7,10 +7,20 @@ using UnityEngine;
 /// <summary>Identity is captured from this player, never from a mutable external release folder or Git checkout.</summary>
 public static class PlayerBuildIdentity
 {
+    private static readonly string EditorRuntimeIdentity = Guid.NewGuid().ToString("N");
+    private static readonly object Gate = new object();
+    private static JObject cached;
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetCache(){lock(Gate)cached=null;}
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void WarmCache()=>Capture();
     public static JObject Capture()
+    { lock(Gate){if(cached==null)cached=CaptureUncached();return (JObject)cached.DeepClone();} }
+    private static JObject CaptureUncached()
     {
         var result = new JObject { ["applicationVersion"] = Application.version, ["unityVersion"] = Application.unityVersion,
             ["buildGuid"] = Application.buildGUID, ["sourceRevision"] = null, ["sourceState"] = "unknown" };
+        if (Application.isEditor) result["editorRuntimeIdentity"] = EditorRuntimeIdentity;
         try
         {
             string path = Path.Combine(Application.streamingAssetsPath, "player_build_info.json");

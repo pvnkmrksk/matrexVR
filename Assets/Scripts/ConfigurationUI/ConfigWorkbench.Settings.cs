@@ -247,7 +247,7 @@ namespace ConfigurationUI
             {
                 setting.AddToClassList("text-setting");
                 if(key.EndsWith("File") || key.EndsWith("Path") || key=="design" || key=="configFile") setting.AddToClassList("path-setting");
-                var input=new TextField { value=shown.ToString(),isDelayed=true,multiline=key=="comments" }; setting.Add(input); input.RegisterValueChangedCallback(e=>Guard(()=>assign(new JValue(e.newValue),false)));
+                var input=new TextField { value=shown.ToString(),isDelayed=true,multiline=key=="comments" }; setting.Add(input); BindDelayedText(input,text=>assign(new JValue(text),false));
             }
             Action enable=()=>{
                 bool active=ConfigSchema.Enabled(ConfigSchema.EffectiveValue(ConfigDocument.At(doc.Root,parts.Take(parts.Length-1).ToArray()),ownerSchema,true),ownerSchema,key,Context);
@@ -290,15 +290,15 @@ namespace ConfigurationUI
             input.style.width=Mathf.Clamp(value.ToString().Length*7+23,64,160);
             Slider slider=null; IVisualElementScheduledItem pending=null;
             JToken draft=null;
-            Action flush=()=>{ if(draft==null) return; var number=draft; draft=null; Guard(()=>{commit(number);lastValidText=number.ToString();}); };
+            Action flush=()=>{ if(draft==null) return; var number=draft; draft=null;numberDrafts.Remove(control); Guard(()=>{commit(number);lastValidText=number.ToString();MarkEditorCommitted(input,lastValidText);});RefreshSaveAvailability(); };
             var range=schema["x-ui"]?["slider"] as JObject;
             bool integer=schema["type"] is JArray types?types.Any(t=>t.ToString()=="integer"):schema["type"]?.ToString()=="integer";
             string step=integer?"1":(range?["step"]?.ToString()??"0.1");
             Action<int,int> increment=(direction,power)=>Guard(()=>{
-                pending?.Pause();draft=null;
+                pending?.Pause();draft=null;numberDrafts.Remove(control);textDrafts.Remove(input);
                 var current=LosslessJson.Parse(input.value);
                 JToken next=JsonNumberStepper.Step(current,step,direction,power);commit(next);input.SetValueWithoutNotify(next.ToString());
-                lastValidText=next.ToString();
+                lastValidText=next.ToString();MarkEditorCommitted(input,lastValidText);
                 if(slider!=null) slider.SetValueWithoutNotify((float)ExperimentBlocks.Number(next));
             });
             var arrows=new VisualElement();arrows.AddToClassList("spin-arrows");spin.Add(arrows);
@@ -320,17 +320,17 @@ namespace ConfigurationUI
                 slider=new Slider((float)min,(float)max) { name="slider-"+key }; slider.SetValueWithoutNotify((float)Math.Max(min,Math.Min(max,n))); control.Add(slider);
                 if(n<min || n>max) { var outside=new Label("Outside slider range · exact value retained"); outside.AddToClassList("key-hint"); control.Add(outside); }
                 slider.RegisterValueChangedCallback(e=>{
-                    double chosen=Math.Round(Math.Round(e.newValue/sliderStep)*sliderStep,6); string text=chosen.ToString("0.######",CultureInfo.InvariantCulture); input.SetValueWithoutNotify(text); draft=new JRaw(text); pending?.Pause(); pending=control.schedule.Execute(flush).StartingIn(180);
+                    double chosen=Math.Round(Math.Round(e.newValue/sliderStep)*sliderStep,6); string text=chosen.ToString("0.######",CultureInfo.InvariantCulture); input.SetValueWithoutNotify(text); draft=new JRaw(text);numberDrafts.Add(control);RefreshSaveAvailability(); pending?.Pause(); pending=control.schedule.Execute(flush).StartingIn(180);
                 });
                 slider.RegisterCallback<PointerUpEvent>(_=>flush()); slider.RegisterCallback<FocusOutEvent>(_=>flush());
             }
-            input.RegisterValueChangedCallback(e=>Guard(()=>{
-                pending?.Pause(); draft=null;
-                try { JToken parsed=LosslessJson.Parse(e.newValue); string kind=LosslessJson.Kind(parsed); if(kind!="integer" && kind!="number") throw new ArgumentException("Enter a JSON number."); commit(parsed); lastValidText=parsed.ToString();if(slider!=null) slider.SetValueWithoutNotify((float)ExperimentBlocks.Number(parsed)); }
+            BindDelayedText(input,text=>{
+                pending?.Pause(); draft=null;numberDrafts.Remove(control);textDrafts.Remove(input);
+                try { JToken parsed=LosslessJson.Parse(text); string kind=LosslessJson.Kind(parsed); if(kind!="integer" && kind!="number") throw new ArgumentException("Enter a JSON number."); commit(parsed); lastValidText=parsed.ToString();if(slider!=null) slider.SetValueWithoutNotify((float)ExperimentBlocks.Number(parsed)); }
                 catch { input.SetValueWithoutNotify(lastValidText); throw; }
-            }));
+            });
             // A quick Start, navigation, Undo or Save must flush the last visual slider position first.
-            control.RegisterCallback<DetachFromPanelEvent>(_=>numberFlushes.Remove(flush)); numberFlushes.Add(flush);
+            control.RegisterCallback<DetachFromPanelEvent>(_=>{numberFlushes.Remove(flush);numberDrafts.Remove(control);}); numberFlushes.Add(flush);
             return control;
         }
         private readonly List<Action> numberFlushes=new List<Action>();

@@ -1,5 +1,17 @@
 # Unity experiment studio
 
+## Operator overlays and their saved locations
+
+Open **Configure → Operator display & monitoring → Overlay placement & configuration file**. The read-only path is the exact system JSON file being edited. Each overlay also shows its JSON location: `$.statusOverlay`, `$.frameOverlay` or `$.desktopControls`.
+
+Overlays default to automatic placement. Disable **Automatic placement** to enter preferred X/Y positions in physical display pixels measured from the bottom-left. X/Y fields are gray while automatic placement is on; disabling the overlay grays its other controls without deleting their saved values. Output display indices start at 0. Desktop controls may use display −1 to follow the first desktop-preview rig.
+
+The allocator protects calibrated LED rectangles and keeps monitoring widgets apart. A preferred location relocates if needed; an exact free strip remains usable even without decorative margins. If no free rectangle fits, the monitoring widget hides rather than covering an LED stimulus. Fullscreen monitor previews permit operator overlays because the view occupies the full screen. An explicitly opened frame-rate settings dialog can temporarily overlay a full display when no free area fits.
+
+The overhead preview uses `$.overheadCamera` in the same system JSON. Its X/Y/width/height remain normalized fractions of the display, and it uses the same LED-safe allocator. These settings move operator graphics only; physical camera rectangles retain the apparatus calibration.
+
+Run status and frame-rate readouts use routed canvases; desktop controls use a routed UI Toolkit panel. A connected secondary display is activated when explicitly selected. An unavailable display produces a warning and falls back to operator display 0. The temporary live frame-rate editor uses Unity IMGUI on operator display 0; `frameOverlay.targetDisplay` routes the readout, not that settings dialog.
+
 The Config UI Test integration provides a working runtime UI Toolkit experiment studio to `ControlScene`. Experiment execution remains inside the Unity player; Python plotting and analysis remain optional. A desktop Unity release includes the UI and its JSON schemas without a Python installation, uv, browser server, or second application.
 
 ## Try it
@@ -9,6 +21,8 @@ In Unity 6000.3.16f1, choose **Tools → Experiment setup → Open setup screen 
 Normal players honor the sequence's existing `autoStart` setting. Ship `autoStart: false` for a release that opens setup on double-click. `-configure` overrides auto-start when launching an existing player; `-no-configuration-ui` disables the studio for legacy validation workflows.
 
 An unconfigured apparatus opens a clearly labelled **Night sky** flying demo; press **Start demo** without hardware. **Configure** holds species, walking/flying mode, VR/display counts, LED dimensions, face order and tracker endpoints. Its face net and display map share the runtime pixel geometry. Save with **Use this configuration**; subsequent sessions put the sequence and block parameters first, retaining hardware settings separately.
+
+Choose LED panels or monitors with the two output icons. Set the VR count with one numeric field; changing the count preserves the retained rigs' calibration. The MATRIX brand opens a quiet About dialog with design credits, the source repository and license notices.
 
 **Initialize tracking** opens the independent native tracker windows while setup stays open. Check input and calibration before **Start experiment**; initializing does not start the experiment or allocate a run directory. A native tracker's own video option still governs its independent recorder.
 
@@ -28,11 +42,13 @@ In **Sequence config**, blocks are virtualized cards showing their config path, 
 
 Number entries retain their exact JSON text. Sliders are convenience ranges and never clamp a value simply by displaying it. Numbers outside a slider's range remain editable and visibly marked. Explicit slider changes use a documented step and synchronize the exact entry. Pending slider positions flush before navigation, undo, save and Start. Ports, IDs and values without meaningful slider ranges retain number entries.
 
+The frame-rate cap defaults to **60 FPS**. Click the cap readout to open its exact setting. Saving a cap or VSync change in setup applies it immediately while idle. During an experiment, the readout opens a small live cap editor; applying a cap keeps acquisition running and appends a timestamped `runtime_display_settings.jsonl` event without rewriting the archived initial configuration. VSync disables an ineffective live cap edit.
+
 The run overview shows exact total timing, heading-assessment time, loop/order state and effective config effects. Sky summaries follow uniform-color/panorama/procedural precedence and distinguish live from fixed sky. Disabled or absent phases are marked inactive. System overview shows input modes, frame synchronization, display, configured camera faces, telemetry and overview state. Configs shared by multiple blocks are explicitly labelled.
 
 **Make an independent copy** on a selected sequence block creates a complete variation file and relinks only that block. Undo restores the original reference; the newly created file remains on disk. **Save a variation** in the sidebar copies the current document. Existing files are never overwritten by these creation actions. Absolute paths are supported; relative experiment/data references resolve against `RuntimePaths.ConfigRoot` (Editor: StreamingAssets; standalone: writable profile), matching the runtime loaders. **Open a file** loads a different primary system/sequence or standalone config.
 
-**Edit JSON** exposes the complete document. Apply a draft to synchronize the form, or discard it. An unapplied draft blocks navigation, save and start. **Save setup** writes changed loaded documents and a metadata draft under `RunData/Backup`, leaving completed-run metadata intact. **Start experiment** validates the active file graph, saves changes, archives a fresh session using the selected system and sequence paths, copies metadata into that new run folder, and starts the existing runner. Session metadata includes every configured VR even when subject details were not edited. Non-looping runs started here return to session setup; Escape also returns from a running experiment. The next run gets a separate data folder.
+**Edit JSON** exposes the complete document. Apply a draft to synchronize the form, or discard it. An unapplied draft blocks navigation, save and start. **Save changes** enables when configuration or session metadata changes, including an edit still in a delayed text field, and disables after a successful save. It commits pending field values, writes changed loaded documents and a metadata draft under `RunData/Backup`, leaving completed-run metadata intact. **Start experiment** validates the active file graph, saves changes, archives a fresh session using the selected system and sequence paths, copies metadata into that new run folder, and starts the existing runner. Session metadata includes every configured VR even when subject details were not edited. Non-looping runs started here return to session setup; Escape also returns from a running experiment. The next run gets a separate data folder.
 
 ## JSON parity
 

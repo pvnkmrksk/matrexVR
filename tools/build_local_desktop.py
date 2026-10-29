@@ -7,6 +7,7 @@ import platform
 import shutil
 import subprocess
 import sys
+import shlex
 
 ROOT = Path(__file__).resolve().parents[1]
 UNITY = Path('/Applications/Unity/Hub/Editor/6000.3.16f1/Unity.app/Contents/MacOS/Unity')
@@ -49,12 +50,32 @@ def prepare(project, library):
     build_identity.write(project, revision, 'working-tree-snapshot', dirty)
 
 
+def write_preview_entrypoints(app):
+    """Put the local test app, editable config and launcher in one visible folder."""
+    if app.parent.resolve() != (ROOT / 'Preview').resolve():
+        return
+    folder = app.parent
+    (folder / 'Config').mkdir(exist_ok=True)
+    (folder / 'RunData').mkdir(exist_ok=True)
+    launcher = folder / 'Open MATREX VR.command'
+    launcher.write_text('#!/bin/zsh\nset -e\npreview_dir="${0:A:h}"\n' +
+        'open -n "$preview_dir"/' + shlex.quote(app.name) +
+        ' --args --config-dir "$preview_dir/Config" --data-dir "$preview_dir/RunData" -configure\n')
+    launcher.chmod(0o755)
+    (folder / 'README.txt').write_text(
+        'MATREX VR local development preview\n\n'
+        'Double-click Open MATREX VR.command to use the visible Config and RunData folders.\n'
+        'The app itself is MATREX VR.app; no Unity Editor is needed to run it.\n'
+        'Config contains editable experiment/system/sequence JSONs. RunData contains new recordings.\n'
+        'Rebuilding preserves Config and RunData.\n')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--prepare-only', action='store_true')
     parser.add_argument('--project', type=Path, default=ROOT / '.local/project')
-    parser.add_argument('--app', type=Path, default=ROOT / '.local/MATREX VR.app')
-    parser.add_argument('--version', default='0.3.1-dev', help='Application version embedded in the local player and its recordings')
+    parser.add_argument('--app', type=Path, default=ROOT / 'Preview/MATREX VR.app')
+    parser.add_argument('--version', default='0.5.0-dev', help='Application version embedded in the local player and its recordings')
     parser.add_argument('--library', type=Path, default=ROOT / '.release-work/project-v0.3/Library')
     parser.add_argument('--skip-companions', action='store_true', help='Advanced development-only opt-out')
     parser.add_argument('--skip-native-camera-fix', action='store_true', help='Advanced development-only opt-out; bundled flight camera input then remains unavailable')
@@ -98,7 +119,10 @@ def main():
     # Seal after embedding. Upstream tracker signatures are retained; no recursive re-signing.
     run('/usr/bin/codesign', '--force', '--sign', '-', '--timestamp=none', args.app)
     run('/usr/bin/codesign', '--verify', '--strict', args.app)
+    write_preview_entrypoints(args.app)
     print('Local app:', args.app)
+    if args.app.parent == (ROOT / 'Preview').resolve():
+        print('Double-click:', args.app.parent / 'Open MATREX VR.command')
     print('Build log:', ROOT / '.local/build.log')
 
 

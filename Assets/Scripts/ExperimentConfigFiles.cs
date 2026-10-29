@@ -7,6 +7,7 @@ public static class ExperimentConfigFiles
 {
     public static string ReadAllText(string reference,string role="experiment")
     {
+        if (ReplayExecutionContext.Active) return File.ReadAllText(ReplayExecutionContext.Resolve(reference));
         var logger=MasterDataLogger.Instance;
         return logger!=null && logger.ConfigArchive!=null
             ? logger.ConfigArchive.ReadText(reference,role,UnityEngine.SceneManagement.SceneManager.GetActiveScene().name)
@@ -14,6 +15,7 @@ public static class ExperimentConfigFiles
     }
     public static byte[] ReadAllBytes(string reference,string role)
     {
+        if (ReplayExecutionContext.Active) return File.ReadAllBytes(ReplayExecutionContext.Resolve(reference));
         var logger=MasterDataLogger.Instance;
         return logger!=null && logger.ConfigArchive!=null
             ? logger.ConfigArchive.ReadBytes(reference,role,UnityEngine.SceneManagement.SceneManager.GetActiveScene().name)
@@ -21,6 +23,7 @@ public static class ExperimentConfigFiles
     }
     public static string Resolve(string reference)
     {
+        if (ReplayExecutionContext.Active) return ReplayExecutionContext.Resolve(reference);
         string current = Path.Combine(RuntimePaths.ConfigRoot, reference);
         if (File.Exists(current) || Path.IsPathRooted(reference)) return current;
         string archived = Path.Combine(RuntimePaths.ConfigRoot, "Archive", "Legacy", reference);

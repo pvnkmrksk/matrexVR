@@ -84,10 +84,10 @@ namespace ConfigurationUI
             var identity=Row("config-identity");parent.Add(identity);
             var field=new TextField(selected==Workspace.Sequence?"Paradigm title":"Experiment title") {name="config-title",value=selected.Root["title"]?.Type==JTokenType.String?selected.Root["title"].ToString():"",isDelayed=true};
             field.tooltip="Human-readable name stored in this JSON and the recording. Leave blank to use the file name.";field.textEdition.placeholder="Optional human-readable title";identity.Add(field);
-            field.RegisterValueChangedCallback(e=>StudioEdit(selected,r=>r["title"]=e.newValue));
+            BindDelayedText(field,text=>StudioEdit(selected,r=>r["title"]=text));
             var notes=new Foldout {name="config-comments-foldout",text="Comments",value=false};parent.Add(notes);
             var comments=new TextField {name="config-comments",value=selected.Root["comments"]?.Type==JTokenType.String?selected.Root["comments"].ToString():"",multiline=true,isDelayed=true};comments.tooltip="Optional notes saved with this configuration and its run snapshot.";notes.Add(comments);
-            comments.RegisterValueChangedCallback(e=>StudioEdit(selected,r=>r["comments"]=e.newValue,false));
+            BindDelayedText(comments,text=>StudioEdit(selected,r=>r["comments"]=text,false));
         }
         private JArray BuilderSteps => Workspace.Sequence.Root["sequences"] as JArray??new JArray();
         private JObject Block(int index) => index>=0 && index<BuilderSteps.Count?BuilderSteps[index] as JObject:null;
@@ -323,7 +323,7 @@ namespace ConfigurationUI
             var health=new VisualElement(); health.AddToClassList("health-card"); inspector.Add(health); health.Add(new Label("CONFIGURATION CHECK")); summary=new Label(); health.Add(summary);
         }
         private string SystemSyncSummary()
-        { int sync=(int)ExperimentBlocks.Number(Workspace.System.Root["vSyncCount"]); return sync>0?"vSync /"+sync+" · software FPS target overridden":"Software FPS target: "+(Workspace.System.Root["targetFrameRate"]?.ToString()??"120"); }
+        { int sync=(int)ExperimentBlocks.Number(Workspace.System.Root["vSyncCount"]); return sync>0?"vSync /"+sync+" · software FPS target overridden":"Software FPS target: "+(Workspace.System.Root["targetFrameRate"]?.ToString()??"60"); }
         private string SystemDisplaySummary()
         {
             var displays=DesktopApparatusProfile.Rigs(Workspace.System.Root).GroupBy(ApparatusOutputDisplay).OrderBy(group=>group.Key).ToList();

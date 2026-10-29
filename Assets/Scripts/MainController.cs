@@ -37,7 +37,9 @@ public class MainController : MonoBehaviour
     public void SetAnimalMetadata(AnimalData metadata) => CurrentAnimalMetadata = metadata ?? new AnimalData();
     public TelemetryConfig TelemetrySettings { get; private set; } = new TelemetryConfig();
     public StatusOverlayConfig StatusOverlaySettings { get; private set; } = new StatusOverlayConfig();
-    public int TargetFrameRate { get; private set; } = 120;
+    public OverlayPlacementConfig FrameOverlaySettings { get; private set; } = new OverlayPlacementConfig();
+    public OverlayPlacementConfig DesktopControlsSettings { get; private set; } = new OverlayPlacementConfig { targetDisplay = -1 };
+    public int TargetFrameRate { get; private set; } = 60;
     public int VSyncCount { get; private set; } = 0;
     public OverheadCameraConfig OverheadCameraSettings { get; private set; } = new OverheadCameraConfig();
 
@@ -326,7 +328,7 @@ public class MainController : MonoBehaviour
 
     private void ApplyFrameTiming(JObject config)
     {
-        int target = config.Value<int?>("targetFrameRate") ?? 120;
+        int target = config.Value<int?>("targetFrameRate") ?? 60;
         int sync = config.Value<int?>("vSyncCount") ?? 0;
         if (target != -1 && target <= 0)
             throw new System.ArgumentException("targetFrameRate must be positive, or -1 for uncapped desktop rendering.");
@@ -338,8 +340,36 @@ public class MainController : MonoBehaviour
         Application.targetFrameRate = target;
     }
 
+    public void SetRuntimeFrameRate(int target)
+    {
+        if(target!=-1&&target<=0)throw new System.ArgumentException("Use a positive frame-rate cap, or -1 for uncapped.");
+        if(VSyncCount>0)throw new System.InvalidOperationException("VSync controls presentation timing. Change VSync in system settings first.");
+        if(target==TargetFrameRate)return;
+        var logger=MasterDataLogger.Instance;
+        if(SequenceRunning&&logger!=null&&logger.AcceptingWrites)
+        {
+            var evidence=new JObject { ["schemaVersion"]=1,["event"]="frameRateCap",["utc"]=System.DateTimeOffset.UtcNow,
+                ["unityFrame"]=Time.frameCount,["unityTimeSeconds"]=Time.timeAsDouble,["previousTarget"]=TargetFrameRate,["target"]=target,["vSyncCount"]=VSyncCount };
+            File.AppendAllText(Path.Combine(logger.directoryPath,"runtime_display_settings.jsonl"),evidence.ToString(Formatting.None)+"\n");
+        }
+        TargetFrameRate=target;Application.targetFrameRate=target;
+    }
+
+    public void ApplyIdleFrameTiming(JObject config)
+    {
+        if(SequenceRunning||SequencePreparing)throw new System.InvalidOperationException("Use the live frame-rate editor while an experiment is running or preparing.");
+        ApplyFrameTiming(config);
+    }
+
     private void LoadDiagnosticsConfigurations(JObject config)
     {
+        try { FrameOverlaySettings=config["frameOverlay"]?.ToObject<OverlayPlacementConfig>()??new OverlayPlacementConfig(); }
+        catch(System.Exception error){FrameOverlaySettings=new OverlayPlacementConfig();Debug.LogWarning("Invalid frame overlay placement; using defaults: "+error.Message);}
+        try {
+            DesktopControlsSettings=config["desktopControls"]?.ToObject<OverlayPlacementConfig>()??new OverlayPlacementConfig { targetDisplay=-1 };
+            if(!(config["desktopControls"] is JObject controls)||controls["targetDisplay"]==null)DesktopControlsSettings.targetDisplay=-1;
+        }
+        catch(System.Exception error){DesktopControlsSettings=new OverlayPlacementConfig {targetDisplay=-1};Debug.LogWarning("Invalid desktop controls placement; using defaults: "+error.Message);}
         // Optional monitoring must not erase the independently configured tracker ports.
         // Value validation and bind failures belong to ExperimentTelemetry.Configure.
         try { TelemetrySettings = config["telemetry"]?.ToObject<TelemetryConfig>() ?? new TelemetryConfig(); }
@@ -360,6 +390,7 @@ public class MainController : MonoBehaviour
     // Rendering callers use TryGet so a missing rig cannot borrow VR1's physical viewports.
     public bool TryGetSystemConfigForGameObject(GameObject target, out SystemConfig config)
     {
+        if(ReplayExecutionContext.Active)return ReplayExecutionContext.TrySystemConfig(target,out config);
         for (Transform item = target.transform; item != null; item = item.parent)
         {
             var match = System.Text.RegularExpressions.Regex.Match(item.name, @"(?<![A-Za-z0-9])VR[0-9]+(?![A-Za-z0-9])");
@@ -813,16 +844,31 @@ private void ApplyExperiment(Dictionary<string, object> parameters, System.Actio
         MasterDataLogger.Instance.ConfigArchive.RequireComplete();
         using (ExperimentRandom.Scope("trial:" + currentTrial + ":row:" + executionOrder[currentStep] + ":phase:" + ExperimentPhase))
         {
+            var presentation = ReplayPresentationRecorder.Begin(this, document, payload);
             apply(payload);
             ExperimentWorldObjects.Apply(SceneManager.GetActiveScene(), document);
             ExperimentSun.Apply(SceneManager.GetActiveScene(), document);
             ExperimentRandom.SeedParticles(SceneManager.GetActiveScene(), "trial:" + currentTrial + ":row:" + executionOrder[currentStep] + ":phase:" + ExperimentPhase);
+            ReplayPresentationRecorder.Commit(presentation, this);
         }
         StartCoroutine(RecordingThumbnail.Capture(SceneManager.GetActiveScene(), MasterDataLogger.Instance.directoryPath));
         MasterDataLogger.Instance.ConfigArchive.RequireComplete();
         if (step != null) ApplyAutoTrimToClosedLoopComponents(step);
     };
     if (!phaseRunner.TryBegin(resolved, applyConfigured, FailExperiment)) applyConfigured(resolved);
+}
+
+public void FailRecordingEvidence(System.Exception error)
+{
+    var logger=MasterDataLogger.Instance;
+    if(logger!=null&&logger.AcceptingWrites)
+    {
+        try { File.AppendAllText(Path.Combine(logger.directoryPath,"replay_evidence_errors.jsonl"),new JObject {
+            ["frame"]=Time.frameCount,["presentationId"]=ReplayPresentationRecorder.CurrentPresentationId,["error"]=error.Message
+        }.ToString(Newtonsoft.Json.Formatting.None)+"\n"); }
+        catch(System.Exception writeError){Debug.LogError("Could not archive replay evidence failure: "+writeError.Message);}
+    }
+    FailExperiment(error);
 }
 
 private void FailExperiment(System.Exception error)

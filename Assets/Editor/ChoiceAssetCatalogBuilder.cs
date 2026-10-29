@@ -46,7 +46,7 @@ public sealed class ChoiceAssetCatalogBuilder:IPreprocessBuildWithReport
     }
     private static JArray Rows<T>(IEnumerable<T> source) where T:UnityEngine.Object
     {
-        return new JArray(source.Where(asset=>asset!=null).GroupBy(asset=>asset.name,StringComparer.Ordinal).Select(group=>group.Last())
+        return new JArray(source.Where(asset=>asset!=null && (!(asset is GameObject prefab) || !prefab.GetComponentsInChildren<WindZone>(true).Any(wind=>wind.gameObject.activeSelf&&(wind.windMain!=0||wind.windTurbulence!=0||wind.windPulseMagnitude!=0)))).GroupBy(asset=>asset.name,StringComparer.Ordinal).Select(group=>group.Last())
             .OrderBy(asset=>asset.name,StringComparer.Ordinal).Select(asset=>{
                 string path=AssetDatabase.GetAssetPath(asset);string folder=Path.GetDirectoryName(path)?.Replace('\\','/')??"";
                 string description=asset is Material material?material.shader!=null?material.shader.name:"Material":Path.GetFileName(folder);

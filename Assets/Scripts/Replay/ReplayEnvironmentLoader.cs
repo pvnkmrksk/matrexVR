@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -51,6 +52,8 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private string currentSky;
     private Material importedDefaultSky;
     private Color importedAmbientLight, importedAmbientSky, importedAmbientEquator, importedAmbientGround, importedFogColor;
+    private RecordedWorldStateReader worldFrames;
+    private JObject currentPresentation;
     private UnityEngine.Rendering.AmbientMode importedAmbientMode;
     private bool importedFog;
     private float importedFogDensity, importedFogStart, importedFogEnd;
@@ -68,8 +71,10 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             foreach(var light in root.GetComponentsInChildren<Light>(true))previewLights[light]=light.enabled;
     }
 
-    public void BeginSession(ReplaySessionArchive session,IEnumerable<string> ids)
+    public void BeginSession(ReplaySessionArchive session,IEnumerable<string> ids,RecordedWorldStateReader frames=null)
     {
+        session.RequireCompatibleBuild();
+        worldFrames?.Dispose();worldFrames=frames??(session.Presentations.IsCurrentContract?new RecordedWorldStateReader(session.DirectoryPath):null);
         archive=session;SetRigIds(ids);requested=null;appliedKey=null;currentConfig=null;importedName=null;cameraStateKeys.Clear();latestAsynchronousSamples.Clear();
         ClearEnvironment();ReleaseSky();archivedModelKeys.Clear();
         FidelityStatus="Saved configurations loaded; waiting for recorded scene";
@@ -97,8 +102,8 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             {
                 ClearEnvironment();importedRigs.Clear();importedFrontCameras.Clear();cameraStateKeys.Clear();
                 if(importedScene.IsValid() && importedScene.isLoaded)yield return SceneManager.UnloadSceneAsync(importedScene);
-                importedScene=default;importedName=target.scene;
-                loadedSceneName = Application.CanStreamedLevelBeLoaded(target.scene) ? target.scene : SceneCompatibility.Resolve(target.scene);
+                importedScene=default;importedName=target.scene;importedFailure=null;
+                loadedSceneName = Application.CanStreamedLevelBeLoaded(target.scene) ? target.scene : archive.Presentations.IsCurrentContract ? null : SceneCompatibility.Resolve(target.scene);
                 foreach(string key in prefabDict.Where(p=>p.Value==null).Select(p=>p.Key).ToArray())prefabDict.Remove(key);
                 foreach(string key in materialDict.Where(p=>p.Value==null).Select(p=>p.Key).ToArray())materialDict.Remove(key);
                 if(!string.IsNullOrEmpty(loadedSceneName) && loadedSceneName!="ReplayScene" && loadedSceneName!="ControlScene" && Application.CanStreamedLevelBeLoaded(loadedSceneName))
@@ -134,11 +139,13 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             }
             try
             {
+                if(importedFailure!=null)throw new InvalidDataException("Recorded scene isolation failed.",importedFailure);
                 if(appliedKey!=target.ContextKey)
                 {
                     ClearEnvironment();
                     currentConfig=archive?.ExperimentFor(target);
-                    if(!(currentConfig?["steps"] is JArray))RestoreObjects(currentConfig,target);
+                    if(archive.Presentations.IsCurrentContract)RestoreCanonicalPresentation(target);
+                    else if(!(currentConfig?["steps"] is JArray))RestoreObjects(currentConfig,target);
                     else foreach(var sample in latestAsynchronousSamples.Values.Where(sample=>sample.scene==target.scene).ToArray())RestoreAsynchronousSample(sample);
                     RestoreRugosity(currentConfig);
                     if (importedScene.IsValid() && importedScene.isLoaded) ExperimentSun.Apply(importedScene, currentConfig);
@@ -154,15 +161,21 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             }
             catch(Exception error)
             {
-                Warn("Replay reconstruction: "+error.Message);
-                appliedKey=target.ContextKey;currentSky=target.skyboxId;
-                FidelityStatus="Partial reconstruction: "+error.Message;
+                if(archive?.Presentations.IsCurrentContract==true)
+                {Loading=false;requested=null;FidelityStatus="Same-build replay stopped: "+error.Message;GetComponent<ReplayController>()?.StopForFidelityError(error.Message);}
+                else
+                {
+                    Warn("Replay reconstruction: "+error.Message);
+                    appliedKey=target.ContextKey;currentSky=target.skyboxId;
+                    FidelityStatus="Partial reconstruction: "+error.Message;
+                }
             }
             yield return null;
         }
         Loading=false;
     }
 
+    private Exception importedFailure;
     private void FreezeLoadedScene(Scene scene,LoadSceneMode mode)
     {
         if(scene.name!=loadedSceneName || scene==gameObject.scene)return;
@@ -184,7 +197,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                     foreach(var root in roots)if(root.GetComponent<ClosedLoop>()!=null)active[root]=root.activeSelf;
                 }
             }
-            catch(Exception error){Warn("Recorded rig layout unavailable: "+error.Message);}
+            catch(Exception error){if(archive?.Presentations.IsCurrentContract==true)throw;Warn("Recorded rig layout unavailable: "+error.Message);}
             // Registry configuration can clone rigs. Templates were already
             // frozen, and this second pass also covers every generated child.
             foreach(var root in scene.GetRootGameObjects())FreezeHierarchy(root,false);
@@ -217,7 +230,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                 }
             }
         }
-        catch(Exception error){Warn("Recorded scene isolation/reconstruction: "+error.Message);}
+        catch(Exception error){if(archive?.Presentations.IsCurrentContract==true){importedFailure=error;isolated=false;}else Warn("Recorded scene isolation/reconstruction: "+error.Message);}
         finally
         {
             if(isolated){foreach(var root in roots)if(root!=null)root.SetActive(active[root]);}
@@ -229,7 +242,8 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     {
         if(root==null)return;
         foreach(var script in root.GetComponentsInChildren<MonoBehaviour>(true))
-            if(script!=null && (!visual || !(script is RuntimeMaterialOwner || script is BogongMoth || script is BogongSwarmRenderer)))script.enabled=false;
+            if(script!=null && (!visual || !(script is RuntimeMaterialOwner || script is BogongMoth || script is BogongSwarmRenderer)))
+            {script.StopAllCoroutines();script.CancelInvoke();script.enabled=false;}
         foreach(var camera in root.GetComponentsInChildren<Camera>(true))if(camera!=null)camera.enabled=false;
         foreach(var listener in root.GetComponentsInChildren<AudioListener>(true))if(listener!=null)listener.enabled=false;
         foreach(var animator in root.GetComponentsInChildren<Animator>(true))if(animator!=null)animator.enabled=false;
@@ -299,12 +313,33 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     }
     private void RestoreAsynchronousSample(ReplaySessionArchive.Sample sample)
     {
-        if(asynchronousKeys.TryGetValue(sample.rig,out string previous) && previous==sample.StimulusKey)return;
-        if(asynchronousRoots.TryGetValue(sample.rig,out var old) && old!=null){old.gameObject.SetActive(false);Destroy(old.gameObject);}
+        JObject recordedStep=archive?.Presentations.IsCurrentContract==true?worldFrames.ConfigurationFor(sample.presentationId,sample.unityFrame,"dynamic:"+sample.rig):null;
+        string stimulusKey=sample.StimulusKey+(archive?.Presentations.IsCurrentContract==true?"|inputs:"+(recordedStep?.ToString(Formatting.None)??"blank"):"");
+        if(asynchronousKeys.TryGetValue(sample.rig,out string previous) && previous==stimulusKey)return;
+        if(asynchronousRoots.TryGetValue(sample.rig,out var old) && old!=null){old.gameObject.SetActive(false);old.gameObject.AddComponent<RecordedPendingDestroy>();Destroy(old.gameObject);}
         var root=new GameObject("Recorded condition "+sample.rig).transform;root.SetParent(environmentRoot,false);
-        asynchronousRoots[sample.rig]=root;asynchronousKeys[sample.rig]=sample.StimulusKey;
-        try{RestoreObjects(currentConfig,sample,root);}
-        catch(Exception error){Warn("Recorded asynchronous condition: "+error.Message);}
+        asynchronousRoots[sample.rig]=root;asynchronousKeys[sample.rig]=stimulusKey;
+        try
+        {
+            if(archive?.Presentations.IsCurrentContract==true)
+            {
+                var controller=importedScene.GetRootGameObjects().SelectMany(value=>value.GetComponentsInChildren<DynamicSequenceController>(true)).FirstOrDefault();
+                // The recorded container's local TRS belongs to this original
+                // controller's coordinate frame, never to the operator UI loader.
+                root.SetParent(controller.transform,false);
+                var step=recordedStep;
+                if(step!=null)
+                    using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys))
+                        controller.RecreateRecordedStep(sample.rig,step,root,importedRigs.TryGetValue(sample.rig,out var rig)?rig:null);
+                else root.gameObject.AddComponent<RecordedWorldStateTarget>().Key="dynamic:"+sample.rig;
+            }
+            else RestoreObjects(currentConfig,sample,root);
+            // Seeking can create a new native stimulus without rebuilding the scene.
+            // Freeze its scripts immediately; later Update callbacks must not overwrite
+            // the realized pose/material checkpoint applied by the replay frame.
+            if(archive?.Presentations.IsCurrentContract==true)FreezeHierarchy(root.gameObject,true);
+        }
+        catch(Exception error){if(archive?.Presentations.IsCurrentContract==true)throw;Warn("Recorded asynchronous condition: "+error.Message);}
     }
     public static string CanonicalRig(string name)=>ReplaySessionArchive.CanonicalRig(name);
 
@@ -425,6 +460,8 @@ public class ReplayEnvironmentLoader : MonoBehaviour
 
     private void RestoreRugosity(JObject config)
     {
+        if(archive?.Presentations.IsCurrentContract==true)
+        {RugosityWorld.Apply(importedScene,config?["rugosity"]?.ToObject<RugosityConfig>());return;}
         if(!(config?["rugosity"] is JObject rugosity) || !importedScene.IsValid())return;
         string visual=(string)rugosity["visualSurface"];
         foreach(var root in importedScene.GetRootGameObjects())
@@ -474,14 +511,24 @@ public class ReplayEnvironmentLoader : MonoBehaviour
 
     public GameObject CreateAgentVisual(string kind,string name,string layer,Transform parent,float fallbackSize)
     {
+        if(kind=="Band"&&archive.Presentations.IsCurrentContract)
+        {
+            var original=importedScene.GetRootGameObjects().SelectMany(root=>root.GetComponentsInChildren<ChoiceController>(true)).FirstOrDefault();
+            if(original==null)throw new InvalidDataException("The acquisition Band controller is missing.");
+            var band=original.CreateRecordedBandVisual(name,parent);FreezeVisual(band);band.AddComponent<ReplayAnimationDriver>();
+            int bandLayer=RecordedLayer(layer);if(bandLayer>=0)SetLayer(band,bandLayer);return band;
+        }
         JObject swarm=currentConfig?["swarm"] as JObject??currentConfig;
-        if(kind=="Swarm" && string.Equals((string)swarm?["agentVisual"],"Bogong",StringComparison.OrdinalIgnoreCase))
+        var manifest=(currentPresentation?["populationVisuals"] as JArray??new JArray()).OfType<JObject>().Where(value=>(string)value["kind"]==kind&&((string)value["layer"]==layer||RecordedLayer((string)value["layer"])>=0&&RecordedLayer((string)value["layer"])==RecordedLayer(layer))).ToArray();
+        var resolved=manifest.FirstOrDefault(value=>(string)value["family"]=="Kannadi")??manifest.FirstOrDefault();
+        var resolvedSwarm=manifest.FirstOrDefault(value=>(string)value["family"]=="Swarm");
+        if(kind=="Swarm" && string.Equals((string)(resolvedSwarm?["agentVisual"]??swarm?["agentVisual"]),"Bogong",StringComparison.OrdinalIgnoreCase))
         {
             var agent=new GameObject("Recorded agent "+name);agent.transform.SetParent(parent,false);
             var renderHost=new GameObject("Recorded Bogong visual");renderHost.transform.SetParent(agent.transform,false);
             int agentLayer=RecordedLayer(layer);if(agentLayer>=0){agent.layer=agentLayer;renderHost.layer=agentLayer;}
-            var visual=swarm["bogongVisual"]?.ToObject<BogongVisualConfig>()??new BogongVisualConfig();
-            renderHost.AddComponent<BogongSwarmRenderer>().Configure(new[]{agent},visual,(float?)swarm["worldUnitsPerMetre"]??1);
+            var visual=(resolvedSwarm?["bogongVisual"]??swarm["bogongVisual"])?.ToObject<BogongVisualConfig>()??new BogongVisualConfig();
+            renderHost.AddComponent<BogongSwarmRenderer>().Configure(new[]{agent},visual,(float?)(resolvedSwarm?["worldUnitsPerMetre"]??swarm["worldUnitsPerMetre"])??1);
             agent.AddComponent<ReplayAnimationDriver>();
             return agent;
         }
@@ -490,7 +537,24 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         if (string.IsNullOrWhiteSpace(externalPath)) externalPath = (string)swarm?["modelPath"];
         string selection=kind=="Kannadi"?(string)currentConfig?["kannadiTilePrefab"]:(string)swarm?["locustPrefab"];
         GameObject prefab=!string.IsNullOrEmpty(selection)?catalog?.Find(selection):catalog?.Find("SimulatedLocust");
-        if (!string.IsNullOrEmpty(externalPath) && archivedModelKeys.TryGetValue(externalPath, out string externalKey)) prefab = ExternalModelLibrary.GetPrefab(externalKey);
+        if(archive.Presentations.IsCurrentContract&&resolved!=null)
+        {
+            if((string)resolved["family"]=="Kannadi")
+            {
+                string rigId=(string)resolved["rig"];
+                var original=importedRigs.TryGetValue(rigId,out var rig)?rig.GetComponent<Kannadi>():null;
+                if(original==null)throw new InvalidDataException("Original Kannadi population factory is missing: "+rigId);
+                var settings=currentConfig.ToObject<KannadiConfig>();settings.kannadiTilePrefab=(string)resolved["prefab"];
+                using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys))prefab=original.ResolvePrefab(settings);
+            }
+            else prefab=catalog?.Find((string)resolved["prefab"]);
+        }
+        if (!string.IsNullOrEmpty(externalPath))
+        {
+            if(archivedModelKeys.TryGetValue(externalPath,out string externalKey))prefab=ExternalModelLibrary.GetPrefab(externalKey);
+            else if(archive.Presentations.IsCurrentContract)throw new InvalidDataException("Required archived population model was not loaded: "+externalPath);
+        }
+        if(prefab==null&&archive.Presentations.IsCurrentContract)throw new InvalidDataException("Required original population prefab is missing: "+selection);
         GameObject go=prefab!=null?ExternalModelLibrary.InstantiatePrefab(prefab,parent):GameObject.CreatePrimitive(PrimitiveType.Capsule);
         if (!string.IsNullOrWhiteSpace(externalPath) && prefab != null) ExternalModelLibrary.ConfigureAnimation(go);
         if(prefab==null){go.transform.SetParent(parent,false);go.transform.localScale=Vector3.one*fallbackSize;Warn("An agent model was unavailable; pose markers are shown.");}
@@ -516,13 +580,69 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private void ClearEnvironment()
     {
         objectAnimations.Clear();
-        if(environmentRoot!=null)foreach(Transform child in environmentRoot){child.gameObject.SetActive(false);Destroy(child.gameObject);}
+        if(environmentRoot!=null)foreach(Transform child in environmentRoot){child.gameObject.SetActive(false);child.gameObject.AddComponent<RecordedPendingDestroy>();Destroy(child.gameObject);}
+        foreach(var root in asynchronousRoots.Values)
+            if(root!=null&&root.GetComponent<RecordedPendingDestroy>()==null)
+            {root.gameObject.SetActive(false);root.gameObject.AddComponent<RecordedPendingDestroy>();Destroy(root.gameObject);}
         asynchronousKeys.Clear();asynchronousRoots.Clear();
     }
     public void ApplyAnimationClock(double seconds)
     {
         if (Loading) return;
         foreach (var pair in objectAnimations) if (pair.Key != null) pair.Key.Sample(null, Math.Max(0, seconds - pair.Value));
+    }
+
+    private void RestoreCanonicalPresentation(ReplaySessionArchive.Sample sample)
+    {
+        if(!importedScene.IsValid()||!importedScene.isLoaded)throw new InvalidDataException("Acquisition scene is missing from its own build.");
+        currentPresentation=archive.Presentations.For(sample.presentationId);
+        var parameters=currentPresentation["parameters"].ToObject<Dictionary<string,object>>();
+        parameters[ExperimentPhases.PayloadKey]=currentConfig.DeepClone();
+        foreach(var saved in currentPresentation["rigsBeforeApply"] as JArray??new JArray())
+            if(importedRigs.TryGetValue((string)saved["id"],out var rig))
+            {var p=(JArray)saved["position"];var r=(JArray)saved["rotation"];rig.SetPositionAndRotation(new Vector3((float)p[0],(float)p[1],(float)p[2]),new Quaternion((float)r[0],(float)r[1],(float)r[2],(float)r[3]));}
+        Scene prior=SceneManager.GetActiveScene();SceneManager.SetActiveScene(importedScene);
+        try
+        {
+            using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys))
+            using(ExperimentRandom.RestoreCheckpoint((JObject)currentPresentation["initializationRandom"]))
+            {
+                var roots=importedScene.GetRootGameObjects();
+                var choice=roots.SelectMany(root=>root.GetComponentsInChildren<ChoiceController>(true)).FirstOrDefault();
+                var optomotor=roots.SelectMany(root=>root.GetComponentsInChildren<OptomotorSceneController>(true)).FirstOrDefault();
+                if(choice!=null)choice.InitializeScene(parameters);
+                else if(optomotor!=null)optomotor.InitializeScene(parameters);
+                else if(currentConfig["steps"] is JArray)
+                    foreach(var row in latestAsynchronousSamples.Values.Where(row=>row.scene==sample.scene).ToArray())RestoreAsynchronousSample(row);
+                else
+                {
+                    var host=roots.FirstOrDefault(root=>root.GetComponentInChildren<Kannadi>(true)!=null);
+                    if(host!=null)
+                        (host.GetComponent<KannadiWorldObjects>()??host.AddComponent<KannadiWorldObjects>()).Apply(currentConfig["objects"]?.ToObject<SceneObject[]>(),ReplayExecutionContext.Rigs(importedScene));
+                }
+                ExperimentWorldObjects.Apply(importedScene,currentConfig);
+                RestoreRugosity(currentConfig);ExperimentSun.Apply(importedScene,currentConfig);
+                importedAmbientMode=RenderSettings.ambientMode;importedAmbientLight=RenderSettings.ambientLight;
+                importedAmbientSky=RenderSettings.ambientSkyColor;importedAmbientEquator=RenderSettings.ambientEquatorColor;importedAmbientGround=RenderSettings.ambientGroundColor;
+                importedFog=RenderSettings.fog;importedFogColor=RenderSettings.fogColor;importedFogDensity=RenderSettings.fogDensity;importedFogStart=RenderSettings.fogStartDistance;importedFogEnd=RenderSettings.fogEndDistance;
+                foreach(var root in importedScene.GetRootGameObjects())FreezeHierarchy(root,false);
+                foreach(var root in asynchronousRoots.Values)if(root!=null)FreezeHierarchy(root.gameObject,true);
+            }
+        }
+        finally{if(prior.IsValid()&&prior.isLoaded)SceneManager.SetActiveScene(prior);}
+    }
+    public void ApplyRecordedWorldFrame(ReplaySessionArchive.Sample sample)
+    {
+        if(Loading||worldFrames==null||sample==null)return;
+        try
+        {
+            JObject clock;
+            using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys))
+                clock=worldFrames.Apply(sample.presentationId,sample.unityFrame,FindObjectsByType<RecordedWorldStateTarget>(FindObjectsInactive.Include,FindObjectsSortMode.None));
+            foreach(var camera in gameObject.scene.GetRootGameObjects().SelectMany(root=>root.GetComponentsInChildren<Camera>(true)))
+                (camera.GetComponent<ReplayRenderClock>()??camera.gameObject.AddComponent<ReplayRenderClock>()).SetClock((JObject)clock["shaderGlobals"]);
+        }
+        catch(Exception error){GetComponent<ReplayController>()?.StopForFidelityError(error.Message);}
     }
 
     // Retain inspector/event integrations for older scenes; session replay reads saved JSON above.
@@ -542,6 +662,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     public CameraSpec[] GetCameraSpecs(string stepName)=>legacySteps.TryGetValue(stepName,out var step)?step["camera"]?.ToObject<CameraSpec[]>():null;
     private void OnDestroy()
     {
+        worldFrames?.Dispose();worldFrames=null;
         SceneManager.sceneLoaded-=FreezeLoadedScene;ReleaseSky();
         foreach(var light in previewLights)if(light.Key!=null)light.Key.enabled=light.Value;
         if(importedScene.IsValid() && importedScene.isLoaded)SceneManager.UnloadSceneAsync(importedScene);

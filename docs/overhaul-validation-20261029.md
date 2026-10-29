@@ -1,5 +1,7 @@
 # Overhaul validation — 29 October 2026
 
+This records the earlier overhaul pass. The later greenfield replay architecture and setup refinements are governed by the [same-build replay contract](same-build-replay-contract.md); the [new validation report](same-build-validation-20261029.md) supersedes the replay limitations below.
+
 Development branch: `codex/experiment-replay-overhaul`, Unity 6000.3.16f1. The [requirements and priorities](overhaul-0.5-plan.md) distinguish implemented behavior from follow-up work. [Machine-readable evidence](overhaul-validation-20261029.json) records suite counts and local report locations.
 
 ## Verified software behavior

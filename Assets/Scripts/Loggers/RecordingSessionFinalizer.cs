@@ -56,7 +56,7 @@ public sealed class RecordingSessionFinalizer
                     summary["writerEvidence"] = writers;
                     JObject receipt = await media(cancellation.Token).ConfigureAwait(false);
                     cancellation.Token.ThrowIfCancellationRequested();
-                    string[] failures = writers.OfType<JObject>().Select(item => (string)item["failure"])
+                    string[] failures = writers.OfType<JObject>().Select(item => (long?)item["droppedFrames"]>0 ? "Population writer dropped "+item["droppedFrames"]+" rendered frames: "+item["relativePath"] : (string)item["failure"])
                         .Concat(closeErrors ?? Array.Empty<string>()).Where(text => !string.IsNullOrWhiteSpace(text)).ToArray();
                     bool readFailure = (bool?)summary["changedDuringScan"] == true ||
                         ((JArray)summary["files"]).OfType<JObject>().Any(file => file["readError"] != null);

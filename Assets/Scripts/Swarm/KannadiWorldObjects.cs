@@ -10,6 +10,7 @@ public sealed class KannadiWorldObjects : MonoBehaviour
         Clear();
         if (objects == null || objects.Length == 0) return;
         objectsRoot = new GameObject("Kannadi world objects").transform;
+        objectsRoot.gameObject.AddComponent<RecordedWorldStateTarget>().Key = "kannadi-world";
         UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(objectsRoot.gameObject, gameObject.scene);
         var catalog = Resources.Load<KannadiPrefabCatalog>("KannadiPrefabCatalog");
         foreach (var item in objects)
@@ -49,7 +50,7 @@ public sealed class KannadiWorldObjects : MonoBehaviour
     private void Clear()
     {
         if (objectsRoot == null) return;
-        objectsRoot.gameObject.SetActive(false); Destroy(objectsRoot.gameObject); objectsRoot = null;
+        objectsRoot.gameObject.SetActive(false); objectsRoot.gameObject.AddComponent<RecordedPendingDestroy>(); Destroy(objectsRoot.gameObject); objectsRoot = null;
     }
     private void OnDestroy() => Clear();
 }

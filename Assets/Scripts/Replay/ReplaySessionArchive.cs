@@ -14,9 +14,9 @@ public sealed class ReplaySessionArchive
     public sealed class Sample
     {
         public long timestampTicks;
-        public double time;
+        public double time,monotonicTime=double.NaN;
         public Vector3 position, rotation;
-        public string rig, recordedRigName, scene, configFile, stepName, phase, skyboxId;
+        public string rig, recordedRigName, scene, configFile, stepName, phase, skyboxId, presentationId;
         public int sequenceStep, stepIndex, trial,loopIndex,cumulativeStep;
         public int unityFrame = -1;
         public bool colorsSwapped;
@@ -24,7 +24,7 @@ public sealed class ReplaySessionArchive
         public string blackSideAtTrialStart;
         internal bool swapEvent;
         public string StimulusKey => ContextKey + "|swap:" + colorsSwapped + "|gray:" + grayAtTrialStart?.ToString(CultureInfo.InvariantCulture) + "|black:" + blackSideAtTrialStart;
-        public string ContextKey => scene + "|" + sequenceStep + "|" + trial + "|" + loopIndex + "|" + cumulativeStep + "|" + configFile + "|" + stepName + "|" + phase;
+        public string ContextKey => presentationId + "|" + scene + "|" + sequenceStep + "|" + trial + "|" + loopIndex + "|" + cumulativeStep + "|" + configFile + "|" + stepName + "|" + phase;
     }
 
     public string DirectoryPath { get; }
@@ -36,13 +36,16 @@ public sealed class ReplaySessionArchive
     public JObject Sequence { get; private set; }
     public JObject SystemConfiguration { get; private set; }
     public RecordedPosePolicy PosePolicy { get; }
+    public ReplayPresentationJournal Presentations { get; }
     private readonly JObject manifest;
+    private readonly Dictionary<string,(long bytes,long ticks)> verifiedCsv = new Dictionary<string,(long,long)>(StringComparer.Ordinal);
     private readonly HashSet<string> verified = new HashSet<string>(StringComparer.Ordinal);
 
     public ReplaySessionArchive(string directory)
     {
         DirectoryPath = Path.GetFullPath(directory.Trim().Trim('"'));
         if (!Directory.Exists(DirectoryPath)) throw new DirectoryNotFoundException("Run folder does not exist: " + DirectoryPath);
+        Presentations = new ReplayPresentationJournal(DirectoryPath);
         string manifestPath = Path.Combine(DirectoryPath, "config_manifest.json");
         if (File.Exists(manifestPath))
         {
@@ -53,6 +56,42 @@ public sealed class ReplaySessionArchive
         Sequence = ReadRole("sequence", "sequenceConfig.json");
         SystemConfiguration = ReadRole("system", "system_config.json");
         PosePolicy=RecordedPosePolicy.FromSavedSequence(Sequence,manifest!=null&&Sequence!=null);
+    }
+
+    public void RequireCompatibleBuild()
+    {
+        Presentations.ValidateBuild(PlayerBuildIdentity.Capture());
+        if(!Presentations.IsCurrentContract)return;
+        if(File.Exists(Path.Combine(DirectoryPath,"replay_evidence_errors.jsonl")))
+            throw new InvalidDataException("Acquisition stopped because required replay evidence could not be recorded. Inspect replay_evidence_errors.jsonl.");
+        string path=Path.Combine(DirectoryPath,"recording_manifest.json");
+        if(!File.Exists(path))throw new InvalidDataException("Same-build replay requires a finalized recording manifest.");
+        var evidence=ReplayPresentationJournal.Parse(File.ReadAllText(path));
+        if((string)evidence["lifecycle"]?["status"]!="finalized" || (bool?)evidence["lifecycle"]?["writersDrained"]!=true)
+            throw new InvalidDataException("The recording is not finalized with all writers drained.");
+        foreach(var writer in evidence["writerEvidence"] as JArray??new JArray())
+            if((long?)writer["droppedFrames"]>0 || !string.IsNullOrEmpty((string)writer["failure"]))
+                throw new InvalidDataException("The recording has incomplete population evidence: "+writer["relativePath"]);
+        var expectedFiles=evidence["files"] as JArray??throw new InvalidDataException("Finalized CSV inventory is missing.");
+        var expectedPaths=new HashSet<string>(StringComparer.Ordinal);
+        foreach(var item in expectedFiles.OfType<JObject>())
+        {
+            string relative=(string)item["relativePath"];
+            if(string.IsNullOrWhiteSpace(relative)||Path.GetFileName(relative)!=relative||!expectedPaths.Add(relative))
+                throw new InvalidDataException("Invalid or duplicate CSV inventory path.");
+            if((long?)item["rejectedRows"]>0||item["readError"]!=null||(bool?)item["changedDuringScan"]==true)
+                throw new InvalidDataException("Acquisition CSV evidence is incomplete: "+relative);
+            string file=Path.Combine(DirectoryPath,relative);var info=new FileInfo(file);
+            if(!info.Exists||info.Length!=(long?)item["bytes"]||string.IsNullOrEmpty((string)item["sha256"]))
+                throw new InvalidDataException("Required acquisition CSV is missing or has changed: "+relative);
+            if(verifiedCsv.TryGetValue(file,out var prior)&&prior.bytes==info.Length&&prior.ticks==info.LastWriteTimeUtc.Ticks)continue;
+            string hash;using(var algorithm=System.Security.Cryptography.SHA256.Create())using(var input=File.OpenRead(file))
+                hash=BitConverter.ToString(algorithm.ComputeHash(input)).Replace("-","").ToLowerInvariant();
+            if(hash!=(string)item["sha256"])throw new InvalidDataException("Acquisition CSV hash differs from finalized evidence: "+relative);
+            verifiedCsv[file]=(info.Length,info.LastWriteTimeUtc.Ticks);
+        }
+        if(!expectedPaths.SetEquals(CsvFiles(DirectoryPath).Select(Path.GetFileName)))
+            throw new InvalidDataException("Acquisition CSV inventory differs from the finalized recording.");
     }
 
     public void LoadRigSamples()
@@ -85,16 +124,26 @@ public sealed class ReplaySessionArchive
                     float[] values = new float[6]; bool valid = true;
                     for (int i = 0; i < pose.Length; i++) valid &= TryNumber(cells[pose[i]], out values[i]);
                     if (!valid) { rejected++; continue; }
+                    if(Presentations.IsCurrentContract && !System.Text.RegularExpressions.Regex.IsMatch(CanonicalRig(cells[rig]),"^VR([1-9]|1[0-6])$"))continue;
                     var sample = new Sample { timestampTicks = ticks, rig = CanonicalRig(cells[rig]),recordedRigName=cells[rig],
                         position = new Vector3(values[0], values[1], values[2]), rotation = new Vector3(values[3], values[4], values[5]),
                         scene = Cell(header,cells,"Scene"), configFile = Cell(header,cells,"ConfigFile"), stepName = Cell(header,cells,"stepName"),
                         phase = Cell(header,cells,"experimentPhase"), skyboxId = Cell(header,cells,"skyboxId"),
+                        presentationId = Cell(header,cells,"presentationId"),
                         unityFrame = Integer(Cell(header,cells,"unityFrame"),-1),
+                        monotonicTime=double.TryParse(Cell(header,cells,"monotonicTime"),NumberStyles.Float,CultureInfo.InvariantCulture,out double monotonic)?monotonic:double.NaN,
                         swapEvent = TryNumber(Cell(header,cells,"swapElapsedSec"), out _),
                         grayAtTrialStart = TryNumber(Cell(header,cells,"grayAtTrialStart"), out float gray) ? gray : (float?)null,
                         blackSideAtTrialStart = Cell(header,cells,"blackSideAtTrialStart"),
                         sequenceStep = Integer(Cell(header,cells,"CurrentStep"),-1), stepIndex = Integer(Cell(header,cells,"stepIndex"),-1),
                         trial = Integer(Cell(header,cells,"CurrentTrial"),0),loopIndex=Integer(Cell(header,cells,"loopIndex")),cumulativeStep=Integer(Cell(header,cells,"cumulativeStep")) };
+                    if(!Presentations.IsCurrentContract && !string.IsNullOrEmpty(sample.presentationId))
+                        throw new InvalidDataException("Frame references a presentation but its same-build contract is missing.");
+                    if(Presentations.IsCurrentContract)
+                    {
+                        if(sample.unityFrame<0||double.IsNaN(sample.monotonicTime)||double.IsInfinity(sample.monotonicTime))throw new InvalidDataException("Same-build pose frame has no monotonic rendered-frame clock.");
+                        Presentations.For(sample.presentationId);
+                    }
                     if (!Rigs.TryGetValue(sample.rig, out var samples)) Rigs[sample.rig] = samples = new List<Sample>();
                     samples.Add(sample); OriginTicks = Math.Min(OriginTicks,ticks);
                 }
@@ -105,14 +154,19 @@ public sealed class ReplaySessionArchive
             }
         }
         if (Rigs.Count == 0) throw new InvalidDataException("This folder contains no readable animal pose CSV rows (Current Time, VR and six GameObject pose columns). " + string.Join(" ",Warnings.Take(4)));
+        double monotonicOrigin=Presentations.IsCurrentContract?Rigs.Values.SelectMany(rows=>rows).Min(sample=>sample.monotonicTime):0;
+        if(Presentations.IsCurrentContract)OriginTicks=Rigs.Values.SelectMany(rows=>rows).OrderBy(sample=>sample.unityFrame).First().timestampTicks;
         foreach (string id in Rigs.Keys.ToArray())
         {
             // Stable sorting preserves explicit onset/swap rows written in the same timestamp tick.
-            var samples = Rigs[id].OrderBy(sample => sample.timestampTicks).ToList(); Rigs[id] = samples;
+            var samples = (Presentations.IsCurrentContract?Rigs[id].OrderBy(sample=>sample.unityFrame):Rigs[id].OrderBy(sample => sample.timestampTicks)).ToList(); Rigs[id] = samples;
+            if(Presentations.IsCurrentContract)
+                for(int i=1;i<samples.Count;i++)if(samples[i].unityFrame<=samples[i-1].unityFrame||samples[i].monotonicTime<=samples[i-1].monotonicTime)
+                    throw new InvalidDataException("Acquisition frame clock is duplicated or not increasing for "+id);
             string context = null; bool swapped = false; float? gray = null; string black = "";
             foreach (var sample in samples)
             {
-                sample.time = (sample.timestampTicks - OriginTicks) / (double)TimeSpan.TicksPerSecond;
+                sample.time = Presentations.IsCurrentContract?sample.monotonicTime-monotonicOrigin:(sample.timestampTicks - OriginTicks) / (double)TimeSpan.TicksPerSecond;
                 if (sample.ContextKey != context) { context = sample.ContextKey; swapped = false; gray = null; black = ""; }
                 if (sample.swapEvent) swapped = true;
                 if (sample.grayAtTrialStart.HasValue) gray = sample.grayAtTrialStart;
@@ -122,11 +176,12 @@ public sealed class ReplaySessionArchive
             Duration = Math.Max(Duration,samples[samples.Count-1].time);
         }
         FirstExperimentTime = Rigs.Values.SelectMany(samples => samples).Where(sample => sample.scene != "ControlScene" && sample.scene != "ReplayScene").Select(sample => sample.time).DefaultIfEmpty(0).Min();
-        Warnings.Add("Historical rig clocks are local wall time. Clock changes, unlogged animation, and tracker validity cannot be recovered from these CSVs.");
+        if(!Presentations.IsCurrentContract)Warnings.Add("Historical rig clocks are local wall time. Clock changes, unlogged animation, and tracker validity cannot be recovered from these CSVs.");
     }
 
     public JObject ExperimentFor(Sample sample)
     {
+        if (Presentations.IsCurrentContract) return (JObject)Presentations.For(sample.presentationId)["config"];
         string reference = sample.configFile;
         var rows = Sequence?["sequences"] as JArray;
         JObject parameters = rows != null && sample.sequenceStep >= 0 && sample.sequenceStep < rows.Count ? rows[sample.sequenceStep]?["parameters"] as JObject : null;

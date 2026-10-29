@@ -73,6 +73,31 @@ public static class ExperimentRandom
     }
 
     public static IDisposable Scope(string key) => new UnityScope(NextSeed(key), key, true);
+    public static JObject CaptureCheckpoint() => new JObject {
+        ["version"] = 1, ["resolvedSeed"] = ResolvedSeed, ["unityRandomState"] = JsonUtility.ToJson(UnityEngine.Random.state),
+        ["activeContext"] = activeContext, ["latestContext"] = latestContext, ["occurrences"] = JObject.FromObject(occurrences)
+    };
+    public static IDisposable RestoreCheckpoint(JObject checkpoint) => new CheckpointScope(checkpoint);
+    private sealed class CheckpointScope : IDisposable
+    {
+        private readonly JObject prior = CaptureCheckpoint();
+        private readonly bool priorActive = Active;
+        private readonly string priorEvidence = evidencePath;
+        public CheckpointScope(JObject checkpoint)
+        {
+            if ((int?)checkpoint?["version"] != 1) throw new ArgumentException("Unsupported replay RNG checkpoint.");
+            // Replaying must never append random stream evidence to acquisition.
+            Active = false; evidencePath = null; Apply(checkpoint);
+        }
+        private static void Apply(JObject value)
+        {
+            ResolvedSeed = (int)value["resolvedSeed"];
+            activeContext = (string)value["activeContext"]; latestContext = (string)value["latestContext"];
+            occurrences.Clear(); foreach (var item in ((JObject)value["occurrences"]).Properties()) occurrences[item.Name] = (int)item.Value;
+            UnityEngine.Random.state = JsonUtility.FromJson<UnityEngine.Random.State>((string)value["unityRandomState"]);
+        }
+        public void Dispose() { Apply(prior); Active = priorActive; evidencePath = priorEvidence; }
+    }
     public static IDisposable ScopeFor(Component component, string purpose)
     {
         string key = Context + ":" + ComponentKey(component) + ":" + purpose;

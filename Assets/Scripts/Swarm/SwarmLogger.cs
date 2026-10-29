@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-[DefaultExecutionOrder(1100)]
+[DefaultExecutionOrder(1300)]
 public class SwarmLogger : MonoBehaviour
 {
     public LayerMask locustLayerMask;
@@ -40,7 +40,7 @@ public class SwarmLogger : MonoBehaviour
         string path = Path.Combine(master.directoryPath,
             $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_SimulatedLocustData_{layerNames.TrimEnd('_')}_{spawner.numberOfLocusts}_{spawner.spawnAreaSize}_{spawner.mu}_{spawner.kappa}_{spawner.locustSpeed}.csv.gz");
         LogPath = path;
-        string header = FormattableString.Invariant($"Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase,RotationX,RotationY,RotationZ,AnimationState,NumberOfLocusts:{spawner.numberOfLocusts},SpawnAreaSize:{spawner.spawnAreaSize},Mu:{spawner.mu},Kappa:{spawner.kappa},LocustSpeed:{spawner.locustSpeed},LocustSpeedStdDev:{spawner.locustSpeedStdDev},DirectionDistribution:{spawner.directionDistribution},KappaElevation:{spawner.kappaElevation}");
+        string header = FormattableString.Invariant($"Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase,RotationX,RotationY,RotationZ,AnimationState,UnityFrame,ScaleX,ScaleY,ScaleZ,NumberOfLocusts:{spawner.numberOfLocusts},SpawnAreaSize:{spawner.spawnAreaSize},Mu:{spawner.mu},Kappa:{spawner.kappa},LocustSpeed:{spawner.locustSpeed},LocustSpeedStdDev:{spawner.locustSpeedStdDev},DirectionDistribution:{spawner.directionDistribution},KappaElevation:{spawner.kappaElevation}");
         writer = new AsyncSwarmWriter(path, header);
     }
 
@@ -66,7 +66,7 @@ public class SwarmLogger : MonoBehaviour
                 cachedRevision = spawner.SpawnRevision; cachedMask = locustLayerMask.value;
             }
             var frame = writer.Rent(agents.Count);
-            frame.timestamp = DateTime.Now;
+            frame.timestamp = RecordedFrameClock.Now; frame.unityFrame = Time.frameCount;
             frame.skyboxId = NightSkyController.CurrentId;
             frame.skyboxSampleUtc = NightSkyController.CurrentSampleUtc;
             frame.phase = MainController.RecordedExperimentPhase;
@@ -75,8 +75,9 @@ public class SwarmLogger : MonoBehaviour
                 if (agents[i] == null || !agents[i].gameObject.activeInHierarchy) continue;
                 Vector3 p = agents[i].position;
                 Vector3 rotation = agents[i].rotation.eulerAngles;
+                Vector3 scale = agents[i].lossyScale;
                 frame.agents[frame.count++] = new AsyncSwarmWriter.Agent { name = names[i], layer = layers[i], x = p.x, y = p.y, z = p.z,
-                    rx = rotation.x, ry = rotation.y, rz = rotation.z,
+                    rx = rotation.x, ry = rotation.y, rz = rotation.z, sx=scale.x,sy=scale.y,sz=scale.z,
                     animationState = animationCaptures[i].Capture(batchRenderer, sourceIndices[i]) };
             }
             writer.Submit(frame);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using InSceneSequence;
 
@@ -16,6 +17,7 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
     private List<ClosedLoop> closedLoopComponents = new List<ClosedLoop>();
     private OptomotorConfig optomotorConfig;
     private int currentStimulusIndex = 0;
+    private int appliedStimulusIndex = -1;
     private bool isRunning = false;
     private Dictionary<string, object> loggingData = new Dictionary<string, object>();
     private Coroutine stimulusRoutine;
@@ -49,6 +51,8 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
         drumRotator = drumObject.GetComponent<DrumRotator>();
         sinusoidalGrating = drumObject.GetComponent<SinusoidalGrating>();
         drumObject.AddComponent<OptomotorDataLogger>();
+        drumObject.AddComponent<RecordedWorldStateTarget>().Key = "optomotor-drum";
+        drumObject.AddComponent<OptomotorRecordedState>().Controller = this;
     }
 
     private void FindClosedLoopComponents()
@@ -85,6 +89,7 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
 
         if (parameters.ContainsKey("configFile"))
         {
+            replayStimulusApplied = false;
             string configFileName = parameters["configFile"].ToString();
             Debug.Log($"Loading optomotor config file: {configFileName}");
             StopStimulusSequence();
@@ -104,7 +109,8 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
                         optomotorConfig.resetPositionOnStart && optomotorConfig.initialPosition != null,
                         optomotorConfig.resetRotationOnStart && (optomotorConfig.initialRotation != null || optomotorConfig.randomInitialRotation));
                 }
-                stimulusRoutine = StartCoroutine(RunStimulusSequence());
+                if (ReplayExecutionContext.Active) ApplyReplayStimulus(0);
+                else stimulusRoutine = StartCoroutine(RunStimulusSequence());
             }
         }
         else
@@ -187,6 +193,7 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
             return;
 
         OptomotorStimulus stimulus = optomotorConfig.stimuli[stimulusIndex];
+        appliedStimulusIndex=stimulusIndex;
         Debug.Log($"Applying stimulus {stimulusIndex}: Speed={stimulus.speed}, Clockwise={stimulus.clockwise}, Axis={stimulus.rotationAxis}");
 
         // Update the DrumRotator
@@ -266,6 +273,15 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
     {
         return drumObject?.transform;
     }
+    public int ReplayStimulusIndex => appliedStimulusIndex;
+    public void ApplyReplayStimulus(int index)
+    {
+        if (optomotorConfig == null || index < 0 || index >= optomotorConfig.stimuli.Count)
+            throw new InvalidDataException("Recorded Optomotor stimulus does not exist in the archived controller configuration.");
+        if (appliedStimulusIndex == index && replayStimulusApplied) return;
+        currentStimulusIndex = index; ApplyStimulusConfig(index); replayStimulusApplied = true;
+    }
+    private bool replayStimulusApplied;
 
     void OnDestroy()
     {
@@ -282,6 +298,18 @@ public class OptomotorSceneController : MonoBehaviour, IInSceneSequencer
             StopCoroutine(stimulusRoutine);
             stimulusRoutine = null;
         }
+    }
+}
+
+/// <summary>The original controller recreates procedural texture/settings from its recorded index.</summary>
+public sealed class OptomotorRecordedState : MonoBehaviour, IReplayStateParticipant
+{
+    public OptomotorSceneController Controller;
+    public JToken CaptureReplayState() => new JObject { ["stimulusIndex"] = Controller.ReplayStimulusIndex };
+    public void RestoreReplayState(JToken state)
+    {
+        if (Controller == null) throw new InvalidDataException("Original Optomotor controller is unavailable.");
+        Controller.ApplyReplayStimulus((int)state["stimulusIndex"]);
     }
 }
 

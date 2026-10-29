@@ -9,7 +9,7 @@ using System.IO.Compression;
 /// <summary>
 /// Logs positions and orientations of Kannadi clones with VR index information.
 /// </summary>
-[DefaultExecutionOrder(200)]
+[DefaultExecutionOrder(1300)]
 public class KannadiLogger : MonoBehaviour
 {
     private string directoryPath;
@@ -66,7 +66,7 @@ public class KannadiLogger : MonoBehaviour
 
         // Write header
         logFile.WriteLine(
-            "Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius,skyboxId,skyboxSampleUtc,experimentPhase,AnimationState"
+            "Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius,skyboxId,skyboxSampleUtc,experimentPhase,AnimationState,UnityFrame,ScaleX,ScaleY,ScaleZ"
         );
     }
 
@@ -84,7 +84,7 @@ public class KannadiLogger : MonoBehaviour
             for (int i = 0; i < clones.Length; i++) if (clones[i] != null) animationCaptures[i] = new RecordedAnimationCapture(clones[i]);
         }
 
-        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        string timestamp = RecordedFrameClock.Now.ToString("yyyy-MM-dd HH:mm:ss.fffffff");
 
         for (int i = 0; i < clones.Length; i++)
         {
@@ -96,7 +96,8 @@ public class KannadiLogger : MonoBehaviour
                 string data = FormattableString.Invariant($"{timestamp},{vrIndex},{i},{clones[i].name},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z},{kannadi.numberOfRings},{kannadi.hexRadius},{NightSkyController.CurrentId},{NightSkyController.CurrentSampleUtc},{MainController.RecordedExperimentPhase}");
 
                 string animation = animationCaptures[i]?.Capture() ?? "";
-                logFile.WriteLine(data + ",\"" + animation.Replace("\"", "\"\"") + "\"");
+                Vector3 scale=clones[i].transform.lossyScale;
+                logFile.WriteLine(data + ",\"" + animation.Replace("\"", "\"\"") + "\"," + Time.frameCount + FormattableString.Invariant($",{scale.x},{scale.y},{scale.z}"));
             }
         }
     }

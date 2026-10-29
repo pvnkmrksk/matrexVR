@@ -86,7 +86,7 @@ namespace ConfigurationUI
                             else if(stimulusLayers.TryGetValue(layer,out string previous))errors.Add(label+": "+id+" and "+previous+" share stimulus layer "+layer+".");
                             else stimulusLayers.Add(layer,id);
                         }
-                        int fps=(int?)json["targetFrameRate"]??120;
+                        int fps=(int?)json["targetFrameRate"]??60;
                         if(fps!=-1 && fps<=0) errors.Add(label+": targetFrameRate must be positive or -1.");
                         json["telemetry"]?.ToObject<TelemetryConfig>()?.Validate();
                     }

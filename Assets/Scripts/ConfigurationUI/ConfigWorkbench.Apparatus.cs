@@ -98,6 +98,7 @@ namespace ConfigurationUI
             if(errors.Count>0)throw new InvalidOperationException(string.Join("\n",errors));
             ApplyUntouchedStarterMotion();
             Workspace.System.Edit(r=>DesktopApparatusProfile.Complete((JObject)r,ApparatusDisplayFallback));Workspace.SaveAll();
+            MainController.Instance?.ApplyIdleFrameTiming((JObject)Workspace.System.Root);
             DesktopQuickStart.RememberWorkspace(Workspace.System.Path,Workspace.Sequence.Path);
             ShowSessionHome();UpdateStatus("Configuration saved. Review your experiment sequence before starting.");
         }
@@ -116,8 +117,8 @@ namespace ConfigurationUI
                 else
                 {
                     var types=Row("apparatus-type-choices");intro.Add(types);
-                    types.Add(StudioButton("Configure LED panels","system",()=>BeginOwnedApparatus("led"),"primary"));
-                    types.Add(StudioButton("Configure desktop preview","system",()=>BeginOwnedApparatus("desktop"),"quiet"));
+                    types.Add(StudioButton("Configure LED panels","led-panels",()=>BeginOwnedApparatus("led"),"primary"));
+                    types.Add(StudioButton("Configure monitors","monitor-array",()=>BeginOwnedApparatus("desktop"),"quiet"));
                 }
                 if(!string.IsNullOrEmpty(unconfiguredSystem)&&File.Exists(unconfiguredSystem))
                 {
@@ -135,17 +136,19 @@ namespace ConfigurationUI
             overview.Add(ApparatusInteger("VR count","apparatus-vr-count",DesktopApparatusProfile.Rigs(system).Count(),value=>{
                 StudioEdit(Workspace.System,r=>DesktopApparatusProfile.ResizeRigs((JObject)r,value,ApparatusDisplayFallback));
             },"Number of real animals/VR rigs. Adding a rig assigns a unique tracker port and a separate LED strip; existing calibration files are retained. Removing rigs is undoable.",1,DesktopApparatusProfile.MaximumRigCount));
-            var counts=Row("apparatus-count-presets");scroll.Add(counts);counts.Add(SessionLabel("Quick VR count","apparatus-copy"));
-            foreach(int count in new[]{1,2,4,8,16})
-            {
-                int chosen=count;var button=StudioButton(count.ToString(),null,()=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.ResizeRigs((JObject)r,chosen,ApparatusDisplayFallback)),"quiet");
-                button.name="apparatus-count-"+count;button.tooltip="Configure "+count+" VRs. Existing rigs retain their settings; new rigs get distinct tracker ports. Undo restores the previous count.";counts.Add(button);
-            }
             overview.Add(ApparatusInteger("Display count","apparatus-monitor-count",DesktopApparatusProfile.MonitorCount(system,ApparatusDisplayFallback),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.Marker((JObject)r)["monitorCount"]=value),"Displays used by the apparatus, including any operator display. Rig output display numbers below are 1-based here and zero-based in JSON. Unattached outputs can be planned before connecting hardware.",1,32));
             string output=DesktopApparatusProfile.Presentation(system);
-            var presentation=new DropdownField("Output",new List<string>{"LED panels","Desktop preview"},output=="led"?0:1){name="apparatus-presentation"};
-            presentation.tooltip="LED panels use exact small pixel rectangles. Desktop preview uses one full-screen face per rig. The automatic three-/four-monitor prism/cuboid wizard is deferred.";
-            presentation.RegisterValueChangedCallback(e=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.SetPresentation((JObject)r,e.newValue=="LED panels"?"led":"desktop")));overview.Add(presentation);
+            var presentation=new VisualElement {name="apparatus-presentation"};presentation.AddToClassList("apparatus-output-choices");
+            presentation.Add(SessionLabel("Output","apparatus-copy"));var outputButtons=Row("apparatus-output-buttons");presentation.Add(outputButtons);
+            foreach(string mode in new[]{"led","desktop"})
+            {
+                string selectedMode=mode;string caption=mode=="led"?"LED panels":"Monitors";
+                var button=StudioButton(caption,mode=="led"?"led-panels":"monitor-array",()=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.SetPresentation((JObject)r,selectedMode)),"apparatus-output-choice");
+                button.name="apparatus-output-"+mode;button.EnableInClassList("is-on",output==mode);
+                button.tooltip=mode=="led"?"Render the configured camera faces into exact LED pixel rectangles.":"Render one full-screen camera face per rig on its assigned monitor. The icon represents a monitor arrangement; physical routing is configured below.";
+                button.Q<WorkbenchIcon>().style.width=36;button.Q<WorkbenchIcon>().style.height=30;outputButtons.Add(button);
+            }
+            overview.Add(presentation);
             var native=Row("apparatus-native-option");scroll.Add(native);
             native.Add(StateSwitch(DesktopApparatusProfile.Flag((system[DesktopApparatusProfile.MarkerName] as JObject)?["launchBundledTrackers"]),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.Marker((JObject)r)["launchBundledTrackers"]=value),"apparatus-native-trackers"));
             var nativeLabel=SessionLabel("Launch bundled native trackers with Start","apparatus-copy");nativeLabel.tooltip="Only local modern Rekkefly/HejjéTrac rigs without an explicit executable/calibration override are launched. Disable this when sharing an externally started publisher. Remote and legacy endpoints remain externally managed.";native.Add(nativeLabel);
@@ -162,7 +165,8 @@ namespace ConfigurationUI
             }
             var schema=Workspace.Schemas.Get("system");
             Section(monitorOptions,"Rendering & timing","system",system,schema,Array.Empty<string>(),new[]{"targetDisplay","targetFrameRate","vSyncCount"});
-            Section(monitorOptions,"Telemetry & overview","radio",system,schema,Array.Empty<string>(),new[]{"telemetry","statusOverlay","overheadCamera"});
+            Section(monitorOptions,"Telemetry & overview","radio",system,schema,Array.Empty<string>(),new[]{"telemetry","overheadCamera"});
+            AddOverlayAdvancedSettings(monitorOptions);
             foreach(string warning in DesktopApparatusProfile.SharedInputWarnings(system))scroll.Add(SessionLabel(warning,"apparatus-validation"));
             if(DesktopApparatusProfile.Rigs(system).Select(RigMode).Distinct().Count()>1)scroll.Add(SessionLabel("Mixed input contracts: review motion settings in each experiment block. A shared block can apply different walking/flight gains, but its movement options are not guessed from one rig.","apparatus-validation"));
             var errors=DesktopApparatusProfile.Validate(system,ApparatusDisplayFallback);
@@ -174,17 +178,14 @@ namespace ConfigurationUI
         private IntegerField ApparatusInteger(string label,string name,int value,Action<int> change,string help,int minimum=0,int maximum=int.MaxValue)
         {
             var field=new IntegerField(label){name=name,value=value,isDelayed=true,tooltip=help};field.AddToClassList("apparatus-input");
-            field.RegisterValueChangedCallback(e=>{
-                try{if(e.newValue<minimum||e.newValue>maximum)throw new ArgumentException(label+" must be between "+minimum+" and "+maximum+".");change(e.newValue);}
-                catch(Exception error){field.SetValueWithoutNotify(e.previousValue);UpdateStatus(error.GetBaseException().Message);status.AddToClassList("error");}
+            BindDelayedInteger(field,number=>{
+                if(number<minimum||number>maximum)throw new ArgumentException(label+" must be between "+minimum+" and "+maximum+".");change(number);
             });return field;
         }
         private TextField ApparatusText(string label,string name,string value,Action<string> change,string help)
         {
             var field=new TextField(label){name=name,value=value??"",isDelayed=true,tooltip=help};field.AddToClassList("apparatus-input");
-            field.RegisterValueChangedCallback(e=>{
-                try{change(e.newValue);}catch(Exception error){field.SetValueWithoutNotify(e.previousValue);UpdateStatus(error.GetBaseException().Message);status.AddToClassList("error");}
-            });return field;
+            BindDelayedText(field,change);return field;
         }
         private void BuildApparatusRig(VisualElement parent,JObject rig,int index,string presentation)
         {

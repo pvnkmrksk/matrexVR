@@ -123,3 +123,8 @@ Replay settings are inspector/UI fields: sessionFolder (newest when empty), abso
 The dedicated `matrex.telemetry.v2` PUB stream (schema version 2) provides all rigs on port 9880, separately from tracking inputs. Heading-relative presentations append per-rig onset context to `heading_reference.jsonl`. See [the versioned telemetry and onset schema](heading-reference-telemetry.md) for clocks, coordinate units, raw/consumed inputs, gains, sample freshness, circular mean and resultant length.
 
 For named cross-block heading references, `heading_reference.jsonl` additionally records `savedAs` and `measureDuringPresentation`. In the current Selwyn cycle, measurements are independent per rig, saved as `milky-way-baseline` each 240-second Milky Way block, and the following two swarm headers record the resolved world `Mu`. Sequence `CurrentTrial` increments when the repeated block group restarts; the setup prefix occurs only in the first pass.
+
+
+## Greenfield same-build replay
+
+New recordings add `presentationId`, `unityFrame` and `monotonicTime` to pose evidence. `Current Time` remains the wall-clock timestamp; playback uses monotonic elapsed time and the shared rendered-frame identity. Complete controller inputs are in `presentations.jsonl`, serial/world checkpoints in `world_state.jsonl`, and the required creating build/schema in `replay_contract.json`. The finalized CSV inventory and hashes are in `recording_manifest.json`. See the [same-build replay contract](same-build-replay-contract.md) for strict evidence, extension hooks and read-only seek behavior.

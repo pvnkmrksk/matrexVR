@@ -275,6 +275,22 @@ public static class Regression
                 {stream.ReadLine();var cells=ReplaySessionArchive.Csv(stream.ReadLine());Check(cells.Length==12 && cells[1]=="agent,quoted" && cells[11]=="3","writer columns and quotation "+i);}
             }
             Check(AsyncSwarmWriter.ActiveWriterCount==0,"no retained async writer after 150 cycles");
+            var strict=Path.Combine(root,"same-build");Directory.CreateDirectory(strict);
+            var identity=PlayerBuildIdentity.Capture();
+            File.WriteAllText(Path.Combine(strict,"replay_contract.json"),new JObject{["schemaVersion"]=1,["player"]=identity}.ToString());
+            var presentation=new JObject{["id"]="exact",["config"]=new JObject{["futureVariable"]=42}};
+            presentation["sha256"]=ReplayPresentationJournal.HashEntry(presentation);
+            File.WriteAllText(Path.Combine(strict,"presentations.jsonl"),presentation.ToString(Newtonsoft.Json.Formatting.None));
+            var strictCsv=Path.Combine(strict,"poses.csv");
+            string strictOriginal=Header+",presentationId,unityFrame,monotonicTime\n"+Row("10:00:02.000","VR1","Choice",0,0,0)+",exact,11,100\n"+Row("10:00:01.000","VR1","Choice",0,1,0)+",exact,12,100.1\n";
+            File.WriteAllText(strictCsv,strictOriginal);
+            var strictManifest=new JObject{["lifecycle"]=new JObject{["status"]="finalized",["writersDrained"]=true},["files"]=new JArray(new JObject{["relativePath"]="poses.csv",["bytes"]=new FileInfo(strictCsv).Length,["sha256"]=RunConfigArchive.Hash(File.ReadAllBytes(strictCsv))})};
+            File.WriteAllText(Path.Combine(strict,"recording_manifest.json"),strictManifest.ToString());
+            var strictArchive=new ReplaySessionArchive(strict);strictArchive.RequireCompatibleBuild();Check(true,"Same-build finalized CSV hashes pass verification");
+            strictArchive.LoadRigSamples();Check(strictArchive.Rigs["VR1"][0].unityFrame==11&&strictArchive.Rigs["VR1"][1].unityFrame==12&&Math.Abs(strictArchive.Duration-.1)<.000001,"Same-build replay timeline survives wall-clock rollback using monotonic frame times");
+            File.WriteAllText(strictCsv,strictOriginal.Replace("Choice,0","Choice,9"));Reject(()=>strictArchive.RequireCompatibleBuild(),"Valid changed CSV bytes must not pass finalized inventory");
+            File.WriteAllText(strictCsv,strictOriginal);File.WriteAllText(Path.Combine(strict,"extra.csv"),"unexpected");Reject(()=>new ReplaySessionArchive(strict).RequireCompatibleBuild(),"Unlisted CSV evidence must not silently enter replay");File.Delete(Path.Combine(strict,"extra.csv"));
+            File.Delete(strictCsv);Reject(()=>new ReplaySessionArchive(strict).RequireCompatibleBuild(),"Missing whole population/pose CSV must not silently disappear");
             Console.WriteLine("PASS: "+checks+" replay/archive/writer regressions; 150 async writer lifecycle cycles.");
         }
         finally{Directory.Delete(root,true);}

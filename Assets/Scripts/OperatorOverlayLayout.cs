@@ -35,37 +35,52 @@ public static class OperatorOverlayLayout
         }
         return result;
     }
-    public static bool Reserve(string owner,int display,Rect desired,out Rect actual)
+    public static bool Reserve(string owner,int display,Rect desired,out Rect actual,bool allowOverlapWhenNoSpace=false)
     {
         var size=DisplaySize(display);var bounds=new Rect(0,0,size.x,size.y);
         var blocked=ProtectedRects(display,(int)size.x,(int)size.y);
         blocked.AddRange(reservations.Where(p=>p.Key!=owner&&p.Value.display==display).Select(p=>p.Value.actual));
         if(reservations.TryGetValue(owner,out var previous)&&previous.display==display&&previous.desired==desired&&Fits(previous.actual,bounds,blocked))
         {actual=previous.actual;return true;}
-        if(!TryPlace(desired,bounds,blocked,out actual)){Release(owner);return false;}
+        if(!TryPlace(desired,bounds,blocked,out actual))
+        {
+            // Explicitly opened settings dialogs may need to overlay a fullscreen
+            // view. Ordinary monitoring widgets never request this exception.
+            if(!allowOverlapWhenNoSpace||!Finite(desired)||desired.width>bounds.width||desired.height>bounds.height||desired.width<=0||desired.height<=0)
+            {Release(owner);return false;}
+            actual=new Rect(Mathf.Clamp(desired.x,bounds.xMin,bounds.xMax-desired.width),Mathf.Clamp(desired.y,bounds.yMin,bounds.yMax-desired.height),desired.width,desired.height);
+        }
         if(previous==null||previous.display!=display||previous.actual!=actual||previous.desired!=desired)Revision++;
         reservations[owner]=new Reservation{display=display,desired=desired,actual=actual};return true;
     }
     private static bool Fits(Rect candidate,Rect bounds,IEnumerable<Rect> blocked) =>
-        candidate.width>0&&candidate.height>0&&candidate.xMin>=bounds.xMin&&candidate.yMin>=bounds.yMin&&candidate.xMax<=bounds.xMax&&candidate.yMax<=bounds.yMax&&!blocked.Any(candidate.Overlaps);
+        Finite(candidate)&&candidate.width>0&&candidate.height>0&&candidate.xMin>=bounds.xMin&&candidate.yMin>=bounds.yMin&&candidate.xMax<=bounds.xMax&&candidate.yMax<=bounds.yMax&&!blocked.Any(candidate.Overlaps);
+    private static bool Finite(Rect rect) => new[]{rect.x,rect.y,rect.width,rect.height}.All(value=>!float.IsNaN(value)&&!float.IsInfinity(value));
     // Sweep candidate rows and merge occupied horizontal intervals. A complete LED
     // display simply has no operator space: omit the widget instead of covering it.
     public static bool TryPlace(Rect desired,Rect bounds,IEnumerable<Rect> obstacles,out Rect actual)
     {
         actual=default;
-        if(desired.width<=0||desired.height<=0||desired.width>bounds.width||desired.height>bounds.height)return false;
-        var blocked=obstacles.Where(r=>r.width>0&&r.height>0&&r.Overlaps(bounds)).ToList();
+        if(!Finite(desired)||!Finite(bounds)||desired.width<=0||desired.height<=0||desired.width>bounds.width||desired.height>bounds.height)return false;
+        var blocked=obstacles.Where(r=>Finite(r)&&r.width>0&&r.height>0&&r.Overlaps(bounds)).ToList();
         if(Fits(desired,bounds,blocked)){actual=desired;return true;}
+        // Prefer breathing room, but a tight free strip is still operator space.
+        // Never omit a widget merely because four padding pixels did not fit.
+        return TryPlaceWithSpacing(desired,bounds,blocked,4,out actual)||TryPlaceWithSpacing(desired,bounds,blocked,0,out actual);
+    }
+    private static bool TryPlaceWithSpacing(Rect desired,Rect bounds,List<Rect> blocked,float spacing,out Rect actual)
+    {
+        actual=default;
         var rows=new HashSet<float>{bounds.yMin,bounds.yMax-desired.height,Mathf.Clamp(desired.y,bounds.yMin,bounds.yMax-desired.height)};
-        foreach(var r in blocked){rows.Add(r.yMax+4);rows.Add(r.yMin-desired.height-4);}
+        foreach(var r in blocked){rows.Add(r.yMax+spacing);rows.Add(r.yMin-desired.height-spacing);}
         float best=float.PositiveInfinity;
         foreach(float y in rows.Where(y=>y>=bounds.yMin&&y+desired.height<=bounds.yMax))
         {
             float left=bounds.xMin;
             var intervals=blocked.Where(r=>r.yMin<y+desired.height&&r.yMax>y).OrderBy(r=>r.xMin).ToList();
-            foreach(var r in intervals.Concat(new[]{new Rect(bounds.xMax+4,y,0,desired.height)}))
+            foreach(var r in intervals.Concat(new[]{new Rect(bounds.xMax+spacing,y,0,desired.height)}))
             {
-                float right=Mathf.Min(bounds.xMax,r.xMin-4);
+                float right=Mathf.Min(bounds.xMax,r.xMin-spacing);
                 if(right-left>=desired.width)
                 {
                     float x=Mathf.Clamp(desired.x,left,right-desired.width);
@@ -73,7 +88,7 @@ public static class OperatorOverlayLayout
                     float score=(x-desired.x)*(x-desired.x)+(y-desired.y)*(y-desired.y);
                     if(score<best&&Fits(candidate,bounds,blocked)){best=score;actual=candidate;}
                 }
-                left=Mathf.Max(left,r.xMax+4);
+                left=Mathf.Max(left,r.xMax+spacing);
             }
         }
         return !float.IsPositiveInfinity(best);

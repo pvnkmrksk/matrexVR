@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using InSceneSequence;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
@@ -259,6 +260,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         foreach (var kv in players)
         {
             var container = new GameObject($"Rig_{kv.Key}_Objects").transform;
+            container.gameObject.AddComponent<RecordedWorldStateTarget>().Key = "dynamic:" + kv.Key;
             container.SetParent(transform);
 
             rigStates[kv.Key] = new RigState
@@ -288,7 +290,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
                 if (loopSequence)
                 {
                     if (designFile != null)
-                        state.steps = BuildOrdered(designFile, Environment.TickCount);
+                        state.steps = BuildOrdered(designFile, ExperimentRandom.NextSeed("dynamic-reshuffle:" + state.id));
                     state.loopCount++;
                     state.index = -1;
                     continue;
@@ -349,11 +351,15 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     private IEnumerator RunSingleStep(RigState state, Step step, AreaWaitResult areaResult, Action onStepStarted)
     {
         foreach (Transform child in state.container)
-            Destroy(child.gameObject);
+        { child.gameObject.SetActive(false); child.gameObject.AddComponent<RecordedPendingDestroy>(); Destroy(child.gameObject); }
 
+        var clearedTarget=state.container.GetComponent<RecordedWorldStateTarget>();
+        if(clearedTarget!=null){clearedTarget.Configuration=null;clearedTarget.Invalidate();}
         yield return null;
 
         ResetVR(state.id, step);
+        var stateTarget = state.container.GetComponent<RecordedWorldStateTarget>();
+        if (stateTarget != null) { stateTarget.Configuration = ReplayConfigurationJson.Capture(step); stateTarget.Invalidate(); }
         float stepStartTime = Time.time;
         var spawned = SpawnObjects(state.id, step.objects, state.container);
 
@@ -383,6 +389,18 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         }
 
         state.cumulativeStep++;
+    }
+
+    public Transform RecreateRecordedStep(string vrId, JObject recordedStep, Transform parent, Transform trackedRig)
+    {
+        var step = recordedStep.ToObject<Step>();
+        if (trackedRig != null) players[vrId] = trackedRig;
+        var container = new GameObject("Rig_" + vrId + "_Objects").transform;
+        container.SetParent(parent,false);
+        var target=container.gameObject.AddComponent<RecordedWorldStateTarget>();target.Key="dynamic:"+vrId;target.Configuration=(JObject)recordedStep.DeepClone();
+        SpawnObjects(vrId,step.objects,container);
+        ApplyCameraSettings(vrId,step.camera);
+        return container;
     }
 
     private List<SpawnedObject> SpawnObjects(string vrId, SceneObjectSpec[] specs, Transform parent)

@@ -37,7 +37,7 @@ namespace ConfigurationUI
                 var modelRow=new VisualElement();modelRow.Add(modelPicker);
                 modelPicker.RegisterValueChangedCallback(e=>Guard(()=>assign(new JValue(modelPaths[modelLabels.IndexOf(e.newValue)]))));
                 var modelInput=new TextField {value=modelCurrent,isDelayed=true,name="external-model-path-"+string.Join("-",parts),tooltip="Model path relative to StreamingAssets, or an existing absolute GLB path. The original model is archived with the run."};modelRow.Add(modelInput);
-                modelInput.RegisterValueChangedCallback(e=>Guard(()=>assign(new JValue(e.newValue))));control=modelRow;return true;
+                BindDelayedText(modelInput,text=>assign(new JValue(text)));control=modelRow;return true;
             }
             if(!ChoiceAssetCatalog.IsObjectField(parts))return false;
             var entries=ChoiceAssetCatalog.Load().Entries(ChoiceCatalogScene(),parts.Last());if(entries.Count==0)return false;
@@ -53,7 +53,7 @@ namespace ConfigurationUI
                 int chosen=labels.IndexOf(evt.newValue);input.style.display=chosen==labels.Count-1?DisplayStyle.Flex:DisplayStyle.None;
                 if(chosen>0&&chosen<=entries.Count){input.SetValueWithoutNotify(entries[chosen-1].Name);assign(new JValue(entries[chosen-1].Name));}
             }));
-            input.RegisterValueChangedCallback(evt=>Guard(()=>assign(new JValue(evt.newValue))));control=row;return true;
+            BindDelayedText(input,text=>assign(new JValue(text)));control=row;return true;
         }
         private void AddChoiceCatalogAction(VisualElement target)
         {

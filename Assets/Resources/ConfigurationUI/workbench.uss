@@ -7,6 +7,8 @@
 
 .badge { color: rgb(154, 209, 200); font-size: 11px; padding: 5px 10px; margin-right: 18px; }
 .frame-rate { color: rgb(186, 198, 210); font-size: 12px; min-width: 158px; -unity-text-align: middle-right; }
+.clickable:hover { color: rgb(151, 210, 200); }
+.clickable:focus { border-bottom-width: 1px; border-bottom-color: rgb(151, 210, 200); }
 .main { flex-grow: 1; min-height: 0; align-items: stretch; }
 
 .sidebar #navigation-title { margin-top: 0; }

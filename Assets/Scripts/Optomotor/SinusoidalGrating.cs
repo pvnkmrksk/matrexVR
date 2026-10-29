@@ -172,6 +172,15 @@ public class SinusoidalGrating : MonoBehaviour
         {
             Debug.Log("No parameters changed, no update needed");
         }
+        CommitConfiguredTexture();
+    }
+
+    // A stimulus change is one rendered-frame transaction in both acquisition and replay.
+    // Frozen replay components cannot wait for a later Update to realize their texture.
+    public void CommitConfiguredTexture()
+    {
+        if(texture==null||material==null)Awake();
+        UpdateTexture();textureNeedsUpdate=false;
     }
 
     private void Update()

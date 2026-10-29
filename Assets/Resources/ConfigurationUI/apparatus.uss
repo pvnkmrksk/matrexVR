@@ -8,6 +8,11 @@
 .apparatus-type-choices { flex-wrap: wrap; margin: 12px 0; }
 .apparatus-type-choices > Button { margin-left: 0; margin-right: 10px; }
 .apparatus-overview-controls { max-width: 1000px; flex-wrap: wrap; align-items: flex-start; margin: 12px 0 6px; }
+.apparatus-output-choices { flex-grow: 1; min-width: 260px; max-width: 390px; margin: 5px 0 7px; }
+.apparatus-output-choices > .apparatus-copy { margin: 0 0 6px; }
+.apparatus-output-buttons { flex-wrap: wrap; }
+.apparatus-output-choice { flex-grow: 1; justify-content: center; min-height: 52px; margin: 0 6px 0 0; padding: 8px 10px; }
+.apparatus-output-choice.is-on { border-color: rgb(79, 153, 146); background-color: rgb(34, 76, 78); }
 .apparatus-input { flex-grow: 1; flex-basis: 0; min-width: 150px; max-width: 300px; margin: 5px 12px 7px 0; flex-direction: column; align-items: stretch; }
 .apparatus-input > .unity-base-field__label { min-width: 0; margin-bottom: 6px; font-size: 12px; color: rgb(183, 198, 211); white-space: normal; }
 .apparatus-overview-controls > .unity-popup-field { flex-grow: 1; flex-basis: 0; min-width: 180px; max-width: 300px; flex-direction: column; margin: 5px 0 7px; }

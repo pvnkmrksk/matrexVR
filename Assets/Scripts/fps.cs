@@ -51,19 +51,20 @@ public class fps : MonoBehaviour
         timingsEnabled = FrameTimingManager.IsFeatureEnabled();
         graphicsApi = SystemInfo.graphicsDeviceType.ToString();
         DontDestroyOnLoad(gameObject);
-        GameObject canvasObject = new GameObject("FPS Canvas", typeof(RectTransform), typeof(Canvas));
+        GameObject canvasObject = new GameObject("FPS Canvas", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
         canvasObject.transform.SetParent(transform, false);
         displayCanvas = canvasObject.GetComponent<Canvas>();
         displayCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
         displayCanvas.sortingOrder = 2000;
-        RectTransform box = new GameObject("FPS", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
+        RectTransform box = new GameObject("FPS", typeof(RectTransform), typeof(Image), typeof(Button)).GetComponent<RectTransform>();
         displayBox=box;
         box.SetParent(canvasObject.transform, false);
         box.anchorMin = box.anchorMax = box.pivot = Vector2.one;
         box.anchoredPosition = new Vector2(-12, -12);
         box.sizeDelta = new Vector2(520, 72);
         box.GetComponent<Image>().color = new Color(0, 0, 0, 0.65f);
-        box.GetComponent<Image>().raycastTarget = false;
+        box.GetComponent<Image>().raycastTarget = true;
+        var editCap=box.GetComponent<Button>();editCap.targetGraphic=box.GetComponent<Image>();editCap.onClick.AddListener(ConfigurationUI.ConfigWorkbench.RequestFrameRateSetting);
         label = new GameObject("FPS Label", typeof(RectTransform), typeof(Text)).GetComponent<Text>();
         label.transform.SetParent(box, false);
         label.rectTransform.anchorMin = Vector2.zero; label.rectTransform.anchorMax = Vector2.one;
@@ -81,8 +82,11 @@ public class fps : MonoBehaviour
     {
         if (displayCanvas == null) return;
         OperatorOverlayLayout.Invalidate();layoutVersion=-1;
-        int display = MainController.Instance != null ? MainController.Instance.GetSystemConfig("VR1").targetDisplay : 0;
+        int display = MainController.Instance != null ? MainController.Instance.FrameOverlaySettings.targetDisplay : 0;
+        if(display<0)display=MainController.Instance!=null?MainController.Instance.GetSystemConfig("VR1").targetDisplay:0;
+        if(display<0||display>=Display.displays.Length)Debug.LogWarning("Frame-rate overlay display "+display+" is unavailable; using operator display 0.");
         displayCanvas.targetDisplay = display >= 0 && display < Display.displays.Length ? display : 0;
+        if((MainController.Instance?.FrameOverlaySettings.visible??true)&&displayCanvas.targetDisplay>0&&!Display.displays[displayCanvas.targetDisplay].active)Display.displays[displayCanvas.targetDisplay].Activate();
     }
     private void OnEnable(){if(instance==this)layoutVersion=-1;}
     private void OnDisable()
@@ -96,14 +100,18 @@ public class fps : MonoBehaviour
         if(displayCanvas==null||displayBox==null)return;
         if(ConfigurationUI.ConfigWorkbench.IsOpen||OperatorOverlayVisibility.Hidden||UnityEngine.SceneManagement.SceneManager.GetActiveScene().name=="ReplayScene")
         {displayCanvas.enabled=false;OperatorOverlayLayout.Release("fps");return;}
+        var placement=MainController.Instance!=null?MainController.Instance.FrameOverlaySettings:new OverlayPlacementConfig();
+        if(!placement.visible){displayCanvas.enabled=false;OperatorOverlayLayout.Release("fps");return;}
         var screen=OperatorOverlayLayout.DisplaySize(displayCanvas.targetDisplay);float scale=DesktopDisplay.UiScale;
         var size=new Vector2(310,58)*scale;displayBox.sizeDelta=size;label.fontSize=Mathf.RoundToInt(12*scale);
         if(layoutVersion!=OperatorOverlayLayout.Revision||lastWidth!=(int)screen.x||lastHeight!=(int)screen.y||lastSize!=size)
         {
-            displayCanvas.enabled=OperatorOverlayLayout.Reserve("fps",displayCanvas.targetDisplay,new Rect(screen.x-size.x-12,screen.y-size.y-12,size.x,size.y),out var placed);
+            displayCanvas.enabled=OperatorOverlayLayout.Reserve("fps",displayCanvas.targetDisplay,placement.Preferred(new Rect(screen.x-size.x-12,screen.y-size.y-12,size.x,size.y)),out var placed);
             if(displayCanvas.enabled){displayBox.anchorMin=displayBox.anchorMax=displayBox.pivot=Vector2.zero;displayBox.anchoredPosition=placed.position;}
             lastWidth=(int)screen.x;lastHeight=(int)screen.y;lastSize=size;layoutVersion=OperatorOverlayLayout.Revision;
         }
+        if(displayCanvas.enabled&&UnityEngine.EventSystems.EventSystem.current==null)
+            new GameObject("Frame rate controls EventSystem",typeof(UnityEngine.EventSystems.EventSystem),typeof(UnityEngine.InputSystem.UI.InputSystemUIInputModule));
     }
     private void Update()
     {

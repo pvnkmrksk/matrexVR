@@ -6,11 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [Serializable]
-public sealed class StatusOverlayConfig
-{
-    public bool visible = true;
-    public int targetDisplay = 0;
-}
+public sealed class StatusOverlayConfig : OverlayPlacementConfig { }
 
 /// <summary>Persistent operator HUD and bounded, thread-safe player error capture.</summary>
 public sealed class RuntimeStatusOverlay : MonoBehaviour
@@ -41,6 +37,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private bool layoutAvailable;
     private int layoutVersion=-1,lastWidth,lastHeight;
     private Vector2 lastPanelSize;
+    private StatusOverlayConfig settings = new StatusOverlayConfig();
     public bool Visible => visible&&!OperatorOverlayVisibility.Hidden;
     public bool ShouldDisplay => isActiveAndEnabled && Visible && layoutAvailable && !ConfigurationUI.ConfigWorkbench.IsOpen && SceneManager.GetActiveScene().name!="ReplayScene";
 
@@ -90,7 +87,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     { TryToggleDashboard(); }
     private void TryToggleDashboard()
     {
-        if (ConfigurationUI.ConfigWorkbench.IsOpen || SceneManager.GetActiveScene().name=="ReplayScene") return;
+        if (ConfigurationUI.ConfigWorkbench.IsOpen || RuntimeFrameRateEditor.IsOpen || SceneManager.GetActiveScene().name=="ReplayScene") return;
         // Display-only control stays available during a run, including stale legacy
         // metadata focus. Idle text forms retain Tab for field navigation.
         if (lastToggleFrame!=Time.frameCount && ((MainController.Instance != null && MainController.Instance.SequenceRunning) || !ExperimentInput.IsEditingText))
@@ -195,9 +192,10 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     {
         if (canvas == null) return;
         OperatorOverlayLayout.Invalidate();layoutVersion=-1;
-        var settings = MainController.Instance != null ? MainController.Instance.StatusOverlaySettings : new StatusOverlayConfig();
+        settings = MainController.Instance != null ? MainController.Instance.StatusOverlaySettings : new StatusOverlayConfig();
+        if(settings.targetDisplay<0||settings.targetDisplay>=Display.displays.Length)Debug.LogWarning("Status overlay display "+settings.targetDisplay+" is unavailable; using operator display 0.");
         canvas.targetDisplay = settings.targetDisplay >= 0 && settings.targetDisplay < Display.displays.Length ? settings.targetDisplay : 0;
-        if (canvas.targetDisplay > 0) Display.displays[canvas.targetDisplay].Activate();
+        if (settings.visible && canvas.targetDisplay > 0) Display.displays[canvas.targetDisplay].Activate();
         if (!operatorVisibility) ApplyVisibility(settings.visible);
     }
 
@@ -248,13 +246,13 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private void LateUpdate()
     {
         if(canvas==null||panel==null)return;
-        if(!Visible||ConfigurationUI.ConfigWorkbench.IsOpen)
+        if(!Visible||ConfigurationUI.ConfigWorkbench.IsOpen||SceneManager.GetActiveScene().name=="ReplayScene")
         {OperatorOverlayLayout.Release("status");layoutAvailable=false;panel.SetActive(false);return;}
         var rect=panel.GetComponent<RectTransform>();float scale=Mathf.Max(.01f,canvas.scaleFactor);
         var screen=OperatorOverlayLayout.DisplaySize(canvas.targetDisplay);var size=rect.sizeDelta*scale;
         if(layoutVersion!=OperatorOverlayLayout.Revision||lastWidth!=(int)screen.x||lastHeight!=(int)screen.y||lastPanelSize!=size)
         {
-            layoutAvailable=OperatorOverlayLayout.Reserve("status",canvas.targetDisplay,new Rect(screen.x-size.x-12,12,size.x,size.y),out var placed);
+            layoutAvailable=OperatorOverlayLayout.Reserve("status",canvas.targetDisplay,settings.Preferred(new Rect(screen.x-size.x-12,12,size.x,size.y)),out var placed);
             if(layoutAvailable){rect.anchorMin=rect.anchorMax=rect.pivot=Vector2.zero;rect.anchoredPosition=placed.position/scale;}
             lastWidth=(int)screen.x;lastHeight=(int)screen.y;lastPanelSize=size;layoutVersion=OperatorOverlayLayout.Revision;
         }

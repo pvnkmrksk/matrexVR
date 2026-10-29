@@ -39,7 +39,8 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
             ["system"] = new JObject { ["type"]="object", ["additionalProperties"]=true, ["properties"]=new JObject {
                 ["targetDisplay"]=Schema(typeof(int)), ["targetFrameRate"]=Schema(typeof(int)), ["vSyncCount"]=Schema(typeof(int)),
                 ["configs"]=Schema(typeof(SystemConfig[])), ["telemetry"]=Schema(typeof(TelemetryConfig)),
-                ["statusOverlay"]=Schema(typeof(StatusOverlayConfig)), ["overheadCamera"]=Schema(typeof(OverheadCameraConfig)) } },
+                ["statusOverlay"]=Schema(typeof(StatusOverlayConfig)), ["overheadCamera"]=Schema(typeof(OverheadCameraConfig)),
+                ["frameOverlay"]=Schema(typeof(OverlayPlacementConfig)),["desktopControls"]=Schema(typeof(OverlayPlacementConfig)) } },
             ["sequence"]=Schema(typeof(SequenceConfig)), ["choice"]=Schema(typeof(SceneConfig)),
             ["swarm"]=Schema(typeof(KannadiConfig)), ["kannadi"]=Schema(typeof(KannadiConfig)),
             ["optomotor"]=Schema(typeof(OptomotorConfig)),
@@ -86,10 +87,13 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         // Expose those to the form without inserting them into the user's JSON.
         system["properties"]["telemetry"]["default"]=JToken.FromObject(new TelemetryConfig());
         system["properties"]["statusOverlay"]["default"]=JToken.FromObject(new StatusOverlayConfig());
+        system["properties"]["frameOverlay"]["default"]=JToken.FromObject(new OverlayPlacementConfig());
+        system["properties"]["desktopControls"]["default"]=JToken.FromObject(new OverlayPlacementConfig { targetDisplay=-1 });
+        system["properties"]["desktopControls"]["properties"]["targetDisplay"]["default"]=-1;
         system["properties"]["overheadCamera"]["default"]=JToken.FromObject(new OverheadCameraConfig());
         system["properties"]["targetDisplay"]["minimum"]=0;
         system["properties"]["targetDisplay"]["default"]=1;
-        system["properties"]["targetFrameRate"]["default"]=120;
+        system["properties"]["targetFrameRate"]["default"]=60;
         system["properties"]["vSyncCount"]["default"]=0;
         system["properties"]["vSyncCount"]["minimum"]=0; system["properties"]["vSyncCount"]["maximum"]=4;
         system["properties"]["targetFrameRate"]["x-ui"]=new JObject { ["enabledWhen"]=Rule("vSyncCount",0),["help"]="Positive FPS, or -1 for uncapped. vSync overrides this value." };

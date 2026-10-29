@@ -13,13 +13,14 @@ namespace ConfigurationUI
         {
             var timing=fps.Latest;
             if(frameRate==null) return;
-            string pacing=timing==null?"":timing.vSyncCount>0?"VSync /"+timing.vSyncCount:timing.targetFrameRate>0?"cap "+timing.targetFrameRate:"uncapped";
-            frameRate.text=timing==null?"— FPS":$"{timing.framesPerSecond:0} FPS  ·  {pacing}";
-            frameRate.tooltip=timing==null?"Measured frame rate and average frame time. Waiting for the first timing sample.":
+            int sync=QualitySettings.vSyncCount,target=Application.targetFrameRate;
+            string pacing=sync>0?"VSync /"+sync:target>0?"cap "+target:"uncapped";
+            frameRate.text=timing==null?$"— FPS  ·  {pacing}":$"{timing.framesPerSecond:0} FPS  ·  {pacing}";
+            frameRate.tooltip=timing==null?$"Click to change the frame-rate cap. Current target: {target} · VSync: {sync}. Waiting for the first timing sample.":
                 $"Measured frame rate: {timing.framesPerSecond:0.0} FPS\nFrame mean / peak: {timing.frameMeanMs:0.0} / {timing.framePeakMs:0.0} ms\n"+
-                $"Current target: {timing.targetFrameRate} · VSync: {timing.vSyncCount}\n"+
+                $"Current target: {target} · VSync: {sync}\n"+
                 (timing.processCpuMsPerFrame.HasValue?$"Process CPU work: {timing.processCpuMsPerFrame:0.00} ms/frame across all Unity threads ({timing.processCpuPercentOfOneCore:0}% of one CPU core).\n":"")+
-                "Present wait is one presentation timing field, not all idle time. These are live setup measurements; capped FPS does not measure uncapped throughput.";
+                "Click to open the frame-rate setting. Present wait is one presentation timing field, not all idle time. Capped FPS does not measure uncapped throughput.";
         }
         // VisualElement.tooltip is Editor-only. This setup-owned help layer works in
         // both Play mode and standalone builds, and never receives pointer input.

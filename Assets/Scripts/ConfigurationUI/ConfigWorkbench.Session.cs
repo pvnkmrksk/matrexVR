@@ -51,7 +51,7 @@ namespace ConfigurationUI
             mode.RegisterValueChangedCallback(e=>StudioEdit(Workspace.Sequence,r=>r["randomSeedMode"]=e.newValue));reproducibility.Add(mode);
             var seed=new IntegerField("Seed") {name="sequence-random-seed",value=(int?)Workspace.Sequence.Root["randomSeed"]??1,isDelayed=true};
             seed.tooltip="Explicit seed for experiment random choices, including shuffled block order. The effective seed is saved with the run.";seed.SetEnabled(!randomMode);
-            seed.RegisterValueChangedCallback(e=>StudioEdit(Workspace.Sequence,r=>r["randomSeed"]=e.newValue,false));reproducibility.Add(seed);
+            BindDelayedInteger(seed,number=>StudioEdit(Workspace.Sequence,r=>r["randomSeed"]=number,false));reproducibility.Add(seed);
             return flags;
         }
         private TextField SessionField(VisualElement parent,string label,string name,string value,Action<string> change,string placeholder,bool multiline=false)
@@ -60,7 +60,7 @@ namespace ConfigurationUI
             field.tooltip=label+". "+placeholder+". Saved in this run's subject/session metadata.";
             field.textEdition.placeholder=placeholder; field.AddToClassList("session-field");
             if(multiline) field.AddToClassList("session-comments");
-            field.RegisterValueChangedCallback(e=>change(e.newValue)); parent.Add(field); return field;
+            field.RegisterValueChangedCallback(e=>{if(e.target!=field)return;change(e.newValue);UpdateStatus();}); parent.Add(field); return field;
         }
         private VisualElement SessionHeading(string title,string icon,string detail=null)
         {
@@ -261,7 +261,7 @@ namespace ConfigurationUI
                 string sex=string.IsNullOrEmpty(fly.Sex)?"Unspecified":fly.Sex;
                 if(!sexes.Contains(sex)) sexes.Add(sex); // Preserve labels from existing metadata.
                 var sexField=new DropdownField("Sex",sexes,0) { name="subject-sex-"+id,value=sex,tooltip="Subject sex recorded with the run. Unspecified leaves it unclassified." }; traits.Add(sexField);
-                sexField.RegisterValueChangedCallback(e=>fly.Sex=e.newValue);
+                sexField.RegisterValueChangedCallback(e=>{fly.Sex=e.newValue;UpdateStatus();});
                 SessionField(traits,"Age (days)","subject-age-"+id,fly.AgeDays,v=>fly.AgeDays=v,"Unspecified");
                 SessionField(card,"Comments","subject-comments-"+id,fly.Comments,v=>fly.Comments=v,"Notes for "+id,true);
                 if(TrackerBackend.TryParse(rig["closedLoopMode"]?.ToString(),out var videoMode)&&(TrackerBackend.IsFlight(videoMode)||TrackerBackend.IsWalking(videoMode)))

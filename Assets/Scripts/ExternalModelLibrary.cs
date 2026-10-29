@@ -93,6 +93,7 @@ public static class ExternalModelLibrary
 
     public static GameObject GetPrefab(string reference)
     {
+        reference = ReplayExecutionContext.ModelKey(reference);
         if (!models.TryGetValue(reference, out Entry entry) || entry.Prefab == null)
             throw new InvalidOperationException("External model was not preloaded before the experiment: " + reference);
         return entry.Prefab;

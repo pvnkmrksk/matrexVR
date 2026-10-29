@@ -289,7 +289,7 @@ namespace ConfigurationUI
             if(libraryFinalizationState!=null)libraryFinalizationState.style.display=finishing?DisplayStyle.Flex:DisplayStyle.None;
             if(status!=null){status.text=messageText;status.RemoveFromClassList("error");status.RemoveFromClassList("warning");}
             if(start!=null){var label=start.Q<Label>();if(label!=null)label.text="Replay selected";start.tooltip="Save this setup, then open the selected recording. Original recording files are read without modification.";start.SetEnabled(LibrarySelectionReady);}
-            save?.SetEnabled(true);undo?.SetEnabled(false);redo?.SetEnabled(false);
+            save?.SetEnabled(!rawPending && HasUnsavedChanges);undo?.SetEnabled(false);redo?.SetEnabled(false);
             libraryBrowse?.SetEnabled(libraryPicker==null);libraryRefresh?.SetEnabled(!libraryRunning&&libraryPicker==null);
         }
         private void AddLibraryFact(VisualElement parent,string name,string value)

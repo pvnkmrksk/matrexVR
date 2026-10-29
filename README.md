@@ -24,6 +24,8 @@
 
 MATREX VR is a Unity application for flight, walking and collective-behaviour experiments. It connects tracked animal movement to configurable visual environments, with multi-rig display routing, experimental sequences, configuration snapshots and saved-run replay.
 
+**MATRIX: Matrix Architecture for Terraforming Realistic Environments in X** — X spans land, water and air. [Name, credits and third-party acknowledgements](docs/project-credits.md).
+
 <p align="center"><img src="docs/site/assets/experiment-loop.svg" width="960" alt="Experiment loop: animal movement is measured by a tracker, MATREX VR updates the visual stimulus, and the stimulus is presented back to the animal. Configurations and recordings are retained for analysis and replay."></p>
 
 ## Capabilities
@@ -34,7 +36,9 @@ Development branch: [custom GLB models, Kannadi populations and 1–16 rigs](doc
 
 [Five world starters](Assets/StreamingAssets/Examples/Worlds/README.md) and the [optional local MCP control interface](docs/ai-control.md) are available in the development branch.
 
-[Overhaul validation and remaining work](docs/overhaul-validation-20261029.md) records the actual Unity, standalone Mac and regression checks.
+[Greenfield replay and setup validation](docs/same-build-validation-20261029.md) records the latest checks; [earlier overhaul evidence](docs/overhaul-validation-20261029.md) covers the wider world/rig feature pass.
+
+The greenfield [same-build replay contract](docs/same-build-replay-contract.md) governs new recordings: preserve the creating build, complete archived configurations and realized state, and apply the original experiment controllers during replay.
 
 | | Research workflow |
 | :--- | :--- |
@@ -66,7 +70,7 @@ cd matrexVR
 python3 tools/build_local_desktop.py
 ```
 
-The local Mac builder creates **`.local/MATREX VR.app`** from your checkout with checksum-verified native companions. It publishes no release; the finished app needs neither Unity nor Rust. For source development, add the project to Unity Hub, let pinned packages restore, and open `Assets/Scenes/ControlScene.unity`.
+The local Mac builder creates **`Preview/MATREX VR.app`** from your checkout with checksum-verified native companions. Open the visible **Preview** folder and double-click **Open MATREX VR.command**, or use **Open MATREX VR Preview.command** at the top of the repository. Editable files are in **Preview/Config** and recordings in **Preview/RunData**; rebuilding keeps both. It publishes no release; the finished app needs neither Unity nor Rust. For source development, add the project to Unity Hub, let pinned packages restore, and open `Assets/Scenes/ControlScene.unity`.
 
 <details>
 <summary><strong>Desktop interface preview</strong></summary>

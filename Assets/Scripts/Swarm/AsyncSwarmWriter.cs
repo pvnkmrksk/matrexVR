@@ -9,11 +9,12 @@ using System.Threading;
 /// <summary>Bounded, pooled snapshots. Formatting, gzip and file I/O run on one worker.</summary>
 public sealed class AsyncSwarmWriter
 {
-    public struct Agent { public string name, layer, animationState; public float x, y, z, rx, ry, rz; }
+    public struct Agent { public string name, layer, animationState; public float x, y, z, rx, ry, rz, sx, sy, sz; }
     public sealed class Frame
     {
         public Agent[] agents;
         public int count;
+        public int unityFrame;
         public DateTime timestamp;
         public string skyboxId, skyboxSampleUtc, phase;
     }
@@ -110,12 +111,14 @@ public sealed class AsyncSwarmWriter
                 {
                     while (pending.TryDequeue(out Frame frame))
                     {
-                        string timestamp = frame.timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
+                        string timestamp = frame.timestamp.ToString("yyyy-MM-dd HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
                         for (int i = 0; i < frame.count; i++)
                         {
                             Agent a = frame.agents[i];
                             output.Write(FormattableString.Invariant($"{timestamp},{Csv(a.name)},{Csv(a.layer)},{a.x},{a.y},{a.z},{Csv(frame.skyboxId)},{Csv(frame.skyboxSampleUtc)},{Csv(frame.phase)},{a.rx},{a.ry},{a.rz}"));
                             if (header.IndexOf(",AnimationState", StringComparison.Ordinal) >= 0) { output.Write(','); output.Write(Csv(a.animationState)); }
+                            if(header.IndexOf(",UnityFrame",StringComparison.Ordinal)>=0){output.Write(',');output.Write(frame.unityFrame);}
+                            if(header.IndexOf(",ScaleX",StringComparison.Ordinal)>=0) output.Write(FormattableString.Invariant($",{a.sx},{a.sy},{a.sz}"));
                             output.WriteLine();
                         }
                         Interlocked.Add(ref writtenRows, frame.count);

@@ -126,3 +126,6 @@ tools/__pycache__/
 
 # Stable local desktop build and test profile.
 /.local/
+
+# Visible local desktop builds and their writable test data.
+/Preview/

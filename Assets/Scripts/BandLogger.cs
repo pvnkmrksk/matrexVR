@@ -61,7 +61,7 @@ public class BandLogger : MonoBehaviour
         );
 
         // Write header
-        logFile.WriteLine(FormattableString.Invariant($"Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase,experimentPhase,Visible,UnityFrame,SpawnLengthX:{bandSpawner.spawnLengthX},SpawnLengthZ:{bandSpawner.spawnLengthZ},GridType:{bandSpawner.gridType},Mu:{bandSpawner.mu},Kappa:{bandSpawner.kappa},Speed:{bandSpawner.speed},VisibleOffDuration:{bandSpawner.visibleOffDuration},VisibleOnDuration:{bandSpawner.visibleOnDuration},BoundaryLengthX:{bandSpawner.boundaryLengthX},BoundaryLengthZ:{bandSpawner.boundaryLengthZ},RotationAngle:{bandSpawner.rotationAngle},VisibilityPhaseClock:local-timer"));
+        logFile.WriteLine(FormattableString.Invariant($"Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase,experimentPhase,Visible,UnityFrame,AnimationState,ScaleX,ScaleY,ScaleZ,SpawnLengthX:{bandSpawner.spawnLengthX},SpawnLengthZ:{bandSpawner.spawnLengthZ},GridType:{bandSpawner.gridType},Mu:{bandSpawner.mu},Kappa:{bandSpawner.kappa},Speed:{bandSpawner.speed},VisibleOffDuration:{bandSpawner.visibleOffDuration},VisibleOnDuration:{bandSpawner.visibleOnDuration},BoundaryLengthX:{bandSpawner.boundaryLengthX},BoundaryLengthZ:{bandSpawner.boundaryLengthZ},RotationAngle:{bandSpawner.rotationAngle},VisibilityPhaseClock:local-timer"));
 
         LogAllInstances();
     }
@@ -74,7 +74,7 @@ public class BandLogger : MonoBehaviour
     void LogAllInstances()
     {
         if (bandSpawner == null || logFile == null) return;
-        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fffffff",CultureInfo.InvariantCulture);
+        string timestamp = RecordedFrameClock.Now.ToString("yyyy-MM-dd HH:mm:ss.fffffff",CultureInfo.InvariantCulture);
         // Unlocked agents are spawned without a parent, so transform children omit them.
         foreach (GameObject instance in bandSpawner.Instances)
         {
@@ -86,6 +86,7 @@ public class BandLogger : MonoBehaviour
         }
     }
 
+    private readonly System.Collections.Generic.Dictionary<GameObject,RecordedAnimationCapture> animationCaptures = new System.Collections.Generic.Dictionary<GameObject,RecordedAnimationCapture>();
     void LogInstanceData(string timestamp, GameObject instance)
     {
         Vector3 position = instance.transform.position;
@@ -100,6 +101,10 @@ public class BandLogger : MonoBehaviour
         var data=new StringBuilder(192);
         object[] values={timestamp,instance.name,RuntimeRigRegistry.LayerLabel(instance.layer),position.x,position.y,position.z,rotation.x,rotation.y,rotation.z,speed,visibilityPhase,MainController.RecordedExperimentPhase,visibility==null||visibility.IsVisible,Time.frameCount};
         for(int i=0;i<values.Length;i++){if(i>0)data.Append(',');RecordedCsv.Append(data,values[i]);}
+        if(!animationCaptures.TryGetValue(instance,out var capture))animationCaptures[instance]=capture=new RecordedAnimationCapture(instance);
+        var scale=instance.transform.lossyScale;
+        data.Append(',');RecordedCsv.Append(data,capture.Capture());
+        data.Append(FormattableString.Invariant($",{scale.x},{scale.y},{scale.z}"));
         logFile.WriteLine(data.ToString());
     }
 

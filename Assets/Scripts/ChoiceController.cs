@@ -43,6 +43,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         spawnedObjectsRoot.position = Vector3.zero;
         spawnedObjectsRoot.rotation = Quaternion.identity;
         spawnedObjectsRoot.localScale = Vector3.one;
+        spawnedObjectsRoot.gameObject.AddComponent<RecordedWorldStateTarget>().Key = "choice";
     }
 
     public void InitializeScene(Dictionary<string, object> parameters)
@@ -73,7 +74,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         }
 
         config.headingReference?.Validate();
-        Keyboard.ApplyAutopilotConfig(config.autopilotEnabled, config.autopilotSpeed);
+        if (!ReplayExecutionContext.Active) Keyboard.ApplyAutopilotConfig(config.autopilotEnabled, config.autopilotSpeed);
 
         CleanupSpawnedObjects();
         ApplyConfig(config);
@@ -99,7 +100,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             return;
         }
 
-        ClosedLoop[] closedLoopComponents = RuntimeRigRegistry.Rigs(gameObject.scene);
+        ClosedLoop[] closedLoopComponents = ReplayExecutionContext.Rigs(gameObject.scene);
         Debugger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length, 4);
 
         // if randomInitialRotation is true, then set the rotation to a random value for y axis and the rest to initialRotation value
@@ -181,6 +182,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         // Retain the legacy delayed initialization only for old full-reset configs.
         if (!phased && config.rugosity?.enabled != true && config.headingReference?.enabled != true && config.resetPositionOnStart && config.resetRotationOnStart)
             StartCoroutine(DelayedOnLoaded(0.05f));
+        if (ReplayExecutionContext.Active) return; // Recorded sky image is restored after canonical configuration.
         if (config.uniformSkyColor != null)
             NightSkyController.Apply(gameObject, null, null, config.uniformSkyColor);
         else if (!string.IsNullOrEmpty(config.skyboxPath)) SetSkybox(config.skyboxPath);
@@ -192,10 +194,10 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         SpawnAbsoluteObjects(config);
         foreach (ClosedLoop rig in rigs)
         {
-            var reference = rig.GetComponent<StimulusHeadingReference>()?.Result;
+            var reference = ReplayExecutionContext.Active ? ReplayExecutionContext.Heading(rig) : rig.GetComponent<StimulusHeadingReference>()?.Result;
             if ((config.objects ?? System.Array.Empty<SceneObject>()).Any(o => o.useHeadingReference))
                 SpawnRelativeObjects(config, rig, reference);
-            if (config.swarm == null) continue;
+            if (config.swarm == null || ReplayExecutionContext.Active) continue;
             int vrIndex = Kannadi.ParseVRIndex(rig.name);
             var host = new GameObject("VR" + vrIndex + "_EmbeddedSwarm");
             host.transform.SetParent(spawnedObjectsRoot, false);
@@ -227,6 +229,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
             if (isBandObject)
             {
+                if (ReplayExecutionContext.Active) continue; // Population tracks restore realized individuals.
                 foreach (ClosedLoop rig in RuntimeRigRegistry.Rigs(gameObject.scene))
                     InstantiateBand(obj, Kannadi.ParseVRIndex(rig.name));
             }
@@ -300,6 +303,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             old.GetComponent<BandSpawner>()?.ClearInstances();
             old.GetComponent<LocustSpawner>()?.PrepareObservation();
             old.SetActive(false);
+            old.AddComponent<RecordedPendingDestroy>();
             Destroy(old);
         }
     }
@@ -347,6 +351,18 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             colorDrift.meanBlueB = obj.meanBlueB;
             colorDrift.switchInterval = obj.switchInterval;
         }
+    }
+
+    public GameObject CreateRecordedBandVisual(string recordedName,Transform parent)
+    {
+        foreach(var candidate in prefabs??System.Array.Empty<GameObject>())
+        {
+            var spawner=candidate!=null?candidate.GetComponent<BandSpawner>():null;
+            if(spawner?.instancePrefab==null)continue;
+            if(recordedName.StartsWith(spawner.instancePrefab.name+"_"+candidate.name+"_",System.StringComparison.Ordinal))
+                return Instantiate(spawner.instancePrefab,parent);
+        }
+        throw new System.IO.InvalidDataException("Recorded band visual is absent from its acquisition scene: "+recordedName);
     }
 
     private void InstantiateBand(SceneObject obj, int vrIndex, HeadingReferenceResult reference = null, Vector3 pivot = default)

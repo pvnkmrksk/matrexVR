@@ -14,6 +14,6 @@ public static class ExperimentWorldObjects
         if (host == null && !(config?["objects"] is JArray)) return;
         if (host == null) { host = new GameObject("Configured world objects"); SceneManager.MoveGameObjectToScene(host, scene); }
         var objects = host.GetComponent<KannadiWorldObjects>() ?? host.AddComponent<KannadiWorldObjects>();
-        objects.Apply(config?["objects"]?.ToObject<SceneObject[]>(), RuntimeRigRegistry.Rigs(scene));
+        objects.Apply(config?["objects"]?.ToObject<SceneObject[]>(), ReplayExecutionContext.Rigs(scene));
     }
 }

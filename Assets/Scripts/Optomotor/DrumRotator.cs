@@ -34,8 +34,13 @@ public class DrumRotator : MonoBehaviour
     void Awake()
     {
         Debug.Log($"DrumRotator.Awake() - {gameObject.name}");
-        drum = this.gameObject;
-        initialRotation = drum.transform.rotation;
+        EnsureInitialized();
+    }
+
+    private void EnsureInitialized()
+    {
+        if(drum!=null)return;
+        drum=gameObject;initialRotation=transform.rotation;
     }
 
     void Start()
@@ -74,7 +79,7 @@ public class DrumRotator : MonoBehaviour
         }
 
         // Start new rotation if speed is not zero
-        if (rotationSpeed != 0)
+        if (rotationSpeed != 0 && !ReplayExecutionContext.Active)
         {
             // IMPORTANT: Set isRotating flag BEFORE starting the coroutine
             isRotating = true;
@@ -117,6 +122,7 @@ public class DrumRotator : MonoBehaviour
     public void ResetRotation()
     {
         Debug.Log("Resetting drum rotation to initial state");
+        EnsureInitialized();
         drum.transform.rotation = initialRotation;
     }
 

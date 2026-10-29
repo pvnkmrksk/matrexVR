@@ -52,6 +52,7 @@ namespace ConfigurationUI
         private string filter="";
         private readonly List<string> rows=new List<string>();
         private AnimalData metadata;
+        private string savedMetadataFingerprint;
         private readonly List<UnityEngine.UI.GraphicRaycaster> legacyRaycasters=new List<UnityEngine.UI.GraphicRaycaster>();
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Reset() { Instance=null; SceneManager.sceneLoaded-=Loaded; }
@@ -118,11 +119,13 @@ namespace ConfigurationUI
             });navigation.name="toggle-navigation";navigation.AddToClassList("navigation-toggle");header.Add(navigation);
             root.EnableInClassList("navigation-collapsed",navigationCollapsed);
             var identity=new VisualElement(); identity.AddToClassList("identity"); header.Add(identity);
-            var brand=new Label("MATREX"); brand.AddToClassList("brand"); identity.Add(brand);
+            var brand=new Label("MATREX"){name="about-matrex",focusable=true,tooltip="About MATRIX, design credits and open-source notices"}; brand.AddToClassList("brand"); brand.AddToClassList("clickable"); identity.Add(brand);
+            brand.RegisterCallback<ClickEvent>(_=>Guard(ShowAbout));brand.RegisterCallback<NavigationSubmitEvent>(evt=>{Guard(ShowAbout);evt.StopPropagation();});
             var descriptor=new Label("EXPERIMENT CONTROL"); descriptor.AddToClassList("brand-detail"); identity.Add(descriptor);
             pageLocation=new Label(); pageLocation.AddToClassList("page-location"); header.Add(pageLocation);
             var badge=new Label("●  SETUP"); badge.AddToClassList("badge"); badge.tooltip="Setup is open. The experiment starts when you choose Start experiment."; header.Add(badge);
-            frameRate=new Label("— FPS"){name="setup-frame-rate"}; frameRate.AddToClassList("frame-rate"); header.Add(frameRate);
+            frameRate=new Label("— FPS"){name="setup-frame-rate"}; frameRate.AddToClassList("frame-rate");frameRate.AddToClassList("clickable");frameRate.focusable=true;
+            frameRate.RegisterCallback<ClickEvent>(_=>Guard(OpenFrameRateSetting));frameRate.RegisterCallback<NavigationSubmitEvent>(evt=>{Guard(OpenFrameRateSetting);evt.StopPropagation();});header.Add(frameRate);
             root.Add(header);AddRecordingFinalizationBanner();
             var main=Row("main"); root.Add(main);
             side=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; side.name="setup-navigation"; side.AddToClassList("sidebar"); main.Add(side);
@@ -132,13 +135,13 @@ namespace ConfigurationUI
             status=new Label(); status.AddToClassList("status"); footer.Add(status);
             undo=Button("Undo",()=>{ RequireApplied(); selected.Undo(); RebuildPreservingView(); }); footer.Add(undo);
             redo=Button("Redo",()=>{ RequireApplied(); selected.Redo(); RebuildPreservingView(); }); footer.Add(redo);
-            save=StudioButton("Save changes","file",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); UpdateStatus("Setup and session details saved."); }); footer.Add(save);
+            save=StudioButton("Save changes","file",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); MainController.Instance?.ApplyIdleFrameTiming((JObject)Workspace.System.Root);UpdateStatus("Setup and session details saved."); }); save.name="save-changes";footer.Add(save);
             start=StudioButton("Start experiment","play",RunPrimaryAction,"primary"); start.name="start-experiment"; footer.Add(start);
             save.tooltip="Save the system, sequence, edited experiment files and subject metadata. Omitted values and unknown JSON fields are preserved.";
             start.tooltip="Validate and save this setup, archive the run's configuration files, then start the experiment.";
             undo.tooltip="Undo the last change in the current configuration file."; redo.tooltip="Redo the last undone change in the current configuration file.";
             InstallHoverHelp();
-            InstallKeyboardNavigation();
+            InstallKeyboardNavigation();InstallDraftTracking();
             root.schedule.Execute(UpdateFrameRate).Every(500); UpdateFrameRate();
             root.schedule.Execute(()=>{
                 if(!Application.isEditor&&panel!=null&&Mathf.Abs(panel.scale-DesktopDisplay.UiScale)>.01f)
@@ -148,7 +151,7 @@ namespace ConfigurationUI
         private void BuildNavigation() { Workspace.RefreshReferences(); BuildStudioNavigation(); }
         private void Select(ConfigDocument doc)
         { RequireApplied(); LeaveRecordingLibrary(); if(selected!=doc) { activePhase="stimulus"; settingsTab="Essentials"; } selected=doc; path.Clear(); homeMode=false; experimentIndexMode=false; metadataMode=false; jsonMode=false; advancedMode=false; filter=""; BuildNavigation(); BuildContent(); }
-        private void RequireApplied() { FlushNumbers(); if(rawPending) throw new InvalidOperationException("Apply the JSON draft or discard it before saving, navigating or starting."); }
+        private void RequireApplied() { FlushEditorDrafts();FlushNumbers(); if(rawPending) throw new InvalidOperationException("Apply the JSON draft or discard it before saving, navigating or starting."); }
         private JToken Current => ConfigDocument.At(selected.Root,path);
         private JObject Context => new JObject { ["flight"]=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().Any(r=>TrackerBackend.TryParse(r["closedLoopMode"]?.ToString()??"FicTrac",out var mode) && TrackerBackend.IsFlight(mode)) };
         private JObject CurrentSchema
@@ -308,15 +311,15 @@ namespace ConfigurationUI
             else
             {
                 var text=new TextField { value=value.ToString(),isDelayed=true }; edit.Add(text);
-                text.RegisterValueChangedCallback(e=>Guard(()=>{
+                BindDelayedText(text,entered=>{
                     try
                     {
-                        JToken v=value.Type==JTokenType.String?new JValue(e.newValue):LosslessJson.Parse(e.newValue);
+                        JToken v=value.Type==JTokenType.String?new JValue(entered):LosslessJson.Parse(entered);
                         string kind=LosslessJson.Kind(v); if(value.Type!=JTokenType.String && kind!="number" && kind!="integer") throw new ArgumentException("Enter a JSON number; use the JSON view to change its type.");
                         replace(v);
                     }
                     catch { text.SetValueWithoutNotify(value.ToString()); throw; }
-                }));
+                });
             }
             if(value!=null)
             {
@@ -336,6 +339,7 @@ namespace ConfigurationUI
         { return value is JObject obj?(string)(obj["vrId"]??obj["sceneName"]??obj["name"]??obj["type"])??"Item "+(index+1):"Item "+(index+1); }
         private void UpdateStatus(string message=null)
         {
+            UpdateFrameRate();
             if(replayLibraryMode){RefreshLibraryFooter(message);return;}
             if(preparing)
             {
@@ -352,10 +356,10 @@ namespace ConfigurationUI
                 if(doc?.Root is JObject payload) warnings.AddRange(ExperimentBlocks.TimingWarnings(payload,ExperimentBlocks.Number(step["duration"])));
             }
             if(summary!=null) summary.text=errors.Count==0?(ApparatusDraft?"Review apparatus configuration\n\nChoose Use configuration to save this setup and return to the experiment workspace. This does not start an experiment.\n\n":"✓  Configuration ready\n\n")+Workspace.Documents.Count+" files loaded\n"+(Workspace.System.Root["configs"] as JArray)?.Count+" VR entries\n"+(Workspace.Sequence.Root["sequences"] as JArray)?.Count+" sequence steps":string.Join("\n\n",errors.Take(12));
-            status.text=message??(errors.Count>0?string.Join(" · ",errors.Take(2)):ApparatusDraft?"Review hardware settings, then choose Use configuration to save and continue.":warnings.Count>0?warnings[0]:Workspace.Documents.Any(d=>d.Dirty)?"Unsaved config changes · saved when you start":"Ready to run · session details saved when you start");
+            status.text=message??(errors.Count>0?string.Join(" · ",errors.Take(2)):ApparatusDraft?"Review hardware settings, then choose Use configuration to save and continue.":warnings.Count>0?warnings[0]:HasUnsavedChanges?"Unsaved changes · saved when you start":"Ready to run · session details saved when you start");
             status.EnableInClassList("error",errors.Count>0);
             status.EnableInClassList("warning",errors.Count==0 && warnings.Count>0);
-            start.SetEnabled(errors.Count==0 && !rawPending); save.SetEnabled(!rawPending); undo.SetEnabled(selected.CanUndo && !rawPending); redo.SetEnabled(selected.CanRedo && !rawPending);
+            start.SetEnabled(errors.Count==0 && !rawPending); save.SetEnabled(!rawPending && HasUnsavedChanges); undo.SetEnabled(selected.CanUndo && !rawPending); redo.SetEnabled(selected.CanRedo && !rawPending);
         }
         private void PollFiles()
         {
@@ -373,8 +377,8 @@ namespace ConfigurationUI
             var title=new Label("Session metadata"); title.AddToClassList("title"); body.Add(title);
             EnsureMetadata();
             var scroll=new ScrollView(); scroll.AddToClassList("metadata"); body.Add(scroll);
-            var experimenter=new TextField("Experimenter") { value=metadata.ExperimenterName }; scroll.Add(experimenter); experimenter.RegisterValueChangedCallback(e=>metadata.ExperimenterName=e.newValue);
-            var comments=new TextField("Comments") { multiline=true,value=metadata.Comments }; scroll.Add(comments); comments.RegisterValueChangedCallback(e=>metadata.Comments=e.newValue);
+            var experimenter=new TextField("Experimenter") { value=metadata.ExperimenterName }; scroll.Add(experimenter); experimenter.RegisterValueChangedCallback(e=>{metadata.ExperimenterName=e.newValue;UpdateStatus();});
+            var comments=new TextField("Comments") { multiline=true,value=metadata.Comments }; scroll.Add(comments); comments.RegisterValueChangedCallback(e=>{metadata.Comments=e.newValue;UpdateStatus();});
             foreach(var rig in (Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>())
             {
                 string id=(string)rig["vrId"]; var fly=metadata.Animals.FirstOrDefault(f=>f.VR==id);
@@ -383,9 +387,9 @@ namespace ConfigurationUI
                 var f=fly;
                 foreach(string key in new[]{"AnimalID","AgeDays","StarvedSinceHours"})
                 {
-                    var property=typeof(AnimalMetadata).GetProperty(key); var field=new TextField(Human(key)) { value=(string)property.GetValue(f) }; scroll.Add(field); field.RegisterValueChangedCallback(e=>property.SetValue(f,e.newValue));
+                    var property=typeof(AnimalMetadata).GetProperty(key); var field=new TextField(Human(key)) { value=(string)property.GetValue(f) }; scroll.Add(field); field.RegisterValueChangedCallback(e=>{property.SetValue(f,e.newValue);UpdateStatus();});
                 }
-                var sex=new DropdownField("Sex",new List<string>{"Unspecified","Female","Male"},0) { value=string.IsNullOrEmpty(f.Sex)?"Unspecified":f.Sex }; scroll.Add(sex); sex.RegisterValueChangedCallback(e=>f.Sex=e.newValue);
+                var sex=new DropdownField("Sex",new List<string>{"Unspecified","Female","Male"},0) { value=string.IsNullOrEmpty(f.Sex)?"Unspecified":f.Sex }; scroll.Add(sex); sex.RegisterValueChangedCallback(e=>{f.Sex=e.newValue;UpdateStatus();});
             }
             scroll.Add(Button("Save metadata",()=>{ SaveMetadata(); UpdateStatus("Session metadata saved."); }));
             UpdateStatus();
@@ -403,10 +407,14 @@ namespace ConfigurationUI
             File.WriteAllText(Path.Combine(backup,"FlyMetaData.json"),json);
             // Setup edits belong to the draft backup. A completed run's metadata
             // is written only once, into the fresh folder prepared by Start.
+            savedMetadataFingerprint=MetadataFingerprint();
             return json;
         }
+        private string MetadataFingerprint() => metadata==null?null:JsonConvert.SerializeObject(metadata,Formatting.None);
+        private bool HasUnsavedChanges => Workspace?.Documents.Any(d=>d.Dirty)==true || HasPendingEditorDrafts || (metadata!=null && savedMetadataFingerprint!=null && MetadataFingerprint()!=savedMetadataFingerprint);
         private void EnsureMetadata()
         {
+            bool firstLoad=metadata==null;
             if(metadata==null)
             {
                 string backup=Path.Combine(RuntimePaths.RunDataRoot,"Backup/AnimalMetadata.json");
@@ -421,6 +429,7 @@ namespace ConfigurationUI
                 var fly=metadata.Animals.First(f=>f.VR==id); if(string.IsNullOrEmpty(fly.Sex)) fly.Sex="Unspecified";
                 if(rig["speciesName"]!=null) fly.SpeciesName=(string)rig["speciesName"];
             }
+            if(firstLoad)savedMetadataFingerprint=MetadataFingerprint();
         }
         public void StartExperiment()
         {

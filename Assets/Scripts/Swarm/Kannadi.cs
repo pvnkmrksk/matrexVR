@@ -69,7 +69,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     }
     public void AdvanceStep(Dictionary<string, object> parameters) => InitializeScene(parameters);
 
-    private GameObject ResolvePrefab(KannadiConfig settings)
+    public GameObject ResolvePrefab(KannadiConfig settings)
     {
         if (!string.IsNullOrWhiteSpace(settings.kannadiModelPath)) return ExternalModelLibrary.GetPrefab(settings.kannadiModelPath);
         if (!string.IsNullOrWhiteSpace(settings.modelPath)) return ExternalModelLibrary.GetPrefab(settings.modelPath);

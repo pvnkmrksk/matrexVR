@@ -10,6 +10,20 @@ public sealed class RecordedAnimationState
     public AnimatorPose[] animators;
     public LegacyPose[] legacy;
     public ProceduralPose procedural;
+    // A sampled controller state cannot reproduce an in-progress transition blend.
+    // Archive the realized local pose for those frames (including newly spawned bind poses).
+    public LocalPose[] realizedPose;
+    public BlendPose[] blendShapes;
+    [Serializable] public sealed class LocalPose
+    {
+        public string path;
+        public float[] position, rotation, scale;
+    }
+    [Serializable] public sealed class BlendPose
+    {
+        public string path;
+        public float[] weights;
+    }
     [Serializable] public sealed class AnimatorPose
     {
         public string path;
@@ -77,6 +91,7 @@ public sealed class RecordedAnimationCapture
         var procedural = batch != null ? batch : ownProcedural;
         if (animators.Length == 0 && legacy.Length == 0 && procedural == null) return "";
         var evidence = new RecordedAnimationState { animators = new RecordedAnimationState.AnimatorPose[animators.Length] };
+        bool captureRealizedPose = false;
         for (int i = 0; i < animators.Length; i++)
         {
             var animator = animators[i];
@@ -86,6 +101,7 @@ public sealed class RecordedAnimationCapture
             for (int layer = 0; layer < animator.layerCount; layer++)
             {
                 var state = animator.GetCurrentAnimatorStateInfo(layer);
+                captureRealizedPose |= state.fullPathHash == 0 || animator.IsInTransition(layer);
                 pose.layers[layer] = new RecordedAnimationState.LayerPose { state = state.fullPathHash,
                     time = state.normalizedTime, weight = animator.GetLayerWeight(layer), transitioning = animator.IsInTransition(layer) };
             }
@@ -103,6 +119,28 @@ public sealed class RecordedAnimationCapture
                 parameters.Add(new RecordedAnimationState.ParameterPose { hash = parameter.nameHash, type = (int)parameter.type, value = value });
             }
             pose.parameters = parameters.ToArray(); evidence.animators[i] = pose;
+        }
+        if (captureRealizedPose)
+        {
+            var local = new List<RecordedAnimationState.LocalPose>();
+            foreach (var node in root.GetComponentsInChildren<Transform>(true))
+            {
+                // World movement is already authoritative in the pose stream.
+                if (node == root.transform) continue;
+                var p=node.localPosition;var r=node.localRotation;var s=node.localScale;
+                local.Add(new RecordedAnimationState.LocalPose { path=Path(root.transform,node),
+                    position=new[]{p.x,p.y,p.z},rotation=new[]{r.x,r.y,r.z,r.w},scale=new[]{s.x,s.y,s.z} });
+            }
+            evidence.realizedPose=local.ToArray();
+            var blends = new List<RecordedAnimationState.BlendPose>();
+            foreach (var renderer in root.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+            {
+                int count=renderer.sharedMesh!=null?renderer.sharedMesh.blendShapeCount:0;
+                if(count==0)continue;
+                var weights=new float[count];for(int shape=0;shape<count;shape++)weights[shape]=renderer.GetBlendShapeWeight(shape);
+                blends.Add(new RecordedAnimationState.BlendPose {path=Path(root.transform,renderer.transform),weights=weights});
+            }
+            evidence.blendShapes=blends.ToArray();
         }
         evidence.legacy = new RecordedAnimationState.LegacyPose[legacy.Length];
         for (int i = 0; i < legacy.Length; i++)
@@ -243,6 +281,24 @@ public sealed class ReplayAnimationDriver : MonoBehaviour
             if (parsed?.procedural != null) renderer.SetRecordedAnimation(parsed.procedural.time, parsed.procedural.phase);
             else renderer.SetRecordedAnimation((float)seconds, 0);
             renderer.RefreshCenters();
+        }
+        if(parsed?.realizedPose!=null)
+        {
+            foreach(var pose in parsed.realizedPose)
+            {
+                var node=AtPath(pose.path);
+                if(node==null){Approximate=true;continue;}
+                node.localPosition=new Vector3(pose.position[0],pose.position[1],pose.position[2]);
+                node.localRotation=new Quaternion(pose.rotation[0],pose.rotation[1],pose.rotation[2],pose.rotation[3]);
+                node.localScale=new Vector3(pose.scale[0],pose.scale[1],pose.scale[2]);
+            }
+            foreach(var pose in parsed.blendShapes??Array.Empty<RecordedAnimationState.BlendPose>())
+            {
+                var renderer=AtPath(pose.path)?.GetComponent<SkinnedMeshRenderer>();
+                if(renderer==null||renderer.sharedMesh==null||renderer.sharedMesh.blendShapeCount!=pose.weights.Length){Approximate=true;continue;}
+                for(int shape=0;shape<pose.weights.Length;shape++)renderer.SetBlendShapeWeight(shape,pose.weights[shape]);
+            }
+            TransitionApproximation=false;
         }
     }
 }

@@ -15,7 +15,10 @@ namespace ConfigurationUI
         internal const string WalkingDemoTooltip="Short recorded walking sample. Replay in HejjéTrac: More → Rig manager… → Start all. Manual exploration remains available.";
         private PanelSettings panel;
         private Label input;
-        private VisualElement help,hudRoot;
+        private VisualElement help,hudRoot,bar;
+        private OverlayPlacementConfig placement;
+        private string BarReservation => "desktop-controls-" + GetInstanceID();
+        private string HelpReservation => BarReservation + "-help";
         private Button forward;
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Reset() { SceneManager.sceneLoaded -= Loaded; }
@@ -31,7 +34,11 @@ namespace ConfigurationUI
         private void Start()
         {
             panel=ScriptableObject.CreateInstance<PanelSettings>();panel.name="Desktop preview controls";
-            panel.scaleMode=PanelScaleMode.ConstantPixelSize;panel.scale=DesktopDisplay.UiScale;panel.sortingOrder=700;panel.targetDisplay=MainController.Instance.SystemConfigs.Values.First(r=>r.desktopPreview).targetDisplay;
+            placement=MainController.Instance.DesktopControlsSettings;
+            int selectedDisplay=placement.targetDisplay>=0?placement.targetDisplay:MainController.Instance.SystemConfigs.Values.First(r=>r.desktopPreview).targetDisplay;
+            if(selectedDisplay<0||selectedDisplay>=Display.displays.Length)Debug.LogWarning("Desktop controls display "+selectedDisplay+" is unavailable; using operator display 0.");
+            panel.scaleMode=PanelScaleMode.ConstantPixelSize;panel.scale=DesktopDisplay.UiScale;panel.sortingOrder=700;panel.targetDisplay=selectedDisplay>=0&&selectedDisplay<Display.displays.Length?selectedDisplay:0;
+            if(placement.visible&&panel.targetDisplay>0&&!Display.displays[panel.targetDisplay].active)Display.displays[panel.targetDisplay].Activate();
             panel.themeStyleSheet=Resources.Load<ThemeStyleSheet>("ConfigurationUI/runtime");
             var document=gameObject.AddComponent<UIDocument>();document.panelSettings=panel;
             var root=document.rootVisualElement;hudRoot=root;root.AddToClassList("desktop-preview-hud");root.pickingMode=PickingMode.Ignore;
@@ -40,7 +47,7 @@ namespace ConfigurationUI
             try{marker=JObject.Parse(ExperimentConfigFiles.ReadAllText(ExperimentConfigFiles.Resolve(MainController.Instance.SystemConfigurationFileName)))["desktopQuickStart"] as JObject;}catch(Exception){ }
             bool demo=(bool?)marker?["demo"]??false;
             bool walkingDemo=demo&&(string)marker?["mode"]=="walking";
-            var bar=new VisualElement();bar.AddToClassList("desktop-run-bar");root.Add(bar);
+            bar=new VisualElement();bar.AddToClassList("desktop-run-bar");bar.style.flexWrap=Wrap.Wrap;root.Add(bar);
             var badge=new Label(demo?"DEMO":"TRACKER INPUT");badge.AddToClassList("desktop-input-badge");bar.Add(badge);
             badge.tooltip=demo?"Demonstration input is simulated or prerecorded.":"A connected publisher is not proof of a physical camera. Verify the source and tracking quality in the native tracker window.";
             input=new Label("Waiting for tracker");input.AddToClassList("desktop-input-status");bar.Add(input);
@@ -65,13 +72,12 @@ namespace ConfigurationUI
         }
         private void Refresh()
         {
-            // A mixed preview/LED configuration must protect the LED pixels too.
             var size=OperatorOverlayLayout.DisplaySize(panel.targetDisplay);
             var main=MainController.Instance;
-            bool hidden=ConfigWorkbench.IsOpen||main==null||!main.SequenceRunning||OperatorOverlayVisibility.Hidden||
-                SceneManager.GetActiveScene().name=="ReplayScene"||OperatorOverlayLayout.ProtectedRects(panel.targetDisplay,(int)size.x,(int)size.y).Count>0;
+            bool hidden=!placement.visible||ConfigWorkbench.IsOpen||main==null||!main.SequenceRunning||OperatorOverlayVisibility.Hidden||
+                SceneManager.GetActiveScene().name=="ReplayScene";
             hudRoot.style.display=hidden?DisplayStyle.None:DisplayStyle.Flex;
-            if(hidden)return;
+            if(hidden){OperatorOverlayLayout.Release(BarReservation);OperatorOverlayLayout.Release(HelpReservation);return;}
             int expected=0,fresh=0;
             foreach(var rig in MainController.Instance.SystemConfigs.Values.Where(r=>r.desktopPreview))
             {
@@ -86,7 +92,27 @@ namespace ConfigurationUI
             bool on=FindObjectsByType<Keyboard>(FindObjectsSortMode.None).Any(k=>k.AutopilotEnabled);
             forward.text="Auto forward "+(on?"on":"off");
             if(Mathf.Abs(panel.scale-DesktopDisplay.UiScale)>.01f)panel.scale=DesktopDisplay.UiScale;
+            PlaceControls(size);
         }
-        private void OnDestroy(){OperatorOverlayVisibility.Changed-=Refresh;if(panel!=null)Destroy(panel);}
+        private void PlaceControls(Vector2 screen)
+        {
+            float scale=Mathf.Max(.01f,panel.scale);
+            bar.style.maxWidth=Mathf.Max(1,screen.x/scale-40);
+            float width=bar.resolvedStyle.width*scale,height=bar.resolvedStyle.height*scale;
+            if(float.IsNaN(width)||float.IsNaN(height)||width<=0||height<=0)return;
+            var desired=placement.Preferred(new Rect(20*scale,screen.y-18*scale-height,width,height));
+            bool fits=OperatorOverlayLayout.Reserve(BarReservation,panel.targetDisplay,desired,out var placed);
+            bar.style.visibility=fits?Visibility.Visible:Visibility.Hidden;
+            if(fits){bar.style.left=placed.x/scale;bar.style.top=(screen.y-placed.yMax)/scale;}
+            if(!fits||help.style.display==DisplayStyle.None)
+            {OperatorOverlayLayout.Release(HelpReservation);help.style.visibility=Visibility.Hidden;return;}
+            help.style.maxWidth=Mathf.Max(1,screen.x/scale-40);
+            width=help.resolvedStyle.width*scale;height=help.resolvedStyle.height*scale;
+            if(float.IsNaN(width)||float.IsNaN(height)||width<=0||height<=0)return;
+            bool helpFits=OperatorOverlayLayout.Reserve(HelpReservation,panel.targetDisplay,new Rect(placed.x,placed.y-height-8*scale,width,height),out var helpPlaced);
+            help.style.visibility=helpFits?Visibility.Visible:Visibility.Hidden;
+            if(helpFits){help.style.left=helpPlaced.x/scale;help.style.top=(screen.y-helpPlaced.yMax)/scale;}
+        }
+        private void OnDestroy(){OperatorOverlayVisibility.Changed-=Refresh;OperatorOverlayLayout.Release(BarReservation);OperatorOverlayLayout.Release(HelpReservation);if(panel!=null)Destroy(panel);}
     }
 }

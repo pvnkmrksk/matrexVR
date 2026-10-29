@@ -123,6 +123,6 @@
     "trailWidthPixels": 1.5,
     "trailBreakDistance": 50
   },
-  "targetFrameRate": 120,
+  "targetFrameRate": 60,
   "vSyncCount": 0
 }
