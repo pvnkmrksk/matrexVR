@@ -88,3 +88,11 @@ Validation uses isolated profiles, test footage and synthetic input. Native OS
 pointer delivery and physical camera/display acceptance remain separate. This
 pass does not claim to resolve the dense many-camera 60 FPS limit documented in
 the prior performance report.
+
+## Final local preview
+
+`Preview/MATREX VR.app` is rebuilt as **0.5.1-dev** from `253cdda8`, with recorded player build GUID `ac80604a332e44b7b5e254b76eaf6e14`. Signature verification passed. The actual standalone app passed 30 checks while its configured tracker executable/calibration were deliberately missing: VR started with an honest unavailable warning, executed all three models and their original animation clips, finalized the ZIP, and replayed it without changing source files. Only the owned test player was closed.
+
+All 1,449 existing preview config files remain byte-identical; 16 new model/example/notice files were added without overwriting them. Relaunch through **Open MATREX VR Preview.command**, then load `Examples/Sequences/custom-models.sequence.json` and open Appearance. The new examples are also directly visible in `Preview/Config/Models/Examples`.
+
+[Final machine-readable acceptance](availability-models-final-validation-20261030.json) records the exact build, scopes and remaining limits.
