@@ -135,7 +135,7 @@ namespace ConfigurationUI
             status=new Label(); status.AddToClassList("status"); footer.Add(status);
             undo=StudioButton("Undo","undo",()=>{ RequireApplied(); selected.Undo(); RebuildPreservingView(); }); footer.Add(undo);
             redo=StudioButton("Redo","redo",()=>{ RequireApplied(); selected.Redo(); RebuildPreservingView(); }); footer.Add(redo);
-            save=StudioButton("Save changes","file",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); MainController.Instance?.ApplyIdleFrameTiming((JObject)Workspace.System.Root);UpdateStatus("Setup and session details saved."); }); save.name="save-changes";footer.Add(save);
+            save=StudioButton("Save changes","save",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); MainController.Instance?.ApplyIdleFrameTiming((JObject)Workspace.System.Root);UpdateStatus("Setup and session details saved."); }); save.name="save-changes";footer.Add(save);
             start=StudioButton("Start experiment","play",RunPrimaryAction,"primary"); start.name="start-experiment"; footer.Add(start);
             save.tooltip="Save the system, sequence, edited experiment files and subject metadata. Omitted values and unknown JSON fields are preserved.";
             start.tooltip="Validate and save this setup, archive the run's configuration files, then start the experiment.";
@@ -191,7 +191,7 @@ namespace ConfigurationUI
             HideHoverHelp();
             body.EnableInClassList("session-body",homeMode || experimentIndexMode || replayLibraryMode);
             side.style.display=DisplayStyle.Flex;
-            inspector.style.display=homeMode || experimentIndexMode || replayLibraryMode || root.resolvedStyle.width<1220?DisplayStyle.None:DisplayStyle.Flex;
+            inspector.style.display=homeMode || experimentIndexMode || replayLibraryMode || selected!=Workspace.Sequence || root.resolvedStyle.width<1440?DisplayStyle.None:DisplayStyle.Flex;
             pageLocation.text=replayLibraryMode?"Recording library":homeMode?"Start":experimentIndexMode?"Experiment settings":selected==Workspace.System?"Apparatus setup":selected==Workspace.Sequence?"Experiment sequence":ExperimentBlocks.Title(selected.Root as JObject,selected.Path);
             save.style.display=replayLibraryMode?DisplayStyle.None:DisplayStyle.Flex;
             undo.style.display=redo.style.display=homeMode||replayLibraryMode?DisplayStyle.None:DisplayStyle.Flex;
@@ -357,10 +357,10 @@ namespace ConfigurationUI
                 if(doc?.Root is JObject payload) warnings.AddRange(ExperimentBlocks.TimingWarnings(payload,ExperimentBlocks.Number(step["duration"])));
             }
             if(summary!=null) summary.text=errors.Count==0?(ApparatusDraft?"Review apparatus configuration\n\nChoose Use configuration to save this setup and return to the experiment workspace. This does not start an experiment.\n\n":"✓  Configuration ready\n\n")+Workspace.Documents.Count+" files loaded\n"+(Workspace.System.Root["configs"] as JArray)?.Count+" VR entries\n"+(Workspace.Sequence.Root["sequences"] as JArray)?.Count+" sequence steps":string.Join("\n\n",errors.Take(12));
-            status.text=message??(errors.Count>0?string.Join(" · ",errors.Take(2)):ApparatusDraft?"Review hardware settings, then choose Use configuration to save and continue.":warnings.Count>0?warnings[0]:HasUnsavedChanges?"Unsaved changes · saved when you start":"Ready to run · session details saved when you start");
+            status.text=message??(errors.Count>0?string.Join(" · ",errors.Take(2)):ApparatusDraft?"Review hardware settings, then choose Use configuration to save and continue.":warnings.Count>0?warnings[0]:HasUnsavedChanges?"Unsaved changes · saved on Start":"Ready");
             status.EnableInClassList("error",errors.Count>0);
             status.EnableInClassList("warning",errors.Count==0 && warnings.Count>0);
-            start.SetEnabled(errors.Count==0 && !rawPending && MainController.Instance?.SequenceStopping!=true); save.SetEnabled(!rawPending && HasUnsavedChanges); undo.SetEnabled(selected.CanUndo && !rawPending); redo.SetEnabled(selected.CanRedo && !rawPending);
+            start.SetEnabled(errors.Count==0 && !rawPending && !preparing && MainController.Instance?.SequenceStopping!=true); save.SetEnabled(!rawPending && HasUnsavedChanges); undo.SetEnabled(selected.CanUndo && !rawPending); redo.SetEnabled(selected.CanRedo && !rawPending);
         }
         private void PollFiles()
         {
@@ -474,8 +474,15 @@ namespace ConfigurationUI
         }
         private void OpenQuickTracker()
         {if(preparing)return;RequireApplied();BeginCompanionPreparation(false);}
+        private readonly List<string> companionWarnings=new List<string>();
+        private void CompanionWarning(string message)
+        {
+            if(!companionWarnings.Contains(message))companionWarnings.Add(message);
+            preparationStatus="VR ready · tracker unavailable";UpdateStatus(preparationStatus);
+        }
         private void BeginCompanionPreparation(bool startAfter)
         {
+            companionWarnings.Clear();
             preparing=true;preparationStatus="Preparing the native tracker…";
             body.SetEnabled(false);side.SetEnabled(false);RefreshPreparingCaption();UpdateStatus();
             StartCoroutine(PrepareQuickStartRun(++preparationVersion,startAfter));
@@ -492,7 +499,7 @@ namespace ConfigurationUI
                     bool more=false;object current=null;Exception failure=null;
                     try { more=operation.MoveNext();if(more)current=operation.Current; }
                     catch(Exception error) { failure=error; }
-                    if(failure!=null) { PreparationFailed(failure);yield break; }
+                    if(failure!=null) { if(!startAfter)PreparationFailed(failure);else{CompanionWarning(failure.GetBaseException().Message);PrepareRunMetadata();StartAfterPreviousRecording();}yield break; }
                     if(!more)yield break;
                     yield return current;
                 }
@@ -518,6 +525,7 @@ namespace ConfigurationUI
             var rigs=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>()
                 .Where(r=>!configured||DesktopApparatusProfile.ShouldLaunchBundledForRig(Workspace.System.Root,r))
                 .Select(LosslessJson.ToRuntime<SystemConfig>).ToList();
+            double trackerDeadline=Time.realtimeSinceStartupAsDouble+2.5;
             foreach(var rig in rigs)
             {
                 preparationStatus="Preparing "+TrackerBackend.DisplayName(rig.closedLoopMode)+" for "+rig.vrId+"…";UpdateStatus();
@@ -529,16 +537,18 @@ namespace ConfigurationUI
                     task=CompanionCatalog.PrepareAsync(rig,demo);
 #endif
                 }
-                catch(Exception error){PreparationFailed(error);yield break;}
-                while(!task.IsCompleted)
+                catch(Exception error){if(!startAfter){PreparationFailed(error);yield break;}CompanionWarning(rig.vrId+": "+error.GetBaseException().Message);continue;}
+                while(!task.IsCompleted && (!startAfter || Time.realtimeSinceStartupAsDouble<trackerDeadline))
                 {
                     if(!isActiveAndEnabled||version!=preparationVersion)yield break;
                     yield return null;
                 }
                 if(!isActiveAndEnabled||version!=preparationVersion)yield break;
-                if(task.IsFaulted||task.IsCanceled){PreparationFailed(task.Exception?.GetBaseException()??new OperationCanceledException("Tracker preparation was cancelled."));yield break;}
+                if(!task.IsCompleted){task.ContinueWith(completed=>{var observed=completed.Exception;},System.Threading.Tasks.TaskContinuationOptions.OnlyOnFaulted);CompanionWarning(rig.vrId+": tracker preparation is still pending; the VR starts without waiting.");continue;}
+                if(task.IsFaulted||task.IsCanceled){var error=task.Exception?.GetBaseException()??new OperationCanceledException("Tracker preparation was cancelled.");if(!startAfter){PreparationFailed(error);yield break;}CompanionWarning(rig.vrId+": "+error.Message);continue;}
                 try{
                     var prepared=task.GetAwaiter().GetResult();
+                    if(!string.IsNullOrWhiteSpace(prepared.recordingWarning))CompanionWarning(rig.vrId+": "+prepared.recordingWarning);
 #if UNITY_EDITOR
                     if(launchCompanionForValidation!=null)launchCompanionForValidation(prepared);else
 #endif
@@ -549,7 +559,7 @@ namespace ConfigurationUI
 #endif
                     )TrackerProcessManager.Instance.Show(rig.vrId);
                 }
-                catch(Exception error){PreparationFailed(error);yield break;}
+                catch(Exception error){if(!startAfter){PreparationFailed(error);yield break;}CompanionWarning(rig.vrId+": "+error.GetBaseException().Message);}
             }
             if(!startAfter)
             {
@@ -635,6 +645,8 @@ namespace ConfigurationUI
 #endif
             var main=MainController.Instance;
             main.PrepareConfiguredRun(Workspace.System.Path,Workspace.Sequence.Path);
+            foreach(string warning in companionWarnings)main.AddRecordingWarning(warning);
+            companionWarnings.Clear();
             string metadataJson=SaveMetadata();
             File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"AnimalMetadata.json"),metadataJson);
             File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"FlyMetaData.json"),metadataJson);

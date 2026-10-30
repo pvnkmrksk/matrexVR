@@ -18,9 +18,11 @@ namespace ConfigurationUI
             if(!new[]{"type","material","modelPath","kannadiModelPath","kannadiTilePrefab","agentVisual"}.Contains(key))return;
             if((key=="type"||key=="material")&&!ChoiceAssetCatalog.IsObjectField(path))return;
             string scene=key=="kannadiTilePrefab"||key=="agentVisual"||key=="kannadiModelPath"?"Kannadi":ChoiceCatalogScene();
+            if(key=="modelPath"&&selected.SchemaId=="swarm")scene="Kannadi";
             JObject Owner()=>ConfigDocument.At(document.Root,path.Take(path.Length-1).ToArray()) as JObject??new JObject();
-            var pane=new EditPreviewPane(false,()=>new JObject{["value"]=ConfigDocument.At(document.Root,path)?.DeepClone(),["model"]=Owner()["modelPath"]?.DeepClone(),["material"]=Owner()["material"]?.DeepClone(),["clip"]=Owner()["animationClip"]?.DeepClone()}.ToString(Formatting.None),async cancellation=>{
+            var pane=new EditPreviewPane(false,()=>new JObject{["value"]=ConfigDocument.At(document.Root,path)?.DeepClone(),["model"]=Owner()["modelPath"]?.DeepClone(),["agentVisual"]=Owner()["agentVisual"]?.DeepClone(),["tile"]=Owner()["kannadiTilePrefab"]?.DeepClone(),["material"]=Owner()["material"]?.DeepClone(),["clip"]=Owner()["animationClip"]?.DeepClone(),["appearance"]=(Owner()["appearance"]??Owner()["modelAppearance"])?.DeepClone()}.ToString(Formatting.None),async cancellation=>{
                 var owner=(JObject)Owner().DeepClone();string value=ConfigDocument.At(document.Root,path)?.ToString()??"";
+                ModelAppearanceConfig appearance=(owner["appearance"]??owner["modelAppearance"]) is JObject surface?Newtonsoft.Json.JsonConvert.DeserializeObject<ModelAppearanceConfig>(surface.ToString(Formatting.None)):null;
                 string external=key=="modelPath"||key=="kannadiModelPath"?value:key=="type"?(string)owner["modelPath"]:null;
                 if(!string.IsNullOrWhiteSpace(external))
                 {
@@ -31,24 +33,36 @@ namespace ConfigurationUI
                     cancellation.ThrowIfCancellationRequested();
                     if(!ConfigurationPreviewRenderer.Idle)throw new InvalidOperationException("Preview paused for the experiment.");
                     var prefab=ExternalModelLibrary.GetPrefab(external);
-                    return ConfigurationPreviewRenderer.Object(prefab,PreviewVisuals.Animations(prefab),null,(string)owner["animationClip"]);
+                    return ConfigurationPreviewRenderer.Object(prefab,PreviewVisuals.Animations(prefab),null,(string)owner["animationClip"],appearance);
                 }
                 if(key=="modelPath"||key=="kannadiModelPath")value=key=="kannadiModelPath"?(string)owner["kannadiTilePrefab"]??"SimulatedLocust":(string)owner["type"]??"SimulatedLocust";
+                if(key=="modelPath"&&string.IsNullOrEmpty(external)&&string.Equals((string)owner["agentVisual"],"Bogong",StringComparison.OrdinalIgnoreCase))throw new ArgumentException("Generated Bogong visual · choose its shape and color in Bogong visual settings.");
                 if(key=="agentVisual")value=value=="ScenePrefab"?"SimulatedLocust":value;
                 var entry=ChoiceAssetCatalog.Load().Entries(scene,key=="material"?"material":"type").FirstOrDefault(item=>item.Name==value);
                 if(entry==null||string.IsNullOrEmpty(entry.PreviewResource))throw new ArgumentException("No authored mesh preview is available for this selection.");
-                var resource=Resources.LoadAsync<ConfigurationPreviewAsset>(entry.PreviewResource);var ready=new TaskCompletionSource<bool>();
-                resource.completed+=_=>ready.TrySetResult(true);if(resource.isDone)ready.TrySetResult(true);await ready.Task;
-                var definition=resource.asset as ConfigurationPreviewAsset;
+                var definition=await LoadPreviewAsset(entry.PreviewResource,cancellation);ConfigurationPreviewAsset selectedMaterial=null;
                 try
                 {
+                    if(key!="material"&&!string.IsNullOrWhiteSpace((string)owner["material"]))
+                    {
+                        var materialEntry=ChoiceAssetCatalog.Load().Entries(scene,"material").FirstOrDefault(item=>item.Name==(string)owner["material"]);
+                        if(!string.IsNullOrEmpty(materialEntry?.PreviewResource))selectedMaterial=await LoadPreviewAsset(materialEntry.PreviewResource,cancellation);
+                    }
                     cancellation.ThrowIfCancellationRequested();
                     if(!ConfigurationPreviewRenderer.Idle)throw new InvalidOperationException("Preview paused for the experiment.");
-                    return ConfigurationPreviewRenderer.Object(definition,(string)owner["animationClip"]);
+                    if(definition==null)throw new ArgumentException("This asset has no visual preview in this build.");
+                    return ConfigurationPreviewRenderer.Object(definition.visual,definition.animations,selectedMaterial?.material??definition.material,(string)owner["animationClip"],appearance);
                 }
-                finally{if(definition!=null)Resources.UnloadAsset(definition);}
+                finally{if(selectedMaterial!=null)Resources.UnloadAsset(selectedMaterial);if(definition!=null)Resources.UnloadAsset(definition);}
             });
             pane.name="object-preview-"+string.Join("-",path);target.Add(pane);BindViewState(pane,pane.Refresh);
+        }
+        private static async Task<ConfigurationPreviewAsset> LoadPreviewAsset(string key,CancellationToken cancellation)
+        {
+            var resource=Resources.LoadAsync<ConfigurationPreviewAsset>(key);var ready=new TaskCompletionSource<bool>();resource.completed+=_=>ready.TrySetResult(true);if(resource.isDone)ready.TrySetResult(true);await ready.Task;
+            var asset=resource.asset as ConfigurationPreviewAsset;
+            try{cancellation.ThrowIfCancellationRequested();return asset;}
+            catch{if(asset!=null)Resources.UnloadAsset(asset);throw;}
         }
         private void AddSkyPreview(VisualElement target,ConfigDocument document,string[] prefix)
         {

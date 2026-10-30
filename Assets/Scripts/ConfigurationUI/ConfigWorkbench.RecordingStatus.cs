@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -33,8 +34,10 @@ namespace ConfigurationUI
             bool pending=stopping||finishing||preparingRecording;
             recordingFinalizationBanner.style.display=DisplayStyle.Flex;
             recordingFinalizationBanner.style.color=string.IsNullOrWhiteSpace(error)?new Color(.74f,.89f,.84f):new Color(.95f,.72f,.52f);
-            recordingFinalizationBanner.text=preparingRecording?(main.PreparationStatus??"Preparing experiment…"):stopping?(main.PreparationStatus??"Finishing recorders… Waiting for native acknowledgement and completed files."):finishing?"Finishing recording… Saving data and closing files.":!string.IsNullOrWhiteSpace(error)?"Recording needs attention: "+error:"Recording ready · tracking data and configuration snapshots are saved with each experiment.";
-            recordingFinalizationBanner.tooltip=recordingFinalizationBanner.text;
+            string[] warnings=(main?.RecordingWarnings??Array.Empty<string>()).Concat(companionWarnings).Distinct().ToArray();
+            string ready=warnings.Length==0?"VR ready":warnings.Any(warning=>warning.IndexOf("record",StringComparison.OrdinalIgnoreCase)>=0)?"VR ready · recording unavailable":"VR ready · tracking unavailable";
+            recordingFinalizationBanner.text=preparingRecording?(main.PreparationStatus??"Preparing…"):stopping?(main.PreparationStatus??"Finishing recorders…"):finishing?"Saving recording…":!string.IsNullOrWhiteSpace(error)?"Recording needs attention":ready;
+            recordingFinalizationBanner.tooltip=!string.IsNullOrWhiteSpace(error)?error:warnings.Length>0?string.Join("\n",warnings):"Tracking data and configuration snapshots are saved with each experiment. Tracker availability does not prevent the VR from starting.";
             bool changed=recordingPending!=pending||recordingBannerError!=error;
             recordingPending=pending;recordingBannerError=error;
             if(changed&&status!=null&&selected!=null)UpdateStatus();

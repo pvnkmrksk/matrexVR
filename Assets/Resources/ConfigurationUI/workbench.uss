@@ -565,3 +565,70 @@ Button.desktop-run-button { height: 31px; min-height: 31px; font-size: 11px; mar
 .edit-preview-caption { font-size: 11px; color: rgb(151, 163, 181); height: 26px; min-height: 26px; max-height: 26px; white-space: normal; overflow: hidden; -unity-text-align: middle-center; }
 
 .edit-rendered-preview { width: 280px; max-width: 100%; }
+
+/* Compact concept-level navigation. Field-value changes retain these slots. */
+.body { padding: 18px 22px 16px; }
+.studio-title-row { min-height: 58px; margin-bottom: 6px; }
+.studio-title-row > VisualElement { min-width: 0; flex-shrink: 1; }
+.studio-title-row .title { font-size: 22px; margin-bottom: 4px; }
+.studio-subtitle { font-size: 11px; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.config-identity { flex-wrap: nowrap; margin: 0; min-height: 36px; }
+.config-identity > #config-title { min-width: 0; max-width: none; flex-grow: 1; flex-shrink: 1; margin: 0 6px 0 0; }
+.config-identity > #config-title > .unity-base-field__input { font-size: 20px; -unity-font-style: bold; height: 36px; min-height: 36px; background-color: rgba(0,0,0,0); border-color: rgba(0,0,0,0); padding: 2px 0; }
+.config-identity > #config-title > .unity-base-field__input:focus { border-color: rgb(73,133,142); }
+.experiment-actions { min-height: 34px; margin-bottom: 6px; flex-wrap: wrap; }
+.experiment-actions Button { margin: 0 8px 0 0; }
+.settings-tabs { margin: 0 0 10px; padding-bottom: 8px; flex-wrap: nowrap; }
+.settings-tabs > .studio-button { flex-direction: row; width: 118px; height: 40px; min-height: 40px; margin: 0 6px 0 0; padding: 6px 10px; }
+.settings-tabs > .studio-button > .studio-icon { width: 18px; height: 18px; margin: 0 8px 0 0; }
+.settings-tabs > .studio-button > Label { font-size: 12px; }
+.editor-shortcuts { margin-top: 6px; flex-wrap: wrap; }
+.editor-shortcuts Button { margin-left: 0; margin-right: 8px; }
+.editor-disclosure { margin: 6px 0 12px; padding-top: 4px; border-top-width: 1px; border-top-color: rgb(50,63,74); }
+.editor-disclosure > .unity-foldout__toggle { height: 34px; min-height: 34px; color: rgb(201,218,230); font-size: 13px; }
+.editor-disclosure > .unity-foldout__content { margin-left: 0; padding-top: 8px; }
+.inherited-indicator { display: none; }
+.quiet-hint { color: rgb(163,183,199); font-size: 12px; margin: 6px 0 12px; }
+.workbench .spin-arrows > Button.studio-button { height: 14px; min-height: 14px; max-height: 14px; width: 18px; min-width: 18px; margin: 0; padding: 0; flex-shrink: 0; }
+.workbench .spin-arrows { width: 18px; height: 28px; min-height: 28px; max-height: 28px; }
+/* Object choices, surface color and a single thumbnail form one visual unit. */
+.object-collection { margin-bottom: 12px; }
+.object-collection > .section-heading > Label { flex-grow: 1; }
+.scene-object-card { padding: 12px; margin-bottom: 12px; border-width: 1px; border-color: rgb(61,79,92); border-radius: 6px; background-color: rgb(23,31,40); }
+.object-heading { margin-bottom: 8px; }
+.object-heading .object-name { flex-grow: 1; color: rgb(215,229,239); -unity-font-style: bold; }
+.object-heading > .studio-switch { margin-right: 12px; }
+.object-visual-row { align-items: flex-start; flex-wrap: wrap; }
+.object-main-controls { flex-grow: 1; flex-basis: 390px; min-width: 300px; margin-right: 14px; }
+.object-main-controls > .studio-setting { width: 100%; max-width: 100%; min-width: 0; margin-right: 0; }
+.object-main-controls > .path-setting { flex-direction: column; align-items: stretch; }
+.object-main-controls > .path-setting > .setting-label { flex-basis: auto; margin: 0 0 5px; }
+.external-model-control { width: 100%; }
+.external-model-control > DropdownField, .external-model-control > TextField { width: 100%; min-width: 0; margin: 0 0 4px; }
+.object-preview-slot { width: 280px; min-width: 280px; flex-shrink: 0; }
+.object-preview-slot .edit-rendered-preview { margin-top: 0; }
+.object-color-row { min-height: 42px; justify-content: space-between; padding: 4px 10px; background-color: rgb(27,37,47); border-radius: 4px; }
+.object-color-row .color-control { flex-shrink: 0; }
+.surface-details { margin: 8px 0 0; }
+.surface-details > .unity-foldout__toggle { font-size: 12px; min-height: 28px; }
+.scene-object-card .vector-setting { max-width: 100%; }
+.daily-welcome .start-title { font-size: 24px; margin-bottom: 4px; }
+.daily-apparatus-summary { padding: 4px 0; }
+.recording-summary-state { font-size: 12px; }
+
+.asset-picker-control { min-height: 34px; height: 34px; flex-wrap: nowrap; }
+.asset-picker-control > DropdownField { flex-grow: 1; flex-shrink: 1; width: auto; margin: 0; }
+.asset-picker-control > Button { flex-shrink: 0; }
+.external-model-control { flex-direction: row; align-items: center; height: 34px; min-height: 34px; }
+.external-model-control > TextField { flex-grow: 1; flex-shrink: 1; width: auto; margin: 0 4px 0 0; }
+.external-model-control > .model-file-menu { width: 34px; min-width: 34px; max-width: 34px; height: 32px; margin: 0; flex-shrink: 0; }
+.model-file-menu .unity-base-popup-field__text { display: none; }
+.object-main-controls > .choice-setting, .object-main-controls > .path-setting { flex-direction: column; align-items: stretch; min-height: 76px; padding: 8px 10px; }
+.object-main-controls > .choice-setting > .setting-label, .object-main-controls > .path-setting > .setting-label { flex-grow: 0; flex-basis: auto; margin: 0 0 4px; }
+.object-main-controls > .choice-setting .asset-picker-control, .object-main-controls > .path-setting .external-model-control { width: 100%; }
+
+.workbench Button.runtime-color-swatch { width: 52px; min-width: 52px; height: 32px; min-height: 32px; margin: 0; padding: 5px; }
+.runtime-color-swatch > .studio-icon { margin: 0; width: 18px; height: 18px; }
+
+.studio-setting.surface-setting { width: 100%; max-width: 100%; flex-direction: column; align-items: stretch; }
+.surface-setting > .surface-details > .unity-foldout__toggle { display: flex; }

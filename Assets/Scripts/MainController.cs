@@ -110,6 +110,14 @@ public class MainController : MonoBehaviour
     public bool SequencePreparing { get; private set; }
     public bool SequenceStopping { get; private set; }
     public string RecordingTransitionError { get; private set; }
+    private readonly List<string> recordingWarnings = new List<string>();
+    public IReadOnlyList<string> RecordingWarnings => recordingWarnings;
+    public void AddRecordingWarning(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message) || recordingWarnings.Contains(message)) return;
+        recordingWarnings.Add(message);
+        Debug.LogWarning(message);
+    }
     public string PreparationStatus { get; private set; }
     public System.Threading.Tasks.Task RecordingCompletion => recordingCompletion;
     public bool NativeRecordingStopSettled { get; private set; } = true;
@@ -135,6 +143,7 @@ public class MainController : MonoBehaviour
         recordingDirectory = null;
         nativeRecordingStartTask = System.Threading.Tasks.Task.CompletedTask;
         RecordingTransitionError = null;
+        recordingWarnings.Clear();
         NativeRecordingStopSettled = true;
         SequenceError = null;
         currentTrial = 0;
@@ -557,6 +566,7 @@ public class MainController : MonoBehaviour
 
     private async System.Threading.Tasks.Task PrepareAndStartSequence(int generation)
     {
+        var cancellationToken = preparationCancellation.Token;
         try
         {
             // Import before starting the stimulus clock: loading a model must not shorten a trial.
@@ -566,7 +576,7 @@ public class MainController : MonoBehaviour
                 .Concat(ExternalModelLibrary.CollectReferences(step.parameters != null ? JObject.FromObject(step.parameters) : null))).Distinct())
             {
                 await ExternalModelLibrary.PreloadAsync(reference, ExperimentConfigFiles.ReadAllBytes(reference, "model"),
-                    preparationCancellation.Token);
+                    cancellationToken);
                 if (generation != preparationGeneration) return;
             }
             if (generation != preparationGeneration) return;
@@ -578,9 +588,19 @@ public class MainController : MonoBehaviour
             }
             NativeRecordingStopSettled = false;
             PreparationStatus = "Starting tracker recording…";
-            nativeRecordingStartTask = TrackerProcessManager.BeginExperimentRecordingAsync(
-                systemConfigs.Values, recordingDirectory, recordingRunId, preparationCancellation.Token);
-            await nativeRecordingStartTask;
+            try
+            {
+                var recorderPreparation = TrackerProcessManager.BeginExperimentRecordingAsync(
+                    systemConfigs.Values, recordingDirectory, recordingRunId, cancellationToken);
+                nativeRecordingStartTask = recorderPreparation;
+                var recorderReport = await recorderPreparation;
+                foreach (string warning in recorderReport.Warnings) AddRecordingWarning(warning);
+            }
+            catch (System.OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
+            catch (System.Exception error)
+            {
+                AddRecordingWarning("Tracker recording unavailable: " + error.GetBaseException().Message);
+            }
             if (generation != preparationGeneration) return;
             ExperimentRandom.Begin(randomSeedMode, randomSeed, MasterDataLogger.Instance.directoryPath, SequenceTitle, sequenceConfigFileName);
             SequencePreparing = false;
@@ -1108,17 +1128,23 @@ void ManageTimerAndTransitions()
     // Add method to clear screen to black
     void ClearScreenToBlack()
     {
-        // This creates a temporary camera to clear the screen to black
-        // It's cheaper than keeping an extra camera around all the time
+        RenderTexture previous = RenderTexture.active;
         Camera clearCamera = new GameObject("TempClearCamera").AddComponent<Camera>();
-        clearCamera.clearFlags = CameraClearFlags.SolidColor;
-        clearCamera.backgroundColor = Color.black;
-        clearCamera.cullingMask = 0; // Render nothing
-        clearCamera.Render(); // Force a render
-        Destroy(clearCamera.gameObject); // Clean up
-
-        // Also force a GL clear to ensure everything is black
-        GL.Clear(true, true, Color.black);
+        clearCamera.enabled = false; // Manual clear only; never enter the automatic camera pass.
+        try
+        {
+            RenderTexture.active = null;
+            clearCamera.targetTexture = null;
+            clearCamera.clearFlags = CameraClearFlags.SolidColor;
+            clearCamera.backgroundColor = Color.black;
+            clearCamera.cullingMask = 0;
+            clearCamera.Render();
+        }
+        finally
+        {
+            RenderTexture.active = previous;
+            Destroy(clearCamera.gameObject);
+        }
     }
 }
 

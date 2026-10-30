@@ -55,6 +55,10 @@ public static class ConfigurationPreviewValidation
             var objectImage=ConfigurationPreviewRenderer.Object(source,new[]{new PreviewAnimationBinding{root="",clip=clip}});
             Check(objectImage.width==256&&objectImage.height==256,"Object image is bounded to256 square pixels");
             var pixels=objectImage.GetPixels32();Check(pixels.Any(pixel=>pixel.r>pixel.b+20)&&pixels.Any(pixel=>pixel.r<30),"Object render contains both mesh and background pixels");Save(objectImage,"animated-object");PreviewVisuals.Dispose(objectImage);
+            var originalMaterial=child.GetComponent<Renderer>().sharedMaterial;
+            var selectedRed=ConfigurationPreviewRenderer.Object(source,null,red);var selectedBlue=ConfigurationPreviewRenderer.Object(source,null,blue);
+            Check(Hash(selectedRed)!=Hash(selectedBlue),"Selected built-in material overrides produce different actual object pixels");
+            Check(child.GetComponent<Renderer>().sharedMaterial==originalMaterial,"Built-in material preview overrides leave the original renderer binding unchanged");PreviewVisuals.Dispose(selectedRed);PreviewVisuals.Dispose(selectedBlue);
             var materialRed=ConfigurationPreviewRenderer.Object(null,null,red);var materialBlue=ConfigurationPreviewRenderer.Object(null,null,blue);
             Check(Hash(materialRed)!=Hash(materialBlue),"Selected materials produce visibly different rendered thumbnails");PreviewVisuals.Dispose(materialRed);PreviewVisuals.Dispose(materialBlue);
             var solid=ConfigurationPreviewRenderer.Sky(JObject.Parse("{\"uniformSkyColor\":{\"r\":0.4,\"g\":0.2,\"b\":0.1}}"),"Kannadi",DateTimeOffset.UtcNow);

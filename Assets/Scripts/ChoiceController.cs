@@ -331,7 +331,8 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         }
 
         if (
-            !string.IsNullOrEmpty(obj.material)
+            string.IsNullOrWhiteSpace(obj.modelPath)
+            && !string.IsNullOrEmpty(obj.material)
             && materialDict.TryGetValue(obj.material, out Material material)
         )
         {
@@ -351,6 +352,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             colorDrift.meanBlueB = obj.meanBlueB;
             colorDrift.switchInterval = obj.switchInterval;
         }
+        ModelAppearance.Apply(instance, obj.appearance);
     }
 
     public GameObject CreateRecordedBandVisual(string recordedName,Transform parent)
@@ -709,6 +711,7 @@ public class SceneObject
     public string type;
     public Position position;
     public string material;
+    public ModelAppearanceConfig appearance;
     public ScaleConfig scale;
     public RotationConfig rotation;
     public bool flip;

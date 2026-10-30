@@ -30,6 +30,8 @@ MATREX VR is a Unity application for flight, walking and collective-behaviour ex
 
 ## Capabilities
 
+The [30 October startup and model workflow update](docs/availability-and-model-workflow-20261030.md) makes tracker failures non-blocking, simplifies settings, and supplies real GLB examples with editable appearance. Load `Examples/Sequences/custom-models.sequence.json` to try the exported locust and downloaded animated models without rebuilding.
+
 The next development pass is tracked in the [experiment and replay overhaul plan](docs/overhaul-0.5-plan.md), including prioritized requirements, parallel ownership, compatibility decisions and deferred validation. The [GUI, recording and performance follow-up](docs/gui-recording-performance-followup.md) tracks current operator feedback and acceptance. These are work plans, not lists of released features.
 
 Development branch: [custom GLB models, Kannadi populations and 1–16 rigs](docs/custom-models-and-rigs.md). External models use self-contained GLB exports; vendor Unity packages need export/conversion first.

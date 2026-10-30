@@ -42,7 +42,10 @@ public static class ClientRegression
             peer=Answer(root,request=>new JObject{["id"]=request["id"],["instance"]="foreign",["ok"]=true,["result"]=new JObject()});
             await Reject(()=>client.CallAsync("status"),"Foreign response nonce is rejected");await peer;
             peer=Answer(root,request=>new JObject{["id"]=request["id"],["instance"]=instance,["ok"]=false,["error"]="writer failed"});
-            await Reject(()=>client.CallAsync("record_start"),"Native errors are visible rather than successful acknowledgements");await peer;
+            bool commandRejected=false;try{await client.CallAsync("record_start");}catch(NativeRecorderCommandRejectedException error){commandRejected=error.Command=="record_start";}
+            Check(commandRejected,"A negative native reply identifies an unaccepted command, distinct from an ambiguous timeout");await peer;
+            peer=Answer(root,request=>new JObject{["id"]=request["id"],["instance"]=instance,["result"]=new JObject()});
+            bool malformedUnknown=false;try{await client.CallAsync("record_start");}catch(InvalidDataException){malformedUnknown=true;}Check(malformedUnknown,"A malformed acceptance reply remains an ambiguous outcome rather than a definitive pre-queue rejection");await peer;
             await Reject(()=>client.CallAsync("status"),"Missing response has a bounded timeout");
             var canceled=new CancellationTokenSource();canceled.Cancel();await Reject(()=>client.CallAsync("record_start",token:canceled.Token),"Canceled commands are not sent");
             Check(!Directory.GetFiles(root,"*.request.json").Any(),"Timeout and cancellation leave no executable stale request");

@@ -8,6 +8,13 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+/// <summary>The verified endpoint rejected a command before accepting it into its worker queue.</summary>
+public sealed class NativeRecorderCommandRejectedException : InvalidOperationException
+{
+    public string Command { get; }
+    public NativeRecorderCommandRejectedException(string command,string message):base("Native tracker rejected "+command+": "+message){Command=command;}
+}
+
 /// <summary>Pure filesystem transport; it never launches another engine or touches calibration.</summary>
 public sealed class NativeRecorderClient
 {
@@ -56,7 +63,8 @@ public sealed class NativeRecorderClient
                 {
                     var reply=ReadObject(response);
                     if((string)reply["id"]!=id||(string)reply["instance"]!=Instance)throw new InvalidDataException("Native recording response identity mismatch.");
-                    if((bool?)reply["ok"]!=true)throw new InvalidOperationException("Native tracker rejected "+command+": "+reply["error"]);
+                    if(reply["ok"]?.Type!=JTokenType.Boolean)throw new InvalidDataException("Native reply has no valid acceptance flag; the command outcome remains unknown.");
+                    if(!(bool)reply["ok"])throw new NativeRecorderCommandRejectedException(command,(string)reply["error"]);
                     return reply["result"] as JObject??throw new InvalidDataException("Native tracker response has no state object.");
                 }
                 await Task.Delay(25,token).ConfigureAwait(false);

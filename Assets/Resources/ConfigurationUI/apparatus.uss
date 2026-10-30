@@ -96,3 +96,11 @@ Button.apparatus-face > .apparatus-face-slot { font-size: 9px; color: rgb(179, 1
 /* Native single-line editors otherwise stretch beyond a column field's Yoga
    measurement and their text is clipped by the field's65px outer bounds. */
 .apparatus-input > .unity-base-field__input { height: 32px; min-height: 32px; max-height: 32px; flex-grow: 0; flex-shrink: 0; }
+
+/* Calibration stays available without dominating everyday setup. */
+.apparatus-eyebrow { margin-bottom: 2px; }
+.apparatus-scroll > .unity-scroll-view__content-viewport > .unity-scroll-view__content-container > .apparatus-copy { margin-bottom: 6px; }
+.apparatus-map-section { max-width: 720px; }
+.apparatus-rig { padding: 8px 12px; }
+.apparatus-rig .editor-disclosure { margin-bottom: 4px; }
+.apparatus-rig > .unity-foldout__content { padding-top: 6px; }

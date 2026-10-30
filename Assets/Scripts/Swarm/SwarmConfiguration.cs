@@ -13,6 +13,7 @@ public static class SwarmConfiguration
     public static void Apply(LocustSpawner spawner, SwarmConfig config, ClosedLoop rig, float sceneUnitsPerMetre = 0f)
     {
         config.ValidateSwarm();
+        spawner.modelAppearance = config.modelAppearance;
         if (!string.IsNullOrWhiteSpace(config.modelPath)) spawner.locustPrefab = ExternalModelLibrary.GetPrefab(config.modelPath);
         // Births at t=0 must use the settled flight height, before the first LateUpdate.
         if (rig != null && !string.IsNullOrWhiteSpace(config.trajectoryFile))

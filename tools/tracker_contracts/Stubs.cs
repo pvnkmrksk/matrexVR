@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System;
 public sealed class ManualControlConfig { }
 // Recorder process boundary is tested here; actual archive/import semantics have their own suite.
-public sealed class MediaRecordingSource {public string RigId,Backend,DirectoryPath,SourceRevision,ExecutableSha256,TrackerSessionId,SourceClock,RunId,ChildDirectoryPrefix,State;public long NotBeforeUtcTicks;}
-public static class CompanionMediaArchive {public static void ConfigureReceiptRoot(string root){}public static void RegisterLaunchedSource(MediaRecordingSource source){}public static void ClearLaunchedSource(string rig){}public static void AcknowledgeStopped(string rig,string session=null){}public static void AcknowledgeFinalizedTake(string rig,string session,Newtonsoft.Json.Linq.JObject receipt){}}
+public sealed class MediaRecordingSource {public string RigId,Backend,DirectoryPath,SourceRevision,ExecutableSha256,TrackerSessionId,SourceClock,RunId,ChildDirectoryPrefix,State;public long NotBeforeUtcTicks;public bool NoVideoFrames;}
+public static class CompanionMediaArchive {public static void ConfigureReceiptRoot(string root){}public static readonly Dictionary<string,MediaRecordingSource> LaunchedSources=new Dictionary<string,MediaRecordingSource>();public static void RegisterLaunchedSource(MediaRecordingSource source){LaunchedSources[source.RigId]=source;}public static void ClearLaunchedSource(string rig){LaunchedSources.Remove(rig);}public static void AcknowledgeStopped(string rig,string session=null){}public static void AcknowledgeFinalizedTake(string rig,string session,Newtonsoft.Json.Linq.JObject receipt){}}
 public sealed class MasterDataLogger {public static MasterDataLogger Instance;public string directoryPath;public void RegisterCompanionSource(MediaRecordingSource source){}}
 public static class RuntimePaths { public static string ConfigRoot=System.IO.Path.GetTempPath(); }
 namespace UnityEngine

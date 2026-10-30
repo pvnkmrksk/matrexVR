@@ -15,7 +15,7 @@ public sealed class MediaRecordingSource
     public string ChildDirectoryPrefix;
     public long NotBeforeUtcTicks;
     // Only an acknowledged stopped recorder or an explicitly closed imported folder may set this.
-    public bool Finalized;
+    public bool Finalized,NoVideoFrames;
     public string State="pending";
 }
 public sealed class MediaImportRequest
@@ -27,7 +27,7 @@ public sealed class MediaImportRequest
     public long ReplayOriginTicks;
     internal List<MediaPoseAnchor> Anchors;
     internal MediaRecordingSource Source;
-    internal bool UnpresentedNoPose;
+    internal bool UnpresentedNoPose,NativeNoVideoFrames;
 }
 public sealed class MediaArchiveReceipt
 {
@@ -189,7 +189,7 @@ public sealed class CompanionMediaArchiveSession
                 foreach(string recording in directories)
                 {
                     var imported=await MediaArchive.ImportAsync(new MediaImportRequest{RunDirectory=directory,SourceDirectory=recording,RigId=source.RigId,ExpectedBackend=source.Backend,
-                        SourceClosed=true,SyncMode="consumed-frame-id",ReplayOriginTicks=origin==long.MaxValue?0:origin,Anchors=anchors,Source=source,UnpresentedNoPose=origin==long.MaxValue},token).ConfigureAwait(false);
+                        SourceClosed=true,SyncMode="consumed-frame-id",ReplayOriginTicks=origin==long.MaxValue?0:origin,Anchors=anchors,Source=source,UnpresentedNoPose=origin==long.MaxValue,NativeNoVideoFrames=source.NoVideoFrames},token).ConfigureAwait(false);
                     receipt.Complete&=imported.Complete;receipt.Pending|=imported.Pending;receipt.ImportedClips+=imported.ImportedClips;receipt.Warnings.AddRange(imported.Warnings);
                     if(imported.Complete)source.State="collected";
                 }
@@ -291,9 +291,10 @@ public static class MediaArchive
         }
         if(origin<=0)
         {
-            if(request.UnpresentedNoPose)return ArchiveUnpresented(request,run,source,inputFiles,token);
+            if(request.UnpresentedNoPose)return ArchiveClosedArtifacts(request,run,source,inputFiles,token);
             throw new InvalidDataException("The run has no valid recorded replay origin.");
         }
+        if(request.NativeNoVideoFrames)return ArchiveClosedArtifacts(request,run,source,inputFiles,token);
         string rig=SafeName(request.RigId),session=DateTime.UtcNow.ToString("yyyyMMddTHHmmss",CultureInfo.InvariantCulture)+"-"+Guid.NewGuid().ToString("N").Substring(0,8);
         string relative="media/"+rig+"/"+session,destination=ReplayMediaArchive.SafePath(run,relative),temporary=destination+".importing";
         Directory.CreateDirectory(temporary);
@@ -350,7 +351,7 @@ public static class MediaArchive
         catch{if(Directory.Exists(temporary))Directory.Delete(temporary,true);throw;}
     }
 
-    private static MediaArchiveReceipt ArchiveUnpresented(MediaImportRequest request,string run,string source,string[] inputFiles,CancellationToken token)
+    private static MediaArchiveReceipt ArchiveClosedArtifacts(MediaImportRequest request,string run,string source,string[] inputFiles,CancellationToken token)
     {
         string relative="native-takes/"+SafeName(request.RigId)+"/"+Guid.NewGuid().ToString("N");
         string destination=ReplayMediaArchive.SafePath(run,relative),temporary=destination+".importing";
@@ -372,14 +373,17 @@ public static class MediaArchive
             token.ThrowIfCancellationRequested();Directory.CreateDirectory(Path.GetDirectoryName(destination));Directory.Move(temporary,destination);
             lock(manifestGate)
             {
-                string path=Path.Combine(run,"native_unpresented_takes.json");
-                var manifest=File.Exists(path)?JObject.Parse(File.ReadAllText(path)):new JObject{["schemaVersion"]=1,["presented"]=false,["playableVrTimeline"]=false,["alignment"]="unavailable",["takes"]=new JArray()};
+                bool unpresented=request.UnpresentedNoPose;
+                string path=Path.Combine(run,unpresented?"native_unpresented_takes.json":"native_unrecorded_takes.json");
+                var manifest=File.Exists(path)?JObject.Parse(File.ReadAllText(path)):new JObject{["schemaVersion"]=1,["alignment"]="unavailable",["trackerVideoAvailable"]=false,["takes"]=new JArray()};
+                if(unpresented){manifest["presented"]=false;manifest["playableVrTimeline"]=false;}
+                else manifest["vrPosesRecorded"]=true;
                 ((JArray)manifest["takes"]).Add(new JObject{["rigId"]=request.RigId,["backend"]=request.ExpectedBackend,["nativeTakeId"]=request.Source?.TrackerSessionId,
-                    ["sourceClosed"]=true,["state"]="closed-unpresented",["artifacts"]=artifacts});
+                    ["sourceClosed"]=true,["state"]=unpresented?"closed-unpresented":"closed-no-video-frames",["artifacts"]=artifacts});
                 string writing=path+".writing";File.WriteAllText(writing,manifest.ToString(Formatting.Indented));if(File.Exists(path))File.Delete(path);File.Move(writing,path);
             }
             var receipt=new MediaArchiveReceipt{Complete=true,Pending=false,ImportedClips=0};
-            receipt.Warnings.Add("The run ended before any presented VR pose. Closed native files were archived as unaligned, not-presented artifacts; no playable VR timeline or video offset was invented.");
+            receipt.Warnings.Add(request.UnpresentedNoPose?"The run ended before any presented VR pose. Closed native files were archived as unaligned, not-presented artifacts; no playable VR timeline or video offset was invented.":"No tracker video frames were recorded. Closed native artifacts were retained without creating a replay video clip; VR data remains separate.");
             return receipt;
         }
         catch{if(Directory.Exists(temporary))Directory.Delete(temporary,true);throw;}

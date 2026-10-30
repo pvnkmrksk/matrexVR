@@ -11,12 +11,12 @@ namespace ConfigurationUI
     {
         public const int Width=256;
         public static bool Idle => MainController.Instance?.SequenceRunning!=true&&MainController.Instance?.SequencePreparing!=true&&MainController.Instance?.SequenceStopping!=true&&MasterDataLogger.Instance?.IsFinalizing!=true;
-        public static Texture2D Object(ConfigurationPreviewAsset asset,string clip=null)
+        public static Texture2D Object(ConfigurationPreviewAsset asset,string clip=null,ModelAppearanceConfig appearance=null)
         {
             if(asset==null)throw new ArgumentException("This asset has no visual preview in this build.");
-            return Object(asset.visual,asset.animations,asset.material,clip);
+            return Object(asset.visual,asset.animations,asset.material,clip,appearance);
         }
-        public static Texture2D Object(GameObject source,PreviewAnimationBinding[] clips,Material material=null,string clip=null)
+        public static Texture2D Object(GameObject source,PreviewAnimationBinding[] clips,Material material=null,string clip=null,ModelAppearanceConfig appearance=null)
         {
             if(!Idle)throw new InvalidOperationException("Previews pause while an experiment is running.");
             GameObject visual=null;
@@ -28,6 +28,9 @@ namespace ConfigurationUI
                     visual=GameObject.CreatePrimitive(PrimitiveType.Sphere);var collider=visual.GetComponent<Collider>();collider.enabled=false;PreviewVisuals.Dispose(collider);visual.GetComponent<Renderer>().sharedMaterial=material;
                 }
                 else throw new ArgumentException("Procedural objects do not have a static visual preview.");
+                if (source != null && material != null)
+                    foreach (var renderer in visual.GetComponentsInChildren<Renderer>(true)) renderer.sharedMaterial = material;
+                ModelAppearance.Apply(visual, appearance);
                 var renderers=visual.GetComponentsInChildren<Renderer>(false);
                 bool any=false;var bounds=new Bounds();
                 foreach(var renderer in renderers)

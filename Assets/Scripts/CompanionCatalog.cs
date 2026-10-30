@@ -24,7 +24,7 @@ public static class CompanionCatalog
     public sealed class Prepared
     {
         public SystemConfig rig;
-        public string backend,releaseTag,executableSha256;
+        public string backend,releaseTag,executableSha256,recordingWarning;
         public bool demo,supportsNoCameraFallback,supportsSourceProvenance,supportsRecordingControl;
     }
     public static string Platform
@@ -87,8 +87,6 @@ public static class CompanionCatalog
     {
         if(entry.backend=="rekkefly"&&!demo&&!entry.supportsNoCameraFallback)
             throw new InvalidOperationException("This bundled tracker cannot guarantee camera-only input. Use a patched compatible build, or configure an external tracker and verify its actual source.");
-        if((source.tracker?.saveVideo??true)&&(source.tracker?.recordingControl??TrackerRecordingControlMode.Experiment)==TrackerRecordingControlMode.Experiment&&!entry.supportsRecordingControl)
-            throw new InvalidOperationException("This bundled tracker cannot acknowledge experiment recording. Install the control-capable companion build, choose Manual recording control, or turn off tracker video.");
         string installed=Install(bundleRoot,entry,persistent);
         string trackerFolder=Path.Combine(configRoot,"Trackers");Directory.CreateDirectory(trackerFolder);
         string id=Regex.Replace(source.vrId??"VR1","[^A-Za-z0-9_-]","_");
@@ -150,7 +148,7 @@ public static class CompanionCatalog
         }
         var clone=source; // Snapshot was already cloned on the caller's main thread.
         clone.tracker=new TrackerLaunchConfig{executablePath=Child(installed,entry.executable),configFile=config,headless=false,strictCameraFallback=entry.supportsNoCameraFallback&&!demo,saveVideo=requestedSaveVideo,recordingControl=recordingControl,recordingDirectory=recordingDirectory,recordingPrefix=recordingPrefix};
-        return new Prepared{rig=clone,backend=entry.backend,releaseTag=entry.releaseTag,executableSha256=entry.executableSha256,demo=demo,supportsNoCameraFallback=entry.supportsNoCameraFallback,supportsSourceProvenance=entry.supportsSourceProvenance,supportsRecordingControl=entry.supportsRecordingControl};
+        return new Prepared{recordingWarning=requestedSaveVideo&&recordingControl==TrackerRecordingControlMode.Experiment&&!entry.supportsRecordingControl?"Tracker video control is unavailable in this companion. VR can continue; recording will be unacknowledged. Update the companion or choose Manual recording control.":null,rig=clone,backend=entry.backend,releaseTag=entry.releaseTag,executableSha256=entry.executableSha256,demo=demo,supportsNoCameraFallback=entry.supportsNoCameraFallback,supportsSourceProvenance=entry.supportsSourceProvenance,supportsRecordingControl=entry.supportsRecordingControl};
     }
     private static void WriteAtomic(string path,string text,string expected=null,bool createOnly=false)
     {

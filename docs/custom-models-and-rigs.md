@@ -75,7 +75,7 @@ Keep the original license and export a small test asset before a large purchase.
 | GLB 2.0 scene, geometry and base-color material | Embedded, uncompressed `.glb`; choose transform and scale in the experiment | Actual Mac Unity import, rendered animation and archived-byte replay |
 | Embedded transform animation | Named clip, speed, loop; sampled from experiment/replay time | Actual GLB translation-clip round trip and edit-only preview |
 | Embedded PNG/JPEG and standard glTF material properties | Importer supported; use embedded buffer views or data URIs | Preview/material rendering checked; no comprehensive vendor material corpus |
-| Skeletal and morph-target clips | Importer capability; export to standard glTF animation | Built-in locust skeletal animation is checked separately; arbitrary external GLB skins/morphs need asset-specific acceptance |
+| Skeletal and morph-target clips | Export to standard glTF animation | Exported locust, downloaded RiggedSimple skin and AnimatedMorphCube morphs pass actual deformed-geometry and forward/backward replay checks on Mac; other assets need their own acceptance |
 | Optional material extensions | Subject to this pinned importer and shader set | No blanket appearance-equivalence claim; check the exported asset |
 | Draco, Meshopt or BasisU required compression | Rejected before import; matching optional decoders are absent from this player | Production preflight regression |
 | External `.bin`/texture/URL dependencies | Rejected, including local relative paths; embed all dependencies | Production preflight regression |
@@ -87,6 +87,16 @@ Keep the original license and export a small test asset before a large purchase.
 and active-reference checks. These establish file/dependency validation, not
 renderer correctness. A given acquisition build records its own identity and
 the model bytes; use that same build for scientifically faithful replay.
+
+Load `Examples/Sequences/custom-models.sequence.json` for three real GLB object
+examples. **Appearance → Objects** combines the model/path, optional color
+override and preview. Placement and detailed surface controls stay collapsed.
+The original model file is unchanged. `appearance.enabled` opts an object into
+`appearance.color`; `keepTexture` chooses tint versus a uniform color. The
+population equivalent is `modelAppearance` in Kannadi/generated-model configs.
+`Examples/Sequences/kannadi-glb.sequence.json` points social animals at the
+visible exported locust file. Sources, exact hashes and license notices are
+beside the files in `Models/Examples/`.
 
 ### Appearance and visibility
 

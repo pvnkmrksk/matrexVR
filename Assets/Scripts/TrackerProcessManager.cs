@@ -33,10 +33,10 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
 {
     private sealed class Receipt
     {
-        public string vrId,backend,executable,configFile,releaseTag,executableSha256;
+        public string vrId,backend,executable,configFile,releaseTag,executableSha256,device,configRoot;
         public int processId,port;
         public long startUtcTicks;
-        public bool demo,strictCameraFallback;
+        public bool demo,strictCameraFallback,headless;
         public bool saveVideo;
         public string recordingDirectory,recordingPrefix;
         public TrackerRecordingControlMode recordingControl;
@@ -118,6 +118,7 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
         result["executableSha256"]=receipt.executableSha256;result["executable"]=receipt.executable;
         result["processId"]=receipt.processId;result["startUtcTicks"]=receipt.startUtcTicks;
         result["port"]=receipt.port;result["configFile"]=receipt.configFile;
+        result["launchConfigRoot"]=receipt.configRoot;result["device"]=receipt.device;result["headless"]=receipt.headless;
         result["demoRequested"]=receipt.demo;result["strictCameraFallback"]=receipt.strictCameraFallback;
         var recording=RecordingState(vrId);bool hasRequest=(string)recording["state"]!="idle";
         result["savedVideoRequested"]=hasRequest?(bool?)recording["requested"]==true:receipt.saveVideo;
@@ -194,7 +195,10 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
                 {
                     if(previous.unverified)throw new InvalidOperationException("An existing tracker process cannot be verified. Close its own window before trying Start again; another copy will not be spawned.");
                     string requestedConfig=rig.tracker!=null&&!string.IsNullOrWhiteSpace(rig.tracker.configFile)?ResolveConfig(rig.tracker.configFile):previous.configFile;
-                    if(previous.recordingControl!=(rig.tracker?.recordingControl??TrackerRecordingControlMode.Experiment)||previous.port!=rig.zmqPort||previous.backend!=TrackerBackend.DisplayName(rig.closedLoopMode)||requestedConfig!=previous.configFile||previous.strictCameraFallback!=(rig.tracker?.strictCameraFallback??false)||(string.IsNullOrEmpty(previous.controlDirectory)&&previous.saveVideo!=(rig.tracker?.saveVideo??true))||(prepared!=null&&previous.executableSha256!=prepared.executableSha256))
+                    bool deviceChanged=!string.IsNullOrWhiteSpace(rig.tracker?.device)&&!string.Equals(previous.device,rig.tracker.device,StringComparison.Ordinal);
+                    bool headlessChanged=rig.tracker?.headless==true&&!previous.headless;
+                    bool profileChanged=!string.IsNullOrWhiteSpace(previous.configRoot)&&!SameRecordingPath(previous.configRoot,RuntimePaths.ConfigRoot);
+                    if(deviceChanged||headlessChanged||profileChanged||previous.recordingControl!=(rig.tracker?.recordingControl??TrackerRecordingControlMode.Experiment)||previous.port!=rig.zmqPort||previous.backend!=TrackerBackend.DisplayName(rig.closedLoopMode)||requestedConfig!=previous.configFile||previous.strictCameraFallback!=(rig.tracker?.strictCameraFallback??false)||(string.IsNullOrEmpty(previous.controlDirectory)&&previous.saveVideo!=(rig.tracker?.saveVideo??true))||(prepared!=null&&previous.executableSha256!=prepared.executableSha256))
                         throw new InvalidOperationException("This rig already has an independent tracker window using another source/configuration. Close it or choose Stop tracker before switching.");
                     RegisterMedia(previous);MonitorRecordingExit(previous);
                     return; // Start is idempotent, including after restarting Unity.
@@ -220,7 +224,7 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
             using(var process=macBundle?MacAppLauncher.Launch(executable,args):Process.Start(DetachedStart(executable,args,Path.GetDirectoryName(executable),log)))
             {
                 if(process==null)throw new InvalidOperationException("Tracker process did not start.");
-                var receipt=new Receipt{vrId=rig.vrId,backend=TrackerBackend.DisplayName(rig.closedLoopMode),executable=executable,configFile=ResolveConfig(rig.tracker.configFile),port=rig.zmqPort,processId=process.Id,startUtcTicks=process.StartTime.ToUniversalTime().Ticks,demo=prepared?.demo??false,strictCameraFallback=rig.tracker.strictCameraFallback,releaseTag=prepared?.releaseTag,executableSha256=prepared?.executableSha256??HashFile(executable),
+                var receipt=new Receipt{vrId=rig.vrId,backend=TrackerBackend.DisplayName(rig.closedLoopMode),executable=executable,configFile=ResolveConfig(rig.tracker.configFile),port=rig.zmqPort,processId=process.Id,startUtcTicks=process.StartTime.ToUniversalTime().Ticks,demo=prepared?.demo??false,strictCameraFallback=rig.tracker.strictCameraFallback,device=rig.tracker.device,headless=rig.tracker.headless,configRoot=Path.GetFullPath(RuntimePaths.ConfigRoot),releaseTag=prepared?.releaseTag,executableSha256=prepared?.executableSha256??HashFile(executable),
                     saveVideo=rig.tracker.saveVideo,recordingDirectory=rig.tracker.recordingDirectory,recordingPrefix=rig.tracker.recordingPrefix,
                     recordingControl=rig.tracker.recordingControl,controlDirectory=controlDirectory,controlInstance=controlInstance};
                 string file=ReceiptPath(rig.vrId),temporary=file+".writing";
@@ -233,7 +237,7 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
     private static void RegisterMedia(Receipt receipt)
     {
         if(receipt==null)return;
-        if(receipt.recordingControl==TrackerRecordingControlMode.Experiment&&!string.IsNullOrEmpty(receipt.controlDirectory)){CompanionMediaArchive.ClearLaunchedSource(receipt.vrId);return;}
+        if(receipt.recordingControl==TrackerRecordingControlMode.Experiment){CompanionMediaArchive.ClearLaunchedSource(receipt.vrId);return;}
         if(!receipt.saveVideo){CompanionMediaArchive.ClearLaunchedSource(receipt.vrId);return;}
         if(string.IsNullOrWhiteSpace(receipt.recordingDirectory))return;
         CompanionMediaArchive.RegisterLaunchedSource(new MediaRecordingSource{RigId=receipt.vrId,Backend=receipt.backend,DirectoryPath=receipt.recordingDirectory,
@@ -242,7 +246,7 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
     }
     private static void MonitorRecordingExit(Receipt receipt)
     {
-        if(!receipt.saveVideo||!string.IsNullOrEmpty(receipt.controlDirectory))return;
+        if(receipt.recordingControl==TrackerRecordingControlMode.Experiment||!receipt.saveVideo||!string.IsNullOrEmpty(receipt.controlDirectory))return;
         string identity=receipt.processId+"-"+receipt.startUtcTicks;
         lock(recordingWatchGate)if(!recordingWatches.Add(identity))return;
         try

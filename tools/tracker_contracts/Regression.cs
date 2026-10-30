@@ -100,8 +100,76 @@ public static class Regression
             }
             var unmanaged=new SystemConfig{vrId="VR-UNMANAGED",closedLoopMode=ClosedLoopMode.Rekkefly,tracker=new TrackerLaunchConfig{saveVideo=true}};
             string unsupportedId=Guid.NewGuid().ToString("N"),unsupportedRun=Path.Combine(temp,"unmanaged-run");Directory.CreateDirectory(unsupportedRun);
-            Reject(()=>TrackerProcessManager.BeginExperimentRecordingAsync(new[]{unmanaged},unsupportedRun,unsupportedId).GetAwaiter().GetResult(),"Required automatic video rejects an unmanaged source instead of silently skipping recording");
-            Reject(()=>TrackerProcessManager.EndExperimentRecordingAsync(unsupportedId,"failed").GetAwaiter().GetResult(),"Failed native preparation retains explicit terminal failure");
+            var unsupported=TrackerProcessManager.BeginExperimentRecordingAsync(new[]{unmanaged},unsupportedRun,unsupportedId).GetAwaiter().GetResult();
+            Check(unsupported.Warnings.Count==1&&unsupported.AcknowledgedRigCount==0&&(string)TrackerProcessManager.RecordingState(unmanaged.vrId)["state"]=="unavailable","Missing automatic recorder returns an explicit warning without blocking VR startup or claiming recording");
+            TrackerProcessManager.EndExperimentRecordingAsync(unsupportedId,"stopped").GetAwaiter().GetResult();Check((string)TrackerProcessManager.RecordingState(unmanaged.vrId)["state"]=="unavailable","A recorder that never started stays unavailable without failing VR finalization");
+            var endpointRigs=new List<SystemConfig>();
+            try
+            {
+                foreach(string fixture in new[]{"unresponsive-a","unresponsive-b","healthy","reject-start","zero-frames"})
+                {
+                    string fixtureConfig=Path.Combine(temp,fixture+".toml");File.WriteAllText(fixtureConfig,"fixture-endpoint "+fixture);
+                    var fixtureRig=new SystemConfig{vrId="VR-"+fixture,closedLoopMode=ClosedLoopMode.Rekkefly,zmqAddress="localhost",zmqPort=9860+endpointRigs.Count,tracker=new TrackerLaunchConfig{executablePath=args[0],configFile=fixtureConfig,saveVideo=true,headless=true}};
+                    endpointRigs.Add(fixtureRig);TrackerProcessManager.Instance.Launch(fixtureRig);
+                }
+                string stateRoot=Path.Combine(UnityEngine.Application.persistentDataPath,"Companions/processes");
+                for(int wait=0;wait<200;wait++)
+                {if(endpointRigs.All(rig=>Directory.EnumerateFiles(stateRoot,"*.json").Select(path=>JObject.Parse(File.ReadAllText(path))).Where(value=>(string)value["vrId"]==rig.vrId).Any(value=>File.Exists(Path.Combine((string)value["controlDirectory"],"endpoint.json")))))break;Thread.Sleep(5);}
+                string independentId=Guid.NewGuid().ToString("N"),independentRun=Path.Combine(temp,"independent-recorders");Directory.CreateDirectory(independentRun);
+                var elapsed=Stopwatch.StartNew();
+                var independent=TrackerProcessManager.BeginExperimentRecordingAsync(new[]{endpointRigs[0],endpointRigs[1],unmanaged,endpointRigs[2],endpointRigs[3]},independentRun,independentId).GetAwaiter().GetResult();
+                Check(elapsed.Elapsed.TotalSeconds<1.8,"Two silent endpoints share a bounded parallel wait rather than delaying startup serially");
+                Check(independent.Warnings.Count==4&&independent.AcknowledgedRigCount==1,"Missing, silent and rejected recorders produce independent warnings while a healthy later rig still starts");
+                Check((string)TrackerProcessManager.RecordingState("VR-healthy")["state"]=="recording"&&(bool)TrackerProcessManager.RecordingState("VR-healthy")["acknowledged"],"Only the actual acknowledged filesystem peer is labeled recording");
+                var savedStart=JObject.Parse(File.ReadAllText(Path.Combine(independentRun,"native_recording_start.json")));
+                Check((string)savedStart["runId"]==independentId&&savedStart["warnings"].Count()==4,"Saved run report retains all recorder warnings and its immutable GUID");
+                TrackerProcessManager.EndExperimentRecordingAsync(independentId,"stopped").GetAwaiter().GetResult();
+                Check((string)TrackerProcessManager.RecordingState("VR-healthy")["state"]=="complete"&&(string)TrackerProcessManager.RecordingState("VR-reject-start")["state"]=="unavailable","End drains the exact accepted take without treating a definitive unaccepted Start as an unresolved recorder");
+                var healthy=endpointRigs[2];
+                var healthyReceipt=Directory.EnumerateFiles(stateRoot,"*.json").Select(path=>JObject.Parse(File.ReadAllText(path))).Single(value=>(string)value["vrId"]==healthy.vrId);
+                string requestLog=Path.Combine((string)healthyReceipt["controlDirectory"],"requests.jsonl"),savedProfile=RuntimePaths.ConfigRoot;
+                string otherConfig=Path.Combine(temp,"different-calibration.toml"),otherExecutable=Path.Combine(temp,"different-Mock");File.WriteAllText(otherConfig,"fixture-endpoint healthy");File.Copy(args[0],otherExecutable);
+                var mismatches=new (string name,Action<SystemConfig> change)[]{
+                    ("port",changed=>changed.zmqPort++),
+                    ("remote-address",changed=>changed.zmqAddress="192.0.2.77"),
+                    ("calibration",changed=>changed.tracker.configFile=otherConfig),
+                    ("executable",changed=>changed.tracker.executablePath=otherExecutable),
+                    ("device",changed=>changed.tracker.device="DifferentCamera"),
+                    ("backend",changed=>changed.closedLoopMode=ClosedLoopMode.Hejjetrac),
+                    ("camera-only",changed=>changed.tracker.strictCameraFallback=true),
+                    ("profile",changed=>RuntimePaths.ConfigRoot=Path.Combine(temp,"another-profile")),
+                    ("legacy-profile",changed=>RuntimePaths.ConfigRoot=Path.Combine(temp,"another-profile"))};
+                foreach(var mismatch in mismatches)
+                {
+                    var desired=JsonConvert.DeserializeObject<SystemConfig>(JsonConvert.SerializeObject(healthy));
+                    int beforeCommands=File.ReadAllLines(requestLog).Length;mismatch.change(desired);
+                    string ownedReceiptPath=Directory.EnumerateFiles(stateRoot,"*.json").Single(path=>(string)JObject.Parse(File.ReadAllText(path))["vrId"]==healthy.vrId),savedReceipt=File.ReadAllText(ownedReceiptPath);
+                    if(mismatch.name=="legacy-profile"){var legacy=JObject.Parse(savedReceipt);legacy.Remove("configRoot");File.WriteAllText(ownedReceiptPath,legacy.ToString());}
+                    string mismatchId=Guid.NewGuid().ToString("N"),mismatchRun=Path.Combine(temp,"identity-"+mismatch.name);Directory.CreateDirectory(mismatchRun);
+                    try
+                    {
+                        var report=TrackerProcessManager.BeginExperimentRecordingAsync(new[]{desired},mismatchRun,mismatchId).GetAwaiter().GetResult();
+                        Check(report.Warnings.Count==1&&report.AcknowledgedRigCount==0&&(string)TrackerProcessManager.RecordingState(healthy.vrId)["state"]=="unavailable","Desired "+mismatch.name+" mismatch leaves the old owned tracker unacknowledged and warns while VR can continue");
+                        TrackerProcessManager.EndExperimentRecordingAsync(mismatchId,"stopped").GetAwaiter().GetResult();
+                        Check(File.ReadAllLines(requestLog).Length==beforeCommands,"Desired "+mismatch.name+" mismatch sends zero native commands, including status/start/stop");
+                    }
+                    finally{RuntimePaths.ConfigRoot=savedProfile;File.WriteAllText(ownedReceiptPath,savedReceipt);}
+                }
+                var aliasRig=JsonConvert.DeserializeObject<SystemConfig>(JsonConvert.SerializeObject(healthy));aliasRig.closedLoopMode=ClosedLoopMode.Kinefly;
+                string aliasId=Guid.NewGuid().ToString("N"),aliasRun=Path.Combine(temp,"normalized-owner");Directory.CreateDirectory(aliasRun);
+                var aliasReport=TrackerProcessManager.BeginExperimentRecordingAsync(new[]{aliasRig},aliasRun,aliasId).GetAwaiter().GetResult();
+                Check(aliasReport.AcknowledgedRigCount==1&&aliasReport.Warnings.Count==0,"Unchanged owner still records when the flight backend uses its normalized legacy alias");
+                TrackerProcessManager.EndExperimentRecordingAsync(aliasId,"stopped").GetAwaiter().GetResult();
+                string emptyId=Guid.NewGuid().ToString("N"),emptyRun=Path.Combine(temp,"zero-frame-run");Directory.CreateDirectory(emptyRun);
+                var empty=TrackerProcessManager.BeginExperimentRecordingAsync(new[]{endpointRigs[4]},emptyRun,emptyId).GetAwaiter().GetResult();
+                Check(empty.Warnings.Count==1&&empty.AcknowledgedRigCount==0,"An armed recorder without a first frame becomes a warning after the shared preparation budget");
+                TrackerProcessManager.EndExperimentRecordingAsync(emptyId,"stopped").GetAwaiter().GetResult();
+                var emptyState=TrackerProcessManager.RecordingState(endpointRigs[4].vrId);
+                Check((string)emptyState["state"]=="closed-unacknowledged"&&(bool?)emptyState["acknowledged"]==false&&(string)emptyState["native"]?["state"]=="complete","Physical closure of an empty take never becomes a false first-frame recording acknowledgement");
+                Check(CompanionMediaArchive.LaunchedSources[endpointRigs[4].vrId].NoVideoFrames,"A closed empty take is retained as artifacts rather than a fabricated replay clip");
+
+            }
+            finally{foreach(var fixtureRig in endpointRigs)TrackerProcessManager.Instance.Stop(fixtureRig.vrId);}
             unmanaged.tracker.recordingControl=TrackerRecordingControlMode.Manual;
             string manualId=Guid.NewGuid().ToString("N"),manualRun=Path.Combine(temp,"manual-run");Directory.CreateDirectory(manualRun);
             TrackerProcessManager.BeginExperimentRecordingAsync(new[]{unmanaged},manualRun,manualId).GetAwaiter().GetResult();
@@ -137,6 +205,14 @@ public static class Regression
                     File.AppendAllText(video.rig.tracker.configFile,"\n# video calibration edit\n");var again=CompanionCatalog.Prepare(cameraRig,true);
                     Check(File.ReadAllText(again.rig.tracker.configFile).Contains("video calibration edit"),"Repeated preparation keeps operator recording calibration: "+mode);cameraRig.tracker.saveVideo=false;var off=CompanionCatalog.Prepare(cameraRig,true);Check(!off.rig.tracker.saveVideo&&off.rig.tracker.configFile==again.rig.tracker.configFile&&File.ReadAllText(off.rig.tracker.configFile).Contains("video calibration edit"),"Explicit video opt-out retains the same newly edited calibration: "+mode);
                     cameraRig.tracker=null;var omitted=CompanionCatalog.Prepare(cameraRig,true);Check(omitted.rig.tracker.saveVideo,"Omitted tracker object uses the same video-on runtime default: "+mode);
+                    var catalogEntry=entries.OfType<JObject>().Single(entry=>(string)entry["backend"]==(mode==ClosedLoopMode.Rekkefly?"rekkefly":"hejjetrac"));
+                    catalogEntry["supportsRecordingControl"]=false;File.WriteAllText(Path.Combine(fixtureBundle,"catalog.json"),new JObject{["schemaVersion"]=1,["entries"]=entries}.ToString());
+                    cameraRig.tracker=new TrackerLaunchConfig{saveVideo=true};var unavailable=CompanionCatalog.Prepare(cameraRig,true);
+                    Check(!string.IsNullOrEmpty(unavailable.recordingWarning)&&!unavailable.supportsRecordingControl,"A companion without recording control prepares input with a warning instead of blocking: "+mode);
+                    unavailable.rig.tracker.executablePath=args[0]; // Use the fixture apphost beside its runtime DLLs.
+                    try{TrackerProcessManager.Instance.LaunchPrepared(unavailable);for(int wait=0;wait<200&&(bool?)TrackerProcessManager.RecordingProvenance(cameraRig.vrId)["identityVerified"]!=true;wait++)Thread.Sleep(5);Check(!CompanionMediaArchive.LaunchedSources.ContainsKey(cameraRig.vrId),"Unsupported automatic recording never creates a fake pending launched-media source: "+mode);}finally{TrackerProcessManager.Instance.Stop(cameraRig.vrId);}
+                    catalogEntry["supportsRecordingControl"]=true;File.WriteAllText(Path.Combine(fixtureBundle,"catalog.json"),new JObject{["schemaVersion"]=1,["entries"]=entries}.ToString());
+
                 }
             }
             finally{Environment.SetEnvironmentVariable("MATREX_COMPANION_DIR",originalBundle);}

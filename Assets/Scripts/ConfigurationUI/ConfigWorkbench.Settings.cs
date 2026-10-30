@@ -16,15 +16,16 @@ namespace ConfigurationUI
         private void BuildExperimentEditor()
         {
             bool phased=ExperimentBlocks.Phased((JObject)selected.Root);
+            var editToolbar=Row("experiment-actions");body.Add(editToolbar);
             if(!phased && selected.SchemaId!="dynamic-choice")
             {
-                var addPhases=StudioButton("Add pre / stimulus / post timeline","sequence",()=>{
+                var addPhases=StudioButton("Add phases","sequence",()=>{
                     double seconds=BuilderSteps.OfType<JObject>().Where(s=>BlockReference(s)!=null&&System.IO.Path.GetFullPath(ExperimentConfigFiles.Resolve(BlockReference(s)))==selected.Path)
                         .Select(s=>ExperimentBlocks.Number(s["duration"],30)).FirstOrDefault();
                     if(seconds<=0)seconds=ExperimentBlocks.FlatDuration(selected.Root as JObject);
                     StudioEdit(selected,r=>ExperimentBlocks.AddPhaseTimeline((JObject)r,seconds));
                 },"quiet");addPhases.name="add-phase-timeline";
-                addPhases.tooltip="Keep the existing stimulus and add optional pre/post phases. An existing heading observation moves into pre-stimulus with its own duration. Shuffling and looping keep the timeline together. This change is undoable.";body.Add(addPhases);
+                addPhases.tooltip="Keep the existing stimulus and add optional pre/post phases. An existing heading observation moves into pre-stimulus with its own duration. Shuffling and looping keep the timeline together. This change is undoable.";editToolbar.Add(addPhases);
             }
             if(phased)
             {
@@ -46,7 +47,7 @@ namespace ConfigurationUI
                 }
             }
             JObject payload=EditingPayload(); JObject schema=phased?ConfigSchema.Child(Workspace.Schemas.Get(selected.SchemaId),activePhase):Workspace.Schemas.Get(selected.SchemaId);
-            AddChoiceCatalogAction(body);
+            AddChoiceCatalogAction(editToolbar);
             string[] prefix=phased?new[]{activePhase}:Array.Empty<string>();
             if(phased)
             {
@@ -65,49 +66,57 @@ namespace ConfigurationUI
                 keep.tooltip="ON continues the animal's position and heading into stimulus and post-stimulus. OFF resets both to each phase's configured initial pose. Individual reset switches remain available under Motion.";continuity.Add(keep);
             }
             AddSequenceOverrideNotice(body);
+            string category=SettingsCategory(settingsTab);
             var tabs=Row("settings-tabs"); body.Add(tabs);
-            foreach(string name in new[]{"Essentials","Motion","Stimulus","Sky","Visibility","Tuning","All parameters"})
-            { string key=name; tabs.Add(StudioButton(name,name=="Essentials"?"home":name=="Motion"?"motion":name=="Stimulus"?"swarm":name=="Sky"?"sky":name=="Visibility"?"visibility":"settings",()=>{ settingsTab=key; BuildContent(); },settingsTab==name?"tab-active":"quiet")); }
-            var scroll=new ScrollView { name="settings-editor-scroll",horizontalScrollerVisibility=ScrollerVisibility.Hidden }; scroll.AddToClassList("settings-scroll"); body.Add(scroll);
+            foreach(string name in new[]{"Basics","Appearance","Motion","Advanced"})
+            { string key=name;tabs.Add(StudioButton(name,name=="Basics"?"home":name=="Appearance"?"palette":name=="Motion"?"motion":"settings",()=>{settingsTab=key;BuildContent();},category==name?"tab-active":"quiet")); }
+            var scroll=new ScrollView {name="settings-editor-scroll",horizontalScrollerVisibility=ScrollerVisibility.Hidden};scroll.AddToClassList("settings-scroll");body.Add(scroll);
             AddTimingWarnings(scroll,selected);
-            if(settingsTab=="Sky")BuildSkyChoices(scroll,payload,schema,prefix);
-            if(settingsTab=="Essentials")
+            var present=DisplayKeys(payload,schema).Where(key=>key!="enabled"&&!new[]{"preStimulus","stimulus","postStimulus"}.Contains(key)).ToList();
+            if(category=="Basics")
             {
-                Section(scroll,"Core controls","motion",payload,schema,prefix,new[]{"durationSeconds","populationMode","closedLoopOrientation","closedLoopPosition","autopilotEnabled","autopilotSpeed","aglHeight",AgentCountKey(payload),AgentSpeedKey(payload),"dimension","agentVisual","modelPath","kannadiModelPath","numberOfRings","animateOnMove","loop","repetitions","sync"});
-                var features=Row("feature-grid"); scroll.Add(features);
-                foreach(string name in new[]{"swarm","nightSky","headingReference","objects","stimuli","steps"})
-                    if(payload[name]!=null)
-                    {
-                        string key=name; var card=new VisualElement(); card.AddToClassList("feature-card"); features.Add(card); var line=Row(); card.Add(line); line.Add(new WorkbenchIcon(key=="nightSky"?"sky":key=="swarm"?"swarm":"settings")); line.Add(new Label(Pretty(key)));
-                        JToken value=payload[key]; bool active=value.Type!=JTokenType.Null && (!(value is JObject o) || ExperimentBlocks.Flag(o["enabled"],true));
-                        card.Add(Pill(value is JArray a?a.Count+" items":active?"ON":"OFF",active?"accent":"muted-pill"));
-                        card.Add(Button("Edit parameters",()=>{ settingsTab=key=="nightSky"?"Sky":key=="headingReference"?"Tuning":"Stimulus"; expandedSections.Add(selected.Path+"|"+string.Join("/",prefix.Concat(new[]{key}))); BuildContent(); },"quiet"));
-                    }
+                Section(scroll,"Experiment","sequence",payload,schema,prefix,new[]{"durationSeconds","populationMode",AgentCountKey(payload),"numberOfRings","dimension"});
+                Section(scroll,"Tracking","navigation",payload,schema,prefix,new[]{"closedLoopOrientation","closedLoopPosition"});
+                var shortcuts=Row("editor-shortcuts");scroll.Add(shortcuts);
+                shortcuts.Add(StudioButton("Objects & sky","palette",()=>{settingsTab="Appearance";BuildContent();},"quiet"));
+                shortcuts.Add(StudioButton("Motion & resets","motion",()=>{settingsTab="Motion";BuildContent();},"quiet"));
+            }
+            else if(category=="Appearance")
+            {
+                BuildPopulationAppearance(scroll,payload,schema,prefix);
+                if(schema["properties"]?["objects"]!=null||payload["objects"] is JArray)BuildObjectCollection(scroll,payload,schema,prefix);
+                var sky=new Foldout {name="appearance-sky",text="Sky & light",value=settingsTab=="Sky"||!(payload["objects"] is JArray objects)||objects.Count==0};sky.AddToClassList("editor-disclosure");scroll.Add(sky);
+                BuildSkyChoices(sky,payload,schema,prefix);
+                var skyKeys=new[]{"uniformSkyColor","skyboxPath","panoramaRotationDegrees","nightSky","sun"};
+                Section(sky,"Background & sun","sky",payload,schema,prefix,skyKeys);
+            }
+            else if(category=="Motion")
+            {
+                Section(scroll,"Tracking","navigation",payload,schema,prefix,present.Where(key=>key.StartsWith("closedLoop")||key.StartsWith("walking")));
+                Section(scroll,"Movement","motion",payload,schema,prefix,present.Where(key=>key.StartsWith("autopilot")||new[]{"aglHeight",AgentSpeedKey(payload),"animateOnMove"}.Contains(key)));
+                var pose=new Foldout {name="motion-pose-details",text="Starting pose & resets",value=false};pose.AddToClassList("editor-disclosure");scroll.Add(pose);
+                Section(pose,"Pose","settings",payload,schema,prefix,present.Where(key=>key.StartsWith("initial")||key.StartsWith("reset")||key=="randomInitialRotation"));
+                var environment=new Foldout {name="motion-environment-details",text="Wind & terrain",value=false};environment.AddToClassList("editor-disclosure");scroll.Add(environment);
+                Section(environment,"Environment","motion",payload,schema,prefix,present.Where(key=>key.StartsWith("wind")||key=="groundLayerMask"));
             }
             else
             {
-                var present=DisplayKeys(payload,schema).Where(k=>k!="enabled" && !new[]{"preStimulus","stimulus","postStimulus"}.Contains(k)).ToList();
-                if(settingsTab=="Visibility" && !present.Contains(ExperimentVisibility.Field))present.Add(ExperimentVisibility.Field);
-                if(settingsTab=="Sky")foreach(string skyField in new[]{"uniformSkyColor","skyboxPath","panoramaRotationDegrees","nightSky","sun"})if(schema["properties"]?[skyField]!=null&&!present.Contains(skyField))present.Add(skyField);
-                if(settingsTab=="All parameters")
-                {
-                    var addMissing=new Toggle("Show unset optional fields") { name="show-omitted-settings",tooltip="Defaults are already shown. Also reveal optional fields whose omitted value is null or unspecified; viewing them does not write to JSON." }; scroll.Add(addMissing);
-                    var addParameter=Button("Add parameter…",()=>ShowParameterDialog(selected,prefix),"quiet");addParameter.AddToClassList("add-parameter-action");scroll.Add(addParameter);
-                    var content=new VisualElement(); scroll.Add(content);
-                    Action render=()=>{ content.Clear(); var keys=present.ToList(); if(addMissing.value) keys.AddRange(((JObject)schema["properties"]).Properties().Select(p=>p.Name).Where(k=>!keys.Contains(k) && k!="enabled" && !new[]{"preStimulus","stimulus","postStimulus"}.Contains(k)));
-                        foreach(string group in new[]{"Motion","Stimulus","Sky","Visibility","Tuning","Other"}) Section(content,group,GroupIcon(group),payload,schema,prefix,keys.Where(k=>Group(k)==group),false); };
-                    addMissing.RegisterValueChangedCallback(_=>render()); render();
-                }
-                else if(settingsTab=="Motion")
-                {
-                    Section(scroll,"Closed loop","motion",payload,schema,prefix,present.Where(k=>k.StartsWith("closedLoop") || k.StartsWith("walking")));
-                    Section(scroll,"Forward motion & altitude","motion",payload,schema,prefix,present.Where(k=>k.StartsWith("autopilot") || k.StartsWith("wind") || new[]{"aglHeight","groundLayerMask","durationSeconds"}.Contains(k)));
-                    Section(scroll,"Starting pose & resets","settings",payload,schema,prefix,present.Where(k=>k.StartsWith("initial") || k.StartsWith("reset") || k=="randomInitialRotation"));
-                }
-                else Section(scroll,settingsTab,GroupIcon(settingsTab),payload,schema,prefix,present.Where(k=>Group(k)==settingsTab));
+                var visibility=new Foldout {name="advanced-visibility",text="Who sees whom",value=settingsTab=="Visibility"};visibility.AddToClassList("editor-disclosure");scroll.Add(visibility);
+                Section(visibility,"Visibility","visibility",payload,schema,prefix,new[]{ExperimentVisibility.Field});
+                var tuning=new Foldout {name="advanced-tuning",text="Timing & behavior",value=settingsTab=="Tuning"};tuning.AddToClassList("editor-disclosure");scroll.Add(tuning);
+                Section(tuning,"Behavior","settings",payload,schema,prefix,present.Where(key=>Group(key)=="Tuning"));
+                var all=new Foldout {name="advanced-all-parameters",text="All parameters",value=settingsTab=="All parameters"||settingsTab=="Stimulus"};all.AddToClassList("editor-disclosure");scroll.Add(all);
+                var addMissing=new Toggle("Show optional fields"){name="show-omitted-settings",tooltip="Show omitted optional fields without writing defaults into JSON."};all.Add(addMissing);
+                var addParameter=StudioButton("Add parameter","plus",()=>ShowParameterDialog(selected,prefix),"quiet");addParameter.AddToClassList("add-parameter-action");all.Add(addParameter);
+                var content=new VisualElement();all.Add(content);
+                Action render=()=>{content.Clear();var keys=present.ToList();if(addMissing.value)keys.AddRange(((JObject)schema["properties"]).Properties().Select(property=>property.Name).Where(key=>!keys.Contains(key)&&key!="enabled"&&!new[]{"preStimulus","stimulus","postStimulus"}.Contains(key)));
+                    foreach(string group in new[]{"Motion","Stimulus","Sky","Visibility","Tuning","Other"})Section(content,group,GroupIcon(group),payload,schema,prefix,keys.Where(key=>Group(key)==group),false);};
+                addMissing.RegisterValueChangedCallback(_=>render());render();
             }
             if(phased) BindViewState(scroll,()=>scroll.SetEnabled(ExperimentBlocks.Flag(selected.Root[activePhase]?["enabled"],activePhase=="stimulus")));
         }
+        private static string SettingsCategory(string tab)=>tab=="Essentials"||tab=="Basics"?"Basics":tab=="Sky"||tab=="Appearance"?"Appearance":tab=="Motion"?"Motion":"Advanced";
+        private bool EditingSky=>SettingsCategory(settingsTab)=="Appearance";
         private static bool HasValue(JObject payload,string key) => payload[key]!=null && payload[key].Type!=JTokenType.Null;
         private static string AgentCountKey(JObject payload) => HasValue(payload,"agentCount")?"agentCount":HasValue(payload,"numberOfLocusts")?"numberOfLocusts":"agentCount";
         private static string AgentSpeedKey(JObject payload) => HasValue(payload,"agentSpeed")?"agentSpeed":HasValue(payload,"locustSpeed")?"locustSpeed":HasValue(payload,"locoSpeed")?"locoSpeed":"agentSpeed";
@@ -121,7 +130,7 @@ namespace ConfigurationUI
         {
             if(key==ExperimentVisibility.Field)return "Visibility";
             if(key.StartsWith("initial") || key.StartsWith("reset") || key.StartsWith("closedLoop") || key.StartsWith("walking") || key.StartsWith("autopilot") || key.StartsWith("wind") || new[]{"randomInitialRotation","aglHeight","groundLayerMask","durationSeconds"}.Contains(key)) return "Motion";
-            if(new[]{"backgroundColor","uniformSkyColor","nightSky","skyboxPath","skybox","panoramaRotationDegrees","sun"}.Contains(key)) return "Sky";
+            if(new[]{"backgroundColor","uniformSkyColor","nightSky","skyboxPath","skybox","panoramaRotationDegrees","sun","modelAppearance"}.Contains(key)) return "Sky";
             if(key.StartsWith("autoTrim") || key=="headingReference" || key=="adaptiveDecision" || key=="useHeadingReference") return "Tuning";
             if(new[]{"preStimulus","stimulus","postStimulus"}.Contains(key)) return "Other";
             if(new[]{"seed","repetitions","sync","loop"}.Contains(key)) return "Tuning";
@@ -148,11 +157,11 @@ namespace ConfigurationUI
             var label=Row("setting-label"); setting.Add(label); var caption=new Label(Pretty(key)); caption.AddToClassList("setting-title"); label.Add(caption);
             string unit=(string)schema["x-ui"]?["unit"]; if(!string.IsNullOrEmpty(unit)) label.Add(Pill(unit,"unit-pill"));
             if(schema["default"]!=null && schema["default"].Type!=JTokenType.Null)
-            { var inherited=Pill("Inherited","muted-pill"); inherited.tooltip="Not explicitly set in this file. The displayed value comes from the runtime/schema default."; label.Add(inherited); BindViewState(inherited,()=>inherited.style.visibility=ConfigDocument.At(doc.Root,parts)==null?Visibility.Visible:Visibility.Hidden); }
+            { var inherited=Pill("Inherited","muted-pill"); inherited.tooltip="Not explicitly set in this file. The displayed value comes from the runtime/schema default."; inherited.AddToClassList("inherited-indicator"); label.Add(inherited); BindViewState(inherited,()=>inherited.style.visibility=ConfigDocument.At(doc.Root,parts)==null?Visibility.Visible:Visibility.Hidden); }
             setting.tooltip=ConfigParameterHelp.Description(key,parts,schema); caption.tooltip=setting.tooltip;
             Action<JToken,bool> assign=(v,rebuild)=>StudioEdit(doc,root=>AssignAt(root,parts,v),rebuild);
             JToken shown=ConfigSchema.EffectiveValue(value,schema);
-            if(settingsTab=="Sky" && (shown==null || shown.Type==JTokenType.Null))
+            if(EditingSky && (shown==null || shown.Type==JTokenType.Null))
             {
                 if(key=="uniformSkyColor")shown=new JObject{["r"]=.12,["g"]=.12,["b"]=.12,["a"]=1};
                 else if(key=="nightSky")shown=ConfigSchema.NewValue(schema);
@@ -162,7 +171,8 @@ namespace ConfigurationUI
             {
                 var fallback=Pill("Check JSON","muted-pill");fallback.tooltip="This file contains an invalid value. The control displays its default; edit the value to repair it. Starting stays disabled until validation passes.";label.Add(fallback);BindViewState(fallback,()=>fallback.style.visibility=ConfigSchema.Validate(ConfigDocument.At(doc.Root,parts),schema).Count>0?Visibility.Visible:Visibility.Hidden);
             }
-            if(TryVisibilityControl(doc,parts,out var visibilityControl)){setting.AddToClassList("visibility-setting");setting.Add(visibilityControl);}
+            if(key=="modelAppearance"&&schema["properties"]!=null){setting.AddToClassList("surface-setting");BuildSurfaceControls(setting,schema,parts);}
+            else if(TryVisibilityControl(doc,parts,out var visibilityControl)){setting.AddToClassList("visibility-setting");setting.Add(visibilityControl);}
             else if(TryChoiceCatalogControl(parts,value,v=>assign(v,false),out var catalogControl))setting.Add(catalogControl);
             else if(BooleanControl(shown,schema))
             {
@@ -244,6 +254,11 @@ namespace ConfigurationUI
                 var choices=modes.Select(title).ToList();var dropdown=new DropdownField(choices,modes.IndexOf(current)) {name="tracker-backend-"+string.Join("-",parts)};setting.Add(dropdown);
                 dropdown.RegisterValueChangedCallback(e=>Guard(()=>assign(new JValue(modes[choices.IndexOf(e.newValue)].ToString()),false)));
             }
+            else if(key=="agentVisual")
+            {
+                var choices=new List<string>{"Built-in / GLB model","Bogong visual"};var current=shown?.ToString()??"ScenePrefab";if(current!="ScenePrefab"&&current!="Bogong")choices.Add(current);
+                var picker=new DropdownField(choices,current=="Bogong"?1:current=="ScenePrefab"?0:2);picker.RegisterValueChangedCallback(evt=>assign(new JValue(evt.newValue==choices[0]?"ScenePrefab":evt.newValue==choices[1]?"Bogong":evt.newValue),false));setting.AddToClassList("choice-setting");setting.Add(picker);
+            }
             else if(schema["enum"] is JArray options)
             {
                 setting.AddToClassList("choice-setting");
@@ -266,15 +281,18 @@ namespace ConfigurationUI
                 bool active=ConfigSchema.Enabled(currentOwner,ownerSchema,key,Context)&&ConfigSchema.Visible(currentOwner,ownerSchema,key,Context);
                 if(key=="localTime"&&parts.Contains("nightSky"))
                 {var local=ConfigDocument.At(doc.Root,parts.Take(parts.Length-1).ToArray())?["localTime"]?.ToString();active&=!string.IsNullOrWhiteSpace(local)&&!string.Equals(local,"now",StringComparison.OrdinalIgnoreCase);}
-                if(settingsTab=="Sky")
+                if(EditingSky)
                 {
                     if(key=="uniformSkyColor")active&=selectedSkyMode==1;
                     else if(key=="skyboxPath" || key=="panoramaRotationDegrees")active&=selectedSkyMode==2;
                     else if(key=="nightSky")active&=selectedSkyMode==3;
                 }
+                if((key=="modelAppearance"||key=="modelPath")&&string.Equals((string)currentOwner?["agentVisual"],"Bogong",StringComparison.OrdinalIgnoreCase))active=false;
+                if(key=="kannadiTilePrefab"&&!string.IsNullOrWhiteSpace((string)currentOwner?["kannadiModelPath"]))active=false;
+                if(ChoiceAssetCatalog.IsObjectField(parts)&&!string.IsNullOrWhiteSpace((string)currentOwner?["modelPath"]))active=false;
                 setting.SetEnabled(active);
             };
-            AddObjectPreview(setting,doc,parts);
+            if(!buildingObjectCard)AddObjectPreview(setting,doc,parts);
             BindViewState(setting,enable); return setting;
         }
         private int selectedSkyMode;

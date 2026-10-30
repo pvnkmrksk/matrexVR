@@ -224,7 +224,7 @@ public static class Regression
             Reject(()=>new ReplaySessionArchive(root).Resolve("choice.json"),"manifest path traversal accepted");
             string profile=Path.Combine(root,"native-profile"),native=Path.Combine(root,"native-app-config"),nativeRun=Path.Combine(root,"native-recording");
             Directory.CreateDirectory(profile);Directory.CreateDirectory(native);
-            byte[] originalSystem=Encoding.UTF8.GetBytes("{\"configs\":[{\"vrId\":\"VR1\"}]}\r\n");
+            byte[] originalSystem=Encoding.UTF8.GetBytes("{\"configs\":[{\"vrId\":\"VR1\",\"tracker\":{\"configFile\":\"missing-optional-native.toml\"}},{\"vrId\":\"VR2\",\"tracker\":{\"configFile\":\"missing-optional-native.json\"}}]}\r\n");
             File.WriteAllBytes(Path.Combine(profile,"system_config.json"),originalSystem);
             File.WriteAllText(Path.Combine(profile,"sequenceConfig.json"),"{\"sequences\":[]}");
             string calibration=Path.Combine(native,"calibration.JSON"),sidecar=Path.Combine(native,"unrelated-secret.txt"),stale=Path.Combine(native,"stale.toml"),media=Path.Combine(native,"camera.avi");
@@ -232,6 +232,18 @@ public static class Regression
             byte[] calibrationBytes=new byte[]{0xef,0xbb,0xbf}.Concat(Encoding.UTF8.GetBytes(new JObject{["precision"]="1.0000000000000000000001",["configFile"]=sidecar}.ToString()+"\r\n")).ToArray();
             File.WriteAllBytes(calibration,calibrationBytes);
             var nativeArchive=new RunConfigArchive(nativeRun,profile,"20260101_100000","test");nativeArchive.CaptureStartup("ControlScene");
+            nativeArchive.RequireComplete();
+            Check((bool)JObject.Parse(File.ReadAllText(nativeArchive.ManifestPath))["complete"],"missing native TOML/JSON paths do not become required experiment dependencies at startup");
+            foreach(string requiredKind in new[]{"experiment","model","skybox"})
+            {
+                string strictProfile=Path.Combine(root,"required-"+requiredKind);Directory.CreateDirectory(strictProfile);
+                File.WriteAllBytes(Path.Combine(strictProfile,"system_config.json"),originalSystem);
+                File.WriteAllText(Path.Combine(strictProfile,"sequenceConfig.json"),"{\"sequences\":[{\"parameters\":{\"configFile\":\"required.json\"}}]}");
+                if(requiredKind!="experiment")File.WriteAllText(Path.Combine(strictProfile,"required.json"),new JObject{[requiredKind=="model"?"modelPath":"skyboxPath"]="missing-required-asset"}.ToString());
+                var requiredArchive=new RunConfigArchive(Path.Combine(root,"required-run-"+requiredKind),strictProfile,"20260101_110000","test");requiredArchive.CaptureStartup("ControlScene");
+                bool rejected=false;try{requiredArchive.RequireComplete();}catch(IOException){rejected=true;}
+                Check(rejected,"optional tracker exclusion keeps missing required "+requiredKind+" dependencies strict");
+            }
             nativeArchive.CaptureCompanions(new[]{
                 new JObject{["vrId"]="VR1",["backend"]="Rekkefly",["identityVerified"]=true,["matchesConfiguredRig"]=true,["configFile"]=calibration,["releaseTag"]="local-test",["executableSha256"]=new string('a',64),["demoRequested"]=false,["strictCameraFallback"]=true,["actualInputSource"]="unverified"},
                 new JObject{["vrId"]="VR2",["identityVerified"]=false,["matchesConfiguredRig"]=true,["configFile"]=sidecar},

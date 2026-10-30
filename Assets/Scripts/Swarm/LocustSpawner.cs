@@ -50,6 +50,7 @@ public class LocustSpawner : MonoBehaviour
     public bool useBatchedBogongRendering = true;
 
     public bool animateOnMove;
+    public ModelAppearanceConfig modelAppearance;
     public float animationSpeedThreshold = 0.5f;
     public bool loadConfigFromJsonFile = true; // If true, load config from json file, else use default values
 
@@ -176,6 +177,7 @@ public class LocustSpawner : MonoBehaviour
                 if (locust.GetComponent<LocustMover>() == null) locust.AddComponent<LocustMover>();
             }
             spawned.Add(locust);
+            if (!UsesBogongVisual()) ModelAppearance.Apply(locust, modelAppearance);
             locust.layer = locustLayer; // Set the layer of the spawned locust
             SetLayerRecursively(locust.transform, locustLayer); // Set layer for all children
 
@@ -226,6 +228,7 @@ public class LocustSpawner : MonoBehaviour
     {
         GameObject agent = UsesBogongVisual() ? CreateBogongAgent(Vector3.zero, spawned.Count) : ExternalModelLibrary.InstantiatePrefab(locustPrefab);
         if (!UsesBogongVisual() && locustPrefab.GetComponent<UnityGLTF.InstantiatedGLTFObject>() != null) ExternalModelLibrary.ConfigureAnimation(agent);
+        if (!UsesBogongVisual()) ModelAppearance.Apply(agent, modelAppearance);
         agent.name = layerName + "_ID_pool"; agent.tag = "SimulatedLocust";
         int layer = ResolvedLayer; if (layer < 0) layer = gameObject.layer;
         SetLayerRecursively(agent.transform,layer);
@@ -244,6 +247,7 @@ public class LocustSpawner : MonoBehaviour
         {
             GameObject agent = UsesBogongVisual() ? CreateBogongAgent(Vector3.zero, i) : ExternalModelLibrary.InstantiatePrefab(locustPrefab);
             if (!UsesBogongVisual() && locustPrefab.GetComponent<UnityGLTF.InstantiatedGLTFObject>() != null) ExternalModelLibrary.ConfigureAnimation(agent);
+            if (!UsesBogongVisual()) ModelAppearance.Apply(agent, modelAppearance);
             agent.name = layerName + "_ID_" + data.Tracks[i].id;
             agent.tag = "SimulatedLocust";
             SetLayerRecursively(agent.transform, layer);

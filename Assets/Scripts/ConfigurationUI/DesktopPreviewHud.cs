@@ -44,7 +44,7 @@ namespace ConfigurationUI
             var root=document.rootVisualElement;hudRoot=root;root.AddToClassList("desktop-preview-hud");root.pickingMode=PickingMode.Ignore;
             root.styleSheets.Add(Resources.Load<StyleSheet>("ConfigurationUI/workbench"));WorkbenchTypography.Apply(root);
             JObject marker=null;
-            try{marker=JObject.Parse(ExperimentConfigFiles.ReadAllText(ExperimentConfigFiles.Resolve(MainController.Instance.SystemConfigurationFileName)))["desktopQuickStart"] as JObject;}catch(Exception){ }
+            try{marker=JObject.Parse(ExperimentConfigFiles.ReadAllText(ExperimentConfigFiles.Resolve(MainController.Instance.SystemConfigurationFileName),"system"))["desktopQuickStart"] as JObject;}catch(Exception){ }
             bool demo=(bool?)marker?["demo"]??false;
             bool walkingDemo=demo&&(string)marker?["mode"]=="walking";
             bar=new VisualElement();bar.AddToClassList("desktop-run-bar");bar.style.flexWrap=Wrap.Wrap;root.Add(bar);

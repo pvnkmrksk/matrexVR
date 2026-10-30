@@ -1,0 +1,19 @@
+Portable GLB examples
+
+RiggedSimple.glb
+Copyright 2017 Cesium. Credit: Cesium for the model.
+License: Creative Commons Attribution 4.0 International (CC-BY-4.0).
+License URL: https://creativecommons.org/licenses/by/4.0/
+Source: https://github.com/KhronosGroup/glTF-Sample-Assets/tree/8f492390ddc7a2ae221a1369ef560589cf8c70fb/Models/RiggedSimple
+The downloaded GLB is unmodified. Per-instance colors are configured at runtime.
+
+AnimatedMorphCube.glb
+Copyright attribution in the source: 2017 Public; Microsoft for the model.
+License: Creative Commons Zero v1.0 Universal (CC0-1.0).
+License URL: https://creativecommons.org/publicdomain/zero/1.0/
+Source: https://github.com/KhronosGroup/glTF-Sample-Assets/tree/8f492390ddc7a2ae221a1369ef560589cf8c70fb/Models/AnimatedMorphCube
+The downloaded GLB is unmodified. Per-instance colors are configured at runtime.
+
+Exact download URLs and SHA-256 hashes are in Models/Examples/downloaded-models.provenance.json.
+The exported SimulatedLocust.glb is derived from the pre-existing bundled asset;
+its original asset rights and notices continue to apply. It is not a Khronos sample.

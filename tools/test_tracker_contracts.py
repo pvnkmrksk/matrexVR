@@ -13,7 +13,7 @@ with tempfile.TemporaryDirectory(prefix='matrex-tracker-contracts-') as folder:
     env=dict(os.environ,DOTNET_CLI_HOME=folder,DOTNET_CLI_TELEMETRY_OPTOUT='1',DOTNET_SKIP_FIRST_TIME_EXPERIENCE='1')
     (tmp/'NuGet.Config').write_text('<configuration><packageSources><clear /></packageSources></configuration>')
     (mock/'Mock.csproj').write_text(f'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net{version}.0</TargetFramework></PropertyGroup></Project>')
-    (mock/'Program.cs').write_text('using System; class Mock { static void Main(string[] args) { string log=Environment.GetEnvironmentVariable("MATREX_TRACKER_ARGUMENT_LOG");if(log!=null)System.IO.File.WriteAllText(log,System.Text.Json.JsonSerializer.Serialize(args));while(true)System.Threading.Thread.Sleep(20); } }')
+    shutil.copy2(root/'tools/tracker_contracts/Mock.cs',mock/'Program.cs')
     main=(root/'Assets/Scripts/MainController.cs').read_text();enum=re.search(r'\[JsonConverter\(typeof\(TrackerBackendConverter\)\)\]\s*public enum ClosedLoopMode[^}]+}',main)[0];model=re.search(r'public class SystemConfig\s*\{[^}]+}',main)[0]
     (test/'Models.cs').write_text('using Newtonsoft.Json;\n'+enum+'\n'+model)
     sources=['Assets/Scripts/TrackerBackend.cs','Assets/Scripts/TrackerWireDecoder.cs','Assets/Scripts/MacAppLauncher.cs','Assets/Scripts/TrackerProcessManager.cs','Assets/Scripts/TrackerProcessManager.Recording.cs','Assets/Scripts/NativeRecorderClient.cs','Assets/Scripts/CompanionCatalog.cs','tools/tracker_contracts/Stubs.cs','tools/tracker_contracts/Regression.cs']

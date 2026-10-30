@@ -80,6 +80,10 @@ public static class NativeRecordingLifecycleValidation
         template["overheadCamera"] = new JObject { ["enabled"] = false }; template["statusOverlay"] = new JObject { ["visible"] = false };
         var root = Application.streamingAssetsPath;
         File.WriteAllText(Path.Combine(root, "__native-system.json"), template.ToString());
+        var mixed=(JObject)template.DeepClone();var missing=(JObject)mixed["configs"][0].DeepClone();missing["vrId"]="VR3";missing["zmqPort"]=65534;missing["startCol"]=2;
+        missing["tracker"]=new JObject{["saveVideo"]=true,["recordingControl"]="Experiment",["executablePath"]=Path.Combine(inputs,"missing-tracker"),["configFile"]=Path.Combine(inputs,"missing-native-config.toml")};
+        ((JArray)mixed["configs"]).Add(missing);File.WriteAllText(Path.Combine(root,"__native-mixed-system.json"),mixed.ToString());
+
         // Idle startup has no automatic video request or acquisition side effects.
         var idle = (JObject)template.DeepClone(); foreach (var rig in idle["configs"].OfType<JObject>()) rig["tracker"]["saveVideo"] = false;
         File.WriteAllText(Path.Combine(root, "system_config.json"), idle.ToString());
@@ -130,6 +134,7 @@ public static class NativeRecordingLifecycleValidation
                 Check(!NativeRecorderClient.Recording(NativeRecorderClient.State(await client.CallAsync("status"))), rig.vrId + " initialization opens the actual native GUI without recording");
             }
             for (int take = 0; take < 2; take++) await RunCase("normal-" + take, false, false);
+            await RunCase("mixed-missing-tracker",false,false,true);
             await RunCase("cancelled-preparation", true, false);
             await RunCase("manual-pause", false, true);
             Check(typeof(TrackerProcessManager).GetField("recordingRuns", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null) is System.Collections.IDictionary retained && retained.Count == 0, "Settled takes release run/CTS structures between repetitions");
@@ -142,15 +147,15 @@ public static class NativeRecordingLifecycleValidation
             if (rigs != null) foreach (var rig in rigs) try { TrackerProcessManager.Instance.Stop(rig.vrId); } catch (Exception error) { errors.Add("Owned native cleanup: " + error); }
             Application.logMessageReceived-=CaptureLog;
             SessionState.SetBool(Key, false);
-            File.WriteAllText(Path.Combine(output, "results.json"), new JObject { ["passed"] = failure == null && errors.Count == 0, ["checks"] = new JArray(checks), ["runs"] = new JArray(runs), ["failure"] = failure, ["cleanupErrors"] = new JArray(errors), ["persistentDataPath"] = Application.persistentDataPath, ["scope"] = "Actual Editor MainController start/stop, two owned native GUI engines on generated/sample input, native receipt proof and run-local archive; no physical camera/LED claim." }.ToString(Formatting.Indented));
+            File.WriteAllText(Path.Combine(output, "results.json"), new JObject { ["passed"] = failure == null && errors.Count == 0, ["checks"] = new JArray(checks), ["runs"] = new JArray(runs), ["failure"] = failure, ["cleanupErrors"] = new JArray(errors), ["persistentDataPath"] = Application.persistentDataPath, ["scope"] = "Actual Editor MainController start/stop, two owned native GUI engines plus one unavailable mixed-run recorder on generated/sample input, native receipt proof and run-local archive; no physical camera/LED claim." }.ToString(Formatting.Indented));
             EditorApplication.Exit(failure == null && errors.Count == 0 ? 0 : 1);
         }
     }
-    static async Task RunCase(string label, bool cancelPreparation, bool manualPause)
+    static async Task RunCase(string label, bool cancelPreparation, bool manualPause,bool missingTracker=false)
     {
         await PauseInputs();
         var main = MainController.Instance;
-        main.PrepareConfiguredRun("__native-system.json", "__native-sequence.json");
+        main.PrepareConfiguredRun(missingTracker?"__native-mixed-system.json":"__native-system.json", "__native-sequence.json");
         string directory = MasterDataLogger.Instance.directoryPath;
         main.StartSequence();
         Check(main.SequencePreparing && !main.SequenceRunning, label + ": stimulus waits for native first-frame acknowledgement");
@@ -163,6 +168,13 @@ public static class NativeRecordingLifecycleValidation
         {
             await Until(() => main.SequenceRunning || main.SequenceError != null, label + " first-frame gate");
             Check(main.SequenceError == null, label + ": start succeeded: " + main.SequenceError);
+            if(missingTracker)
+            {
+                Check(main.RecordingWarnings.Any(warning=>warning.Contains("VR3")),"Missing third recorder produces a warning while both healthy native GUIs acknowledge");
+                var absent=TrackerProcessManager.RecordingState("VR3");Check((string)absent["state"]=="unavailable"&&(bool?)absent["acknowledged"]==false,"Missing native recorder never receives a false acknowledgement");
+                var report=JObject.Parse(File.ReadAllText(Path.Combine(directory,"native_recording_start.json")));Check(report["rigs"].Count()==3&&report["warnings"].Count()==1,"Actual Main archives the three-rig startup report with one independent failure");
+            }
+
             foreach (var rig in rigs) Check((bool?)TrackerProcessManager.RecordingState(rig.vrId)["acknowledged"] == true, label + ": " + rig.vrId + " first raw frame acknowledged");
             await Task.Delay(900);
             if (manualPause)

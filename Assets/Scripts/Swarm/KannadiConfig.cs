@@ -211,6 +211,7 @@ public class LocustGainConverter : JsonConverter
 public class SwarmConfig
 {
     public string modelPath; // Optional embedded GLB visual for generated or recorded agents.
+    public ModelAppearanceConfig modelAppearance;
     public string trajectoryFile = ""; // Blank retains the generated swarm.
     public SwarmPlaybackConfig playback = new SwarmPlaybackConfig();
     public float? worldUnitsPerMetre; // Omitted: scenes with active Terrain=1; legacy walking scenes=100.
@@ -255,6 +256,7 @@ public class SwarmConfig
     public float animationSpeedThreshold = 0.5f;
     public void ValidateSwarm()
     {
+        modelAppearance?.Validate();
         if (!string.IsNullOrWhiteSpace(headingReferenceId) && !useHeadingReference)
             throw new ArgumentException("headingReferenceId requires useHeadingReference=true.");
         if (!string.Equals(directionDistribution, "Legacy", StringComparison.OrdinalIgnoreCase) &&

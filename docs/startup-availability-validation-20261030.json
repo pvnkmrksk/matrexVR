@@ -1,0 +1,388 @@
+{
+  "checks": 50,
+  "passed": [
+    "Native ownership state is isolated from the user's profile",
+    "Startup manual screen clear restores the caller's active RenderTexture",
+    "Actual GPU sentinel texture pixels survive startup screen clear",
+    "Temporary startup clear cameras are disabled before deferred destruction",
+    "Startup manual clear explicitly targets the screen rather than a preview/export texture",
+    "missing-config: actual launch reports its missing optional native dependency",
+    "missing-config: archive opens despite optional tracker problems",
+    "missing-config: VR starts without a native recorder",
+    "missing-config: live rig and manual controls remain enabled",
+    "missing-config: no tracking samples or recorder acknowledgement are fabricated",
+    "missing-config: startup warning is visible on Main",
+    "missing-config: unavailable tracker never claims recording acknowledged",
+    "missing-config: original VR recording finalizes without optional-video failure",
+    "missing-config: warning is retained in this run's trace",
+    "missing-executable: actual launch reports its missing optional native dependency",
+    "missing-executable: archive opens despite optional tracker problems",
+    "missing-executable: VR starts without a native recorder",
+    "missing-executable: live rig and manual controls remain enabled",
+    "missing-executable: no tracking samples or recorder acknowledgement are fabricated",
+    "missing-executable: startup warning is visible on Main",
+    "missing-executable: unavailable tracker never claims recording acknowledged",
+    "missing-executable: original VR recording finalizes without optional-video failure",
+    "missing-executable: warning is retained in this run's trace",
+    "failed-process: archive opens despite optional tracker problems",
+    "failed-process: VR starts without a native recorder",
+    "failed-process: live rig and manual controls remain enabled",
+    "failed-process: no tracking samples or recorder acknowledgement are fabricated",
+    "failed-process: startup warning is visible on Main",
+    "failed-process: unavailable tracker never claims recording acknowledged",
+    "failed-process: original VR recording finalizes without optional-video failure",
+    "failed-process: warning is retained in this run's trace",
+    "invalid-endpoint: archive opens despite optional tracker problems",
+    "invalid-endpoint: VR starts without a native recorder",
+    "invalid-endpoint: live rig and manual controls remain enabled",
+    "invalid-endpoint: no tracking samples or recorder acknowledgement are fabricated",
+    "Invalid endpoint retains its failure cause after worker cleanup",
+    "Dead listener leaves the actual VR experiment running",
+    "invalid-endpoint: startup warning is visible on Main",
+    "invalid-endpoint: unavailable tracker never claims recording acknowledged",
+    "invalid-endpoint: original VR recording finalizes without optional-video failure",
+    "invalid-endpoint: warning is retained in this run's trace",
+    "video-disabled: archive opens despite optional tracker problems",
+    "video-disabled: VR starts without a native recorder",
+    "video-disabled: live rig and manual controls remain enabled",
+    "video-disabled: no tracking samples or recorder acknowledgement are fabricated",
+    "video-disabled: unavailable tracker never claims recording acknowledged",
+    "video-disabled: original VR recording finalizes without optional-video failure",
+    "All five actual experiment scene loads expose their temporary clear camera to the post-Main probe",
+    "Actual sceneLoaded clear cameras cannot perform an additional automatic black render",
+    "Optional tracking failures produce no Unity Error/Exception: "
+  ],
+  "failure": null,
+  "errors": [],
+  "runs": [
+    {
+      "fixture": "missing-config",
+      "directory": "/Users/pavan/src/ledpanelVR/.local/nonblocking-startup-rundata-clear/20261030_005346_001",
+      "launchFailure": "Tracker calibration/config file does not exist.",
+      "listenerState": "waiting for packets",
+      "listenerFailure": null,
+      "warnings": [
+        "VR1: optional tracker launch unavailable; VR continues. Tracker calibration/config file does not exist.",
+        "VR1: tracker video unavailable; VR continues. No verified control-capable tracker is running. Initialize its window, choose Manual control, or turn off tracker video."
+      ],
+      "nativeState": {
+        "schemaVersion": 1,
+        "utc": "2026-10-29T23:53:46.615144+00:00",
+        "runId": "f301731aae4d4e34bfb2d4d2462e2ed8",
+        "vrId": "VR1",
+        "backend": "rekkefly",
+        "state": "unavailable",
+        "requested": true,
+        "controlMode": "Experiment",
+        "acknowledged": false,
+        "takeId": null,
+        "directory": null,
+        "stopRequestId": null,
+        "processId": null,
+        "controlInstance": null,
+        "error": "No verified control-capable tracker is running. Initialize its window, choose Manual control, or turn off tracker video.",
+        "native": null
+      },
+      "lifecycle": {
+        "status": "finalized",
+        "createdUtc": "2026-10-30T00:53:46.600501+01:00",
+        "writersDrained": true,
+        "endReason": "stopped",
+        "sequenceOutcome": "stopped",
+        "player": {
+          "applicationVersion": "perf-native-final",
+          "unityVersion": "6000.3.16f1",
+          "buildGuid": "00000000000000000000000000000000",
+          "sourceRevision": "85d11a230823eed5e4aa93adc4067c7ca104de45",
+          "sourceState": "working-tree-snapshot",
+          "editorRuntimeIdentity": "b15f339e2fdd46efa1ecc994a0d087d8",
+          "sourceTreeDirty": true,
+          "runtimeSourceFingerprintSha256": "3fd0ee23021a58811e68b54a5b70ffdd9e721489560ea2abfd379d183ffca66c",
+          "runtimeSourceFileCount": 257,
+          "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint."
+        },
+        "error": null,
+        "finalizedUtc": "2026-10-30T00:53:47.33194+01:00"
+      }
+    },
+    {
+      "fixture": "missing-executable",
+      "directory": "/Users/pavan/src/ledpanelVR/.local/nonblocking-startup-rundata-clear/20261030_005347",
+      "launchFailure": "Select an absolute native tracker executable (inside Contents/MacOS for a Mac app).",
+      "listenerState": "waiting for packets",
+      "listenerFailure": null,
+      "warnings": [
+        "VR1: optional tracker launch unavailable; VR continues. Select an absolute native tracker executable (inside Contents/MacOS for a Mac app).",
+        "VR1: tracker video unavailable; VR continues. No verified control-capable tracker is running. Initialize its window, choose Manual control, or turn off tracker video."
+      ],
+      "nativeState": {
+        "schemaVersion": 1,
+        "utc": "2026-10-29T23:53:47.55937+00:00",
+        "runId": "b3e6cfe555ef4b1a92b46e517d4b2fe7",
+        "vrId": "VR1",
+        "backend": "rekkefly",
+        "state": "unavailable",
+        "requested": true,
+        "controlMode": "Experiment",
+        "acknowledged": false,
+        "takeId": null,
+        "directory": null,
+        "stopRequestId": null,
+        "processId": null,
+        "controlInstance": null,
+        "error": "No verified control-capable tracker is running. Initialize its window, choose Manual control, or turn off tracker video.",
+        "native": null
+      },
+      "lifecycle": {
+        "status": "finalized",
+        "createdUtc": "2026-10-30T00:53:47.551349+01:00",
+        "writersDrained": true,
+        "endReason": "stopped",
+        "sequenceOutcome": "stopped",
+        "player": {
+          "applicationVersion": "perf-native-final",
+          "unityVersion": "6000.3.16f1",
+          "buildGuid": "00000000000000000000000000000000",
+          "sourceRevision": "85d11a230823eed5e4aa93adc4067c7ca104de45",
+          "sourceState": "working-tree-snapshot",
+          "editorRuntimeIdentity": "b15f339e2fdd46efa1ecc994a0d087d8",
+          "sourceTreeDirty": true,
+          "runtimeSourceFingerprintSha256": "3fd0ee23021a58811e68b54a5b70ffdd9e721489560ea2abfd379d183ffca66c",
+          "runtimeSourceFileCount": 257,
+          "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint."
+        },
+        "error": null,
+        "finalizedUtc": "2026-10-30T00:53:47.979782+01:00"
+      }
+    },
+    {
+      "fixture": "failed-process",
+      "directory": "/Users/pavan/src/ledpanelVR/.local/nonblocking-startup-rundata-clear/20261030_005348",
+      "launchFailure": null,
+      "listenerState": "waiting for packets",
+      "listenerFailure": null,
+      "warnings": [
+        "VR1: tracker video unavailable; VR continues. No verified control-capable tracker is running. Initialize its window, choose Manual control, or turn off tracker video."
+      ],
+      "nativeState": {
+        "schemaVersion": 1,
+        "utc": "2026-10-29T23:53:48.220103+00:00",
+        "runId": "684bbe76b0c84522a7a5eab741f0fd29",
+        "vrId": "VR1",
+        "backend": "rekkefly",
+        "state": "unavailable",
+        "requested": true,
+        "controlMode": "Experiment",
+        "acknowledged": false,
+        "takeId": null,
+        "directory": null,
+        "stopRequestId": null,
+        "processId": 91327,
+        "controlInstance": "6ced600b07814d0a97d19fd55acf403a",
+        "error": "No verified control-capable tracker is running. Initialize its window, choose Manual control, or turn off tracker video.",
+        "native": null
+      },
+      "lifecycle": {
+        "status": "finalized",
+        "createdUtc": "2026-10-30T00:53:48.210443+01:00",
+        "writersDrained": true,
+        "endReason": "stopped",
+        "sequenceOutcome": "stopped",
+        "player": {
+          "applicationVersion": "perf-native-final",
+          "unityVersion": "6000.3.16f1",
+          "buildGuid": "00000000000000000000000000000000",
+          "sourceRevision": "85d11a230823eed5e4aa93adc4067c7ca104de45",
+          "sourceState": "working-tree-snapshot",
+          "editorRuntimeIdentity": "b15f339e2fdd46efa1ecc994a0d087d8",
+          "sourceTreeDirty": true,
+          "runtimeSourceFingerprintSha256": "3fd0ee23021a58811e68b54a5b70ffdd9e721489560ea2abfd379d183ffca66c",
+          "runtimeSourceFileCount": 257,
+          "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint."
+        },
+        "error": null,
+        "finalizedUtc": "2026-10-30T00:53:48.603327+01:00"
+      }
+    },
+    {
+      "fixture": "invalid-endpoint",
+      "directory": "/Users/pavan/src/ledpanelVR/.local/nonblocking-startup-rundata-clear/20261030_005348_001",
+      "launchFailure": null,
+      "listenerState": "error",
+      "listenerFailure": "Could not resolve host 'invalid address/'",
+      "warnings": [
+        "VR1: tracker video unavailable; VR continues. No verified control-capable tracker is running. Initialize its window, choose Manual control, or turn off tracker video.",
+        "Tracking input unavailable on tcp://invalid address/:39871; VR continues with manual/autopilot controls. Could not resolve host 'invalid address/'"
+      ],
+      "nativeState": {
+        "schemaVersion": 1,
+        "utc": "2026-10-29T23:53:48.806522+00:00",
+        "runId": "075dfc0b5ad8472da7de2b48aa497c0e",
+        "vrId": "VR1",
+        "backend": "rekkefly",
+        "state": "unavailable",
+        "requested": true,
+        "controlMode": "Experiment",
+        "acknowledged": false,
+        "takeId": null,
+        "directory": null,
+        "stopRequestId": null,
+        "processId": 91327,
+        "controlInstance": "6ced600b07814d0a97d19fd55acf403a",
+        "error": "No verified control-capable tracker is running. Initialize its window, choose Manual control, or turn off tracker video.",
+        "native": null
+      },
+      "lifecycle": {
+        "status": "finalized",
+        "createdUtc": "2026-10-30T00:53:48.79787+01:00",
+        "writersDrained": true,
+        "endReason": "stopped",
+        "sequenceOutcome": "stopped",
+        "player": {
+          "applicationVersion": "perf-native-final",
+          "unityVersion": "6000.3.16f1",
+          "buildGuid": "00000000000000000000000000000000",
+          "sourceRevision": "85d11a230823eed5e4aa93adc4067c7ca104de45",
+          "sourceState": "working-tree-snapshot",
+          "editorRuntimeIdentity": "b15f339e2fdd46efa1ecc994a0d087d8",
+          "sourceTreeDirty": true,
+          "runtimeSourceFingerprintSha256": "3fd0ee23021a58811e68b54a5b70ffdd9e721489560ea2abfd379d183ffca66c",
+          "runtimeSourceFileCount": 257,
+          "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint."
+        },
+        "error": null,
+        "finalizedUtc": "2026-10-30T00:53:49.225884+01:00"
+      }
+    },
+    {
+      "fixture": "video-disabled",
+      "directory": "/Users/pavan/src/ledpanelVR/.local/nonblocking-startup-rundata-clear/20261030_005349",
+      "launchFailure": null,
+      "listenerState": "waiting for packets",
+      "listenerFailure": null,
+      "warnings": [],
+      "nativeState": {
+        "schemaVersion": 1,
+        "utc": "2026-10-29T23:53:49.427811+00:00",
+        "runId": "3b82652c941a481dac852b6cf3c74220",
+        "vrId": "VR1",
+        "backend": "rekkefly",
+        "state": "disabled",
+        "requested": false,
+        "controlMode": "Experiment",
+        "acknowledged": false,
+        "takeId": null,
+        "directory": null,
+        "stopRequestId": null,
+        "processId": null,
+        "controlInstance": null,
+        "error": null,
+        "native": null
+      },
+      "lifecycle": {
+        "status": "finalized",
+        "createdUtc": "2026-10-30T00:53:49.419416+01:00",
+        "writersDrained": true,
+        "endReason": "stopped",
+        "sequenceOutcome": "stopped",
+        "player": {
+          "applicationVersion": "perf-native-final",
+          "unityVersion": "6000.3.16f1",
+          "buildGuid": "00000000000000000000000000000000",
+          "sourceRevision": "85d11a230823eed5e4aa93adc4067c7ca104de45",
+          "sourceState": "working-tree-snapshot",
+          "editorRuntimeIdentity": "b15f339e2fdd46efa1ecc994a0d087d8",
+          "sourceTreeDirty": true,
+          "runtimeSourceFingerprintSha256": "3fd0ee23021a58811e68b54a5b70ffdd9e721489560ea2abfd379d183ffca66c",
+          "runtimeSourceFileCount": 257,
+          "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint."
+        },
+        "error": null,
+        "finalizedUtc": "2026-10-30T00:53:49.758557+01:00"
+      }
+    }
+  ],
+  "clearFrames": [
+    {
+      "scene": "Choice",
+      "frame": 3,
+      "cameraCount": 1,
+      "allDisabled": true,
+      "screenOnly": true
+    },
+    {
+      "scene": "Choice",
+      "frame": 7,
+      "cameraCount": 1,
+      "allDisabled": true,
+      "screenOnly": true
+    },
+    {
+      "scene": "Choice",
+      "frame": 20,
+      "cameraCount": 1,
+      "allDisabled": true,
+      "screenOnly": true
+    },
+    {
+      "scene": "Choice",
+      "frame": 33,
+      "cameraCount": 1,
+      "allDisabled": true,
+      "screenOnly": true
+    },
+    {
+      "scene": "Choice",
+      "frame": 46,
+      "cameraCount": 1,
+      "allDisabled": true,
+      "screenOnly": true
+    }
+  ],
+  "unity": "6000.3.16f1",
+  "scope": "Actual Main startup, Choice scene and manual rig, unavailable native dependencies/failing executable/invalid NetMQ endpoint, warning evidence, honest recorder state and complete VR stop. No physical camera or acquisition. Includes actual GPU sentinel pixels/RenderTexture ownership and post-Main sceneLoaded camera-disable checks for the startup clear.",
+  "rootCauses": [
+    {
+      "file": "Assets/Scripts/ConfigurationUI/ConfigWorkbench.cs",
+      "cause": "Optional companion prepare/launch failures aborted the iterator before VR Start; GUI agent owns warning-and-continue handling."
+    },
+    {
+      "file": "Assets/Scripts/Loggers/RunConfigArchive.cs",
+      "cause": "Generic configFile traversal incorrectly required native tracker calibration as an experiment dependency. System tracker subtree now uses dedicated optional, ownership-verified native provenance."
+    },
+    {
+      "file": "Assets/Scripts/ConfigurationUI/DesktopPreviewHud.cs",
+      "cause": "HUD reread the system document with default experiment role, recreating the required-native dependency after Start. It now explicitly uses system role."
+    },
+    {
+      "file": "Assets/Scripts/ZmqListener.cs",
+      "cause": "Worker endpoint errors logged a fatal-looking Error and finally replaced error state with stopped. Error cause/state now persist and the main-thread run receives a nonblocking warning."
+    },
+    {
+      "file": "Assets/Scripts/MainController.cs",
+      "cause": "Startup clear used an enabled temporary full-screen camera plus a GL.Clear against an uncontrolled active render target. Root fix disables the camera before manual Render, targets the screen, restores RenderTexture.active in finally and removes the redundant GL.Clear."
+    }
+  ],
+  "requiredDependencies": "Required experiment, external-model and skybox files remain strict; optional tracker failures do not silently rewrite configuration or claim acquired input/video.",
+  "archiveRegressions": {
+    "checks": 694,
+    "asyncWriterLifecycleCycles": 150,
+    "missingNativeTomlJsonAllowed": true,
+    "requiredExperimentModelSkyboxRejected": true
+  },
+  "startupClearRegression": {
+    "actualGpuSentinelTexturePreserved": true,
+    "activeRenderTextureRestored": true,
+    "temporaryCamerasDisabledBeforeDestroy": true,
+    "actualSceneLoadedProbes": 5,
+    "extraAutomaticClearPassEligible": false
+  },
+  "runtimeSnapshotSha256": {
+    "Assets/Scripts/MainController.cs": "a09e6f2dd65bf04f9739b186aaf572903bbd981c794d3e6ef08caef8e7a20f7e",
+    "Assets/Scripts/ZmqListener.cs": "495e7f8d77a0ac585b12e56599a68978bb6a2eb92c1d3e017e7eeddc0895d373",
+    "Assets/Scripts/Loggers/RunConfigArchive.cs": "3b651ec8e8c9ddb7385395ffb1c1b9e2f8d353721671298fb0f75fb0d9a592d9",
+    "Assets/Scripts/ConfigurationUI/DesktopPreviewHud.cs": "0f4c2c4ac376efb31a343c2d877e6090921d3f1533e6d1fc438079792c5aca2f",
+    "Assets/Scripts/TrackerProcessManager.Recording.cs": "1c0b0ea484dbd748ef0c2d57b0f7b2c1dc6afdd3f4a1f2cf5427bd52da83f42d",
+    "Assets/Editor/NonBlockingStartupValidation.cs": "9afddb184c8aa1f097fd8ab8d76a4411a5532719d1285fae341ad0ae00b88c9c"
+  }
+}

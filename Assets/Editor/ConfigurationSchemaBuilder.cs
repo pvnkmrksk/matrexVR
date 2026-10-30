@@ -200,6 +200,8 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
     }
     private static void Annotate(JObject child,string name,Type owner)
     {
+        if(owner==typeof(ModelAppearanceConfig) && (name=="metallic"||name=="smoothness"))
+        { child["minimum"]=0;child["maximum"]=1; }
         var ui=new JObject();
         var attribute=owner.GetField(name)?.GetCustomAttribute<TooltipAttribute>();
         if(attribute!=null) ui["help"]=attribute.tooltip;

@@ -1633,6 +1633,109 @@
               "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
             }
           },
+          "modelAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Override this object's surface without changing the original model file."
+                }
+              },
+              "color": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "r": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "g": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "b": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "a": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  }
+                },
+                "default": {
+                  "r": 1.0,
+                  "g": 1.0,
+                  "b": 1.0,
+                  "a": 1.0
+                }
+              },
+              "keepTexture": {
+                "type": "boolean",
+                "default": true,
+                "x-ui": {
+                  "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                }
+              },
+              "metallic": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0
+              },
+              "smoothness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5
+              }
+            },
+            "default": null
+          },
           "trajectoryFile": {
             "type": [
               "string",
@@ -2726,6 +2829,109 @@
                 "string",
                 "null"
               ],
+              "default": null
+            },
+            "appearance": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": false,
+                  "x-ui": {
+                    "help": "Override this object's surface without changing the original model file."
+                  }
+                },
+                "color": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "r": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    },
+                    "g": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    },
+                    "b": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    },
+                    "a": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    }
+                  },
+                  "default": {
+                    "r": 1.0,
+                    "g": 1.0,
+                    "b": 1.0,
+                    "a": 1.0
+                  }
+                },
+                "keepTexture": {
+                  "type": "boolean",
+                  "default": true,
+                  "x-ui": {
+                    "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                  }
+                },
+                "metallic": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.0
+                },
+                "smoothness": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.5
+                }
+              },
               "default": null
             },
             "scale": {
@@ -4256,6 +4462,109 @@
                   "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
                 }
               },
+              "modelAppearance": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "x-ui": {
+                      "help": "Override this object's surface without changing the original model file."
+                    }
+                  },
+                  "color": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                      "r": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "g": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "b": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "a": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      }
+                    },
+                    "default": {
+                      "r": 1.0,
+                      "g": 1.0,
+                      "b": 1.0,
+                      "a": 1.0
+                    }
+                  },
+                  "keepTexture": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-ui": {
+                      "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                    }
+                  },
+                  "metallic": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0
+                  },
+                  "smoothness": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.5
+                  }
+                },
+                "default": null
+              },
               "trajectoryFile": {
                 "type": [
                   "string",
@@ -5348,6 +5657,109 @@
                     "string",
                     "null"
                   ],
+                  "default": null
+                },
+                "appearance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false,
+                      "x-ui": {
+                        "help": "Override this object's surface without changing the original model file."
+                      }
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "r": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "g": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "b": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "a": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                      }
+                    },
+                    "keepTexture": {
+                      "type": "boolean",
+                      "default": true,
+                      "x-ui": {
+                        "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                      }
+                    },
+                    "metallic": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0
+                    },
+                    "smoothness": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.5
+                    }
+                  },
                   "default": null
                 },
                 "scale": {
@@ -6884,6 +7296,109 @@
                   "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
                 }
               },
+              "modelAppearance": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "x-ui": {
+                      "help": "Override this object's surface without changing the original model file."
+                    }
+                  },
+                  "color": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                      "r": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "g": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "b": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "a": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      }
+                    },
+                    "default": {
+                      "r": 1.0,
+                      "g": 1.0,
+                      "b": 1.0,
+                      "a": 1.0
+                    }
+                  },
+                  "keepTexture": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-ui": {
+                      "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                    }
+                  },
+                  "metallic": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0
+                  },
+                  "smoothness": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.5
+                  }
+                },
+                "default": null
+              },
               "trajectoryFile": {
                 "type": [
                   "string",
@@ -7976,6 +8491,109 @@
                     "string",
                     "null"
                   ],
+                  "default": null
+                },
+                "appearance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false,
+                      "x-ui": {
+                        "help": "Override this object's surface without changing the original model file."
+                      }
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "r": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "g": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "b": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "a": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                      }
+                    },
+                    "keepTexture": {
+                      "type": "boolean",
+                      "default": true,
+                      "x-ui": {
+                        "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                      }
+                    },
+                    "metallic": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0
+                    },
+                    "smoothness": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.5
+                    }
+                  },
                   "default": null
                 },
                 "scale": {
@@ -9512,6 +10130,109 @@
                   "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
                 }
               },
+              "modelAppearance": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "x-ui": {
+                      "help": "Override this object's surface without changing the original model file."
+                    }
+                  },
+                  "color": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                      "r": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "g": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "b": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "a": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      }
+                    },
+                    "default": {
+                      "r": 1.0,
+                      "g": 1.0,
+                      "b": 1.0,
+                      "a": 1.0
+                    }
+                  },
+                  "keepTexture": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-ui": {
+                      "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                    }
+                  },
+                  "metallic": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0
+                  },
+                  "smoothness": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.5
+                  }
+                },
+                "default": null
+              },
               "trajectoryFile": {
                 "type": [
                   "string",
@@ -10604,6 +11325,109 @@
                     "string",
                     "null"
                   ],
+                  "default": null
+                },
+                "appearance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false,
+                      "x-ui": {
+                        "help": "Override this object's surface without changing the original model file."
+                      }
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "r": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "g": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "b": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "a": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                      }
+                    },
+                    "keepTexture": {
+                      "type": "boolean",
+                      "default": true,
+                      "x-ui": {
+                        "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                      }
+                    },
+                    "metallic": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0
+                    },
+                    "smoothness": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.5
+                    }
+                  },
                   "default": null
                 },
                 "scale": {
@@ -12023,6 +12847,109 @@
               ],
               "default": null
             },
+            "appearance": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": false,
+                  "x-ui": {
+                    "help": "Override this object's surface without changing the original model file."
+                  }
+                },
+                "color": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "r": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    },
+                    "g": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    },
+                    "b": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    },
+                    "a": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    }
+                  },
+                  "default": {
+                    "r": 1.0,
+                    "g": 1.0,
+                    "b": 1.0,
+                    "a": 1.0
+                  }
+                },
+                "keepTexture": {
+                  "type": "boolean",
+                  "default": true,
+                  "x-ui": {
+                    "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                  }
+                },
+                "metallic": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.0
+                },
+                "smoothness": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.5
+                }
+              },
+              "default": null
+            },
             "scale": {
               "type": [
                 "object",
@@ -12986,6 +13913,109 @@
         "x-ui": {
           "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
         }
+      },
+      "modelAppearance": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "help": "Override this object's surface without changing the original model file."
+            }
+          },
+          "color": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "r": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "g": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "b": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "a": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1.0,
+                    "step": 0.01
+                  }
+                }
+              }
+            },
+            "default": {
+              "r": 1.0,
+              "g": 1.0,
+              "b": 1.0,
+              "a": 1.0
+            }
+          },
+          "keepTexture": {
+            "type": "boolean",
+            "default": true,
+            "x-ui": {
+              "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+            }
+          },
+          "metallic": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.0
+          },
+          "smoothness": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.5
+          }
+        },
+        "default": null
       },
       "trajectoryFile": {
         "type": [
@@ -14639,6 +15669,109 @@
                   ],
                   "default": null
                 },
+                "appearance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false,
+                      "x-ui": {
+                        "help": "Override this object's surface without changing the original model file."
+                      }
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "r": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "g": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "b": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "a": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                      }
+                    },
+                    "keepTexture": {
+                      "type": "boolean",
+                      "default": true,
+                      "x-ui": {
+                        "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                      }
+                    },
+                    "metallic": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0
+                    },
+                    "smoothness": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.5
+                    }
+                  },
+                  "default": null
+                },
                 "scale": {
                   "type": [
                     "object",
@@ -15601,6 +16734,109 @@
             "x-ui": {
               "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
             }
+          },
+          "modelAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Override this object's surface without changing the original model file."
+                }
+              },
+              "color": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "r": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "g": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "b": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "a": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  }
+                },
+                "default": {
+                  "r": 1.0,
+                  "g": 1.0,
+                  "b": 1.0,
+                  "a": 1.0
+                }
+              },
+              "keepTexture": {
+                "type": "boolean",
+                "default": true,
+                "x-ui": {
+                  "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                }
+              },
+              "metallic": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0
+              },
+              "smoothness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5
+              }
+            },
+            "default": null
           },
           "trajectoryFile": {
             "type": [
@@ -17120,6 +18356,109 @@
                 "x-ui": {
                   "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
                 }
+              },
+              "modelAppearance": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "x-ui": {
+                      "help": "Override this object's surface without changing the original model file."
+                    }
+                  },
+                  "color": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                      "r": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "g": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "b": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "a": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      }
+                    },
+                    "default": {
+                      "r": 1.0,
+                      "g": 1.0,
+                      "b": 1.0,
+                      "a": 1.0
+                    }
+                  },
+                  "keepTexture": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-ui": {
+                      "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                    }
+                  },
+                  "metallic": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0
+                  },
+                  "smoothness": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.5
+                  }
+                },
+                "default": null
               },
               "trajectoryFile": {
                 "type": [
@@ -18199,6 +19538,109 @@
                   ],
                   "default": null
                 },
+                "appearance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false,
+                      "x-ui": {
+                        "help": "Override this object's surface without changing the original model file."
+                      }
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "r": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "g": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "b": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "a": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                      }
+                    },
+                    "keepTexture": {
+                      "type": "boolean",
+                      "default": true,
+                      "x-ui": {
+                        "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                      }
+                    },
+                    "metallic": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0
+                    },
+                    "smoothness": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.5
+                    }
+                  },
+                  "default": null
+                },
                 "scale": {
                   "type": [
                     "object",
@@ -19161,6 +20603,109 @@
             "x-ui": {
               "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
             }
+          },
+          "modelAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Override this object's surface without changing the original model file."
+                }
+              },
+              "color": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "r": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "g": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "b": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "a": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  }
+                },
+                "default": {
+                  "r": 1.0,
+                  "g": 1.0,
+                  "b": 1.0,
+                  "a": 1.0
+                }
+              },
+              "keepTexture": {
+                "type": "boolean",
+                "default": true,
+                "x-ui": {
+                  "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                }
+              },
+              "metallic": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0
+              },
+              "smoothness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5
+              }
+            },
+            "default": null
           },
           "trajectoryFile": {
             "type": [
@@ -20680,6 +22225,109 @@
                 "x-ui": {
                   "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
                 }
+              },
+              "modelAppearance": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "x-ui": {
+                      "help": "Override this object's surface without changing the original model file."
+                    }
+                  },
+                  "color": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                      "r": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "g": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "b": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "a": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      }
+                    },
+                    "default": {
+                      "r": 1.0,
+                      "g": 1.0,
+                      "b": 1.0,
+                      "a": 1.0
+                    }
+                  },
+                  "keepTexture": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-ui": {
+                      "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                    }
+                  },
+                  "metallic": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0
+                  },
+                  "smoothness": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.5
+                  }
+                },
+                "default": null
               },
               "trajectoryFile": {
                 "type": [
@@ -21759,6 +23407,109 @@
                   ],
                   "default": null
                 },
+                "appearance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false,
+                      "x-ui": {
+                        "help": "Override this object's surface without changing the original model file."
+                      }
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "r": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "g": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "b": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "a": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                      }
+                    },
+                    "keepTexture": {
+                      "type": "boolean",
+                      "default": true,
+                      "x-ui": {
+                        "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                      }
+                    },
+                    "metallic": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0
+                    },
+                    "smoothness": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.5
+                    }
+                  },
+                  "default": null
+                },
                 "scale": {
                   "type": [
                     "object",
@@ -22721,6 +24472,109 @@
             "x-ui": {
               "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
             }
+          },
+          "modelAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Override this object's surface without changing the original model file."
+                }
+              },
+              "color": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "r": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "g": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "b": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "a": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  }
+                },
+                "default": {
+                  "r": 1.0,
+                  "g": 1.0,
+                  "b": 1.0,
+                  "a": 1.0
+                }
+              },
+              "keepTexture": {
+                "type": "boolean",
+                "default": true,
+                "x-ui": {
+                  "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                }
+              },
+              "metallic": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0
+              },
+              "smoothness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5
+              }
+            },
+            "default": null
           },
           "trajectoryFile": {
             "type": [
@@ -24241,6 +26095,109 @@
                   "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
                 }
               },
+              "modelAppearance": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "x-ui": {
+                      "help": "Override this object's surface without changing the original model file."
+                    }
+                  },
+                  "color": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                      "r": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "g": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "b": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      },
+                      "a": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "default": 0.0,
+                        "x-ui": {
+                          "slider": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "step": 0.01
+                          }
+                        }
+                      }
+                    },
+                    "default": {
+                      "r": 1.0,
+                      "g": 1.0,
+                      "b": 1.0,
+                      "a": 1.0
+                    }
+                  },
+                  "keepTexture": {
+                    "type": "boolean",
+                    "default": true,
+                    "x-ui": {
+                      "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                    }
+                  },
+                  "metallic": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0
+                  },
+                  "smoothness": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.5
+                  }
+                },
+                "default": null
+              },
               "trajectoryFile": {
                 "type": [
                   "string",
@@ -25182,6 +27139,109 @@
             "x-ui": {
               "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
             }
+          },
+          "modelAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Override this object's surface without changing the original model file."
+                }
+              },
+              "color": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "r": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "g": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "b": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "a": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  }
+                },
+                "default": {
+                  "r": 1.0,
+                  "g": 1.0,
+                  "b": 1.0,
+                  "a": 1.0
+                }
+              },
+              "keepTexture": {
+                "type": "boolean",
+                "default": true,
+                "x-ui": {
+                  "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                }
+              },
+              "metallic": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0
+              },
+              "smoothness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5
+              }
+            },
+            "default": null
           },
           "trajectoryFile": {
             "type": [
@@ -26437,6 +28497,109 @@
               ],
               "default": null
             },
+            "appearance": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": false,
+                  "x-ui": {
+                    "help": "Override this object's surface without changing the original model file."
+                  }
+                },
+                "color": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "r": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    },
+                    "g": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    },
+                    "b": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    },
+                    "a": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    }
+                  },
+                  "default": {
+                    "r": 1.0,
+                    "g": 1.0,
+                    "b": 1.0,
+                    "a": 1.0
+                  }
+                },
+                "keepTexture": {
+                  "type": "boolean",
+                  "default": true,
+                  "x-ui": {
+                    "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                  }
+                },
+                "metallic": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.0
+                },
+                "smoothness": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.5
+                }
+              },
+              "default": null
+            },
             "scale": {
               "type": [
                 "object",
@@ -27400,6 +29563,109 @@
         "x-ui": {
           "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
         }
+      },
+      "modelAppearance": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "help": "Override this object's surface without changing the original model file."
+            }
+          },
+          "color": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "r": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "g": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "b": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1.0,
+                    "step": 0.01
+                  }
+                }
+              },
+              "a": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0,
+                "x-ui": {
+                  "slider": {
+                    "min": 0.0,
+                    "max": 1.0,
+                    "step": 0.01
+                  }
+                }
+              }
+            },
+            "default": {
+              "r": 1.0,
+              "g": 1.0,
+              "b": 1.0,
+              "a": 1.0
+            }
+          },
+          "keepTexture": {
+            "type": "boolean",
+            "default": true,
+            "x-ui": {
+              "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+            }
+          },
+          "metallic": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.0
+          },
+          "smoothness": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0.5
+          }
+        },
+        "default": null
       },
       "trajectoryFile": {
         "type": [
@@ -29053,6 +31319,109 @@
                   ],
                   "default": null
                 },
+                "appearance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false,
+                      "x-ui": {
+                        "help": "Override this object's surface without changing the original model file."
+                      }
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "r": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "g": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "b": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "a": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                      }
+                    },
+                    "keepTexture": {
+                      "type": "boolean",
+                      "default": true,
+                      "x-ui": {
+                        "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                      }
+                    },
+                    "metallic": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0
+                    },
+                    "smoothness": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.5
+                    }
+                  },
+                  "default": null
+                },
                 "scale": {
                   "type": [
                     "object",
@@ -30015,6 +32384,109 @@
             "x-ui": {
               "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
             }
+          },
+          "modelAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Override this object's surface without changing the original model file."
+                }
+              },
+              "color": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "r": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "g": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "b": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "a": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  }
+                },
+                "default": {
+                  "r": 1.0,
+                  "g": 1.0,
+                  "b": 1.0,
+                  "a": 1.0
+                }
+              },
+              "keepTexture": {
+                "type": "boolean",
+                "default": true,
+                "x-ui": {
+                  "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                }
+              },
+              "metallic": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0
+              },
+              "smoothness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5
+              }
+            },
+            "default": null
           },
           "trajectoryFile": {
             "type": [
@@ -31674,6 +34146,109 @@
                   ],
                   "default": null
                 },
+                "appearance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false,
+                      "x-ui": {
+                        "help": "Override this object's surface without changing the original model file."
+                      }
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "r": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "g": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "b": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "a": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                      }
+                    },
+                    "keepTexture": {
+                      "type": "boolean",
+                      "default": true,
+                      "x-ui": {
+                        "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                      }
+                    },
+                    "metallic": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0
+                    },
+                    "smoothness": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.5
+                    }
+                  },
+                  "default": null
+                },
                 "scale": {
                   "type": [
                     "object",
@@ -32636,6 +35211,109 @@
             "x-ui": {
               "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
             }
+          },
+          "modelAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Override this object's surface without changing the original model file."
+                }
+              },
+              "color": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "r": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "g": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "b": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "a": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  }
+                },
+                "default": {
+                  "r": 1.0,
+                  "g": 1.0,
+                  "b": 1.0,
+                  "a": 1.0
+                }
+              },
+              "keepTexture": {
+                "type": "boolean",
+                "default": true,
+                "x-ui": {
+                  "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                }
+              },
+              "metallic": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0
+              },
+              "smoothness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5
+              }
+            },
+            "default": null
           },
           "trajectoryFile": {
             "type": [
@@ -34295,6 +36973,109 @@
                   ],
                   "default": null
                 },
+                "appearance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false,
+                      "x-ui": {
+                        "help": "Override this object's surface without changing the original model file."
+                      }
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "r": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "g": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "b": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "a": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                      }
+                    },
+                    "keepTexture": {
+                      "type": "boolean",
+                      "default": true,
+                      "x-ui": {
+                        "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                      }
+                    },
+                    "metallic": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0
+                    },
+                    "smoothness": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.5
+                    }
+                  },
+                  "default": null
+                },
                 "scale": {
                   "type": [
                     "object",
@@ -35257,6 +38038,109 @@
             "x-ui": {
               "help": "Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay."
             }
+          },
+          "modelAppearance": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false,
+                "x-ui": {
+                  "help": "Override this object's surface without changing the original model file."
+                }
+              },
+              "color": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "r": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "g": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "b": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  },
+                  "a": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.0,
+                    "x-ui": {
+                      "slider": {
+                        "min": 0.0,
+                        "max": 1.0,
+                        "step": 0.01
+                      }
+                    }
+                  }
+                },
+                "default": {
+                  "r": 1.0,
+                  "g": 1.0,
+                  "b": 1.0,
+                  "a": 1.0
+                }
+              },
+              "keepTexture": {
+                "type": "boolean",
+                "default": true,
+                "x-ui": {
+                  "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                }
+              },
+              "metallic": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.0
+              },
+              "smoothness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "default": 0.5
+              }
+            },
+            "default": null
           },
           "trajectoryFile": {
             "type": [
@@ -36984,6 +39868,109 @@
               ],
               "default": null
             },
+            "appearance": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": false,
+                  "x-ui": {
+                    "help": "Override this object's surface without changing the original model file."
+                  }
+                },
+                "color": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "r": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    },
+                    "g": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    },
+                    "b": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    },
+                    "a": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0,
+                      "x-ui": {
+                        "slider": {
+                          "min": 0.0,
+                          "max": 1.0,
+                          "step": 0.01
+                        }
+                      }
+                    }
+                  },
+                  "default": {
+                    "r": 1.0,
+                    "g": 1.0,
+                    "b": 1.0,
+                    "a": 1.0
+                  }
+                },
+                "keepTexture": {
+                  "type": "boolean",
+                  "default": true,
+                  "x-ui": {
+                    "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                  }
+                },
+                "metallic": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.0
+                },
+                "smoothness": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.5
+                }
+              },
+              "default": null
+            },
             "scale": {
               "type": [
                 "object",
@@ -38432,6 +41419,109 @@
                     "string",
                     "null"
                   ],
+                  "default": null
+                },
+                "appearance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false,
+                      "x-ui": {
+                        "help": "Override this object's surface without changing the original model file."
+                      }
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "r": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "g": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "b": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "a": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                      }
+                    },
+                    "keepTexture": {
+                      "type": "boolean",
+                      "default": true,
+                      "x-ui": {
+                        "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                      }
+                    },
+                    "metallic": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0
+                    },
+                    "smoothness": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.5
+                    }
+                  },
                   "default": null
                 },
                 "scale": {
@@ -39939,6 +43029,109 @@
                   ],
                   "default": null
                 },
+                "appearance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false,
+                      "x-ui": {
+                        "help": "Override this object's surface without changing the original model file."
+                      }
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "r": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "g": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "b": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "a": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                      }
+                    },
+                    "keepTexture": {
+                      "type": "boolean",
+                      "default": true,
+                      "x-ui": {
+                        "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                      }
+                    },
+                    "metallic": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0
+                    },
+                    "smoothness": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.5
+                    }
+                  },
+                  "default": null
+                },
                 "scale": {
                   "type": [
                     "object",
@@ -41442,6 +44635,109 @@
                     "string",
                     "null"
                   ],
+                  "default": null
+                },
+                "appearance": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "default": false,
+                      "x-ui": {
+                        "help": "Override this object's surface without changing the original model file."
+                      }
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "r": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "g": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "b": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        },
+                        "a": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "default": 0.0,
+                          "x-ui": {
+                            "slider": {
+                              "min": 0.0,
+                              "max": 1.0,
+                              "step": 0.01
+                            }
+                          }
+                        }
+                      },
+                      "default": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                      }
+                    },
+                    "keepTexture": {
+                      "type": "boolean",
+                      "default": true,
+                      "x-ui": {
+                        "help": "Keep the model's base-color texture. Disable for a uniform chosen color."
+                      }
+                    },
+                    "metallic": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.0
+                    },
+                    "smoothness": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.5
+                    }
+                  },
                   "default": null
                 },
                 "scale": {

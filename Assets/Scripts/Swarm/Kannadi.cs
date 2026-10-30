@@ -135,6 +135,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
                 next.animationSpeedThreshold, next.periodicBoundary, next.boundaryLengthX, next.boundaryLengthZ, next.useHeadingReference, watchIndex });
             if (!(initialized && !wasSwarm && !next.resetPositionOnStart && mirrorPopulationKey == key)) GenerateHexGrid();
             mirrorPopulationKey = key; swarmPopulationKey = null;
+            foreach (var clone in Clones) ModelAppearance.Apply(clone, next.modelAppearance);
         }
         initialized = true;
         var mirrorLogger = GetComponent<KannadiLogger>();

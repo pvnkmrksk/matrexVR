@@ -94,6 +94,7 @@ public sealed class ExperimentControlEndpoint : MonoBehaviour
                 ["protocolVersion"] = 1, ["scene"] = SceneManager.GetActiveScene().name,
                 ["sequenceRunning"] = main?.SequenceRunning ?? false, ["sequencePreparing"] = main?.SequencePreparing ?? false,
                 ["sequenceStopping"] = main?.SequenceStopping ?? false, ["recordingError"] = main?.RecordingTransitionError,
+                ["recordingWarnings"] = main == null ? new JArray() : JArray.FromObject(main.RecordingWarnings),
                 ["sequenceTitle"] = main?.SequenceTitle, ["phase"] = MainController.RecordedExperimentPhase, ["sequenceError"] = main?.SequenceError,
                 ["setupOpen"] = gui != null, ["unsavedDraft"] = gui?.ControlHasUnsavedDraft ?? false, ["setupModal"] = gui?.ControlHasModal ?? false,
                 ["replayReady"] = replay?.Ready ?? false, ["replayTime"] = replay?.ReplayTime ?? 0, ["replayDuration"] = replay?.Duration ?? 0,

@@ -265,6 +265,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         target.transform.localPosition=rig.InverseTransformPoint(source.transform.position);
         target.transform.localRotation=Quaternion.Inverse(rig.rotation)*source.transform.rotation;
         target.fieldOfView=source.fieldOfView;target.nearClipPlane=source.nearClipPlane;target.farClipPlane=source.farClipPlane;
+        target.orthographic=source.orthographic;target.orthographicSize=source.orthographicSize;
         target.allowHDR=source.allowHDR;target.allowMSAA=source.allowMSAA;target.renderingPath=source.renderingPath;
         var saved=(archive?.SystemConfiguration?["configs"] as JArray)?.OfType<JObject>().FirstOrDefault(config=>(string)config["vrId"]==id);
         // The configured source camera also covers desktop previews and custom
@@ -273,7 +274,17 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         if(float.IsNaN(aspect) || float.IsInfinity(aspect) || aspect<=0)
             aspect=Mathf.Max(.01f,((float?)saved?["ledPanelWidth"]??128)/Mathf.Max(1,(float?)saved?["ledPanelHeight"]??128));
         target.aspect=aspect;
-        target.projectionMatrix=source.projectionMatrix;
+        var projection=source.projectionMatrix;
+        bool valid=true;
+        for(int element=0;element<16;element++)
+            if(float.IsNaN(projection[element])||float.IsInfinity(projection[element])){valid=false;break;}
+        float determinant=valid?projection.determinant:0;
+        valid=valid&&!float.IsNaN(determinant)&&!float.IsInfinity(determinant)&&Mathf.Abs(determinant)>1e-12f;
+        // Frozen source viewports can have zero area before their disabled
+        // ViewportSetter runs. Keep valid custom projections; otherwise use
+        // the copied lens with the known original aspect instead of NaNs.
+        if(valid)target.projectionMatrix=projection;
+        else target.ResetProjectionMatrix();
         float available=Mathf.Max(.01f,Screen.width/(Screen.height*.8f));
         target.rect=aspect<=available?new Rect((1-aspect/available)*.5f,.20f,aspect/available,.80f):new Rect(0,.20f+(.80f-.80f*available/aspect)*.5f,1,.80f*available/aspect);
         string key=ContextVersion+"|"+sample?.StimulusKey;
@@ -564,6 +575,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         if(prefab==null&&archive.Presentations.IsCurrentContract)throw new InvalidDataException("Required original population prefab is missing: "+selection);
         GameObject go=prefab!=null?ExternalModelLibrary.InstantiatePrefab(prefab,parent):GameObject.CreatePrimitive(PrimitiveType.Capsule);
         if (!string.IsNullOrWhiteSpace(externalPath) && prefab != null) ExternalModelLibrary.ConfigureAnimation(go);
+        ModelAppearance.Apply(go, (kind == "Kannadi" ? currentConfig?["modelAppearance"] : swarm?["modelAppearance"])?.ToObject<ModelAppearanceConfig>());
         if(prefab==null){go.transform.SetParent(parent,false);go.transform.localScale=Vector3.one*fallbackSize;Warn("An agent model was unavailable; pose markers are shown.");}
         go.name="Recorded agent "+name;FreezeVisual(go);
         go.AddComponent<ReplayAnimationDriver>();

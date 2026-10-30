@@ -152,7 +152,8 @@ namespace ConfigurationUI
             var native=Row("apparatus-native-option");scroll.Add(native);
             native.Add(StateSwitch(DesktopApparatusProfile.Flag((system[DesktopApparatusProfile.MarkerName] as JObject)?["launchBundledTrackers"]),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.Marker((JObject)r)["launchBundledTrackers"]=value,false),"apparatus-native-trackers"));
             var nativeLabel=SessionLabel("Launch bundled native trackers with Start","apparatus-copy");nativeLabel.tooltip="Only local modern Rekkefly/HejjéTrac rigs without an explicit executable/calibration override are launched. Disable this when sharing an externally started publisher. Remote and legacy endpoints remain externally managed.";native.Add(nativeLabel);
-            var maps=new VisualElement {name="apparatus-map-host"};scroll.Add(maps);BindViewState(maps,()=>{maps.Clear();BuildApparatusDisplayMap(maps,(JObject)Workspace.System.Root);});
+            var layout=new Foldout {name="apparatus-layout-details",text="Display layout",value=false};layout.AddToClassList("editor-disclosure");scroll.Add(layout);
+            var maps=new VisualElement {name="apparatus-map-host"};layout.Add(maps);BindViewState(maps,()=>{maps.Clear();BuildApparatusDisplayMap(maps,(JObject)Workspace.System.Root);});
             var rigs=DesktopApparatusProfile.Rigs(system).ToList();
             for(int i=0;i<rigs.Count;i++)BuildApparatusRig(scroll,rigs[i],i,output);
             var monitorOptions=new Foldout {name="apparatus-operator-options",text="Operator display & monitoring",value=false};monitorOptions.AddToClassList("apparatus-advanced");scroll.Add(monitorOptions);
@@ -171,7 +172,7 @@ namespace ConfigurationUI
             if(DesktopApparatusProfile.Rigs(system).Select(RigMode).Distinct().Count()>1)scroll.Add(SessionLabel("Mixed input contracts: review motion settings in each experiment block. A shared block can apply different walking/flight gains, but its movement options are not guessed from one rig.","apparatus-validation"));
             var errors=DesktopApparatusProfile.Validate(system,ApparatusDisplayFallback);
             if(errors.Count>0){var validation=SessionLabel(string.Join("\n",errors),"apparatus-validation");validation.AddToClassList("error");scroll.Add(validation);}
-            var complete=StudioButton(ApparatusConfigured?"Save configuration":"Use this configuration","system",FinishApparatusConfiguration,"primary");complete.name="apparatus-complete";scroll.Add(complete);
+            var complete=StudioButton(ApparatusConfigured?"Save configuration":"Use this configuration","system",FinishApparatusConfiguration,"primary");complete.name="apparatus-complete";if(!ApparatusConfigured)scroll.Add(complete);
             complete.tooltip="Validate and save this system JSON, then return to the experiment workspace. Unknown JSON fields and untouched calibration settings are retained.";
             scroll.Add(SessionLabel("Panel cells start at row 0 / column 0. Letters match the runtime cameras: D Down, R Right, B Back, L Left, F Front, U Up.","apparatus-note"));
         }
@@ -204,12 +205,13 @@ namespace ConfigurationUI
             var movement=new DropdownField("Movement / input",labels,mode){name="apparatus-mode-"+id,tooltip="Choose the animal’s input contract. Existing legacy JSON values remain untouched until changed. This does not rewrite a tracker calibration file."};movement.AddToClassList("apparatus-input");
             movement.RegisterValueChangedCallback(e=>set("closedLoopMode",values[labels.IndexOf(e.newValue)],true));identity.Add(movement);
             identity.Add(ApparatusText("Species","apparatus-species-"+id,(string)rig["speciesName"],value=>set("speciesName",value,false),"Common or scientific species name stored in system JSON and copied to the animal’s recording metadata."));
-            var transport=Row("apparatus-grid");fold.Add(transport);
+            var connections=new Foldout {name="apparatus-connections-"+id,text="Connections",value=false};connections.AddToClassList("editor-disclosure");fold.Add(connections);
+            var transport=Row("apparatus-grid");connections.Add(transport);
             transport.Add(ApparatusText("Tracker host","apparatus-host-"+id,(string)rig["zmqAddress"]??"localhost",value=>set("zmqAddress",value,true),"Host running the tracker publisher. Use localhost for bundled native apps; a remote host remains externally managed."));
             transport.Add(ApparatusInteger("Tracker port","apparatus-port-"+id,DesktopApparatusProfile.Integer(rig["zmqPort"],9871),value=>set("zmqPort",value,true),"ZeroMQ tracking input port. Each rig on the same host requires its own port.",1,65535));
             transport.Add(ApparatusInteger("Output display","apparatus-display-"+id,ApparatusOutputDisplay(rig)+1,value=>set("targetDisplay",value-1,true),"Physical output display, numbered from1 here. System JSON stores display0 for the first output. The preview below shows every configured rectangle on that display.",1,32));
             {
-                var ledControls=new VisualElement {name="apparatus-led-controls-"+id};fold.Add(ledControls);
+                var ledControls=new Foldout {name="apparatus-led-controls-"+id,text="LED calibration",value=false};ledControls.AddToClassList("editor-disclosure");fold.Add(ledControls);
                 BindViewState(ledControls,()=>ledControls.SetEnabled(DesktopApparatusProfile.Presentation(Workspace.System.Root)=="led"));
                 var pixels=Row("apparatus-grid");ledControls.Add(pixels);
                 pixels.Add(ApparatusInteger("Panel width (px)","apparatus-width-"+id,DesktopApparatusProfile.Integer(rig["ledPanelWidth"],128),value=>set("ledPanelWidth",value,true),"Pixels across one LED panel. Typical panels are64 or128 pixels; any positive integer can be entered.",1));

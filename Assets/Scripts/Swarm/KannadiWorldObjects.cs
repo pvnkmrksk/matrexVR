@@ -40,6 +40,7 @@ public sealed class KannadiWorldObjects : MonoBehaviour
         if (item.groundOnTerrain) instance.transform.position = DesktopQuickStart.GroundPosition(instance.transform.position);
         if (!string.IsNullOrWhiteSpace(item.modelPath) || !string.IsNullOrWhiteSpace(item.animationClip) || item.animationSpeed != 1)
             ExternalModelLibrary.ConfigureAnimation(instance, item.animationClip, item.animationSpeed);
+        ModelAppearance.Apply(instance, item.appearance);
         return instance;
     }
     private static void Layer(Transform item, int layer)
