@@ -436,15 +436,7 @@ namespace ConfigurationUI
         {
             if(preparing)return;
             RequireApplied();
-            bool configured=DesktopApparatusProfile.IsConfigured(Workspace.System.Root);
-            if(!configured&&!DesktopQuickStart.IsQuickStart(Workspace))
-                throw new InvalidOperationException("Finish Configure before using this apparatus, or return to Start to explore the demo.");
-            var errors=Workspace.Validate();
-            if(configured)
-            {
-                errors.AddRange(DesktopApparatusProfile.Validate(Workspace.System.Root,ApparatusDisplayFallback));
-                errors.AddRange(ConnectedOutputErrors());
-            }
+            var errors=ValidateSetupForStart(Workspace);
             if(errors.Count>0)throw new InvalidOperationException(string.Join("\n",errors));
             PrepareRunMetadata();Workspace.SaveAll();
             if(DesktopQuickStart.IsQuickStart(Workspace)||DesktopApparatusProfile.ShouldPrepareCompanions(Workspace.System.Root))
@@ -453,11 +445,18 @@ namespace ConfigurationUI
             }
             StartAfterPreviousRecording();
         }
-        private IEnumerable<string> ConnectedOutputErrors()
+        public List<string> ValidateSetupForStart(ConfigWorkspace workspace)
         {
-            foreach(var rig in DesktopApparatusProfile.Rigs(Workspace.System.Root))
+            var errors=workspace.Validate();bool configured=DesktopApparatusProfile.IsConfigured(workspace.System.Root);
+            if(!configured&&!DesktopQuickStart.IsQuickStart(workspace))errors.Add("Finish Configure before using this apparatus, or return to Start to explore the demo.");
+            if(configured){errors.AddRange(DesktopApparatusProfile.Validate(workspace.System.Root,ApparatusDisplayFallback));errors.AddRange(ConnectedOutputErrors(workspace));}
+            return errors;
+        }
+        private IEnumerable<string> ConnectedOutputErrors(ConfigWorkspace workspace)
+        {
+            foreach(var rig in DesktopApparatusProfile.Rigs(workspace.System.Root))
             {
-                int display=DesktopApparatusProfile.OutputDisplay(Workspace.System.Root,rig,ApparatusDisplayFallback);
+                int display=DesktopApparatusProfile.OutputDisplay(workspace.System.Root,rig,ApparatusDisplayFallback);
                 string id=(string)rig["vrId"];
                 if(display<0||display>=Display.displays.Length)
                 {yield return id+": output display "+(display+1)+" is not connected. Connect it or change its display in Configure.";continue;}
@@ -473,7 +472,13 @@ namespace ConfigurationUI
             }
         }
         private void OpenQuickTracker()
-        {if(preparing)return;RequireApplied();BeginCompanionPreparation(false);}
+        {
+            if(preparing)return;RequireApplied();
+            var errors=ConfigSchema.Validate(Workspace.System.Root,Workspace.Schemas.Get("system"));
+            if(errors.Count>0)throw new InvalidOperationException(string.Join("; ",errors));
+            Workspace.System.Save();MainController.Instance?.ConfigureTrackingWhileIdle(Workspace.System.Path);
+            BeginCompanionPreparation(false);
+        }
         private readonly List<string> companionWarnings=new List<string>();
         private void CompanionWarning(string message)
         {

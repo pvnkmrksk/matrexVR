@@ -160,6 +160,15 @@ public static class Regression
                 var aliasReport=TrackerProcessManager.BeginExperimentRecordingAsync(new[]{aliasRig},aliasRun,aliasId).GetAwaiter().GetResult();
                 Check(aliasReport.AcknowledgedRigCount==1&&aliasReport.Warnings.Count==0,"Unchanged owner still records when the flight backend uses its normalized legacy alias");
                 TrackerProcessManager.EndExperimentRecordingAsync(aliasId,"stopped").GetAwaiter().GetResult();
+                string operatorId=Guid.NewGuid().ToString("N"),operatorRun=Path.Combine(temp,"operator-recorder-stop");Directory.CreateDirectory(operatorRun);
+                TrackerProcessManager.BeginExperimentRecordingAsync(new[]{healthy},operatorRun,operatorId).GetAwaiter().GetResult();
+                int stopsBefore=File.ReadAllLines(requestLog).Count(line=>line=="record_stop");
+                var overrideState=TrackerProcessManager.StopRecorderForOperatorAsync(healthy.vrId).GetAwaiter().GetResult();
+                Check((string)overrideState["state"]=="override"&&(bool?)overrideState["native"]?["writersDrained"]==true,
+                    "Agent/manual recorder Stop drains the exact owned take and latches override without quitting tracking");
+                bool warned=false;try{TrackerProcessManager.EndExperimentRecordingAsync(operatorId,"stopped").GetAwaiter().GetResult();}catch(InvalidOperationException){warned=true;}
+                Check(warned&&File.ReadAllLines(requestLog).Count(line=>line=="record_stop")==stopsBefore+1,
+                    "Experiment Stop reuses the settled manual-stop task and sends no duplicate native stop");
                 string emptyId=Guid.NewGuid().ToString("N"),emptyRun=Path.Combine(temp,"zero-frame-run");Directory.CreateDirectory(emptyRun);
                 var empty=TrackerProcessManager.BeginExperimentRecordingAsync(new[]{endpointRigs[4]},emptyRun,emptyId).GetAwaiter().GetResult();
                 Check(empty.Warnings.Count==1&&empty.AcknowledgedRigCount==0,"An armed recorder without a first frame becomes a warning after the shared preparation budget");

@@ -8,10 +8,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>Opt-in local file RPC. Requests execute on Unity's main thread, never on an acquisition worker.</summary>
-public sealed class ExperimentControlEndpoint : MonoBehaviour
+public sealed partial class ExperimentControlEndpoint : MonoBehaviour
 {
     public string ControlDirectory { get; private set; }
     private float nextPoll;
+    private FileStream ownerLock;
+    private readonly string controlInstance=Guid.NewGuid().ToString("N");
+    public string ControlInstance => controlInstance;
     private static bool installed;
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)] private static void Reset() => installed = false;
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -41,7 +44,19 @@ public sealed class ExperimentControlEndpoint : MonoBehaviour
                 throw new ArgumentException("Choose a separate command directory outside saved recordings.");
         if (Directory.Exists(full) && ReplaySessionArchive.CsvFiles(full).Length > 0)
             throw new ArgumentException("Choose a command directory without recording CSV files.");
-        Directory.CreateDirectory(full); ControlDirectory = full;
+        if(ControlDirectory!=null)throw new InvalidOperationException("This endpoint is already configured.");
+        Directory.CreateDirectory(full);
+        ownerLock=new FileStream(Path.Combine(full,"owner.lock"),FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);
+        try
+        {
+            ownerLock.Lock(0,1);
+            var descriptor=new JObject{["protocolVersion"]=2,["instance"]=controlInstance,["processId"]=System.Diagnostics.Process.GetCurrentProcess().Id,
+                ["methods"]=new JArray(ControlMethods),["configRoot"]=RuntimePaths.ConfigRoot,["runDataRoot"]=RuntimePaths.RunDataRoot};
+            string temporary=Path.Combine(full,"endpoint."+controlInstance+".tmp"),destination=Path.Combine(full,"endpoint.json");
+            File.WriteAllText(temporary,descriptor.ToString());
+            if(File.Exists(destination))File.Delete(destination);File.Move(temporary,destination);ControlDirectory=full;
+        }
+        catch{ownerLock.Dispose();ownerLock=null;throw;}
     }
     private void Update()
     {
@@ -60,17 +75,31 @@ public sealed class ExperimentControlEndpoint : MonoBehaviour
             JObject result;
             try
             {
-                if (new FileInfo(file).Length > 65536) throw new ArgumentException("Request exceeds 64 KiB.");
+                if (new FileInfo(file).Length > 1048576) throw new ArgumentException("Request exceeds 1 MiB.");
                 var request = JObject.Parse(File.ReadAllText(file));
+                if((string)request["instance"]!=controlInstance)throw new ArgumentException("Application instance changed; the request was not executed.");
                 if ((string)request["id"] != id) throw new ArgumentException("Request id does not match its file.");
                 if (!DateTimeOffset.TryParse((string)request["expiresUtc"], out var expiry) || expiry < DateTimeOffset.UtcNow)
                     throw new ArgumentException("Request expired; it was not executed.");
-                result = new JObject { ["id"] = id, ["ok"] = true, ["result"] = Execute((string)request["method"], request["arguments"] as JObject ?? new JObject()) };
+                result = new JObject { ["id"] = id, ["instance"]=controlInstance, ["ok"] = true, ["result"] = Execute((string)request["method"], request["arguments"] as JObject ?? new JObject()) };
             }
-            catch (Exception error) { result = new JObject { ["id"] = id, ["ok"] = false, ["error"] = error.GetBaseException().Message }; }
+            catch (Exception error) { result = new JObject { ["id"] = id, ["instance"]=controlInstance, ["ok"] = false, ["error"] = error.GetBaseException().Message, ["errorCode"]=error is ArgumentException?"invalid_argument":error is IOException?"io_error":"invalid_state" }; }
             string temporary = response + ".tmp";
             File.WriteAllText(temporary, result.ToString(Formatting.None)); File.Move(temporary, response); File.Delete(file);
         }
+    }
+    private void OnDestroy()
+    {
+        try
+        {
+            if(ControlDirectory!=null)
+            {
+                string path=Path.Combine(ControlDirectory,"endpoint.json");
+                if(File.Exists(path)&&(string)JObject.Parse(File.ReadAllText(path))["instance"]==controlInstance)File.Delete(path);
+            }
+        }
+        catch(IOException){}catch(UnauthorizedAccessException){}
+        finally{ownerLock?.Dispose();ownerLock=null;}
     }
     private static string RequiredPath(JObject args, string name)
     {
@@ -91,18 +120,18 @@ public sealed class ExperimentControlEndpoint : MonoBehaviour
         switch (method)
         {
             case "status": return new JObject {
-                ["protocolVersion"] = 1, ["scene"] = SceneManager.GetActiveScene().name,
+                ["protocolVersion"] = 2, ["scene"] = SceneManager.GetActiveScene().name,
                 ["sequenceRunning"] = main?.SequenceRunning ?? false, ["sequencePreparing"] = main?.SequencePreparing ?? false,
                 ["sequenceStopping"] = main?.SequenceStopping ?? false, ["recordingError"] = main?.RecordingTransitionError,
                 ["recordingWarnings"] = main == null ? new JArray() : JArray.FromObject(main.RecordingWarnings),
                 ["sequenceTitle"] = main?.SequenceTitle, ["phase"] = MainController.RecordedExperimentPhase, ["sequenceError"] = main?.SequenceError,
                 ["setupOpen"] = gui != null, ["unsavedDraft"] = gui?.ControlHasUnsavedDraft ?? false, ["setupModal"] = gui?.ControlHasModal ?? false,
-                ["replayReady"] = replay?.Ready ?? false, ["replayTime"] = replay?.ReplayTime ?? 0, ["replayDuration"] = replay?.Duration ?? 0,
-                ["replayPlaying"] = replay?.IsPlaying ?? false };
+                ["replayReady"] = replay?.Ready ?? false, ["replayLoading"]=replay?.Loading??false,["replayError"]=replay?.LoadError, ["replayTime"] = replay?.ReplayTime ?? 0, ["replayDuration"] = replay?.Duration ?? 0,
+                ["replayPlaying"] = replay?.IsPlaying ?? false, ["diagnostics"]=DetailedStatus() };
             case "validate":
                 RequireIdle();
                 var workspace = new ConfigWorkspace(RequiredPath(args, "systemFile"), RequiredPath(args, "sequenceFile"), ConfigSchema.Load());
-                var errors = workspace.Validate(); return new JObject { ["valid"] = errors.Count == 0, ["errors"] = new JArray(errors) };
+                var errors = gui!=null?gui.ValidateSetupForStart(workspace):workspace.Validate(); return new JObject { ["valid"] = errors.Count == 0, ["errors"] = new JArray(errors) };
             case "start_current":
                 RequireIdle(); if (gui == null) throw new InvalidOperationException("Open setup before starting the current draft.");
                 gui.StartCurrentFromControl(); return new JObject { ["accepted"] = true, ["note"] = "Start uses the GUI workflow; poll status for asynchronous preparation or errors." };
@@ -132,7 +161,7 @@ public sealed class ExperimentControlEndpoint : MonoBehaviour
                 double seconds = (double?)args["seconds"] ?? double.NaN;
                 if (double.IsNaN(seconds) || double.IsInfinity(seconds)) throw new ArgumentException("seconds must be finite.");
                 replay.SeekSeconds(seconds); return new JObject { ["seconds"] = replay.ReplayTime };
-            default: throw new ArgumentException("Unknown control method: " + method);
+            default: return ExecuteExtended(method,args);
         }
     }
 }

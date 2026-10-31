@@ -50,6 +50,14 @@ def prepare(project, library):
     build_identity.write(project, revision, 'working-tree-snapshot', dirty)
 
 
+def stage_mcp_adapter(app):
+    """Bundle the self-contained official-SDK adapter; the endpoint remains opt-in."""
+    target = Path(app) / 'Contents/Resources/MCP'
+    target.mkdir(parents=True, exist_ok=True)
+    for name in ('matrex_control_mcp.py', 'matrex_control_mcp.py.lock'):
+        shutil.copy2(ROOT / 'tools' / name, target / name)
+
+
 def write_preview_entrypoints(app):
     """Put the local test app, editable config and launcher in one visible folder."""
     if app.parent.resolve() != (ROOT / 'Preview').resolve():
@@ -126,6 +134,7 @@ def main():
             run(sys.executable, ROOT / 'tools/build_local_hejjetrac.py', '--companions', args.app / 'Contents/Companions', *hj_args)
         dashboard_args = ['--local-archive', args.local_dashboard_archive] if local_dashboard else []
         run(sys.executable, ROOT / 'tools/stage_local_dashboard.py', '--output', args.app / 'Contents/Companions', *dashboard_args)
+    stage_mcp_adapter(args.app)
     # Seal after embedding. Upstream tracker signatures are retained; no recursive re-signing.
     run('/usr/bin/codesign', '--force', '--sign', '-', '--timestamp=none', args.app)
     run('/usr/bin/codesign', '--verify', '--strict', args.app)

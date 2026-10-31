@@ -442,6 +442,21 @@ public class MainController : MonoBehaviour
         return new SystemConfig { vrId = vrId };
     }
 
+    /// <summary>Apply saved apparatus input/routing for preflight, without beginning an experiment or recorder.</summary>
+    public void ConfigureTrackingWhileIdle(string systemFile)
+    {
+        if(SequenceRunning||SequencePreparing||SequenceStopping)throw new System.InvalidOperationException("Finish the experiment and its recorders before initializing tracking.");
+        SetSystemConfigFile(systemFile);
+        if(systemConfigurationError!=null)throw new System.ArgumentException(systemConfigurationError);
+        var scene=SceneManager.GetActiveScene();RuntimeRigRegistry.Configure(scene,systemConfigs);
+        foreach(var rig in RuntimeRigRegistry.Rigs(scene))
+        {
+            rig.GetComponent<ViewportSetter>()?.RefreshSystemConfig();
+            var listener=rig.GetComponent<ZmqListener>();
+            if(listener!=null&&listener.enabled){listener.enabled=false;listener.enabled=true;}
+        }
+    }
+
     // Method to set a different system config file
     public void SetSystemConfigFile(string fileName)
     {

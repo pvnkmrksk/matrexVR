@@ -94,6 +94,15 @@ namespace ConfigurationUI
             if (!(parsed is JObject)) throw new ArgumentException("Configuration root must be an object.");
             Edit(_ => {if(LoadError!=null)repairedSource=true;Root=parsed;LoadError=null;});
         }
+        /// <summary>Validate a candidate through the shared workspace without changing source, history or draft.</summary>
+        public T PreviewJson<T>(string json, Func<T> inspect)
+        {
+            var candidate=LosslessJson.Parse(json);
+            if(!(candidate is JObject))throw new ArgumentException("Configuration root must be an object.");
+            var original=Root;var error=LoadError;
+            try{Root=candidate;LoadError=null;return inspect();}
+            finally{Root=original;LoadError=error;}
+        }
         public void Undo() { if (undo.Count == 0) return; redo.Push(Capture()); Restore(undo.Pop()); }
         public void Redo() { if (redo.Count == 0) return; undo.Push(Capture()); Restore(redo.Pop()); }
         public void EnsureSaveable()

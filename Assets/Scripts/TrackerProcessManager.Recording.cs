@@ -29,8 +29,9 @@ public sealed partial class TrackerProcessManager
     private sealed class RecordingTake
     {
         public string RigId,Backend,RequestedRoot,Directory,TakeId,StopRequestId,State="preparing",Error;
-        public SystemConfig Desired;public Receipt Owner;public NativeRecorderClient Client;public bool StartSent,StartQueued,ManualOverride,FirstFrameAcknowledged,Requested=true,Automatic=true;
+        public SystemConfig Desired;public Receipt Owner;public NativeRecorderClient Client;public bool StartSent,StartQueued,ManualOverride,OperatorStopRequested,FirstFrameAcknowledged,Requested=true,Automatic=true;
         public MediaRecordingSource Media;
+        public Task<string> EndTask;
     }
     private sealed class RecordingRun
     {
@@ -52,7 +53,7 @@ public sealed partial class TrackerProcessManager
         if(value=="disabled")return "Tracker video disabled";
         if(value=="recording")return "Recording acknowledged · "+state["takeId"];
         if(value=="complete")return "Recording finalized · native writers drained";
-        if(value=="override")return "Stopped in native tracker · automatic restart disabled";
+        if(value=="override")return "Stopped by operator · automatic restart disabled";
         if(value=="closed-unacknowledged")return "Native take closed · first-frame recording was not acknowledged";
         if(value=="unavailable")return "Tracker video unavailable · VR continues · "+state["error"];
         if(value=="failed")return "Recorder needs attention · "+state["error"];
@@ -225,7 +226,23 @@ public sealed partial class TrackerProcessManager
         run.Cancellation.Dispose();
         if(errors.Count>0)throw new InvalidOperationException(string.Join("; ",errors.Distinct()));
     }
-    private static async Task<string> EndTakeAsync(RecordingRun run,RecordingTake take,CancellationToken token)
+    public static async Task<JObject> StopRecorderForOperatorAsync(string vrId)
+    {
+        RecordingRun run;RecordingTake take;
+        lock(recordingGate)
+        {
+            run=recordingRuns.Values.SingleOrDefault(value=>!value.Ending&&value.Takes.Any(item=>item.RigId==vrId&&item.State=="recording"));
+            take=run?.Takes.SingleOrDefault(item=>item.RigId==vrId&&item.State=="recording");
+            if(take==null)throw new InvalidOperationException("No acknowledged experiment-owned recorder is active for "+vrId+". Manual mode remains controlled in the native tracker.");
+            take.ManualOverride=true;take.OperatorStopRequested=true;
+        }
+        await EndTakeAsync(run,take,CancellationToken.None);
+        if(take.State=="failed")throw new InvalidOperationException(take.Error);
+        return RecordingState(vrId);
+    }
+    private static Task<string> EndTakeAsync(RecordingRun run,RecordingTake take,CancellationToken token)
+    {lock(recordingGate)return take.EndTask??(take.EndTask=EndTakeCoreAsync(run,take,token));}
+    private static async Task<string> EndTakeCoreAsync(RecordingRun run,RecordingTake take,CancellationToken token)
     {
         try
         {
@@ -263,7 +280,7 @@ public sealed partial class TrackerProcessManager
             CompanionMediaArchive.AcknowledgeFinalizedTake(take.RigId,take.Media.TrackerSessionId,completion);
             if((string)completion["control_stop_id"]!=take.StopRequestId||(long?)completion["capture_pause_count"]>0)take.ManualOverride=true;
             SetRecordingState(run,take,take.ManualOverride?"override":take.FirstFrameAcknowledged?"complete":"closed-unacknowledged",completion);
-            return take.ManualOverride?take.RigId+": native recording was paused/stopped outside the matching VR stop request; automatic restart was disabled.":null;
+            return take.ManualOverride?take.RigId+(take.OperatorStopRequested?": operator requested a manual recorder stop; automatic restart was disabled.":": native recording was paused/stopped outside the matching VR stop request; automatic restart was disabled."):null;
         }
         catch(Exception error){take.Error=error.Message;SetRecordingState(run,take,"failed");return error.Message;}
     }

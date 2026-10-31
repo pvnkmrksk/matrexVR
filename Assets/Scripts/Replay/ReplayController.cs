@@ -350,6 +350,12 @@ public partial class ReplayController : MonoBehaviour
         if(selectedView>=0)overviewDragButton=-1;
         for(int i=0;i<rigOrder.Count;i++)if(camerasByRig.TryGetValue(rigOrder[i],out var camera)){camera.targetTexture=null;FitReplayAnimalViewport(camera);camera.enabled=selectedView==i;}
     }
+    public void ShowAnimalView(string id)
+    {
+        int index=rigOrder.IndexOf(id);
+        if(index<0||!camerasByRig.ContainsKey(id)||!createRigCameras)throw new ArgumentException("Replay animal camera is unavailable: "+id);
+        selectedView=index;ApplyView();
+    }
     public void ShowOverview(){selectedView=-1;ApplyView();}
     private void CycleView(){selectedView++;if(selectedView>=rigOrder.Count)selectedView=-1;ApplyView();}
 
