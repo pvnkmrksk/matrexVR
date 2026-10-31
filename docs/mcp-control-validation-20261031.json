@@ -1,0 +1,126 @@
+{
+  "scope": "Local Mac review only. Official MCP SDK 2.3.0 stdio client/server, real standalone player, generated native input on localhost port 32971, isolated configuration and run-data roots. No physical camera/animal, exposure timing, other-platform runtime or UI pointer-operation claim. Recorder media was explicitly disabled in standalone simulation; healthy owned-take override/finalization uses separate real-process protocol fixtures with simulated frame counts.",
+  "build": {
+    "version": "0.5.1-mcp-preview",
+    "target": "StandaloneOSX",
+    "result": "Succeeded",
+    "errors": 0,
+    "warnings": 61,
+    "bytes": 453232250,
+    "buildGuid": "922e6ef0ce364bcb85bb461c5ef273b0",
+    "scenes": [
+      "Assets/Scenes/ControlScene.unity",
+      "Assets/Scenes/Optomotor.unity",
+      "Assets/Scenes/Choice.unity",
+      "Assets/Scenes/Choice_desync.unity",
+      "Assets/Scenes/ReplayScene.unity",
+      "Assets/Scenes/Kannadi.unity",
+      "Assets/Scenes/Choice_Selwyn.unity",
+      "Assets/Scenes/Rugosity_RS.unity",
+      "Assets/Scenes/TerrainCueLab.unity",
+      "Assets/Scenes/TerrainChoice_RoughLeft_SmoothRight.unity",
+      "Assets/Scenes/TerrainChoice_SmoothLeft_RoughRight.unity",
+      "Assets/Scenes/TerrainChoice_BothSmooth.unity",
+      "Assets/Scenes/TerrainChoice_BothRough.unity"
+    ]
+  },
+  "identity": {
+    "schemaVersion": 1,
+    "sourceRevision": "437b930e7d203b9078dd2c071e9e00c13abc8987",
+    "sourceState": "working-tree-snapshot",
+    "sourceTreeDirty": true,
+    "runtimeSourceFingerprintSha256": "fd664583e85bee500c8de38e99fd5517af7a1a7dc0d7097e5bfeb6cabd5e4071",
+    "runtimeSourceFileCount": 272,
+    "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint.",
+    "dirtyPathsAtPreparation": [
+      " M Assets/Editor/ExperimentControlValidation.cs",
+      " M Assets/Scripts/ConfigurationUI/ConfigDocument.cs",
+      " M Assets/Scripts/ConfigurationUI/ConfigWorkbench.Control.cs",
+      " M Assets/Scripts/ConfigurationUI/ConfigWorkbench.cs",
+      " M Assets/Scripts/ExperimentControlEndpoint.cs",
+      " M Assets/Scripts/MainController.cs",
+      " M Assets/Scripts/Replay/ReplayController.cs",
+      " M Assets/Scripts/TrackerProcessManager.Recording.cs",
+      "?? Assets/Scripts/ExperimentControlEndpoint.Extended.cs",
+      "?? Assets/Scripts/ExperimentControlEndpoint.Extended.cs.meta",
+      "?? Assets/Scripts/Replay/ReplayController.Control.cs",
+      "?? Assets/Scripts/Replay/ReplayController.Control.cs.meta",
+      "?? Assets/StreamingAssets/Archive/Legacy/Templates/README.md.meta",
+      "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config.py.meta",
+      "?? Assets/StreamingAssets/Archive/LegacyLocustInputs/archive/permutation_sequence_config_choice.py.meta",
+      "?? Assets/StreamingAssets/Archive/README.md.meta"
+    ],
+    "applicationVersion": "0.5.1-mcp-preview",
+    "unityVersion": "6000.3.16f1",
+    "buildTarget": "StandaloneOSX"
+  },
+  "mcp": {
+    "sdkVersion": "2.3.0",
+    "python": "3.13.4",
+    "tools": 27,
+    "resources": 3,
+    "protocolUnitTests": 10,
+    "stdioAcceptanceChecks": 64,
+    "failure": null,
+    "runs": [
+      "/Users/pavan/src/ledpanelVR/.local/mcp-evidence/standalone-verified/RunData/20261031_105425",
+      "/Users/pavan/src/ledpanelVR/.local/mcp-evidence/standalone-verified/RunData/20261031_105427"
+    ],
+    "rawEvidence": {
+      "path": ".local/mcp-evidence/standalone-verified/results.json",
+      "sha256": "7ee92f9194ea167b62da5a7642139fe27b2e4232adc80166c6559f0d20644718"
+    },
+    "script": {
+      "path": "tools/matrex_control_mcp.py",
+      "sha256": "bfbf82d3502797a65f0b0dedae8af156c94151c46dabe26bcba4caf619379faf"
+    },
+    "dependencyLock": {
+      "path": "tools/matrex_control_mcp.py.lock",
+      "sha256": "6b950ff8ec9951e0318dc1bbbdd4843593f4617fbcc02888ad1e14742b6f19fc"
+    }
+  },
+  "unityGuiParity": {
+    "checks": 25,
+    "failure": null,
+    "unity": "6000.3.16f1",
+    "evidence": {
+      "path": ".local/mcp-project/control-validation/results.json",
+      "sha256": "42233cf2d544369edb99ef6efe0be58a3df3b8b9f7bf3b099e924591e1240f54"
+    }
+  },
+  "trackerContracts": {
+    "checks": 142,
+    "evidence": {
+      "path": ".local/mcp-evidence/tracker-contracts-final.json",
+      "sha256": "4199e3680f27ff2119229cc10350a7da5df62055ea4351269968072ca2487d41"
+    }
+  },
+  "acceptedBehaviors": [
+    "SDK initialization/discovery issues no experiment commands",
+    "shared GUI JSON drafts, exact defaults, revision fencing, undo/redo and source conflicts",
+    "safe new config creation and explicit invalid drafts during repair",
+    "same GUI and MCP Start readiness validation including apparatus and connected outputs",
+    "tracking initialization applies selected saved apparatus without an experiment recording",
+    "metadata, precision-safe JSON text and unknown field round-trip",
+    "two distinct standalone experiment runs and default install-local recording discovery",
+    "actual recorded replay load, play/pause, seek and first-person/overview selection",
+    "live frame-rate cap changes through the existing recorded controller",
+    "replay speed, trails, projection and overview camera edits; invalid patch changes nothing",
+    "inactive recorder reports failed asynchronous operation without a false acknowledgement",
+    "healthy owned-recorder operator stop drains its exact take and experiment Stop sends no duplicate stop"
+  ],
+  "limitations": [
+    "Physical device enumeration/formats/calibration use native companion APIs; MATREX reports configured camera selections",
+    "This standalone smoke uses generated input with video off, not fresh physical-camera recording acceptance",
+    "Existing native adapter platform limits still apply; Windows/Linux native execution was not tested",
+    "Stable 60 FPS and hardware presentation/exposure synchronization are not established by this feature",
+    "MCP GUI layout cosmetics/help dialogs are not screen-automated; experiment settings and replay state use structured APIs"
+  ],
+  "delivery": {
+    "app": "/Users/pavan/src/ledpanelVR/.local/mcp-review/MATREX VR.app",
+    "launcher": "/Users/pavan/src/ledpanelVR/.local/mcp-review/Open MCP Preview.command",
+    "mcpClientConfig": "/Users/pavan/src/ledpanelVR/.local/mcp-review/mcp-client.json",
+    "pushed": false,
+    "released": false
+  }
+}
