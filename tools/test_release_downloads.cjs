@@ -1,6 +1,6 @@
 // Release links must never point to a guessed, incomplete or source-only artifact.
 const assert = require('node:assert/strict');
-const { availableReleases, platformAsset, formatSize } = require('../docs/site/release-downloads.js');
+const { availableReleases, platformAsset, formatSize, detectPlatform } = require('../docs/site/release-downloads.js');
 const asset = (name, state = 'uploaded', size = 4096) => ({ name, state, size,
   browser_download_url: 'https://github.com/pvnkmrksk/matrexVR/releases/download/v0.1.0/' + name });
 const baseline = { draft: false, prerelease: false, published_at: '2026-10-25T11:00:00Z', tag_name: 'v0.1.0', assets: [
@@ -20,4 +20,5 @@ assert.deepEqual(availableReleases([baseline, { ...baseline, tag_name: 'v0.10.0'
   { ...baseline, draft: true }, { ...baseline, prerelease: true }, { ...baseline, published_at: null }]).map(r => r.tag_name), ['v0.10.0', 'v0.2.0', 'v0.1.0']);
 assert.equal(formatSize(2 * 1024 * 1024), '2 MB');
 assert.equal(formatSize(2 * 1024 * 1024 * 1024), '2.0 GB');
-console.log('Release downloads: 15 assertions passed.');
+for (const [input, expected] of [['MacIntel','macos'],['Windows','windows'],['Linux x86_64','linux'],['Linux Android','null'],['iPhone','null'],['iPad','null'],['unknown','null']]) assert.equal(detectPlatform(input), expected === 'null' ? null : expected);
+console.log('Release downloads: 22 assertions passed.');
