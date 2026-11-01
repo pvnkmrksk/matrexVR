@@ -1,0 +1,246 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Assembly worksheet — MATREX VR</title><meta name="description" content="Recovered MATREX apparatus mesh candidates, dimensions and assembly review instructions."><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="hardware.css"></head><body><a class="skip" href="#main">Skip to content</a><header class="masthead wrap"><a class="wordmark" href="../index.html">MATREX <span>VR</span></a><nav aria-label="Hardware navigation"><a href="index.html">Parts &amp; files</a><a href="assembly.html">Assembly guide</a><a href="../manual/getting-started.html">Software setup</a></nav></header><main id="main" class="hardware-main"><article><h1 id="matrex-apparatus-recovered-parts-and-assembly-worksheet">MATREX
+apparatus: recovered parts and assembly worksheet</h1>
+<p><strong>Local review edition · 1 November 2026.</strong> This is an
+illustrated identification and dry-fit worksheet, not a mechanically
+validated assembly manual. Five named source groups were recovered from
+local Downloads. Their compatibility, final revision, required
+quantities and redistribution rights have not been established. Do not
+combine the variants as a complete kit without checking the actual
+apparatus.</p>
+<p><a href="index.html">Part catalogue and
+individual files</a> · <a
+href="inventory.json">Machine-readable
+inventory</a> · <a href="../manual/getting-started.html">Software setup</a> · <a
+href="../manual/six-camera-rig.html">Display geometry</a> · <a
+href="../manual/tracker-integration.html">Tracker integration</a></p>
+<h2 id="1-identify-the-parts-before-printing">1. Identify the parts
+before printing</h2>
+<p>The catalogue gives every recovered mesh its own identifier, measured
+X × Y × Z bounding box and file hash. The illustrations below show
+actual exported triangles. They show source build orientation with plate
+translation removed; they are not assembly poses. Inspect every shape in
+multi-shape groups before selecting a part.</p>
+<h3 id="camera-mount">Camera mount</h3>
+<p><img
+src="images/camera-locust-matrex-01.png"
+alt="Measured camera-holder mesh, in the orientation stored in its source build" /></p>
+<p><strong>camera-locust-matrex-01:</strong> recovered from
+<code>Part Studio 1 - Camera Holder Locust MATREX.3mf</code>. The
+filename explicitly associates this candidate with MATREX and Locust.
+Confirm the camera body, lens clearance, working distance and mating
+bracket against your physical instrument. Eight copies on the original
+plate indicate a print layout, not eight parts required per
+apparatus.</p>
+<h3 id="led-panel-holders">LED-panel holders</h3>
+<p><img src="images/panel-middle-01.png"
+alt="Measured middle panel-holder mesh" /></p>
+<p><strong>panel-middle-01:</strong> recovered from
+<code>Led Panel Holder - Middle.3mf</code>. Determine the panel edge
+thickness and attachment surfaces from the actual panel and mesh; no
+screw standard has been inferred.</p>
+<p><img src="images/top-panel-p1952-01.png"
+alt="First measured top-panel mount shape" /></p>
+<p><img src="images/top-panel-p1952-02.png"
+alt="Second measured top-panel mount shape" /></p>
+<p><strong>top-panel-p1952-01 / -02:</strong> two different shapes from
+<code>Top Panel Mount P1.952 128 128.3mf</code>. P1.952 and 128 × 128
+are filename labels, not verified panel specifications. The original
+plate contains two instances of shape 01 and four of shape 02. These are
+not established kit quantities.</p>
+<h3 id="ball-support">Ball support</h3>
+<p><img src="images/ball-holder-265-01.png"
+alt="Measured ball-holder mesh" /></p>
+<p><strong>ball-holder-265-01:</strong> recovered from
+<code>Ball Holder 26.5-2.3mf</code>. The label “26.5” has not been
+verified as a ball diameter. The outer mesh is much larger; use the
+catalogue dimensions and inspect the contact surfaces before choosing a
+ball or deciding how this support attaches.</p>
+<h3 id="table-clamp-candidates">Table-clamp candidates</h3>
+<p><img src="images/table-clamp-01.png"
+alt="First table-clamp mesh" /></p>
+<p><img src="images/table-clamp-02.png"
+alt="Second table-clamp mesh" /></p>
+<p><img src="images/table-clamp-03.png"
+alt="Third table-clamp mesh" /></p>
+<p><img src="images/table-clamp-04.png"
+alt="Fourth table-clamp mesh" /></p>
+<p><strong>table-clamp-01 to -04:</strong> four shapes from
+<code>Table Clamp Part Studio-7.3mf</code>. Numbering identifies export
+order, not a verified mating or fastening order. Confirm which
+components belong to the apparatus and the table thickness before
+loading or tightening the assembly.</p>
+<h2 id="2-candidate-bill-of-materials">2. Candidate bill of
+materials</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Available geometry</th>
+<th>Required quantity</th>
+<th>Still needed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Camera holder</td>
+<td>One unique mesh</td>
+<td>Confirm per tracked station</td>
+<td>Camera model, lens, mounting hardware, datum and working
+distance</td>
+</tr>
+<tr>
+<td>Middle LED holder</td>
+<td>One unique mesh</td>
+<td>Confirm from panel arrangement</td>
+<td>Panel outline, edge clearance, mating frame and fasteners</td>
+</tr>
+<tr>
+<td>Top-panel mount</td>
+<td>Two unique meshes</td>
+<td>Confirm from apparatus</td>
+<td>Correct panel revision and relationship between the shapes</td>
+</tr>
+<tr>
+<td>Ball holder</td>
+<td>One unique mesh</td>
+<td>Confirm per tracked station</td>
+<td>Ball specification, support/contact design and attachment</td>
+</tr>
+<tr>
+<td>Table clamp</td>
+<td>Four unique meshes</td>
+<td>Confirm from frame/table</td>
+<td>Part pairing, table thickness, tightening limits and hardware</td>
+</tr>
+<tr>
+<td>LED panels, display interface, power and cables</td>
+<td>No verified hardware BOM recovered</td>
+<td>Confirm</td>
+<td>Panel electrical specifications, wiring and power documentation</td>
+</tr>
+<tr>
+<td>Camera, host computer, ball and frame</td>
+<td>No complete matched procurement list recovered</td>
+<td>Confirm</td>
+<td>Models, dimensions and supplier references</td>
+</tr>
+</tbody>
+</table></div>
+<p>No fastener diameters, torque, tolerances or fit allowances are
+specified by this recovery. Original CAD history and a dimensioned
+assembly drawing identifying a matched revision are needed to complete
+the production BOM.</p>
+<h2 id="3-units-geometry-and-editable-files">3. Units, geometry and
+editable files</h2>
+<p>All selected source 3MF models explicitly declare
+<strong>millimetres</strong>. Component references and nested transforms
+are resolved before export using the <a
+href="https://github.com/3MFConsortium/spec_core/blob/master/3MF%20Core%20Specification.md">3MF
+Consortium core specification</a>. Plate translation is removed
+independently for each shape, placing its lowest X/Y/Z at zero; source
+rotation is retained. Repeated identical shapes are collapsed and their
+original plate-instance counts recorded.</p>
+<ul>
+<li><strong>3MF:</strong> geometry-only, millimetre-labelled mesh files.
+Edit in a mesh-capable CAD/slicer application; these do not contain
+parametric design history.</li>
+<li><strong>STL:</strong> binary triangles in millimetre coordinates.
+STL itself has no unit field; import at <strong>1 unit = 1 mm</strong>,
+100% scale.</li>
+<li><strong>Inventory:</strong> original filenames and SHA-256 hashes,
+shape bounds, vertex/triangle counts, indexed boundary/non-manifold edge
+diagnostics and export hashes.</li>
+</ul>
+<p>Original slicer projects remain in local Downloads. Export packages
+intentionally omit printer profiles, personal designer identifiers and
+machine-specific settings. An unmatched <code>Flexure System.step</code>
+candidate is inventoried but not distributed as a verified MATREX
+source. The Unity <code>.blend</code> models are visual assets, not
+established printable apparatus designs.</p>
+<p>Basic checks establish finite vertices, valid triangle indices,
+readable archives and measured geometry. Indexed edge checks do not
+certify dimensional fit, mesh self-intersection, load-bearing strength
+or printing success.</p>
+<h2 id="4-printing-and-orientation-review">4. Printing and orientation
+review</h2>
+<ol type="1">
+<li>Open one labelled 3MF or STL. Compare its bounding box with the
+catalogue before slicing; stop if it is 1,000 times too large or too
+small.</li>
+<li>Inspect the <strong>source build orientation</strong> shown above.
+This is evidence of how the file was arranged, not a validated
+recommendation. Check the contact face, overhangs, bridges, holes and
+the direction of expected mechanical load.</li>
+<li>Select material, nozzle, layers, walls, infill, supports and
+adhesion for your printer and the actual part. No settings have been
+invented or certified here. Do not reuse unrelated embedded slicer
+profiles.</li>
+<li>Preview every layer, including enclosed support or cavities. Confirm
+that supports can be removed without damaging mating surfaces or
+camera/panel clearance.</li>
+<li>Print and measure a representative part before producing the
+required quantity. Record actual dimensions, fit, material, printer and
+settings with your chosen revision.</li>
+</ol>
+<h2 id="5-proposed-dry-fit-sequence">5. Proposed dry-fit sequence</h2>
+<p>The following is a dependency checklist for completing the missing
+assembly validation. It does not establish that these five source groups
+fit together.</p>
+<ol type="1">
+<li><strong>Establish the frame and table datum.</strong> Identify the
+intended frame drawing and matched clamp revision. Dry-fit the relevant
+clamp components to the table without loading the frame. Resolve unknown
+fasteners and load limits with the designer.</li>
+<li><strong>Locate the ball support.</strong> Confirm the ball/support
+design and frame connection. Establish the animal position as the
+visual/tracking datum. Check free movement and clearance using the
+actual ball.</li>
+<li><strong>Locate the camera.</strong> Use the matched holder and
+camera. Confirm focus, field of view and unobstructed tracking at the
+ball/animal datum before final attachment. Do not infer working distance
+from the outer mesh size.</li>
+<li><strong>Locate the display panels.</strong> Identify the correct
+holder and top-mount variants. Compare panel dimensions, pixel pitch and
+connector clearance against the physical panels. Dry-fit each panel
+around the established datum, retaining camera and cable clearance.</li>
+<li><strong>Route cables and verify mechanical clearance.</strong>
+Confirm connector access and strain relief from the actual hardware.
+Inspect the whole movement envelope. Electrical wiring and power
+validation require the panel supplier’s instructions.</li>
+<li><strong>Document the assembled revision.</strong> Photograph each
+stage and record part IDs, quantities, hardware, measured positions,
+printer settings and modifications. Only then promote a matched set from
+candidate files to a validated kit.</li>
+</ol>
+<h2 id="6-software-configuration-and-calibration-handoff">6. Software
+configuration and calibration handoff</h2>
+<p>After the physical arrangement is established, follow <a
+href="../manual/getting-started.html">installation and first-run setup</a>, <a
+href="../manual/six-camera-rig.html">six-camera/display geometry</a> and <a
+href="../manual/tracker-integration.html">tracker integration</a>. Record the
+measured apparatus dimensions in the appropriate system JSON;
+printable-file millimetres do not establish Unity world scale or
+tracking gain.</p>
+<p>Initialize/check tracking independently before starting an
+experimental run. Inspect the correct rig identity, input port,
+orientation, display routing and fresh input. Use a simple known
+stimulus to check each panel. Calibrate using the native tracker’s
+supported procedure and verify the intended visual and navigation scale
+with your actual apparatus. Saved settings and run metadata should
+identify the matched physical revision.</p>
+<h2 id="7-inputs-needed-to-finish-the-assembly-manual">7. Inputs needed
+to finish the assembly manual</h2>
+<ul>
+<li>The authoritative matched revision and assembly drawing (or
+photographs identifying every mating part).</li>
+<li>Required quantities, purchased hardware BOM, panel/camera/ball
+specifications and fastening details.</li>
+<li>Matching parametric CAD sources and a confirmed permission/license
+for redistribution.</li>
+<li>Validated print settings, fit/clearance measurements, mechanical
+checks and calibration evidence.</li>
+</ul>
+<p>Until those inputs are supplied, use the resources for identification
+and review rather than treating them as a ready-to-build kit. Nothing in
+this local review has been externally published.</p>
+</article></main></body></html>

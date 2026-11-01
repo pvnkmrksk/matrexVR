@@ -1,0 +1,131 @@
+{
+  "date": "2026-11-01",
+  "scope": "Local website and hardware review; no external publication or physical validation",
+  "artifacts": [
+    {
+      "path": ".local/weekend-review/assembly-desktop-full.png",
+      "bytes": 1261204,
+      "sha256": "36c4a1bc82d4dc51aec7ebbd66daad1f89b79465ca1fdd6e9f432e7f76769bc0"
+    },
+    {
+      "path": ".local/weekend-review/assembly-desktop.png",
+      "bytes": 157698,
+      "sha256": "e632db824372c9242f637af10cb76098bf0525793cac01dc911963e7e554b618"
+    },
+    {
+      "path": ".local/weekend-review/assembly-mobile-full.png",
+      "bytes": 1053207,
+      "sha256": "23f063b4db96a03c17d3e6bb4d7c83ea9b982ace74628243681a784b734e6b08"
+    },
+    {
+      "path": ".local/weekend-review/assembly-mobile.png",
+      "bytes": 89214,
+      "sha256": "91e7f6c7602a328a2edcb7b5e7d7ba12bb7d0d0e73bc37162f099fb7cc9af894"
+    },
+    {
+      "path": ".local/weekend-review/browser-results.json",
+      "bytes": 1230,
+      "sha256": "dd260cbe0ebb6df8a876611c3ff65286415af19daf4d37bd8be12d7b53d9fb6d"
+    },
+    {
+      "path": ".local/weekend-review/home-desktop-full.png",
+      "bytes": 1858368,
+      "sha256": "743de766417d2c2bfc8bdde2779086ef4e75b3d7b1543ae4151ebd21e9d7a093"
+    },
+    {
+      "path": ".local/weekend-review/home-desktop.png",
+      "bytes": 595545,
+      "sha256": "1952c284d9a0f6082b5a2c6c6041762d4555050c87fd8debd527d2e0b28e92b6"
+    },
+    {
+      "path": ".local/weekend-review/home-mobile-full.png",
+      "bytes": 1202027,
+      "sha256": "c4ca0190c7a335234360d0ba877dbea7324278f5eb972424a0e49f4eb8f7821d"
+    },
+    {
+      "path": ".local/weekend-review/home-mobile.png",
+      "bytes": 165239,
+      "sha256": "48acc05ae4db9928e0a6ff5ebd16f7b982861f6b8fccaa61fd18d77442eeac0f"
+    },
+    {
+      "path": ".local/weekend-review/index.html",
+      "bytes": 1553,
+      "sha256": "8297fc7b4514ed68f63248cd5dd22fb57dc2ad19f9fc4205ec9ff5332bd2fe19"
+    },
+    {
+      "path": ".local/weekend-review/latest-release.json",
+      "bytes": 28138,
+      "sha256": "56422e64b532e416d19e8c2adea96e93996fb99fea25f4fd287d674e88fa34f3"
+    },
+    {
+      "path": ".local/weekend-review/parts-desktop-full.png",
+      "bytes": 628404,
+      "sha256": "2985fd266de51700250f5c5cd6e72b2b64dd43424db9f4e4c6b5613aa5fd535d"
+    },
+    {
+      "path": ".local/weekend-review/parts-desktop.png",
+      "bytes": 144530,
+      "sha256": "5293ae3766f901111bfeafcc2b06bada22c8cbb02d03f3b9690887b4c62085cb"
+    },
+    {
+      "path": ".local/weekend-review/parts-mobile-full.png",
+      "bytes": 542060,
+      "sha256": "b0925febae4596448a57f6bb7114b06ca6485c383d7e691a56b8ded4f6689502"
+    },
+    {
+      "path": ".local/weekend-review/parts-mobile.png",
+      "bytes": 74913,
+      "sha256": "b58309cbdeaa6120be1fe8b14249e2f21c33754d91118b97303838c1384e1002"
+    },
+    {
+      "path": ".local/weekend-review/platform-results.json",
+      "bytes": 675,
+      "sha256": "694238df284cc2898bfdc13db0346bdfc33e9528d70bf04abee8b216c2b95bb2"
+    },
+    {
+      "path": ".local/weekend-review/platforms.cjs",
+      "bytes": 1770,
+      "sha256": "2abbdbcfff7cc77a248a639cc0832504439de7813a18b74cc56b3bc74582e408"
+    },
+    {
+      "path": ".local/weekend-review/release-links.json",
+      "bytes": 657,
+      "sha256": "5bff8b8e9462af1e15029a87eed48d20ed185d5f0875bcb305c1ac693cdd6861"
+    },
+    {
+      "path": ".local/weekend-review/review.cjs",
+      "bytes": 3853,
+      "sha256": "bade8c60f5b10cd9d2eac36a3b04060f7f3581d924e7822b7fb2a85bee18d482"
+    },
+    {
+      "path": "docs/site/hardware/inventory.json",
+      "bytes": 60996,
+      "sha256": "ecc5e888560da21ef387ca3baac5ccce74b34d045859ce686381aa79135b571f"
+    },
+    {
+      "path": "docs/site/hardware/matrex-hardware-review.zip",
+      "bytes": 4209141,
+      "sha256": "b679e7517d930803d018ccc9d3cee10dfed4a8f3736fbb779fb6b065e8918311"
+    }
+  ],
+  "tests": {
+    "hardwareResourceTests": 4,
+    "downloadAssertions": 22,
+    "browserPageSizes": [
+      [
+        1920,
+        1080
+      ],
+      [
+        390,
+        844
+      ]
+    ],
+    "legacyDocsSchemaGate": "Pre-existing unindexed schema paths; not reported as passing"
+  },
+  "publication": {
+    "pushed": false,
+    "deployed": false,
+    "released": false
+  }
+}

@@ -129,3 +129,6 @@ tools/__pycache__/
 
 # Visible local desktop builds and their writable test data.
 /Preview/
+
+# Measured hardware mesh illustrations shipped with the local review catalogue.
+!docs/site/hardware/images/*.png
