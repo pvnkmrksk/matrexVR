@@ -189,7 +189,7 @@ Four **TerrainChoice** layouts share one environment prefab and two equidistant 
 
 ![Four measured terrain conditions](docs/terrain-cue-four-conditions.svg)
 
-The compact build contains fourteen scenes: **ControlScene, Choice, Choice_desync, Choice_Selwyn, Swarm, Kannadi, Optomotor, TerrainCueLab, Rugosity_RS, ReplayScene, TerrainChoice_RoughLeft_SmoothRight, TerrainChoice_SmoothLeft_RoughRight, TerrainChoice_BothSmooth and TerrainChoice_BothRough**. The current desktop Forest starter uses Choice_Selwyn terrain with grounded tree objects. Separate legacy forest/two-tree examples are marked `sourceBuildOnly`; enable their scenes and rebuild to run those examples. Add custom scenes, assets and controllers in Unity, enable them in the build scene list, and rebuild. See [experiment workflow](docs/experiment-workflow.md); this project does not provide a general level editor.
+The 0.4.1 compact build contains thirteen scenes: **ControlScene, Choice, Choice_desync, Choice_Selwyn, Kannadi, Optomotor, TerrainCueLab, Rugosity_RS, ReplayScene, TerrainChoice_RoughLeft_SmoothRight, TerrainChoice_SmoothLeft_RoughRight, TerrainChoice_BothSmooth and TerrainChoice_BothRough**. The current desktop Forest starter uses Choice_Selwyn terrain with grounded tree objects. The legacy Swarm scene and separate forest/two-tree examples require source builds; forest/two-tree examples are marked `sourceBuildOnly`; enable their scenes and rebuild to run those examples. Add custom scenes, assets and controllers in Unity, enable them in the build scene list, and rebuild. See [experiment workflow](docs/experiment-workflow.md); this project does not provide a general level editor.
 
 ## Compatibility and saved runs
 

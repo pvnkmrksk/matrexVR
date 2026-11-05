@@ -33,7 +33,7 @@ An **animal** is the real subject providing movement input. An **agent** is a vi
 
 ## What is included
 
-The compact desktop build includes ControlScene, Choice, Choice_desync, Choice_Selwyn, Swarm, Kannadi, Optomotor, TerrainCueLab, Rugosity_RS, ReplayScene and four TerrainChoice layouts. Optional forest/tree environments remain in source and must be enabled in a custom build. The [scene guide](scenes.md) distinguishes a controller family, a particular authored environment and its JSON recipe.
+The compact desktop build includes ControlScene, Choice, Choice_desync, Choice_Selwyn, Kannadi, Optomotor, TerrainCueLab, Rugosity_RS, ReplayScene and four TerrainChoice layouts. The legacy Swarm scene and optional forest/tree environments remain in source and must be enabled in a custom build. The [scene guide](scenes.md) distinguishes a controller family, a particular authored environment and its JSON recipe.
 
 **Kannadi — ಕನ್ನಡಿ — means “mirror” in Kannada.** It presents a matrix of mirrored animal poses across a hexagonal arrangement. The [Kannadi section](scenes.md#kannadi-the-mirror-matrix) explains visibility and replication; it is more than an isolated animal model.
 

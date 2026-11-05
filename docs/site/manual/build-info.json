@@ -15,7 +15,7 @@
     "dynamic-choice": 176
   },
   "sourceSha256": {
-    "docs/manual/index.md": "46c5c823458ebb189df1141605b6fc7b694ca9a8a2770f897036b10468d61c7d",
+    "docs/manual/index.md": "ba2f26b55ecaa720b78672970f9106176734e7341c2e4ef883be58b07d39dc78",
     "docs/five-minute-start.md": "bc80e857e7e58b8d7e3ccb29251ba5fd1f74f30841ad597ba65cc8e33a30f41e",
     "docs/getting-started.md": "1e544fb7473781c17250fb633cdbee29475d8da1e1f427c30cc85d75ad4d8945",
     "docs/manual/gallery.md": "e11573873f6849f29d4406ba8ac788dde03646667bff0d11c3fb6feec96f7b55",
@@ -63,7 +63,7 @@
     "docs/diagnostics.md": "34bceaa361c68c96884b60466bfc7cedb32ca322aca03481aff21ca156f48f73",
     "docs/six-camera-rig.md": "073ec0b07263a8908095a6f89178e14b1418adf75a83887054d81e37126ef937",
     "docs/kannadi-modernization.md": "02c739190139f37e5eb327bf264bd2bebae489dd0deb2e7187b7155655e525d5",
-    "docs/releases.md": "4f466c7ecd4ff8f140a99eeef107bbc0a6fa58e4a4c07269428123ecdf0d59da",
+    "docs/releases.md": "3ed3f795c93515369a3fbc4094eb038609cf408b46af556c8982beacc8a2d301",
     "docs/manual/hardware.md": "8c0199d2af8b0fa2cf44154effb608af019d42689a6423116b165c39d763d297",
     "docs/manual/integrations.md": "4034a5d2b56e66d89cd84f1e54083d3c18f9335e6da36ba73e0c379c1ffa0ab8",
     "docs/tracker-integration.md": "ae94e95bb1e20142cf4bbeae30d4402001e1baa96a106cd5833d8711dc6dbc49",
