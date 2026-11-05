@@ -1,10 +1,60 @@
 # Sequence schema fields
 
-This atlas lists **44 emitted property paths** from the current `sequence` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **51 emitted property paths** from the current `sequence` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
 Every field has a deep link and is indexed by the manual search. Array items use `[]` in their path. Nested pre/stimulus/post fields are listed where the schema emits them; repeated names in different phases are distinct paths.
+
+## title group
+
+### `title`
+
+Optional human-readable experiment or paradigm name. The file path remains visible separately.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string` |
+| Required by parent schema | No |
+| Default | `""` |
+
+## comments group
+
+### `comments`
+
+Optional notes retained in this configuration and the run archive.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string` |
+| Required by parent schema | No |
+| Default | `""` |
+
+## randomSeedMode group
+
+### `randomSeedMode`
+
+Fixed repeats the explicit seed. Random generates a fresh seed when a run starts and archives the effective seed for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"Fixed"` |
+
+## randomSeed group
+
+### `randomSeed`
+
+Explicit signed integer seed for experiment random choices. Fixed mode repeats it; Random mode records its generated replacement in the saved run.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `1` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
 
 ## loopStartIndex group
 
@@ -36,7 +86,7 @@ Start the sequence when Play begins in ControlScene. Returning with Escape does 
 
 ### `randomise`
 
-Shuffle outer scene execution order.
+Shuffle outer blocks or contiguous named groups. Pre-stimulus, stimulus and post-stimulus inside one experiment file always remain together.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -70,9 +120,39 @@ Required nonempty array of scene steps.
 
 ## sequences[] group
 
+### `sequences[].title`
+
+Optional human-readable name for this experiment, sequence block or whole paradigm. The source file path is displayed separately.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `sequences[].comments`
+
+Optional notes saved with this configuration and its run snapshot.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `sequences[].group`
+
+Optional group name for adjacent sequence blocks. Blocks with the same group stay in order and are shuffled together. Reuse the name only within that contiguous group.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
 ### `sequences[].sceneName`
 
-Exact enabled scene name, e.g. Swarm, Kannadi, Choice, Optomotor, Choice_desync. No Matrix scene exists.
+World used by this block. Kannadi supports both social mirror and swarm paradigms. The historical Swarm name is a compatibility alias.
 
 | Contract | Emitted value |
 | --- | --- |

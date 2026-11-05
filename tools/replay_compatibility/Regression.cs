@@ -224,7 +224,7 @@ public static class Regression
             Reject(()=>new ReplaySessionArchive(root).Resolve("choice.json"),"manifest path traversal accepted");
             string profile=Path.Combine(root,"native-profile"),native=Path.Combine(root,"native-app-config"),nativeRun=Path.Combine(root,"native-recording");
             Directory.CreateDirectory(profile);Directory.CreateDirectory(native);
-            byte[] originalSystem=Encoding.UTF8.GetBytes("{\"configs\":[{\"vrId\":\"VR1\"}]}\r\n");
+            byte[] originalSystem=Encoding.UTF8.GetBytes("{\"configs\":[{\"vrId\":\"VR1\",\"tracker\":{\"configFile\":\"missing-optional-native.toml\"}},{\"vrId\":\"VR2\",\"tracker\":{\"configFile\":\"missing-optional-native.json\"}}]}\r\n");
             File.WriteAllBytes(Path.Combine(profile,"system_config.json"),originalSystem);
             File.WriteAllText(Path.Combine(profile,"sequenceConfig.json"),"{\"sequences\":[]}");
             string calibration=Path.Combine(native,"calibration.JSON"),sidecar=Path.Combine(native,"unrelated-secret.txt"),stale=Path.Combine(native,"stale.toml"),media=Path.Combine(native,"camera.avi");
@@ -232,6 +232,18 @@ public static class Regression
             byte[] calibrationBytes=new byte[]{0xef,0xbb,0xbf}.Concat(Encoding.UTF8.GetBytes(new JObject{["precision"]="1.0000000000000000000001",["configFile"]=sidecar}.ToString()+"\r\n")).ToArray();
             File.WriteAllBytes(calibration,calibrationBytes);
             var nativeArchive=new RunConfigArchive(nativeRun,profile,"20260101_100000","test");nativeArchive.CaptureStartup("ControlScene");
+            nativeArchive.RequireComplete();
+            Check((bool)JObject.Parse(File.ReadAllText(nativeArchive.ManifestPath))["complete"],"missing native TOML/JSON paths do not become required experiment dependencies at startup");
+            foreach(string requiredKind in new[]{"experiment","model","skybox"})
+            {
+                string strictProfile=Path.Combine(root,"required-"+requiredKind);Directory.CreateDirectory(strictProfile);
+                File.WriteAllBytes(Path.Combine(strictProfile,"system_config.json"),originalSystem);
+                File.WriteAllText(Path.Combine(strictProfile,"sequenceConfig.json"),"{\"sequences\":[{\"parameters\":{\"configFile\":\"required.json\"}}]}");
+                if(requiredKind!="experiment")File.WriteAllText(Path.Combine(strictProfile,"required.json"),new JObject{[requiredKind=="model"?"modelPath":"skyboxPath"]="missing-required-asset"}.ToString());
+                var requiredArchive=new RunConfigArchive(Path.Combine(root,"required-run-"+requiredKind),strictProfile,"20260101_110000","test");requiredArchive.CaptureStartup("ControlScene");
+                bool rejected=false;try{requiredArchive.RequireComplete();}catch(IOException){rejected=true;}
+                Check(rejected,"optional tracker exclusion keeps missing required "+requiredKind+" dependencies strict");
+            }
             nativeArchive.CaptureCompanions(new[]{
                 new JObject{["vrId"]="VR1",["backend"]="Rekkefly",["identityVerified"]=true,["matchesConfiguredRig"]=true,["configFile"]=calibration,["releaseTag"]="local-test",["executableSha256"]=new string('a',64),["demoRequested"]=false,["strictCameraFallback"]=true,["actualInputSource"]="unverified"},
                 new JObject{["vrId"]="VR2",["identityVerified"]=false,["matchesConfiguredRig"]=true,["configFile"]=sidecar},
@@ -275,6 +287,40 @@ public static class Regression
                 {stream.ReadLine();var cells=ReplaySessionArchive.Csv(stream.ReadLine());Check(cells.Length==12 && cells[1]=="agent,quoted" && cells[11]=="3","writer columns and quotation "+i);}
             }
             Check(AsyncSwarmWriter.ActiveWriterCount==0,"no retained async writer after 150 cycles");
+            string mirrorPath=Path.Combine(root,"mirror-async.csv.gz");
+            var mirrorWriter=new AsyncSwarmWriter(mirrorPath,"Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius,skyboxId,skyboxSampleUtc,experimentPhase,AnimationState,UnityFrame,ScaleX,ScaleY,ScaleZ",AsyncSwarmWriter.RowLayout.Kannadi);
+            var mirrorFrame=mirrorWriter.Rent(2);mirrorFrame.timestamp=new DateTime(2026,1,1,10,0,0);mirrorFrame.unityFrame=81;
+            mirrorFrame.vrIndex=16;mirrorFrame.numberOfRings=3;mirrorFrame.hexRadius=2.5f;mirrorFrame.phase="postStimulus";mirrorFrame.count=2;
+            mirrorFrame.agents[0]=new AsyncSwarmWriter.Agent {index=2,name="clone, \"quoted\"",x=1.25f,y=2,z=3,rx=4,ry=5,rz=6,sx=2,sy=3,sz=4,animationState="{\"version\":1}"};
+            mirrorFrame.agents[1]=new AsyncSwarmWriter.Agent {index=7,name="other",x=-2.75f,sx=1,sy=1,sz=1};
+            Check(mirrorWriter.Submit(mirrorFrame),"Kannadi pooled frame accepted");mirrorWriter.WaitForCompletion();
+            Check(mirrorWriter.Failure==null&&mirrorWriter.WrittenRows==2&&mirrorWriter.DroppedFrames==0&&mirrorWriter.PendingFrames==0,"Kannadi async writer drains every individual with no drops");
+            using(var stream=ReplaySessionArchive.OpenCsv(mirrorPath))
+            {
+                Check(ReplaySessionArchive.Csv(stream.ReadLine()).Length==20,"Kannadi keeps its exact twenty-column schema");
+                var cells=ReplaySessionArchive.Csv(stream.ReadLine());
+                Check(cells.Length==20&&cells[1]=="16"&&cells[2]=="2"&&cells[3]=="clone, \"quoted\"","Kannadi identity and CSV quoting survive asynchronous encoding");
+                Check(cells[4]=="1.25"&&cells[10]=="3"&&cells[11]=="2.5"&&cells[14]=="postStimulus","Kannadi pose/geometry/phase fields keep invariant numeric precision and order");
+                Check(cells[15]=="{\"version\":1}"&&cells[16]=="81"&&cells[17]=="2"&&cells[18]=="3"&&cells[19]=="4","Kannadi animation/frame/scale evidence survives worker encoding");
+                cells=ReplaySessionArchive.Csv(stream.ReadLine());Check(cells[2]=="7"&&cells[4]=="-2.75"&&stream.ReadLine()==null,"Kannadi preserves sparse clone IDs and writes each supplied row once");
+            }
+            Check(AsyncSwarmWriter.CompletionsForDirectory(root).Any(item=>item.Path==mirrorPath&&item.WrittenRows==2&&item.DroppedFrames==0&&item.Failure==null),"Kannadi worker contributes drained writer evidence to the normal recording finalizer");
+            var strict=Path.Combine(root,"same-build");Directory.CreateDirectory(strict);
+            var identity=PlayerBuildIdentity.Capture();
+            File.WriteAllText(Path.Combine(strict,"replay_contract.json"),new JObject{["schemaVersion"]=1,["player"]=identity}.ToString());
+            var presentation=new JObject{["id"]="exact",["config"]=new JObject{["futureVariable"]=42}};
+            presentation["sha256"]=ReplayPresentationJournal.HashEntry(presentation);
+            File.WriteAllText(Path.Combine(strict,"presentations.jsonl"),presentation.ToString(Newtonsoft.Json.Formatting.None));
+            var strictCsv=Path.Combine(strict,"poses.csv");
+            string strictOriginal=Header+",presentationId,unityFrame,monotonicTime\n"+Row("10:00:02.000","VR1","Choice",0,0,0)+",exact,11,100\n"+Row("10:00:01.000","VR1","Choice",0,1,0)+",exact,12,100.1\n";
+            File.WriteAllText(strictCsv,strictOriginal);
+            var strictManifest=new JObject{["lifecycle"]=new JObject{["status"]="finalized",["writersDrained"]=true},["files"]=new JArray(new JObject{["relativePath"]="poses.csv",["bytes"]=new FileInfo(strictCsv).Length,["sha256"]=RunConfigArchive.Hash(File.ReadAllBytes(strictCsv))})};
+            File.WriteAllText(Path.Combine(strict,"recording_manifest.json"),strictManifest.ToString());
+            var strictArchive=new ReplaySessionArchive(strict);strictArchive.RequireCompatibleBuild();Check(true,"Same-build finalized CSV hashes pass verification");
+            strictArchive.LoadRigSamples();Check(strictArchive.Rigs["VR1"][0].unityFrame==11&&strictArchive.Rigs["VR1"][1].unityFrame==12&&Math.Abs(strictArchive.Duration-.1)<.000001,"Same-build replay timeline survives wall-clock rollback using monotonic frame times");
+            File.WriteAllText(strictCsv,strictOriginal.Replace("Choice,0","Choice,9"));Reject(()=>strictArchive.RequireCompatibleBuild(),"Valid changed CSV bytes must not pass finalized inventory");
+            File.WriteAllText(strictCsv,strictOriginal);File.WriteAllText(Path.Combine(strict,"extra.csv"),"unexpected");Reject(()=>new ReplaySessionArchive(strict).RequireCompatibleBuild(),"Unlisted CSV evidence must not silently enter replay");File.Delete(Path.Combine(strict,"extra.csv"));
+            File.Delete(strictCsv);Reject(()=>new ReplaySessionArchive(strict).RequireCompatibleBuild(),"Missing whole population/pose CSV must not silently disappear");
             Console.WriteLine("PASS: "+checks+" replay/archive/writer regressions; 150 async writer lifecycle cycles.");
         }
         finally{Directory.Delete(root,true);}

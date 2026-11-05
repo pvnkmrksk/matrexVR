@@ -188,7 +188,7 @@ public static class RecordingSummary
     public static JArray MetadataInventory(string directory)
     {
         var result = new JArray();
-        foreach (string name in new[] { "AnimalMetadata.json", "FlyMetaData.json", "config_manifest.json", "companion_provenance.json", "system_config.json", "sequenceConfig.json", "media_manifest.json" })
+        foreach (string name in new[] { "AnimalMetadata.json", "FlyMetaData.json", "config_manifest.json", "companion_provenance.json", "system_config.json", "sequenceConfig.json", "media_manifest.json", "replay_contract.json", "presentations.jsonl", "world_state.jsonl", "replay_evidence_errors.jsonl", "reproducibility.json", "runtime_display_settings.jsonl" })
         {
             var file = new FileInfo(Path.Combine(directory, name));
             if (file.Exists) result.Add(new JObject { ["relativePath"] = name, ["bytes"] = file.Length, ["lastWriteUtcTicks"] = file.LastWriteTimeUtc.Ticks });
@@ -227,6 +227,8 @@ public static class RecordingSummary
         var ids = normalized.OfType<JObject>().Select(animal => (string)animal["AnimalID"]).Where(id => !string.IsNullOrWhiteSpace(id)).Distinct().OrderBy(id => id, StringComparer.Ordinal);
         var planned = archive?.Sequence?["sequences"] as JArray ?? new JArray();
         return new JObject { ["experimentName"] = data?["ExperimentName"]?.DeepClone(), ["experimenterName"] = data?["ExperimenterName"]?.DeepClone(),
+            ["sequenceConfigTitle"] = archive?.Sequence?["title"]?.DeepClone(),
+            ["sequenceTitles"] = new JArray(planned.OfType<JObject>().Select(step => (string)step["title"]).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct()),
             ["configuredAnimals"] = normalized, ["identifiedAnimalIds"] = new JArray(ids),
             ["backends"] = new JArray(rigs.OfType<JObject>().Select(rig => (string)rig["closedLoopMode"]).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct()),
             ["plannedSceneNames"] = new JArray(planned.OfType<JObject>().Select(step => (string)step["sceneName"]).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct()) };

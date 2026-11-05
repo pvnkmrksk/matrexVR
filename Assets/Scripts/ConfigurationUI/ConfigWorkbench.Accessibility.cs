@@ -34,7 +34,7 @@ namespace ConfigurationUI
                 bool command=evt.ctrlKey||evt.commandKey;
                 Action action=null;
                 if(evt.keyCode==KeyCode.F1)action=ShowKeyboardHelp;
-                else if(command && evt.keyCode==KeyCode.S)action=()=>{RequireApplied();Workspace.SaveAll();SaveMetadata();UpdateStatus("Setup and session details saved.");};
+                else if(command && evt.keyCode==KeyCode.S)action=()=>{RequireApplied();Workspace.SaveAll();SaveMetadata();MainController.Instance?.ApplyIdleFrameTiming((JObject)Workspace.System.Root);UpdateStatus("Setup and session details saved.");};
                 else if(command && evt.shiftKey && evt.keyCode==KeyCode.J)action=()=>{RequireApplied();LeaveRecordingLibrary();homeMode=experimentIndexMode=metadataMode=advancedMode=false;jsonMode=true;path.Clear();BuildContent();};
                 else if(evt.altKey && evt.keyCode==KeyCode.Alpha1)action=ShowSessionHome;
                 else if(evt.altKey && evt.keyCode==KeyCode.Alpha2)action=()=>Select(Workspace.Sequence);

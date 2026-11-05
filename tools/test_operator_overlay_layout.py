@@ -49,11 +49,19 @@ static class Regression {
  static void Geometry(){
   var bounds=new Rect(0,0,1000,800);Rect actual;
   var requested=new Rect(50,60,320,80);
+  var placement=new OverlayPlacementConfig {x=87,y=91};
+  Check(placement.Preferred(requested)==requested,"automatic settings preserve normal preferred corner");
+  placement.automaticPlacement=false;
+  Check(placement.Preferred(requested)==new Rect(87,91,320,80),"manual preference uses physical pixel coordinates without changing widget dimensions");
+  placement.x=float.NaN;Check(placement.Preferred(requested)==requested,"nonfinite stored preference falls back to automatic placement");
   Check(OperatorOverlayLayout.TryPlace(requested,bounds,new Rect[0],out actual)&&actual==requested,"unblocked request should stay exact");
   Check(!OperatorOverlayLayout.TryPlace(new Rect(0,0,1001,50),bounds,new Rect[0],out actual),"oversized width must omit");
   Check(!OperatorOverlayLayout.TryPlace(new Rect(0,0,1,801),bounds,new Rect[0],out actual),"oversized height must omit");
   Check(!OperatorOverlayLayout.TryPlace(new Rect(0,0,0,50),bounds,new Rect[0],out actual),"zero width must omit");
   Check(!OperatorOverlayLayout.TryPlace(new Rect(0,0,20,20),bounds,new[]{bounds},out actual),"fully occupied display must omit");
+  Check(!OperatorOverlayLayout.TryPlace(new Rect(float.NaN,0,20,20),bounds,new Rect[0],out actual),"nonfinite preferred geometry must not produce an unsafe placement");
+  Check(OperatorOverlayLayout.TryPlace(new Rect(0,0,100,80),new Rect(0,0,100,100),new[]{new Rect(0,0,100,20)},out actual),"exact free strip should remain usable when decorative padding cannot fit");
+  Check(actual==new Rect(0,20,100,80),"tight strip must touch but never cover LED output");
   var blocked=new[]{new Rect(0,0,128,128),new Rect(128,0,128,128),new Rect(256,0,128,128)};
   Check(OperatorOverlayLayout.TryPlace(new Rect(12,12,420,190),bounds,blocked,out actual),"HUD must relocate past lower LED strip");Safe(actual,bounds,blocked,"lower LED strip");
   var shifted=new Rect(40,70,500,400);var wall=new Rect(180,70,120,260);
@@ -70,15 +78,15 @@ static class Regression {
   }
  }
  static void Matrix(){
-  foreach(int count in new[]{1,4,8})foreach(int faces in new[]{4,6})foreach(int pixels in new[]{64,128})foreach(bool horizontal in new[]{true,false}){
+  foreach(int count in new[]{1,2,4,8,16})foreach(int faces in new[]{4,6})foreach(int pixels in new[]{64,128})foreach(bool horizontal in new[]{true,false}){
    cases++;MainController.Instance=new MainController();
    for(int i=0;i<count;i++)MainController.Instance.SystemConfigs["VR"+(i+1)]=new SystemConfig{displayOrder=faces==4?"RBLF":"DRBLFU",ledPanelWidth=pixels,ledPanelHeight=pixels,startRow=horizontal?i:0,startCol=horizontal?0:i,horizontal=horizontal};
    var blocked=OperatorOverlayLayout.ProtectedRects(0,1920,1080);
    Check(blocked.Count==count*faces,"protected face count differs from rendering allow-list");
    var first=blocked[0];Check(Math.Abs(first.x)<.001&&Math.Abs(first.y-(1080-pixels))<.001&&Math.Abs(first.width-pixels)<.001&&Math.Abs(first.height-pixels)<.001,"LED coordinates do not preserve top-left pixel config");
    for(int slot=0;slot<faces;slot++){var r=blocked[slot];Check(Math.Abs(r.x-(horizontal?slot*pixels:0))<.001&&Math.Abs(r.y-(1080-pixels*(horizontal?1:slot+1)))<.001,"LED horizontal/vertical slots differ");}
-   var owners=new[]{"test-status","test-fps","test-overview"};foreach(var owner in owners)OperatorOverlayLayout.Release(owner);
-   var widgets=new[]{new Rect(12,12,550,230),new Rect(1598,1010,310,58),new Rect(1120,20,600,400)};
+   var owners=new[]{"test-status","test-fps","test-overview","test-controls"};foreach(var owner in owners)OperatorOverlayLayout.Release(owner);
+   var widgets=new[]{new Rect(12,12,550,230),new Rect(1598,1010,310,58),new Rect(1120,20,600,400),new Rect(20,980,700,72)};
    var occupied=new List<Rect>(blocked);var display=new Rect(0,0,1920,1080);
    for(int i=0;i<widgets.Length;i++)if(OperatorOverlayLayout.Reserve(owners[i],0,widgets[i],out var placed)){
     Safe(placed,display,occupied,"matrix "+cases+" widget "+i);int revision=OperatorOverlayLayout.Revision;
@@ -93,6 +101,8 @@ static class Regression {
   Check(OperatorOverlayLayout.ProtectedRects(0,1920,1080).Count==0,"desktop preview falsely reserves LED panel pixels");
   MainController.Instance.SystemConfigs["VR1"]=new SystemConfig{displayOrder="F",ledPanelWidth=1920,ledPanelHeight=1080};
   Check(!OperatorOverlayLayout.Reserve("test-full",0,new Rect(12,12,100,100),out _),"operator widget covers full LED display");
+  Check(OperatorOverlayLayout.Reserve("test-dialog",0,new Rect(-100,-100,100,100),out var modal,allowOverlapWhenNoSpace:true)&&modal==new Rect(0,0,100,100),"explicit settings dialog can remain accessible on a fully occupied display");
+  OperatorOverlayLayout.Release("test-dialog");
  }
  static void Visibility(){
   int notifications=0;OperatorOverlayVisibility.Changed+=()=>notifications++;
@@ -136,6 +146,7 @@ def main():
         (temporary/'Stubs.cs').write_text(STUBS+'\npublic static class ViewportSetter {\n'+viewport_methods+'\n}')
         (temporary/'Program.cs').write_text(PROGRAM)
         (temporary/'OperatorOverlayLayout.cs').write_text('using Screen=HarnessScreen;\nusing Display=HarnessDisplay;\n'+(ROOT/'Assets/Scripts/OperatorOverlayLayout.cs').read_text())
+        (temporary/'OverlayPlacementConfig.cs').write_text((ROOT/'Assets/Scripts/OverlayPlacementConfig.cs').read_text())
         project = temporary/'Regression.csproj'
         project.write_text(f'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net{version}.0</TargetFramework></PropertyGroup><ItemGroup><Reference Include="UnityEngine.CoreModule"><HintPath>{escape(str(core))}</HintPath></Reference></ItemGroup></Project>')
         result = subprocess.run([dotnet, 'build', str(project), '--configfile', str(temporary/'NuGet.Config'), '-p:UseSharedCompilation=false', '-v:q'], env=environment, capture_output=True, text=True)

@@ -11,7 +11,7 @@ namespace ConfigurationUI
     {
         public const string MarkerName="apparatusConfiguration";
         public const string FaceLetters="DRBLFU";
-        public const int MaximumRigCount=28;
+        public const int MaximumRigCount=16;
         public static IEnumerable<JObject> Rigs(JToken root) => (root?["configs"] as JArray??new JArray()).OfType<JObject>();
         private static JObject Profile(JToken root) => (root as JObject)?[MarkerName] as JObject;
         public static bool IsConfigured(JToken root) => Integer(Profile(root)?["version"],0)==1&&Flag(Profile(root)?["configured"]);
@@ -131,8 +131,26 @@ namespace ConfigurationUI
         public static void SetPresentation(JObject root,string presentation)
         {
             if(presentation!="led"&&presentation!="desktop")throw new ArgumentException("Choose LED panels or desktop preview.");
-            Marker(root)["presentation"]=presentation;
-            foreach(var rig in Rigs(root)){rig["desktopPreview"]=presentation=="desktop";if(presentation=="desktop")rig["displayOrder"]="F";}
+            string previous=Presentation(root);
+            if(previous==presentation&&Rigs(root).All(rig=>Flag(rig["desktopPreview"])==(presentation=="desktop")&&(presentation!="desktop"||Order(rig)=="F")))return;
+            var marker=Marker(root);
+            var remembered=marker["ledFaceOrders"] as JArray;
+            if(remembered==null){remembered=new JArray();marker["ledFaceOrders"]=remembered;}
+            var rigs=Rigs(root).ToList();
+            for(int i=0;i<rigs.Count;i++)
+            {
+                var rig=rigs[i];
+                while(remembered.Count<=i)remembered.Add(JValue.CreateNull());
+                if(presentation=="desktop")
+                {
+                    if(previous!="desktop")remembered[i]=Order(rig);
+                    rig["displayOrder"]="F";
+                }
+                else if(previous=="desktop" && remembered[i].Type==JTokenType.String)
+                    rig["displayOrder"]=remembered[i].ToString();
+                rig["desktopPreview"]=presentation=="desktop";
+            }
+            marker["presentation"]=presentation;
         }
         public static List<string> Validate(JToken root,int? fallbackDisplay=null)
         {
@@ -143,7 +161,7 @@ namespace ConfigurationUI
             foreach(var rig in rigs)
             {
                 string id=(string)rig["vrId"]??"";
-                if(!System.Text.RegularExpressions.Regex.IsMatch(id,@"^VR[1-9][0-9]*$")||!ids.Add(id))errors.Add("Each rig needs a unique ID such as VR1 or VR2.");
+                if(!System.Text.RegularExpressions.Regex.IsMatch(id,@"^VR([1-9]|1[0-6])$")||!ids.Add(id))errors.Add("Each rig needs a unique ID from VR1 through VR16.");
                 string order=Order(rig);
                 if(order.Length<1||order.Length>6||order.Any(c=>FaceLetters.IndexOf(c)<0)||order.Distinct().Count()!=order.Length)errors.Add(id+": use unique D/R/B/L/F/U face letters.");
                 if(Flag(rig["desktopPreview"])&&order.Length!=1)errors.Add(id+": desktop preview uses one face per display.");

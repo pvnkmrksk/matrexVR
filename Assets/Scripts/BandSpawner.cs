@@ -87,10 +87,13 @@ public class BandSpawner : MonoBehaviour
     /// </summary>
     void Start()
     {
+        using (ExperimentRandom.ScopeFor(this, "band-initialization"))
+        {
         SetupInitialTransform();
         areaRotation = Quaternion.Euler(0, rotationAngle, 0);
         GenerateSpawnPositions();
         SpawnInstances();
+        }
     }
 
     /// <summary>

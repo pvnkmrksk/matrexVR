@@ -8,6 +8,7 @@ Each JSON file is a complete example that can be copied and edited independently
 | `Flight` | Selwyn live sampled sky, fixed date/time sky, historical Adaminaby panorama, migration AGL 10/100/1000; the active 240 s stars → 240 s leftward dorsal swarm recipe. |
 | `Swarm` | Physical generated moths in a moving 4 m cube, speeds 6.17 ± 1.24 m/s; per-rig mean-heading aligned (0°), crossed (+90°) and opposed (180°) presentations; dispersed 3D directions; angular flickering Bogong dots; recorded Selwyn moth playback. |
 | `Choice` | Empty control, two cylinders at ±45°, moving band. |
+| `Models` | Actual portable GLBs: bundled locust export, downloaded skeletal/morph animation, editable color and placement. Load `Sequences/custom-models.sequence.json`. |
 | `Kannadi` | Social coupling with one tracked representation per animal by default; one ring-count field controls additional copies. |
 | `DynamicChoice` | Time trigger, area trigger with timeout, independent per-rig sequences, adaptive gray discrimination. |
 | `Optomotor` | Yaw, pitch, roll, and a frequency/speed sweep. |

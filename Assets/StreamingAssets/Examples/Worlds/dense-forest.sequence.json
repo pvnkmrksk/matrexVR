@@ -1,0 +1,23 @@
+{
+  "title": "World example · Dense forest · grounded trees",
+  "comments": "Reusable packaged-world starter. Your current apparatus is retained when loading this sequence. Inspect and edit its experiment before starting. It runs once and returns to setup.",
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "randomSeedMode": "Fixed",
+  "randomSeed": 1,
+  "sequences": [
+    {
+      "title": "Dense forest · grounded trees",
+      "comments": "World inspection block; change its duration and experiment settings as needed.",
+      "sceneName": "Choice_Selwyn",
+      "duration": 120,
+      "reloadScene": false,
+      "gain": 1,
+      "autoTrim": false,
+      "parameters": {
+        "configFile": "Examples/Worlds/dense-forest.experiment.json"
+      }
+    }
+  ]
+}

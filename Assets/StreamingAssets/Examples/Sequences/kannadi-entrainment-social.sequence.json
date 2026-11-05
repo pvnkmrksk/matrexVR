@@ -1,0 +1,22 @@
+{
+  "title": "Kannadi · entrainment and social response",
+  "comments": "A single experiment block keeps pre-stimulus and stimulus together when the outer sequence is shuffled or looped. The scene is not reloaded between phases and the social condition retains the animals’ tracked poses. The historical two-scene Swarm example remains available for compatibility.",
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "randomSeedMode": "Fixed",
+  "randomSeed": 1,
+  "sequences": [
+    {
+      "title": "Entrainment → social coupling",
+      "duration": 420,
+      "gain": 1,
+      "autoTrim": false,
+      "reloadScene": false,
+      "sceneName": "Kannadi",
+      "parameters": {
+        "configFile": "Examples/Kannadi/entrainment-social.phases.json"
+      }
+    }
+  ]
+}

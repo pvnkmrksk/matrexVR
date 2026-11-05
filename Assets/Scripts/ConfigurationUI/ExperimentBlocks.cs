@@ -79,6 +79,40 @@ namespace ConfigurationUI
             string name=Path.GetFileNameWithoutExtension(reference??"").Replace(".example","").Replace(".template","").Replace('-',' ').Replace('_',' ');
             return string.IsNullOrEmpty(name)?"Untitled block":char.ToUpperInvariant(name[0])+name.Substring(1);
         }
+        public static string Title(JObject document,string reference)
+        { var value=document?["title"];return value?.Type!=JTokenType.String||string.IsNullOrWhiteSpace(value.ToString())?Title(reference):value.ToString().Trim(); }
+        public static string NextAnimalId(string value,int count,int ordinal)
+        {
+            if(string.IsNullOrWhiteSpace(value))return ordinal.ToString(CultureInfo.InvariantCulture);
+            int first=value.Length;while(first>0&&value[first-1]>='0'&&value[first-1]<='9')first--;
+            if(first==value.Length||!long.TryParse(value.Substring(first),out long number)||number>long.MaxValue-count)return value;
+            return value.Substring(0,first)+(number+count).ToString(new string('0',value.Length-first),CultureInfo.InvariantCulture);
+        }
+        /// <summary>Explicit conversion only: the existing stimulus remains intact and optional phases start disabled.</summary>
+        public static void AddPhaseTimeline(JObject document,double duration)
+        {
+            if(Phased(document)) throw new ArgumentException("This experiment already has a phase timeline.");
+            if(double.IsNaN(duration)||double.IsInfinity(duration)||duration<=0)throw new ArgumentException("Stimulus duration must be positive and finite.");
+            var stimulus=(JObject)document.DeepClone();
+            foreach(string key in new[]{"title","comments","description"})stimulus.Remove(key);
+            stimulus["enabled"]=true;stimulus["durationSeconds"]=duration;
+            JObject observation=null;
+            // A phased experiment measures heading in pre-stimulus. Copy its
+            // original world there, then carry the measured pose into stimulus.
+            if(Flag(stimulus["headingReference"]?["enabled"]))
+            {
+                observation=(JObject)stimulus.DeepClone();
+                double seconds=Number(stimulus["headingReference"]?["windowSeconds"],180)+Number(stimulus["headingReference"]?["startOffsetSeconds"]);
+                if(seconds<=0||double.IsNaN(seconds)||double.IsInfinity(seconds))throw new ArgumentException("Heading observation duration must be positive and finite.");
+                observation["durationSeconds"]=seconds;
+                stimulus.Remove("headingReference");
+                stimulus["resetPositionOnStart"]=false;stimulus["resetRotationOnStart"]=false;
+            }
+            var optional=(JObject)stimulus.DeepClone();optional["enabled"]=false;optional["durationSeconds"]=10;
+            optional["resetPositionOnStart"]=false;optional["resetRotationOnStart"]=false;
+            foreach(var property in document.Properties().Where(p=>p.Name!="title"&&p.Name!="comments"&&p.Name!="description").ToList())property.Remove();
+            document["preStimulus"]=observation??optional.DeepClone();document["stimulus"]=stimulus;document["postStimulus"]=optional.DeepClone();
+        }
         public static string Schema(JObject config,string reference)
         {
             JObject p=Payload(config); string path=reference.Replace('\\','/').ToLowerInvariant();
@@ -96,7 +130,7 @@ namespace ConfigurationUI
             if(config==null) throw new ArgumentException("Experiment config must be an object.");
             string schema=Schema(config,reference); JObject p=Payload(config);
             bool flight=Number(p?["aglHeight"])>0 || reference.Replace('\\','/').Contains("/Flight/");
-            string scene=schema=="swarm"?"Swarm":schema=="kannadi"?"Kannadi":schema=="optomotor"?"Optomotor":schema=="dynamic-choice"?"Choice_desync":flight?"Choice_Selwyn":"Choice";
+            string scene=schema=="swarm"?"Kannadi":schema=="kannadi"?"Kannadi":schema=="optomotor"?"Optomotor":schema=="dynamic-choice"?"Choice_desync":flight?"Choice_Selwyn":"Choice";
             string category=schema=="swarm"?"Swarm":schema=="optomotor"?"Optomotor":schema=="dynamic-choice"?"Dynamic choice":schema=="kannadi"?"Walking":flight?"Flight":"Choice";
             if(p?["rugosity"] is JObject terrain && Flag(terrain["enabled"]))
             {
@@ -105,7 +139,7 @@ namespace ConfigurationUI
                 category="Terrain";
             }
             if(!reference.StartsWith("Templates/",StringComparison.Ordinal) && !reference.StartsWith("Examples/",StringComparison.Ordinal)) category="Custom";
-            return new ExperimentPreset { Reference=reference,Title=Title(reference),Schema=schema,Scene=scene,Category=category,Config=config };
+            return new ExperimentPreset { Reference=reference,Title=Title(config,reference),Schema=schema,Scene=scene,Category=category,Config=config };
         }
         public static List<ExperimentPreset> Catalog(string streaming,bool includeArchive=false)
         {
@@ -148,8 +182,10 @@ namespace ConfigurationUI
         public static JArray Steps(JToken root) => root["sequences"] as JArray??throw new ArgumentException("Sequence must have a sequences array.");
         public static JObject NewBlock(ExperimentPreset preset,string scene=null)
         {
-            return new JObject { ["sceneName"]=scene??preset.Scene,["duration"]=new JRaw(Math.Max(.001,preset.Duration+(Number(preset.Config["sessionSeconds"])>0?1:0)).ToString("R",CultureInfo.InvariantCulture)),["gain"]=1,["autoTrim"]=false,["reloadScene"]=true,
+            var block=new JObject { ["sceneName"]=scene??preset.Scene,["duration"]=new JRaw(Math.Max(.001,preset.Duration+(Number(preset.Config["sessionSeconds"])>0?1:0)).ToString("R",CultureInfo.InvariantCulture)),["gain"]=1,["autoTrim"]=false,["reloadScene"]=true,
                 ["parameters"]=new JObject { [preset.Schema=="dynamic-choice"?"design":"configFile"]=preset.Reference } };
+            if(preset.Schema=="swarm"){block["parameters"]["populationMode"]="Swarm";block["parameters"]["worldUnitsPerMetre"]=100;}
+            return block;
         }
         public static void Move(JToken root,int from,int to)
         { var steps=Steps(root); if(from<0 || to<0 || from>=steps.Count || to>=steps.Count || from==to) return; JToken step=steps[from]; steps.RemoveAt(from); steps.Insert(to,step); }

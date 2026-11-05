@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 /// <summary>Adapt authored rig templates to the configured animals before Start opens trackers.</summary>
 public static class RuntimeRigRegistry
 {
+    public const int MaximumRigCount = 16;
     private static readonly Dictionary<int, int> layers = new Dictionary<int, int>();
     public static int ParseIndex(string name)
     {
@@ -16,17 +17,27 @@ public static class RuntimeRigRegistry
     }
     public static int StimulusLayer(int index)
     {
+        if (index < 1 || index > MaximumRigCount) return -1;
         if (layers.TryGetValue(index, out int layer)) return layer;
-        return LayerMask.NameToLayer("SimulatedLocustsVR" + index);
+        // Keep the original four layer IDs for archived scenes. New rigs have a
+        // stable slot independent of which subset of animals is active.
+        return index <= 4 ? LayerMask.NameToLayer("SimulatedLocustsVR" + index) : index + 14;
     }
     public static int StimulusMask
     {
         get
         {
-            int mask = LayerMask.GetMask("SimulatedLocustsVR1", "SimulatedLocustsVR2", "SimulatedLocustsVR3", "SimulatedLocustsVR4");
-            foreach (int layer in layers.Values) mask |= 1 << layer;
+            int mask = 0;
+            for (int i = 1; i <= MaximumRigCount; i++)
+                if (StimulusLayer(i) >= 0) mask |= 1 << StimulusLayer(i);
             return mask;
         }
+    }
+    public static int PeerStimulusMask(int index)
+    {
+        int layer = StimulusLayer(index);
+        if (layer < 0) throw new ArgumentOutOfRangeException(nameof(index), "Rig index must be 1 through 16.");
+        return StimulusMask & ~(1 << layer);
     }
     public static string LayerLabel(int layer)
     {
@@ -46,25 +57,19 @@ public static class RuntimeRigRegistry
         var authored = UnityEngine.Object.FindObjectsByType<ClosedLoop>(FindObjectsInactive.Include, FindObjectsSortMode.None)
             .Where(r => r.gameObject.scene == scene && ParseIndex(r.name) > 0).ToArray();
         if (authored.Length == 0) return; // Control-only and replay scenes need no animal template.
+        foreach (var rig in authored) EnsureSixFaceRig(rig);
         var wanted = new SortedSet<int>();
         foreach (string id in configs.Keys)
         {
             int index = ParseIndex(id);
-            if (index < 1 || id != "VR" + index) throw new ArgumentException("Rig IDs must be unique VR1, VR2, … values: " + id);
+            if (index < 1 || index > MaximumRigCount || id != "VR" + index) throw new ArgumentException("Rig IDs must be unique VR1 through VR16 values: " + id);
             wanted.Add(index);
         }
         var nextLayers = new Dictionary<int, int>();
-        for (int i = 1; i <= 4; i++)
+        for (int i = 1; i <= MaximumRigCount; i++)
         {
-            int layer = LayerMask.NameToLayer("SimulatedLocustsVR" + i);
+            int layer = StimulusLayer(i);
             if (layer >= 0) nextLayers[i] = layer;
-        }
-        var free = new Queue<int>(Enumerable.Range(8, 24).Where(i => string.IsNullOrEmpty(LayerMask.LayerToName(i))));
-        foreach (int index in wanted)
-        {
-            if (nextLayers.ContainsKey(index)) continue;
-            if (free.Count == 0) throw new ArgumentException("The configured animals exceed the available isolated stimulus layers. Remove unused rig entries or build a scene with another rendering strategy.");
-            nextLayers[index] = free.Dequeue();
         }
         layers.Clear();
         foreach (var pair in nextLayers) layers.Add(pair.Key, pair.Value);
@@ -109,7 +114,29 @@ public static class RuntimeRigRegistry
                 spawner.RuntimeLayer = StimulusLayer(pair.Key);
             foreach (SwarmLogger logger in pair.Value.GetComponentsInChildren<SwarmLogger>(true))
                 logger.locustLayerMask = 1 << StimulusLayer(pair.Key);
-            pair.Value.GetComponent<ViewportSetter>()?.RefreshSystemConfig();
+            pair.Value.GetComponentInChildren<ViewportSetter>(true)?.ApplyConfiguration(configs["VR" + pair.Key]);
         }
+    }
+
+    private static void EnsureSixFaceRig(ClosedLoop rig)
+    {
+        var setter = rig.GetComponentInChildren<ViewportSetter>(true);
+        if (setter == null)
+        {
+            // Older manual terrain labs put one camera on the tracking root.
+            // Preserve its projection/material settings in an editable child;
+            // tracking and the physical camera allow-list then have separate owners.
+            Camera source = rig.GetComponent<Camera>() ?? rig.GetComponentInChildren<Camera>(true);
+            if (source == null) throw new InvalidOperationException("Configured rig has no camera template: " + rig.name);
+            var front = new GameObject("Main Camera F");
+            front.transform.SetParent(rig.transform, false);
+            var camera = front.AddComponent<Camera>(); camera.CopyFrom(source);
+            camera.fieldOfView = 90; camera.enabled = false;
+            source.enabled = false;
+            if (Application.isPlaying) UnityEngine.Object.Destroy(source);
+            else UnityEngine.Object.DestroyImmediate(source);
+            setter = rig.gameObject.AddComponent<ViewportSetter>();
+        }
+        setter.EnsureSixFaces();
     }
 }

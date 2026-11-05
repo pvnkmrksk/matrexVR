@@ -1,0 +1,48 @@
+{
+  "objects": [],
+  "closedLoopPosition": true,
+  "closedLoopOrientation": true,
+  "initialPosition": {
+    "x": 0,
+    "y": 100,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "resetPositionOnStart": true,
+  "resetRotationOnStart": true,
+  "randomInitialRotation": false,
+  "autopilotEnabled": false,
+  "autopilotSpeed": 7,
+  "skyboxPath": "",
+  "nightSky": {
+    "enabled": false
+  },
+  "uniformSkyColor": null,
+  "sun": {
+    "enabled": true,
+    "intensity": 1,
+    "color": {
+      "r": 1,
+      "g": 1,
+      "b": 1,
+      "a": 1
+    },
+    "rotation": {
+      "x": 50,
+      "y": 330,
+      "z": 0
+    }
+  },
+  "title": "Real-world terrain · Selwyn",
+  "comments": "Packaged Selwyn real-world terrain without added stimulus objects. Units are metres; walkingPositionGain 0.01 converts centimetre tracking to metres. Ground-following height is 1.6 m. This is a reusable terrain example, not a newly imported satellite dataset. Autopilot is off; configure tracking/manual movement in the apparatus.",
+  "walkingPositionGain": 0.01,
+  "walkingOrientationGain": 1,
+  "aglHeight": 1.6,
+  "groundLayerMask": 1,
+  "windSpeed": 0,
+  "windDirection": 0
+}

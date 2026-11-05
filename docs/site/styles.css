@@ -170,3 +170,18 @@ footer .credits { margin-left: auto; text-align: right; font-size: .63rem; }
   footer .credits { text-align: left; margin-top: 18px; }
 }
 @media (prefers-reduced-motion: reduce) { :root { scroll-behavior: auto; } }
+
+/* Product captures lead; technical explanation follows the experiment catalogue. */
+.hero { grid-template-columns: 1fr 1.1fr; gap: 48px; padding-block: 56px 44px; }
+.hero-worlds { min-width: 0; }
+.hero-worlds img { width: 100%; object-fit: cover; border-radius: 6px; background: var(--wash); }
+.hero-world { aspect-ratio: 16 / 10; }
+.hero-world-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.hero-world-strip img { aspect-ratio: 16 / 9; }
+.hero-worlds figcaption { font-size: .75rem; color: var(--muted); line-height: 1.6; margin-top: 12px; }
+.hardware-section { background: var(--wash); border: 1px solid var(--line); border-radius: 8px; }
+@media(max-width:720px) { .hero { grid-template-columns: 1fr; gap: 26px; padding-block: 35px; } .workflow img { min-width: 0; } }
+@media(max-width:720px) {
+  .hero-worlds { order: -1; }
+  .hero-world-strip { display: none; }
+}

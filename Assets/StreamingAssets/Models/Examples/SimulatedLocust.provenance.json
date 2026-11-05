@@ -1,0 +1,48 @@
+{
+  "file": "SimulatedLocust.glb",
+  "sourcePrefab": "Assets/Prefabs/Locust/SimulatedLocust.prefab",
+  "sha256": "4c50df1ffe9a33dd8ddbf4da1a0192a520036efce593af1439807ca817d24a92",
+  "bytes": 752828,
+  "unity": "6000.3.16f1",
+  "exporter": "pinned UnityGLTF GLTFSceneExporter",
+  "skins": 1,
+  "animations": [
+    "Scene"
+  ],
+  "boundsSize": [
+    3.03510213,
+    3.66243267,
+    5.21098948
+  ],
+  "sourceDependencies": [
+    {
+      "path": "Assets/Prefabs/Locust/Locust.blend",
+      "sha256": "b1dfcccbbdf6d0fdc53651077fda98fc9ba01d20ec3043263f699e46cd40264a"
+    },
+    {
+      "path": "Assets/Prefabs/Locust/locustAnimationController.controller",
+      "sha256": "424ffaa6ce4c5d730ed0b5d6757786f4cbd0b70ed15dbf928758f596b268bf05"
+    },
+    {
+      "path": "Assets/Prefabs/Locust/locust diffuse1.jpg",
+      "sha256": "fbf8492990d938bd3bcd430446d948629cce8bab1083a4ea325eb55fabe92c13"
+    },
+    {
+      "path": "Assets/Scripts/Swarm/LocustMover.cs",
+      "sha256": "bf4e6543319b0a545afb8085eb04ed0329893c53368f143395c47197eb084921"
+    },
+    {
+      "path": "Assets/Prefabs/Locust/SimulatedLocust.prefab",
+      "sha256": "16839c026ce533f2dde54f1ce381ba517819e56e455b995d7e8ea978e57f805c"
+    },
+    {
+      "path": "Assets/Materials/locust diffuse1.mat",
+      "sha256": "820678bf5a1fa83a1e0938b4dceabd44c9f6cd848af66b7a27fb6bfaf56faae1"
+    },
+    {
+      "path": "Assets/Prefabs/Locust/Locust.prefab",
+      "sha256": "4bc4cc8ec99e7b878899c7ab0d3a8bdf05c3a45a4c9f640aaf6d7fd761e1859f"
+    }
+  ],
+  "rights": "Derived from the existing bundled locust asset. Original asset rights and notices continue to apply; this export grants no additional rights."
+}

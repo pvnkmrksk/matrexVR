@@ -1,0 +1,2588 @@
+{
+  "checks": 46,
+  "passed": [
+    "Validation uses a fresh isolated native/application profile",
+    "Supplied custom GLB sequence has all three example rows",
+    "Main preloads all embedded GLBs before starting its scene clock",
+    "Row 0: actual world GLB is active and rendered",
+    "Row 0: imported original animation is actually playing",
+    "Row 0: animation evidence is captured from the live object",
+    "Exported locust keeps its original surface when appearance override is disabled",
+    "Row 0: original exported/downloaded skin and bones are present",
+    "Row 1: actual world GLB is active and rendered",
+    "Row 1: imported original animation is actually playing",
+    "Row 1: animation evidence is captured from the live object",
+    "Row 1: instance appearance override is installed",
+    "Row 1: actual live material contains the configured color",
+    "Row 1: realized world evidence contains the actual configured material color",
+    "Row 1: original exported/downloaded skin and bones are present",
+    "Row 2: actual world GLB is active and rendered",
+    "Row 2: imported original animation is actually playing",
+    "Row 2: animation evidence is captured from the live object",
+    "Row 2: instance appearance override is installed",
+    "Row 2: actual live material contains the configured color",
+    "Row 2: realized world evidence contains the actual configured material color",
+    "Morph example retains its actual blend shapes",
+    "All three source example GLBs were observed in real sequential Main scene execution",
+    "Three-row sequence and VR finalization have no experiment or recorder error",
+    "Complete configuration archive is retained",
+    "Models/Examples/SimulatedLocust.glb: actual consumed model is classified as model evidence",
+    "Models/Examples/SimulatedLocust.glb: archived GLB bytes match the provided original source",
+    "Models/Examples/SimulatedLocust.glb: running and archiving never modify the external model source",
+    "Models/Examples/RiggedSimple.glb: actual consumed model is classified as model evidence",
+    "Models/Examples/RiggedSimple.glb: archived GLB bytes match the provided original source",
+    "Models/Examples/RiggedSimple.glb: running and archiving never modify the external model source",
+    "Models/Examples/AnimatedMorphCube.glb: actual consumed model is classified as model evidence",
+    "Models/Examples/AnimatedMorphCube.glb: archived GLB bytes match the provided original source",
+    "Models/Examples/AnimatedMorphCube.glb: running and archiving never modify the external model source",
+    "Referenced example JSON is archived: Examples/Models/locust-glb.example.json",
+    "Referenced example JSON is archived: Examples/Models/rigged-glb.example.json",
+    "Referenced example JSON is archived: Examples/Models/morph-glb.example.json",
+    "Presentation journal contains exactly three configured model presentations",
+    "Models/Examples/SimulatedLocust.glb: realized world evidence is bound to its exact configured presentation",
+    "Models/Examples/RiggedSimple.glb: realized world evidence is bound to its exact configured presentation",
+    "Models/Examples/AnimatedMorphCube.glb: realized world evidence is bound to its exact configured presentation",
+    "VR recording is finalized with all writers drained",
+    "Final VR archive ZIP exists",
+    "Final ZIP includes the source GLB bytes",
+    "Scene changes release all instance appearance materials",
+    "Actual Main custom GLB sequence has no Unity runtime errors: "
+  ],
+  "failure": null,
+  "errors": [],
+  "observations": [
+    {
+      "index": 0,
+      "model": "Models/Examples/SimulatedLocust.glb",
+      "clips": [
+        "Scene"
+      ],
+      "state": {
+        "key": "choice",
+        "configuration": null,
+        "nodes": [
+          {
+            "path": "",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              2.0,
+              12.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              0.8,
+              0.8,
+              0.8
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              100.0,
+              100.0,
+              100.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "r": [
+              -0.7071068,
+              0.0,
+              0.0,
+              0.7071067
+            ],
+            "s": [
+              0.66666,
+              0.66666,
+              0.66666
+            ],
+            "renderers": [
+              {
+                "enabled": true,
+                "materials": [
+                  {
+                    "shader": "UnityGLTF/PBRGraph",
+                    "properties": {
+                      "thicknessFactor": {
+                        "f": 0.0
+                      },
+                      "alphaCutoff": {
+                        "f": 0.5
+                      },
+                      "ior": {
+                        "f": 1.5
+                      },
+                      "roughnessFactor": {
+                        "f": 0.5
+                      },
+                      "baseColorFactor": {
+                        "c": [
+                          1.0,
+                          1.0,
+                          1.0,
+                          1.0
+                        ]
+                      },
+                      "metallicFactor": {
+                        "f": 0.0
+                      },
+                      "transmissionFactor": {
+                        "f": 0.0
+                      },
+                      "attenuationDistance": {
+                        "f": 0.001
+                      },
+                      "attenuationColor": {
+                        "c": [
+                          1.0,
+                          1.0,
+                          1.0,
+                          0.0
+                        ]
+                      },
+                      "baseColorTexture": {
+                        "t": {
+                          "name": "locust diffuse1",
+                          "width": 2048,
+                          "height": 2048,
+                          "dimension": 2,
+                          "wrapU": 0,
+                          "wrapV": 0,
+                          "wrapW": 0,
+                          "filter": 2,
+                          "aniso": 1,
+                          "mipBias": 0.0
+                        },
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "baseColorTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "baseColorTextureRotation": {
+                        "f": 0.0
+                      },
+                      "baseColorTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "metallicRoughnessTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "metallicRoughnessTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "metallicRoughnessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "metallicRoughnessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "transmissionTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "transmissionTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "transmissionTextureRotation": {
+                        "f": 0.0
+                      },
+                      "transmissionTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "thicknessTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "thicknessTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "thicknessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "thicknessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "emissiveFactor": {
+                        "c": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "emissiveTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "emissiveTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "emissiveTextureRotation": {
+                        "f": 0.0
+                      },
+                      "emissiveTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "normalTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "normalTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "normalTextureRotation": {
+                        "f": 0.0
+                      },
+                      "normalTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "normalScale": {
+                        "f": 1.0
+                      },
+                      "occlusionTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "occlusionStrength": {
+                        "f": 1.0
+                      },
+                      "occlusionTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "occlusionTextureRotation": {
+                        "f": 0.0
+                      },
+                      "occlusionTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "iridescenceFactor": {
+                        "f": 0.0
+                      },
+                      "iridescenceTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "iridescenceIor": {
+                        "f": 1.3
+                      },
+                      "iridescenceTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "iridescenceTextureRotation": {
+                        "f": 0.0
+                      },
+                      "iridescenceTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "iridescenceThicknessTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "iridescenceThicknessMinimum": {
+                        "f": 100.0
+                      },
+                      "iridescenceThicknessMaximum": {
+                        "f": 400.0
+                      },
+                      "iridescenceThicknessTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "iridescenceThicknessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "iridescenceThicknessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "specularFactor": {
+                        "f": 1.0
+                      },
+                      "specularColorFactor": {
+                        "c": [
+                          1.0,
+                          1.0,
+                          1.0,
+                          1.0
+                        ]
+                      },
+                      "specularTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "specularTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "specularTextureRotation": {
+                        "f": 0.0
+                      },
+                      "specularTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "specularColorTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "specularColorTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "specularColorTextureRotation": {
+                        "f": 0.0
+                      },
+                      "specularColorTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "clearcoatFactor": {
+                        "f": 0.0
+                      },
+                      "clearcoatRoughnessFactor": {
+                        "f": 0.0
+                      },
+                      "clearcoatTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "clearcoatTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "clearcoatTextureRotation": {
+                        "f": 0.0
+                      },
+                      "clearcoatTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "clearcoatRoughnessTexture": {
+                        "t": null,
+                        "st": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "clearcoatRoughnessTexture_ST": {
+                        "v": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "clearcoatRoughnessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "clearcoatRoughnessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "dispersion": {
+                        "f": 0.0
+                      },
+                      "sheenColorFactor": {
+                        "c": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenRoughnessFactor": {
+                        "f": 0.0
+                      },
+                      "sheenColorTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenColorTextureRotation": {
+                        "f": 0.0
+                      },
+                      "sheenColorTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenColorTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "sheenRoughnessTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenRoughnessTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenRoughnessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "sheenRoughnessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "_VOLUME_ON": {
+                        "f": 0.0
+                      },
+                      "_CLEARCOAT": {
+                        "f": 0.0
+                      },
+                      "_IRIDESCENCE": {
+                        "f": 0.0
+                      },
+                      "_SPECULAR": {
+                        "f": 0.0
+                      },
+                      "_SHEEN": {
+                        "f": 0.0
+                      },
+                      "_VOLUME_TRANSMISSION": {
+                        "f": 0.0
+                      },
+                      "_TEXTURE_TRANSFORM": {
+                        "f": 1.0
+                      },
+                      "_OverrideSurfaceMode": {
+                        "f": 0.0
+                      },
+                      "_NormalMapFormatXYZ": {
+                        "f": 1.0
+                      },
+                      "_BUILTIN_Surface": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_Blend": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_AlphaClip": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_SrcBlend": {
+                        "f": 1.0
+                      },
+                      "_BUILTIN_DstBlend": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_ZWrite": {
+                        "f": 1.0
+                      },
+                      "_BUILTIN_ZWriteControl": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_ZTest": {
+                        "f": 4.0
+                      },
+                      "_BUILTIN_CullMode": {
+                        "f": 2.0
+                      },
+                      "_BUILTIN_QueueOffset": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_QueueControl": {
+                        "f": -1.0
+                      }
+                    },
+                    "keywords": [
+                      "_TEXTURE_TRANSFORM_ON",
+                      "_VOLUME_TRANSMISSION_OFF",
+                      "_VERTEX_COLORS_ON"
+                    ],
+                    "renderQueue": 2000
+                  }
+                ]
+              }
+            ],
+            "participants": []
+          },
+          {
+            "path": "0/0/1",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "r": [
+              -0.7071068,
+              0.0,
+              0.0,
+              0.7071067
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              0.66666,
+              0.66666,
+              0.66666
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              -0.0003797445,
+              0.0292268731,
+              0.007457873
+            ],
+            "r": [
+              -0.9958581,
+              -0.008843217,
+              0.0116741424,
+              -0.08973425
+            ],
+            "s": [
+              0.99999994,
+              0.99999994,
+              1.00000024
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              -4.36557457e-11,
+              0.0226776469,
+              7.54312168e-10
+            ],
+            "r": [
+              0.406097621,
+              -0.406383872,
+              -0.5831998,
+              -0.5742951
+            ],
+            "s": [
+              1.0,
+              1.00000012,
+              1.00000012
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              7.421477e-10,
+              0.009214771,
+              7.49423634e-10
+            ],
+            "r": [
+              0.182768747,
+              -0.256265521,
+              0.690387845,
+              -0.651374161
+            ],
+            "s": [
+              0.9999999,
+              0.9999999,
+              0.9999998
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/0/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              4.656613e-10,
+              0.0178655926,
+              -3.49245965e-10
+            ],
+            "r": [
+              0.02689498,
+              0.387887269,
+              -0.9195911,
+              0.0563236549
+            ],
+            "s": [
+              0.99999994,
+              1.00000024,
+              1.00000119
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/0/0/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.025702361,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/1",
+            "active": true,
+            "layer": 0,
+            "p": [
+              -4.36557457e-11,
+              0.0226776469,
+              7.54312168e-10
+            ],
+            "r": [
+              0.407696217,
+              0.4074299,
+              0.573364556,
+              -0.5822695
+            ],
+            "s": [
+              0.9999999,
+              0.99999994,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/1/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              8.731149e-11,
+              0.008723996,
+              1.63709046e-10
+            ],
+            "r": [
+              0.331610948,
+              0.313212067,
+              -0.6599647,
+              -0.5969749
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/1/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              2.32830644e-10,
+              0.0194832049,
+              -1.19234755e-09
+            ],
+            "r": [
+              0.04040483,
+              0.6053548,
+              -0.7949135,
+              -0.005062167
+            ],
+            "s": [
+              1.00000012,
+              0.999998569,
+              0.999998331
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/1/0/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.0268949661,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/2",
+            "active": true,
+            "layer": 0,
+            "p": [
+              -4.36557457e-11,
+              0.0226776469,
+              7.54312168e-10
+            ],
+            "r": [
+              -0.0423651636,
+              -0.0127069093,
+              0.001551258,
+              -0.9990202
+            ],
+            "s": [
+              1.0,
+              1.00000012,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/2/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              6.252776e-12,
+              0.006342293,
+              -3.114735e-10
+            ],
+            "r": [
+              0.139854908,
+              -0.01642035,
+              -0.004221488,
+              -0.9900269
+            ],
+            "s": [
+              1.00000012,
+              1.00000012,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/2/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              8.00355338e-11,
+              0.0058567645,
+              -2.36286724e-09
+            ],
+            "r": [
+              0.344534039,
+              0.361119926,
+              0.602487564,
+              -0.622814238
+            ],
+            "s": [
+              0.99999994,
+              0.9999998,
+              0.9999999
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/2/0/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.007364822,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/2/0/1",
+            "active": true,
+            "layer": 0,
+            "p": [
+              8.00355338e-11,
+              0.0058567645,
+              -2.36286724e-09
+            ],
+            "r": [
+              0.180600777,
+              -0.475973874,
+              -0.4690003,
+              -0.72171396
+            ],
+            "s": [
+              0.9999999,
+              0.99999994,
+              0.9999999
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/2/0/1/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.006212116,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/2/1",
+            "active": true,
+            "layer": 0,
+            "p": [
+              6.252776e-12,
+              0.006342293,
+              -3.114735e-10
+            ],
+            "r": [
+              0.4788234,
+              -0.377427429,
+              -0.61006695,
+              -0.506058455
+            ],
+            "s": [
+              1.0,
+              1.00000012,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/2/1/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.00688589877,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/2/2",
+            "active": true,
+            "layer": 0,
+            "p": [
+              6.252776e-12,
+              0.006342293,
+              -3.114735e-10
+            ],
+            "r": [
+              0.217007443,
+              0.6024324,
+              0.389183283,
+              -0.6622079
+            ],
+            "s": [
+              1.00000012,
+              1.0,
+              0.99999994
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/2/2/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.00684532663,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/3",
+            "active": true,
+            "layer": 0,
+            "p": [
+              -4.36557457e-11,
+              0.0226776469,
+              7.54312168e-10
+            ],
+            "r": [
+              0.406097621,
+              -0.406383723,
+              -0.5832,
+              -0.574295044
+            ],
+            "s": [
+              1.00000024,
+              1.00000024,
+              1.00000024
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/3/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.004919565,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/4",
+            "active": true,
+            "layer": 0,
+            "p": [
+              -4.36557457e-11,
+              0.0226776469,
+              7.54312168e-10
+            ],
+            "r": [
+              0.407696158,
+              0.407429934,
+              0.573364556,
+              -0.5822696
+            ],
+            "s": [
+              1.0,
+              1.00000012,
+              1.00000012
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/1/0/0/4/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.00478628371,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          }
+        ],
+        "animation": "{\"version\":1,\"animators\":[],\"legacy\":[{\"path\":\"0\",\"clips\":[{\"name\":\"Scene\",\"time\":0.0,\"speed\":1.0,\"weight\":1.0,\"layer\":0,\"wrap\":2,\"blend\":0,\"enabled\":true}]}]}"
+      }
+    },
+    {
+      "index": 1,
+      "model": "Models/Examples/RiggedSimple.glb",
+      "clips": [
+        "animation:0"
+      ],
+      "state": {
+        "key": "choice",
+        "configuration": null,
+        "nodes": [
+          {
+            "path": "",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              2.0,
+              12.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.8,
+              1.8,
+              1.8
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "r": [
+              -0.7071068,
+              0.0,
+              0.0,
+              0.7071068
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.7071068,
+              0.7071068
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              -1.35973e-07,
+              -4.18033
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/0/0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              4.532762e-14,
+              0.0279774889,
+              4.187077
+            ],
+            "r": [
+              0.0118339183,
+              -0.000289902324,
+              3.43093438e-06,
+              -0.999929965
+            ],
+            "s": [
+              1.00000012,
+              0.99999994,
+              0.99999994
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0/0/1",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [
+              {
+                "enabled": true,
+                "materials": [
+                  {
+                    "shader": "UnityGLTF/PBRGraph",
+                    "properties": {
+                      "thicknessFactor": {
+                        "f": 0.0
+                      },
+                      "alphaCutoff": {
+                        "f": 0.5
+                      },
+                      "ior": {
+                        "f": 1.5
+                      },
+                      "roughnessFactor": {
+                        "f": 0.6
+                      },
+                      "baseColorFactor": {
+                        "c": [
+                          0.95,
+                          0.5,
+                          0.12,
+                          1.0
+                        ]
+                      },
+                      "metallicFactor": {
+                        "f": 0.0
+                      },
+                      "transmissionFactor": {
+                        "f": 0.0
+                      },
+                      "attenuationDistance": {
+                        "f": 0.001
+                      },
+                      "attenuationColor": {
+                        "c": [
+                          1.0,
+                          1.0,
+                          1.0,
+                          0.0
+                        ]
+                      },
+                      "baseColorTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "baseColorTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "baseColorTextureRotation": {
+                        "f": 0.0
+                      },
+                      "baseColorTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "metallicRoughnessTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "metallicRoughnessTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "metallicRoughnessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "metallicRoughnessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "transmissionTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "transmissionTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "transmissionTextureRotation": {
+                        "f": 0.0
+                      },
+                      "transmissionTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "thicknessTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "thicknessTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "thicknessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "thicknessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "emissiveFactor": {
+                        "c": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "emissiveTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "emissiveTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "emissiveTextureRotation": {
+                        "f": 0.0
+                      },
+                      "emissiveTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "normalTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "normalTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "normalTextureRotation": {
+                        "f": 0.0
+                      },
+                      "normalTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "normalScale": {
+                        "f": 1.0
+                      },
+                      "occlusionTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "occlusionStrength": {
+                        "f": 1.0
+                      },
+                      "occlusionTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "occlusionTextureRotation": {
+                        "f": 0.0
+                      },
+                      "occlusionTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "iridescenceFactor": {
+                        "f": 0.0
+                      },
+                      "iridescenceTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "iridescenceIor": {
+                        "f": 1.3
+                      },
+                      "iridescenceTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "iridescenceTextureRotation": {
+                        "f": 0.0
+                      },
+                      "iridescenceTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "iridescenceThicknessTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "iridescenceThicknessMinimum": {
+                        "f": 100.0
+                      },
+                      "iridescenceThicknessMaximum": {
+                        "f": 400.0
+                      },
+                      "iridescenceThicknessTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "iridescenceThicknessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "iridescenceThicknessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "specularFactor": {
+                        "f": 1.0
+                      },
+                      "specularColorFactor": {
+                        "c": [
+                          1.0,
+                          1.0,
+                          1.0,
+                          1.0
+                        ]
+                      },
+                      "specularTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "specularTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "specularTextureRotation": {
+                        "f": 0.0
+                      },
+                      "specularTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "specularColorTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "specularColorTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "specularColorTextureRotation": {
+                        "f": 0.0
+                      },
+                      "specularColorTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "clearcoatFactor": {
+                        "f": 0.0
+                      },
+                      "clearcoatRoughnessFactor": {
+                        "f": 0.0
+                      },
+                      "clearcoatTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "clearcoatTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "clearcoatTextureRotation": {
+                        "f": 0.0
+                      },
+                      "clearcoatTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "clearcoatRoughnessTexture": {
+                        "t": null,
+                        "st": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "clearcoatRoughnessTexture_ST": {
+                        "v": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "clearcoatRoughnessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "clearcoatRoughnessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "dispersion": {
+                        "f": 0.0
+                      },
+                      "sheenColorFactor": {
+                        "c": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenRoughnessFactor": {
+                        "f": 0.0
+                      },
+                      "sheenColorTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenColorTextureRotation": {
+                        "f": 0.0
+                      },
+                      "sheenColorTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenColorTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "sheenRoughnessTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenRoughnessTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenRoughnessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "sheenRoughnessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "_VOLUME_ON": {
+                        "f": 0.0
+                      },
+                      "_CLEARCOAT": {
+                        "f": 0.0
+                      },
+                      "_IRIDESCENCE": {
+                        "f": 0.0
+                      },
+                      "_SPECULAR": {
+                        "f": 0.0
+                      },
+                      "_SHEEN": {
+                        "f": 0.0
+                      },
+                      "_VOLUME_TRANSMISSION": {
+                        "f": 0.0
+                      },
+                      "_TEXTURE_TRANSFORM": {
+                        "f": 0.0
+                      },
+                      "_OverrideSurfaceMode": {
+                        "f": 0.0
+                      },
+                      "_NormalMapFormatXYZ": {
+                        "f": 1.0
+                      },
+                      "_BUILTIN_Surface": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_Blend": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_AlphaClip": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_SrcBlend": {
+                        "f": 1.0
+                      },
+                      "_BUILTIN_DstBlend": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_ZWrite": {
+                        "f": 1.0
+                      },
+                      "_BUILTIN_ZWriteControl": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_ZTest": {
+                        "f": 4.0
+                      },
+                      "_BUILTIN_CullMode": {
+                        "f": 2.0
+                      },
+                      "_BUILTIN_QueueOffset": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_QueueControl": {
+                        "f": -1.0
+                      }
+                    },
+                    "keywords": [
+                      "_VOLUME_TRANSMISSION_OFF",
+                      "_VERTEX_COLORS_ON"
+                    ],
+                    "renderQueue": 2000
+                  }
+                ]
+              }
+            ],
+            "participants": []
+          }
+        ],
+        "animation": "{\"version\":1,\"animators\":[],\"legacy\":[{\"path\":\"0\",\"clips\":[{\"name\":\"animation:0\",\"time\":0.0,\"speed\":1.0,\"weight\":1.0,\"layer\":0,\"wrap\":2,\"blend\":0,\"enabled\":true}]}]}"
+      }
+    },
+    {
+      "index": 2,
+      "model": "Models/Examples/AnimatedMorphCube.glb",
+      "clips": [
+        "Square"
+      ],
+      "state": {
+        "key": "choice",
+        "configuration": null,
+        "nodes": [
+          {
+            "path": "",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              2.0,
+              12.0
+            ],
+            "r": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "s": [
+              2.2,
+              2.2,
+              2.2
+            ],
+            "renderers": [],
+            "participants": []
+          },
+          {
+            "path": "0/0",
+            "active": true,
+            "layer": 0,
+            "p": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "r": [
+              0.0,
+              -0.7071067,
+              0.7071068,
+              0.0
+            ],
+            "s": [
+              100.0,
+              100.0,
+              100.0
+            ],
+            "renderers": [
+              {
+                "enabled": true,
+                "materials": [
+                  {
+                    "shader": "UnityGLTF/PBRGraph",
+                    "properties": {
+                      "thicknessFactor": {
+                        "f": 0.0
+                      },
+                      "alphaCutoff": {
+                        "f": 0.5
+                      },
+                      "ior": {
+                        "f": 1.5
+                      },
+                      "roughnessFactor": {
+                        "f": 0.6
+                      },
+                      "baseColorFactor": {
+                        "c": [
+                          0.15,
+                          0.5,
+                          0.9,
+                          1.0
+                        ]
+                      },
+                      "metallicFactor": {
+                        "f": 0.0
+                      },
+                      "transmissionFactor": {
+                        "f": 0.0
+                      },
+                      "attenuationDistance": {
+                        "f": 0.001
+                      },
+                      "attenuationColor": {
+                        "c": [
+                          1.0,
+                          1.0,
+                          1.0,
+                          0.0
+                        ]
+                      },
+                      "baseColorTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "baseColorTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "baseColorTextureRotation": {
+                        "f": 0.0
+                      },
+                      "baseColorTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "metallicRoughnessTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "metallicRoughnessTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "metallicRoughnessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "metallicRoughnessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "transmissionTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "transmissionTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "transmissionTextureRotation": {
+                        "f": 0.0
+                      },
+                      "transmissionTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "thicknessTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "thicknessTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "thicknessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "thicknessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "emissiveFactor": {
+                        "c": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "emissiveTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "emissiveTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "emissiveTextureRotation": {
+                        "f": 0.0
+                      },
+                      "emissiveTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "normalTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "normalTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "normalTextureRotation": {
+                        "f": 0.0
+                      },
+                      "normalTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "normalScale": {
+                        "f": 1.0
+                      },
+                      "occlusionTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "occlusionStrength": {
+                        "f": 1.0
+                      },
+                      "occlusionTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "occlusionTextureRotation": {
+                        "f": 0.0
+                      },
+                      "occlusionTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "iridescenceFactor": {
+                        "f": 0.0
+                      },
+                      "iridescenceTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "iridescenceIor": {
+                        "f": 1.3
+                      },
+                      "iridescenceTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "iridescenceTextureRotation": {
+                        "f": 0.0
+                      },
+                      "iridescenceTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "iridescenceThicknessTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "iridescenceThicknessMinimum": {
+                        "f": 100.0
+                      },
+                      "iridescenceThicknessMaximum": {
+                        "f": 400.0
+                      },
+                      "iridescenceThicknessTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "iridescenceThicknessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "iridescenceThicknessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "specularFactor": {
+                        "f": 1.0
+                      },
+                      "specularColorFactor": {
+                        "c": [
+                          1.0,
+                          1.0,
+                          1.0,
+                          1.0
+                        ]
+                      },
+                      "specularTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "specularTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "specularTextureRotation": {
+                        "f": 0.0
+                      },
+                      "specularTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "specularColorTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "specularColorTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "specularColorTextureRotation": {
+                        "f": 0.0
+                      },
+                      "specularColorTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "clearcoatFactor": {
+                        "f": 0.0
+                      },
+                      "clearcoatRoughnessFactor": {
+                        "f": 0.0
+                      },
+                      "clearcoatTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "clearcoatTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "clearcoatTextureRotation": {
+                        "f": 0.0
+                      },
+                      "clearcoatTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "clearcoatRoughnessTexture": {
+                        "t": null,
+                        "st": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "clearcoatRoughnessTexture_ST": {
+                        "v": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "clearcoatRoughnessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "clearcoatRoughnessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "dispersion": {
+                        "f": 0.0
+                      },
+                      "sheenColorFactor": {
+                        "c": [
+                          0.0,
+                          0.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenRoughnessFactor": {
+                        "f": 0.0
+                      },
+                      "sheenColorTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenColorTextureRotation": {
+                        "f": 0.0
+                      },
+                      "sheenColorTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenColorTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "sheenRoughnessTexture": {
+                        "t": null,
+                        "st": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenRoughnessTexture_ST": {
+                        "v": [
+                          1.0,
+                          1.0,
+                          0.0,
+                          0.0
+                        ]
+                      },
+                      "sheenRoughnessTextureRotation": {
+                        "f": 0.0
+                      },
+                      "sheenRoughnessTextureTexCoord": {
+                        "f": 0.0
+                      },
+                      "_VOLUME_ON": {
+                        "f": 0.0
+                      },
+                      "_CLEARCOAT": {
+                        "f": 0.0
+                      },
+                      "_IRIDESCENCE": {
+                        "f": 0.0
+                      },
+                      "_SPECULAR": {
+                        "f": 0.0
+                      },
+                      "_SHEEN": {
+                        "f": 0.0
+                      },
+                      "_VOLUME_TRANSMISSION": {
+                        "f": 0.0
+                      },
+                      "_TEXTURE_TRANSFORM": {
+                        "f": 0.0
+                      },
+                      "_OverrideSurfaceMode": {
+                        "f": 0.0
+                      },
+                      "_NormalMapFormatXYZ": {
+                        "f": 1.0
+                      },
+                      "_BUILTIN_Surface": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_Blend": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_AlphaClip": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_SrcBlend": {
+                        "f": 1.0
+                      },
+                      "_BUILTIN_DstBlend": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_ZWrite": {
+                        "f": 1.0
+                      },
+                      "_BUILTIN_ZWriteControl": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_ZTest": {
+                        "f": 4.0
+                      },
+                      "_BUILTIN_CullMode": {
+                        "f": 2.0
+                      },
+                      "_BUILTIN_QueueOffset": {
+                        "f": 0.0
+                      },
+                      "_BUILTIN_QueueControl": {
+                        "f": -1.0
+                      }
+                    },
+                    "keywords": [
+                      "_VOLUME_TRANSMISSION_OFF",
+                      "_VERTEX_COLORS_ON"
+                    ],
+                    "renderQueue": 2000
+                  }
+                ]
+              }
+            ],
+            "participants": []
+          }
+        ],
+        "animation": "{\"version\":1,\"animators\":[],\"legacy\":[{\"path\":\"0\",\"clips\":[{\"name\":\"Square\",\"time\":0.0,\"speed\":1.0,\"weight\":1.0,\"layer\":0,\"wrap\":2,\"blend\":0,\"enabled\":true}]}]}"
+      }
+    }
+  ],
+  "directory": "/Users/pavan/src/ledpanelVR/.local/glb-examples-rundata-v3/20261030_005046_001",
+  "unity": "6000.3.16f1",
+  "scope": "Actual Main execution of provided exported locust/skeletal/morph GLB example sequence at1sec per row, live appearances/animations/world evidence and immutable consumed model bytes with final ZIP. Video disabled; no native camera or input acquisition.",
+  "fixture": {
+    "providedSequence": "Examples/Sequences/custom-models.sequence.json",
+    "localSequence": "__glb-sequence.json",
+    "durationPerRowSeconds": 1,
+    "videoEnabled": false,
+    "sourceExamplesModified": false,
+    "runtimeModifiedByValidator": false,
+    "sceneObservationGuard": "Waits for Main.SceneTransitionPending=false before inspecting each new Choice scene."
+  },
+  "modelSources": [
+    {
+      "path": "Models/Examples/SimulatedLocust.glb",
+      "bytes": 752828,
+      "sha256": "4c50df1ffe9a33dd8ddbf4da1a0192a520036efce593af1439807ca817d24a92"
+    },
+    {
+      "path": "Models/Examples/RiggedSimple.glb",
+      "bytes": 15104,
+      "sha256": "3a79dabb67bb0cd598a18d08b954d9d357c27c30672f82ef5d3f4e7fe6ca3401"
+    },
+    {
+      "path": "Models/Examples/AnimatedMorphCube.glb",
+      "bytes": 6752,
+      "sha256": "214ee56160a50dbf22543a1d66dbf860986e87f0efac3d89feac1359d0e6aeab"
+    }
+  ],
+  "runtimeSnapshotSha256": {
+    "Assets/Scripts/MainController.cs": "b9e42d80a81035aa93aef18e58b6126809d6018ba5fc944ab18c3799cc8aea6c",
+    "Assets/Scripts/ChoiceController.cs": "e68817157a5df4e088829411efaa791cae6b9705b9c5931be7ac9566118b43fa",
+    "Assets/Scripts/ModelAppearance.cs": "b235fd6dbaa958435d81de9cc4847ebfeddb469f7e050d4268adfa219d776dd9",
+    "Assets/Scripts/ExternalModelLibrary.cs": "b0395bed16f16a74d6e2cc0d6c2083a1bbcc82b0118315e71ede36137c3eed32",
+    "Assets/Scripts/Replay/RecordedWorldState.cs": "7c6acaf53c912945916d13f7b3047426b03beca4d59b674aa871b92ec0045bcc"
+  },
+  "zipSha256": "d8d328c10fe10c02aaef5ed9071f082b363892f8b5d105998c91e93081c16003"
+}

@@ -1,9 +1,12 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 51befd4..ed3b765 100644
 --- a/CHANGELOG.md
 +++ b/CHANGELOG.md
-@@ -6,6 +6,16 @@
- change behaviour; such changes are listed under **Changed**).
+@@ -7,6 +7,18 @@ change behaviour; such changes are listed under **Changed**).
  
  ## [Unreleased]
+ 
++- Opt-in local native-GUI recording mailbox with per-take finalization, ownership-fenced Stop receipts, accepted/written frame counts, and capture-pause evidence. Tracking/calibration can remain active between separately controlled recording takes.
 +
 +### Fixed
 +- Local MATREX integration patch: independent `--no-camera-fallback` camera
@@ -14,12 +17,15 @@
 +### Added
 +- Engine ZMQ messages append actual `source_kind` and `source_fallback`
 +  metadata; legacy pose fields and the standalone bridge encoder are unchanged.
- 
++
  ### Documentation
  - Link the MATREX VR experiment manual and the companion HejjéTrac/Daari Deepa toolchain, keeping tracker input distinct from experiment telemetry.
+ 
+diff --git a/Cargo.lock b/Cargo.lock
+index 114d5a7..c9c3384 100644
 --- a/Cargo.lock
 +++ b/Cargo.lock
-@@ -2585,6 +2585,7 @@
+@@ -2585,6 +2585,7 @@ dependencies = [
   "image",
   "jpeg-encoder",
   "nokhwa",
@@ -27,9 +33,11 @@
   "serde",
   "serde_json",
   "tempfile",
+diff --git a/Cargo.toml b/Cargo.toml
+index d6758ab..67ffb5f 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -14,7 +14,7 @@
+@@ -14,7 +14,7 @@ readme = "README.md"
  [features]
  default = ["gui", "camera"]
  gui = ["dep:eframe"]
@@ -38,19 +46,21 @@
  
  [dependencies]
  anyhow = "1"
-@@ -34,6 +34,9 @@
- 
+@@ -35,6 +35,9 @@ zune-core = "0.5"
  [target.'cfg(target_os = "linux")'.dependencies]
  v4l = { version = "0.14", optional = true }
-+
+ 
 +[target.'cfg(target_os = "macos")'.dependencies]
 +nokhwa-bindings-macos = { version = "0.2.4", optional = true }
- 
++
  # A second, independent ZMTP 3 implementation for testing the ZMQ output.
  [dev-dependencies]
+ zeromq = { version = "0.6", default-features = false, features = ["tokio-runtime", "tcp-transport"] }
+diff --git a/book/src/guide/cameras.md b/book/src/guide/cameras.md
+index dc410f6..585b01a 100644
 --- a/book/src/guide/cameras.md
 +++ b/book/src/guide/cameras.md
-@@ -74,6 +74,12 @@
+@@ -74,6 +74,12 @@ so you can work on the markers and settings. Click **Retry camera** after
  connecting one. Headless runs and rigs started from a manifest stop with an
  error instead.
  
@@ -63,9 +73,11 @@
  ## Network streams
  
  `source.kind = "network"` reads an RTSP, HTTP or other stream through FFmpeg:
+diff --git a/book/src/guide/outputs.md b/book/src/guide/outputs.md
+index f4c7f01..70f023f 100644
 --- a/book/src/guide/outputs.md
 +++ b/book/src/guide/outputs.md
-@@ -16,9 +16,9 @@
+@@ -16,9 +16,9 @@ addresses changed, in **Settings → Instance / output** or the config's
  
  Each rig binds a ZMQ PUB socket (`output.zmq_bind`, default `tcp://*:9871`; the
  second rig `9872`). Subscribe to everything (`b""`) and receive **one UTF-8 JSON
@@ -77,7 +89,7 @@
  
  ```json
  {"timestamp_unix": 1700000000.125, "pitch": 0.0, "y": -0.5, "x": 0.25, "yaw": 0.75, "z": 0.0, "roll": 0.0, "frame_number": 77}
-@@ -32,6 +32,14 @@
+@@ -32,6 +32,14 @@ sends it:
  | `z`, `pitch`, `roll` | Always `0.0`, as in the bridge |
  | `frame_number` | The source's frame sequence number |
  | `timestamp_unix` | When the frame arrived, seconds since 1970 |
@@ -92,21 +104,42 @@
  
  A missing angle is sent as `0.0`, as the bridge did. Use the full measurements
  when you need to tell a missing angle from a real zero.
+@@ -124,3 +132,10 @@ format offline.
+ computer (host time), not a hardware exposure timestamp. `processing_us` is how
+ long tracking took for that frame; measurements are published as soon as it
+ finishes.
++
++
++## Experiment-controlled recording in the native window
++
++An integrator can launch the ordinary GUI with `--control-dir <absolute-private-directory> --control-instance <32-hex-token>`. This opts in to a local filesystem mailbox; it does not start recording or create another tracking engine. `endpoint.json` identifies the instance, backend, process and supported capabilities. Requests and replies use matching random IDs, an instance token and bounded expiry.
++
++`record_start` accepts a fresh absolute output `directory`, with `raw` and `debug` options. A reply means the native worker received the command; recording is established only when status names that fresh take and at least one video frame has been accepted. `record_stop` requires that take's `expected_directory` and an immutable `stop_request_id`; it cannot stop another take. Wait for that directory's `completion.json`, successful writer drain and matching accepted/written counts. Its `control_stop_id` proves the capture worker stopped the owned take. An earlier manual stop has no such proof; `capture_pause_count` also records intervening capture pauses. `pause` pauses tracking, while Stop only ends recording. The native window and source can remain running for another take.
+diff --git a/book/src/reference/cli-help.txt b/book/src/reference/cli-help.txt
+index bc8cc56..ce6ccc1 100644
 --- a/book/src/reference/cli-help.txt
 +++ b/book/src/reference/cli-help.txt
-@@ -59,6 +59,9 @@
- 
+@@ -60,6 +60,15 @@ Options:
        --record
            Record video to this instance's recording directory
+ 
++      --control-dir <CONTROL_DIR>
++          Reconnectable local recording control for this native window; no network listener
++
++      --control-instance <CONTROL_INSTANCE>
++          Unique32-character launch identity for --control-dir
 +
 +      --no-camera-fallback
 +          Fail if the requested camera cannot open; never substitute sample/demo input. Independent of supervision: closing the launcher does not stop this app
- 
++
        --init
            Create a sample configuration at --config and exit (never overwrites)
+ 
+diff --git a/src/camera.rs b/src/camera.rs
+index 4664cf7..252b132 100644
 --- a/src/camera.rs
 +++ b/src/camera.rs
-@@ -108,12 +108,14 @@
+@@ -108,12 +108,14 @@ fn describe(cameras: &[CameraEntry]) -> String {
  mod native {
      use super::*;
      use crate::frame::{GrayFrame, unix_ns};
@@ -122,7 +155,7 @@
          },
      };
      use std::sync::atomic::{AtomicBool, Ordering};
-@@ -222,6 +224,58 @@
+@@ -222,6 +224,58 @@ mod native {
          ranked.dedup();
          ranked
      }
@@ -181,7 +214,7 @@
      fn open_one(
          entry: &CameraEntry,
          width: u32,
-@@ -242,8 +296,7 @@
+@@ -242,8 +296,7 @@ mod native {
                  .map(|f| CameraFormat::new(Resolution::new(width, height), f, fps))
                  .to_vec();
          }
@@ -191,30 +224,27 @@
              // All formats, including GRAY (RgbFormat's own list excludes it);
              // decoding to RGB handles every one of them.
              let request =
-@@ -254,12 +307,12 @@
+@@ -254,12 +307,12 @@ mod native {
              match result {
                  Ok(()) => {
                      let actual = camera.camera_format();
 -                    return Ok((camera, actual));
--                }
++                    Ok(actual)
+                 }
 -                Err(e) => errors.push(format!("{format}: {e}")),
--            }
++                Err(e) => Err(anyhow::anyhow!("{e}")),
+             }
 -        }
 -        bail!("{}", errors.join("; "))
-+                    Ok(actual)
-+                }
-+                Err(e) => Err(anyhow::anyhow!("{e}")),
-+            }
 +        })
 +        .map(|actual| (camera, actual))
      }
      pub fn open(
          device: &str,
-@@ -513,4 +566,24 @@
+@@ -513,4 +566,24 @@ mod tests {
          let ranked = native::rank(&modes, 800, 600, 60);
          assert_eq!(ranked[0].resolution(), Resolution::new(1280, 720));
      }
--}
 +
 +    #[cfg(feature = "camera")]
 +    #[test]
@@ -235,10 +265,12 @@
 +        assert_eq!(selected, supported);
 +        assert!(native::attempt_formats::<()>([], |_| Ok(())).is_err());
 +    }
-+}
+ }
+diff --git a/src/engine.rs b/src/engine.rs
+index 3fcea88..1710748 100644
 --- a/src/engine.rs
 +++ b/src/engine.rs
-@@ -5,6 +5,7 @@
+@@ -5,6 +5,7 @@ use crate::{
      recording::{Recorder, RecordingState},
      source::{self, AviSource, ChildControl, DemoSource, Opened},
      tracker::{Measurement, Tracker},
@@ -246,7 +278,54 @@
  };
  use anyhow::{Context, Result, ensure};
  use std::{
-@@ -295,6 +296,12 @@
+@@ -35,6 +36,9 @@ pub struct State {
+     pub udp_dropped: u64,
+     pub zmq_dropped: u64,
+     pub recording: RecordingState,
++    pub recording_finalizations: Vec<RecordingState>,
++    pub paused: bool,
++    pub command_error: Option<String>,
+     /// What is being acquired, for example the camera name and mode.
+     pub source: String,
+     /// Why the configured camera was replaced by the sample video.
+@@ -69,6 +73,9 @@ enum Command {
+     LoadBackground,
+     DemoBackground,
+     Record(bool),
++    RecordTo(PathBuf),
++    StopRecordIf(PathBuf, String),
++    Pause(bool),
+ }
+ pub struct Engine {
+     state: Arc<Mutex<State>>,
+@@ -246,6 +253,26 @@ impl Engine {
+             .send(Command::Record(enabled))
+             .context("Acquisition has stopped")
+     }
++    pub fn record_to(&self, directory: PathBuf) -> Result<()> {
++        ensure!(directory.is_absolute(), "Recording root must be absolute");
++        self.sender
++            .send(Command::RecordTo(directory))
++            .context("Acquisition has stopped")
++    }
++    pub fn stop_recording_if(&self, directory: PathBuf, request_id: String) -> Result<()> {
++        ensure!(
++            directory.is_absolute(),
++            "Expected recording root must be absolute"
++        );
++        self.sender
++            .send(Command::StopRecordIf(directory, request_id))
++            .context("Acquisition has stopped")
++    }
++    pub fn pause(&self, paused: bool) -> Result<()> {
++        self.sender
++            .send(Command::Pause(paused))
++            .context("Acquisition has stopped")
++    }
+     pub fn load_background(&self) -> Result<()> {
+         self.sender
+             .send(Command::LoadBackground)
+@@ -295,6 +322,12 @@ fn run(
      fallback: bool,
  ) -> Result<()> {
      let (w, h, _) = config.source.dimensions();
@@ -259,7 +338,7 @@
      let opened = match source::open(&config, &path, child) {
          Ok(opened) => opened,
          Err(error) if fallback && matches!(config.source, SourceConfig::Camera { .. }) => {
-@@ -307,6 +314,7 @@
+@@ -307,6 +340,7 @@ fn run(
              let opened = source::sample_video()
                  .and_then(|video| {
                      let s = AviSource::open(&video, w, h, true, true).ok()?;
@@ -267,7 +346,7 @@
                      example =
                          source::sample_config(&video).and_then(|e| config.with_geometry_of(&e));
                      let name = video.file_name().unwrap_or_default().to_string_lossy();
-@@ -319,9 +327,12 @@
+@@ -319,9 +353,12 @@ fn run(
                          },
                      })
                  })
@@ -283,7 +362,7 @@
                  });
              if let Some(example) = &example {
                  config = example.clone();
-@@ -335,6 +346,11 @@
+@@ -335,6 +372,11 @@ fn run(
      };
      let mut source = opened.source;
      let sample = state.lock().unwrap().fallback.is_some();
@@ -295,12 +374,267 @@
      state.lock().unwrap().source = opened.description;
      let mut tracker = Tracker::new(&config, w, h);
      let mut recorder = if config.recording.enabled && !sample {
+@@ -351,6 +393,7 @@ fn run(
+     let mut frames = 0;
+     let mut dropped = 0;
+     let mut capture_bg = false;
++    let mut paused = false;
+     let mut subscribers: Vec<mpsc::SyncSender<Measurement>> = Vec::new();
+     {
+         let mut s = state.lock().unwrap();
+@@ -390,9 +433,56 @@ fn run(
+                         capture_bg = true;
+                         Ok(())
+                     }
+-                    Command::Record(true) if sample => Err(anyhow::anyhow!(
++                    Command::RecordTo(_) | Command::Record(true) if sample => Err(anyhow::anyhow!(
+                         "Recording is off while the sample plays; connect the camera and Restart"
+                     )),
++                    Command::Pause(value) => {
++                        if value
++                            && !paused
++                            && let Some(r) = &mut recorder
++                        {
++                            r.capture_paused();
++                        }
++                        paused = value;
++                        state.lock().unwrap().paused = value;
++                        Ok(())
++                    }
++                    Command::RecordTo(directory) => {
++                        if recorder.as_ref().is_some_and(|r| r.accepting()) {
++                            Err(anyhow::anyhow!(
++                                "A recording is already active; stop the owned take before starting another"
++                            ))
++                        } else {
++                            if let Some(old) = recorder.take() {
++                                draining.push(old);
++                            }
++                            let mut recording_config = config.clone();
++                            recording_config.recording.format = crate::config::VideoFormat::Mjpeg;
++                            recording_config.recording.directory =
++                                directory.to_string_lossy().into_owned();
++                            Recorder::start(&recording_config, &path).map(|r| {
++                                recorder = Some(r);
++                            })
++                        }
++                    }
++                    Command::StopRecordIf(expected, request_id) => {
++                        if let Some(r) = &mut recorder {
++                            if r.state()
++                                .directory
++                                .as_ref()
++                                .is_some_and(|directory| directory.starts_with(&expected))
++                            {
++                                r.request_owned_stop(request_id);
++                                Ok(())
++                            } else {
++                                Err(anyhow::anyhow!(
++                                    "Recorder belongs to another take; it was not stopped"
++                                ))
++                            }
++                        } else {
++                            Ok(())
++                        }
++                    }
+                     Command::Record(enabled) => {
+                         if enabled && recorder.as_ref().is_none_or(|r| !r.accepting()) {
+                             if let Some(old) = recorder.take() {
+@@ -449,10 +539,21 @@ fn run(
+                             s.message = "Live".into();
+                         }
+                         s.error = None;
++                        s.command_error = None;
++                    }
++                    Err(e) => {
++                        s.message = format!("{e:#}");
++                        s.command_error = Some(format!("{e:#}"));
+                     }
+-                    Err(e) => s.message = format!("{e:#}"),
+                 }
+             }
++            if paused {
++                if let Some(r) = &recorder {
++                    state.lock().unwrap().recording = r.state();
++                }
++                thread::sleep(Duration::from_millis(5));
++                continue;
++            }
+             let Some(raw) = source.next_frame(&stop)? else {
+                 if !stop.load(Ordering::Relaxed) {
+                     state.lock().unwrap().message = "End of video".into();
+@@ -495,6 +596,11 @@ fn run(
+                     if let Err(error) = old.finish() {
+                         prior_recording_error = Some(format!("{error:#}"));
+                     }
++                    let mut shared = state.lock().unwrap();
++                    if shared.recording_finalizations.len() >= 32 {
++                        shared.recording_finalizations.remove(0);
++                    }
++                    shared.recording_finalizations.push(old.state());
+                 } else {
+                     index += 1;
+                 }
+@@ -584,3 +690,39 @@ fn run(
+     output_result?;
+     Ok(())
+ }
++
++/// Shared state/commands for a reconnectable native GUI or headless endpoint.
++pub fn control_command(
++    engine: &Engine,
++    command: &str,
++    args: &serde_json::Value,
++) -> Result<serde_json::Value> {
++    match command {
++        "record_start" => engine.record_to(PathBuf::from(
++            args["directory"]
++                .as_str()
++                .context("record_start requires directory")?,
++        ))?,
++        "record_stop" => engine.stop_recording_if(
++            PathBuf::from(
++                args["expected_directory"]
++                    .as_str()
++                    .context("Owned stop requires expected_directory")?,
++            ),
++            args["stop_request_id"]
++                .as_str()
++                .context("Owned stop requires stop_request_id")?
++                .to_owned(),
++        )?,
++        "pause" => engine.pause(true)?,
++        "start" => engine.pause(false)?,
++        "status" => {}
++        _ => anyhow::bail!("Unsupported native command"),
++    }
++    let state = engine.state();
++    Ok(
++        serde_json::json!({"queued":command!="status","backend":"rekkefly","processId":std::process::id(),
++        "frames":state.frames,"paused":state.paused,"ended":state.finished,"error":state.error,"command_error":state.command_error,
++        "source":state.source,"fallback":state.fallback,"recording":state.recording,"recording_finalizations":state.recording_finalizations}),
++    )
++}
+diff --git a/src/gui.rs b/src/gui.rs
+index 961cc73..3c96cad 100644
+--- a/src/gui.rs
++++ b/src/gui.rs
+@@ -115,6 +115,7 @@ pub struct App {
+     autosaver: Option<Autosaver>,
+     last_autosave: Config,
+     shutdown: Arc<AtomicBool>,
++    control: Option<crate::native_mailbox::Mailbox>,
+ }
+ fn app_icon() -> egui::IconData {
+     let icon = image::load_from_memory(include_bytes!("../assets/rekkefly-64.png"))
+@@ -140,6 +141,7 @@ pub struct Launch {
+     /// Panels to open at start: "settings", "plots".
+     pub panels: Vec<String>,
+     pub shutdown: Arc<AtomicBool>,
++    pub control_directory: Option<(PathBuf, String)>,
+ }
+ fn window_title(config: &Config) -> String {
+     let source = match &config.source {
+@@ -173,6 +175,7 @@ pub fn launch(launch: Launch) -> eframe::Result<()> {
+         screenshot_after,
+         panels,
+         shutdown,
++        control_directory,
+     } = launch;
+     let config = overrides.apply(&saved);
+     let title = window_title(&config);
+@@ -203,6 +206,12 @@ pub fn launch(launch: Launch) -> eframe::Result<()> {
+                 autosaver: Some(Autosaver::new(path.clone())),
+                 last_autosave: config.clone(),
+                 shutdown,
++                control: control_directory
++                    .map(|(directory, instance)| {
++                        crate::native_mailbox::Mailbox::new(directory, instance, "rekkefly")
++                    })
++                    .transpose()
++                    .map_err(std::io::Error::other)?,
+                 config,
+                 saved,
+                 overrides,
+@@ -1257,6 +1266,14 @@ impl Drop for App {
+ }
+ impl eframe::App for App {
+     fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
++        if let Some(mut mailbox) = self.control.take() {
++            if let Err(error) = mailbox.poll(|command, args| self.control_command(command, args)) {
++                self.status = error;
++            }
++            self.control = Some(mailbox);
++            ctx.request_repaint_after(Duration::from_millis(40));
++        }
++
+         if self.shutdown.load(Ordering::Relaxed) {
+             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+         }
+@@ -1437,6 +1454,21 @@ impl eframe::App for App {
+         ));
+     }
+ }
++
++impl App {
++    fn control_command(
++        &mut self,
++        command: &str,
++        args: &serde_json::Value,
++    ) -> Result<serde_json::Value, String> {
++        let engine = self
++            .engine
++            .as_ref()
++            .ok_or("Tracker is not running; inspect its native window")?;
++        crate::engine::control_command(engine, command, args).map_err(|e| format!("{e:#}"))
++    }
++}
++
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+@@ -1515,6 +1547,7 @@ mod tests {
+             screenshot_after: Duration::from_secs(2),
+             screenshot_requested: false,
+             started: Instant::now(),
++            control: None,
+         }
+     }
+     #[test]
+@@ -1587,6 +1620,7 @@ mod tests {
+                 screenshot_after: Duration::from_secs(2),
+                 screenshot_requested: false,
+                 started: Instant::now(),
++                control: None,
+             };
+             let raw = |events| egui::RawInput {
+                 screen_rect: Some(Rect::from_min_size(Pos2::ZERO, Vec2::new(640.0, 480.0))),
+diff --git a/src/lib.rs b/src/lib.rs
+index bdb0499..858adf7 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -12,6 +12,7 @@ pub mod installation;
+ pub mod lock;
+ pub mod mcp;
+ pub mod measurement_log;
++pub mod native_mailbox;
+ pub mod output;
+ pub mod overlay;
+ pub mod persistence;
+diff --git a/src/main.rs b/src/main.rs
+index 6b922b0..e7ef5d5 100644
 --- a/src/main.rs
 +++ b/src/main.rs
-@@ -74,6 +74,10 @@
+@@ -74,6 +74,16 @@ struct Args {
      record: bool,
      #[arg(long, hide = true)]
      supervised: bool,
++    /// Reconnectable local recording control for this native window; no network listener.
++    #[arg(long, requires = "control_instance")]
++    control_dir: Option<PathBuf>,
++    /// Unique32-character launch identity for --control-dir.
++    #[arg(long, requires = "control_dir")]
++    control_instance: Option<String>,
 +    /// Fail if the requested camera cannot open; never substitute sample/demo input.
 +    /// Independent of supervision: closing the launcher does not stop this app.
 +    #[arg(long)]
@@ -308,7 +642,32 @@
      /// Create a sample configuration at --config and exit (never overwrites).
      #[arg(long)]
      init: bool,
-@@ -565,8 +569,8 @@
+@@ -510,7 +520,24 @@ fn run() -> Result<()> {
+         };
+         let started = std::time::Instant::now();
+         let engine = Engine::start_with(config, config_path, options)?;
++        let mut control = args
++            .control_dir
++            .clone()
++            .zip(args.control_instance.clone())
++            .map(|(directory, instance)| {
++                rekkefly::native_mailbox::Mailbox::new(directory, instance, "rekkefly")
++            })
++            .transpose()
++            .map_err(anyhow::Error::msg)?;
+         while !engine.is_finished() {
++            if let Some(mailbox) = &mut control {
++                mailbox
++                    .poll(|command, args| {
++                        rekkefly::engine::control_command(&engine, command, args)
++                            .map_err(|e| format!("{e:#}"))
++                    })
++                    .map_err(anyhow::Error::msg)?;
++            }
+             if stop.load(Ordering::Relaxed) {
+                 engine.stop();
+             }
+@@ -565,8 +592,8 @@ fn run() -> Result<()> {
              limit: args.frames,
              // A rig launched for an experiment must show its camera error,
              // never a sample that could be mistaken for live data.
@@ -319,7 +678,15 @@
              ..Default::default()
          };
          let result = rekkefly::gui::launch(rekkefly::gui::Launch {
-@@ -626,6 +630,13 @@
+@@ -578,6 +605,7 @@ fn run() -> Result<()> {
+             screenshot_after: Duration::from_secs_f64(args.screenshot_after.clamp(0.5, 600.0)),
+             panels: args.show.clone(),
+             shutdown: stop,
++            control_directory: args.control_dir.zip(args.control_instance),
+         })
+         .map_err(|e| anyhow::anyhow!("GUI: {e}"));
+         drop(lock);
+@@ -626,6 +654,13 @@ mod tests {
          let a = Args::try_parse_from(["rekkefly", "--device", "1", "--zmq-port", "9900"]).unwrap();
          assert_eq!(a.device.as_deref(), Some("1"));
          assert_eq!(a.zmq_port, Some(9900));
@@ -333,9 +700,56 @@
          let a = Args::try_parse_from(["rekkefly", "clip", "in.avi", "out.avi", "--duration", "30"])
              .unwrap();
          assert!(matches!(a.command, Some(Tool::Clip { duration: Some(d), .. }) if d == 30.0));
+diff --git a/src/mcp.rs b/src/mcp.rs
+index 6eba54f..cf25ea2 100644
+--- a/src/mcp.rs
++++ b/src/mcp.rs
+@@ -545,6 +545,9 @@ impl Server {
+             "own_markers": state.example.is_some(),
+             "recording": {
+                 "active": state.recording.active,
++                "finalized": state.recording.finalized,
++                "take_id": state.recording.take_id,
++                "frames_accepted": state.recording.accepted,
+                 "frames_written": state.recording.written,
+                 "megabytes": (state.recording.bytes as f64 / 1e4).round() / 100.0,
+                 "directory": state.recording.directory,
+@@ -695,7 +698,29 @@ impl Server {
+         let (label, rig) = self.rig(args)?;
+         let enabled = flag(args, "enabled")?.context("enabled is required")?;
+         rig.engine.record(enabled)?;
+-        std::thread::sleep(Duration::from_millis(150));
++        let deadline = Instant::now() + Duration::from_secs(15);
++        loop {
++            let state = rig.engine.state();
++            if let Some(error) = state.recording.error {
++                anyhow::bail!(error);
++            }
++            let complete = if enabled {
++                state.recording.active && state.recording.accepted > 0
++            } else {
++                !state.recording.active
++                    && (state.recording.take_id.is_none()
++                        || state.recording.finalized
++                            && state.recording.accepted == state.recording.written)
++            };
++            if complete {
++                break;
++            }
++            ensure!(
++                Instant::now() < deadline,
++                "Native recording did not acknowledge first frame/finalized writers before timeout"
++            );
++            std::thread::sleep(Duration::from_millis(10));
++        }
+         Ok(self.status(label).into())
+     }
+     fn save_background(&self, args: &Map<String, Value>) -> Result<Output> {
+diff --git a/src/output.rs b/src/output.rs
+index 5ec5179..a89485b 100644
 --- a/src/output.rs
 +++ b/src/output.rs
-@@ -2,7 +2,7 @@
+@@ -2,7 +2,7 @@ use crate::{
      config::{Config, OutputConfig},
      measurement_log::MeasurementLog,
      tracker::Measurement,
@@ -344,7 +758,7 @@
  };
  use anyhow::{Context, Result};
  use std::{
-@@ -82,6 +82,20 @@
+@@ -82,6 +82,20 @@ impl Publisher {
  
          Ok(sent)
      }
@@ -365,6 +779,78 @@
      pub fn flush(&mut self) -> Result<()> {
          if let Some(w) = &mut self.recording {
              w.finish()?;
+diff --git a/src/recording.rs b/src/recording.rs
+index a7c9df1..2553271 100644
+--- a/src/recording.rs
++++ b/src/recording.rs
+@@ -18,9 +18,14 @@ use std::{
+     thread::{self, JoinHandle},
+ };
+ 
+-#[derive(Clone, Default, Debug)]
++#[derive(Clone, Default, Debug, Serialize)]
+ pub struct RecordingState {
+     pub active: bool,
++    /// True only after AVI/timestamp writers and the completion receipt have closed.
++    pub finalized: bool,
++    pub take_id: Option<String>,
++    pub control_stop_id: Option<String>,
++    pub capture_pause_count: u64,
+     pub accepted: u64,
+     pub written: u64,
+     /// Bytes written to video segments so far.
+@@ -77,6 +82,9 @@ impl Recorder {
+             mpsc::sync_channel::<Arc<GrayFrame>>(config.recording.queue_frames);
+         let shared = Arc::new(Mutex::new(RecordingState {
+             active: true,
++            take_id: directory
++                .file_name()
++                .map(|name| name.to_string_lossy().into_owned()),
+             directory: Some(directory),
+             ..Default::default()
+         }));
+@@ -90,6 +98,21 @@ impl Recorder {
+                 if let Err(error) = result {
+                     state.error = Some(format!("Video recording: {error:#}"));
+                 }
++                let mut receipt = state.clone();
++                receipt.finalized = true;
++                let completion = (|| -> Result<()> {
++                    let directory = receipt.directory.as_ref().context("Recording directory missing")?;
++                    let body = serde_json::json!({"schemaVersion":1,"takeId":receipt.take_id,"directory":directory,
++                        "state":if receipt.error.is_none(){"complete"}else{"failed"},"writersDrained":true,
++                        "control_stop_id":receipt.control_stop_id,"capture_pause_count":receipt.capture_pause_count,
++                        "accepted":receipt.accepted,"written":receipt.written,"bytes":receipt.bytes,"error":receipt.error});
++                    let temporary = directory.join("completion.json.writing");
++                    fs::write(&temporary, serde_json::to_vec_pretty(&body)?)?;
++                    fs::rename(temporary, directory.join("completion.json"))?;
++                    Ok(())
++                })();
++                if let Err(error) = completion { state.error = Some(format!("Recording completion receipt: {error:#}")); }
++                state.finalized = true;
+             })?;
+         Ok(Self {
+             sender: Some(sender),
+@@ -103,6 +126,17 @@ impl Recorder {
+     pub fn accepting(&self) -> bool {
+         self.sender.is_some()
+     }
++    pub fn request_owned_stop(&mut self, request_id: String) {
++        if self.accepting() {
++            self.shared.lock().unwrap().control_stop_id = Some(request_id);
++        }
++        self.request_stop();
++    }
++    pub fn capture_paused(&mut self) {
++        if self.accepting() {
++            self.shared.lock().unwrap().capture_pause_count += 1;
++        }
++    }
+     pub fn request_stop(&mut self) {
+         self.sender.take();
+         self.shared.lock().unwrap().active = false;
+diff --git a/src/zmq_output.rs b/src/zmq_output.rs
+index b7ef1dc..1f51f0c 100644
 --- a/src/zmq_output.rs
 +++ b/src/zmq_output.rs
 @@ -9,10 +9,11 @@
@@ -381,11 +867,10 @@
  //! subscriber more than `HIGH_WATER_MARK` messages behind misses messages.
  use crate::tracker::Measurement;
  use anyhow::{Context, Result, ensure};
-@@ -50,6 +51,31 @@
-     pub roll: f64,
+@@ -51,6 +52,31 @@ pub struct KineflyMessage {
      pub frame_number: u64,
      pub timestamp_unix: f64,
-+}
+ }
 +
 +/// Identity of the source actually opened, rather than the requested camera.
 +#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -410,10 +895,11 @@
 +struct SourceProvenance {
 +    kind: SourceKind,
 +    fallback: bool,
- }
++}
  impl From<&Measurement> for KineflyMessage {
      fn from(m: &Measurement) -> Self {
-@@ -199,6 +225,7 @@
+         // The bridge reads angles[0], not a separately selected primary angle.
+@@ -199,6 +225,7 @@ pub struct ZmqPublisher {
      shared: Arc<Shared>,
      acceptor: Option<JoinHandle<()>>,
      address: SocketAddr,
@@ -421,7 +907,7 @@
      /// Messages a subscriber missed because it fell behind.
      pub dropped: u64,
  }
-@@ -228,6 +255,7 @@
+@@ -228,6 +255,7 @@ impl ZmqPublisher {
              shared,
              acceptor: Some(acceptor),
              address,
@@ -429,7 +915,7 @@
              dropped: 0,
          })
      }
-@@ -236,8 +264,23 @@
+@@ -236,9 +264,24 @@ impl ZmqPublisher {
          self.address
      }
      pub fn send(&mut self, measurement: &Measurement) -> Result<()> {
@@ -447,16 +933,19 @@
 +        }
 +        self.send_bytes(json.into_bytes());
          Ok(())
-+    }
+     }
 +    /// Set once after acquisition opened; absence retains the exact legacy wire JSON.
 +    pub fn set_source_provenance(&mut self, kind: SourceKind, fallback: bool) {
 +        self.source = Some(SourceProvenance { kind, fallback });
-     }
++    }
      /// Queues one message for every subscriber whose topics match; never blocks.
      pub fn send_bytes(&mut self, message: Vec<u8>) {
+         let message: Arc<[u8]> = message.into();
+diff --git a/tests/sources.rs b/tests/sources.rs
+index 0089ded..e24af00 100644
 --- a/tests/sources.rs
 +++ b/tests/sources.rs
-@@ -146,6 +146,84 @@
+@@ -146,6 +146,84 @@ fn missing_camera_falls_back_to_a_sample_only_when_allowed() {
      engine.wait();
  }
  #[test]
@@ -541,9 +1030,11 @@
  fn a_busy_output_port_turns_outputs_off_in_the_gui_but_fails_headless() {
      let busy = std::net::UdpSocket::bind("127.0.0.1:0").unwrap();
      let mut config = Config::demo();
+diff --git a/tests/zmq.rs b/tests/zmq.rs
+index 1d7f0eb..add8a10 100644
 --- a/tests/zmq.rs
 +++ b/tests/zmq.rs
-@@ -3,7 +3,7 @@
+@@ -3,7 +3,7 @@ use rekkefly::{
      frame::GrayFrame,
      output::Publisher,
      tracker::Tracker,
@@ -552,12 +1043,10 @@
  };
  use std::{
      io::{Read, Write},
-@@ -89,6 +89,59 @@
-         assert_eq!(value.yaw, 0.0);
-     });
+@@ -91,6 +91,59 @@ fn zmq_pub_sends_one_utf8_json_frame_and_rejects_port_conflicts() {
      publisher.flush().unwrap();
-+}
-+
+ }
+ 
 +#[test]
 +fn additive_source_provenance_keeps_all_legacy_numerical_fields_unchanged() {
 +    let runtime = tokio::runtime::Builder::new_current_thread()
@@ -609,6 +1098,162 @@
 +            publisher.finish().unwrap();
 +        }
 +    });
- }
- 
++}
++
  /// The publisher and its port, for tests that speak the wire protocol.
+ fn publisher() -> (ZmqPublisher, u16) {
+     let port = std::net::TcpListener::bind("127.0.0.1:0")
+diff --git a/src/native_mailbox.rs b/src/native_mailbox.rs
+new file mode 100644
+index 0000000..fa7e1e0
+--- /dev/null
++++ b/src/native_mailbox.rs
+@@ -0,0 +1,148 @@
++//! Opt-in, reconnectable local control of the existing native window/engine.
++//! Requests carry an endpoint instance identity and expiry. No network listener.
++use serde_json::{Value, json};
++use std::{
++    collections::BTreeMap,
++    fs,
++    path::{Path, PathBuf},
++    time::{SystemTime, UNIX_EPOCH},
++};
++
++const MAX_BYTES: u64 = 65_536;
++pub struct Mailbox {
++    directory: PathBuf,
++    instance: String,
++    replies: BTreeMap<String, (u64, Value)>,
++}
++fn now_ms() -> Result<u64, String> {
++    SystemTime::now()
++        .duration_since(UNIX_EPOCH)
++        .map(|d| d.as_millis() as u64)
++        .map_err(|e| e.to_string())
++}
++fn atomic(path: &Path, value: &Value) -> Result<(), String> {
++    let temp = path.with_extension("writing");
++    fs::write(&temp, serde_json::to_vec(value).map_err(|e| e.to_string())?)
++        .map_err(|e| e.to_string())?;
++    fs::rename(temp, path).map_err(|e| e.to_string())
++}
++impl Mailbox {
++    pub fn new(directory: PathBuf, instance: String, backend: &str) -> Result<Self, String> {
++        if !directory.is_absolute()
++            || instance.len() != 32
++            || !instance.bytes().all(|b| b.is_ascii_hexdigit())
++        {
++            return Err("control directory must be absolute and control instance must be 32 hexadecimal characters".into());
++        }
++        fs::create_dir_all(&directory).map_err(|e| e.to_string())?;
++        #[cfg(unix)]
++        {
++            use std::os::unix::fs::PermissionsExt;
++            fs::set_permissions(&directory, fs::Permissions::from_mode(0o700))
++                .map_err(|e| e.to_string())?;
++        }
++        let descriptor = directory.join("endpoint.json");
++        if descriptor.exists() {
++            let old: Value =
++                serde_json::from_slice(&fs::read(&descriptor).map_err(|e| e.to_string())?)
++                    .map_err(|e| e.to_string())?;
++            if old["instance"].as_str() != Some(instance.as_str()) {
++                return Err("control directory belongs to another tracker instance; choose a fresh directory".into());
++            }
++        }
++        atomic(
++            &descriptor,
++            &json!({"protocolVersion":1,"instance":instance,"backend":backend,"processId":std::process::id(),
++            "startedUtcMilliseconds":now_ms()?,"capabilities":["native-gui-control","per-take-finalization", "owned-take-stop-v1"],
++            "commands":["status","record_start","record_stop","start","pause"],
++            "semantics":"Commands may queue native worker changes. Inspect recording state and the exact take finalization receipt; queued or inactive is not completion."}),
++        )?;
++        Ok(Self {
++            directory,
++            instance,
++            replies: BTreeMap::new(),
++        })
++    }
++    pub fn poll(
++        &mut self,
++        mut execute: impl FnMut(&str, &Value) -> Result<Value, String>,
++    ) -> Result<(), String> {
++        let current = now_ms()?;
++        self.replies.retain(|_, (expiry, _)| *expiry >= current);
++        let mut requests: Vec<_> = fs::read_dir(&self.directory)
++            .map_err(|e| e.to_string())?
++            .filter_map(Result::ok)
++            .map(|e| e.path())
++            .filter(|p| {
++                p.file_name().and_then(|n| n.to_str()).is_some_and(|n| {
++                    n.strip_suffix(".request.json").is_some_and(|id| {
++                        id.len() == 32 && id.bytes().all(|b| b.is_ascii_hexdigit())
++                    })
++                })
++            })
++            .collect();
++        requests.sort();
++        for path in requests.into_iter().take(8) {
++            let Some(name) = path.file_name().and_then(|n| n.to_str()) else {
++                continue;
++            };
++            let id = name.trim_end_matches(".request.json");
++            if id.len() != 32 || !id.bytes().all(|b| b.is_ascii_hexdigit()) {
++                continue;
++            }
++            let response_path = self.directory.join(format!("{id}.response.json"));
++            if let Some((_, cached)) = self.replies.get(id) {
++                atomic(&response_path, cached)?;
++                let _ = fs::remove_file(&path);
++                continue;
++            }
++            let outcome = (|| {
++                if self.replies.len() >= 4096 {
++                    return Err(
++                        "control request history is full; wait for expired requests to clear"
++                            .into(),
++                    );
++                }
++                if fs::metadata(&path).map_err(|e| e.to_string())?.len() > MAX_BYTES {
++                    return Err("request exceeds 64 KiB".into());
++                }
++                let req: Value =
++                    serde_json::from_slice(&fs::read(&path).map_err(|e| e.to_string())?)
++                        .map_err(|e| e.to_string())?;
++                if req["id"].as_str() != Some(id)
++                    || req["instance"].as_str() != Some(self.instance.as_str())
++                {
++                    return Err("request does not match this endpoint instance".into());
++                }
++                let expires = req["expiresUtcMilliseconds"]
++                    .as_u64()
++                    .ok_or("request expiry is required")?;
++                let now = now_ms()?;
++                if expires < now || expires > now.saturating_add(120_000) {
++                    return Err("request expired or expiry exceeds two minutes".into());
++                }
++                let command = req["command"].as_str().ok_or("command is required")?;
++                if !matches!(
++                    command,
++                    "status" | "record_start" | "record_stop" | "start" | "pause"
++                ) {
++                    return Err("unsupported recording-control command".into());
++                }
++                let args = req.get("args").cloned().unwrap_or_else(|| json!({}));
++                if !args.is_object() {
++                    return Err("args must be an object".into());
++                }
++                execute(command, &args)
++            })();
++            let response = match outcome {
++                Ok(value) => json!({"id":id,"instance":self.instance,"ok":true,"result":value}),
++                Err(error) => json!({"id":id,"instance":self.instance,"ok":false,"error":error}),
++            };
++            atomic(&response_path, &response)?;
++            self.replies
++                .insert(id.to_owned(), (current.saturating_add(120_000), response));
++            fs::remove_file(path).map_err(|e| e.to_string())?;
++        }
++        Ok(())
++    }
++}

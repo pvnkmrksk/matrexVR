@@ -1,27 +1,27 @@
 .recording-library-tools { align-items: center; margin: 10px 0; flex-wrap: wrap; }
 #recording-library-search { flex-grow: 1; min-width: 200px; max-width: 520px; margin-right: 12px; }
-.recording-library-state { color: rgb(72, 103, 125); font-size: 12px; white-space: normal; margin: 3px 0 14px; }
+.recording-library-state { color: rgb(179, 199, 214); font-size: 12px; white-space: normal; margin: 3px 0 14px; }
 .row.recording-library-split { flex-grow: 1; min-height: 220px; align-items: flex-start; }
 .recording-library-local { width: 42%; height: 100%; min-width: 260px; min-height: 0; margin-right: 20px; align-self: flex-start; }
-.recording-library-root { color: rgb(94, 118, 137); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 100%; flex-shrink: 1; margin: 5px 0 10px; }
-#recording-library-list { min-height: 200px; border-width: 1px; border-color: rgb(205, 218, 228); background-color: rgb(255, 255, 255); }
-.recording-library-row { padding: 10px 12px; border-bottom-width: 1px; border-bottom-color: rgb(218, 228, 235); }
-.recording-library-name { font-size: 14px; color: rgb(35, 67, 89); -unity-font-style: bold; margin-bottom: 4px; }
-.recording-library-date { font-size: 12px; color: rgb(89, 114, 134); margin-bottom: 4px; }
-.recording-library-row-meta { font-size: 12px; color: rgb(73, 102, 122); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.recording-library-empty { white-space: normal; color: rgb(89, 114, 134); margin: 20px 0; }
-.recording-library-details { border-radius: 6px; flex-grow: 1; flex-basis: 0; min-width: 260px; align-self: stretch; border-width: 1px; border-color: rgb(205, 218, 228); padding: 16px; background-color: rgb(255, 255, 255); }
-.recording-library-detail-title { font-size: 23px; color: rgb(34, 66, 89); margin-bottom: 8px; -unity-font-style: bold; white-space: normal; }
-.recording-library-copy { font-size: 12px; color: rgb(78, 107, 129); white-space: normal; margin: 5px 0 9px; }
+.recording-library-root { color: rgb(181, 197, 209); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 100%; flex-shrink: 1; margin: 5px 0 10px; }
+#recording-library-list { min-height: 200px; border-width: 1px; border-color: rgb(62, 68, 72); background-color: rgb(27, 27, 27); }
+.recording-library-row { padding: 10px 12px; border-bottom-width: 1px; border-bottom-color: rgb(63, 68, 71); }
+.recording-library-name { font-size: 14px; color: rgb(183, 204, 218); -unity-font-style: bold; margin-bottom: 4px; }
+.recording-library-date { font-size: 12px; color: rgb(181, 197, 210); margin-bottom: 4px; }
+.recording-library-row-meta { font-size: 12px; color: rgb(181, 199, 212); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recording-library-empty { white-space: normal; color: rgb(181, 197, 210); margin: 20px 0; }
+.recording-library-details { border-radius: 6px; flex-grow: 1; flex-basis: 0; min-width: 260px; align-self: stretch; border-width: 1px; border-color: rgb(62, 68, 72); padding: 16px; background-color: rgb(27, 27, 27); }
+.recording-library-detail-title { font-size: 23px; color: rgb(183, 204, 219); margin-bottom: 8px; -unity-font-style: bold; white-space: normal; }
+.recording-library-copy { font-size: 12px; color: rgb(180, 199, 213); white-space: normal; margin: 5px 0 9px; }
 .recording-library-facts { flex-wrap: wrap; margin: 12px 0; }
 .recording-library-fact { min-width: 120px; margin: 5px 15px 8px 0; }
-.recording-library-fact-value { font-size: 18px; color: rgb(29, 121, 95); }
-.recording-library-file-name { font-size: 12px; color: rgb(55, 99, 130); margin-top: 8px; white-space: normal; }
-.recording-library-warning { color: rgb(146, 92, 29); font-size: 12px; white-space: normal; margin: 6px 0; }
-#recording-library-external-path { margin-top: 12px; color: rgb(87, 115, 136); }
+.recording-library-fact-value { font-size: 18px; color: rgb(150, 210, 193); }
+.recording-library-file-name { font-size: 12px; color: rgb(173, 202, 222); margin-top: 8px; white-space: normal; }
+.recording-library-warning { color: rgb(227, 192, 151); font-size: 12px; white-space: normal; margin: 6px 0; }
+#recording-library-external-path { margin-top: 12px; color: rgb(179, 198, 211); }
 .narrow-layout .recording-library-split { flex-direction: column; }
 .narrow-layout .recording-library-local { width: 100%; height: 260px; min-height: 220px; max-height: 280px; margin-right: 0; margin-bottom: 12px; }
 .narrow-layout .recording-library-details { border-radius: 6px; min-height: 200px; }
 
-#recording-library-list .unity-collection-view__item:hover { background-color: rgb(240, 247, 250); }
-#recording-library-list .unity-collection-view__item--selected { background-color: rgb(226, 242, 235); }
+#recording-library-list .unity-collection-view__item:hover { background-color: rgb(25, 28, 29); }
+#recording-library-list .unity-collection-view__item--selected { background-color: rgb(22, 29, 26); }

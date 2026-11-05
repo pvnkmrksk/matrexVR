@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/pvnkmrksk/hejjetrak",
+  "sourceRevision": "6c0bea66d77d55eab5b3669d90ca3c0dae9a2dd7",
+  "sourceUrl": "https://github.com/pvnkmrksk/hejjetrak/commit/6c0bea66d77d55eab5b3669d90ca3c0dae9a2dd7",
+  "sourceVersion": "0.3.2",
+  "patch": "tools/native_patches/hejjetrac-recording-macos.patch",
+  "platform": "macos-arm64",
+  "templateArchive": {
+    "asset": "hejjetrac-macos-arm64.zip",
+    "url": "https://github.com/pvnkmrksk/hejjetrak/releases/download/v0.3.2/hejjetrac-macos-arm64.zip",
+    "sha256": "26072da06436829cc5cccce0bbad921b9f47f22eb08eaeb370e59cd36616c832",
+    "sizeBytes": 23848165
+  },
+  "patchSha256": "f8a325f3da6cb1d2497f4e06987d8925318391683e50c70da921917971a47173",
+  "changedFiles": [
+    "apps/fictrac-desktop/src/control.rs",
+    "apps/fictrac-desktop/src/main.rs",
+    "apps/fictrac-desktop/src/native_mailbox.rs",
+    "apps/fictrac-desktop/src/runtime.rs",
+    "docs/architecture.md",
+    "docs/validation.md"
+  ],
+  "capabilities": [
+    "native-gui-control",
+    "per-take-finalization",
+    "owned-take-stop-v1"
+  ],
+  "purpose": "Local source adapter only; no upstream publication or claim about unchanged other-platform binaries"
+}

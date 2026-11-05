@@ -40,14 +40,14 @@ public sealed class ExperimentPhase
         }
         if (!phases.Any(p => p.Name == "stimulus"))
             throw new ArgumentException("A phased experiment requires an enabled stimulus object with durationSeconds.");
-        if (document.Properties().Any(p => p.Name != "preStimulus" && p.Name != "stimulus" && p.Name != "postStimulus"))
+        if (document.Properties().Any(p => p.Name != "preStimulus" && p.Name != "stimulus" && p.Name != "postStimulus" && p.Name != "title" && p.Name != "comments" && p.Name != "description"))
             throw new ArgumentException("Put experiment settings inside preStimulus, stimulus or postStimulus; do not mix flat and phased schemas.");
         return phases;
     }
 }
 
 /// <summary>Changes conditions on the existing scene, after movement and heading sampling.</summary>
-[DefaultExecutionOrder(1500)]
+[DefaultExecutionOrder(1100)]
 public sealed class ExperimentPhases : MonoBehaviour
 {
     internal const string PayloadKey = "__experimentPhase";

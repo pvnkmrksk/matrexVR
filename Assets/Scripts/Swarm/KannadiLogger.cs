@@ -1,23 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System;
-using System.Text;
-using System.IO.Compression;
 
 /// <summary>
 /// Logs positions and orientations of Kannadi clones with VR index information.
 /// </summary>
-[DefaultExecutionOrder(200)]
+[DefaultExecutionOrder(1300)]
 public class KannadiLogger : MonoBehaviour
 {
     private string directoryPath;
     private string logPath;
-    private StreamWriter logFile;
+    private AsyncSwarmWriter writer;
     private bool closedForArchive;
     private Kannadi kannadi;
     private int vrIndex = 0; // Will be extracted from GameObject name (VR1, VR2, etc.)
+    private GameObject[] capturedClones;
+    private RecordedAnimationCapture[] animationCaptures;
+    private string[] names;
+    public double CaptureMilliseconds { get; private set; }
+    public int PendingFrames => writer?.PendingFrames ?? 0;
+    public long DroppedFrames => writer?.DroppedFrames ?? 0;
+    public string Failure => writer?.Failure;
 
     void Start()
     {
@@ -58,26 +61,37 @@ public class KannadiLogger : MonoBehaviour
             $"{date}_{time}_{sceneName}_Kannadi_VR{vrIndex}_Clones.csv.gz"
         );
 
-        logFile = new StreamWriter(
-            new GZipStream(File.Create(logPath), System.IO.Compression.CompressionLevel.Optimal)
-        );
-
-        // Write header
-        logFile.WriteLine(
-            "Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius,skyboxId,skyboxSampleUtc,experimentPhase"
-        );
+        writer=new AsyncSwarmWriter(logPath,
+            "Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius,skyboxId,skyboxSampleUtc,experimentPhase,AnimationState,UnityFrame,ScaleX,ScaleY,ScaleZ",
+            AsyncSwarmWriter.RowLayout.Kannadi);
     }
 
     void LateUpdate()
     {
-        if (kannadi == null || logFile == null)
+        long captureStarted = System.Diagnostics.Stopwatch.GetTimestamp();
+        CaptureFrame();
+        CaptureMilliseconds = 1000.0 * (System.Diagnostics.Stopwatch.GetTimestamp() - captureStarted) / System.Diagnostics.Stopwatch.Frequency;
+    }
+
+    private void CaptureFrame()
+    {
+        if (closedForArchive || kannadi == null || writer == null)
             return;
+        if(writer.Failure!=null) { StopForEvidenceFailure(writer.Failure);return; }
 
         GameObject[] clones = kannadi.Clones;
         if (clones == null)
             return;
-
-        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        if (!ReferenceEquals(capturedClones, clones))
+        {
+            capturedClones = clones; animationCaptures = new RecordedAnimationCapture[clones.Length];names=new string[clones.Length];
+            for (int i = 0; i < clones.Length; i++) if (clones[i] != null) {animationCaptures[i] = new RecordedAnimationCapture(clones[i]);names[i]=clones[i].name;}
+        }
+        var frame=writer.Rent(clones.Length);
+        frame.timestamp=RecordedFrameClock.Now;frame.unityFrame=Time.frameCount;frame.vrIndex=vrIndex;
+        frame.numberOfRings=kannadi.numberOfRings;frame.hexRadius=kannadi.hexRadius;
+        frame.skyboxId=NightSkyController.CurrentId;frame.skyboxSampleUtc=NightSkyController.CurrentSampleUtc;
+        frame.phase=MainController.RecordedExperimentPhase;
 
         for (int i = 0; i < clones.Length; i++)
         {
@@ -86,11 +100,13 @@ public class KannadiLogger : MonoBehaviour
                 Vector3 position = clones[i].transform.position;
                 Vector3 rotation = clones[i].transform.rotation.eulerAngles;
 
-                string data = FormattableString.Invariant($"{timestamp},{vrIndex},{i},{clones[i].name},{position.x},{position.y},{position.z},{rotation.x},{rotation.y},{rotation.z},{kannadi.numberOfRings},{kannadi.hexRadius},{NightSkyController.CurrentId},{NightSkyController.CurrentSampleUtc},{MainController.RecordedExperimentPhase}");
-
-                logFile.WriteLine(data);
+                Vector3 scale=clones[i].transform.lossyScale;
+                frame.agents[frame.count++]=new AsyncSwarmWriter.Agent {index=i,name=names[i],x=position.x,y=position.y,z=position.z,
+                    rx=rotation.x,ry=rotation.y,rz=rotation.z,sx=scale.x,sy=scale.y,sz=scale.z,
+                    animationState=animationCaptures[i]?.Capture()??""};
             }
         }
+        if(!writer.Submit(frame))StopForEvidenceFailure("The bounded population recording queue could not accept the rendered frame.");
     }
 
     void OnDestroy() => CloseForArchive();
@@ -98,11 +114,12 @@ public class KannadiLogger : MonoBehaviour
     public void CloseForArchive()
     {
         closedForArchive = true;
-        if (logFile != null)
-        {
-            logFile.Flush();
-            logFile.Dispose();
-            logFile = null;
-        }
+        writer?.Complete();
+    }
+    private void StopForEvidenceFailure(string reason)
+    {
+        closedForArchive=true;
+        var error=new IOException("Kannadi recording evidence could not be preserved: "+reason);
+        if(MainController.Instance!=null)MainController.Instance.FailRecordingEvidence(error);else Debug.LogException(error);
     }
 }

@@ -19,7 +19,7 @@ def main():
     dotnet = shutil.which('dotnet') or '/usr/local/share/dotnet/dotnet'
     versions = [int(v) for v in re.findall(r'^(\d+)\.', subprocess.check_output([dotnet, '--list-sdks'], text=True), re.MULTILINE) if int(v) >= 6]
     dll = next((repo / 'Library/PackageCache').glob('com.unity.nuget.newtonsoft-json@*/Runtime/Newtonsoft.Json.dll'))
-    paths = ['Assets/Scripts/Replay/ReplaySessionArchive.cs', 'Assets/Scripts/Replay/RecordedPosePolicy.cs',
+    paths = ['Assets/Scripts/Replay/ReplayPresentationJournal.cs', 'Assets/Scripts/Replay/ReplaySessionArchive.cs', 'Assets/Scripts/Replay/RecordedPosePolicy.cs',
              'Assets/Scripts/Loggers/RunConfigArchive.cs', 'Assets/Scripts/Loggers/RecordedCsv.cs',
              'Assets/Scripts/Loggers/RecordingSummary.cs', 'tools/replay_compatibility/Stubs.cs',
              'Assets/Scripts/Loggers/PlayerBuildIdentity.cs', 'Assets/Scripts/Swarm/AsyncSwarmWriter.cs',

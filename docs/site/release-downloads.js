@@ -31,13 +31,21 @@
     return matches[0] || null;
   }
 
+  function detectPlatform(value) {
+    if (/android|iphone|ipad|ipod/i.test(value)) return null;
+    if (/mac|darwin/i.test(value)) return 'macos';
+    if (/win/i.test(value)) return 'windows';
+    if (/linux|x11/i.test(value) && !/android/i.test(value)) return 'linux';
+    return null;
+  }
+
   function formatSize(bytes) {
     return bytes >= 1024 * 1024 * 1024 ? (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB' :
       Math.max(1, Math.round(bytes / (1024 * 1024))) + ' MB';
   }
 
   if (typeof module === 'object' && module.exports) {
-    module.exports = { availableReleases: availableReleases, platformAsset: platformAsset, formatSize: formatSize };
+    module.exports = { availableReleases: availableReleases, platformAsset: platformAsset, formatSize: formatSize, detectPlatform: detectPlatform };
     return;
   }
 
@@ -71,6 +79,15 @@
         if (os === 'macos' && macDetails) macDetails.textContent = 'Desktop player';
       }
     });
+    const hero = document.getElementById('hero-download');
+    const platform = navigator.userAgentData?.platform || navigator.platform || navigator.userAgent;
+    const detected = /mac/i.test(platform) && navigator.maxTouchPoints > 1 ? null : detectPlatform(platform);
+    const heroAsset = platformAsset(release, detected);
+    if (hero) {
+      hero.href = heroAsset ? heroAsset.browser_download_url : '#downloads';
+      hero.textContent = heroAsset ? 'Download Now — ' + ({ macos: 'macOS', windows: 'Windows', linux: 'Linux' })[detected] + ' ↓' : 'Download Now ↓';
+      hero.setAttribute('aria-label', heroAsset ? 'Download ' + release.tag_name + ' for ' + detected + ', ' + formatSize(heroAsset.size) : 'Choose a platform download');
+    }
     status.textContent = release.tag_name + ' · ' + found + ' of 3 operating-system archives available. ' +
       'Published ' + new Date(release.published_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) + '.';
   }

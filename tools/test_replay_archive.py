@@ -27,10 +27,13 @@ def main():
     if dll is None:
         raise SystemExit('Open this project in Unity once to import the pinned Newtonsoft dependency.')
     versions = [int(v) for v in re.findall(r'^(\d+)\.', subprocess.check_output([dotnet, '--list-sdks'], text=True), re.MULTILINE) if int(v) >= 6]
-    paths = ['Assets/Scripts/Replay/RecordedPosePolicy.cs', 'Assets/Scripts/Replay/ReplaySessionArchive.cs', 'Assets/Scripts/Replay/ReplayAgentStream.cs', 'Assets/Scripts/Replay/ReplayStimulusState.cs', 'Assets/Scripts/Loggers/RecordedCsv.cs', 'Assets/Scripts/Swarm/AsyncSwarmWriter.cs', 'Assets/Scripts/Loggers/RunConfigArchive.cs', 'tools/replay_compatibility/Stubs.cs', 'tools/replay_compatibility/Regression.cs']
+    paths = ['Assets/Scripts/Replay/ReplayPresentationJournal.cs', 'Assets/Scripts/Replay/RecordedPosePolicy.cs', 'Assets/Scripts/Replay/ReplaySessionArchive.cs', 'Assets/Scripts/Replay/ReplayAgentStream.cs', 'Assets/Scripts/Replay/ReplayStimulusState.cs', 'Assets/Scripts/Loggers/RecordedCsv.cs', 'Assets/Scripts/Swarm/AsyncSwarmWriter.cs', 'Assets/Scripts/Loggers/RunConfigArchive.cs', 'tools/replay_compatibility/Stubs.cs', 'tools/replay_compatibility/Regression.cs']
     with tempfile.TemporaryDirectory(prefix='matrex-replay-regression-') as tmp:
         root = Path(tmp)
         includes = ''.join(f'<Compile Include="{escape(str(repo / path))}"/>' for path in paths)
+        identity=root/'IdentityStub.cs'
+        identity.write_text('public static class PlayerBuildIdentity { public static Newtonsoft.Json.Linq.JObject Capture()=>new Newtonsoft.Json.Linq.JObject { ["buildGuid"]="fixture-current-build" }; }')
+        includes+=f'<Compile Include="{escape(str(identity))}"/>'
         project = root / 'ReplayRegression.csproj'
         project.write_text(f'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net{max(versions)}.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup><ItemGroup><Reference Include="Newtonsoft.Json"><HintPath>{escape(str(dll.resolve()))}</HintPath></Reference>{includes}</ItemGroup></Project>')
         config = root / 'NuGet.Config'

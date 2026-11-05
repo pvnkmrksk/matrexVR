@@ -1,0 +1,73 @@
+{
+  "date": "2026-10-29",
+  "sourceCommit": "297e2202391d496b7d1a0adda4aaf3f3c458f8c7",
+  "application": {
+    "version": "0.5.0-dev",
+    "unity": "6000.3.16f1",
+    "runtimeSourceFingerprintSha256": "6cf8a8b15d2f48ccb8d4c76ff5342e961b5c6abbe906665faad1b802223c787c",
+    "buildGuid": "0feac85481194952b4067d28ef6ceba6",
+    "path": "Preview/MATREX VR.app",
+    "signatureVerified": true
+  },
+  "checks": {
+    "guiStability": 45,
+    "editOnlyPreviewGpu": 24,
+    "setupUsability": 28,
+    "primaryRigCountGui": 95,
+    "nativeRecorderMainIntegration": 58,
+    "sameBuildCore": 43,
+    "recordReplayRoundtrip": 1024,
+    "sixteenRigPhases": 96,
+    "appearanceVisibilityGpu": 104,
+    "sharedSkyRuntime": 7,
+    "animationReplay": 371,
+    "glbPreflight": 22,
+    "apparatusModel": 58,
+    "loggerSeal": 16,
+    "archiveWriter": 690,
+    "writerLifecycleCycles": 150,
+    "finalStandalone": 25
+  },
+  "outcomes": {
+    "finalStandalonePassed": true,
+    "standaloneRecordingSourcesUnchanged": true,
+    "standaloneZipUnchanged": true,
+    "ownedTestPlayerExited": true,
+    "existingPreviewConfigFilesUnchanged": 1449,
+    "nativeRecorderNormalRuns": 2,
+    "nativeRecorderPreparationCancellation": "passed",
+    "nativeManualPauseHonesty": "passed",
+    "nativeRecorderPlatformsValidated": [
+      "macos-arm64"
+    ]
+  },
+  "performance": {
+    "workload": "592 mirrored animals across 96 original 128x128 cameras, native rendering retained",
+    "baselineFps": 20,
+    "optimizedFps": 30,
+    "targetFps": 60,
+    "targetMet": false,
+    "remainingCost": "Many-camera native culling/skin/draw preparation and submission",
+    "failedInstancingPrototypeShipped": false
+  },
+  "nativePointerKeyboardAcceptance": "Operator explicitly chose automated checks only while Mac was locked",
+  "physicalCameraLedAcceptance": "pending",
+  "remainingWork": [
+    "60 FPS dense many-camera rendering",
+    "large-dataset persistent indexes/cache budgets",
+    "other-platform native recorder control",
+    "broader MCP/accessibility and physical apparatus acceptance"
+  ],
+  "evidence": [
+    "docs/gui-stability-validation-results.json",
+    "docs/native-recording-control-validation-results.json",
+    "docs/population-performance-20261029-results.json"
+  ],
+  "localEvidence": {
+    "finalStandalone": ".local/followup-native/Reports/20261029T212559Z-92ae7d12",
+    "recordReplayRoundtrip": ".local/followup-roundtrip-20261029/results.json",
+    "appearanceVisibility": ".local/root-followup-project/appearance-visibility-validation/results.json",
+    "sixteenRigPhases": ".local/root-followup-project/kannadi-phase-validation.json",
+    "sharedSky": ".local/root-followup-project/shared-sky-runtime-validation/results.json"
+  }
+}

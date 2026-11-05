@@ -1,0 +1,16 @@
+{
+  "title": "Kannadi GLB starter",
+  "autoStart": false,
+  "loop": false,
+  "sequences": [
+    {
+      "title": "External GLB social animals and world object",
+      "sceneName": "Kannadi",
+      "duration": 30,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Kannadi/external-glb.example.json"
+      }
+    }
+  ]
+}

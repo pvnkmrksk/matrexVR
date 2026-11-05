@@ -1,6 +1,6 @@
 # System schema fields
 
-This atlas lists **58 emitted property paths** from the current `system` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **74 emitted property paths** from the current `system` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -30,7 +30,7 @@ Positive FPS, or -1 for uncapped. vSync overrides this value.
 | --- | --- |
 | Type | `integer` |
 | Required by parent schema | No |
-| Default | `120` |
+| Default | `60` |
 | `minimum` | `-2147483648` |
 | `maximum` | `2147483647` |
 | UI soft slider range | `{"min":30,"max":240,"step":1}`; display/edit convenience, not an extra runtime constraint. |
@@ -364,6 +364,17 @@ Save supported bundled tracker camera footage for replay; enabled when omitted. 
 | Required by parent schema | No |
 | Default | `true` |
 
+### `configs[].tracker.recordingControl`
+
+Optional headless Rekkefly launch. HejjéTrac uses its native desktop window.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Experiment"` |
+| `enum` | `["Experiment","Manual",0,1]` |
+
 ### `configs[].tracker.recordingDirectory`
 
 Optional headless Rekkefly launch. HejjéTrac uses its native desktop window.
@@ -520,7 +531,10 @@ Operator status panel showing flight state, run progress and diagnostics. Visibl
 ```json
 {
   "visible": true,
-  "targetDisplay": 0
+  "targetDisplay": 0,
+  "automaticPlacement": true,
+  "x": 12.0,
+  "y": 12.0
 }
 ```
 
@@ -547,6 +561,38 @@ Zero-based monitor for the operator status panel. Default 0 is the primary monit
 | Default | `0` |
 | `minimum` | `-2147483648` |
 | `maximum` | `2147483647` |
+
+### `statusOverlay.automaticPlacement`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `statusOverlay.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `12.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `statusOverlay.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `12.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
 
 ## overheadCamera group
 
@@ -721,6 +767,162 @@ World-unit jump that breaks a trail at reset/wrap.
 | Type | `number` |
 | Required by parent schema | No |
 | Default | `50.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+## frameOverlay group
+
+### `frameOverlay`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "visible": true,
+  "targetDisplay": 0,
+  "automaticPlacement": true,
+  "x": 12.0,
+  "y": 12.0
+}
+```
+
+</details>
+
+### `frameOverlay.visible`
+
+Show this feature. Hidden operator views skip rendering; the experiment’s independent logging/telemetry continues.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `frameOverlay.targetDisplay`
+
+Zero-based physical display for stimulus cameras. 0 is the primary monitor. The top-level setting overrides legacy per-rig values.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `0` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+
+### `frameOverlay.automaticPlacement`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `frameOverlay.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `12.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `frameOverlay.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `12.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+## desktopControls group
+
+### `desktopControls`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "visible": true,
+  "targetDisplay": -1,
+  "automaticPlacement": true,
+  "x": 12.0,
+  "y": 12.0
+}
+```
+
+</details>
+
+### `desktopControls.visible`
+
+Show this feature. Hidden operator views skip rendering; the experiment’s independent logging/telemetry continues.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `desktopControls.targetDisplay`
+
+Zero-based physical display for stimulus cameras. 0 is the primary monitor. The top-level setting overrides legacy per-rig values.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `-1` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+
+### `desktopControls.automaticPlacement`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `desktopControls.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `12.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `desktopControls.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `12.0` |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 

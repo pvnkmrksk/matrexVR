@@ -26,6 +26,7 @@ public static class ReplayRoundtripValidation
     static readonly Dictionary<string,int> sceneObservations=new Dictionary<string,int>();
     static readonly List<object> comparisons=new List<object>();
     static Texture2D sourceImage;
+    static readonly Dictionary<string,string> sourceHashes=new Dictionary<string,string>();
     sealed class Observation { public int frame; public long ticks; public string scene; public float[] position,rotation; public float[][] colors; public string image; }
     static ReplayRoundtripValidation()
     {
@@ -45,11 +46,14 @@ public static class ReplayRoundtripValidation
         string root=Application.streamingAssetsPath;
         foreach(string name in new[]{"system_config.json","sequenceConfig.json"})if(File.Exists(Path.Combine(root,name)))File.Copy(Path.Combine(root,name),Path.Combine(output,"original-"+name),true);
         var system=JObject.Parse(File.ReadAllText(Path.Combine(root,"Templates/system_config.template.json")));
-        var rig=(JObject)((JArray)system["configs"])[0].DeepClone();rig["vrId"]="VR1";rig["closedLoopMode"]=Arg("-replay-backend","Rekkefly");rig["zmqAddress"]="127.0.0.1";rig["zmqPort"]=int.Parse(Arg("-replay-port","29921"));rig["displayOrder"]="F";rig["targetDisplay"]=0;rig["ledPanelWidth"]=128;rig["ledPanelHeight"]=128;rig["tracker"]=null;
+        var rig=(JObject)((JArray)system["configs"])[0].DeepClone();rig["vrId"]="VR1";rig["closedLoopMode"]=Arg("-replay-backend","Rekkefly");rig["zmqAddress"]="127.0.0.1";rig["zmqPort"]=int.Parse(Arg("-replay-port","29921"));rig["displayOrder"]="F";rig["targetDisplay"]=0;rig["ledPanelWidth"]=128;rig["ledPanelHeight"]=128;rig["tracker"]=new JObject{["saveVideo"]=false,["recordingControl"]="Manual"};
         system["configs"]=new JArray(rig);system["targetDisplay"]=0;system["telemetry"]=new JObject{["enabled"]=false};system["statusOverlay"]=new JObject{["visible"]=false};system["overheadCamera"]=new JObject{["enabled"]=false};
         Write(root,"__roundtrip-system.json",system);
         var choice=new JObject{["closedLoopPosition"]=false,["closedLoopOrientation"]=true,["autopilotEnabled"]=false,["initialPosition"]=new JObject{["x"]=0,["y"]=1,["z"]=0},["initialRotation"]=new JObject{["x"]=0,["y"]=0,["z"]=0},["uniformSkyColor"]=new JObject{["r"]=.12,["g"]=.24,["b"]=.36,["a"]=1},["objects"]=new JArray(new JObject{["type"]="Cube",["material"]="Black",["position"]=new JObject{["x"]=-4,["y"]=1,["z"]=12},["scale"]=new JObject{["x"]=2,["y"]=8,["z"]=2}}),["autoTrimSettings"]=new JObject{["flightCheckEnabled"]=false}};
-        Write(root,"__roundtrip-choice.json",choice);
+        var phasedChoice=new JObject();
+        foreach(var part in new[]{("preStimulus",.6),("stimulus",2.0),("postStimulus",1.4)})
+        {var payload=(JObject)choice.DeepClone();payload["enabled"]=true;payload["durationSeconds"]=part.Item2;phasedChoice[part.Item1]=payload;}
+        Write(root,"__roundtrip-choice.json",phasedChoice);
         var dynamic=new JObject{["repetitions"]=1,["shuffle"]=false,["loop"]=false,["autoTrimSettings"]=new JObject{["flightCheckEnabled"]=false},["steps"]=new JArray(new JObject{["name"]="Recorded, color swap",["closedLoopPosition"]=false,["closedLoopOrientation"]=true,["swapAfterSeconds"]=1.5,["initialPosition"]=new JObject{["x"]=0,["y"]=1,["z"]=0},["objects"]=new JArray(Bar(-4,new JArray(0,0,0,1),new JArray(.8,.3,.1,1)),Bar(4,new JArray(.7,.7,.7,1),new JArray(.1,.6,.8,1))),["camera"]=new JArray(new JObject{["vrId"]="VR1",["clearFlags"]="SolidColor",["bgColor"]=new JArray(.3,.3,.3,1)}),["trigger"]=new JObject{["type"]="time",["seconds"]=60}})};
         Write(root,"__roundtrip-dynamic.json",dynamic);
         Write(root,"__roundtrip-sequence.json",new JObject{["autoStart"]=false,["loop"]=false,["randomise"]=false,["returnToSetup"]=true,["sequences"]=new JArray(Row("Choice","configFile","__roundtrip-choice.json"),Row("Choice_desync","design","__roundtrip-dynamic.json"))});
@@ -96,17 +100,29 @@ public static class ReplayRoundtripValidation
                         var camera=rig.GetComponentsInChildren<Camera>(true).First(c=>c.name=="Main Camera F");
                         var objects=Stimuli(scene);
                         string image=scene+"-"+point+".png";
+                        File.WriteAllText(Path.Combine(output,"source-"+scene+"-"+point+"-diagnostics.json"),Diagnostics(camera,objects,Time.frameCount).ToString(Formatting.Indented));
                         sourceImage=Render(camera);File.WriteAllBytes(Path.Combine(output,image),sourceImage.EncodeToPNG());Object.Destroy(sourceImage);sourceImage=null;
                         observations.Add(new Observation{frame=Time.frameCount,ticks=DateTime.Now.Ticks,scene=scene,position=V(rig.transform.position),rotation=V(rig.transform.eulerAngles),colors=objects.Select(r=>C(r.sharedMaterial.color)).ToArray(),image=image});
                         sceneObservations[scene]=point;
                     }
                     return;
                 }
-                if(main.SequenceRunning)return;
+                if(main.SequenceRunning||main.SequencePreparing||main.SequenceStopping||MasterDataLogger.Instance.IsFinalizing)return;
                 MasterDataLogger.Instance.ZipDataFolder();
                 Check(observations.Count==4,"two live observations in each actual scene");
                 var saved=new ReplaySessionArchive(runFolder);saved.LoadRigSamples();
                 Check(saved.Rigs.Count==1,"actual CSV produces one canonical animal track");
+                Check(saved.Presentations.IsCurrentContract,"Actual acquisition opts into the same-build replay contract");
+                var choiceSamples=saved.Rigs["VR1"].Where(row=>row.scene=="Choice").ToArray();
+                Check(new[]{"preStimulus","stimulus","postStimulus"}.All(phase=>choiceSamples.Any(row=>row.phase==phase)),"Actual acquisition records all three grouped phases");
+                using(var world=new RecordedWorldStateReader(runFolder))
+                    foreach(var row in saved.Rigs["VR1"])
+                    {
+                        var presentation=saved.Presentations.For(row.presentationId);
+                        Check((string)presentation["phase"]==row.phase,"Rendered pose row and applied presentation phase agree at frame "+row.unityFrame);
+                        world.ConfigurationFor(row.presentationId,row.unityFrame,row.scene=="Choice"?"choice":"dynamic:VR1");
+                    }
+                sourceHashes.Clear();foreach(var file in Directory.EnumerateFiles(runFolder,"*",SearchOption.AllDirectories))sourceHashes[file]=RunConfigArchive.Hash(File.ReadAllBytes(file));
                 Check(saved.Rigs["VR1"].Select(s=>s.scene).Distinct().Contains("Choice_desync"),"both recorded scenes load");
                 if(Arg("-replay-require-motion","true")=="true")Check(saved.Rigs["VR1"].Where(s=>s.scene=="Choice").Select(s=>s.rotation.y).Distinct().Count()>10,"external live input moved the tracked view");
                 foreach(var observation in observations)
@@ -122,7 +138,7 @@ public static class ReplayRoundtripValidation
             }
             if(stage==2)
             {
-                replay=Object.FindFirstObjectByType<ReplayController>();if(replay==null||!replay.Ready||replay.Loading)return;
+                replay=Object.FindFirstObjectByType<ReplayController>();if(replay!=null&&replay.LoadError!=null)throw new Exception(replay.LoadError);if(replay==null||!replay.Ready||replay.Loading)return;
                 Check(replay.LoadError==null,"actual ReplayScene opens the new recording");
                 Check(replay.OverviewVisible,"God's-eye view is the replay default");
                 replay.SetPlaying(false);stage=3;return;
@@ -140,11 +156,15 @@ public static class ReplayRoundtripValidation
                 Check(Vector3.Distance(marker.position,expected.position)<.001f,"replayed recorded position: "+seekIndex);
                 Check(Quaternion.Angle(marker.rotation,Quaternion.Euler(expected.rotation))<.02f,"replayed recorded yaw: "+seekIndex);
                 Check(replay.environmentLoader.RecordedRigs.ContainsKey("VR1"),"built scene's recorded rig restored");
-                var visuals=replay.environmentLoader.environmentRoot.GetComponentsInChildren<Renderer>().Where(r=>r.gameObject.name.StartsWith("Replay Cube ",StringComparison.Ordinal)).ToArray();
+                if(replay.LoadError!=null)throw new Exception(replay.LoadError);
+                var visuals=Object.FindObjectsByType<RecordedWorldStateTarget>(FindObjectsSortMode.None)
+                    .Where(value=>value.Key==(expected.scene=="Choice"?"choice":"dynamic:VR1")&&value.gameObject.activeInHierarchy&&value.GetComponentInParent<RecordedPendingDestroy>(true)==null)
+                    .SelectMany(value=>value.GetComponentsInChildren<Renderer>()).ToArray();
                 var observation=observations.First(o=>o.frame==expected.unityFrame&&o.scene==expected.scene);
                 Check(visuals.Length==observation.colors.Length,"recorded stimulus count restored: "+seekIndex);
                 for(int i=0;i<visuals.Length;i++)Check(ColorDistance(visuals[i].sharedMaterial.color,observation.colors[i])<.00001f,"recorded object color including reverse swap: "+seekIndex+"/"+i);
                 var camera=Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).First(c=>c.name=="Replay animal view VR1");
+                File.WriteAllText(Path.Combine(output,"seek-"+seekIndex+"-diagnostics.json"),Diagnostics(camera,visuals,expected.unityFrame).ToString(Formatting.Indented));
                 using(var pixels=new ImagePair(camera,Path.Combine(output,observation.image)))
                 {
                     comparisons.Add(new{seek=seekIndex,scene=expected.scene,expected.unityFrame,colorsSwapped=expected.colorsSwapped,pixelMeanAbsoluteError=pixels.error});
@@ -165,6 +185,22 @@ public static class ReplayRoundtripValidation
         var root=GameObject.Find(scene=="Choice"?"ChoiceSpawnedObjects":"Rig_VR1_Objects");
         return root==null?Array.Empty<Renderer>():root.GetComponentsInChildren<Renderer>();
     }
+    static JObject Diagnostics(Camera camera,Renderer[] visuals,int expectedFrame)
+    {
+        JArray Vector(Vector3 v)=>new JArray(v.x,v.y,v.z);
+        JArray Matrix(Matrix4x4 m)=>new JArray(Enumerable.Range(0,16).Select(i=>m[i/4,i%4]));
+        var selected=replay!=null?typeof(ReplayController).GetField("referenceSample",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)?.GetValue(replay) as ReplaySessionArchive.Sample:null;
+        var planes=GeometryUtility.CalculateFrustumPlanes(camera);
+        return new JObject { ["expectedFrame"]=expectedFrame,["selectedFrame"]=selected?.unityFrame,["time"]=replay?.ReplayTime,
+            ["camera"]=new JObject { ["position"]=Vector(camera.transform.position),["rotation"]=Vector(camera.transform.eulerAngles),["localPosition"]=Vector(camera.transform.localPosition),["localRotation"]=Vector(camera.transform.localEulerAngles),["scale"]=Vector(camera.transform.lossyScale),["mask"]=camera.cullingMask,["near"]=camera.nearClipPlane,["far"]=camera.farClipPlane,["fieldOfView"]=camera.fieldOfView,["aspect"]=camera.aspect,["projection"]=Matrix(camera.projectionMatrix),["worldToCamera"]=Matrix(camera.worldToCameraMatrix) },
+            ["renderers"]=new JArray(visuals.Select(renderer=>new JObject {
+                ["name"]=renderer.name,["enabled"]=renderer.enabled,["active"]=renderer.gameObject.activeInHierarchy,["layer"]=renderer.gameObject.layer,["maskIncludes"]=((1<<renderer.gameObject.layer)&camera.cullingMask)!=0,["inFrustum"]=GeometryUtility.TestPlanesAABB(planes,renderer.bounds),
+                ["position"]=Vector(renderer.transform.position),["rotation"]=Vector(renderer.transform.eulerAngles),["localPosition"]=Vector(renderer.transform.localPosition),["localRotation"]=Vector(renderer.transform.localEulerAngles),["localScale"]=Vector(renderer.transform.localScale),["worldScale"]=Vector(renderer.transform.lossyScale),["boundsCenter"]=Vector(renderer.bounds.center),["boundsExtents"]=Vector(renderer.bounds.extents),
+                ["parents"]=new JArray(Parents(renderer.transform).Select(node=>new JObject{["name"]=node.name,["active"]=node.gameObject.activeInHierarchy,["position"]=Vector(node.position),["rotation"]=Vector(node.eulerAngles),["scale"]=Vector(node.lossyScale)})),
+                ["scripts"]=new JArray(renderer.GetComponents<MonoBehaviour>().Where(script=>script!=null).Select(script=>new JObject{["type"]=script.GetType().Name,["enabled"]=script.enabled})),
+                ["materials"]=new JArray(renderer.sharedMaterials.Select(material=>material==null?JValue.CreateNull():(JToken)new JObject{["name"]=material.name,["shader"]=material.shader.name,["color"]=material.HasProperty("_Color")?new JArray(material.color.r,material.color.g,material.color.b,material.color.a):null,["queue"]=material.renderQueue})) })) };
+    }
+    static IEnumerable<Transform> Parents(Transform node){while(node!=null){yield return node;node=node.parent;}}
     static Texture2D Render(Camera camera)
     {
         var oldTarget=camera.targetTexture;var oldRect=camera.rect;float oldAspect=camera.aspect;var active=RenderTexture.active;
@@ -183,6 +219,8 @@ public static class ReplayRoundtripValidation
     static void Finish(string failure)
     {
         EditorApplication.update-=Tick;Application.logMessageReceived-=Log;SceneManager.sceneLoaded-=SetupReplay;SessionState.SetBool(Key,false);
+        if(failure==null)
+            foreach(var source in sourceHashes)if(!File.Exists(source.Key)||RunConfigArchive.Hash(File.ReadAllBytes(source.Key))!=source.Value){failure="Replay changed immutable acquisition evidence: "+source.Key;break;}
         File.WriteAllText(Path.Combine(output,"results.json"),JsonConvert.SerializeObject(new{passed=failure==null,checks,failure,errors,runFolder,comparisons,unity=Application.unityVersion,scope="Real two-scene MainController recording and actual ReplayScene; external native-format PUB input; no physical camera/LED claim."},Formatting.Indented));
         EditorApplication.Exit(failure==null&&errors.Count==0?0:1);
     }

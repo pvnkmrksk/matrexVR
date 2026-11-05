@@ -176,31 +176,36 @@ public sealed class RunConfigArchive
             WriteImmutable(aliasPath,bytes);
         }
         if(role!="tracker-calibration"&&string.Equals(extension,".json",StringComparison.OrdinalIgnoreCase))
-            CaptureReferences(JToken.Parse(Decode(bytes)),scene,visited,required);
+            CaptureReferences(JToken.Parse(Decode(bytes)),scene,visited,required,role=="system");
         if(role=="trajectory")
         {
             string metadata=Path.ChangeExtension(path,".metadata.json");
             if(File.Exists(metadata)) CaptureFile(metadata,"metadata",false,false,scene,visited);
         }
     }
-    private void CaptureReferences(JToken token,string scene,HashSet<string> visited,bool required)
+    private void CaptureReferences(JToken token,string scene,HashSet<string> visited,bool required,bool systemDocument)
     {
         if(token is JObject obj)
         {
             if(obj["enabled"]?.Type==JTokenType.Boolean && !(bool)obj["enabled"]) required=false;
             foreach(var property in obj.Properties())
             {
+                // A native launcher's configFile is optional calibration, not a
+                // required experiment document. CaptureCompanions snapshots only
+                // verified matching native configurations and records failures.
+                if(systemDocument && property.Name=="tracker") continue;
                 string role=property.Name=="configFile"?"experiment":property.Name=="design"?"design":
-                    property.Name=="trajectoryFile"?"trajectory":property.Name=="skyboxPath"?"skybox":null;
+                    property.Name=="trajectoryFile"?"trajectory":property.Name=="skyboxPath"?"skybox":
+                    property.Name=="modelPath" || property.Name=="kannadiModelPath"?"model":null;
                 if(role!=null && property.Value.Type==JTokenType.String && !string.IsNullOrWhiteSpace((string)property.Value))
                 {
                     bool needed=required && !(role=="skybox" && obj["uniformSkyColor"]!=null && obj["uniformSkyColor"].Type!=JTokenType.Null);
                     CaptureFile((string)property.Value,role,false,needed,scene,visited);
                 }
-                else CaptureReferences(property.Value,scene,visited,required);
+                else CaptureReferences(property.Value,scene,visited,required,systemDocument);
             }
         }
-        else if(token is JArray array) foreach(var child in array) CaptureReferences(child,scene,visited,required);
+        else if(token is JArray array) foreach(var child in array) CaptureReferences(child,scene,visited,required,systemDocument);
     }
     private static string SafeName(string text)
     {

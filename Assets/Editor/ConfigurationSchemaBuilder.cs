@@ -39,7 +39,8 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
             ["system"] = new JObject { ["type"]="object", ["additionalProperties"]=true, ["properties"]=new JObject {
                 ["targetDisplay"]=Schema(typeof(int)), ["targetFrameRate"]=Schema(typeof(int)), ["vSyncCount"]=Schema(typeof(int)),
                 ["configs"]=Schema(typeof(SystemConfig[])), ["telemetry"]=Schema(typeof(TelemetryConfig)),
-                ["statusOverlay"]=Schema(typeof(StatusOverlayConfig)), ["overheadCamera"]=Schema(typeof(OverheadCameraConfig)) } },
+                ["statusOverlay"]=Schema(typeof(StatusOverlayConfig)), ["overheadCamera"]=Schema(typeof(OverheadCameraConfig)),
+                ["frameOverlay"]=Schema(typeof(OverlayPlacementConfig)),["desktopControls"]=Schema(typeof(OverlayPlacementConfig)) } },
             ["sequence"]=Schema(typeof(SequenceConfig)), ["choice"]=Schema(typeof(SceneConfig)),
             ["swarm"]=Schema(typeof(KannadiConfig)), ["kannadi"]=Schema(typeof(KannadiConfig)),
             ["optomotor"]=Schema(typeof(OptomotorConfig)),
@@ -52,6 +53,33 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
             schema["$schema"]="https://json-schema.org/draft/2020-12/schema";
             schema["$id"]="urn:matrex:config:"+property.Name;
             schema["title"]=property.Name;
+            if(property.Name!="system"&&property.Name!="rugosity")
+            {
+                schema["properties"]["title"]=new JObject { ["type"]="string",["default"]="",["x-ui"]=new JObject { ["help"]="Optional human-readable experiment or paradigm name. The file path remains visible separately." } };
+                schema["properties"]["comments"]=new JObject { ["type"]="string",["default"]="",["x-ui"]=new JObject { ["help"]="Optional notes retained in this configuration and the run archive." } };
+                if(property.Name!="sequence")schema["properties"]["sun"]=Schema(typeof(SunConfig));
+                if(property.Name!="sequence")
+                {
+                    var common=(JObject)schema["properties"];
+                    if(common["nightSky"]==null)common["nightSky"]=Schema(typeof(NightSkyConfig));
+                    if(common["uniformSkyColor"]==null)common["uniformSkyColor"]=Schema(typeof(ColorConfig));
+                    if(common["skyboxPath"]==null)common["skyboxPath"]=new JObject { ["type"]="string",["default"]="" };
+                }
+                if(property.Name!="sequence")schema["properties"][ExperimentSky.RotationField]=new JObject {
+                    ["type"]="number",["minimum"]=0,["maximum"]=360,["default"]=0,
+                    ["x-ui"]=new JObject { ["unit"]="degrees",["help"]="Rotate an imported panorama horizontally. Zero preserves its original orientation; 360 is one complete turn." }
+                };
+                if(property.Name!="sequence")
+                {
+                    var visibility=Schema(typeof(VisibilityMatrixConfig));
+                    visibility["default"]=ExperimentVisibility.Default();
+                    visibility["properties"]["enabled"]["default"]=false;
+                    visibility["properties"]["rows"]["maxItems"]=RuntimeRigRegistry.MaximumRigCount;
+                    visibility["properties"]["rows"]["items"]["maxItems"]=RuntimeRigRegistry.MaximumRigCount;
+                    visibility["x-ui"]=new JObject { ["help"]="Rows are observers VR1–VR16; columns are the VR population layers they see. The matrix changes no ground, sky, or private Choice-object layers. Disabled preserves the normal scene visibility." };
+                    schema["properties"][ExperimentVisibility.Field]=visibility;
+                }
+            }
             string template=property.Name=="system"?"system_config":property.Name;
             string path=Path.Combine(Application.streamingAssetsPath,"Templates",template+".template.json");
             if(File.Exists(path)) schema["default"]=JObject.Parse(File.ReadAllText(path));
@@ -60,6 +88,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
                 schema["properties"]["autoTrimSettings"]=Schema(typeof(AutoTrimConfig));
                 var phase=(JObject)schema.DeepClone(); phase.Remove("$id"); phase.Remove("$schema"); phase.Remove("default");
                 var props=(JObject)phase["properties"];
+                props.Remove("title");props.Remove("comments");
                 props["enabled"]=new JObject { ["type"]="boolean",["default"]=true };
                 props["durationSeconds"]=new JObject { ["type"]="number",["exclusiveMinimum"]=0,["default"]=10,["x-ui"]=new JObject { ["unit"]="seconds",["slider"]=new JObject { ["min"]=1,["max"]=3600,["step"]=1 } } };
                 props["autoTrimSettings"]=Schema(typeof(AutoTrimConfig));
@@ -79,10 +108,13 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         // Expose those to the form without inserting them into the user's JSON.
         system["properties"]["telemetry"]["default"]=JToken.FromObject(new TelemetryConfig());
         system["properties"]["statusOverlay"]["default"]=JToken.FromObject(new StatusOverlayConfig());
+        system["properties"]["frameOverlay"]["default"]=JToken.FromObject(new OverlayPlacementConfig());
+        system["properties"]["desktopControls"]["default"]=JToken.FromObject(new OverlayPlacementConfig { targetDisplay=-1 });
+        system["properties"]["desktopControls"]["properties"]["targetDisplay"]["default"]=-1;
         system["properties"]["overheadCamera"]["default"]=JToken.FromObject(new OverheadCameraConfig());
         system["properties"]["targetDisplay"]["minimum"]=0;
         system["properties"]["targetDisplay"]["default"]=1;
-        system["properties"]["targetFrameRate"]["default"]=120;
+        system["properties"]["targetFrameRate"]["default"]=60;
         system["properties"]["vSyncCount"]["default"]=0;
         system["properties"]["vSyncCount"]["minimum"]=0; system["properties"]["vSyncCount"]["maximum"]=4;
         system["properties"]["targetFrameRate"]["x-ui"]=new JObject { ["enabledWhen"]=Rule("vSyncCount",0),["help"]="Positive FPS, or -1 for uncapped. vSync overrides this value." };
@@ -168,6 +200,8 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
     }
     private static void Annotate(JObject child,string name,Type owner)
     {
+        if(owner==typeof(ModelAppearanceConfig) && (name=="metallic"||name=="smoothness"))
+        { child["minimum"]=0;child["maximum"]=1; }
         var ui=new JObject();
         var attribute=owner.GetField(name)?.GetCustomAttribute<TooltipAttribute>();
         if(attribute!=null) ui["help"]=attribute.tooltip;
@@ -228,6 +262,21 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         {
             child["minimum"]=0;
             ui["help"]="Zero-based row to restart after the final row: 0 repeats everything; 1 runs row 0 once, then repeats rows 1 onward. Requires fixed order when nonzero.";
+        }
+        if(name=="title"||name=="comments"||name=="group")child["default"]="";
+        if(name=="group")ui["help"]="Optional group name for adjacent sequence blocks. Blocks with the same group stay in order and are shuffled together. Reuse the name only within that contiguous group.";
+        if(name=="populationMode")
+        { child["enum"]=new JArray("Mirror","Swarm");ui["help"]="Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world."; }
+        if(name=="modelPath"||name=="kannadiModelPath")
+        {child["default"]="";ui["help"]="Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.";}
+        if(name=="animationClip")ui["help"]="Optional animation clip in the imported model. Leave blank to use its first clip.";
+        if(name=="animationSpeed")ui["help"]="Model animation playback multiplier. 1 uses the model's authored timing; 0 freezes it.";
+        if(owner==typeof(SunConfig))
+        {
+            if(name=="intensity"){child["minimum"]=0;ui["help"]="Brightness of the directional sun. Zero gives no direct illumination.";}
+            if(name=="color")ui["help"]="Sunlight color. Choose a color or enter its hexadecimal RGB value.";
+            if(name=="rotation")
+            {ui["help"]="Sun direction as X/Y/Z Euler angles in degrees. Position does not affect directional lighting.";foreach(string axis in new[]{"x","y","z"}){child["properties"][axis]["minimum"]=0;child["properties"][axis]["maximum"]=360;}}
         }
         if(new[]{"muElevation","kappaElevation","boundaryHeight","wrapY"}.Contains(name)) ui["visibleWhen"]=Rule("dimension","3D");
         if(name=="bogongVisual") ui["visibleWhen"]=Rule("agentVisual","Bogong");

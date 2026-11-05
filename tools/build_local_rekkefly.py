@@ -35,14 +35,14 @@ def local_tag(lock):
     return 'local-' + lock['sourceRevision'][:8] + '-' + lock['patchSha256'][:12]
 
 
-def source_repository(preferred, lock):
+def source_repository(preferred, lock, backend="rekkefly"):
     """Read a suitable local clone, otherwise fetch into our disposable bare cache."""
     if preferred.is_dir():
         result = subprocess.run(['git', '-C', str(preferred), 'cat-file', '-e', lock['sourceRevision'] + '^{commit}'],
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if result.returncode == 0:
             return preferred
-    cached = ROOT / '.integration/native-upstream/rekkefly.git'
+    cached = ROOT / '.integration/native-upstream' / (backend + '.git')
     if not cached.exists():
         cached.parent.mkdir(parents=True, exist_ok=True)
         subprocess.run(['git', 'init', '--bare', str(cached)], check=True, stdout=subprocess.DEVNULL)
@@ -73,7 +73,7 @@ def prepare_source(repository, output, lock, patch):
         finally:
             archive.stdout.close()
         if archive.wait() != 0:
-            raise RuntimeError('Could not extract the pinned Rekkefly commit from the local clone')
+            raise RuntimeError('Could not extract the pinned native commit from the local clone')
         environment = os.environ.copy()
         environment['GIT_CEILING_DIRECTORIES'] = str(temporary.parent.resolve())
         subprocess.run(['git', 'apply', '--check', str(patch)], cwd=temporary, env=environment, check=True)
@@ -169,7 +169,7 @@ def stage(companions, binary, lock, patch):
         entry.update(releaseTag=tag, releaseUrl=lock['sourceUrl'], sourceRevision=lock['sourceRevision'],
                      patchSha256=lock['patchSha256'], localSourceBuild=True,
                      packageRoot=package.relative_to(companions).as_posix(),
-                     supportsNoCameraFallback=True, supportsSourceProvenance=True)
+                     supportsNoCameraFallback=True, supportsSourceProvenance=True, supportsRecordingControl=True)
         catalog['localNativeCorrection'] = provenance
         catalog['upstreamCatalogId'] = catalog['catalogId']
         catalog['catalogId'] = hashlib.sha256((catalog['upstreamCatalogId'] + ':' + lock['patchSha256']).encode()).hexdigest()[:16]
@@ -185,7 +185,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--companions', type=Path, required=True)
     parser.add_argument('--source-repo', type=Path, default=ROOT.parent / 'rekkefly')
-    parser.add_argument('--cargo', type=Path, default=Path(shutil.which('cargo') or '/private/tmp/fictrac-cargo/bin/cargo'))
+    parser.add_argument('--cargo', type=Path, default=Path(shutil.which('cargo') or '/private/tmp/hejjetrac-cargo/bin/cargo'))
     parser.add_argument('--target-dir', type=Path, default=ROOT / '.release-work/native-target/rekkefly')
     parser.add_argument('--verified-binary', type=Path, help='Explicit previously built unsigned executable; requires --binary-provenance and skips Cargo only after source/provenance verification')
     parser.add_argument('--binary-provenance', type=Path, help='Prior MATREX-NATIVE-PROVENANCE.json matching the selected binary and the pinned source/patch lock')
@@ -201,7 +201,7 @@ def main():
     environment['PATH'] = str(args.cargo.parent) + os.pathsep + environment.get('PATH', '')
     # Reuse this machine's already provisioned local toolchain when no normal
     # Rust installation is configured. Other machines use ordinary Cargo.
-    for variable, candidate in [('CARGO_HOME', '/private/tmp/matrex-rekkefly-cargo'), ('RUSTUP_HOME', '/private/tmp/fictrac-rustup')]:
+    for variable, candidate in [('CARGO_HOME', '/private/tmp/hejjetrac-cargo'), ('RUSTUP_HOME', '/private/tmp/hejjetrac-rustup')]:
         if variable not in environment and Path(candidate).is_dir():
             environment[variable] = candidate
     binary = verified_binary(args.verified_binary, args.binary_provenance, lock) if args.verified_binary is not None else build(source, args.cargo, args.target_dir.resolve(), environment)

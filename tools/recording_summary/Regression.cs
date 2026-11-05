@@ -12,6 +12,7 @@ namespace UnityEngine
 {
     public static class Application
     {
+        public static bool isEditor=false;
         public static string version="0.3.1-dev", unityVersion="fixture-unity", buildGUID="actual-player-guid", streamingAssetsPath;
     }
 }
@@ -19,6 +20,7 @@ namespace UnityEngine
 static class Regression
 {
     static int checks;
+    static JObject ReadBuildIdentity()=>(JObject)typeof(PlayerBuildIdentity).GetMethod("CaptureUncached",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic).Invoke(null,null);
     static void Check(bool condition, string message) { checks++; if (!condition) throw new Exception(message); }
     static readonly string[] Header = { "Current Time", "VR", "Scene", "CurrentSequenceScene", "ConfigFile", "CurrentTrial", "CurrentStep",
         "GameObjectPosX", "GameObjectPosY", "GameObjectPosZ", "GameObjectRotX", "GameObjectRotY", "GameObjectRotZ", "experimentPhase", "unityFrame" };
@@ -95,13 +97,13 @@ static class Regression
             var old=RecordingSummary.Scan(legacy);Check(old["observed"]["sequenceCycleCount"].Type==JTokenType.Null,"legacy missing trial count stays unknown");
             Check((long)old["poseRows"]["playable"]==1,"legacy pose is preserved without invented exclusion evidence");
             UnityEngine.Application.streamingAssetsPath=configs;
-            var identity=PlayerBuildIdentity.Capture();
+            var identity=ReadBuildIdentity();
             Check(identity["sourceRevision"].Type==JTokenType.Null&&(string)identity["buildGuid"]=="actual-player-guid","legacy build keeps actual buildGUID but unknown revision");
             string identityFile=Path.Combine(configs,"player_build_info.json");
             File.WriteAllText(identityFile,new JObject{["schemaVersion"]=1,["applicationVersion"]="0.3.1-dev",["sourceRevision"]=new string('f',40),["sourceState"]="working-tree-snapshot",["sourceTreeDirty"]=true}.ToString());
-            identity=PlayerBuildIdentity.Capture();Check((string)identity["sourceRevision"]==new string('f',40)&&(bool)identity["sourceTreeDirty"],"source state is preserved without pretending dirty snapshot is clean");
+            identity=ReadBuildIdentity();Check((string)identity["sourceRevision"]==new string('f',40)&&(bool)identity["sourceTreeDirty"],"source state is preserved without pretending dirty snapshot is clean");
             File.WriteAllText(identityFile,new JObject{["schemaVersion"]=1,["applicationVersion"]="old-version",["sourceRevision"]=new string('f',40)}.ToString());
-            Check(PlayerBuildIdentity.Capture()["sourceRevision"].Type==JTokenType.Null,"mismatched embedded build info is not attributed to current player");
+            Check(ReadBuildIdentity()["sourceRevision"].Type==JTokenType.Null,"mismatched embedded build info is not attributed to current player");
             string failurePath=Path.Combine(run,"directory-instead-of-file.csv.gz");Directory.CreateDirectory(failurePath);
             var failed=new AsyncSwarmWriter(failurePath,"Timestamp,Name");failed.WaitForCompletion();
             Check(AsyncSwarmWriter.ActiveWriterCount==0,"failed writer leaves active registry");

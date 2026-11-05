@@ -52,6 +52,7 @@ namespace ConfigurationUI
         private string filter="";
         private readonly List<string> rows=new List<string>();
         private AnimalData metadata;
+        private string savedMetadataFingerprint;
         private readonly List<UnityEngine.UI.GraphicRaycaster> legacyRaycasters=new List<UnityEngine.UI.GraphicRaycaster>();
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Reset() { Instance=null; SceneManager.sceneLoaded-=Loaded; }
@@ -118,11 +119,13 @@ namespace ConfigurationUI
             });navigation.name="toggle-navigation";navigation.AddToClassList("navigation-toggle");header.Add(navigation);
             root.EnableInClassList("navigation-collapsed",navigationCollapsed);
             var identity=new VisualElement(); identity.AddToClassList("identity"); header.Add(identity);
-            var brand=new Label("MATREX"); brand.AddToClassList("brand"); identity.Add(brand);
+            var brand=new Label("MATREX"){name="about-matrex",focusable=true,tooltip="About MATRIX, design credits and open-source notices"}; brand.AddToClassList("brand"); brand.AddToClassList("clickable"); identity.Add(brand);
+            brand.RegisterCallback<ClickEvent>(_=>Guard(ShowAbout));brand.RegisterCallback<NavigationSubmitEvent>(evt=>{Guard(ShowAbout);evt.StopPropagation();});
             var descriptor=new Label("EXPERIMENT CONTROL"); descriptor.AddToClassList("brand-detail"); identity.Add(descriptor);
             pageLocation=new Label(); pageLocation.AddToClassList("page-location"); header.Add(pageLocation);
             var badge=new Label("●  SETUP"); badge.AddToClassList("badge"); badge.tooltip="Setup is open. The experiment starts when you choose Start experiment."; header.Add(badge);
-            frameRate=new Label("— FPS"){name="setup-frame-rate"}; frameRate.AddToClassList("frame-rate"); header.Add(frameRate);
+            frameRate=new Label("— FPS"){name="setup-frame-rate"}; frameRate.AddToClassList("frame-rate");frameRate.AddToClassList("clickable");frameRate.focusable=true;
+            frameRate.RegisterCallback<ClickEvent>(_=>Guard(OpenFrameRateSetting));frameRate.RegisterCallback<NavigationSubmitEvent>(evt=>{Guard(OpenFrameRateSetting);evt.StopPropagation();});header.Add(frameRate);
             root.Add(header);AddRecordingFinalizationBanner();
             var main=Row("main"); root.Add(main);
             side=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; side.name="setup-navigation"; side.AddToClassList("sidebar"); main.Add(side);
@@ -130,15 +133,15 @@ namespace ConfigurationUI
             inspector=new ScrollView { horizontalScrollerVisibility=ScrollerVisibility.Hidden }; inspector.AddToClassList("inspector"); main.Add(inspector);
             var footer=Row("footer"); root.Add(footer);
             status=new Label(); status.AddToClassList("status"); footer.Add(status);
-            undo=Button("Undo",()=>{ RequireApplied(); selected.Undo(); RebuildPreservingView(); }); footer.Add(undo);
-            redo=Button("Redo",()=>{ RequireApplied(); selected.Redo(); RebuildPreservingView(); }); footer.Add(redo);
-            save=StudioButton("Save changes","file",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); UpdateStatus("Setup and session details saved."); }); footer.Add(save);
+            undo=StudioButton("Undo","undo",()=>{ RequireApplied(); selected.Undo(); RebuildPreservingView(); }); footer.Add(undo);
+            redo=StudioButton("Redo","redo",()=>{ RequireApplied(); selected.Redo(); RebuildPreservingView(); }); footer.Add(redo);
+            save=StudioButton("Save changes","save",()=>{ RequireApplied(); Workspace.SaveAll(); SaveMetadata(); MainController.Instance?.ApplyIdleFrameTiming((JObject)Workspace.System.Root);UpdateStatus("Setup and session details saved."); }); save.name="save-changes";footer.Add(save);
             start=StudioButton("Start experiment","play",RunPrimaryAction,"primary"); start.name="start-experiment"; footer.Add(start);
             save.tooltip="Save the system, sequence, edited experiment files and subject metadata. Omitted values and unknown JSON fields are preserved.";
             start.tooltip="Validate and save this setup, archive the run's configuration files, then start the experiment.";
             undo.tooltip="Undo the last change in the current configuration file."; redo.tooltip="Redo the last undone change in the current configuration file.";
             InstallHoverHelp();
-            InstallKeyboardNavigation();
+            InstallKeyboardNavigation();InstallDraftTracking();
             root.schedule.Execute(UpdateFrameRate).Every(500); UpdateFrameRate();
             root.schedule.Execute(()=>{
                 if(!Application.isEditor&&panel!=null&&Mathf.Abs(panel.scale-DesktopDisplay.UiScale)>.01f)
@@ -148,7 +151,7 @@ namespace ConfigurationUI
         private void BuildNavigation() { Workspace.RefreshReferences(); BuildStudioNavigation(); }
         private void Select(ConfigDocument doc)
         { RequireApplied(); LeaveRecordingLibrary(); if(selected!=doc) { activePhase="stimulus"; settingsTab="Essentials"; } selected=doc; path.Clear(); homeMode=false; experimentIndexMode=false; metadataMode=false; jsonMode=false; advancedMode=false; filter=""; BuildNavigation(); BuildContent(); }
-        private void RequireApplied() { FlushNumbers(); if(rawPending) throw new InvalidOperationException("Apply the JSON draft or discard it before saving, navigating or starting."); }
+        private void RequireApplied() { FlushEditorDrafts();FlushNumbers(); if(rawPending) throw new InvalidOperationException("Apply the JSON draft or discard it before saving, navigating or starting."); }
         private JToken Current => ConfigDocument.At(selected.Root,path);
         private JObject Context => new JObject { ["flight"]=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().Any(r=>TrackerBackend.TryParse(r["closedLoopMode"]?.ToString()??"FicTrac",out var mode) && TrackerBackend.IsFlight(mode)) };
         private JObject CurrentSchema
@@ -188,8 +191,8 @@ namespace ConfigurationUI
             HideHoverHelp();
             body.EnableInClassList("session-body",homeMode || experimentIndexMode || replayLibraryMode);
             side.style.display=DisplayStyle.Flex;
-            inspector.style.display=homeMode || experimentIndexMode || replayLibraryMode || root.resolvedStyle.width<1220?DisplayStyle.None:DisplayStyle.Flex;
-            pageLocation.text=replayLibraryMode?"Recording library":homeMode?"Start":experimentIndexMode?"Experiment settings":selected==Workspace.System?"Apparatus setup":selected==Workspace.Sequence?"Experiment sequence":ExperimentBlocks.Title(selected.Path);
+            inspector.style.display=homeMode || experimentIndexMode || replayLibraryMode || selected!=Workspace.Sequence || root.resolvedStyle.width<1440?DisplayStyle.None:DisplayStyle.Flex;
+            pageLocation.text=replayLibraryMode?"Recording library":homeMode?"Start":experimentIndexMode?"Experiment settings":selected==Workspace.System?"Apparatus setup":selected==Workspace.Sequence?"Experiment sequence":ExperimentBlocks.Title(selected.Root as JObject,selected.Path);
             save.style.display=replayLibraryMode?DisplayStyle.None:DisplayStyle.Flex;
             undo.style.display=redo.style.display=homeMode||replayLibraryMode?DisplayStyle.None:DisplayStyle.Flex;
             RefreshStartCaption();
@@ -283,9 +286,12 @@ namespace ConfigurationUI
             var hint=new Label(array?"item "+key:key+(schema["x-ui"]?["unit"]!=null?" · "+schema["x-ui"]["unit"]:"")); hint.AddToClassList("key-hint"); caption.Add(hint);
             row.tooltip=ConfigParameterHelp.Description(key,path.Concat(new[]{key}).ToArray(),schema);
             var edit=Row("field-controls"); row.Add(edit);
-            bool enabled=array || ConfigSchema.Enabled(Current,CurrentSchema,key,Context);
-            edit.SetEnabled(enabled);
-            Action<JToken> replace=v=>Change(node=>{ if(array) ((JArray)node)[int.Parse(key)]=v; else node[key]=v; });
+            BindViewState(edit,()=>edit.SetEnabled(array || ConfigSchema.Enabled(Current,CurrentSchema,key,Context)));
+            Action<JToken> replace=v=>{
+                bool structural=value==null || value is JContainer || v is JContainer || value.Type==JTokenType.Null || v.Type==JTokenType.Null;
+                if(structural)Change(node=>{ if(array) ((JArray)node)[int.Parse(key)]=v; else node[key]=v; });
+                else StudioEdit(selected,_=>{var node=Current;if(array)((JArray)node)[int.Parse(key)]=v;else node[key]=v;},false);
+            };
             if(TryChoiceCatalogControl(path.Concat(new[]{key}).ToArray(),value,replace,out var catalogControl))edit.Add(catalogControl);
             else if(value==null) edit.Add(Button("+ Set value",()=>replace(ConfigSchema.NewValue(schema)),"quiet"));
             else if(value is JContainer && !(value is JValue))
@@ -295,28 +301,26 @@ namespace ConfigurationUI
             }
             else if(value.Type==JTokenType.Null)
             { edit.Add(new Label("null · unset / inherited")); edit.Add(Button("Set",()=>replace(ConfigSchema.NewValue(schema)))); }
-            else if(value.Type==JTokenType.Boolean)
+            else if(BooleanControl(value,schema))
             {
-                var toggle=new Toggle { value=(bool)value }; edit.Add(toggle);
-                toggle.RegisterValueChangedCallback(e=>replace(new JValue(e.newValue)));
+                var toggle=StateSwitch(ExperimentBlocks.Flag(value),on=>replace(BooleanValue(on,value,schema))); edit.Add(toggle);
             }
-            else if(schema["enum"] is JArray options && value.Type==JTokenType.String)
+            else if(schema["enum"] is JArray options)
             {
-                var choices=options.Where(v=>v.Type==JTokenType.String).Select(v=>v.ToString()).ToList(); if(!choices.Contains(value.ToString())) choices.Add(value.ToString());
-                var dropdown=new DropdownField(choices,choices.IndexOf(value.ToString())); edit.Add(dropdown); dropdown.RegisterValueChangedCallback(e=>replace(new JValue(e.newValue)));
+                edit.Add(EnumControl(options,value,replace));
             }
             else
             {
                 var text=new TextField { value=value.ToString(),isDelayed=true }; edit.Add(text);
-                text.RegisterValueChangedCallback(e=>Guard(()=>{
+                BindDelayedText(text,entered=>{
                     try
                     {
-                        JToken v=value.Type==JTokenType.String?new JValue(e.newValue):LosslessJson.Parse(e.newValue);
+                        JToken v=value.Type==JTokenType.String?new JValue(entered):LosslessJson.Parse(entered);
                         string kind=LosslessJson.Kind(v); if(value.Type!=JTokenType.String && kind!="number" && kind!="integer") throw new ArgumentException("Enter a JSON number; use the JSON view to change its type.");
                         replace(v);
                     }
                     catch { text.SetValueWithoutNotify(value.ToString()); throw; }
-                }));
+                });
             }
             if(value!=null)
             {
@@ -324,10 +328,10 @@ namespace ConfigurationUI
                 if(array)
                 {
                     int position=int.Parse(key);
-                    edit.Add(Button("Copy",()=>Change(node=>((JArray)node).Insert(position+1,node[position].DeepClone())),"mini"));
-                    edit.Add(Button("↑",()=>Move(position,-1),"mini")); edit.Add(Button("↓",()=>Move(position,1),"mini"));
+                    edit.Add(IconButton("copy","Duplicate item",()=>Change(node=>((JArray)node).Insert(position+1,node[position].DeepClone()))));
+                    edit.Add(IconButton("up","Move item up",()=>Move(position,-1))); edit.Add(IconButton("down","Move item down",()=>Move(position,1)));
                 }
-                edit.Add(Button("×",()=>Change(node=>{ if(array) ((JArray)node).RemoveAt(int.Parse(key)); else ((JObject)node).Property(key).Remove(); }),"mini"));
+                edit.Add(IconButton("trash","Remove value",()=>Change(node=>{ if(array) ((JArray)node).RemoveAt(int.Parse(key)); else ((JObject)node).Property(key).Remove(); })));
             }
         }
         private void Move(int position,int offset)
@@ -336,6 +340,7 @@ namespace ConfigurationUI
         { return value is JObject obj?(string)(obj["vrId"]??obj["sceneName"]??obj["name"]??obj["type"])??"Item "+(index+1):"Item "+(index+1); }
         private void UpdateStatus(string message=null)
         {
+            UpdateFrameRate();RefreshNavigationLabels();
             if(replayLibraryMode){RefreshLibraryFooter(message);return;}
             if(preparing)
             {
@@ -352,10 +357,10 @@ namespace ConfigurationUI
                 if(doc?.Root is JObject payload) warnings.AddRange(ExperimentBlocks.TimingWarnings(payload,ExperimentBlocks.Number(step["duration"])));
             }
             if(summary!=null) summary.text=errors.Count==0?(ApparatusDraft?"Review apparatus configuration\n\nChoose Use configuration to save this setup and return to the experiment workspace. This does not start an experiment.\n\n":"✓  Configuration ready\n\n")+Workspace.Documents.Count+" files loaded\n"+(Workspace.System.Root["configs"] as JArray)?.Count+" VR entries\n"+(Workspace.Sequence.Root["sequences"] as JArray)?.Count+" sequence steps":string.Join("\n\n",errors.Take(12));
-            status.text=message??(errors.Count>0?string.Join(" · ",errors.Take(2)):ApparatusDraft?"Review hardware settings, then choose Use configuration to save and continue.":warnings.Count>0?warnings[0]:Workspace.Documents.Any(d=>d.Dirty)?"Unsaved config changes · saved when you start":"Ready to run · session details saved when you start");
+            status.text=message??(errors.Count>0?string.Join(" · ",errors.Take(2)):ApparatusDraft?"Review hardware settings, then choose Use configuration to save and continue.":warnings.Count>0?warnings[0]:HasUnsavedChanges?"Unsaved changes · saved on Start":"Ready");
             status.EnableInClassList("error",errors.Count>0);
             status.EnableInClassList("warning",errors.Count==0 && warnings.Count>0);
-            start.SetEnabled(errors.Count==0 && !rawPending); save.SetEnabled(!rawPending); undo.SetEnabled(selected.CanUndo && !rawPending); redo.SetEnabled(selected.CanRedo && !rawPending);
+            start.SetEnabled(errors.Count==0 && !rawPending && !preparing && MainController.Instance?.SequenceStopping!=true); save.SetEnabled(!rawPending && HasUnsavedChanges); undo.SetEnabled(selected.CanUndo && !rawPending); redo.SetEnabled(selected.CanRedo && !rawPending);
         }
         private void PollFiles()
         {
@@ -373,8 +378,8 @@ namespace ConfigurationUI
             var title=new Label("Session metadata"); title.AddToClassList("title"); body.Add(title);
             EnsureMetadata();
             var scroll=new ScrollView(); scroll.AddToClassList("metadata"); body.Add(scroll);
-            var experimenter=new TextField("Experimenter") { value=metadata.ExperimenterName }; scroll.Add(experimenter); experimenter.RegisterValueChangedCallback(e=>metadata.ExperimenterName=e.newValue);
-            var comments=new TextField("Comments") { multiline=true,value=metadata.Comments }; scroll.Add(comments); comments.RegisterValueChangedCallback(e=>metadata.Comments=e.newValue);
+            var experimenter=new TextField("Experimenter") { value=metadata.ExperimenterName }; scroll.Add(experimenter); experimenter.RegisterValueChangedCallback(e=>{metadata.ExperimenterName=e.newValue;UpdateStatus();});
+            var comments=new TextField("Comments") { multiline=true,value=metadata.Comments }; scroll.Add(comments); comments.RegisterValueChangedCallback(e=>{metadata.Comments=e.newValue;UpdateStatus();});
             foreach(var rig in (Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>())
             {
                 string id=(string)rig["vrId"]; var fly=metadata.Animals.FirstOrDefault(f=>f.VR==id);
@@ -383,9 +388,9 @@ namespace ConfigurationUI
                 var f=fly;
                 foreach(string key in new[]{"AnimalID","AgeDays","StarvedSinceHours"})
                 {
-                    var property=typeof(AnimalMetadata).GetProperty(key); var field=new TextField(Human(key)) { value=(string)property.GetValue(f) }; scroll.Add(field); field.RegisterValueChangedCallback(e=>property.SetValue(f,e.newValue));
+                    var property=typeof(AnimalMetadata).GetProperty(key); var field=new TextField(Human(key)) { value=(string)property.GetValue(f) }; scroll.Add(field); field.RegisterValueChangedCallback(e=>{property.SetValue(f,e.newValue);UpdateStatus();});
                 }
-                var sex=new DropdownField("Sex",new List<string>{"Unspecified","Female","Male"},0) { value=string.IsNullOrEmpty(f.Sex)?"Unspecified":f.Sex }; scroll.Add(sex); sex.RegisterValueChangedCallback(e=>f.Sex=e.newValue);
+                var sex=new DropdownField("Sex",new List<string>{"Unspecified","Female","Male"},0) { value=string.IsNullOrEmpty(f.Sex)?"Unspecified":f.Sex }; scroll.Add(sex); sex.RegisterValueChangedCallback(e=>{f.Sex=e.newValue;UpdateStatus();});
             }
             scroll.Add(Button("Save metadata",()=>{ SaveMetadata(); UpdateStatus("Session metadata saved."); }));
             UpdateStatus();
@@ -403,10 +408,14 @@ namespace ConfigurationUI
             File.WriteAllText(Path.Combine(backup,"FlyMetaData.json"),json);
             // Setup edits belong to the draft backup. A completed run's metadata
             // is written only once, into the fresh folder prepared by Start.
+            savedMetadataFingerprint=MetadataFingerprint();
             return json;
         }
+        private string MetadataFingerprint() => metadata==null?null:JsonConvert.SerializeObject(metadata,Formatting.None);
+        private bool HasUnsavedChanges => Workspace?.Documents.Any(d=>d.Dirty)==true || HasPendingEditorDrafts || (metadata!=null && savedMetadataFingerprint!=null && MetadataFingerprint()!=savedMetadataFingerprint);
         private void EnsureMetadata()
         {
+            bool firstLoad=metadata==null;
             if(metadata==null)
             {
                 string backup=Path.Combine(RuntimePaths.RunDataRoot,"Backup/AnimalMetadata.json");
@@ -421,20 +430,13 @@ namespace ConfigurationUI
                 var fly=metadata.Animals.First(f=>f.VR==id); if(string.IsNullOrEmpty(fly.Sex)) fly.Sex="Unspecified";
                 if(rig["speciesName"]!=null) fly.SpeciesName=(string)rig["speciesName"];
             }
+            if(firstLoad)savedMetadataFingerprint=MetadataFingerprint();
         }
         public void StartExperiment()
         {
             if(preparing)return;
             RequireApplied();
-            bool configured=DesktopApparatusProfile.IsConfigured(Workspace.System.Root);
-            if(!configured&&!DesktopQuickStart.IsQuickStart(Workspace))
-                throw new InvalidOperationException("Finish Configure before using this apparatus, or return to Start to explore the demo.");
-            var errors=Workspace.Validate();
-            if(configured)
-            {
-                errors.AddRange(DesktopApparatusProfile.Validate(Workspace.System.Root,ApparatusDisplayFallback));
-                errors.AddRange(ConnectedOutputErrors());
-            }
+            var errors=ValidateSetupForStart(Workspace);
             if(errors.Count>0)throw new InvalidOperationException(string.Join("\n",errors));
             PrepareRunMetadata();Workspace.SaveAll();
             if(DesktopQuickStart.IsQuickStart(Workspace)||DesktopApparatusProfile.ShouldPrepareCompanions(Workspace.System.Root))
@@ -443,11 +445,18 @@ namespace ConfigurationUI
             }
             StartAfterPreviousRecording();
         }
-        private IEnumerable<string> ConnectedOutputErrors()
+        public List<string> ValidateSetupForStart(ConfigWorkspace workspace)
         {
-            foreach(var rig in DesktopApparatusProfile.Rigs(Workspace.System.Root))
+            var errors=workspace.Validate();bool configured=DesktopApparatusProfile.IsConfigured(workspace.System.Root);
+            if(!configured&&!DesktopQuickStart.IsQuickStart(workspace))errors.Add("Finish Configure before using this apparatus, or return to Start to explore the demo.");
+            if(configured){errors.AddRange(DesktopApparatusProfile.Validate(workspace.System.Root,ApparatusDisplayFallback));errors.AddRange(ConnectedOutputErrors(workspace));}
+            return errors;
+        }
+        private IEnumerable<string> ConnectedOutputErrors(ConfigWorkspace workspace)
+        {
+            foreach(var rig in DesktopApparatusProfile.Rigs(workspace.System.Root))
             {
-                int display=DesktopApparatusProfile.OutputDisplay(Workspace.System.Root,rig,ApparatusDisplayFallback);
+                int display=DesktopApparatusProfile.OutputDisplay(workspace.System.Root,rig,ApparatusDisplayFallback);
                 string id=(string)rig["vrId"];
                 if(display<0||display>=Display.displays.Length)
                 {yield return id+": output display "+(display+1)+" is not connected. Connect it or change its display in Configure.";continue;}
@@ -463,9 +472,22 @@ namespace ConfigurationUI
             }
         }
         private void OpenQuickTracker()
-        {if(preparing)return;RequireApplied();BeginCompanionPreparation(false);}
+        {
+            if(preparing)return;RequireApplied();
+            var errors=ConfigSchema.Validate(Workspace.System.Root,Workspace.Schemas.Get("system"));
+            if(errors.Count>0)throw new InvalidOperationException(string.Join("; ",errors));
+            Workspace.System.Save();MainController.Instance?.ConfigureTrackingWhileIdle(Workspace.System.Path);
+            BeginCompanionPreparation(false);
+        }
+        private readonly List<string> companionWarnings=new List<string>();
+        private void CompanionWarning(string message)
+        {
+            if(!companionWarnings.Contains(message))companionWarnings.Add(message);
+            preparationStatus="VR ready · tracker unavailable";UpdateStatus(preparationStatus);
+        }
         private void BeginCompanionPreparation(bool startAfter)
         {
+            companionWarnings.Clear();
             preparing=true;preparationStatus="Preparing the native tracker…";
             body.SetEnabled(false);side.SetEnabled(false);RefreshPreparingCaption();UpdateStatus();
             StartCoroutine(PrepareQuickStartRun(++preparationVersion,startAfter));
@@ -482,7 +504,7 @@ namespace ConfigurationUI
                     bool more=false;object current=null;Exception failure=null;
                     try { more=operation.MoveNext();if(more)current=operation.Current; }
                     catch(Exception error) { failure=error; }
-                    if(failure!=null) { PreparationFailed(failure);yield break; }
+                    if(failure!=null) { if(!startAfter)PreparationFailed(failure);else{CompanionWarning(failure.GetBaseException().Message);PrepareRunMetadata();StartAfterPreviousRecording();}yield break; }
                     if(!more)yield break;
                     yield return current;
                 }
@@ -508,6 +530,7 @@ namespace ConfigurationUI
             var rigs=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>()
                 .Where(r=>!configured||DesktopApparatusProfile.ShouldLaunchBundledForRig(Workspace.System.Root,r))
                 .Select(LosslessJson.ToRuntime<SystemConfig>).ToList();
+            double trackerDeadline=Time.realtimeSinceStartupAsDouble+2.5;
             foreach(var rig in rigs)
             {
                 preparationStatus="Preparing "+TrackerBackend.DisplayName(rig.closedLoopMode)+" for "+rig.vrId+"…";UpdateStatus();
@@ -519,16 +542,18 @@ namespace ConfigurationUI
                     task=CompanionCatalog.PrepareAsync(rig,demo);
 #endif
                 }
-                catch(Exception error){PreparationFailed(error);yield break;}
-                while(!task.IsCompleted)
+                catch(Exception error){if(!startAfter){PreparationFailed(error);yield break;}CompanionWarning(rig.vrId+": "+error.GetBaseException().Message);continue;}
+                while(!task.IsCompleted && (!startAfter || Time.realtimeSinceStartupAsDouble<trackerDeadline))
                 {
                     if(!isActiveAndEnabled||version!=preparationVersion)yield break;
                     yield return null;
                 }
                 if(!isActiveAndEnabled||version!=preparationVersion)yield break;
-                if(task.IsFaulted||task.IsCanceled){PreparationFailed(task.Exception?.GetBaseException()??new OperationCanceledException("Tracker preparation was cancelled."));yield break;}
+                if(!task.IsCompleted){task.ContinueWith(completed=>{var observed=completed.Exception;},System.Threading.Tasks.TaskContinuationOptions.OnlyOnFaulted);CompanionWarning(rig.vrId+": tracker preparation is still pending; the VR starts without waiting.");continue;}
+                if(task.IsFaulted||task.IsCanceled){var error=task.Exception?.GetBaseException()??new OperationCanceledException("Tracker preparation was cancelled.");if(!startAfter){PreparationFailed(error);yield break;}CompanionWarning(rig.vrId+": "+error.Message);continue;}
                 try{
                     var prepared=task.GetAwaiter().GetResult();
+                    if(!string.IsNullOrWhiteSpace(prepared.recordingWarning))CompanionWarning(rig.vrId+": "+prepared.recordingWarning);
 #if UNITY_EDITOR
                     if(launchCompanionForValidation!=null)launchCompanionForValidation(prepared);else
 #endif
@@ -539,7 +564,7 @@ namespace ConfigurationUI
 #endif
                     )TrackerProcessManager.Instance.Show(rig.vrId);
                 }
-                catch(Exception error){PreparationFailed(error);yield break;}
+                catch(Exception error){if(!startAfter){PreparationFailed(error);yield break;}CompanionWarning(rig.vrId+": "+error.GetBaseException().Message);}
             }
             if(!startAfter)
             {
@@ -625,17 +650,41 @@ namespace ConfigurationUI
 #endif
             var main=MainController.Instance;
             main.PrepareConfiguredRun(Workspace.System.Path,Workspace.Sequence.Path);
+            foreach(string warning in companionWarnings)main.AddRecordingWarning(warning);
+            companionWarnings.Clear();
             string metadataJson=SaveMetadata();
             File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"AnimalMetadata.json"),metadataJson);
             File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"FlyMetaData.json"),metadataJson);
             Document.enabled=false;root.Clear();enabled=false;
             main.StartSequence();
+            if(main.SequencePreparing)
+            {
+                RestoreSetupAfterStart();preparing=true;preparationStatus=(main.PreparationStatus??"Preparing experiment…")+" Escape cancels preparation.";
+                body.SetEnabled(false);side.SetEnabled(false);UpdateStatus();
+                StartCoroutine(WaitForSequencePreparation(main));return;
+            }
             if(!main.SequenceRunning)
             {
-                preparing=false;enabled=true;Document.enabled=true;root=Document.rootVisualElement;root.AddToClassList("workbench");
-                WorkbenchTypography.Apply(root);root.styleSheets.Add(Resources.Load<StyleSheet>("ConfigurationUI/workbench"));BuildShell();BuildNavigation();BuildContent();return;
+                RestoreSetupAfterStart();return;
             }
             Destroy(gameObject);
+        }
+        private void RestoreSetupAfterStart()
+        {
+            preparing=false;enabled=true;Document.enabled=true;root=Document.rootVisualElement;root.AddToClassList("workbench");
+            WorkbenchTypography.Apply(root);root.styleSheets.Add(Resources.Load<StyleSheet>("ConfigurationUI/workbench"));BuildShell();BuildNavigation();BuildContent();
+        }
+        private IEnumerator WaitForSequencePreparation(MainController main)
+        {
+            while(main!=null&&main.SequencePreparing)
+            {
+                string current=(main.PreparationStatus??"Preparing experiment…")+" Escape cancels preparation.";
+                if(preparationStatus!=current){preparationStatus=current;RefreshPreparingCaption();UpdateStatus();}
+                yield return null;
+            }
+            if(main!=null&&main.SequenceRunning){Destroy(gameObject);yield break;}
+            preparing=false;body.SetEnabled(true);side.SetEnabled(true);RefreshStartCaption();
+            UpdateStatus(main?.SequenceError??"Experiment preparation cancelled.");
         }
         private void OnDisable()
         {if(preparing){preparing=false;preparationVersion++;}}

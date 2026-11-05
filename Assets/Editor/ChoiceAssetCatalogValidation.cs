@@ -42,9 +42,9 @@ public static class ChoiceAssetCatalogValidation
             {
                 var choice=scene.GetRootGameObjects().SelectMany(root=>root.GetComponentsInChildren<ChoiceController>(true)).ToArray();
                 var dynamic=scene.GetRootGameObjects().SelectMany(root=>root.GetComponentsInChildren<DynamicSequenceController>(true)).ToArray();
-                var expectedObjects=choice.SelectMany(c=>c.prefabs??Array.Empty<GameObject>()).Concat(dynamic.SelectMany(c=>c.prefabs??Array.Empty<GameObject>())).Where(p=>p!=null).Select(p=>p.name).Distinct().OrderBy(p=>p,StringComparer.Ordinal);
+                var expectedObjects=choice.SelectMany(c=>c.prefabs??Array.Empty<GameObject>()).Concat(dynamic.SelectMany(c=>c.prefabs??Array.Empty<GameObject>())).Where(p=>p!=null&&!p.GetComponentsInChildren<WindZone>(true).Any(wind=>wind.gameObject.activeSelf&&(wind.windMain!=0||wind.windTurbulence!=0||wind.windPulseMagnitude!=0))).Select(p=>p.name).Distinct().OrderBy(p=>p,StringComparer.Ordinal);
                 var expectedMaterials=choice.SelectMany(c=>c.materials??Array.Empty<Material>()).Concat(dynamic.SelectMany(c=>c.materials??Array.Empty<Material>())).Where(p=>p!=null).Select(p=>p.name).Distinct().OrderBy(p=>p,StringComparer.Ordinal);
-                Check(expectedObjects.SequenceEqual(property.Value["objects"].Select(p=>(string)p["name"])),"catalog object names match the actual registered prefabs: "+property.Name);
+                Check(expectedObjects.SequenceEqual(property.Value["objects"].Select(p=>(string)p["name"])),"catalog object names match admissible registered prefabs with unowned native wind omitted: "+property.Name);
                 Check(expectedMaterials.SequenceEqual(property.Value["materials"].Select(p=>(string)p["name"])),"catalog material names match the actual registered materials: "+property.Name);
             }
             finally{EditorSceneManager.ClosePreviewScene(scene);}

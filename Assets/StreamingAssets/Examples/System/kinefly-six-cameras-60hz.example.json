@@ -1,5 +1,5 @@
 {
-  "targetFrameRate": 120,
+  "targetFrameRate": 60,
   "vSyncCount": 0,
   "telemetry": {
     "enabled": true,

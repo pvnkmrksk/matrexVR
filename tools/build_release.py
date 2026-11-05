@@ -22,6 +22,7 @@ TARGETS = {
     'Windows': ('StandaloneWindows64', 'Win64', 'MATREX VR.exe'),
     'Linux': ('StandaloneLinux64', 'Linux64', 'MATREX VR.x86_64'),
 }
+MCP_SOURCE_FILES = ('tools/matrex_control_mcp.py', 'tools/matrex_control_mcp.py.lock')
 
 def git(*args):
     return subprocess.check_output(['git', *args], cwd=ROOT)
@@ -100,6 +101,29 @@ def validate_local_payload_options(platform, with_companions, with_dashboard,
             raise ValueError('Local dashboard archive differs from its reviewed lock')
 
 
+def stage_mcp_adapter(stage, platform, revision):
+    """Bundle the adapter from the player's pinned Git revision, never local edits.
+
+    Historical releases without MCP remain reproducible without adding a new
+    endpoint or mismatched current adapter to an old player.
+    """
+    tracked = set(git('ls-tree', '-r', '--name-only', revision, '--', *MCP_SOURCE_FILES).decode().splitlines())
+    if not tracked:
+        return None
+    if tracked != set(MCP_SOURCE_FILES):
+        raise RuntimeError('Pinned MCP adapter is incomplete; both script and dependency lock are required')
+    payloads = {source: git('show', revision + ':' + source) for source in MCP_SOURCE_FILES}
+    target = stage / 'MATREX VR.app/Contents/Resources/MCP' if platform == 'macOS' else stage / 'MCP'
+    target.mkdir(parents=True, exist_ok=True)
+    files = []
+    for source, payload in payloads.items():
+        destination = target / Path(source).name
+        destination.write_bytes(payload)
+        files.append(dict(path=destination.relative_to(stage).as_posix(), sourcePath=source,
+                          sha256=hashlib.sha256(payload).hexdigest()))
+    return dict(sourceRevision=revision, transport='stdio', enabledByDefault=False, files=files)
+
+
 def package(build, output, version, platform, revision, project, quickstart, with_companions=True, with_dashboard=True,
             local_native_camera_fix=False, local_dashboard_archive=None,
             verified_native_binary=None, native_binary_provenance=None):
@@ -119,6 +143,7 @@ def package(build, output, version, platform, revision, project, quickstart, wit
             shutil.rmtree(p)
     if platform == 'Linux':
         (stage / 'MATREX VR.x86_64').chmod(0o755)
+    mcp_adapter = stage_mcp_adapter(stage, platform, revision)
     companion_root = stage / 'MATREX VR.app' / 'Contents' / 'Companions' if platform == 'macOS' else stage / 'Companions'
     companion_catalog = {}
     if with_companions:
@@ -147,7 +172,7 @@ def package(build, output, version, platform, revision, project, quickstart, wit
         dashboard_entries = stage_local_dashboard.stage(platforms, companion_root, ROOT / '.release-work/dashboard-cache')
         if local_dashboard_archive and platform == 'macOS':
             dashboard_entries.append(stage_local_dashboard.stage_local(local_dashboard_archive, companion_root))
-    if (with_companions or with_dashboard) and platform == 'macOS' and sys.platform == 'darwin':
+    if (with_companions or with_dashboard or mcp_adapter) and platform == 'macOS' and sys.platform == 'darwin':
         # Seal the parent after all payloads are embedded. Nested native app
         # signatures and their catalog digests remain unchanged.
         subprocess.run(['/usr/bin/codesign', '--force', '--sign', '-', '--timestamp=none', str(stage / 'MATREX VR.app')], check=True)
@@ -164,6 +189,7 @@ def package(build, output, version, platform, revision, project, quickstart, wit
         raise RuntimeError('Refusing to package an unsuccessful Unity build')
     manifest = dict(version=version, sourceRevision=revision, unityVersion='6000.3.16f1', platform=label,
                     publicSystemTemplate=True, companionsBundled=with_companions, dashboardBundled=with_dashboard,
+                    mcpBundled=mcp_adapter is not None, mcpAdapter=mcp_adapter,
                     companionCatalogId=companion_catalog.get('catalogId'), companionPackages=companion_catalog.get('entries', []),
                     localNativeCameraCorrection=companion_catalog.get('localNativeCorrection'), dashboardPackages=dashboard_entries,
                     builderSha256=hashlib.sha256((ROOT / 'Assets/Editor/MatrexReleaseBuilder.cs').read_bytes()).hexdigest(),

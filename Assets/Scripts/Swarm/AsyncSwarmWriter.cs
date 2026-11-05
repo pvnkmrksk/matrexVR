@@ -9,13 +9,17 @@ using System.Threading;
 /// <summary>Bounded, pooled snapshots. Formatting, gzip and file I/O run on one worker.</summary>
 public sealed class AsyncSwarmWriter
 {
-    public struct Agent { public string name, layer; public float x, y, z, rx, ry, rz; }
+    public enum RowLayout { Swarm, Kannadi }
+    public struct Agent { public string name, layer, animationState; public int index; public float x, y, z, rx, ry, rz, sx, sy, sz; }
     public sealed class Frame
     {
         public Agent[] agents;
         public int count;
+        public int unityFrame;
         public DateTime timestamp;
         public string skyboxId, skyboxSampleUtc, phase;
+        public int vrIndex, numberOfRings;
+        public float hexRadius;
     }
     private const int Capacity = 240;
     private readonly ConcurrentQueue<Frame> pending = new ConcurrentQueue<Frame>();
@@ -56,11 +60,11 @@ public sealed class AsyncSwarmWriter
         }
     }
 
-    public AsyncSwarmWriter(string path, string header)
+    public AsyncSwarmWriter(string path, string header, RowLayout layout = RowLayout.Swarm)
     {
         path = System.IO.Path.GetFullPath(path); // Invalid paths fail on the caller, not an unhandled worker finally block.
         lock (activeLock) active.Add(this);
-        worker = new Thread(() => Write(path, header)) { IsBackground = true, Name = "Swarm CSV writer" };
+        worker = new Thread(() => Write(path, header, layout)) { IsBackground = true, Name = "Population CSV writer" };
         worker.Start();
     }
     public Frame Rent(int count)
@@ -97,10 +101,14 @@ public sealed class AsyncSwarmWriter
     }
     public void WaitForCompletion() { Complete(); worker.Join(); }
 
-    private void Write(string path, string header)
+    private void Write(string path, string header, RowLayout layout)
     {
         try
         {
+            bool animation=header.IndexOf(",AnimationState",StringComparison.Ordinal)>=0;
+            bool unityFrame=header.IndexOf(",UnityFrame",StringComparison.Ordinal)>=0;
+            bool scale=header.IndexOf(",ScaleX",StringComparison.Ordinal)>=0;
+            var numberBuffer=new char[64];
             using (var file = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read, 65536))
             using (var gzip = new GZipStream(file, CompressionLevel.Fastest))
             using (var output = new StreamWriter(gzip, new System.Text.UTF8Encoding(false), 65536))
@@ -110,11 +118,30 @@ public sealed class AsyncSwarmWriter
                 {
                     while (pending.TryDequeue(out Frame frame))
                     {
-                        string timestamp = frame.timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
+                        string timestamp = frame.timestamp.ToString("yyyy-MM-dd HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
                         for (int i = 0; i < frame.count; i++)
                         {
                             Agent a = frame.agents[i];
-                            output.WriteLine(FormattableString.Invariant($"{timestamp},{Csv(a.name)},{Csv(a.layer)},{a.x},{a.y},{a.z},{Csv(frame.skyboxId)},{Csv(frame.skyboxSampleUtc)},{Csv(frame.phase)},{a.rx},{a.ry},{a.rz}"));
+                            output.Write(timestamp);
+                            if(layout==RowLayout.Kannadi)
+                            {
+                                Number(output,frame.vrIndex,numberBuffer);Number(output,a.index,numberBuffer);Cell(output,a.name);
+                                Number(output,a.x,numberBuffer);Number(output,a.y,numberBuffer);Number(output,a.z,numberBuffer);
+                                Number(output,a.rx,numberBuffer);Number(output,a.ry,numberBuffer);Number(output,a.rz,numberBuffer);
+                                Number(output,frame.numberOfRings,numberBuffer);Number(output,frame.hexRadius,numberBuffer);
+                                Cell(output,frame.skyboxId);Cell(output,frame.skyboxSampleUtc);Cell(output,frame.phase);
+                            }
+                            else
+                            {
+                                Cell(output,a.name);Cell(output,a.layer);
+                                Number(output,a.x,numberBuffer);Number(output,a.y,numberBuffer);Number(output,a.z,numberBuffer);
+                                Cell(output,frame.skyboxId);Cell(output,frame.skyboxSampleUtc);Cell(output,frame.phase);
+                                Number(output,a.rx,numberBuffer);Number(output,a.ry,numberBuffer);Number(output,a.rz,numberBuffer);
+                            }
+                            if (animation) Cell(output,a.animationState);
+                            if(unityFrame)Number(output,frame.unityFrame,numberBuffer);
+                            if(scale){Number(output,a.sx,numberBuffer);Number(output,a.sy,numberBuffer);Number(output,a.sz,numberBuffer);}
+                            output.WriteLine();
                         }
                         Interlocked.Add(ref writtenRows, frame.count);
                         Interlocked.Decrement(ref pendingCount);
@@ -143,10 +170,26 @@ public sealed class AsyncSwarmWriter
             }
         }
     }
-    private static string Csv(string value)
+    private static void Number(StreamWriter output,float value,char[] buffer)
     {
-        if (string.IsNullOrEmpty(value)) return "";
-        return value.IndexOfAny(CsvCharacters) >= 0 ? "\"" + value.Replace("\"", "\"\"") + "\"" : value;
+        output.Write(',');
+        if(!value.TryFormat(buffer,out int length,"R",CultureInfo.InvariantCulture))throw new InvalidDataException("Population number exceeds the encoding buffer.");
+        output.Write(buffer,0,length);
+    }
+    private static void Number(StreamWriter output,int value,char[] buffer)
+    {
+        output.Write(',');
+        if(!value.TryFormat(buffer,out int length,default,CultureInfo.InvariantCulture))throw new InvalidDataException("Population integer exceeds the encoding buffer.");
+        output.Write(buffer,0,length);
+    }
+    private static void Cell(StreamWriter output,string value)
+    {
+        output.Write(',');if(string.IsNullOrEmpty(value))return;
+        if(value.IndexOfAny(CsvCharacters)<0){output.Write(value);return;}
+        output.Write('"');int start=0;
+        for(int i=0;i<value.Length;i++)if(value[i]=='"')
+        {output.Write(value.AsSpan(start,i-start));output.Write("\"\"");start=i+1;}
+        output.Write(value.AsSpan(start));output.Write('"');
     }
     private static readonly char[] CsvCharacters = { ',', '"', '\r', '\n' };
 }

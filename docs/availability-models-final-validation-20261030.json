@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-30",
+  "sourceCommit": "253cdda80a14f58852dcff5bc18aa3b5d8cdef96",
+  "applicationVersion": "0.5.1-dev",
+  "runtimeSourceFingerprintSha256": "79c53b33fc8e6bb88bbc4b4ae10e0684dc88bc03fad1862b1b299e9a09f6bbb0",
+  "playerBuildGuid": "ac80604a332e44b7b5e254b76eaf6e14",
+  "signatureVerified": true,
+  "app": "Preview/MATREX VR.app",
+  "launcher": "Open MATREX VR Preview.command",
+  "standalone": {
+    "checks": 30,
+    "passed": true,
+    "missingTracker": "VR16 unavailable, acknowledged:false; VR completed with a warning",
+    "portableGlbExamplesExecuted": 3,
+    "actualRecordedAnimationClips": [
+      "Scene",
+      "animation:0",
+      "Square"
+    ],
+    "modelSnapshotsByteIdentical": true,
+    "replaySourcesAndZipUnchanged": true,
+    "ownedTestPlayerExited": true,
+    "playerErrorMarkers": 0,
+    "localEvidence": ".local/availability-models-native/Reports/20261030T003554Z-784099a8"
+  },
+  "regressions": {
+    "responsiveGui": 165,
+    "guiOptionalTrackerStartup": 12,
+    "stableControls": 45,
+    "setupUsability": 28,
+    "vrCountGui": 95,
+    "gpuPreview": 26,
+    "mainStartupAndRenderTarget": 50,
+    "actualNativeGuiLifecycle": 76,
+    "nativeOwnerManager": 140,
+    "runtimeGlbAndAppearance": 46,
+    "glbExamplesMain": 46,
+    "populationAppearanceAndActualReplay": 225,
+    "sameBuildCore": 43,
+    "originalAnimation": 371,
+    "sixteenRigPhases": 96,
+    "renderedRecordReplayRoundtrip": 1028
+  },
+  "preservation": {
+    "existingPreviewConfigFilesByteIdentical": 1449,
+    "newExampleFilesAdded": [
+      "Models/Examples/downloaded-models.provenance.json",
+      "Models/Examples/RiggedSimple.glb",
+      "Models/Examples/RiggedSimple.source.md",
+      "Models/Examples/README.md",
+      "Models/Examples/AnimatedMorphCube.glb",
+      "Models/Examples/SimulatedLocust.glb",
+      "Models/Examples/AnimatedMorphCube.source.md",
+      "Models/Examples/SimulatedLocust.provenance.json",
+      "Examples/Models/locust-glb.example.json",
+      "Examples/Models/README.md",
+      "Examples/Models/morph-glb.example.json",
+      "Examples/Models/rigged-glb.example.json",
+      "Examples/Sequences/custom-models.sequence.json",
+      "Examples/Sequences/kannadi-glb.sequence.json",
+      "Examples/Kannadi/external-glb.example.json",
+      "ThirdPartyNotices/GLB-Examples.txt"
+    ],
+    "userRecordingsUsedAsTestWriteTargets": false,
+    "fourPreExistingArchiveMetaFilesPreserved": true
+  },
+  "limits": [
+    "Native OS pointer testing was previously declined; checks use actual UI Toolkit callbacks and rendering.",
+    "Physical camera and LED/display timing acceptance remains separate.",
+    "The previous dense-many-camera60FPS gap is unchanged by this pass."
+  ],
+  "reports": [
+    "docs/responsive-gui-validation-20261030.json",
+    "docs/startup-availability-validation-20261030.json",
+    "docs/native-recording-best-effort-validation-results.json",
+    "docs/model-import-validation-20261030.json",
+    "docs/glb-example-sequence-validation-20261030.json",
+    "docs/population-appearance-validation-20261030.json"
+  ]
+}

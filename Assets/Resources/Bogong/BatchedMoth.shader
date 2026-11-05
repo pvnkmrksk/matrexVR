@@ -62,7 +62,7 @@ Shader "Bogong/BatchedMoth"
                     rotate(v.rotation,float3(0,_WingSpan*.25*factor*sin(wingAngle),0)));
                 bool proxy = _Subpixel > .5 && extent < 1.5;
                 o.visible = v.phase.y > .5 && (v.part.x > 1.5 ? proxy : !proxy) ? 1 : -1;
-                if (_FlickerFrequency > 0 && frac((_Time.y + v.phase.x) * _FlickerFrequency) >= _FlickerDuty) o.visible = -1;
+                if (_FlickerFrequency > 0 && frac((clock + v.phase.x) * _FlickerFrequency) >= _FlickerDuty) o.visible = -1;
                 float3 local = v.local * radii;
                 if (v.part.x > .5 && v.part.x < 1.5)
                 {

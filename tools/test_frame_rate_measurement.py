@@ -127,6 +127,7 @@ using System;
 using UnityEngine;
 class MainController {
  public static MainController Instance; public static event Action SystemConfigurationChanged;
+ public OverlayPlacementConfig FrameOverlaySettings=new OverlayPlacementConfig();
  public SystemConfig GetSystemConfig(string rig)=>new SystemConfig();
 }
 class SystemConfig { public int targetDisplay; }
@@ -137,7 +138,7 @@ class OperatorOverlayLayout {
  public static Vector2 DisplaySize(int display)=>new Vector2(1920,1080);
  public static bool Reserve(string owner,int display,Rect desired,out Rect placed){placed=desired;return true;}
 }
-namespace ConfigurationUI { class ConfigWorkbench { public static bool IsOpen; } }
+namespace ConfigurationUI { class ConfigWorkbench { public static bool IsOpen; public static void RequestFrameRateSetting(){} } }
 '''
 
 
@@ -167,8 +168,10 @@ def main():
                 (project_dir/'Program.cs').write_text(HARNESS.replace('__PRODUCTION__', methods))
             else:
                 (project_dir/'fps.cs').write_text(source)
+                (project_dir/'OverlayPlacementConfig.cs').write_text((ROOT/'Assets/Scripts/OverlayPlacementConfig.cs').read_text())
                 (project_dir/'AppStubs.cs').write_text(API_STUBS)
-                references = ''.join(f'<Reference Include="{escape(path.stem)}"><HintPath>{escape(str(path))}</HintPath></Reference>' for path in [*engines[-1].glob('*.dll'), ui])
+                input_system=ROOT/'.local/project/Library/ScriptAssemblies/Unity.InputSystem.dll'
+                references = ''.join(f'<Reference Include="{escape(path.stem)}"><HintPath>{escape(str(path))}</HintPath></Reference>' for path in [*engines[-1].glob('*.dll'), ui, input_system])
             project = project_dir/(kind+'.csproj')
             output = 'Exe' if kind == 'Measurement' else 'Library'
             project.write_text(f'<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>{output}</OutputType><TargetFramework>net{version}.0</TargetFramework></PropertyGroup><ItemGroup>{references}</ItemGroup></Project>')

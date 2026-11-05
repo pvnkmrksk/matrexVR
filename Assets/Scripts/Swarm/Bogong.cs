@@ -30,7 +30,7 @@ public sealed class Bogong : MonoBehaviour
         }
         angular = string.Equals(config.sizeMode, "Angular", System.StringComparison.OrdinalIgnoreCase);
         tangentHalfAngle = Mathf.Tan(.5f * config.angularSizeDegrees * Mathf.Deg2Rad);
-        phaseOffset = Random.value;
+        phaseOffset = (float)ExperimentRandom.ForComponent(this, "flicker-phase").NextDouble();
         Update();
     }
 

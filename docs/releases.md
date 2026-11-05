@@ -2,6 +2,31 @@
 
 [GitHub Releases](https://github.com/pvnkmrksk/matrexVR/releases) is the publication record. A local build or source change is not a published binary. The [website](https://pvnkmrksk.github.io/matrexVR/) discovers real uploaded ZIPs; it never constructs a download URL for an absent asset.
 
+## 0.4.1 — agent onboarding and desktop workflow fixes
+
+Release: [`v0.4.1`](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.4.1). This patch integrates the committed desktop, same-build replay and local-control work after 0.4.0, with a clearer [five-minute start](five-minute-start.md), [repository agent instructions](../AGENTS.md), and [dedicated role guides](agents/README.md). Uncommitted recording/performance experiments are excluded from the pinned release source.
+
+- **Desktop setup:** native-resolution setup, legible controls, tracker-independent startup, self-contained GLB examples, Kannadi populations and up to sixteen configured rigs. Tracker readiness and recorder readiness remain distinct.
+- **Recording and replay:** new recordings retain the creating build identity and archived controller/configuration evidence. Replay follows the [same-build contract](same-build-replay-contract.md); keep the complete run and creating build. Experiment-owned recorder control requires a companion that advertises the matching capability. The reviewed Mac arm64 Rekkefly correction supports it; unchanged companion packages, including release-bundled HejjéTrac, retain their existing limits. Manual/external recording and VR startup remain available.
+- **Agent control:** explicit local opt-in exposes the shared GUI/JSON workspace through 27 MCP tools and three resources. Release packages include the matching adapter and dependency lock, under `Contents/Resources/MCP` on macOS or `MCP` beside the Windows/Linux player. Python 3.11+ is needed only on the MCP host. Follow the [connection guide and runnable health check](ai-control.md); no command endpoint is enabled by a normal launch.
+- **Documentation:** the README separates desktop use from source builds; the searchable manual includes onboarding, MCP and agent workflow pages. Agent role guides identify source ownership, targeted checks and the steps needed to complete already authorized work.
+
+The 0.4.1 package manifests list **13 compiled scenes**. The legacy `Swarm` scene is disabled in this build; supported swarm populations remain available in the current Choice/Kannadi workflows. Discovery reports the scenes actually compiled into each player.
+
+Existing standalone evidence covers [same-build replay](same-build-validation-20261029.md), [desktop/recorder acceptance](gui-recording-performance-followup.md), [startup/model availability](availability-and-model-workflow-20261030.md), and [MCP control](mcp-control-validation-20261031.json). Release manifests and the attached validation report identify the exact package source, fresh checks and their scope.
+
+Windows/Linux packages are cross-built; their native execution and physical apparatus calibration are separate checks. macOS packages are ad hoc signed and not notarized. Uniform LED presentation timing, camera exposure synchronization and long-run acquisition remain apparatus-dependent. The [0.4.0 limits below](#04-verification-and-known-limits) describe that historical release; its lack of acknowledged recorder control does not describe a capability-enabled 0.4.1 companion.
+
+To reproduce the reviewed package, use the immutable release tag and matching packaging tools/locks:
+
+```sh
+python3 tools/build_release.py --ref v0.4.1 --version 0.4.1 --platform all \
+  --local-native-camera-fix \
+  --local-dashboard-archive .integration/local-dashboard/DaariDeepa-macos-arm64.zip
+```
+
+See the [release agent guide](agents/release.md) for validation, provenance and publication checks.
+
 ## 0.4 — terrain, recording and replay
 
 Release target: [`v0.4.0`](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.4.0). Publication is established by the uploaded GitHub Release assets, not by this source document or a local build. The release manifests identify the exact source revision and packaged companions. Earlier 0.3 release descriptions below retain their historical scope.

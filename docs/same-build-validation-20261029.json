@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-29",
+  "unity": "6000.3.16f1",
+  "branch": "codex/experiment-replay-overhaul",
+  "scope": "Greenfield same-build replay and setup refinements; synthetic input and software checks, no physical apparatus claim",
+  "suites": {
+    "setup": {
+      "passed": true,
+      "checks": 28,
+      "report": ".local/greenfield-project/SetupUsabilityValidation/results.json"
+    },
+    "sameBuild": {
+      "passed": true,
+      "checks": 43,
+      "report": ".local/greenfield-project/same-build-replay-validation/results.json"
+    },
+    "animation": {
+      "passed": true,
+      "checks": 359,
+      "report": ".local/greenfield-project/replay-animation-validation/results.json"
+    },
+    "sixteenRigPhases": {
+      "passed": true,
+      "checks": 96,
+      "report": ".local/greenfield-project/kannadi-phase-validation.json"
+    },
+    "recordReplay": {
+      "passed": true,
+      "checks": 1025,
+      "report": ".local/greenfield-roundtrip-v6/results.json",
+      "comparisons": [
+        {
+          "seek": 0,
+          "scene": "Choice",
+          "unityFrame": 40,
+          "colorsSwapped": false,
+          "pixelMeanAbsoluteError": 0.00019882301879084967
+        },
+        {
+          "seek": 1,
+          "scene": "Choice",
+          "unityFrame": 160,
+          "colorsSwapped": false,
+          "pixelMeanAbsoluteError": 4.340277777777778e-05
+        },
+        {
+          "seek": 2,
+          "scene": "Choice_desync",
+          "unityFrame": 281,
+          "colorsSwapped": false,
+          "pixelMeanAbsoluteError": 0.0
+        },
+        {
+          "seek": 3,
+          "scene": "Choice_desync",
+          "unityFrame": 401,
+          "colorsSwapped": true,
+          "pixelMeanAbsoluteError": 0.0
+        },
+        {
+          "seek": 4,
+          "scene": "Choice_desync",
+          "unityFrame": 281,
+          "colorsSwapped": false,
+          "pixelMeanAbsoluteError": 0.0
+        },
+        {
+          "seek": 5,
+          "scene": "Choice",
+          "unityFrame": 40,
+          "colorsSwapped": false,
+          "pixelMeanAbsoluteError": 0.00019882301879084967
+        }
+      ],
+      "maxMeanRgbError": 0.00019882301879084967,
+      "publisher": "Explicit synthetic native-format JSON PUB at120Hz through local libzmq ctypes; no physical tracker or camera"
+    }
+  },
+  "offline": {
+    "worldReaderDotNet": 89,
+    "worldReaderUnityMono": 88,
+    "archiveAndWriter": 682,
+    "asyncLifecycleCycles": 150,
+    "recordingSummary": 66,
+    "operatorLayouts": 6843,
+    "frameTiming": 1393,
+    "apparatus": 55,
+    "worldStarters": 442,
+    "primaryActions": 18,
+    "previewLauncher": 2,
+    "buildIdentity": 1,
+    "nativePackaging": 9,
+    "companionBundles": 4,
+    "dashboardPackaging": 9,
+    "activeTemplates": 106,
+    "archivedHashes": 622,
+    "preservedInputs": 979,
+    "recordingSeal": 16
+  },
+  "standalone": {
+    "status": "passed",
+    "checks": 25,
+    "report": ".local/greenfield-native/Reports/20261029T130548Z-38fd5a5c",
+    "app": "Preview/MATREX VR.app",
+    "version": "0.5.0-dev",
+    "sourceRevision": "558578c9",
+    "config": "Preview/Config",
+    "data": "Preview/RunData",
+    "nativeKeyboardPlayback": true,
+    "animatedTriangleObservedMoving": true,
+    "sourceAndZipUnchanged": true,
+    "pointerStressAcceptance": false,
+    "buildGuid": "6b0d18c9bff04c92b7fd8fe9621f5dac",
+    "buildErrors": 0,
+    "buildWarnings": 62,
+    "doubleClickLauncherVerified": true,
+    "normalSetupShowsCap60": true,
+    "normalMenuQuitVerified": true
+  }
+}

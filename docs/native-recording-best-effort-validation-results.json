@@ -1,0 +1,245 @@
+{
+  "schemaVersion": 1,
+  "validationDate": "2026-10-30",
+  "policy": "best-effort-independent-recorders",
+  "passed": true,
+  "scope": "Production manager/client/archive code compiled and exercised offline with isolated real owned fixture processes, private filesystem endpoints and simulated video counters. Actual native sample-video/MainController evidence is recorded separately; no physical camera claim.",
+  "preparationBudgetMillisecondsPerRig": 2000,
+  "transportCallTimeoutMilliseconds": 1000,
+  "startsRunInParallel": true,
+  "productionManagerProcessConfigChecks": 140,
+  "productionTransportChecks": 21,
+  "productionArchiveChecks": 76,
+  "loggingSourceGuards": 3,
+  "settledRepeatRuns": 120,
+  "cases": [
+    "Missing owned tracker returns unavailable with acknowledged:false and warning instead of rejecting VR startup.",
+    "Two silent endpoints share a bounded parallel wait; a healthy later rig still receives Start.",
+    "Native pre-queue rejection is distinct from ambiguous delivery timeout and creates no nonexistent-take cleanup failure.",
+    "The exact accepted take retains its immutable run GUID and owned stop receipt.",
+    "Armed zero-frame take times out as unavailable; physical closure remains closed-unacknowledged with acknowledged:false.",
+    "Closed zero-video config/completion artifacts are hashed and retained without inventing a replay clip or failing VR archival.",
+    "A companion lacking automatic video capability still prepares its input with a warning and no fake pending-media source.",
+    "Manual control remains explicitly unacknowledged/operator-controlled.",
+    "Repeated settled runs release retained task/cancellation structures."
+  ],
+  "nativeAdaptersChanged": false,
+  "nativeBuildEvidence": "native-recording-control-validation-results.json",
+  "actualMainStartupEvidence": "startup-availability-validation-20261030.json",
+  "physicalAcceptance": "pending",
+  "published": false,
+  "actualMainLifecycle": {
+    "passed": true,
+    "checks": 76,
+    "runCount": 5,
+    "scope": "Actual Editor MainController start/stop, two owned native GUI engines plus one unavailable mixed-run recorder on generated/sample input, native receipt proof and run-local archive; no physical camera/LED claim.",
+    "desiredOwnerIdentityGuardActive": true,
+    "cases": [
+      {
+        "case": "normal-0",
+        "lifecycleStatus": "finalized",
+        "sequenceOutcome": "stopped",
+        "zipCreated": true,
+        "mediaComplete": true,
+        "mediaPending": false,
+        "importedClips": 2,
+        "nativeStates": {
+          "VR1": {
+            "state": "complete",
+            "acknowledged": true,
+            "physicalClosure": "complete",
+            "configurationProfileMatches": true
+          },
+          "VR2": {
+            "state": "complete",
+            "acknowledged": true,
+            "physicalClosure": "complete",
+            "configurationProfileMatches": true
+          }
+        },
+        "startupWarningCount": 0,
+        "startupRigCount": 2,
+        "cameraClips": [
+          {
+            "rigId": "VR1",
+            "frameCount": 94,
+            "alignment": "consumed-frame-id"
+          },
+          {
+            "rigId": "VR2",
+            "frameCount": 15,
+            "alignment": "consumed-frame-id"
+          }
+        ]
+      },
+      {
+        "case": "normal-1",
+        "lifecycleStatus": "finalized",
+        "sequenceOutcome": "stopped",
+        "zipCreated": true,
+        "mediaComplete": true,
+        "mediaPending": false,
+        "importedClips": 2,
+        "nativeStates": {
+          "VR1": {
+            "state": "complete",
+            "acknowledged": true,
+            "physicalClosure": "complete",
+            "configurationProfileMatches": true
+          },
+          "VR2": {
+            "state": "complete",
+            "acknowledged": true,
+            "physicalClosure": "complete",
+            "configurationProfileMatches": true
+          }
+        },
+        "startupWarningCount": 0,
+        "startupRigCount": 2,
+        "cameraClips": [
+          {
+            "rigId": "VR1",
+            "frameCount": 83,
+            "alignment": "consumed-frame-id"
+          },
+          {
+            "rigId": "VR2",
+            "frameCount": 14,
+            "alignment": "consumed-frame-id"
+          }
+        ]
+      },
+      {
+        "case": "mixed-missing-tracker",
+        "lifecycleStatus": "finalized",
+        "sequenceOutcome": "stopped",
+        "zipCreated": true,
+        "mediaComplete": true,
+        "mediaPending": false,
+        "importedClips": 2,
+        "nativeStates": {
+          "VR1": {
+            "state": "complete",
+            "acknowledged": true,
+            "physicalClosure": "complete",
+            "configurationProfileMatches": true
+          },
+          "VR2": {
+            "state": "complete",
+            "acknowledged": true,
+            "physicalClosure": "complete",
+            "configurationProfileMatches": true
+          },
+          "VR3": {
+            "state": "unavailable",
+            "acknowledged": false,
+            "physicalClosure": null
+          }
+        },
+        "startupWarningCount": 1,
+        "startupRigCount": 3,
+        "cameraClips": [
+          {
+            "rigId": "VR1",
+            "frameCount": 83,
+            "alignment": "consumed-frame-id"
+          },
+          {
+            "rigId": "VR2",
+            "frameCount": 14,
+            "alignment": "consumed-frame-id"
+          }
+        ]
+      },
+      {
+        "case": "cancelled-preparation",
+        "lifecycleStatus": "finalized",
+        "sequenceOutcome": "cancelled",
+        "zipCreated": true,
+        "mediaComplete": true,
+        "mediaPending": false,
+        "importedClips": 0,
+        "nativeStates": {
+          "VR1": {
+            "state": "complete",
+            "acknowledged": true,
+            "physicalClosure": "complete",
+            "configurationProfileMatches": true
+          },
+          "VR2": {
+            "state": "closed-unacknowledged",
+            "acknowledged": false,
+            "physicalClosure": "complete",
+            "configurationProfileMatches": true
+          }
+        },
+        "startupWarningCount": 0,
+        "startupRigCount": 2,
+        "unpresented": {
+          "presented": false,
+          "playableVrTimeline": false,
+          "alignment": "unavailable"
+        }
+      },
+      {
+        "case": "manual-pause",
+        "lifecycleStatus": "error",
+        "sequenceOutcome": "stopped",
+        "zipCreated": false,
+        "mediaComplete": true,
+        "mediaPending": false,
+        "importedClips": 2,
+        "nativeStates": {
+          "VR1": {
+            "state": "override",
+            "acknowledged": false,
+            "physicalClosure": "complete",
+            "configurationProfileMatches": true
+          },
+          "VR2": {
+            "state": "complete",
+            "acknowledged": true,
+            "physicalClosure": "complete",
+            "configurationProfileMatches": true
+          }
+        },
+        "startupWarningCount": 0,
+        "startupRigCount": 2,
+        "cameraClips": [
+          {
+            "rigId": "VR1",
+            "frameCount": 96,
+            "alignment": "consumed-frame-id"
+          },
+          {
+            "rigId": "VR2",
+            "frameCount": 20,
+            "alignment": "consumed-frame-id"
+          }
+        ]
+      }
+    ],
+    "cleanupErrors": []
+  },
+  "actualMainRawLocalEvidence": ".local/native-owner-guard-results/results.json",
+  "desiredOwnerIdentity": {
+    "checkedBeforeAnyNativeCommand": true,
+    "mismatchesSendZeroCommands": [
+      "tracking-port",
+      "remote-address",
+      "calibration-path",
+      "executable-path",
+      "device",
+      "normalized-backend",
+      "camera-only-mode",
+      "configuration-profile",
+      "unknown-legacy-profile"
+    ],
+    "newReceiptFields": [
+      "configRoot",
+      "device",
+      "headless"
+    ],
+    "unchangedNormalizedAliasAcknowledges": true
+  }
+}

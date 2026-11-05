@@ -1,6 +1,6 @@
 # Full schema field atlas
 
-The bundled schemas currently emit **2,821 property paths across 8 families**. This index includes nested arrays and phase payloads, current animal/agent names and the accepted legacy aliases. It is generated with the static manual from the same JSON used by the configuration studio.
+The bundled schemas currently emit **4,181 property paths across 8 families**. This index includes nested arrays and phase payloads, current animal/agent names and the accepted legacy aliases. It is generated with the static manual from the same JSON used by the configuration studio.
 
 Use the field pages for exact type/default/constraint data. Use the [written parameter reference](../../configuration-reference.md) for units, precedence and experimental meaning. The schema cannot replace cross-field production validation or physical calibration.
 
@@ -8,21 +8,21 @@ Use the field pages for exact type/default/constraint data. Use the [written par
 
 | --- | --- | --- |
 
-| `system` | 58 | [System fields](schema-system.md) |
+| `system` | 74 | [System fields](schema-system.md) |
 
-| `sequence` | 44 | [Sequence fields](schema-sequence.md) |
+| `sequence` | 51 | [Sequence fields](schema-sequence.md) |
 
-| `choice` | 821 | [Choice fields](schema-choice.md) |
+| `choice` | 987 | [Choice fields](schema-choice.md) |
 
-| `swarm` | 933 | [Swarm fields](schema-swarm.md) |
+| `swarm` | 1323 | [Swarm fields](schema-swarm.md) |
 
-| `kannadi` | 637 | [Kannadi fields](schema-kannadi.md) |
+| `kannadi` | 983 | [Kannadi fields](schema-kannadi.md) |
 
-| `optomotor` | 187 | [Optomotor fields](schema-optomotor.md) |
+| `optomotor` | 573 | [Optomotor fields](schema-optomotor.md) |
 
 | `rugosity` | 14 | [Rugosity fields](schema-rugosity.md) |
 
-| `dynamic-choice` | 127 | [Dynamic-Choice fields](schema-dynamic-choice.md) |
+| `dynamic-choice` | 176 | [Dynamic-Choice fields](schema-dynamic-choice.md) |
 
 ## Read the contract correctly
 

@@ -43,6 +43,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         spawnedObjectsRoot.position = Vector3.zero;
         spawnedObjectsRoot.rotation = Quaternion.identity;
         spawnedObjectsRoot.localScale = Vector3.one;
+        spawnedObjectsRoot.gameObject.AddComponent<RecordedWorldStateTarget>().Key = "choice";
     }
 
     public void InitializeScene(Dictionary<string, object> parameters)
@@ -73,7 +74,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         }
 
         config.headingReference?.Validate();
-        Keyboard.ApplyAutopilotConfig(config.autopilotEnabled, config.autopilotSpeed);
+        if (!ReplayExecutionContext.Active) Keyboard.ApplyAutopilotConfig(config.autopilotEnabled, config.autopilotSpeed);
 
         CleanupSpawnedObjects();
         ApplyConfig(config);
@@ -99,7 +100,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             return;
         }
 
-        ClosedLoop[] closedLoopComponents = RuntimeRigRegistry.Rigs(gameObject.scene);
+        ClosedLoop[] closedLoopComponents = ReplayExecutionContext.Rigs(gameObject.scene);
         Debugger.Log("Number of ClosedLoop scripts found: " + closedLoopComponents.Length, 4);
 
         // if randomInitialRotation is true, then set the rotation to a random value for y axis and the rest to initialRotation value
@@ -181,6 +182,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         // Retain the legacy delayed initialization only for old full-reset configs.
         if (!phased && config.rugosity?.enabled != true && config.headingReference?.enabled != true && config.resetPositionOnStart && config.resetRotationOnStart)
             StartCoroutine(DelayedOnLoaded(0.05f));
+        if (ReplayExecutionContext.Active) return; // Recorded sky image is restored after canonical configuration.
         if (config.uniformSkyColor != null)
             NightSkyController.Apply(gameObject, null, null, config.uniformSkyColor);
         else if (!string.IsNullOrEmpty(config.skyboxPath)) SetSkybox(config.skyboxPath);
@@ -192,10 +194,10 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         SpawnAbsoluteObjects(config);
         foreach (ClosedLoop rig in rigs)
         {
-            var reference = rig.GetComponent<StimulusHeadingReference>()?.Result;
+            var reference = ReplayExecutionContext.Active ? ReplayExecutionContext.Heading(rig) : rig.GetComponent<StimulusHeadingReference>()?.Result;
             if ((config.objects ?? System.Array.Empty<SceneObject>()).Any(o => o.useHeadingReference))
                 SpawnRelativeObjects(config, rig, reference);
-            if (config.swarm == null) continue;
+            if (config.swarm == null || ReplayExecutionContext.Active) continue;
             int vrIndex = Kannadi.ParseVRIndex(rig.name);
             var host = new GameObject("VR" + vrIndex + "_EmbeddedSwarm");
             host.transform.SetParent(spawnedObjectsRoot, false);
@@ -218,21 +220,22 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
     {
         foreach (var obj in config.objects ?? System.Array.Empty<SceneObject>())
         {
-            if (obj.useHeadingReference || string.IsNullOrEmpty(obj.type))
+            if (obj == null || !obj.enabled || obj.useHeadingReference || (string.IsNullOrEmpty(obj.type) && string.IsNullOrEmpty(obj.modelPath)))
             {
                 continue; // Skip objects with no type specified
             }
 
-            bool isBandObject = obj.type.ToLower().Contains("band");
+            bool isBandObject = string.IsNullOrEmpty(obj.modelPath) && obj.type.ToLowerInvariant().Contains("band");
 
             if (isBandObject)
             {
+                if (ReplayExecutionContext.Active) continue; // Population tracks restore realized individuals.
                 foreach (ClosedLoop rig in RuntimeRigRegistry.Rigs(gameObject.scene))
                     InstantiateBand(obj, Kannadi.ParseVRIndex(rig.name));
             }
-            else if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
+            else if (ResolveObjectPrefab(obj, out GameObject prefab))
             {
-                GameObject instance = Instantiate(prefab, spawnedObjectsRoot);
+                GameObject instance = ExternalModelLibrary.InstantiatePrefab(prefab, spawnedObjectsRoot);
                 ApplyResolvedTransform(instance.transform, obj);
                 ConfigureRegularObjectInstance(instance, obj);
             }
@@ -251,12 +254,12 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             camera.cullingMask = (camera.cullingMask & ~layers) | (1 << layer);
         foreach (SceneObject obj in config.objects ?? System.Array.Empty<SceneObject>())
         {
-            if (!obj.useHeadingReference || string.IsNullOrEmpty(obj.type)) continue;
-            if (obj.type.ToLowerInvariant().Contains("band"))
+            if (obj == null || !obj.enabled || !obj.useHeadingReference || (string.IsNullOrEmpty(obj.type) && string.IsNullOrEmpty(obj.modelPath))) continue;
+            if (string.IsNullOrEmpty(obj.modelPath) && obj.type.ToLowerInvariant().Contains("band"))
                 InstantiateBand(obj, vrIndex, reference, rig.transform.position);
-            else if (prefabDict.TryGetValue(obj.type, out GameObject prefab))
+            else if (ResolveObjectPrefab(obj, out GameObject prefab))
             {
-                GameObject instance = Instantiate(prefab, spawnedObjectsRoot);
+                GameObject instance = ExternalModelLibrary.InstantiatePrefab(prefab, spawnedObjectsRoot);
                 ApplyResolvedTransform(instance.transform, obj);
                 // Authored coordinates are relative to the animal's location at onset.
                 if (reference != null)
@@ -268,6 +271,12 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
                 ConfigureRegularObjectInstance(instance, obj);
             }
         }
+    }
+
+    private bool ResolveObjectPrefab(SceneObject obj, out GameObject prefab)
+    {
+        if (!string.IsNullOrWhiteSpace(obj.modelPath)) { prefab = ExternalModelLibrary.GetPrefab(obj.modelPath); return true; }
+        return prefabDict.TryGetValue(obj.type, out prefab);
     }
 
     private void CleanupSpawnedObjects()
@@ -294,6 +303,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             old.GetComponent<BandSpawner>()?.ClearInstances();
             old.GetComponent<LocustSpawner>()?.PrepareObservation();
             old.SetActive(false);
+            old.AddComponent<RecordedPendingDestroy>();
             Destroy(old);
         }
     }
@@ -309,20 +319,24 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 
     private void ConfigureRegularObjectInstance(GameObject instance, SceneObject obj)
     {
+        if (!string.IsNullOrWhiteSpace(obj.modelPath) || !string.IsNullOrWhiteSpace(obj.animationClip) || obj.animationSpeed != 1)
+            ExternalModelLibrary.ConfigureAnimation(instance, obj.animationClip, obj.animationSpeed);
         if (obj.groundOnTerrain) instance.transform.position = DesktopQuickStart.GroundPosition(instance.transform.position);
         Debug.Log("Instance position: " + instance.transform.position);
 
         if (obj.speed != 0)
         {
-            instance.GetComponent<LocustMover>().speed = obj.speed;
+            var mover = instance.GetComponent<LocustMover>();
+            if (mover != null) mover.speed = obj.speed;
         }
 
         if (
-            !string.IsNullOrEmpty(obj.material)
+            string.IsNullOrWhiteSpace(obj.modelPath)
+            && !string.IsNullOrEmpty(obj.material)
             && materialDict.TryGetValue(obj.material, out Material material)
         )
         {
-            instance.GetComponent<Renderer>().sharedMaterial = material;
+            foreach (var renderer in instance.GetComponentsInChildren<Renderer>(true)) renderer.sharedMaterial = material;
         }
 
         ScaleWithDistance scaleScript = instance.GetComponent<ScaleWithDistance>();
@@ -338,6 +352,19 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
             colorDrift.meanBlueB = obj.meanBlueB;
             colorDrift.switchInterval = obj.switchInterval;
         }
+        ModelAppearance.Apply(instance, obj.appearance);
+    }
+
+    public GameObject CreateRecordedBandVisual(string recordedName,Transform parent)
+    {
+        foreach(var candidate in prefabs??System.Array.Empty<GameObject>())
+        {
+            var spawner=candidate!=null?candidate.GetComponent<BandSpawner>():null;
+            if(spawner?.instancePrefab==null)continue;
+            if(recordedName.StartsWith(spawner.instancePrefab.name+"_"+candidate.name+"_",System.StringComparison.Ordinal))
+                return Instantiate(spawner.instancePrefab,parent);
+        }
+        throw new System.IO.InvalidDataException("Recorded band visual is absent from its acquisition scene: "+recordedName);
     }
 
     private void InstantiateBand(SceneObject obj, int vrIndex, HeadingReferenceResult reference = null, Vector3 pivot = default)
@@ -454,7 +481,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         }
     }
 
-    private Vector3 CalculatePosition(float radius, float angle, float height = 0)
+    private static Vector3 CalculatePosition(float radius, float angle, float height = 0)
     {
         // Use double-precision trig so mirrored angles stay symmetric when cast back to float.
         double angleRadians = angle * Mathf.Deg2Rad;
@@ -463,7 +490,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         return new Vector3(x, height, z); // Assuming y is always 0
     }
 
-    private Vector3 ResolvePosition(Position position)
+    public static Vector3 ResolvePosition(Position position)
     {
         if (position == null)
         {
@@ -478,7 +505,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         return CalculatePosition(position.radius, position.angle, position.height);
     }
 
-    private Vector3 ResolveScale(SceneObject obj)
+    public static Vector3 ResolveScale(SceneObject obj)
     {
         if (obj?.scale == null)
         {
@@ -489,7 +516,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         return new Vector3(x, obj.scale.y, obj.scale.z);
     }
 
-    private Quaternion ResolveRotation(SceneObject obj)
+    public static Quaternion ResolveRotation(SceneObject obj)
     {
         if (obj?.rotation != null && obj.rotation.HasExplicitRotation())
         {
@@ -504,7 +531,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         return Quaternion.identity;
     }
 
-    private void ApplyResolvedTransform(Transform target, SceneObject obj)
+    public static void ApplyResolvedTransform(Transform target, SceneObject obj)
     {
         if (target == null)
         {
@@ -643,6 +670,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
 [System.Serializable]
 public class SceneConfig
 {
+    public SunConfig sun;
     public RugosityConfig rugosity;
     public bool resetPositionOnStart = true;
     public bool resetRotationOnStart = true;
@@ -674,11 +702,16 @@ public class SceneConfig
 [System.Serializable]
 public class SceneObject
 {
+    public bool enabled = true;
+    public string modelPath;
+    public string animationClip;
+    public float animationSpeed = 1f;
     public bool groundOnTerrain = false;
     public bool useHeadingReference = false;
     public string type;
     public Position position;
     public string material;
+    public ModelAppearanceConfig appearance;
     public ScaleConfig scale;
     public RotationConfig rotation;
     public bool flip;

@@ -9,6 +9,14 @@
   },
   {
     "group": "Start here",
+    "title": "Five-minute start",
+    "slug": "five-minute-start",
+    "source": "docs/five-minute-start.md",
+    "icon": "play",
+    "summary": "Run a hardware-free demo, save a short recording and replay it."
+  },
+  {
+    "group": "Start here",
     "title": "Getting started",
     "slug": "getting-started",
     "source": "docs/getting-started.md",
@@ -302,6 +310,22 @@
     "source": "docs/replay.md",
     "icon": "play",
     "summary": "Folder browser, shared timeline, archived stimuli and reconstruction limits."
+  },
+  {
+    "group": "Extend and validate",
+    "title": "Agent and MCP control",
+    "slug": "ai-control",
+    "source": "docs/ai-control.md",
+    "icon": "sliders-horizontal",
+    "summary": "Connect an MCP client and verify configuration, run and replay operations."
+  },
+  {
+    "group": "Extend and validate",
+    "title": "Agent workflow",
+    "slug": "agent-workflow",
+    "source": "docs/agents/README.md",
+    "icon": "layout-dashboard",
+    "summary": "Repository context, dedicated roles and validation responsibilities."
   },
   {
     "group": "Extend and validate",

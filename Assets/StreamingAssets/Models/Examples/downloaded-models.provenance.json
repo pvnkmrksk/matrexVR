@@ -1,0 +1,26 @@
+{
+  "models": [
+    {
+      "file": "RiggedSimple.glb",
+      "source": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/8f492390ddc7a2ae221a1369ef560589cf8c70fb/Models/RiggedSimple/glTF-Binary/RiggedSimple.glb",
+      "sourceRevision": "8f492390ddc7a2ae221a1369ef560589cf8c70fb",
+      "sha256": "3a79dabb67bb0cd598a18d08b954d9d357c27c30672f82ef5d3f4e7fe6ca3401",
+      "bytes": 15104,
+      "license": "CC-BY-4.0",
+      "credit": "2017 Cesium",
+      "licenseReference": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/8f492390ddc7a2ae221a1369ef560589cf8c70fb/Models/RiggedSimple/README.md",
+      "modified": false
+    },
+    {
+      "file": "AnimatedMorphCube.glb",
+      "source": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/8f492390ddc7a2ae221a1369ef560589cf8c70fb/Models/AnimatedMorphCube/glTF-Binary/AnimatedMorphCube.glb",
+      "sourceRevision": "8f492390ddc7a2ae221a1369ef560589cf8c70fb",
+      "sha256": "214ee56160a50dbf22543a1d66dbf860986e87f0efac3d89feac1359d0e6aeab",
+      "bytes": 6752,
+      "license": "CC0-1.0",
+      "credit": "2017 Public; Microsoft",
+      "licenseReference": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/8f492390ddc7a2ae221a1369ef560589cf8c70fb/Models/AnimatedMorphCube/README.md",
+      "modified": false
+    }
+  ]
+}

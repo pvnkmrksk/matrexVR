@@ -1,0 +1,553 @@
+{
+  "checks": 225,
+  "passed": [
+    "Actual Main starts two-rig external GLB appearance sequence",
+    "Mirror preStimulus: both configured rigs remain active",
+    "Fixture acquisition front camera is1:1 and inside the actual output for VR1",
+    "Fixture acquisition front camera is1:1 and inside the actual output for VR2",
+    "preStimulus: GLB body actual surface matches enabled/restored appearance",
+    "preStimulus: original external GLB animation keeps playing",
+    "preStimulus: GLB body actual surface matches enabled/restored appearance",
+    "preStimulus: original external GLB animation keeps playing",
+    "preStimulus: instance override never changes the loaded shared GLB template",
+    "preStimulus: Main Camera R retains peer-only mirror visibility for VR1",
+    "preStimulus: Main Camera B retains peer-only mirror visibility for VR1",
+    "preStimulus: Main Camera L retains peer-only mirror visibility for VR1",
+    "preStimulus: Main Camera F retains peer-only mirror visibility for VR1",
+    "preStimulus: Main Camera U retains peer-only mirror visibility for VR1",
+    "preStimulus: Main Camera D retains peer-only mirror visibility for VR1",
+    "preStimulus: Main Camera R retains peer-only mirror visibility for VR2",
+    "preStimulus: Main Camera B retains peer-only mirror visibility for VR2",
+    "preStimulus: Main Camera L retains peer-only mirror visibility for VR2",
+    "preStimulus: Main Camera F retains peer-only mirror visibility for VR2",
+    "preStimulus: Main Camera U retains peer-only mirror visibility for VR2",
+    "preStimulus: Main Camera D retains peer-only mirror visibility for VR2",
+    "Mirror stimulus: both configured rigs remain active",
+    "Fixture acquisition front camera is1:1 and inside the actual output for VR1",
+    "Fixture acquisition front camera is1:1 and inside the actual output for VR2",
+    "Appearance-only stimulus retains every original body instance",
+    "Appearance-only stimulus retains every original animation component",
+    "reset=false retains the moved focal pose through stimulus",
+    "Appearance-only stimulus does not reset live clip phase for VR1: 0.005685632",
+    "Appearance-only stimulus does not reset live clip phase for VR2: 0.005685632",
+    "stimulus: GLB body actual surface matches enabled/restored appearance",
+    "stimulus: original external GLB animation keeps playing",
+    "stimulus: GLB body actual surface matches enabled/restored appearance",
+    "stimulus: original external GLB animation keeps playing",
+    "stimulus: instance override never changes the loaded shared GLB template",
+    "stimulus: Main Camera R retains peer-only mirror visibility for VR1",
+    "stimulus: Main Camera B retains peer-only mirror visibility for VR1",
+    "stimulus: Main Camera L retains peer-only mirror visibility for VR1",
+    "stimulus: Main Camera F retains peer-only mirror visibility for VR1",
+    "stimulus: Main Camera U retains peer-only mirror visibility for VR1",
+    "stimulus: Main Camera D retains peer-only mirror visibility for VR1",
+    "stimulus: Main Camera R retains peer-only mirror visibility for VR2",
+    "stimulus: Main Camera B retains peer-only mirror visibility for VR2",
+    "stimulus: Main Camera L retains peer-only mirror visibility for VR2",
+    "stimulus: Main Camera F retains peer-only mirror visibility for VR2",
+    "stimulus: Main Camera U retains peer-only mirror visibility for VR2",
+    "stimulus: Main Camera D retains peer-only mirror visibility for VR2",
+    "Mirror postStimulus: both configured rigs remain active",
+    "Fixture acquisition front camera is1:1 and inside the actual output for VR1",
+    "Fixture acquisition front camera is1:1 and inside the actual output for VR2",
+    "Appearance-only postStimulus retains every original body instance",
+    "Appearance-only postStimulus retains every original animation component",
+    "reset=false retains the moved focal pose through postStimulus",
+    "Appearance-only postStimulus does not reset live clip phase for VR1: 0.0009510966",
+    "Appearance-only postStimulus does not reset live clip phase for VR2: 0.0009510966",
+    "postStimulus: GLB body actual surface matches enabled/restored appearance",
+    "postStimulus: original external GLB animation keeps playing",
+    "postStimulus: GLB body actual surface matches enabled/restored appearance",
+    "postStimulus: original external GLB animation keeps playing",
+    "postStimulus: instance override never changes the loaded shared GLB template",
+    "postStimulus: Main Camera R retains peer-only mirror visibility for VR1",
+    "postStimulus: Main Camera B retains peer-only mirror visibility for VR1",
+    "postStimulus: Main Camera L retains peer-only mirror visibility for VR1",
+    "postStimulus: Main Camera F retains peer-only mirror visibility for VR1",
+    "postStimulus: Main Camera U retains peer-only mirror visibility for VR1",
+    "postStimulus: Main Camera D retains peer-only mirror visibility for VR1",
+    "postStimulus: Main Camera R retains peer-only mirror visibility for VR2",
+    "postStimulus: Main Camera B retains peer-only mirror visibility for VR2",
+    "postStimulus: Main Camera L retains peer-only mirror visibility for VR2",
+    "postStimulus: Main Camera F retains peer-only mirror visibility for VR2",
+    "postStimulus: Main Camera U retains peer-only mirror visibility for VR2",
+    "postStimulus: Main Camera D retains peer-only mirror visibility for VR2",
+    "Fixture acquisition front camera is1:1 and inside the actual output for VR1",
+    "Fixture acquisition front camera is1:1 and inside the actual output for VR2",
+    "Generated GLB swarm has exactly three agents per rig",
+    "Generated GLB agent inherits configured actual modelAppearance color",
+    "Generated GLB agent retains original animation and instance-owned surface override",
+    "Generated GLB agent inherits configured actual modelAppearance color",
+    "Generated GLB agent retains original animation and instance-owned surface override",
+    "Generated GLB agent inherits configured actual modelAppearance color",
+    "Generated GLB agent retains original animation and instance-owned surface override",
+    "Generated GLB swarm has exactly three agents per rig",
+    "Generated GLB agent inherits configured actual modelAppearance color",
+    "Generated GLB agent retains original animation and instance-owned surface override",
+    "Generated GLB agent inherits configured actual modelAppearance color",
+    "Generated GLB agent retains original animation and instance-owned surface override",
+    "Generated GLB agent inherits configured actual modelAppearance color",
+    "Generated GLB agent retains original animation and instance-owned surface override",
+    "Actual Main observed three retained-body appearance phases plus generated GLB swarm",
+    "Population appearance run has no experiment/finalization error",
+    "Complete native population/VR writers finalize to a ZIP",
+    "Both mirror and generated GLB population streams drain without dropped frames or writer failures",
+    "All phase/population appearance settings are archived in full presentation configurations",
+    "Mirror phase changes, generated populations and world objects release every override material",
+    "Actual ReplayScene opens both rigs and all four recorded GLB population streams",
+    "Replay seek 0 has no fidelity/reconstruction error",
+    "Replay seek 0 keeps both original-view camera projections finite and nonsingular",
+    "Replay seek 0: VR2 retains the acquired1:1 LED aspect",
+    "Replay seek 0: VR2 retains actual acquired FOV/near/far/projection mode",
+    "Replay seek 0: VR1 retains the acquired1:1 LED aspect",
+    "Replay seek 0: VR1 retains actual acquired FOV/near/far/projection mode",
+    "Replay seek 0 shows every recorded GLB body exactly once",
+    "Replay seek 0: original recorded body identity VR1_Kannadi_0",
+    "Replay seek 0: actual original GLB material color restored for VR1_Kannadi_0",
+    "Replay seek 0: exact original animation state restored for VR1_Kannadi_0",
+    "Replay seek 0: actual Legacy clip time matches recorded evidence for VR1_Kannadi_0",
+    "Replay seek 0: paused body animation does not advance on wall time",
+    "Replay seek 0: original authoritative body position/yaw restored for VR1_Kannadi_0",
+    "Replay seek 0: original recorded body identity VR2_Kannadi_0",
+    "Replay seek 0: actual original GLB material color restored for VR2_Kannadi_0",
+    "Replay seek 0: exact original animation state restored for VR2_Kannadi_0",
+    "Replay seek 0: actual Legacy clip time matches recorded evidence for VR2_Kannadi_0",
+    "Replay seek 0: paused body animation does not advance on wall time",
+    "Replay seek 0: original authoritative body position/yaw restored for VR2_Kannadi_0",
+    "Replay seek 0 starts no tracking/acquisition worker",
+    "Replay seek 1 has no fidelity/reconstruction error",
+    "Replay seek 1 keeps both original-view camera projections finite and nonsingular",
+    "Replay seek 1: VR2 retains the acquired1:1 LED aspect",
+    "Replay seek 1: VR2 retains actual acquired FOV/near/far/projection mode",
+    "Replay seek 1: VR1 retains the acquired1:1 LED aspect",
+    "Replay seek 1: VR1 retains actual acquired FOV/near/far/projection mode",
+    "Replay seek 1 shows every recorded GLB body exactly once",
+    "Replay seek 1: original recorded body identity VR1_Kannadi_0",
+    "Replay seek 1: actual original GLB material color restored for VR1_Kannadi_0",
+    "Replay seek 1: exact original animation state restored for VR1_Kannadi_0",
+    "Replay seek 1: actual Legacy clip time matches recorded evidence for VR1_Kannadi_0",
+    "Replay seek 1: paused body animation does not advance on wall time",
+    "Replay seek 1: original authoritative body position/yaw restored for VR1_Kannadi_0",
+    "Replay seek 1: original recorded body identity VR2_Kannadi_0",
+    "Replay seek 1: actual original GLB material color restored for VR2_Kannadi_0",
+    "Replay seek 1: exact original animation state restored for VR2_Kannadi_0",
+    "Replay seek 1: actual Legacy clip time matches recorded evidence for VR2_Kannadi_0",
+    "Replay seek 1: paused body animation does not advance on wall time",
+    "Replay seek 1: original authoritative body position/yaw restored for VR2_Kannadi_0",
+    "Replay seek 1 starts no tracking/acquisition worker",
+    "Replay seek 2 has no fidelity/reconstruction error",
+    "Replay seek 2 keeps both original-view camera projections finite and nonsingular",
+    "Replay seek 2: VR2 retains the acquired1:1 LED aspect",
+    "Replay seek 2: VR2 retains actual acquired FOV/near/far/projection mode",
+    "Replay seek 2: VR1 retains the acquired1:1 LED aspect",
+    "Replay seek 2: VR1 retains actual acquired FOV/near/far/projection mode",
+    "Replay seek 2 shows every recorded GLB body exactly once",
+    "Replay seek 2: original recorded body identity VR2_Kannadi_0",
+    "Replay seek 2: actual original GLB material color restored for VR2_Kannadi_0",
+    "Replay seek 2: exact original animation state restored for VR2_Kannadi_0",
+    "Replay seek 2: actual Legacy clip time matches recorded evidence for VR2_Kannadi_0",
+    "Replay seek 2: paused body animation does not advance on wall time",
+    "Replay seek 2: original authoritative body position/yaw restored for VR2_Kannadi_0",
+    "Replay seek 2: original recorded body identity VR1_Kannadi_0",
+    "Replay seek 2: actual original GLB material color restored for VR1_Kannadi_0",
+    "Replay seek 2: exact original animation state restored for VR1_Kannadi_0",
+    "Replay seek 2: actual Legacy clip time matches recorded evidence for VR1_Kannadi_0",
+    "Replay seek 2: paused body animation does not advance on wall time",
+    "Replay seek 2: original authoritative body position/yaw restored for VR1_Kannadi_0",
+    "Replay seek 2 starts no tracking/acquisition worker",
+    "Replay seek 3 has no fidelity/reconstruction error",
+    "Replay seek 3 keeps both original-view camera projections finite and nonsingular",
+    "Replay seek 3: VR2 retains the acquired1:1 LED aspect",
+    "Replay seek 3: VR2 retains actual acquired FOV/near/far/projection mode",
+    "Replay seek 3: VR1 retains the acquired1:1 LED aspect",
+    "Replay seek 3: VR1 retains actual acquired FOV/near/far/projection mode",
+    "Replay seek 3 shows every recorded GLB body exactly once",
+    "Replay seek 3: original recorded body identity SimulatedLocustsVR2_Locust_0",
+    "Replay seek 3: actual original GLB material color restored for SimulatedLocustsVR2_Locust_0",
+    "Replay seek 3: exact original animation state restored for SimulatedLocustsVR2_Locust_0",
+    "Replay seek 3: actual Legacy clip time matches recorded evidence for SimulatedLocustsVR2_Locust_0",
+    "Replay seek 3: paused body animation does not advance on wall time",
+    "Replay seek 3: original authoritative body position/yaw restored for SimulatedLocustsVR2_Locust_0",
+    "Replay seek 3: original recorded body identity SimulatedLocustsVR2_Locust_2",
+    "Replay seek 3: actual original GLB material color restored for SimulatedLocustsVR2_Locust_2",
+    "Replay seek 3: exact original animation state restored for SimulatedLocustsVR2_Locust_2",
+    "Replay seek 3: actual Legacy clip time matches recorded evidence for SimulatedLocustsVR2_Locust_2",
+    "Replay seek 3: paused body animation does not advance on wall time",
+    "Replay seek 3: original authoritative body position/yaw restored for SimulatedLocustsVR2_Locust_2",
+    "Replay seek 3: original recorded body identity SimulatedLocustsVR2_Locust_1",
+    "Replay seek 3: actual original GLB material color restored for SimulatedLocustsVR2_Locust_1",
+    "Replay seek 3: exact original animation state restored for SimulatedLocustsVR2_Locust_1",
+    "Replay seek 3: actual Legacy clip time matches recorded evidence for SimulatedLocustsVR2_Locust_1",
+    "Replay seek 3: paused body animation does not advance on wall time",
+    "Replay seek 3: original authoritative body position/yaw restored for SimulatedLocustsVR2_Locust_1",
+    "Replay seek 3: original recorded body identity SimulatedLocustsVR1_Locust_1",
+    "Replay seek 3: actual original GLB material color restored for SimulatedLocustsVR1_Locust_1",
+    "Replay seek 3: exact original animation state restored for SimulatedLocustsVR1_Locust_1",
+    "Replay seek 3: actual Legacy clip time matches recorded evidence for SimulatedLocustsVR1_Locust_1",
+    "Replay seek 3: paused body animation does not advance on wall time",
+    "Replay seek 3: original authoritative body position/yaw restored for SimulatedLocustsVR1_Locust_1",
+    "Replay seek 3: original recorded body identity SimulatedLocustsVR1_Locust_0",
+    "Replay seek 3: actual original GLB material color restored for SimulatedLocustsVR1_Locust_0",
+    "Replay seek 3: exact original animation state restored for SimulatedLocustsVR1_Locust_0",
+    "Replay seek 3: actual Legacy clip time matches recorded evidence for SimulatedLocustsVR1_Locust_0",
+    "Replay seek 3: paused body animation does not advance on wall time",
+    "Replay seek 3: original authoritative body position/yaw restored for SimulatedLocustsVR1_Locust_0",
+    "Replay seek 3: original recorded body identity SimulatedLocustsVR1_Locust_2",
+    "Replay seek 3: actual original GLB material color restored for SimulatedLocustsVR1_Locust_2",
+    "Replay seek 3: exact original animation state restored for SimulatedLocustsVR1_Locust_2",
+    "Replay seek 3: actual Legacy clip time matches recorded evidence for SimulatedLocustsVR1_Locust_2",
+    "Replay seek 3: paused body animation does not advance on wall time",
+    "Replay seek 3: original authoritative body position/yaw restored for SimulatedLocustsVR1_Locust_2",
+    "Replay seek 3 starts no tracking/acquisition worker",
+    "Replay seek 4 has no fidelity/reconstruction error",
+    "Replay seek 4 keeps both original-view camera projections finite and nonsingular",
+    "Replay seek 4: VR2 retains the acquired1:1 LED aspect",
+    "Replay seek 4: VR2 retains actual acquired FOV/near/far/projection mode",
+    "Replay seek 4: VR1 retains the acquired1:1 LED aspect",
+    "Replay seek 4: VR1 retains actual acquired FOV/near/far/projection mode",
+    "Replay seek 4 shows every recorded GLB body exactly once",
+    "Replay seek 4: original recorded body identity VR1_Kannadi_0",
+    "Replay seek 4: actual original GLB material color restored for VR1_Kannadi_0",
+    "Replay seek 4: exact original animation state restored for VR1_Kannadi_0",
+    "Replay seek 4: actual Legacy clip time matches recorded evidence for VR1_Kannadi_0",
+    "Replay seek 4: paused body animation does not advance on wall time",
+    "Replay seek 4: original authoritative body position/yaw restored for VR1_Kannadi_0",
+    "Replay seek 4: original recorded body identity VR2_Kannadi_0",
+    "Replay seek 4: actual original GLB material color restored for VR2_Kannadi_0",
+    "Replay seek 4: exact original animation state restored for VR2_Kannadi_0",
+    "Replay seek 4: actual Legacy clip time matches recorded evidence for VR2_Kannadi_0",
+    "Replay seek 4: paused body animation does not advance on wall time",
+    "Replay seek 4: original authoritative body position/yaw restored for VR2_Kannadi_0",
+    "Replay seek 4 starts no tracking/acquisition worker",
+    "Deliberately clipped frozen source camera reproduces the degenerate projection case",
+    "Replay safely reconstructs valid1:1 lens projection from a clipped frozen source camera",
+    "Replay retains every coefficient of a valid original custom projection",
+    "Actual forward/reverse replay never modifies any original recording/model/config/evidence bytes",
+    "Actual replay never modifies the finalized source ZIP",
+    "Closing actual ReplayScene releases every reconstructed body/world appearance material",
+    "Population appearance integration has no Unity runtime errors: "
+  ],
+  "failure": null,
+  "errors": [],
+  "observations": [
+    {
+      "key": "0:preStimulus",
+      "bodyIds": [
+        -2430,
+        -2556
+      ],
+      "animationIds": [
+        -2434,
+        -2560
+      ],
+      "times": [
+        0.0,
+        0.0
+      ],
+      "colors": [
+        [
+          0.8,
+          0.35,
+          0.08,
+          1.0
+        ],
+        [
+          0.8,
+          0.35,
+          0.08,
+          1.0
+        ]
+      ]
+    },
+    {
+      "key": "0:stimulus",
+      "bodyIds": [
+        -2430,
+        -2556
+      ],
+      "animationIds": [
+        -2434,
+        -2560
+      ],
+      "times": [
+        0.68667686,
+        0.68667686
+      ],
+      "colors": [
+        [
+          0.1,
+          0.35,
+          0.9,
+          1.0
+        ],
+        [
+          0.1,
+          0.35,
+          0.9,
+          1.0
+        ]
+      ]
+    },
+    {
+      "key": "0:postStimulus",
+      "bodyIds": [
+        -2430,
+        -2556
+      ],
+      "animationIds": [
+        -2434,
+        -2560
+      ],
+      "times": [
+        1.45896876,
+        1.45896876
+      ],
+      "colors": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "key": "1:stimulus",
+      "count": 6
+    },
+    {
+      "replaySeek": 0,
+      "presentationId": "3a6b86c772174620b507b5a6a31e900b",
+      "unityFrame": 24,
+      "time": 0.3331285430839004,
+      "bodyCount": 2,
+      "rgba": [
+        0.8,
+        0.35,
+        0.08,
+        1.0
+      ]
+    },
+    {
+      "replaySeek": 1,
+      "presentationId": "73b1a5963ef641d58c5c686db71ca55d",
+      "unityFrame": 68,
+      "time": 1.0721253330498866,
+      "bodyCount": 2,
+      "rgba": [
+        0.1,
+        0.35,
+        0.9,
+        1.0
+      ]
+    },
+    {
+      "replaySeek": 2,
+      "presentationId": "4cbb1e48da8b4c35947e0c9eabb7db44",
+      "unityFrame": 107,
+      "time": 1.7231206278344673,
+      "bodyCount": 2,
+      "rgba": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "replaySeek": 3,
+      "presentationId": "fe7eac0770f2465c9686803f14f76f13",
+      "unityFrame": 146,
+      "time": 2.7683234623015873,
+      "bodyCount": 6,
+      "rgba": [
+        0.2,
+        0.8,
+        0.3,
+        1.0
+      ]
+    },
+    {
+      "replaySeek": 4,
+      "presentationId": "3a6b86c772174620b507b5a6a31e900b",
+      "unityFrame": 24,
+      "time": 0.3331285430839004,
+      "bodyCount": 2,
+      "rgba": [
+        0.8,
+        0.35,
+        0.08,
+        1.0
+      ]
+    }
+  ],
+  "liveLenses": {
+    "0:VR1": {
+      "aspect": 1.0,
+      "fov": 90.0,
+      "near": 0.01,
+      "far": 1000.0,
+      "orthographic": false,
+      "orthographicSize": 5.0
+    },
+    "0:VR2": {
+      "aspect": 1.0,
+      "fov": 90.0,
+      "near": 0.01,
+      "far": 1000.0,
+      "orthographic": false,
+      "orthographicSize": 5.0
+    },
+    "1:VR1": {
+      "aspect": 1.0,
+      "fov": 90.0,
+      "near": 0.01,
+      "far": 1000.0,
+      "orthographic": false,
+      "orthographicSize": 5.0
+    },
+    "1:VR2": {
+      "aspect": 1.0,
+      "fov": 90.0,
+      "near": 0.01,
+      "far": 1000.0,
+      "orthographic": false,
+      "orthographicSize": 5.0
+    }
+  },
+  "directory": "/Users/pavan/src/ledpanelVR/.local/population-appearance-replay-rundata-v3/20261030_011244_001",
+  "unity": "6000.3.16f1",
+  "scope": "Actual Main two-rig external-GLB mirror body color phases with reset=false/instance and clip continuity, source-template isolation, visibility, three generated GLB agents per rig and drained immutable population evidence, then actual ReplayScene forward/reverse colors/poses/Legacy clip times and unchanged source hashes. No native acquisition.",
+  "populationWriterEvidence": [
+    {
+      "relativePath": "2026-10-30_01-12-45-3452210_Kannadi_Kannadi_VR2_Clones.csv.gz",
+      "writtenRows": 122,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-10-30_01-12-45-3447960_Kannadi_Kannadi_VR1_Clones.csv.gz",
+      "writtenRows": 122,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-10-30_01-12-47-7886690_SimulatedLocustData_SimulatedLocustsVR1_3_200_0_10000_0.csv.gz",
+      "writtenRows": 123,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-10-30_01-12-47-7889950_SimulatedLocustData_SimulatedLocustsVR2_3_200_0_10000_0.csv.gz",
+      "writtenRows": 123,
+      "droppedFrames": 0,
+      "failure": null
+    }
+  ],
+  "finalization": {
+    "status": "finalized",
+    "createdUtc": "2026-10-30T00:12:44.70683+00:00",
+    "writersDrained": true,
+    "endReason": "completed",
+    "sequenceOutcome": "completed",
+    "player": {
+      "applicationVersion": "perf-native-final",
+      "unityVersion": "6000.3.16f1",
+      "buildGuid": "00000000000000000000000000000000",
+      "sourceRevision": "85d11a230823eed5e4aa93adc4067c7ca104de45",
+      "sourceState": "working-tree-snapshot",
+      "editorRuntimeIdentity": "aa94d37716ff43e09016abc0169cb374",
+      "sourceTreeDirty": true,
+      "runtimeSourceFingerprintSha256": "3fd0ee23021a58811e68b54a5b70ffdd9e721489560ea2abfd379d183ffca66c",
+      "runtimeSourceFileCount": 257,
+      "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint."
+    },
+    "error": null,
+    "finalizedUtc": "2026-10-30T00:12:48.68288+00:00"
+  },
+  "zipSha256": "23e873fa312070e93d3a7215ed719844585e65947638e417c94eaaccb9037f49",
+  "fixture": {
+    "rigCount": 2,
+    "mirrorClonesPerRig": 1,
+    "mirrorModel": "Models/Examples/SimulatedLocust.glb",
+    "appearancePhaseColors": [
+      [
+        0.8,
+        0.35,
+        0.08,
+        1
+      ],
+      [
+        0.1,
+        0.35,
+        0.9,
+        1
+      ],
+      "disabled: original surface restored"
+    ],
+    "phaseDurationsSeconds": [
+      0.67,
+      0.77,
+      0.53
+    ],
+    "resetPositionOnStart": false,
+    "resetRotationOnStart": false,
+    "generatedAgentsPerRig": 3,
+    "generatedModel": "Models/Examples/RiggedSimple.glb",
+    "generatedColor": [
+      0.2,
+      0.8,
+      0.3,
+      1
+    ],
+    "videoEnabled": false,
+    "sourceExampleEditedByValidator": false,
+    "runtimeEditedByValidator": false,
+    "panelPixels": [
+      24,
+      24
+    ],
+    "totalLayoutPixels": [
+      288,
+      24
+    ],
+    "fitsActualEditorOutput": true,
+    "actualReplaySceneSeeks": [
+      "orange",
+      "blue",
+      "original surface restored",
+      "generated green",
+      "reverse to orange"
+    ],
+    "sameProcessBuildGate": true
+  },
+  "runtimeSnapshotSha256": {
+    "Assets/Scripts/Swarm/KannadiConfig.cs": "c732633744e3607fc645a14c982a165773b89f4da670016cb26646be3071b32d",
+    "Assets/Scripts/Swarm/Kannadi.cs": "ede8fc22138ec90200d23c3e12c4676b166a189df74a3b96c016fb7406c7cbaa",
+    "Assets/Scripts/Swarm/SwarmConfiguration.cs": "a8cf7feabedaab07d6f58f4c50dc901b0b53befc71fa139040dd55d1540cfe65",
+    "Assets/Scripts/Swarm/LocustSpawner.cs": "aa4bca386b00bc87545042bbdef6a74991e17fa311caf353e6f6ccddd7795755",
+    "Assets/Scripts/ModelAppearance.cs": "b235fd6dbaa958435d81de9cc4847ebfeddb469f7e050d4268adfa219d776dd9",
+    "Assets/Scripts/Replay/ReplayEnvironmentLoader.cs": "fd5ffce7e70faaf2392216f6c3878c3cd5343f74b549d42af3f7bd26874131a4",
+    "Assets/Scripts/Replay/ReplayController.cs": "55421bb16bf5310639b0695fe3eb50d3ced112ef8775aed6c3aaf3247bb07659"
+  },
+  "replayFidelity": {
+    "actualColorsAndExactBodyCounts": true,
+    "actualLegacyClipTimesMatchRecordedEvidence": true,
+    "authoritativeRecordedPositionsYawRestored": true,
+    "noNativeInputWorkers": true,
+    "allSourceFilesAndZipByteIdenticalAfterForwardReverseSeeks": true,
+    "acquiredAndReplayAspect": 1,
+    "acquiredAndReplayFovDegrees": 90,
+    "nearClip": 0.01,
+    "farClip": 1000,
+    "clippedFrozenSourceProjectionSafelyReconstructed": true,
+    "validCustomProjectionAll16CoefficientsPreserved": true,
+    "allAppearanceMaterialsReleasedOnReplayClose": true
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "title": "Custom GLB model examples",
+  "comments": "Three portable examples: the bundled locust, downloaded skeletal animation and downloaded morph animation. Open Appearance to replace a model and change its color.",
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "randomSeedMode": "Fixed",
+  "randomSeed": 42,
+  "sequences": [
+    {
+      "title": "Bundled locust exported to GLB",
+      "sceneName": "Choice",
+      "duration": 8,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Models/locust-glb.example.json"
+      }
+    },
+    {
+      "title": "Downloaded skeletal GLB",
+      "sceneName": "Choice",
+      "duration": 8,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Models/rigged-glb.example.json"
+      }
+    },
+    {
+      "title": "Downloaded morph-animation GLB",
+      "sceneName": "Choice",
+      "duration": 8,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Models/morph-glb.example.json"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1550 @@
+{
+  "status": "Recovered geometry candidates for local review; not a validated kit",
+  "units": "millimeter",
+  "license": "No redistribution license found in selected source metadata. No license is granted by this package. Confirm ownership/permission before publication.",
+  "parametricSources": "No verified matching parametric source recovered. 3MF is editable mesh geometry, not CAD history. Unmatched STEP candidate is inventory-only.",
+  "inventory": [
+    {
+      "name": "Assembly 1 Ball holders 26.5 41 56.3mf",
+      "bytes": 4512412,
+      "sha256": "c49bd2fa97d5603982cb9cb6b14ea42a33dee3d3ed4515b3a4c2b7ea7eec0ffd",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Assembly 1 Ball holders-3.3mf",
+      "bytes": 3959789,
+      "sha256": "d405b9ac91165bfe2d88d837498d3662ed3462b14942de430be8f5187258834d",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Assembly 1 Ball holders.3mf",
+      "bytes": 813782,
+      "sha256": "144844810491e156ec8aea272bfaab9a08f9bd0d7ca03113cbf9fc7ea37e6f59",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Assembly 1 Flexures.3mf",
+      "bytes": 1529565,
+      "sha256": "0ed2522e9731f0bda50931b485cc9375deefc83db66cc0c8876ab070d9b15575",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Assembly 1 ball holders-2.3mf",
+      "bytes": 1297039,
+      "sha256": "4b863f7d5cc00e1fd0220c704ca0f10e1d9aa03cbc47f29a0d84d38a642d4191",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Assembly Ball Holders.3mf",
+      "bytes": 53613106,
+      "sha256": "332b5d1e2cd989cd7f6c6272c161cfcde4f23caebf6e111f9eae76c57fdf6b33",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Ball Holder (1).3mf",
+      "bytes": 6387869,
+      "sha256": "7d02d8ccb885466bd7ffa5a1f51bdd30c5da6354aca1c76dc9d84d9617e0179c",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Ball Holder 100.3mf",
+      "bytes": 72025252,
+      "sha256": "35cbe06c14e371492d99d3833e73d1c7aa4ff5d4079a07fbf04a405061f97181",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Ball Holder 26.5 77 2.3mf",
+      "bytes": 5938091,
+      "sha256": "a097b42540101e63a5d0412bb20935f16b8f550a368ac2981a6d30f7abc0335a",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Ball Holder 26.5-2.3mf",
+      "bytes": 288451,
+      "sha256": "8648940eeb8d9d959a6be8b19c2223937d99bc27ef5ec24da422357d0623b8c2",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Ball Holder 26.5.3mf",
+      "bytes": 1047908,
+      "sha256": "1631cea02ca49a338c459d7c916aa6ce6f557e5fd6a5a568dc1a7d5b0070ba32",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Ball Holder Locust.3mf",
+      "bytes": 6261668,
+      "sha256": "129d466dc6c6bda46a326c7fe8845f5f416767420a50257ad565815bc9cec341",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Ball Holder VR1 250 constantLayer.gcode.3mf",
+      "bytes": 759797,
+      "sha256": "b4c204385119301a6d218579bfc17b7f021576c3ed9fd7cc456651f3ea8c3163",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Ball Holder VR1 250 variable layers.gcode.3mf",
+      "bytes": 898857,
+      "sha256": "2a4a21fe33011cb99229f7daad6a60a3d08372138b0c52f56ab425da9380b2d0",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Ball Holder VR1 250.3mf",
+      "bytes": 5974763,
+      "sha256": "6b5a0c773875e42af8dfd6bd0396b72c825744a20ca1acd46b74e9267c311bbb",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Ball Holders 160mm Big vr cube.3mf",
+      "bytes": 18130509,
+      "sha256": "f1344e09d17f695717a1e853f8a38ba9281b2f818439a10e0646fe464d4e7d11",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "BallHolder_26.5_147.3mf",
+      "bytes": 979822,
+      "sha256": "1c98f56b3941fcdd5f0e22fdfe892419b041ce30f058e8d8ff3bc0a6c5b72bed",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Bogong Camera Holder v2.1.3mf",
+      "bytes": 1452288,
+      "sha256": "ae3499488c5c6d6aee320fdb189e49b90a63080a24a3c60b3222adcefd545aa5",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Bogong v2 Camera Holder.3mf",
+      "bytes": 1392795,
+      "sha256": "8579c849aa78e0f72358f44452bf09510fd2d65b6189e63357ada3ea1803fe6b",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Camera Holder Drosophila v8.3mf",
+      "bytes": 53449,
+      "sha256": "dcd1c65b3483b7aaf06d832c57bc6a2a1c1941230425412a11062083235ea95f",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Camera Holder Kosova v2.2.3mf",
+      "bytes": 7007475,
+      "sha256": "38f1b04c2a0f436127fce324adae38e0d93e73ae6bf97d5d9884b18dc402f46a",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Camera Holder Locust v2.1.3mf",
+      "bytes": 319232,
+      "sha256": "c1d3f31a225acf6b06640ddbdff5dd6e811118d045049ceb74d8d6f286759792",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Camera Holder Locust v2.2 30.3mf",
+      "bytes": 323028,
+      "sha256": "0edfbcc467aa0562bbd61233d527bf91801391d880101e9fff19121296b18247",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Camera Holder VR quad.3mf",
+      "bytes": 125330,
+      "sha256": "fdfabeb88306216f16c4fcfd5e67b3e86768ece98ad11e52c27ee9db7c60150f",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Camera Holder. I beam.3mf",
+      "bytes": 399709,
+      "sha256": "2cd76613dd73aae8a2979d760ebf9f05ae83822653f9390daabb5e1e2bf080b0",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System - Part 1 1.2 1.2.3mf",
+      "bytes": 36234,
+      "sha256": "e9ec65f2ce117242c64064979e30f221b505817a7a467b7e88acda7f73d7af73",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System - Part 1-2.3mf",
+      "bytes": 47268,
+      "sha256": "0db5667d1227ded1855d182e6bcdeb2cef84474e8989d1bb5c6812bc4c9cc1c7",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System - Part 1-3.3mf",
+      "bytes": 47349,
+      "sha256": "aafc8a246b83a96252179b9f13abe50cae473e37f9c6936840c007d60a457e1e",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System - Part 1-4.3mf",
+      "bytes": 69593,
+      "sha256": "d6f8e1601057888ecfe1fcda6a825ad9ac90b9a5554abda2523bf587048b7ca4",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System - Part 1-5.3mf",
+      "bytes": 42376,
+      "sha256": "893123d4e91a06ed62b422afeca7baaa4aacf46ada9794e203fb3503628d52ab",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System - Part 1-6.3mf",
+      "bytes": 52211,
+      "sha256": "ccc604bed8b9bd37135b38b6f049c842683ac400a2deb917c3b0e3d79ec0ef8c",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System - Part 1-7.3mf",
+      "bytes": 53754,
+      "sha256": "265e60719b09bd3d2525c0bcbef87a4c1ca0bbd02de7c91e2d345e63ef1b984f",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System - Part 1.3mf",
+      "bytes": 50831,
+      "sha256": "07ff6479cad6f432bfb11709ff2ffa6555373b3c549c155620933b52baf1782f",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System - Part 6.3mf",
+      "bytes": 102315,
+      "sha256": "90e461c674623c730d4b284be4a652bf88df707e3de67d07133f5f197109348a",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System - Platform-2.3mf",
+      "bytes": 59732,
+      "sha256": "7d1f64055567b838f8fd0c087267127267a6eabe652c089635cab1e80ec0edb8",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System - Platform-3.3mf",
+      "bytes": 16571,
+      "sha256": "6abc2017946ff4f46e4e2cafafa909c4faef4d49539dd5f8f0bb7c301535a854",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System - Platform.3mf",
+      "bytes": 14788,
+      "sha256": "2fed9256c1261e6886867fd3619d3eec197baa789aee2d2b8c9c7dee2539578b",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System 35 35 15 1 1 0.1-2.3mf",
+      "bytes": 887414,
+      "sha256": "063b6c0f5cfe786a4775185802229b775a14093762c71ddddc1e77185cee7fdd",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System 35 35 15 1 1 0.1.3mf",
+      "bytes": 624764,
+      "sha256": "d16bc3803a6fde46c862d81a4d0412eb7a5ca2ca719aab8e2cc5f78f11c0dd86",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System 35 35 15 1.2 1.2 0.1.3mf",
+      "bytes": 933713,
+      "sha256": "c3607deee24c2d20af143384ffc43700157d5cb18dc64481eba957c1487a29dd",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System 35 35 15 1.4 1.4 0.1.3mf",
+      "bytes": 922156,
+      "sha256": "5ea9fbbc547f68d97cb7b0a32fcb2b1a55ee4f6ab0d49ef2f5b273bbccd04ff0",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System 35 35 15 1.4 1.4.3mf",
+      "bytes": 996638,
+      "sha256": "5b52420dccc873851fb2e3a4bde1e53a1b5804a7399a2fc27dea7917ed8969ee",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System 35 35 15 1.6 1.6 0.1-2.3mf",
+      "bytes": 2875118,
+      "sha256": "754682cec79fa1942ec9ca8f84e6956b0c63c89520c23553679fc9810ee08d30",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System 35 35 15 1.6 1.6 0.1.3mf",
+      "bytes": 883371,
+      "sha256": "fd06ca4b69bfcfbcb6accd8e94779b0bc5e876008b96073b10ac35639cba14b9",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System 35 35 15 1.6 1.6.3mf",
+      "bytes": 337822,
+      "sha256": "0d5cc48a6c80fae750fcded513eb1a908f6296ccb189a9518ca04d6b6db0a6d0",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System 6.2 35 1.15.3mf",
+      "bytes": 201459,
+      "sha256": "b1e2f905528cc27b5fc33b173cd1f0f638889739d6d675dbed527caa2836a326",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System 6.2 35 1.65.3mf",
+      "bytes": 210309,
+      "sha256": "159591d20254dbe7935b8be6289b10056388f328d5828ee4fc0d190a555d6852",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System 6.2 35 2.15.3mf",
+      "bytes": 193711,
+      "sha256": "f4c2a22314b003f99c7e09cc125cd6ba8e88a3476e74b5b026c186c438c7fd00",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System 6.2.3mf",
+      "bytes": 157033,
+      "sha256": "4584d7a1b5c6aedb73dd7b5a5fd715e57a88eb609e04158dde7795de50ef00b3",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System v1.02 35 35 15 1.0 1.2 1.4 1.6 A1 mini.3mf",
+      "bytes": 1536844,
+      "sha256": "801ecdfe025fc892de545781005001a550a3df72563cd38ca2e8eeb332a797cd",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System v1.02 35 35 15 1.0 1.2 1.4 1.6.3mf",
+      "bytes": 1414788,
+      "sha256": "7696e1fc93b76a20c8cde35df76206198710d08d69d7334f698761b1a7173607",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System v1.03 1.4 1.6 only.3mf",
+      "bytes": 1405043,
+      "sha256": "858600fb7ec65ece13dcf126be38395885fb16f3972544acfccfdce73af3b513",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System v1.03.3mf",
+      "bytes": 2571004,
+      "sha256": "4379a412ed0f4627306f1753a8ca41dd8f1885f0f1506bb754205fc2e648d0a1",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System-2.3mf",
+      "bytes": 697257,
+      "sha256": "02f55293c3f5fba111fd2b390fb067e3b7371bf34f2c43b35d37c0912eecb7ce",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System.3mf",
+      "bytes": 57705,
+      "sha256": "c020a0331d403a1c856f565ddc60a3eadcdfdd62a49ae26bf003aaa434177e91",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure System.step",
+      "bytes": 199889,
+      "sha256": "c223d857398d075bac6ad67b51ab7fc16cde30175be8155f9da705c9861ea049",
+      "format": "step",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Flexure assembly.3mf",
+      "bytes": 3230943,
+      "sha256": "70a1573d3a9103b0dcaeeb27cf00b0a69da6cbc22a540dde254d8099767943b0",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Kosova Led Panel Holder - Part 1.3mf",
+      "bytes": 20518,
+      "sha256": "cb0a15280850fbbca35ea1126caf5482e0303957df96ea792cb47d61a1a4357f",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "LED Panel Cutting - Jig.3mf",
+      "bytes": 3364,
+      "sha256": "abdd63698039393ce2009b18eb2e6024658ee3483db196992eacd92e4dc3b966",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "LED Panel Offset Bracket (1).3mf",
+      "bytes": 123467,
+      "sha256": "8a126f0b4d8cadf3ca934ce9cf8311bb65e42f3d5839ea185292bbd5f1f030a5",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "LED Panel Offset Bracket (14).3mf",
+      "bytes": 51724,
+      "sha256": "309815c204e7f27c44fce0c6ae9db95f76713153767bcdb6ed924c7678e30791",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "LED Panel Offset Bracket (5).3mf",
+      "bytes": 93509,
+      "sha256": "1ac1c06ff6a0832fdfda7409277853395a67b022fc89ac870d8ec8e797462281",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "LED Panel Offset Bracket (7).3mf",
+      "bytes": 75193,
+      "sha256": "401b174437761add7af5622513002530018078063d5c96628280fafe1cde16d9",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "LED Panel Offset Bracket v1.3mf",
+      "bytes": 20533,
+      "sha256": "262dbedcee6515fda4f4f908326b89cee41aff0a890b33536f7f1cf8e5ea715b",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Bracket - Part 1.3mf",
+      "bytes": 43434,
+      "sha256": "98ed93c6b3a42ee7361cd44cfbefb15c3bad6dbc8be1b7b60174283eaa61b5cc",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder -  Mormon v1.3mf",
+      "bytes": 63759,
+      "sha256": "a1139c8a590a7e115c48db5365d5bacc62874b613967e83eea244c23036a96bd",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Holder.3mf",
+      "bytes": 68603,
+      "sha256": "2378c4b873f39d35bb9bc4989cd31cb4b0121f206294022a075e49eb2e5457cb",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Middle Kosova.3mf",
+      "bytes": 75928,
+      "sha256": "723f0889af2083484a02c1a11df40e7c52af3e201fc8496bef4ddc0c0d52d370",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Middle.3mf",
+      "bytes": 47726,
+      "sha256": "ddca891f6db483e327a2236d83ed44653d54f7b42dbe1435bb56286197f184ac",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1 Kosova.3mf",
+      "bytes": 72866,
+      "sha256": "3771a8fb86d2d1985c21c69e34ce2602b770e30c3518d2795cbf474d5f1c17bc",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1 Kosovo.3mf",
+      "bytes": 17761,
+      "sha256": "b877ec01c52e640b270989f532360195f099a8862c71a9fd60f569f1368775df",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1-10.3mf",
+      "bytes": 20617,
+      "sha256": "ce91f906a639de6d7e630e1715f75eafa52af86b815adf9203dfd1eb5858d7fa",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1-11.3mf",
+      "bytes": 20536,
+      "sha256": "26756a2dbc372a61b796034309dcbef8304f4be9f2e3dd4e5a95a1e6500e5af2",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1-12.3mf",
+      "bytes": 107181,
+      "sha256": "e0fb968d6656e4aeb90e0424f79be75728b5e3e1fdf46104ba5716f6e970734f",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1-2.3mf",
+      "bytes": 45849,
+      "sha256": "8cecf70046a96f84f31b05a5ca7bad2d9a5e23d9566622490b8d15e01c7721be",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1-3.3mf",
+      "bytes": 9851,
+      "sha256": "68bdafcc552678ecfeba0870c790421e52eba993035983c4192a53dd9395c182",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1-4.3mf",
+      "bytes": 5702,
+      "sha256": "fe5614e04e04c3734e729276f71a26c8ecb1d69b7e0f62b3d633d4a8df41608f",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1-5.3mf",
+      "bytes": 35777,
+      "sha256": "4145779bdb878a25e2961f3f69c42b47d1ef6f2a17f0f18c10ec9af729a9bfe6",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1-6.3mf",
+      "bytes": 40661,
+      "sha256": "ab442f594efd3c7c20e5b11e6c6ae0019d479ff60f164b1d80bd2400fd7fd503",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1-7.3mf",
+      "bytes": 45158,
+      "sha256": "e66eb7f32ca0e667035d5c80274a217e060e44033ecb9523a5ca7717b72dbb6a",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1-8.3mf",
+      "bytes": 38545,
+      "sha256": "a7b3c000d45444fac43294d9f08c1b2b303666b6f45701ad1ca056af95ad762f",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1-9.3mf",
+      "bytes": 49726,
+      "sha256": "d5352965e0f2965d9ada3981ea47ad89ab2c41b15be46cfbc3388ddec90f157f",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - Part 1.3mf",
+      "bytes": 19958,
+      "sha256": "80b84047e53be2444594ce8d20e19f01dc821f6cf74ae50332f433df1764f710",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder - TVM.3mf",
+      "bytes": 128930,
+      "sha256": "663d8f09ebef6d4c64206bb9a2329dd6e98ad07668ed8705ca7d635f4b338f3b",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder Mormon v0.3.3mf",
+      "bytes": 124153,
+      "sha256": "448af2a801526f86581ffbd7fb4ae084de40c0b0393ef340d46b36a0c7936360",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Led Panel Holder TVM- Part 1 v0.2.3mf",
+      "bytes": 32097,
+      "sha256": "69e2bcd6320342aaf17a57a7dca6af513cb735c8bf7aa94eeb1f1f32a91c4ca9",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Locust Camera Holder v2 35 100.3mf",
+      "bytes": 277210,
+      "sha256": "410e10513d424cae872f9864052bf28fadf8a62bc260df5745a33b546558fd31",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Locust Camera Holder v2 35 100.3mf.3mf",
+      "bytes": 300672,
+      "sha256": "c3121e51950ba65dcecef78ac00ec5d73d097b23d9795835a8b557fd4ceb4744",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Main Assembly Brackets 4.2 Hole.3mf",
+      "bytes": 249461,
+      "sha256": "7904e7defd13adf37a2b379098193e31af07644f10b52f34b0fdb7e19eb3fa42",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Main Assembly Cut 4.2.3mf",
+      "bytes": 108007,
+      "sha256": "0d41dfd62f59c18eb983e190dce8986f88a67c8ed1a384e72666824cb43b1d97",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Main Assembly.3mf",
+      "bytes": 739636,
+      "sha256": "1dd5941a332e65c9ebac71efd26fae2b08875d548b3fc3a64e6808ba856104bd",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder 25.3mf",
+      "bytes": 274579,
+      "sha256": "8fc39904a12c0a9857825e5525965f3a67ce6cf99edca54fce7dc249ebd91edf",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder 25.5.3mf",
+      "bytes": 154375,
+      "sha256": "a20524757051259d8209808037b5420764c51bd5224ce16aa96aae6c56b4a82a",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder 26.3mf",
+      "bytes": 1201730,
+      "sha256": "278796de2cd843e978b9cf56adb3c49eb8d6b70b8f499989cb5c7a4f8dc3d4c2",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder 26.5 2 147.3mf",
+      "bytes": 1090806,
+      "sha256": "7f27b82072caf574d7607a7faf5b2de00f492ef6908620cddc08e32c585a9802",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder 28 147.3mf",
+      "bytes": 1028495,
+      "sha256": "73728d94b64f8b6a330e52a6c38241292710b5fa232a7d023549d58a20a25d61",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder 40 80.3mf",
+      "bytes": 310858,
+      "sha256": "eab016a86565409ccd80aa7e9334fd4808d5661b2ec64c5c7485a2987f2e775c",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder locust.3mf",
+      "bytes": 6307132,
+      "sha256": "a0e35d6f9f8f3394d53fdb690671c20ddde5b5cd4184b497de902b2cc14c4096",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder-2.3mf",
+      "bytes": 6964770,
+      "sha256": "8ad2a92549974a0ab328bbc0dc42e518a145d99967b1165a22022d79e6b996bc",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder-3.3mf",
+      "bytes": 233857,
+      "sha256": "b3b211048f6f76dba523a8705d2540d94055b93e8b83553c974682adc9195f6d",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder-4.3mf",
+      "bytes": 6255408,
+      "sha256": "3bc4a624cb20080e783f19e8313d0a0fe9816211aae70ba3a70dbbfd1385515c",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder-5.3mf",
+      "bytes": 233847,
+      "sha256": "4af0d718a14ad8755f83a4211b74212b09749746f643b438931a1c927f18aa62",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder-6.3mf",
+      "bytes": 7252905,
+      "sha256": "787158b6c50cabfe3cd1ca21f11b6f0cd07d11aa19f8718e6e39d630c6071e12",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder-7.3mf",
+      "bytes": 7107092,
+      "sha256": "4a41800fc3aaec2280500e5dd5953ed633ceecbcf62a44fa36112d30815358e2",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder-8.3mf",
+      "bytes": 7564857,
+      "sha256": "7c394a2eae78ed04e4a6eb1c6476ffea1cf621bc0a7f4fe36e4ba5f3387e8db3",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder-9.3mf",
+      "bytes": 7540020,
+      "sha256": "34d6876105f3243e05a6d3e80fda06941c2167f512488241cc2e506feb492033",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Ball Holder.3mf",
+      "bytes": 272997,
+      "sha256": "5d2234aef58dd637ad51b0650cdaab4a97635c3e2b635daa97a4820108858c3b",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder 25.3mf",
+      "bytes": 481662,
+      "sha256": "7734cddf6d1b37029c2378c010708d0c7e52ec0e2f18e96cd9317a989b5bbe38",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder 27.3mf",
+      "bytes": 248698,
+      "sha256": "08f6afae35b96e1325710359bf67dc5efff760df103acc9b80dc29d4fc49e130",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder 32.3mf",
+      "bytes": 96857,
+      "sha256": "836a5019989309621ed263ad7dce41a76fe184e541795b3680515b429137abb3",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder Bogong.3mf",
+      "bytes": 355403,
+      "sha256": "4df94a639f4c312e480d05a01b7def5375aec3c8598a9728530a3e4fd035012b",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder Kosova 2.3 0 90.3mf",
+      "bytes": 141282,
+      "sha256": "f8f2843ecf50984db991d16559390558e25ab37289baf6162f5d59b9dc044a35",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder Kosova 2.4.3mf",
+      "bytes": 116305,
+      "sha256": "45a53d092ecd0865bd4afc440db4932222e1f2ed0edc9c74db4ddac7b90a1f59",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder Kosova 20 115.3mf",
+      "bytes": 264012,
+      "sha256": "2ac01fbd7c7250896e7d15ad853e419c5ecacb8e5ed6fde83a26f7bf33e08f08",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder Locust 30 v2.1.3mf",
+      "bytes": 445802,
+      "sha256": "af8d0a345ad3290492806b4d5222e954c959f7451dc92f63ba2ef42f8a942d70",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder Locust MATREX.3mf",
+      "bytes": 146895,
+      "sha256": "dcb32db65ff3a4500be7a638beca937f87daed28e68057878e13855cacca9a64",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder v2.2 Locust 30.3mf",
+      "bytes": 640919,
+      "sha256": "80f932152a7fe6ecd99bc6ad8bc5644051956c2aff1cdeef6783b6877cee9c0d",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-10.3mf",
+      "bytes": 148013,
+      "sha256": "492e5b1d7b20039828c02b848d60d074cbaaa31bd3f800a33875762103a8a8a3",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-11.3mf",
+      "bytes": 372539,
+      "sha256": "03242e5f96dc3f09344876845b5aaca2f7af22f563db6e84c390317aab4896f5",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-12.3mf",
+      "bytes": 218854,
+      "sha256": "1023e90b634eb7d4c6653d238b7eb98db9d323ce276fd74992d9a4889e3b0406",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-13.3mf",
+      "bytes": 112908,
+      "sha256": "f99c54d4ad76fe8a26c84f61e491afe21f85f6a08f2d3640938cc194dc3e758c",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-14.3mf",
+      "bytes": 218620,
+      "sha256": "d94fea96c7e4c289e0d3275326cd21850d87c4e46a4342dfd8c9481924a4bc9e",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-2.3mf",
+      "bytes": 253419,
+      "sha256": "13d7786ece983a2900b92e23f7b383f20f8c6fe25dd2bdea6a3afe80fca185e8",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-3.3mf",
+      "bytes": 253570,
+      "sha256": "123073c418826bcb7d1834555c155a0160d4571473bd6c3910fa99151a5a1557",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-4.3mf",
+      "bytes": 321383,
+      "sha256": "5a17a3e9d36f507a9148fb93bd4600bc93eb7492ee11a3a21a7e6ada0543a9ec",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-5.3mf",
+      "bytes": 124112,
+      "sha256": "9c31cfb47b493c5c9b65699d320ff6542114702719464ceb4c15333a7f5fe80f",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-6.3mf",
+      "bytes": 364630,
+      "sha256": "45543b19db705d9f46374fff1d3235860a734f8f84df7413015341f99464a899",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-7.3mf",
+      "bytes": 278830,
+      "sha256": "ae89ffe2ca4e469cd22d89283b621a1e38b239e56581dea09e462a806aa94886",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-8.3mf",
+      "bytes": 104253,
+      "sha256": "df1ec20dc8b9b7c5bb42913586528f1d09fde1d6504effbbb7a49f3e4060bd51",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder-9.3mf",
+      "bytes": 68891,
+      "sha256": "3a5177f8cd340ef9932354d3491661b6e2ff6cd4c6181b7818fd1b040b49357b",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Camera Holder.3mf",
+      "bytes": 249229,
+      "sha256": "d0238286867d026067fce2dc8ab33adda1460b848dab55b5b82e7a6e961299e4",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Top Panel Mount Inside.3mf",
+      "bytes": 26511,
+      "sha256": "341394de1165672e680c1faf090050721fc29d4f480929559e7b417a6cba2e93",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Top Panel Mount-2.3mf",
+      "bytes": 42553,
+      "sha256": "64f1cdd7e3cff86bffefc4f70ea33a83299a15e3c88c525a09f912243f6db40f",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Top Panel Mount-3.3mf",
+      "bytes": 48862,
+      "sha256": "21e31158d6fb80c1cf432566779ed33474b468ea42725a05c18c669100f31d64",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Top Panel Mount-4.3mf",
+      "bytes": 8324,
+      "sha256": "ca29062adc8314b9ef4122d99dfa11724d2780ff178dcb4e9c0b1d8908dc1e9a",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Top Panel Mount-5.3mf",
+      "bytes": 26665,
+      "sha256": "d0f8b7af7f1411d0eb401deed46619086a5872d1960361fc564be1ff1e66d24b",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 - Top Panel Mount.3mf",
+      "bytes": 34314,
+      "sha256": "1c894cb066201ecd48ceee992224130979aad6206951086ceb75d618f425b8e3",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 Camera holder airflow nozzle v1.3mf",
+      "bytes": 312306,
+      "sha256": "5d4aa75e1842083f7590e8153f7f730f444dbe1573dd0e69d529cc78e992e632",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Part Studio 1 nozzle camera holder v2.3mf",
+      "bytes": 1374033,
+      "sha256": "b24ed25b2f56a61a8e731595d2fc5d100714aa099dd36ed459a1bd48e975fd0d",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Table Clamp Part Studio-2.3mf",
+      "bytes": 7722345,
+      "sha256": "1cfac42f10deec013525c82135640a4697dddb9e12b2d4df870f65a3db4a0064",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Table Clamp Part Studio-3.3mf",
+      "bytes": 7768451,
+      "sha256": "5039bf5d7de53ce1f19eb1e10d4a7a603b145f951b39406df050a1cea58a5b18",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Table Clamp Part Studio-4.3mf",
+      "bytes": 1564113,
+      "sha256": "9fc53bf6660442f9efa71f3eead7ce67e142d3e7d8b64710259562d3727dec8c",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Table Clamp Part Studio-5.3mf",
+      "bytes": 1649892,
+      "sha256": "38ea452a72166f095c5580322e4d54902b3362c4c0621528e22581666f9db0a8",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Table Clamp Part Studio-6.3mf",
+      "bytes": 7581770,
+      "sha256": "2d669433ef6117d7035af39d7a0eac774192c7faec5cb701f4727b742e589874",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Table Clamp Part Studio-7.3mf",
+      "bytes": 1205721,
+      "sha256": "4f6bd8ec7a39c2b92421521ed5f30362197f906780705c16253b9cd1f5a7d711",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Table Clamp Part Studio.3mf",
+      "bytes": 7378880,
+      "sha256": "41bf678d08a7caafa2c92856a50dce13900b698356687b80205c1f092323083a",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Top Panel Mount P1.952 128 128.3mf",
+      "bytes": 85207,
+      "sha256": "0f29c3943abae83195130dcf7c647bb88b4367ad3f3d499af24978baeb6416c3",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Top Panel P1.952 128 128 nib 20.3mf",
+      "bytes": 318051,
+      "sha256": "8596f5d71f50e28a2794b2e74ab9944b70907d208884c57db53d728a828044f9",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Top Panel P1.952 128 128-2.3mf",
+      "bytes": 319952,
+      "sha256": "97981d516ec595d76e4baef7c54f77e3ba742c63ef071230ed67345439bd6221",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Top Panel P1.952 128 128-3.3mf",
+      "bytes": 329822,
+      "sha256": "5ebcde361a18922b7fd6aea6332cc949d604360ecfd196d8ba02adfc7dd0a462",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Top Panel P1.952 128 128.3mf",
+      "bytes": 660846,
+      "sha256": "ac0d0e27572b6a69e2bc9c61da58b6d9c28d793a6e1f75e1195e1748a6a4eea8",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Top Panel P2 64 64.3mf",
+      "bytes": 659582,
+      "sha256": "9cc3fb427e2929220795461f3ef2da16cb1c7e085aff018a84487caca985ce87",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Top Panel P2.5 64 64-2.3mf",
+      "bytes": 228340,
+      "sha256": "95d83f13dee77e1bf2a6ef070edb3ad047e006e1d4ad2fed63e447d8d14c92be",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    },
+    {
+      "name": "Top Panel P2.5 64 64.3mf",
+      "bytes": 318080,
+      "sha256": "d9c36081965ed9efea65741e893e9fd3fb76130af8e125367d1fbbd5c59e6eba",
+      "format": "3mf",
+      "association": "filename candidate; compatibility and rights unconfirmed",
+      "location": "local Downloads (not distributed)"
+    }
+  ],
+  "parts": [
+    {
+      "id": "camera-locust-matrex",
+      "label": "Locust MATREX camera holder",
+      "sourceFilename": "Part Studio 1 - Camera Holder Locust MATREX.3mf",
+      "sourceSha256": "dcb32db65ff3a4500be7a638beca937f87daed28e68057878e13855cacca9a64",
+      "variantSelection": "Representative named candidate, not a newest/compatible revision claim",
+      "shapes": [
+        {
+          "boundsMm": [
+            38.0,
+            91.4599,
+            67.9387
+          ],
+          "vertices": 3370,
+          "triangles": 6768,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "exports": [
+            {
+              "file": "camera-locust-matrex-01.3mf",
+              "sha256": "c69c50476ac19d24bfce6b5bbff35363d86e65a59bf85f9a02d1dab72718f71d",
+              "bytes": 86818
+            },
+            {
+              "file": "camera-locust-matrex-01.stl",
+              "sha256": "9e4bcaac69a518e23f14efe49d1627bc207e47710dcb7ca488b6d2c20b052581",
+              "bytes": 338484
+            }
+          ],
+          "id": "camera-locust-matrex-01",
+          "plateInstances": 8,
+          "sourceBuildItem": 1,
+          "image": "images/camera-locust-matrex-01.png"
+        }
+      ]
+    },
+    {
+      "id": "panel-middle",
+      "label": "Middle LED-panel holder",
+      "sourceFilename": "Led Panel Holder - Middle.3mf",
+      "sourceSha256": "ddca891f6db483e327a2236d83ed44653d54f7b42dbe1435bb56286197f184ac",
+      "variantSelection": "Representative named candidate, not a newest/compatible revision claim",
+      "shapes": [
+        {
+          "boundsMm": [
+            58.8,
+            28.0,
+            15.0
+          ],
+          "vertices": 754,
+          "triangles": 1516,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "exports": [
+            {
+              "file": "panel-middle-01.3mf",
+              "sha256": "bea35033b6d9d1615e625b77068bbbbf1cbefc4c7871e8f2ed691a36dd8329d4",
+              "bytes": 16311
+            },
+            {
+              "file": "panel-middle-01.stl",
+              "sha256": "1dace8101195a34c9d311d9cf80bb4c0ab3d1b8c7e47f237883918cf200c52f1",
+              "bytes": 75884
+            }
+          ],
+          "id": "panel-middle-01",
+          "plateInstances": 1,
+          "sourceBuildItem": 1,
+          "image": "images/panel-middle-01.png"
+        }
+      ]
+    },
+    {
+      "id": "top-panel-p1952",
+      "label": "Top-panel mount \u00b7 P1.952 / 128 \u00d7 128 filename variant",
+      "sourceFilename": "Top Panel Mount P1.952 128 128.3mf",
+      "sourceSha256": "0f29c3943abae83195130dcf7c647bb88b4367ad3f3d499af24978baeb6416c3",
+      "variantSelection": "Representative named candidate, not a newest/compatible revision claim",
+      "shapes": [
+        {
+          "boundsMm": [
+            85.0,
+            150.0,
+            15.0
+          ],
+          "vertices": 888,
+          "triangles": 1784,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "exports": [
+            {
+              "file": "top-panel-p1952-01.3mf",
+              "sha256": "7675028eddd68b0d1e37045650092f263d405e44fc8813368a6360b310b0442e",
+              "bytes": 18106
+            },
+            {
+              "file": "top-panel-p1952-01.stl",
+              "sha256": "b8adb925b6e0ffd40713b0fcf169dc89e81585f439aac48ca2c7e70042bdea09",
+              "bytes": 89284
+            }
+          ],
+          "id": "top-panel-p1952-01",
+          "plateInstances": 2,
+          "sourceBuildItem": 1,
+          "image": "images/top-panel-p1952-01.png"
+        },
+        {
+          "boundsMm": [
+            85.0,
+            85.0,
+            15.0
+          ],
+          "vertices": 583,
+          "triangles": 1170,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "exports": [
+            {
+              "file": "top-panel-p1952-02.3mf",
+              "sha256": "cac5cda0ec8c3715fa1860676d51bb1852e84d29088a4be692f5241aac56f63f",
+              "bytes": 12387
+            },
+            {
+              "file": "top-panel-p1952-02.stl",
+              "sha256": "a1ada708a2eada591130f505eddeddfbfeb40c012a54765bdc6812353a9842f0",
+              "bytes": 58584
+            }
+          ],
+          "id": "top-panel-p1952-02",
+          "plateInstances": 4,
+          "sourceBuildItem": 3,
+          "image": "images/top-panel-p1952-02.png"
+        }
+      ]
+    },
+    {
+      "id": "ball-holder-265",
+      "label": "Ball-holder 26.5 filename variant",
+      "sourceFilename": "Ball Holder 26.5-2.3mf",
+      "sourceSha256": "8648940eeb8d9d959a6be8b19c2223937d99bc27ef5ec24da422357d0623b8c2",
+      "variantSelection": "Representative named candidate, not a newest/compatible revision claim",
+      "shapes": [
+        {
+          "boundsMm": [
+            38.6145,
+            100.0,
+            132.7757
+          ],
+          "vertices": 9776,
+          "triangles": 19560,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "exports": [
+            {
+              "file": "ball-holder-265-01.3mf",
+              "sha256": "b8906ca319369458308a2a23a0a001fc8cf79494564d92f736ccb0523410ebe5",
+              "bytes": 239028
+            },
+            {
+              "file": "ball-holder-265-01.stl",
+              "sha256": "6ce3ccc8835fce8a02b9aa3c5c3c51fefeec515c95aba5dec8e4a03df31a5421",
+              "bytes": 978084
+            }
+          ],
+          "id": "ball-holder-265-01",
+          "plateInstances": 1,
+          "sourceBuildItem": 1,
+          "image": "images/ball-holder-265-01.png"
+        }
+      ]
+    },
+    {
+      "id": "table-clamp",
+      "label": "Table-clamp filename variant 7",
+      "sourceFilename": "Table Clamp Part Studio-7.3mf",
+      "sourceSha256": "4f6bd8ec7a39c2b92421521ed5f30362197f906780705c16253b9cd1f5a7d711",
+      "variantSelection": "Representative named candidate, not a newest/compatible revision claim",
+      "shapes": [
+        {
+          "boundsMm": [
+            120.0,
+            80.0,
+            77.0
+          ],
+          "vertices": 16877,
+          "triangles": 33754,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "exports": [
+            {
+              "file": "table-clamp-01.3mf",
+              "sha256": "0dc455a8ed0da3c2af0ddebb9f4f7b361c7d741029bede8687a758211b7f4f15",
+              "bytes": 522389
+            },
+            {
+              "file": "table-clamp-01.stl",
+              "sha256": "70f0a62ee3cb49a546fb665351548d33fc23561afe22a78956df24d0b7abfb34",
+              "bytes": 1687784
+            }
+          ],
+          "id": "table-clamp-01",
+          "plateInstances": 1,
+          "sourceBuildItem": 1,
+          "image": "images/table-clamp-01.png"
+        },
+        {
+          "boundsMm": [
+            104.0,
+            42.0,
+            25.0
+          ],
+          "vertices": 80,
+          "triangles": 156,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "exports": [
+            {
+              "file": "table-clamp-02.3mf",
+              "sha256": "fe3abb66c69a11d65f48252ab1bd10f48cc1856a59e03e2ee09ee0276425eec1",
+              "bytes": 2367
+            },
+            {
+              "file": "table-clamp-02.stl",
+              "sha256": "e4ab4878e99827cdc488751ed57ae8850b44113dda493931e5c61f331515d0f5",
+              "bytes": 7884
+            }
+          ],
+          "id": "table-clamp-02",
+          "plateInstances": 1,
+          "sourceBuildItem": 2,
+          "image": "images/table-clamp-02.png"
+        },
+        {
+          "boundsMm": [
+            43.4746,
+            66.8,
+            10.3945
+          ],
+          "vertices": 22199,
+          "triangles": 44394,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "exports": [
+            {
+              "file": "table-clamp-03.3mf",
+              "sha256": "471dddcf17172ea0201340bb70973f25bde25be9601a06840a1b98f73b5b9ddc",
+              "bytes": 515666
+            },
+            {
+              "file": "table-clamp-03.stl",
+              "sha256": "74fbbb4d8e20f3ff2c025d4bd56c9307b28ef0105c0cb8f2e542701fecfc7daf",
+              "bytes": 2219784
+            }
+          ],
+          "id": "table-clamp-03",
+          "plateInstances": 1,
+          "sourceBuildItem": 3,
+          "image": "images/table-clamp-03.png"
+        },
+        {
+          "boundsMm": [
+            29.956,
+            30.0,
+            10.1753
+          ],
+          "vertices": 5150,
+          "triangles": 10296,
+          "boundaryEdges": 0,
+          "nonManifoldEdges": 0,
+          "degenerateTriangles": 0,
+          "exports": [
+            {
+              "file": "table-clamp-04.3mf",
+              "sha256": "afdada8b7b766c6d8666aa7acd21ab0ce246bc99dc28397578a5baf3c002b942",
+              "bytes": 142876
+            },
+            {
+              "file": "table-clamp-04.stl",
+              "sha256": "eb62b5556889d16ab487b957aaa1db4a1357efe41b8035f339850c1af3979ce3",
+              "bytes": 514884
+            }
+          ],
+          "id": "table-clamp-04",
+          "plateInstances": 1,
+          "sourceBuildItem": 4,
+          "image": "images/table-clamp-04.png"
+        }
+      ]
+    }
+  ],
+  "searchScope": [
+    "Project source tree (Unity visual meshes excluded)",
+    "Local Downloads top-level filename candidates",
+    "Documents and Desktop CAD/print filename scan: no additional matches found"
+  ],
+  "excludedVisualAssets": [
+    "Assets/Prefabs/Locust/Locust.blend",
+    "Assets/Prefabs/Locust/cylinder_mini.blend",
+    "Assets/Prefabs/Locust/matrexvr_cylinder 1.blend",
+    "Assets/Prefabs/Locust/matrexvr_cylinder.blend"
+  ]
+}

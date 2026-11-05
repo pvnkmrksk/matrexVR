@@ -15,7 +15,7 @@ namespace ConfigurationUI
     {
         private bool advancedMode;
         private int activeBlock;
-        private string settingsTab="Essentials",activePhase="stimulus";
+        private string settingsTab="Basics",activePhase="stimulus";
         private List<ExperimentPreset> presets;
         private ListView blockList;
         private readonly List<int> blockIndices=new List<int>();
@@ -27,7 +27,7 @@ namespace ConfigurationUI
         private readonly HashSet<string> expandedSections=new HashSet<string>();
         private static string Pretty(string key)
         {
-            var names=new Dictionary<string,string> { ["closedLoopOrientation"]="Closed loop orientation",["closedLoopPosition"]="Closed loop position",["closedLoopMode"]="Input mode",["vrId"]="VR ID",["ledPanelWidth"]="LED panel width",["ledPanelHeight"]="LED panel height",["vSyncCount"]="VSync count",["autoTrim"]="Auto-trim",["reloadScene"]="Reload environment",["autoStart"]="Start automatically",["randomise"]="Shuffle blocks",["loop"]="Loop sequence",["aglHeight"]="Height above terrain",["mu"]="Mean heading",["kappa"]="Heading concentration",["numberOfLocusts"]="Agent count",["agentCount"]="Agent count",["locustSpeed"]="Agent speed",["locoSpeed"]="Agent speed",["agentSpeed"]="Agent speed",["locustSpeedStdDev"]="Agent speed SD",["agentSpeedStdDev"]="Agent speed SD",["speciesName"]="Species name",["nightSky"]="Night sky",["zmqAddress"]="Input host",["zmqPort"]="Input port" };
+            var names=new Dictionary<string,string> { ["durationSeconds"]="Duration (s)",["modelPath"]="Custom GLB",["kannadiModelPath"]="Custom GLB",["type"]="Built-in object",["kannadiTilePrefab"]="Built-in model",["agentVisual"]="Population model",["closedLoopOrientation"]="Track heading",["closedLoopPosition"]="Track position",["closedLoopMode"]="Input mode",["vrId"]="VR ID",["ledPanelWidth"]="LED panel width",["ledPanelHeight"]="LED panel height",["vSyncCount"]="VSync count",["autoTrim"]="Auto-trim",["reloadScene"]="Reload environment",["autoStart"]="Start automatically",["randomise"]="Shuffle blocks",["loop"]="Loop sequence",["aglHeight"]="Height above terrain",["mu"]="Mean heading",["kappa"]="Heading concentration",["numberOfLocusts"]="Agent count",["agentCount"]="Agent count",["locustSpeed"]="Agent speed",["locoSpeed"]="Agent speed",["agentSpeed"]="Agent speed",["locustSpeedStdDev"]="Agent speed SD",["agentSpeedStdDev"]="Agent speed SD",["speciesName"]="Species name",["nightSky"]="Night sky",["zmqAddress"]="Input host",["zmqPort"]="Input port" };
             if(names.TryGetValue(key,out string label)) return label;
             string text=Human(key).ToLowerInvariant(); return string.IsNullOrEmpty(text)?text:char.ToUpperInvariant(text[0])+text.Substring(1);
         }
@@ -47,16 +47,16 @@ namespace ConfigurationUI
             side.Add(new Label("EXPERIMENT") {name="navigation-title"});
             var session=StudioButton("Start","home",ShowSessionHome,homeMode?"nav-active":null);session.name="back-to-session";session.tooltip="Review and start your experiment sequence, or explore the demonstration before configuring hardware.";side.Add(session);
             var sequence=StudioButton("Sequence","sequence",()=>Select(Workspace.Sequence),!homeMode&&!experimentIndexMode&&!replayLibraryMode&&selected==Workspace.Sequence?"nav-active":null);sequence.name="open-sequence";sequence.tooltip="Arrange blocks, timing and repetitions. Open a block to change its parameters.";side.Add(sequence);
-            var experiments=StudioButton("Experiment settings","settings",ShowExperimentConfigs,experimentIndexMode||!homeMode&&!replayLibraryMode&&selected!=Workspace.Sequence&&selected!=Workspace.System?"nav-active":null);experiments.name="open-experiments";experiments.tooltip="Reusable stimulus, movement and scene parameters for the current sequence.";side.Add(experiments);
-            var replay=StudioButton("Replay recordings","play",ShowReplayLauncher,replayLibraryMode?"nav-active":null);replay.name="open-recorded-replay";replay.tooltip="Open a recorded session and inspect its timeline and overview.";side.Add(replay);
+            var experiments=StudioButton("Settings","settings",ShowExperimentConfigs,experimentIndexMode||!homeMode&&!replayLibraryMode&&selected!=Workspace.Sequence&&selected!=Workspace.System?"nav-active":null);experiments.name="open-experiments";experiments.tooltip="Reusable stimulus, movement and scene parameters for the current sequence.";side.Add(experiments);
+            var replay=StudioButton("Replay","play",ShowReplayLauncher,replayLibraryMode?"nav-active":null);replay.name="open-recorded-replay";replay.tooltip="Open a recorded session and inspect its timeline and overview.";side.Add(replay);
             var files=new Foldout {name="navigation-files",text="In this sequence",value=!homeMode&&!replayLibraryMode};files.AddToClassList("nav-foldout");side.Add(files);
             var linked=new HashSet<string>(BuilderSteps.OfType<JObject>().Select(BlockReference).Where(r=>!string.IsNullOrEmpty(r)).Select(r=>Path.GetFullPath(ExperimentConfigFiles.Resolve(r))));
             foreach(var doc in Workspace.Documents.Where(d=>d.SchemaId!="sequence"&&d.SchemaId!="system"&&linked.Contains(d.Path)))
             {
-                var button=StudioButton(ExperimentBlocks.Title(doc.Path)+(doc.Dirty?" •":""),doc.SchemaId=="swarm"?"swarm":"file",()=>Select(doc),!homeMode&&!experimentIndexMode&&selected==doc?"file-active":null);
-                button.AddToClassList("nav-file");button.tooltip="Edit "+doc.Path;files.Add(button);
+                var button=StudioButton(ExperimentBlocks.Title(doc.Root as JObject,doc.Path)+(doc.Dirty?" •":""),doc.SchemaId=="swarm"?"swarm":"file",()=>Select(doc),!homeMode&&!experimentIndexMode&&selected==doc?"file-active":null);
+                button.userData=doc;button.AddToClassList("nav-file");button.tooltip="Edit "+doc.Path;files.Add(button);
             }
-            var library=new Foldout {name="navigation-library",text="Files & library",value=false};library.AddToClassList("nav-foldout");side.Add(library);
+            var library=new Foldout {name="navigation-library",text="Files",value=false};library.AddToClassList("nav-foldout");side.Add(library);
             library.Add(StudioButton("Add a block","plus",()=>ShowBlockLibrary()));library.Add(StudioButton("Open JSON file","file",ShowOpenFile));library.Add(StudioButton("Save a variation","copy",()=>ShowVariation(null)));
             var spacer=new VisualElement();spacer.AddToClassList("nav-spacer");side.Add(spacer);
             side.Add(new Label("APPLICATION"));
@@ -70,13 +70,28 @@ namespace ConfigurationUI
             body.AddToClassList("studio-body"); inspector.AddToClassList("studio-inspector");
             var top=Row("studio-title-row"); body.Add(top);
             var titles=new VisualElement(); titles.style.flexGrow=1; top.Add(titles);
-            var title=new Label(selected==Workspace.Sequence?"Your experiment sequence":selected==Workspace.System?"Configure apparatus":ExperimentBlocks.Title(selected.Path)); title.AddToClassList("title"); titles.Add(title);
-            var subtitle=new Label(selected==Workspace.Sequence?"Combine reusable configs. Drag to reorder. Open a block to edit its stimulus.":Path.GetRelativePath(RuntimePaths.ConfigRoot,selected.Path).Replace('\\','/')); subtitle.AddToClassList("studio-subtitle"); titles.Add(subtitle);
-            top.Add(StudioButton("More","settings",ShowEditorTools,"quiet"));
+            if(selected==Workspace.System){var title=new Label("Apparatus");title.AddToClassList("title");titles.Add(title);}
+            else BuildConfigIdentity(titles);
+            var subtitle=new Label(Path.GetRelativePath(RuntimePaths.ConfigRoot,selected.Path).Replace('\\','/')){tooltip=selected.Path};subtitle.AddToClassList("studio-subtitle");titles.Add(subtitle);
+            top.Add(StudioButton("Tools","more",ShowEditorTools,"quiet"));
             if(selected==Workspace.Sequence) BuildSequenceBuilder();
             else if(selected==Workspace.System) BuildSystemEditor();
             else BuildExperimentEditor();
             BuildStudioOverview(); UpdateStatus();
+        }
+        private void BuildConfigIdentity(VisualElement parent)
+        {
+            var identity=Row("config-identity");parent.Add(identity);
+            var field=new TextField {name="config-title",value=selected.Root["title"]?.Type==JTokenType.String?selected.Root["title"].ToString():"",isDelayed=true};
+            field.tooltip="Edit the human-readable experiment or paradigm title. The JSON file name is shown below.";field.textEdition.placeholder=ExperimentBlocks.Title(selected.Root as JObject,selected.Path);identity.Add(field);
+            BindDelayedText(field,text=>StudioEdit(selected,root=>root["title"]=text,false));
+            BindViewState(field,()=>RefreshBoundText(field,selected.Root["title"]?.ToString()));
+            var notes=IconButton("file","Edit configuration notes",()=>{
+                var dialog=OpenModal("Notes","Optional notes saved with this configuration.");
+                var comments=new TextField {name="config-comments",value=selected.Root["comments"]?.ToString()??"",multiline=true,isDelayed=true};comments.style.minHeight=120;dialog.Add(comments);
+                BindDelayedText(comments,text=>StudioEdit(selected,root=>root["comments"]=text,false));
+                dialog.Add(StudioButton("Done","next",()=>{RequireApplied();CloseModal();},"primary"));
+            });notes.name="config-notes";identity.Add(notes);
         }
         private JArray BuilderSteps => Workspace.Sequence.Root["sequences"] as JArray??new JArray();
         private JObject Block(int index) => index>=0 && index<BuilderSteps.Count?BuilderSteps[index] as JObject:null;
@@ -89,10 +104,10 @@ namespace ConfigurationUI
         private void BuildSequenceBuilder()
         {
             var stats=Row("sequence-stats"); body.Add(stats);
-            stats.Add(Pill(BuilderSteps.Count+" blocks","accent"));
+            stats.Add(Pill(BuilderSteps.Count+(BuilderSteps.Count==1?" block":" blocks"),"accent"));
             var total=Pill(SequenceDuration()+" total");total.name="sequence-total-duration";stats.Add(total);
-            stats.Add(Pill(ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])?"Shuffled order":"Listed order"));
-            stats.Add(Pill(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass"));
+            var order=Pill(""); stats.Add(order); BindViewState(order,()=>order.text=ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])?"Shuffled order":"Listed order");
+            var repeats=Pill(""); stats.Add(repeats); BindViewState(repeats,()=>repeats.text=ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass");
             body.Add(BuildSequenceFlags());
             blockIndices.Clear(); blockIndices.AddRange(Enumerable.Range(0,BuilderSteps.Count));
             blockList=new ListView(blockIndices,156,()=>new VisualElement(),BindBlockCard) { selectionType=SelectionType.Single,reorderable=true,reorderMode=ListViewReorderMode.Animated,virtualizationMethod=CollectionVirtualizationMethod.FixedHeight };
@@ -107,8 +122,8 @@ namespace ConfigurationUI
             if(BuilderSteps.Count>0) blockList.SetSelectionWithoutNotify(new[]{Mathf.Clamp(activeBlock,0,BuilderSteps.Count-1)});
             if(BuilderSteps.Count==0) body.Add(new Label("Your sequence is empty. Add a config from the library to create the first block."));
             var add=Row("builder-add-row"); body.Add(add);
-            add.Add(StudioButton("Add experiment block","plus",()=>ShowBlockLibrary(),"primary"));
-            add.Add(new Label("Pick a file once — its complete configuration becomes the reusable brick."));
+            add.Add(StudioButton("Add block","plus",()=>ShowBlockLibrary(),"primary"));
+            add.tooltip="Choose a configuration file to add as a complete reusable experiment block.";
         }
         private void BindBlockCard(VisualElement holder,int index)
         {
@@ -240,10 +255,8 @@ namespace ConfigurationUI
         private Toggle StateSwitch(bool value,Action<bool> changed,string name=null)
         {
             var toggle=new Toggle { name=name }; toggle.AddToClassList("studio-switch"); toggle.SetValueWithoutNotify(value);
-            var track=new VisualElement(); track.AddToClassList("switch-track"); var knob=new VisualElement(); knob.AddToClassList("switch-knob"); track.Add(knob);
-            var input=toggle.Q<VisualElement>(className:"unity-toggle__input"); (input??toggle).Add(track);
-            var indicator=new Label(value?"ON":"OFF"); indicator.AddToClassList("switch-indicator"); (input??toggle).Add(indicator); toggle.EnableInClassList("is-on",value);
-            toggle.RegisterValueChangedCallback(e=>{ indicator.text=e.newValue?"ON":"OFF"; toggle.EnableInClassList("is-on",e.newValue); Guard(()=>changed(e.newValue)); }); return toggle;
+            toggle.EnableInClassList("is-on",value);
+            toggle.RegisterValueChangedCallback(e=>{ if(e.target!=toggle)return; toggle.EnableInClassList("is-on",e.newValue); Guard(()=>{FlushEditorDrafts();FlushNumbers();changed(e.newValue);}); }); return toggle;
         }
         private string SequenceDuration()
         {
@@ -264,7 +277,7 @@ namespace ConfigurationUI
             inspector.Clear(); inspector.Add(new Label("RUN OVERVIEW") { name="overview-title" });
             var big=new Label(SequenceDuration()); big.AddToClassList("overview-duration"); inspector.Add(big);
             inspector.Add(new Label(BuilderSteps.Count+" blocks · "+(Workspace.System.Root["configs"] as JArray)?.Count+" VR rigs"));
-            inspector.Add(Pill(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"LOOP ON · repeating":"ONE PASS","accent"));
+            var loopSummary=Pill("","accent");inspector.Add(loopSummary);BindViewState(loopSummary,()=>loopSummary.text=ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"LOOP ON · repeating":"ONE PASS");
             if(selected==Workspace.Sequence && Block(activeBlock) is JObject step)
             {
                 inspector.Add(new Label("SELECTED BLOCK "+(activeBlock+1).ToString("00")));
@@ -277,7 +290,7 @@ namespace ConfigurationUI
                 var dropdown=new DropdownField("Environment",sceneChoices,Math.Max(0,sceneChoices.IndexOf(scene))) { tooltip="Unity scene used for this block. Its experiment file controls the stimulus and movement settings." }; dropdown.formatSelectedValueCallback=SceneOptionCaption;dropdown.formatListItemCallback=SceneCaption;inspector.Add(dropdown);
                 dropdown.RegisterValueChangedCallback(e=>StudioEdit(Workspace.Sequence,r=>r["sequences"][activeBlock]["sceneName"]=e.newValue));
                 var schema=(JObject)Workspace.Schemas.Get("sequence")["properties"]["sequences"]["items"];
-                foreach(string key in new[]{"duration","gain","autoTrim","reloadScene"})
+                foreach(string key in new[]{"title","comments","group","duration","gain","autoTrim","reloadScene"})
                 {
                     var control=Setting(Workspace.Sequence,new[]{"sequences",activeBlock.ToString(),key},ConfigSchema.Child(schema,key),step,schema);
                     if(key=="duration" && ExperimentBlocks.Phased(config)) control.SetEnabled(false);
@@ -312,7 +325,7 @@ namespace ConfigurationUI
             var health=new VisualElement(); health.AddToClassList("health-card"); inspector.Add(health); health.Add(new Label("CONFIGURATION CHECK")); summary=new Label(); health.Add(summary);
         }
         private string SystemSyncSummary()
-        { int sync=(int)ExperimentBlocks.Number(Workspace.System.Root["vSyncCount"]); return sync>0?"vSync /"+sync+" · software FPS target overridden":"Software FPS target: "+(Workspace.System.Root["targetFrameRate"]?.ToString()??"120"); }
+        { int sync=(int)ExperimentBlocks.Number(Workspace.System.Root["vSyncCount"]); return sync>0?"vSync /"+sync+" · software FPS target overridden":"Software FPS target: "+(Workspace.System.Root["targetFrameRate"]?.ToString()??"60"); }
         private string SystemDisplaySummary()
         {
             var displays=DesktopApparatusProfile.Rigs(Workspace.System.Root).GroupBy(ApparatusOutputDisplay).OrderBy(group=>group.Key).ToList();
@@ -321,8 +334,9 @@ namespace ConfigurationUI
         }
         private List<string> ScenesFor(string schema)
         {
-            var list=new List<string>(); for(int i=0;i<SceneManager.sceneCountInBuildSettings;i++) { string name=Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i)); if(name!="ControlScene" && name!="ReplayScene" && ConfigSchema.ForScene(name)==schema) list.Add(name); }
-            if(list.Count==0) list.Add(schema=="swarm"?"Swarm":schema=="kannadi"?"Kannadi":schema=="optomotor"?"Optomotor":schema=="dynamic-choice"?"Choice_desync":"Choice"); return list;
+            if(schema=="swarm")schema="kannadi";
+            var list=new List<string>(); for(int i=0;i<SceneManager.sceneCountInBuildSettings;i++) { string name=Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(i)); if(name!="ControlScene" && name!="ReplayScene" && name!="Swarm" && ConfigSchema.ForScene(name)==schema) list.Add(name); }
+            if(list.Count==0) list.Add(schema=="swarm"?"Kannadi":schema=="kannadi"?"Kannadi":schema=="optomotor"?"Optomotor":schema=="dynamic-choice"?"Choice_desync":"Choice"); return list;
         }
         private VisualElement OpenModal(string title,string subtitle)
         {

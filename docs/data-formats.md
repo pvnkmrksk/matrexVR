@@ -72,9 +72,13 @@ Gzip CSV with columns:
 
 Each row is one visible-model root per frame. VRIndex is the configured numeric rig identifier (historically 1–4); CloneIndex is zero-based and can change when a grid is rebuilt. Positions are world cm, rotations are Euler degrees, hexRadius is world cm, NumberOfRings is an integer. A clone root can contain a whole mirrored band; it is not necessarily a single mesh/animal. Numeric clone values use invariant decimal points.
 
+Current source appends `AnimationState` after this existing prefix. It is a quoted JSON field, schema `version:1`, containing `animators` (hierarchy paths, controller layers/state hashes/normalized times/weights and non-trigger parameters), `legacy` (clip names/times/speeds/weights and enabled state), and optional `procedural` shader clock/phase. Empty fields mean that root has no supported animation. Paths use child indices relative to the recorded root. Replay requires the same original controller/model hierarchy; state hashes alone do not embed a controller. Transition blending and consumed triggers are not fully captured. Existing recordings remain readable.
+
 ## Swarm and band logs
 
 Historical Swarm gzip CSV uses nine row columns: `Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase`. Its header then appends `NumberOfLocusts:...`, `SpawnAreaSize:...`, `Mu:...`, `Kappa:...`, `LocustSpeed:...` as **header metadata**, not per-row columns. New 0.3 files append `RotationX,RotationY,RotationZ` after `experimentPhase`, yielding twelve data columns while retaining the old nine-column prefix. Parse column names and the appended metadata separately; older files have six, eight or nine data columns. Units: X/Y/Z and area size in scene world units (cm in walking scenes, m on terrain), mu in degrees, kappa dimensionless, speed in world units/s. Pre-0.3 logs contain positions without heading columns; their missing headings cannot be recovered as measurements. Current logs append recorded Euler rotations in degrees.
+
+Current source additionally appends `AnimationState` after `RotationZ` and before header-only metadata, using the same JSON schema as Kannadi clone rows. Bogong moth/dot records preserve the actual shader clock and per-agent phase, so replay flap/flicker does not depend on the wall clock at playback. Use a real CSV reader: the quoted JSON contains commas and quotes.
 
 New headers additionally include `LocustSpeedStdDev` in world units/s, `DirectionDistribution` and `KappaElevation`; the existing data-column prefix is unchanged. `LocustSpeed` is the generated population mean, not each individual's sampled speed. The archived experiment specifies the distribution; successive recorded positions give the realized motion. Periodic crossings jump across the cube and must be unwrapped before estimating speed. Embedded Choice populations create a new per-rig file when a phase rebuilds them.
 
@@ -119,3 +123,8 @@ Replay settings are inspector/UI fields: sessionFolder (newest when empty), abso
 The dedicated `matrex.telemetry.v2` PUB stream (schema version 2) provides all rigs on port 9880, separately from tracking inputs. Heading-relative presentations append per-rig onset context to `heading_reference.jsonl`. See [the versioned telemetry and onset schema](heading-reference-telemetry.md) for clocks, coordinate units, raw/consumed inputs, gains, sample freshness, circular mean and resultant length.
 
 For named cross-block heading references, `heading_reference.jsonl` additionally records `savedAs` and `measureDuringPresentation`. In the current Selwyn cycle, measurements are independent per rig, saved as `milky-way-baseline` each 240-second Milky Way block, and the following two swarm headers record the resolved world `Mu`. Sequence `CurrentTrial` increments when the repeated block group restarts; the setup prefix occurs only in the first pass.
+
+
+## Greenfield same-build replay
+
+New recordings add `presentationId`, `unityFrame` and `monotonicTime` to pose evidence. `Current Time` remains the wall-clock timestamp; playback uses monotonic elapsed time and the shared rendered-frame identity. Complete controller inputs are in `presentations.jsonl`, serial/world checkpoints in `world_state.jsonl`, and the required creating build/schema in `replay_contract.json`. The finalized CSV inventory and hashes are in `recording_manifest.json`. See the [same-build replay contract](same-build-replay-contract.md) for strict evidence, extension hooks and read-only seek behavior.

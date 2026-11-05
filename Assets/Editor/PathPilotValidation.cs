@@ -25,6 +25,8 @@ public static class PathPilotValidation
     static readonly List<object> sessions=new();
     static JObject source;
     static MainController main;
+    // Unity frame clocks and Stopwatch can differ slightly at coroutine boundaries.
+    const double TimingToleranceSeconds = .05;
     static void Check(bool ok,string message) {if(!ok)throw new Exception(message);checks.Add(message);}
     static PathPilotValidation()
     {
@@ -121,8 +123,8 @@ public static class PathPilotValidation
                 }
                 if(ends.Length==0)return;
                 Check((string)ends[0]["data"]["outcome"]=="duration_complete","Crossing the absent goal does not terminate the no-bars trial");
-                Check((double)ends[0]["data"]["durationSeconds"]>=20&&(double)ends[0]["data"]["durationSeconds"]<21,"No-bars trial lasts the configured 20 seconds");
-                Check((double)starts[0]["elapsedSeconds"]-(double)events.First(e=>(string)e["kind"]=="intertrial_start")["elapsedSeconds"]>=5,"Initial intertrial lasts the configured 5 seconds");
+                Check((double)ends[0]["data"]["durationSeconds"]>=20-TimingToleranceSeconds&&(double)ends[0]["data"]["durationSeconds"]<21,"No-bars trial lasts the configured 20 seconds");
+                Check((double)starts[0]["elapsedSeconds"]-(double)events.First(e=>(string)e["kind"]=="intertrial_start")["elapsedSeconds"]>=5-TimingToleranceSeconds,"Initial intertrial lasts the configured 5 seconds");
                 CompleteCase();return;
             }
             if(test==2) {
@@ -138,7 +140,7 @@ public static class PathPilotValidation
                 if(ends.Length<3)return;
                 Check((string)ends[0]["data"]["goalSide"]=="left"&&(string)ends[1]["data"]["goalSide"]=="right","Real physics contacts record left and right goals");
                 Check((string)ends[2]["data"]["outcome"]=="no_choice_timeout","Stationary bar trial records no choice on timeout");
-                Check((double)ends[2]["data"]["durationSeconds"]>=120&&(double)ends[2]["data"]["durationSeconds"]<121,"Bar timeout lasts the configured 120 seconds");
+                Check((double)ends[2]["data"]["durationSeconds"]>=120-TimingToleranceSeconds&&(double)ends[2]["data"]["durationSeconds"]<121,"Bar timeout lasts the configured 120 seconds");
                 CompleteCase();return;
             }
             if(test>=3) {

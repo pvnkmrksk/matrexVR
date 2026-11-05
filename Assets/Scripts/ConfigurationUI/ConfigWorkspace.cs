@@ -65,6 +65,17 @@ namespace ConfigurationUI
                 {
                     // Use the production parser too, including cross-field constraints.
                     JObject json=JObject.Parse(doc.Root.ToString());
+                    if(doc.SchemaId!="system" && doc.SchemaId!="sequence")
+                    {
+                        int largestRig=(System.Root["configs"] as JArray??new JArray()).OfType<JObject>()
+                            .Select(rig=>RuntimeRigRegistry.ParseIndex((string)rig["vrId"])).DefaultIfEmpty(0).Max();
+                        bool phasedCommon=json["stimulus"]!=null||json["preStimulus"]!=null||json["postStimulus"]!=null;
+                        foreach(var payload in phasedCommon?ExperimentPhase.Parse(json).Select(phase=>phase.Config):new[]{json}.AsEnumerable())
+                        {
+                            ExperimentSky.Rotation(payload);
+                            ExperimentVisibility.Validate(payload,largestRig);
+                        }
+                    }
                     if(doc.SchemaId=="system")
                     {
                         var ids=new HashSet<string>();
@@ -73,14 +84,20 @@ namespace ConfigurationUI
                             string id=(string)rig["vrId"];
                             if(string.IsNullOrWhiteSpace(id) || !ids.Add(id)) errors.Add(label+": unique nonempty vrId required.");
                             int index=RuntimeRigRegistry.ParseIndex(id);
-                            if(index<1 || id!="VR"+index) errors.Add(label+": vrId must be VR followed by a positive integer, such as VR1 or VR10.");
+                            if(index<1 || index>16 || id!="VR"+index) errors.Add(label+": vrId must be VR1 through VR16.");
                             string order=(string)rig["displayOrder"]??"";
                             if(order.Any(c=>"DRBLFU".IndexOf(c)<0) || order.Distinct().Count()!=order.Length) errors.Add(label+": displayOrder uses each D/R/B/L/F/U at most once.");
                         }
-                        int extraRigs=ids.Count(id=>RuntimeRigRegistry.ParseIndex(id)>4);
-                        int availableLayers=Enumerable.Range(8,24).Count(layer=>string.IsNullOrEmpty(LayerMask.LayerToName(layer)));
-                        if(extraRigs>availableLayers) errors.Add(label+": "+extraRigs+" additional rigs require isolated stimulus layers; this build has "+availableLayers+" available.");
-                        int fps=(int?)json["targetFrameRate"]??120;
+                        var stimulusLayers=new Dictionary<int,string>();
+                        foreach(string id in ids)
+                        {
+                            int index=RuntimeRigRegistry.ParseIndex(id);if(index<1||index>16)continue;
+                            int layer=RuntimeRigRegistry.StimulusLayer(index);
+                            if(layer<8||layer>31)errors.Add(label+": "+id+" has no valid isolated stimulus layer in this build.");
+                            else if(stimulusLayers.TryGetValue(layer,out string previous))errors.Add(label+": "+id+" and "+previous+" share stimulus layer "+layer+".");
+                            else stimulusLayers.Add(layer,id);
+                        }
+                        int fps=(int?)json["targetFrameRate"]??60;
                         if(fps!=-1 && fps<=0) errors.Add(label+": targetFrameRate must be positive or -1.");
                         json["telemetry"]?.ToObject<TelemetryConfig>()?.Validate();
                     }
@@ -92,7 +109,7 @@ namespace ConfigurationUI
                         foreach(var step in sequence.sequences??Array.Empty<SequenceItem>())
                         {
                             if(step==null) { errors.Add(label+": null sequence step."); continue; }
-                            if(scenes && !Application.CanStreamedLevelBeLoaded(step.sceneName)) errors.Add(label+": scene unavailable in this build: "+step.sceneName);
+                            if(scenes && !Application.CanStreamedLevelBeLoaded(SceneCompatibility.Resolve(step.sceneName))) errors.Add(label+": scene unavailable in this build: "+step.sceneName);
                             step.autoTrimSettings?.Validate();
                             if(step.parameters!=null && step.parameters.TryGetValue("configFile",out object reference) && reference!=null)
                             {

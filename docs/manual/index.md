@@ -2,12 +2,13 @@
 
 MATREX VR connects measured animal movement to controlled visual environments in Unity. Use this manual to operate an existing experiment, understand the path from a tracker packet to an LED viewport, interpret saved data, or extend the source.
 
-The manual describes the **0.3 software and the current source**. Sections for modern native tracker decoding and the live browser bridge are explicitly marked as source updates after 0.3; those changes do not retroactively appear in the stable 0.3 downloads. The standalone application, this documentation website, external trackers and analysis tools have separate responsibilities. Documentation updates do not change an installed application or publish a new software release.
+The manual describes **0.4.1 and the current source**, with historical sections labelled by version. Follow the `START-HERE.txt` included with your installed player and the [release notes](../releases.md) for its exact capabilities. The standalone application, this website, external trackers and analysis tools have separate responsibilities. A documentation update does not change an installed application.
 
 ## Choose your starting point
 
 | Goal | Start here |
 | --- | --- |
+| Try a hardware-free demo and replay | [Five-minute start](../five-minute-start.md) |
 | Run a supplied experiment | [Getting started](../getting-started.md), then [configuration studio](../configuration-ui.md) |
 | Understand how the application works | [Runtime architecture](architecture.md) and [component index](components.md) |
 | Route camera faces to an LED array | [Rigs and viewports](viewports.md), then [six-camera reference](../six-camera-rig.md) |
@@ -16,6 +17,7 @@ The manual describes the **0.3 software and the current source**. Sections for m
 | Choose a visual task | [Scenes and capabilities](scenes.md) and [native gallery](gallery.md) |
 | Inspect the original experiment | [Recording pipeline](recording-pipeline.md), [data formats](../data-formats.md) and [replay](../replay.md) |
 | Add an experiment or asset | [Extension guide](extending.md) |
+| Automate configuration, runs and replay | [MCP control](../ai-control.md) and [agent role guides](../agents/README.md) |
 | Connect the wider toolchain | [Trackers and analysis](integrations.md) |
 
 ## Follow one experiment through the system
@@ -31,7 +33,7 @@ An **animal** is the real subject providing movement input. An **agent** is a vi
 
 ## What is included
 
-The compact desktop build includes ControlScene, Choice, Choice_desync, Choice_Selwyn, Swarm, Kannadi, Optomotor, TerrainCueLab, Rugosity_RS and ReplayScene. Optional forest/tree environments remain in source and must be enabled in a custom build. The [scene guide](scenes.md) distinguishes a controller family, a particular authored environment and its JSON recipe.
+The compact desktop build includes ControlScene, Choice, Choice_desync, Choice_Selwyn, Kannadi, Optomotor, TerrainCueLab, Rugosity_RS, ReplayScene and four TerrainChoice layouts. The legacy Swarm scene and optional forest/tree environments remain in source and must be enabled in a custom build. The [scene guide](scenes.md) distinguishes a controller family, a particular authored environment and its JSON recipe.
 
 **Kannadi — ಕನ್ನಡಿ — means “mirror” in Kannada.** It presents a matrix of mirrored animal poses across a hexagonal arrangement. The [Kannadi section](scenes.md#kannadi-the-mirror-matrix) explains visibility and replication; it is more than an isolated animal model.
 

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "matrex": {
+      "command": "/absolute/path/to/uv",
+      "args": [
+        "run",
+        "--locked",
+        "--script",
+        "/absolute/path/matrexVR/tools/matrex_control_mcp.py",
+        "--control-dir",
+        "/absolute/path/MATREX-Control"
+      ]
+    }
+  }
+}

@@ -57,6 +57,24 @@ public static class PathPilotAppearanceValidation
             ground=PathGround.Create(root.transform,0,config,appearance,false);var tiled=Render(camera);Object.DestroyImmediate(ground.gameObject);
             Check(tiled.GetPixels().Any(p=>p.r>p.g+.2)&&tiled.GetPixels().Any(p=>p.g>p.r+.2),"Supplied grass image is rendered in tiled mode");
             File.WriteAllBytes(Path.Combine(output,"tiled-ground.png"),tiled.EncodeToPNG());Object.DestroyImmediate(tiled);
+            // Exercise the acquisition snapshot and original-controller replay together.
+            var replayHost=new GameObject("Pilot replay validation");SceneManager.MoveGameObjectToScene(replayHost,scene);
+            var controller=replayHost.AddComponent<DynamicSequenceController>();
+            var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+            typeof(DynamicSequenceController).GetField("pilotAppearance",flags).SetValue(controller,appearance);
+            var stepType=typeof(DynamicSequenceController).GetNestedType("Step",System.Reflection.BindingFlags.NonPublic);
+            var replayStep=design["steps"].Last().ToObject(stepType);
+            var recorded=(JObject)typeof(DynamicSequenceController).GetMethod("CaptureStepConfiguration",flags).Invoke(controller,new[]{replayStep});
+            Check((string)recorded["pathGroundAppearance"]["texturePath"]==image,"Acquisition snapshot retains effective pilot ground appearance");
+            var replayRoot=controller.RecreateRecordedStep("VR1",recorded,replayHost.transform,null);
+            var replayGround=replayRoot.GetComponentInChildren<PathGround>();
+            Check(replayGround!=null&&replayGround.GetComponentsInChildren<Collider>().Length==0,"Original-controller replay recreates the visual pilot ground without colliders");
+            var replayMaterial=replayGround.GetComponent<Renderer>().sharedMaterial;
+            Check(Math.Abs(replayMaterial.GetFloat("_PathWidth")-appearance.pathWidthCm)<.001&&replayMaterial.GetTexture("_GroundTexture")!=null,"Replay restores recorded width and supplied texture");
+            var replayTarget=replayRoot.GetComponent<RecordedWorldStateTarget>();
+            var checkpoint=replayTarget.Capture(true);replayTarget.Apply(checkpoint);
+            Check(replayTarget.Configuration.ToString()==recorded.ToString(),"Pilot ground survives world checkpoint capture and restore");
+            Object.DestroyImmediate(replayHost);
             // Per-condition imagery overrides a bad shared reference; same API as runtime trials.
             appearance.texturePath="missing-shared-image.png";config.preparedTexturePath=image;
             ground=PathGround.Create(root.transform,0,config,appearance,false);Object.DestroyImmediate(ground.gameObject);

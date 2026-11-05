@@ -64,6 +64,7 @@ public class ViewportSetter : MonoBehaviour
     }
 
     private Camera[] RigCameras() => GetComponentsInChildren<Camera>(true);
+    public void EnsureSixFaces() => EnsureRequestedCameras(RigCameras(), "DRBLFU");
     private bool Owns(Camera camera) => camera.GetComponentInParent<ViewportSetter>(true) == this;
 
     private Camera[] EnsureRequestedCameras(Camera[] cameras, string order)

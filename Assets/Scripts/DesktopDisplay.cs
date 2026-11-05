@@ -85,12 +85,14 @@ public sealed class DesktopDisplay : MonoBehaviour
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "--windowed") >= 0)
             { Screen.fullScreenMode = FullScreenMode.Windowed; yield break; }
 #endif
-            var native = Screen.currentResolution;
-            int width = native.width, height = native.height;
+            // currentResolution can retain the player's last low-resolution render
+            // size on macOS. The window's display reports the actual framebuffer.
+            var display = Screen.mainWindowDisplayInfo;
+            int width = display.width, height = display.height;
             if (width <= 0 || height <= 0)
             {
-                var display = Screen.mainWindowDisplayInfo;
-                width = display.width; height = display.height;
+                var native = Screen.currentResolution;
+                width = native.width; height = native.height;
             }
             Screen.SetResolution(Math.Max(1, width), Math.Max(1, height), FullScreenMode.FullScreenWindow);
             yield return null; yield return null;

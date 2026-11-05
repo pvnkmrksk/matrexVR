@@ -92,11 +92,6 @@
           "name": "tree01_texturedgrey",
           "description": "Prefabs",
           "source": "Assets/Prefabs/tree01_texturedgrey.prefab"
-        },
-        {
-          "name": "tree01_windy",
-          "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_windy.prefab"
         }
       ],
       "materials": [
@@ -248,11 +243,6 @@
           "name": "tree01_texturedgrey",
           "description": "Prefabs",
           "source": "Assets/Prefabs/tree01_texturedgrey.prefab"
-        },
-        {
-          "name": "tree01_windy",
-          "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_windy.prefab"
         }
       ],
       "materials": [

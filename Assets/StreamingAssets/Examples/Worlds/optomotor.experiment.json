@@ -1,0 +1,40 @@
+{
+  "title": "Optomotor · yaw drum",
+  "comments": "Packaged procedural optomotor world: 30 s of moderate-contrast yaw rotation at 20 degrees/s. The animal stays centered; closed-loop translation and yaw are disabled for this open-loop example. Edit frequency, speed, axis and colors in the stimulus list. No custom mesh or source rebuild is required.",
+  "loop": false,
+  "resetPositionOnStart": true,
+  "resetRotationOnStart": true,
+  "initialPosition": null,
+  "initialRotation": null,
+  "randomInitialRotation": false,
+  "sun": {
+    "enabled": true,
+    "intensity": 1,
+    "color": {
+      "r": 1,
+      "g": 1,
+      "b": 1,
+      "a": 1
+    },
+    "rotation": {
+      "x": 50,
+      "y": 330,
+      "z": 0
+    }
+  },
+  "stimuli": [
+    {
+      "duration": 30,
+      "speed": 20,
+      "clockwise": true,
+      "rotationAxis": "Yaw",
+      "frequency": 4,
+      "contrast": 0.5,
+      "dutyCycle": 0.5,
+      "color1": "#000000",
+      "color2": "#FFFFFF",
+      "closedLoopOrientation": false,
+      "closedLoopPosition": false
+    }
+  ]
+}

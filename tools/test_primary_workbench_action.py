@@ -16,6 +16,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 namespace ConfigurationUI { public static class ConfigWorkbench { public static bool IsOpen; } }
+public static class RuntimeFrameRateEditor { public static bool IsOpen; }
 namespace UnityEngine {
  public sealed class Canvas { public bool isActiveAndEnabled=true; }
  public sealed class GameObject { public bool activeInHierarchy=true; public object input;public T GetComponent<T>() where T:class=>input as T;public T GetComponentInParent<T>() where T:class=>null; }
@@ -76,7 +77,8 @@ TESTS = r'''
   ConfigurationUI.ConfigWorkbench.IsOpen=false;ExperimentInput.Cancel.released=true;
   EventSystem.current=new EventSystem{currentSelectedGameObject=new GameObject{input=new InputField()}};
   dispatcher.Tick();Check(dispatcher.escapes==1,"runtime text fields lost their existing Escape guard");
-  EventSystem.current=null;dispatcher.Tick();Check(dispatcher.escapes==2,"ordinary experiment/replay Escape no longer reaches its handler");
+  EventSystem.current=null;RuntimeFrameRateEditor.IsOpen=true;dispatcher.Tick();Check(dispatcher.escapes==1,"live cap editor must suppress experiment shortcuts and Escape stop");
+  RuntimeFrameRateEditor.IsOpen=false;dispatcher.Tick();Check(dispatcher.escapes==2,"ordinary experiment/replay Escape no longer reaches its handler");
   Console.WriteLine("PASS: "+checks+" production primary-action checks; UI/validation/action boundaries mocked, no native app launched.");
  }
 }

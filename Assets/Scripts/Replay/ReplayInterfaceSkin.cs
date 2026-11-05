@@ -13,9 +13,9 @@ internal sealed class ReplayInterfaceSkin : IDisposable
     private readonly Font semibold;
     private float appliedScale=-1;
     private bool disposed;
-    private static readonly Color Text=new Color32(36,52,68,255),Muted=new Color32(94,112,129,255);
+    private static readonly Color Text=new Color32(222,233,241,255),Muted=new Color32(157,178,195,255);
     private static readonly Color Teal=new Color32(23,111,99,255),TealDark=new Color32(18,90,81,255);
-    private static readonly Color Border=new Color32(191,205,216,255),Focus=new Color32(35,121,167,255);
+    private static readonly Color Border=new Color32(65,84,101,255),Focus=new Color32(35,121,167,255);
     public ReplayInterfaceSkin(GUISkin source)
     {
         Skin=UnityEngine.Object.Instantiate(source);Skin.name="MATREX replay interface";
@@ -30,12 +30,12 @@ internal sealed class ReplayInterfaceSkin : IDisposable
         if(disposed||Mathf.Approximately(appliedScale,scale))return;
         appliedScale=scale;ClearTextures();
         int P(float value)=>Mathf.Max(1,Mathf.RoundToInt(value*scale));
-        var panel=Rounded(P(48),P(48),P(7),Color.white,Border,P(1));
-        var normal=Rounded(P(40),P(40),P(5),Color.white,Border,P(1));
-        var hover=Rounded(P(40),P(40),P(5),new Color32(233,241,247,255),new Color32(88,133,164,255),P(1));
-        var active=Rounded(P(40),P(40),P(5),new Color32(220,235,244,255),Focus,P(1));
-        var focused=Rounded(P(40),P(40),P(5),new Color32(244,250,254,255),Focus,P(1));
-        var selected=Rounded(P(40),P(40),P(5),new Color32(225,241,237,255),new Color32(94,159,144,255),P(1));
+        var panel=Rounded(P(48),P(48),P(7),new Color32(20,29,40,248),Border,P(1));
+        var normal=Rounded(P(40),P(40),P(5),new Color32(31,45,60,255),Border,P(1));
+        var hover=Rounded(P(40),P(40),P(5),new Color32(43,61,79,255),new Color32(88,133,164,255),P(1));
+        var active=Rounded(P(40),P(40),P(5),new Color32(36,74,89,255),Focus,P(1));
+        var focused=Rounded(P(40),P(40),P(5),new Color32(37,57,75,255),Focus,P(1));
+        var selected=Rounded(P(40),P(40),P(5),new Color32(26,74,65,255),new Color32(94,159,144,255),P(1));
         var primary=Rounded(P(40),P(40),P(5),Teal,Teal,P(1));
         var primaryHover=Rounded(P(40),P(40),P(5),TealDark,TealDark,P(1));
         var primaryFocus=Rounded(P(40),P(40),P(5),Teal,Focus,P(2));
@@ -54,15 +54,15 @@ internal sealed class ReplayInterfaceSkin : IDisposable
         }
         PrimaryButton.fixedHeight=30*scale;PrimaryButton.alignment=TextAnchor.MiddleCenter;
         PrimaryButton.padding=new RectOffset(P(8),P(8),P(5),P(5));
-        var checkOff=Checkbox(P(32),false,Border,Color.white);
-        var checkHover=Checkbox(P(32),false,Focus,new Color32(233,241,247,255));
+        var checkOff=Checkbox(P(32),false,Border,new Color32(31,45,60,255));
+        var checkHover=Checkbox(P(32),false,Focus,new Color32(43,61,79,255));
         var checkOn=Checkbox(P(32),true,Teal,Teal);
         var checkOnHover=Checkbox(P(32),true,TealDark,TealDark);
         States(Skin.toggle,checkOff,checkHover,checkHover,checkHover,Text,checkOn,Teal);
         Skin.toggle.onHover.background=checkOnHover;Skin.toggle.onActive.background=checkOnHover;Skin.toggle.onFocused.background=checkOnHover;
         Skin.toggle.border=new RectOffset(P(21),0,0,0);Skin.toggle.padding=new RectOffset(P(25),0,0,0);
-        var rail=Rail(P(32),P(18),new Color32(190,208,221,255),false);
-        var verticalRail=Rail(P(18),P(32),new Color32(222,231,238,255),true);
+        var rail=Rail(P(32),P(18),new Color32(65,89,107,255),false);
+        var verticalRail=Rail(P(18),P(32),new Color32(45,63,80,255),true);
         var thumb=Rounded(P(22),P(22),P(10),new Color32(40,127,136,255),new Color32(40,127,136,255),0);
         var thumbHover=Rounded(P(22),P(22),P(10),TealDark,TealDark,0);
         States(Skin.horizontalSlider,rail,rail,rail,rail,Text);Skin.horizontalSlider.border=new RectOffset(P(4),P(4),0,0);Skin.horizontalSlider.padding=new RectOffset();

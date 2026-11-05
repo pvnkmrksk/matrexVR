@@ -37,9 +37,32 @@ namespace ConfigurationUI
         private Label libraryState,libraryEmpty,libraryFinalizationState;
         private TextField librarySearch;
         private Button libraryBrowse,libraryRefresh;
+        private Texture2D libraryThumbnail;
+        private void ClearLibraryThumbnail()
+        {if(libraryThumbnail!=null)Destroy(libraryThumbnail);libraryThumbnail=null;}
+        private void AddLibraryThumbnail(RecordingLibrary.Entry entry)
+        {
+            string thumbnail=Path.Combine(entry.DirectoryPath,"thumbnail.png");
+            try
+            {
+                if(!File.Exists(thumbnail)||new FileInfo(thumbnail).Length>2*1024*1024)return;
+                byte[] bytes=File.ReadAllBytes(thumbnail);
+                if(bytes.Length<24||bytes[0]!=137||bytes[1]!=80||bytes[2]!=78||bytes[3]!=71)return;
+                // Bound PNG dimensions before decoding compressed pixel data.
+                long width=((long)bytes[16]<<24)|((long)bytes[17]<<16)|((long)bytes[18]<<8)|bytes[19];
+                long height=((long)bytes[20]<<24)|((long)bytes[21]<<16)|((long)bytes[22]<<8)|bytes[23];
+                if(width<1||height<1||width>2048||height>2048||width*height>2*1024*1024)return;
+                var texture=new Texture2D(2,2,TextureFormat.RGB24,false);
+                if(!texture.LoadImage(bytes,true)){Destroy(texture);return;}
+                libraryThumbnail=texture;
+                var preview=new Image {name="recording-library-thumbnail",image=texture,scaleMode=ScaleMode.ScaleToFit,tooltip="First recorded stimulus view. This thumbnail is read from the saved run."};
+                preview.style.height=160;preview.style.maxWidth=360;preview.style.marginBottom=12;libraryDetails.Add(preview);
+            }
+            catch(IOException){}catch(UnauthorizedAccessException){}
+        }
         private void LeaveRecordingLibrary()
         {
-            replayLibraryMode=false;StopLibraryWork();libraryPoll?.Pause();
+            replayLibraryMode=false;StopLibraryWork();libraryPoll?.Pause();ClearLibraryThumbnail();
         }
         private void StopLibraryWork()
         {libraryGeneration++;libraryChecked.Clear();libraryCancellation?.Cancel();libraryCancellation?.Dispose();libraryCancellation=null;libraryRunning=false;libraryFreshnessRunning=false;}
@@ -216,12 +239,17 @@ namespace ConfigurationUI
             if(libraryDetails==null)return;var entry=SelectedLibraryEntry;
             if(ReferenceEquals(libraryDetailEntry,entry)&&libraryDetails.childCount>0)return;
             var state=entry!=null&&libraryDetailPath==entry.DirectoryPath?WorkbenchViewState.Capture(libraryDetails):null;
-            libraryDetailEntry=entry;libraryDetailPath=entry?.DirectoryPath;libraryDetails.Clear();libraryFinalizationState=null;
+            libraryDetailEntry=entry;libraryDetailPath=entry?.DirectoryPath;libraryDetails.Clear();libraryFinalizationState=null;ClearLibraryThumbnail();
             if(entry==null){libraryDetails.Add(SessionLabel("Select a recording","recording-library-name"));return;}
             libraryDetails.Add(SessionLabel(entry.Title,"recording-library-detail-title"));libraryDetails.Add(SessionLabel(entry.DateLabel+" · "+entry.Id,"recording-library-date"));
+            AddLibraryThumbnail(entry);
             if(entry.Error!=null){libraryDetails.Add(SessionLabel(entry.Error,"recording-library-warning"));return;}
             if(!entry.Indexed){libraryDetails.Add(SessionLabel("Reading recorded metadata and pose rows. Your experiment files are not changed.","recording-library-copy"));return;}
             var summary=entry.Summary;var facts=Row("recording-library-facts");libraryDetails.Add(facts);
+            string paradigm=(string)summary?["metadata"]?["sequenceConfigTitle"];
+            if(!string.IsNullOrWhiteSpace(paradigm))libraryDetails.Add(SessionLabel("Paradigm · "+paradigm,"recording-library-copy"));
+            if(summary?["metadata"]?["sequenceTitles"] is JArray titles&&titles.Count>0)
+                libraryDetails.Add(SessionLabel("Blocks · "+JoinLibraryValues(titles),"recording-library-copy"));
             AddLibraryFact(facts,"Recorded span",LibrarySpan(entry));AddLibraryFact(facts,"Sequence cycles",LibraryCycles(entry,false));AddLibraryFact(facts,"Observed rigs",JoinLibraryValues(summary?["observed"]?["rigIds"]));
             libraryDetails.Add(SessionLabel(LibraryFinalizationCaption(entry),"recording-library-copy"));
             libraryFinalizationState=SessionLabel("Finishing recording… Waiting for this run’s remaining data and media files before replay.","recording-library-warning");libraryFinalizationState.name="recording-library-finalization";libraryDetails.Add(libraryFinalizationState);
@@ -261,7 +289,7 @@ namespace ConfigurationUI
             if(libraryFinalizationState!=null)libraryFinalizationState.style.display=finishing?DisplayStyle.Flex:DisplayStyle.None;
             if(status!=null){status.text=messageText;status.RemoveFromClassList("error");status.RemoveFromClassList("warning");}
             if(start!=null){var label=start.Q<Label>();if(label!=null)label.text="Replay selected";start.tooltip="Save this setup, then open the selected recording. Original recording files are read without modification.";start.SetEnabled(LibrarySelectionReady);}
-            save?.SetEnabled(true);undo?.SetEnabled(false);redo?.SetEnabled(false);
+            save?.SetEnabled(!rawPending && HasUnsavedChanges);undo?.SetEnabled(false);redo?.SetEnabled(false);
             libraryBrowse?.SetEnabled(libraryPicker==null);libraryRefresh?.SetEnabled(!libraryRunning&&libraryPicker==null);
         }
         private void AddLibraryFact(VisualElement parent,string name,string value)

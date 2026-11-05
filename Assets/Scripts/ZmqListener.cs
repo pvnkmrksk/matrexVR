@@ -21,10 +21,13 @@ public class ZmqListener : MonoBehaviour
     private static int activeWorkerCount;
     public static int ActiveWorkerCount => Volatile.Read(ref activeWorkerCount);
     private volatile string workerState = "not started";
+    private volatile string workerFailure;
+    private string pendingWarning;
     private volatile string wireFormat;
     private ClosedLoopMode backend=ClosedLoopMode.Kinefly;
     public string Endpoint { get; private set; }
     public string WireFormat => wireFormat;
+    public string Failure => workerFailure;
     public string State => workerState != "waiting for packets" ? workerState :
         !HasPose ? "waiting for packets" : HasFreshPose() ? "receiving" : "stale";
     // Pose is a multi-word struct. Publish/copy it under one lock so a render frame
@@ -108,6 +111,7 @@ public class ZmqListener : MonoBehaviour
             return;
         }
         ApplySystemConfig();
+        workerFailure = null;
         lock(poseLock) {receiverSessionId=Guid.NewGuid().ToString("N");sourceEpoch=0;sourceFrame=sourceSequence=sourceTimestamp=sourceClock=sourceSessionId=null;hasPose=false;}
         string endpoint = $"tcp://{address}:{port}";
         Endpoint = endpoint;
@@ -183,15 +187,27 @@ public class ZmqListener : MonoBehaviour
         {
             if (isRunning)
             {
+                workerFailure = ex.Message;
                 workerState = "error";
-                Debug.LogError("ZMQ listener failed on " + endpoint + ": " + ex);
+                // Transport failure is optional input availability, not a VR
+                // startup failure. Publish to the main thread so run warnings
+                // and their archived trace retain the actual endpoint/cause.
+                Interlocked.Exchange(ref pendingWarning, "Tracking input unavailable on " + endpoint +
+                    "; VR continues with manual/autopilot controls. " + ex.Message);
             }
         }
         finally
         {
             Interlocked.Decrement(ref activeWorkerCount);
-            workerState = "stopped";
+            if (workerState != "error") workerState = "stopped";
         }
+    }
+    private void Update()
+    {
+        string warning = Interlocked.Exchange(ref pendingWarning, null);
+        if (warning == null) return;
+        if (MainController.Instance != null) MainController.Instance.AddRecordingWarning(warning);
+        else Debug.LogWarning(warning);
     }
     private long lastPacketErrorTicks;
 

@@ -1,0 +1,67 @@
+{
+  "closedLoopPosition": false,
+  "closedLoopOrientation": false,
+  "resetPositionOnStart": true,
+  "resetRotationOnStart": true,
+  "initialPosition": {
+    "x": 0,
+    "y": 1,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "sun": {
+    "enabled": true,
+    "intensity": 1,
+    "color": {
+      "r": 1,
+      "g": 1,
+      "b": 1,
+      "a": 1
+    },
+    "rotation": {
+      "x": 45,
+      "y": 315,
+      "z": 0
+    }
+  },
+  "title": "Bundled locust exported to GLB",
+  "comments": "Select the object under Appearance. Replace modelPath with your own embedded GLB; set color and size there.",
+  "objects": [
+    {
+      "enabled": true,
+      "modelPath": "Models/Examples/SimulatedLocust.glb",
+      "position": {
+        "x": 0,
+        "y": 2,
+        "z": 12
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 0.8,
+        "y": 0.8,
+        "z": 0.8
+      },
+      "animationSpeed": 1,
+      "appearance": {
+        "enabled": false,
+        "color": {
+          "r": 0.95,
+          "g": 0.5,
+          "b": 0.12,
+          "a": 1
+        },
+        "keepTexture": false,
+        "metallic": 0,
+        "smoothness": 0.4
+      }
+    }
+  ]
+}

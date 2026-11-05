@@ -25,24 +25,30 @@ namespace ConfigurationUI
             foreach(string key in new[]{"autoStart","loop","randomise"})
             {
                 string flag=key;
-                bool on=ExperimentBlocks.Flag(Workspace.Sequence.Root[key],key=="loop");
-                string text=key=="autoStart"?"Auto start":key=="loop"?"Loop":"Randomize";
-                var button=StudioButton(text,key=="autoStart"?"auto":key=="loop"?"loop":"shuffle",
-                    ()=>StudioEdit(Workspace.Sequence,r=>r[flag]=!on),"sequence-flag");
-                button.name="sequence-"+key; button.EnableInClassList("is-on",on);
-                button.tooltip=text+": "+(on?"ON":"OFF")+". Click to turn "+(on?"off":"on")+
-                    (key=="autoStart"?". Applies to the next application launch; this session starts with Start experiment.":".");
-                var state=new Label(on?"ON":"OFF"); state.AddToClassList("flag-state"); button.Add(state);
-                flags.Add(button);
+                var item=Row("sequence-option");flags.Add(item);
+                item.Add(new WorkbenchIcon(key=="autoStart"?"auto":key=="loop"?"loop":"shuffle"));
+                string text=key=="autoStart"?"Auto start":key=="loop"?"Loop":"Shuffle";
+                var toggle=StateSwitch(ExperimentBlocks.Flag(Workspace.Sequence.Root[key],key=="loop"),
+                    on=>StudioEdit(Workspace.Sequence,r=>r[flag]=on,false),"sequence-"+key);
+                toggle.text=text;item.Add(toggle);
+                toggle.tooltip=key=="autoStart"?"Start the saved sequence on the next application launch. This session starts with Start experiment.":key=="loop"?"Repeat the sequence from the chosen block.":"Shuffle complete blocks or phase groups, retaining their internal order.";
             }
-            if(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true))
-            {
-                var loopStart=new IntegerField("Repeat from block") {
-                    name="sequence-loop-start", value=(int?)Workspace.Sequence.Root["loopStartIndex"]+1??1,
-                    tooltip="1 repeats every block. 2 runs the first block once, then repeats from the second block. Requires listed order." };
-                loopStart.RegisterValueChangedCallback(evt=>StudioEdit(Workspace.Sequence,r=>r["loopStartIndex"]=Math.Max(0,evt.newValue-1)));
-                flags.Add(loopStart);
-            }
+            var loopStart=new IntegerField("Repeat from block") {
+                name="sequence-loop-start", value=(int?)Workspace.Sequence.Root["loopStartIndex"]+1??1,isDelayed=true,
+                tooltip="1 repeats every block. 2 runs the first block once, then repeats from the second block. Available with looping and listed order." };
+            BindDelayedInteger(loopStart,number=>StudioEdit(Workspace.Sequence,r=>r["loopStartIndex"]=Math.Max(0,number-1),false));
+            flags.Add(loopStart);
+            BindViewState(loopStart,()=>loopStart.SetEnabled(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)&&!ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])));
+            var reproducibility=Row("sequence-seed");flags.Add(reproducibility);
+            string selectedMode=(string)Workspace.Sequence.Root["randomSeedMode"]??"Fixed";
+            bool randomMode=string.Equals(selectedMode,"Random",StringComparison.OrdinalIgnoreCase);
+            var mode=new DropdownField("Random seed",new List<string>{"Fixed","Random"},randomMode?1:0){name="sequence-seed-mode"};
+            mode.tooltip="Fixed repeats the configured seed. Random creates a new seed for each run and records it for replay.";
+            mode.RegisterValueChangedCallback(e=>StudioEdit(Workspace.Sequence,r=>r["randomSeedMode"]=e.newValue,false));reproducibility.Add(mode);
+            var seed=new IntegerField("Seed") {name="sequence-random-seed",value=(int?)Workspace.Sequence.Root["randomSeed"]??1,isDelayed=true};
+            seed.tooltip="Explicit seed for experiment random choices, including shuffled block order. The effective seed is saved with the run.";
+            BindViewState(seed,()=>seed.SetEnabled(!string.Equals((string)Workspace.Sequence.Root["randomSeedMode"],"Random",StringComparison.OrdinalIgnoreCase)));
+            BindDelayedInteger(seed,number=>StudioEdit(Workspace.Sequence,r=>r["randomSeed"]=number,false));reproducibility.Add(seed);
             return flags;
         }
         private TextField SessionField(VisualElement parent,string label,string name,string value,Action<string> change,string placeholder,bool multiline=false)
@@ -51,7 +57,7 @@ namespace ConfigurationUI
             field.tooltip=label+". "+placeholder+". Saved in this run's subject/session metadata.";
             field.textEdition.placeholder=placeholder; field.AddToClassList("session-field");
             if(multiline) field.AddToClassList("session-comments");
-            field.RegisterValueChangedCallback(e=>change(e.newValue)); parent.Add(field); return field;
+            field.RegisterValueChangedCallback(e=>{if(e.target!=field)return;change(e.newValue);UpdateStatus();}); parent.Add(field); return field;
         }
         private VisualElement SessionHeading(string title,string icon,string detail=null)
         {
@@ -98,9 +104,10 @@ namespace ConfigurationUI
                 " · "+(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass");
             if(BuilderSteps.Count==1 && ExperimentBlocks.Number((BlockDocument(0)?.Root as JObject)?["sessionSeconds"])>0)
                 order="Randomized complete blocks · Hard stop";
-            var planHeading=SessionHeading("Experiment sequence","sequence",BuilderSteps.Count+(BuilderSteps.Count==1?" block · ":" blocks · ")+SequenceDuration()+" · "+order);
-            var load=StudioButton("Load sequence","file",ShowSequenceLibrary,"quiet");load.name="session-load-sequence";load.tooltip="Choose a prepared ant, terrain, or swarm/social sequence. The current apparatus and other drafts are retained.";planHeading.Add(load);
-            var edit=StudioButton("Edit sequence","settings",()=>Select(Workspace.Sequence),"quiet");edit.name="session-edit-sequence";planHeading.Add(edit);sequenceParent.Add(planHeading);
+            var planHeading=SessionHeading(ExperimentBlocks.Title(Workspace.Sequence.Root as JObject,Workspace.Sequence.Path),"sequence",BuilderSteps.Count+(BuilderSteps.Count==1?" block · ":" blocks · ")+SequenceDuration()+" · "+order);
+            var load=StudioButton("Load","file",ShowSequenceLibrary,"quiet");load.name="session-load-sequence";load.tooltip="Choose a prepared ant, world, terrain, or swarm/social sequence. The current apparatus and other drafts are retained.";planHeading.Add(load);
+            var edit=StudioButton("Edit","settings",()=>Select(Workspace.Sequence),"quiet");edit.name="session-edit-sequence";planHeading.Add(edit);sequenceParent.Add(planHeading);
+            var sequencePath=SessionLabel(System.IO.Path.GetRelativePath(RuntimePaths.ConfigRoot,Workspace.Sequence.Path).Replace('\\','/'),"config-reference");sequencePath.name="session-sequence-reference";sequenceParent.Add(sequencePath);
             var summaryIndices=Enumerable.Range(0,BuilderSteps.Count).ToList();
             var plan=new ListView(summaryIndices,64,()=>new VisualElement(),BindSessionBlock)
             {name="session-plan",selectionType=SelectionType.None,virtualizationMethod=CollectionVirtualizationMethod.FixedHeight};
@@ -121,7 +128,7 @@ namespace ConfigurationUI
             Action refresh=()=>{
                 var videoRigs=DesktopApparatusProfile.Rigs(Workspace.System.Root).Where(r=>TrackerBackend.TryParse(r["closedLoopMode"]?.ToString(),out var mode)&&(TrackerBackend.IsFlight(mode)||TrackerBackend.IsWalking(mode))).ToList();
                 int videoCount=videoRigs.Count(r=>{JToken value=(r["tracker"] as JObject)?["saveVideo"];return value?.Type!=JTokenType.Boolean||(bool)value;});
-                state.text="Save tracking data"+(videoRigs.Count==0?" · external video source":videoCount==videoRigs.Count?" · tracker video ON":" · tracker video "+videoCount+" / "+videoRigs.Count+" ON");
+                state.text=videoCount==0?"Data only":videoCount==videoRigs.Count?"Data + tracker video":"Data + video · "+videoCount+" / "+videoRigs.Count;
             };refresh();state.schedule.Execute(refresh).Every(500);
             summary.tooltip="Tracking data and configuration snapshots are saved with each experiment. Tracker video follows each rig’s saveVideo setting. Change recording options in Animal & recording details before initializing tracking.";
             var options=StudioButton("Options","settings",()=>{
@@ -143,7 +150,7 @@ namespace ConfigurationUI
             movement.RegisterValueChangedCallback(e=>ChooseQuickStart(e.newValue.StartsWith("Walking",StringComparison.Ordinal)?"walking":"flying",CurrentWorld,true));options.Add(movement);
             if(CurrentMovement=="walking")options.Add(SessionLabel(DesktopPreviewHud.WalkingDemoHelp,"apparatus-note"));
             AddQuickTrackerControls(options);
-            var preparation=StudioButton("Initialize tracking","camera",OpenQuickTracker,"quiet");preparation.name="initialize-tracking";preparation.tooltip="Open tracking now to check input and calibration. This keeps the setup open and does not start an experiment or create a run recording.";parent.Add(preparation);
+            var preparation=StudioButton("Open tracker","camera",OpenQuickTracker,"quiet");preparation.name="initialize-tracking";preparation.tooltip="Open tracking now to check input and calibration. This keeps the setup open and does not start an experiment or create a run recording.";parent.Add(preparation);
             var links=Row("tracker-links");options.Add(links);AddSessionPlotLink(links);
             links.Add(StudioButton(CurrentMovement=="walking"?"About HejjéTrac":"About Rekkefly","external",()=>UnityEngine.Application.OpenURL(CurrentMovement=="walking"?"https://github.com/pvnkmrksk/hejjetrak":"https://github.com/pvnkmrksk/rekkefly"),"text-link"));
             var configure=Row("demo-configure");parent.Add(configure);configure.Add(new WorkbenchIcon("system"));
@@ -153,17 +160,16 @@ namespace ConfigurationUI
         private void BuildDailyRunHeader(VisualElement parent)
         {
             var welcome=new VisualElement();welcome.AddToClassList("daily-welcome");parent.Add(welcome);
-            welcome.Add(SessionLabel("EXPERIMENT","eyebrow"));welcome.Add(SessionLabel("Ready to run.","start-title"));
-            welcome.Add(SessionLabel("Review the sequence, adjust its parameters, and start.","start-subtitle"));
+            welcome.Add(SessionLabel("Ready to run","start-title"));
             var rigs=DesktopApparatusProfile.Rigs(Workspace.System.Root).ToList();
             var summary=Row("daily-apparatus-summary");parent.Add(summary);summary.Add(new WorkbenchIcon("system"));
             var text=SessionLabel(rigs.Count+(rigs.Count==1?" VR":" VRs")+" · "+(DesktopApparatusProfile.Presentation(Workspace.System.Root)=="led"?"LED panels":"Desktop preview")+" · "+string.Join(" / ",rigs.Select(RigMode).Distinct()),"apparatus-copy");text.name="configured-apparatus-summary";text.tooltip=SystemHeadline();summary.Add(text);
             var links=Row("tracker-links");parent.Add(links);AddSessionPlotLink(links);
             if(DesktopApparatusProfile.ShouldPrepareCompanions(Workspace.System.Root))
             {
-                var open=StudioButton("Initialize tracking","camera",OpenQuickTracker,"quiet");open.name="initialize-tracking";open.tooltip="Open or show the independent native tracker windows to check input before starting. This does not start the experiment or create a run recording. Camera calibration stays in those windows.";links.Add(open);
+                var open=StudioButton("Open tracker","camera",OpenQuickTracker,"quiet");open.name="initialize-tracking";open.tooltip="Open or show the independent native tracker windows to check input before starting. This does not start the experiment or create a run recording. Camera calibration stays in those windows.";links.Add(open);
             }
-            var state=new Foldout {name="session-tracker-windows",text="Tracking status & windows",value=false};state.AddToClassList("apparatus-advanced");parent.Add(state);
+            var state=new Foldout {name="session-tracker-windows",text="Trackers",value=false};state.AddToClassList("apparatus-advanced");parent.Add(state);
             foreach(var rig in rigs)
             {
                 string id=(string)rig["vrId"];
@@ -176,7 +182,7 @@ namespace ConfigurationUI
         }
         private void AddSessionPlotLink(VisualElement parent)
         {
-            var plots=StudioButton("Live plots","radio",DesktopDashboard.Open,"text-link");plots.name="open-live-plots";plots.tooltip="Open the optional independent live trajectory dashboard. Plotting is separate from stimulus rendering.";parent.Add(plots);
+            var plots=StudioButton("Plots","radio",DesktopDashboard.Open,"text-link");plots.name="open-live-plots";plots.tooltip="Open the optional independent live trajectory dashboard. Plotting is separate from stimulus rendering.";parent.Add(plots);
             var state=SessionLabel("","viewer-launch-state");parent.Add(state);
             state.schedule.Execute(()=>{if(!DesktopDashboard.Status.StartsWith("Optional",StringComparison.Ordinal))state.text=DesktopDashboard.Status;}).Every(500);
         }
@@ -223,7 +229,19 @@ namespace ConfigurationUI
             SessionField(details,"Experimenter","session-experimenter",metadata.ExperimenterName,v=>metadata.ExperimenterName=v,"Your name");
             SessionField(details,"Overall comments","session-comments",metadata.Comments,v=>metadata.Comments=v,"Notes for this session",true);
 
-            parent.Add(SessionHeading("Animals","person","Names and IDs can be any text. Empty age means unspecified."));
+            var animalHeading=SessionHeading("Animals","person","Names and IDs can be any text. Empty age means unspecified.");parent.Add(animalHeading);
+            var increment=StudioButton("Next animal IDs","next",()=>{
+                var active=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>().Select(r=>(string)r["vrId"]).ToList();
+                previousAnimalIds=metadata.Animals.Where(a=>active.Contains(a.VR)).ToDictionary(a=>a.VR,a=>a.AnimalID);
+                for(int index=0;index<active.Count;index++)
+                {var animal=metadata.Animals.First(a=>a.VR==active[index]);animal.AnimalID=ExperimentBlocks.NextAnimalId(animal.AnimalID,active.Count,index+1);}
+                BuildContent();UpdateStatus("Animal IDs advanced by "+active.Count+". Labels without a trailing number are retained.");
+            },"quiet");increment.name="increment-animal-ids";increment.tooltip="Advance every numeric or numbered animal ID by the current VR count: 1–16 becomes 17–32 with 16 VRs. Empty IDs start at 1; text labels keep their prefix.";animalHeading.Add(increment);
+            if(previousAnimalIds!=null)
+                animalHeading.Add(StudioButton("Undo ID increment","back",()=>{
+                    foreach(var animal in metadata.Animals)if(previousAnimalIds.TryGetValue(animal.VR,out string id))animal.AnimalID=id;
+                    previousAnimalIds=null;BuildContent();
+                },"quiet"));
             var rigs=Row("subject-grid"); parent.Add(rigs);
             foreach(var rig in (Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>())
             {
@@ -241,7 +259,7 @@ namespace ConfigurationUI
                 string sex=string.IsNullOrEmpty(fly.Sex)?"Unspecified":fly.Sex;
                 if(!sexes.Contains(sex)) sexes.Add(sex); // Preserve labels from existing metadata.
                 var sexField=new DropdownField("Sex",sexes,0) { name="subject-sex-"+id,value=sex,tooltip="Subject sex recorded with the run. Unspecified leaves it unclassified." }; traits.Add(sexField);
-                sexField.RegisterValueChangedCallback(e=>fly.Sex=e.newValue);
+                sexField.RegisterValueChangedCallback(e=>{fly.Sex=e.newValue;UpdateStatus();});
                 SessionField(traits,"Age (days)","subject-age-"+id,fly.AgeDays,v=>fly.AgeDays=v,"Unspecified");
                 SessionField(card,"Comments","subject-comments-"+id,fly.Comments,v=>fly.Comments=v,"Notes for "+id,true);
                 if(TrackerBackend.TryParse(rig["closedLoopMode"]?.ToString(),out var videoMode)&&(TrackerBackend.IsFlight(videoMode)||TrackerBackend.IsWalking(videoMode)))
@@ -253,13 +271,29 @@ namespace ConfigurationUI
                         var current=(r["configs"] as JArray).OfType<JObject>().First(row=>(string)row["vrId"]==id);
                         if(!(current["tracker"] is JObject tracker)){tracker=new JObject();current["tracker"]=tracker;}tracker["saveVideo"]=enabled;
                     },false),"recording-save-video-"+id);
-                    video.tooltip="Save native camera video alongside tracker frame/configuration logs. Uses additional disk space. Recording options preserve calibration. A running tracker using another profile must be closed explicitly before changing this option. Media remains pending until the native recorder closes cleanly; archival never stops your tracker.";
+                    video.tooltip="Save native camera video alongside tracker frame/configuration logs. Automatic requests video from compatible native endpoints. Unavailable recording produces a warning and the VR continues. Manual leaves recording to the operator or external system.";
                     videoLabel.tooltip=video.tooltip;videoLabel.RegisterCallback<ClickEvent>(_=>video.value=!video.value);videoRow.Add(video);card.Add(videoRow);
+                    var recordingControls=new VisualElement {name="recording-control-"+id};recordingControls.AddToClassList("recording-control-mode");card.Add(recordingControls);
+                    var controlModes=new List<string>{"Automatic · experiment","Manual · external"};
+                    var recordingMode=new DropdownField("Recorder control",controlModes,ManualRecorder(rig["tracker"]?["recordingControl"])?1:0){name="recording-control-mode-"+id};
+                    recordingMode.tooltip="Automatic starts and stops the recorder for each experiment and verifies acknowledgement. Manual never sends recorder commands and does not promise automatic media collection.";recordingControls.Add(recordingMode);
+                    recordingMode.RegisterValueChangedCallback(evt=>StudioEdit(Workspace.System,r=>{
+                        var current=(r["configs"] as JArray).OfType<JObject>().First(row=>(string)row["vrId"]==id);
+                        if(!(current["tracker"] is JObject tracker)){tracker=new JObject();current["tracker"]=tracker;}
+                        bool manual=controlModes.IndexOf(evt.newValue)==1;tracker["recordingControl"]=tracker["recordingControl"]?.Type==JTokenType.Integer?new JValue((int)(manual?TrackerRecordingControlMode.Manual:TrackerRecordingControlMode.Experiment)):new JValue(manual?"Manual":"Experiment");
+                    },false));
+                    BindViewState(recordingControls,()=>recordingControls.SetEnabled(ExperimentBlocks.Flag((Workspace.System.Root["configs"] as JArray).OfType<JObject>().First(row=>(string)row["vrId"]==id)["tracker"]?["saveVideo"],true)));
+                    var controlHelp=SessionLabel("","recording-control-help");recordingControls.Add(controlHelp);
+                    BindViewState(controlHelp,()=>{controlHelp.text=ManualRecorder((Workspace.System.Root["configs"] as JArray).OfType<JObject>().First(row=>(string)row["vrId"]==id)["tracker"]?["recordingControl"])?"Recorder controlled externally. VR start/stop does not change it.":"Automatic video when a compatible tracker is available. The VR can start without it.";controlHelp.tooltip=controlHelp.text;});
+                    var recordingState=SessionLabel("","recording-control-status");recordingState.name="recording-control-status-"+id;card.Add(recordingState);
+                    Action refreshRecording=()=>{recordingState.text=TrackerProcessManager.RecordingStatus(id);recordingState.tooltip=recordingState.text;};
+                    refreshRecording();recordingState.schedule.Execute(refreshRecording).Every(300);
                 }
                 AddTrackerControls(card,rig);
             }
 
         }
+        private Dictionary<string,string> previousAnimalIds;
         private void ShowSubjectDetails(AnimalMetadata fly)
         {
             var details=OpenModal(fly.VR+" · subject details","Additional metadata for this subject.");
@@ -278,6 +312,8 @@ namespace ConfigurationUI
         private static string RigMode(JObject rig)
         {
             string value=rig["closedLoopMode"]?.ToString()??"FicTrac";
+            if(string.Equals(value,"Kinefly",StringComparison.OrdinalIgnoreCase))return "Kinefly (legacy)";
+            if(string.Equals(value,"FicTrac",StringComparison.OrdinalIgnoreCase))return "FicTrac (legacy)";
             return TrackerBackend.TryParse(value,out ClosedLoopMode mode)?TrackerBackend.DisplayName(mode):value;
         }
         private void AddTrackerControls(VisualElement parent,JObject rig)
@@ -328,7 +364,7 @@ namespace ConfigurationUI
             {
                 var doc=group.First().doc; var card=StudioButton("","file",()=>Select(doc),"experiment-link"); scroll.Add(card);
                 var text=new VisualElement(); text.style.flexGrow=1; card.Add(text);
-                text.Add(SessionLabel(ExperimentBlocks.Title(doc.Path),"session-plan-title"));
+                text.Add(SessionLabel(ExperimentBlocks.Title(doc.Root as JObject,doc.Path),"session-plan-title"));
                 text.Add(SessionLabel(ExperimentBlocks.Describe(doc.Root as JObject),"session-plan-description"));
                 card.Add(Pill(group.Count()+" block"+(group.Count()==1?"":"s"))); card.Add(new Label("Configure  ›")); card.tooltip=doc.Path;
             }

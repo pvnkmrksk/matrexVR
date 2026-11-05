@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-29",
+  "unity": "6000.3.16f1",
+  "scope": "Working-tree development source. Synthetic inputs, no physical apparatus equivalence claim.",
+  "suites": {
+    "rigWorld": {
+      "passed": true,
+      "checks": 1728,
+      "distinctChecks": 1623,
+      "sourceReport": ".local/overhaul-project/rig-world-validation.json"
+    },
+    "animation": {
+      "passed": true,
+      "checks": 359,
+      "distinctChecks": 359,
+      "sourceReport": ".local/overhaul-project/replay-animation-validation/results.json"
+    },
+    "seedSequence": {
+      "passed": true,
+      "checks": 524,
+      "distinctChecks": 524,
+      "sourceReport": ".local/overhaul-project/OverhaulValidation/seed-sequence-results.json"
+    },
+    "configuration": {
+      "passed": true,
+      "checks": 42,
+      "distinctChecks": 42,
+      "sourceReport": ".local/overhaul-project/OverhaulValidation/configuration.json"
+    },
+    "phases": {
+      "passed": true,
+      "checks": 56352,
+      "distinctChecks": 106,
+      "sourceReport": ".local/overhaul-project/kannadi-phase-validation.json"
+    },
+    "control": {
+      "passed": true,
+      "checks": 10,
+      "distinctChecks": 10,
+      "sourceReport": ".local/overhaul-project/control-validation/results.json"
+    },
+    "roundTrip": {
+      "passed": true,
+      "checks": 998,
+      "distinctChecks": 998,
+      "sourceReport": ".local/overhaul-roundtrip/results.json",
+      "worstMeanPixelError": 0.0001212924134497549,
+      "publisher": "Explicit synthetic native-format JSON PUB at120Hz through local libzmq ctypes; no physical tracker or camera"
+    }
+  },
+  "native": {
+    "buildVersion": "0.5.0-dev",
+    "platform": "macOS Apple Silicon",
+    "buildSucceeded": true,
+    "modelArchivedExactly": true,
+    "modelMaterialAndMotion": "Observed in native CUA screenshots at two times",
+    "keyboard": [
+      "Tab hides overlays",
+      "Escape returns to setup",
+      "Cmd+Q exits after recording finalization"
+    ],
+    "mouse": "CUA pointer action failed with noWindowsAvailable; no complete native pointer acceptance claim",
+    "physicalHardware": false,
+    "sourceRevision": "12c49ec6",
+    "buildGuid": "80b85771a7c14f9aa37d0ced1b073b2e",
+    "buildErrors": 0,
+    "buildWarnings": 61,
+    "framebuffer": {
+      "width": 3024,
+      "height": 1898,
+      "mode": "FullScreenWindow",
+      "dpi": 255.0
+    },
+    "logicalWidth": 1512.0,
+    "logicalHeight": 949.0,
+    "historicalSwarmSetupValidation": true,
+    "desktopStartupRegressionChecks": 77,
+    "overlayLayoutRegressionChecks": 6428
+  }
+}

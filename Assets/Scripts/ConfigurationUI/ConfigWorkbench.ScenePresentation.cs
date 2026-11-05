@@ -28,9 +28,14 @@ namespace ConfigurationUI
         }
         private string BlockCaption(JObject step)
         {
-            string scene=(string)step?["sceneName"];
+            if(step?["title"]?.Type==JTokenType.String&&!string.IsNullOrWhiteSpace(step["title"].ToString()))return step["title"].ToString().Trim();
+            string scene=(string)step?["sceneName"],reference=BlockReference(step);
+            JObject config=null;
+            if(!string.IsNullOrWhiteSpace(reference))
+                try {config=Workspace.Documents.FirstOrDefault(d=>d.Path==System.IO.Path.GetFullPath(ExperimentConfigFiles.Resolve(reference)))?.Root as JObject;} catch { }
+            if(config?["title"]?.Type==JTokenType.String&&!string.IsNullOrWhiteSpace(config["title"].ToString()))return ExperimentBlocks.Title(config,reference);
             return scene!=null&&scene.StartsWith("TerrainChoice_",System.StringComparison.Ordinal)
-                ?"Terrain choice · "+SceneCaption(scene):ExperimentBlocks.Title(BlockReference(step));
+                ?"Terrain choice · "+SceneCaption(scene):ExperimentBlocks.Title(reference);
         }
         private static string BlockDescription(JObject step,JObject config)
         {

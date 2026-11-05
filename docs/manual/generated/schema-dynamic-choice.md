@@ -1,6 +1,6 @@
 # Dynamic-Choice schema fields
 
-This atlas lists **127 emitted property paths** from the current `dynamic-choice` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **176 emitted property paths** from the current `dynamic-choice` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -262,6 +262,48 @@ Omitted, null or [] means environment-only flight/migration; sky and movement se
 | Type | `array or null` |
 | Required by parent schema | No |
 | Default | `null` |
+
+### `intertrial.objects[].enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `intertrial.objects[].modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `intertrial.objects[].animationClip`
+
+Optional animation clip in the imported model. Leave blank to use its first clip.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `intertrial.objects[].animationSpeed`
+
+Model animation playback multiplier. 1 uses the model's authored timing; 0 freezes it.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
 
 ### `intertrial.objects[].useHeadingReference`
 
@@ -936,6 +978,48 @@ Omitted, null or [] means environment-only flight/migration; sky and movement se
 | Required by parent schema | No |
 | Default | `null` |
 
+### `steps[].objects[].enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `steps[].objects[].modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `steps[].objects[].animationClip`
+
+Optional animation clip in the imported model. Leave blank to use its first clip.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `steps[].objects[].animationSpeed`
+
+Model animation playback multiplier. 1 uses the model's authored timing; 0 freezes it.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ### `steps[].objects[].useHeadingReference`
 
 Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
@@ -1489,6 +1573,817 @@ Duration, in seconds, of a no-bar adaptive control trial.
 | UI unit label | seconds |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+
+## title group
+
+### `title`
+
+Optional human-readable experiment or paradigm name. The file path remains visible separately.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string` |
+| Required by parent schema | No |
+| Default | `""` |
+
+## comments group
+
+### `comments`
+
+Optional notes retained in this configuration and the run archive.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string` |
+| Required by parent schema | No |
+| Default | `""` |
+
+## sun group
+
+### `sun`
+
+Optional directional sunlight. Configure brightness, color and angle; position does not affect directional lighting. Omitted preserves the scene’s authored sun.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | No default emitted at this path. |
+| `additionalProperties` | `true` |
+
+### `sun.enabled`
+
+Enable the directional sun. Disabled settings stay in this configuration.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `sun.intensity`
+
+Brightness of the directional sun. Zero gives no direct illumination.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+
+### `sun.color`
+
+Sunlight color. Choose a color or enter its hexadecimal RGB value.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `sun.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `sun.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `sun.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `sun.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `sun.rotation`
+
+Sun direction as X/Y/Z Euler angles in degrees. Position does not affect directional lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 50.0,
+  "y": 330.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `sun.rotation.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `sun.rotation.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `sun.rotation.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+## nightSky group
+
+### `nightSky`
+
+Generated astronomical sky and RunData archive, with the same location/time settings as Swarm. Used when skyboxPath is empty. Omitted/disabled restores the scene background.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | No default emitted at this path. |
+| `additionalProperties` | `true` |
+
+### `nightSky.enabled`
+
+Render the astronomical night sky using the configured location and time. Disabled sky settings are retained in the file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `nightSky.latitude`
+
+Approximate University of Konstanz campus location, 47.6896° N, 9.1881° E, Universitätsstraße 10. Latitude −90…90; longitude −180…180; east positive.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `47.6896` |
+| `minimum` | `-90` |
+| `maximum` | `90` |
+| UI soft slider range | `{"min":-90.0,"max":90.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `nightSky.longitude`
+
+Approximate University of Konstanz campus location, 47.6896° N, 9.1881° E, Universitätsstraße 10. Latitude −90…90; longitude −180…180; east positive.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `9.1881` |
+| `minimum` | `-180` |
+| `maximum` | `180` |
+| UI soft slider range | `{"min":-180.0,"max":180.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `nightSky.timeZoneId`
+
+Optional legacy/advanced named-zone input for automatic daylight saving. Fallback is Europe/Berlin when no offset is supplied (Konstanz default). Coordinates do not infer a zone. Berlin and Sydney have cross-platform Windows aliases. No zone ID is required when supplying utcOffsetHours.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"Europe/Berlin"` |
+
+### `nightSky.utcOffsetHours`
+
+Preferred fixed offset east of UTC, e.g. 11, -5, 5.5, or 5.75. Range −14…+14 in whole-minute increments. Overrides any named zone; no seasonal rules. Active Adaminaby config uses 11.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `nightSky.utcOffsetMinutes`
+
+Legacy equivalent, e.g. 660 for UTC+11. Use either hours or minutes, not both.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+
+### `nightSky.date`
+
+Optional yyyy-MM-dd; omitted means today's date in the selected zone.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `nightSky.localTime`
+
+Default "now"; omitted, null or blank also means now. Otherwise "22:30", "22:30:15", or "22:30:15.125" starts at that exact local time on date (or today).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"now"` |
+
+### `nightSky.advanceWithRealTime`
+
+true: advances from the resolved start using an unscaled monotonic clock. False freezes the sampled sky.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `nightSky.updateIntervalMinutes`
+
+30; integer 1…60. Regenerates and archives a panorama each interval. The image is static between updates.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `30` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+
+### `nightSky.roundToInterval`
+
+false: exact starting instant, then start+30 minutes, start+60 minutes, etc. Opt into true for nearest UTC interval, ties forward; this can round an explicitly supplied time.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `nightSky.northYawDegrees`
+
+0: north +Z, east +X, zenith +Y. Positive yaw rotates north toward +X. Calibrate against the physical arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":360.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `nightSky.exposure`
+
+1; linear-source multiplier in (0,100], before clipping and conversion to 8-bit sRGB.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.1,"max":5.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+### `nightSky.faintDetailCutoff`
+
+0 preserves all source detail. Range 0…1; active preview uses 0.15 to suppress faint texture detail. Pixels at/below the cutoff are black, those at twice the cutoff or above are unchanged, with a smooth fade between, measured on the maximum linear source RGB channel before exposure. Not a magnitude or Bortle scale.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `nightSky.maskBelowHorizon`
+
+true: black below zero altitude. False shows the whole celestial sphere. Scene geometry can still occlude it.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `nightSky.imageWidth`
+
+4096; also accepts 2048 or 1024. Height is half width.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `4096` |
+| `enum` | `[1024,2048,4096]` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+
+## uniformSkyColor group
+
+### `uniformSkyColor`
+
+Uniform sky background with RGB channels in 0–1. Replaces the Milky Way when the sky configuration requests a uniform background.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | No default emitted at this path. |
+| `additionalProperties` | `true` |
+
+### `uniformSkyColor.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `uniformSkyColor.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `uniformSkyColor.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `uniformSkyColor.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+## skyboxPath group
+
+### `skyboxPath`
+
+Panorama path under StreamingAssets; takes precedence over nightSky. Uses Choice's legacy image loader.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string` |
+| Required by parent schema | No |
+| Default | `""` |
+
+## panoramaRotationDegrees group
+
+### `panoramaRotationDegrees`
+
+Rotate an imported panorama horizontally. Zero preserves its original orientation; 360 is one complete turn.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0` |
+| UI unit label | degrees |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+## visibilityMatrix group
+
+### `visibilityMatrix`
+
+Rows are observers VR1–VR16; columns are the VR population layers they see. The matrix changes no ground, sky, or private Choice-object layers. Disabled preserves the normal scene visibility.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "enabled": false,
+  "rows": [
+    [
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  ]
+}
+```
+
+</details>
+
+### `visibilityMatrix.enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `visibilityMatrix.rows`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `maxItems` | `16` |
 
 ## Source
 

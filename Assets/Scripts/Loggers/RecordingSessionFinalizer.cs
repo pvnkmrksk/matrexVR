@@ -56,7 +56,7 @@ public sealed class RecordingSessionFinalizer
                     summary["writerEvidence"] = writers;
                     JObject receipt = await media(cancellation.Token).ConfigureAwait(false);
                     cancellation.Token.ThrowIfCancellationRequested();
-                    string[] failures = writers.OfType<JObject>().Select(item => (string)item["failure"])
+                    string[] failures = writers.OfType<JObject>().Select(item => (long?)item["droppedFrames"]>0 ? "Population writer dropped "+item["droppedFrames"]+" rendered frames: "+item["relativePath"] : (string)item["failure"])
                         .Concat(closeErrors ?? Array.Empty<string>()).Where(text => !string.IsNullOrWhiteSpace(text)).ToArray();
                     bool readFailure = (bool?)summary["changedDuringScan"] == true ||
                         ((JArray)summary["files"]).OfType<JObject>().Any(file => file["readError"] != null);
@@ -108,7 +108,9 @@ public sealed class RecordingSessionFinalizer
 
     private JObject Lifecycle(string status, string reason, bool drained, string error) => new JObject {
         ["status"] = status, ["createdUtc"] = created, ["writersDrained"] = drained, ["endReason"] = reason,
-        ["sequenceOutcome"] = reason == "completed" ? "completed" : reason == "stopped" ? "stopped" : reason == "error" || reason == "failed" ? "failed" : "unknown",
+        ["sequenceOutcome"] = reason == "completed" ? "completed" : reason == "error" || reason == "failed" ? "failed" :
+            reason?.StartsWith("cancelled",StringComparison.Ordinal)==true ? "cancelled" :
+            reason == "stopped" || reason == "local-control-stop" || reason == "application-quit" ? "stopped" : "unknown",
         ["player"] = player.DeepClone(), ["error"] = error
     };
 

@@ -38,6 +38,7 @@ static class Regression {
  static void Sample(Actual logger,bool expected,string label){logger.Tick();Check(logger.written==(expected?1:0)&&logger.prepared==(expected?1:0),label);}
  static void Main(){
   Sample(new Actual(),true,"stable active experiment must record");
+  var alias=new Actual();alias.gameObject.scene.name="Kannadi";alias.mainController.step.sceneName="Swarm";Sample(alias,true,"historical Swarm sequence routed to Kannadi must record");
   var a=new Actual();a.mainController.step.sceneName="Choice_Selwyn";Sample(a,false,"outgoing scene must not record the next scene metadata");
   a=new Actual();a.mainController.SceneTransitionPending=true;Sample(a,false,"same-scene full reload must suppress outgoing samples");
   a=new Actual();a.mainController.SequenceRunning=false;Sample(a,false,"stopped sequence must not append a mislabeled idle tail");
@@ -67,6 +68,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix='matrex-log-handoff-') as temporary:
         folder=Path(temporary)
         (folder/'Program.cs').write_text(PROGRAM.replace('__PRODUCTION__',production))
+        shutil.copyfile(ROOT/'Assets/Scripts/SceneCompatibility.cs',folder/'SceneCompatibility.cs')
         (folder/'Regression.csproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType>'+f'<TargetFramework>net{version}.0</TargetFramework></PropertyGroup></Project>')
         (folder/'NuGet.Config').write_text('<configuration><packageSources><clear /></packageSources></configuration>')
         env=dict(os.environ,DOTNET_CLI_HOME=str(folder),DOTNET_CLI_TELEMETRY_OPTOUT='1',DOTNET_SKIP_FIRST_TIME_EXPERIENCE='1')

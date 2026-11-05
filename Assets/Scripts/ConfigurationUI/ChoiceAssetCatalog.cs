@@ -11,8 +11,8 @@ namespace ConfigurationUI
     {
         public sealed class Entry
         {
-            public readonly string Name, Description, Source;
-            public Entry(string name,string description,string source){Name=name;Description=description;Source=source;}
+            public readonly string Name, Description, Source, PreviewResource;
+            public Entry(string name,string description,string source,string previewResource=null){Name=name;Description=description;Source=source;PreviewResource=previewResource;}
             public string Label=>Name;
         }
         private readonly JObject catalog;
@@ -34,7 +34,7 @@ namespace ConfigurationUI
             string key=role=="type"?"objects":role=="material"?"materials":null;
             if(key==null||!(catalog["scenes"]?[scene]?[key] is JArray values))return Array.Empty<Entry>();
             return values.OfType<JObject>().Where(value=>!string.IsNullOrEmpty((string)value["name"]))
-                .Select(value=>new Entry((string)value["name"],(string)value["description"],(string)value["source"]))
+                .Select(value=>new Entry((string)value["name"],(string)value["description"],(string)value["source"],(string)value["previewResource"]))
                 .GroupBy(value=>value.Name,StringComparer.Ordinal).Select(group=>group.Last()).OrderBy(value=>value.Name,StringComparer.Ordinal).ToArray();
         }
         public static bool IsObjectField(string[] path)

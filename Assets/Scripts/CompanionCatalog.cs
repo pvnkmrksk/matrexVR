@@ -18,14 +18,14 @@ public static class CompanionCatalog
     {
         public string backend,platform,releaseTag,repository,releaseUrl,archiveSha256,packageRoot;
         public string executable,executableSha256,demoConfig,cameraConfig,sampleVideo;
-        public bool supportsNoCameraFallback,supportsSourceProvenance;
+        public bool supportsNoCameraFallback,supportsSourceProvenance,supportsRecordingControl;
     }
     private sealed class Catalog { public int schemaVersion; public string catalogId; public List<Entry> entries; }
     public sealed class Prepared
     {
         public SystemConfig rig;
-        public string backend,releaseTag,executableSha256;
-        public bool demo,supportsNoCameraFallback,supportsSourceProvenance;
+        public string backend,releaseTag,executableSha256,recordingWarning;
+        public bool demo,supportsNoCameraFallback,supportsSourceProvenance,supportsRecordingControl;
     }
     public static string Platform
     {
@@ -112,13 +112,15 @@ public static class CompanionCatalog
             }
             WriteAtomic(config,"# Created once by MATREX VR. Native tracker owns calibration edits.\n"+text,createOnly:true);
         }
-        bool saveVideo=source.tracker?.saveVideo??true;
+        bool requestedSaveVideo=source.tracker?.saveVideo??true;
+        var recordingControl=source.tracker?.recordingControl??TrackerRecordingControlMode.Experiment;
+        bool saveVideo=requestedSaveVideo&&recordingControl==TrackerRecordingControlMode.Manual;
         string recordingDirectory="",recordingPrefix="";
         string recordingText=File.ReadAllText(config),updatedRecording=recordingText;
         if(entry.backend=="rekkefly")
         {
             updatedRecording=Toml(recordingText,"recording","enabled",saveVideo?"true":"false");
-            if(saveVideo)
+            if(requestedSaveVideo)
             {
                 recordingDirectory=Path.Combine(persistent,"Companions","recordings","rekkefly",id);
                 updatedRecording=Toml(Toml(updatedRecording,"recording","format",Quote("mjpeg")),"recording","directory",Quote(recordingDirectory));
@@ -127,7 +129,7 @@ public static class CompanionCatalog
         else
         {
             updatedRecording=Field(Field(recordingText,"save_raw",saveVideo?"y":"n"),"save_debug","n");
-            if(saveVideo)
+            if(requestedSaveVideo)
             {
                 updatedRecording=Field(updatedRecording,"vid_codec","mjpg");
                 string user=Environment.GetEnvironmentVariable("USERPROFILE")??Environment.GetEnvironmentVariable("HOME");
@@ -145,8 +147,8 @@ public static class CompanionCatalog
             if(text!=updated) WriteAtomic(config,updated,expected:text);
         }
         var clone=source; // Snapshot was already cloned on the caller's main thread.
-        clone.tracker=new TrackerLaunchConfig{executablePath=Child(installed,entry.executable),configFile=config,headless=false,strictCameraFallback=entry.supportsNoCameraFallback&&!demo,saveVideo=saveVideo,recordingDirectory=recordingDirectory,recordingPrefix=recordingPrefix};
-        return new Prepared{rig=clone,backend=entry.backend,releaseTag=entry.releaseTag,executableSha256=entry.executableSha256,demo=demo,supportsNoCameraFallback=entry.supportsNoCameraFallback,supportsSourceProvenance=entry.supportsSourceProvenance};
+        clone.tracker=new TrackerLaunchConfig{executablePath=Child(installed,entry.executable),configFile=config,headless=false,strictCameraFallback=entry.supportsNoCameraFallback&&!demo,saveVideo=requestedSaveVideo,recordingControl=recordingControl,recordingDirectory=recordingDirectory,recordingPrefix=recordingPrefix};
+        return new Prepared{recordingWarning=requestedSaveVideo&&recordingControl==TrackerRecordingControlMode.Experiment&&!entry.supportsRecordingControl?"Tracker video control is unavailable in this companion. VR can continue; recording will be unacknowledged. Update the companion or choose Manual recording control.":null,rig=clone,backend=entry.backend,releaseTag=entry.releaseTag,executableSha256=entry.executableSha256,demo=demo,supportsNoCameraFallback=entry.supportsNoCameraFallback,supportsSourceProvenance=entry.supportsSourceProvenance,supportsRecordingControl=entry.supportsRecordingControl};
     }
     private static void WriteAtomic(string path,string text,string expected=null,bool createOnly=false)
     {

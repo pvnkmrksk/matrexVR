@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROGRAM = r'''
 using System;using System.IO;using System.Text;using System.Linq;using System.Globalization;using System.Collections.Generic;using System.Threading;using System.Threading.Tasks;using Newtonsoft.Json.Linq;
 namespace UnityEngine {public struct Quaternion{public static Quaternion Euler(float a,float b,float c)=>new Quaternion();}public static class Mathf{public const float Rad2Deg=57.2957795f;}}
+public static class PlayerBuildIdentity{public static JObject Capture()=>new JObject();}
 public enum ClosedLoopMode{Kinefly,FicTrac}public static class TrackerBackend{public static bool IsWalking(ClosedLoopMode mode)=>mode==ClosedLoopMode.FicTrac;}
 class Regression {
  static int checks;static long origin=new DateTime(2026,10,26,10,0,0).Ticks;
@@ -44,6 +45,27 @@ class Regression {
   string unknownRun=Run(root,"unknown");await MediaArchive.ImportAsync(Request(unknownRun,source,"unavailable"));archive=await ReplayMediaArchive.LoadAsync(unknownRun,origin);Check(archive.Clips[0].Complete&&!archive.TryResolveFrame(archive.Clips[0],1,out _),"unknown historical media available but never auto synchronized");
   request=Request(Run(root,"open"),source);request.SourceClosed=false;receipt=await MediaArchive.ImportAsync(request);Check(receipt.Pending&&!receipt.Complete&&receipt.ImportedClips==0,"unacknowledged source stays pending");
   string partial=Source(root,"partial");File.WriteAllText(Path.Combine(partial,"video-0001.avi.partial"),"open");receipt=await MediaArchive.ImportAsync(Request(Run(root,"partial-run"),partial));Check(receipt.Pending&&!receipt.Complete,"partial encoder outputs never labeled finalized");
+  string ownedRun=Run(root,"owned-per-run"),ownedId=Guid.NewGuid().ToString("N");
+  File.WriteAllText(Path.Combine(ownedRun,"native_recording_run.json"),new JObject{["runId"]=ownedId}.ToString());
+  var runBoundSource=new MediaRecordingSource{RigId="VR1",Backend="Rekkefly",DirectoryPath=source,ChildDirectoryPrefix=null,Finalized=true,TrackerSessionId="scoped-native-take",RunId=ownedId};
+  CompanionMediaArchive.RegisterLaunchedSource(runBoundSource);
+  var following=CompanionMediaArchive.BeginSession(Run(root,"following-run"),"following");
+  Check((await following.FinalizeAsync()).Complete&&!File.Exists(Path.Combine(root,"following-run","media_manifest.json")),"an experiment-owned take is never inherited by a later run");
+  bool wrongRun=false;try{following.RegisterSource(runBoundSource);}catch(InvalidDataException){wrongRun=true;}Check(wrongRun,"explicit stale callback cannot register into another run");
+  var exactRun=CompanionMediaArchive.BeginSession(ownedRun,"owned");exactRun.RegisterSource(runBoundSource);RecordingSummary.Scan(ownedRun,false,default,exactRun.ObservePose);Check((await exactRun.FinalizeAsync()).ImportedClips==1,"matching immutable run ID permits its exact native take");
+  CompanionMediaArchive.ClearLaunchedSource("VR1");
+  string cancelled=Path.Combine(root,"cancelled-before-presentation");Directory.CreateDirectory(cancelled);
+  var unpresented=CompanionMediaArchive.BeginSession(cancelled,"cancelled");unpresented.RegisterSource(new MediaRecordingSource{RigId="VR1",Backend="Rekkefly",DirectoryPath=source,ChildDirectoryPrefix=null,Finalized=true,TrackerSessionId="closed-preparing-take"});
+  receipt=await unpresented.FinalizeAsync();Check(receipt.Complete&&!receipt.Pending&&receipt.ImportedClips==0,"closed zero-pose cancellation archives artifacts without fake replay timing");
+  var unpresentedManifest=JObject.Parse(File.ReadAllText(Path.Combine(cancelled,"native_unpresented_takes.json")));
+  Check((bool)unpresentedManifest["presented"]==false&&(bool)unpresentedManifest["playableVrTimeline"]==false&&(string)unpresentedManifest["alignment"]=="unavailable","canceled native artifacts explicitly have no presentation or playable timeline");
+  Check(!File.Exists(Path.Combine(cancelled,"media_manifest.json")),"unpresented native take never becomes a replay clip");
+  foreach(var artifact in (JArray)unpresentedManifest["takes"][0]["artifacts"]){string copied=Path.Combine(cancelled,(string)artifact["path"]);Check(File.Exists(copied)&&ReplayMediaArchive.Hash(copied)==(string)artifact["sha256"],"every closed native artifact is retained byte-for-byte with hashes");}
+  string emptyVideoSource=Path.Combine(root,"closed-no-video");Directory.CreateDirectory(emptyVideoSource);File.WriteAllText(Path.Combine(emptyVideoSource,"config.toml"),"[recording]\nenabled=false");File.WriteAllText(Path.Combine(emptyVideoSource,"completion.json"),"{\"state\":\"complete\",\"accepted\":0,\"written\":0}");
+  string vrWithoutVideo=Run(root,"vr-without-video");var noVideoSession=CompanionMediaArchive.BeginSession(vrWithoutVideo,"no-video");noVideoSession.RegisterSource(new MediaRecordingSource{RigId="VR1",Backend="Rekkefly",DirectoryPath=emptyVideoSource,ChildDirectoryPrefix=null,Finalized=true,NoVideoFrames=true});RecordingSummary.Scan(vrWithoutVideo,false,default,noVideoSession.ObservePose);
+  receipt=await noVideoSession.FinalizeAsync();Check(receipt.Complete&&!receipt.Pending&&receipt.ImportedClips==0,"A closed zero-frame recorder does not fail VR archival or invent a video clip");
+  var noVideoArtifacts=JObject.Parse(File.ReadAllText(Path.Combine(vrWithoutVideo,"native_unrecorded_takes.json")));Check((bool)noVideoArtifacts["vrPosesRecorded"]&&(bool)noVideoArtifacts["trackerVideoAvailable"]==false,"Zero-video artifacts retain the distinction between recorded VR poses and absent tracker footage");
+  Check(!File.Exists(Path.Combine(vrWithoutVideo,"media_manifest.json"))&&((JArray)noVideoArtifacts["takes"][0]["artifacts"]).Count==2,"Closed config/receipt artifacts are saved with no false playable camera manifest");
   var session=CompanionMediaArchive.BeginSession(Run(root,"empty-session"),"empty");var done=session.FinalizeAsync();Check(done.IsCompleted&&(await done).Complete,"no sources finalizes immediately");Check(object.ReferenceEquals(done,session.FinalizeAsync()),"finalization idempotent task");
   session=CompanionMediaArchive.BeginSession(Run(root,"pending-session"),"pending");session.RegisterSource(new MediaRecordingSource{RigId="VR1",DirectoryPath=source});session.ObservePose("poses.csv",header,Row(0,"","",false));receipt=await session.FinalizeAsync();Check(receipt.Pending&&!receipt.Complete&&receipt.ToJson().Value<bool>("pending"),"independent recorder untouched and transparently pending");
   doc=JObject.Parse(File.ReadAllText(Path.Combine(unknownRun,"media_manifest.json")));doc["clips"][0]["path"]="../native/video-0000.avi";File.WriteAllText(Path.Combine(unknownRun,"media_manifest.json"),doc.ToString());archive=await ReplayMediaArchive.LoadAsync(unknownRun,origin);Check(!archive.Clips[0].Complete,"manifest path escape rejected");
@@ -98,7 +120,7 @@ def main():
         raise SystemExit("A local .NET SDK is required.")
     version = max(map(int, re.findall(r"^(\d+)\.", subprocess.check_output([dotnet, "--list-sdks"], text=True), re.M)))
     dll = next((ROOT / "Library/PackageCache").glob("com.unity.nuget.newtonsoft-json@*/Runtime/Newtonsoft.Json.dll"))
-    sources = ["Assets/Scripts/Replay/ReplayMediaArchive.cs", "Assets/Scripts/Replay/CompanionMediaArchive.cs", "Assets/Scripts/Replay/ReplayAviFrameSource.cs", "Assets/Scripts/Replay/ReplaySessionArchive.cs", "Assets/Scripts/Replay/RecordedPosePolicy.cs", "Assets/Scripts/Loggers/RecordingSummary.cs", "Assets/Scripts/Loggers/RunConfigArchive.cs", "Assets/Scripts/TrackerWireDecoder.cs", "tools/replay_compatibility/Stubs.cs"]
+    sources = ["Assets/Scripts/Replay/ReplayMediaArchive.cs", "Assets/Scripts/Replay/CompanionMediaArchive.cs", "Assets/Scripts/Replay/ReplayAviFrameSource.cs", "Assets/Scripts/Replay/ReplaySessionArchive.cs", "Assets/Scripts/Replay/ReplayPresentationJournal.cs", "Assets/Scripts/Replay/RecordedPosePolicy.cs", "Assets/Scripts/Loggers/RecordingSummary.cs", "Assets/Scripts/Loggers/RunConfigArchive.cs", "Assets/Scripts/TrackerWireDecoder.cs", "tools/replay_compatibility/Stubs.cs"]
     with tempfile.TemporaryDirectory(prefix="matrex-media-regression-") as folder:
         temporary = Path(folder)
         env = dict(os.environ, DOTNET_CLI_HOME=folder, DOTNET_CLI_TELEMETRY_OPTOUT="1", DOTNET_SKIP_FIRST_TIME_EXPERIENCE="1")
@@ -111,7 +133,7 @@ def main():
             raise SystemExit(result.stdout + result.stderr)
         subprocess.run([dotnet, str(temporary / f"bin/Debug/net{version}.0/Regression.dll")], env=env, check=True)
     logger = (ROOT / "Assets/Scripts/Loggers/DataLogger.cs").read_text()
-    assert 'DateTime poseWallTime=DateTime.Now;' in logger
+    assert 'DateTime poseWallTime=RecordedFrameClock.Now;' in logger
     assert 'poseWallTime.ToString(' in logger and 'SetData("poseWallTicks",poseWallTime.Ticks.' in logger
     assert 'var consumed=tracking.LastConsumedSample;' in logger
     print("PASS: 3 source guards keep logged wall time and consumed-input metadata atomic.")

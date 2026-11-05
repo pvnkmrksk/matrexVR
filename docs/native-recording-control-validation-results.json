@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "validationDate": "2026-10-29",
+  "platform": "macos-arm64",
+  "unityVersion": "6000.3.16f1",
+  "scope": "Actual disposable Unity Editor MainController plus the ordinary owned Rekkefly and Hejj\u00e9Trac native GUI engines; generated fly and attributed bundled walking sample video. No physical camera, exposure/animal timing, LED panel or other-platform execution claim.",
+  "passed": true,
+  "integrationChecks": 58,
+  "integrationRuns": [
+    {
+      "case": "normal-0",
+      "lifecycleStatus": "finalized",
+      "sequenceOutcome": "stopped",
+      "zipCreated": true,
+      "mediaComplete": true,
+      "mediaPending": false,
+      "importedClips": 2,
+      "mediaWarnings": [],
+      "nativeTakes": [
+        {
+          "rigId": "VR1",
+          "backend": "rekkefly",
+          "terminalState": "complete",
+          "physicalClosure": "complete",
+          "ownedStopIdMatches": true,
+          "capturePauseCount": 0,
+          "immutableRunIdBound": true,
+          "accepted": 104,
+          "written": 104,
+          "writersDrained": true
+        },
+        {
+          "rigId": "VR2",
+          "backend": "hejjetrac",
+          "terminalState": "complete",
+          "physicalClosure": "complete",
+          "ownedStopIdMatches": true,
+          "capturePauseCount": 0,
+          "immutableRunIdBound": true,
+          "numericFrames": 16,
+          "rawSubmitted": 16,
+          "rawEncoded": 16,
+          "containerFinalized": true
+        }
+      ],
+      "clipAlignmentModes": [
+        "consumed-frame-id"
+      ]
+    },
+    {
+      "case": "normal-1",
+      "lifecycleStatus": "finalized",
+      "sequenceOutcome": "stopped",
+      "zipCreated": true,
+      "mediaComplete": true,
+      "mediaPending": false,
+      "importedClips": 2,
+      "mediaWarnings": [],
+      "nativeTakes": [
+        {
+          "rigId": "VR1",
+          "backend": "rekkefly",
+          "terminalState": "complete",
+          "physicalClosure": "complete",
+          "ownedStopIdMatches": true,
+          "capturePauseCount": 0,
+          "immutableRunIdBound": true,
+          "accepted": 97,
+          "written": 97,
+          "writersDrained": true
+        },
+        {
+          "rigId": "VR2",
+          "backend": "hejjetrac",
+          "terminalState": "complete",
+          "physicalClosure": "complete",
+          "ownedStopIdMatches": true,
+          "capturePauseCount": 0,
+          "immutableRunIdBound": true,
+          "numericFrames": 14,
+          "rawSubmitted": 14,
+          "rawEncoded": 14,
+          "containerFinalized": true
+        }
+      ],
+      "clipAlignmentModes": [
+        "consumed-frame-id"
+      ]
+    },
+    {
+      "case": "cancelled-preparation",
+      "lifecycleStatus": "finalized",
+      "sequenceOutcome": "cancelled",
+      "zipCreated": true,
+      "mediaComplete": true,
+      "mediaPending": false,
+      "importedClips": 0,
+      "mediaWarnings": [
+        "The run ended before any presented VR pose. Closed native files were archived as unaligned, not-presented artifacts; no playable VR timeline or video offset was invented."
+      ],
+      "nativeTakes": [
+        {
+          "rigId": "VR1",
+          "backend": "rekkefly",
+          "terminalState": "complete",
+          "physicalClosure": "complete",
+          "ownedStopIdMatches": true,
+          "capturePauseCount": 0,
+          "immutableRunIdBound": true,
+          "accepted": 11,
+          "written": 11,
+          "writersDrained": true
+        }
+      ],
+      "unpresented": {
+        "presented": false,
+        "playableVrTimeline": false,
+        "alignment": "unavailable"
+      }
+    },
+    {
+      "case": "manual-pause",
+      "lifecycleStatus": "error",
+      "sequenceOutcome": "stopped",
+      "zipCreated": false,
+      "mediaComplete": true,
+      "mediaPending": false,
+      "importedClips": 2,
+      "mediaWarnings": [],
+      "nativeTakes": [
+        {
+          "rigId": "VR1",
+          "backend": "rekkefly",
+          "terminalState": "override",
+          "physicalClosure": "complete",
+          "ownedStopIdMatches": true,
+          "capturePauseCount": 1,
+          "immutableRunIdBound": true,
+          "accepted": 92,
+          "written": 92,
+          "writersDrained": true
+        },
+        {
+          "rigId": "VR2",
+          "backend": "hejjetrac",
+          "terminalState": "complete",
+          "physicalClosure": "complete",
+          "ownedStopIdMatches": true,
+          "capturePauseCount": 0,
+          "immutableRunIdBound": true,
+          "numericFrames": 18,
+          "rawSubmitted": 18,
+          "rawEncoded": 18,
+          "containerFinalized": true
+        }
+      ],
+      "clipAlignmentModes": [
+        "consumed-frame-id"
+      ]
+    }
+  ],
+  "nativeEndpointChecksPerBackend": 30,
+  "productionTransportChecks": 20,
+  "productionArchiveAndSourceIdChecks": 73,
+  "loggingSourceGuards": 3,
+  "processConfigurationAndLifecycleChecks": 109,
+  "repetitionCleanupRuns": 120,
+  "sourceBuilds": {
+    "rekkefly": {
+      "repository": "https://github.com/pvnkmrksk/rekkefly",
+      "sourceRevision": "f9a9ba71619b86becf0fb1ce1fc2cf5aa3d851bb",
+      "sourceVersion": "0.6.2",
+      "patchSha256": "5c469f2bfa968ab5574864aaff95fea7b8eda94675902172d96da9f7c59a2d04",
+      "platform": "macos-arm64",
+      "capabilities": [
+        "native_exact_camera_negotiation",
+        "no_camera_fallback",
+        "source_provenance",
+        "native-gui-control",
+        "per-take-finalization",
+        "owned-take-stop-v1"
+      ],
+      "unsignedExecutableSha256": "1ad7bd26367ce7c2b73d869664be456bb54ee6e51b3c1b56a675c61237d4df39"
+    },
+    "hejjetrac": {
+      "repository": "https://github.com/pvnkmrksk/hejjetrak",
+      "sourceRevision": "6c0bea66d77d55eab5b3669d90ca3c0dae9a2dd7",
+      "sourceVersion": "0.3.2",
+      "patchSha256": "f8a325f3da6cb1d2497f4e06987d8925318391683e50c70da921917971a47173",
+      "platform": "macos-arm64",
+      "capabilities": [
+        "native-gui-control",
+        "per-take-finalization",
+        "owned-take-stop-v1"
+      ],
+      "unsignedExecutableSha256": "a450bffaced68c2f9d622e4438197acee888a2a48ec39328998ba94e095b42d1"
+    }
+  },
+  "physicalAcceptance": "pending",
+  "published": false,
+  "rawLocalEvidence": [
+    ".local/native-integration-followup-results/results.json",
+    ".local/native-recording-control-20261029-v4/summary.json"
+  ],
+  "flightNumericalEquality": {
+    "passed": true,
+    "scope": "Serial Mac arm64 CLI-only fixed-frame and full real Bogong video probes; excludes GUI/acquisition/output and CSV processing_us timing.",
+    "detectorSourceUnchanged": true,
+    "results": {
+      "previous-camera-correction": {
+        "executableSha256": "3ce9ce3788d92e279757bce9f5351f747bd7e76465d19e2775d866f1f0bb522d",
+        "benchmark": {
+          "frames": 3000,
+          "width": 640,
+          "height": 480,
+          "angle_bins": 240,
+          "radial_samples": 72,
+          "sectors": 2,
+          "mean_us": 134.0,
+          "frames_per_second": 7465.0
+        },
+        "videoTiming": {
+          "frames_per_second": 1920.6,
+          "seconds": 0.469,
+          "mean_us": 148.8,
+          "p99_us": 162.8,
+          "max_us": 174.6
+        },
+        "frames": 900,
+        "numericalRowsSha256": "6ba6ea814ecebe22a7cc09bb019a0a7ee7f3214632806cd424b2d55f5ee22cd5"
+      },
+      "recording-adapter": {
+        "executableSha256": "1ad7bd26367ce7c2b73d869664be456bb54ee6e51b3c1b56a675c61237d4df39",
+        "benchmark": {
+          "frames": 3000,
+          "width": 640,
+          "height": 480,
+          "angle_bins": 240,
+          "radial_samples": 72,
+          "sectors": 2,
+          "mean_us": 133.5,
+          "frames_per_second": 7490.0
+        },
+        "videoTiming": {
+          "frames_per_second": 1943.8,
+          "seconds": 0.463,
+          "mean_us": 151.3,
+          "p99_us": 181.4,
+          "max_us": 293.5
+        },
+        "frames": 900,
+        "numericalRowsSha256": "6ba6ea814ecebe22a7cc09bb019a0a7ee7f3214632806cd424b2d55f5ee22cd5"
+      }
+    }
+  }
+}

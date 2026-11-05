@@ -39,7 +39,9 @@ public class MainController : MonoBehaviour
     public void SetAnimalMetadata(AnimalData metadata) => CurrentAnimalMetadata = metadata ?? new AnimalData();
     public TelemetryConfig TelemetrySettings { get; private set; } = new TelemetryConfig();
     public StatusOverlayConfig StatusOverlaySettings { get; private set; } = new StatusOverlayConfig();
-    public int TargetFrameRate { get; private set; } = 120;
+    public OverlayPlacementConfig FrameOverlaySettings { get; private set; } = new OverlayPlacementConfig();
+    public OverlayPlacementConfig DesktopControlsSettings { get; private set; } = new OverlayPlacementConfig { targetDisplay = -1 };
+    public int TargetFrameRate { get; private set; } = 60;
     public int VSyncCount { get; private set; } = 0;
     public OverheadCameraConfig OverheadCameraSettings { get; private set; } = new OverheadCameraConfig();
 
@@ -105,17 +107,46 @@ public class MainController : MonoBehaviour
     public string SystemConfigurationFileName => systemConfigFileName;
     private string sequenceConfigFileName = "sequenceConfig.json";
     public string SequenceConfigurationFileName => sequenceConfigFileName;
+    public string SequenceTitle { get; private set; }
+    public string CurrentExperimentTitle { get; private set; }
+    public bool SequencePreparing { get; private set; }
+    public bool SequenceStopping { get; private set; }
+    public string RecordingTransitionError { get; private set; }
+    private readonly List<string> recordingWarnings = new List<string>();
+    public IReadOnlyList<string> RecordingWarnings => recordingWarnings;
+    public void AddRecordingWarning(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message) || recordingWarnings.Contains(message)) return;
+        recordingWarnings.Add(message);
+        Debug.LogWarning(message);
+    }
+    public string PreparationStatus { get; private set; }
+    public System.Threading.Tasks.Task RecordingCompletion => recordingCompletion;
+    public bool NativeRecordingStopSettled { get; private set; } = true;
+    private System.Threading.CancellationTokenSource preparationCancellation;
+    private System.Threading.Tasks.Task nativeRecordingStartTask = System.Threading.Tasks.Task.CompletedTask;
+    private System.Threading.Tasks.Task recordingCompletion = System.Threading.Tasks.Task.CompletedTask;
+    private string recordingRunId, recordingDirectory;
+    private string randomSeedMode = "Fixed";
+    private int randomSeed = 1;
+    private int preparationGeneration;
     public bool ReturnToSetupAfterSequence { get; private set; }
 
     // Called only from the idle setup screen, after validation and saving.
     public void PrepareConfiguredRun(string systemFile, string sequenceFile)
     {
-        if (sequenceStarted) throw new System.InvalidOperationException("Stop the experiment before changing its configuration.");
+        if (sequenceStarted || SequencePreparing || SequenceStopping) throw new System.InvalidOperationException("Wait for the experiment and its recorders to stop before changing configuration.");
         systemConfigFileName = systemFile;
         sequenceConfigFileName = sequenceFile;
         DesktopQuickStart.RememberWorkspace(systemFile, sequenceFile);
         masterDataLogger = MasterDataLogger.Instance;
         masterDataLogger.BeginConfiguredSession(systemFile, sequenceFile);
+        recordingRunId = null;
+        recordingDirectory = null;
+        nativeRecordingStartTask = System.Threading.Tasks.Task.CompletedTask;
+        RecordingTransitionError = null;
+        recordingWarnings.Clear();
+        NativeRecordingStopSettled = true;
         SequenceError = null;
         currentTrial = 0;
         savedHeadings.Clear();
@@ -322,7 +353,7 @@ public class MainController : MonoBehaviour
 
     private void ApplyFrameTiming(JObject config)
     {
-        int target = config.Value<int?>("targetFrameRate") ?? 120;
+        int target = config.Value<int?>("targetFrameRate") ?? 60;
         int sync = config.Value<int?>("vSyncCount") ?? 0;
         if (target != -1 && target <= 0)
             throw new System.ArgumentException("targetFrameRate must be positive, or -1 for uncapped desktop rendering.");
@@ -334,8 +365,36 @@ public class MainController : MonoBehaviour
         Application.targetFrameRate = target;
     }
 
+    public void SetRuntimeFrameRate(int target)
+    {
+        if(target!=-1&&target<=0)throw new System.ArgumentException("Use a positive frame-rate cap, or -1 for uncapped.");
+        if(VSyncCount>0)throw new System.InvalidOperationException("VSync controls presentation timing. Change VSync in system settings first.");
+        if(target==TargetFrameRate)return;
+        var logger=MasterDataLogger.Instance;
+        if(SequenceRunning&&logger!=null&&logger.AcceptingWrites)
+        {
+            var evidence=new JObject { ["schemaVersion"]=1,["event"]="frameRateCap",["utc"]=System.DateTimeOffset.UtcNow,
+                ["unityFrame"]=Time.frameCount,["unityTimeSeconds"]=Time.timeAsDouble,["previousTarget"]=TargetFrameRate,["target"]=target,["vSyncCount"]=VSyncCount };
+            File.AppendAllText(Path.Combine(logger.directoryPath,"runtime_display_settings.jsonl"),evidence.ToString(Formatting.None)+"\n");
+        }
+        TargetFrameRate=target;Application.targetFrameRate=target;
+    }
+
+    public void ApplyIdleFrameTiming(JObject config)
+    {
+        if(SequenceRunning||SequencePreparing)throw new System.InvalidOperationException("Use the live frame-rate editor while an experiment is running or preparing.");
+        ApplyFrameTiming(config);
+    }
+
     private void LoadDiagnosticsConfigurations(JObject config)
     {
+        try { FrameOverlaySettings=config["frameOverlay"]?.ToObject<OverlayPlacementConfig>()??new OverlayPlacementConfig(); }
+        catch(System.Exception error){FrameOverlaySettings=new OverlayPlacementConfig();Debug.LogWarning("Invalid frame overlay placement; using defaults: "+error.Message);}
+        try {
+            DesktopControlsSettings=config["desktopControls"]?.ToObject<OverlayPlacementConfig>()??new OverlayPlacementConfig { targetDisplay=-1 };
+            if(!(config["desktopControls"] is JObject controls)||controls["targetDisplay"]==null)DesktopControlsSettings.targetDisplay=-1;
+        }
+        catch(System.Exception error){DesktopControlsSettings=new OverlayPlacementConfig {targetDisplay=-1};Debug.LogWarning("Invalid desktop controls placement; using defaults: "+error.Message);}
         // Optional monitoring must not erase the independently configured tracker ports.
         // Value validation and bind failures belong to ExperimentTelemetry.Configure.
         try { TelemetrySettings = config["telemetry"]?.ToObject<TelemetryConfig>() ?? new TelemetryConfig(); }
@@ -356,6 +415,7 @@ public class MainController : MonoBehaviour
     // Rendering callers use TryGet so a missing rig cannot borrow VR1's physical viewports.
     public bool TryGetSystemConfigForGameObject(GameObject target, out SystemConfig config)
     {
+        if(ReplayExecutionContext.Active)return ReplayExecutionContext.TrySystemConfig(target,out config);
         for (Transform item = target.transform; item != null; item = item.parent)
         {
             var match = System.Text.RegularExpressions.Regex.Match(item.name, @"(?<![A-Za-z0-9])VR[0-9]+(?![A-Za-z0-9])");
@@ -384,6 +444,21 @@ public class MainController : MonoBehaviour
         return new SystemConfig { vrId = vrId };
     }
 
+    /// <summary>Apply saved apparatus input/routing for preflight, without beginning an experiment or recorder.</summary>
+    public void ConfigureTrackingWhileIdle(string systemFile)
+    {
+        if(SequenceRunning||SequencePreparing||SequenceStopping)throw new System.InvalidOperationException("Finish the experiment and its recorders before initializing tracking.");
+        SetSystemConfigFile(systemFile);
+        if(systemConfigurationError!=null)throw new System.ArgumentException(systemConfigurationError);
+        var scene=SceneManager.GetActiveScene();RuntimeRigRegistry.Configure(scene,systemConfigs);
+        foreach(var rig in RuntimeRigRegistry.Rigs(scene))
+        {
+            rig.GetComponent<ViewportSetter>()?.RefreshSystemConfig();
+            var listener=rig.GetComponent<ZmqListener>();
+            if(listener!=null&&listener.enabled){listener.enabled=false;listener.enabled=true;}
+        }
+    }
+
     // Method to set a different system config file
     public void SetSystemConfigFile(string fileName)
     {
@@ -399,6 +474,10 @@ public class MainController : MonoBehaviour
         foreach (var dynamicSequence in FindObjectsByType<DynamicSequenceController>(FindObjectsSortMode.None))
             dynamicSequence.EndPilotSession(endReason);
         sessionClock.Stop();
+        ExperimentRandom.End();
+        preparationGeneration++;
+        preparationCancellation?.Cancel();
+        SequencePreparing = false;
         sequenceStarted = false;
         savedHeadings.Clear();
         phaseRunner?.Cancel();
@@ -412,15 +491,72 @@ public class MainController : MonoBehaviour
         FinalizeRecording(endReason);
     }
 
-    private static void FinalizeRecording(string endReason)
+    public System.Threading.Tasks.Task StopSequenceAsync(string endReason = "stopped")
     {
-        try { _=MasterDataLogger.Instance?.FinalizeSessionAsync(endReason); }
-        catch(System.Exception error) {Debug.LogError("Could not finalize the recording: "+error.Message);}
+        StopSequence(endReason);
+        return recordingCompletion;
+    }
+
+    private void FinalizeRecording(string endReason)
+    {
+        var logger = MasterDataLogger.Instance;
+        if (logger == null || SequenceStopping || logger.FinalizationTask != null) return;
+        SequenceStopping = true;
+        // Pose/world writers stop immediately. The media session stays open for
+        // the matching native take's eventual completion receipt.
+        try { logger.SealSessionForFinalization(); }
+        catch (System.Exception error) { RecordTransitionFailure(logger, "Closing VR writers: " + error.Message); }
+        recordingCompletion = FinishRecordingAsync(logger, recordingRunId, endReason, nativeRecordingStartTask);
+    }
+
+    private async System.Threading.Tasks.Task FinishRecordingAsync(MasterDataLogger logger, string runId,
+        string endReason, System.Threading.Tasks.Task startTask)
+    {
+        try
+        {
+            // End owns cancellation and settles any queued start before it
+            // acknowledges that this run's native writers have finished.
+            if (!string.IsNullOrEmpty(runId))
+            {
+                PreparationStatus = "Finishing tracker recordings…";
+                try { await TrackerProcessManager.EndExperimentRecordingAsync(runId, endReason); }
+                catch (System.Exception error) { RecordTransitionFailure(logger, "Tracker recording stop: " + error.GetBaseException().Message); }
+            }
+            else
+            {
+                try { await startTask; }
+                catch (System.OperationCanceledException) { }
+                catch (System.Exception error) { RecordTransitionFailure(logger, "Tracker recording start: " + error.GetBaseException().Message); }
+            }
+            NativeRecordingStopSettled = true;
+            PreparationStatus = "Saving recording…";
+            await logger.FinalizeSessionAsync(endReason);
+            if (!string.IsNullOrEmpty(logger.FinalizationError))
+                RecordingTransitionError = logger.FinalizationError;
+        }
+        catch (System.Exception error) { RecordTransitionFailure(logger, "Recording finalization: " + error.GetBaseException().Message); }
+        finally
+        {
+            NativeRecordingStopSettled = true;
+            SequenceStopping = false;
+            PreparationStatus = null;
+            preparationCancellation?.Dispose();
+            preparationCancellation = null;
+        }
+    }
+
+    private void RecordTransitionFailure(MasterDataLogger logger, string message)
+    {
+        RecordingTransitionError = message;
+        if (string.IsNullOrEmpty(SequenceError)) SequenceError = message;
+        try { logger.RegisterRecordingFailure(message); }
+        catch (System.Exception error) { Debug.LogError("Could not retain recording failure: " + error.Message); }
+        Debug.LogError(message);
     }
 
     public void StartSequence()
     {
-        if (sequenceStarted) return;
+        if (sequenceStarted || SequencePreparing || SequenceStopping) return;
         if (systemConfigurationError != null) { FailExperiment(new System.ArgumentException(systemConfigurationError)); return; }
         Debugger.Log("MainController.StartSequence()", 3);
         try {MasterDataLogger.Instance.ConfigArchive.RequireComplete();}
@@ -434,6 +570,69 @@ public class MainController : MonoBehaviour
         }
 
         sessionClock.Restart();
+        var currentLogger = MasterDataLogger.Instance;
+        if (recordingDirectory != currentLogger.directoryPath || string.IsNullOrEmpty(recordingRunId))
+        {
+            recordingDirectory = currentLogger.directoryPath;
+            recordingRunId = System.Guid.NewGuid().ToString("N");
+            nativeRecordingStartTask = System.Threading.Tasks.Task.CompletedTask;
+            NativeRecordingStopSettled = true;
+        }
+        SequencePreparing = true;
+        PreparationStatus = "Loading model assets…";
+        RecordingTransitionError = null;
+        preparationCancellation = new System.Threading.CancellationTokenSource();
+        _ = PrepareAndStartSequence(++preparationGeneration);
+    }
+
+    private async System.Threading.Tasks.Task PrepareAndStartSequence(int generation)
+    {
+        var cancellationToken = preparationCancellation.Token;
+        try
+        {
+            // Import before starting the stimulus clock: loading a model must not shorten a trial.
+            foreach (string reference in sequenceSteps.SelectMany(step => ExternalModelLibrary.CollectReferences(
+                step.parameters != null && (step.parameters.ContainsKey("configFile") || step.parameters.ContainsKey("design"))
+                    ? ExperimentPhases.Read(step.parameters, step.parameters.ContainsKey("configFile") ? "configFile" : "design") : null)
+                .Concat(ExternalModelLibrary.CollectReferences(step.parameters != null ? JObject.FromObject(step.parameters) : null))).Distinct())
+            {
+                await ExternalModelLibrary.PreloadAsync(reference, ExperimentConfigFiles.ReadAllBytes(reference, "model"),
+                    cancellationToken);
+                if (generation != preparationGeneration) return;
+            }
+            if (generation != preparationGeneration) return;
+            var logger = MasterDataLogger.Instance;
+            if (recordingDirectory != logger.directoryPath || string.IsNullOrEmpty(recordingRunId))
+            {
+                recordingDirectory = logger.directoryPath;
+                recordingRunId = System.Guid.NewGuid().ToString("N");
+            }
+            NativeRecordingStopSettled = false;
+            PreparationStatus = "Starting tracker recording…";
+            try
+            {
+                var recorderPreparation = TrackerProcessManager.BeginExperimentRecordingAsync(
+                    systemConfigs.Values, recordingDirectory, recordingRunId, cancellationToken);
+                nativeRecordingStartTask = recorderPreparation;
+                var recorderReport = await recorderPreparation;
+                foreach (string warning in recorderReport.Warnings) AddRecordingWarning(warning);
+            }
+            catch (System.OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
+            catch (System.Exception error)
+            {
+                AddRecordingWarning("Tracker recording unavailable: " + error.GetBaseException().Message);
+            }
+            if (generation != preparationGeneration) return;
+            ExperimentRandom.Begin(randomSeedMode, randomSeed, MasterDataLogger.Instance.directoryPath, SequenceTitle, sequenceConfigFileName);
+            SequencePreparing = false;
+            PreparationStatus = null;
+            BeginPreparedSequence();
+        }
+        catch (System.Exception error) { if (generation == preparationGeneration) { SequencePreparing = false; FailExperiment(error); } }
+    }
+
+    private void BeginPreparedSequence()
+    {
         sequenceStarted = true;
         SequenceError = null;
         savedHeadings.Clear();
@@ -461,28 +660,31 @@ public class MainController : MonoBehaviour
     void InitializeExecutionOrder()
     {
         executionOrder.Clear();
-        for (int i = 0; i < sequenceSteps.Count; i++)
-        {
-            executionOrder.Add(i);
-        }
-        // Shuffle executionOrder
-        ShuffleList(executionOrder);
+        executionOrder.AddRange(BuildExecutionOrder(sequenceSteps, ExperimentRandom.Sequence));
     }
 
-    void ShuffleList<T>(IList<T> list)
+    public static List<int> BuildExecutionOrder(IList<SequenceStep> steps, System.Random rng)
     {
-        // Implement a simple Fisher-Yates shuffle
-        System.Random rng = new System.Random();
-        int n = list.Count;
+        var units = new List<List<int>>();
+        var seen = new HashSet<string>(System.StringComparer.Ordinal);
+        for (int i = 0; i < steps.Count; i++)
+        {
+            string group = steps[i].group;
+            if (!string.IsNullOrWhiteSpace(group) && i > 0 && steps[i - 1].group == group) units[units.Count - 1].Add(i);
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(group) && !seen.Add(group)) throw new System.ArgumentException("Sequence group '" + group + "' must occupy consecutive rows.");
+                units.Add(new List<int> { i });
+            }
+        }
+        int n = units.Count;
         while (n > 1)
         {
             n--;
             int k = rng.Next(n + 1);
-            // Swap list[k] with list[n]
-            T value = list[k];
-            list[k] = list[n];
-            list[n] = value;
+            var value = units[k]; units[k] = units[n]; units[n] = value;
         }
+        return units.SelectMany(unit => unit).ToList();
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -631,6 +833,7 @@ public class MainController : MonoBehaviour
 
     public void HandleEscape()
     {
+        if (SequencePreparing) { StopSequence("cancelled-during-model-load"); return; }
         if(SceneManager.GetActiveScene().name=="ReplayScene" && FindFirstObjectByType<ReplayController>()?.TryCloseModal()==true)return;
         if (SceneManager.GetActiveScene().name == "ControlScene")
         {
@@ -652,7 +855,7 @@ public class MainController : MonoBehaviour
         // Clear the screen to black before loading the new scene
         ClearScreenToBlack();
 
-        SceneManager.LoadScene(step.sceneName);
+        SceneManager.LoadScene(SceneCompatibility.Resolve(step.sceneName));
     }
 
     void SyncTimestamp()
@@ -698,6 +901,11 @@ public class MainController : MonoBehaviour
                     loopSequence = config.loop; // Set looping based on config
                     LoopStartIndex = config.loopStartIndex;
                     autoStart = config.autoStart;
+                    SequenceTitle = config.title;
+                    randomSeedMode = config.randomSeedMode ?? "Fixed";
+                    randomSeed = config.randomSeed;
+                    if (!string.Equals(randomSeedMode, "Fixed", System.StringComparison.OrdinalIgnoreCase) && !string.Equals(randomSeedMode, "Random", System.StringComparison.OrdinalIgnoreCase))
+                        throw new System.ArgumentException("randomSeedMode must be Fixed or Random.");
 
                     foreach (SequenceItem item in config.sequences)
                     {
@@ -710,6 +918,7 @@ public class MainController : MonoBehaviour
                             item.autoTrim,
                             item.autoTrimSettings
                         );
+                        newStep.title = item.title; newStep.comments = item.comments; newStep.group = item.group;
                         sequenceSteps.Add(newStep);
                         Debugger.Log("Added sequence step: " + JsonUtility.ToJson(newStep), 3);
                     }
@@ -757,26 +966,59 @@ public class MainController : MonoBehaviour
 private void ApplyExperiment(Dictionary<string, object> parameters, System.Action<Dictionary<string, object>> apply)
 {
     if (phaseRunner == null) phaseRunner = gameObject.AddComponent<ExperimentPhases>();
-    var resolved = ExperimentConfigFiles.ResolveReferences(parameters);
+    var resolved = SceneCompatibility.Parameters(GetCurrentSequenceStep()?.sceneName, ExperimentConfigFiles.ResolveReferences(parameters));
     System.Action<Dictionary<string, object>> applyConfigured = payload => {
         var step = GetCurrentSequenceStep();
         string key = payload != null && payload.ContainsKey("configFile") ? "configFile" : "design";
         JObject document = payload != null && (ExperimentPhases.IsPhase(payload) || payload.ContainsKey(key)) ? ExperimentPhases.Read(payload, key) : null;
+        CurrentExperimentTitle = (string)document?["title"];
+        if (string.IsNullOrWhiteSpace(CurrentExperimentTitle) && payload != null && payload.TryGetValue(key, out var reference) && reference != null)
+            CurrentExperimentTitle = (string)JObject.Parse(ExperimentConfigFiles.ReadAllText(reference.ToString()))["title"];
         // Experiment/phase values take precedence; retain old sequence settings for existing recordings/configs.
         var settings = document?["autoTrimSettings"]?.ToObject<AutoTrimConfig>() ?? step?.autoTrimSettings ?? new AutoTrimConfig();
         settings.Validate();
         currentAutoTrimSettings = settings;
         flightCheckOverride = null;
         MasterDataLogger.Instance.ConfigArchive.RequireComplete();
-        apply(payload);
+        using (ExperimentRandom.Scope("trial:" + currentTrial + ":row:" + executionOrder[currentStep] + ":phase:" + ExperimentPhase))
+        {
+            var presentation = ReplayPresentationRecorder.Begin(this, document, payload);
+            ExperimentVisibility.Restore(SceneManager.GetActiveScene());
+            apply(payload);
+            ExperimentWorldObjects.Apply(SceneManager.GetActiveScene(), document);
+            ExperimentSun.Apply(SceneManager.GetActiveScene(), document);
+            ExperimentSky.ApplyScene(SceneManager.GetActiveScene(), document);
+            ExperimentSky.Apply(document);
+            ExperimentVisibility.Apply(SceneManager.GetActiveScene(), document);
+            ExperimentRandom.SeedParticles(SceneManager.GetActiveScene(), "trial:" + currentTrial + ":row:" + executionOrder[currentStep] + ":phase:" + ExperimentPhase);
+            ReplayPresentationRecorder.Commit(presentation, this);
+        }
+        StartCoroutine(RecordingThumbnail.Capture(SceneManager.GetActiveScene(), MasterDataLogger.Instance.directoryPath));
         MasterDataLogger.Instance.ConfigArchive.RequireComplete();
         if (step != null) ApplyAutoTrimToClosedLoopComponents(step);
     };
     if (!phaseRunner.TryBegin(resolved, applyConfigured, FailExperiment)) applyConfigured(resolved);
 }
 
+public void FailRecordingEvidence(System.Exception error)
+{
+    var logger=MasterDataLogger.Instance;
+    if(logger!=null&&logger.AcceptingWrites)
+    {
+        try { File.AppendAllText(Path.Combine(logger.directoryPath,"replay_evidence_errors.jsonl"),new JObject {
+            ["frame"]=Time.frameCount,["presentationId"]=ReplayPresentationRecorder.CurrentPresentationId,["error"]=error.Message
+        }.ToString(Newtonsoft.Json.Formatting.None)+"\n"); }
+        catch(System.Exception writeError){Debug.LogError("Could not archive replay evidence failure: "+writeError.Message);}
+    }
+    FailExperiment(error);
+}
+
 private void FailExperiment(System.Exception error)
 {
+    ExperimentRandom.End();
+    preparationGeneration++;
+    preparationCancellation?.Cancel();
+    SequencePreparing = false;
     SequenceError = error.Message;
     sequenceStarted = false;
     phaseRunner?.Cancel();
@@ -884,7 +1126,7 @@ void ManageTimerAndTransitions()
     // ❷ build the condition
     bool canMutateInPlace =
             !next.reloadScene &&
-            SceneManager.GetActiveScene().name == next.sceneName &&
+            SceneManager.GetActiveScene().name == SceneCompatibility.Resolve(next.sceneName) &&
             sequencer != null;
 
     if (canMutateInPlace)
@@ -907,23 +1149,30 @@ void ManageTimerAndTransitions()
     // Add method to clear screen to black
     void ClearScreenToBlack()
     {
-        // This creates a temporary camera to clear the screen to black
-        // It's cheaper than keeping an extra camera around all the time
+        RenderTexture previous = RenderTexture.active;
         Camera clearCamera = new GameObject("TempClearCamera").AddComponent<Camera>();
-        clearCamera.clearFlags = CameraClearFlags.SolidColor;
-        clearCamera.backgroundColor = Color.black;
-        clearCamera.cullingMask = 0; // Render nothing
-        clearCamera.Render(); // Force a render
-        Destroy(clearCamera.gameObject); // Clean up
-
-        // Also force a GL clear to ensure everything is black
-        GL.Clear(true, true, Color.black);
+        clearCamera.enabled = false; // Manual clear only; never enter the automatic camera pass.
+        try
+        {
+            RenderTexture.active = null;
+            clearCamera.targetTexture = null;
+            clearCamera.clearFlags = CameraClearFlags.SolidColor;
+            clearCamera.backgroundColor = Color.black;
+            clearCamera.cullingMask = 0;
+            clearCamera.Render();
+        }
+        finally
+        {
+            RenderTexture.active = previous;
+            Destroy(clearCamera.gameObject);
+        }
     }
 }
 
 [System.Serializable]
 public class SequenceStep
 {
+    public string title, comments, group;
     public string sceneName;
     public float duration;
     public Dictionary<string, object> parameters;
@@ -947,6 +1196,9 @@ public class SequenceStep
 [System.Serializable]
 public class SequenceConfig
 {
+    public string title, comments;
+    public string randomSeedMode = "Fixed";
+    public int randomSeed = 1;
     public int loopStartIndex = 0; // Zero-based first row to revisit after the final row; preceding rows run once.
     public void ValidateLoop()
     {
@@ -954,6 +1206,16 @@ public class SequenceConfig
             throw new System.ArgumentException("loopStartIndex must identify an existing zero-based sequence row.");
         if (loopStartIndex > 0 && randomise)
             throw new System.ArgumentException("A one-time sequence prefix requires randomise=false.");
+        var seen = new HashSet<string>(System.StringComparer.Ordinal);
+        for (int i = 0; i < (sequences?.Length ?? 0); i++)
+        {
+            var row = sequences[i];
+            if (row == null) throw new System.ArgumentException("Sequence rows cannot be null.");
+            if (string.IsNullOrWhiteSpace(row.group)) continue;
+            bool continues = i > 0 && sequences[i - 1].group == row.group;
+            if (i == loopStartIndex && continues) throw new System.ArgumentException("loopStartIndex cannot split sequence group '" + row.group + "'.");
+            if (!continues && !seen.Add(row.group)) throw new System.ArgumentException("Sequence group '" + row.group + "' must occupy consecutive rows.");
+        }
     }
     public bool autoStart = false;
     public bool randomise = false; // Added field
@@ -964,6 +1226,7 @@ public class SequenceConfig
 [System.Serializable]
 public class SequenceItem
 {
+    public string title, comments, group;
     public string sceneName;
     public float duration;
     public float gain = 1f;

@@ -39,7 +39,7 @@ def validate(obj, path):
         else:
             assert key in ranges and isinstance(value, (int, float)) and not isinstance(value, bool) and ranges[key][0] <= value <= ranges[key][1], (path, key)
     if any(name in obj for name in ('preStimulus', 'stimulus', 'postStimulus')):
-        assert set(obj) <= {'preStimulus', 'stimulus', 'postStimulus'}, path
+        assert set(obj) <= {'preStimulus', 'stimulus', 'postStimulus', 'title', 'comments', 'description', '_comment'}, path
         assert obj.get('stimulus', {}).get('enabled', True), path
         for name in ('preStimulus', 'stimulus', 'postStimulus'):
             phase = obj.get(name)
@@ -65,7 +65,8 @@ def validate(obj, path):
             if source_only:
                 assert (ROOT / 'Assets/Scenes' / (step['sceneName'] + '.unity')).is_file(), (path, step['sceneName'])
             else:
-                assert step['sceneName'] in scenes, (path, step['sceneName'])
+                resolved_scene = 'Kannadi' if step['sceneName'] == 'Swarm' else step['sceneName']
+                assert resolved_scene in scenes, (path, step['sceneName'])
             assert step['duration'] > 0, path
             assert isinstance(step.get('autoTrim', False), bool), path
             validate(step, str(path) + ':sequence')
@@ -167,7 +168,7 @@ count = len(paths)
 for path in paths:
     validate(json.loads(path.read_text()), path)
 
-# The shipped runnable sequences use the experiment-file hierarchy for Swarm.
+# Historical Swarm scene names remain valid aliases for Kannadi population mode.
 for sequence_path in [SA / 'sequenceConfig.json', SA / 'Kannadi' / 'sequenceConfig.json']:
     if not sequence_path.is_file():
         continue
@@ -177,9 +178,10 @@ for sequence_path in [SA / 'sequenceConfig.json', SA / 'Kannadi' / 'sequenceConf
             reference = step.get('parameters', {}).get(key)
             if reference:
                 assert (SA / reference).is_file() or (SA / 'Archive/Legacy' / reference).is_file(), (sequence_path, reference)
-        if step.get('sceneName') != 'Swarm':
-            continue
         params = step.get('parameters', {})
+        is_swarm = step.get('sceneName') == 'Swarm' or (step.get('sceneName') == 'Kannadi' and params.get('populationMode') == 'Swarm')
+        if not is_swarm:
+            continue
         assert params.get('configFile'), (sequence_path, 'Swarm configFile')
         assert (SA / params['configFile']).is_file(), (sequence_path, params['configFile'])
         assert not any(key in params for key in ['numberOfLocusts', 'spawnAreaSize', 'mu', 'kappa', 'locustSpeed']), (sequence_path, 'legacy inline Swarm setting')

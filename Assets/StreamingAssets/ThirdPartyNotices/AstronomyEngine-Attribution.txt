@@ -1,0 +1,9 @@
+Astronomy Engine by Don Cross and contributors
+https://github.com/cosinekitty/astronomy
+MIT license: see LICENSE.txt and the header of astronomy.cs.
+
+astronomy.cs is the unmodified upstream C# source pinned to:
+865d3da7d8112bbc7911238052c6af4aaf877181
+https://github.com/cosinekitty/astronomy/blob/865d3da7d8112bbc7911238052c6af4aaf877181/source/csharp/astronomy.cs
+
+Used for J2000 equatorial <-> observer horizontal rotations.

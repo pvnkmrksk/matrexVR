@@ -1,0 +1,48 @@
+{
+  "title": "Kannadi using the visible GLB locust",
+  "populationMode": "Mirror",
+  "kannadiTilePrefab": "SimulatedLocust",
+  "kannadiModelPath": "Models/Examples/SimulatedLocust.glb",
+  "numberOfRings": 0,
+  "animateOnMove": false,
+  "closedLoopPosition": false,
+  "closedLoopOrientation": false,
+  "objects": [
+    {
+      "enabled": true,
+      "modelPath": "Models/Examples/AnimatedMorphCube.glb",
+      "position": {
+        "x": 0,
+        "y": 1,
+        "z": 12
+      },
+      "scale": {
+        "x": 2,
+        "y": 2,
+        "z": 2
+      },
+      "appearance": {
+        "enabled": true,
+        "color": {
+          "r": 0.1,
+          "g": 0.7,
+          "b": 0.4,
+          "a": 1
+        },
+        "keepTexture": false
+      }
+    }
+  ],
+  "modelAppearance": {
+    "enabled": true,
+    "color": {
+      "r": 0.8,
+      "g": 0.35,
+      "b": 0.08,
+      "a": 1
+    },
+    "keepTexture": false,
+    "metallic": 0,
+    "smoothness": 0.4
+  }
+}
