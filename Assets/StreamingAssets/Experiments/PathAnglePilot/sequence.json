@@ -1,0 +1,15 @@
+{
+  "randomise": false,
+  "loop": true,
+  "autoStart": false,
+  "sequences": [
+    {
+      "sceneName": "Choice_desync",
+      "duration": 10801,
+      "parameters": {
+        "design": "Experiments/PathAnglePilot/design.json"
+      },
+      "reloadScene": false
+    }
+  ]
+}

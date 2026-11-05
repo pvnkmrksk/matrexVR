@@ -1,0 +1,42 @@
+{
+  "targetDisplay": 0,
+  "configs": [
+    {
+      "sphereDiameter": 2.6,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 0,
+      "startCol": 0,
+      "horizontal": true,
+      "zmqAddress": "127.0.0.1",
+      "zmqPort": 29951,
+      "vrId": "VR1",
+      "displayOrder": "F",
+      "targetDisplay": 0,
+      "closedLoopMode": "Hejjetrac",
+      "manualControls": {
+        "enabled": false,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "maxRotateSpeed": 180,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      },
+      "tracker": null,
+      "desktopPreview": true
+    }
+  ],
+  "targetFrameRate": 120,
+  "vSyncCount": 0,
+  "telemetry": {
+    "enabled": false
+  },
+  "statusOverlay": {
+    "visible": false
+  },
+  "overheadCamera": {
+    "enabled": false
+  },
+  "previewPurpose": "Apparatus template: replace tracker connection, displays and calibration before an animal run."
+}

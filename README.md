@@ -69,6 +69,10 @@ Actual Mac player, 3024 × 1898, 2× UI scale, fresh demo profile. [Capture prov
 
 </details>
 
+## Ant path-angle pilot
+
+This branch adds the ten-condition ant path-angle pilot. In MATREX choose **Start → Load sequence → Ant · path-angle pilot**. See [pilot setup and Ubuntu testing](docs/path-angle-pilot.md) for the protocol, adjustable preview, apparatus settings and validation.
+
 ## Experimental environments
 
 | Choice & forest | Terrain & night sky | Kannadi · ಕನ್ನಡಿ |

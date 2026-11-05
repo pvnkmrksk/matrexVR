@@ -7,11 +7,13 @@ using InSceneSequence;
 using Newtonsoft.Json;
 using UnityEngine;
 
-public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
+public partial class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 {
     [Serializable]
     private class DesignFile
     {
+        public double sessionSeconds = 0;
+        public string groundAppearance;
         public int seed = -1;
         public int repetitions = 1;
         public bool sync = true;
@@ -37,6 +39,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     {
         public bool resetPositionOnStart = true;
         public bool resetRotationOnStart = true;
+        public PathGroundConfig pathGround;
         public string name = "";
         public Trigger trigger;
         public SceneObjectSpec[] objects;
@@ -177,6 +180,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             orderedSteps = IsAdaptiveDecisionEnabled() ? new List<Step>() : BuildOrdered(designFile, null);
         }
         else LoadDesign(design);
+        InitializePilotSession();
         CachePlayers();
         InitRigStates();
 
@@ -186,6 +190,9 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
     public void CleanupScene()
     {
+        EndPilotSession("scene-cleanup");
+        pilotRandom = null;
+        pilotAppearance = null;
         StopAllCoroutines();
         foreach (var state in rigStates.Values)
             if (state.container != null) { state.container.gameObject.SetActive(false); Destroy(state.container.gameObject); }
@@ -214,7 +221,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
     private List<Step> BuildOrdered(DesignFile design, int? seedOverride)
     {
-        int seed = seedOverride ?? design.seed;
+        int seed = pilotRandom != null ? pilotRandom.Next() : seedOverride ?? design.seed;
         var rng = new System.Random(seed < 0 ? Environment.TickCount : seed);
         var list = new List<Step>();
 
@@ -293,6 +300,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             }
 
             var step = state.steps[state.index];
+            if (pilotActive && state.index == 0) PilotBlockStarted(state);
             yield return RunSingleStep(state, step, null, null);
         }
     }
@@ -345,19 +353,23 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
     private IEnumerator RunSingleStep(RigState state, Step step, AreaWaitResult areaResult, Action onStepStarted)
     {
         foreach (Transform child in state.container)
-            Destroy(child.gameObject);
+        { if (pilotActive) child.gameObject.SetActive(false); Destroy(child.gameObject); }
 
         yield return null;
 
+        if (TickPilotSession()) yield break;
         ResetVR(state.id, step);
         float stepStartTime = Time.time;
         var spawned = SpawnObjects(state.id, step.objects, state.container);
+        if (step.pathGround != null)
+            PathGround.Create(state.container, ResolveChoiceLayer(state.id), step.pathGround, pilotAppearance);
 
         ApplyCameraSettings(state.id, step.camera);
         ApplySkybox(step.skybox);
         ApplyClosedLoopFlags(state.id, step);
 
         state.rig.GetComponent<DataLogger>()?.SetStep(state.index, step.name, state.loopCount, state.cumulativeStep);
+        PilotStepStarted(state, step);
         onStepStarted?.Invoke();
 
         if (step.swapAfterSeconds > 0f && spawned.Count > 0)
@@ -378,6 +390,8 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
             yield return WaitForArea(state, step, areaResult);
         }
 
+        if (TickPilotSession()) yield break;
+        PilotStepEnded(state, step, areaResult);
         state.cumulativeStep++;
     }
 
@@ -398,8 +412,7 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
 
             int vrIndex = RuntimeRigRegistry.ParseIndex(vrId);
             string layerName = $"ChoiceVR{vrIndex}";
-            int layerId = LayerMask.NameToLayer(layerName);
-            if(layerId<0)layerId=RuntimeRigRegistry.StimulusLayer(vrIndex);
+            int layerId = ResolveChoiceLayer(vrId);
             if(layerId<0)throw new InvalidOperationException("No isolated stimulus layer is allocated for "+vrId);
 
             Vector3 position = obj.polar != null ? PolarToXZ(obj.polar) : ToVector3(obj.pos);
@@ -455,6 +468,13 @@ public class DynamicSequenceController : MonoBehaviour, IInSceneSequencer
         }
 
         return spawned;
+    }
+
+    private static int ResolveChoiceLayer(string vrId)
+    {
+        int index = RuntimeRigRegistry.ParseIndex(vrId);
+        int layer = LayerMask.NameToLayer("ChoiceVR" + index);
+        return layer >= 0 ? layer : RuntimeRigRegistry.StimulusLayer(index);
     }
 
     private static void SetLayerRecursively(GameObject root, int layer)

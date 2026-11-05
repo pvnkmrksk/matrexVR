@@ -17,6 +17,8 @@ public class MainController : MonoBehaviour
     public static MainController Instance { get; private set; }
     public static event System.Action SystemConfigurationChanged;
     public bool SequenceRunning => sequenceStarted;
+    private readonly System.Diagnostics.Stopwatch sessionClock = new System.Diagnostics.Stopwatch();
+    public double SessionElapsedSeconds => sessionClock.Elapsed.TotalSeconds;
     public bool SceneTransitionPending { get; private set; }
     public string InputKind { get; private set; } = "tracker";
     public float RemainingStepSeconds => phaseRunner != null && phaseRunner.Active ? (float)phaseRunner.RemainingSeconds : Mathf.Max(0,timer);
@@ -394,6 +396,9 @@ public class MainController : MonoBehaviour
 
     public void StopSequence(string endReason)
     {
+        foreach (var dynamicSequence in FindObjectsByType<DynamicSequenceController>(FindObjectsSortMode.None))
+            dynamicSequence.EndPilotSession(endReason);
+        sessionClock.Stop();
         sequenceStarted = false;
         savedHeadings.Clear();
         phaseRunner?.Cancel();
@@ -428,6 +433,7 @@ public class MainController : MonoBehaviour
             return;
         }
 
+        sessionClock.Restart();
         sequenceStarted = true;
         SequenceError = null;
         savedHeadings.Clear();

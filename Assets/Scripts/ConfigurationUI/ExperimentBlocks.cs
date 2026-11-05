@@ -32,6 +32,7 @@ namespace ConfigurationUI
         public static double EffectiveDuration(JObject config,double outer)
         {
             if(config==null) return outer;
+            if(config["steps"] is JArray && Number(config["sessionSeconds"])>0) return Number(config["sessionSeconds"]);
             if(!Phased(config))
             {
                 var heading=config["headingReference"] as JObject;
@@ -71,6 +72,10 @@ namespace ConfigurationUI
         }
         public static string Title(string reference)
         {
+            string normalized=(reference??"").Replace('\\','/');
+            string leaf=Path.GetFileNameWithoutExtension(normalized);
+            if((leaf=="design"||leaf=="sequence")&&normalized.Contains("/PathAnglePilot/"))return "Ant · path-angle pilot";
+            if((leaf=="design"||leaf=="sequence")&&normalized.Contains("/HistoricalReplicationPreview/"))return "Ant · historical reproduction";
             string name=Path.GetFileNameWithoutExtension(reference??"").Replace(".example","").Replace(".template","").Replace('-',' ').Replace('_',' ');
             return string.IsNullOrEmpty(name)?"Untitled block":char.ToUpperInvariant(name[0])+name.Substring(1);
         }
@@ -109,7 +114,7 @@ namespace ConfigurationUI
             {
                 string reference=Path.GetRelativePath(streaming,file).Replace('\\','/');
                 if((!includeArchive && reference.StartsWith("Archive/")) || reference.Contains("/NightSky/") || reference.EndsWith(".metadata.json") || reference.Contains(".before-")) continue;
-                try { var preset=Read(reference,file); if(reference.StartsWith("Archive/")) preset.Category="Archive"; if(preset.Schema!="system" && preset.Schema!="sequence") result.Add(preset); }
+                try { var preset=Read(reference,file); if(reference.StartsWith("Archive/")) preset.Category="Archive"; if(preset.Schema!="system" && preset.Schema!="sequence" && preset.Config["pathWidthCm"]==null) result.Add(preset); }
                 catch { /* Malformed files can still be selected explicitly and show their parse error. */ }
             }
             return result.OrderBy(p=>p.Category).ThenBy(p=>p.Title).ThenBy(p=>p.Reference).ToList();
@@ -130,6 +135,8 @@ namespace ConfigurationUI
             if(p["objects"] is JArray objects && objects.Count>0) details.Add(objects.Count+" objects");
             if(p["stimuli"] is JArray stimuli)
             { details.Add(stimuli.Count+" gratings"); if(stimuli.First is JObject first) { details.Add((first["rotationAxis"]?.ToString()??"Yaw")+" · "+first["speed"]+" deg/s"); if(first["contrast"]!=null) details.Add((Number(first["contrast"])*100).ToString("0.#",CultureInfo.InvariantCulture)+"% contrast"); } }
+            if(p["steps"] is JArray && Number(p["sessionSeconds"])>0)
+                return ((JArray)p["steps"]).Count+" conditions · randomized complete blocks · "+Time(Number(p["sessionSeconds"]))+" hard stop";
             if(p["steps"] is JArray steps) details.Add(steps.Count+" decision steps · "+(Flag(p["sync"],true)?"synchronized":"independent"));
             if(p["adaptiveDecision"] is JObject adaptive && Flag(adaptive["enabled"])) details.Add("Adaptive decision ON");
             if(p["uniformSkyColor"] is JObject) details.Add("Uniform sky");
@@ -141,7 +148,7 @@ namespace ConfigurationUI
         public static JArray Steps(JToken root) => root["sequences"] as JArray??throw new ArgumentException("Sequence must have a sequences array.");
         public static JObject NewBlock(ExperimentPreset preset,string scene=null)
         {
-            return new JObject { ["sceneName"]=scene??preset.Scene,["duration"]=new JRaw(Math.Max(.001,preset.Duration).ToString("R",CultureInfo.InvariantCulture)),["gain"]=1,["autoTrim"]=false,["reloadScene"]=true,
+            return new JObject { ["sceneName"]=scene??preset.Scene,["duration"]=new JRaw(Math.Max(.001,preset.Duration+(Number(preset.Config["sessionSeconds"])>0?1:0)).ToString("R",CultureInfo.InvariantCulture)),["gain"]=1,["autoTrim"]=false,["reloadScene"]=true,
                 ["parameters"]=new JObject { [preset.Schema=="dynamic-choice"?"design":"configFile"]=preset.Reference } };
         }
         public static void Move(JToken root,int from,int to)

@@ -1,0 +1,15 @@
+{
+  "randomise": false,
+  "loop": true,
+  "sequences": [
+    {
+      "sceneName": "Choice_desync",
+      "duration": 3600,
+      "parameters": {
+        "design": "Experiments/HistoricalReplicationPreview/design.json"
+      },
+      "reloadScene": false
+    }
+  ],
+  "autoStart": false
+}

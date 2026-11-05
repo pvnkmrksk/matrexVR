@@ -126,3 +126,10 @@ tools/__pycache__/
 
 # Stable local desktop build and test profile.
 /.local/
+
+# Installed companion binaries, generated desktop profiles, and local run output.
+/Companions/
+/* RunData/
+/Assets/StreamingAssets/QuickStart/
+/Assets/StreamingAssets/QuickStart.meta
+/validation-output/

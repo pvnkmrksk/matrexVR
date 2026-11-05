@@ -96,8 +96,10 @@ namespace ConfigurationUI
             }
             string order=(ExperimentBlocks.Flag(Workspace.Sequence.Root["randomise"])?"Random order":"Listed order")+
                 " · "+(ExperimentBlocks.Flag(Workspace.Sequence.Root["loop"],true)?"Repeats":"One pass");
+            if(BuilderSteps.Count==1 && ExperimentBlocks.Number((BlockDocument(0)?.Root as JObject)?["sessionSeconds"])>0)
+                order="Randomized complete blocks · Hard stop";
             var planHeading=SessionHeading("Experiment sequence","sequence",BuilderSteps.Count+(BuilderSteps.Count==1?" block · ":" blocks · ")+SequenceDuration()+" · "+order);
-            var load=StudioButton("Load sequence","file",ShowSequenceLibrary,"quiet");load.name="session-load-sequence";load.tooltip="Choose a prepared terrain treatment or swarm/social sequence. The current apparatus and other drafts are retained.";planHeading.Add(load);
+            var load=StudioButton("Load sequence","file",ShowSequenceLibrary,"quiet");load.name="session-load-sequence";load.tooltip="Choose a prepared ant, terrain, or swarm/social sequence. The current apparatus and other drafts are retained.";planHeading.Add(load);
             var edit=StudioButton("Edit sequence","settings",()=>Select(Workspace.Sequence),"quiet");edit.name="session-edit-sequence";planHeading.Add(edit);sequenceParent.Add(planHeading);
             var summaryIndices=Enumerable.Range(0,BuilderSteps.Count).ToList();
             var plan=new ListView(summaryIndices,64,()=>new VisualElement(),BindSessionBlock)

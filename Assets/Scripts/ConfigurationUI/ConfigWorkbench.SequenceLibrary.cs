@@ -15,6 +15,10 @@ namespace ConfigurationUI
             { Title=title;Reference=reference;Description=description; }
         }
         private static readonly SequenceStarter[] SequenceStarters = {
+            new SequenceStarter("Ant · path-angle pilot","Experiments/PathAnglePilot/sequence.json",
+                "Nine two-black-bar path angles (40°–210°), plus 85° without bars. Randomized complete blocks; hard stop after three hours. Uses your current apparatus."),
+            new SequenceStarter("Ant · historical reproduction","Experiments/HistoricalReplicationPreview/sequence.json",
+                "The original six-condition protocol: scaling bars, original contrasts and goal contacts, and the empty-world trial. Repeating one-hour sequence. Uses your current apparatus."),
             new SequenceStarter("Terrain · matched relief","Examples/Rugosity/sequence-treatment-matched-terrain.json",
                 "Four terrain patterns. Visible relief and navigation follow the same surface."),
             new SequenceStarter("Terrain · visible relief, flat navigation","Examples/Rugosity/sequence-treatment-visual-terrain_navigation-flat.json",
@@ -54,7 +58,11 @@ namespace ConfigurationUI
                     var document=Workspace.Open(preset.Reference,"sequence");
                     if(document.LoadError!=null)throw new IOException(document.LoadError);
                     var blocks=document.Root["sequences"] as JArray??new JArray();
-                    double seconds=blocks.OfType<JObject>().Sum(block=>ExperimentBlocks.Number(block["duration"]));
+                    double seconds=blocks.OfType<JObject>().Sum(block=>{
+                        string file=(string)(block["parameters"]?["design"]??block["parameters"]?["configFile"]);
+                        var config=string.IsNullOrEmpty(file)?null:Workspace.Open(file,ConfigSchema.ForScene((string)block["sceneName"])).Root as JObject;
+                        return ExperimentBlocks.EffectiveDuration(config,ExperimentBlocks.Number(block["duration"]));
+                    });
                     timing.text=ExperimentBlocks.Time(seconds)+" · "+blocks.Count+(blocks.Count==1?" block":" blocks");
                     load.SetEnabled(true);
                 }

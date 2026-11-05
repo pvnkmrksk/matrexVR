@@ -1,0 +1,10 @@
+{
+  "pathWidthCm": 4,
+  "pathDarkness": 0.65,
+  "groundBrightness": 0.55,
+  "textureScaleCm": 8,
+  "extentCm": 400,
+  "groundHeightCm": -1,
+  "texturePath": "",
+  "preparedGroundImage": false
+}

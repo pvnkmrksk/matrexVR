@@ -1,0 +1,56 @@
+{
+  "targetDisplay": 0,
+  "configs": [
+    {
+      "sphereDiameter": 2.6,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "startRow": 0,
+      "startCol": 0,
+      "horizontal": true,
+      "zmqAddress": "127.0.0.1",
+      "zmqPort": 29941,
+      "vrId": "VR1",
+      "displayOrder": "F",
+      "targetDisplay": 0,
+      "closedLoopMode": "Hejjetrac",
+      "manualControls": {
+        "enabled": true,
+        "translateSpeed": 10,
+        "rotateSpeed": 50,
+        "maxTranslateSpeed": 100,
+        "maxRotateSpeed": 180,
+        "allowVerticalTranslation": false,
+        "allowPitchAndRoll": false
+      },
+      "tracker": {
+        "saveVideo": false
+      },
+      "desktopPreview": true
+    }
+  ],
+  "targetFrameRate": 120,
+  "vSyncCount": 0,
+  "telemetry": {
+    "enabled": true,
+    "bindAddress": "127.0.0.1",
+    "port": 9880,
+    "rateHz": 20,
+    "contextIntervalSeconds": 2,
+    "topic": "matrex.telemetry.v2"
+  },
+  "statusOverlay": {
+    "visible": false
+  },
+  "overheadCamera": {
+    "enabled": false
+  },
+  "previewPurpose": "Keyboard exploration of the historical six-condition protocol; not animal data.",
+  "apparatusConfiguration": {
+    "version": 1,
+    "configured": true,
+    "presentation": "desktop",
+    "monitorCount": 1,
+    "launchBundledTrackers": false
+  }
+}
