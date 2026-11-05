@@ -32,7 +32,7 @@ MATREX VR is a Unity application for flight, walking and collective-behaviour ex
 
 Start with a desktop demo, then configure tracking and displays for your apparatus. **[The five-minute guide](docs/five-minute-start.md)** takes you from opening the app to replaying a short saved run without a camera, animal or LED panels.
 
-Use [published desktop archives](https://github.com/pvnkmrksk/matrexVR/releases) for a versioned installation. This checkout also contains development work; use the [local preview build](#build-a-local-macos-preview) to try it. Each archive's `START-HERE.txt` describes its exact capabilities and startup behavior.
+Use [published desktop archives](https://github.com/pvnkmrksk/matrexVR/releases) for a versioned installation. To modify or build the source, follow the [local preview build instructions](#build-a-local-macos-preview). Each archive's `START-HERE.txt` describes its exact capabilities and startup behavior.
 
 **0.4.1** integrates desktop workflow fixes, same-build replay and optional MCP control. Its [release notes](docs/releases.md#041--agent-onboarding-and-desktop-workflow-fixes) identify recorder and platform capabilities. The package includes the matching MCP adapter; a normal launch enables no control endpoint.
 
@@ -115,7 +115,7 @@ Software checks use simulated or prerecorded inputs; physical tracker calibratio
 - [Desktop UI validation](docs/desktop-ui-validation-results.json) and [native player checks](docs/desktop-player-validation-results.json).
 - [Record → replay verification](docs/replay-roundtrip-validation.md), including paired renders and reconstruction limits.
 - [Manual Mac workflow validation](docs/manual-mac-workflow-validation.md) and [scene lifecycle investigation](docs/diagnostics.md).
-- [Latest Mac terrain/video/replay review](docs/replay-recording-mac-review-20261027.md). Evenly paced 60 FPS and acknowledged per-run recorder control remain open; latest standalone pointer acceptance is incomplete. Windows/Linux builds are cross-built without native walkthroughs. [Full 0.4 verification and companion requirements](docs/releases.md#04-verification-and-known-limits).
+- [Historical 0.4 Mac terrain/video/replay review](docs/replay-recording-mac-review-20261027.md) records that build’s scope. For 0.4.1, [native recorder control](docs/native-recording-control.md) requires a capability-enabled companion; [release notes](docs/releases.md#041--agent-onboarding-and-desktop-workflow-fixes) identify packaged capabilities. Evenly paced 60 FPS and latest standalone pointer acceptance remain incomplete. Windows/Linux builds are cross-built without native walkthroughs.
 
 <details>
 <summary><strong>Archived versions and their startup behaviour</strong></summary>

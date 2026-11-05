@@ -2,13 +2,15 @@
 
 The saved-run replay path loads evidence from a **saved run folder**: animal poses, saved sequence/system/experiment files, archived sky images and recorded population poses. It opens with the **God's-eye view** so the whole experiment is visible. It does not substitute today's installed config for an absent historical file.
 
+**For 0.4.1, keep the creating player build with the complete run.** New-contract recordings require the exact build identity and complete, hash-verified configurations, models and journals. A changed build or missing required evidence is an error. Older reconstruction paths have their recorded limits; see the [same-build contract](same-build-replay-contract.md).
+
 ## Open a run
 
 Keep the complete session directory, including `config_manifest.json`, `Configs`, `Skyboxes`, rig CSVs, population CSV/gzip logs and any `media` directory. Extract a session ZIP before opening it. The folder is the portable unit; copying only a CSV loses the saved environment and optional video evidence.
 
-The **0.4 release target** adds the recording library, tracker video controls and linked recorded trajectories described below; [release publication and limits](releases.md#04--terrain-recording-and-replay) identify the actual available packages. These additions are not part of the frozen 0.3.1 download, whose existing replay still opens a saved folder with Browse, a path or the launch argument.
+The recording library, tracker video controls and linked recorded trajectories originated in **0.4**. [0.4.1 release notes](releases.md#041--agent-onboarding-and-desktop-workflow-fixes) identify the current packaged capabilities; the [0.4 notes](releases.md#04--terrain-recording-and-replay) retain their historical scope. These additions are not part of the frozen 0.3.1 download, whose existing replay still opens a saved folder with Browse, a path or the launch argument.
 
-In 0.4, choose **Replay recordings** from the setup sidebar. The library automatically lists recordings under this installation's RunData directory, newest first. By default this is `MATREX VR RunData` beside the app or executable. Protected installation directories use a stable per-installation folder in application support; the exact path is always shown above the list. `--data-dir` overrides it. Earlier builds' shared application-support recordings remain available through Browse. It shows the recorded span, observed rigs, animal metadata, tracker backend, sequence cycles and per-rig condition presentations. These are derived from saved rows; planned steps are not counted as completed trials. Setup-only folders and duplicate ZIP snapshots are not presented as experiment recordings.
+In 0.4.1, choose **Replay** from the setup sidebar to open **Replay recordings** (older builds can use **Replay recordings** as the entry label). The library automatically lists recordings under this installation's RunData directory, newest first. By default this is `MATREX VR RunData` beside the app or executable. Protected installation directories use a stable per-installation folder in application support; the exact path is always shown above the list. `--data-dir` overrides it. Earlier builds' shared application-support recordings remain available through Browse. It shows the recorded span, observed rigs, animal metadata, tracker backend, sequence cycles and per-rig condition presentations. These are derived from saved rows; planned steps are not counted as completed trials. Setup-only folders and duplicate ZIP snapshots are not presented as experiment recordings.
 
 Select a recording to inspect **Recorded files** and **Saved evidence & limitations**, then choose **Replay selected**. This saves the current setup draft before opening the saved run. A finishing recording remains unavailable until its data writers have closed; other recordings can still be opened. Use **Refresh** to rescan or search by name, animal, backend or recorded scene. **Browse…** and **Open an external folder path → Inspect folder** open a recording on another drive or computer without moving it into the local library.
 
@@ -46,13 +48,25 @@ All animal timestamps use a common session origin so independent rigs do not eac
 
 ## Record and replay tracker video
 
-These controls belong to the 0.4 release target. Video is optional: pose recording and replay work without it. **Acknowledged per-experiment recording Start/Stop, manual override and recorder-state reconciliation are not implemented.** One independent tracker recording can span preflight and multiple experiment runs; stopping a VR experiment does not stop that recorder.
+### 0.4.1 automatic and manual recording
+
+Video remains optional. Under **Animal & recording details**, review **Save tracker video** and **Recorder control** before starting. **Automatic / experiment** requests a fresh take from a verified owned compatible tracker at experiment Start, requires first-frame acknowledgement, and stops that exact take at experiment Stop. **Open tracker** performs input/calibration preflight without starting an automatic take. **Manual / external** leaves recorder Start/Stop to the operator or external system.
+
+Unavailable recorders produce per-rig warnings while VR can start. After stopping, wait for **Finishing recorders… / Saving recording…** to clear before opening that run. An accepted Start or a visible tracker window does not prove a completed camera take. Manual interruption, failed closure and partial artifacts remain explicit in saved evidence. The independent tracker window can stay open after an automatic take closes.
+
+The reviewed Mac arm64 Rekkefly correction in 0.4.1 supports this workflow. Release-bundled HejjéTrac and unchanged other-platform companions retain their existing capabilities and can report automatic video unavailable. See [native recording control](native-recording-control.md) and the [release notes](releases.md#041--agent-onboarding-and-desktop-workflow-fixes) for ownership, completion evidence and platform limits.
+
+### Archived 0.4.0 recorder workflow
+
+The following procedure describes **archived 0.4.0**. Video is optional: pose recording and replay work without it. **That version did not implement acknowledged per-experiment recording Start/Stop, manual override or recorder-state reconciliation.** One independent tracker recording can span preflight and multiple experiment runs; stopping a VR experiment does not stop that recorder.
 
 1. Before starting, review **Save tracker video** for the relevant rig. 0.4 enables it by default for supported bundled Rekkefly/HejjéTrac launches; explicit `tracker.saveVideo:false` remains an opt-out. This requests native MJPEG AVI plus frame/configuration logs. A tracker already running with another recording option must be closed explicitly before changing it; calibration stays in its shared native configuration. The legacy Kinefly/FicTrac backend names can also select those bundled successors. An independently running external legacy tracker supplies camera footage only if that application actually records it; its tracking transport alone contains no camera pixels.
 2. Use **Initialize tracking** for input/calibration preflight, then start the experiment or labeled demo. Preflight creates no experiment pose recording, but a tracker launched with video enabled may already record. The tracker remains an independent application. For real experiments, inspect its camera, calibration and tracking quality before presenting stimuli. Demonstration input is simulated or prerecorded, not a new animal measurement.
 3. End the experiment with **Back to setup / Esc**, or let its configured sequence finish. Wait for **Finishing recording…** to clear before opening that run. Data writers are drained and the saved context and recording summary are finalized in the background.
 4. Close the native tracker normally when its video recording is finished. Unity never stops it as part of archival. If it closes cleanly while Unity is still running, the app can acknowledge the completed recorder. If the tracker is still open when the experiment finalizes, camera media stays **pending** while the poses remain replayable.
 5. Open the run and choose **Media tools… → Collect media** to gather completed app-launched footage. **Refresh** reloads media already present in the run. The original tracker recording stays at its source; copied media and sidecars are preserved under the run's `media` directory with integrity hashes.
+
+### Playback and explicit media import
 
 A linked clip follows the same replay clock as the trajectory, including pause, playback speed and forward/backward scrubbing. **Software consumed-input frame association** means a saved pose used the tracker input frame matched to that video frame; it is not an exposure or display synchronization measurement. Gaps or unavailable coverage remain visible rather than being filled with guessed frames.
 

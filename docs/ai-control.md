@@ -2,7 +2,7 @@
 
 MATREX now exposes its configuration and experiment workflow through **27 MCP tools and three JSON resources**, using the [official MCP Python SDK](https://py.sdk.modelcontextprotocol.io/). Configuration, validation, defaults, history and Start use the same C# `ConfigWorkspace`, `ConfigDocument`, schema and GUI controller methods. The adapter does not drive the mouse or keyboard and does not maintain another copy of experiment settings.
 
-This guide describes the **current source and compatible local preview**. An older desktop download does not acquire MCP support from a documentation update. Use the adapter shipped with the app, or the adapter from its matching source revision. The app must expose control protocol **2**; discovery reports its actual methods and compiled scenes.
+This guide describes **0.4.1 and the current source**. An older desktop download does not acquire MCP support from a documentation update. Use the adapter shipped with the app, or the adapter from its matching source revision. The app must expose control protocol **2**; discovery reports its actual methods and compiled scenes.
 
 Normal app launches enable no command endpoint. Control is an explicit local opt-in. MCP-capable desktop packages include the server script and its dependency lock at the paths below. Source users can use `tools/matrex_control_mcp.py` and the adjacent lock instead. The tested SDK version is **2.3.0**, requiring Python **3.11 or newer**; Python and the SDK are needed on the MCP host, not for ordinary desktop use.
 
