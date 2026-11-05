@@ -529,24 +529,33 @@ public partial class DynamicSequenceController : MonoBehaviour, IInSceneSequence
 
     private void ApplyCameraSettings(string vrId, CameraSpec[] specs)
     {
-        if (specs == null)
+        if (specs == null || !players.TryGetValue(vrId, out var rig))
             return;
 
-        foreach (var spec in specs)
-        {
-            if (spec.vrId != vrId)
-                continue;
-            if (!players.TryGetValue(spec.vrId, out var rig))
-                continue;
+        var selected = specs.Where(spec => spec != null && spec.vrId == vrId).ToArray();
+        // Original designs repeat one shared appearance for VR1–VR4. Preserve
+        // saved files while extending that uniform appearance to additional rigs.
+        // Mixed or partial per-rig lists remain explicit; never guess their intent.
+        if (selected.Length == 0 && UniformLegacyCameraSettings(specs))
+            selected = new[] { specs[0] };
 
-            Camera[] cams = rig.GetComponentsInChildren<Camera>(true);
-            foreach (var cam in cams)
+        foreach (var spec in selected)
+            foreach (var cam in rig.GetComponentsInChildren<Camera>(true))
             {
                 cam.clearFlags = spec.clearFlags;
                 if (spec.bgColor != null && spec.bgColor.Length >= 3)
                     cam.backgroundColor = ToColor(spec.bgColor);
             }
-        }
+    }
+
+    private static bool UniformLegacyCameraSettings(CameraSpec[] specs)
+    {
+        if (specs.Length != 4 || specs.Any(spec => spec == null)) return false;
+        if (!Enumerable.Range(1, 4).All(index => specs.Count(spec => spec.vrId == "VR" + index) == 1)) return false;
+        var first = specs[0];
+        return specs.All(spec => spec.clearFlags == first.clearFlags &&
+            (spec.bgColor == null ? first.bgColor == null :
+                first.bgColor != null && spec.bgColor.SequenceEqual(first.bgColor)));
     }
 
     private void ApplyClosedLoopFlags(string vrId, Step s)
@@ -899,13 +908,10 @@ public partial class DynamicSequenceController : MonoBehaviour, IInSceneSequence
 
     private CameraSpec[] BuildDefaultCameraSpecs()
     {
-        return new[]
-        {
-            new CameraSpec { vrId = "VR1", clearFlags = CameraClearFlags.SolidColor, bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f } },
-            new CameraSpec { vrId = "VR2", clearFlags = CameraClearFlags.SolidColor, bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f } },
-            new CameraSpec { vrId = "VR3", clearFlags = CameraClearFlags.SolidColor, bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f } },
-            new CameraSpec { vrId = "VR4", clearFlags = CameraClearFlags.SolidColor, bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f } }
-        };
+        return players.Keys.Select(id => new CameraSpec {
+            vrId = id, clearFlags = CameraClearFlags.SolidColor,
+            bgColor = new[] { 0.8f, 0.8f, 0.8f, 1f }
+        }).ToArray();
     }
 
     private float ResolveTemplateRadius(SceneObjectSpec[] objects)
