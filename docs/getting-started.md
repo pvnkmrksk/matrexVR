@@ -1,5 +1,7 @@
 # Getting started
 
+**First time? Follow the [five-minute demo, recording and replay guide](five-minute-start.md).** This page covers platform requirements, setup, storage paths and source development. A desktop archive runs without Unity Editor or Python; building from source has separate prerequisites.
+
 Choose an operating-system ZIP from [GitHub Releases](https://github.com/pvnkmrksk/matrexVR/releases), or use the [download website](https://pvnkmrksk.github.io/matrexVR/). Extract the **whole** ZIP to a writable location. Keep its application, data folder, Unity libraries and `START-HERE.txt` together. Players run without Unity Editor or Python.
 
 ## Launch and configure
@@ -20,13 +22,13 @@ For example:
 open "/path/to/MATREX VR.app" --args -configure
 ```
 
-**0.3** opens setup by default for a fresh profile (`autoStart: false`). **0.4** opens its hardware-free demo/configuration home for a fresh profile. Existing user sequence flags remain authoritative. The [0.4 release section](releases.md#04--terrain-recording-and-replay) records publication status and known limits.
+**0.3** opens setup by default for a fresh profile (`autoStart: false`). **0.4 / 0.4.1** open the hardware-free demo/configuration home for a fresh profile. Existing user sequence flags remain authoritative. The [0.4 release section](releases.md#04--terrain-recording-and-replay) records publication status and known limits.
 
 In the studio, **System config** describes hardware, **Sequence config** arranges experiment blocks, and **Experiment configs** edits each referenced stimulus. Session cards describe the real animals; `VR1`, `VR2`, etc. remain hardware routing identifiers. Set tracker endpoint/mode, sphere diameter and display layout for your actual apparatus. A supplied public system template opens the application; it does not calibrate an LED array.
 
-Choose `closedLoopMode: "Kinefly"` for the historical flight yaw-rate input. FicTrac walking uses its separate cumulative-displacement contract. [System examples](../Assets/StreamingAssets/Examples/System) and [input/data documentation](data-formats.md) describe the difference. A tracking publisher is needed for closed-loop motion, not for browsing setup or using configured manual controls.
+Choose `closedLoopMode: "Rekkefly"` for modern flight input or `"Hejjetrac"` for walking. Historical `"Kinefly"` flight and `"FicTrac"` walking names remain recognized; walking uses a separate cumulative-displacement contract. [System examples](../Assets/StreamingAssets/Examples/System) and [input/data documentation](data-formats.md) describe the difference. A tracking publisher is needed for closed-loop motion, not for browsing setup or using configured manual controls.
 
-Use **Initialize tracking** to open the independent tracker and inspect input/calibration while setup remains open. This does not start an experiment or create its pose recording. Then use **Save setup** and **Start experiment**. Review **Save tracker video** before initializing the tracker; a recorder started with video enabled can already be recording during preflight. Auto start controls the next launch. Escape returns from a run to Control; Escape from Control exits the standalone player. Each studio-started experiment gets a separate recording directory.
+In 0.4.1, use **Open tracker** (called **Initialize tracking** in earlier interfaces) to open the independent tracker and inspect input/calibration while setup remains open. This does not start an experiment or create its pose recording. Review **Save tracker video** and recorder-control mode before acquisition, then use **Save setup** and **Start experiment**. Recorder behavior depends on the build and companion capabilities: archived 0.4 trackers can record continuously from preflight; 0.4.1 supports acknowledged experiment-owned takes on compatible companions. See [native recording control](native-recording-control.md). Auto start controls the next launch. Escape returns from a run to Control; Escape from Control exits the standalone player. Each studio-started experiment gets a separate recording directory.
 
 ## Configuration and data locations
 
@@ -86,18 +88,33 @@ Rig CSVs use wall-clock timestamps. TerrainChoice/rugosity and walking scenes us
 
 ## Terrain recipes and current limits
 
-Load one of the four `Examples/Rugosity/sequence-treatment-*.json` sequences for matched terrain, visible terrain with flat navigation, flat appearance with terrain navigation, or both flat. Each sequence runs the four shared TerrainChoice layouts for 30 seconds each and uses `terrain-treatment.json` for common settings. The two placeholder trees are equally distant from the start. The recipe uses real tracked motion, 1 cm clearance and texture scale 4; initialize tracking before starting. Both-flat trials intentionally have identical surfaces. See [the four treatment files](rugosity.md#load-one-treatment-and-run-all-four-spatial-patterns).
+Load one of the four `Examples/Rugosity/sequence-treatment-*.json` sequences for matched terrain, visible terrain with flat navigation, flat appearance with terrain navigation, or both flat. Each sequence runs the four shared TerrainChoice layouts for 30 seconds each and uses `terrain-treatment.json` for common settings. The two placeholder trees are equally distant from the start. The recipe uses real tracked motion, 1 cm clearance and texture scale 4; open the tracker and inspect input before starting. Both-flat trials intentionally have identical surfaces. See [the four treatment files](rugosity.md#load-one-treatment-and-run-all-four-spatial-patterns).
 
 Choice blocks expose **Edit config → Available objects & materials**. Under **Stimulus → Objects**, Type and Material controls offer names registered in that scene, preserving exact JSON values and existing custom names.
 
-Video recording currently follows the independently launched tracker, rather than acknowledged per-experiment Start/Stop commands. Finish the tracker normally and collect completed footage for replay. The linked external recorded-trajectory viewer is supported only by the reviewed Mac arm64 dashboard bundle; Unity’s internal pose/video replay remains independent. Older pinned strict flight-camera paths on other architectures remain blocked.
+Archived 0.4 video recording follows the independently launched tracker and can span several VR experiments. 0.4.1 adds Automatic/Manual recorder control with acknowledgement where supported; an unavailable recorder is reported separately from VR readiness. See [native recording control](native-recording-control.md) for ownership, stop and finalization behavior. Pose recording and replay do not require camera footage. The linked external recorded-trajectory viewer is supported only by the reviewed Mac arm64 dashboard bundle; Unity’s internal pose/video replay remains independent. Older pinned strict flight-camera paths on other architectures remain blocked.
 
 Evenly paced 60 FPS is [still under investigation](frame-pacing-20261027.md). Latest standalone mouse/drag acceptance was blocked by the native automation tool; keyboard, rendering and separate Unity GUI-event checks have their recorded scope. Windows/Linux builds are cross-built and have not received native execution walkthroughs. These limits and physical calibration requirements are recorded in [release verification](releases.md#04-verification-and-known-limits).
 
 ## Source and tracker setup
+
+For a local macOS player, see the [README build instructions](../README.md#build-a-local-macos-preview). After building, launch **`Preview/Open MATREX VR.command`** to use `Preview/Config` and `Preview/RunData`; rebuilding preserves those folders. A build can take longer than five minutes and requires the pinned Unity installation, plus the native companion prerequisites linked there.
 
 Clone [the repository](https://github.com/pvnkmrksk/matrexVR), add it to Unity Hub and open it using **Unity 6000.3.16f1**, as pinned in `ProjectSettings/ProjectVersion.txt`. Let Package Manager restore the pinned dependencies. Start at `Assets/Scenes/ControlScene.unity`. Restart an already open Editor after pulling Input System/backend changes.
 
 FicTrac is an optional external acquisition component for walking experiments. The project's [FicTrac fork](https://github.com/pvnkmrksk/fictrac) includes `install_ubuntu.sh` for Linux setup. Follow that repository's installation instructions and confirm the publisher's units and endpoint against [the ZMQ contract](data-formats.md#zmq-input-contract). Kinefly and Tirbala use their own input paths.
 
 Custom experiments require Unity scene/asset/controller authoring. Add them to the build scene list and rebuild; the packaged studio configures the experiments the build contains. [Experiment workflow](experiment-workflow.md) covers that extension path.
+
+## If the first run does not work
+
+| Symptom | Next step |
+| --- | --- |
+| An experiment starts before setup appears | Press **Escape** once, or relaunch with `-configure`. Existing sequences keep their saved Auto start setting. |
+| Home has no **Start demo** button | You may have a configured apparatus or an archived build. Follow its `START-HERE.txt`; use separate `--config-dir` and `--data-dir` paths for a disposable demo profile. |
+| A demo has no fresh tracking input | Check its native demo window and input status. Keep demonstration mode selected; use manual arrows/A/D to inspect the scene while diagnosing input. See [bundled companions](bundled-companions.md). |
+| A saved run is missing from Replay | Check the root displayed above the library, wait for that run to finish saving, then **Refresh**. Use **Browse…** for a different installation's complete run folder. |
+| Camera video is absent | Inspect saved recorder evidence. A working scene or pose CSV does not establish a completed video take; [recorder controls](native-recording-control.md) describe the states. |
+| A source project has compile/import errors | Confirm Unity **6000.3.16f1**, let package restoration finish, and check the first Console error before trying to run a scene. |
+
+When reporting a problem, include the release/build revision, operating system, exact action, visible error and relevant `runtime_trace.log` from the saved run. Preserve the original run and configuration files.

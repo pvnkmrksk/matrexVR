@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent and MCP control · MATREX VR manual</title><meta name="description" content="Connect an MCP client and verify configuration, run and replay operations.">
+<link rel="canonical" href="https://pvnkmrksk.github.io/matrexVR/manual/ai-control.html"><meta name="theme-color" content="#102d33">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/manual.css"><script src="assets/manual.js" defer></script><noscript><style>.search-open,.mobile-menu{display:none!important}@media(max-width:800px){.left-sidebar{display:block;position:static;width:auto;height:auto;box-shadow:none}}</style></noscript></head>
+<body><a class="skip-link" href="#article">Skip to content</a>
+<header class="docs-header"><a class="docs-brand" href="../index.html"><span class="brand-mark" aria-hidden="true">M</span> MATREX <span>VR</span></a><a class="manual-label" href="index.html">Documentation <span>0.4.1 + source</span></a><div class="header-actions"><a href="gallery.html">Gallery</a><a href="../index.html#downloads">Downloads</a><a href="https://github.com/pvnkmrksk/matrexVR">Source ↗</a><button type="button" class="mobile-menu" aria-controls="manual-nav" aria-expanded="false">Menu</button></div></header>
+<div class="docs-layout"><aside class="left-sidebar" id="manual-nav"><button class="search-open" type="button"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg> Search the manual <kbd>/</kbd></button><nav aria-label="Documentation chapters"><details class="nav-group" open><summary>Start here<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Manual overview</span></a><a href="five-minute-start.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Five-minute start</span></a><a href="getting-started.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Getting started</span></a><a href="gallery.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Native gallery</span></a></div></details><details class="nav-group"><summary>How it works<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="architecture.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Runtime architecture</span></a><a href="components.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Component index</span></a><a href="scenes.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Scenes and Kannadi</span></a><a href="viewports.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Rigs and viewports</span></a><a href="closed-loop.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>ClosedLoop and motion</span></a><a href="input-contracts.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Input contracts</span></a><a href="controls.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Keyboard and gamepad</span></a></div></details><details class="nav-group"><summary>Configure<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="configuration-studio.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Configuration studio</span></a><a href="configuration-ux.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>GUI and HUD details</span></a><a href="configuration-reference.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Parameter reference</span></a><a href="animal-agent-compatibility.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Animal and agent names</span></a><a href="experiment-phases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment phases</span></a><a href="auto-trim.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Flight gate and auto trim</span></a></div></details><details class="nav-group"><summary>Schema field atlas<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="schema-index.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Full schema index</span></a><a href="schema-system.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>System fields</span></a><a href="schema-sequence.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Sequence fields</span></a><a href="schema-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Choice fields</span></a><a href="schema-swarm.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Swarm fields</span></a><a href="schema-kannadi.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Kannadi fields</span></a><a href="schema-optomotor.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Optomotor fields</span></a><a href="schema-rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Rugosity fields</span></a><a href="schema-dynamic-choice.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Dynamic-Choice fields</span></a></div></details><details class="nav-group"><summary>Stimuli<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="night-sky.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Astronomical night sky</span></a><a href="generated-swarms.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Generated swarms</span></a><a href="swarm-playback.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Recorded swarm playback</span></a><a href="selwyn-cycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Selwyn sky and swarm cycle</span></a><a href="rugosity.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Visual/navigation rugosity</span></a><a href="selwyn-terrain.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#maximize"></use></svg><span>Selwyn terrain source</span></a><a href="historical-panorama.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Historical panorama recipe</span></a></div></details><details class="nav-group"><summary>Data and replay<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="recording-pipeline.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Recording pipeline</span></a><a href="data-formats.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Saved data formats</span></a><a href="run-config-snapshots.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Configuration snapshots</span></a><a href="telemetry.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live telemetry and headings</span></a><a href="live-monitoring.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Live browser monitoring</span></a><a href="replay.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#play"></use></svg><span>Replay a recorded run</span></a></div></details><details class="nav-group" open><summary>Extend and validate<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="ai-control.html" class="active" aria-current="page"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Agent and MCP control</span></a><a href="agent-workflow.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Agent workflow</span></a><a href="extending.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Extend the source</span></a><a href="experiment-workflow.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Experiment workflow</span></a><a href="scene-lifecycle.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene lifecycle</span></a><a href="diagnostics-performance.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#layout-dashboard"></use></svg><span>Diagnostics and performance</span></a><a href="scene-reload-investigation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#refresh-cw"></use></svg><span>Scene reload investigation</span></a><a href="six-camera-rig.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#camera"></use></svg><span>Six-camera reference</span></a><a href="kannadi-history.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#rotate-ccw"></use></svg><span>Kannadi integration history</span></a><a href="releases.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#skip-forward"></use></svg><span>Releases and rebuilding</span></a></div></details><details class="nav-group"><summary>Hardware and ecosystem<svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#chevron-down"></use></svg></summary><div><a href="hardware.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#sliders-horizontal"></use></svg><span>Hardware and calibration</span></a><a href="integrations.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Trackers and analysis</span></a><a href="tracker-integration.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#circle-dot"></use></svg><span>Native tracker integration</span></a><a href="citation.html"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="assets/icons.svg#ellipsis"></use></svg><span>Cite MATREX VR</span></a></div></details></nav><div class="sidebar-footer"><a href="citation.html">Cite the software</a><a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/ai-control.md">Edit this page ↗</a></div></aside>
+<main id="article" tabindex="-1"><div class="article-context"><span>Extend and validate</span><span>MATREX VR / source manual</span></div><article class="prose"><h1 id="agent-control-through-json-and-mcp">Agent control through JSON and MCP</h1>
+<p>MATREX now exposes its configuration and experiment workflow through <strong>27 MCP tools and three JSON resources</strong>, using the <a href="https://py.sdk.modelcontextprotocol.io/">official MCP Python SDK</a>. Configuration, validation, defaults, history and Start use the same C# <code>ConfigWorkspace</code>, <code>ConfigDocument</code>, schema and GUI controller methods. The adapter does not drive the mouse or keyboard and does not maintain another copy of experiment settings.</p>
+<p>This guide describes the <strong>current source and compatible local preview</strong>. An older desktop download does not acquire MCP support from a documentation update. Use the adapter shipped with the app, or the adapter from its matching source revision. The app must expose control protocol <strong>2</strong>; discovery reports its actual methods and compiled scenes.</p>
+<p>Normal app launches enable no command endpoint. Control is an explicit local opt-in. MCP-capable desktop packages include the server script and its dependency lock at the paths below. Source users can use <code>tools/matrex_control_mcp.py</code> and the adjacent lock instead. The tested SDK version is <strong>2.3.0</strong>, requiring Python <strong>3.11 or newer</strong>; Python and the SDK are needed on the MCP host, not for ordinary desktop use.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Adapter location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>macOS release / local preview</td>
+<td><code>MATREX VR.app/Contents/Resources/MCP/matrex_control_mcp.py</code></td>
+</tr>
+<tr>
+<td>Windows / Linux release</td>
+<td><code>MCP/matrex_control_mcp.py</code>, beside the player executable</td>
+</tr>
+<tr>
+<td>Source checkout</td>
+<td><code>tools/matrex_control_mcp.py</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The 0.4.1 release packager includes the script and adjacent <code>.py.lock</code> from the player's pinned source revision. <code>release-manifest.json</code> records <code>mcpBundled</code>, the adapter's source revision and SHA-256 hashes. Older archives can lack these files; check their actual contents.</p>
+<p><strong>First connection:</strong> launch an MCP-capable app with a private control directory, point your client's stdio server at that same directory, then call <code>matrex_discover</code> and <code>matrex_status</code>. Success means <code>ok: true</code>, protocol 2 and the intended config/data roots. Connecting does not initialize a tracker or start acquisition. See the <a href="assets/reference/docs/mcp/mcp-client.example.json">copyable client configuration</a> and <a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/mcp/inspect_connection.py">read-only connection check</a>.</p>
+<h2 id="connect-a-client">Connect a client</h2>
+<p>Create a private command directory and launch an independently reviewable local profile:</p>
+<pre class="sh"><code>mkdir -m 700 /absolute/path/MATREX-Control
+open -n &quot;/absolute/path/MATREX VR.app&quot; --args \
+  --control-dir &quot;/absolute/path/MATREX-Control&quot; \
+  --config-dir &quot;/absolute/path/Config&quot; \
+  --data-dir &quot;/absolute/path/RunData&quot; -configure</code></pre>
+<p>Use a separate command directory for each running player. Config and RunData should be explicit for test profiles so they cannot affect a calibrated installation. The command directory must remain outside saved recordings.</p>
+<p>On Windows or Linux, launch the actual player executable with the same arguments instead of the macOS <code>open</code> command:</p>
+<pre class="sh"><code>&quot;/absolute/path/to/MATREX VR.x86_64&quot; \
+  --control-dir &quot;/absolute/path/MATREX-Control&quot; \
+  --config-dir &quot;/absolute/path/Config&quot; \
+  --data-dir &quot;/absolute/path/RunData&quot; -configure</code></pre>
+<p>The Windows executable may be named differently; use the <code>.exe</code> supplied in that archive. Keep the player visible and responsive: Unity processes commands on its main thread. After launch, <code>MATREX-Control/endpoint.json</code> identifies the process, instance, config root and run-data root. A fresh config root is seeded from the app's bundled examples. The MCP adapter connects to this running app; it does not launch the player itself.</p>
+<p>With <code>uv</code>, the adapter's inline dependency declaration and adjacent lock install the pinned SDK:</p>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;matrex&quot;: {
+      &quot;command&quot;: &quot;uv&quot;,
+      &quot;args&quot;: [
+        &quot;run&quot;, &quot;--locked&quot;, &quot;--script&quot;,
+        &quot;/absolute/path/MATREX VR.app/Contents/Resources/MCP/matrex_control_mcp.py&quot;,
+        &quot;--control-dir&quot;, &quot;/absolute/path/MATREX-Control&quot;
+      ]
+    }
+  }
+}</code></pre>
+<p>Replace every <code>/absolute/path/...</code> with a real absolute path, including the path to <code>uv</code> if your GUI client cannot find it. This <code>mcpServers</code> JSON is for clients that accept that configuration shape; clients with another format still need the same executable and argument array. For a source checkout, substitute <code>/absolute/path/matrexVR/tools/matrex_control_mcp.py</code>; retain its adjacent <code>.lock</code> file. Let the client launch the adapter as a stdio subprocess; running the adapter in an interactive terminal waits for protocol input and shows no application UI.</p>
+<p>Alternatively, from the repository root, prepare a Python 3.11+ virtual environment:</p>
+<pre class="sh"><code>python3 --version
+python3 -m venv .local/mcp-venv
+.local/mcp-venv/bin/python -m pip install &#39;mcp==2.3.0&#39;</code></pre>
+<p>On Windows use <code>.local\mcp-venv\Scripts\python.exe</code> in place of <code>.local/mcp-venv/bin/python</code>. Use that environment's <strong>absolute Python executable path</strong> as the client <code>command</code>, with only the adapter path, <code>--control-dir</code> and the control path in <code>args</code>. No shell activation is needed. The <code>uv --locked</code> route also locks transitive dependencies; a plain pip installation pins the SDK alone. Prepare dependencies before an offline experiment. Quit and relaunch the app without <code>--control-dir</code> to disable control.</p>
+<h2 id="check-the-connection-without-starting-a-run">Check the connection without starting a run</h2>
+<p>With the player launched in setup, run this from the repository root using the prepared environment:</p>
+<pre class="sh"><code>.local/mcp-venv/bin/python docs/mcp/inspect_connection.py \
+  --adapter &quot;/absolute/path/matrexVR/tools/matrex_control_mcp.py&quot; \
+  --control-dir &quot;/absolute/path/MATREX-Control&quot;</code></pre>
+<p>For a packaged adapter, change <code>--adapter</code> to the package path above. The check uses the real SDK stdio client, lists tools/resources, and reads discovery, status and the GUI workspace. It sends no mutation. JSON output includes the actual root paths, scene and selected document revisions; exit status 0 means all requested reads succeeded. If setup is closed or an experiment is preparing/running/stopping, status/discovery can still succeed, but workspace inspection fails with the ordinary idle-setup requirement and the script exits 1. Inspect the reported state and return to idle setup when appropriate before rerunning; a working transport does not make that workspace read successful.</p>
+<p>In an agent client, the equivalent first request is: “Inspect MATREX with discovery, status and the current workspace. Report the config and run-data roots, selected sequence, validation errors and current run state.” Supply the intended experiment task once; an agent can then carry its authorized steps through validation and completion without asking for approval at each tool call.</p>
+<h2 id="available-operations">Available operations</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Tools</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Discovery</td>
+<td><code>matrex_discover</code>, <code>matrex_schemas</code></td>
+</tr>
+<tr>
+<td>Shared GUI draft</td>
+<td><code>matrex_workspace_get</code>, <code>matrex_config_get</code>, <code>matrex_config_create</code>, <code>matrex_config_replace</code>, <code>matrex_config_save</code>, <code>matrex_config_history</code></td>
+</tr>
+<tr>
+<td>Select and validate</td>
+<td><code>matrex_setup_select</code>, <code>matrex_validate_setup</code></td>
+</tr>
+<tr>
+<td>Tracking preflight</td>
+<td><code>matrex_tracking_initialize</code>, <code>matrex_tracker_control</code></td>
+</tr>
+<tr>
+<td>Session/animal metadata</td>
+<td><code>matrex_metadata_get</code>, <code>matrex_metadata_set</code></td>
+</tr>
+<tr>
+<td>Experiment lifecycle</td>
+<td><code>matrex_start_current</code>, <code>matrex_start_files</code>, <code>matrex_stop</code>, <code>matrex_status</code></td>
+</tr>
+<tr>
+<td>Recorder override</td>
+<td><code>matrex_recorder_stop</code>, <code>matrex_operation_get</code></td>
+</tr>
+<tr>
+<td>Live controls</td>
+<td><code>matrex_runtime_control</code></td>
+</tr>
+<tr>
+<td>Run data and replay</td>
+<td><code>matrex_recordings_list</code>, <code>matrex_replay_open</code>, <code>matrex_replay_play</code>, <code>matrex_replay_seek</code>, <code>matrex_replay_view</code>, <code>matrex_replay_options</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The resources <code>matrex://status</code>, <code>matrex://catalog</code> and <code>matrex://schemas</code> return read-only JSON snapshots. Poll the status tool for live progress. Discovery/initialization never implicitly starts an experiment, tracking, or a recorder. Tool calls are intended for a user-authorized workflow; the server contains no autonomous experiment loop.</p>
+<p>Discovery includes the scenes actually compiled into the build, their selectable/legacy status, exact built-in object and material names, example/treatment/sequence JSON paths, connected display names, and configured camera selections. <strong>Physical camera enumeration, camera formats and calibration remain owned by the native companion APIs.</strong> MATREX does not open another camera stream to invent an inventory. External GLB object paths and their settings remain ordinary configuration fields, with the same production asset validation/preload at Start.</p>
+<h2 id="json-and-gui-parity">JSON and GUI parity</h2>
+<p><code>matrex_workspace_get</code> and <code>matrex_config_get</code> report the current GUI DOM, including unsaved form edits, <code>revision</code>, <code>dirty</code>, <code>conflict</code>, parse errors, undo/redo availability and <code>effective</code> defaults. Effective defaults use the exact GUI export path and never silently fill the source file. Damaged input retains its original text in <code>damagedSourceText</code>; the GUI and agent can inspect inherited defaults while the explicit invalid input remains an error.</p>
+<p>Use <strong><code>jsonText</code></strong>, rather than rebuilding a file from the effective-defaults object, when editing. It preserves unknown keys and lossless numeric literals, including integers beyond JavaScript's exact number range. <code>matrex_config_replace</code> requires the revision just read. It validates the candidate through the production workspace without changing the draft or undo history on failure. A successful replacement is one normal GUI undo transaction and does not save automatically. <code>config_save</code> uses the same external-conflict checks and atomic replacement/<code>.bak</code> preservation as the GUI.</p>
+<p>To repair a multi-file setup with pre-existing errors, <code>allowInvalidDraft:true</code> explicitly allows an invalid GUI draft. Its validation errors remain visible and Start still refuses it. This is useful when building system and sequence JSONs incrementally; it never coerces invalid values or reports the draft runnable. New files are created only below the configured config root and cannot overwrite an existing file. New unreferenced files initially receive document-schema validation; production cross-file validation occurs when the selected sequence references them.</p>
+<p>Selecting different primary files refuses unsaved GUI changes, focused/pending editor input and open dialogs. A conflict or stale revision requires inspecting the current state before retrying. Shared metadata can also be read/replaced with a revision; <code>save:true</code> persists it through the ordinary GUI metadata backup routine, otherwise Start saves it.</p>
+<p>Saved-setup validation and GUI Start share the same readiness method: production document/runtime validation, apparatus/profile checks and connected-output layout checks. It does not silently ignore missing panel dimensions just because the scene can load.</p>
+<h2 id="end-to-end-workflow">End-to-end workflow</h2>
+<ol type="1">
+<li>Discover the catalog and schemas; inspect the selected workspace.</li>
+<li>Select existing system/sequence JSON paths, or create JSON files under the config root and reference them from the sequence. Read a document's revision, replace its JSON draft and save it.</li>
+<li>Set session metadata if needed.</li>
+<li>Call <code>matrex_tracking_initialize</code>. It saves the apparatus draft, applies the selected input ports and routing, then uses the ordinary tracker-preparation workflow. It does <strong>not</strong> create an experiment recording. Poll <code>status.diagnostics.setupPreparing</code> and each rig's <code>inputState</code>/<code>freshPose</code>; a process being alive does not establish valid acquisition.</li>
+<li>Call <code>matrex_start_current</code> for the current GUI draft, or <code>matrex_start_files</code> for already saved files with no pending GUI changes. Both use the ordinary Start action and preserve metadata/configuration provenance.</li>
+<li>Poll status until the intended scene is running or a preparation/sequence error is reported. Status distinguishes preparation, running and finalization, and exposes trial/step/phase timing, actual ports, live performance, run directory, native recorder requested/acknowledged state and warnings.</li>
+<li>Call <code>matrex_stop</code>, then wait for both experiment and recording finalization to settle. Discover new runs under this installation's RunData root with <code>matrex_recordings_list</code>; supply another directory only when intentionally browsing elsewhere.</li>
+<li>Open a run, wait for <code>replayReady:true</code> and <code>replayLoading:false</code>, then control play/pause, seek and overview/animal views. <code>replayError</code> reports a failed load. Replay operations do not edit saved data.</li>
+</ol>
+<p>Use these argument shapes when turning that workflow into tool calls. Paths come from discovery and workspace results; revisions come from the latest document read or mutation result.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Tool and arguments</th>
+<th>Completion check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inspect</td>
+<td><code>matrex_discover {}</code>, <code>matrex_status {}</code>, <code>matrex_workspace_get {}</code></td>
+<td>Confirm intended roots, selected files and state. Workspace reads require idle setup.</td>
+</tr>
+<tr>
+<td>Read/edit</td>
+<td><code>matrex_config_get {"path":"/absolute/path/Config/example.json"}</code>, then <code>matrex_config_replace {"path":"…","revision":"…","jsonText":"…"}</code></td>
+<td>Supply the complete edited JSON text, preserving unknown fields and numeric text. Check returned validation errors.</td>
+</tr>
+<tr>
+<td>Save</td>
+<td><code>matrex_config_save {"path":"…","revision":"…"}</code></td>
+<td>Use the revision returned by replacement; confirm <code>dirty:false</code>, <code>conflict:false</code>.</td>
+</tr>
+<tr>
+<td>Validate saved files</td>
+<td><code>matrex_validate_setup {"systemFile":"…","sequenceFile":"…"}</code></td>
+<td><code>valid:true</code> and no errors. This validates saved files; unsaved workspace changes are separate.</td>
+</tr>
+<tr>
+<td>Preflight, when needed</td>
+<td><code>matrex_tracking_initialize {}</code></td>
+<td>Wait for <code>diagnostics.setupPreparing:false</code>; inspect <code>diagnostics.rigs[].freshPose</code> and <code>inputState</code> for every intended rig.</td>
+</tr>
+<tr>
+<td>Start</td>
+<td><code>matrex_start_current {}</code></td>
+<td>Wait for <code>sequenceRunning:true</code> and the expected scene; inspect <code>sequenceError</code> and recorder state.</td>
+</tr>
+<tr>
+<td>Stop</td>
+<td><code>matrex_stop {}</code></td>
+<td>Wait for <code>sequenceRunning:false</code>, <code>sequencePreparing:false</code>, <code>sequenceStopping:false</code> and <code>diagnostics.runFinalizing:false</code>; inspect errors/warnings and the run's saved evidence.</td>
+</tr>
+<tr>
+<td>Find/open</td>
+<td><code>matrex_recordings_list {}</code>, then <code>matrex_replay_open {"directory":"…"}</code></td>
+<td>Use an entry's returned directory; wait for <code>replayReady:true</code>, <code>replayLoading:false</code>, with no <code>replayError</code>.</td>
+</tr>
+<tr>
+<td>Inspect replay</td>
+<td><code>matrex_replay_play {"playing":false}</code>, <code>matrex_replay_seek {"seconds":1}</code>, <code>matrex_replay_view {}</code></td>
+<td><code>replayTime</code> reflects the seek; empty view arguments select overview. Use a recorded <code>vrId</code> for animal view.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The ellipses in this table are placeholders, not literal values. One shared workspace is visible to the operator and agent: finish a focused text/JSON edit or close an open dialog before requesting conflicting changes. Inspect a validation failure and correct its actual cause; repeated Start calls do not repair a setup.</p>
+<p>For example, with the official SDK client connected to the adapter:</p>
+<pre class="python"><code>from mcp import Client
+from mcp.client.stdio import StdioServerParameters
+
+server = StdioServerParameters(
+    command=&quot;/absolute/path/venv/bin/python&quot;,
+    args=[&quot;/absolute/path/matrex_control_mcp.py&quot;,
+          &quot;--control-dir&quot;, &quot;/absolute/path/MATREX-Control&quot;],
+)
+
+async def configure_and_start():
+    async with Client(server) as client:
+        workspace = await client.call_tool(&quot;matrex_workspace_get&quot;, {})
+        if workspace.is_error:
+            raise RuntimeError(workspace.structured_content)
+        print(workspace.structured_content[&quot;result&quot;])
+        # Only as part of the requested experiment task:
+        accepted = await client.call_tool(&quot;matrex_start_current&quot;, {})
+        if accepted.is_error:
+            raise RuntimeError(accepted.structured_content)
+        print(accepted.structured_content[&quot;result&quot;])
+        # Poll matrex_status; accepted is not running or recorder acknowledgement.</code></pre>
+<p>This function is an SDK usage fragment; the <a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/mcp/inspect_connection.py">connection check</a> is a complete executable example. The wire reply is <code>{"ok":true,"result":{...}}</code>; tool results expose that envelope as <code>structured_content</code>. Read state fields under <code>result</code>. Failures set <code>is_error:true</code>, <code>ok:false</code>, <code>errorCode</code> and <code>error</code>. A successful tool result can still describe a failed validation (<code>result.valid:false</code>) or an asynchronous operation that has not completed.</p>
+<p>Replay options are a validated partial JSON object, for example:</p>
+<pre class="json"><code>{
+  &quot;playbackSpeed&quot;: 0.5,
+  &quot;trailSeconds&quot;: 8,
+  &quot;trailProminence&quot;: 2,
+  &quot;perspective&quot;: true,
+  &quot;pivot&quot;: {&quot;x&quot;: 0, &quot;y&quot;: 0, &quot;z&quot;: 0},
+  &quot;yaw&quot;: 35,
+  &quot;pitch&quot;: 25,
+  &quot;distance&quot;: 12
+}</code></pre>
+<p>Send that object as the <code>jsonText</code> string to <code>matrex_replay_options</code>, after selecting the overview with <code>matrex_replay_view</code>. Omitting <code>jsonText</code> reads the current state. The same playback/trail/projection/camera variables drive the GUI sliders and mouse controls. Other options include <code>loop</code>, <code>panelPixels</code>, <code>followRig</code> (rig ID or null), and orthographic <code>zoom</code>. All fields are validated before any option changes.</p>
+<p><code>matrex_runtime_control</code> exposes the ordinary live auto-trim, flight-check and frame-rate-cap controls. Frame-rate changes use the existing controller, respect VSync, and retain its runtime display-setting evidence. These are transient live controls, distinct from editing the next run's saved system JSON.</p>
+<h2 id="recording-acknowledgement-and-override">Recording acknowledgement and override</h2>
+<p>Starting/stopping an experiment delegates to the existing <a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/native-recording-control.md">native recording controller</a>. <code>Experiment</code> versus <code>Manual</code> mode and video opt-out remain system JSON settings. Manual/continuous native recording is never commandeered by an automatic experiment command. A missing or incompatible companion is reported honestly; best-effort VR start does not imply video success.</p>
+<p><code>matrex_recorder_stop</code> only stops an <strong>acknowledged experiment-owned take</strong> for the requested rig. It does not terminate tracking or the VR experiment. It sends the same ownership-fenced stop/finalization operation, latches operator override and returns an <code>operationId</code>; inspect <code>matrex_operation_get</code> for completion/error. A later experiment Stop reuses that task rather than sending a second native stop. The existing quality/finalization policy still reports an interrupted requested recording in run evidence. A rig in Manual mode or with no acknowledged active take yields a failed operation, without a false recorder acknowledgement. Native GUI pause/stop/replacement overrides remain respected.</p>
+<h2 id="transport-and-concurrency">Transport and concurrency</h2>
+<p>The SDK uses stdio, with no listening HTTP/network port. A private local directory carries bounded atomic request/reply files to Unity's main thread. An exclusive owner lock prevents two app instances from serving the same directory. Each request/reply includes the application instance token and random request ID. Expiry and instance fencing prevent an old queued mutation from executing after a later launch. Requests are limited to 1 MiB.</p>
+<p>Configuration writes use optimistic document revisions, retain normal GUI history and reject external edit conflicts. State-changing requests are not automatically retried. A timeout can occur after an operation began, so the outcome is <strong>unknown</strong> until status/operation evidence establishes it. Accepted Start means asynchronous preparation began, not that a scene is running or camera video is recording. The same distinction applies to tracker launch and recorder Stop.</p>
+<p>Any process that can write the selected directory can request operations. Keep it private to the intended local account. No command transport is written into a recording, and replay remains read-only. Shared status reflects observed runtime state; the workspace tools reflect selected/unsaved GUI configuration.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Client cannot start <code>uv</code>/Python, or reports missing <code>mcp</code></td>
+<td>Use absolute executable paths and the prepared Python 3.11+ environment. Keep the script and lock together for <code>uv --locked</code>.</td>
+</tr>
+<tr>
+<td>Missing <code>endpoint.json</code> / unavailable control directory</td>
+<td>Launch an MCP-capable player with <code>--control-dir</code>; check the exact same absolute path on both sides. Ordinary launches expose no endpoint.</td>
+</tr>
+<tr>
+<td><code>Unsupported endpoint</code> / method unavailable</td>
+<td>Match the adapter to the app revision. Read discovery before assuming a scene or operation exists in an older build.</td>
+</tr>
+<tr>
+<td>Control directory already owned</td>
+<td>Choose a separate directory for another running player. Do not delete an active instance's files to take ownership.</td>
+</tr>
+<tr>
+<td>Timeout / unknown execution outcome</td>
+<td>Read status and any returned operation ID before deciding whether to retry. Check that the player is responsive and not blocked by a native dialog. The adapter's <code>--timeout</code> defaults to 15 seconds and allows up to 60; extending it does not make Start synchronous.</td>
+</tr>
+<tr>
+<td>Revision changed / external conflict</td>
+<td>Read the current draft again and reconcile the operator's changes. Preserve both versions when resolving a disk conflict.</td>
+</tr>
+<tr>
+<td>Pending input, unsaved draft or modal dialog</td>
+<td>Finish/apply the active editor or dialog. Save the current draft before selecting other files; use <code>start_current</code> when the intended task is to run that draft.</td>
+</tr>
+<tr>
+<td><code>accepted:true</code> but no experiment/video</td>
+<td>Inspect <code>sequenceError</code>, preparation flags, <code>recordingError</code>, <code>recordingWarnings</code> and each rig's recorder acknowledgement. A live tracker process alone does not show fresh measurements.</td>
+</tr>
+<tr>
+<td>Stop returned but files are still saving</td>
+<td>Follow sequence/finalization state and recording evidence before opening a replay, moving files or quitting. A timeout is not evidence of a safe finalization.</td>
+</tr>
+<tr>
+<td>Replay controls rejected</td>
+<td>Wait for ready/loading/error fields. Use the creating build and complete run folder, following the <a href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/same-build-replay-contract.md">same-build replay contract</a>.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="validation-and-scope">Validation and scope</h2>
+<p><code>tools/test_matrex_control_mcp.py</code> exercises the actual official SDK client/server, standard tools/resources, structured results/errors, strict argument rejection, precision-safe JSON text, instance-fenced mailbox and timeout cleanup. <code>ExperimentControlValidation.Run</code> exercises the real Unity endpoint and GUI DOM/history/validators in a marked disposable project. Tracker regression tests cover exact owned-take manual stop and single-stop finalization reuse.</p>
+<p>The standalone acceptance uses a real Mac player and the <strong>packaged</strong> MCP adapter, generated tracker input on an isolated localhost port, two distinct experiment runs, read-only replay and recorded input/configuration provenance. Hardware camera/exposure timing and other-platform native runtime acceptance remain outside that test. The <a href="assets/reference/docs/mcp-control-validation-20261031.json">review report</a> records exact evidence and limits. The Mac preview is a local review build, not a published release.</p>
+</article><nav class="chapter-pager" aria-label="Adjacent chapters"><a href="replay.html"><small>Previous</small>Replay a recorded run</a><a href="agent-workflow.html"><small>Next</small>Agent workflow<span aria-hidden="true"> →</span></a></nav><footer class="article-footer">Static documentation · software contracts and recorded evidence. <a href="citation.html">Citation and credits</a></footer></main>
+<aside class="right-sidebar"><nav aria-label="On this page"><p>On this page</p><a href="#connect-a-client" class="toc-level-2">Connect a client</a><a href="#check-the-connection-without-starting-a-run" class="toc-level-2">Check the connection without starting a run</a><a href="#available-operations" class="toc-level-2">Available operations</a><a href="#json-and-gui-parity" class="toc-level-2">JSON and GUI parity</a><a href="#end-to-end-workflow" class="toc-level-2">End-to-end workflow</a><a href="#recording-acknowledgement-and-override" class="toc-level-2">Recording acknowledgement and override</a><a href="#transport-and-concurrency" class="toc-level-2">Transport and concurrency</a><a href="#troubleshooting" class="toc-level-2">Troubleshooting</a><a href="#validation-and-scope" class="toc-level-2">Validation and scope</a></nav><a class="source-link" href="https://github.com/pvnkmrksk/matrexVR/blob/main/docs/ai-control.md">View Markdown source ↗</a></aside></div>
+<dialog class="search-dialog" aria-labelledby="search-title"><form method="dialog"><h2 id="search-title">Search documentation</h2><button class="search-close" aria-label="Close search">×</button></form><label class="sr-only" for="manual-search">Search every manual section</label><input id="manual-search" type="search" placeholder="Try: ViewportSetter, yaw units, replay, sky…" autocomplete="off"><p class="search-status" role="status">Search runs locally in your browser.</p><div class="search-results"></div><p class="search-hint">Enter a term · Tab to a result · Escape to close</p></dialog>
+</body></html>

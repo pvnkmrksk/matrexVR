@@ -1,10 +1,178 @@
 # Choice schema fields
 
-This atlas lists **821 emitted property paths** from the current `choice` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **987 emitted property paths** from the current `choice` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
 Every field has a deep link and is indexed by the manual search. Array items use `[]` in their path. Nested pre/stimulus/post fields are listed where the schema emits them; repeated names in different phases are distinct paths.
+
+## sun group
+
+### `sun`
+
+Optional directional sunlight. Configure brightness, color and angle; position does not affect directional lighting. Omitted preserves the scene’s authored sun.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | No default emitted at this path. |
+| `additionalProperties` | `true` |
+
+### `sun.enabled`
+
+Enable the directional sun. Disabled settings stay in this configuration.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `sun.intensity`
+
+Brightness of the directional sun. Zero gives no direct illumination.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+
+### `sun.color`
+
+Sunlight color. Choose a color or enter its hexadecimal RGB value.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `sun.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `sun.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `sun.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `sun.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `sun.rotation`
+
+Sun direction as X/Y/Z Euler angles in degrees. Position does not affect directional lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 50.0,
+  "y": 330.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `sun.rotation.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `sun.rotation.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `sun.rotation.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
 
 ## rugosity group
 
@@ -282,6 +450,144 @@ Conspecific swarm stimulus. Contains population, size, direction, speed distribu
 | Required by parent schema | No |
 | Default | `null` |
 | `additionalProperties` | `true` |
+
+### `swarm.modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `swarm.modelAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `swarm.modelAppearance.enabled`
+
+Override this object's surface without changing the original model file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `swarm.modelAppearance.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `swarm.modelAppearance.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.modelAppearance.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.modelAppearance.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.modelAppearance.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.modelAppearance.keepTexture`
+
+Keep the model's base-color texture. Disable for a uniform chosen color.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `swarm.modelAppearance.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `swarm.modelAppearance.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `0` |
+| `maximum` | `1` |
 
 ### `swarm.trajectoryFile`
 
@@ -1332,6 +1638,48 @@ Omitted, null or [] means environment-only flight/migration; sky and movement se
 
 ## objects[] group
 
+### `objects[].enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `objects[].modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `objects[].animationClip`
+
+Optional animation clip in the imported model. Leave blank to use its first clip.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `objects[].animationSpeed`
+
+Model animation playback multiplier. 1 uses the model's authored timing; 0 freezes it.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ### `objects[].groundOnTerrain`
 
 Place this object on the active terrain at its X/Z position. Its configured Y becomes an extra height above terrain. Off uses the explicit world position.
@@ -1454,6 +1802,134 @@ Registered material name; empty keeps prefab material.
 | Type | `string or null` |
 | Required by parent schema | No |
 | Default | `null` |
+
+### `objects[].appearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `objects[].appearance.enabled`
+
+Override this object's surface without changing the original model file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `objects[].appearance.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `objects[].appearance.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `objects[].appearance.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `objects[].appearance.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `objects[].appearance.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `objects[].appearance.keepTexture`
+
+Keep the model's base-color texture. Disable for a uniform chosen color.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `objects[].appearance.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `objects[].appearance.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `0` |
+| `maximum` | `1` |
 
 ### `objects[].scale`
 
@@ -2370,6 +2846,376 @@ Forward autopilot speed in scene units per second: m/s on terrain, cm/s for walk
 
 UI `enabledWhen`: `{"property":"autopilotEnabled","oneOf":[true]}`. This governs the form, not removal of stored values.
 
+## title group
+
+### `title`
+
+Optional human-readable experiment or paradigm name. The file path remains visible separately.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string` |
+| Required by parent schema | No |
+| Default | `""` |
+
+## comments group
+
+### `comments`
+
+Optional notes retained in this configuration and the run archive.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string` |
+| Required by parent schema | No |
+| Default | `""` |
+
+## panoramaRotationDegrees group
+
+### `panoramaRotationDegrees`
+
+Rotate an imported panorama horizontally. Zero preserves its original orientation; 360 is one complete turn.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0` |
+| UI unit label | degrees |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+## visibilityMatrix group
+
+### `visibilityMatrix`
+
+Rows are observers VR1–VR16; columns are the VR population layers they see. The matrix changes no ground, sky, or private Choice-object layers. Disabled preserves the normal scene visibility.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "enabled": false,
+  "rows": [
+    [
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  ]
+}
+```
+
+</details>
+
+### `visibilityMatrix.enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `visibilityMatrix.rows`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `maxItems` | `16` |
+
 ## autoTrimSettings group
 
 ### `autoTrimSettings`
@@ -2564,6 +3410,172 @@ Optional phase before the main stimulus. It retains its own duration, movement, 
 | Required by parent schema | No |
 | Default | No default emitted at this path. |
 | `additionalProperties` | `true` |
+
+### `preStimulus.sun`
+
+Optional directional sunlight. Configure brightness, color and angle; position does not affect directional lighting. Omitted preserves the scene’s authored sun.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | No default emitted at this path. |
+| `additionalProperties` | `true` |
+
+### `preStimulus.sun.enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `preStimulus.sun.intensity`
+
+Brightness of the directional sun. Zero gives no direct illumination.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.sun.color`
+
+Sunlight color. Choose a color or enter its hexadecimal RGB value.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `preStimulus.sun.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.sun.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.sun.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.sun.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.sun.rotation`
+
+Sun direction as X/Y/Z Euler angles in degrees. Position does not affect directional lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 50.0,
+  "y": 330.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `preStimulus.sun.rotation.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `preStimulus.sun.rotation.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `preStimulus.sun.rotation.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
 
 ### `preStimulus.rugosity`
 
@@ -2831,6 +3843,144 @@ Conspecific swarm stimulus. Contains population, size, direction, speed distribu
 | Required by parent schema | No |
 | Default | `null` |
 | `additionalProperties` | `true` |
+
+### `preStimulus.swarm.modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `preStimulus.swarm.modelAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `preStimulus.swarm.modelAppearance.enabled`
+
+Override this object's surface without changing the original model file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `preStimulus.swarm.modelAppearance.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `preStimulus.swarm.modelAppearance.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.modelAppearance.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.modelAppearance.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.modelAppearance.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.modelAppearance.keepTexture`
+
+Keep the model's base-color texture. Disable for a uniform chosen color.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `preStimulus.swarm.modelAppearance.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `preStimulus.swarm.modelAppearance.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `0` |
+| `maximum` | `1` |
 
 ### `preStimulus.swarm.trajectoryFile`
 
@@ -3875,6 +5025,48 @@ Omitted, null or [] means environment-only flight/migration; sky and movement se
 | Required by parent schema | No |
 | Default | No default emitted at this path. |
 
+### `preStimulus.objects[].enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `preStimulus.objects[].modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `preStimulus.objects[].animationClip`
+
+Optional animation clip in the imported model. Leave blank to use its first clip.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.objects[].animationSpeed`
+
+Model animation playback multiplier. 1 uses the model's authored timing; 0 freezes it.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ### `preStimulus.objects[].groundOnTerrain`
 
 Place this object on the active terrain at its X/Z position. Its configured Y becomes an extra height above terrain. Off uses the explicit world position.
@@ -3997,6 +5189,134 @@ Registered material name; empty keeps prefab material.
 | Type | `string or null` |
 | Required by parent schema | No |
 | Default | `null` |
+
+### `preStimulus.objects[].appearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `preStimulus.objects[].appearance.enabled`
+
+Override this object's surface without changing the original model file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `preStimulus.objects[].appearance.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `preStimulus.objects[].appearance.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.objects[].appearance.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.objects[].appearance.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.objects[].appearance.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.objects[].appearance.keepTexture`
+
+Keep the model's base-color texture. Disable for a uniform chosen color.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `preStimulus.objects[].appearance.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `preStimulus.objects[].appearance.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `0` |
+| `maximum` | `1` |
 
 ### `preStimulus.objects[].scale`
 
@@ -4881,6 +6201,348 @@ Forward autopilot speed in scene units per second: m/s on terrain, cm/s for walk
 
 UI `enabledWhen`: `{"property":"autopilotEnabled","oneOf":[true]}`. This governs the form, not removal of stored values.
 
+### `preStimulus.panoramaRotationDegrees`
+
+Rotate an imported panorama horizontally. Zero preserves its original orientation; 360 is one complete turn.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0` |
+| UI unit label | degrees |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `preStimulus.visibilityMatrix`
+
+Rows are observers VR1–VR16; columns are the VR population layers they see. The matrix changes no ground, sky, or private Choice-object layers. Disabled preserves the normal scene visibility.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "enabled": false,
+  "rows": [
+    [
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  ]
+}
+```
+
+</details>
+
+### `preStimulus.visibilityMatrix.enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `preStimulus.visibilityMatrix.rows`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `maxItems` | `16` |
+
 ### `preStimulus.autoTrimSettings`
 
 Per-rig flight classification and automatic yaw-bias compensation. These settings apply while auto-trim is enabled for the sequence block.
@@ -5096,6 +6758,172 @@ Main phase of this experiment. Duration, motion and stimuli are configured withi
 | Required by parent schema | No |
 | Default | No default emitted at this path. |
 | `additionalProperties` | `true` |
+
+### `stimulus.sun`
+
+Optional directional sunlight. Configure brightness, color and angle; position does not affect directional lighting. Omitted preserves the scene’s authored sun.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | No default emitted at this path. |
+| `additionalProperties` | `true` |
+
+### `stimulus.sun.enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `stimulus.sun.intensity`
+
+Brightness of the directional sun. Zero gives no direct illumination.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.sun.color`
+
+Sunlight color. Choose a color or enter its hexadecimal RGB value.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `stimulus.sun.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.sun.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.sun.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.sun.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.sun.rotation`
+
+Sun direction as X/Y/Z Euler angles in degrees. Position does not affect directional lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 50.0,
+  "y": 330.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `stimulus.sun.rotation.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `stimulus.sun.rotation.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `stimulus.sun.rotation.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
 
 ### `stimulus.rugosity`
 
@@ -5363,6 +7191,144 @@ Conspecific swarm stimulus. Contains population, size, direction, speed distribu
 | Required by parent schema | No |
 | Default | `null` |
 | `additionalProperties` | `true` |
+
+### `stimulus.swarm.modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `stimulus.swarm.modelAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `stimulus.swarm.modelAppearance.enabled`
+
+Override this object's surface without changing the original model file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `stimulus.swarm.modelAppearance.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `stimulus.swarm.modelAppearance.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.modelAppearance.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.modelAppearance.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.modelAppearance.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.modelAppearance.keepTexture`
+
+Keep the model's base-color texture. Disable for a uniform chosen color.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `stimulus.swarm.modelAppearance.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `stimulus.swarm.modelAppearance.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `0` |
+| `maximum` | `1` |
 
 ### `stimulus.swarm.trajectoryFile`
 
@@ -6407,6 +8373,48 @@ Omitted, null or [] means environment-only flight/migration; sky and movement se
 | Required by parent schema | No |
 | Default | No default emitted at this path. |
 
+### `stimulus.objects[].enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `stimulus.objects[].modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `stimulus.objects[].animationClip`
+
+Optional animation clip in the imported model. Leave blank to use its first clip.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.objects[].animationSpeed`
+
+Model animation playback multiplier. 1 uses the model's authored timing; 0 freezes it.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ### `stimulus.objects[].groundOnTerrain`
 
 Place this object on the active terrain at its X/Z position. Its configured Y becomes an extra height above terrain. Off uses the explicit world position.
@@ -6529,6 +8537,134 @@ Registered material name; empty keeps prefab material.
 | Type | `string or null` |
 | Required by parent schema | No |
 | Default | `null` |
+
+### `stimulus.objects[].appearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `stimulus.objects[].appearance.enabled`
+
+Override this object's surface without changing the original model file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `stimulus.objects[].appearance.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `stimulus.objects[].appearance.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.objects[].appearance.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.objects[].appearance.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.objects[].appearance.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.objects[].appearance.keepTexture`
+
+Keep the model's base-color texture. Disable for a uniform chosen color.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `stimulus.objects[].appearance.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `stimulus.objects[].appearance.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `0` |
+| `maximum` | `1` |
 
 ### `stimulus.objects[].scale`
 
@@ -7413,6 +9549,348 @@ Forward autopilot speed in scene units per second: m/s on terrain, cm/s for walk
 
 UI `enabledWhen`: `{"property":"autopilotEnabled","oneOf":[true]}`. This governs the form, not removal of stored values.
 
+### `stimulus.panoramaRotationDegrees`
+
+Rotate an imported panorama horizontally. Zero preserves its original orientation; 360 is one complete turn.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0` |
+| UI unit label | degrees |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `stimulus.visibilityMatrix`
+
+Rows are observers VR1–VR16; columns are the VR population layers they see. The matrix changes no ground, sky, or private Choice-object layers. Disabled preserves the normal scene visibility.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "enabled": false,
+  "rows": [
+    [
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  ]
+}
+```
+
+</details>
+
+### `stimulus.visibilityMatrix.enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `stimulus.visibilityMatrix.rows`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `maxItems` | `16` |
+
 ### `stimulus.autoTrimSettings`
 
 Per-rig flight classification and automatic yaw-bias compensation. These settings apply while auto-trim is enabled for the sequence block.
@@ -7628,6 +10106,172 @@ Optional phase after the main stimulus. It retains its own duration, movement, s
 | Required by parent schema | No |
 | Default | No default emitted at this path. |
 | `additionalProperties` | `true` |
+
+### `postStimulus.sun`
+
+Optional directional sunlight. Configure brightness, color and angle; position does not affect directional lighting. Omitted preserves the scene’s authored sun.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | No default emitted at this path. |
+| `additionalProperties` | `true` |
+
+### `postStimulus.sun.enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `postStimulus.sun.intensity`
+
+Brightness of the directional sun. Zero gives no direct illumination.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.sun.color`
+
+Sunlight color. Choose a color or enter its hexadecimal RGB value.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `postStimulus.sun.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.sun.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.sun.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.sun.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.sun.rotation`
+
+Sun direction as X/Y/Z Euler angles in degrees. Position does not affect directional lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 50.0,
+  "y": 330.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `postStimulus.sun.rotation.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `postStimulus.sun.rotation.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `postStimulus.sun.rotation.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `360` |
 
 ### `postStimulus.rugosity`
 
@@ -7895,6 +10539,144 @@ Conspecific swarm stimulus. Contains population, size, direction, speed distribu
 | Required by parent schema | No |
 | Default | `null` |
 | `additionalProperties` | `true` |
+
+### `postStimulus.swarm.modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `postStimulus.swarm.modelAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `postStimulus.swarm.modelAppearance.enabled`
+
+Override this object's surface without changing the original model file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `postStimulus.swarm.modelAppearance.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `postStimulus.swarm.modelAppearance.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.modelAppearance.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.modelAppearance.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.modelAppearance.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.modelAppearance.keepTexture`
+
+Keep the model's base-color texture. Disable for a uniform chosen color.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `postStimulus.swarm.modelAppearance.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `postStimulus.swarm.modelAppearance.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `0` |
+| `maximum` | `1` |
 
 ### `postStimulus.swarm.trajectoryFile`
 
@@ -8939,6 +11721,48 @@ Omitted, null or [] means environment-only flight/migration; sky and movement se
 | Required by parent schema | No |
 | Default | No default emitted at this path. |
 
+### `postStimulus.objects[].enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `postStimulus.objects[].modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `postStimulus.objects[].animationClip`
+
+Optional animation clip in the imported model. Leave blank to use its first clip.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.objects[].animationSpeed`
+
+Model animation playback multiplier. 1 uses the model's authored timing; 0 freezes it.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ### `postStimulus.objects[].groundOnTerrain`
 
 Place this object on the active terrain at its X/Z position. Its configured Y becomes an extra height above terrain. Off uses the explicit world position.
@@ -9061,6 +11885,134 @@ Registered material name; empty keeps prefab material.
 | Type | `string or null` |
 | Required by parent schema | No |
 | Default | `null` |
+
+### `postStimulus.objects[].appearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `postStimulus.objects[].appearance.enabled`
+
+Override this object's surface without changing the original model file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `postStimulus.objects[].appearance.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `postStimulus.objects[].appearance.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.objects[].appearance.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.objects[].appearance.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.objects[].appearance.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.objects[].appearance.keepTexture`
+
+Keep the model's base-color texture. Disable for a uniform chosen color.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `postStimulus.objects[].appearance.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `postStimulus.objects[].appearance.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `0` |
+| `maximum` | `1` |
 
 ### `postStimulus.objects[].scale`
 
@@ -9944,6 +12896,348 @@ Forward autopilot speed in scene units per second: m/s on terrain, cm/s for walk
 | UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
 
 UI `enabledWhen`: `{"property":"autopilotEnabled","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.panoramaRotationDegrees`
+
+Rotate an imported panorama horizontally. Zero preserves its original orientation; 360 is one complete turn.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0` |
+| UI unit label | degrees |
+| `minimum` | `0` |
+| `maximum` | `360` |
+
+### `postStimulus.visibilityMatrix`
+
+Rows are observers VR1–VR16; columns are the VR population layers they see. The matrix changes no ground, sky, or private Choice-object layers. Disabled preserves the normal scene visibility.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "enabled": false,
+  "rows": [
+    [
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true
+    ],
+    [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+    ]
+  ]
+}
+```
+
+</details>
+
+### `postStimulus.visibilityMatrix.enabled`
+
+Enable this feature. Its saved parameters remain in the JSON when disabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `postStimulus.visibilityMatrix.rows`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `maxItems` | `16` |
 
 ### `postStimulus.autoTrimSettings`
 

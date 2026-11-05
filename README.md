@@ -14,7 +14,7 @@
 </p>
 <p align="center">
   <a href="https://pvnkmrksk.github.io/matrexVR/"><strong>Website</strong></a> ·
-  <a href="#quick-start"><strong>Quick start</strong></a> ·
+  <a href="docs/five-minute-start.md"><strong>5-minute start</strong></a> ·
   <a href="https://pvnkmrksk.github.io/matrexVR/manual/"><strong>Manual</strong></a> ·
   <a href="https://pvnkmrksk.github.io/matrexVR/manual/gallery.html"><strong>Scene gallery</strong></a> ·
   <a href="https://github.com/pvnkmrksk/matrexVR/releases"><strong>Downloads</strong></a>
@@ -30,17 +30,11 @@ MATREX VR is a Unity application for flight, walking and collective-behaviour ex
 
 ## Capabilities
 
-The [30 October startup and model workflow update](docs/availability-and-model-workflow-20261030.md) makes tracker failures non-blocking, simplifies settings, and supplies real GLB examples with editable appearance. Load `Examples/Sequences/custom-models.sequence.json` to try the exported locust and downloaded animated models without rebuilding.
+Start with a desktop demo, then configure tracking and displays for your apparatus. **[The five-minute guide](docs/five-minute-start.md)** takes you from opening the app to replaying a short saved run without a camera, animal or LED panels.
 
-The next development pass is tracked in the [experiment and replay overhaul plan](docs/overhaul-0.5-plan.md), including prioritized requirements, parallel ownership, compatibility decisions and deferred validation. The [GUI, recording and performance follow-up](docs/gui-recording-performance-followup.md) tracks current operator feedback and acceptance. These are work plans, not lists of released features.
+Use [published desktop archives](https://github.com/pvnkmrksk/matrexVR/releases) for a versioned installation. This checkout also contains development work; use the [local preview build](#build-a-local-macos-preview) to try it. Each archive's `START-HERE.txt` describes its exact capabilities and startup behavior.
 
-Development branch: [custom GLB models, Kannadi populations and 1–16 rigs](docs/custom-models-and-rigs.md). External models use self-contained GLB exports; vendor Unity packages need export/conversion first.
-
-[Five world starters](Assets/StreamingAssets/Examples/Worlds/README.md) and the [optional local MCP control interface](docs/ai-control.md) are available in the development branch.
-
-[GUI and recorder follow-up](docs/gui-recording-performance-followup.md) tracks the current implementation and its acceptance evidence. [Greenfield replay and setup validation](docs/same-build-validation-20261029.md) records the core replay checks; [earlier overhaul evidence](docs/overhaul-validation-20261029.md) covers the wider world/rig feature pass.
-
-The greenfield [same-build replay contract](docs/same-build-replay-contract.md) governs new recordings: preserve the creating build, complete archived configurations and realized state, and apply the original experiment controllers during replay.
+**0.4.1** integrates desktop workflow fixes, same-build replay and optional MCP control. Its [release notes](docs/releases.md#041--agent-onboarding-and-desktop-workflow-fixes) identify recorder and platform capabilities. The package includes the matching MCP adapter; a normal launch enables no control endpoint.
 
 | | Research workflow |
 | :--- | :--- |
@@ -51,20 +45,22 @@ The greenfield [same-build replay contract](docs/same-build-replay-contract.md) 
 
 ## Quick start
 
-### Use a desktop release
+### Run a demo and replay it
 
-1. **[Download an OS archive](https://github.com/pvnkmrksk/matrexVR/releases)** and extract the entire ZIP into a writable folder. Keep the application and its supporting files together. Unity Editor is not required to run a release.
-2. **Read the included `START-HERE.txt`**, then open the application. Startup behaviour differs between versions; use the instructions packaged with your release.
-3. **Try the demo or configure an apparatus.** Current desktop builds offer **Start demo** without animal hardware. Use **Configure** for tracker input, displays and LED geometry before acquisition.
-4. **Set session labels and sequence blocks.** Use **Initialize tracking** to inspect input before starting, then save the setup and start the experiment. Keep the complete run directory for analysis and replay.
+1. **[Download the latest published OS archive](https://github.com/pvnkmrksk/matrexVR/releases/latest)** and extract the whole ZIP into a writable folder. Open its `.exe` (Windows), `.app` (macOS) or `.x86_64` (Linux). Unity Editor and Python are not required.
+2. **Choose Night sky → Start demo** on a fresh desktop profile. Leave the flying demonstration selected; its input is synthetic. If an existing sequence starts automatically, press **Escape** once to return to setup.
+3. **Try a short run.** Use the arrow keys to move and **A/D** to turn. After about 30 seconds, choose **Back to setup** or press **Escape** once. Wait for that recording to finish saving.
+4. **Open Replay / Replay recordings**, select the newest completed run, and choose **Replay selected**. **Space** pauses; **Left/Right** seeks. Keep the complete run folder and the build that created it.
 
-**Desktop 0.4.0 release target:** [publication status and platform packages](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.4.0). Four shared terrain-choice layouts, independent visual/navigation treatments and refined recording/video replay extend the desktop workflow. macOS packages are ad hoc signed and not notarized. See [0.4 features and platform limits](docs/releases.md#04--terrain-recording-and-replay).
+**Success:** a scene runs, a completed recording appears, and its replay timeline advances. The [five-minute guide](docs/five-minute-start.md) includes checkpoints and fixes for common startup problems. Older archives can have different labels and defaults; follow their packaged `START-HERE.txt`.
 
-[Setup & controls](docs/getting-started.md) · [Connect a tracker](docs/tracker-integration.md) · [Configuration reference](docs/configuration-reference.md) · [Replay a run](docs/replay.md)
+For real acquisition, use **Configure** for tracker input, displays and LED geometry; review input/calibration in the native tracker, set session labels, then save the setup and start. The demo does not calibrate an apparatus.
 
-### Try the current desktop preview
+[Installation & paths](docs/getting-started.md) · [Connect a tracker](docs/tracker-integration.md) · [Configuration reference](docs/configuration-reference.md) · [Replay a run](docs/replay.md)
 
-Install and activate **Unity 6000.3.16f1** with desktop build support. Apple Silicon maintainer builds also require a stable **Rust** toolchain and the reviewed dashboard archive described in the [native companion build guide](tools/native_patches/README.md).
+### Build a local macOS preview
+
+Building is separate from the five-minute player walkthrough. On macOS, install and activate **Unity 6000.3.16f1** with desktop build support. Apple Silicon maintainer builds also require a stable **Rust** toolchain and the reviewed dashboard archive described in the [native companion build guide](tools/native_patches/README.md).
 
 ```sh
 git clone https://github.com/pvnkmrksk/matrexVR.git
@@ -95,10 +91,12 @@ Actual Unity renders with synthetic inputs. The forest capture is an optional **
 
 | Get running | Configure & extend | Understand the data |
 | :--- | :--- | :--- |
-| [Installation & controls](docs/getting-started.md) | [Configuration studio](docs/configuration-ui.md) | [Recording formats & units](docs/data-formats.md) |
+| [Five-minute demo → recording → replay](docs/five-minute-start.md) | [Configuration studio](docs/configuration-ui.md) | [Recording formats & units](docs/data-formats.md) |
 | [Tracker integration](docs/tracker-integration.md) | [Templates & examples](Assets/StreamingAssets/Examples/README.md) | [Snapshots & provenance](docs/run-config-snapshots.md) |
 | [Bundled companion apps](docs/bundled-companions.md) | [Add an experiment](docs/experiment-workflow.md) | [Saved-run replay](docs/replay.md) |
 | [Release history](docs/releases.md) | [Parameter reference](docs/configuration-reference.md) | [Full searchable manual](https://pvnkmrksk.github.io/matrexVR/manual/) |
+
+For contributors and coding agents, begin with **[AGENTS.md](AGENTS.md)** for repository context, ownership and validation commands, then [JSON/MCP control](docs/ai-control.md) for the optional local experiment interface. [Installation and storage paths](docs/getting-started.md) cover player setup; [current development plans](docs/overhaul-0.5-plan.md) and the [GUI/recorder follow-up](docs/gui-recording-performance-followup.md) describe ongoing work rather than released features.
 
 ## Tracking & analysis ecosystem
 

@@ -31,7 +31,7 @@ def declaration(source, signature):
 PROGRAM = r'''
 using System;using System.Collections.Generic;using System.Linq;using UnityEngine;
 namespace UnityEngine {
- public class Component{}public class Behaviour:Component{public bool enabled=true;} public class MonoBehaviour:Behaviour{} public class Camera:Behaviour{}public class AudioListener:Behaviour{}public class Animator:Behaviour{}public class Animation:Behaviour{}public class Collider:Behaviour{}public class Rigidbody:Component{public bool isKinematic;}public class Renderer:Behaviour{}
+ public class Component{}public class Behaviour:Component{public bool enabled=true;} public class MonoBehaviour:Behaviour{public void StopAllCoroutines(){}public void CancelInvoke(){}} public class Camera:Behaviour{}public class AudioListener:Behaviour{}public class Animator:Behaviour{}public class Animation:Behaviour{}public class Collider:Behaviour{}public class Rigidbody:Component{public bool isKinematic;}public class Renderer:Behaviour{}
  public class GameObject {public List<Component> components=new List<Component>();public T[] GetComponentsInChildren<T>(bool include) where T:class=>components.Where(c=>c==null||c is T).Select(c=>c as T).ToArray();}
 }
 public class RuntimeMaterialOwner:MonoBehaviour{}
