@@ -1,154 +1,183 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "scenes": {
     "Choice": {
       "objects": [
         {
           "name": "Ant",
           "description": "Prefabs",
-          "source": "Assets/JSAnt/Demo/Prefabs/Ant.prefab"
+          "source": "Assets/JSAnt/Demo/Prefabs/Ant.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/365a6af1237885f448ba3d55607568db_152672"
         },
         {
           "name": "BrownCylinder",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/BrownCylinder.prefab"
+          "source": "Assets/Prefabs/BrownCylinder.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/b351c2361cf451e75be98c20e073f899_6900320540568269874"
         },
         {
           "name": "Cube",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/Cube.prefab"
+          "source": "Assets/Prefabs/Cube.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/640fd9f1faa774ed08f8a945c42d4ecf_613882636469030215"
         },
         {
           "name": "Cylinder",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/Cylinder.prefab"
+          "source": "Assets/Prefabs/Cylinder.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/9b515e49167a84113aabe1d555d9bdf0_4200047036864494803"
         },
         {
           "name": "Cylinder_3D_black",
           "description": "Locust",
-          "source": "Assets/Prefabs/Locust/Cylinder_3D_black.prefab"
+          "source": "Assets/Prefabs/Locust/Cylinder_3D_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/4063ecd025fa4cbc78ff94a335e26dcd_6398141713017070807"
         },
         {
           "name": "Lemon",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/Lemon.prefab"
+          "source": "Assets/Prefabs/Lemon.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/eed7da0dd105843ff8b63e74c2eb7805_1274570263506488403"
         },
         {
           "name": "Lemon Tree 1",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/Lemon Tree 1.prefab"
+          "source": "Assets/Prefabs/Lemon Tree 1.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/3c98bb4bee2f2ba4b92a2fbca7b8831f_1139572726157748"
         },
         {
           "name": "LocustBand_black",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/LocustBand_black.prefab"
+          "source": "Assets/Prefabs/LocustBand_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/3da0b96ed66f8d0a0802b986e41f213c_5359356435596721786"
         },
         {
           "name": "Sphere",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/Sphere.prefab"
+          "source": "Assets/Prefabs/Sphere.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/1695d22eb5f8d458e8d19ce4729a7bd9_1931617803381333906"
         },
         {
           "name": "Spider",
           "description": "Models",
-          "source": "Assets/PB_Spider/Models/Spider.fbx"
+          "source": "Assets/PB_Spider/Models/Spider.fbx",
+          "previewResource": "ConfigurationUI/AssetPreviews/f5a9bd478ca094495a4520e37f57420d_100100"
         },
         {
           "name": "tree01",
           "description": "Nature",
-          "source": "Assets/NatureStarterKit2/Nature/tree01.prefab"
+          "source": "Assets/NatureStarterKit2/Nature/tree01.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/393b236c42954a640b513d46de90ac38_136824"
         },
         {
           "name": "tree01_100Bright",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_100Bright.prefab"
+          "source": "Assets/Prefabs/tree01_100Bright.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/3d97c705c107321bfafe3c48a8d6238f_136824"
         },
         {
           "name": "tree01_100Dark",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_100Dark.prefab"
+          "source": "Assets/Prefabs/tree01_100Dark.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/39ccef0cd735f1ecb8ea7afb9c89b089_136824"
         },
         {
           "name": "tree01_100Sat",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_100Sat.prefab"
+          "source": "Assets/Prefabs/tree01_100Sat.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/fc614f122874d457caebf256443ccaab_136824"
         },
         {
           "name": "tree01_noleaf",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_noleaf.prefab"
+          "source": "Assets/Prefabs/tree01_noleaf.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/e50a72fc252768158a84f2011b3ebe2e_136824"
         },
         {
           "name": "tree01_notrunk",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_notrunk.prefab"
+          "source": "Assets/Prefabs/tree01_notrunk.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/74de095baee0d9b65ac207c8de3babff_136824"
         },
         {
           "name": "tree01_swapcolor",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_swapcolor.prefab"
+          "source": "Assets/Prefabs/tree01_swapcolor.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/a5ca6ad9d662decf99f0aacd566eb9ce_136824"
         },
         {
           "name": "tree01_texturedgrey",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_texturedgrey.prefab"
+          "source": "Assets/Prefabs/tree01_texturedgrey.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/83f22bd3d740454079b7ed5442608d50_136824"
         }
       ],
       "materials": [
         {
           "name": "Black",
           "description": "Standard",
-          "source": "Assets/Materials/Black.mat"
+          "source": "Assets/Materials/Black.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/68412cf8cf2347368bd2519a5752bb70_2100000"
         },
         {
           "name": "Blue",
           "description": "Standard",
-          "source": "Assets/Materials/Blue.mat"
+          "source": "Assets/Materials/Blue.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/04a0ce8100d744a8eab46dbe477643a8_2100000"
         },
         {
           "name": "Green",
           "description": "Standard",
-          "source": "Assets/Materials/Green.mat"
+          "source": "Assets/Materials/Green.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/c3bee356da6944c539ff6c2360cba73d_2100000"
         },
         {
           "name": "Grey_141414",
           "description": "Standard",
-          "source": "Assets/Materials/Grey_141414.mat"
+          "source": "Assets/Materials/Grey_141414.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/5197157949f244b49a0174c9827f6749_2100000"
         },
         {
           "name": "Grey_969696",
           "description": "Standard",
-          "source": "Assets/Materials/Grey_969696.mat"
+          "source": "Assets/Materials/Grey_969696.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/aa430a8afd269c26fb8b9b428811755c_2100000"
         },
         {
           "name": "Lemon",
           "description": "Standard",
-          "source": "Assets/Materials/lemon/source/Lemon.mat"
+          "source": "Assets/Materials/lemon/source/Lemon.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/8bf719516907744c296a0214354a32a2_2100000"
         },
         {
           "name": "LemonRed",
           "description": "Standard",
-          "source": "Assets/Materials/lemon/source/LemonRed.mat"
+          "source": "Assets/Materials/lemon/source/LemonRed.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/463a29183fd6db830be6acd798abb4b0_2100000"
         },
         {
           "name": "LemonYellow",
           "description": "Standard",
-          "source": "Assets/Materials/lemon/source/LemonYellow.mat"
+          "source": "Assets/Materials/lemon/source/LemonYellow.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/fd28db8498f04a02890e57c80d65f409_2100000"
         },
         {
           "name": "Lemonveryred",
           "description": "Standard",
-          "source": "Assets/Materials/lemon/source/Lemonveryred.mat"
+          "source": "Assets/Materials/lemon/source/Lemonveryred.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/d091fce5a3194e5c88b3534915c4434b_2100000"
         },
         {
           "name": "Red",
           "description": "Standard",
-          "source": "Assets/Materials/Red.mat"
+          "source": "Assets/Materials/Red.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/40980a71a99a444baa9ee262da880583_2100000"
         },
         {
           "name": "White",
           "description": "Standard",
-          "source": "Assets/Materials/White.mat"
+          "source": "Assets/Materials/White.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/3a2871cee947502c9ab9fd873ac72f72_2100000"
         }
       ]
     },
@@ -157,149 +186,178 @@
         {
           "name": "Ant",
           "description": "Prefabs",
-          "source": "Assets/JSAnt/Demo/Prefabs/Ant.prefab"
+          "source": "Assets/JSAnt/Demo/Prefabs/Ant.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/365a6af1237885f448ba3d55607568db_152672"
         },
         {
           "name": "BrownCylinder",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/BrownCylinder.prefab"
+          "source": "Assets/Prefabs/BrownCylinder.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/b351c2361cf451e75be98c20e073f899_6900320540568269874"
         },
         {
           "name": "Cube",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/Cube.prefab"
+          "source": "Assets/Prefabs/Cube.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/640fd9f1faa774ed08f8a945c42d4ecf_613882636469030215"
         },
         {
           "name": "Cylinder",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/Cylinder.prefab"
+          "source": "Assets/Prefabs/Cylinder.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/9b515e49167a84113aabe1d555d9bdf0_4200047036864494803"
         },
         {
           "name": "Cylinder_3D_black",
           "description": "Locust",
-          "source": "Assets/Prefabs/Locust/Cylinder_3D_black.prefab"
+          "source": "Assets/Prefabs/Locust/Cylinder_3D_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/4063ecd025fa4cbc78ff94a335e26dcd_6398141713017070807"
         },
         {
           "name": "Lemon",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/Lemon.prefab"
+          "source": "Assets/Prefabs/Lemon.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/eed7da0dd105843ff8b63e74c2eb7805_1274570263506488403"
         },
         {
           "name": "Lemon Tree 1",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/Lemon Tree 1.prefab"
+          "source": "Assets/Prefabs/Lemon Tree 1.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/3c98bb4bee2f2ba4b92a2fbca7b8831f_1139572726157748"
         },
         {
           "name": "LocustBand_black",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/LocustBand_black.prefab"
+          "source": "Assets/Prefabs/LocustBand_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/3da0b96ed66f8d0a0802b986e41f213c_5359356435596721786"
         },
         {
           "name": "Sphere",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/Sphere.prefab"
+          "source": "Assets/Prefabs/Sphere.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/1695d22eb5f8d458e8d19ce4729a7bd9_1931617803381333906"
         },
         {
           "name": "Spider",
           "description": "Models",
-          "source": "Assets/PB_Spider/Models/Spider.fbx"
+          "source": "Assets/PB_Spider/Models/Spider.fbx",
+          "previewResource": "ConfigurationUI/AssetPreviews/f5a9bd478ca094495a4520e37f57420d_100100"
         },
         {
           "name": "tree01",
           "description": "Nature",
-          "source": "Assets/NatureStarterKit2/Nature/tree01.prefab"
+          "source": "Assets/NatureStarterKit2/Nature/tree01.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/393b236c42954a640b513d46de90ac38_136824"
         },
         {
           "name": "tree01_100Bright",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_100Bright.prefab"
+          "source": "Assets/Prefabs/tree01_100Bright.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/3d97c705c107321bfafe3c48a8d6238f_136824"
         },
         {
           "name": "tree01_100Dark",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_100Dark.prefab"
+          "source": "Assets/Prefabs/tree01_100Dark.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/39ccef0cd735f1ecb8ea7afb9c89b089_136824"
         },
         {
           "name": "tree01_100Sat",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_100Sat.prefab"
+          "source": "Assets/Prefabs/tree01_100Sat.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/fc614f122874d457caebf256443ccaab_136824"
         },
         {
           "name": "tree01_noleaf",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_noleaf.prefab"
+          "source": "Assets/Prefabs/tree01_noleaf.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/e50a72fc252768158a84f2011b3ebe2e_136824"
         },
         {
           "name": "tree01_notrunk",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_notrunk.prefab"
+          "source": "Assets/Prefabs/tree01_notrunk.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/74de095baee0d9b65ac207c8de3babff_136824"
         },
         {
           "name": "tree01_swapcolor",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_swapcolor.prefab"
+          "source": "Assets/Prefabs/tree01_swapcolor.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/a5ca6ad9d662decf99f0aacd566eb9ce_136824"
         },
         {
           "name": "tree01_texturedgrey",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/tree01_texturedgrey.prefab"
+          "source": "Assets/Prefabs/tree01_texturedgrey.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/83f22bd3d740454079b7ed5442608d50_136824"
         }
       ],
       "materials": [
         {
           "name": "Black",
           "description": "Standard",
-          "source": "Assets/Materials/Black.mat"
+          "source": "Assets/Materials/Black.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/68412cf8cf2347368bd2519a5752bb70_2100000"
         },
         {
           "name": "Blue",
           "description": "Standard",
-          "source": "Assets/Materials/Blue.mat"
+          "source": "Assets/Materials/Blue.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/04a0ce8100d744a8eab46dbe477643a8_2100000"
         },
         {
           "name": "Green",
           "description": "Standard",
-          "source": "Assets/Materials/Green.mat"
+          "source": "Assets/Materials/Green.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/c3bee356da6944c539ff6c2360cba73d_2100000"
         },
         {
           "name": "Grey_141414",
           "description": "Standard",
-          "source": "Assets/Materials/Grey_141414.mat"
+          "source": "Assets/Materials/Grey_141414.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/5197157949f244b49a0174c9827f6749_2100000"
         },
         {
           "name": "Grey_969696",
           "description": "Standard",
-          "source": "Assets/Materials/Grey_969696.mat"
+          "source": "Assets/Materials/Grey_969696.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/aa430a8afd269c26fb8b9b428811755c_2100000"
         },
         {
           "name": "Lemon",
           "description": "Standard",
-          "source": "Assets/Materials/lemon/source/Lemon.mat"
+          "source": "Assets/Materials/lemon/source/Lemon.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/8bf719516907744c296a0214354a32a2_2100000"
         },
         {
           "name": "LemonRed",
           "description": "Standard",
-          "source": "Assets/Materials/lemon/source/LemonRed.mat"
+          "source": "Assets/Materials/lemon/source/LemonRed.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/463a29183fd6db830be6acd798abb4b0_2100000"
         },
         {
           "name": "LemonYellow",
           "description": "Standard",
-          "source": "Assets/Materials/lemon/source/LemonYellow.mat"
+          "source": "Assets/Materials/lemon/source/LemonYellow.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/fd28db8498f04a02890e57c80d65f409_2100000"
         },
         {
           "name": "Lemonveryred",
           "description": "Standard",
-          "source": "Assets/Materials/lemon/source/Lemonveryred.mat"
+          "source": "Assets/Materials/lemon/source/Lemonveryred.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/d091fce5a3194e5c88b3534915c4434b_2100000"
         },
         {
           "name": "Red",
           "description": "Standard",
-          "source": "Assets/Materials/Red.mat"
+          "source": "Assets/Materials/Red.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/40980a71a99a444baa9ee262da880583_2100000"
         },
         {
           "name": "White",
           "description": "Standard",
-          "source": "Assets/Materials/White.mat"
+          "source": "Assets/Materials/White.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/3a2871cee947502c9ab9fd873ac72f72_2100000"
         }
       ]
     },
@@ -308,39 +366,46 @@
         {
           "name": "3dHangar",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/3dHangar.prefab"
+          "source": "Assets/Prefabs/3dHangar.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/a15dc1e3fb5f0be0891a0ec8479b2a1e_5747027317967396415"
         },
         {
           "name": "Cube",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/Cube.prefab"
+          "source": "Assets/Prefabs/Cube.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/640fd9f1faa774ed08f8a945c42d4ecf_613882636469030215"
         },
         {
           "name": "ScalingCylinder",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/ScalingCylinder.prefab"
+          "source": "Assets/Prefabs/ScalingCylinder.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/b1de23ca45fde9afb9402d7563db3786_2847650824615190857"
         },
         {
           "name": "glassplane",
           "description": "Prefabs",
-          "source": "Assets/Prefabs/glassplane.prefab"
+          "source": "Assets/Prefabs/glassplane.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/04435266c2d514eadb44a0a719de2605_3992630106712533386"
         }
       ],
       "materials": [
         {
           "name": "Blue",
           "description": "Standard",
-          "source": "Assets/Materials/Blue.mat"
+          "source": "Assets/Materials/Blue.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/04a0ce8100d744a8eab46dbe477643a8_2100000"
         },
         {
           "name": "BlueGreen",
           "description": "Standard",
-          "source": "Assets/Materials/BlueGreen.mat"
+          "source": "Assets/Materials/BlueGreen.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/b1fd2acbabaa55140b6e85bd1c98bf58_2100000"
         },
         {
           "name": "SetColor",
           "description": "Standard",
-          "source": "Assets/Materials/SetColor.mat"
+          "source": "Assets/Materials/SetColor.mat",
+          "previewResource": "ConfigurationUI/AssetPreviews/3db9848e69f71fcbe85a18aa53cabd02_2100000"
         }
       ]
     },
@@ -366,6 +431,329 @@
     },
     "TerrainCueLab": {
       "objects": [],
+      "materials": []
+    },
+    "Kannadi": {
+      "objects": [
+        {
+          "name": "Band",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/Band.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/819ebf525bd3cb63dbe6997158a1de0d_4006871233168333227"
+        },
+        {
+          "name": "BrownCylinder",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/BrownCylinder.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/b351c2361cf451e75be98c20e073f899_6900320540568269874"
+        },
+        {
+          "name": "CylinderBand_3D_black",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/CylinderBand_3D_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/2aa0cf5fb2c8cb098aaa0f6cca534db4_3965544649594426470"
+        },
+        {
+          "name": "CylinderBand_3D_white",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/CylinderBand_3D_white.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/d71ce1858a8f65f508c25fdcbf61e254_6839372128103566480"
+        },
+        {
+          "name": "CylinderBand_b",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/CylinderBand_b.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/5e09f5292def14f05809d7df65715aa4_5359356435596721786"
+        },
+        {
+          "name": "CylinderBand_black",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/CylinderBand_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/e95c7959657a400e98ead3dc6790be35_5359356435596721786"
+        },
+        {
+          "name": "CylinderBand_w",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/CylinderBand_w.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/9546fea1fa70b2c92b8561eaa2b567ef_5360470824835091895"
+        },
+        {
+          "name": "CylinderBand_white",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/CylinderBand_white.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/e17cefe36c8f4be9b4e29b715225a775_5360470824835091895"
+        },
+        {
+          "name": "Cylinder_3D_black",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/Cylinder_3D_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/4063ecd025fa4cbc78ff94a335e26dcd_6398141713017070807"
+        },
+        {
+          "name": "Cylinder_3D_white",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/Cylinder_3D_white.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/599cea4e46d9ea760a8702e987f2fc1b_283201206045152796"
+        },
+        {
+          "name": "Cylinder_black",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/Cylinder_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/910aab7e55085edadbf17aaab051aa79_4961463237354851949"
+        },
+        {
+          "name": "InanimatedBand",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/InanimatedBand.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/1c288bd6da08f03efbda00895f8f72c5_5359356435596721786"
+        },
+        {
+          "name": "InanimatedBand_black",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/InanimatedBand_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/89c3d73929d1a918db0568eacb34df0a_5359356435596721786"
+        },
+        {
+          "name": "InanimatedLeaderLocust",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/InanimatedLeaderLocust.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/f79600912885500deac26899c345583d_751920776276428372"
+        },
+        {
+          "name": "InanimatedLeaderLocust_black",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/InanimatedLeaderLocust_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/fc2f5ec1bc4dff5a5bb2b8514c7987d9_7652047199309307485"
+        },
+        {
+          "name": "InanimatedLocust",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/InanimatedLocust.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/d61ddbc2f9a157bf3b9cc51f517bb4e4_1616747004011761651"
+        },
+        {
+          "name": "LeaderCylinder_black",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/LeaderCylinder_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/3ae70c3d24b93f7c19f42efcf257d8a3_1640541331753697193"
+        },
+        {
+          "name": "LeaderCylinder_white",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/LeaderCylinder_white.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/971f4b44b8c6d365c86350cf5585807a_4790511028332848242"
+        },
+        {
+          "name": "LeaderLocust",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/LeaderLocust.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/1aeca6fee807789d1b0943f5bb918d28_751920776276428372"
+        },
+        {
+          "name": "LeaderLocust_3Dblack",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/LeaderLocust_3Dblack.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/ae8289065bda16636807be5238a0bfb1_6993718128887526793"
+        },
+        {
+          "name": "LeaderLocust_3Dwhite",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/LeaderLocust_3Dwhite.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/7954fb005df16c9368d91f22c244e407_6964428136594506903"
+        },
+        {
+          "name": "LeaderLocust_black",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/LeaderLocust_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/775a4a8ff9fb74b03b243bbf1163a3c1_7652047199309307485"
+        },
+        {
+          "name": "LeaderLocust_green",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/LeaderLocust_green.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/844d801dbe5b660cdaeb97fa2d6abece_9135888749898131575"
+        },
+        {
+          "name": "LeaderLocust_white",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/LeaderLocust_white.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/b02e55beff485fa8ab77b3e68035bcaa_8300558096275860161"
+        },
+        {
+          "name": "LeaderLocust_yellow1",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/LeaderLocust_yellow1.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/779e52da980481380b199d06ea667282_9159847183382374915"
+        },
+        {
+          "name": "LeaderLocust_yellow2",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/LeaderLocust_yellow2.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/63d8242e0e9899e3c8bccb46931f0486_3342520793452284840"
+        },
+        {
+          "name": "Locust",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/Locust.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/4ddc52669d76f426187bd17a1e19775a_1616747004011761651"
+        },
+        {
+          "name": "LocustBand",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/LocustBand.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/4115d46fd76421756b8310ec56af56da_5359356435596721786"
+        },
+        {
+          "name": "LocustBand_3Dblack",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/LocustBand_3Dblack.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/a8b735c866af8a6bcae6fbe4f656429e_5359356435596721786"
+        },
+        {
+          "name": "LocustBand_3Dwhite",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/LocustBand_3Dwhite.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/4b3d327c38ec205098ede9d70f2ada9f_3077562303730470947"
+        },
+        {
+          "name": "LocustBand_black",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/LocustBand_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/3da0b96ed66f8d0a0802b986e41f213c_5359356435596721786"
+        },
+        {
+          "name": "LocustBand_g",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/LocustBand_g.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/82c567c3d607848ceabfe59ccc8fe73a_5359356435596721786"
+        },
+        {
+          "name": "LocustBand_green",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/LocustBand_green.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/1f0d2e562a9344db8f73d10223684327_5359356435596721786"
+        },
+        {
+          "name": "LocustBand_white",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/LocustBand_white.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/944c002a799192f34a9e2aefae788498_3077562303730470947"
+        },
+        {
+          "name": "LocustBand_y1",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/LocustBand_y1.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/eaee5865e206f02b8b758f828e4ee388_5359356435596721786"
+        },
+        {
+          "name": "LocustBand_y2",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/LocustBand_y2.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/45f52bd4532ada4878531dcfe082342f_5359356435596721786"
+        },
+        {
+          "name": "LocustBand_yellow1",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/LocustBand_yellow1.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/ef37a5d089ed425b86948f683a16b8a0_5359356435596721786"
+        },
+        {
+          "name": "LocustBand_yellow2",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/LocustBand_yellow2.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/e01f8b6a9b334493ab91f24c8fb07122_5359356435596721786"
+        },
+        {
+          "name": "Locust_3Dblack",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/Locust_3Dblack.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/99978ec984fae621793991e187cb5b40_5265705847518342656"
+        },
+        {
+          "name": "Locust_3Dwhite",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/Locust_3Dwhite.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/99ba2a4601e3de8f58505d98f5069022_4563240660965353295"
+        },
+        {
+          "name": "Locust_black",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/Locust_black.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/c69f7f8a9c04152c099dc8e43deb2b9f_5958323684924412648"
+        },
+        {
+          "name": "Locust_green",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/Locust_green.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/8a145ee36413fe685b51cbdfcc262dc9_2496022753320354903"
+        },
+        {
+          "name": "Locust_white",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/Locust_white.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/e3e7caa264dc7ac3c9d764b56081b50a_3525772074909644603"
+        },
+        {
+          "name": "Locust_yellow1",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/Locust_yellow1.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/c6fe967b1fbec1f578586b4dc90a44fe_7213716345219618523"
+        },
+        {
+          "name": "Locust_yellow2",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/Locust_yellow2.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/0b3000d24cb0d3218940e53bbc8f42e5_2590477857001696130"
+        },
+        {
+          "name": "ScalingCylinder",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/ScalingCylinder.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/b1de23ca45fde9afb9402d7563db3786_2847650824615190857"
+        },
+        {
+          "name": "ScalingDynamicCylinder",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/ScalingDynamicCylinder.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/606009a219ac24373b89767b426631fc_1746449780843387213"
+        },
+        {
+          "name": "SimulatedLocust",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/SimulatedLocust.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/87af0590a96c14e5ba5ce499eb8de0d4_168781855370994105"
+        },
+        {
+          "name": "changingLuminance",
+          "description": "Prefabs",
+          "source": "Assets/Prefabs/changingLuminance.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/75197810c9f6e11a7a70fa2d0b85c939_4200047036864494803"
+        },
+        {
+          "name": "cylinder_3Dblack",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/cylinder_3Dblack.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/9d54b31b458622b4883e1294b79aa616_2794025205052658551"
+        },
+        {
+          "name": "cylinder_3Dwhite",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/cylinder_3Dwhite.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/8c64855f5c49db8b4b29524255fbb01d_5334075467416726835"
+        },
+        {
+          "name": "cylinder_b",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/cylinder_b.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/459189666926523af85e7682495837d2_2420050282771736873"
+        },
+        {
+          "name": "cylinder_w",
+          "description": "Locust",
+          "source": "Assets/Prefabs/Locust/cylinder_w.prefab",
+          "previewResource": "ConfigurationUI/AssetPreviews/5c4406aff85d4aaa2ac774d4b6469190_494461695701329242"
+        }
+      ],
       "materials": []
     }
   }

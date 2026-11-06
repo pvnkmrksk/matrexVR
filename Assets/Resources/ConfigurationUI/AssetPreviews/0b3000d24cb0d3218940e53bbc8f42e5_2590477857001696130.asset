@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46f8c3835f01463bb33606b766dc6a50, type: 3}
+  m_Name: 0b3000d24cb0d3218940e53bbc8f42e5_2590477857001696130
+  m_EditorClassIdentifier: Assembly-CSharp::ConfigurationUI.ConfigurationPreviewAsset
+  fingerprint: visual-only-v1:aa5a2c5d36419c610f3a9d437eda2a22
+  visual: {fileID: 4073403882663075745, guid: 1abd01e62d96a0127aa64a05fc7248da, type: 3}
+  material: {fileID: 0}
+  animations:
+  - root: 
+    clip: {fileID: -623603649343465320, guid: a29e68e8cc66f4897bf387c161d4aede, type: 3}

@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46f8c3835f01463bb33606b766dc6a50, type: 3}
+  m_Name: 365a6af1237885f448ba3d55607568db_152672
+  m_EditorClassIdentifier: Assembly-CSharp::ConfigurationUI.ConfigurationPreviewAsset
+  fingerprint: visual-only-v1:7ece4e42a9954139823ac866d4ed9c68
+  visual: {fileID: 7802456469220723721, guid: 374957f18b5a554868c6635feb6d22da, type: 3}
+  material: {fileID: 0}
+  animations:
+  - root: 
+    clip: {fileID: 7400018, guid: f21b5c427654b234c8c50e7f794e4517, type: 3}
+  - root: 
+    clip: {fileID: 7400004, guid: f21b5c427654b234c8c50e7f794e4517, type: 3}
+  - root: 
+    clip: {fileID: 7400006, guid: f21b5c427654b234c8c50e7f794e4517, type: 3}
+  - root: 
+    clip: {fileID: 7400002, guid: f21b5c427654b234c8c50e7f794e4517, type: 3}
+  - root: 
+    clip: {fileID: 7400000, guid: f21b5c427654b234c8c50e7f794e4517, type: 3}
+  - root: 
+    clip: {fileID: 7400008, guid: f21b5c427654b234c8c50e7f794e4517, type: 3}
+  - root: 
+    clip: {fileID: 7400010, guid: f21b5c427654b234c8c50e7f794e4517, type: 3}
+  - root: 
+    clip: {fileID: 7400012, guid: f21b5c427654b234c8c50e7f794e4517, type: 3}
+  - root: 
+    clip: {fileID: 7400014, guid: f21b5c427654b234c8c50e7f794e4517, type: 3}
+  - root: 
+    clip: {fileID: 7400016, guid: f21b5c427654b234c8c50e7f794e4517, type: 3}
