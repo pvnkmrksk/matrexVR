@@ -42,7 +42,7 @@ A change of scene or an explicit `reloadScene: true` follows the full-load path.
 | Unity frame thread | Scene/rig transforms, stimulus configuration, rendered cameras, immutable snapshot capture and most Unity object creation/destruction |
 | Tracker receive worker | SUB socket, payload validation and a locked latest-sample handoff; the worker owns socket disposal |
 | Telemetry publisher worker | JSON encoding and outbound PUB operations using the latest bounded pending snapshot |
-| Swarm recording worker | Buffered population formatting, gzip and file writes; clean shutdown drains before ZIP creation |
+| Swarm recording worker | Pooled binary population snapshots, streaming SHA-256 and a bounded drain before sealing the session. |
 | Replay loading/indexing | Saved evidence parsing/indexing; Unity object application remains in the replay's frame-side flow |
 
 Do not call Unity rendering APIs from an arbitrary socket or file worker. Do not let a network subscriber back-pressure the experiment frame loop. Telemetry can drop snapshots; recordings and their dropped-frame diagnostics have their own contract.
@@ -50,6 +50,10 @@ Do not call Unity rendering APIs from an arbitrary socket or file worker. Do not
 ## Motion and experimental phases
 
 ClosedLoop consumes the newest complete tracker sample and applies the selected walking or flight interpretation. Keyboard adds permitted operator/autopilot movement. Optional RugosityRig owns height/normal alignment after horizontal movement; MigrationMotion retains its specific wind/AGL role and yields where rugosity owns the pose.
+
+Generated stock locusts can share an instanced renderer when their mesh, material, camera and lighting settings are compatible. Their roots and animation phases remain individual. The Vulkan stock path preloads one baked walk cycle before setup. Each locust keeps its own playhead and uses the nearest baked phase for drawing and recording. The original stock clip has no root displacement, so the swarm controller still owns movement. Launch with `--live-stock-locust-animators` to keep evaluating native Animators with instanced rendering. Large stock groups with independent parallel motion and **Animate on move** enabled split the speed check into ten cohorts. Each locust uses its average wrap-aware horizontal speed since its last check. Walking begins above the configured threshold and stops at or below 80% of it. The display and recording still use the resulting Animator state on every frame. Launch with `--per-frame-swarm-animation-gate` for the original movement check cadence.
+
+Large cached locust batches prepare camera visibility and ordered draw lists in Burst jobs. The Unity thread captures camera state and issues the draw calls. Population capture dispatches one read-only position and rotation job across rigs, then records the original Euler angles, scale and sampled animation phase in the existing format. World capture shares shader-clock commands across acquisition cameras and uses registered world targets, with live checks for unsupported effects and new cameras.
 
 ExperimentPhases manages enabled preStimulus, stimulus and postStimulus conditions in one scene. Phase clocks begin after their configuration/sky setup completes. Heading windows are bounded to the scene or phase duration rather than lengthening the condition. Heading observations use the animal's virtual yaw; raw flight control input is not the measured heading.
 

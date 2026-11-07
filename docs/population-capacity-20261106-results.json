@@ -1,0 +1,1746 @@
+{
+  "scope": "Same original-animated-locust build, Vulkan, 128x128 RBLF faces, 10cm balls, full recording, software60FPS cap/VSync0. Every population/camera count checked against requested values. Native trackers remained running. No production code was changed for this sweep.",
+  "buildIdentity": {
+    "schemaVersion": 1,
+    "sourceRevision": "5fbfc05fd3d787e2b45aaf6d023875eb322e5173",
+    "sourceState": "locust-performance-working-snapshot",
+    "sourceTreeDirty": true,
+    "runtimeSourceFingerprintSha256": "4e00cde2f216045a6f33a5cc39bf26baa19144f27ad690b2829a21505287e6bd",
+    "runtimeSourceFileCount": 272,
+    "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint.",
+    "dirtyPathsAtPreparation": [
+      "Assets/Scripts/RuntimePerformanceProbe.cs",
+      "Assets/Scripts/Replay/RecordedAnimationState.cs",
+      "Assets/Scripts/Swarm/AsyncSwarmWriter.cs",
+      "Assets/Scripts/Swarm/SwarmLogger.cs",
+      "Assets/Scripts/Swarm/KannadiLogger.cs",
+      "Assets/Editor/PopulationSnapshotValidation.cs",
+      "Assets/Editor/PopulationSnapshotValidation.cs.meta"
+    ],
+    "applicationVersion": "0.4.2-native64-noalloc",
+    "unityVersion": "6000.3.16f1",
+    "buildTarget": "StandaloneLinux64"
+  },
+  "cpuSample16x64": {
+    "pid": 384612,
+    "seconds": 3.0090687310002977,
+    "logicalCpuCount": 32,
+    "unityCpuPercentOneLogicalCpuIs100": 792.9363578235137,
+    "unityCpuPercentOfMachine": 24.779261181984804,
+    "systemCpuBusyPercent": 31.890684814972346,
+    "mainThreadCpuPercentOfOneLogicalCpu": 72.44766387490616,
+    "busiestThreads": [
+      {
+        "tid": 384612,
+        "name": "MATREX VR.x86_6",
+        "cpuPercentOfOneLogicalCpu": 72.44766387490616
+      },
+      {
+        "tid": 384657,
+        "name": "Job.Worker 1",
+        "cpuPercentOfOneLogicalCpu": 32.56821587037067
+      },
+      {
+        "tid": 384718,
+        "name": "UnityGfxDeviceW",
+        "cpuPercentOfOneLogicalCpu": 31.238900936886157
+      },
+      {
+        "tid": 384659,
+        "name": "Job.Worker 3",
+        "cpuPercentOfOneLogicalCpu": 22.930682602607895
+      },
+      {
+        "tid": 384660,
+        "name": "Job.Worker 4",
+        "cpuPercentOfOneLogicalCpu": 22.59835386923679
+      },
+      {
+        "tid": 384661,
+        "name": "Job.Worker 5",
+        "cpuPercentOfOneLogicalCpu": 21.60136766912339
+      },
+      {
+        "tid": 384662,
+        "name": "Job.Worker 6",
+        "cpuPercentOfOneLogicalCpu": 21.60136766912339
+      },
+      {
+        "tid": 384663,
+        "name": "Job.Worker 7",
+        "cpuPercentOfOneLogicalCpu": 20.93671020238115
+      },
+      {
+        "tid": 384664,
+        "name": "Job.Worker 8",
+        "cpuPercentOfOneLogicalCpu": 20.936710202381136
+      },
+      {
+        "tid": 384665,
+        "name": "Job.Worker 9",
+        "cpuPercentOfOneLogicalCpu": 20.936710202381136
+      },
+      {
+        "tid": 384667,
+        "name": "Job.Worker 11",
+        "cpuPercentOfOneLogicalCpu": 20.604381469009997
+      },
+      {
+        "tid": 384658,
+        "name": "Job.Worker 2",
+        "cpuPercentOfOneLogicalCpu": 20.27205273563889
+      }
+    ],
+    "rssMiB": 712.33984375,
+    "threadCount": 151,
+    "command": [
+      "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/locust-optimization/builds/native64-noalloc/MATREX VR.x86_64",
+      "-force-vulkan",
+      "--config-dir",
+      "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/locust-optimization/capacity-20261106/Config",
+      "--data-dir",
+      "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/locust-optimization/capacity-20261106/measurements/r16-a0064-sustained/RunData",
+      "--performance-probe",
+      "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/locust-optimization/capacity-20261106/measurements/r16-a0064-sustained",
+      "--performance-system",
+      "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/locust-optimization/capacity-20261106/Systems/r16.json",
+      "--performance-scene",
+      "Kannadi",
+      "--performance-experiment",
+      "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/locust-optimization/Experiments/native64.json",
+      "--performance-agents",
+      "64",
+      "--performance-seconds",
+      "20.0",
+      "--performance-phases",
+      "all-60,all-60-repeat",
+      "--performance-cap",
+      "60",
+      "-logFile",
+      "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/locust-optimization/capacity-20261106/measurements/r16-a0064-sustained/Player.log"
+    ],
+    "scope": "Three-second live CPU-time sample; all-frame main-path elapsed time is reported separately by Unity."
+  },
+  "cpuSampleSetupBeforeSweep": {
+    "pid": 365591,
+    "seconds": 3.000212424012716,
+    "logicalCpuCount": 32,
+    "unityCpuPercentOneLogicalCpuIs100": 136.32368052558212,
+    "unityCpuPercentOfMachine": 4.260115016424441,
+    "systemCpuBusyPercent": 10.408611140140033,
+    "rssMiB": 596.8984375,
+    "threadCount": 145,
+    "command": [
+      "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/locust-optimization/builds/native64-noalloc/MATREX VR.x86_64",
+      "-configure",
+      "-force-vulkan",
+      "--config-dir",
+      "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/Profiles/all16/Config",
+      "--data-dir",
+      "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/Profiles/all16/RunData",
+      "-logFile",
+      "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/Profiles/all16/Player.log"
+    ],
+    "scope": "Current setup/scene state only; active workload phase CPU is reported separately by Unity."
+  },
+  "caseCount": 32,
+  "phaseCount": 43,
+  "measurementPolicy": "Coarse samples8seconds; boundary samples12seconds twice except noted single8-second point; 16x64 and1x1536 repeated20-second samples. Startup/warmup/finalization outside measurement intervals. endingPendingFrames is sampled only at phase end, not a time-series peak. Approximately60FPS is not a hard real-time16.67ms guarantee.",
+  "sourceSha256Unchanged": {
+    "Assets/Scripts/Replay/RecordedAnimationState.cs": "aa30b4a8743895183df82540207b194bf84fcb2f2bc3d75b3251d1f8b724fdd6",
+    "Assets/Scripts/Swarm/AsyncSwarmWriter.cs": "9f10755013f6372bdafe9d73dc86e7b7c1c8036eb660034fa8d383155d8bfd0a",
+    "Assets/Scripts/Swarm/SwarmLogger.cs": "e9c64537c84d695f27f93ffe1b618c75dbbd30cb4c0194922a7101d858db6187",
+    "Assets/Scripts/Swarm/KannadiLogger.cs": "a65fc8663dd03f0dca077fe13fb5e217ef900fd6eb82d59b5bdeda40bb69e139",
+    "Assets/Scripts/RuntimePerformanceProbe.cs": "ab256f701b30ab4ec30c638f28175f0cd1755e11d16a05e12468599114086e66",
+    "Assets/Editor/PopulationSnapshotValidation.cs": "43eed092c795defb49202820e4f77d6c47ce4c2663dd73bfcd0fed2ef113ab27"
+  },
+  "harnessSha256": "8ad835409f7a98d9d1c5b37fd715e55099590201add02b34ac50c50db99cb1f4",
+  "points": [
+    {
+      "case": "r01-a1024-coarse",
+      "rigs": 1,
+      "agentsPerRig": 1024,
+      "totalAgents": 1024,
+      "cameras": 4,
+      "fpsRange": [
+        59.95484217809154,
+        59.95484217809154
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.95484217809154,
+          "seconds": 8.006210072,
+          "mainMs": 5.223855881002081,
+          "mainP95Ms": 6.161189,
+          "gpuMs": 3.622673102296449,
+          "frameP99Ms": 18.14895299999897,
+          "unityCpuPercentOfMachine": 8.196762189579479,
+          "logicalCpusUsed": 2.6229639006654333,
+          "populationCaptureMs": 0.45338016701461414,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 479,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 1,
+          "writtenRows": 798720,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r01-a1536-boundary",
+      "rigs": 1,
+      "agentsPerRig": 1536,
+      "totalAgents": 1536,
+      "cameras": 4,
+      "fpsRange": [
+        59.97890812431707,
+        59.984344534333225
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.984344534333225,
+          "seconds": 20.005115485,
+          "mainMs": 7.818234408673901,
+          "mainP95Ms": 9.426644,
+          "gpuMs": 3.62917642035029,
+          "frameP99Ms": 18.768307000001982,
+          "unityCpuPercentOfMachine": 12.63270637900044,
+          "logicalCpusUsed": 4.042466041280141,
+          "populationCaptureMs": 0.7569839032527103,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 1199,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        },
+        {
+          "phase": "all-60-repeat",
+          "fps": 59.97890812431707,
+          "seconds": 20.007426494,
+          "mainMs": 7.862566445371146,
+          "mainP95Ms": 9.572247,
+          "gpuMs": 3.731404116763972,
+          "frameP99Ms": 18.92575900000537,
+          "unityCpuPercentOfMachine": 12.65467600622839,
+          "logicalCpusUsed": 4.049496321993085,
+          "populationCaptureMs": 0.7683958298582161,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 1199,
+          "endingSumPendingFrames": 1,
+          "endingLargestWriterPendingFrames": 1
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 1,
+          "writtenRows": 4331520,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r01-a1536-coarse",
+      "rigs": 1,
+      "agentsPerRig": 1536,
+      "totalAgents": 1536,
+      "cameras": 4,
+      "fpsRange": [
+        59.98682681268252,
+        59.98682681268252
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.98682681268252,
+          "seconds": 8.000124829999997,
+          "mainMs": 7.9093614321503125,
+          "mainP95Ms": 9.8571,
+          "gpuMs": 3.8356832734864335,
+          "frameP99Ms": 18.824879000000294,
+          "unityCpuPercentOfMachine": 12.60527206048609,
+          "logicalCpusUsed": 4.0336870593555485,
+          "populationCaptureMs": 0.7688409185803761,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 479,
+          "endingSumPendingFrames": 1,
+          "endingLargestWriterPendingFrames": 1
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 1,
+          "writtenRows": 1196544,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r01-a1792-boundary",
+      "rigs": 1,
+      "agentsPerRig": 1792,
+      "totalAgents": 1792,
+      "cameras": 4,
+      "fpsRange": [
+        59.96451122083811,
+        59.97158643156967
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.96451122083811,
+          "seconds": 12.006252191999998,
+          "mainMs": 9.417553310152988,
+          "mainP95Ms": 11.648249,
+          "gpuMs": 4.160740545961001,
+          "frameP99Ms": 19.309436000000346,
+          "unityCpuPercentOfMachine": 14.71629091030841,
+          "logicalCpusUsed": 4.709213091298691,
+          "populationCaptureMs": 1.0011503477051462,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 719,
+          "endingSumPendingFrames": 96,
+          "endingLargestWriterPendingFrames": 96
+        },
+        {
+          "phase": "all-60-repeat",
+          "fps": 59.97158643156967,
+          "seconds": 12.006519133999998,
+          "mainMs": 9.287624503477042,
+          "mainP95Ms": 10.919349,
+          "gpuMs": 4.508953991655073,
+          "frameP99Ms": 19.185073000002717,
+          "unityCpuPercentOfMachine": 14.650894904408188,
+          "logicalCpusUsed": 4.68828636941062,
+          "populationCaptureMs": 0.9703400556328231,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 719,
+          "endingSumPendingFrames": 196,
+          "endingLargestWriterPendingFrames": 196
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 1,
+          "writtenRows": 3331328,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r01-a2048-boundary",
+      "rigs": 1,
+      "agentsPerRig": 2048,
+      "totalAgents": 2048,
+      "cameras": 4,
+      "fpsRange": [
+        59.65828849918464,
+        59.97338387062676
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.97338387062676,
+          "seconds": 12.005333274000002,
+          "mainMs": 11.03461434075104,
+          "mainP95Ms": 13.419244,
+          "gpuMs": 4.388230889518416,
+          "frameP99Ms": 20.14438599999835,
+          "unityCpuPercentOfMachine": 16.654056612739392,
+          "logicalCpusUsed": 5.329298116076606,
+          "populationCaptureMs": 1.2618885952712102,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 719,
+          "endingSumPendingFrames": 205,
+          "endingLargestWriterPendingFrames": 205
+        },
+        {
+          "phase": "all-60-repeat",
+          "fps": 59.65828849918464,
+          "seconds": 12.001721929000002,
+          "mainMs": 11.111831682517483,
+          "mainP95Ms": 13.381375,
+          "gpuMs": 4.707846146892655,
+          "frameP99Ms": 19.665504000002443,
+          "unityCpuPercentOfMachine": 16.643445097435567,
+          "logicalCpusUsed": 5.325902431179381,
+          "populationCaptureMs": 1.1674872727272734,
+          "focused": true,
+          "droppedFrames": 165,
+          "writerFailures": [],
+          "sampledFrames": 715,
+          "endingSumPendingFrames": 239,
+          "endingLargestWriterPendingFrames": 239
+        }
+      ],
+      "finalRecordingDroppedFrames": 165,
+      "applicationErrors": [
+        "Swarm log backlog exceeded 240 frames on VR9 Kannadi; 1 frames dropped. Check recording disk speed/space.",
+        "Swarm log backlog exceeded 240 frames on VR9 Kannadi; 120 frames dropped. Check recording disk speed/space."
+      ],
+      "recordingLifecycle": [
+        {
+          "status": "error",
+          "writersDrained": false,
+          "writerCount": 1,
+          "writtenRows": 3461120,
+          "droppedFrames": 165,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r01-a2048-coarse",
+      "rigs": 1,
+      "agentsPerRig": 2048,
+      "totalAgents": 2048,
+      "cameras": 4,
+      "fpsRange": [
+        59.95563010755419,
+        59.95563010755419
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.95563010755419,
+          "seconds": 8.006381154999998,
+          "mainMs": 11.034905258872646,
+          "mainP95Ms": 13.353318,
+          "gpuMs": 4.637712742616033,
+          "frameP99Ms": 19.633062999998785,
+          "unityCpuPercentOfMachine": 16.701521875022454,
+          "logicalCpusUsed": 5.344487000007185,
+          "populationCaptureMs": 1.2582991649269315,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 479,
+          "endingSumPendingFrames": 160,
+          "endingLargestWriterPendingFrames": 160
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 1,
+          "writtenRows": 1593344,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r02-a0512-coarse",
+      "rigs": 2,
+      "agentsPerRig": 512,
+      "totalAgents": 1024,
+      "cameras": 8,
+      "fpsRange": [
+        59.99025863151466,
+        59.99025863151466
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.99025863151466,
+          "seconds": 8.001691716000002,
+          "mainMs": 5.808609252609603,
+          "mainP95Ms": 7.206266,
+          "gpuMs": 3.5006503549060577,
+          "frameP99Ms": 18.33467500000019,
+          "unityCpuPercentOfMachine": 9.497991511973915,
+          "logicalCpusUsed": 3.0393572838316527,
+          "populationCaptureMs": 0.48112379958246304,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 479,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 2,
+          "writtenRows": 798720,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r02-a1024-coarse",
+      "rigs": 2,
+      "agentsPerRig": 1024,
+      "totalAgents": 2048,
+      "cameras": 8,
+      "fpsRange": [
+        59.982007353783395,
+        59.982007353783395
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.982007353783395,
+          "seconds": 8.002692571999999,
+          "mainMs": 11.895932891440484,
+          "mainP95Ms": 14.769314,
+          "gpuMs": 4.893259991578947,
+          "frameP99Ms": 19.578764999998555,
+          "unityCpuPercentOfMachine": 19.09513562156115,
+          "logicalCpusUsed": 6.110443398899568,
+          "populationCaptureMs": 1.1871590814196256,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 479,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 2,
+          "writtenRows": 1593344,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r02-a1280-boundary",
+      "rigs": 2,
+      "agentsPerRig": 1280,
+      "totalAgents": 2560,
+      "cameras": 8,
+      "fpsRange": [
+        58.4298346089603,
+        58.670118490400824
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 58.4298346089603,
+          "seconds": 12.015362353999999,
+          "mainMs": 15.76720145649073,
+          "mainP95Ms": 18.901396,
+          "gpuMs": 5.125427909878683,
+          "frameP99Ms": 20.755817000001286,
+          "unityCpuPercentOfMachine": 23.997923783298,
+          "logicalCpusUsed": 7.67933561065536,
+          "populationCaptureMs": 1.6517954350927275,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 701,
+          "endingSumPendingFrames": 1,
+          "endingLargestWriterPendingFrames": 1
+        },
+        {
+          "phase": "all-60-repeat",
+          "fps": 58.670118490400824,
+          "seconds": 12.000937719000003,
+          "mainMs": 15.638518165007113,
+          "mainP95Ms": 18.882404,
+          "gpuMs": 5.005333406143345,
+          "frameP99Ms": 20.658393000001496,
+          "unityCpuPercentOfMachine": 24.07363964089246,
+          "logicalCpusUsed": 7.703564685085587,
+          "populationCaptureMs": 1.6131194879089619,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 703,
+          "endingSumPendingFrames": 2,
+          "endingLargestWriterPendingFrames": 1
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 2,
+          "writtenRows": 4646400,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r02-a1536-boundary",
+      "rigs": 2,
+      "agentsPerRig": 1536,
+      "totalAgents": 3072,
+      "cameras": 8,
+      "fpsRange": [
+        51.82210442751342,
+        51.82210442751342
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 51.82210442751342,
+          "seconds": 8.007214518000001,
+          "mainMs": 19.251688929951683,
+          "mainP95Ms": 23.952551,
+          "gpuMs": 4.380070524271843,
+          "frameP99Ms": 25.643242999999316,
+          "unityCpuPercentOfMachine": 26.12487769994824,
+          "logicalCpusUsed": 8.359960863983437,
+          "populationCaptureMs": 2.1542799516908175,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 414,
+          "endingSumPendingFrames": 2,
+          "endingLargestWriterPendingFrames": 1
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 2,
+          "writtenRows": 2067456,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r04-a0256-coarse",
+      "rigs": 4,
+      "agentsPerRig": 256,
+      "totalAgents": 1024,
+      "cameras": 16,
+      "fpsRange": [
+        59.87463028164232,
+        59.87463028164232
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.87463028164232,
+          "seconds": 8.015855083000002,
+          "mainMs": 6.740687536534447,
+          "mainP95Ms": 8.518155,
+          "gpuMs": 3.384362221294363,
+          "frameP99Ms": 18.924929000000645,
+          "unityCpuPercentOfMachine": 12.093220123899783,
+          "logicalCpusUsed": 3.869830439647931,
+          "populationCaptureMs": 0.5056519832985386,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 479,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 4,
+          "writtenRows": 798720,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r04-a0512-coarse",
+      "rigs": 4,
+      "agentsPerRig": 512,
+      "totalAgents": 2048,
+      "cameras": 16,
+      "fpsRange": [
+        59.9389024447849,
+        59.9389024447849
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.9389024447849,
+          "seconds": 8.008498003999996,
+          "mainMs": 13.292431851774534,
+          "mainP95Ms": 16.40054,
+          "gpuMs": 4.992933089324618,
+          "frameP99Ms": 19.484479999999138,
+          "unityCpuPercentOfMachine": 22.655621554675747,
+          "logicalCpusUsed": 7.249798897496239,
+          "populationCaptureMs": 1.1645874739039672,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 479,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 4,
+          "writtenRows": 1593344,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r04-a0576-boundary",
+      "rigs": 4,
+      "agentsPerRig": 576,
+      "totalAgents": 2304,
+      "cameras": 16,
+      "fpsRange": [
+        59.27764138152752,
+        59.4577808004946
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.4577808004946,
+          "seconds": 12.008042864999997,
+          "mainMs": 15.099397910238434,
+          "mainP95Ms": 17.808195,
+          "gpuMs": 5.06775140065147,
+          "frameP99Ms": 19.443984999998776,
+          "unityCpuPercentOfMachine": 25.23829265161439,
+          "logicalCpusUsed": 8.076253648516605,
+          "populationCaptureMs": 1.3961572230014017,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 713,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        },
+        {
+          "phase": "all-60-repeat",
+          "fps": 59.27764138152752,
+          "seconds": 12.011287145000004,
+          "mainMs": 15.071411274261608,
+          "mainP95Ms": 18.552745,
+          "gpuMs": 5.006544809135397,
+          "frameP99Ms": 19.7553269999986,
+          "unityCpuPercentOfMachine": 25.299120429944555,
+          "logicalCpusUsed": 8.095718537582258,
+          "populationCaptureMs": 1.405354571026722,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 711,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 4,
+          "writtenRows": 4237056,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r04-a0640-boundary",
+      "rigs": 4,
+      "agentsPerRig": 640,
+      "totalAgents": 2560,
+      "cameras": 16,
+      "fpsRange": [
+        56.50429344489332,
+        57.48101683745938
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 57.48101683745938,
+          "seconds": 12.004286563000003,
+          "mainMs": 16.96636578374458,
+          "mainP95Ms": 19.98642,
+          "gpuMs": 5.346274397394143,
+          "frameP99Ms": 21.542691000000502,
+          "unityCpuPercentOfMachine": 26.985152203751163,
+          "logicalCpusUsed": 8.635248705200372,
+          "populationCaptureMs": 1.5843066763425255,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 689,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        },
+        {
+          "phase": "all-60-repeat",
+          "fps": 56.50429344489332,
+          "seconds": 12.000815173999992,
+          "mainMs": 17.318588906942395,
+          "mainP95Ms": 20.586694,
+          "gpuMs": 5.36098463123993,
+          "frameP99Ms": 21.472633999998436,
+          "unityCpuPercentOfMachine": 27.013789921734542,
+          "logicalCpusUsed": 8.644412774955054,
+          "populationCaptureMs": 1.6372676514032507,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 677,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 4,
+          "writtenRows": 4520960,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r04-a0768-coarse",
+      "rigs": 4,
+      "agentsPerRig": 768,
+      "totalAgents": 3072,
+      "cameras": 16,
+      "fpsRange": [
+        48.467927205438535,
+        48.467927205438535
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 48.467927205438535,
+          "seconds": 8.007043499,
+          "mainMs": 20.56283925839793,
+          "mainP95Ms": 24.329916,
+          "gpuMs": 6.983659842519681,
+          "frameP99Ms": 25.656984999999466,
+          "unityCpuPercentOfMachine": 27.612407754199463,
+          "logicalCpusUsed": 8.835970481343828,
+          "populationCaptureMs": 1.9576506459948315,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 387,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 4,
+          "writtenRows": 1923072,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r04-a1024-coarse",
+      "rigs": 4,
+      "agentsPerRig": 1024,
+      "totalAgents": 4096,
+      "cameras": 16,
+      "fpsRange": [
+        33.62375871169966,
+        33.62375871169966
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 33.62375871169966,
+          "seconds": 8.030422289000004,
+          "mainMs": 29.651174446096643,
+          "mainP95Ms": 33.036839,
+          "gpuMs": 9.668793744360903,
+          "frameP99Ms": 35.91963200000059,
+          "unityCpuPercentOfMachine": 26.55526600289848,
+          "logicalCpusUsed": 8.497685120927514,
+          "populationCaptureMs": 3.0006434944237927,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 269,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 4,
+          "writtenRows": 1785856,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r08-a0128-coarse",
+      "rigs": 8,
+      "agentsPerRig": 128,
+      "totalAgents": 1024,
+      "cameras": 32,
+      "fpsRange": [
+        59.9745617533221,
+        59.9745617533221
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.9745617533221,
+          "seconds": 8.003774538,
+          "mainMs": 8.492624872651351,
+          "mainP95Ms": 10.312041,
+          "gpuMs": 4.201272116910228,
+          "frameP99Ms": 18.836928999999003,
+          "unityCpuPercentOfMachine": 16.656203815720225,
+          "logicalCpusUsed": 5.329985221030472,
+          "populationCaptureMs": 0.5073405010438412,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 479,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 8,
+          "writtenRows": 797696,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r08-a0192-coarse",
+      "rigs": 8,
+      "agentsPerRig": 192,
+      "totalAgents": 1536,
+      "cameras": 32,
+      "fpsRange": [
+        59.95023644515306,
+        59.95023644515306
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.95023644515306,
+          "seconds": 8.008741124999998,
+          "mainMs": 11.923875173277661,
+          "mainP95Ms": 14.311351,
+          "gpuMs": 4.731730476987447,
+          "frameP99Ms": 19.124881999999843,
+          "unityCpuPercentOfMachine": 22.92807285614442,
+          "logicalCpusUsed": 7.336983313966215,
+          "populationCaptureMs": 0.812522964509394,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 479,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 8,
+          "writtenRows": 1196544,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r08-a0224-boundary",
+      "rigs": 8,
+      "agentsPerRig": 224,
+      "totalAgents": 1792,
+      "cameras": 32,
+      "fpsRange": [
+        59.7492824625846,
+        59.76105381786144
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.7492824625846,
+          "seconds": 12.000054134,
+          "mainMs": 14.10440936033519,
+          "mainP95Ms": 16.682258,
+          "gpuMs": 5.267447717647053,
+          "frameP99Ms": 19.682605999999936,
+          "unityCpuPercentOfMachine": 25.908737288034636,
+          "logicalCpusUsed": 8.290795932171084,
+          "populationCaptureMs": 1.017095670391062,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 716,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        },
+        {
+          "phase": "all-60-repeat",
+          "fps": 59.76105381786144,
+          "seconds": 12.014007430999996,
+          "mainMs": 14.105690361227326,
+          "mainP95Ms": 16.512257,
+          "gpuMs": 5.457539002932556,
+          "frameP99Ms": 19.58342800000068,
+          "unityCpuPercentOfMachine": 26.07893342828748,
+          "logicalCpusUsed": 8.345258697051994,
+          "populationCaptureMs": 1.0135372384937236,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 717,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 8,
+          "writtenRows": 3316992,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r08-a0240-boundary",
+      "rigs": 8,
+      "agentsPerRig": 240,
+      "totalAgents": 1920,
+      "cameras": 32,
+      "fpsRange": [
+        59.644985203294524,
+        59.69689946991416
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.644985203294524,
+          "seconds": 12.004245720000004,
+          "mainMs": 14.74617524475523,
+          "mainP95Ms": 17.394715,
+          "gpuMs": 5.406241612213749,
+          "frameP99Ms": 19.372229999998325,
+          "unityCpuPercentOfMachine": 27.25598156116384,
+          "logicalCpusUsed": 8.721914099572428,
+          "populationCaptureMs": 1.1163851748251745,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 715,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        },
+        {
+          "phase": "all-60-repeat",
+          "fps": 59.69689946991416,
+          "seconds": 12.010741420999995,
+          "mainMs": 14.717587202513947,
+          "mainP95Ms": 17.083128,
+          "gpuMs": 5.407864447806358,
+          "frameP99Ms": 19.655338999996275,
+          "unityCpuPercentOfMachine": 27.464998906997963,
+          "logicalCpusUsed": 8.788799650239348,
+          "populationCaptureMs": 1.1092117318435737,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 716,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 8,
+          "writtenRows": 3544320,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r08-a0256-coarse",
+      "rigs": 8,
+      "agentsPerRig": 256,
+      "totalAgents": 2048,
+      "cameras": 32,
+      "fpsRange": [
+        58.974727089154,
+        58.974727089154
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 58.974727089154,
+          "seconds": 8.003179345999998,
+          "mainMs": 15.764609959660307,
+          "mainP95Ms": 18.765339,
+          "gpuMs": 5.810279032098767,
+          "frameP99Ms": 20.15709799999854,
+          "unityCpuPercentOfMachine": 28.476963984807853,
+          "logicalCpusUsed": 9.112628475138512,
+          "populationCaptureMs": 1.2182146496815294,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 471,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 8,
+          "writtenRows": 1564672,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r08-a1024-coarse",
+      "rigs": 8,
+      "agentsPerRig": 1024,
+      "totalAgents": 8192,
+      "cameras": 32,
+      "fpsRange": [
+        13.289409614640475,
+        13.289409614640475
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 13.289409614640475,
+          "seconds": 8.047934415,
+          "mainMs": 75.0369107735849,
+          "mainP95Ms": 81.501064,
+          "gpuMs": 23.362489725490196,
+          "frameP99Ms": 83.84479200000072,
+          "unityCpuPercentOfMachine": 28.042909939643188,
+          "logicalCpusUsed": 8.97373118068582,
+          "populationCaptureMs": 7.583350000000001,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 106,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 8,
+          "writtenRows": 1392640,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r16-a0064-coarse",
+      "rigs": 16,
+      "agentsPerRig": 64,
+      "totalAgents": 1024,
+      "cameras": 64,
+      "fpsRange": [
+        59.99402764840441,
+        59.99402764840441
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.99402764840441,
+          "seconds": 8.002747547999999,
+          "mainMs": 12.289588450939458,
+          "mainP95Ms": 14.837697,
+          "gpuMs": 8.478225860465121,
+          "frameP99Ms": 18.688807000000196,
+          "unityCpuPercentOfMachine": 24.725883056182596,
+          "logicalCpusUsed": 7.912282577978431,
+          "populationCaptureMs": 0.6007455114822549,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 479,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 16,
+          "writtenRows": 797696,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r16-a0064-sustained",
+      "rigs": 16,
+      "agentsPerRig": 64,
+      "totalAgents": 1024,
+      "cameras": 64,
+      "fpsRange": [
+        59.94065481206402,
+        59.94818866805145
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.94818866805145,
+          "seconds": 20.001115534,
+          "mainMs": 12.122144246243751,
+          "mainP95Ms": 14.506619,
+          "gpuMs": 8.521665393634835,
+          "frameP99Ms": 18.99498599999916,
+          "unityCpuPercentOfMachine": 24.736120300838813,
+          "logicalCpusUsed": 7.91555849626842,
+          "populationCaptureMs": 0.6034756260434068,
+          "focused": false,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 1198,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        },
+        {
+          "phase": "all-60-repeat",
+          "fps": 59.94065481206402,
+          "seconds": 20.002762131000004,
+          "mainMs": 12.296559803005005,
+          "mainP95Ms": 15.08844,
+          "gpuMs": 8.82234409443508,
+          "frameP99Ms": 18.967555999999774,
+          "unityCpuPercentOfMachine": 24.815322841375238,
+          "logicalCpusUsed": 7.940903309240076,
+          "populationCaptureMs": 0.6151818864774627,
+          "focused": false,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 1198,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 16,
+          "writtenRows": 2885632,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r16-a0072-boundary",
+      "rigs": 16,
+      "agentsPerRig": 72,
+      "totalAgents": 1152,
+      "cameras": 64,
+      "fpsRange": [
+        59.79407329956948,
+        59.852130154167384
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.852130154167384,
+          "seconds": 12.013579340999996,
+          "mainMs": 13.343217786908069,
+          "mainP95Ms": 16.398587,
+          "gpuMs": 8.774080831168838,
+          "frameP99Ms": 18.899475999999638,
+          "unityCpuPercentOfMachine": 26.472647407806395,
+          "logicalCpusUsed": 8.471247170498046,
+          "populationCaptureMs": 0.7008245125348195,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 718,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        },
+        {
+          "phase": "all-60-repeat",
+          "fps": 59.79407329956948,
+          "seconds": 12.005762637,
+          "mainMs": 13.377083439330562,
+          "mainP95Ms": 15.901104,
+          "gpuMs": 9.035583725321883,
+          "frameP99Ms": 19.047738999997677,
+          "unityCpuPercentOfMachine": 26.536735702081995,
+          "logicalCpusUsed": 8.491755424666238,
+          "populationCaptureMs": 0.697560529986053,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 717,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 16,
+          "writtenRows": 2136960,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r16-a0080-coarse",
+      "rigs": 16,
+      "agentsPerRig": 80,
+      "totalAgents": 1280,
+      "cameras": 64,
+      "fpsRange": [
+        59.627413650623765,
+        59.627413650623765
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 59.627413650623765,
+          "seconds": 8.014628732000002,
+          "mainMs": 14.43733726834382,
+          "mainP95Ms": 17.002719,
+          "gpuMs": 9.181030167800456,
+          "frameP99Ms": 19.795924000000298,
+          "unityCpuPercentOfMachine": 28.939269397962665,
+          "logicalCpusUsed": 9.260566207348052,
+          "populationCaptureMs": 0.7611322851153038,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 477,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 16,
+          "writtenRows": 992000,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r16-a0088-boundary",
+      "rigs": 16,
+      "agentsPerRig": 88,
+      "totalAgents": 1408,
+      "cameras": 64,
+      "fpsRange": [
+        58.70110375234287,
+        58.77919539123409
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 58.77919539123409,
+          "seconds": 12.010213553000003,
+          "mainMs": 15.687255639716302,
+          "mainP95Ms": 18.651806,
+          "gpuMs": 9.690885102990032,
+          "frameP99Ms": 21.051734000000266,
+          "unityCpuPercentOfMachine": 30.41942163540811,
+          "logicalCpusUsed": 9.734214923330596,
+          "populationCaptureMs": 0.8485964539007094,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 705,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        },
+        {
+          "phase": "all-60-repeat",
+          "fps": 58.70110375234287,
+          "seconds": 12.009365593000002,
+          "mainMs": 15.79621315198865,
+          "mainP95Ms": 18.89124,
+          "gpuMs": 9.867524685524126,
+          "frameP99Ms": 20.99056699999835,
+          "unityCpuPercentOfMachine": 30.52305279253563,
+          "logicalCpusUsed": 9.767376893611402,
+          "populationCaptureMs": 0.8473650568181814,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 704,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 16,
+          "writtenRows": 2565376,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r16-a0096-coarse",
+      "rigs": 16,
+      "agentsPerRig": 96,
+      "totalAgents": 1536,
+      "cameras": 64,
+      "fpsRange": [
+        58.092787870342065,
+        58.092787870342065
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 58.092787870342065,
+          "seconds": 8.004175985000002,
+          "mainMs": 16.681240467672403,
+          "mainP95Ms": 19.421284,
+          "gpuMs": 10.096708632707772,
+          "frameP99Ms": 20.796530999998453,
+          "unityCpuPercentOfMachine": 32.44790600390578,
+          "logicalCpusUsed": 10.38332992124985,
+          "populationCaptureMs": 0.9123700431034479,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 464,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 16,
+          "writtenRows": 1152000,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r16-a0128-coarse",
+      "rigs": 16,
+      "agentsPerRig": 128,
+      "totalAgents": 2048,
+      "cameras": 64,
+      "fpsRange": [
+        45.85556449051783,
+        45.85556449051783
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 45.85556449051783,
+          "seconds": 8.002211285000003,
+          "mainMs": 21.719396535519127,
+          "mainP95Ms": 25.859979,
+          "gpuMs": 12.417966512676049,
+          "frameP99Ms": 29.309420999998892,
+          "unityCpuPercentOfMachine": 31.838855652009933,
+          "logicalCpusUsed": 10.188433808643179,
+          "populationCaptureMs": 1.3462836065573778,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 366,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 16,
+          "writtenRows": 1218560,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r16-a0256-coarse",
+      "rigs": 16,
+      "agentsPerRig": 256,
+      "totalAgents": 4096,
+      "cameras": 64,
+      "fpsRange": [
+        23.28465944552066,
+        23.28465944552066
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 23.28465944552066,
+          "seconds": 8.030661168000002,
+          "mainMs": 42.83453550537635,
+          "mainP95Ms": 47.590046,
+          "gpuMs": 21.960579575418997,
+          "frameP99Ms": 52.449879000000976,
+          "unityCpuPercentOfMachine": 29.52745671114585,
+          "logicalCpusUsed": 9.448786147566672,
+          "populationCaptureMs": 3.277090322580646,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 186,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 16,
+          "writtenRows": 1228800,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r16-a0512-coarse",
+      "rigs": 16,
+      "agentsPerRig": 512,
+      "totalAgents": 8192,
+      "cameras": 64,
+      "fpsRange": [
+        10.621786010863076,
+        10.621786010863076
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 10.621786010863076,
+          "seconds": 8.093611366,
+          "mainMs": 93.79830523529414,
+          "mainP95Ms": 101.972144,
+          "gpuMs": 43.042469463414626,
+          "frameP99Ms": 104.8701240000014,
+          "unityCpuPercentOfMachine": 28.475391216356563,
+          "logicalCpusUsed": 9.1121251892341,
+          "populationCaptureMs": 7.945630588235293,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 85,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 16,
+          "writtenRows": 1130496,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    },
+    {
+      "case": "r16-a1024-coarse",
+      "rigs": 16,
+      "agentsPerRig": 1024,
+      "totalAgents": 16384,
+      "cameras": 64,
+      "fpsRange": [
+        3.9772095306816753,
+        3.9772095306816753
+      ],
+      "phases": [
+        {
+          "phase": "all-60",
+          "fps": 3.9772095306816753,
+          "seconds": 8.046874636000002,
+          "mainMs": 251.07279632258067,
+          "mainP95Ms": 264.080701,
+          "gpuMs": 122.41194941935483,
+          "frameP99Ms": 269.8051310000018,
+          "unityCpuPercentOfMachine": 32.49320535332371,
+          "logicalCpusUsed": 10.397825713063588,
+          "populationCaptureMs": 17.212519354838708,
+          "focused": true,
+          "droppedFrames": 0,
+          "writerFailures": [],
+          "sampledFrames": 31,
+          "endingSumPendingFrames": 0,
+          "endingLargestWriterPendingFrames": 0
+        }
+      ],
+      "finalRecordingDroppedFrames": 0,
+      "applicationErrors": [],
+      "recordingLifecycle": [
+        {
+          "status": "finalized",
+          "writersDrained": true,
+          "writerCount": 16,
+          "writtenRows": 835584,
+          "droppedFrames": 0,
+          "failures": []
+        }
+      ]
+    }
+  ],
+  "interpretation": {
+    "16VR": "64 has headroom;72 roughly59.8;80 is near the edge;88 and96 fall below59FPS.",
+    "8VR": "192 comfortable;224-240 near the edge;256 approximately59FPS.",
+    "4VR": "512 near60;576 approximately59.3;640 approximately57.",
+    "2VR": "1024 near60;1280 approximately58.5.",
+    "1VR": "1536 near60 with0-1endingpendingframes;1792 endingqueue96to196;2048 drops165recordingframes despite near60rendering.",
+    "scaling": "Capacity is not inversely proportional to VR count. Fewer VRs reduce camera/rig work, while fewer per-VR population writers can reduce recording parallelism.",
+    "focus": "All coarse and boundary phases reportedfocusedtrue. The extra16x64 sustained CPU/throughput run reportedfocusedfalse while sessionremainedunlocked; its live CPU sample is a workload measurement, not independent physical scanout proof."
+  }
+}

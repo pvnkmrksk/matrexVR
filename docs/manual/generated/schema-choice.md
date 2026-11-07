@@ -1,6 +1,6 @@
 # Choice schema fields
 
-This atlas lists **987 emitted property paths** from the current `choice` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **999 emitted property paths** from the current `choice` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -720,7 +720,7 @@ Align the full dataset's sample centroid with the animal at each track appearanc
 
 ### `swarm.playback.periodicBoundary`
 
-Wrap animal and replicas in X/Z.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -822,6 +822,19 @@ Physical scene scale: 1 terrain or 100 walking.
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `swarm.farClipMetres`
+
+Maximum depth rendered by stimulus cameras, in metres. Sets the camera far plane for agents and scenery. Leave empty to use the camera's original distance. This changes visibility without changing the spawn area or periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ### `swarm.useHeadingReference`
 
 Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
@@ -867,7 +880,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `swarm.followAnimalPosition`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -913,17 +926,30 @@ Optional agents per world-unit area (2D) or volume (3D). Used only when numberOf
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `swarm.spawnType`
+
+Random samples independent starting positions and configured heading distributions. Grid uses fixed cell centers and evenly spaced headings around a full turn starting at Mean heading. In 3D, Grid uses evenly spaced layers and the configured mean elevation.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Random"` |
+| `enum` | `["Random","Grid",0,1]` |
+
 ### `swarm.spawnAreaSize`
 
-Square spawn extent in world units.
+Width and length of the initial square in scene units. In 3D this is also its height. Agents can leave it after spawning. It can be smaller than the periodic arena and is superseded by an explicit spawn volume.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `swarm.mu`
 
@@ -1032,7 +1058,7 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `swarm.volumeHalfExtentMetres`
 
-Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.
+Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -1049,13 +1075,13 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `swarm.preserveBoundaryOvershoot`
 
-Keep excess travel when wrapping the generated population; legacy edge snapping is used when false.
+Retained in existing files. Generated agents always retain excess travel across periodic edges.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `boolean` |
 | Required by parent schema | No |
-| Default | `false` |
+| Default | `true` |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
 
@@ -1119,7 +1145,7 @@ Z component. Unity +Z points forward/north. Distances use scene units: metres on
 
 ### `swarm.spawnVolumeSize`
 
-Positive {x,y,z} volume dimensions. Omit for spawnAreaSize in every dimension.
+Independent X, Y and Z spawn dimensions in scene units. In 2D only X and Z are used. Leave empty to use Spawn area size. Each wrapped axis must fit within the corresponding arena length.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -1197,15 +1223,17 @@ UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the fo
 
 ### `swarm.boundaryHeight`
 
-3D periodic Y extent. Required only when wrapY is true; otherwise Y is not wrapped.
+Total vertical span of a 3D periodic arena. Applies when Wrap Y is enabled. An omitted height uses the spawn height unless a physical arena half extent is configured.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
 
@@ -1509,29 +1537,43 @@ Visible fraction, 0–1.
 | `maximum` | `3.40282347e+38` |
 | UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
 
-### `swarm.boundaryLengthX`
+### `swarm.periodicBoundary`
 
-Periodic arena lengths in world units; example 200 each.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `boolean` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `true` |
+
+### `swarm.boundaryLengthX`
+
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `swarm.boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `number or null` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `swarm.animateOnMove`
 
@@ -2197,7 +2239,7 @@ Band invisibility/visibility durations in seconds; example 0/10.
 
 ### `objects[].boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -2209,7 +2251,7 @@ Periodic arena lengths in world units; example 200 each.
 
 ### `objects[].boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -4113,7 +4155,7 @@ Align the full dataset's sample centroid with the animal at each track appearanc
 
 ### `preStimulus.swarm.playback.periodicBoundary`
 
-Wrap animal and replicas in X/Z.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -4215,6 +4257,19 @@ Physical scene scale: 1 terrain or 100 walking.
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `preStimulus.swarm.farClipMetres`
+
+Maximum depth rendered by stimulus cameras, in metres. Sets the camera far plane for agents and scenery. Leave empty to use the camera's original distance. This changes visibility without changing the spawn area or periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ### `preStimulus.swarm.useHeadingReference`
 
 Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
@@ -4260,7 +4315,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `preStimulus.swarm.followAnimalPosition`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -4306,17 +4361,30 @@ Optional agents per world-unit area (2D) or volume (3D). Used only when numberOf
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `preStimulus.swarm.spawnType`
+
+Random samples independent starting positions and configured heading distributions. Grid uses fixed cell centers and evenly spaced headings around a full turn starting at Mean heading. In 3D, Grid uses evenly spaced layers and the configured mean elevation.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Random"` |
+| `enum` | `["Random","Grid",0,1]` |
+
 ### `preStimulus.swarm.spawnAreaSize`
 
-Square spawn extent in world units.
+Width and length of the initial square in scene units. In 3D this is also its height. Agents can leave it after spawning. It can be smaller than the periodic arena and is superseded by an explicit spawn volume.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `preStimulus.swarm.mu`
 
@@ -4425,7 +4493,7 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `preStimulus.swarm.volumeHalfExtentMetres`
 
-Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.
+Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -4442,13 +4510,13 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `preStimulus.swarm.preserveBoundaryOvershoot`
 
-Keep excess travel when wrapping the generated population; legacy edge snapping is used when false.
+Retained in existing files. Generated agents always retain excess travel across periodic edges.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `boolean` |
 | Required by parent schema | No |
-| Default | `false` |
+| Default | `true` |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
 
@@ -4512,7 +4580,7 @@ Z component. Unity +Z points forward/north. Distances use scene units: metres on
 
 ### `preStimulus.swarm.spawnVolumeSize`
 
-Positive {x,y,z} volume dimensions. Omit for spawnAreaSize in every dimension.
+Independent X, Y and Z spawn dimensions in scene units. In 2D only X and Z are used. Leave empty to use Spawn area size. Each wrapped axis must fit within the corresponding arena length.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -4590,15 +4658,17 @@ UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the fo
 
 ### `preStimulus.swarm.boundaryHeight`
 
-3D periodic Y extent. Required only when wrapY is true; otherwise Y is not wrapped.
+Total vertical span of a 3D periodic arena. Applies when Wrap Y is enabled. An omitted height uses the spawn height unless a physical arena half extent is configured.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
 
@@ -4902,29 +4972,43 @@ Visible fraction, 0–1.
 | `maximum` | `3.40282347e+38` |
 | UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
 
-### `preStimulus.swarm.boundaryLengthX`
+### `preStimulus.swarm.periodicBoundary`
 
-Periodic arena lengths in world units; example 200 each.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `boolean` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `true` |
+
+### `preStimulus.swarm.boundaryLengthX`
+
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `preStimulus.swarm.boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `number or null` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `preStimulus.swarm.animateOnMove`
 
@@ -5584,7 +5668,7 @@ Band invisibility/visibility durations in seconds; example 0/10.
 
 ### `preStimulus.objects[].boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -5596,7 +5680,7 @@ Periodic arena lengths in world units; example 200 each.
 
 ### `preStimulus.objects[].boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -7461,7 +7545,7 @@ Align the full dataset's sample centroid with the animal at each track appearanc
 
 ### `stimulus.swarm.playback.periodicBoundary`
 
-Wrap animal and replicas in X/Z.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -7563,6 +7647,19 @@ Physical scene scale: 1 terrain or 100 walking.
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `stimulus.swarm.farClipMetres`
+
+Maximum depth rendered by stimulus cameras, in metres. Sets the camera far plane for agents and scenery. Leave empty to use the camera's original distance. This changes visibility without changing the spawn area or periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ### `stimulus.swarm.useHeadingReference`
 
 Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
@@ -7608,7 +7705,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `stimulus.swarm.followAnimalPosition`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -7654,17 +7751,30 @@ Optional agents per world-unit area (2D) or volume (3D). Used only when numberOf
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `stimulus.swarm.spawnType`
+
+Random samples independent starting positions and configured heading distributions. Grid uses fixed cell centers and evenly spaced headings around a full turn starting at Mean heading. In 3D, Grid uses evenly spaced layers and the configured mean elevation.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Random"` |
+| `enum` | `["Random","Grid",0,1]` |
+
 ### `stimulus.swarm.spawnAreaSize`
 
-Square spawn extent in world units.
+Width and length of the initial square in scene units. In 3D this is also its height. Agents can leave it after spawning. It can be smaller than the periodic arena and is superseded by an explicit spawn volume.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `stimulus.swarm.mu`
 
@@ -7773,7 +7883,7 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `stimulus.swarm.volumeHalfExtentMetres`
 
-Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.
+Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -7790,13 +7900,13 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `stimulus.swarm.preserveBoundaryOvershoot`
 
-Keep excess travel when wrapping the generated population; legacy edge snapping is used when false.
+Retained in existing files. Generated agents always retain excess travel across periodic edges.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `boolean` |
 | Required by parent schema | No |
-| Default | `false` |
+| Default | `true` |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
 
@@ -7860,7 +7970,7 @@ Z component. Unity +Z points forward/north. Distances use scene units: metres on
 
 ### `stimulus.swarm.spawnVolumeSize`
 
-Positive {x,y,z} volume dimensions. Omit for spawnAreaSize in every dimension.
+Independent X, Y and Z spawn dimensions in scene units. In 2D only X and Z are used. Leave empty to use Spawn area size. Each wrapped axis must fit within the corresponding arena length.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -7938,15 +8048,17 @@ UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the fo
 
 ### `stimulus.swarm.boundaryHeight`
 
-3D periodic Y extent. Required only when wrapY is true; otherwise Y is not wrapped.
+Total vertical span of a 3D periodic arena. Applies when Wrap Y is enabled. An omitted height uses the spawn height unless a physical arena half extent is configured.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
 
@@ -8250,29 +8362,43 @@ Visible fraction, 0–1.
 | `maximum` | `3.40282347e+38` |
 | UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
 
-### `stimulus.swarm.boundaryLengthX`
+### `stimulus.swarm.periodicBoundary`
 
-Periodic arena lengths in world units; example 200 each.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `boolean` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `true` |
+
+### `stimulus.swarm.boundaryLengthX`
+
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `stimulus.swarm.boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `number or null` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `stimulus.swarm.animateOnMove`
 
@@ -8932,7 +9058,7 @@ Band invisibility/visibility durations in seconds; example 0/10.
 
 ### `stimulus.objects[].boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -8944,7 +9070,7 @@ Periodic arena lengths in world units; example 200 each.
 
 ### `stimulus.objects[].boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -10809,7 +10935,7 @@ Align the full dataset's sample centroid with the animal at each track appearanc
 
 ### `postStimulus.swarm.playback.periodicBoundary`
 
-Wrap animal and replicas in X/Z.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -10911,6 +11037,19 @@ Physical scene scale: 1 terrain or 100 walking.
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `postStimulus.swarm.farClipMetres`
+
+Maximum depth rendered by stimulus cameras, in metres. Sets the camera far plane for agents and scenery. Leave empty to use the camera's original distance. This changes visibility without changing the spawn area or periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ### `postStimulus.swarm.useHeadingReference`
 
 Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
@@ -10956,7 +11095,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `postStimulus.swarm.followAnimalPosition`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -11002,17 +11141,30 @@ Optional agents per world-unit area (2D) or volume (3D). Used only when numberOf
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `postStimulus.swarm.spawnType`
+
+Random samples independent starting positions and configured heading distributions. Grid uses fixed cell centers and evenly spaced headings around a full turn starting at Mean heading. In 3D, Grid uses evenly spaced layers and the configured mean elevation.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Random"` |
+| `enum` | `["Random","Grid",0,1]` |
+
 ### `postStimulus.swarm.spawnAreaSize`
 
-Square spawn extent in world units.
+Width and length of the initial square in scene units. In 3D this is also its height. Agents can leave it after spawning. It can be smaller than the periodic arena and is superseded by an explicit spawn volume.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `postStimulus.swarm.mu`
 
@@ -11121,7 +11273,7 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `postStimulus.swarm.volumeHalfExtentMetres`
 
-Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.
+Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -11138,13 +11290,13 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `postStimulus.swarm.preserveBoundaryOvershoot`
 
-Keep excess travel when wrapping the generated population; legacy edge snapping is used when false.
+Retained in existing files. Generated agents always retain excess travel across periodic edges.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `boolean` |
 | Required by parent schema | No |
-| Default | `false` |
+| Default | `true` |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
 
@@ -11208,7 +11360,7 @@ Z component. Unity +Z points forward/north. Distances use scene units: metres on
 
 ### `postStimulus.swarm.spawnVolumeSize`
 
-Positive {x,y,z} volume dimensions. Omit for spawnAreaSize in every dimension.
+Independent X, Y and Z spawn dimensions in scene units. In 2D only X and Z are used. Leave empty to use Spawn area size. Each wrapped axis must fit within the corresponding arena length.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -11286,15 +11438,17 @@ UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the fo
 
 ### `postStimulus.swarm.boundaryHeight`
 
-3D periodic Y extent. Required only when wrapY is true; otherwise Y is not wrapped.
+Total vertical span of a 3D periodic arena. Applies when Wrap Y is enabled. An omitted height uses the spawn height unless a physical arena half extent is configured.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
 
@@ -11598,29 +11752,43 @@ Visible fraction, 0–1.
 | `maximum` | `3.40282347e+38` |
 | UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
 
-### `postStimulus.swarm.boundaryLengthX`
+### `postStimulus.swarm.periodicBoundary`
 
-Periodic arena lengths in world units; example 200 each.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `boolean` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `true` |
+
+### `postStimulus.swarm.boundaryLengthX`
+
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `postStimulus.swarm.boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `number or null` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `postStimulus.swarm.animateOnMove`
 
@@ -12280,7 +12448,7 @@ Band invisibility/visibility durations in seconds; example 0/10.
 
 ### `postStimulus.objects[].boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -12292,7 +12460,7 @@ Periodic arena lengths in world units; example 200 each.
 
 ### `postStimulus.objects[].boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |

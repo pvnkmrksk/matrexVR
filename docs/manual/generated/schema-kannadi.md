@@ -1,6 +1,6 @@
 # Kannadi schema fields
 
-This atlas lists **983 emitted property paths** from the current `kannadi` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **1343 emitted property paths** from the current `kannadi` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -604,7 +604,7 @@ Band invisibility/visibility durations in seconds; example 0/10.
 
 ### `objects[].boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -616,7 +616,7 @@ Periodic arena lengths in world units; example 200 each.
 
 ### `objects[].boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -1108,18 +1108,6 @@ Catalog name, e.g. SimulatedLocust or LocustBand_black. Catalog is a build-safe 
 | Type | `string or null` |
 | Required by parent schema | No |
 | Default | `null` |
-
-## periodicBoundary group
-
-### `periodicBoundary`
-
-Wrap animal and replicas in X/Z.
-
-| Contract | Emitted value |
-| --- | --- |
-| Type | `boolean` |
-| Required by parent schema | No |
-| Default | `true` |
 
 ## skyboxPath group
 
@@ -1889,7 +1877,7 @@ Align the full dataset's sample centroid with the animal at each track appearanc
 
 ### `playback.periodicBoundary`
 
-Wrap animal and replicas in X/Z.
+Wrap recorded trajectories within their playback volume. Leave this off when continuing tracks beyond their last recorded sample.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -1995,6 +1983,21 @@ Physical scene scale: 1 terrain or 100 walking.
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+## farClipMetres group
+
+### `farClipMetres`
+
+Maximum depth rendered by stimulus cameras, in metres. Sets the camera far plane for agents and scenery. Leave empty to use the camera's original distance. This changes visibility without changing the spawn area or periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ## useHeadingReference group
 
 ### `useHeadingReference`
@@ -2050,7 +2053,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `followAnimalPosition`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -2102,19 +2105,34 @@ Optional agents per world-unit area (2D) or volume (3D). Used only when numberOf
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+## spawnType group
+
+### `spawnType`
+
+Random samples independent starting positions and configured heading distributions. Grid uses fixed cell centers and evenly spaced headings around a full turn starting at Mean heading. In 3D, Grid uses evenly spaced layers and the configured mean elevation.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Random"` |
+| `enum` | `["Random","Grid",0,1]` |
+
 ## spawnAreaSize group
 
 ### `spawnAreaSize`
 
-Square spawn extent in world units.
+Width and length of the initial square in scene units. In 3D this is also its height. Agents can leave it after spawning. It can be smaller than the periodic arena and is superseded by an explicit spawn volume.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ## mu group
 
@@ -2239,7 +2257,7 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `volumeHalfExtentMetres`
 
-Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.
+Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -2258,13 +2276,13 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `preserveBoundaryOvershoot`
 
-Keep excess travel when wrapping the generated population; legacy edge snapping is used when false.
+Retained in existing files. Generated agents always retain excess travel across periodic edges.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `boolean` |
 | Required by parent schema | No |
-| Default | `false` |
+| Default | `true` |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
 
@@ -2334,7 +2352,7 @@ Z component. Unity +Z points forward/north. Distances use scene units: metres on
 
 ### `spawnVolumeSize`
 
-Positive {x,y,z} volume dimensions. Omit for spawnAreaSize in every dimension.
+Independent X, Y and Z spawn dimensions in scene units. In 2D only X and Z are used. Leave empty to use Spawn area size. Each wrapped axis must fit within the corresponding arena length.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -2418,15 +2436,17 @@ UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the fo
 
 ### `boundaryHeight`
 
-3D periodic Y extent. Required only when wrapY is true; otherwise Y is not wrapped.
+Total vertical span of a 3D periodic arena. Applies when Wrap Y is enabled. An omitted height uses the spawn height unless a physical arena half extent is configured.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
 
@@ -2736,33 +2756,49 @@ Visible fraction, 0–1.
 | `maximum` | `3.40282347e+38` |
 | UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
 
+## periodicBoundary group
+
+### `periodicBoundary`
+
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
 ## boundaryLengthX group
 
 ### `boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `number or null` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ## boundaryLengthZ group
 
 ### `boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `number or null` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ## animateOnMove group
 
@@ -4050,7 +4086,7 @@ Band invisibility/visibility durations in seconds; example 0/10.
 
 ### `preStimulus.objects[].boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -4062,7 +4098,7 @@ Periodic arena lengths in world units; example 200 each.
 
 ### `preStimulus.objects[].boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -4532,16 +4568,6 @@ Catalog name, e.g. SimulatedLocust or LocustBand_black. Catalog is a build-safe 
 | Type | `string or null` |
 | Required by parent schema | No |
 | Default | `null` |
-
-### `preStimulus.periodicBoundary`
-
-Wrap animal and replicas in X/Z.
-
-| Contract | Emitted value |
-| --- | --- |
-| Type | `boolean` |
-| Required by parent schema | No |
-| Default | `true` |
 
 ### `preStimulus.skyboxPath`
 
@@ -5285,7 +5311,7 @@ Align the full dataset's sample centroid with the animal at each track appearanc
 
 ### `preStimulus.playback.periodicBoundary`
 
-Wrap animal and replicas in X/Z.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -5387,6 +5413,19 @@ Physical scene scale: 1 terrain or 100 walking.
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `preStimulus.farClipMetres`
+
+Maximum depth rendered by stimulus cameras, in metres. Sets the camera far plane for agents and scenery. Leave empty to use the camera's original distance. This changes visibility without changing the spawn area or periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ### `preStimulus.useHeadingReference`
 
 Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
@@ -5432,7 +5471,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `preStimulus.followAnimalPosition`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -5478,17 +5517,30 @@ Optional agents per world-unit area (2D) or volume (3D). Used only when numberOf
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `preStimulus.spawnType`
+
+Random samples independent starting positions and configured heading distributions. Grid uses fixed cell centers and evenly spaced headings around a full turn starting at Mean heading. In 3D, Grid uses evenly spaced layers and the configured mean elevation.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Random"` |
+| `enum` | `["Random","Grid",0,1]` |
+
 ### `preStimulus.spawnAreaSize`
 
-Square spawn extent in world units.
+Width and length of the initial square in scene units. In 3D this is also its height. Agents can leave it after spawning. It can be smaller than the periodic arena and is superseded by an explicit spawn volume.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `preStimulus.mu`
 
@@ -5597,7 +5649,7 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `preStimulus.volumeHalfExtentMetres`
 
-Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.
+Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -5614,13 +5666,13 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `preStimulus.preserveBoundaryOvershoot`
 
-Keep excess travel when wrapping the generated population; legacy edge snapping is used when false.
+Retained in existing files. Generated agents always retain excess travel across periodic edges.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `boolean` |
 | Required by parent schema | No |
-| Default | `false` |
+| Default | `true` |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
 
@@ -5684,7 +5736,7 @@ Z component. Unity +Z points forward/north. Distances use scene units: metres on
 
 ### `preStimulus.spawnVolumeSize`
 
-Positive {x,y,z} volume dimensions. Omit for spawnAreaSize in every dimension.
+Independent X, Y and Z spawn dimensions in scene units. In 2D only X and Z are used. Leave empty to use Spawn area size. Each wrapped axis must fit within the corresponding arena length.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -5762,15 +5814,17 @@ UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the fo
 
 ### `preStimulus.boundaryHeight`
 
-3D periodic Y extent. Required only when wrapY is true; otherwise Y is not wrapped.
+Total vertical span of a 3D periodic arena. Applies when Wrap Y is enabled. An omitted height uses the spawn height unless a physical arena half extent is configured.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
 
@@ -6074,29 +6128,43 @@ Visible fraction, 0–1.
 | `maximum` | `3.40282347e+38` |
 | UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
 
-### `preStimulus.boundaryLengthX`
+### `preStimulus.periodicBoundary`
 
-Periodic arena lengths in world units; example 200 each.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `boolean` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `true` |
+
+### `preStimulus.boundaryLengthX`
+
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `preStimulus.boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `number or null` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `preStimulus.animateOnMove`
 
@@ -6766,6 +6834,1166 @@ Duration of this phase, in seconds. Its clock takes priority over the heading ob
 | `exclusiveMinimum` | `0` |
 | UI soft slider range | `{"min":1,"max":3600,"step":1}`; display/edit convenience, not an extra runtime constraint. |
 
+### `preStimulus.swarm`
+
+Conspecific swarm stimulus. Contains population, size, direction, speed distribution, boundaries and optional recorded playback settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | No default emitted at this path. |
+| `additionalProperties` | `true` |
+
+### `preStimulus.swarm.modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `preStimulus.swarm.modelAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `preStimulus.swarm.modelAppearance.enabled`
+
+Override this object's surface without changing the original model file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `preStimulus.swarm.modelAppearance.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `preStimulus.swarm.modelAppearance.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.modelAppearance.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.modelAppearance.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.modelAppearance.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.modelAppearance.keepTexture`
+
+Keep the model's base-color texture. Disable for a uniform chosen color.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `preStimulus.swarm.modelAppearance.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `preStimulus.swarm.modelAppearance.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `preStimulus.swarm.trajectoryFile`
+
+StreamingAssets-relative or absolute CSV path. Blank preserves generated motion. Supplied missing/malformed files raise errors.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `preStimulus.swarm.playback`
+
+Recorded swarm trajectory playback: time mapping, anchoring, looping and continuation beyond the recorded track.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "dataUnitsPerMetre": 1.0,
+  "loop": true,
+  "speed": 1.0,
+  "startTimeSeconds": 0.0,
+  "maxGapSeconds": 0.1,
+  "yawOffsetDegrees": 0.0,
+  "centerOnAnimal": true,
+  "periodicBoundary": true,
+  "continueAfterTrack": false,
+  "despawnDistanceMetres": 100.0,
+  "terminalVelocityWindowSeconds": 0.1,
+  "continuationSpeedMetresPerSecond": null,
+  "preRollSeconds": 0.0
+}
+```
+
+</details>
+
+UI `enabledWhen`: `{"property":"trajectoryFile","nonEmpty":true}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.playback.dataUnitsPerMetre`
+
+Number of CSV distance units per metre. Use 1 for sanitized metre data and 1000 for millimetres. Combined with worldUnitsPerMetre during playback.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.playback.loop`
+
+Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `preStimulus.swarm.playback.speed`
+
+Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| UI unit label | × time |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":100.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.playback.startTimeSeconds`
+
+Shared clock offset.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.playback.maxGapSeconds`
+
+Interpolate across gaps no longer than this; longer missing intervals are invisible.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.1` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.playback.yawOffsetDegrees`
+
+Clockwise presentation yaw independent of steering.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.playback.centerOnAnimal`
+
+Align the full dataset's sample centroid with the animal at each track appearance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `preStimulus.swarm.playback.periodicBoundary`
+
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `preStimulus.swarm.playback.continueAfterTrack`
+
+Continue each uninterrupted recorded segment at its terminal velocity. Requires periodicBoundary: false.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `preStimulus.swarm.playback.despawnDistanceMetres`
+
+In continuation mode, retire a moth when its 3D distance from the current animal exceeds this many physical metres. Scaled correctly in centimetre scenes.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `100.0` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.playback.terminalVelocityWindowSeconds`
+
+Estimate outgoing velocity from approximately the final 0.1 s of each uninterrupted segment, and incoming velocity from its first 0.1 s. Short segments use available samples; zero uses the endpoint pair. Does not smooth or alter recorded positions.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.1` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.playback.continuationSpeedMetresPerSecond`
+
+Physical speed override for extrapolated incoming/outgoing lines; positive m/s, independent of CSV/scene units. Null retains each measured endpoint velocity. Active recorded examples use 6. Recorded positions/times are unchanged. A singleton or zero-velocity endpoint stays stationary.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.playback.preRollSeconds`
+
+Seconds of straight-line incoming extrapolation before a segment's first sample. Requires continueAfterTrack: true. The passive Selwyn example uses 5 (about 30 m at 6 m/s); active/flying examples use 0. Preserve 0 for historical first-sample spawns. No prior recording cycle is invented at startup.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.worldUnitsPerMetre`
+
+Physical scene scale: 1 terrain or 100 walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.nearClipMetres`
+
+1 mm near plane; permits seeing a moth 1 cm ahead. Applied to stimulus cameras, preserving system camera allow-lists.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.farClipMetres`
+
+Maximum depth rendered by stimulus cameras, in metres. Sets the camera far plane for agents and scenery. Leave empty to use the camera's original distance. This changes visibility without changing the spawn area or periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.useHeadingReference`
+
+Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `preStimulus.swarm.headingReferenceId`
+
+Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+UI `enabledWhen`: `{"property":"useHeadingReference","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.directionDistribution`
+
+Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"Legacy"` |
+| `enum` | `["Legacy","VonMises"]` |
+
+### `preStimulus.swarm.spawnRelativeToAnimal`
+
+Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `preStimulus.swarm.followAnimalPosition`
+
+Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `preStimulus.swarm.numberOfLocusts`
+
+Population per rig; template 256 means 1024 total.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.agentCount`
+
+Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `0` |
+| `maximum` | `2147483647` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.density`
+
+Optional agents per world-unit area (2D) or volume (3D). Used only when numberOfLocusts is omitted; count is rounded to the nearest whole agent.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.spawnType`
+
+Random samples independent starting positions and configured heading distributions. Grid uses fixed cell centers and evenly spaced headings around a full turn starting at Mean heading. In 3D, Grid uses evenly spaced layers and the configured mean elevation.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Random"` |
+| `enum` | `["Random","Grid",0,1]` |
+
+### `preStimulus.swarm.spawnAreaSize`
+
+Width and length of the initial square in scene units. In 3D this is also its height. Agents can leave it after spawning. It can be smaller than the periodic arena and is superseded by an explicit spawn volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `preStimulus.swarm.mu`
+
+Mean/explicit yaw in degrees.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":-180.0,"max":180.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.kappa`
+
+Dimensionless heading concentration: 0 uniform, 10 concentrated, 100000 aligned.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.locustSpeed`
+
+Generated mean speed in world units/s: cm/s in walking scenes, m/s on terrain. Recorded CSV playback is unaffected.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.locustSpeedStdDev`
+
+Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":10.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.agentSpeed`
+
+Generated agent speed in scene units/s. Takes precedence over locustSpeed and locoSpeed. Recorded trajectory timing is controlled by playback.speed.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.agentSpeedStdDev`
+
+Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":10.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.locoSpeed`
+
+Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitted.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.volumeHalfExtentMetres`
+
+Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+| UI soft slider range | `{"min":0.1,"max":10.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.preserveBoundaryOvershoot`
+
+Retained in existing files. Generated agents always retain excess travel across periodic edges.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.dimension`
+
+2D preserves the historical X/Z swarm. 3D samples a volume and can wrap Y.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"2D"` |
+| `enum` | `["2D","3D"]` |
+
+### `preStimulus.swarm.spawnCenter`
+
+Optional {x,y,z} center of the spawn volume. In 2D only X/Z are used.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `preStimulus.swarm.spawnCenter.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.spawnCenter.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.spawnCenter.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.spawnVolumeSize`
+
+Independent X, Y and Z spawn dimensions in scene units. In 2D only X and Z are used. Leave empty to use Spawn area size. Each wrapped axis must fit within the corresponding arena length.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `preStimulus.swarm.spawnVolumeSize.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.spawnVolumeSize.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.spawnVolumeSize.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.muElevation`
+
+Unity X pitch in degrees: negative tilts upward, positive downward; ignored in 2D.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":-90.0,"max":90.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.kappaElevation`
+
+3D elevation concentration. Legacy: 0 is uniform, >=10000 fixed. VonMises: concentration uses the corrected circular sampler without that cutoff.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.boundaryHeight`
+
+Total vertical span of a 3D periodic arena. Applies when Wrap Y is enabled. An omitted height uses the spawn height unless a physical arena half extent is configured.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.wrapY`
+
+Enable periodic Y wrapping for a 3D swarm.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.agentVisual`
+
+Existing prefab, or Bogong for an opaque, unlit circular patch.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"ScenePrefab"` |
+| `enum` | `["ScenePrefab","Bogong"]` |
+
+### `preStimulus.swarm.bogongVisual`
+
+sizeMode is World (diameter size) or Angular (diameter angularSizeDegrees, 0–180 exclusive). Both draw a camera-facing circular patch of solid color RGB; alpha, metallic and smoothness have no visual effect. No lighting, fog, shadows, textures or soft edges. flickerFrequencyHz 0 disables flicker; flickerDutyCycle is the visible fraction.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+UI `visibleWhen`: `{"property":"agentVisual","oneOf":["Bogong"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.bogongVisual.shape`
+
+box or cylinder (capsule collider).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"Dot"` |
+| `enum` | `["Dot","Moth"]` |
+
+### `preStimulus.swarm.bogongVisual.bodyLengthMetres`
+
+Length along local +Z.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0254` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.bogongVisual.bodyDiameterMetres`
+
+Physical diameter of the cigar-shaped moth body, in metres. 0.01 means 1 cm. Independent of terrain/walking scene units.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.01` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.bogongVisual.wingSpanMetres`
+
+Total two-wing width.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.04` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.bogongVisual.flapFrequencyHz`
+
+Flap cycles/s; zero gives a static pose.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `30.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":100.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.bogongVisual.wingOpacity`
+
+Faint wing blur opacity, 0–1.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.25` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.bogongVisual.subpixelVisibility`
+
+Soft proxy below a few pixels, with opacity proportional to projected body area plus faint wings; retains subpixel flap motion.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.bogongVisual.sizeMode`
+
+Physical distance scaling, or Angular for constant apparent nominal body length.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"World"` |
+| `enum` | `["World","Angular"]` |
+
+### `preStimulus.swarm.bogongVisual.size`
+
+Legacy fields not consulted by trigger construction; use trigger fields.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.01,"max":5.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"sizeMode","oneOf":["World"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.bogongVisual.angularSizeDegrees`
+
+Dot diameter, or nominal moth body length, in Angular mode; orientation still changes the projected shape.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.1,"max":10.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"sizeMode","oneOf":["Angular"]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.bogongVisual.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 0.12,
+  "g": 0.12,
+  "b": 0.12,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `preStimulus.swarm.bogongVisual.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.bogongVisual.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.bogongVisual.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.bogongVisual.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.bogongVisual.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.bogongVisual.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.25` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.bogongVisual.flickerFrequencyHz`
+
+Whole-agent flicker separate from flap. Zero disables.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.bogongVisual.flickerDutyCycle`
+
+Visible fraction, 0–1.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `preStimulus.swarm.periodicBoundary`
+
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `preStimulus.swarm.boundaryLengthX`
+
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `preStimulus.swarm.boundaryLengthZ`
+
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `preStimulus.swarm.animateOnMove`
+
+Enable leg-animation gating; templates set true.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `preStimulus.swarm.animationSpeedThreshold`
+
+cm/s planar translation; animate only strictly above threshold. Rotation alone does not animate.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":5.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `enabledWhen`: `{"property":"animateOnMove","oneOf":[true]}`. This governs the form, not removal of stored values.
+
 ## stimulus group
 
 ### `stimulus`
@@ -7369,7 +8597,7 @@ Band invisibility/visibility durations in seconds; example 0/10.
 
 ### `stimulus.objects[].boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -7381,7 +8609,7 @@ Periodic arena lengths in world units; example 200 each.
 
 ### `stimulus.objects[].boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -7851,16 +9079,6 @@ Catalog name, e.g. SimulatedLocust or LocustBand_black. Catalog is a build-safe 
 | Type | `string or null` |
 | Required by parent schema | No |
 | Default | `null` |
-
-### `stimulus.periodicBoundary`
-
-Wrap animal and replicas in X/Z.
-
-| Contract | Emitted value |
-| --- | --- |
-| Type | `boolean` |
-| Required by parent schema | No |
-| Default | `true` |
 
 ### `stimulus.skyboxPath`
 
@@ -8604,7 +9822,7 @@ Align the full dataset's sample centroid with the animal at each track appearanc
 
 ### `stimulus.playback.periodicBoundary`
 
-Wrap animal and replicas in X/Z.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -8706,6 +9924,19 @@ Physical scene scale: 1 terrain or 100 walking.
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `stimulus.farClipMetres`
+
+Maximum depth rendered by stimulus cameras, in metres. Sets the camera far plane for agents and scenery. Leave empty to use the camera's original distance. This changes visibility without changing the spawn area or periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ### `stimulus.useHeadingReference`
 
 Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
@@ -8751,7 +9982,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `stimulus.followAnimalPosition`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -8797,17 +10028,30 @@ Optional agents per world-unit area (2D) or volume (3D). Used only when numberOf
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `stimulus.spawnType`
+
+Random samples independent starting positions and configured heading distributions. Grid uses fixed cell centers and evenly spaced headings around a full turn starting at Mean heading. In 3D, Grid uses evenly spaced layers and the configured mean elevation.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Random"` |
+| `enum` | `["Random","Grid",0,1]` |
+
 ### `stimulus.spawnAreaSize`
 
-Square spawn extent in world units.
+Width and length of the initial square in scene units. In 3D this is also its height. Agents can leave it after spawning. It can be smaller than the periodic arena and is superseded by an explicit spawn volume.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `stimulus.mu`
 
@@ -8916,7 +10160,7 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `stimulus.volumeHalfExtentMetres`
 
-Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.
+Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -8933,13 +10177,13 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `stimulus.preserveBoundaryOvershoot`
 
-Keep excess travel when wrapping the generated population; legacy edge snapping is used when false.
+Retained in existing files. Generated agents always retain excess travel across periodic edges.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `boolean` |
 | Required by parent schema | No |
-| Default | `false` |
+| Default | `true` |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
 
@@ -9003,7 +10247,7 @@ Z component. Unity +Z points forward/north. Distances use scene units: metres on
 
 ### `stimulus.spawnVolumeSize`
 
-Positive {x,y,z} volume dimensions. Omit for spawnAreaSize in every dimension.
+Independent X, Y and Z spawn dimensions in scene units. In 2D only X and Z are used. Leave empty to use Spawn area size. Each wrapped axis must fit within the corresponding arena length.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -9081,15 +10325,17 @@ UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the fo
 
 ### `stimulus.boundaryHeight`
 
-3D periodic Y extent. Required only when wrapY is true; otherwise Y is not wrapped.
+Total vertical span of a 3D periodic arena. Applies when Wrap Y is enabled. An omitted height uses the spawn height unless a physical arena half extent is configured.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
 
@@ -9393,29 +10639,43 @@ Visible fraction, 0–1.
 | `maximum` | `3.40282347e+38` |
 | UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
 
-### `stimulus.boundaryLengthX`
+### `stimulus.periodicBoundary`
 
-Periodic arena lengths in world units; example 200 each.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `boolean` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `true` |
+
+### `stimulus.boundaryLengthX`
+
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `stimulus.boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `number or null` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `stimulus.animateOnMove`
 
@@ -10085,6 +11345,1166 @@ Duration of this phase, in seconds. Its clock takes priority over the heading ob
 | `exclusiveMinimum` | `0` |
 | UI soft slider range | `{"min":1,"max":3600,"step":1}`; display/edit convenience, not an extra runtime constraint. |
 
+### `stimulus.swarm`
+
+Conspecific swarm stimulus. Contains population, size, direction, speed distribution, boundaries and optional recorded playback settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | No default emitted at this path. |
+| `additionalProperties` | `true` |
+
+### `stimulus.swarm.modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `stimulus.swarm.modelAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `stimulus.swarm.modelAppearance.enabled`
+
+Override this object's surface without changing the original model file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `stimulus.swarm.modelAppearance.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `stimulus.swarm.modelAppearance.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.modelAppearance.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.modelAppearance.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.modelAppearance.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.modelAppearance.keepTexture`
+
+Keep the model's base-color texture. Disable for a uniform chosen color.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `stimulus.swarm.modelAppearance.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `stimulus.swarm.modelAppearance.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `stimulus.swarm.trajectoryFile`
+
+StreamingAssets-relative or absolute CSV path. Blank preserves generated motion. Supplied missing/malformed files raise errors.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `stimulus.swarm.playback`
+
+Recorded swarm trajectory playback: time mapping, anchoring, looping and continuation beyond the recorded track.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "dataUnitsPerMetre": 1.0,
+  "loop": true,
+  "speed": 1.0,
+  "startTimeSeconds": 0.0,
+  "maxGapSeconds": 0.1,
+  "yawOffsetDegrees": 0.0,
+  "centerOnAnimal": true,
+  "periodicBoundary": true,
+  "continueAfterTrack": false,
+  "despawnDistanceMetres": 100.0,
+  "terminalVelocityWindowSeconds": 0.1,
+  "continuationSpeedMetresPerSecond": null,
+  "preRollSeconds": 0.0
+}
+```
+
+</details>
+
+UI `enabledWhen`: `{"property":"trajectoryFile","nonEmpty":true}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.playback.dataUnitsPerMetre`
+
+Number of CSV distance units per metre. Use 1 for sanitized metre data and 1000 for millimetres. Combined with worldUnitsPerMetre during playback.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.playback.loop`
+
+Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `stimulus.swarm.playback.speed`
+
+Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| UI unit label | × time |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":100.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.playback.startTimeSeconds`
+
+Shared clock offset.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.playback.maxGapSeconds`
+
+Interpolate across gaps no longer than this; longer missing intervals are invisible.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.1` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.playback.yawOffsetDegrees`
+
+Clockwise presentation yaw independent of steering.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.playback.centerOnAnimal`
+
+Align the full dataset's sample centroid with the animal at each track appearance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `stimulus.swarm.playback.periodicBoundary`
+
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `stimulus.swarm.playback.continueAfterTrack`
+
+Continue each uninterrupted recorded segment at its terminal velocity. Requires periodicBoundary: false.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `stimulus.swarm.playback.despawnDistanceMetres`
+
+In continuation mode, retire a moth when its 3D distance from the current animal exceeds this many physical metres. Scaled correctly in centimetre scenes.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `100.0` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.playback.terminalVelocityWindowSeconds`
+
+Estimate outgoing velocity from approximately the final 0.1 s of each uninterrupted segment, and incoming velocity from its first 0.1 s. Short segments use available samples; zero uses the endpoint pair. Does not smooth or alter recorded positions.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.1` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.playback.continuationSpeedMetresPerSecond`
+
+Physical speed override for extrapolated incoming/outgoing lines; positive m/s, independent of CSV/scene units. Null retains each measured endpoint velocity. Active recorded examples use 6. Recorded positions/times are unchanged. A singleton or zero-velocity endpoint stays stationary.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.playback.preRollSeconds`
+
+Seconds of straight-line incoming extrapolation before a segment's first sample. Requires continueAfterTrack: true. The passive Selwyn example uses 5 (about 30 m at 6 m/s); active/flying examples use 0. Preserve 0 for historical first-sample spawns. No prior recording cycle is invented at startup.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.worldUnitsPerMetre`
+
+Physical scene scale: 1 terrain or 100 walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.nearClipMetres`
+
+1 mm near plane; permits seeing a moth 1 cm ahead. Applied to stimulus cameras, preserving system camera allow-lists.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.farClipMetres`
+
+Maximum depth rendered by stimulus cameras, in metres. Sets the camera far plane for agents and scenery. Leave empty to use the camera's original distance. This changes visibility without changing the spawn area or periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.useHeadingReference`
+
+Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `stimulus.swarm.headingReferenceId`
+
+Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+UI `enabledWhen`: `{"property":"useHeadingReference","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.directionDistribution`
+
+Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"Legacy"` |
+| `enum` | `["Legacy","VonMises"]` |
+
+### `stimulus.swarm.spawnRelativeToAnimal`
+
+Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `stimulus.swarm.followAnimalPosition`
+
+Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `stimulus.swarm.numberOfLocusts`
+
+Population per rig; template 256 means 1024 total.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.agentCount`
+
+Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `0` |
+| `maximum` | `2147483647` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.density`
+
+Optional agents per world-unit area (2D) or volume (3D). Used only when numberOfLocusts is omitted; count is rounded to the nearest whole agent.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.spawnType`
+
+Random samples independent starting positions and configured heading distributions. Grid uses fixed cell centers and evenly spaced headings around a full turn starting at Mean heading. In 3D, Grid uses evenly spaced layers and the configured mean elevation.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Random"` |
+| `enum` | `["Random","Grid",0,1]` |
+
+### `stimulus.swarm.spawnAreaSize`
+
+Width and length of the initial square in scene units. In 3D this is also its height. Agents can leave it after spawning. It can be smaller than the periodic arena and is superseded by an explicit spawn volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `stimulus.swarm.mu`
+
+Mean/explicit yaw in degrees.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":-180.0,"max":180.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.kappa`
+
+Dimensionless heading concentration: 0 uniform, 10 concentrated, 100000 aligned.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.locustSpeed`
+
+Generated mean speed in world units/s: cm/s in walking scenes, m/s on terrain. Recorded CSV playback is unaffected.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.locustSpeedStdDev`
+
+Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":10.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.agentSpeed`
+
+Generated agent speed in scene units/s. Takes precedence over locustSpeed and locoSpeed. Recorded trajectory timing is controlled by playback.speed.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.agentSpeedStdDev`
+
+Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":10.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.locoSpeed`
+
+Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitted.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.volumeHalfExtentMetres`
+
+Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+| UI soft slider range | `{"min":0.1,"max":10.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.preserveBoundaryOvershoot`
+
+Retained in existing files. Generated agents always retain excess travel across periodic edges.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.dimension`
+
+2D preserves the historical X/Z swarm. 3D samples a volume and can wrap Y.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"2D"` |
+| `enum` | `["2D","3D"]` |
+
+### `stimulus.swarm.spawnCenter`
+
+Optional {x,y,z} center of the spawn volume. In 2D only X/Z are used.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `stimulus.swarm.spawnCenter.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.spawnCenter.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.spawnCenter.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.spawnVolumeSize`
+
+Independent X, Y and Z spawn dimensions in scene units. In 2D only X and Z are used. Leave empty to use Spawn area size. Each wrapped axis must fit within the corresponding arena length.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `stimulus.swarm.spawnVolumeSize.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.spawnVolumeSize.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.spawnVolumeSize.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.muElevation`
+
+Unity X pitch in degrees: negative tilts upward, positive downward; ignored in 2D.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":-90.0,"max":90.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.kappaElevation`
+
+3D elevation concentration. Legacy: 0 is uniform, >=10000 fixed. VonMises: concentration uses the corrected circular sampler without that cutoff.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.boundaryHeight`
+
+Total vertical span of a 3D periodic arena. Applies when Wrap Y is enabled. An omitted height uses the spawn height unless a physical arena half extent is configured.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.wrapY`
+
+Enable periodic Y wrapping for a 3D swarm.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.agentVisual`
+
+Existing prefab, or Bogong for an opaque, unlit circular patch.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"ScenePrefab"` |
+| `enum` | `["ScenePrefab","Bogong"]` |
+
+### `stimulus.swarm.bogongVisual`
+
+sizeMode is World (diameter size) or Angular (diameter angularSizeDegrees, 0–180 exclusive). Both draw a camera-facing circular patch of solid color RGB; alpha, metallic and smoothness have no visual effect. No lighting, fog, shadows, textures or soft edges. flickerFrequencyHz 0 disables flicker; flickerDutyCycle is the visible fraction.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+UI `visibleWhen`: `{"property":"agentVisual","oneOf":["Bogong"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.bogongVisual.shape`
+
+box or cylinder (capsule collider).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"Dot"` |
+| `enum` | `["Dot","Moth"]` |
+
+### `stimulus.swarm.bogongVisual.bodyLengthMetres`
+
+Length along local +Z.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0254` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.bogongVisual.bodyDiameterMetres`
+
+Physical diameter of the cigar-shaped moth body, in metres. 0.01 means 1 cm. Independent of terrain/walking scene units.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.01` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.bogongVisual.wingSpanMetres`
+
+Total two-wing width.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.04` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.bogongVisual.flapFrequencyHz`
+
+Flap cycles/s; zero gives a static pose.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `30.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":100.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.bogongVisual.wingOpacity`
+
+Faint wing blur opacity, 0–1.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.25` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.bogongVisual.subpixelVisibility`
+
+Soft proxy below a few pixels, with opacity proportional to projected body area plus faint wings; retains subpixel flap motion.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.bogongVisual.sizeMode`
+
+Physical distance scaling, or Angular for constant apparent nominal body length.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"World"` |
+| `enum` | `["World","Angular"]` |
+
+### `stimulus.swarm.bogongVisual.size`
+
+Legacy fields not consulted by trigger construction; use trigger fields.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.01,"max":5.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"sizeMode","oneOf":["World"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.bogongVisual.angularSizeDegrees`
+
+Dot diameter, or nominal moth body length, in Angular mode; orientation still changes the projected shape.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.1,"max":10.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"sizeMode","oneOf":["Angular"]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.bogongVisual.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 0.12,
+  "g": 0.12,
+  "b": 0.12,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `stimulus.swarm.bogongVisual.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.bogongVisual.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.bogongVisual.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.bogongVisual.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.bogongVisual.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.bogongVisual.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.25` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.bogongVisual.flickerFrequencyHz`
+
+Whole-agent flicker separate from flap. Zero disables.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.bogongVisual.flickerDutyCycle`
+
+Visible fraction, 0–1.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `stimulus.swarm.periodicBoundary`
+
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `stimulus.swarm.boundaryLengthX`
+
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `stimulus.swarm.boundaryLengthZ`
+
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `stimulus.swarm.animateOnMove`
+
+Enable leg-animation gating; templates set true.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `stimulus.swarm.animationSpeedThreshold`
+
+cm/s planar translation; animate only strictly above threshold. Rotation alone does not animate.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":5.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `enabledWhen`: `{"property":"animateOnMove","oneOf":[true]}`. This governs the form, not removal of stored values.
+
 ## postStimulus group
 
 ### `postStimulus`
@@ -10688,7 +13108,7 @@ Band invisibility/visibility durations in seconds; example 0/10.
 
 ### `postStimulus.objects[].boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -10700,7 +13120,7 @@ Periodic arena lengths in world units; example 200 each.
 
 ### `postStimulus.objects[].boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -11170,16 +13590,6 @@ Catalog name, e.g. SimulatedLocust or LocustBand_black. Catalog is a build-safe 
 | Type | `string or null` |
 | Required by parent schema | No |
 | Default | `null` |
-
-### `postStimulus.periodicBoundary`
-
-Wrap animal and replicas in X/Z.
-
-| Contract | Emitted value |
-| --- | --- |
-| Type | `boolean` |
-| Required by parent schema | No |
-| Default | `true` |
 
 ### `postStimulus.skyboxPath`
 
@@ -11923,7 +14333,7 @@ Align the full dataset's sample centroid with the animal at each track appearanc
 
 ### `postStimulus.playback.periodicBoundary`
 
-Wrap animal and replicas in X/Z.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -12025,6 +14435,19 @@ Physical scene scale: 1 terrain or 100 walking.
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `postStimulus.farClipMetres`
+
+Maximum depth rendered by stimulus cameras, in metres. Sets the camera far plane for agents and scenery. Leave empty to use the camera's original distance. This changes visibility without changing the spawn area or periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
 ### `postStimulus.useHeadingReference`
 
 Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
@@ -12070,7 +14493,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `postStimulus.followAnimalPosition`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -12116,17 +14539,30 @@ Optional agents per world-unit area (2D) or volume (3D). Used only when numberOf
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
+### `postStimulus.spawnType`
+
+Random samples independent starting positions and configured heading distributions. Grid uses fixed cell centers and evenly spaced headings around a full turn starting at Mean heading. In 3D, Grid uses evenly spaced layers and the configured mean elevation.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Random"` |
+| `enum` | `["Random","Grid",0,1]` |
+
 ### `postStimulus.spawnAreaSize`
 
-Square spawn extent in world units.
+Width and length of the initial square in scene units. In 3D this is also its height. Agents can leave it after spawning. It can be smaller than the periodic arena and is superseded by an explicit spawn volume.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `postStimulus.mu`
 
@@ -12235,7 +14671,7 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `postStimulus.volumeHalfExtentMetres`
 
-Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.
+Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -12252,13 +14688,13 @@ UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the
 
 ### `postStimulus.preserveBoundaryOvershoot`
 
-Keep excess travel when wrapping the generated population; legacy edge snapping is used when false.
+Retained in existing files. Generated agents always retain excess travel across periodic edges.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `boolean` |
 | Required by parent schema | No |
-| Default | `false` |
+| Default | `true` |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
 
@@ -12322,7 +14758,7 @@ Z component. Unity +Z points forward/north. Distances use scene units: metres on
 
 ### `postStimulus.spawnVolumeSize`
 
-Positive {x,y,z} volume dimensions. Omit for spawnAreaSize in every dimension.
+Independent X, Y and Z spawn dimensions in scene units. In 2D only X and Z are used. Leave empty to use Spawn area size. Each wrapped axis must fit within the corresponding arena length.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -12400,15 +14836,17 @@ UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the fo
 
 ### `postStimulus.boundaryHeight`
 
-3D periodic Y extent. Required only when wrapY is true; otherwise Y is not wrapped.
+Total vertical span of a 3D periodic arena. Applies when Wrap Y is enabled. An omitted height uses the spawn height unless a physical arena half extent is configured.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
 
@@ -12712,29 +15150,43 @@ Visible fraction, 0–1.
 | `maximum` | `3.40282347e+38` |
 | UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
 
-### `postStimulus.boundaryLengthX`
+### `postStimulus.periodicBoundary`
 
-Periodic arena lengths in world units; example 200 each.
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `boolean` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `true` |
+
+### `postStimulus.boundaryLengthX`
+
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `postStimulus.boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
-| Type | `number` |
+| Type | `number or null` |
 | Required by parent schema | No |
-| Default | `200.0` |
+| Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `postStimulus.animateOnMove`
 
@@ -13403,6 +15855,2328 @@ Duration of this phase, in seconds. Its clock takes priority over the heading ob
 | UI unit label | seconds |
 | `exclusiveMinimum` | `0` |
 | UI soft slider range | `{"min":1,"max":3600,"step":1}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm`
+
+Conspecific swarm stimulus. Contains population, size, direction, speed distribution, boundaries and optional recorded playback settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | No default emitted at this path. |
+| `additionalProperties` | `true` |
+
+### `postStimulus.swarm.modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `postStimulus.swarm.modelAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `postStimulus.swarm.modelAppearance.enabled`
+
+Override this object's surface without changing the original model file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `postStimulus.swarm.modelAppearance.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `postStimulus.swarm.modelAppearance.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.modelAppearance.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.modelAppearance.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.modelAppearance.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.modelAppearance.keepTexture`
+
+Keep the model's base-color texture. Disable for a uniform chosen color.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `postStimulus.swarm.modelAppearance.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `postStimulus.swarm.modelAppearance.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `postStimulus.swarm.trajectoryFile`
+
+StreamingAssets-relative or absolute CSV path. Blank preserves generated motion. Supplied missing/malformed files raise errors.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `postStimulus.swarm.playback`
+
+Recorded swarm trajectory playback: time mapping, anchoring, looping and continuation beyond the recorded track.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "dataUnitsPerMetre": 1.0,
+  "loop": true,
+  "speed": 1.0,
+  "startTimeSeconds": 0.0,
+  "maxGapSeconds": 0.1,
+  "yawOffsetDegrees": 0.0,
+  "centerOnAnimal": true,
+  "periodicBoundary": true,
+  "continueAfterTrack": false,
+  "despawnDistanceMetres": 100.0,
+  "terminalVelocityWindowSeconds": 0.1,
+  "continuationSpeedMetresPerSecond": null,
+  "preRollSeconds": 0.0
+}
+```
+
+</details>
+
+UI `enabledWhen`: `{"property":"trajectoryFile","nonEmpty":true}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.playback.dataUnitsPerMetre`
+
+Number of CSV distance units per metre. Use 1 for sanitized metre data and 1000 for millimetres. Combined with worldUnitsPerMetre during playback.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.playback.loop`
+
+Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `postStimulus.swarm.playback.speed`
+
+Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| UI unit label | × time |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":100.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.playback.startTimeSeconds`
+
+Shared clock offset.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.playback.maxGapSeconds`
+
+Interpolate across gaps no longer than this; longer missing intervals are invisible.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.1` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.playback.yawOffsetDegrees`
+
+Clockwise presentation yaw independent of steering.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.playback.centerOnAnimal`
+
+Align the full dataset's sample centroid with the animal at each track appearance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `postStimulus.swarm.playback.periodicBoundary`
+
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `postStimulus.swarm.playback.continueAfterTrack`
+
+Continue each uninterrupted recorded segment at its terminal velocity. Requires periodicBoundary: false.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `postStimulus.swarm.playback.despawnDistanceMetres`
+
+In continuation mode, retire a moth when its 3D distance from the current animal exceeds this many physical metres. Scaled correctly in centimetre scenes.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `100.0` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.playback.terminalVelocityWindowSeconds`
+
+Estimate outgoing velocity from approximately the final 0.1 s of each uninterrupted segment, and incoming velocity from its first 0.1 s. Short segments use available samples; zero uses the endpoint pair. Does not smooth or alter recorded positions.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.1` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.playback.continuationSpeedMetresPerSecond`
+
+Physical speed override for extrapolated incoming/outgoing lines; positive m/s, independent of CSV/scene units. Null retains each measured endpoint velocity. Active recorded examples use 6. Recorded positions/times are unchanged. A singleton or zero-velocity endpoint stays stationary.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.playback.preRollSeconds`
+
+Seconds of straight-line incoming extrapolation before a segment's first sample. Requires continueAfterTrack: true. The passive Selwyn example uses 5 (about 30 m at 6 m/s); active/flying examples use 0. Preserve 0 for historical first-sample spawns. No prior recording cycle is invented at startup.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.worldUnitsPerMetre`
+
+Physical scene scale: 1 terrain or 100 walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.nearClipMetres`
+
+1 mm near plane; permits seeing a moth 1 cm ahead. Applied to stimulus cameras, preserving system camera allow-lists.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.farClipMetres`
+
+Maximum depth rendered by stimulus cameras, in metres. Sets the camera far plane for agents and scenery. Leave empty to use the camera's original distance. This changes visibility without changing the spawn area or periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.useHeadingReference`
+
+Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `postStimulus.swarm.headingReferenceId`
+
+Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+UI `enabledWhen`: `{"property":"useHeadingReference","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.directionDistribution`
+
+Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"Legacy"` |
+| `enum` | `["Legacy","VonMises"]` |
+
+### `postStimulus.swarm.spawnRelativeToAnimal`
+
+Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `postStimulus.swarm.followAnimalPosition`
+
+Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `postStimulus.swarm.numberOfLocusts`
+
+Population per rig; template 256 means 1024 total.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.agentCount`
+
+Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `0` |
+| `maximum` | `2147483647` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.density`
+
+Optional agents per world-unit area (2D) or volume (3D). Used only when numberOfLocusts is omitted; count is rounded to the nearest whole agent.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.spawnType`
+
+Random samples independent starting positions and configured heading distributions. Grid uses fixed cell centers and evenly spaced headings around a full turn starting at Mean heading. In 3D, Grid uses evenly spaced layers and the configured mean elevation.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Random"` |
+| `enum` | `["Random","Grid",0,1]` |
+
+### `postStimulus.swarm.spawnAreaSize`
+
+Width and length of the initial square in scene units. In 3D this is also its height. Agents can leave it after spawning. It can be smaller than the periodic arena and is superseded by an explicit spawn volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `postStimulus.swarm.mu`
+
+Mean/explicit yaw in degrees.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":-180.0,"max":180.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.kappa`
+
+Dimensionless heading concentration: 0 uniform, 10 concentrated, 100000 aligned.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.locustSpeed`
+
+Generated mean speed in world units/s: cm/s in walking scenes, m/s on terrain. Recorded CSV playback is unaffected.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.locustSpeedStdDev`
+
+Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":10.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.agentSpeed`
+
+Generated agent speed in scene units/s. Takes precedence over locustSpeed and locoSpeed. Recorded trajectory timing is controlled by playback.speed.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.agentSpeedStdDev`
+
+Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":10.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.locoSpeed`
+
+Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitted.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.volumeHalfExtentMetres`
+
+Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+| UI soft slider range | `{"min":0.1,"max":10.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.preserveBoundaryOvershoot`
+
+Retained in existing files. Generated agents always retain excess travel across periodic edges.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.dimension`
+
+2D preserves the historical X/Z swarm. 3D samples a volume and can wrap Y.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"2D"` |
+| `enum` | `["2D","3D"]` |
+
+### `postStimulus.swarm.spawnCenter`
+
+Optional {x,y,z} center of the spawn volume. In 2D only X/Z are used.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `postStimulus.swarm.spawnCenter.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.spawnCenter.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.spawnCenter.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.spawnVolumeSize`
+
+Independent X, Y and Z spawn dimensions in scene units. In 2D only X and Z are used. Leave empty to use Spawn area size. Each wrapped axis must fit within the corresponding arena length.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `postStimulus.swarm.spawnVolumeSize.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.spawnVolumeSize.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.spawnVolumeSize.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.muElevation`
+
+Unity X pitch in degrees: negative tilts upward, positive downward; ignored in 2D.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":-90.0,"max":90.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.kappaElevation`
+
+3D elevation concentration. Legacy: 0 is uniform, >=10000 fixed. VonMises: concentration uses the corrected circular sampler without that cutoff.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.boundaryHeight`
+
+Total vertical span of a 3D periodic arena. Applies when Wrap Y is enabled. An omitted height uses the spawn height unless a physical arena half extent is configured.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.wrapY`
+
+Enable periodic Y wrapping for a 3D swarm.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.agentVisual`
+
+Existing prefab, or Bogong for an opaque, unlit circular patch.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"ScenePrefab"` |
+| `enum` | `["ScenePrefab","Bogong"]` |
+
+### `postStimulus.swarm.bogongVisual`
+
+sizeMode is World (diameter size) or Angular (diameter angularSizeDegrees, 0–180 exclusive). Both draw a camera-facing circular patch of solid color RGB; alpha, metallic and smoothness have no visual effect. No lighting, fog, shadows, textures or soft edges. flickerFrequencyHz 0 disables flicker; flickerDutyCycle is the visible fraction.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+UI `visibleWhen`: `{"property":"agentVisual","oneOf":["Bogong"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.bogongVisual.shape`
+
+box or cylinder (capsule collider).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"Dot"` |
+| `enum` | `["Dot","Moth"]` |
+
+### `postStimulus.swarm.bogongVisual.bodyLengthMetres`
+
+Length along local +Z.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0254` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.bogongVisual.bodyDiameterMetres`
+
+Physical diameter of the cigar-shaped moth body, in metres. 0.01 means 1 cm. Independent of terrain/walking scene units.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.01` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.bogongVisual.wingSpanMetres`
+
+Total two-wing width.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.04` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.bogongVisual.flapFrequencyHz`
+
+Flap cycles/s; zero gives a static pose.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `30.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":100.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.bogongVisual.wingOpacity`
+
+Faint wing blur opacity, 0–1.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.25` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.bogongVisual.subpixelVisibility`
+
+Soft proxy below a few pixels, with opacity proportional to projected body area plus faint wings; retains subpixel flap motion.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.bogongVisual.sizeMode`
+
+Physical distance scaling, or Angular for constant apparent nominal body length.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"World"` |
+| `enum` | `["World","Angular"]` |
+
+### `postStimulus.swarm.bogongVisual.size`
+
+Legacy fields not consulted by trigger construction; use trigger fields.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.01,"max":5.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"sizeMode","oneOf":["World"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.bogongVisual.angularSizeDegrees`
+
+Dot diameter, or nominal moth body length, in Angular mode; orientation still changes the projected shape.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.1,"max":10.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"sizeMode","oneOf":["Angular"]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.bogongVisual.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 0.12,
+  "g": 0.12,
+  "b": 0.12,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `postStimulus.swarm.bogongVisual.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.bogongVisual.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.bogongVisual.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.bogongVisual.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.bogongVisual.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.bogongVisual.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.25` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.bogongVisual.flickerFrequencyHz`
+
+Whole-agent flicker separate from flap. Zero disables.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.bogongVisual.flickerDutyCycle`
+
+Visible fraction, 0–1.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `postStimulus.swarm.periodicBoundary`
+
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `postStimulus.swarm.boundaryLengthX`
+
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `postStimulus.swarm.boundaryLengthZ`
+
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `postStimulus.swarm.animateOnMove`
+
+Enable leg-animation gating; templates set true.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `postStimulus.swarm.animationSpeedThreshold`
+
+cm/s planar translation; animate only strictly above threshold. Rotation alone does not animate.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":5.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `enabledWhen`: `{"property":"animateOnMove","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+## swarm group
+
+### `swarm`
+
+Conspecific swarm stimulus. Contains population, size, direction, speed distribution, boundaries and optional recorded playback settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | No default emitted at this path. |
+| `additionalProperties` | `true` |
+
+### `swarm.modelPath`
+
+Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `swarm.modelAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `swarm.modelAppearance.enabled`
+
+Override this object's surface without changing the original model file.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `swarm.modelAppearance.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 1.0,
+  "g": 1.0,
+  "b": 1.0,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `swarm.modelAppearance.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.modelAppearance.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.modelAppearance.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.modelAppearance.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.modelAppearance.keepTexture`
+
+Keep the model's base-color texture. Disable for a uniform chosen color.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `swarm.modelAppearance.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `swarm.modelAppearance.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+
+### `swarm.trajectoryFile`
+
+StreamingAssets-relative or absolute CSV path. Blank preserves generated motion. Supplied missing/malformed files raise errors.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+### `swarm.playback`
+
+Recorded swarm trajectory playback: time mapping, anchoring, looping and continuation beyond the recorded track.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "dataUnitsPerMetre": 1.0,
+  "loop": true,
+  "speed": 1.0,
+  "startTimeSeconds": 0.0,
+  "maxGapSeconds": 0.1,
+  "yawOffsetDegrees": 0.0,
+  "centerOnAnimal": true,
+  "periodicBoundary": true,
+  "continueAfterTrack": false,
+  "despawnDistanceMetres": 100.0,
+  "terminalVelocityWindowSeconds": 0.1,
+  "continuationSpeedMetresPerSecond": null,
+  "preRollSeconds": 0.0
+}
+```
+
+</details>
+
+UI `enabledWhen`: `{"property":"trajectoryFile","nonEmpty":true}`. This governs the form, not removal of stored values.
+
+### `swarm.playback.dataUnitsPerMetre`
+
+Number of CSV distance units per metre. Use 1 for sanitized metre data and 1000 for millimetres. Combined with worldUnitsPerMetre during playback.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.playback.loop`
+
+Repeat the recorded swarm timeline. Continued agents keep moving according to the continuation settings; this does not change the outer scene duration.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `swarm.playback.speed`
+
+Playback time multiplier. 1 reproduces recorded timing; 2 runs twice as fast. This is not a speed in metres per second.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| UI unit label | × time |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":100.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.playback.startTimeSeconds`
+
+Shared clock offset.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.playback.maxGapSeconds`
+
+Interpolate across gaps no longer than this; longer missing intervals are invisible.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.1` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.playback.yawOffsetDegrees`
+
+Clockwise presentation yaw independent of steering.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.playback.centerOnAnimal`
+
+Align the full dataset's sample centroid with the animal at each track appearance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `swarm.playback.periodicBoundary`
+
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `swarm.playback.continueAfterTrack`
+
+Continue each uninterrupted recorded segment at its terminal velocity. Requires periodicBoundary: false.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `swarm.playback.despawnDistanceMetres`
+
+In continuation mode, retire a moth when its 3D distance from the current animal exceeds this many physical metres. Scaled correctly in centimetre scenes.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `100.0` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `swarm.playback.terminalVelocityWindowSeconds`
+
+Estimate outgoing velocity from approximately the final 0.1 s of each uninterrupted segment, and incoming velocity from its first 0.1 s. Short segments use available samples; zero uses the endpoint pair. Does not smooth or alter recorded positions.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.1` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `swarm.playback.continuationSpeedMetresPerSecond`
+
+Physical speed override for extrapolated incoming/outgoing lines; positive m/s, independent of CSV/scene units. Null retains each measured endpoint velocity. Active recorded examples use 6. Recorded positions/times are unchanged. A singleton or zero-velocity endpoint stays stationary.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `swarm.playback.preRollSeconds`
+
+Seconds of straight-line incoming extrapolation before a segment's first sample. Requires continueAfterTrack: true. The passive Selwyn example uses 5 (about 30 m at 6 m/s); active/flying examples use 0. Preserve 0 for historical first-sample spawns. No prior recording cycle is invented at startup.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | seconds |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `enabledWhen`: `{"property":"continueAfterTrack","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `swarm.worldUnitsPerMetre`
+
+Physical scene scale: 1 terrain or 100 walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.nearClipMetres`
+
+1 mm near plane; permits seeing a moth 1 cm ahead. Applied to stimulus cameras, preserving system camera allow-lists.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.farClipMetres`
+
+Maximum depth rendered by stimulus cameras, in metres. Sets the camera far plane for agents and scenery. Leave empty to use the camera's original distance. This changes visibility without changing the spawn area or periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.useHeadingReference`
+
+Add the measured per-rig heading to mu and rotate its spawn/boundary frame accordingly.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `swarm.headingReferenceId`
+
+Named per-animal mean saved by headingReference.saveAs in an earlier block of this cycle. Empty uses the current experiment's result. Missing named references stop the run.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
+UI `enabledWhen`: `{"property":"useHeadingReference","oneOf":[true]}`. This governs the form, not removal of stored values.
+
+### `swarm.directionDistribution`
+
+Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a normalized sampler; yaw/elevation kappa=100 each gives approximately 99% 3D directional order.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"Legacy"` |
+| `enum` | `["Legacy","VonMises"]` |
+
+### `swarm.spawnRelativeToAnimal`
+
+Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `swarm.followAnimalPosition`
+
+Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `swarm.numberOfLocusts`
+
+Population per rig; template 256 means 1024 total.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.agentCount`
+
+Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `0` |
+| `maximum` | `2147483647` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.density`
+
+Optional agents per world-unit area (2D) or volume (3D). Used only when numberOfLocusts is omitted; count is rounded to the nearest whole agent.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.spawnType`
+
+Random samples independent starting positions and configured heading distributions. Grid uses fixed cell centers and evenly spaced headings around a full turn starting at Mean heading. In 3D, Grid uses evenly spaced layers and the configured mean elevation.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Random"` |
+| `enum` | `["Random","Grid",0,1]` |
+
+### `swarm.spawnAreaSize`
+
+Width and length of the initial square in scene units. In 3D this is also its height. Agents can leave it after spawning. It can be smaller than the periodic arena and is superseded by an explicit spawn volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `swarm.mu`
+
+Mean/explicit yaw in degrees.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":-180.0,"max":180.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.kappa`
+
+Dimensionless heading concentration: 0 uniform, 10 concentrated, 100000 aligned.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.locustSpeed`
+
+Generated mean speed in world units/s: cm/s in walking scenes, m/s on terrain. Recorded CSV playback is unaffected.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.locustSpeedStdDev`
+
+Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":10.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `swarm.agentSpeed`
+
+Generated agent speed in scene units/s. Takes precedence over locustSpeed and locoSpeed. Recorded trajectory timing is controlled by playback.speed.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `swarm.agentSpeedStdDev`
+
+Generated speed standard deviation, not variance. Sampled once per agent; zero retains constant speed.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":10.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `swarm.locoSpeed`
+
+Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitted.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units / s |
+| `minimum` | `0` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `swarm.volumeHalfExtentMetres`
+
+Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+| UI soft slider range | `{"min":0.1,"max":10.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `swarm.preserveBoundaryOvershoot`
+
+Retained in existing files. Generated agents always retain excess travel across periodic edges.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `swarm.dimension`
+
+2D preserves the historical X/Z swarm. 3D samples a volume and can wrap Y.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"2D"` |
+| `enum` | `["2D","3D"]` |
+
+### `swarm.spawnCenter`
+
+Optional {x,y,z} center of the spawn volume. In 2D only X/Z are used.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `swarm.spawnCenter.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.spawnCenter.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.spawnCenter.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.spawnVolumeSize`
+
+Independent X, Y and Z spawn dimensions in scene units. In 2D only X and Z are used. Leave empty to use Spawn area size. Each wrapped axis must fit within the corresponding arena length.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `swarm.spawnVolumeSize.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.spawnVolumeSize.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.spawnVolumeSize.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.muElevation`
+
+Unity X pitch in degrees: negative tilts upward, positive downward; ignored in 2D.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":-90.0,"max":90.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `swarm.kappaElevation`
+
+3D elevation concentration. Legacy: 0 is uniform, >=10000 fixed. VonMises: concentration uses the corrected circular sampler without that cutoff.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1000.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `swarm.boundaryHeight`
+
+Total vertical span of a 3D periodic arena. Applies when Wrap Y is enabled. An omitted height uses the spawn height unless a physical arena half extent is configured.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `swarm.wrapY`
+
+Enable periodic Y wrapping for a 3D swarm.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+UI `visibleWhen`: `{"property":"dimension","oneOf":["3D"]}`. This governs the form, not removal of stored values.
+
+### `swarm.agentVisual`
+
+Existing prefab, or Bogong for an opaque, unlit circular patch.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"ScenePrefab"` |
+| `enum` | `["ScenePrefab","Bogong"]` |
+
+### `swarm.bogongVisual`
+
+sizeMode is World (diameter size) or Angular (diameter angularSizeDegrees, 0–180 exclusive). Both draw a camera-facing circular patch of solid color RGB; alpha, metallic and smoothness have no visual effect. No lighting, fog, shadows, textures or soft edges. flickerFrequencyHz 0 disables flicker; flickerDutyCycle is the visible fraction.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+UI `visibleWhen`: `{"property":"agentVisual","oneOf":["Bogong"]}`. This governs the form, not removal of stored values.
+
+### `swarm.bogongVisual.shape`
+
+box or cylinder (capsule collider).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"Dot"` |
+| `enum` | `["Dot","Moth"]` |
+
+### `swarm.bogongVisual.bodyLengthMetres`
+
+Length along local +Z.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0254` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `swarm.bogongVisual.bodyDiameterMetres`
+
+Physical diameter of the cigar-shaped moth body, in metres. 0.01 means 1 cm. Independent of terrain/walking scene units.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.01` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `swarm.bogongVisual.wingSpanMetres`
+
+Total two-wing width.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.04` |
+| UI unit label | metres |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `swarm.bogongVisual.flapFrequencyHz`
+
+Flap cycles/s; zero gives a static pose.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `30.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":100.0,"step":1.0}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `swarm.bogongVisual.wingOpacity`
+
+Faint wing blur opacity, 0–1.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.25` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `swarm.bogongVisual.subpixelVisibility`
+
+Soft proxy below a few pixels, with opacity proportional to projected body area plus faint wings; retains subpixel flap motion.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+UI `visibleWhen`: `{"property":"shape","oneOf":["Moth"]}`. This governs the form, not removal of stored values.
+
+### `swarm.bogongVisual.sizeMode`
+
+Physical distance scaling, or Angular for constant apparent nominal body length.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"World"` |
+| `enum` | `["World","Angular"]` |
+
+### `swarm.bogongVisual.size`
+
+Legacy fields not consulted by trigger construction; use trigger fields.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.01,"max":5.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"sizeMode","oneOf":["World"]}`. This governs the form, not removal of stored values.
+
+### `swarm.bogongVisual.angularSizeDegrees`
+
+Dot diameter, or nominal moth body length, in Angular mode; orientation still changes the projected shape.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `1.0` |
+| UI unit label | degrees |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.1,"max":10.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `visibleWhen`: `{"property":"sizeMode","oneOf":["Angular"]}`. This governs the form, not removal of stored values.
+
+### `swarm.bogongVisual.color`
+
+Normalized color channels from 0 to 1. Use the JSON object or array format shown for this parameter; alpha is optional where supported. These are stimulus values, not calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "r": 0.12,
+  "g": 0.12,
+  "b": 0.12,
+  "a": 1.0
+}
+```
+
+</details>
+
+### `swarm.bogongVisual.color.r`
+
+Red channel, normalized from 0 (none) to 1 (full intensity). This is a stimulus value, not a calibrated luminance.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.bogongVisual.color.g`
+
+Green channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.bogongVisual.color.b`
+
+Blue channel, normalized from 0 (none) to 1 (full intensity).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.bogongVisual.color.a`
+
+Alpha channel, from 0 (transparent) to 1 (opaque).
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `0` |
+| `maximum` | `1` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.bogongVisual.metallic`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.bogongVisual.smoothness`
+
+Legacy compatibility; unlit visual ignores PBR lighting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.25` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.bogongVisual.flickerFrequencyHz`
+
+Whole-agent flicker separate from flap. Zero disables.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.bogongVisual.flickerDutyCycle`
+
+Visible fraction, 0–1.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
+
+### `swarm.periodicBoundary`
+
+Recycle generated agents at opposite arena edges. In Kannadi Mirror mode, wrap the tracked animal and its replicas in X/Z. Recorded trajectories have a separate playback boundary setting.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
+
+### `swarm.boundaryLengthX`
+
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `swarm.boundaryLengthZ`
+
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `swarm.animateOnMove`
+
+Enable leg-animation gating; templates set true.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `false` |
+
+### `swarm.animationSpeedThreshold`
+
+cm/s planar translation; animate only strictly above threshold. Rotation alone does not animate.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.5` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| UI soft slider range | `{"min":0.0,"max":5.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
+
+UI `enabledWhen`: `{"property":"animateOnMove","oneOf":[true]}`. This governs the form, not removal of stored values.
 
 ## Source
 

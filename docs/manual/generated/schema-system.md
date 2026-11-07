@@ -1,6 +1,6 @@
 # System schema fields
 
-This atlas lists **74 emitted property paths** from the current `system` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **75 emitted property paths** from the current `system` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -41,7 +41,7 @@ UI `enabledWhen`: `{"property":"vSyncCount","oneOf":[0]}`. This governs the form
 
 ### `vSyncCount`
 
-0 uses the FPS target; 1–4 synchronize to every Nth display refresh and override the target on desktop.
+0 uses the software FPS cap (60 by default). 1 presents on every refresh, 2 on every second refresh, up to 4. On a 60 Hz display, 1 targets 60 FPS and 2 targets 30 FPS. With VSync enabled, the display interval takes precedence over the FPS cap.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -50,6 +50,18 @@ UI `enabledWhen`: `{"property":"vSyncCount","oneOf":[0]}`. This governs the form
 | Default | `0` |
 | `minimum` | `0` |
 | `maximum` | `4` |
+
+## saveSwarmData group
+
+### `saveSwarmData`
+
+Save virtual population agents every frame for analysis and replay. Switch off to measure rendering performance or run without swarm data. Animal tracking and behavior are still recorded.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `boolean` |
+| Required by parent schema | No |
+| Default | `true` |
 
 ## configs group
 

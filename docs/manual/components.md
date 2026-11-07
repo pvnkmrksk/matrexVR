@@ -48,7 +48,7 @@ This index maps runtime responsibilities to the production classes. Start with t
 | `DataLogger`, `SceneDataLogger`, optomotor loggers | Animal/world/sensor rows and stimulus-specific columns |
 | `AnimalData`, `AnimalMetadata`, `UIDataLogger` | Canonical real-animal metadata and transitional legacy aliases |
 | `RunConfigArchive` | Recursive original-input capture, immutable content snapshots, SHA-256 manifest and consumed-load attribution |
-| `SwarmLogger`, `AsyncSwarmWriter` | Population snapshots, bounded queue/pool, worker encoding/gzip and drain diagnostics |
+| `SwarmLogger`, `AsyncSwarmWriter` | Population snapshots, bounded queue/pool, binary encoding and drain diagnostics |
 | `KannadiLogger`, `BandLogger` | Replicated-pose and band stimulus rows |
 | `ExperimentTelemetry` | Immutable frame snapshots and a separate bounded PUB publisher |
 | `RuntimeStatusOverlay`, frame timing/FPS components | Operator dashboard, errors, frame-work/wait visibility and timing summaries |

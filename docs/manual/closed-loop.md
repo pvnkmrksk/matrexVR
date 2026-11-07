@@ -37,7 +37,11 @@ Experiment pose reset flags and operator tracking toggles are separate controls.
 
 ## Manual motion and autopilot
 
-Keyboard uses the shared Input System actions, respects the system's `manualControls`, and suppresses movement while the operator types into metadata. Forward autopilot uses the active experiment's `autopilotSpeed`; lateral, reverse and yaw input remain available. Ctrl+Space toggles the mode. It does not synthesize a tracker packet.
+Keyboard input respects each rig's `manualControls` and pauses while an operator edits a text field. Use **1–9** to select VR1–VR9, **Shift+1–7** for VR10–VR16, or **0** to apply keyboard input to all rigs. Selection applies to manual translation, rotation, pose reset and tracking shortcuts. The runtime dashboard also cycles through individual rigs and all rigs.
+
+Forward autopilot uses the active experiment's `autopilotSpeed`. The arrow keys and **A/D** steer the selected rig while it moves forward. **Ctrl+Space** toggles autopilot for the selection. An autopilot already running on another rig continues to run.
+
+**Tab** toggles the operator overlays. **Escape** returns to setup and shows **Saving data…** while the recording finishes. Escape becomes available again when setup returns.
 
 Walking scenes use cm/s while metre-scale flight scenes use m/s. Manual operator speed, generated **agentSpeed** and the real animal's measured speed are different quantities. Optomotor disables forward autopilot to retain ownership of stimulus motion.
 
@@ -52,3 +56,10 @@ KineflyAutoTrim observes distinct, fresh input samples, qualifies flight and app
 ## Source and related contracts
 
 [ClosedLoop](https://github.com/pvnkmrksk/matrexVR/blob/main/Assets/Scripts/ClosedLoop.cs), [Keyboard](https://github.com/pvnkmrksk/matrexVR/blob/main/Assets/Scripts/Keyboard.cs), [input contract](input-contracts.md), [data columns](../data-formats.md), [operator controls](../unity6-controls.md).
+
+
+## Stock locust rendering
+
+Generated stock locust swarms use instanced skinning when the scene uses Vulkan, Built-in Forward, one skin weight, and the supported stock material and lighting profile. The renderer uses each original Animator and its live bone transforms. Incompatible models, camera passes, lighting, or materials use Unity's stock renderers. Large independent generated swarms also distribute transform movement across Unity workers before the frame's animation and recording.
+
+Use `--stock-locust-renderers` or `--serial-swarm-motion` to select the respective reference paths for a comparison. The recording manifest lists the permitted renderer and motion options. The run trace records which rig layers activated instancing and any fallback. Same-build replay restores recorded transforms and animation through the stock rendering path. The supported instanced profile matched the stock mesh geometry to floating-point tolerance, with minor rasterization differences at isolated pixels.

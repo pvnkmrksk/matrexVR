@@ -579,7 +579,7 @@ Band invisibility/visibility durations in seconds; example 0/10.
 
 ### `objects[].boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -591,7 +591,7 @@ Periodic arena lengths in world units; example 200 each.
 
 ### `objects[].boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -2548,7 +2548,7 @@ Band invisibility/visibility durations in seconds; example 0/10.
 
 ### `preStimulus.objects[].boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -2560,7 +2560,7 @@ Periodic arena lengths in world units; example 200 each.
 
 ### `preStimulus.objects[].boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -4550,7 +4550,7 @@ Band invisibility/visibility durations in seconds; example 0/10.
 
 ### `stimulus.objects[].boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -4562,7 +4562,7 @@ Periodic arena lengths in world units; example 200 each.
 
 ### `stimulus.objects[].boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -6552,7 +6552,7 @@ Band invisibility/visibility durations in seconds; example 0/10.
 
 ### `postStimulus.objects[].boundaryLengthZ`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic length along Z in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The length must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -6564,7 +6564,7 @@ Periodic arena lengths in world units; example 200 each.
 
 ### `postStimulus.objects[].boundaryLengthX`
 
-Periodic arena lengths in world units; example 200 each.
+Total periodic width along X in scene units. With a fixed agent count, a smaller arena keeps more agents close to an observer inside it. The width must accommodate the spawn area or volume.
 
 | Contract | Emitted value |
 | --- | --- |

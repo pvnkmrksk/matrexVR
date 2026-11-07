@@ -1,0 +1,404 @@
+{
+  "status": "passed requested scope",
+  "scope": "16VRs x64 original native locusts,64 configured128-pixel camera views,full recording,Hejjetrac deliberately disconnected at operator request",
+  "build": {
+    "version": "0.4.2-gui-final",
+    "target": "StandaloneLinux64",
+    "result": "Succeeded",
+    "errors": 0,
+    "warnings": 67,
+    "bytes": 433333542,
+    "buildGuid": "6b0b39fed82a4957b3050c9254fbd5d1",
+    "graphicsApis": [
+      "Vulkan",
+      "OpenGLCore"
+    ],
+    "scenes": [
+      "Assets/Scenes/ControlScene.unity",
+      "Assets/Scenes/Optomotor.unity",
+      "Assets/Scenes/Choice.unity",
+      "Assets/Scenes/Choice_desync.unity",
+      "Assets/Scenes/ReplayScene.unity",
+      "Assets/Scenes/Kannadi.unity",
+      "Assets/Scenes/Choice_Selwyn.unity",
+      "Assets/Scenes/Rugosity_RS.unity",
+      "Assets/Scenes/TerrainCueLab.unity",
+      "Assets/Scenes/TerrainChoice_RoughLeft_SmoothRight.unity",
+      "Assets/Scenes/TerrainChoice_SmoothLeft_RoughRight.unity",
+      "Assets/Scenes/TerrainChoice_BothSmooth.unity",
+      "Assets/Scenes/TerrainChoice_BothRough.unity"
+    ]
+  },
+  "player": {
+    "applicationVersion": "0.4.2-gui-final",
+    "unityVersion": "6000.3.16f1",
+    "buildGuid": "6b0b39fed82a4957b3050c9254fbd5d1",
+    "sourceRevision": "5fbfc05fd3d787e2b45aaf6d023875eb322e5173",
+    "sourceState": "locust-performance-working-snapshot",
+    "sourceTreeDirty": true,
+    "runtimeSourceFingerprintSha256": "ec8023157c4e8f3b7145a4358b54e23c6bbde0733f6ccc6cfc67d34b9d28f746",
+    "runtimeSourceFileCount": 273,
+    "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint."
+  },
+  "systemLayout": [
+    {
+      "vrId": "VR1",
+      "displayOrder": "BLFR",
+      "startCol": 0,
+      "startRow": 0,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR2",
+      "displayOrder": "BLFR",
+      "startCol": 0,
+      "startRow": 1,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR3",
+      "displayOrder": "BLFR",
+      "startCol": 0,
+      "startRow": 2,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR4",
+      "displayOrder": "BLFR",
+      "startCol": 0,
+      "startRow": 3,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR5",
+      "displayOrder": "BLFR",
+      "startCol": 0,
+      "startRow": 4,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR6",
+      "displayOrder": "BLFR",
+      "startCol": 0,
+      "startRow": 5,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR7",
+      "displayOrder": "BLFR",
+      "startCol": 0,
+      "startRow": 6,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR8",
+      "displayOrder": "BLFR",
+      "startCol": 0,
+      "startRow": 7,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR9",
+      "displayOrder": "BLFR",
+      "startCol": 6,
+      "startRow": 0,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR10",
+      "displayOrder": "BLFR",
+      "startCol": 6,
+      "startRow": 1,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR11",
+      "displayOrder": "BLFR",
+      "startCol": 6,
+      "startRow": 2,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR12",
+      "displayOrder": "BLFR",
+      "startCol": 6,
+      "startRow": 3,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR13",
+      "displayOrder": "BLFR",
+      "startCol": 6,
+      "startRow": 4,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR14",
+      "displayOrder": "BLFR",
+      "startCol": 6,
+      "startRow": 5,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR15",
+      "displayOrder": "BLFR",
+      "startCol": 6,
+      "startRow": 6,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    },
+    {
+      "vrId": "VR16",
+      "displayOrder": "BLFR",
+      "startCol": 6,
+      "startRow": 7,
+      "ledPanelWidth": 128,
+      "ledPanelHeight": 128,
+      "sphereDiameter": 10,
+      "targetDisplay": 0
+    }
+  ],
+  "vSyncCount": 1,
+  "targetFrameRate": 60,
+  "performance": {
+    "seconds": 25.0,
+    "weightedFramesPerSecond": 59.999277459825784,
+    "unityCpuPercentOfMachine": 23.272456999106147,
+    "logicalCpuCount": 32,
+    "frameTiming": {
+      "framesPerSecond": {
+        "samples": 50,
+        "mean": 60.00320757802251,
+        "median": 59.99161853344809,
+        "p95": 61.986790031736334,
+        "p99": 62.65637853919906,
+        "maximum": 62.65637853919906
+      },
+      "frameMeanMs": {
+        "samples": 50,
+        "mean": 16.669680622539598,
+        "median": 16.66899518140402,
+        "p95": 17.220630432727074,
+        "p99": 17.450089432329683,
+        "maximum": 17.450089432329683
+      },
+      "framePeakMs": {
+        "samples": 50,
+        "mean": 26.238402919484543,
+        "median": 33.272402919465094,
+        "p95": 33.486536281088775,
+        "p99": 39.401799886718436,
+        "maximum": 39.401799886718436
+      },
+      "gpuMs": {
+        "samples": 50,
+        "mean": 5.34511615489634,
+        "median": 5.335727697441602,
+        "p95": 7.060386133333333,
+        "p99": 7.077923310344828,
+        "maximum": 7.077923310344828
+      },
+      "cpuMainMs": {
+        "samples": 50,
+        "mean": 10.85017943111369,
+        "median": 10.61121895,
+        "p95": 12.523959645161291,
+        "p99": 12.924898666666667,
+        "maximum": 12.924898666666667
+      },
+      "cpuRenderMs": {
+        "samples": 50,
+        "mean": 2.7238813656858545,
+        "median": 2.6667816333333336,
+        "p95": 3.420985066666667,
+        "p99": 3.494497806451613,
+        "maximum": 3.494497806451613
+      },
+      "presentWaitMs": {
+        "samples": 50,
+        "mean": 5.815582484172135,
+        "median": 5.9897332500000005,
+        "p95": 6.615782,
+        "p99": 6.868529133333333,
+        "maximum": 6.868529133333333
+      },
+      "processCpuMsPerFrame": {
+        "samples": 50,
+        "mean": 123.98776789024842,
+        "median": 123.76881720430109,
+        "p95": 126.7741935483871,
+        "p99": 129.33333333333334,
+        "maximum": 129.33333333333334
+      },
+      "processCpuPercentOfOneCore": {
+        "samples": 50,
+        "mean": 743.9695109925844,
+        "median": 742.177481302746,
+        "p95": 774.2255575362093,
+        "p99": 785.9679085383955,
+        "maximum": 785.9679085383955
+      },
+      "timingSamples": {
+        "samples": 50,
+        "mean": 30.44,
+        "median": 30.0,
+        "p95": 31,
+        "p99": 32,
+        "maximum": 32
+      }
+    },
+    "passiveTiming": true
+  },
+  "recording": {
+    "directory": "/home/flyvr01/Documents/ChatGPT/Matrex VR/Build/MATREX VR RunData/20261106_231025",
+    "writers": 16,
+    "droppedFrames": 0,
+    "lifecycle": {
+      "status": "finalized",
+      "createdUtc": "2026-11-06T22:10:25.784315+00:00",
+      "writersDrained": true,
+      "endReason": "local-control-stop",
+      "sequenceOutcome": "stopped",
+      "player": {
+        "applicationVersion": "0.4.2-gui-final",
+        "unityVersion": "6000.3.16f1",
+        "buildGuid": "6b0b39fed82a4957b3050c9254fbd5d1",
+        "sourceRevision": "5fbfc05fd3d787e2b45aaf6d023875eb322e5173",
+        "sourceState": "locust-performance-working-snapshot",
+        "sourceTreeDirty": true,
+        "runtimeSourceFingerprintSha256": "ec8023157c4e8f3b7145a4358b54e23c6bbde0733f6ccc6cfc67d34b9d28f746",
+        "runtimeSourceFileCount": 273,
+        "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint."
+      },
+      "error": null,
+      "finalizedUtc": "2026-11-06T22:11:17.608198+00:00"
+    }
+  },
+  "capturedFrameChecks": [
+    {
+      "file": "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/gui-launch/frame-capture/frame-01.png",
+      "nonblackPixelsInPanelGapAndLowerBlankStrip": 0,
+      "fpsHeadingPixels": 486,
+      "presentedPanelTopPixels": 32768
+    },
+    {
+      "file": "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/gui-launch/frame-capture/frame-02.png",
+      "nonblackPixelsInPanelGapAndLowerBlankStrip": 0,
+      "fpsHeadingPixels": 486,
+      "presentedPanelTopPixels": 32768
+    },
+    {
+      "file": "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/gui-launch/frame-capture/frame-03.png",
+      "nonblackPixelsInPanelGapAndLowerBlankStrip": 0,
+      "fpsHeadingPixels": 486,
+      "presentedPanelTopPixels": 32768
+    },
+    {
+      "file": "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/gui-launch/frame-capture/frame-04.png",
+      "nonblackPixelsInPanelGapAndLowerBlankStrip": 0,
+      "fpsHeadingPixels": 486,
+      "presentedPanelTopPixels": 32768
+    },
+    {
+      "file": "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/gui-launch/frame-capture/frame-05.png",
+      "nonblackPixelsInPanelGapAndLowerBlankStrip": 0,
+      "fpsHeadingPixels": 486,
+      "presentedPanelTopPixels": 32768
+    }
+  ],
+  "localGuiWorkspace": {
+    "schemaVersion": 1,
+    "systemFile": "/home/flyvr01/Documents/ChatGPT/Matrex VR/Build/Config/system_config.json",
+    "sequenceFile": "/home/flyvr01/Documents/ChatGPT/Matrex VR/Build/Config/sequenceConfig.json"
+  },
+  "globalGuiWorkspacePreserved": {
+    "schemaVersion": 1,
+    "systemFile": "/home/flyvr01/Documents/ChatGPT/Matrex VR/Build/Config/system_config.json",
+    "sequenceFile": "/home/flyvr01/.config/unity3d/InsectVRLab/MATREX VR/Config/Examples/Sequences/kannadi-entrainment-social.sequence.json"
+  },
+  "workspaceValidation": {
+    "failure": null,
+    "checks": [
+      "Unmarked players retain global user selection",
+      "An unrelated Config directory cannot override user selection",
+      "Configured GUI player selects its own Config, including paths with spaces",
+      "Editor retains its existing isolated config behavior",
+      "Selecting a configured player preserves global operator preferences",
+      "Incomplete configured players fail clearly rather than opening another experiment",
+      "Editor remains independent of an incomplete adjacent player profile"
+    ]
+  },
+  "displayLayout": "Screen 0: minimum 8 x 8, current 1920 x 1080, maximum 32767 x 32767\nHDMI-0 connected primary 1920x1080+0+0 (normal left inverted right x axis y axis) 0mm x 0mm\n   1920x1080     60.00*+ 119.88    59.94    50.00    29.97    25.00    23.98  \n   4096x2160     59.94    50.00    29.97    25.00    24.00    23.98  \n   3840x2160     59.94    50.00    29.97    25.00    23.98  \n   1280x1024     75.02    60.02  \n   1280x720      59.94    50.00  \n   1024x768      75.03    70.07    60.00  \n   800x600       75.00    72.19    60.32  \n   640x480       59.95  \nDP-0 disconnected (normal left inverted right x axis y axis)\nDP-1 disconnected (normal left inverted right x axis y axis)\nDP-2 disconnected (normal left inverted right x axis y axis)\nDP-3 disconnected (normal left inverted right x axis y axis)\nDP-4 disconnected (normal left inverted right x axis y axis)\nDP-5 disconnected (normal left inverted right x axis y axis)\n",
+  "displayLayoutUnchangedDuringTiming": true,
+  "launchArguments": [
+    "/home/flyvr01/Documents/ChatGPT/Matrex VR/Build/MATREX VR.x86_64",
+    "--control-dir",
+    "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/gui-launch/control",
+    "-logFile",
+    "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/gui-launch/controlled-Player.log"
+  ],
+  "inputMessages": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0,
+    "11": 0,
+    "12": 0,
+    "13": 0,
+    "14": 0,
+    "15": 0,
+    "16": 0
+  },
+  "qualification": "Rendering and recording verified without live tracking. No claim is made about live packet jitter or load from external camera capture. Half-second FPS windows vary; this is not a hard-real-time guarantee.",
+  "artifacts": "/home/flyvr01/Documents/ChatGPT/MatrexPerformance-20261105/gui-launch"
+}

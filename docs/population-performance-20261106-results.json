@@ -1,0 +1,2640 @@
+{
+  "scope": "Unlocked Linux workstation, original locust visuals, current single NOVA display0, target60/VSync0 except explicit VSync phase; screenshot verifies layout, no photodiode scanout or long-trial guarantee.",
+  "baseRevision": "5fbfc05fd3d787e2b45aaf6d023875eb322e5173",
+  "playerIdentity": {
+    "applicationVersion": "0.4.2-native64-noalloc",
+    "unityVersion": "6000.3.16f1",
+    "buildGuid": "37ac6c3676bb473a8da83382a9fba279",
+    "sourceRevision": "5fbfc05fd3d787e2b45aaf6d023875eb322e5173",
+    "sourceState": "locust-performance-working-snapshot",
+    "sourceTreeDirty": true,
+    "runtimeSourceFingerprintSha256": "4e00cde2f216045a6f33a5cc39bf26baa19144f27ad690b2829a21505287e6bd",
+    "runtimeSourceFileCount": 272,
+    "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint."
+  },
+  "build": {
+    "version": "0.4.2-native64-noalloc",
+    "target": "StandaloneLinux64",
+    "result": "Succeeded",
+    "errors": 0,
+    "warnings": 67,
+    "bytes": 433329859,
+    "buildGuid": "37ac6c3676bb473a8da83382a9fba279",
+    "scenes": [
+      "Assets/Scenes/ControlScene.unity",
+      "Assets/Scenes/Optomotor.unity",
+      "Assets/Scenes/Choice.unity",
+      "Assets/Scenes/Choice_desync.unity",
+      "Assets/Scenes/ReplayScene.unity",
+      "Assets/Scenes/Kannadi.unity",
+      "Assets/Scenes/Choice_Selwyn.unity",
+      "Assets/Scenes/Rugosity_RS.unity",
+      "Assets/Scenes/TerrainCueLab.unity",
+      "Assets/Scenes/TerrainChoice_RoughLeft_SmoothRight.unity",
+      "Assets/Scenes/TerrainChoice_SmoothLeft_RoughRight.unity",
+      "Assets/Scenes/TerrainChoice_BothSmooth.unity",
+      "Assets/Scenes/TerrainChoice_BothRough.unity"
+    ]
+  },
+  "sourceSha256": {
+    "Assets/Scripts/Replay/RecordedAnimationState.cs": "aa30b4a8743895183df82540207b194bf84fcb2f2bc3d75b3251d1f8b724fdd6",
+    "Assets/Scripts/Swarm/AsyncSwarmWriter.cs": "9f10755013f6372bdafe9d73dc86e7b7c1c8036eb660034fa8d383155d8bfd0a",
+    "Assets/Scripts/Swarm/SwarmLogger.cs": "e9c64537c84d695f27f93ffe1b618c75dbbd30cb4c0194922a7101d858db6187",
+    "Assets/Scripts/Swarm/KannadiLogger.cs": "a65fc8663dd03f0dca077fe13fb5e217ef900fd6eb82d59b5bdeda40bb69e139",
+    "Assets/Scripts/RuntimePerformanceProbe.cs": "ab256f701b30ab4ec30c638f28175f0cd1755e11d16a05e12468599114086e66",
+    "Assets/Editor/PopulationSnapshotValidation.cs": "43eed092c795defb49202820e4f77d6c47ce4c2663dd73bfcd0fed2ef113ab27"
+  },
+  "measurements": [
+    {
+      "label": "baseline-foreground",
+      "unity": "6000.3.16f1",
+      "gpu": "NVIDIA GeForce RTX 4070",
+      "graphicsApi": "Vulkan",
+      "results": [
+        {
+          "phase": "all-60",
+          "fps": 44.54756003309593,
+          "seconds": 12.009976545999999,
+          "frames": 534,
+          "cpuMainMs": {
+            "samples": 534,
+            "mean": 22.26272378838951,
+            "minimum": 19.408417,
+            "median": 21.146973,
+            "p95": 27.646208,
+            "p99": 32.602412,
+            "maximum": 37.937154,
+            "standardDeviation": 2.7939155304329653
+          },
+          "cpuRenderMs": {
+            "samples": 534,
+            "mean": 3.4645054831460667,
+            "minimum": 2.268016,
+            "median": 3.460487,
+            "p95": 4.040422,
+            "p99": 4.254447,
+            "maximum": 4.507279,
+            "standardDeviation": 0.3482915714351451
+          },
+          "gpuMs": {
+            "samples": 492,
+            "mean": 8.80637190243903,
+            "minimum": 6.614528,
+            "median": 8.499712,
+            "p95": 11.18848,
+            "p99": 12.694784,
+            "maximum": 14.589696,
+            "standardDeviation": 1.2402178134826678
+          },
+          "frameMs": {
+            "samples": 534,
+            "mean": 22.44791856741571,
+            "minimum": 19.372174999997327,
+            "median": 21.485752000000247,
+            "p95": 28.17410900000006,
+            "p99": 32.31077899999946,
+            "maximum": 38.91658800000286,
+            "standardDeviation": 2.8348451081994166
+          },
+          "populationCaptureMs": {
+            "samples": 534,
+            "mean": 10.6335192883895,
+            "minimum": 8.8478,
+            "median": 9.7319,
+            "p95": 14.834299999999999,
+            "p99": 18.6045,
+            "maximum": 24.4706,
+            "standardDeviation": 2.1802458806768743
+          },
+          "worldCaptureMs": {
+            "samples": 534,
+            "mean": 0.4330788389513104,
+            "minimum": 0.3535,
+            "median": 0.3993,
+            "p95": 0.5719,
+            "p99": 0.84,
+            "maximum": 2.0745,
+            "standardDeviation": 0.13733192636056227
+          },
+          "collections": [
+            103,
+            103,
+            103
+          ],
+          "focused": true,
+          "observedRigs": 16,
+          "observedStimulusCameras": 64,
+          "observedPopulation": [
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            }
+          ],
+          "trackingFresh": [
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true
+          ]
+        }
+      ]
+    },
+    {
+      "label": "native64-final",
+      "unity": "6000.3.16f1",
+      "gpu": "NVIDIA GeForce RTX 4070",
+      "graphicsApi": "Vulkan",
+      "results": [
+        {
+          "phase": "all-60",
+          "fps": 59.92980648138663,
+          "seconds": 15.001248429000006,
+          "frames": 898,
+          "cpuMainMs": {
+            "samples": 898,
+            "mean": 12.302232462138077,
+            "minimum": 10.78878,
+            "median": 11.858285,
+            "p95": 15.004958,
+            "p99": 16.259742,
+            "maximum": 17.862361,
+            "standardDeviation": 1.2175502245559968
+          },
+          "cpuRenderMs": {
+            "samples": 898,
+            "mean": 3.558862318485525,
+            "minimum": 2.536907,
+            "median": 3.556858,
+            "p95": 4.105371,
+            "p99": 4.269814,
+            "maximum": 4.504172,
+            "standardDeviation": 0.3123771490465972
+          },
+          "gpuMs": {
+            "samples": 894,
+            "mean": 8.480601055928425,
+            "minimum": 5.892096,
+            "median": 8.197888,
+            "p95": 10.49088,
+            "p99": 11.517952,
+            "maximum": 13.298944,
+            "standardDeviation": 1.0587750014628012
+          },
+          "frameMs": {
+            "samples": 898,
+            "mean": 16.6861877037862,
+            "minimum": 13.551977999998854,
+            "median": 16.66879200000082,
+            "p95": 18.317010000000522,
+            "p99": 19.15590500000164,
+            "maximum": 21.157688999998925,
+            "standardDeviation": 0.8388292651814797
+          },
+          "populationCaptureMs": {
+            "samples": 898,
+            "mean": 0.613618262806236,
+            "minimum": 0.4856,
+            "median": 0.5441,
+            "p95": 1.0655000000000001,
+            "p99": 1.172,
+            "maximum": 1.2532999999999999,
+            "standardDeviation": 0.16362431152944693
+          },
+          "worldCaptureMs": {
+            "samples": 898,
+            "mean": 0.452845991091314,
+            "minimum": 0.3533,
+            "median": 0.4081,
+            "p95": 0.6164,
+            "p99": 0.7086,
+            "maximum": 0.8448,
+            "standardDeviation": 0.08504258877094503
+          },
+          "collections": [
+            26,
+            26,
+            26
+          ],
+          "focused": true,
+          "observedRigs": 16,
+          "observedStimulusCameras": 64,
+          "observedPopulation": [
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            }
+          ],
+          "trackingFresh": [
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "populationRecording": [
+            {
+              "name": "VR2 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR15 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR11 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR16 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR3 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR13 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR6 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR7 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR14 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR10 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR5 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR4 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR12 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR9 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR1 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            },
+            {
+              "name": "VR8 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 76672,
+              "Failure": null
+            }
+          ]
+        },
+        {
+          "phase": "vsync-1",
+          "fps": 60.04228287237109,
+          "seconds": 15.006176756999992,
+          "frames": 900,
+          "cpuMainMs": {
+            "samples": 900,
+            "mean": 12.24120786222222,
+            "minimum": 10.891599,
+            "median": 11.900531,
+            "p95": 14.575397,
+            "p99": 15.868989,
+            "maximum": 16.731116,
+            "standardDeviation": 1.0644971123295
+          },
+          "cpuRenderMs": {
+            "samples": 900,
+            "mean": 3.6136463522222257,
+            "minimum": 2.689348,
+            "median": 3.60568,
+            "p95": 4.136081,
+            "p99": 4.336639,
+            "maximum": 4.580218,
+            "standardDeviation": 0.3100517287090321
+          },
+          "gpuMs": {
+            "samples": 875,
+            "mean": 16.622087021714268,
+            "minimum": 13.1136,
+            "median": 16.630784,
+            "p95": 17.893888,
+            "p99": 18.622976,
+            "maximum": 20.049152,
+            "standardDeviation": 0.7035525789496868
+          },
+          "frameMs": {
+            "samples": 900,
+            "mean": 16.654929695555555,
+            "minimum": 10.905183000005536,
+            "median": 16.64379599999677,
+            "p95": 18.845694999996,
+            "p99": 33.744919999996625,
+            "maximum": 35.71779099999617,
+            "standardDeviation": 3.2655750766385196
+          },
+          "populationCaptureMs": {
+            "samples": 900,
+            "mean": 0.6029014444444437,
+            "minimum": 0.4929,
+            "median": 0.5429999999999999,
+            "p95": 1.0474,
+            "p99": 1.1305,
+            "maximum": 1.2301,
+            "standardDeviation": 0.14661998457131062
+          },
+          "worldCaptureMs": {
+            "samples": 900,
+            "mean": 0.45175711111111067,
+            "minimum": 0.3443,
+            "median": 0.41,
+            "p95": 0.6207,
+            "p99": 0.7514,
+            "maximum": 1.2972,
+            "standardDeviation": 0.09264674021062112
+          },
+          "collections": [
+            25,
+            25,
+            25
+          ],
+          "focused": true,
+          "observedRigs": 16,
+          "observedStimulusCameras": 64,
+          "observedPopulation": [
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            }
+          ],
+          "trackingFresh": [
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "populationRecording": [
+            {
+              "name": "VR2 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR15 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR11 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR16 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR3 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR13 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR6 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR7 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR14 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR10 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR5 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR4 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR12 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR9 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR1 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            },
+            {
+              "name": "VR8 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 141824,
+              "Failure": null
+            }
+          ]
+        },
+        {
+          "phase": "all-60-repeat",
+          "fps": 59.910927665801594,
+          "seconds": 15.005238556999998,
+          "frames": 898,
+          "cpuMainMs": {
+            "samples": 898,
+            "mean": 12.445029707126942,
+            "minimum": 10.846023,
+            "median": 12.01018,
+            "p95": 15.420705,
+            "p99": 16.576668,
+            "maximum": 18.219597,
+            "standardDeviation": 1.27794106079305
+          },
+          "cpuRenderMs": {
+            "samples": 898,
+            "mean": 3.599121775055683,
+            "minimum": 2.607773,
+            "median": 3.605555,
+            "p95": 4.142781,
+            "p99": 4.385106,
+            "maximum": 4.644947,
+            "standardDeviation": 0.3295875379906022
+          },
+          "gpuMs": {
+            "samples": 888,
+            "mean": 8.660011243243256,
+            "minimum": 5.64992,
+            "median": 8.367872,
+            "p95": 10.827008,
+            "p99": 11.990016,
+            "maximum": 13.45024,
+            "standardDeviation": 1.1612635961029782
+          },
+          "frameMs": {
+            "samples": 898,
+            "mean": 16.6914457672606,
+            "minimum": 13.399885999994865,
+            "median": 16.677422000000774,
+            "p95": 18.411230999994643,
+            "p99": 19.236279000004686,
+            "maximum": 20.865514999997004,
+            "standardDeviation": 0.8761877301381988
+          },
+          "populationCaptureMs": {
+            "samples": 898,
+            "mean": 0.6177650334075722,
+            "minimum": 0.48860000000000003,
+            "median": 0.5457,
+            "p95": 1.0644,
+            "p99": 1.1349999999999998,
+            "maximum": 1.2763,
+            "standardDeviation": 0.1637426430862322
+          },
+          "worldCaptureMs": {
+            "samples": 898,
+            "mean": 0.45604432071269463,
+            "minimum": 0.344,
+            "median": 0.4089,
+            "p95": 0.6142,
+            "p99": 0.8145,
+            "maximum": 3.5236,
+            "standardDeviation": 0.13940431014942
+          },
+          "collections": [
+            25,
+            25,
+            25
+          ],
+          "focused": true,
+          "observedRigs": 16,
+          "observedStimulusCameras": 64,
+          "observedPopulation": [
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            }
+          ],
+          "trackingFresh": [
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            true
+          ],
+          "populationRecording": [
+            {
+              "name": "VR2 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR15 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR11 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR16 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR3 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR13 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR6 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR7 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR14 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR10 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR5 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR4 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR12 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR9 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR1 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            },
+            {
+              "name": "VR8 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 206848,
+              "Failure": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "right4-native4",
+      "unity": "6000.3.16f1",
+      "gpu": "NVIDIA GeForce RTX 4070",
+      "graphicsApi": "Vulkan",
+      "results": [
+        {
+          "phase": "all-60",
+          "fps": 59.99569024050859,
+          "seconds": 6.002584209999998,
+          "frames": 359,
+          "cpuMainMs": {
+            "samples": 359,
+            "mean": 1.4495073259052926,
+            "minimum": 1.08405,
+            "median": 1.319635,
+            "p95": 1.963558,
+            "p99": 3.243097,
+            "maximum": 4.544191,
+            "standardDeviation": 0.3613566031308545
+          },
+          "cpuRenderMs": {
+            "samples": 359,
+            "mean": 0.625786259052925,
+            "minimum": 0.2158,
+            "median": 0.610378,
+            "p95": 0.798138,
+            "p99": 0.867608,
+            "maximum": 0.913242,
+            "standardDeviation": 0.09289573111187793
+          },
+          "gpuMs": {
+            "samples": 359,
+            "mean": 1.6693410584958235,
+            "minimum": 0.849152,
+            "median": 1.383424,
+            "p95": 3.177984,
+            "p99": 5.404416,
+            "maximum": 5.654528,
+            "standardDeviation": 0.7776754508039342
+          },
+          "frameMs": {
+            "samples": 359,
+            "mean": 16.66786390807799,
+            "minimum": 13.719123999999638,
+            "median": 16.668880999999303,
+            "p95": 16.95334799999948,
+            "p99": 18.51182000000051,
+            "maximum": 19.419659000000422,
+            "standardDeviation": 0.36630674392235063
+          },
+          "populationCaptureMs": {
+            "samples": 359,
+            "mean": 0.02162869080779943,
+            "minimum": 0.016,
+            "median": 0.0185,
+            "p95": 0.035,
+            "p99": 0.0391,
+            "maximum": 0.0436,
+            "standardDeviation": 0.006368864568388359
+          },
+          "worldCaptureMs": {
+            "samples": 359,
+            "mean": 0.16347743732590517,
+            "minimum": 0.1159,
+            "median": 0.1383,
+            "p95": 0.2147,
+            "p99": 0.2817,
+            "maximum": 2.169,
+            "standardDeviation": 0.15160210076416092
+          },
+          "collections": [
+            6,
+            6,
+            6
+          ],
+          "focused": true,
+          "observedRigs": 4,
+          "observedStimulusCameras": 16,
+          "observedPopulation": [
+            {
+              "numberOfLocusts": 4,
+              "agentVisual": "ScenePrefab",
+              "spawned": 4
+            },
+            {
+              "numberOfLocusts": 4,
+              "agentVisual": "ScenePrefab",
+              "spawned": 4
+            },
+            {
+              "numberOfLocusts": 4,
+              "agentVisual": "ScenePrefab",
+              "spawned": 4
+            },
+            {
+              "numberOfLocusts": 4,
+              "agentVisual": "ScenePrefab",
+              "spawned": 4
+            }
+          ],
+          "trackingFresh": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "populationRecording": [
+            {
+              "name": "VR12 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 2644,
+              "Failure": null
+            },
+            {
+              "name": "VR11 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 2644,
+              "Failure": null
+            },
+            {
+              "name": "VR9 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 2644,
+              "Failure": null
+            },
+            {
+              "name": "VR10 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 2644,
+              "Failure": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "right8-native16",
+      "unity": "6000.3.16f1",
+      "gpu": "NVIDIA GeForce RTX 4070",
+      "graphicsApi": "Vulkan",
+      "results": [
+        {
+          "phase": "all-60",
+          "fps": 59.961096258654756,
+          "seconds": 6.004561288000001,
+          "frames": 359,
+          "cpuMainMs": {
+            "samples": 359,
+            "mean": 2.9187423649025064,
+            "minimum": 2.515232,
+            "median": 2.791328,
+            "p95": 3.67161,
+            "p99": 4.863752,
+            "maximum": 6.158652,
+            "standardDeviation": 0.41803791423724357
+          },
+          "cpuRenderMs": {
+            "samples": 359,
+            "mean": 1.1204315738161552,
+            "minimum": 0.512675,
+            "median": 1.124931,
+            "p95": 1.399827,
+            "p99": 1.491846,
+            "maximum": 1.562649,
+            "standardDeviation": 0.19502581777575634
+          },
+          "gpuMs": {
+            "samples": 359,
+            "mean": 3.6526329582172705,
+            "minimum": 2.552832,
+            "median": 3.220992,
+            "p95": 6.002176,
+            "p99": 6.738944,
+            "maximum": 7.659264,
+            "standardDeviation": 0.9926099358318373
+          },
+          "frameMs": {
+            "samples": 359,
+            "mean": 16.677480272980507,
+            "minimum": 13.332461000000961,
+            "median": 16.676449000000204,
+            "p95": 17.128087999999764,
+            "p99": 18.609836000001323,
+            "maximum": 19.202704999999654,
+            "standardDeviation": 0.4423189895867725
+          },
+          "populationCaptureMs": {
+            "samples": 359,
+            "mean": 0.08669192200557102,
+            "minimum": 0.0698,
+            "median": 0.0782,
+            "p95": 0.14520000000000002,
+            "p99": 0.15380000000000002,
+            "maximum": 0.1647,
+            "standardDeviation": 0.01915769237371347
+          },
+          "worldCaptureMs": {
+            "samples": 359,
+            "mean": 0.20053537604456811,
+            "minimum": 0.1519,
+            "median": 0.1803,
+            "p95": 0.2779,
+            "p99": 0.31,
+            "maximum": 2.2088,
+            "standardDeviation": 0.13540213562092804
+          },
+          "collections": [
+            9,
+            9,
+            9
+          ],
+          "focused": true,
+          "observedRigs": 8,
+          "observedStimulusCameras": 32,
+          "observedPopulation": [
+            {
+              "numberOfLocusts": 16,
+              "agentVisual": "ScenePrefab",
+              "spawned": 16
+            },
+            {
+              "numberOfLocusts": 16,
+              "agentVisual": "ScenePrefab",
+              "spawned": 16
+            },
+            {
+              "numberOfLocusts": 16,
+              "agentVisual": "ScenePrefab",
+              "spawned": 16
+            },
+            {
+              "numberOfLocusts": 16,
+              "agentVisual": "ScenePrefab",
+              "spawned": 16
+            },
+            {
+              "numberOfLocusts": 16,
+              "agentVisual": "ScenePrefab",
+              "spawned": 16
+            },
+            {
+              "numberOfLocusts": 16,
+              "agentVisual": "ScenePrefab",
+              "spawned": 16
+            },
+            {
+              "numberOfLocusts": 16,
+              "agentVisual": "ScenePrefab",
+              "spawned": 16
+            },
+            {
+              "numberOfLocusts": 16,
+              "agentVisual": "ScenePrefab",
+              "spawned": 16
+            }
+          ],
+          "trackingFresh": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "populationRecording": [
+            {
+              "name": "VR11 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 10560,
+              "Failure": null
+            },
+            {
+              "name": "VR15 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 10560,
+              "Failure": null
+            },
+            {
+              "name": "VR16 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 10560,
+              "Failure": null
+            },
+            {
+              "name": "VR9 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 10560,
+              "Failure": null
+            },
+            {
+              "name": "VR12 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 10560,
+              "Failure": null
+            },
+            {
+              "name": "VR10 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 10560,
+              "Failure": null
+            },
+            {
+              "name": "VR14 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 10560,
+              "Failure": null
+            },
+            {
+              "name": "VR13 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 10560,
+              "Failure": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "left8-native64",
+      "unity": "6000.3.16f1",
+      "gpu": "NVIDIA GeForce RTX 4070",
+      "graphicsApi": "Vulkan",
+      "results": [
+        {
+          "phase": "all-60",
+          "fps": 60.019018316362434,
+          "seconds": 6.014828261000002,
+          "frames": 360,
+          "cpuMainMs": {
+            "samples": 360,
+            "mean": 5.0249309166666665,
+            "minimum": 4.53651,
+            "median": 4.879558,
+            "p95": 5.869998,
+            "p99": 6.853117,
+            "maximum": 8.557022,
+            "standardDeviation": 0.46378761762254767
+          },
+          "cpuRenderMs": {
+            "samples": 360,
+            "mean": 1.4477512055555553,
+            "minimum": 0.941265,
+            "median": 1.453699,
+            "p95": 1.821838,
+            "p99": 1.924944,
+            "maximum": 2.051826,
+            "standardDeviation": 0.226060562843989
+          },
+          "gpuMs": {
+            "samples": 360,
+            "mean": 3.807271111111112,
+            "minimum": 2.45504,
+            "median": 3.407616,
+            "p95": 6.12096,
+            "p99": 6.484992,
+            "maximum": 6.804224,
+            "standardDeviation": 0.9815360060251646
+          },
+          "frameMs": {
+            "samples": 360,
+            "mean": 16.661385475,
+            "minimum": 13.011134999999285,
+            "median": 16.67439300000062,
+            "p95": 17.15759200000022,
+            "p99": 17.6694150000003,
+            "maximum": 18.555226000000147,
+            "standardDeviation": 0.39611188122837976
+          },
+          "populationCaptureMs": {
+            "samples": 360,
+            "mean": 0.26951805555555564,
+            "minimum": 0.2223,
+            "median": 0.2445,
+            "p95": 0.3955000000000001,
+            "p99": 0.4535,
+            "maximum": 0.4678,
+            "standardDeviation": 0.05157296914294478
+          },
+          "worldCaptureMs": {
+            "samples": 360,
+            "mean": 0.2810366666666667,
+            "minimum": 0.2268,
+            "median": 0.2574,
+            "p95": 0.3774,
+            "p99": 0.4167,
+            "maximum": 0.8164,
+            "standardDeviation": 0.05575309099552736
+          },
+          "collections": [
+            5,
+            5,
+            5
+          ],
+          "focused": true,
+          "observedRigs": 8,
+          "observedStimulusCameras": 32,
+          "observedPopulation": [
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            }
+          ],
+          "trackingFresh": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "populationRecording": [
+            {
+              "name": "VR4 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42304,
+              "Failure": null
+            },
+            {
+              "name": "VR8 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42304,
+              "Failure": null
+            },
+            {
+              "name": "VR3 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42304,
+              "Failure": null
+            },
+            {
+              "name": "VR1 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42304,
+              "Failure": null
+            },
+            {
+              "name": "VR2 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42304,
+              "Failure": null
+            },
+            {
+              "name": "VR6 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42304,
+              "Failure": null
+            },
+            {
+              "name": "VR5 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42304,
+              "Failure": null
+            },
+            {
+              "name": "VR7 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42304,
+              "Failure": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "right8-native64",
+      "unity": "6000.3.16f1",
+      "gpu": "NVIDIA GeForce RTX 4070",
+      "graphicsApi": "Vulkan",
+      "results": [
+        {
+          "phase": "all-60",
+          "fps": 59.938776930423636,
+          "seconds": 6.006212474000002,
+          "frames": 359,
+          "cpuMainMs": {
+            "samples": 359,
+            "mean": 5.105624158774371,
+            "minimum": 4.550244,
+            "median": 4.96521,
+            "p95": 5.945224,
+            "p99": 6.860066,
+            "maximum": 10.041233,
+            "standardDeviation": 0.5106051714163823
+          },
+          "cpuRenderMs": {
+            "samples": 359,
+            "mean": 1.4305765013927574,
+            "minimum": 0.915371,
+            "median": 1.426845,
+            "p95": 1.812456,
+            "p99": 1.963945,
+            "maximum": 2.24225,
+            "standardDeviation": 0.22503792841903394
+          },
+          "gpuMs": {
+            "samples": 359,
+            "mean": 3.8611766908078,
+            "minimum": 2.562304,
+            "median": 3.453184,
+            "p95": 6.24768,
+            "p99": 6.937856,
+            "maximum": 7.87456,
+            "standardDeviation": 1.0597280471077997
+          },
+          "frameMs": {
+            "samples": 359,
+            "mean": 16.68369044568244,
+            "minimum": 12.794026999999986,
+            "median": 16.67618199999943,
+            "p95": 17.44028599999936,
+            "p99": 18.674686000000662,
+            "maximum": 19.462150000000733,
+            "standardDeviation": 0.48921621670572235
+          },
+          "populationCaptureMs": {
+            "samples": 359,
+            "mean": 0.263317270194986,
+            "minimum": 0.2142,
+            "median": 0.23659999999999998,
+            "p95": 0.3719,
+            "p99": 0.4882,
+            "maximum": 1.9425999999999999,
+            "standardDeviation": 0.1033053468500677
+          },
+          "worldCaptureMs": {
+            "samples": 359,
+            "mean": 0.28473621169916435,
+            "minimum": 0.2311,
+            "median": 0.2554,
+            "p95": 0.3921,
+            "p99": 0.6428,
+            "maximum": 1.0745,
+            "standardDeviation": 0.08037757675310755
+          },
+          "collections": [
+            9,
+            9,
+            9
+          ],
+          "focused": true,
+          "observedRigs": 8,
+          "observedStimulusCameras": 32,
+          "observedPopulation": [
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "ScenePrefab",
+              "spawned": 64
+            }
+          ],
+          "trackingFresh": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+          ],
+          "populationRecording": [
+            {
+              "name": "VR13 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42240,
+              "Failure": null
+            },
+            {
+              "name": "VR15 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42240,
+              "Failure": null
+            },
+            {
+              "name": "VR9 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42240,
+              "Failure": null
+            },
+            {
+              "name": "VR10 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42240,
+              "Failure": null
+            },
+            {
+              "name": "VR16 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42240,
+              "Failure": null
+            },
+            {
+              "name": "VR14 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42240,
+              "Failure": null
+            },
+            {
+              "name": "VR11 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42240,
+              "Failure": null
+            },
+            {
+              "name": "VR12 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 42240,
+              "Failure": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "all16-native0",
+      "unity": "6000.3.16f1",
+      "gpu": "NVIDIA GeForce RTX 4070",
+      "graphicsApi": "Vulkan",
+      "results": [
+        {
+          "phase": "all-60",
+          "fps": 59.93840242579382,
+          "seconds": 6.006356597999998,
+          "frames": 359,
+          "cpuMainMs": {
+            "samples": 359,
+            "mean": 2.9589890501392753,
+            "minimum": 2.336646,
+            "median": 2.72227,
+            "p95": 4.371306,
+            "p99": 4.803266,
+            "maximum": 7.16997,
+            "standardDeviation": 0.6665420342067324
+          },
+          "cpuRenderMs": {
+            "samples": 359,
+            "mean": 1.6483296601671293,
+            "minimum": 1.022944,
+            "median": 1.640604,
+            "p95": 2.488977,
+            "p99": 2.53704,
+            "maximum": 2.558582,
+            "standardDeviation": 0.34343301652127733
+          },
+          "gpuMs": {
+            "samples": 359,
+            "mean": 4.944671376044567,
+            "minimum": 2.955264,
+            "median": 4.393472,
+            "p95": 7.941376,
+            "p99": 9.276416,
+            "maximum": 9.596672,
+            "standardDeviation": 1.303595192223337
+          },
+          "frameMs": {
+            "samples": 359,
+            "mean": 16.683794688022267,
+            "minimum": 13.36339999999936,
+            "median": 16.67123100000012,
+            "p95": 17.147316000000856,
+            "p99": 18.993767999999633,
+            "maximum": 20.005740000000216,
+            "standardDeviation": 0.5203240785448693
+          },
+          "populationCaptureMs": {
+            "samples": 359,
+            "mean": 0.08803788300835658,
+            "minimum": 0.07289999999999999,
+            "median": 0.07980000000000001,
+            "p95": 0.1292,
+            "p99": 0.1365,
+            "maximum": 0.18480000000000005,
+            "standardDeviation": 0.018579122736191826
+          },
+          "worldCaptureMs": {
+            "samples": 359,
+            "mean": 0.2143788300835655,
+            "minimum": 0.1615,
+            "median": 0.183,
+            "p95": 0.2818,
+            "p99": 0.3105,
+            "maximum": 3.1323,
+            "standardDeviation": 0.19783370749001325
+          },
+          "collections": [
+            12,
+            12,
+            12
+          ],
+          "focused": true,
+          "observedRigs": 16,
+          "observedStimulusCameras": 64,
+          "observedPopulation": [
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            },
+            {
+              "numberOfLocusts": 0,
+              "agentVisual": "ScenePrefab",
+              "spawned": 0
+            }
+          ],
+          "trackingFresh": [
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            true,
+            false,
+            false,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false
+          ],
+          "populationRecording": [
+            {
+              "name": "VR4 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR5 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR13 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR12 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR7 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR3 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR2 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR10 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR16 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR6 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR1 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR11 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR8 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR15 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR9 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            },
+            {
+              "name": "VR14 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 0,
+              "Failure": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "all16-bogong-moth64",
+      "unity": "6000.3.16f1",
+      "gpu": "NVIDIA GeForce RTX 4070",
+      "graphicsApi": "Vulkan",
+      "results": [
+        {
+          "phase": "all-60",
+          "fps": 59.8703969734979,
+          "seconds": 8.000414817000001,
+          "frames": 478,
+          "cpuMainMs": {
+            "samples": 478,
+            "mean": 6.522870635983266,
+            "minimum": 4.269207,
+            "median": 6.254494,
+            "p95": 9.76204,
+            "p99": 11.500923,
+            "maximum": 14.474494,
+            "standardDeviation": 1.661644373979683
+          },
+          "cpuRenderMs": {
+            "samples": 478,
+            "mean": 2.410063882845188,
+            "minimum": 1.403635,
+            "median": 2.233538,
+            "p95": 3.1089,
+            "p99": 3.167274,
+            "maximum": 3.27851,
+            "standardDeviation": 0.3996297283615278
+          },
+          "gpuMs": {
+            "samples": 478,
+            "mean": 6.4022311631799145,
+            "minimum": 3.907328,
+            "median": 6.105088,
+            "p95": 9.085696,
+            "p99": 12.320256,
+            "maximum": 13.039104,
+            "standardDeviation": 1.4244510823125842
+          },
+          "frameMs": {
+            "samples": 478,
+            "mean": 16.702745439330524,
+            "minimum": 8.092195000001468,
+            "median": 16.682398000000376,
+            "p95": 20.06352800000144,
+            "p99": 21.615526000001495,
+            "maximum": 25.0501870000015,
+            "standardDeviation": 1.9909729387492872
+          },
+          "populationCaptureMs": {
+            "samples": 478,
+            "mean": 0.5368133891213394,
+            "minimum": 0.3194,
+            "median": 0.4534,
+            "p95": 0.8398,
+            "p99": 1.2871,
+            "maximum": 2.7502999999999997,
+            "standardDeviation": 0.220547767263691
+          },
+          "worldCaptureMs": {
+            "samples": 478,
+            "mean": 1.566423640167365,
+            "minimum": 0.4046,
+            "median": 1.143,
+            "p95": 4.1944,
+            "p99": 5.7696,
+            "maximum": 9.4645,
+            "standardDeviation": 1.2150788383455269
+          },
+          "collections": [
+            54,
+            54,
+            54
+          ],
+          "focused": true,
+          "observedRigs": 16,
+          "observedStimulusCameras": 64,
+          "observedPopulation": [
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            },
+            {
+              "numberOfLocusts": 64,
+              "agentVisual": "Bogong",
+              "spawned": 64
+            }
+          ],
+          "trackingFresh": [
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true
+          ],
+          "populationRecording": [
+            {
+              "name": "VR6 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR2 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR15 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR16 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR4 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR8 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR11 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR5 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR13 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR7 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR1 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR10 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR14 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR3 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR9 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            },
+            {
+              "name": "VR12 Kannadi",
+              "PendingFrames": 0,
+              "DroppedFrames": 0,
+              "WrittenRows": 49728,
+              "Failure": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "recordingLifecycle": {
+    "status": "finalized",
+    "createdUtc": "2026-11-06T07:36:05.245939+00:00",
+    "writersDrained": true,
+    "endReason": "stopped",
+    "sequenceOutcome": "stopped",
+    "player": {
+      "applicationVersion": "0.4.2-native64-noalloc",
+      "unityVersion": "6000.3.16f1",
+      "buildGuid": "37ac6c3676bb473a8da83382a9fba279",
+      "sourceRevision": "5fbfc05fd3d787e2b45aaf6d023875eb322e5173",
+      "sourceState": "locust-performance-working-snapshot",
+      "sourceTreeDirty": true,
+      "runtimeSourceFingerprintSha256": "4e00cde2f216045a6f33a5cc39bf26baa19144f27ad690b2829a21505287e6bd",
+      "runtimeSourceFileCount": 272,
+      "fingerprintScope": "Prepared non-Editor C# files under Assets, sorted path-to-SHA256 compact JSON; packages, scenes and settings are outside this fingerprint."
+    },
+    "error": null,
+    "finalizedUtc": "2026-11-06T07:37:27.580872+00:00"
+  },
+  "writerEvidence": [
+    {
+      "relativePath": "2026-11-06_08-36-06-0957620_SimulatedLocustData_SimulatedLocustsVR1_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0974020_SimulatedLocustData_SimulatedLocustsVR15_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0965930_SimulatedLocustData_SimulatedLocustsVR4_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0973290_SimulatedLocustData_SimulatedLocustsVR14_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0966830_SimulatedLocustData_SimulatedLocustsVR5_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0971260_SimulatedLocustData_SimulatedLocustsVR11_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0969820_SimulatedLocustData_SimulatedLocustsVR9_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0969070_SimulatedLocustData_SimulatedLocustsVR8_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0967570_SimulatedLocustData_SimulatedLocustsVR6_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0968340_SimulatedLocustData_SimulatedLocustsVR7_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0970480_SimulatedLocustData_SimulatedLocustsVR10_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0972590_SimulatedLocustData_SimulatedLocustsVR13_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0963890_SimulatedLocustData_SimulatedLocustsVR2_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0971900_SimulatedLocustData_SimulatedLocustsVR12_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0974770_SimulatedLocustData_SimulatedLocustsVR16_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    },
+    {
+      "relativePath": "2026-11-06_08-36-06-0965010_SimulatedLocustData_SimulatedLocustsVR3_64_400_0_100_2.csv.gz",
+      "writtenRows": 206848,
+      "droppedFrames": 0,
+      "failure": null
+    }
+  ],
+  "actualArchiveInspection": {
+    "rigs": 16,
+    "rows": 51696,
+    "Duration": 54.060621726190476,
+    "FirstExperimentTime": 0.0,
+    "contexts": 1,
+    "restoredConfigurations": 1,
+    "representativePopulation": {
+      "Kind": "Swarm",
+      "RowCount": 206848,
+      "FrameCount": 3232,
+      "HasRotations": true,
+      "HasVisibility": false
+    },
+    "warnings": []
+  },
+  "trackingReceiveAgeScope": "Software-capped measured frames only. Pose wall ticks converted from Europe/Berlin to UTC, minus consumed packet receive UTC ticks; excludes camera capture and physical display delay. Held input is not a backward sequence or lost recording.",
+  "tracking": [
+    {
+      "rig": "VR9",
+      "sampledFrames": 1796,
+      "backwardReceiveSequences": 0,
+      "heldReceiveSequences": 0,
+      "receiveAgeMedianMs": 7.1705,
+      "receiveAgeP99Ms": 14.183,
+      "receiveAgeMaximumMs": 17.01
+    },
+    {
+      "rig": "VR10",
+      "sampledFrames": 1796,
+      "backwardReceiveSequences": 0,
+      "heldReceiveSequences": 0,
+      "receiveAgeMedianMs": 7.2275,
+      "receiveAgeP99Ms": 14.078,
+      "receiveAgeMaximumMs": 18.994
+    },
+    {
+      "rig": "VR11",
+      "sampledFrames": 1796,
+      "backwardReceiveSequences": 0,
+      "heldReceiveSequences": 1,
+      "receiveAgeMedianMs": 7.2364999999999995,
+      "receiveAgeP99Ms": 14.302,
+      "receiveAgeMaximumMs": 20.861
+    },
+    {
+      "rig": "VR12",
+      "sampledFrames": 1796,
+      "backwardReceiveSequences": 0,
+      "heldReceiveSequences": 1,
+      "receiveAgeMedianMs": 7.119,
+      "receiveAgeP99Ms": 14.209,
+      "receiveAgeMaximumMs": 21.21
+    },
+    {
+      "rig": "VR13",
+      "sampledFrames": 1796,
+      "backwardReceiveSequences": 0,
+      "heldReceiveSequences": 0,
+      "receiveAgeMedianMs": 7.2075,
+      "receiveAgeP99Ms": 14.094,
+      "receiveAgeMaximumMs": 17.101
+    },
+    {
+      "rig": "VR14",
+      "sampledFrames": 1796,
+      "backwardReceiveSequences": 0,
+      "heldReceiveSequences": 1,
+      "receiveAgeMedianMs": 7.1135,
+      "receiveAgeP99Ms": 14.252,
+      "receiveAgeMaximumMs": 20.665
+    },
+    {
+      "rig": "VR15",
+      "sampledFrames": 1796,
+      "backwardReceiveSequences": 0,
+      "heldReceiveSequences": 1,
+      "receiveAgeMedianMs": 7.2275,
+      "receiveAgeP99Ms": 14.543,
+      "receiveAgeMaximumMs": 20.058
+    },
+    {
+      "rig": "VR16",
+      "sampledFrames": 1796,
+      "backwardReceiveSequences": 0,
+      "heldReceiveSequences": 1,
+      "receiveAgeMedianMs": 7.133,
+      "receiveAgeP99Ms": 14.181,
+      "receiveAgeMaximumMs": 20.952
+    }
+  ],
+  "snapshotValidation": {
+    "checks": 443,
+    "failure": null,
+    "unity": "6000.3.16f1"
+  },
+  "animationValidation": {
+    "checks": 371,
+    "failure": null,
+    "unity": "6000.3.16f1",
+    "scope": "Original Unity controllers and deformed geometry, procedural material clock/phase, imported animated GLB, CSV cache and immutable source hashes. No physical display or native pointer claim."
+  },
+  "archiveRegressions": {
+    "passed": 694,
+    "asyncWriterLifecycleCycles": 150
+  },
+  "excludedRuns": {
+    "native64-isolation": "Competing previous ready player; excluded.",
+    "native64-async-first": "NOVA changed from display1 to display0; no active cameras; rejected.",
+    "native64-async-background": "Initial async candidate before allocation fix; not final foreground acceptance."
+  }
+}
