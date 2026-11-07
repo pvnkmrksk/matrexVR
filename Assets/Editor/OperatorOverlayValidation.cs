@@ -93,7 +93,7 @@ public static class OperatorOverlayValidation
         foreach(var telemetry in Object.FindObjectsByType<ExperimentTelemetry>(FindObjectsSortMode.None))telemetry.enabled=false;
         if(ConfigurationUI.ConfigWorkbench.Instance!=null)ConfigurationUI.ConfigWorkbench.Instance.gameObject.SetActive(false);
         MainController.Instance.enabled=false;
-        foreach(var camera in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))camera.enabled=false;
+        foreach(var camera in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))if(camera.GetComponentInParent<DisplayBackgroundClear>()==null)camera.enabled=false;
         status=Object.FindFirstObjectByType<RuntimeStatusOverlay>();frames=Object.FindFirstObjectByType<fps>();
         Check(status!=null&&frames!=null,"production status and FPS components exist");
         foreach(var canvas in Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None))
@@ -107,7 +107,8 @@ public static class OperatorOverlayValidation
         Check(Screen.width==1920&&Screen.height==1080,"actual Game-view framebuffer uses1920x1080 pixels");
         var lifecycle=ExerciseLifecycle();while(lifecycle.MoveNext())yield return lifecycle.Current;
         // Cover sparse strips, common4-rig6-face apparatus, vertical wiring, and a fully allocated display.
-        foreach(var layout in new[]{new[]{1,4,64,1,0,0},new[]{4,6,128,1,0,0},new[]{4,6,128,0,0,0},new[]{1,4,128,1,7,0},new[]{1,4,128,1,0,11},new[]{1,4,128,1,7,9},new[]{1,1,1920,2,0,0}}){
+        foreach(var layout in new[]{new[]{1,4,64,1,0,0},new[]{4,6,128,1,0,0},new[]{4,6,128,0,0,0},new[]{1,4,128,1,7,0},new[]{1,4,128,1,0,11},new[]{1,4,128,1,7,9},new[]{1,1,1920,2,0,0},new[]{16,4,128,1,0,0}}){
+            overview.enabled=layout[0]!=16;
             ConfigureStimulus(layout[0],layout[1],layout[2],layout[3],layout[4],layout[5]);
             OperatorOverlayVisibility.SetHidden(true);for(int n=0;n<5;n++)yield return null;
             yield return new WaitForEndOfFrame();var baseline=Capture("baseline-"+cases.Count);
@@ -129,6 +130,16 @@ public static class OperatorOverlayValidation
             yield return new WaitForEndOfFrame();var hidden=Capture("tab-hidden-settled-"+cases.Count);
             Check(Changed(baseline,hidden,protectedRects,true)==0,"hidden settled framebuffer keeps every LED pixel intact");
             Check(Changed(baseline,hidden,protectedRects,false)==0,"Tab removes operator pixels without retained HUD ghosts");
+            if(layout[0]==16)
+            {
+                Check(Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).Count(c=>c.enabled&&c.GetComponentInParent<DisplayBackgroundClear>()!=null)==1,"production clear owns the active primary display without the overview");
+                for(int frame=0;frame<5;frame++)
+                {
+                    yield return new WaitForEndOfFrame();var presented=Capture("sixteen-hidden-swap-"+frame);
+                    Check(NonblackOutside(presented,protectedRects)==0,"unused pixels are exactly black on consecutive presented frame "+frame);
+                    Object.Destroy(presented);yield return null;
+                }
+            }
             PressTab();yield return null;ReleaseTab();for(int n=0;n<4;n++)yield return null;
             yield return new WaitForEndOfFrame();var restored=Capture("tab-restored-"+cases.Count);
             Check(!OperatorOverlayVisibility.Hidden&&Changed(baseline,restored,protectedRects,true)==0,"second Tab restores overlays and preserves stimulus pixels");
@@ -191,9 +202,8 @@ public static class OperatorOverlayValidation
     {
         foreach(var camera in stimulus)if(camera!=null){camera.enabled=false;Object.Destroy(camera.gameObject);}stimulus.Clear();
         var configs=(Dictionary<string,SystemConfig>)typeof(MainController).GetField("systemConfigs",Hidden).GetValue(MainController.Instance);configs.Clear();
-        var back=new GameObject("Synthetic full-frame background").AddComponent<Camera>();back.clearFlags=CameraClearFlags.SolidColor;back.backgroundColor=Color.black;back.cullingMask=0;back.depth=-500;back.allowHDR=false;back.allowMSAA=false;stimulus.Add(back);
         for(int rig=0;rig<rigs;rig++){
-            var config=new SystemConfig{vrId="VR"+(rig+1),targetDisplay=0,displayOrder=faces==1?"F":faces==4?"RBLF":"DRBLFU",ledPanelWidth=pixels,ledPanelHeight=direction==2?Screen.height:pixels,horizontal=direction!=0,startRow=row+(direction==0?0:rig),startCol=column+(direction==0?rig:0)};configs.Add(config.vrId,config);
+            var config=new SystemConfig{vrId="VR"+(rig+1),targetDisplay=0,displayOrder=faces==1?"F":faces==4?"BLFR":"DRBLFU",ledPanelWidth=pixels,ledPanelHeight=direction==2?Screen.height:pixels,horizontal=direction!=0,startRow=row+(direction==0?0:rigs==16?rig%8:rig),startCol=column+(direction==0?rig:rigs==16&&rig>=8?6:0)};configs.Add(config.vrId,config);
             for(int slot=0;slot<faces;slot++){
                 var camera=new GameObject("Synthetic LED "+config.vrId+" "+slot).AddComponent<Camera>();camera.targetDisplay=0;camera.rect=ViewportSetter.PanelRect(slot,config,Screen.width,Screen.height);camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=Color.HSVToRGB((rig*faces+slot)*.137f%1,.8f,.8f);camera.cullingMask=0;camera.depth=slot+rig*faces;camera.allowHDR=false;camera.allowMSAA=false;stimulus.Add(camera);
             }
@@ -205,6 +215,18 @@ public static class OperatorOverlayValidation
         // This includes ScreenSpaceOverlay UI. Camera.Render()/targetTexture alone does not.
         var texture=ScreenCapture.CaptureScreenshotAsTexture();Check(texture!=null&&texture.width==Screen.width&&texture.height==Screen.height,"full Game-view screenshot contains the presented framebuffer");
         File.WriteAllBytes(Path.Combine(Output,name+".png"),texture.EncodeToPNG());return texture;
+    }
+    private static int NonblackOutside(Texture2D texture,List<Rect> regions)
+    {
+        var pixels=texture.GetPixels32();var protectedPixels=new bool[pixels.Length];
+        foreach(var region in regions)
+        {
+            int x0=Mathf.Clamp(Mathf.CeilToInt(region.xMin-.5f),0,texture.width),x1=Mathf.Clamp(Mathf.CeilToInt(region.xMax-.5f),0,texture.width);
+            int y0=Mathf.Clamp(Mathf.CeilToInt(region.yMin-.5f),0,texture.height),y1=Mathf.Clamp(Mathf.CeilToInt(region.yMax-.5f),0,texture.height);
+            for(int y=y0;y<y1;y++)for(int x=x0;x<x1;x++)protectedPixels[y*texture.width+x]=true;
+        }
+        int count=0;for(int i=0;i<pixels.Length;i++)if(!protectedPixels[i]&&(pixels[i].r!=0||pixels[i].g!=0||pixels[i].b!=0))count++;
+        return count;
     }
     private static int Changed(Texture2D before,Texture2D after,List<Rect> regions,bool inside)
     {

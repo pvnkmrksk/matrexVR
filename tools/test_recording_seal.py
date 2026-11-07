@@ -15,18 +15,18 @@ namespace UnityEngine {
  public struct LayerMask {public int value;}public static class Application {public static string persistentDataPath,temporaryCachePath;}
 }
 namespace UnityEngine.SceneManagement {public struct Scene {public string name;}public static class SceneManager {public static Scene GetActiveScene()=>new Scene{name="Choice"};}}
-public class MasterDataLogger {public static MasterDataLogger Instance;public bool AcceptingWrites;public string directoryPath,timestamp="session";}
+public class MasterDataLogger {public static MasterDataLogger Instance;public bool AcceptingWrites,SaveSwarmData=true;public string directoryPath,timestamp="session";}
 public class MainController {}public class ZmqListener {}public static class Debugger {public static void Log(string s,int i){}}
 public class BandSpawner {public GameObject instancePrefab=new GameObject();public int numberOfInstances=1;public float spawnLengthX,spawnLengthZ,mu,kappa,speed,visibleOffDuration,visibleOnDuration,boundaryLengthX,boundaryLengthZ,rotationAngle;public string gridType;}
 public class Kannadi {public int numberOfRings=1;public float hexRadius;}
 public class LocustSpawner {public int numberOfLocusts=1;public float spawnAreaSize,mu,kappa,locustSpeed,locustSpeedStdDev,kappaElevation;public string directionDistribution;}
 public static class RuntimeRigRegistry {public static int ParseIndex(string n)=>1;public static string LayerLabel(int i)=>"VR1";}
-public class AsyncSwarmWriter {public enum RowLayout{Swarm,Kannadi}public static int Opened;public bool Completed;public AsyncSwarmWriter(string path,string header,RowLayout layout=RowLayout.Swarm){Opened++;File.WriteAllText(path,header);}public void Complete(){Completed=true;}}
+public class AsyncSwarmWriter {public enum RowLayout{Swarm,Kannadi,Band}public static int Opened;public bool Completed;public AsyncSwarmWriter(string path,string header,RowLayout layout=RowLayout.Swarm){Opened++;File.WriteAllText(path,header);}public void Complete(){Completed=true;}}
 '''
 SHIMS={
 'DataLogger':r'''public class DataLogger:MonoBehaviour {protected string directoryPath,line;protected string logPath {get;private set;}protected StreamWriter logFile;protected bool logInitialized;private bool closedForArchive;protected List<string> bufferedLines;protected bool isLogging,isBuffering,isFirstLine;protected ZmqListener zmq;protected MainController mainController;public string PathWritten=>logPath;public void Begin()=>Start();public void Append()=>LogData("\npose");private void AddColumns(params string[] headers){}protected virtual string BuildHeader()=>"Time,X,Y";private IEnumerator FlushBufferedLinesRoutine(){yield break;}''',
-'BandLogger':r'''public class BandLogger:MonoBehaviour {public LayerMask targetLayerMask;private string directoryPath,logPath;private StreamWriter logFile;private BandSpawner bandSpawner;private bool closedForArchive;public void Begin()=>Start();private string GetLayerNames(LayerMask m)=>"VR1";private string GetUniqueFileName(string d,string a,string b)=>a+Guid.NewGuid().ToString("N")+b;private void LogAllInstances(){}''',
-'KannadiLogger':r'''public class KannadiLogger:MonoBehaviour {private string directoryPath,logPath;private AsyncSwarmWriter writer;private Kannadi kannadi;private int vrIndex;private bool closedForArchive;public void Begin()=>Start();''',
+'BandLogger':r'''public class BandLogger:MonoBehaviour {public LayerMask targetLayerMask;private string directoryPath,logPath;private AsyncSwarmWriter writer;private BandSpawner bandSpawner;private bool closedForArchive;public void Begin()=>Start();private string GetLayerNames(LayerMask m)=>"VR1";private string GetUniqueFileName(string d,string a,string b)=>a+Guid.NewGuid().ToString("N")+b;private void LogAllInstances(){}''',
+'KannadiLogger':r'''public class KannadiLogger:MonoBehaviour {private string directoryPath,logPath;private AsyncSwarmWriter writer;private Kannadi kannadi;private int vrIndex;private string recordedLayer;private bool closedForArchive;public void Begin()=>Start();''',
 'SwarmLogger':r'''public class SwarmLogger:MonoBehaviour {public LayerMask locustLayerMask;private LocustSpawner spawner;private AsyncSwarmWriter writer;private bool closed;public string LogPath {get;private set;}public void Begin()=>Start();'''
 }
 TESTS=r'''
@@ -52,6 +52,15 @@ static class Regression {
   // Normal scene reload uses new component instances while the same session remains open.
   var trial=new DataLogger();trial.Begin();trial.Append();trial.Append();trial.CloseForArchive();Check(File.ReadAllText(trial.PathWritten).Contains("pose"),"trial reload could no longer append recorded rows");
   var newBand=new BandLogger();newBand.components[typeof(BandSpawner)]=new BandSpawner();var newMirror=new KannadiLogger();newMirror.components[typeof(Kannadi)]=new Kannadi();var newSwarm=new SwarmLogger();newSwarm.components[typeof(LocustSpawner)]=new LocustSpawner();int count=Files(b);newBand.Begin();newMirror.Begin();newSwarm.Begin();newBand.CloseForArchive();newMirror.CloseForArchive();newSwarm.CloseForArchive();Check(Files(b)==count+3,"new active population loggers stopped recording");
+  MasterDataLogger.Instance.SaveSwarmData=false;
+  var skipBand=new BandLogger();skipBand.components[typeof(BandSpawner)]=new BandSpawner();
+  var skipMirror=new KannadiLogger();skipMirror.components[typeof(Kannadi)]=new Kannadi();
+  var skipSwarm=new SwarmLogger();skipSwarm.components[typeof(LocustSpawner)]=new LocustSpawner();
+  count=Files(b);int openWriters=AsyncSwarmWriter.Opened;
+  skipBand.Begin();skipMirror.Begin();skipSwarm.Begin();
+  Check(Files(b)==count&&AsyncSwarmWriter.Opened==openWriters,"skip population setting opens no population files");
+  var measured=new DataLogger();measured.gameObject.name="Measured";measured.Begin();measured.CloseForArchive();
+  Check(Files(b)==count+1,"skip population setting preserves animal pose capture");
   var sky=new NightSkyArchive();Check(sky.Resolve()==Path.Combine(b,"Skyboxes"),"open sky must archive exact stimulus to run");MasterDataLogger.Instance.AcceptingWrites=false;string cache=sky.Resolve();Check(cache.StartsWith(Application.temporaryCachePath)&&!cache.StartsWith(b),"sealed sky selected a run path");
   MasterDataLogger.Instance.AcceptingWrites=true;sky.Resolve();MasterDataLogger.Instance.AcceptingWrites=false;sky.Recheck();Check(sky.Directory.StartsWith(Application.temporaryCachePath),"sky with cached path reopened sealed run");MasterDataLogger.Instance.AcceptingWrites=true;sky.Resolve();MasterDataLogger.Instance.directoryPath=a;sky.Recheck();Check(sky.Directory.StartsWith(Application.temporaryCachePath),"old sky leaked into rotated run");MasterDataLogger.Instance=null;Check(new NightSkyArchive().Resolve().StartsWith(Application.persistentDataPath),"direct scene audit trail lost");
   Console.WriteLine("PASS: "+checks+" production logger seal/start/drain/rotation/sky-path checks with real temporary files; no Unity/native acquisition.");

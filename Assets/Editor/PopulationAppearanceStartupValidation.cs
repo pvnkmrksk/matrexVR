@@ -86,7 +86,7 @@ public static class PopulationAppearanceStartupValidation
         var journal=File.ReadLines(Path.Combine(directory,"presentations.jsonl")).Select(JObject.Parse).ToArray();
         var chosen=journal.OrderBy(j=>(int)j["authoredRow"]).ThenBy(j=>(string)j["phase"]=="preStimulus"?0:(string)j["phase"]=="stimulus"?1:2)
             .Select(j=>{var rows=saved.Rigs["VR1"].Where(sample=>sample.presentationId==(string)j["id"]).ToArray();return rows[rows.Length/2];}).ToList();chosen.Add(chosen[0]);
-        var streams=ReplaySessionArchive.CsvFiles(directory).Select(file=>ReplayAgentStream.TryOpen(file,Path.Combine(output,"replay-cache"),saved.OriginTicks)).Where(stream=>stream!=null).ToArray();
+        var streams=ReplaySessionArchive.RecordedFiles(directory).Select(file=>ReplayAgentStream.TryOpen(file,Path.Combine(output,"replay-cache"),saved.OriginTicks)).Where(stream=>stream!=null).ToArray();
         try
         {
             SceneManager.sceneLoaded+=SetupReplay;ReplayController.OpenSession(directory);
@@ -197,7 +197,7 @@ public static class PopulationAppearanceStartupValidation
                 await Task.Delay(5);
             }
             await main.RecordingCompletion;Check(seen.Count==4,"Actual Main observed three retained-body appearance phases plus generated GLB swarm");Check(main.SequenceError==null&&main.RecordingTransitionError==null,"Population appearance run has no experiment/finalization error");
-            var manifest=JObject.Parse(File.ReadAllText(Path.Combine(directory,"recording_manifest.json")));Check((string)manifest["lifecycle"]?["status"]=="finalized"&&(bool?)manifest["lifecycle"]?["writersDrained"]==true&&File.Exists(directory+".zip"),"Complete native population/VR writers finalize to a ZIP");
+            var manifest=JObject.Parse(File.ReadAllText(Path.Combine(directory,"recording_manifest.json")));Check((string)manifest["lifecycle"]?["status"]=="finalized"&&(bool?)manifest["lifecycle"]?["writersDrained"]==true&&!File.Exists(directory+".zip"),"Complete native population/VR writers seal the run directory");
             Check(manifest["writerEvidence"].Count()==4&&manifest["writerEvidence"].All(w=>(long)w["droppedFrames"]==0&&w["failure"].Type==JTokenType.Null),"Both mirror and generated GLB population streams drain without dropped frames or writer failures");
             var presentations=File.ReadLines(Path.Combine(directory,"presentations.jsonl")).Select(JObject.Parse).ToArray();Check(presentations.Length==4&&presentations.All(p=>p["config"]?["modelAppearance"] is JObject),"All phase/population appearance settings are archived in full presentation configurations");
             await Task.Delay(100);Check(ModelAppearance.ActiveMaterialCount==0,"Mirror phase changes, generated populations and world objects release every override material");await ValidateReplay(directory,original);Check(errors.Count==0,"Population appearance integration has no Unity runtime errors: "+string.Join("; ",errors));

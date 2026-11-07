@@ -814,7 +814,7 @@ public static class KannadiValidation
                     main.HandleEscape(); Later(); break;
                 case 11:
                     Check(Object.FindObjectsOfType<SimpleOverheadCamera>().Length == 0 && GameObject.Find("Overhead Camera Canvas") == null, "overview resources cleaned up on exit");
-                    Check(Directory.GetFiles(logDirectory, "*Kannadi*Clones.csv.gz").Length >= 8, "Kannadi clone logging across reloads");
+                    Check(Directory.GetFiles(logDirectory, "*Kannadi*Clones.matpop").Length >= 8, "Kannadi clone logging across reloads");
                     Check(!Resources.FindObjectsOfTypeAll<EditorWindow>().Any(w => w.GetType().Name == "TMP_PackageResourceImporterWindow"), "TMP import prompt does not reopen");
                     Check(Object.FindObjectsOfType<fps>().Length == 1, "FPS display survives sequence exit");
                     Check(Object.FindObjectsOfType<UnityEngine.EventSystems.StandaloneInputModule>().Length == 0, "Control uses the Input System UI module");

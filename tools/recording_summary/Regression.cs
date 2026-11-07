@@ -120,11 +120,40 @@ static class Regression
             string finalRun=Path.Combine(root,"final"), zip=Path.Combine(root,"final.zip");Directory.CreateDirectory(finalRun);
             File.WriteAllText(Path.Combine(finalRun,"pose.csv"),RecordedCsv.Join(Header)+"\n"+Row(0)+"\n"+Row(2)+"\n");
             string preserved=RecordingSummary.HashFile(Path.Combine(finalRun,"pose.csv"));
+            string packed = Path.Combine(finalRun, "population.matpop");
+            var packedWriter = new AsyncSwarmWriter(packed, "Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase,RotationX,RotationY,RotationZ,AnimationState,UnityFrame,ScaleX,ScaleY,ScaleZ");
+            var packedFrame = packedWriter.Rent(1);
+            packedFrame.timestamp = new DateTime(2026, 11, 7, 10, 0, 0);
+            packedFrame.unityFrame = 12;
+            packedFrame.count = 1;
+            packedFrame.agents[0] = new AsyncSwarmWriter.Agent { name = "agent", layer = "AgentsVR1", x = 2.5f };
+            Check(packedWriter.Submit(packedFrame), "packed finalizer fixture accepted");
+            packedWriter.WaitForCompletion();
+            string packedHash = RecordingSummary.HashFile(packed);
+            var packedCompletion = AsyncSwarmWriter.CompletionsForDirectory(finalRun, true).Single();
+            Check(packedCompletion.Sha256 == packedHash && packedCompletion.BytesWritten == new FileInfo(packed).Length &&
+                packedCompletion.LastWriteUtcTicks == File.GetLastWriteTimeUtc(packed).Ticks,
+                "the streaming digest matches an independent byte audit after the writer closes");
+            var receipt = new JObject {
+                ["relativePath"]="population.matpop", ["sha256"]=packedCompletion.Sha256,
+                ["bytes"]=packedCompletion.BytesWritten, ["lastWriteUtcTicks"]=packedCompletion.LastWriteUtcTicks,
+                ["writtenFrames"]=packedCompletion.WrittenFrames, ["writtenRows"]=packedCompletion.WrittenRows,
+                ["droppedFrames"]=packedCompletion.DroppedFrames
+            };
+            var missingReceipt = RecordingSummary.Scan(finalRun, true, populationWriterEvidence: new JArray());
+            Check(missingReceipt["files"].Any(item => item["readError"] != null), "a packed file without a completion receipt cannot seal");
+            var wrongReceipt = (JObject)receipt.DeepClone();
+            wrongReceipt["writtenRows"] = 999;
+            var wrongTotals = RecordingSummary.Scan(finalRun, true, populationWriterEvidence: new JArray(wrongReceipt));
+            Check(wrongTotals["files"].Any(item => item["readError"] != null), "the sealed footer must agree with the completion receipt");
             var finalizer=new RecordingSessionFinalizer(finalRun,zip,identity);
             var drainGate=new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             var mediaGate=new TaskCompletionSource<JObject>(TaskCreationOptions.RunContinuationsAsynchronously);int visited=0;
-            var finishing=finalizer.FinalizeAsync("stopped",token=>drainGate.Task,token=>mediaGate.Task,()=>new JArray(),(f,h,c)=>Interlocked.Increment(ref visited));
+            var finishing=finalizer.FinalizeAsync("stopped",token=>drainGate.Task,token=>mediaGate.Task,()=>new JArray(receipt),(f,h,c)=>Interlocked.Increment(ref visited));
             Check(ReferenceEquals(finishing,finalizer.FinalizeAsync("completed",token=>Task.CompletedTask,token=>Task.FromResult(new JObject()),()=>new JArray())),"finalization is idempotent and preserves original end reason");
+            bool earlyZipRejected = false;
+            try { finalizer.WriteArchive(); } catch (InvalidOperationException) { earlyZipRejected = true; }
+            Check(earlyZipRejected, "explicit packaging cannot run while writers are still draining");
             Check(!finishing.IsCompleted&&!File.Exists(zip),"summary/archive cannot finish ahead of writer barrier");
             drainGate.SetResult(true);Check(SpinWait.SpinUntil(()=>Volatile.Read(ref visited)==2,10000),"scan begins only after writer drain");
             Check(!finishing.IsCompleted&&!File.Exists(zip),"media barrier completes before final manifest/ZIP");
@@ -133,6 +162,22 @@ static class Regression
             Check((string)finalized["lifecycle"]["endReason"]=="stopped"&&(string)finalized["lifecycle"]["sequenceOutcome"]=="stopped","manual stop does not become completed protocol");
             Check((bool)finalized["media"]["pending"]&&!(bool)finalized["media"]["complete"],"pending independent camera stays explicitly incomplete");
             Check(RecordingSummary.TryReadFinalized(finalRun,out _,out _),"finalized output passes freshness policy");
+            var packedSummary = ((JArray)finalized["files"]).OfType<JObject>().Single(item => (string)item["relativePath"] == "population.matpop");
+            Check((long)packedSummary["storedRows"] == 1 && (long)packedSummary["storedFrames"] == 1 &&
+                (bool)packedSummary["rowsInspected"] == false && (string)packedSummary["sha256"] == packedHash,
+                "packed finalizer uses footer counts and the acquisition worker digest");
+            Check(!File.Exists(zip), "successful Stop leaves a sealed directory without creating a ZIP");
+            finalizer.WriteArchive();
+            using (var zipped = ZipFile.OpenRead(zip))
+            {
+                var entry = zipped.GetEntry("population.matpop");
+                using (var contents = entry.Open())
+                using (var buffer = new MemoryStream())
+                {
+                    contents.CopyTo(buffer);
+                    Check(buffer.ToArray().SequenceEqual(File.ReadAllBytes(packed)), "ZIP preserves packed acquisition evidence");
+                }
+            }
             using(var zipped=ZipFile.OpenRead(zip))using(var reader=new StreamReader(zipped.GetEntry(RecordingSummary.ManifestName).Open()))
                 Check((string)JObject.Parse(reader.ReadToEnd())["lifecycle"]["status"]=="finalized","ZIP includes finalized summary, not its opening placeholder");
             Check(preserved==RecordingSummary.HashFile(Path.Combine(finalRun,"pose.csv")),"finalization preserves original CSV bytes");

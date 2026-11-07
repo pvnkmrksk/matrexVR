@@ -133,7 +133,7 @@ def main():
         raise SystemExit('A local .NET SDK is required.')
     sdk = subprocess.check_output([dotnet, '--list-sdks'], text=True)
     version = max(map(int, re.findall(r'^(\d+)\.', sdk, re.M)))
-    engines = list(Path('/Applications/Unity/Hub/Editor').glob('*/Unity.app/Contents/Resources/Scripting/Managed/UnityEngine/UnityEngine.CoreModule.dll'))
+    engines = [*Path('/Applications/Unity/Hub/Editor').glob('*/Unity.app/Contents/Resources/Scripting/Managed/UnityEngine/UnityEngine.CoreModule.dll'), *(Path.home()/'Unity/Hub/Editor').glob('*/Editor/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll')]
     if not engines:
         raise SystemExit('A local Unity editor CoreModule is required for actual managed Rect/Mathf geometry.')
     core = sorted(engines)[-1]

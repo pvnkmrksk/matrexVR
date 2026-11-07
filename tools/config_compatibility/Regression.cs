@@ -93,6 +93,17 @@ public static class Regression
         headings.initialHeadingDistribution=(RandomInitialHeadingDistribution)99;
         Reject(headings.Validate,"Invalid heading enum cannot start an experiment");
         Reject(()=>continuous.SampleInitialYaw(float.NaN),"Nonfinite random heading sample is rejected");
+        var groups = JObject.Parse(@"{'populationMode':'Swarm','swarm':{'agentCount':9,'spawnAreaSize':8,'boundaryLengthX':20,'agentGroups':[{'count':3,'appearance':'Stock','spawnOffset':{'x':-6}},{'count':4,'appearance':'Black','spawnOffset':{'x':6}}]}}");
+        var mixed = KannadiConfig.LoadSwarm(new Dictionary<string, object> { [ExperimentPhases.PayloadKey] = groups });
+        Check(mixed.EffectiveAgentCount == 7 && mixed.agentGroups[1].appearance == SwarmAgentAppearance.Black,
+            "Nested groups supply the total and retain their ordered stock and black appearances");
+        Check((string)JObject.FromObject(mixed)["agentGroups"][1]["appearance"] == "Black", "Group appearance remains a readable JSON enum");
+        mixed.agentGroups[1].spawnOffset.x = 7;
+        Reject(mixed.ValidateSwarm, "An offset group must fit inside the periodic arena");
+        mixed.periodicBoundary = false;
+        mixed.ValidateSwarm();
+        mixed.agentGroups[1].count = 0;
+        Reject(mixed.ValidateSwarm, "Agent group counts must be positive");
     }
     private static void Documents(string scratch)
     {

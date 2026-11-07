@@ -120,7 +120,7 @@ def main():
         raise SystemExit("A local .NET SDK is required.")
     version = max(map(int, re.findall(r"^(\d+)\.", subprocess.check_output([dotnet, "--list-sdks"], text=True), re.M)))
     dll = next((ROOT / "Library/PackageCache").glob("com.unity.nuget.newtonsoft-json@*/Runtime/Newtonsoft.Json.dll"))
-    sources = ["Assets/Scripts/Replay/ReplayMediaArchive.cs", "Assets/Scripts/Replay/CompanionMediaArchive.cs", "Assets/Scripts/Replay/ReplayAviFrameSource.cs", "Assets/Scripts/Replay/ReplaySessionArchive.cs", "Assets/Scripts/Replay/ReplayPresentationJournal.cs", "Assets/Scripts/Replay/RecordedPosePolicy.cs", "Assets/Scripts/Loggers/RecordingSummary.cs", "Assets/Scripts/Loggers/RunConfigArchive.cs", "Assets/Scripts/TrackerWireDecoder.cs", "tools/replay_compatibility/Stubs.cs"]
+    sources = ["Assets/Scripts/Replay/ReplayMediaArchive.cs", "Assets/Scripts/Swarm/AsyncSwarmWriter.cs", "Assets/Scripts/Swarm/PopulationRecording.cs", "Assets/Scripts/Replay/CompanionMediaArchive.cs", "Assets/Scripts/Replay/ReplayAviFrameSource.cs", "Assets/Scripts/Replay/ReplaySessionArchive.cs", "Assets/Scripts/Replay/ReplayPresentationJournal.cs", "Assets/Scripts/Replay/RecordedPosePolicy.cs", "Assets/Scripts/Loggers/RecordingSummary.cs", "Assets/Scripts/Loggers/RunConfigArchive.cs", "Assets/Scripts/TrackerWireDecoder.cs", "tools/replay_compatibility/Stubs.cs"]
     with tempfile.TemporaryDirectory(prefix="matrex-media-regression-") as folder:
         temporary = Path(folder)
         env = dict(os.environ, DOTNET_CLI_HOME=folder, DOTNET_CLI_TELEMETRY_OPTOUT="1", DOTNET_SKIP_FIRST_TIME_EXPERIENCE="1")

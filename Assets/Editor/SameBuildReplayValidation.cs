@@ -35,7 +35,7 @@ public static class SameBuildReplayValidation
         try
         {
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
-            InputsAndRandom();ConfigurationNulls();WorldSnapshots();AnimationBlend();OriginalControllers();OriginalPopulationFactory();AsynchronousParentFrame();UnsupportedEffects();RenderClock();
+            InputsAndRandom();ConfigurationNulls();WorldSnapshots();WorldTargetRegistry();AnimationBlend();OriginalControllers();OriginalPopulationFactory();AsynchronousParentFrame();UnsupportedEffects();RenderClock();
             Check((DefaultExecutionOrder)Attribute.GetCustomAttribute(typeof(ExperimentPhases),typeof(DefaultExecutionOrder)) is DefaultExecutionOrder phase && phase.order<1200,"Phase transitions complete before pose/population/world evidence");
         }
         catch(Exception error){failure=error.ToString();Debug.LogError(failure);}
@@ -202,6 +202,32 @@ public static class SameBuildReplayValidation
         wind.gameObject.SetActive(false);ReplayEvidenceSupport.RequireSupportedScene(wind.gameObject.scene);Check(true,"Disabled native wind remains an admissible static scene");
         Object.DestroyImmediate(wind.gameObject);
     }
+    private static void WorldTargetRegistry()
+    {
+        var root=new GameObject("registry parent");
+        var first=new GameObject("registry first").AddComponent<RecordedWorldStateTarget>();first.Key="z";first.transform.SetParent(root.transform);
+        var second=new GameObject("registry second").AddComponent<RecordedWorldStateTarget>();second.Key="a";
+        var collect=typeof(RecordedWorldStateTarget).GetMethod("GetActiveTargets",BindingFlags.NonPublic|BindingFlags.Static);
+        var targets=new List<RecordedWorldStateTarget>();
+        void Collect()=>collect.Invoke(null,new object[]{targets});
+        try
+        {
+            // The editor runner is outside Play Mode, so exercise the runtime
+            // registration callbacks explicitly.
+            Invoke(first,"Awake");Invoke(second,"Awake");Invoke(first,"OnEnable");first.enabled=false;
+            Collect();Check(targets.SequenceEqual(new[]{second,first}),"Registry includes live targets once in current Key order");
+            first.Key="0";Collect();Check(targets.SequenceEqual(new[]{first,second}),"Registry observes changed target keys without rediscovery");
+            root.SetActive(false);Collect();Check(targets.SequenceEqual(new[]{second}),"Registry excludes a target under an inactive parent");
+            root.SetActive(true);Collect();Check(targets.Contains(first),"Registry observes reactivated hierarchies");
+            root.AddComponent<RecordedPendingDestroy>();Collect();Check(targets.SequenceEqual(new[]{second}),"Registry excludes pending-destroy ancestors");
+            Invoke(second,"OnDestroy");Collect();Check(targets.Count==0,"Registry releases destroyed targets");
+        }
+        finally
+        {
+            Invoke(first,"OnDestroy");Invoke(second,"OnDestroy");
+            Object.DestroyImmediate(root);Object.DestroyImmediate(second.gameObject);
+        }
+    }
     private static void RenderClock()
     {
         var camera=new GameObject("clock camera").AddComponent<Camera>();camera.transform.position=new Vector3(0,0,-3);camera.orthographic=true;camera.orthographicSize=1;camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=Color.black;
@@ -210,17 +236,55 @@ public static class SameBuildReplayValidation
         var clock=camera.gameObject.AddComponent<ReplayRenderClock>();clock.SetClock(2.5f,.125f,.25f);camera.Render();var prior=RenderTexture.active;RenderTexture.active=rt;texture.ReadPixels(new Rect(0,0,32,32),0,0);texture.Apply();Color first=texture.GetPixel(16,16);
         Check(Mathf.Abs(first.r-.25f)<.002f&&Mathf.Abs(first.g-.125f)<.002f,"GPU original shader receives defined acquisition/replay clock vectors");
         clock.SetClock(7,.2f,.2f);camera.Render();clock.SetClock(2.5f,.125f,.25f);camera.Render();texture.ReadPixels(new Rect(0,0,32,32),0,0);texture.Apply();Check((first-texture.GetPixel(16,16)).maxColorComponent<.001f,"GPU shader time-dependent appearance restores after backward seek");
-        ShadowClock(camera,clock);
+        ShadowClock(camera,()=>clock.SetClock(2.5f,.125f,.25f));
+        // The edit-mode fixture installed buffers without running MonoBehaviour activation.
+        Invoke(clock,"OnDestroy");Object.DestroyImmediate(clock);
+        AcquisitionClock(camera,rt,texture,first);
         RenderTexture.active=prior;camera.targetTexture=null;Object.DestroyImmediate(camera.gameObject);Object.DestroyImmediate(quad);Object.DestroyImmediate(material);Object.DestroyImmediate(rt);Object.DestroyImmediate(texture);
     }
-    private static void ShadowClock(Camera camera,ReplayRenderClock clock)
+    private static void AcquisitionClock(Camera first,RenderTexture rt,Texture2D texture,Color expected)
+    {
+        var type=typeof(ReplayRenderClock).GetNestedType("Acquisition",BindingFlags.NonPublic);
+        var evaluate=typeof(ReplayRenderClock).GetMethod("Evaluate",BindingFlags.Static|BindingFlags.NonPublic);
+        var update=type.GetMethod("Update");
+        var second=new GameObject("second acquisition clock camera").AddComponent<Camera>();second.CopyFrom(first);second.transform.SetPositionAndRotation(first.transform.position,first.transform.rotation);second.targetTexture=rt;
+        Camera manual=null;
+        int firstPrior=first.commandBufferCount,secondPrior=second.commandBufferCount,manualPrior=-1;
+        void CheckPixel(Camera camera,string message)
+        {
+            camera.Render();RenderTexture.active=rt;texture.ReadPixels(new Rect(0,0,32,32),0,0);texture.Apply();
+            Check((texture.GetPixel(16,16)-expected).maxColorComponent<.001f&&(expected-texture.GetPixel(16,16)).maxColorComponent<.001f,message);
+        }
+        try
+        {
+            using(var clock=(IDisposable)Activator.CreateInstance(type))
+            {
+                void Install()=>update.Invoke(clock,new[]{evaluate.Invoke(null,new object[]{2.5f,.125f,.25f})});
+                Install();
+                CheckPixel(first,"First acquisition camera uses the shared shader clock");
+                CheckPixel(second,"Second acquisition camera renders the same recorded shader clock");
+                manual=new GameObject("new disabled manual clock camera").AddComponent<Camera>();manual.CopyFrom(first);manual.transform.SetPositionAndRotation(first.transform.position,first.transform.rotation);manual.targetTexture=rt;manual.enabled=false;
+                manualPrior=manual.commandBufferCount;
+                CheckPixel(manual,"A newly created disabled manual camera gets the clock on its first render");
+                ShadowClock(first,Install);
+            }
+            Check(first.commandBufferCount==firstPrior&&second.commandBufferCount==secondPrior&&manual.commandBufferCount==manualPrior,
+                $"Sealing releases acquisition buffers from enabled and manual cameras ({firstPrior}/{first.commandBufferCount}, {secondPrior}/{second.commandBufferCount}, {manualPrior}/{manual.commandBufferCount})");
+        }
+        finally
+        {
+            if(manual!=null)Object.DestroyImmediate(manual.gameObject);
+            Object.DestroyImmediate(second.gameObject);
+        }
+    }
+    private static void ShadowClock(Camera camera,Action installClock)
     {
         var sun=new GameObject("shadow clock sun").AddComponent<Light>();sun.type=LightType.Directional;sun.shadows=LightShadows.Hard;sun.transform.rotation=Quaternion.Euler(40,-30,0);sun.shadowCustomResolution=256;
         var cube=GameObject.CreatePrimitive(PrimitiveType.Cube);cube.transform.localScale=Vector3.one*.4f;cube.transform.position=new Vector3(.5f,0,-.5f);cube.GetComponent<Renderer>().sharedMaterial=new Material(Shader.Find("Standard"));
         var previous=QualitySettings.shadows;float distance=QualitySettings.shadowDistance;QualitySettings.shadows=ShadowQuality.All;QualitySettings.shadowDistance=30;
         var rt=new RenderTexture(8,8,0,RenderTextureFormat.ARGBFloat,RenderTextureReadWrite.Linear);rt.Create();var read=new Texture2D(8,8,TextureFormat.RGBAFloat,false,true);
         var material=new Material(Shader.Find("Hidden/MATREX/ValidationShadowClock"));var probe=new UnityEngine.Rendering.CommandBuffer{name="Validate actual shadow pass clock"};
-        clock.SetClock(2.5f,.125f,.25f);
+        installClock();
         probe.Blit(Texture2D.blackTexture,rt,material);sun.AddCommandBuffer(UnityEngine.Rendering.LightEvent.BeforeShadowMap,probe);
         camera.Render();var active=RenderTexture.active;RenderTexture.active=rt;read.ReadPixels(new Rect(0,0,8,8),0,0);read.Apply();Color value=read.GetPixel(4,4);
         Check(Mathf.Abs(value.r-.25f)<.002f&&Mathf.Abs(value.g-.125f)<.002f,"GPU directional shadow-map pass consumes the recorded clock before caster rendering");

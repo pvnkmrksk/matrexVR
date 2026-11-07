@@ -83,7 +83,7 @@ public static class DiagnosticsFrameValidation
                 listeners = rigs.Select(rig => rig.GetComponent<ZmqListener>()).ToArray();
                 loggers = rigs.Select(rig => rig.GetComponent<DataLogger>()).ToArray();
                 overlay = Object.FindFirstObjectByType<RuntimeStatusOverlay>(); telemetry = Object.FindFirstObjectByType<ExperimentTelemetry>();
-                cameras = Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).Where(camera => camera.enabled).ToArray();
+                cameras = Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).Where(camera => camera.enabled && camera.GetComponentInParent<ViewportSetter>()!=null).ToArray();
                 var type = typeof(ZmqListener).GetNestedType("ZmqMessage", BindingFlags.NonPublic);
                 packet = Activator.CreateInstance(type); yaw = type.GetField("yaw"); publish = typeof(ZmqListener).GetMethod("UpdatePose", Private);
                 playerLoop = ProfilerRecorder.StartNew(ProfilerCategory.Internal, "PlayerLoop");
@@ -124,7 +124,7 @@ public static class DiagnosticsFrameValidation
         playerLoop.Dispose(); allocations.Dispose();
         File.WriteAllText(Path.Combine(Application.dataPath, "../diagnostics-frames.json"), JsonConvert.SerializeObject(new {
             failure, results, unity = Application.unityVersion, gpu = SystemInfo.graphicsDeviceName,
-            cameras = Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).Count(camera => camera.enabled),
+            cameras = Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).Count(camera => camera.enabled && camera.GetComponentInParent<ViewportSetter>()!=null),
             note = "Isolated batch Editor Play mode; same Selwyn MW sky and four rigs/six 128px cameras each. No swarm. Cameras explicitly rendered because batch mode has no automatically rendered Game view; camera timings measure CPU submission, not completed GPU time. PlayerLoop measures game callbacks separately. Two seconds settling and four seconds measured per case, synthetic fresh wing samples. These are not LED workstation/display FPS. CSV coroutines can drain their preceding case during warmup." }, Formatting.Indented));
         EditorApplication.Exit(failure == null ? 0 : 1);
     }

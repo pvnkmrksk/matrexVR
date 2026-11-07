@@ -305,6 +305,60 @@ public static class Regression
                 cells=ReplaySessionArchive.Csv(stream.ReadLine());Check(cells[2]=="7"&&cells[4]=="-2.75"&&stream.ReadLine()==null,"Kannadi preserves sparse clone IDs and writes each supplied row once");
             }
             Check(AsyncSwarmWriter.CompletionsForDirectory(root).Any(item=>item.Path==mirrorPath&&item.WrittenRows==2&&item.DroppedFrames==0&&item.Failure==null),"Kannadi worker contributes drained writer evidence to the normal recording finalizer");
+            foreach (var layout in new[] { AsyncSwarmWriter.RowLayout.Swarm, AsyncSwarmWriter.RowLayout.Kannadi, AsyncSwarmWriter.RowLayout.Band })
+            {
+                string packedPath = Path.Combine(root, layout + ".matpop");
+                var packed = new AsyncSwarmWriter(packedPath, "Timestamp,Name,Layer,AnimationState,UnityFrame", layout);
+                var beginning = new DateTime(2026, 11, 7, 10, 0, 0).AddTicks(17);
+                for (int step = 0; step < 3; step++)
+                {
+                    var frame = packed.Rent(2);
+                    frame.timestamp = beginning.AddTicks(step);
+                    frame.unityFrame = 31 + step;
+                    frame.count = step == 1 ? 0 : 2;
+                    frame.vrIndex = 16; frame.numberOfRings = 3; frame.hexRadius = 2.5f;
+                    frame.phase = "stimulus"; frame.skyboxId = "sky, quoted"; frame.skyboxSampleUtc = "utc";
+                    frame.agents[0] = new AsyncSwarmWriter.Agent { index = 2, name = "one, \"quoted\"", layer = "AgentsVR16",
+                        x = BitConverter.Int32BitsToSingle(1), y = step, z = -3, rx = 10, ry = 20, rz = 30,
+                        sx = 2, sy = 3, sz = 4, animationState = "{\"version\":1}", speed = 12f, visibilityPhase = 0.25f, visible = false };
+                    frame.agents[1] = new AsyncSwarmWriter.Agent { index = 7, name = "two", layer = "AgentsVR16",
+                        x = -2.75f, sx = 1, sy = 1, sz = 1, visible = true };
+                    Check(packed.Submit(frame), layout + " packed frame accepted");
+                }
+                packed.WaitForCompletion();
+                Check(packed.Failure == null && packed.DroppedFrames == 0 && packed.WrittenRows == 4, layout + " binary writer drained");
+                using (var file = new PopulationRecording.Reader(packedPath))
+                {
+                    Check(file.Summary.frames == 3 && file.Summary.rows == 4 && file.Summary.firstTicks == beginning.Ticks,
+                        layout + " footer preserves all frames and original time");
+                    Check(file.ReadFrame(file.FirstFrameOffset, out var f, true) && f.unityFrame == 31 && f.count == 2 &&
+                        f.phase == "stimulus" && f.skyboxId == "sky, quoted" && f.skyboxSampleUtc == "utc", layout + " frame metadata");
+                    if (layout == AsyncSwarmWriter.RowLayout.Kannadi)
+                        Check(f.vrIndex == 16 && f.numberOfRings == 3 && f.hexRadius == 2.5f, "Kannadi clone geometry");
+                    var a = file.ReadSample(f);
+                    var b = file.ReadSample(f);
+                    file.RequireFrameEnd(f);
+                    Check(BitConverter.SingleToInt32Bits(a.x) == 1 && a.sx == 2 && a.sy == 3 && a.sz == 4 &&
+                        a.animation == "{\"version\":1}" && file.Identities[a.id].name == "one, \"quoted\"" &&
+                        file.Identities[a.id].index == 2, layout + " exact float, animation, scale and identity");
+                    Check(file.Identities[b.id].index == 7 && b.x == -2.75f && b.sx == 1 && b.sy == 1 && b.sz == 1,
+                        layout + " sparse identities and custom scale");
+                    if (layout == AsyncSwarmWriter.RowLayout.Band)
+                        Check(!a.visible && b.visible && a.speed == 12f && a.visibilityPhase == 0.25f, "Band preserves original visibility timer");
+                }
+                using (var replay = ReplayAgentStream.TryOpen(packedPath, Path.Combine(root, "unused-cache"), beginning.Ticks))
+                {
+                    Check(replay.Kind == layout.ToString() && replay.FrameCount == 3 && replay.RowCount == 4 &&
+                        !Directory.Exists(Path.Combine(root, "unused-cache")), layout + " direct seek without CSV or disk cache");
+                    Check(replay.SampleUnityFrame(33)[0].position.y == 2 && replay.SampleUnityFrame(32).Count == 0 &&
+                        replay.SampleUnityFrame(31)[0].position.y == 0 && replay.SampleUnityFrame(123).Count == 0,
+                        layout + " reverse and empty-frame seeks");
+                }
+                string truncated = Path.Combine(root, "interrupted.matpop");
+                var packedBytes = File.ReadAllBytes(packedPath);
+                File.WriteAllBytes(truncated, packedBytes.Take(packedBytes.Length - 1).ToArray());
+                Reject(() => { using (var invalid = new PopulationRecording.Reader(truncated)) { } }, "Truncated binary stream must report missing finalized evidence");
+            }
             var strict=Path.Combine(root,"same-build");Directory.CreateDirectory(strict);
             var identity=PlayerBuildIdentity.Capture();
             File.WriteAllText(Path.Combine(strict,"replay_contract.json"),new JObject{["schemaVersion"]=1,["player"]=identity}.ToString());

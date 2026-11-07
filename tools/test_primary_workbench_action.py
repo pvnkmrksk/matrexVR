@@ -25,7 +25,7 @@ namespace UnityEngine.UI { public sealed class InputField { public bool isActive
 namespace TMPro { public sealed class TMP_InputField { public bool isActiveAndEnabled=true,isFocused=true;public bool IsInteractable()=>true; } }
 namespace UnityEngine.EventSystems { public sealed class EventSystem { public static EventSystem current;public GameObject currentSelectedGameObject; } }
 public static class ExperimentInput {
- public sealed class ActionState { public bool released;public bool WasReleasedThisFrame()=>released; }
+ public sealed class ActionState { public bool pressed;public bool WasPressedThisFrame()=>pressed; }
  public static readonly ActionState Cancel=new ActionState();private static ActionState Action(string name)=>Cancel;
  INPUT_PRODUCTION
 }
@@ -70,11 +70,11 @@ TESTS = r'''
   Check(demo.start.label.text=="Start demo","demo caption changed");demo.RunPrimaryAction();Check(demo.started==1&&demo.saved==0,"demo tried to complete apparatus");
   var live=new ConfigWorkbench();live.Workspace.quick=true;live.RefreshStartCaption();live.RunPrimaryAction();
   Check(live.start.label.text=="Start experiment"&&live.started==1&&live.saved==0,"live QuickStart dispatch changed");
-  var dispatcher=new MainController();ConfigurationUI.ConfigWorkbench.IsOpen=true;ExperimentInput.Cancel.released=true;
-  Check(ExperimentInput.IsEditingText&&!ExperimentInput.Released("Cancel"),"regression fixture no longer reproduces the ordinary text guard during setup");
+  var dispatcher=new MainController();ConfigurationUI.ConfigWorkbench.IsOpen=true;ExperimentInput.Cancel.pressed=true;
+  Check(ExperimentInput.IsEditingText&&!ExperimentInput.Pressed("Cancel"),"regression fixture no longer reproduces the ordinary text guard during setup");
   dispatcher.Tick();Check(dispatcher.escapes==1,"actual MainController.Update input gate swallowed setup Escape before its handler");
-  ExperimentInput.Cancel.released=false;dispatcher.Tick();Check(dispatcher.escapes==1,"setup Escape fired without a real release edge");
-  ConfigurationUI.ConfigWorkbench.IsOpen=false;ExperimentInput.Cancel.released=true;
+  ExperimentInput.Cancel.pressed=false;dispatcher.Tick();Check(dispatcher.escapes==1,"setup Escape fired without a real press edge");
+  ConfigurationUI.ConfigWorkbench.IsOpen=false;ExperimentInput.Cancel.pressed=true;
   EventSystem.current=new EventSystem{currentSelectedGameObject=new GameObject{input=new InputField()}};
   dispatcher.Tick();Check(dispatcher.escapes==1,"runtime text fields lost their existing Escape guard");
   EventSystem.current=null;RuntimeFrameRateEditor.IsOpen=true;dispatcher.Tick();Check(dispatcher.escapes==1,"live cap editor must suppress experiment shortcuts and Escape stop");
@@ -91,7 +91,7 @@ def main():
     source=(ROOT/'Assets/Scripts/ConfigurationUI/ConfigWorkbench.Session.cs').read_text()
     inputs=(ROOT/'Assets/Scripts/ExperimentInput.cs').read_text()
     input_production=declaration(inputs,'public static bool IsEditingText')
-    for signature in ('public static bool Released(string name) =>','public static bool CancelReleased =>'):
+    for signature in ('public static bool Pressed(string name) =>','public static bool CancelPressed =>'):
         start=inputs.index(signature);input_production+='\n'+inputs[start:inputs.index(';',start)+1]
     controller=declaration((ROOT/'Assets/Scripts/MainController.cs').read_text(),'void Update()')
     properties=[]

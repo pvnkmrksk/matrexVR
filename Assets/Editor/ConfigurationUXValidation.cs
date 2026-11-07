@@ -207,7 +207,8 @@ public static class ConfigurationUXValidation
                 tabDiagnostics=new {visible=hud.Visible,actionEnabled=action.enabled,phase=action.phase.ToString(),controls=action.controls.Count,keyPressed=keyboard.tabKey.isPressed,keyboardEnabled=keyboard.enabled,lastToggleFrame=typeof(RuntimeStatusOverlay).GetField("lastToggleFrame",Private).GetValue(hud),guiOpen=ConfigWorkbench.IsOpen,running=main.SequenceRunning,hudEnabled=hud.enabled};
                 InputSystem.QueueStateEvent(keyboard,new KeyboardState());
                 Check(!hud.Visible,"Actual Tab input hides the HUD rather than stopping only its text updates.");
-                Check(DisplayFrameClear.Requests==requestsBeforeTab+1,"Actual Tab requests exactly one HUD washout.");
+                Check(DisplayFrameClear.Requests==requestsBeforeTab+(DisplayBackgroundClear.CoversDisplay(0)?0:1),
+                    "Actual Tab relies on the active clear or requests one HUD washout.");
                 wash=DisplayFrameClear.ClearOnce(0);
                 var black=new RenderTexture(64,64,24);black.Create();wash.ClearCamera.targetTexture=black;wash.ClearCamera.Render();
                 RenderTexture.active=black;var pixels=new Texture2D(64,64,TextureFormat.RGB24,false);pixels.ReadPixels(new Rect(0,0,64,64),0,0);pixels.Apply();RenderTexture.active=null;

@@ -58,7 +58,7 @@ public static class RuntimeStatusHudValidation
         for(int i=0;i<20;i++)yield return null;
         var main=MainController.Instance;Check(main!=null,"production experiment controller exists");
         if(ConfigurationUI.ConfigWorkbench.Instance!=null)ConfigurationUI.ConfigWorkbench.Instance.gameObject.SetActive(false);
-        main.enabled=false;foreach(var camera in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))camera.enabled=false;
+        main.enabled=false;foreach(var camera in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))if(camera.GetComponentInParent<DisplayBackgroundClear>()==null)camera.enabled=false;
         foreach(var canvas in Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None))if(canvas.GetComponentInParent<RuntimeStatusOverlay>()==null&&canvas.GetComponentInParent<fps>()==null)canvas.gameObject.SetActive(false);
         var scene=SceneManager.CreateScene("TerrainChoice_RoughLeft_SmoothRight");SceneManager.SetActiveScene(scene);
         main.sequenceSteps.Clear();main.executionOrder.Clear();for(int i=0;i<4;i++){main.sequenceSteps.Add(new SequenceStep("TerrainChoice_RoughLeft_SmoothRight",30,null));main.executionOrder.Add(i);}

@@ -19,7 +19,7 @@ public class ColorConfig { public float r, g, b, a; }
 // These are Unity scene/rendering collaborators, outside the JSON gain/phase contracts tested here.
 public class SceneObject { }
 public class SunConfig { public void Validate() { } }
-public class ModelAppearanceConfig { public void Validate() { } }
+public class ModelAppearanceConfig { public bool enabled; public void Validate() { } }
 public static class RuntimeRigRegistry { public const int MaximumRigCount = 16; }
 public class HeadingReferenceConfig { public void Validate() { } public void WithinDuration(double duration,out string warning) { warning=null; } }
 public class NightSkyConfig { public bool enabled; public void Validate() { } }

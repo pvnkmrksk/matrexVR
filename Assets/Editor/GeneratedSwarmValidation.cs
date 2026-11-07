@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -71,6 +70,208 @@ public static class GeneratedSwarmValidation
         var doc=JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath,Recipe)));
         return doc["stimulus"]["swarm"].ToObject<SwarmConfig>();
     }
+
+    public static void ValidateSpawnAndWrapping()
+    {
+        var host = new GameObject("Generated swarm validation");
+        var prefab = new GameObject("Test agent");
+        prefab.AddComponent<LocustMover>();
+        var camera = new GameObject("Main Camera validation").AddComponent<Camera>();
+        camera.nearClipPlane = .1f;
+        camera.farClipPlane = 100f;
+        try
+        {
+            var spawner = host.AddComponent<LocustSpawner>();
+            spawner.locustPrefab = prefab;
+            spawner.RuntimeLayer = host.layer;
+            spawner.boundaryManager = host.AddComponent<BoundaryManager>();
+            var config = KannadiConfig.Load(new Dictionary<string, object> {
+                ["populationMode"] = "Swarm", ["swarm"] = JObject.Parse(@"{""spawnType"":""Grid"",""agentCount"":16,
+                    ""spawnAreaSize"":8,""boundaryLengthX"":12,""boundaryLengthZ"":16,""worldUnitsPerMetre"":1,
+                    ""volumeHalfExtentMetres"":20,""agentSpeed"":2,""agentSpeedStdDev"":0.5}") });
+            Check(config.spawnType == SwarmSpawnType.Grid, "Kannadi reads the nested spawn setting.");
+            SwarmConfiguration.Apply(spawner, config, null);
+            Check(spawner.boundaryManager.LengthX == 12 && spawner.boundaryManager.LengthZ == 16,
+                "Explicit rectangular 2D lengths override the physical shorthand.");
+            Vector3[] grid = spawner.Spawned.Select(agent => agent.transform.position).ToArray();
+            float[] speeds = spawner.Spawned.Select(agent => agent.GetComponent<LocustMover>().speed).ToArray();
+            for (int i = 0; i < grid.Length; i++)
+            {
+                Check(grid[i] == new Vector3(-3 + 2 * (i % 4), -.25f, -3 + 2 * (i / 4)), "16 agents start on a 4-by-4 grid.");
+                Check(Mathf.Abs(Mathf.DeltaAngle(spawner.Spawned[i].transform.eulerAngles.y, i * 22.5f)) < .001f,
+                    "Initial headings span the turn in 22.5 degree steps.");
+            }
+            SwarmConfiguration.Apply(spawner, config, null);
+            Check(grid.SequenceEqual(spawner.Spawned.Select(agent => agent.transform.position)) &&
+                speeds.SequenceEqual(spawner.Spawned.Select(agent => agent.GetComponent<LocustMover>().speed)), "Grid restart restores positions and speeds.");
+
+            config.spawnType = SwarmSpawnType.Random;
+            SwarmConfiguration.Apply(spawner, config, null);
+            Check(!grid.SequenceEqual(spawner.Spawned.Select(agent => agent.transform.position)) &&
+                spawner.Spawned.All(agent => Mathf.Abs(agent.transform.position.x) <= 4 && Mathf.Abs(agent.transform.position.z) <= 4),
+                "Random spawning stays inside its smaller footprint.");
+            var mover = spawner.Spawned[0].GetComponent<LocustMover>();
+            var driver = host.GetComponent<GeneratedSwarmMotion>();
+            mover.transform.SetPositionAndRotation(Vector3.zero, Quaternion.Euler(0, 90, 0));
+            mover.speed = 14;
+            driver.Advance(1);
+            Vector3 oneFrame = mover.transform.position;
+            mover.transform.position = Vector3.zero;
+            for (int i = 0; i < 120; i++) driver.Advance(1f / 120);
+            Check(Vector3.Distance(oneFrame, Vector3.right * 2) < .001f && Vector3.Distance(oneFrame, mover.transform.position) < .001f,
+                "One large frame and 120 short frames preserve the same travel across the X edge.");
+            host.transform.position = Vector3.forward * 10;
+            Check(Mathf.Abs(spawner.boundaryManager.Center.z) < .001f, "With follow disabled the arena stays at its starting center.");
+
+            config.spawnAreaSize = 13;
+            bool rejected = false;
+            try { config.ValidateSwarm(); } catch (ArgumentException) { rejected = true; }
+            Check(rejected, "An explicit spawn area larger than a periodic axis is rejected.");
+            config.periodicBoundary = false;
+            SwarmConfiguration.Apply(spawner, config, null);
+            Check(spawner.Spawned.All(agent => agent.GetComponent<LocustMover>().boundaryManager == null), "With periodic wrapping off, the larger spawn area is allowed.");
+
+            spawner.OverrideClipPlanes(new[] { camera }, .01f, 7f);
+            Check(Mathf.Abs(camera.nearClipPlane - .01f) < .001f && Mathf.Abs(camera.farClipPlane - 7f) < .001f, "Stimulus camera accepts a separate far distance.");
+            SwarmConfiguration.Apply(spawner, config, null);
+            Check(Mathf.Abs(camera.nearClipPlane - .1f) < .001f && Mathf.Abs(camera.farClipPlane - 100f) < .001f, "Rebuild restores authored camera distances.");
+            Debug.Log("Generated swarm spawn, wrapping, and camera clip validation passed (" + checks + " checks).");
+        }
+        finally
+        {
+            Object.DestroyImmediate(host);
+            Object.DestroyImmediate(prefab);
+            Object.DestroyImmediate(camera.gameObject);
+        }
+    }
+
+    public static void ValidateParallelMotion()
+    {
+        var host = new GameObject("Parallel swarm parity");
+        var observer = new GameObject("Parallel swarm observer");
+        var parallel = new GameObject[128];
+        var serial = new LocustMover[parallel.Length];
+        try
+        {
+            var bounds = host.AddComponent<BoundaryManager>();
+            bounds.boundaryLengthX = 4;
+            bounds.boundaryLengthZ = 8;
+            bounds.boundaryHeight = 6;
+            bounds.wrapY = true;
+            bounds.preserveOvershoot = true;
+            bounds.referenceRotation = Quaternion.Euler(0, 32f, 0);
+            bounds.followTarget = observer.transform;
+            bounds.followOffset = new Vector3(2, 3, 4);
+            var driver = host.AddComponent<GeneratedSwarmMotion>();
+            for (int i = 0; i < parallel.Length; i++)
+            {
+                parallel[i] = new GameObject("Job agent");
+                serial[i] = new GameObject("Serial agent").AddComponent<LocustMover>();
+                var mover = parallel[i].AddComponent<LocustMover>();
+                serial[i].boundaryManager = bounds;
+                mover.speed = serial[i].speed = i % 9;
+                Vector3 position = new Vector3(i % 5 - 2, i % 9 - 4, i % 13 - 6);
+                Quaternion rotation = Quaternion.Euler(i % 31, i * 67, 0);
+                parallel[i].transform.SetPositionAndRotation(position, rotation);
+                serial[i].transform.SetPositionAndRotation(position, rotation);
+                parallel[i].SetActive(i % 7 != 0);
+                serial[i].gameObject.SetActive(i % 7 != 0);
+            }
+            driver.Configure(parallel, bounds);
+            Check(driver.UsesParallelMotion, "The eligible swarm uses parallel motion by default.");
+            foreach (float seconds in new[] { 0f, 1f / 60, .2f, 3f, 1f / 120 })
+            {
+                observer.transform.position += new Vector3(.1f, .4f, .2f);
+                driver.Advance(seconds);
+                for (int i = 0; i < serial.Length; i++)
+                {
+                    if (serial[i].gameObject.activeInHierarchy) serial[i].Advance(seconds);
+                    Check(Vector3.Distance(parallel[i].transform.position, serial[i].transform.position) < .00001f,
+                        "Parallel movement matches serial movement through rotated, moving 3D boundaries.");
+                }
+            }
+            driver.Configure(Array.Empty<GameObject>(), bounds);
+            Check(!driver.UsesParallelMotion, "Reconfiguring a small swarm releases its transform jobs.");
+            Debug.Log("Generated swarm parallel-motion validation passed (" + checks + " checks).");
+        }
+        finally
+        {
+            Object.DestroyImmediate(host);
+            Object.DestroyImmediate(observer);
+            foreach (var agent in parallel) if (agent != null) Object.DestroyImmediate(agent);
+            foreach (var mover in serial) if (mover != null) Object.DestroyImmediate(mover.gameObject);
+        }
+    }
+
+    public static void ValidateStaggeredAnimation()
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Locust/SimulatedLocust.prefab");
+        Check(prefab != null, "Stock locust prefab is available.");
+        var host = new GameObject("Staggered animation gate validation");
+        var agents = new GameObject[128];
+        var gates = new AnimateOnMove[agents.Length];
+        var animators = new Animator[agents.Length];
+        var movers = new LocustMover[agents.Length];
+        GeneratedSwarmMotion driver = null;
+        try
+        {
+            var bounds = host.AddComponent<BoundaryManager>();
+            bounds.boundaryLengthX = 4;
+            bounds.boundaryLengthZ = 8;
+            bounds.preserveOvershoot = true;
+            for (int i = 0; i < agents.Length; i++)
+            {
+                var agent = agents[i] = Object.Instantiate(prefab, new Vector3(1.9f, 0, 0), Quaternion.Euler(0, 90, 0));
+                agent.layer = 0;
+                animators[i] = agent.GetComponent<Animator>();
+                movers[i] = agent.GetComponent<LocustMover>();
+                movers[i].speed = .8f;
+                AnimateOnMove.ConfigureHierarchy(agent, agent.transform, true, .5f, new Vector2(4, 8));
+                gates[i] = agent.GetComponent<AnimateOnMove>();
+            }
+            driver = host.AddComponent<GeneratedSwarmMotion>();
+            driver.Configure(agents, bounds, stockAnimation: true);
+            Check(driver.UsesStaggeredAnimation, "The stock parallel group uses staggered animation by default.");
+            Check(animators.All(animator => animator.speed == 0), "All animators begin paused.");
+            driver.Advance(.25f);
+            Check(agents[0].transform.position.x < -1.8f && Mathf.Abs(gates[0].CurrentSpeed - .8f) < .001f,
+                "A wrapped step reports horizontal travel in world units per second.");
+            Check(animators.Where((animator, i) => i % 10 == 0).All(animator => animator.speed > 0) &&
+                animators.Where((animator, i) => i % 10 != 0).All(animator => animator.speed == 0),
+                "Only the first cohort changes playback on the first frame.");
+            for (int i = 0; i < 9; i++) driver.Advance(.25f);
+            Check(animators.All(animator => animator.speed > 0), "All ten cohorts started within ten frames.");
+
+            void AdvanceAtSpeed(float speed)
+            {
+                foreach (var mover in movers) mover.speed = speed;
+                for (int i = 0; i < 20; i++) driver.Advance(i % 2 == 0 ? .1f : .25f);
+            }
+            AdvanceAtSpeed(.45f);
+            Check(animators.All(animator => animator.speed > 0), "Walking continues between stop and start thresholds.");
+            AdvanceAtSpeed(.3f);
+            Check(animators.All(animator => animator.speed == 0), "Walking stops below the lower threshold.");
+            AdvanceAtSpeed(.45f);
+            Check(animators.All(animator => animator.speed == 0), "Standing continues between stop and start thresholds.");
+            AdvanceAtSpeed(.8f);
+            Check(animators.All(animator => animator.speed > 0) && gates.All(gate => Mathf.Abs(gate.CurrentSpeed - .8f) < .001f),
+                "The upper threshold restarts playback and the measured speed is independent of frame time.");
+            driver.Advance(0);
+            Check(animators.All(animator => animator.speed == 0), "A zero-time frame pauses and clears every cohort.");
+            driver.Configure(Array.Empty<GameObject>(), bounds);
+            Check(!driver.UsesStaggeredAnimation && gates.All(gate => gate.enabled), "Releasing the group restores the regular gate.");
+            driver.Configure(agents, bounds, stockAnimation: true);
+            Check(driver.UsesStaggeredAnimation && gates.All(gate => !gate.enabled), "Reconfiguring the group starts fresh cohorts.");
+            Debug.Log("Generated swarm staggered-animation validation passed (" + checks + " checks).");
+        }
+        finally
+        {
+            if (driver != null) driver.Configure(Array.Empty<GameObject>(), null);
+            Object.DestroyImmediate(host);
+            foreach (var agent in agents) if (agent != null) Object.DestroyImmediate(agent);
+        }
+    }
+
     private static void DistributionAndVolume()
     {
         UnityEngine.Random.InitState(137);
@@ -96,6 +297,8 @@ public static class GeneratedSwarmValidation
             try
             {
                 var config=Config();config.worldUnitsPerMetre=scale;config.locustSpeed*=scale;config.locustSpeedStdDev*=scale;
+                config.spawnAreaSize=null;config.spawnVolumeSize=null;
+                config.boundaryLengthX=config.boundaryLengthZ=config.boundaryHeight=null; // Exercise the physical-size fallback on every axis.
                 var rig=animal.AddComponent<ClosedLoop>();
                 SwarmConfiguration.Apply(spawner,config,rig,scale);
                 Check(spawner.Spawned.Count==64 && spawner.GetComponent<SwarmTrajectoryPlayback>()==null,"Blank trajectory selects exactly 64 generated agents.");
@@ -296,15 +499,23 @@ public static class GeneratedSwarmValidation
             foreach(var logger in loggers)
             {
                 Check(logger.DroppedFrames==0 && logger.Failure==null && logger.PendingFrames==0,"All coordinate snapshots drain without backlog drops or writer errors.");
-                string[] lines;using(var file=File.OpenRead(logger.LogPath)) using(var gzip=new GZipStream(file,CompressionMode.Decompress)) using(var reader=new StreamReader(gzip)) lines=reader.ReadToEnd().Split('\n').Where(l=>l.Length>0).ToArray();
                 var spawner=logger.GetComponent<LocustSpawner>();int population=spawner.Spawned.Count;
-                Check(lines.Length-1==logger.WrittenRows && logger.WrittenRows>=280*population,"Gzip contains all submitted rows, including the allocation interval.");
-                var final=lines.Skip(lines.Length-population).Select(l=>l.Split(',')).ToDictionary(c=>c[1]);
-                foreach(var agent in spawner.Spawned)
+                var final=new Dictionary<string,Vector3>();
+                using(var stream=new PopulationRecording.Reader(logger.LogPath))
                 {
-                    var row=final[agent.name];var position=new Vector3(float.Parse(row[3],System.Globalization.CultureInfo.InvariantCulture),float.Parse(row[4],System.Globalization.CultureInfo.InvariantCulture),float.Parse(row[5],System.Globalization.CultureInfo.InvariantCulture));
-                    Check(Vector3.Distance(position,agent.transform.position)<.0001f,"Saved coordinates match the final presented position of "+agent.name);
+                    Check(stream.Summary.rows==logger.WrittenRows && logger.WrittenRows>=280*population,"The population stream contains all submitted rows, including the allocation interval.");
+                    long offset=stream.FirstFrameOffset,lastOffset=offset;
+                    while(stream.ReadFrame(offset,out var frame)){lastOffset=offset;offset=frame.nextOffset;}
+                    Check(stream.ReadFrame(lastOffset,out var last,true),"The final population frame is readable.");
+                    for(int i=0;i<last.count;i++)
+                    {
+                        var row=stream.ReadSample(last);
+                        final.Add(stream.Identities[row.id].name,new Vector3(row.x,row.y,row.z));
+                    }
+                    stream.RequireFrameEnd(last);
                 }
+                foreach(var agent in spawner.Spawned)
+                    Check(Vector3.Distance(final[agent.name],agent.transform.position)<.0001f,"Saved coordinates match the final presented position of "+agent.name);
                 saved.Add(new {rig=spawner.name,rows=logger.WrittenRows,droppedFrames=logger.DroppedFrames,pendingFrames=logger.PendingFrames});
             }
             Check(bytes==0,"Warmed movement, upload and pooled logger capture allocate no managed bytes on the main thread.");

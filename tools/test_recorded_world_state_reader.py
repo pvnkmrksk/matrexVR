@@ -47,6 +47,19 @@ public static class Regression
     private static void Check(bool value, string message) { checks++; if (!value) throw new Exception(message); }
     private static void Throws<T>(Action action, string message) where T : Exception
     { checks++; try { action(); } catch (T) { return; } throw new Exception(message); }
+    private static void CheckWrittenEntry(JObject payload)
+    {
+        var expected = (JObject)payload.DeepClone();
+        expected["sha256"] = ReplayPresentationJournal.HashEntry(expected);
+        using (var writer = new StringWriter { NewLine = "\r\n" })
+        {
+            ReplayPresentationJournal.WriteEntry(writer, payload);
+            string row = writer.ToString();
+            Check(row == expected.ToString(Formatting.None) + writer.NewLine, "Single-pass writer preserves the exact acquisition bytes.");
+            Check((string)ReplayPresentationJournal.ParseVerified(row.Substring(0, row.Length - 1))["sha256"] == (string)expected["sha256"], "Single-pass output verifies with the production reader.");
+            Check(payload.Property("sha256") == null, "Single-pass writer does not mutate the captured state.");
+        }
+    }
     private static JObject Row(int frame, bool active = true, string payload = "")
     {
         var row = new JObject {
@@ -75,6 +88,7 @@ public static class Regression
         foreach (object number in numbers)
         {
             var numeric = new JObject { ["number"] = new JValue(number) };
+            CheckWrittenEntry(numeric);
             numeric["sha256"] = ReplayPresentationJournal.HashEntry(numeric);
             string encoded = numeric.ToString(Formatting.None);
             for (int read = 0; read < 3; read++)
@@ -88,6 +102,8 @@ public static class Regression
         Throws<InvalidDataException>(() => ReplayPresentationJournal.ParseVerified(knownRecord.Replace("60.0312424", "60.0312425")), "Changed numeric bytes must fail integrity.");
         var checksumOnly = new JObject(); checksumOnly["sha256"] = ReplayPresentationJournal.HashEntry(checksumOnly);
         Check(ReplayPresentationJournal.ParseVerified(checksumOnly.ToString(Formatting.None)).Count == 1, "Empty payload checksum is well-defined.");
+        CheckWrittenEntry(new JObject());
+        CheckWrittenEntry(new JObject { ["nested"] = new JObject { ["sha256"] = "\"}\\\nünicode" } });
         string normal = Write(root, "normal", Enumerable.Range(1, 24).Select(frame => Row(frame)));
         string sourceHash = Hash(normal);
         var a = new RecordedWorldStateTarget { Key = "a" }; var b = new RecordedWorldStateTarget { Key = "b" };

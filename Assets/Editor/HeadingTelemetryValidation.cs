@@ -66,6 +66,96 @@ public static class HeadingTelemetryValidation
         SessionState.SetBool(Key, true);
         EditorApplication.isPlaying = true;
     }
+
+    public static void RunPoseContinuity()
+    {
+        if (!File.Exists(Path.Combine(Application.dataPath, "../KANNADI_VALIDATION_COPY")))
+            throw new Exception("Use a disposable Unity validation copy.");
+        var owner = new GameObject("Telemetry fixture");
+        var animal = new GameObject("Tracked pose fixture");
+        var other = new GameObject("Other tracked pose fixture");
+        var previousMain = MainController.Instance;
+        var instance = typeof(MainController).GetProperty(nameof(MainController.Instance));
+        try
+        {
+            var controller = owner.AddComponent<MainController>();
+            var telemetry = owner.AddComponent<ExperimentTelemetry>();
+            var firstRig = animal.AddComponent<ClosedLoop>();
+            var secondRig = other.AddComponent<ClosedLoop>();
+            instance.SetValue(null, controller);
+            controller.RegisterVRClosedLoop("VR1", firstRig);
+            controller.RegisterVRClosedLoop("VR2", secondRig);
+
+            JObject Snapshot() => JObject.FromObject(telemetry.Capture(1));
+            long Id(JObject snapshot, int rig) => snapshot["rigs"][rig].Value<long>("poseContinuityId");
+            firstRig.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            secondRig.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            var initial = Snapshot();
+            long firstId = Id(initial, 0), secondId = Id(initial, 1);
+            Check(initial.Value<int>("schemaVersion") == 2 && firstId > 0 && firstId != secondId,
+                "Continuity metadata is additive to schema 2 and distinct across rig instances");
+
+            firstRig.transform.position = new Vector3(3, 0, 0);
+            firstRig.ApplyStartPose(Vector3.zero, Quaternion.Euler(0, 90, 0), false, true);
+            Check(Id(Snapshot(), 0) == firstId, "Movement and rotation-only reset preserve position continuity");
+            firstRig.ApplyStartPose(Vector3.one, Quaternion.identity, true, false);
+            long positionResetId = Id(Snapshot(), 0);
+            Check(positionResetId != firstId, "Position-only reset changes the pose continuity ID");
+            firstRig.ResetPositionAndRotation();
+            long manualResetId = Id(Snapshot(), 0);
+            Check(manualResetId != positionResetId && Id(Snapshot(), 0) == manualResetId,
+                "Full reset changes the ID and later captures retain it");
+
+            var kannadi = animal.AddComponent<Kannadi>();
+            Set(kannadi, "initialized", true);
+            firstRig.transform.position = new Vector3(99.75f, 0, 0);
+            Call(kannadi, "LateUpdate");
+            Check(Id(Snapshot(), 0) == manualResetId, "Normal Kannadi motion preserves continuity");
+            firstRig.transform.position = new Vector3(100.25f, 0, 0);
+            Call(kannadi, "LateUpdate");
+            var wrapped = Snapshot();
+            Check(Id(wrapped, 0) != manualResetId && wrapped["rigs"][0]["pose"].Value<float>("x") == -99.75f,
+                "Wrapped pose and new continuity ID arrive in the same snapshot");
+            Check(Id(wrapped, 1) == secondId, "Reset and wrap affect only the moving rig");
+            Check(JObject.FromObject(telemetry.CaptureContext(1))["targets"].Type == JTokenType.Null,
+                "No authored targets are fabricated in other scenes");
+
+            var choice = owner.AddComponent<ChoiceController>();
+            var targets = JArray.Parse(@"[
+                { 'enabled': false, 'type': 'Tree', 'position': { 'radius': 10, 'angle': -90 }, 'scale': { 'x': -2 } },
+                { 'enabled': false, 'type': '/private/model.glb', 'position': { 'x': 4, 'z': 3 }, 'scale': null },
+                { 'enabled': false, 'position': { 'radius': 0, 'angle': 0 } },
+                { 'enabled': false, 'position': { 'x': '', 'z': 3 } }
+            ]");
+            for (int i = 0; i < 32; i++) targets.Add(targets[0].DeepClone());
+            var payload = new JObject { ["objects"] = targets, ["resetPositionOnStart"] = false, ["resetRotationOnStart"] = false };
+            var parameters = new Dictionary<string, object> { ["configFile"] = "Choice-fixture.json", ["__experimentPhase"] = payload };
+            choice.AdvanceStep(parameters);
+            var context = JObject.FromObject(telemetry.CaptureContext(2));
+            var authored = (JArray)context["targets"];
+            Check(context.Value<int>("schemaVersion") == 1 && authored.Count == 32 && Snapshot()["targets"] == null,
+                "Bounded target geometry belongs to the context heartbeat, outside high-rate pose snapshots");
+            Check(authored[0].Value<double>("x") == -10 && Math.Abs(authored[0].Value<double>("z")) < 1e-12 &&
+                authored[0].Value<double>("scale") == 2 && authored[0].Value<string>("side") == "left",
+                "Choice target geometry uses the saved viewer's polar axes, side and absolute scale");
+            Check(authored[1].Value<double>("r") == 5 && authored[1].Value<double>("scale") == 1 &&
+                authored[1].Value<string>("side") == "right" && authored[1].Value<string>("type") == "object",
+                "Cartesian target geometry keeps the passive radius and strips path-like labels");
+            Check(authored[2].Value<string>("type") == "Tree", "Origin-centred and incomplete positions add no target");
+            payload["objects"] = new JArray();
+            choice.AdvanceStep(parameters);
+            Check(!JObject.FromObject(telemetry.CaptureContext(3))["targets"].HasValues,
+                "A new Choice phase replaces rather than inherits previous live target geometry");
+            Debug.Log($"PASS: {checks} live telemetry continuity and geometry checks");
+        }
+        finally
+        {
+            instance.SetValue(null, previousMain);
+            Object.DestroyImmediate(animal);
+            Object.DestroyImmediate(other);
+            Object.DestroyImmediate(owner);
+        }
+    }
     private static void Fixture()
     {
         var system = JObject.Parse(File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "Templates/system_config.template.json")));

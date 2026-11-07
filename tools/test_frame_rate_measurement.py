@@ -33,6 +33,7 @@ HARNESS = r'''
 using System;
 class Time { public static double unscaledTimeAsDouble,realtimeSinceStartupAsDouble; }
 class Application { public static int targetFrameRate=60; }
+class SystemInfo { public static int processorCount=32; }
 class QualitySettings { public static int vSyncCount; }
 class Canvas { public bool enabled=true; }
 class Text { public string text; }
@@ -57,7 +58,7 @@ class Actual {
  private double previousTime,elapsed,peakInterval,cpuMain,cpuRender,gpu,presentWait;
  private bool hasPreviousFrame,timingsEnabled;
  private int frames,timingSamples,gpuSamples; private ulong previousTimestamp;
- private string graphicsApi="test"; private readonly FrameTiming[] timings=new FrameTiming[1];
+ private string graphicsApi="test",graphicsDevice="test GPU"; private readonly FrameTiming[] timings=new FrameTiming[1];
  private ProcessClock measuredProcess; private TimeSpan previousProcessCpu;
  public Actual(ProcessClock process=null){instance=this;measuredProcess=process;}
  public FrameStatistics Latest {get;private set;}
@@ -148,8 +149,9 @@ def main():
         raise SystemExit('A local .NET SDK is required.')
     sdk = subprocess.check_output([dotnet, '--list-sdks'], text=True)
     version = max(map(int, re.findall(r'^(\d+)\.', sdk, re.M)))
-    engines = sorted(Path('/Applications/Unity/Hub/Editor').glob('*/Unity.app/Contents/Resources/Scripting/Managed/UnityEngine'))
-    ui = ROOT/'.local/project/Library/ScriptAssemblies/UnityEngine.UI.dll'
+    engines = sorted([*Path('/Applications/Unity/Hub/Editor').glob('*/Unity.app/Contents/Resources/Scripting/Managed/UnityEngine'), *(Path.home()/'Unity/Hub/Editor').glob('*/Editor/Data/Managed/UnityEngine')])
+    validation_project = Path(os.environ.get('MATREX_VALIDATION_PROJECT',str(ROOT/'.local/project')))
+    ui = validation_project/'Library/ScriptAssemblies/UnityEngine.UI.dll'
     if not engines or not ui.exists():
         raise SystemExit('Installed Unity API assemblies and prepared project UnityEngine.UI.dll are required.')
     source = (ROOT/'Assets/Scripts/fps.cs').read_text()
@@ -170,7 +172,7 @@ def main():
                 (project_dir/'fps.cs').write_text(source)
                 (project_dir/'OverlayPlacementConfig.cs').write_text((ROOT/'Assets/Scripts/OverlayPlacementConfig.cs').read_text())
                 (project_dir/'AppStubs.cs').write_text(API_STUBS)
-                input_system=ROOT/'.local/project/Library/ScriptAssemblies/Unity.InputSystem.dll'
+                input_system=validation_project/'Library/ScriptAssemblies/Unity.InputSystem.dll'
                 references = ''.join(f'<Reference Include="{escape(path.stem)}"><HintPath>{escape(str(path))}</HintPath></Reference>' for path in [*engines[-1].glob('*.dll'), ui, input_system])
             project = project_dir/(kind+'.csproj')
             output = 'Exe' if kind == 'Measurement' else 'Library'

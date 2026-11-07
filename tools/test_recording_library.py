@@ -46,7 +46,7 @@ def main():
  if not dotnet:raise SystemExit('A local .NET SDK is required.')
  version=max(map(int,re.findall(r'^(\d+)\.',subprocess.check_output([dotnet,'--list-sdks'],text=True),re.M)))
  dll=next((ROOT/'Library/PackageCache').glob('com.unity.nuget.newtonsoft-json@*/Runtime/Newtonsoft.Json.dll'))
- paths=['Assets/Scripts/Replay/RecordingLibrary.cs','Assets/Scripts/Loggers/RecordingSummary.cs','Assets/Scripts/Replay/RecordedPosePolicy.cs','Assets/Scripts/Replay/ReplaySessionArchive.cs','Assets/Scripts/Loggers/RunConfigArchive.cs','tools/replay_compatibility/Stubs.cs']
+ paths=['Assets/Scripts/Replay/RecordingLibrary.cs','Assets/Scripts/Swarm/AsyncSwarmWriter.cs','Assets/Scripts/Swarm/PopulationRecording.cs','Assets/Scripts/Loggers/RecordingSummary.cs','Assets/Scripts/Replay/RecordedPosePolicy.cs','Assets/Scripts/Replay/ReplaySessionArchive.cs','Assets/Scripts/Loggers/RunConfigArchive.cs','tools/replay_compatibility/Stubs.cs']
  with tempfile.TemporaryDirectory(prefix='matrex-library-check-') as folder:
   temp=Path(folder);(temp/'Program.cs').write_text(PROGRAM);(temp/'NuGet.Config').write_text('<configuration><packageSources><clear /></packageSources></configuration>')
   includes=''.join(f'<Compile Include="{escape(str(ROOT/path))}" />' for path in paths)

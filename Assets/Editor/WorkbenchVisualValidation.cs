@@ -39,7 +39,9 @@ public static class WorkbenchVisualValidation
             EditorApplication.update += Tick;
         };
     }
-    public static void Run()
+    public static void Run() => Begin(false);
+    public static void RunParameterLayout() => Begin(true);
+    private static void Begin(bool parameterLayout)
     {
         if (!File.Exists(Path.Combine(Application.dataPath, "../KANNADI_VALIDATION_COPY")))
             throw new Exception("Use a marked disposable project.");
@@ -50,6 +52,7 @@ public static class WorkbenchVisualValidation
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json"), File.ReadAllText(Path.Combine(profile, "sequence.json")));
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "visual-motion.example.json"),
             "{\"closedLoopOrientation\":true,\"closedLoopPosition\":false,\"autopilotEnabled\":true,\"autopilotSpeed\":7,\"walkingPositionGain\":0.01,\"windSpeed\":0,\"windDirection\":0,\"resetPositionOnStart\":false,\"resetRotationOnStart\":true,\"randomInitialRotation\":true}");
+        SessionState.SetBool(Key+".ParameterLayout",parameterLayout);
         SessionState.SetBool(Key, true);
         EditorSceneManager.OpenScene("Assets/Scenes/ControlScene.unity");
         EditorApplication.isPlaying = true;
@@ -188,8 +191,15 @@ public static class WorkbenchVisualValidation
             if(card.ClassListContains("vector-setting"))
             {
                 var controls=card.Q<VisualElement>(className:"vector-controls");
-                var axes=controls.Children().OfType<Label>().ToList();
+                var axes=controls.Query<VisualElement>(className:"vector-axis").ToList();
                 Check(axes.Count==3&&Mathf.Abs(axes[0].worldBound.y-axes[2].worldBound.y)<1,"Three vector axes share one line: "+card.name);
+                foreach(var axis in axes)
+                {
+                    var axisLabel=axis.Q<Label>();
+                    var field=axis.Q<TextField>();
+                    Check(axisLabel.worldBound.Overlaps(axis.worldBound)&&field.worldBound.xMax<=axis.worldBound.xMax+1,
+                        "Vector axis and number stay together: "+card.name);
+                }
             }
         }
     }
@@ -251,6 +261,34 @@ public static class WorkbenchVisualValidation
         var dropdown=root.Q<DropdownField>();
         Check(dropdown!=null&&dropdown.value.StartsWith("TerrainChoice_",StringComparison.Ordinal),"Friendly scene dropdown retains the actual Unity scene value");
     }
+    private static void OpenSwarmGroups(ConfigWorkbench ui)
+    {
+        experiment=ui.Workspace.Open("Examples/Kannadi/tight-mixed.example.json","kannadi");
+        Call(ui,"Select",experiment);
+        var path=(List<string>)typeof(ConfigWorkbench).GetField("path",Hidden).GetValue(ui);
+        path.Add("agentGroups");
+        Call(ui,"BuildContent");
+    }
+    private static void CheckGroupInputs(ConfigWorkbench ui)
+    {
+        var root=ui.Document.rootVisualElement;
+        var fields=root.Q<ListView>(className:"fields");
+        var count=fields.Q<TextField>("number-count");
+        var appearance=fields.Q<DropdownField>(className:"property-choice");
+        Check(count!=null&&count.worldBound.width>=96&&count.worldBound.width<=120,"Nested group number is compact at "+target.width+" px");
+        Check(appearance!=null&&appearance.value=="Black"&&appearance.worldBound.width>=125&&appearance.worldBound.width<=211,
+            "Nested group appearance stays readable and compact at "+target.width+" px");
+        Check(fields.worldBound.width<=1081,"Advanced list has a bounded reading width");
+        foreach(var row in fields.Query<VisualElement>(className:"field-row").ToList())
+        {
+            var value=row.Q<VisualElement>(className:"field-value");
+            var actions=row.Q<VisualElement>(className:"field-actions");
+            Check(value.worldBound.xMax<=actions.worldBound.xMin+1&&actions.worldBound.xMax<=fields.worldBound.xMax+1,
+                "Value and row actions stay inside the advanced list at "+target.width+" px");
+        }
+        geometry.Add(new {control="advanced-swarm-group",numberWidth=count.worldBound.width,choiceWidth=appearance.worldBound.width,
+            listWidth=fields.worldBound.width,targetWidth=target.width,targetHeight=target.height});
+    }
     private static void Tick()
     {
         if (Time.frameCount < nextFrame) return;
@@ -260,7 +298,28 @@ public static class WorkbenchVisualValidation
             var ui = ConfigWorkbench.Instance; if (ui?.Document == null) return;
             switch (stage)
             {
-                case 0: Render(ui, 1920, 1080, 1); Next(1, 60); break;
+                case 0:
+                    Render(ui,1920,1080,1);
+                    if(SessionState.GetBool(Key+".ParameterLayout",false)){OpenSwarmGroups(ui);Next(90,60);}
+                    else Next(1,60);
+                    break;
+                case 90:
+                    var groups=ui.Document.rootVisualElement.Q<ListView>(className:"fields");
+                    var labels=groups.Query<Label>(className:"field-title").ToList();
+                    Check(labels.Any(label=>label.text=="Stock · 64"),"Group list names the stock appearance and count");
+                    var black=labels.Single(label=>label.text=="Black · 64");
+                    Capture("swarm-group-list-1920x1080");
+                    Submit(black.parent.parent.Q<VisualElement>(className:"field-value").Q<Button>());Next(91);break;
+                case 91:
+                    CheckGroupInputs(ui);Capture("swarm-group-fields-1920x1080");
+                    var beforeGroupEdit=experiment.Root.ToString(Formatting.None);
+                    Submit(ui.Document.rootVisualElement.Q<Button>("spin-up-count"));
+                    Check(experiment.Root["agentGroups"][1]["count"].ToString()=="65","Nested number stepper edits the existing configuration draft");
+                    experiment.Undo();
+                    Check(experiment.Root.ToString(Formatting.None)==beforeGroupEdit,"Undo restores the exact grouped configuration");
+                    Call(ui,"BuildContent");Render(ui,1024,720,1);Next(92);break;
+                case 92:
+                    CheckGroupInputs(ui);Capture("swarm-group-fields-1024x720");Finish(null);break;
                 case 1:
                     Shell(ui); Typography(); Capture("home-1920x1080");
                     File.WriteAllLines(Path.Combine(Output,"foldout-visual-tree.txt"),ui.Document.rootVisualElement.Q<Foldout>("navigation-files").Query<VisualElement>().ToList().Select(e=>e.GetType().Name+" / "+e.name+" / "+string.Join(" ",e.GetClasses())+" / bg="+e.resolvedStyle.backgroundColor+" border="+e.resolvedStyle.borderTopWidth));
@@ -384,7 +443,9 @@ public static class WorkbenchVisualValidation
         Directory.CreateDirectory(Output);
         File.WriteAllText(Path.Combine(Output, "results.json"), JsonConvert.SerializeObject(new {
             checks = checks.Count, failure, errors, geometry, passed = checks, unity = Application.unityVersion,
-            scope = "Native UI Toolkit offscreen rendering at Full HD, 4K at 2× scale and 2560×1440 at 1.25× scale. Synthetic configs; no trackers or experiment started."
+            scope = SessionState.GetBool(Key+".ParameterLayout",false)?
+                "Native UI Toolkit advanced swarm group controls at 1920×1080 and 1024×720. No trackers or experiment started.":
+                "Native UI Toolkit offscreen rendering at Full HD, 4K at 2× scale and 2560×1440 at 1.25× scale. Synthetic configs; no trackers or experiment started."
         }, Formatting.Indented));
         EditorApplication.Exit(failure == null && errors.Count == 0 ? 0 : 1);
     }

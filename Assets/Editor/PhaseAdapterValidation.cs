@@ -169,8 +169,27 @@ public static class PhaseAdapterValidation
     {
         var phasesByKind = new Dictionary<string, HashSet<string>>();
         string directory = MasterDataLogger.Instance.directoryPath;
-        foreach (string file in Directory.GetFiles(directory, "*.csv*").Where(f => f.EndsWith(".csv") || f.EndsWith(".csv.gz")))
+        AsyncSwarmWriter.DrainAll();
+        foreach (string file in ReplaySessionArchive.RecordedFiles(directory))
         {
+            if (PopulationRecording.IsFile(file))
+            {
+                using (var stream = new PopulationRecording.Reader(file))
+                {
+                    string layout = stream.Layout.ToString();
+                    if (!phasesByKind.TryGetValue(layout, out var phases))
+                        phasesByKind[layout] = phases = new HashSet<string>();
+                    long offset = stream.FirstFrameOffset;
+                    while (stream.ReadFrame(offset, out var frame, true))
+                    {
+                        Check(new[] { "preStimulus", "stimulus", "postStimulus", "idle", "assessment", "error" }.Contains(frame.phase),
+                            "Recognized phase on every stored population frame");
+                        if (frame.count > 0) phases.Add(frame.phase);
+                        offset = frame.nextOffset;
+                    }
+                }
+                continue;
+            }
             string text;
             if (file.EndsWith(".gz"))
             {

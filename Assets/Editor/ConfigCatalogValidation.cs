@@ -68,6 +68,8 @@ public static class ConfigCatalogValidation
         foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
         {
             if (excluded != null && excluded.Contains(field.Name)) continue;
+            if (typeof(SwarmConfig).IsAssignableFrom(type) && (field.Name == "spawnType" || field.Name == "farClipMetres" || field.Name == "periodicBoundary") && obj.Property(field.Name) == null)
+                continue; // These optional swarm additions use their runtime defaults in existing recipes.
             Check(obj.Property(field.Name) != null, path + " missing explicit field " + field.Name);
             JToken token = obj[field.Name];
             Type child = Nullable.GetUnderlyingType(field.FieldType) ?? field.FieldType;
