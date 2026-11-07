@@ -6,11 +6,14 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading;
 
-/// <summary>Bounded, pooled snapshots. Formatting, gzip and file I/O run on one worker.</summary>
+/// <summary>Bounded, pooled snapshots. Encoding and file I/O run on one worker.</summary>
 public sealed class AsyncSwarmWriter
 {
-    public enum RowLayout { Swarm, Kannadi }
-    public struct Agent { public string name, layer, animationState; public int index; public float x, y, z, rx, ry, rz, sx, sy, sz; }
+    public enum RowLayout { Swarm, Kannadi, Band }
+    /// <summary>The rented frame owns this capture until its worker returns the frame to the pool.</summary>
+    public interface IAnimationSnapshot { void WriteCsvCell(TextWriter output); }
+    public interface IPackedAnimationSnapshot : IAnimationSnapshot { void WritePacked(BinaryWriter output); }
+    public struct Agent { public string name, layer, animationState; public IAnimationSnapshot animationSnapshot; public int index; public float x, y, z, rx, ry, rz, sx, sy, sz, speed, visibilityPhase; public bool visible; }
     public sealed class Frame
     {
         public Agent[] agents;
@@ -30,14 +33,15 @@ public sealed class AsyncSwarmWriter
     private readonly Thread worker;
     private volatile bool completing;
     private volatile string failure;
-    private int pendingCount;
-    private long droppedFrames, writtenRows;
+    private int pendingCount, peakPendingCount;
+    private long droppedFrames, writtenRows, writtenFrames;
     private static readonly object activeLock = new object();
     private static readonly HashSet<AsyncSwarmWriter> active = new HashSet<AsyncSwarmWriter>();
     public sealed class CompletionSummary
     {
-        public string Path, Failure;
-        public long WrittenRows, DroppedFrames;
+        public string Path, Failure, Sha256;
+        public long WrittenRows, WrittenFrames, DroppedFrames, BytesWritten, LastWriteUtcTicks;
+        public int PeakPendingFrames;
     }
     // Retain only compact evidence, never the writer/thread/frame pool, across scene reloads.
     private static readonly Dictionary<string, CompletionSummary> completed = new Dictionary<string, CompletionSummary>(StringComparer.Ordinal);
@@ -64,7 +68,7 @@ public sealed class AsyncSwarmWriter
     {
         path = System.IO.Path.GetFullPath(path); // Invalid paths fail on the caller, not an unhandled worker finally block.
         lock (activeLock) active.Add(this);
-        worker = new Thread(() => Write(path, header, layout)) { IsBackground = true, Name = "Population CSV writer" };
+        worker = new Thread(() => Write(path, header, layout)) { IsBackground = true, Name = "Population recording writer" };
         worker.Start();
     }
     public Frame Rent(int count)
@@ -80,8 +84,11 @@ public sealed class AsyncSwarmWriter
         {
             if (completing || signalDisposed || failure != null || PendingFrames >= Capacity)
             { Interlocked.Increment(ref droppedFrames); pool.Enqueue(frame); return false; }
-            Interlocked.Increment(ref pendingCount);
-            pending.Enqueue(frame); signal.Set(); return true;
+            int count = Interlocked.Increment(ref pendingCount);
+            peakPendingCount = Math.Max(peakPendingCount, count);
+            pending.Enqueue(frame);
+            signal.Set();
+            return true;
         }
     }
     public void Complete()
@@ -103,8 +110,24 @@ public sealed class AsyncSwarmWriter
 
     private void Write(string path, string header, RowLayout layout)
     {
+        string sha256 = null;
+        long bytesWritten = 0, lastWriteUtcTicks = 0;
         try
         {
+            if (PopulationRecording.IsFile(path))
+            {
+                using (var output = new PopulationRecording.Writer(path, header, layout))
+                {
+                    Drain(output.Write);
+                    output.Finish();
+                    sha256 = output.Sha256;
+                    bytesWritten = output.BytesWritten;
+                }
+                var sealedFile = new FileInfo(path);
+                if (sealedFile.Length != bytesWritten) throw new IOException("Packed population length changed while closing " + path);
+                lastWriteUtcTicks = sealedFile.LastWriteTimeUtc.Ticks;
+                return;
+            }
             bool animation=header.IndexOf(",AnimationState",StringComparison.Ordinal)>=0;
             bool unityFrame=header.IndexOf(",UnityFrame",StringComparison.Ordinal)>=0;
             bool scale=header.IndexOf(",ScaleX",StringComparison.Ordinal)>=0;
@@ -114,42 +137,38 @@ public sealed class AsyncSwarmWriter
             using (var output = new StreamWriter(gzip, new System.Text.UTF8Encoding(false), 65536))
             {
                 output.WriteLine(header);
-                while (true)
+                Drain(frame =>
                 {
-                    while (pending.TryDequeue(out Frame frame))
+                    string timestamp = frame.timestamp.ToString("yyyy-MM-dd HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
+                    for (int i = 0; i < frame.count; i++)
                     {
-                        string timestamp = frame.timestamp.ToString("yyyy-MM-dd HH:mm:ss.fffffff", CultureInfo.InvariantCulture);
-                        for (int i = 0; i < frame.count; i++)
+                        Agent a = frame.agents[i];
+                        output.Write(timestamp);
+                        if(layout==RowLayout.Kannadi)
                         {
-                            Agent a = frame.agents[i];
-                            output.Write(timestamp);
-                            if(layout==RowLayout.Kannadi)
-                            {
-                                Number(output,frame.vrIndex,numberBuffer);Number(output,a.index,numberBuffer);Cell(output,a.name);
-                                Number(output,a.x,numberBuffer);Number(output,a.y,numberBuffer);Number(output,a.z,numberBuffer);
-                                Number(output,a.rx,numberBuffer);Number(output,a.ry,numberBuffer);Number(output,a.rz,numberBuffer);
-                                Number(output,frame.numberOfRings,numberBuffer);Number(output,frame.hexRadius,numberBuffer);
-                                Cell(output,frame.skyboxId);Cell(output,frame.skyboxSampleUtc);Cell(output,frame.phase);
-                            }
-                            else
-                            {
-                                Cell(output,a.name);Cell(output,a.layer);
-                                Number(output,a.x,numberBuffer);Number(output,a.y,numberBuffer);Number(output,a.z,numberBuffer);
-                                Cell(output,frame.skyboxId);Cell(output,frame.skyboxSampleUtc);Cell(output,frame.phase);
-                                Number(output,a.rx,numberBuffer);Number(output,a.ry,numberBuffer);Number(output,a.rz,numberBuffer);
-                            }
-                            if (animation) Cell(output,a.animationState);
-                            if(unityFrame)Number(output,frame.unityFrame,numberBuffer);
-                            if(scale){Number(output,a.sx,numberBuffer);Number(output,a.sy,numberBuffer);Number(output,a.sz,numberBuffer);}
-                            output.WriteLine();
+                            Number(output,frame.vrIndex,numberBuffer);Number(output,a.index,numberBuffer);Cell(output,a.name);
+                            Number(output,a.x,numberBuffer);Number(output,a.y,numberBuffer);Number(output,a.z,numberBuffer);
+                            Number(output,a.rx,numberBuffer);Number(output,a.ry,numberBuffer);Number(output,a.rz,numberBuffer);
+                            Number(output,frame.numberOfRings,numberBuffer);Number(output,frame.hexRadius,numberBuffer);
+                            Cell(output,frame.skyboxId);Cell(output,frame.skyboxSampleUtc);Cell(output,frame.phase);
                         }
-                        Interlocked.Add(ref writtenRows, frame.count);
-                        Interlocked.Decrement(ref pendingCount);
-                        pool.Enqueue(frame);
+                        else
+                        {
+                            Cell(output,a.name);Cell(output,a.layer);
+                            Number(output,a.x,numberBuffer);Number(output,a.y,numberBuffer);Number(output,a.z,numberBuffer);
+                            Cell(output,frame.skyboxId);Cell(output,frame.skyboxSampleUtc);Cell(output,frame.phase);
+                            Number(output,a.rx,numberBuffer);Number(output,a.ry,numberBuffer);Number(output,a.rz,numberBuffer);
+                        }
+                        if (animation)
+                        {
+                            if(a.animationSnapshot!=null)a.animationSnapshot.WriteCsvCell(output);
+                            else Cell(output,a.animationState);
+                        }
+                        if(unityFrame)Number(output,frame.unityFrame,numberBuffer);
+                        if(scale){Number(output,a.sx,numberBuffer);Number(output,a.sy,numberBuffer);Number(output,a.sz,numberBuffer);}
+                        output.WriteLine();
                     }
-                    if (completing && pending.IsEmpty) break;
-                    signal.WaitOne(100);
-                }
+                });
             }
         }
         catch (Exception error)
@@ -159,17 +178,55 @@ public sealed class AsyncSwarmWriter
         }
         finally
         {
-            while (pending.TryDequeue(out _)) { Interlocked.Decrement(ref pendingCount); Interlocked.Increment(ref droppedFrames); }
-            lock (signalGate) { signal.Dispose(); signalDisposed = true; }
+            lock (signalGate)
+            {
+                signalDisposed = true;
+                signal.Dispose();
+                while (pending.TryDequeue(out _))
+                {
+                    Interlocked.Decrement(ref pendingCount);
+                    Interlocked.Increment(ref droppedFrames);
+                }
+            }
             lock (activeLock)
             {
                 string fullPath = System.IO.Path.GetFullPath(path);
                 completed[fullPath] = new CompletionSummary { Path = fullPath, Failure = failure,
-                    WrittenRows = WrittenRows, DroppedFrames = DroppedFrames };
+                    WrittenRows = WrittenRows, WrittenFrames = Interlocked.Read(ref writtenFrames),
+                    PeakPendingFrames = peakPendingCount, DroppedFrames = DroppedFrames,
+                    Sha256 = failure == null ? sha256 : null, BytesWritten = bytesWritten, LastWriteUtcTicks = lastWriteUtcTicks };
                 active.Remove(this);
             }
         }
     }
+    private void Drain(Action<Frame> write)
+    {
+        while (true)
+        {
+            while (pending.TryDequeue(out Frame frame))
+            {
+                try
+                {
+                    write(frame);
+                    Interlocked.Add(ref writtenRows, frame.count);
+                    Interlocked.Increment(ref writtenFrames);
+                }
+                catch
+                {
+                    Interlocked.Increment(ref droppedFrames);
+                    throw;
+                }
+                finally
+                {
+                    Interlocked.Decrement(ref pendingCount);
+                    pool.Enqueue(frame);
+                }
+            }
+            if (completing && pending.IsEmpty) return;
+            signal.WaitOne(100);
+        }
+    }
+
     private static void Number(StreamWriter output,float value,char[] buffer)
     {
         output.Write(',');

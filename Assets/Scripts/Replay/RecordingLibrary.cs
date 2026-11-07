@@ -143,7 +143,7 @@ public static class RecordingLibrary
     public static string GetFreshnessToken(string directory,CancellationToken cancellation=default)=>Fingerprint(Path.GetFullPath(directory),cancellation);
     private static string Fingerprint(string directory,CancellationToken cancellation)
     {
-        var files=new List<string>(ReplaySessionArchive.CsvFiles(directory));
+        var files=new List<string>(ReplaySessionArchive.RecordedFiles(directory));
         files.AddRange(new[]{"config_manifest.json","AnimalMetadata.json","FlyMetaData.json","system_config.json","sequenceConfig.json",RecordingSummary.ManifestName}.Select(name=>Path.Combine(directory,name)).Where(File.Exists));
         string snapshots=Path.Combine(directory,"Configs","Snapshots");
         if(Directory.Exists(snapshots))files.AddRange(Directory.EnumerateFiles(snapshots));

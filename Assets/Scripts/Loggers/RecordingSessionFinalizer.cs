@@ -14,6 +14,7 @@ public sealed class RecordingSessionFinalizer
     private readonly string directory, archivePath;
     private readonly JObject player;
     private readonly object gate = new object();
+    private readonly object archiveGate = new object();
     private readonly CancellationTokenSource cancellation = new CancellationTokenSource();
     private readonly DateTimeOffset created = DateTimeOffset.UtcNow;
     private JObject latest;
@@ -52,7 +53,7 @@ public sealed class RecordingSessionFinalizer
                     await drain(cancellation.Token).ConfigureAwait(false); drained = true;
                     writers = writerEvidence?.Invoke() ?? new JArray();
                     cancellation.Token.ThrowIfCancellationRequested();
-                    summary = RecordingSummary.Scan(directory, true, cancellation.Token, observePose, true);
+                    summary = RecordingSummary.Scan(directory, true, cancellation.Token, observePose, true, writers);
                     summary["writerEvidence"] = writers;
                     JObject receipt = await media(cancellation.Token).ConfigureAwait(false);
                     cancellation.Token.ThrowIfCancellationRequested();
@@ -70,8 +71,6 @@ public sealed class RecordingSessionFinalizer
                         if (shutdown) return (JObject)latest.DeepClone();
                         latest = summary; WriteAtomic(directory, latest);
                     }
-                    // A failed writer remains an inspectable directory, never a supposedly complete ZIP.
-                    if (error == null) CreateArchive(directory, archivePath, cancellation.Token);
                     return (JObject)summary.DeepClone();
                 }
                 catch (Exception error)
@@ -99,10 +98,22 @@ public sealed class RecordingSessionFinalizer
             shutdown = true; cancellation.Cancel();
             latest["lifecycle"] = Lifecycle(error == null ? "open" : "error", "application-shutdown", writersDrained, error);
             latest["lifecycle"]["finalizationPending"] = true;
-            latest["lifecycle"]["warning"] = "Asynchronous summary/media/archive finalization did not complete before shutdown.";
+            latest["lifecycle"]["warning"] = "Asynchronous recording finalization did not complete before shutdown.";
             latest["media"] = mediaReceipt;
             if (writerEvidence != null) latest["writerEvidence"] = writerEvidence;
             WriteAtomic(directory, latest);
+        }
+    }
+
+    // Compatibility for callers that explicitly request a ZIP. Ordinary Stop seals the run directory.
+    public void WriteArchive()
+    {
+        lock (archiveGate)
+        {
+            lock (gate)
+                if (FinalizationTask == null || !FinalizationTask.IsCompleted || (string)latest?["lifecycle"]?["status"] != "finalized")
+                    throw new InvalidOperationException("Only a finalized recording can be archived.");
+            CreateArchive(directory, archivePath, CancellationToken.None);
         }
     }
 
@@ -133,8 +144,34 @@ public sealed class RecordingSessionFinalizer
         try
         {
             token.ThrowIfCancellationRequested();
-            ZipFile.CreateFromDirectory(directory, temporary);
-            token.ThrowIfCancellationRequested(); File.Move(temporary, archive);
+            using (var output = ZipFile.Open(temporary, ZipArchiveMode.Create))
+            {
+                var buffer = new byte[256 * 1024];
+                foreach (string file in Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories))
+                {
+                    token.ThrowIfCancellationRequested();
+                    string relative = Path.GetRelativePath(directory, file).Replace(Path.DirectorySeparatorChar, '/');
+                    string extension = Path.GetExtension(file).ToLowerInvariant();
+                    var compression = PopulationRecording.IsFile(file) || extension == ".gz" || extension == ".zip" ||
+                        extension == ".mp4" || extension == ".png" || extension == ".jpg"
+                        ? CompressionLevel.NoCompression : CompressionLevel.Fastest;
+                    var entry = output.CreateEntry(relative, compression);
+                    DateTime modified = File.GetLastWriteTime(file);
+                    if (modified.Year >= 1980 && modified.Year <= 2107) entry.LastWriteTime = modified;
+                    using (var source = File.OpenRead(file))
+                    using (var destination = entry.Open())
+                    {
+                        int count;
+                        while ((count = source.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            token.ThrowIfCancellationRequested();
+                            destination.Write(buffer, 0, count);
+                        }
+                    }
+                }
+            }
+            token.ThrowIfCancellationRequested();
+            File.Move(temporary, archive);
         }
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }

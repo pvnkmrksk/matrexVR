@@ -38,7 +38,7 @@ public sealed class ReplaySessionArchive
     public RecordedPosePolicy PosePolicy { get; }
     public ReplayPresentationJournal Presentations { get; }
     private readonly JObject manifest;
-    private readonly Dictionary<string,(long bytes,long ticks)> verifiedCsv = new Dictionary<string,(long,long)>(StringComparer.Ordinal);
+    private readonly Dictionary<string,(long bytes,long ticks)> verifiedRecordingFiles = new Dictionary<string,(long,long)>(StringComparer.Ordinal);
     private readonly HashSet<string> verified = new HashSet<string>(StringComparer.Ordinal);
 
     public ReplaySessionArchive(string directory)
@@ -72,26 +72,26 @@ public sealed class ReplaySessionArchive
         foreach(var writer in evidence["writerEvidence"] as JArray??new JArray())
             if((long?)writer["droppedFrames"]>0 || !string.IsNullOrEmpty((string)writer["failure"]))
                 throw new InvalidDataException("The recording has incomplete population evidence: "+writer["relativePath"]);
-        var expectedFiles=evidence["files"] as JArray??throw new InvalidDataException("Finalized CSV inventory is missing.");
+        var expectedFiles=evidence["files"] as JArray??throw new InvalidDataException("Finalized acquisition file inventory is missing.");
         var expectedPaths=new HashSet<string>(StringComparer.Ordinal);
         foreach(var item in expectedFiles.OfType<JObject>())
         {
             string relative=(string)item["relativePath"];
             if(string.IsNullOrWhiteSpace(relative)||Path.GetFileName(relative)!=relative||!expectedPaths.Add(relative))
-                throw new InvalidDataException("Invalid or duplicate CSV inventory path.");
+                throw new InvalidDataException("Invalid or duplicate acquisition inventory path.");
             if((long?)item["rejectedRows"]>0||item["readError"]!=null||(bool?)item["changedDuringScan"]==true)
-                throw new InvalidDataException("Acquisition CSV evidence is incomplete: "+relative);
+                throw new InvalidDataException("Acquisition evidence is incomplete: "+relative);
             string file=Path.Combine(DirectoryPath,relative);var info=new FileInfo(file);
             if(!info.Exists||info.Length!=(long?)item["bytes"]||string.IsNullOrEmpty((string)item["sha256"]))
-                throw new InvalidDataException("Required acquisition CSV is missing or has changed: "+relative);
-            if(verifiedCsv.TryGetValue(file,out var prior)&&prior.bytes==info.Length&&prior.ticks==info.LastWriteTimeUtc.Ticks)continue;
+                throw new InvalidDataException("Required acquisition file is missing or has changed: "+relative);
+            if(verifiedRecordingFiles.TryGetValue(file,out var prior)&&prior.bytes==info.Length&&prior.ticks==info.LastWriteTimeUtc.Ticks)continue;
             string hash;using(var algorithm=System.Security.Cryptography.SHA256.Create())using(var input=File.OpenRead(file))
                 hash=BitConverter.ToString(algorithm.ComputeHash(input)).Replace("-","").ToLowerInvariant();
-            if(hash!=(string)item["sha256"])throw new InvalidDataException("Acquisition CSV hash differs from finalized evidence: "+relative);
-            verifiedCsv[file]=(info.Length,info.LastWriteTimeUtc.Ticks);
+            if(hash!=(string)item["sha256"])throw new InvalidDataException("Acquisition file hash differs from finalized evidence: "+relative);
+            verifiedRecordingFiles[file]=(info.Length,info.LastWriteTimeUtc.Ticks);
         }
-        if(!expectedPaths.SetEquals(CsvFiles(DirectoryPath).Select(Path.GetFileName)))
-            throw new InvalidDataException("Acquisition CSV inventory differs from the finalized recording.");
+        if(!expectedPaths.SetEquals(RecordedFiles(DirectoryPath).Select(Path.GetFileName)))
+            throw new InvalidDataException("Acquisition file inventory differs from the finalized recording.");
     }
 
     public void LoadRigSamples()
@@ -142,7 +142,7 @@ public sealed class ReplaySessionArchive
                     if(Presentations.IsCurrentContract)
                     {
                         if(sample.unityFrame<0||double.IsNaN(sample.monotonicTime)||double.IsInfinity(sample.monotonicTime))throw new InvalidDataException("Same-build pose frame has no monotonic rendered-frame clock.");
-                        Presentations.For(sample.presentationId);
+                        Presentations.RequireEntry(sample.presentationId);
                     }
                     if (!Rigs.TryGetValue(sample.rig, out var samples)) Rigs[sample.rig] = samples = new List<Sample>();
                     samples.Add(sample); OriginTicks = Math.Min(OriginTicks,ticks);
@@ -374,6 +374,9 @@ public sealed class ReplaySessionArchive
         return name;
     }
     public static string[] CsvFiles(string directory) => Directory.GetFiles(directory,"*.csv*").Where(p => p.EndsWith(".csv",StringComparison.OrdinalIgnoreCase) || p.EndsWith(".csv.gz",StringComparison.OrdinalIgnoreCase)).OrderBy(p=>p,StringComparer.Ordinal).ToArray();
+    public static string[] RecordedFiles(string directory) => CsvFiles(directory)
+        .Concat(Directory.GetFiles(directory, "*").Where(path => path.EndsWith(".matpop", StringComparison.OrdinalIgnoreCase)))
+        .OrderBy(path => path, StringComparer.Ordinal).ToArray();
     public static StreamReader OpenCsv(string path)
     {
         Stream stream = new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.ReadWrite);
@@ -395,9 +398,11 @@ public sealed class ReplaySessionArchive
     }
     public static string ReadCsvRecord(StreamReader reader)
     {
-        string line = reader.ReadLine();
-        if (line == null || line.IndexOf('"') < 0) return line;
-        var record = new StringBuilder(line); bool quoted = false;
+        string first = reader.ReadLine();
+        if (first == null || first.IndexOf('"') < 0) return first;
+        string line = first;
+        StringBuilder record = null;
+        bool quoted = false;
         while (true)
         {
             for (int i = 0; i < line.Length; i++)
@@ -406,7 +411,8 @@ public sealed class ReplaySessionArchive
                     if (quoted && i + 1 < line.Length && line[i + 1] == '"') i++;
                     else quoted = !quoted;
                 }
-            if (!quoted || (line = reader.ReadLine()) == null) return record.ToString();
+            if (!quoted || (line = reader.ReadLine()) == null) return record?.ToString() ?? first;
+            if (record == null) record = new StringBuilder(first);
             record.Append('\n').Append(line);
         }
     }
@@ -414,6 +420,7 @@ public sealed class ReplaySessionArchive
     { int index = Array.IndexOf(header,key); return index >= 0 && index < values.Length ? values[index] : ""; }
     public static string[] Csv(string row)
     {
+        if (row.IndexOf('"') < 0) return row.Split(',');
         var cells = new List<string>(); var cell = new StringBuilder(); bool quoted=false;
         for(int i=0;i<row.Length;i++)
         {

@@ -63,6 +63,241 @@ public sealed class RecordedAnimationState
     }
 }
 
+/// <summary>Plain data owned by one rented population frame. No Unity objects or source capture buffers are queued.</summary>
+public sealed class RecordedAnimationSnapshot : AsyncSwarmWriter.IPackedAnimationSnapshot
+{
+    private readonly RecordedAnimationState state=new RecordedAnimationState();
+    private RecordedAnimationState.AnimatorPose[] animators;
+    private RecordedAnimationState.LegacyPose[] legacy;
+    private RecordedAnimationState.LocalPose[] realized;
+    private RecordedAnimationState.BlendPose[] blends;
+    private RecordedAnimationState.ProceduralPose procedural;
+    private bool hasState;
+    [ThreadStatic] private static JsonSerializer workerSerializer;
+    [ThreadStatic] private static CsvJsonWriter workerCsv;
+    [ThreadStatic] private static char[] workerNumber;
+    [ThreadStatic] private static StringWriter workerJson;
+    // New or annotated schema members automatically retain the standard serializer path.
+    private static readonly bool steadySchema=PlainFields(typeof(RecordedAnimationState),"version,animators,legacy,procedural,realizedPose,blendShapes")&&
+        PlainFields(typeof(RecordedAnimationState.AnimatorPose),"path,speed,layers,parameters")&&
+        PlainFields(typeof(RecordedAnimationState.LayerPose),"state,time,weight,transitioning")&&
+        PlainFields(typeof(RecordedAnimationState.ProceduralPose),"time,phase");
+    private static bool PlainFields(Type type,string names)
+    {
+        if(type.BaseType!=typeof(object)||type.GetProperties(System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public).Length!=0)return false;
+        foreach(var attribute in type.GetCustomAttributes(false))if(attribute is JsonContainerAttribute||attribute is JsonConverterAttribute)return false;
+        var fields=type.GetFields(System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public);
+        var expected=names.Split(',');if(fields.Length!=expected.Length)return false;
+        Array.Sort(fields,(a,b)=>a.MetadataToken.CompareTo(b.MetadataToken));
+        for(int i=0;i<fields.Length;i++)if(fields[i].Name!=expected[i]||fields[i].GetCustomAttributes(false).Length!=0)return false;
+        return true;
+    }
+    private static bool Finite(float value)=>!float.IsNaN(value)&&!float.IsInfinity(value);
+    private bool TryGetSteadyAnimator(out RecordedAnimationState.AnimatorPose animator, out RecordedAnimationState.LayerPose layer)
+    {
+        animator = null;
+        layer = null;
+        // The usual original locust: one root Animator/layer, no parameters or transition pose.
+        // Everything outside this shape uses the full extensible JSON serializer below.
+        if(!steadySchema||state.version!=1||state.animators==null||state.animators.Length!=1||
+            state.legacy==null||state.legacy.Length!=0||state.procedural!=null||state.realizedPose!=null||state.blendShapes!=null)return false;
+        animator=state.animators[0];
+        if(animator==null||animator.path!=""||animator.layers==null||animator.layers.Length!=1||animator.parameters==null||animator.parameters.Length!=0)return false;
+        layer=animator.layers[0];
+        return layer!=null&&Finite(animator.speed)&&Finite(layer.time)&&Finite(layer.weight);
+    }
+    private bool WriteSteadyAnimator(TextWriter output)
+    {
+        if(!TryGetSteadyAnimator(out var animator,out var layer))return false;
+        if(workerNumber==null)workerNumber=new char[64];
+        output.Write("{\"version\":1,\"animators\":[{\"path\":\"\",\"speed\":");
+        Float(output,animator.speed);
+        output.Write(",\"layers\":[{\"state\":");
+        if(!layer.state.TryFormat(workerNumber,out int length,default,CultureInfo.InvariantCulture))throw new InvalidDataException("Animator state exceeds number buffer.");
+        output.Write(workerNumber,0,length);output.Write(",\"time\":");Float(output,layer.time);
+        output.Write(",\"weight\":");Float(output,layer.weight);
+        output.Write(layer.transitioning?",\"transitioning\":true}],\"parameters\":[]}],\"legacy\":[]}":",\"transitioning\":false}],\"parameters\":[]}],\"legacy\":[]}");
+        return true;
+    }
+    private static void Float(TextWriter output,float value)
+    {
+        if(!value.TryFormat(workerNumber,out int length,"R",CultureInfo.InvariantCulture))throw new InvalidDataException("Animator float exceeds number buffer.");
+        output.Write(workerNumber,0,length);
+        // Json.NET writes integral floating-point values with a decimal suffix.
+        bool decimalOrExponent=false;
+        for(int i=0;i<length;i++)if(workerNumber[i]=='.'||workerNumber[i]=='E'||workerNumber[i]=='e'){decimalOrExponent=true;break;}
+        if(!decimalOrExponent)output.Write(".0");
+    }
+    private static void Size<T>(ref T[] values,int count)
+    {if(values==null||values.Length!=count)values=count==0?Array.Empty<T>():new T[count];}
+    private static float[] Copy(float[] source,float[] destination)
+    {if(source==null)return null;Size(ref destination,source.Length);Array.Copy(source,destination,source.Length);return destination;}
+    internal void CopyFrom(RecordedAnimationState source)
+    {
+        hasState=source!=null;
+        if(!hasState)return;
+        state.version=source.version;
+        if(source.animators==null)state.animators=null;
+        else
+        {
+            Size(ref animators,source.animators.Length);state.animators=animators;
+            for(int i=0;i<animators.Length;i++)
+            {
+                var input=source.animators[i];if(input==null){animators[i]=null;continue;}
+                var output=animators[i]??(animators[i]=new RecordedAnimationState.AnimatorPose());
+                output.path=input.path;output.speed=input.speed;
+                if(input.layers==null)output.layers=null;
+                else
+                {
+                    Size(ref output.layers,input.layers.Length);
+                    for(int j=0;j<output.layers.Length;j++)
+                    {
+                        var value=input.layers[j];if(value==null){output.layers[j]=null;continue;}
+                        var copy=output.layers[j]??(output.layers[j]=new RecordedAnimationState.LayerPose());
+                        copy.state=value.state;copy.time=value.time;copy.weight=value.weight;copy.transitioning=value.transitioning;
+                    }
+                }
+                if(input.parameters==null)output.parameters=null;
+                else
+                {
+                    Size(ref output.parameters,input.parameters.Length);
+                    for(int j=0;j<output.parameters.Length;j++)
+                    {
+                        var value=input.parameters[j];if(value==null){output.parameters[j]=null;continue;}
+                        var copy=output.parameters[j]??(output.parameters[j]=new RecordedAnimationState.ParameterPose());
+                        copy.hash=value.hash;copy.type=value.type;copy.value=value.value;
+                    }
+                }
+            }
+        }
+        if(source.legacy==null)state.legacy=null;
+        else
+        {
+            Size(ref legacy,source.legacy.Length);state.legacy=legacy;
+            for(int i=0;i<legacy.Length;i++)
+            {
+                var input=source.legacy[i];if(input==null){legacy[i]=null;continue;}
+                var output=legacy[i]??(legacy[i]=new RecordedAnimationState.LegacyPose());output.path=input.path;
+                if(input.clips==null)output.clips=null;
+                else
+                {
+                    Size(ref output.clips,input.clips.Length);
+                    for(int j=0;j<output.clips.Length;j++)
+                    {
+                        var value=input.clips[j];if(value==null){output.clips[j]=null;continue;}
+                        var copy=output.clips[j]??(output.clips[j]=new RecordedAnimationState.ClipPose());
+                        copy.name=value.name;copy.time=value.time;copy.speed=value.speed;copy.weight=value.weight;
+                        copy.layer=value.layer;copy.wrap=value.wrap;copy.blend=value.blend;copy.enabled=value.enabled;
+                    }
+                }
+            }
+        }
+        if(source.realizedPose==null)state.realizedPose=null;
+        else
+        {
+            Size(ref realized,source.realizedPose.Length);state.realizedPose=realized;
+            for(int i=0;i<realized.Length;i++)
+            {
+                var input=source.realizedPose[i];if(input==null){realized[i]=null;continue;}
+                var output=realized[i]??(realized[i]=new RecordedAnimationState.LocalPose());output.path=input.path;
+                output.position=Copy(input.position,output.position);output.rotation=Copy(input.rotation,output.rotation);output.scale=Copy(input.scale,output.scale);
+            }
+        }
+        if(source.blendShapes==null)state.blendShapes=null;
+        else
+        {
+            Size(ref blends,source.blendShapes.Length);state.blendShapes=blends;
+            for(int i=0;i<blends.Length;i++)
+            {
+                var input=source.blendShapes[i];if(input==null){blends[i]=null;continue;}
+                var output=blends[i]??(blends[i]=new RecordedAnimationState.BlendPose());output.path=input.path;output.weights=Copy(input.weights,output.weights);
+            }
+        }
+        if(source.procedural==null)state.procedural=null;
+        else
+        {
+            if(procedural==null)procedural=new RecordedAnimationState.ProceduralPose();
+            procedural.time=source.procedural.time;procedural.phase=source.procedural.phase;state.procedural=procedural;
+        }
+    }
+    public void WritePacked(BinaryWriter output)
+    {
+        if (!hasState)
+        {
+            output.Write((byte)0);
+            return;
+        }
+        if (TryGetSteadyAnimator(out var animator, out var layer))
+        {
+            output.Write((byte)1);
+            output.Write(animator.speed);
+            output.Write(layer.state);
+            output.Write(layer.time);
+            output.Write(layer.weight);
+            output.Write(layer.transitioning);
+            return;
+        }
+        if (steadySchema && state.version == 1 && state.animators?.Length == 0 && state.legacy?.Length == 0 &&
+            state.realizedPose == null && state.blendShapes == null && state.procedural != null &&
+            Finite(state.procedural.time) && Finite(state.procedural.phase))
+        {
+            output.Write((byte)2);
+            output.Write(state.procedural.time);
+            output.Write(state.procedural.phase);
+            return;
+        }
+
+        // Rich Animator states preserve every field through the same serializer as CSV.
+        if (workerJson == null) workerJson = new StringWriter(new StringBuilder(512), CultureInfo.InvariantCulture);
+        workerJson.GetStringBuilder().Clear();
+        Serialize(workerJson);
+        output.Write((byte)3);
+        output.Write(workerJson.ToString());
+    }
+
+    private void Serialize(TextWriter output)
+    {
+        if (workerSerializer == null) workerSerializer = JsonSerializer.Create(new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+        using (var writer = new JsonTextWriter(output) { CloseOutput = false }) workerSerializer.Serialize(writer, state);
+    }
+
+    public void WriteCsvCell(TextWriter output)
+    {
+        output.Write(',');if(!hasState)return;
+        if(workerCsv==null)workerCsv=new CsvJsonWriter();
+        output.Write('"');workerCsv.Output=output;
+        try
+        {
+            if(!WriteSteadyAnimator(workerCsv)) Serialize(workerCsv);
+        }
+        finally{workerCsv.Output=null;}
+        output.Write('"');
+    }
+    /// <summary>JSON escapes control characters; a quoted CSV field only doubles quotation marks.</summary>
+    private sealed class CsvJsonWriter:TextWriter
+    {
+        internal TextWriter Output;
+        public override Encoding Encoding=>Encoding.UTF8;
+        public override void Write(char value){Output.Write(value);if(value=='"')Output.Write('"');}
+        public override void Write(string value)
+        {
+            if(value==null)return;int start=0;
+            for(int i=0;i<value.Length;i++)if(value[i]=='"')
+            {Output.Write(value.AsSpan(start,i-start));Output.Write("\"\"");start=i+1;}
+            Output.Write(value.AsSpan(start));
+        }
+        public override void Write(char[] value,int index,int count)
+        {
+            int start=index,end=index+count;
+            for(int i=index;i<end;i++)if(value[i]=='"')
+            {Output.Write(value,start,i-start);Output.Write("\"\"");start=i+1;}
+            Output.Write(value,start,end-start);
+        }
+        // Per-value disposal must not flush the population file per animal.
+        public override void Flush(){}
+    }
+}
+
 /// <summary>Cache hierarchy discovery per spawned individual rather than scanning it every frame.</summary>
 public sealed class RecordedAnimationCapture
 {
@@ -101,9 +336,21 @@ public sealed class RecordedAnimationCapture
     }
     public string Capture(BogongSwarmRenderer batch = null, int index = 0)
     {
-        if (root == null) return "";
+        var value=ReadEvidence(batch,index);if(value==null)return "";
+        json.Clear();
+        using(var writer=new JsonTextWriter(jsonText){CloseOutput=false})serializer.Serialize(writer,value);
+        return json.ToString();
+    }
+    public void CaptureSnapshot(RecordedAnimationSnapshot destination,BogongSwarmRenderer batch=null,int index=0)
+    {
+        if(destination==null)throw new ArgumentNullException(nameof(destination));
+        destination.CopyFrom(ReadEvidence(batch,index));
+    }
+    private RecordedAnimationState ReadEvidence(BogongSwarmRenderer batch,int index)
+    {
+        if (root == null) return null;
         var procedural = batch != null ? batch : ownProcedural;
-        if (animators.Length == 0 && legacy.Length == 0 && procedural == null) return "";
+        if (animators.Length == 0 && legacy.Length == 0 && procedural == null) return null;
         evidence.realizedPose=null;evidence.blendShapes=null;evidence.procedural=null;
         bool captureRealizedPose = false;
         for (int i = 0; i < animators.Length; i++)
@@ -179,11 +426,7 @@ public sealed class RecordedAnimationCapture
             proceduralPose.time=procedural.AnimationClock;proceduralPose.phase=procedural.AnimationPhase(batch!=null?index:0);
             evidence.procedural=proceduralPose;
         }
-        // Keep the standard extensible JSON contract; reuse serializer/text
-        // storage instead of allocating a serializer and buffers per animal/frame.
-        json.Clear();
-        using(var writer=new JsonTextWriter(jsonText){CloseOutput=false})serializer.Serialize(writer,evidence);
-        return json.ToString();
+        return evidence;
     }
 }
 

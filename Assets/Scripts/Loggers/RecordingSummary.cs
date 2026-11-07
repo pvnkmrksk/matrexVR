@@ -16,7 +16,7 @@ public static class RecordingSummary
     private static readonly string[] PoseColumns = { "GameObjectPosX", "GameObjectPosY", "GameObjectPosZ", "GameObjectRotX", "GameObjectRotY", "GameObjectRotZ" };
 
     public static JObject Scan(string directory, bool includeHashes = false, CancellationToken cancellation = default,
-        Action<string, string[], string[]> onPlayablePose = null, bool scanPopulationRows = false)
+        Action<string, string[], string[]> onPlayablePose = null, bool scanPopulationRows = false, JArray populationWriterEvidence = null)
     {
         directory = Path.GetFullPath(directory);
         if (!Directory.Exists(directory)) throw new DirectoryNotFoundException(directory);
@@ -32,10 +32,15 @@ public static class RecordingSummary
         var steps = new SortedSet<int>();
         var contexts = new HashSet<string>(StringComparer.Ordinal);
         var presentations = new SortedDictionary<string, HashSet<string>>(StringComparer.Ordinal);
+        // A live seal must account for every packed file and every packed worker.
+        // An independent audit can omit receipts and hash the files itself.
+        var packedWriters = populationWriterEvidence?.OfType<JObject>()
+            .Where(item => (string)item["relativePath"] is string path && PopulationRecording.IsFile(path))
+            .ToDictionary(item => (string)item["relativePath"], StringComparer.Ordinal);
         long stored = 0, playable = 0, rejected = 0, setup = 0, handoff = 0;
         long? first = null, last = null;
         bool cyclesComplete = true, changed = false;
-        foreach (string file in ReplaySessionArchive.CsvFiles(directory))
+        foreach (string file in ReplaySessionArchive.RecordedFiles(directory))
         {
             cancellation.ThrowIfCancellationRequested();
             var before = new FileInfo(file);
@@ -45,9 +50,35 @@ public static class RecordingSummary
             long? fileFirst = null, fileLast = null;
             var fileRigs = new SortedSet<string>(StringComparer.Ordinal);
             bool scannedRows = true;
+            string writerHash = null;
             try
             {
-                using (var reader = ReplaySessionArchive.OpenCsv(file))
+                if (PopulationRecording.IsFile(file))
+                {
+                    info["role"] = "agent-population";
+                    scannedRows = false;
+                    JObject receipt = null;
+                    if (packedWriters != null)
+                    {
+                        string relative = Path.GetFileName(file);
+                        if (!packedWriters.TryGetValue(relative, out receipt))
+                            throw new InvalidDataException("Packed population file has no completed writer receipt: " + relative);
+                        packedWriters.Remove(relative);
+                    }
+                    using (var reader = new PopulationRecording.Reader(file, loadIdentities: false))
+                    {
+                        if (receipt != null)
+                            writerHash = ValidatePopulationReceipt(receipt, bytes, writeTicks, reader.Summary);
+                        info["storedFrames"] = reader.Summary.frames;
+                        fileStored = reader.Summary.rows;
+                        if (reader.Summary.frames > 0)
+                        {
+                            fileFirst = reader.Summary.firstTicks;
+                            fileLast = reader.Summary.lastTicks;
+                        }
+                    }
+                }
+                else using (var reader = ReplaySessionArchive.OpenCsv(file))
                 {
                     string record = ReplaySessionArchive.ReadCsvRecord(reader);
                     if (record == null) { info["role"] = "empty"; }
@@ -107,7 +138,7 @@ public static class RecordingSummary
                         }
                     }
                 }
-                if (includeHashes) info["sha256"] = HashFile(file, cancellation);
+                if (includeHashes) info["sha256"] = writerHash ?? HashFile(file, cancellation);
             }
             catch (OperationCanceledException) { throw; }
             catch (Exception error) { info["readError"] = error.Message; warnings.Add(Path.GetFileName(file) + ": " + error.Message); }
@@ -116,11 +147,13 @@ public static class RecordingSummary
             changed |= fileChanged;
             info["changedDuringScan"] = fileChanged;
             info["rowsInspected"] = scannedRows;
-            info["storedRows"] = scannedRows ? (JToken)new JValue(fileStored) : JValue.CreateNull(); info["playableRows"] = filePlayable; info["rejectedRows"] = fileRejected;
+            info["storedRows"] = scannedRows || info["storedFrames"] != null ? (JToken)new JValue(fileStored) : JValue.CreateNull(); info["playableRows"] = filePlayable; info["rejectedRows"] = fileRejected;
             info["excludedRows"] = fileExcluded; info["firstLocal"] = Local(fileFirst); info["lastLocal"] = Local(fileLast);
             info["wallClockSpanSeconds"] = Span(fileFirst, fileLast); info["rigIds"] = new JArray(fileRigs);
             files.Add(info);
         }
+        if (packedWriters?.Count > 0)
+            throw new InvalidDataException("Completed population files are missing or unreadable: " + string.Join(", ", packedWriters.Keys));
         if (changed) warnings.Add("One or more files changed while scanning; this is an observation of an active or changing recording.");
         if (rejected > 0) warnings.Add(rejected + " malformed or incomplete pose rows were rejected.");
         if (setup + handoff > 0) warnings.Add((setup + handoff) + " stored pose rows are excluded by the same saved-evidence policy as replay.");
@@ -139,6 +172,16 @@ public static class RecordingSummary
                 ["presentationCountBasis"] = "unique phase-independent recorded scene/cycle/step/config/internal-step contexts per rig; missing legacy counters can merge occurrences" },
             ["metadata"] = Metadata(directory, archive, warnings), ["files"] = files, ["warnings"] = new JArray(warnings.Distinct())
         };
+    }
+
+    private static string ValidatePopulationReceipt(JObject receipt, long bytes, long writeTicks, PopulationRecording.Totals totals)
+    {
+        string digest = (string)receipt["sha256"];
+        if ((long?)receipt["bytes"] != bytes || (long?)receipt["lastWriteUtcTicks"] != writeTicks ||
+            (long?)receipt["writtenFrames"] != totals.frames || (long?)receipt["writtenRows"] != totals.rows ||
+            digest == null || digest.Length != 64 || digest.Any(c => !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'))))
+            throw new InvalidDataException("Packed population file differs from its completed writer receipt: " + receipt["relativePath"]);
+        return digest;
     }
 
     /// <summary>A cheap freshness check, not a replacement for hash verification when opening a run.</summary>
@@ -166,7 +209,7 @@ public static class RecordingSummary
                 if (!current.Exists || current.Length != (long?)item["bytes"] || current.LastWriteTimeUtc.Ticks != (long?)item["lastWriteUtcTicks"])
                 { reason = "Recording files changed after finalization."; return false; }
             }
-            if (!expected.SetEquals(ReplaySessionArchive.CsvFiles(directory).Select(Path.GetFileName)))
+            if (!expected.SetEquals(ReplaySessionArchive.RecordedFiles(directory).Select(Path.GetFileName)))
             { reason = "Recording file inventory changed after finalization."; return false; }
             var metadataFiles = candidate["metadataFiles"] as JArray ?? new JArray();
             foreach (JObject item in metadataFiles.OfType<JObject>())

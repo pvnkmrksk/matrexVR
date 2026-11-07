@@ -44,12 +44,17 @@ public sealed class ReplayPresentationJournal
     public JObject For(string id)
     {
         if (!IsCurrentContract) return null;
+        return (JObject)FindEntry(id).DeepClone();
+    }
+    internal void RequireEntry(string id) => FindEntry(id);
+    private JObject FindEntry(string id)
+    {
         if (string.IsNullOrEmpty(id) || !entries.TryGetValue(id, out var entry))
             throw new InvalidDataException("Recorded frame has no matching presentation. This build cannot faithfully replay incomplete controller inputs.");
-        return (JObject)entry.DeepClone();
+        return entry;
     }
     /// <summary>Verify the exact compact JSON payload written by acquisition, before parsing numbers.
-    /// HashEntry's checksum is appended as the final top-level property by both journal writers.
+    /// The checksum is appended as the final top-level property by both journal writers.
     /// Reformatting parsed float/double values is not a portable representation: Unity Mono can
     /// parse 60.0312424 then format it as 60.031242399999996. Integrity covers recorded bytes.
     /// </summary>
@@ -78,6 +83,20 @@ public sealed class ReplayPresentationJournal
         var copy = (JObject)source.DeepClone(); copy.Remove("sha256");
         return RunConfigArchive.Hash(System.Text.Encoding.UTF8.GetBytes(copy.ToString(Formatting.None)));
     }
+
+    internal static void WriteEntry(TextWriter output, JObject entry)
+    {
+        if (entry.Property("sha256") != null)
+            throw new ArgumentException("Replay evidence already contains a checksum.", nameof(entry));
+        string payload = entry.ToString(Formatting.None);
+        string hash = RunConfigArchive.Hash(System.Text.Encoding.UTF8.GetBytes(payload));
+        output.Write(payload.AsSpan(0, payload.Length - 1));
+        if (entry.Count != 0) output.Write(',');
+        output.Write("\"sha256\":\"");
+        output.Write(hash);
+        output.WriteLine("\"}");
+    }
+
     public static JObject Parse(string text)
     {
         using(var input = new JsonTextReader(new StringReader(text)) { DateParseHandling = DateParseHandling.None })

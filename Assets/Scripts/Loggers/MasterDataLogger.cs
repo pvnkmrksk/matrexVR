@@ -31,6 +31,7 @@ public class MasterDataLogger : MonoBehaviour
     public string FinalizationError => recording?.Error;
     /// <summary>Scene loggers may open files only until this session starts finalizing.</summary>
     public bool AcceptingWrites { get; private set; }
+    public bool SaveSwarmData { get; private set; } = true;
 
     // Create timestamp variable that can be publicly accessed but not changed with get methods only
     public string timestamp { get; private set; }
@@ -121,7 +122,22 @@ public class MasterDataLogger : MonoBehaviour
     private void BeginRecordingEvidence()
     {
         sealedCloseErrors = null;
-        recording = new RecordingSessionFinalizer(directoryPath, Path.Combine(RuntimePaths.RunDataRoot, timestamp + ".zip"), PlayerBuildIdentity.Capture());
+        SaveSwarmData = true;
+        var player = PlayerBuildIdentity.Capture();
+        string[] arguments = Environment.GetCommandLineArgs();
+        bool batchedLocusts = Array.IndexOf(arguments, "--stock-locust-renderers") < 0;
+        player["renderingOptions"] = new JObject {
+            ["nativeLocustBatchAllowed"] = batchedLocusts,
+            ["parallelSwarmMotionAllowed"] = Array.IndexOf(arguments, "--serial-swarm-motion") < 0,
+            ["staggeredSwarmAnimationAllowed"] = Array.IndexOf(arguments, "--per-frame-swarm-animation-gate") < 0,
+            ["stockWalkCycleCacheAllowed"] = batchedLocusts && Array.IndexOf(arguments, "--live-stock-locust-animators") < 0 &&
+                Array.IndexOf(arguments, "--verify-batch-native-locusts") < 0,
+            ["parallelSwarmPopulationCaptureAllowed"] = Array.IndexOf(arguments, "--serial-swarm-population-capture") < 0,
+            ["parallelStockCullingAllowed"] = batchedLocusts && Array.IndexOf(arguments, "--serial-stock-locust-cull") < 0,
+            ["parallelStockDrawPackingAllowed"] = batchedLocusts && Array.IndexOf(arguments, "--serial-stock-locust-cull") < 0 &&
+                Array.IndexOf(arguments, "--serial-stock-locust-draw-pack") < 0
+        };
+        recording = new RecordingSessionFinalizer(directoryPath, Path.Combine(RuntimePaths.RunDataRoot, timestamp + ".zip"), player);
         mediaSession = CompanionMediaArchive.BeginSession(directoryPath, timestamp);
         AcceptingWrites = true;
     }
@@ -134,6 +150,8 @@ public class MasterDataLogger : MonoBehaviour
             // Read the selected archived document: Main's runtime rigs are loaded
             // after BeginConfiguredSession and may still describe the previous run.
             var system=JObject.Parse(ConfigArchive.ReadText(systemReference,"system",scene));
+            JToken saveSwarm = system["saveSwarmData"];
+            SaveSwarmData = saveSwarm?.Type != JTokenType.Boolean || (bool)saveSwarm;
             var launches=new List<JObject>();
             var retainedMediaRigs = new List<string>();
             foreach(var rig in (system["configs"] as JArray??new JArray()).OfType<JObject>())
@@ -175,7 +193,7 @@ public class MasterDataLogger : MonoBehaviour
     }
 
 
-    /// <summary>Call on Unity's main thread. Closing scene writers is immediate; drain, analysis, media and ZIP run off-thread.</summary>
+    /// <summary>Call on Unity's main thread. Closing scene writers is immediate; drain, analysis and media run off-thread.</summary>
     public Task<JObject> FinalizeSessionAsync(string endReason)
     {
         if (MainController.Instance?.SequenceStopping == true && !MainController.Instance.NativeRecordingStopSettled)
@@ -230,15 +248,27 @@ public class MasterDataLogger : MonoBehaviour
     {
         var result = new JArray();
         foreach (var item in AsyncSwarmWriter.CompletionsForDirectory(directory))
-            result.Add(new JObject { ["relativePath"] = Path.GetFileName(item.Path), ["writtenRows"] = item.WrittenRows,
-                ["droppedFrames"] = item.DroppedFrames, ["failure"] = item.Failure });
+        {
+            var receipt = new JObject { ["relativePath"] = Path.GetFileName(item.Path), ["writtenRows"] = item.WrittenRows,
+                ["writtenFrames"] = item.WrittenFrames, ["peakPendingFrames"] = item.PeakPendingFrames,
+                ["droppedFrames"] = item.DroppedFrames, ["failure"] = item.Failure };
+            if (item.Sha256 != null)
+            {
+                receipt["sha256"] = item.Sha256;
+                receipt["bytes"] = item.BytesWritten;
+                receipt["lastWriteUtcTicks"] = item.LastWriteUtcTicks;
+            }
+            result.Add(receipt);
+        }
         return result;
     }
 
-    // Compatibility entry point. UI callers should await FinalizeSessionAsync instead.
+    // Compatibility entry point for explicit ZIP requests.
     public void ZipDataFolder()
     {
-        FinalizeSessionAsync("session-rotation").GetAwaiter().GetResult();
+        var session = recording;
+        var finalized = FinalizeSessionAsync("session-rotation").GetAwaiter().GetResult();
+        if ((string)finalized?["lifecycle"]?["status"] == "finalized") session.WriteArchive();
     }
 
     private bool WantsToQuit()

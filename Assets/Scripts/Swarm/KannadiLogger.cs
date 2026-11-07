@@ -9,7 +9,7 @@ using System;
 public class KannadiLogger : MonoBehaviour
 {
     private string directoryPath;
-    private string logPath;
+    private string logPath, recordedLayer;
     private AsyncSwarmWriter writer;
     private bool closedForArchive;
     private Kannadi kannadi;
@@ -29,7 +29,7 @@ public class KannadiLogger : MonoBehaviour
         MasterDataLogger masterDataLogger = FindObjectOfType<MasterDataLogger>();
         if (masterDataLogger != null)
         {
-            if (!masterDataLogger.AcceptingWrites) { closedForArchive = true; return; }
+            if (!masterDataLogger.AcceptingWrites || !masterDataLogger.SaveSwarmData) { closedForArchive = true; return; }
             directoryPath = masterDataLogger.directoryPath;
         }
         else
@@ -50,6 +50,7 @@ public class KannadiLogger : MonoBehaviour
 
         // Extract VR index from GameObject name (e.g., "VR1 Kannadi" -> 1)
         vrIndex = RuntimeRigRegistry.ParseIndex(gameObject.name);
+        recordedLayer = $"SimulatedLocustsVR{vrIndex}";
 
         // Initialize the log file
         string date = DateTime.Now.ToString("yyyy-MM-dd");
@@ -58,7 +59,7 @@ public class KannadiLogger : MonoBehaviour
 
         logPath = Path.Combine(
             directoryPath,
-            $"{date}_{time}_{sceneName}_Kannadi_VR{vrIndex}_Clones.csv.gz"
+            $"{date}_{time}_{sceneName}_Kannadi_VR{vrIndex}_Clones.matpop"
         );
 
         writer=new AsyncSwarmWriter(logPath,
@@ -101,9 +102,11 @@ public class KannadiLogger : MonoBehaviour
                 Vector3 rotation = clones[i].transform.rotation.eulerAngles;
 
                 Vector3 scale=clones[i].transform.lossyScale;
-                frame.agents[frame.count++]=new AsyncSwarmWriter.Agent {index=i,name=names[i],x=position.x,y=position.y,z=position.z,
+                var animation=frame.agents[frame.count].animationSnapshot as RecordedAnimationSnapshot??new RecordedAnimationSnapshot();
+                if(animationCaptures[i]!=null)animationCaptures[i].CaptureSnapshot(animation);else animation.CopyFrom(null);
+                frame.agents[frame.count++]=new AsyncSwarmWriter.Agent {index=i,name=names[i],layer=recordedLayer,x=position.x,y=position.y,z=position.z,
                     rx=rotation.x,ry=rotation.y,rz=rotation.z,sx=scale.x,sy=scale.y,sz=scale.z,
-                    animationState=animationCaptures[i]?.Capture()??""};
+                    animationSnapshot=animation};
             }
         }
         if(!writer.Submit(frame))StopForEvidenceFailure("The bounded population recording queue could not accept the rendered frame.");
@@ -118,7 +121,7 @@ public class KannadiLogger : MonoBehaviour
     }
     private void StopForEvidenceFailure(string reason)
     {
-        closedForArchive=true;
+        CloseForArchive();
         var error=new IOException("Kannadi recording evidence could not be preserved: "+reason);
         if(MainController.Instance!=null)MainController.Instance.FailRecordingEvidence(error);else Debug.LogException(error);
     }

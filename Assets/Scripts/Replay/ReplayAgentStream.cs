@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-/// <summary>Indexes recorded population frames on disk so a long gzip run can be scrubbed without keeping every agent sample in RAM.</summary>
+/// <summary>Indexes population frames on disk for seeking without keeping every agent sample in memory.</summary>
 public sealed class ReplayAgentStream : IDisposable
 {
     public struct Pose
@@ -24,6 +24,7 @@ public sealed class ReplayAgentStream : IDisposable
     private readonly List<Pose> current = new List<Pose>();
     private readonly string cachePath;
     private readonly BinaryReader reader;
+    private readonly PopulationRecording.Reader packedReader;
     private int lastFrame = int.MinValue;
     public string SourceFile { get; }
     public bool HasRotations { get; }
@@ -55,24 +56,40 @@ public sealed class ReplayAgentStream : IDisposable
                 var ids = new Dictionary<string,int>(StringComparer.Ordinal);
                 var occurrences = new Dictionary<string,int>(StringComparer.Ordinal);
                 Frame frame = default; long frameTicks = long.MinValue; int lastUnityFrame=-1; string row;
-                string xKey = Kind == "Kannadi" ? "PositionX" : "X", yKey = Kind == "Kannadi" ? "PositionY" : "Y", zKey = Kind == "Kannadi" ? "PositionZ" : "Z";
+                int Column(string name) => Array.IndexOf(header, name);
+                bool isKannadi = Kind == "Kannadi";
+                int timestampColumn = Column("Timestamp"), frameColumn = Column("UnityFrame");
+                int xColumn = Column(isKannadi ? "PositionX" : "X"), yColumn = Column(isKannadi ? "PositionY" : "Y"), zColumn = Column(isKannadi ? "PositionZ" : "Z");
+                int nameColumn = Column(isKannadi ? "CloneName" : "Name"), layerColumn = Column(isKannadi ? "VRIndex" : "Layer");
+                int visibleColumn = Column("Visible"), animationColumn = Column("AnimationState");
+                int[] rotationColumns = { Column("RotationX"), Column("RotationY"), Column("RotationZ") };
+                int[] scaleColumns = { Column("ScaleX"), Column("ScaleY"), Column("ScaleZ") };
+                // All agents in a recorded frame normally share the exact timestamp text.
+                string lastTimestamp = null;
+                long ticks = 0;
                 while ((row=ReplaySessionArchive.ReadCsvRecord(input)) != null)
                 {
                     if (string.IsNullOrWhiteSpace(row)) continue;
                     string[] values=ReplaySessionArchive.Csv(row);
-                    string Cell(string key) => ReplaySessionArchive.Cell(header,values,key);
-                    if (!ReplaySessionArchive.TryTimestamp(Cell("Timestamp"),out long ticks) ||
-                        !ReplaySessionArchive.TryNumber(Cell(xKey),out float x) || !ReplaySessionArchive.TryNumber(Cell(yKey),out float y) || !ReplaySessionArchive.TryNumber(Cell(zKey),out float z))
+                    string Cell(int index) => index >= 0 && index < values.Length ? values[index] : "";
+                    string timestamp = Cell(timestampColumn);
+                    if (!string.Equals(timestamp, lastTimestamp, StringComparison.Ordinal))
+                    {
+                        if (!ReplaySessionArchive.TryTimestamp(timestamp, out ticks))
+                            throw new InvalidDataException("Malformed population pose in " + Path.GetFileName(source));
+                        lastTimestamp = timestamp;
+                    }
+                    if (!ReplaySessionArchive.TryNumber(Cell(xColumn),out float x) || !ReplaySessionArchive.TryNumber(Cell(yColumn),out float y) || !ReplaySessionArchive.TryNumber(Cell(zColumn),out float z))
                         throw new InvalidDataException("Malformed population pose in " + Path.GetFileName(source));
-                    int unityFrame=ReplaySessionArchive.Integer(Cell("UnityFrame"),-1);
+                    int unityFrame=ReplaySessionArchive.Integer(Cell(frameColumn),-1);
                     if (ticks != frameTicks || unityFrame != lastUnityFrame)
                     {
                         if (frame.count > 0) frames.Add(frame);
                         frameTicks=ticks; lastUnityFrame=unityFrame; occurrences.Clear();
                         frame = new Frame { time=(ticks-originTicks)/(double)TimeSpan.TicksPerSecond, offset=output.BaseStream.Position, unityFrame=unityFrame };
                     }
-                    string name=Cell(Kind=="Kannadi"?"CloneName":"Name");
-                    string layer=Kind=="Kannadi"?"SimulatedLocustsVR"+Cell("VRIndex"):Cell("Layer");
+                    string name=Cell(nameColumn);
+                    string layer=isKannadi?"SimulatedLocustsVR"+Cell(layerColumn):Cell(layerColumn);
                     string key=layer+"|"+name;
                     occurrences.TryGetValue(key,out int occurrence); occurrences[key]=occurrence+1;
                     if (occurrence>0) { key+="|duplicate:"+occurrence; HasDuplicateNames=true; }
@@ -80,7 +97,7 @@ public sealed class ReplayAgentStream : IDisposable
                     output.Write(id);output.Write(x);output.Write(y);output.Write(z);
                     if (HasRotations)
                     {
-                        foreach(string axis in new[]{"RotationX","RotationY","RotationZ"})
+                        foreach(int axis in rotationColumns)
                         {
                             if(!ReplaySessionArchive.TryNumber(Cell(axis),out float angle)) throw new InvalidDataException("Malformed population orientation in "+Path.GetFileName(source));
                             output.Write(angle);
@@ -89,14 +106,14 @@ public sealed class ReplayAgentStream : IDisposable
                     bool visible=true;
                     if(HasVisibility)
                     {
-                        string flag=Cell("Visible");
+                        string flag=Cell(visibleColumn);
                         if(bool.TryParse(flag,out bool boolean))visible=boolean;
                         else if(flag=="1" || flag=="0")visible=flag=="1";
                         else throw new InvalidDataException("Malformed recorded visibility in "+Path.GetFileName(source));
                     }
                     output.Write(visible);
-                    if (HasAnimationState) output.Write(Cell("AnimationState") ?? "");
-                    if(HasScale)foreach(var axis in new[]{"ScaleX","ScaleY","ScaleZ"})
+                    if (HasAnimationState) output.Write(Cell(animationColumn) ?? "");
+                    if(HasScale)foreach(int axis in scaleColumns)
                     {if(!ReplaySessionArchive.TryNumber(Cell(axis),out float scale))throw new InvalidDataException("Malformed population scale in "+source);output.Write(scale);}
                     frame.count++;RowCount++;
                 }
@@ -113,8 +130,39 @@ public sealed class ReplayAgentStream : IDisposable
         catch {if(File.Exists(cachePath))File.Delete(cachePath);throw;}
     }
 
+    private ReplayAgentStream(string source, long originTicks)
+    {
+        SourceFile = source;
+        HasRotations = HasAnimationState = HasUnityFrames = HasScale = true;
+        packedReader = new PopulationRecording.Reader(source);
+        Kind = packedReader.Layout.ToString();
+        HasVisibility = packedReader.Layout == AsyncSwarmWriter.RowLayout.Band;
+        try
+        {
+            long offset = packedReader.FirstFrameOffset;
+            while (packedReader.ReadFrame(offset, out var frame))
+            {
+                if (frames.Count != 0 && frame.unityFrame <= frames[frames.Count - 1].unityFrame)
+                    throw new InvalidDataException("Population frames are duplicated or out of order in " + source);
+                frameIndices.Add(frame.unityFrame, frames.Count);
+                frames.Add(new Frame { unityFrame = frame.unityFrame, offset = offset, count = frame.count,
+                    time = (frame.ticks - originTicks) / (double)TimeSpan.TicksPerSecond });
+                RowCount += frame.count;
+                offset = frame.nextOffset;
+            }
+            if (frames.Count != packedReader.Summary.frames || RowCount != packedReader.Summary.rows)
+                throw new InvalidDataException("Population frame or row totals differ from the stored footer in " + source);
+        }
+        catch
+        {
+            packedReader.Dispose();
+            throw;
+        }
+    }
+
     public static ReplayAgentStream TryOpen(string source,string cacheDirectory,long originTicks)
     {
+        if (PopulationRecording.IsFile(source)) return new ReplayAgentStream(source, originTicks);
         using(var input=ReplaySessionArchive.OpenCsv(source))
         {
             string first=ReplaySessionArchive.ReadCsvRecord(input);if(first==null)return null;
@@ -141,7 +189,23 @@ public sealed class ReplayAgentStream : IDisposable
         if(index==lastFrame)return current;
         lastFrame=index;current.Clear();
         if(index<0)return current;
-        Frame frame=frames[index];reader.BaseStream.Position=frame.offset;
+        Frame frame=frames[index];
+        if (packedReader != null)
+        {
+            if (!packedReader.ReadFrame(frame.offset, out var stored, true))
+                throw new InvalidDataException("Population frame is missing in " + SourceFile);
+            for (int i = 0; i < stored.count; i++)
+            {
+                var sample = packedReader.ReadSample(stored);
+                var identity = packedReader.Identities[sample.id];
+                current.Add(new Pose { id = sample.id, name = identity.name, layer = identity.layer, visible = sample.visible,
+                    position = new Vector3(sample.x, sample.y, sample.z), rotation = new Vector3(sample.rx, sample.ry, sample.rz),
+                    scale = new Vector3(sample.sx, sample.sy, sample.sz), animationState = sample.animation });
+            }
+            packedReader.RequireFrameEnd(stored);
+            return current;
+        }
+        reader.BaseStream.Position=frame.offset;
         for(int i=0;i<frame.count;i++)
         {
             int id=reader.ReadInt32();var identity=identities[id];
@@ -157,6 +221,7 @@ public sealed class ReplayAgentStream : IDisposable
 
     public void Dispose()
     {
+        packedReader?.Dispose();
         reader?.Dispose();
         if(File.Exists(cachePath))File.Delete(cachePath);
     }

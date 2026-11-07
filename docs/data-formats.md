@@ -2,11 +2,31 @@
 
 Recorded swarm **input** uses `ID,X,Y,Z,time` with Unity axes (+X east, +Y up, +Z north), metres, and relative seconds. See [swarm-playback.md](swarm-playback.md). Presented/logged positions use the scene's world units: metres on terrain/migration, centimetres in walking scenes. The input CSV scale and physical moth scale are configured independently.
 
-MasterDataLogger creates `Assets/RunData/yyyyMMdd_HHmmss/` in the Editor (current standalone source uses `RuntimePaths.RunDataRoot`, default `<player directory>/MATREX VR RunData` beside the app or executable; a protected installation uses `Application.persistentDataPath/Installations/<installation-id>/RunData`. `--data-dir` overrides either location. Earlier standalone builds used the shared `Application.persistentDataPath/RunData`; 0.1/0.2 retain `Application.dataPath/RunData`). A numeric suffix is added if that timestamp already has a folder or ZIP. It snapshots the system, sequence and referenced experiment files before the sequence starts, and retains exact versions consumed on later loads. A session ZIP is attempted after writers drain; the original folder remains available if ZIP creation fails. See [run configuration snapshots](run-config-snapshots.md) for the layout, manifest and historical audit. Keep this bundle alongside exported data: it defines gains, stimulus conditions, camera layout and physical scale.
+MasterDataLogger creates `Assets/RunData/yyyyMMdd_HHmmss/` in the Editor (current standalone source uses `RuntimePaths.RunDataRoot`, default `<player directory>/MATREX VR RunData` beside the app or executable; a protected installation uses `Application.persistentDataPath/Installations/<installation-id>/RunData`. `--data-dir` overrides either location. Earlier standalone builds used the shared `Application.persistentDataPath/RunData`; 0.1/0.2 retain `Application.dataPath/RunData`). A numeric suffix is added if that timestamp already has a folder or ZIP. It snapshots the system, sequence and referenced experiment files before the sequence starts, and retains exact versions consumed on later loads. Stop seals the run directory. [Package the run](manual/recording-pipeline.md#stop-and-package-a-run) separately when acquisition is idle. Keep the original bundle alongside exported data to retain gains, stimulus conditions, camera layout and physical scale. See [run configuration snapshots](run-config-snapshots.md) for the layout, manifest and historical audit.
 
-Sampling is once per rendered Update, not a fixed Hz acquisition clock. Disk buffering flushes about every 0.5 seconds; clean scene exit flushes remaining rows. Wall-clock timestamps are local machine time and contain milliseconds, without a timezone offset. Record the workstation timezone and synchronize machines for cross-device analysis. Do not assume rows are evenly spaced or use row number as elapsed time.
+Sampling follows rendered frames. The animal CSV buffer writes about every 0.5 seconds and clean scene exit drains remaining rows. Wall-clock timestamps use local machine time with seven fractional digits and no timezone offset. Record the workstation timezone and synchronize machines for cross-device analysis. Do not assume rows are evenly spaced or use row number as elapsed time.
 
-Swarm position snapshots are captured in LateUpdate after generated movement; CSV formatting, gzip and disk writes run on a worker. They retain sample-time metadata and drain on clean exit. The dashboard reports queue overflow/dropped frames. Embedded Choice/Selwyn swarms also record all presented agent positions in one gzip file per rig/population.
+Swarm, Kannadi clones and Band capture the actual agent snapshot in LateUpdate and stream it to `.matpop` on a bounded worker. The format preserves float32 positions, rotations, scales, full animation evidence and the Unity frame and local timestamp. Agent identities appear once in the file and common per-frame values are shared. The worker computes the digest as it writes and closes the file with a footer containing frame and row counts. Embedded Choice/Selwyn populations also use one file per rig/population. **Skip swarm data** disables virtual population capture for the session while leaving animal CSV recording active.
+
+Use Python 3.8 or newer to export a finalized population file as CSV. The exporter uses the standard library. Extract a session ZIP before exporting a file from it.
+
+```sh
+python3 tools/unpack_population.py path/to/session/agents.matpop exports/agents.csv
+```
+
+Use an output directory outside the saved session so replay's acquisition inventory stays intact. The default output is standard output. Use `--legacy-header` to append historical `Key:Value` fields to the header. The default CSV is rectangular and retains the original column order, including frame identity, scale and JSON animation state. Empty population frames have no CSV rows and remain available in the `.matpop` file. Recording directories store the packed streams without compression to keep compression off the acquisition path. These files can occupy more disk space than the old gzip logs. Optional offline ZIP packaging can compress them after the run.
+
+## Offline population Parquet
+
+The recording process appends the native population stream. After the run is finalized, the optional Parquet utility makes a separate standard dataset for analysis. It uses Polars with one worker by default and verifies the acquisition checksums when exporting a complete run. Install Polars in the Python environment used for this task. Launch the export after acquisition, when disk and CPU use can run in the background.
+
+```sh
+nice -n 15 python3 tools/population_parquet.py pack path/to/finalized/run exports/run
+python3 tools/population_parquet.py csv exports/run/stream-001 exports/rig.csv
+python3 tools/population_parquet.py csv exports/run/stream-001 exports/selected.csv --first-frame 1200 --last-frame 1800
+```
+
+The export can also take one finalized `.matpop` file. A run export includes a `run.json` mapping each stream to the source filename. Within a stream, standard Zstandard-compressed `samples-*.parquet` files contain the typed population columns, identity and source indexes. The corresponding `frames-*.parquet` files retain frame context and zero-agent frames. `population.json` records the original header, exact time units and frame ranges for selecting only the required chunks. Timestamp values in Parquet are the original 100 ns local clock ticks. The CSV conversion restores the readable wall time and historical data-column order. Keep exported datasets and CSV files outside the acquisition directory.
 
 ## Rig CSV (`*_VRn_.csv`)
 
@@ -64,9 +84,9 @@ For FicTrac ball calibration to yield centimeters, the displacement stream must 
 
 Kinefly instead integrates `gain * (rawYawRadians - yawDCOffsetRadians) * Rad2Deg * deltaTime`, matching `BogongAustralia`. A held value keeps turning between packets, including after a disconnect, as in that implementation. For Kinefly, `SensRotX/Y/Z` again contain Euler display angles calculated from the raw radians, and `SensRotXRad/YRad/ZRad` preserve the raw radians, matching the historical logger. The walking sensor columns keep their previous values. Use the added `trackingImplementation`, `trackingMode`, `trackingInputUnits`, `wireYaw`, `yawGain`, `yawDCOffsetRadians`, and `yawOutputDegPerSecond` columns to identify the calculation used. `wireYaw` is the untouched received value; its unit is given by `trackingInputUnits`. Kinefly rate output is blank outside yaw mode.
 
-## Kannadi clone logs (`*Kannadi*Clones.csv.gz`)
+## Kannadi clone logs (`*Kannadi*Clones.matpop`)
 
-Gzip CSV with columns:
+The CSV export begins with these columns:
 
 `Timestamp,VRIndex,CloneIndex,CloneName,PositionX,PositionY,PositionZ,RotationX,RotationY,RotationZ,NumberOfRings,hexRadius,skyboxId,skyboxSampleUtc,experimentPhase`
 
@@ -84,7 +104,7 @@ New headers additionally include `LocustSpeedStdDev` in world units/s, `Directio
 
 See [night-sky.md](night-sky.md) for the `Skyboxes/` image/manifest files, `usage.jsonl` activation audit, and `loads.csv` load history. Each load records the previous/new IDs, panorama filename, actual load time and represented sky time in UTC and observer-local time with an explicit offset. These are included in the normal run directory/ZIP. The sky ID identifies a scene stimulus, including when scene geometry occludes it; it does not identify a camera screenshot.
 
-Band gzip CSV has twelve row columns: `Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase,experimentPhase`, followed by extra `Key:Value` header metadata for spawn/boundary/grid parameters. Speed is cm/s; VisibilityPhase is elapsed phase in seconds modulo the total on+off cycle, not a normalized fraction. Read twelve data columns, then parse header metadata separately (older files have eleven). Layer indicates the rig-specific stimulus population, not a physical display number.
+Historical Band gzip CSV has twelve row columns: `Timestamp,Name,Layer,X,Y,Z,RotationX,RotationY,RotationZ,Speed,VisibilityPhase,experimentPhase`, followed by extra `Key:Value` header metadata for spawn/boundary/grid parameters. Speed is cm/s; VisibilityPhase is elapsed phase in seconds modulo the total on+off cycle, not a normalized fraction. Read twelve data columns, then parse header metadata separately (older files have eleven). Layer indicates the rig-specific stimulus population, not a physical display number.
 
 Band logging follows the spawner's owned instances, including unlocked agents without a transform parent (these previously produced empty band logs).
 
@@ -127,4 +147,4 @@ For named cross-block heading references, `heading_reference.jsonl` additionally
 
 ## Greenfield same-build replay
 
-New recordings add `presentationId`, `unityFrame` and `monotonicTime` to pose evidence. `Current Time` remains the wall-clock timestamp; playback uses monotonic elapsed time and the shared rendered-frame identity. Complete controller inputs are in `presentations.jsonl`, serial/world checkpoints in `world_state.jsonl`, and the required creating build/schema in `replay_contract.json`. The finalized CSV inventory and hashes are in `recording_manifest.json`. See the [same-build replay contract](same-build-replay-contract.md) for strict evidence, extension hooks and read-only seek behavior.
+New recordings add `presentationId`, `unityFrame` and `monotonicTime` to pose evidence. `Current Time` remains the wall-clock timestamp; playback uses monotonic elapsed time and the shared rendered-frame identity. Complete controller inputs are in `presentations.jsonl`, serial/world checkpoints in `world_state.jsonl`, and the required creating build/schema in `replay_contract.json`. The finalized pose and population inventory and hashes are in `recording_manifest.json`. See the [same-build replay contract](same-build-replay-contract.md) for strict evidence, extension hooks and read-only seek behavior.

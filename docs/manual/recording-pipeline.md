@@ -25,7 +25,7 @@ RunData/<session>/
     <skyboxId>.json
     usage.jsonl
     loads.csv
-  ... animal / population CSV and gzip logs
+  ... animal CSV and virtual-population .matpop logs
   runtime_trace.log
 ```
 
@@ -35,7 +35,7 @@ Resource catalog names for built prefabs/materials are not external files. Refer
 
 Animal/world loggers sample the rendered rig pose with scene, trial, sequence/inner-step and experiment-phase context. Optional sensor columns retain the receiver's input representation. Position is the virtual rig's world pose, which can contain autopilot, wind or terrain effects as well as measured tracking.
 
-Swarm recording captures population snapshots in LateUpdate and sends immutable pooled data to a bounded worker. That worker formats, gzips and writes. Pending queue overflow/dropped frames are diagnostic evidence; sampling a transform every rendered frame does not establish an independent fixed-frequency acquisition clock.
+Swarm, Kannadi clones and Band capture a snapshot every rendered frame in LateUpdate. A bounded worker streams each snapshot to a binary .matpop file. **Skip swarm data** in session setup disables virtual-population capture while retaining the animal pose CSVs. Pending queue overflow/dropped frames are diagnostic evidence; sampling a transform every rendered frame does not establish an independent fixed-frequency acquisition clock.
 
 Kannadi, band and Optomotor loggers add their own stimulus context. Do not interpret a drum transform or one replicated model root as another measured animal. Headers and data-column counts differ by format and historical version.
 
@@ -45,9 +45,19 @@ Rows retain experimentPhase where supported. Heading-reference and phase-onset J
 
 The configuration manifest records load boundaries; it is not a per-frame world-state recorder. Playback cannot recover an unlogged random state or an exact historical pixel merely from a current file with the same basename.
 
-## Shutdown and ZIP creation
+## Stop and package a run
 
-The archive boundary closes ordinary loggers, drains asynchronous population writers and completes gzip trailers before ZIP creation. The original session folder remains if zipping fails. Stopping the process uncleanly can still lose buffered/in-flight work, so retain the trace and original directory when investigating an interrupted session.
+Stop closes the loggers, drains asynchronous population writers and seals the original run directory. Each population worker computes its checksum while writing. Finalization checks the closed file and footer against the worker's receipt before publishing the manifest. Replay can open the finalized folder directly.
+
+Package a finalized run when acquisition is idle. The utility verifies acquisition checksums while copying, writes to a temporary sibling and publishes a complete ZIP outside the run.
+
+```sh
+python3 tools/package_recording.py path/to/RunData/session
+```
+
+On Linux, prefix the command with `nice -n 15` to run the packaging process at lower CPU priority.
+
+Stopping the process uncleanly can lose buffered work, so retain the trace and original directory when investigating an interrupted session.
 
 ## Interpretation rules
 
