@@ -141,6 +141,7 @@ public sealed class StockLocustPlayback : MonoBehaviour
         lastFrame = Time.frameCount;
         float seconds = Time.deltaTime;
         if (seconds <= 0) return;
+        using var timing = RuntimePerformanceProbe.Measure(RuntimePerformanceProbe.CpuStage.Playheads);
         JobHandle all = default;
         try
         {

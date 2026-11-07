@@ -66,13 +66,21 @@ public sealed class RecordedAnimationState
 /// <summary>Plain data owned by one rented population frame. No Unity objects or source capture buffers are queued.</summary>
 public sealed class RecordedAnimationSnapshot : AsyncSwarmWriter.IPackedAnimationSnapshot
 {
-    private readonly RecordedAnimationState state=new RecordedAnimationState();
+    private RecordedAnimationState state;
     private RecordedAnimationState.AnimatorPose[] animators;
     private RecordedAnimationState.LegacyPose[] legacy;
     private RecordedAnimationState.LocalPose[] realized;
     private RecordedAnimationState.BlendPose[] blends;
     private RecordedAnimationState.ProceduralPose procedural;
     private bool hasState;
+    private bool hasStockAnimator;
+    private AnimatorSample stockAnimator;
+    private struct AnimatorSample
+    {
+        public int State;
+        public float Time, Speed, Weight;
+        public bool Transitioning;
+    }
     [ThreadStatic] private static JsonSerializer workerSerializer;
     [ThreadStatic] private static CsvJsonWriter workerCsv;
     [ThreadStatic] private static char[] workerNumber;
@@ -93,30 +101,33 @@ public sealed class RecordedAnimationSnapshot : AsyncSwarmWriter.IPackedAnimatio
         return true;
     }
     private static bool Finite(float value)=>!float.IsNaN(value)&&!float.IsInfinity(value);
-    private bool TryGetSteadyAnimator(out RecordedAnimationState.AnimatorPose animator, out RecordedAnimationState.LayerPose layer)
+    private bool TryGetSteadyAnimator(out AnimatorSample sample)
     {
-        animator = null;
-        layer = null;
+        sample = stockAnimator;
+        if (hasStockAnimator) return true;
         // The usual original locust: one root Animator/layer, no parameters or transition pose.
         // Everything outside this shape uses the full extensible JSON serializer below.
         if(!steadySchema||state.version!=1||state.animators==null||state.animators.Length!=1||
             state.legacy==null||state.legacy.Length!=0||state.procedural!=null||state.realizedPose!=null||state.blendShapes!=null)return false;
-        animator=state.animators[0];
+        var animator=state.animators[0];
         if(animator==null||animator.path!=""||animator.layers==null||animator.layers.Length!=1||animator.parameters==null||animator.parameters.Length!=0)return false;
-        layer=animator.layers[0];
-        return layer!=null&&Finite(animator.speed)&&Finite(layer.time)&&Finite(layer.weight);
+        var layer=animator.layers[0];
+        if(layer==null||!Finite(animator.speed)||!Finite(layer.time)||!Finite(layer.weight))return false;
+        sample = new AnimatorSample { State = layer.state, Time = layer.time, Speed = animator.speed,
+            Weight = layer.weight, Transitioning = layer.transitioning };
+        return true;
     }
     private bool WriteSteadyAnimator(TextWriter output)
     {
-        if(!TryGetSteadyAnimator(out var animator,out var layer))return false;
+        if(!TryGetSteadyAnimator(out var sample))return false;
         if(workerNumber==null)workerNumber=new char[64];
         output.Write("{\"version\":1,\"animators\":[{\"path\":\"\",\"speed\":");
-        Float(output,animator.speed);
+        Float(output,sample.Speed);
         output.Write(",\"layers\":[{\"state\":");
-        if(!layer.state.TryFormat(workerNumber,out int length,default,CultureInfo.InvariantCulture))throw new InvalidDataException("Animator state exceeds number buffer.");
-        output.Write(workerNumber,0,length);output.Write(",\"time\":");Float(output,layer.time);
-        output.Write(",\"weight\":");Float(output,layer.weight);
-        output.Write(layer.transitioning?",\"transitioning\":true}],\"parameters\":[]}],\"legacy\":[]}":",\"transitioning\":false}],\"parameters\":[]}],\"legacy\":[]}");
+        if(!sample.State.TryFormat(workerNumber,out int length,default,CultureInfo.InvariantCulture))throw new InvalidDataException("Animator state exceeds number buffer.");
+        output.Write(workerNumber,0,length);output.Write(",\"time\":");Float(output,sample.Time);
+        output.Write(",\"weight\":");Float(output,sample.Weight);
+        output.Write(sample.Transitioning?",\"transitioning\":true}],\"parameters\":[]}],\"legacy\":[]}":",\"transitioning\":false}],\"parameters\":[]}],\"legacy\":[]}");
         return true;
     }
     private static void Float(TextWriter output,float value)
@@ -132,10 +143,20 @@ public sealed class RecordedAnimationSnapshot : AsyncSwarmWriter.IPackedAnimatio
     {if(values==null||values.Length!=count)values=count==0?Array.Empty<T>():new T[count];}
     private static float[] Copy(float[] source,float[] destination)
     {if(source==null)return null;Size(ref destination,source.Length);Array.Copy(source,destination,source.Length);return destination;}
+    internal bool TrySetStockAnimator(int stateHash, float normalizedTime, float speed)
+    {
+        if (!steadySchema || !Finite(normalizedTime) || !Finite(speed)) return false;
+        stockAnimator = new AnimatorSample { State = stateHash, Time = normalizedTime, Speed = speed, Weight = 1 };
+        hasState = hasStockAnimator = true;
+        return true;
+    }
+
     internal void CopyFrom(RecordedAnimationState source)
     {
+        hasStockAnimator=false;
         hasState=source!=null;
         if(!hasState)return;
+        if(state==null)state=new RecordedAnimationState();
         state.version=source.version;
         if(source.animators==null)state.animators=null;
         else
@@ -227,14 +248,14 @@ public sealed class RecordedAnimationSnapshot : AsyncSwarmWriter.IPackedAnimatio
             output.Write((byte)0);
             return;
         }
-        if (TryGetSteadyAnimator(out var animator, out var layer))
+        if (TryGetSteadyAnimator(out var sample))
         {
             output.Write((byte)1);
-            output.Write(animator.speed);
-            output.Write(layer.state);
-            output.Write(layer.time);
-            output.Write(layer.weight);
-            output.Write(layer.transitioning);
+            output.Write(sample.Speed);
+            output.Write(sample.State);
+            output.Write(sample.Time);
+            output.Write(sample.Weight);
+            output.Write(sample.Transitioning);
             return;
         }
         if (steadySchema && state.version == 1 && state.animators?.Length == 0 && state.legacy?.Length == 0 &&
@@ -301,6 +322,8 @@ public sealed class RecordedAnimationSnapshot : AsyncSwarmWriter.IPackedAnimatio
 /// <summary>Cache hierarchy discovery per spawned individual rather than scanning it every frame.</summary>
 public sealed class RecordedAnimationCapture
 {
+    private static readonly bool usePrimitiveStockSnapshot =
+        Array.IndexOf(Environment.GetCommandLineArgs(), "--copy-swarm-animation-objects") < 0;
     private readonly GameObject root;
     private readonly StockLocustPlayback clipPlayback;
     private readonly int clipIndex;
@@ -347,6 +370,12 @@ public sealed class RecordedAnimationCapture
     public void CaptureSnapshot(RecordedAnimationSnapshot destination,BogongSwarmRenderer batch=null,int index=0)
     {
         if(destination==null)throw new ArgumentNullException(nameof(destination));
+        if (usePrimitiveStockSnapshot && clipPlayback != null && clipPlayback.UsesCache &&
+            animators.Length == 1 && legacy.Length == 0 && root != null)
+        {
+            clipPlayback.ReadState(clipIndex, out float normalizedTime, out float speed);
+            if (destination.TrySetStockAnimator(clipPlayback.StateHash, normalizedTime, speed)) return;
+        }
         destination.CopyFrom(ReadEvidence(batch,index));
     }
     private RecordedAnimationState ReadEvidence(BogongSwarmRenderer batch,int index)

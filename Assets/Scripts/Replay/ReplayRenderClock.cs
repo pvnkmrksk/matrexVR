@@ -37,10 +37,10 @@ public sealed class ReplayRenderClock : MonoBehaviour
     private static readonly CameraEvent[] Events = { CameraEvent.BeforeDepthTexture, CameraEvent.BeforeDepthNormalsTexture,
         CameraEvent.BeforeGBuffer,CameraEvent.BeforeReflections,CameraEvent.BeforeLighting,
         CameraEvent.BeforeSkybox, CameraEvent.BeforeForwardOpaque, CameraEvent.BeforeForwardAlpha };
-    public static JObject CaptureFrameClock() => Clock(Time.timeSinceLevelLoad,Time.deltaTime,Time.smoothDeltaTime);
-    internal static JObject Clock(float seconds,float delta,float smooth)
+    public static JObject CaptureFrameClock() => Clock(Evaluate(Time.timeSinceLevelLoad,Time.deltaTime,Time.smoothDeltaTime));
+    internal static JObject Clock(Values values)
     {
-        var values=Evaluate(seconds,delta,smooth);var result=new JObject();
+        var result=new JObject();
         for(int i=0;i<Names.Length;i++){var v=values.At(i);result[Names[i]]=new JArray(v.x,v.y,v.z,v.w);}
         return result;
     }
@@ -51,13 +51,92 @@ public sealed class ReplayRenderClock : MonoBehaviour
         var values=Read(recorded);Install(values);SetSunClocks(values);
     }
     /// <summary>One recorded clock, parsed once and shared by all camera/shadow passes of the frame.</summary>
-    public static void SetFrameClocks(IEnumerable<Camera> cameras,JObject recorded)
+    public static void SetFrameClocks(IEnumerable<Camera> cameras,JObject recorded) => SetFrameClocks(cameras,Read(recorded));
+    internal static void SetFrameClocks(IEnumerable<Camera> cameras,Values values)
     {
-        var values=Read(recorded);
         foreach(var camera in cameras)
             if(camera!=null)(camera.GetComponent<ReplayRenderClock>()??camera.gameObject.AddComponent<ReplayRenderClock>()).Install(values);
         SetSunClocks(values);
     }
+
+    // All acquisition cameras render the same logical frame. Attach the same
+    // buffers once, then refresh the recorded and restore clocks once per frame.
+    internal sealed class Acquisition : System.IDisposable
+    {
+        private readonly CommandBuffer before = new CommandBuffer { name = "Recorded experiment shader clock" };
+        private readonly CommandBuffer after = new CommandBuffer { name = "Restore engine shader clock" };
+        private readonly HashSet<Camera> attached = new HashSet<Camera>();
+        private readonly HashSet<Light> suns = new HashSet<Light>();
+        private readonly List<Light> staleSuns = new List<Light>();
+        private Camera[] enabledCameras = System.Array.Empty<Camera>();
+        private int previousCameraCount;
+
+        public Acquisition() => Camera.onPreCull += Attach;
+
+        public void Update(Values clock)
+        {
+            before.Clear();Set(before,clock);
+            after.Clear();Set(after,Evaluate(Time.time,Time.deltaTime,Time.smoothDeltaTime));
+            attached.RemoveWhere(camera => camera == null);
+            int required=Camera.allCamerasCount;
+            if(enabledCameras.Length<required)enabledCameras=new Camera[System.Math.Max(required,enabledCameras.Length*2)];
+            int count=Camera.GetAllCameras(enabledCameras);
+            for(int i=0;i<count;i++)Attach(enabledCameras[i]);
+            if(count<previousCameraCount)System.Array.Clear(enabledCameras,count,previousCameraCount-count);
+            previousCameraCount=count;
+
+            staleSuns.Clear();
+            foreach(var sun in suns)
+                if(sun==null||!sun.isActiveAndEnabled||sun.type!=LightType.Directional)staleSuns.Add(sun);
+            foreach(var sun in staleSuns)
+            {
+                Detach(sun);
+                suns.Remove(sun);
+            }
+            foreach(var sun in UnityEngine.Object.FindObjectsByType<Light>(FindObjectsSortMode.None))
+                if(sun.type==LightType.Directional&&sun.enabled&&suns.Add(sun))
+                {
+                    sun.AddCommandBuffer(LightEvent.BeforeShadowMap,before);
+                    sun.AddCommandBuffer(LightEvent.AfterShadowMap,after);
+                }
+        }
+
+        // Camera.GetAllCameras covers enabled cameras without a general object
+        // query. The callback also catches new and manually rendered cameras.
+        private void Attach(Camera camera)
+        {
+            if(camera==null||attached.Contains(camera)||(camera.hideFlags&HideFlags.DontSave)!=0||!camera.gameObject.scene.IsValid())return;
+            attached.Add(camera);
+            AttachCamera(camera,before,after);
+        }
+
+        private void Detach(Light sun)
+        {
+            if(sun==null)return;
+            sun.RemoveCommandBuffer(LightEvent.BeforeShadowMap,before);
+            sun.RemoveCommandBuffer(LightEvent.AfterShadowMap,after);
+        }
+
+        public void Dispose()
+        {
+            Camera.onPreCull -= Attach;
+            foreach(var camera in attached)if(camera!=null)DetachCamera(camera,before,after);
+            foreach(var sun in suns)Detach(sun);
+            before.Release();after.Release();
+        }
+    }
+
+    private static void AttachCamera(Camera camera,CommandBuffer before,CommandBuffer after)
+    {
+        foreach(var stage in Events)camera.AddCommandBuffer(stage,before);
+        camera.AddCommandBuffer(CameraEvent.AfterEverything,after);
+    }
+    private static void DetachCamera(Camera camera,CommandBuffer before,CommandBuffer after)
+    {
+        foreach(var stage in Events)camera.RemoveCommandBuffer(stage,before);
+        camera.RemoveCommandBuffer(CameraEvent.AfterEverything,after);
+    }
+
     private void Install(Values values)
     {
         if(target==null)target=GetComponent<Camera>();
@@ -65,8 +144,7 @@ public sealed class ReplayRenderClock : MonoBehaviour
         {
             commands=new CommandBuffer{name="Recorded experiment shader clock"};
             restore=new CommandBuffer{name="Restore engine shader clock"};
-            foreach(var stage in Events)target.AddCommandBuffer(stage,commands);
-            target.AddCommandBuffer(CameraEvent.AfterEverything,restore);
+            AttachCamera(target,commands,restore);
         }
         commands.Clear();Set(commands,values);
         RefreshRestore();
@@ -94,11 +172,7 @@ public sealed class ReplayRenderClock : MonoBehaviour
     private void OnDestroy()
     {
         if(commands==null)return;
-        if(target!=null)
-        {
-            foreach(var stage in Events)target.RemoveCommandBuffer(stage,commands);
-            target.RemoveCommandBuffer(CameraEvent.AfterEverything,restore);
-        }
+        if(target!=null)DetachCamera(target,commands,restore);
         commands.Release();restore.Release();commands=null;restore=null;
     }
 }

@@ -196,11 +196,13 @@ public sealed class GeneratedSwarmMotion : MonoBehaviour
     {
         if (!UsesParallelMotion)
         {
+            using var serialTiming = RuntimePerformanceProbe.Measure(RuntimePerformanceProbe.CpuStage.SwarmMotion);
             Advance(Time.deltaTime);
             return;
         }
         if (scheduledFrame == Time.frameCount) return;
         scheduledFrame = Time.frameCount;
+        using var timing = RuntimePerformanceProbe.Measure(RuntimePerformanceProbe.CpuStage.SwarmMotion);
 
         // Dispatch independent groups together, then publish their transforms
         // before any later animation, camera, telemetry or recorder callback.

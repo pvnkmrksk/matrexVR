@@ -21,6 +21,7 @@ public interface IReplayStateParticipant
 /// <summary>Marks objects created by the original controllers, separate from recorded animal populations.</summary>
 public sealed class RecordedWorldStateTarget : MonoBehaviour
 {
+    private static readonly HashSet<RecordedWorldStateTarget> targets = new HashSet<RecordedWorldStateTarget>();
     public string Key;
     public JObject Configuration;
     private readonly Dictionary<Renderer,Material[]> replayMaterials = new Dictionary<Renderer,Material[]>();
@@ -28,6 +29,22 @@ public sealed class RecordedWorldStateTarget : MonoBehaviour
     private string previous;
     private readonly Dictionary<string,Texture> textureReferences = new Dictionary<string,Texture>(StringComparer.Ordinal);
     private readonly Dictionary<string,uint> textureVersions = new Dictionary<string,uint>(StringComparer.Ordinal);
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetTargets() => targets.Clear();
+    private void Awake() => targets.Add(this);
+    private void OnEnable() => targets.Add(this);
+    internal static void GetActiveTargets(List<RecordedWorldStateTarget> output)
+    {
+        output.Clear();
+        foreach (var target in targets)
+            if (target != null && target.gameObject.activeInHierarchy &&
+                (target.hideFlags & HideFlags.DontSave) == 0 &&
+                target.GetComponentInParent<RecordedPendingDestroy>(true) == null)
+                output.Add(target);
+        output.Sort((left, right) => StringComparer.Ordinal.Compare(left.Key, right.Key));
+    }
+
     public void Invalidate() { animation = null; previous = null; textureReferences.Clear(); textureVersions.Clear(); }
     public JObject Capture(bool force = false)
     {
@@ -180,7 +197,7 @@ public sealed class RecordedWorldStateTarget : MonoBehaviour
 
         }
     }
-    private void OnDestroy(){foreach(var materials in replayMaterials.Values)foreach(var material in materials)if(material!=null)Destroy(material);replayMaterials.Clear();}
+    private void OnDestroy(){targets.Remove(this);foreach(var materials in replayMaterials.Values)foreach(var material in materials)if(material!=null)Destroy(material);replayMaterials.Clear();}
     private static JToken TextureIdentity(Texture texture) => texture==null?JValue.CreateNull():new JObject {
         ["name"]=texture.name,["width"]=texture.width,["height"]=texture.height,["dimension"]=(int)texture.dimension,
         ["wrapU"]=(int)texture.wrapModeU,["wrapV"]=(int)texture.wrapModeV,["wrapW"]=(int)texture.wrapModeW,["filter"]=(int)texture.filterMode,["aniso"]=texture.anisoLevel,["mipBias"]=texture.mipMapBias };
@@ -199,7 +216,13 @@ public sealed class RecordedWorldStateTarget : MonoBehaviour
 public sealed class RecordedWorldStateWriter : MonoBehaviour
 {
     public const string FileName = "world_state.jsonl";
+    private static readonly Unity.Profiling.ProfilerMarker supportMarker = new Unity.Profiling.ProfilerMarker("MATREX.World.Support");
+    private static readonly Unity.Profiling.ProfilerMarker targetsMarker = new Unity.Profiling.ProfilerMarker("MATREX.World.Targets");
+    private static readonly Unity.Profiling.ProfilerMarker clockMarker = new Unity.Profiling.ProfilerMarker("MATREX.World.Clocks");
+    private static readonly Unity.Profiling.ProfilerMarker journalMarker = new Unity.Profiling.ProfilerMarker("MATREX.World.Journal");
     public double CaptureMilliseconds { get; private set; }
+    private readonly List<RecordedWorldStateTarget> liveTargets = new List<RecordedWorldStateTarget>();
+    private ReplayRenderClock.Acquisition acquisitionClock;
     private StreamWriter writer;
     private string directory;
     private void LateUpdate()
@@ -218,18 +241,44 @@ public sealed class RecordedWorldStateWriter : MonoBehaviour
         var logger=MasterDataLogger.Instance;
         if(logger==null||!logger.AcceptingWrites||MainController.Instance?.SequenceRunning!=true||string.IsNullOrEmpty(ReplayPresentationRecorder.CurrentPresentationId))return;
         if(directory!=logger.directoryPath){Close();directory=logger.directoryPath;writer=new StreamWriter(Path.Combine(directory,FileName),false,new UTF8Encoding(false),65536);}
-        ReplayEvidenceSupport.RequireSupportedScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+        using(RuntimePerformanceProbe.Measure(RuntimePerformanceProbe.CpuStage.WorldSupport))
+        using(supportMarker.Auto())
+            ReplayEvidenceSupport.RequireSupportedScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
         var targets=new JArray();
-        var live=FindObjectsByType<RecordedWorldStateTarget>(FindObjectsSortMode.None).Where(target=>target.GetComponentInParent<RecordedPendingDestroy>(true)==null).OrderBy(target=>target.Key,StringComparer.Ordinal).ToArray();
-        foreach(var target in live)
-        { var state=target.Capture();if(state!=null)targets.Add(state); }
-        var entry=new JObject { ["presentationId"]=ReplayPresentationRecorder.CurrentPresentationId,["frame"]=Time.frameCount,
-            ["unityTime"]=Time.timeAsDouble,["shaderTime"]=Time.timeSinceLevelLoad,["shaderGlobals"]=ReplayRenderClock.CaptureFrameClock(),["activeTargets"]=new JArray(live.Select(target=>target.Key)),["deltaTime"]=Time.deltaTime,["smoothDeltaTime"]=Time.smoothDeltaTime,["targets"]=targets };
-        ReplayRenderClock.SetFrameClocks(FindObjectsByType<Camera>(FindObjectsSortMode.None),(JObject)entry["shaderGlobals"]);
-        entry["sha256"]=ReplayPresentationJournal.HashEntry(entry);
-        writer.WriteLine(entry.ToString(Formatting.None));
+        var activeTargets=new JArray();
+        using(RuntimePerformanceProbe.Measure(RuntimePerformanceProbe.CpuStage.WorldTargets))
+        using(targetsMarker.Auto())
+        {
+            RecordedWorldStateTarget.GetActiveTargets(liveTargets);
+            foreach(var target in liveTargets)
+            {
+                activeTargets.Add(target.Key);
+                var state=target.Capture();if(state!=null)targets.Add(state);
+            }
+        }
+        float shaderTime=Time.timeSinceLevelLoad,deltaTime=Time.deltaTime,smoothDeltaTime=Time.smoothDeltaTime;
+        var shaderGlobals=ReplayRenderClock.Evaluate(shaderTime,deltaTime,smoothDeltaTime);
+        using(RuntimePerformanceProbe.Measure(RuntimePerformanceProbe.CpuStage.WorldClocks))
+        using(clockMarker.Auto())
+        {
+            if(acquisitionClock==null)acquisitionClock=new ReplayRenderClock.Acquisition();
+            acquisitionClock.Update(shaderGlobals);
+        }
+        using(RuntimePerformanceProbe.Measure(RuntimePerformanceProbe.CpuStage.WorldJournal))
+        using(journalMarker.Auto())
+        {
+            var entry=new JObject { ["presentationId"]=ReplayPresentationRecorder.CurrentPresentationId,["frame"]=Time.frameCount,
+                ["unityTime"]=Time.timeAsDouble,["shaderTime"]=shaderTime,["shaderGlobals"]=ReplayRenderClock.Clock(shaderGlobals),["activeTargets"]=activeTargets,["deltaTime"]=deltaTime,["smoothDeltaTime"]=smoothDeltaTime,["targets"]=targets };
+            ReplayPresentationJournal.WriteEntry(writer,entry);
+        }
     }
-    public void Close(){writer?.Flush();writer?.Dispose();writer=null;directory=null;}
+    public void Close()
+    {
+        acquisitionClock?.Dispose();acquisitionClock=null;
+        liveTargets.Clear();
+        var closing=writer;writer=null;directory=null;
+        closing?.Dispose();
+    }
     private void OnDestroy()=>Close();
 }
 

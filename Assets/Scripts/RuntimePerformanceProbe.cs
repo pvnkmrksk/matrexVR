@@ -13,6 +13,40 @@ using UnityEngine.SceneManagement;
 [DefaultExecutionOrder(10000)]
 public sealed class RuntimePerformanceProbe : MonoBehaviour
 {
+    internal enum CpuStage
+    {
+        Playheads, SwarmMotion, RenderPrepare, RenderWait, RenderSubmit,
+        WorldSupport, WorldTargets, WorldClocks, WorldJournal
+    }
+
+    private static RuntimePerformanceProbe active;
+    private static readonly CpuStage[] cpuStageNames = (CpuStage[])Enum.GetValues(typeof(CpuStage));
+
+    internal readonly struct CpuStageSample : IDisposable
+    {
+        private readonly RuntimePerformanceProbe probe;
+        private readonly CpuStage stage;
+        private readonly long start;
+
+        internal CpuStageSample(CpuStage stage)
+        {
+            probe = active;
+            this.stage = stage;
+            start = !ReferenceEquals(probe, null) && probe.measuring ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
+        }
+
+        public void Dispose()
+        {
+            if (start != 0)
+                probe.stageTicks[(int)stage] += System.Diagnostics.Stopwatch.GetTimestamp() - start;
+        }
+    }
+
+    internal static CpuStageSample Measure(CpuStage stage) => new CpuStageSample(stage);
+
+    private readonly long[] stageTicks = new long[cpuStageNames.Length];
+    private Series[] stageTimings;
+
     private sealed class Series
     {
         public readonly List<double> values=new List<double>(16384);
@@ -41,20 +75,24 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
         if(Application.isEditor||string.IsNullOrEmpty(Arg("--performance-probe")))return;
         if(string.IsNullOrWhiteSpace(Arg("--config-dir"))||string.IsNullOrWhiteSpace(Arg("--data-dir")))
         {Debug.LogError("Performance profiling requires explicit disposable --config-dir and --data-dir paths.");Application.Quit(2);return;}
-        var host=new GameObject("Explicit standalone performance probe");DontDestroyOnLoad(host);host.AddComponent<RuntimePerformanceProbe>();
+        var host=new GameObject("Explicit standalone performance probe");DontDestroyOnLoad(host);active=host.AddComponent<RuntimePerformanceProbe>();
     }
     private readonly List<object> results=new List<object>();
     private readonly List<string> failures=new List<string>();
     private string output,scene;
     private bool measuring;
     private double previous,previousFrameStart;
+    private double phaseStartTime;
+    private double? finalizationSeconds;
+    private int maxPendingPopulationFrames, maxPendingPopulationFramesPerWriter;
     private long previousAllocated;
     private int gc0,gc1,gc2;
     private readonly List<FrameSample> rawSamples=new List<FrameSample>(16384);
     private struct FrameSample
     {
         public int frame,gc0,gc1,gc2;
-        public double frameStartMs,wallLateUpdateMs;
+        public double elapsedMs,frameStartMs,wallLateUpdateMs;
+        public int pendingPopulationFrames;
         public long mainThreadAllocatedBytes;
         // Recorder.LastValue is the last completed profiler frame, not necessarily this callback's frame.
         public long lastProfilerMainNs,lastProfilerWaitNs,lastProfilerPresentNs,lastProfilerScriptsNs;
@@ -63,7 +101,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
     }
     private Counter mainCounter,waitCounter,presentCounter,scriptsCounter;
     private Series intervals,cpuMain,cpuRender,gpu,present;
-    private Series populationCapture,worldCapture;
+    private Series populationCapture,worldCapture,poseDispatch,poseWait,poseRows;
     private SwarmLogger[] populationLoggers;
     private KannadiLogger[] mirrorLoggers;
     private RecordedWorldStateWriter[] worldLoggers;
@@ -72,6 +110,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
     private readonly FrameTiming[] timing=new FrameTiming[1];
     private ulong lastTiming;
     private bool allocationCounterAvailable;
+    private int parallelMotionGroups, staggeredAnimationGroups;
     private IEnumerator Start()
     {
         output=Path.GetFullPath(Arg("--performance-probe"));scene=Arg("--performance-scene","Choice");
@@ -136,10 +175,24 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
                 if(visual=="ScenePrefab")stimulus["kannadiTilePrefab"]="SimulatedLocust";
             }
         }
+        if(Arg("--performance-freeze-agents")=="1")
+        {
+            var population=stimulus["swarm"] as JObject??stimulus;
+            population["agentSpeed"]=0;
+            population["locustSpeed"]=0;
+            population["agentSpeedStdDev"]=0;
+            population["animateOnMove"]=true;
+        }
         if(scene.IndexOf("Terrain",StringComparison.OrdinalIgnoreCase)>=0)
             stimulus["rugosity"]=new JObject{["enabled"]=true,["visualSurface"]="RoughSmooth",["collisionSurface"]="Flat",["heightMode"]="AboveGround",["orientationMode"]="WorldUp"};
         WriteConfig(experiment,stimulus);WriteConfig("PerformanceProbe/system.json",system);
-        WriteConfig("PerformanceProbe/sequence.json",new JObject{["autoStart"]=false,["loop"]=false,["returnToSetup"]=false,["sequences"]=new JArray(new JObject{["sceneName"]=scene,["duration"]=3600,["parameters"]=new JObject{["configFile"]=experiment}})});
+        var sequence=new JObject{["autoStart"]=false,["loop"]=false,["returnToSetup"]=false,["sequences"]=new JArray(new JObject{["sceneName"]=scene,["duration"]=3600,["parameters"]=new JObject{["configFile"]=experiment}})};
+        if(Arg("--performance-seed") is string seed)
+        {
+            sequence["randomSeedMode"]="Fixed";
+            sequence["randomSeed"]=int.Parse(seed);
+        }
+        WriteConfig("PerformanceProbe/sequence.json",sequence);
         var ui=ConfigurationUI.ConfigWorkbench.Instance;if(ui!=null){ui.Document.enabled=false;ui.enabled=false;}
         main.PrepareConfiguredRun("PerformanceProbe/system.json","PerformanceProbe/sequence.json");main.StartSequence();
         while(SceneManager.GetActiveScene().name!=scene&&main.SequenceError==null)yield return null;
@@ -155,6 +208,9 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
         var mirrorEnabled=mirrorLoggers.Select(item=>item.enabled).ToArray();
         var animators=FindObjectsByType<Animator>(FindObjectsSortMode.None);
         var animatorEnabled=animators.Select(item=>item.enabled).ToArray();
+        var motionGroups=FindObjectsByType<GeneratedSwarmMotion>(FindObjectsSortMode.None);
+        parallelMotionGroups=motionGroups.Count(group=>group.UsesParallelMotion);
+        staggeredAnimationGroups=motionGroups.Count(group=>group.UsesStaggeredAnimation);
         var skins=FindObjectsByType<SkinnedMeshRenderer>(FindObjectsSortMode.None);
         var skinEnabled=skins.Select(item=>item.enabled).ToArray();
         var telemetry=FindObjectsByType<ExperimentTelemetry>(FindObjectsSortMode.None);
@@ -218,32 +274,56 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             string cap=Arg("--performance-cap");
             if(cap!=null&&phase!="vsync-1"&&phase!="vsync-2")Application.targetFrameRate=int.Parse(cap);
             yield return new WaitForSecondsRealtime(2);
-            intervals=new Series();cpuMain=new Series();cpuRender=new Series();gpu=new Series();present=new Series();populationCapture=new Series();worldCapture=new Series();lastTiming=0;
+            if(Arg("--performance-capture")=="1")
+            {
+                ScreenCapture.CaptureScreenshot(Path.Combine(output,phase+".png"));
+                yield return new WaitForSecondsRealtime(1);
+            }
+            Array.Clear(stageTicks,0,stageTicks.Length);
+            stageTimings=cpuStageNames.Select(_=>new Series()).ToArray();
+            intervals=new Series();cpuMain=new Series();cpuRender=new Series();gpu=new Series();present=new Series();populationCapture=new Series();worldCapture=new Series();poseDispatch=new Series();poseWait=new Series();poseRows=new Series();lastTiming=0;
             counters=new List<Counter>{(mainCounter=new Counter(ProfilerCategory.Internal,"Main Thread")),new Counter(ProfilerCategory.Internal,"Render Thread"),
                 (waitCounter=new Counter(ProfilerCategory.Internal,"WaitForTargetFPS")),(presentCounter=new Counter(ProfilerCategory.Render,"Gfx.WaitForPresentOnGfxThread")),
                 (scriptsCounter=new Counter(ProfilerCategory.Scripts,"BehaviourUpdate")),new Counter(ProfilerCategory.Scripts,"BehaviourLateUpdate"),
                 new Counter(ProfilerCategory.Memory,"GC Allocated In Frame"),new Counter(ProfilerCategory.Render,"Batches Count"),new Counter(ProfilerCategory.Render,"Triangles Count")};
-            double cpuStarted=System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds;
+            using var process=System.Diagnostics.Process.GetCurrentProcess();
+            double cpuStarted=process.TotalProcessorTime.TotalMilliseconds;
             long allocatedStarted=GC.GetAllocatedBytesForCurrentThread();
             int[] collectionsStarted={GC.CollectionCount(0),GC.CollectionCount(1),GC.CollectionCount(2)};
             previous=0;previousFrameStart=0;rawSamples.Clear();
             previousAllocated=GC.GetAllocatedBytesForCurrentThread();gc0=GC.CollectionCount(0);gc1=GC.CollectionCount(1);gc2=GC.CollectionCount(2);
-            double started=Time.realtimeSinceStartupAsDouble;measuring=true;
+            Debug.Log("[Performance probe] Begin "+phase);
+            double started=Time.realtimeSinceStartupAsDouble;
+            long startedUtcTicks=DateTime.UtcNow.Ticks;
+            phaseStartTime=started;
+            maxPendingPopulationFrames=maxPendingPopulationFramesPerWriter=0;
+            measuring=true;
             yield return new WaitForSecondsRealtime(measureSeconds);measuring=false;
             int endedGc0=GC.CollectionCount(0),endedGc1=GC.CollectionCount(1),endedGc2=GC.CollectionCount(2);
             double seconds=Time.realtimeSinceStartupAsDouble-started;
-            double processCpuMs=System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds-cpuStarted;
+            double processCpuMs=process.TotalProcessorTime.TotalMilliseconds-cpuStarted;
+            Debug.Log("[Performance probe] End "+phase);
             long allocatedBytes=GC.GetAllocatedBytesForCurrentThread()-allocatedStarted;
+            var clipBatches = FindObjectsByType<StockLocustPlayback>(FindObjectsSortMode.None).Where(batch => batch.UsesCache).ToArray();
+            var renderBatches = FindObjectsByType<NativeLocustBatchRenderer>(FindObjectsSortMode.None);
             results.Add(new {phase,scene,sourceSystem,sourceExperiment,sourcePhase,expectedCameras,observedStimulusCameras=stimulusCameras.Length,requestedRigs=rigs,observedRigs=loops.Length,observedDataLoggers=loggers.Length,observedPopulation=FindObjectsByType<LocustSpawner>(FindObjectsSortMode.None).Select(item=>new{item.numberOfLocusts,item.agentVisual,spawned=item.Spawned.Count}).ToArray(),observedAnimators=animators.Length,layout=sourceSystem!=null?"supplied-system":desktop?"desktop":"LED-six-128",seconds,frames=intervals.values.Count,
                 fps=1000*intervals.values.Count/intervals.values.Sum(),phaseBoundaryFps=intervals.values.Count/seconds,completeIntervalSeconds=intervals.values.Sum()/1000,rawFrameMs=intervals.values.ToArray(),rawSamples=rawSamples.ToArray(),frameStartMs=SummarizeFrameStarts(),frameMs=intervals.Summary(),cpuMainMs=cpuMain.Summary(),cpuRenderMs=cpuRender.Summary(),gpuMs=gpu.Summary(),presentWaitMs=present.Summary(),
                 populationCaptureMs=populationCapture.Summary(),worldCaptureMs=worldCapture.Summary(),
+                populationPoseDispatchMs=poseDispatch.Summary(),populationPoseWaitMs=poseWait.Summary(),populationJobPoseRows=poseRows.Summary(),
+                cpuStageMs=cpuStageNames.Select(stage=>new{name=stage.ToString(),statistics=stageTimings[(int)stage].Summary()}).ToArray(),
+                parallelCullGroups=renderBatches.Count(group=>group.UsesParallelCull),
+                parallelDrawPackingGroups=renderBatches.Count(group=>group.UsesParallelDrawPacking),
+                startedUtcTicks,maxPendingPopulationFrames,maxPendingPopulationFramesPerWriter,parallelMotionGroups,staggeredAnimationGroups,
+                cachedAnimationGroups=clipBatches.Length,cachedAnimationAgents=clipBatches.Sum(batch=>batch.AgentCount),
+                cachedAnimationIdentity=clipBatches.FirstOrDefault()?.ClipIdentity,enabledNativeAnimators=animators.Count(item=>item!=null&&item.enabled),
                 processCpuMs,processCpuPercentOfOneCore=processCpuMs/(seconds*10),processCpuMsPerFrame=processCpuMs/Math.Max(1,intervals.values.Count),
                 allocationCounterAvailable,mainThreadAllocatedBytes=allocationCounterAvailable?(long?)allocatedBytes:null,
                 mainThreadAllocatedBytesPerFrame=allocationCounterAvailable?(double?)(allocatedBytes/(double)Math.Max(1,intervals.values.Count)):null,
                 collections=new[]{endedGc0-collectionsStarted[0],endedGc1-collectionsStarted[1],endedGc2-collectionsStarted[2]},focused=Application.isFocused,
                 target=Application.targetFrameRate,vsync=QualitySettings.vSyncCount,refreshNumerator=Screen.currentResolution.refreshRateRatio.numerator,refreshDenominator=Screen.currentResolution.refreshRateRatio.denominator,fullScreen=Screen.fullScreenMode.ToString(),metalDisplayLink=Environment.GetEnvironmentVariable("UNITY_USE_METAL_DISPLAY_LINK"),frameTimingAvailable=FrameTimingManager.IsFeatureEnabled(),
                 backgroundClearCameras=FindObjectsByType<Camera>(FindObjectsSortMode.None).Count(c=>c.enabled && c.GetComponentInParent<DisplayBackgroundClear>()!=null),
-                cameras=cameras.Select(c=>new {c.name,enabled=c.enabled,rect=new[]{c.rect.x,c.rect.y,c.rect.width,c.rect.height},c.targetDisplay,offscreen=c.targetTexture!=null,c.pixelWidth,c.pixelHeight,c.nearClipPlane,c.farClipPlane}).ToArray(),
+                cameras=cameras.Select(c=>new {c.name,enabled=c.enabled,rect=new[]{c.rect.x,c.rect.y,c.rect.width,c.rect.height},c.targetDisplay,offscreen=c.targetTexture!=null,c.pixelWidth,c.pixelHeight,c.nearClipPlane,c.farClipPlane,
+                    position=new[]{c.transform.position.x,c.transform.position.y,c.transform.position.z}}).ToArray(),
                 listenersEnabled=tracking&&phase!="listeners-off",closedLoopsEnabled=tracking,trackingFresh=listeners.Select(l=>l.HasFreshPose()).ToArray(),trackingSequences=listeners.Select(l=>l.ReadRawSample().sequence).ToArray(),
                 populationRecording=populationLoggers.Select(item=>new{item.name,item.PendingFrames,item.DroppedFrames,item.WrittenRows,item.Failure}).ToArray(),
                 mirrorRecording=mirrorLoggers.Select(item=>new{item.name,item.PendingFrames,item.DroppedFrames,item.Failure}).ToArray(),
@@ -253,7 +333,13 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             foreach(var texture in textures){texture.Release();Destroy(texture);}
             Save();Debug.Log("[Performance probe] "+phase+" "+(intervals.values.Count/seconds).ToString("F1")+" FPS");
         }
-        main.StopSequence();while(logger.IsFinalizing)yield return null;Finish();
+        Debug.Log("[Performance probe] Begin recording finalization");
+        double finalizing=Time.realtimeSinceStartupAsDouble;
+        main.StopSequence();
+        while(logger.IsFinalizing)yield return null;
+        finalizationSeconds=Time.realtimeSinceStartupAsDouble-finalizing;
+        Debug.Log("[Performance probe] End recording finalization");
+        Finish();
     }
     private static void WriteConfig(string relative,JObject data)
     {string path=Path.Combine(RuntimePaths.ConfigRoot,relative);Directory.CreateDirectory(Path.GetDirectoryName(path));File.WriteAllText(path,data.ToString(Formatting.Indented));}
@@ -262,17 +348,39 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
         if(!measuring)return;
         double now=Time.realtimeSinceStartupAsDouble,frameStart=Time.unscaledTimeAsDouble;
         long allocated=GC.GetAllocatedBytesForCurrentThread();int g0=GC.CollectionCount(0),g1=GC.CollectionCount(1),g2=GC.CollectionCount(2);
-        if(previous==0){previous=now;previousFrameStart=frameStart;previousAllocated=allocated;gc0=g0;gc1=g1;gc2=g2;return;}
-        var sample=new FrameSample{frame=Time.frameCount,frameStartMs=(frameStart-previousFrameStart)*1000,wallLateUpdateMs=(now-previous)*1000,
+        if(previous==0){Array.Clear(stageTicks,0,stageTicks.Length);previous=now;previousFrameStart=frameStart;previousAllocated=allocated;gc0=g0;gc1=g1;gc2=g2;return;}
+        var sample=new FrameSample{frame=Time.frameCount,elapsedMs=(now-phaseStartTime)*1000,frameStartMs=(frameStart-previousFrameStart)*1000,wallLateUpdateMs=(now-previous)*1000,
             mainThreadAllocatedBytes=allocationCounterAvailable?allocated-previousAllocated:-1,gc0=g0-gc0,gc1=g1-gc1,gc2=g2-gc2,
             lastProfilerMainNs=Last(mainCounter),lastProfilerWaitNs=Last(waitCounter),lastProfilerPresentNs=Last(presentCounter),lastProfilerScriptsNs=Last(scriptsCounter)};
         intervals.Add(sample.wallLateUpdateMs);previous=now;previousFrameStart=frameStart;previousAllocated=allocated;gc0=g0;gc1=g1;gc2=g2;
         foreach(var counter in counters)counter.Capture();
         double populationMilliseconds=0,worldMilliseconds=0;
-        foreach(var item in populationLoggers)if(item!=null&&item.enabled)populationMilliseconds+=item.CaptureMilliseconds;
-        foreach(var item in mirrorLoggers)if(item!=null&&item.enabled)populationMilliseconds+=item.CaptureMilliseconds;
+        void RecordPopulation(double captureMilliseconds,int pendingFrames)
+        {
+            populationMilliseconds+=captureMilliseconds;
+            sample.pendingPopulationFrames+=pendingFrames;
+            maxPendingPopulationFramesPerWriter=Math.Max(maxPendingPopulationFramesPerWriter,pendingFrames);
+        }
+        double schedule=0, wait=0;
+        int jobRows=0;
+        foreach(var item in populationLoggers)
+        {
+            if(item==null||!item.enabled)continue;
+            RecordPopulation(item.CaptureMilliseconds,item.PendingFrames);
+            schedule+=item.PoseScheduleMilliseconds;
+            wait+=item.PoseWaitMilliseconds;
+            jobRows+=item.JobPoseRows;
+        }
+        poseDispatch.Add(schedule);poseWait.Add(wait);poseRows.Add(jobRows);
+        foreach(var item in mirrorLoggers)if(item!=null&&item.enabled)RecordPopulation(item.CaptureMilliseconds,item.PendingFrames);
+        maxPendingPopulationFrames=Math.Max(maxPendingPopulationFrames,sample.pendingPopulationFrames);
         foreach(var item in worldLoggers)if(item!=null&&item.enabled)worldMilliseconds+=item.CaptureMilliseconds;
         populationCapture.Add(populationMilliseconds);worldCapture.Add(worldMilliseconds);
+        for (int i = 0; i < stageTicks.Length; i++)
+        {
+            stageTimings[i].Add(1000.0 * stageTicks[i] / System.Diagnostics.Stopwatch.Frequency);
+            stageTicks[i] = 0;
+        }
         FrameTimingManager.CaptureFrameTimings();
         if(FrameTimingManager.GetLatestTimings(1,timing)==0||timing[0].frameStartTimestamp==lastTiming){rawSamples.Add(sample);return;}
         var frame=timing[0];lastTiming=frame.frameStartTimestamp;
@@ -285,8 +393,8 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
     private object SummarizeFrameStarts(){var series=new Series();foreach(var sample in rawSamples)series.Add(sample.frameStartMs);return series.Summary();}
     private void Log(string text,string stack,LogType type){if(type==LogType.Exception||type==LogType.Error)failures.Add(text);}
     private void Save()
-    {File.WriteAllText(Path.Combine(output,"results.json"),JsonConvert.SerializeObject(new {unity=Application.unityVersion,os=SystemInfo.operatingSystem,cpu=SystemInfo.processorType,gpu=SystemInfo.graphicsDeviceName,graphicsApi=SystemInfo.graphicsDeviceType.ToString(),
-        width=Screen.width,height=Screen.height,quality=QualitySettings.names[QualitySettings.GetQualityLevel()],qualitySettings=new{QualitySettings.shadows,QualitySettings.shadowDistance,QualitySettings.skinWeights,QualitySettings.pixelLightCount,QualitySettings.antiAliasing},failures,results,
+    {File.WriteAllText(Path.Combine(output,"results.json"),JsonConvert.SerializeObject(new {unity=Application.unityVersion,os=SystemInfo.operatingSystem,cpu=SystemInfo.processorType,gpu=SystemInfo.graphicsDeviceName,graphicsApi=SystemInfo.graphicsDeviceType.ToString(),renderingThreadingMode=SystemInfo.renderingThreadingMode.ToString(),jobWorkers=Unity.Jobs.LowLevel.Unsafe.JobsUtility.JobWorkerCount,
+        width=Screen.width,height=Screen.height,quality=QualitySettings.names[QualitySettings.GetQualityLevel()],qualitySettings=new{QualitySettings.shadows,QualitySettings.shadowDistance,QualitySettings.skinWeights,QualitySettings.pixelLightCount,QualitySettings.antiAliasing},failures,results,finalizationSeconds,
         note="Explicit standalone software probe; no animal measurement. On-screen presentation, CPU callbacks, target-FPS pacing and GPU workload are different limits. Raw profiler LastValue belongs to the last completed profiler frame; FrameTiming timestamps identify delayed timing samples. Zero timing timestamp means unavailable/duplicate, not zero work. Raw samples retain frame-start, wall intervals, allocations and GC deltas. Unavailable counters remain explicit; this is not a guarantee of LED timing."},Formatting.Indented));}
-    private void Finish(){Save();Application.logMessageReceived-=Log;Application.Quit(failures.Count==0?0:1);}
+    private void Finish(){Save();active=null;Application.logMessageReceived-=Log;Application.Quit(failures.Count==0?0:1);}
 }
