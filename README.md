@@ -34,7 +34,7 @@ Start with a desktop demo, then configure tracking and displays for your apparat
 
 Use [published desktop archives](https://github.com/pvnkmrksk/matrexVR/releases) for a versioned installation. To modify or build the source, follow the [local preview build instructions](#build-a-local-macos-preview). Each archive's `START-HERE.txt` describes its exact capabilities and startup behavior.
 
-**0.4.1** integrates desktop workflow fixes, same-build replay and optional MCP control. Its [release notes](docs/releases.md#041--agent-onboarding-and-desktop-workflow-fixes) identify recorder and platform capabilities. The package includes the matching MCP adapter; a normal launch enables no control endpoint.
+**0.4.2 for Linux x86-64** adds streamed population recording, cached stock locust rendering, and parallel draw preparation. See the [release notes](docs/release-notes-0.4.2.md), [performance history](docs/performance-history.md), and [platform downloads](https://github.com/pvnkmrksk/matrexVR/releases).
 
 | | Research workflow |
 | :--- | :--- |
@@ -47,7 +47,7 @@ Use [published desktop archives](https://github.com/pvnkmrksk/matrexVR/releases)
 
 ### Run a demo and replay it
 
-1. **[Download the latest published OS archive](https://github.com/pvnkmrksk/matrexVR/releases/latest)** and extract the whole ZIP into a writable folder. Open its `.exe` (Windows), `.app` (macOS) or `.x86_64` (Linux). Unity Editor and Python are not required.
+1. **[Download the published archive for your OS](https://github.com/pvnkmrksk/matrexVR/releases)** and extract the whole ZIP into a writable folder. Open its `.exe` (Windows), `.app` (macOS) or `.x86_64` (Linux). Unity Editor and Python are not required.
 2. **Choose Night sky → Start demo** on a fresh desktop profile. Leave the flying demonstration selected; its input is synthetic. If an existing sequence starts automatically, press **Escape** once to return to setup.
 3. **Try a short run.** Use the arrow keys to move and **A/D** to turn. After about 30 seconds, choose **Back to setup** or press **Escape** once. Wait for that recording to finish saving.
 4. **Open Replay / Replay recordings**, select the newest completed run, and choose **Replay selected**. **Space** pauses; **Left/Right** seeks. Keep the complete run folder and the build that created it.

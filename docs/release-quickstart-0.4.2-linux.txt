@@ -1,0 +1,66 @@
+MATREX VR 0.4.2 FOR LINUX X86-64
+
+Unity 6000.3.16f1
+https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.4.2
+
+INSTALL AND OPEN
+
+Keep the complete extracted archive together in a writable directory. Run the
+Linux executable from that directory.
+
+  sha256sum -c MATREX-VR-0.4.2-Linux.zip.sha256
+  "./MATREX VR.x86_64"
+
+The first command runs beside the downloaded ZIP and checksum file. The second
+runs inside the extracted player folder. Use -configure to open setup when an
+existing sequence is set to start automatically. Keep the archive and its
+manifest with experimental records to identify their creating build.
+
+TRY A SEQUENCE
+
+A fresh profile offers desktop demo and apparatus setup choices. For the new
+close-range swarm examples, open Load, choose Kannadi · tight stock and black
+swarms, and select Load sequence. The two blocks show stock locusts and a mixed
+stock-and-black population from an eye-level camera. Review the selected
+apparatus, sequence, and recording setting before starting.
+
+On real rigs, Configure owns the display selection, camera faces, panel size,
+tracker addresses, and animal settings. Public starter values need the actual
+apparatus calibration. The release manifest lists the pinned Linux tracker and
+dashboard payloads. Bundled Linux HejjéTrac requires glibc 2.39 or newer.
+Use a capability-enabled tracker for native recording control or use a
+separately managed tracker. Recorder readiness and tracker input are distinct states.
+
+RECORD AND REPLAY
+
+Save swarm data includes virtual population capture in the run. Skip swarm
+data leaves the animal pose CSV enabled. Stop or press Escape once and wait for
+the writers to drain and the run to seal. The recording library lists the
+recording location and opens completed runs in the creating player.
+
+Recordings default to MATREX VR RunData beside the player when writable.
+Configuration uses the Unity persistent profile. An isolated test can supply
+both absolute paths explicitly.
+
+  "./MATREX VR.x86_64" -configure \
+    --config-dir "/path/to/config" --data-dir "/path/to/runs"
+
+Keep the complete run folder and creating player for same-build replay. The
+sealed directory contains .matpop population streams, pose CSV, original
+configuration, presentation and world evidence, and the recording manifest.
+ZIP packaging and CSV or Parquet export are separate operations for idle time.
+The operator and data-format guides describe the tools and their dependencies.
+
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.2/docs/manual/recording-pipeline.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.2/docs/data-formats.md
+
+PERFORMANCE AND SCOPE
+
+The stock locust GPU path uses Vulkan. Large groups prepare visibility and
+ordered draws on workers while preserving individual poses and animation
+phases. The controlled Linux tests used generated swarms, 16 rigs and 64
+128 x 128 stimulus faces. Frame pacing at the target workload and physical
+LED/camera timing should be checked on each apparatus. The history retains the
+before/after traces, recorder limits, and reference test setup.
+
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.2/docs/performance-history.md

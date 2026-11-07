@@ -2,6 +2,16 @@
 
 [GitHub Releases](https://github.com/pvnkmrksk/matrexVR/releases) is the publication record. A local build or source change is not a published binary. The [website](https://pvnkmrksk.github.io/matrexVR/) discovers real uploaded ZIPs; it never constructs a download URL for an absent asset.
 
+## 0.4.2 — streamed swarm recording and parallel rendering
+
+The v0.4.2 desktop archive targets Linux x86-64. Its release manifest identifies the exact source, build, scenes, and bundled companions. [GitHub release and SHA-256 download](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.4.2) · [Detailed release notes](release-notes-0.4.2.md)
+
+- Population capture streams to bounded per-rig .matpop files, with counts and digests verified at Stop. ZIP packaging, CSV conversion, and Parquet export are separate operations. Retain the complete sealed run and the creating player for same-build replay. [Recording pipeline](manual/recording-pipeline.md) · [Data formats](data-formats.md) · [Same-build replay contract](same-build-replay-contract.md)
+- Eligible stock locusts share a baked GPU walk cycle and keep individual phases. Large groups use parallel pose, culling, and ordered draw preparation. A 16-rig software test with 1,280 locusts per rig averaged 66.76 FPS uncapped, with a 29.78 ms p99 and zero population recording drops. At 1,536 per rig, the main thread averaged 18.76 ms and population capture consumed 8.45 ms. [Performance history and test scope](performance-history.md)
+- The workbench uses compact numeric controls, aligned vector fields, and clearer group labels. The sequence library includes eye-level stock and mixed black locust examples. [Example sequence](../Assets/StreamingAssets/Examples/Sequences/kannadi-tight-swarms.sequence.json)
+
+Software verification used generated swarm workloads on the Linux workstation. Bundled Linux HejjéTrac requires glibc 2.39 or newer. Physical LED presentation, tracker timing, and live acquisition remain apparatus checks. Build the pinned Linux archive with Unity 6000.3.16f1 and the companion options listed in the release manifest. [Release agent guide](agents/release.md)
+
 ## 0.4.1 — agent onboarding and desktop workflow fixes
 
 Release: [`v0.4.1`](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.4.1). This patch integrates the committed desktop, same-build replay and local-control work after 0.4.0, with a clearer [five-minute start](five-minute-start.md), [repository agent instructions](../AGENTS.md), and [dedicated role guides](agents/README.md). Uncommitted recording/performance experiments are excluded from the pinned release source.
