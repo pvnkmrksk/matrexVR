@@ -116,10 +116,10 @@ Button.tab-active { background-color: rgb(22, 28, 27); color: rgb(157, 210, 202)
 .container-setting > Foldout > .unity-foldout__toggle { display: none; }
 .container-setting > Foldout > .unity-foldout__content { flex-direction: row; flex-wrap: wrap; margin-left: 0; padding-top: 8px; }
 .container-setting .container-setting { background-color: rgb(26, 27, 28); }
-.vector-setting { width: 650px; min-height: 64px; }
+.vector-setting { min-height: 64px; }
 .vector-controls { flex-wrap: wrap; }
-.vector-controls > Label { font-size: 11px; color: rgb(182, 197, 210); margin-right: 5px; }
-.vector-controls > .number-control { margin-right: 16px; }
+.vector-axis { flex-shrink: 0; margin-right: 10px; }
+.vector-axis > Label { min-width: 16px; font-size: 11px; color: rgb(182, 197, 210); }
 .number-control { flex-grow: 0; flex-shrink: 0; min-width: 64px; }
 .spin-box { min-height: 28px; flex-shrink: 0; }
 .exact-number { margin: 0; flex-grow: 0; flex-shrink: 0; }
@@ -140,8 +140,6 @@ Button.tab-active { background-color: rgb(22, 28, 27); color: rgb(157, 210, 202)
 .backend-setting { flex-direction: column; align-items: stretch; }
 .backend-setting > .setting-label { flex-grow: 0; flex-basis: auto; margin: 0 0 5px; }
 .backend-setting > DropdownField { width: auto; min-width: 0; }
-.path-setting { width: 980px; }
-.path-setting > TextField { width: 700px; }
 .feature-grid { flex-wrap: wrap; }
 .feature-card { width: 254px; padding: 12px; margin: 0 10px 10px 0; border-width: 1px; border-color: rgb(62, 68, 72); border-radius: 4px; background-color: rgb(27, 27, 27); }
 .feature-card .row > Label { flex-grow: 1; font-size: 14px; -unity-font-style: bold; }
@@ -213,20 +211,42 @@ Button.tab-active { background-color: rgb(22, 28, 27); color: rgb(157, 210, 202)
 .library-preview #preset-title { font-size: 20px; -unity-font-style: bold; color: rgb(185, 204, 218); }
 .library-preview .unity-base-field { flex-direction: column; }
 .breadcrumb { font-size: 12px; color: rgb(167, 202, 223); margin: 14px 0 8px; }
-.search { flex-grow: 1; min-width: 80px; }
-.fields { flex-grow: 1; margin: 12px 0; background-color: rgb(27, 27, 27); border-radius: 4px; }
-.field-row { height: 64px; flex-direction: row; align-items: center; padding: 7px 12px; border-bottom-width: 1px; border-bottom-color: rgb(64, 68, 71); }
-.caption { width: 40%; }
-.caption > Label { white-space: normal; }
+.parameter-tools { max-width: 1080px; flex-wrap: wrap; }
+.parameter-tools > .search { width: 280px; min-width: 80px; flex-shrink: 1; margin-right: 14px; }
+.parameter-tools > .search > .unity-base-field__label { min-width: 0; width: auto; margin-right: 6px; }
+.parameter-tools > Toggle { flex-shrink: 0; margin-right: 12px; }
+.fields { flex-grow: 1; min-height: 0; max-width: 1080px; margin: 12px 0; background-color: rgb(23, 31, 40); border-radius: 5px; }
+.workbench .fields .unity-collection-view__item { background-color: rgba(0, 0, 0, 0); }
+.workbench .fields .unity-collection-view__item:hover { background-color: rgb(32, 44, 56); }
+.field-row { height: 64px; flex-direction: row; align-items: center; padding: 7px 12px; border-bottom-width: 1px; border-bottom-color: rgb(48, 62, 73); }
+.field-row > .caption { width: 228px; max-width: 36%; margin-right: 14px; flex-shrink: 0; }
+.field-row > .caption > Label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.field-title { color: rgb(213, 227, 238); -unity-font-style: bold; }
 .key-hint { font-size: 11px; color: rgb(183, 196, 207); margin-top: 4px; }
-.field-controls { flex-grow: 1; flex-basis: 0; flex-direction: row; align-items: center; }
-.field-controls TextField, .field-controls DropdownField { flex-grow: 1; flex-basis: 0; min-width: 45px; }
+.field-row .key-hint { color: rgb(161, 182, 200); }
+.field-controls, .field-value { flex-grow: 1; flex-basis: 0; min-width: 0; }
+.field-actions { flex-shrink: 0; margin-left: 8px; }
+.field-actions > Button { flex-shrink: 0; }
+.field-actions > Button:disabled { opacity: .4; }
+.field-value > Button { margin-left: 0; }
+.field-value > .property-choice, .field-value > .property-text, .field-value > .property-path,
+.field-value > .asset-picker-control { min-width: 0; max-width: 100%; flex-shrink: 1; margin-left: 0; }
+.field-value > .property-choice { width: 210px; }
+.field-value > .property-text { width: 280px; }
+.field-value > .property-path, .field-value > .asset-picker-control { width: 480px; }
+.field-value > .property-choice .unity-base-popup-field__text { overflow: hidden; text-overflow: ellipsis; }
+.workbench .field-value .unity-base-field:focus .unity-base-field__input,
+.workbench .field-value .unity-base-field__input:focus { border-color: rgb(102, 170, 179); }
+.narrow-layout .field-row > .caption { width: 168px; margin-right: 10px; }
+.narrow-layout .parameter-tools > .search { width: 168px; }
 Button.mini { height: 29px; padding: 3px 6px; font-size: 11px; }
 .raw-json { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-height: 0; margin-top: 16px; }
 .raw-json .unity-text-field__input { min-height: 0; white-space: normal; -unity-text-align: upper-left; }
 .json-actions { flex-shrink: 0; min-height: 38px; margin-top: 8px; }
 .metadata { flex-grow: 1; padding-top: 15px; }
 .metadata Label { margin-top: 18px; margin-bottom: 5px; }
+.metadata .metadata-scalar { max-width: 380px; }
+.metadata .metadata-quantity > .unity-base-field__input { max-width: 112px; -unity-text-align: middle-right; }
 .studio-setting:disabled { opacity: 1; background-color: rgb(26, 27, 29); border-color: rgb(64, 68, 71); }
 .footer Button:disabled { opacity: 1; }
 .unity-collection-view__item--selected { background-color: rgb(22, 29, 27); }
@@ -457,9 +477,11 @@ Button.desktop-run-button { height: 31px; min-height: 31px; font-size: 11px; mar
 .workbench .sidebar .unity-foldout__toggle .unity-base-field__label { color: rgb(195, 212, 227); }
 /* Specialized field geometry must win over the shared scalar-card rule. */
 .settings-grid { align-items: flex-start; }
-.studio-setting.vector-setting { width: 650px; }
-.studio-setting.path-setting { width: 650px; }
-.studio-setting.path-setting > TextField { width: 450px; }
+.studio-setting.vector-setting { width: 520px; max-width: 100%; }
+.studio-setting.path-setting { width: 650px; max-width: 100%; flex-wrap: wrap; }
+.studio-setting.path-setting > TextField { width: 450px; min-width: 0; max-width: 100%; flex-shrink: 1; }
+.narrow-layout .studio-setting.path-setting { flex-direction: column; align-items: stretch; }
+.narrow-layout .studio-setting.path-setting > .setting-label { flex-grow: 0; flex-basis: auto; margin: 0 0 5px; }
 .studio-setting.container-setting { width: 100%; margin-right: 0; }
 .workbench .unity-base-slider > .unity-base-field__input { background-color: rgba(0, 0, 0, 0); border-width: 0; padding: 0; min-height: 12px; }
 .studio-setting.container-setting { width: 320px; margin-right: 10px; }
@@ -552,8 +574,7 @@ Button.desktop-run-button { height: 31px; min-height: 31px; font-size: 11px; mar
 .workbench .inspector .studio-setting.vector-setting,
 .workbench .inspector .studio-setting.path-setting { width: 100%; min-width: 0; max-width: 100%; }
 .workbench .inspector .vector-controls { flex-wrap: wrap; }
-.workbench .inspector .vector-controls > Label { width: 18px; }
-.workbench .inspector .vector-controls > .number-control { width: 160px; }
+.workbench .inspector .vector-axis { margin-right: 0; }
 .workbench .sidebar .nav-file Label { flex-grow: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 
 /* Visibility remains a fixed matrix while inactive rigs and features dim. */
