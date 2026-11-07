@@ -1,0 +1,7 @@
+{
+  "source": "SimulatedLocust.glb",
+  "sourceSha256": "4c50df1ffe9a33dd8ddbf4da1a0192a520036efce593af1439807ca817d24a92",
+  "derivativeSha256": "ccb2b3d4a0ad59c08cde76cf2dbfcd3d70d0bc8918d00d1596d4c1f935e5ad29",
+  "changes": "Use opaque flat-black unlit material. Preserve the geometry, skin, animations, and original binary chunk.",
+  "rights": "Derived from the existing bundled locust asset. Original asset rights and notices continue to apply; this export grants no additional rights."
+}

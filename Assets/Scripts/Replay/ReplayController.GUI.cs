@@ -104,6 +104,11 @@ public partial class ReplayController
         float scale=ReplayUiScale(DesktopDisplay.UiScale,Screen.width);
         var p=ReplayMousePosition(bottomLeft,Screen.height);
         if(ReplayToolbarRect(Screen.width,Screen.height,scale).Contains(p)||ReplayHeaderRect(Screen.width,Screen.height,scale).Contains(p)||mediaPanel?.ContainsPointer(bottomLeft)==true)return true;
+        if(archive!=null && !loading)
+        {
+            var layout=ReplayWorkspaceLayout(scale);
+            if(layout.Bar.Contains(p) || layout.Divider.Contains(p) || layout.Grid.Contains(p))return true;
+        }
         if((showRunPicker||archive==null)&&ReplayRunPickerRect(scale).Contains(p))return true;
         return (showDetails||showReplayHelp||showReplayTrails)&&ReplayInfoRect(scale).Contains(p);
     }
@@ -112,7 +117,7 @@ public partial class ReplayController
     private Rect ReplayInfoRect(float scale)
     {
         var h=ReplayHeaderRect(Screen.width,Screen.height,scale);var toolbar=ReplayToolbarRect(Screen.width,Screen.height,scale);
-        return new Rect(h.x,h.yMax+8*scale,Mathf.Min(620*scale,Screen.width-24*scale),Mathf.Max(80*scale,Mathf.Min((showReplayTrails?190:showReplayHelp?380:Mathf.Min(420,100+(archive?.Warnings.Count??0)*56))*scale,toolbar.y-h.yMax-24*scale)));
+        return new Rect(h.x,h.yMax+8*scale,Mathf.Min(620*scale,Screen.width-24*scale),Mathf.Max(80*scale,Mathf.Min((showReplayTrails?190:showReplayHelp?442:Mathf.Min(420,100+(archive?.Warnings.Count??0)*56))*scale,toolbar.y-h.yMax-24*scale)));
     }
     private void EnsureReplayStyles(float scale)
     {
@@ -154,6 +159,7 @@ public partial class ReplayController
         // Native root coordinates retain the same hit targets on Retina and Full HD.
         Matrix4x4 previousMatrix=GUI.matrix;GUI.matrix=Matrix4x4.identity;
         NormalizeReplayPointer(Event.current,UnityEngine.InputSystem.Mouse.current,Screen.height);
+        DrawReplayWorkspace(scale);
         DrawPixelAnimalView();
         DrawReplayAgentLabels(scale);
         DrawReplayHeader(scale,previousSkin,previousMatrix);
@@ -218,11 +224,6 @@ public partial class ReplayController
         if(ReplayButton(ReplayControlRect(ref x,top,88*scale,row,6*scale),"Next trial"))JumpToStep(1);
         GUI.Label(ReplayControlRect(ref x,top,180*scale,row,6*scale),Clock(replayTime)+" / "+Clock(Duration),replayClock);
         float right=area.xMax-16*scale;
-        float fitWidth=44*scale,viewWidth=140*scale,projectionWidth=selectedView<0?112*scale:0;
-        if(ReplayButton(new Rect(right-fitWidth,top,fitWidth,row),"Fit")){ShowOverview();FitOverview();}right-=fitWidth+6*scale;
-        if(selectedView<0){if(ReplayButton(new Rect(right-projectionWidth,top,projectionWidth,row),overviewPerspective?"Top-down":"Perspective"))ToggleOverviewProjection();right-=projectionWidth+6*scale;}
-        else { if(ReplayButton(new Rect(right-112*scale,top,112*scale,row),pixelScaleAnimalView?"Panel pixels":"Original view")){pixelScaleAnimalView=!pixelScaleAnimalView;ApplyView();}right-=118*scale; }
-        if(ReplayButton(new Rect(right-viewWidth,top,viewWidth,row),selectedView<0?"God’s-eye view":"Animal "+rigOrder[selectedView]))CycleView();right-=viewWidth+18*scale;
         GUI.Label(new Rect(right-42*scale,top,42*scale,row),playbackSpeed.ToString("0.0")+"×",replayClock);right-=48*scale;
         playbackSpeed=ReplaySlider(new Rect(right-94*scale,top+5*scale,94*scale,22*scale),playbackSpeed,.1f,4);right-=102*scale;
         GUI.Label(new Rect(right-42*scale,top,42*scale,row),"Speed",smallStyle);
@@ -275,7 +276,7 @@ public partial class ReplayController
     {
         var area=ReplayInfoRect(scale);GUI.Box(area,GUIContent.none);float x=area.x+14*scale,y=area.y+10*scale,w=area.width-28*scale;
         GUI.Label(new Rect(x,y,w,26*scale),"Replay controls",replaySession);y+=34*scale;
-        GUI.Label(new Rect(x,y,w,370*scale),@"PLAYBACK
+        GUI.Label(new Rect(x,y,w,420*scale),@"PLAYBACK
 Space   Play / pause
 ← / →   Seek (Shift uses a larger step)
 N / M   Previous / next recorded condition
@@ -286,14 +287,18 @@ Middle drag   Pan
 Mouse wheel   Zoom
 W A S D / Q E   Translate
 I J K L   Look around
-Fit   Return to all tracks
+Fit   Frame all active tracks
 Click animal / blank space   Follow / release
 
 TRACKS
 Trails   Adjust tail duration and prominence
 Wire cone   Front-camera field of view
 Faint line   Recorded path in this condition
-Panel pixels   Original panel resolution, scaled crisply",smallStyle);
+
+WORKSPACE
+Drag the divider   Resize first-person feeds and overview
+Click a feed   Focus that animal camera
+Real / Human   Native panel pixels / smooth view",smallStyle);
     }
     private void DrawReplayTrails(float scale)
     {

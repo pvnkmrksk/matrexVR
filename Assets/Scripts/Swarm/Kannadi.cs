@@ -24,6 +24,8 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     private LocustSpawner swarmSpawner;
     private string swarmPopulationKey, mirrorPopulationKey;
     public bool IsSwarm => string.Equals(config.populationMode, "Swarm", StringComparison.OrdinalIgnoreCase);
+    private float MirrorBoundaryX => config.boundaryLengthX ?? SwarmConfig.DefaultBoundaryLength;
+    private float MirrorBoundaryZ => config.boundaryLengthZ ?? SwarmConfig.DefaultBoundaryLength;
     protected virtual float RowSpacing => hexRadius * 2f;
 
     protected virtual void Start()
@@ -210,7 +212,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
                     band.customParentTransform = null;
                     band.gameObject.layer = layer;
                 }
-                Vector2 wrapSize = config.periodicBoundary ? new Vector2(config.boundaryLengthX, config.boundaryLengthZ) : Vector2.zero;
+                Vector2 wrapSize = config.periodicBoundary ? new Vector2(MirrorBoundaryX, MirrorBoundaryZ) : Vector2.zero;
                 AnimateOnMove.ConfigureHierarchy(clone, transform, config.animateOnMove, config.animationSpeedThreshold, wrapSize);
                 clone.AddComponent<KannadiMirrorTile>().ConfigureAnimation(transform, config.animateOnMove, config.animationSpeedThreshold, wrapSize);
                 copies.Add(clone); positions.Add(offset);
@@ -232,15 +234,23 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     {
         if (config.periodicBoundary)
         {
-            value.x = Wrap(value.x, config.boundaryLengthX);
-            value.z = Wrap(value.z, config.boundaryLengthZ);
+            value.x = Wrap(value.x, MirrorBoundaryX);
+            value.z = Wrap(value.z, MirrorBoundaryZ);
         }
         return value;
     }
     protected virtual void LateUpdate()
     {
         if (!initialized) return;
-        if (!IsSwarm) transform.position = WrapPosition(transform.position);
+        if (!IsSwarm && config.periodicBoundary)
+        {
+            Vector3 position = transform.position;
+            Vector3 wrapped = WrapPosition(position);
+            if (Mathf.Abs(wrapped.x - position.x) > MirrorBoundaryX / 2f ||
+                Mathf.Abs(wrapped.z - position.z) > MirrorBoundaryZ / 2f)
+                GetComponent<ClosedLoop>()?.MarkPositionDiscontinuity();
+            transform.position = wrapped;
+        }
         UpdateClones();
     }
     private void UpdateClones()

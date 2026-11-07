@@ -427,16 +427,74 @@ namespace ConfigurationUI
                 insert.SetEnabled(true);
             };
             var custom=Row(); dialog.Add(custom); var source=new TextField("Custom path") { name="custom-preset-path" }; source.style.flexGrow=1; custom.Add(source);
-            custom.Add(StudioButton("Load custom path","file",()=>{ string full=ExperimentConfigFiles.Resolve(source.value); var preset=ExperimentBlocks.Read(source.value,full); if(preset.Schema=="system" || preset.Schema=="sequence") throw new ArgumentException("Choose an individual experiment config, not a system/sequence file."); if(presets.All(p=>p.Reference!=preset.Reference)) presets.Add(preset); category.value="All"; find.SetValueWithoutNotify(""); update(); int index=visible.FindIndex(p=>p.Reference==preset.Reference); list.SetSelection(index); list.ScrollToItem(index); }));
-            custom.Add(insert); source.tooltip="Relative StreamingAssets path or absolute JSON filename";
+            void LoadCustomBlock(string reference)
+            {
+                var preset=ExperimentBlocks.Read(reference,ExperimentConfigFiles.Resolve(reference));
+                if(preset.Schema=="system"||preset.Schema=="sequence")throw new ArgumentException("Choose an individual experiment config.");
+                if(presets.All(p=>p.Reference!=preset.Reference))presets.Add(preset);
+                category.value="All";find.SetValueWithoutNotify("");update();
+                int index=visible.FindIndex(p=>p.Reference==preset.Reference);
+                list.SetSelection(index);list.ScrollToItem(index);
+            }
+            custom.Add(StudioButton("Load custom path","file",()=>LoadCustomBlock(source.value)));
+            custom.Add(StudioButton("Browse JSON…","file",()=>BrowseFile("Open experiment block","json",path=>{
+                source.SetValueWithoutNotify(path);
+                LoadCustomBlock(path);
+            }),"quiet"));
+            custom.Add(insert); source.tooltip="Optional relative StreamingAssets path or absolute JSON filename";
             dialog.Add(new Label("Current configs, templates, examples and custom JSON are listed. Choose Archive to include historical files."));
         }
+        private bool nativeFilePickerPending;
+        private async void BrowseFile(string title,string extension,Action<string> accept)
+        {
+            if(nativeFilePickerPending||libraryPicker!=null)return;
+            var originalModal=modal;
+            var originalDocument=selected;
+            int originalView=viewGeneration;
+            nativeFilePickerPending=true;
+            try
+            {
+                string chosen=await ReplayFolderPicker.ChooseFileAsync(title,RuntimePaths.ConfigRoot,extension);
+                if(string.IsNullOrEmpty(chosen)||this==null||!isActiveAndEnabled||
+                    modal!=originalModal||selected!=originalDocument||viewGeneration!=originalView)return;
+                if(!string.Equals(Path.GetExtension(chosen),"."+extension,StringComparison.OrdinalIgnoreCase))
+                    throw new IOException("Choose a ."+extension+" file.");
+                Guard(()=>{RequireApplied();accept(chosen);});
+            }
+            catch(Exception error)
+            {
+                if(this!=null&&isActiveAndEnabled)UpdateStatus(error.GetBaseException().Message);
+            }
+            finally {nativeFilePickerPending=false;}
+        }
+
+        private void OpenConfiguration(string role,string path)
+        {
+            if(role=="sequence"||role=="system")
+            {
+                Workspace.SelectPrimary(role,path);
+                CloseModal();
+                Select(role=="sequence"?Workspace.Sequence:Workspace.System);
+            }
+            else
+            {
+                var document=Workspace.Open(path,role);
+                CloseModal();
+                Select(document);
+            }
+        }
+
         private void ShowOpenFile()
         {
-            RequireApplied(); var dialog=OpenModal("Open configuration","Choose a system, sequence, or experiment JSON file. Paths may be relative to StreamingAssets or absolute.");dialog.AddToClassList("small-dialog");
-            var source=new TextField("File path"); dialog.Add(source);
-            var role=new DropdownField("Configuration type",new List<string>{"sequence","system","choice","swarm","kannadi","optomotor","dynamic-choice"},0); dialog.Add(role);
-            dialog.Add(StudioButton("Open file","file",()=>{ if(role.value=="sequence" || role.value=="system") { Workspace.SelectPrimary(role.value,source.value); CloseModal(); Select(role.value=="sequence"?Workspace.Sequence:Workspace.System); } else { var doc=Workspace.Open(source.value,role.value); CloseModal(); Select(doc); } },"primary"));
+            RequireApplied();
+            var dialog=OpenModal("Open configuration","Choose the configuration type, then select its JSON file.");
+            dialog.AddToClassList("small-dialog");
+            var role=new DropdownField("Configuration type",new List<string>{"sequence","system","choice","swarm","kannadi","optomotor","dynamic-choice","rugosity"},0);
+            dialog.Add(role);
+            dialog.Add(StudioButton("Browse JSON…","file",()=>{
+                string type=role.value;
+                BrowseFile("Open "+type+" configuration","json",path=>OpenConfiguration(type,path));
+            },"primary"));
         }
         private void ShowVariation(int? block)
         {

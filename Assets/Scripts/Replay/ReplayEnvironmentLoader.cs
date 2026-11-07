@@ -575,13 +575,34 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         if(prefab==null&&archive.Presentations.IsCurrentContract)throw new InvalidDataException("Required original population prefab is missing: "+selection);
         GameObject go=prefab!=null?ExternalModelLibrary.InstantiatePrefab(prefab,parent):GameObject.CreatePrimitive(PrimitiveType.Capsule);
         if (!string.IsNullOrWhiteSpace(externalPath) && prefab != null) ExternalModelLibrary.ConfigureAnimation(go);
-        ModelAppearance.Apply(go, (kind == "Kannadi" ? currentConfig?["modelAppearance"] : swarm?["modelAppearance"])?.ToObject<ModelAppearanceConfig>());
+        JArray groups = kind == "Swarm" ? (resolvedSwarm?["agentGroups"] ?? swarm?["agentGroups"]) as JArray : null;
+        if (groups != null && groups.Count > 0 && GroupAppearance(name, groups) == SwarmAgentAppearance.Black)
+            StockLocustAppearance.ApplyBlack(go);
+        else
+            ModelAppearance.Apply(go, (kind == "Kannadi" ? currentConfig?["modelAppearance"] : swarm?["modelAppearance"])?.ToObject<ModelAppearanceConfig>());
         if(prefab==null){go.transform.SetParent(parent,false);go.transform.localScale=Vector3.one*fallbackSize;Warn("An agent model was unavailable; pose markers are shown.");}
         go.name="Recorded agent "+name;FreezeVisual(go);
         go.AddComponent<ReplayAnimationDriver>();
         int layerId=RecordedLayer(layer);if(layerId>=0)SetLayer(go,layerId);
         return go;
     }
+    private static SwarmAgentAppearance GroupAppearance(string name, JArray groups)
+    {
+        // The spawner retains its global index across material groups and across
+        // packed/CSV readers. Replay uses the archived effective group order.
+        int suffix = name?.LastIndexOf('_') ?? -1;
+        if (suffix >= 0 && int.TryParse(name.Substring(suffix + 1), out int index) && index >= 0)
+        {
+            foreach (var group in groups)
+            {
+                int count = (int)group["count"];
+                if (index < count) return group["appearance"]?.ToObject<SwarmAgentAppearance>() ?? SwarmAgentAppearance.Stock;
+                index -= count;
+            }
+        }
+        throw new InvalidDataException("Recorded agent has no archived swarm group: " + name);
+    }
+
     private static int RecordedLayer(string label)
     {
         int layer=LayerMask.NameToLayer(label);

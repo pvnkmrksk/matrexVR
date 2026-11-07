@@ -13,19 +13,25 @@ public static class SwarmConfiguration
     public static void Apply(LocustSpawner spawner, SwarmConfig config, ClosedLoop rig, float sceneUnitsPerMetre = 0f)
     {
         config.ValidateSwarm();
+        float unitsPerMetre = config.worldUnitsPerMetre ?? (sceneUnitsPerMetre > 0 ? sceneUnitsPerMetre : SceneUnitsPerMetre(spawner.gameObject));
+        config.ValidateSpawnBounds(unitsPerMetre);
         spawner.modelAppearance = config.modelAppearance;
         if (!string.IsNullOrWhiteSpace(config.modelPath)) spawner.locustPrefab = ExternalModelLibrary.GetPrefab(config.modelPath);
+        if (config.HasAgentGroups &&
+            (spawner.locustPrefab == null || Resources.Load<KannadiPrefabCatalog>("KannadiPrefabCatalog")?.Find("SimulatedLocust") != spawner.locustPrefab))
+            throw new System.ArgumentException("agentGroups require the built-in SimulatedLocust model.");
+        spawner.agentGroups = config.agentGroups;
         // Births at t=0 must use the settled flight height, before the first LateUpdate.
         if (rig != null && !string.IsNullOrWhiteSpace(config.trajectoryFile))
             rig.GetComponent<MigrationMotion>()?.Advance(0);
-        spawner.worldUnitsPerMetre = config.worldUnitsPerMetre ?? (sceneUnitsPerMetre > 0 ? sceneUnitsPerMetre : SceneUnitsPerMetre(spawner.gameObject));
+        spawner.worldUnitsPerMetre = unitsPerMetre;
         spawner.trajectoryFile = config.trajectoryFile;
         spawner.playbackSettings = config.playback ?? new SwarmPlaybackConfig();
         spawner.playbackTarget = rig != null ? rig.transform : null;
         spawner.playbackVolumeSpecified = config.spawnVolumeSize != null;
         spawner.loadConfigFromJsonFile = false;
         spawner.numberOfLocusts = config.EffectiveAgentCount ?? spawner.numberOfLocusts;
-        spawner.spawnAreaSize = config.spawnAreaSize ?? spawner.spawnAreaSize;
+        spawner.spawnType = config.spawnType;
         // Keep authored direction separate from the resolved world direction across repeats.
         spawner.authoredMu = config.mu ?? spawner.authoredMu ?? spawner.mu;
         var reference = config.useHeadingReference && rig != null ? rig.GetComponent<StimulusHeadingReference>()?.Result : null;
@@ -41,32 +47,35 @@ public static class SwarmConfiguration
         spawner.directionDistribution = config.directionDistribution;
         spawner.locustSpeed = config.EffectiveAgentSpeed ?? spawner.locustSpeed;
         spawner.locustSpeedStdDev = config.EffectiveAgentSpeedStdDev;
-        spawner.preserveBoundaryOvershoot = config.preserveBoundaryOvershoot;
         spawner.dimension = config.dimension ?? spawner.dimension;
-        spawner.useSpawnVolume = config.spawnVolumeSize != null;
-        if (config.spawnVolumeSize != null) spawner.spawnVolumeSize = config.spawnVolumeSize.ToVector3();
         spawner.muElevation = config.muElevation ?? spawner.muElevation;
         spawner.kappaElevation = config.kappaElevation ?? spawner.kappaElevation;
-        spawner.boundaryHeight = config.boundaryHeight ?? spawner.boundaryHeight;
+        spawner.periodicBoundary = config.periodicBoundary;
         spawner.wrapY = config.wrapY;
-        bool generatedCube = string.IsNullOrWhiteSpace(config.trajectoryFile) && config.volumeHalfExtentMetres.HasValue;
-        if (generatedCube)
-        {
-            float side = 2f * config.volumeHalfExtentMetres.Value * spawner.worldUnitsPerMetre;
-            spawner.spawnAreaSize = side;
-            spawner.useSpawnVolume = true;
-            spawner.spawnVolumeSize = Vector3.one * side;
-            spawner.boundaryHeight = side;
-        }
+        bool generated = string.IsNullOrWhiteSpace(config.trajectoryFile);
+        float? cubeSide = generated ? config.PhysicalArenaSize(unitsPerMetre) : null;
+        float lengthX = config.boundaryLengthX ?? cubeSide ?? SwarmConfig.DefaultBoundaryLength;
+        float lengthZ = config.boundaryLengthZ ?? cubeSide ?? SwarmConfig.DefaultBoundaryLength;
+        float defaultSpawnSize = cubeSide ?? spawner.SceneSpawnAreaSize;
+        if (generated && config.periodicBoundary)
+            defaultSpawnSize = Mathf.Min(defaultSpawnSize, Mathf.Min(lengthX, lengthZ));
+        bool is3D = spawner.Is3D();
+        spawner.boundaryHeight = config.boundaryHeight ?? cubeSide ?? config.spawnVolumeSize?.y ?? config.spawnAreaSize ?? defaultSpawnSize;
+        if (generated && config.periodicBoundary && is3D && config.wrapY)
+            defaultSpawnSize = Mathf.Min(defaultSpawnSize, spawner.boundaryHeight);
+        spawner.spawnAreaSize = config.spawnAreaSize ?? defaultSpawnSize;
+        spawner.useSpawnVolume = config.spawnVolumeSize != null;
+        spawner.spawnVolumeSize = config.spawnVolumeSize?.ToVector3() ?? Vector3.one * spawner.spawnAreaSize;
+        config.ValidateAgentGroupBounds(spawner.spawnVolumeSize, lengthX, lengthZ,
+            is3D && config.wrapY ? spawner.boundaryHeight : (float?)null);
         spawner.agentVisual = config.agentVisual ?? spawner.agentVisual;
         if (config.bogongVisual != null) { config.bogongVisual.Validate(); spawner.bogongVisual = config.bogongVisual; }
         spawner.animateOnMove = config.animateOnMove;
         spawner.animationSpeedThreshold = config.animationSpeedThreshold;
-        bool is3D = string.Equals(spawner.dimension, "3D", System.StringComparison.OrdinalIgnoreCase);
         if (!config.EffectiveAgentCount.HasValue && config.density.HasValue)
         {
-            Vector3 size = spawner.useSpawnVolume ? spawner.spawnVolumeSize : Vector3.one * spawner.spawnAreaSize;
-            float measure = is3D ? size.x * size.y * size.z : spawner.spawnAreaSize * spawner.spawnAreaSize;
+            Vector3 size = spawner.spawnVolumeSize;
+            float measure = size.x * size.z * (is3D ? size.y : 1);
             spawner.numberOfLocusts = Mathf.Max(0, Mathf.RoundToInt(config.density.Value * measure));
         }
         bool relative = config.spawnRelativeToAnimal || reference != null;
@@ -79,20 +88,21 @@ public static class SwarmConfiguration
         if (spawner.boundaryManager != null)
         {
             var boundary = spawner.boundaryManager;
-            boundary.boundaryLengthX = generatedCube ? spawner.spawnVolumeSize.x : is3D ? config.boundaryLengthX : 0;
-            boundary.boundaryLengthZ = generatedCube ? spawner.spawnVolumeSize.z : is3D ? config.boundaryLengthZ : 0;
-            boundary.preserveOvershoot = config.preserveBoundaryOvershoot;
+            boundary.boundaryLengthX = lengthX;
+            boundary.boundaryLengthZ = lengthZ;
+            boundary.preserveOvershoot = true;
             boundary.wrapY = is3D && config.wrapY;
-            boundary.boundaryHeight = boundary.wrapY ? (spawner.boundaryHeight > 0 ? spawner.boundaryHeight : spawner.spawnVolumeSize.y) : 0;
+            boundary.boundaryHeight = boundary.wrapY ? spawner.boundaryHeight : 0;
             boundary.referenceRotation = rotation;
-            // Historical scenes keep their prefab boundary unless relative placement is requested.
-            boundary.useCenterOverride = relative;
-            boundary.centerOverride = spawner.spawnCenter;
+            boundary.useCenterOverride = true;
+            boundary.centerOverride = spawner.SpawnOrigin;
             boundary.followTarget = config.followAnimalPosition && rig != null ? rig.transform : null;
-            boundary.followOffset = relative ? offset : spawner.spawnCenter - (rig != null ? rig.transform.position : Vector3.zero);
+            boundary.followOffset = boundary.centerOverride - (rig != null ? rig.transform.position : Vector3.zero);
         }
         spawner.Rebuild();
-        if (rig != null && (config.nearClipMetres.HasValue || System.String.Equals(config.bogongVisual?.shape, "Moth", System.StringComparison.OrdinalIgnoreCase)))
-            spawner.OverrideNearClip(rig.GetComponentsInChildren<Camera>(true), (config.nearClipMetres ?? .001f) * spawner.worldUnitsPerMetre);
+        float? near = config.nearClipMetres;
+        if (near == null && System.String.Equals(config.bogongVisual?.shape, "Moth", System.StringComparison.OrdinalIgnoreCase)) near = .001f;
+        if (rig != null && (near.HasValue || config.farClipMetres.HasValue))
+            spawner.OverrideClipPlanes(rig.GetComponentsInChildren<Camera>(true), near * unitsPerMetre, config.farClipMetres * unitsPerMetre);
     }
 }

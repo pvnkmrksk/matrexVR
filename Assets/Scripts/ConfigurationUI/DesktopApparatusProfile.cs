@@ -94,22 +94,34 @@ namespace ConfigurationUI
                 int port=9871;while(port<=65535&&ports.Contains(port))port++;
                 if(port>65535)throw new ArgumentException("No unused local tracker port is available.");
                 rig["zmqPort"]=port;
-                int display=OutputDisplay(root,rig,fallbackDisplay);bool horizontal=rig["horizontal"]==null||Flag(rig["horizontal"]);
-                int width=Math.Max(1,Integer(rig["ledPanelWidth"],128)),height=Math.Max(1,Integer(rig["ledPanelHeight"],128));
-                var same=rigs.OfType<JObject>().Where(r=>OutputDisplay(root,r,fallbackDisplay)==display).ToList();
-                if(horizontal)
-                {
-                    int edge=same.Select(r=>(Integer(r["startRow"],0)+(r["horizontal"]==null||Flag(r["horizontal"])?1:Order(r).Length))*Math.Max(1,Integer(r["ledPanelHeight"],128))).DefaultIfEmpty(0).Max();
-                    rig["startRow"]=(int)Math.Ceiling((double)edge/height);rig["startCol"]=0;
-                }
-                else
-                {
-                    int edge=same.Select(r=>(Integer(r["startCol"],0)+(r["horizontal"]!=null&&!Flag(r["horizontal"])?1:Order(r).Length))*Math.Max(1,Integer(r["ledPanelWidth"],128))).DefaultIfEmpty(0).Max();
-                    rig["startCol"]=(int)Math.Ceiling((double)edge/width);rig["startRow"]=0;
-                }
+                int display=OutputDisplay(root,rig,fallbackDisplay);
+                int height=PanelHeight(rig);
+                int edge=rigs.OfType<JObject>().Where(r=>OutputDisplay(root,r,fallbackDisplay)==display)
+                    .Select(r=>(Integer(r["startRow"],0)+RowsOccupied(r))*PanelHeight(r)).DefaultIfEmpty(0).Max();
+                rig["startRow"]=(int)Math.Ceiling((double)edge/height);
+                rig["startCol"]=0;
                 rigs.Add(rig);
             }
         }
+        private static int PanelHeight(JObject rig) => Math.Max(1,Integer(rig["ledPanelHeight"],128));
+        private static int RowsOccupied(JObject rig) =>
+            rig["horizontal"]==null||Flag(rig["horizontal"])?1:Math.Max(1,Order(rig).Length);
+
+        public static void StackRows(JObject root,int? fallbackDisplay=null)
+        {
+            foreach(var display in Rigs(root).GroupBy(r=>OutputDisplay(root,r,fallbackDisplay)))
+            {
+                int edge=0;
+                foreach(var rig in display)
+                {
+                    int height=PanelHeight(rig);
+                    int row=(int)Math.Ceiling((double)edge/height);
+                    rig["startRow"]=row;rig["startCol"]=0;
+                    edge=(row+RowsOccupied(rig))*height;
+                }
+            }
+        }
+
         private static JObject NewRig() => new JObject { ["vrId"]="VR1",["speciesName"]="",["closedLoopMode"]="Rekkefly",["desktopPreview"]=false,["displayOrder"]="DRBLFU",["ledPanelWidth"]=128,["ledPanelHeight"]=128,["startRow"]=0,["startCol"]=0,["horizontal"]=true,["zmqAddress"]="127.0.0.1",["zmqPort"]=9871,["targetDisplay"]=0,["sphereDiameter"]=2.6 };
         public static string Order(JObject rig) => rig?["displayOrder"]?.ToString()??"";
         public static void SetOrder(JObject rig,string order)

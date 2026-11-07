@@ -129,6 +129,17 @@ namespace ConfigurationUI
                 state.text=videoCount==0?"Data only":videoCount==videoRigs.Count?"Data + tracker video":"Data + video · "+videoCount+" / "+videoRigs.Count;
             };refresh();state.schedule.Execute(refresh).Every(500);
             summary.tooltip="Tracking data and configuration snapshots are saved with each experiment. Tracker video follows each rig’s saveVideo setting. Change recording options in Animal & recording details before initializing tracking.";
+            var swarm=StudioButton("Save swarm data","radio",()=>StudioEdit(Workspace.System,r=>{
+                r["saveSwarmData"]=!ExperimentBlocks.Flag(r["saveSwarmData"],true);
+            },false),"quiet");
+            swarm.name="save-swarm-data";
+            swarm.tooltip="Toggle virtual swarm recording for this run. Animal tracking and behavior are always recorded.";
+            BindViewState(swarm,()=>{
+                bool savePopulation=ExperimentBlocks.Flag(Workspace.System.Root["saveSwarmData"],true);
+                swarm.Q<Label>().text=savePopulation?"Save swarm data":"Skip swarm data";
+                swarm.EnableInClassList("is-on",savePopulation);
+            });
+            summary.Add(swarm);
             var options=StudioButton("Options","settings",()=>{
                 sessionDetailsOpen=true;var details=root.Q<Foldout>("recording-details");if(details!=null){details.value=true;details.schedule.Execute(()=>details.GetFirstAncestorOfType<ScrollView>()?.ScrollTo(details));}
             },"quiet");options.name="recording-summary-options";summary.Add(options);

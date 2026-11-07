@@ -1,0 +1,26 @@
+{
+  "title": "Close-range Kannadi swarms",
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "randomSeedMode": "Fixed",
+  "randomSeed": 4318,
+  "sequences": [
+    {
+      "sceneName": "Kannadi",
+      "duration": 90,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Kannadi/tight-stock.example.json"
+      }
+    },
+    {
+      "sceneName": "Kannadi",
+      "duration": 90,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Kannadi/tight-mixed.example.json"
+      }
+    }
+  ]
+}

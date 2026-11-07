@@ -61,10 +61,22 @@ namespace ConfigurationUI
             back.AddToClassList("desktop-back-button");bar.Add(back);
             help=new VisualElement();help.AddToClassList("desktop-control-help");help.style.display=DisplayStyle.None;root.Add(help);
             help.Add(new Label("Arrow keys  Move    ·    A / D  Turn    ·    Z / C  Down / up (flight)"));
-            help.Add(new Label("Ctrl+Space  Auto forward    ·    R  Reset pose    ·    Esc  Return to setup"));
+            help.Add(new Label("Ctrl+Space  Auto forward    ·    R  Reset pose    ·    Esc  Stop and save"));
+            help.Add(new Label("1–9  Select VR    ·    Shift+1–7  Select VR10–16    ·    0  Control all    ·    Tab  Toggle overlays"));
             help.Add(new Label(walkingDemo?WalkingDemoHelp:demo?"Demo input is simulated or prerecorded and labeled in the recording. Tracker windows run independently.":"Tracker input is connected over the configured transport. Verify camera source, calibration and tracking quality in its window."));
             OperatorOverlayVisibility.Changed+=Refresh;
+            DesktopDisplay.PresentationChanged+=ResetWindowInput;
             root.schedule.Execute(Refresh).Every(500);Refresh();
+        }
+        private void OnApplicationFocus(bool focused)
+        {
+            if(!focused)ResetWindowInput();
+        }
+        private void ResetWindowInput()
+        {
+            int pointerId=PointerId.mousePointerId;
+            if(hudRoot?.panel?.GetCapturingElement(pointerId) is VisualElement capture)capture.ReleasePointer(pointerId);
+            if(panel!=null)panel.scale=DesktopDisplay.UiScale;
         }
         private Button ActionButton(string title, Action action)
         {
@@ -113,6 +125,6 @@ namespace ConfigurationUI
             help.style.visibility=helpFits?Visibility.Visible:Visibility.Hidden;
             if(helpFits){help.style.left=helpPlaced.x/scale;help.style.top=(screen.y-helpPlaced.yMax)/scale;}
         }
-        private void OnDestroy(){OperatorOverlayVisibility.Changed-=Refresh;OperatorOverlayLayout.Release(BarReservation);OperatorOverlayLayout.Release(HelpReservation);if(panel!=null)Destroy(panel);}
+        private void OnDestroy(){OperatorOverlayVisibility.Changed-=Refresh;DesktopDisplay.PresentationChanged-=ResetWindowInput;OperatorOverlayLayout.Release(BarReservation);OperatorOverlayLayout.Release(HelpReservation);if(panel!=null)Destroy(panel);}
     }
 }

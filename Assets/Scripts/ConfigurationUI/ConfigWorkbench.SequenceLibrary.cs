@@ -35,6 +35,8 @@ namespace ConfigurationUI
                 "Four terrain patterns. Appearance and navigation are both flat."),
             new SequenceStarter("Kannadi · entrainment then social coupling","Examples/Sequences/kannadi-entrainment-social.sequence.json",
                 "One Kannadi experiment: 120 seconds of entrainment, then 300 seconds of social coupling. Phases stay together and retain tracked pose without reloading."),
+            new SequenceStarter("Kannadi · tight stock and black swarms","Examples/Sequences/kannadi-tight-swarms.sequence.json",
+                "Two close-range 128-locust blocks. The second shows textured locusts on one side and black silhouettes on the other."),
             new SequenceStarter("Social coupling · control","Examples/Sequences/social-coupling-control.sequence.json",
                 "The same linked Kannadi social scene without prior swarm entrainment.")
         };
@@ -49,7 +51,7 @@ namespace ConfigurationUI
             var timing=SessionLabel("","sequence-starter-timing");timing.name="sequence-starter-timing";dialog.Add(timing);
             var reference=SessionLabel("","sequence-starter-reference");reference.name="sequence-starter-reference";dialog.Add(reference);
             var actions=Row("sequence-starter-actions");dialog.Add(actions);
-            var custom=StudioButton("Open custom JSON…","file",ShowOpenFile,"quiet");custom.name="sequence-starter-custom";actions.Add(custom);
+            var custom=StudioButton("Open custom JSON…","file",()=>BrowseFile("Open sequence configuration","json",path=>OpenConfiguration("sequence",path)),"quiet");custom.name="sequence-starter-custom";actions.Add(custom);
             var load=StudioButton("Load sequence","sequence",()=>{
                 RequireApplied();
                 var preset=SequenceStarters[chooser.index];

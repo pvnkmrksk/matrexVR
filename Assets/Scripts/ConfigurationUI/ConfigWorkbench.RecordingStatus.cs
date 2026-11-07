@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,6 +9,12 @@ namespace ConfigurationUI
     public sealed partial class ConfigWorkbench
     {
         private Label recordingFinalizationBanner;
+        private VisualElement recordingSavingScreen;
+        private Label recordingSavingStatus;
+        private VisualElement focusBeforeSaving;
+        private readonly List<VisualElement> disabledForSaving = new List<VisualElement>();
+        private bool SavingScreenVisible => recordingSavingScreen != null && recordingSavingScreen.parent == root &&
+            recordingSavingScreen.style.display == DisplayStyle.Flex;
         private bool recordingPending;
         private string recordingBannerError;
         private void AddRecordingFinalizationBanner()
@@ -23,6 +30,28 @@ namespace ConfigurationUI
             root.Add(recordingFinalizationBanner);UpdateRecordingFinalizationBanner();
             root.schedule.Execute(UpdateRecordingFinalizationBanner).Every(300);
         }
+        private void AddRecordingSavingScreen()
+        {
+            focusBeforeSaving=null;
+            disabledForSaving.Clear();
+            recordingSavingScreen=new VisualElement {name="recording-saving-screen",focusable=true,tabIndex=-1};
+            recordingSavingScreen.style.position=UnityEngine.UIElements.Position.Absolute;
+            recordingSavingScreen.style.left=recordingSavingScreen.style.right=recordingSavingScreen.style.top=recordingSavingScreen.style.bottom=0;
+            recordingSavingScreen.style.justifyContent=Justify.Center;
+            recordingSavingScreen.style.alignItems=Align.Center;
+            recordingSavingScreen.style.backgroundColor=new Color(.04f,.07f,.10f);
+            recordingSavingScreen.style.color=new Color(.9f,.95f,.98f);
+            var title=new Label("Saving data…");
+            title.style.fontSize=34;
+            recordingSavingScreen.Add(title);
+            recordingSavingStatus=new Label();
+            recordingSavingStatus.style.fontSize=15;
+            recordingSavingScreen.Add(recordingSavingStatus);
+            recordingSavingScreen.style.display=DisplayStyle.None;
+            root.Add(recordingSavingScreen);
+            UpdateRecordingFinalizationBanner();
+        }
+
         private void UpdateRecordingFinalizationBanner()
         {
             if(recordingFinalizationBanner==null)return;
@@ -42,6 +71,34 @@ namespace ConfigurationUI
             recordingPending=pending;recordingBannerError=error;
             if(changed&&status!=null&&selected!=null)UpdateStatus();
             if(stopping)start?.SetEnabled(false);
+            if(recordingSavingScreen==null||recordingSavingScreen.parent!=root)return;
+            bool saving=stopping||finishing;
+            bool shown=SavingScreenVisible;
+            recordingSavingScreen.style.display=saving?DisplayStyle.Flex:DisplayStyle.None;
+            if(saving)recordingSavingStatus.text=(main?.PreparationStatus??"Finishing recording…")+" Setup will return when this finishes.";
+            if(saving==shown)return;
+            if(saving)
+            {
+                focusBeforeSaving=root.panel?.focusController.focusedElement as VisualElement;
+                foreach(var element in root.Children().ToList())
+                {
+                    if(element==recordingSavingScreen||!element.enabledSelf)continue;
+                    disabledForSaving.Add(element);
+                    element.SetEnabled(false);
+                }
+                var screen=recordingSavingScreen;
+                screen.schedule.Execute(()=>{if(screen==recordingSavingScreen&&SavingScreenVisible)screen.Focus();});
+            }
+            else
+            {
+                foreach(var element in disabledForSaving)
+                    if(element.parent==root)element.SetEnabled(true);
+                disabledForSaving.Clear();
+                if(focusBeforeSaving!=null&&focusBeforeSaving.panel==root.panel&&focusBeforeSaving.enabledInHierarchy)
+                    focusBeforeSaving.Focus();
+                else ScheduleKeyboardFocus();
+                focusBeforeSaving=null;
+            }
         }
     }
 }

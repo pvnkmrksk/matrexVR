@@ -19,11 +19,25 @@ public static class DesktopQuickStart
     public static string Scene(ConfigWorkspace workspace) => (string)Marker(workspace)?["scene"] ?? "night-sky";
     public static bool IsDemo(ConfigWorkspace workspace) => (bool?)Marker(workspace)?["demo"] ?? false;
 
+    // Explicitly configured players keep their GUI selection beside their own Config.
+    // Ordinary installations retain the existing user-profile behavior.
+    private static string WorkspaceRoot() => ResolveWorkspaceRoot(RuntimePaths.ConfigRoot,
+        Path.GetDirectoryName(Path.GetFullPath(Application.dataPath)), Application.isEditor);
+
+    private static string ResolveWorkspaceRoot(string userRoot, string playerDirectory, bool editor)
+    {
+        if (editor || !File.Exists(Path.Combine(playerDirectory, ".matrex-configured-gui-build"))) return userRoot;
+        string configured = Path.Combine(playerDirectory, "Config");
+        if (!File.Exists(Path.Combine(configured, "system_config.json")) || !File.Exists(Path.Combine(configured, "sequenceConfig.json")))
+            throw new InvalidOperationException("The configured player requires Config/system_config.json and Config/sequenceConfig.json beside its executable.");
+        return configured;
+    }
+
     public static bool InitialSelection(out string system, out string sequence)
     {
         system = sequence = null;
         if (Application.isEditor || Array.IndexOf(Environment.GetCommandLineArgs(), "--config-dir") >= 0) return false;
-        string root = RuntimePaths.ConfigRoot;
+        string root = WorkspaceRoot();
         string state = Path.Combine(root, "Desktop", "workspace.json");
         if (File.Exists(state))
         {
@@ -36,6 +50,8 @@ public static class DesktopQuickStart
             }
             catch (Exception error) { Debug.LogWarning("The saved workspace could not be opened: " + error.Message); }
         }
+        if (!string.Equals(root, RuntimePaths.ConfigRoot, StringComparison.Ordinal))
+        { system = Path.Combine(root, "system_config.json"); sequence = Path.Combine(root, "sequenceConfig.json"); return true; }
         // The old system/sequence files are still available in Advanced/Open. Never replace a calibrated apparatus.
         string folder = EnsureProfile(root, "flying", "night-sky", true);
         system = Path.Combine(folder, "system.json"); sequence = Path.Combine(folder, "sequence.json"); return true;
@@ -45,7 +61,7 @@ public static class DesktopQuickStart
         if (Application.isEditor || Array.IndexOf(Environment.GetCommandLineArgs(), "--config-dir") >= 0) return;
         try
         {
-            string folder = Path.Combine(RuntimePaths.ConfigRoot, "Desktop"); Directory.CreateDirectory(folder);
+            string folder = Path.Combine(WorkspaceRoot(), "Desktop"); Directory.CreateDirectory(folder);
             string path = Path.Combine(folder, "workspace.json");
             var state = new JObject { ["schemaVersion"] = 1, ["systemFile"] = Path.GetFullPath(system), ["sequenceFile"] = Path.GetFullPath(sequence) };
             File.WriteAllText(path + ".tmp", state.ToString() + "\n");

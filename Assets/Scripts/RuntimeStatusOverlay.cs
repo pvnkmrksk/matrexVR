@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,6 +26,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private Text autoTrimButtonText;
     private Button flightCheckButton;
     private Text flightCheckButtonText;
+    private Text selectedRigText;
     private double nextRefresh;
     private int layoutLineCount = -1;
     private long layoutErrorRevision = -1;
@@ -87,7 +89,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     { TryToggleDashboard(); }
     private void TryToggleDashboard()
     {
-        if (ConfigurationUI.ConfigWorkbench.IsOpen || RuntimeFrameRateEditor.IsOpen || SceneManager.GetActiveScene().name=="ReplayScene") return;
+        if (ConfigurationUI.ConfigWorkbench.IsOpen || RuntimeFrameRateEditor.IsOpen || MainController.Instance?.SequenceStopping == true || SceneManager.GetActiveScene().name=="ReplayScene") return;
         // Display-only control stays available during a run, including stale legacy
         // metadata focus. Idle text forms retain Tab for field navigation.
         if (lastToggleFrame!=Time.frameCount && ((MainController.Instance != null && MainController.Instance.SequenceRunning) || !ExperimentInput.IsEditingText))
@@ -176,15 +178,16 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         nextAnimal.transform.SetParent(panel.transform, false);
         var nextRect = nextAnimal.GetComponent<RectTransform>();
         nextRect.anchorMin = nextRect.anchorMax = nextRect.pivot = Vector2.zero;
-        nextRect.anchoredPosition = new Vector2(124, 10); nextRect.sizeDelta = new Vector2(72, 28);
+        nextRect.anchoredPosition = new Vector2(124, 10); nextRect.sizeDelta = new Vector2(110, 28);
         var nextButton = nextAnimal.GetComponent<Button>(); nextButton.targetGraphic = nextAnimal.GetComponent<Image>();
         nextButton.targetGraphic.color = new Color(.13f, .18f, .24f);
         var nextLabel = new GameObject("Label", typeof(RectTransform), typeof(Text)); nextLabel.transform.SetParent(nextAnimal.transform, false);
         var nextLabelRect = nextLabel.GetComponent<RectTransform>(); nextLabelRect.anchorMin = Vector2.zero; nextLabelRect.anchorMax = Vector2.one;
         nextLabelRect.offsetMin = nextLabelRect.offsetMax = Vector2.zero;
         var nextText = nextLabel.GetComponent<Text>(); nextText.font = label.font; nextText.fontSize = 11;
-        nextText.alignment = TextAnchor.MiddleCenter; nextText.color = new Color(.72f, .83f, .9f); nextText.raycastTarget = false; nextText.text = "Next animal";
+        nextText.alignment = TextAnchor.MiddleCenter; nextText.color = new Color(.72f, .83f, .9f); nextText.raycastTarget = false; nextText.text = "VR controls";
         nextButton.onClick.AddListener(() => { MainController.Instance?.SelectNextAnimal(); nextRefresh = 0; });
+        selectedRigText = nextText;
         Configure();
     }
 
@@ -202,7 +205,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     public void SetVisible(bool value)
     {
         bool wasDisplayed=ShouldDisplay;operatorVisibility=true;ApplyVisibility(value);nextRefresh=0;
-        if(canvas!=null && wasDisplayed && !value) DisplayFrameClear.ClearOnce(canvas.targetDisplay);
+        if(canvas!=null && wasDisplayed && !value && !DisplayBackgroundClear.CoversDisplay(canvas.targetDisplay)) DisplayFrameClear.ClearOnce(canvas.targetDisplay);
         else if(canvas!=null && value) DisplayFrameClear.Cancel(canvas.targetDisplay);
     }
     private void ApplyVisibility(bool value) { visible = value; if (panel != null) panel.SetActive(ShouldDisplay); }
@@ -239,6 +242,8 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         bool flightCheck = main == null || main.CurrentFlightCheckEnabled;
         flightCheckButtonText.text = flightCheck ? "Flight check on · bypass" : "Flight bypassed · restore check";
         flightCheckButton.targetGraphic.color = !available ? new Color(.1f,.13f,.16f) : flightCheck ? new Color(.13f,.18f,.24f) : new Color(.3f,.22f,.12f);
+        if (main != null)
+            selectedRigText.text = main.SelectedVRIndex == 0 ? "All VRs · next" : $"VR{main.SelectedVRIndex} · next";
         label.text = BuildText();
         RefreshLayout();
     }
@@ -268,14 +273,73 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         {
             layoutLineCount = lines; layoutErrorRevision = shownRevision;
             var panelRect = panel.GetComponent<RectTransform>();
-            float width=showDetails?650:480;
+            float width=Dense?480:showDetails?650:480;
+            label.fontSize=Dense?12:13;
             panelRect.sizeDelta = new Vector2(width, panelRect.sizeDelta.y);
             Canvas.ForceUpdateCanvases();
             panelRect.sizeDelta = new Vector2(width, Mathf.Clamp(label.preferredHeight + 62, 180, 780));
         }
     }
 
-    public string BuildText() => showDetails ? BuildDetailedText() : BuildCompactText();
+    private bool Dense => (MainController.Instance?.SystemConfigs.Count ?? 0) > 8;
+    public string BuildText() => Dense ? BuildDenseText() : showDetails ? BuildDetailedText() : BuildCompactText();
+
+    private string BuildDenseText()
+    {
+        var main = MainController.Instance;
+        var text = new StringBuilder("<size=17><b>RUN STATUS · ALL RIGS</b></size>  <size=11>Tab hides overlays</size>\n");
+        AppendRunContext(text, main);
+        int animals = 0, views = 0, queued = 0, writers = 0;
+        long dropped = 0;
+        double capture = 0;
+        foreach (var population in FindObjectsByType<LocustSpawner>(FindObjectsSortMode.None)) animals += population.Spawned.Count;
+        foreach (var mirror in FindObjectsByType<Kannadi>(FindObjectsSortMode.None))
+            if (mirror.isActiveAndEnabled && !mirror.IsSwarm) animals += mirror.Clones.Count(clone => clone != null && clone.activeInHierarchy);
+        foreach (var config in main.SystemConfigs.Values) views += ViewportSetter.NormalizeDisplayOrder(config.displayOrder).Length;
+        text.AppendLine($"{main.SystemConfigs.Count} VRs · {views} panel views · {animals} locusts");
+        foreach (var logger in FindObjectsByType<SwarmLogger>(FindObjectsSortMode.None))
+        { queued += logger.PendingFrames; dropped += logger.DroppedFrames; if (logger.isActiveAndEnabled) { capture += logger.CaptureMilliseconds; writers++; } }
+        foreach (var logger in FindObjectsByType<KannadiLogger>(FindObjectsSortMode.None))
+        { queued += logger.PendingFrames; dropped += logger.DroppedFrames; if (logger.isActiveAndEnabled) { capture += logger.CaptureMilliseconds; writers++; } }
+        text.AppendLine($"{writers} population writers · capture {capture:F2} ms");
+        text.AppendLine($"Recording queued {queued} frames · dropped {dropped}");
+        text.AppendLine("<color=#99ADBD>Y/P: yaw / position · C closed · O open</color>");
+        foreach (var entry in main.SystemConfigs.OrderBy(e => RuntimeRigRegistry.ParseIndex(e.Key)))
+        {
+            main.VRClosedLoops.TryGetValue(entry.Key, out var rig);
+            var listener = rig != null ? rig.GetComponent<ZmqListener>() : null;
+            string endpoint = listener != null && !string.IsNullOrEmpty(listener.Endpoint) ? listener.Endpoint : $"tcp://{entry.Value.zmqAddress}:{entry.Value.zmqPort}";
+            text.AppendLine($"<b>{EscapeRich(entry.Key)}</b> · {EscapeRich(main.GetBackendDisplayName(entry.Value))} · {EscapeRich(endpoint)}");
+            if (rig == null) { text.AppendLine("  INACTIVE · configured input"); continue; }
+            string state = listener == null ? "missing listener" : listener.State;
+            double age = listener != null ? listener.SecondsSinceLastPose : double.PositiveInfinity;
+            string ageLabel = double.IsInfinity(age) ? "no pose" : $"age {Math.Max(0, age):F2}s";
+            string color = state == "receiving" ? "88D8BD" : state == "error" ? "FFADAD" : "E9CA8D";
+            text.Append($"  <color=#{color}>{EscapeRich(state)} · {ageLabel}</color>");
+            if (rig.SupportsAutoTrim)
+            {
+                var flight = rig.AutoTrim;
+                text.Append($" · {(flight.Flying ? "FLYING" : flight.FlightReady ? "GROUND" : "ACQUIRE")} · DC {rig.GetYawDCOffset() * KineflyAutoTrim.RadToDeg:F1}°");
+            }
+            text.Append($" · Y/P {(rig.OrientationTrackingEnabled ? "C" : "O")}/{(rig.PositionTrackingEnabled ? "C" : "O")}");
+            if (entry.Key == "VR" + main.SelectedVRIndex) text.Append(" <color=#FFD166>SELECTED</color>");
+            text.AppendLine();
+        }
+        if (showDetails && main.VRClosedLoops.TryGetValue("VR" + main.SelectedVRIndex, out var selected) && selected != null)
+        {
+            text.AppendLine($"<b>Selected VR{main.SelectedVRIndex}</b> · {selected.GetCurrentMode()} / {selected.MotionMode}");
+            text.AppendLine($"Position gain {selected.PositionGain:G4} · yaw gain {selected.OrientationGain:G4} · yaw {selected.GetLastYawOutput():F2}°/s");
+            if (selected.SupportsAutoTrim)
+            {
+                var trim = selected.AutoTrim;
+                text.AppendLine($"DC {selected.GetYawDCOffset() * KineflyAutoTrim.RadToDeg:F2}° · auto trim {EscapeRich(trim.State)} · samples {trim.FlightSampleCount}");
+                text.AppendLine($"Wing SD {Math.Sqrt(trim.FlightVariance) * KineflyAutoTrim.RadToDeg:F2}° · threshold {Math.Sqrt(trim.FlightThreshold) * KineflyAutoTrim.RadToDeg:F2}°");
+            }
+            text.AppendLine($"Telemetry {(telemetry != null ? EscapeRich(telemetry.State + " " + telemetry.Endpoint) : "starting")}");
+        }
+        AppendErrors(text);
+        return text.ToString();
+    }
 
     private string BuildCompactText()
     {

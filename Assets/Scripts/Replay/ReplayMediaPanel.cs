@@ -42,7 +42,7 @@ public sealed partial class ReplayMediaPanel : IDisposable
     private bool clearFocus;
     private double seconds,lastSeconds=double.NaN;
     private float speed;
-    private float previewScale=1;
+    private float previewScale=1,previewHeightScale=1;
     private Rect visibleRect,formRect;
     private readonly List<string> rigs=new List<string>();
     private int selectedRig;
@@ -65,7 +65,7 @@ public sealed partial class ReplayMediaPanel : IDisposable
     }
     public long DisplayedVideoFrame=>VisibleVideoTexture==null?-1:displayedFrame;
 
-    public ReplayMediaPanel(MonoBehaviour owner,Action pause){this.owner=owner;this.pause=pause;}
+    public ReplayMediaPanel(MonoBehaviour owner,Action pause,bool expandOnOpen=true){this.owner=owner;this.pause=pause;expanded=expandOnOpen;}
     public void SetAnimalPreview(RenderTexture texture,string label){animalPreview=texture;animalLabel=label;}
     public void SetRigs(IEnumerable<string> values){rigs.Clear();rigs.AddRange(values);selectedRig=0;}
     public void Load(string directory,long origin)

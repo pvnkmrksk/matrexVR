@@ -5,8 +5,8 @@ public partial class ReplayController
 {
     private void DrawPixelAnimalView()
     {
-        if (selectedView < 0 || !pixelScaleAnimalView || animalPreviewTexture == null) return;
-        var viewport = CurrentReplayViewport();
+        if (selectedView < 0 || !pixelScaleAnimalView || previewCamera == null || animalPreviewTexture == null) return;
+        var viewport = WorkspaceReplayViewport();
         var area = new Rect(viewport.x * Screen.width, (1 - viewport.yMax) * Screen.height, viewport.width * Screen.width, viewport.height * Screen.height);
         var color = GUI.color; GUI.color = Color.black; GUI.DrawTexture(area, Texture2D.whiteTexture); GUI.color = color;
         GUI.DrawTexture(area, animalPreviewTexture, ScaleMode.ScaleToFit, false);
@@ -22,7 +22,7 @@ public partial class ReplayController
     private void FitReplayAnimalViewport(Camera camera)
     {
         if(camera==null || camera.targetTexture!=null)return;
-        var viewport=CurrentReplayViewport();
+        var viewport=WorkspaceReplayViewport();
         if(!matchRecordedCamera){camera.rect=viewport;return;}
         float available=Mathf.Max(.01f,Screen.width*viewport.width/(Screen.height*viewport.height)),aspect=Mathf.Max(.01f,camera.aspect);
         camera.rect=aspect<=available?new Rect(viewport.x+(viewport.width-viewport.width*aspect/available)*.5f,viewport.y,viewport.width*aspect/available,viewport.height):
@@ -58,10 +58,15 @@ public partial class ReplayController
     private void RefreshReplayAnnotations()
     {
         if (archive == null || overview == null) return;
-        overview.rect = CurrentReplayViewport();
+        var viewport = WorkspaceReplayViewport();
+        if (overview.rect != viewport)
+        {
+            overview.rect = viewport;
+            if (selectedView < 0 && !overviewUserAdjusted) FitOverview();
+        }
         UpdateReplayCameraClipping();
         bool show = selectedView < 0 && !OperatorOverlayVisibility.Hidden && environmentLoader?.Loading != true;
-        foreach (string id in rigOrder)
+        foreach (string id in cameraViewOrder)
         {
             if (!agentAnnotations.TryGetValue(id, out var annotation)) continue;
             var marker = markerByRig[id]; var samples = archive.Rigs[id]; int cursor = AtOrBefore(samples, replayTime);
@@ -122,7 +127,7 @@ public partial class ReplayController
         agentLabelStyle.font = GUI.skin.font; agentLabelStyle.fontSize = Mathf.RoundToInt(13 * scale);
         var pixels = overview.pixelRect; var viewport = new Rect(pixels.x, Screen.height - pixels.yMax, pixels.width, pixels.height);
         annotationLabels.Clear();
-        foreach (string id in rigOrder)
+        foreach (string id in cameraViewOrder)
         {
             if (!agentAnnotations.TryGetValue(id, out var annotation) || !annotation.AnnotationVisible) continue;
             var marker = markerByRig[id];

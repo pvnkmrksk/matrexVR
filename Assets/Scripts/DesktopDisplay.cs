@@ -13,6 +13,9 @@ public sealed class DesktopDisplay : MonoBehaviour
     private static DesktopDisplay instance;
     private readonly List<DisplayInfo> displays = new List<DisplayInfo>();
     private bool changing;
+    private int requestedRevision;
+    private DisplayInfo lastDisplay;
+    public static event Action PresentationChanged;
     private float nextCheck;
     public static float UiScale
     {
@@ -45,7 +48,7 @@ public sealed class DesktopDisplay : MonoBehaviour
     public static int SelectedDisplay => PlayerPrefs.GetInt(Preference, 0);
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void Reset() { instance = null; }
+    private static void Reset() { instance = null; PresentationChanged = null; }
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Install()
     {
@@ -59,11 +62,14 @@ public sealed class DesktopDisplay : MonoBehaviour
         var layout = new List<DisplayInfo>(); Screen.GetDisplayLayout(layout);
         if (index < 0 || index >= layout.Count) throw new ArgumentOutOfRangeException(nameof(index));
         PlayerPrefs.SetInt(Preference, index); PlayerPrefs.Save();
-        if (instance != null && !instance.changing) instance.StartCoroutine(instance.Apply());
+        if (instance == null) return;
+        instance.requestedRevision++;
+        if (!instance.changing) instance.StartCoroutine(instance.Apply());
     }
     private IEnumerator Apply()
     {
         changing = true;
+        int revision = requestedRevision;
         try
         {
             Screen.GetDisplayLayout(displays);
@@ -72,6 +78,7 @@ public sealed class DesktopDisplay : MonoBehaviour
             // move to that same monitor during Cocoa/fullscreen startup is unnecessary.
             if (displays.Count > 1 && !displays[index].Equals(Screen.mainWindowDisplayInfo))
             {
+                PresentationChanged?.Invoke();
                 AsyncOperation move = null;
                 try { move = Screen.MoveMainWindowTo(displays[index], Vector2Int.zero); }
                 catch (Exception error) { Debug.LogWarning("[DesktopDisplay] Cannot move application window: " + error.Message); }
@@ -98,12 +105,24 @@ public sealed class DesktopDisplay : MonoBehaviour
             yield return null; yield return null;
             Debug.Log("[DesktopDisplay] Native fullscreen " + Screen.width + "×" + Screen.height + "; UI backing scale " + UiScale + "; " + Screen.mainWindowDisplayInfo.name);
         }
-        finally { changing = false; }
+        finally
+        {
+            lastDisplay = Screen.mainWindowDisplayInfo;
+            changing = false;
+            PresentationChanged?.Invoke();
+            if (revision != requestedRevision) StartCoroutine(Apply());
+        }
     }
     private void Update()
     {
         if (changing || !Application.isFocused || Time.unscaledTime < nextCheck) return;
         nextCheck = Time.unscaledTime + 1;
+        var current = Screen.mainWindowDisplayInfo;
+        if (!current.Equals(lastDisplay))
+        {
+            lastDisplay = current;
+            PresentationChanged?.Invoke();
+        }
 #if !MATREX_ALLOW_WINDOWED
         if (Screen.fullScreenMode != FullScreenMode.FullScreenWindow) StartCoroutine(Apply());
 #endif

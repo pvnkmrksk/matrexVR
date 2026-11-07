@@ -67,7 +67,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
     private SwarmLogger[] populationLoggers;
     private KannadiLogger[] mirrorLoggers;
     private RecordedWorldStateWriter[] worldLoggers;
-    private string sourceExperiment,sourcePhase;
+    private string sourceExperiment,sourcePhase,sourceSystem;
     private List<Counter> counters;
     private readonly FrameTiming[] timing=new FrameTiming[1];
     private ulong lastTiming;
@@ -84,18 +84,29 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
         var main=MainController.Instance;var logger=MasterDataLogger.Instance;
         var finishing=logger.FinalizeSessionAsync("performance-probe-setup");while(!finishing.IsCompleted)yield return null;
         int rigs=int.Parse(Arg("--performance-rigs","1"));bool desktop=Arg("--performance-layout","desktop")=="desktop";
-        var system=JObject.Parse(File.ReadAllText(Path.Combine(RuntimePaths.ConfigRoot,"Templates/system_config.template.json")));
-        var template=(JObject)system["configs"][0];var configured=new JArray();
-        for(int i=1;i<=rigs;i++)
+        sourceSystem=Arg("--performance-system");
+        JObject system;
+        if(!string.IsNullOrWhiteSpace(sourceSystem))
         {
-            var rig=(JObject)template.DeepClone();rig["vrId"]="VR"+i;rig["closedLoopMode"]="Rekkefly";
-            rig["zmqAddress"]="127.0.0.1";rig["zmqPort"]=30000+i;rig["targetDisplay"]=0;
-            rig["displayOrder"]=desktop?"F":"DRBLFU";rig["desktopPreview"]=desktop;
-            rig["ledPanelWidth"]=128;rig["ledPanelHeight"]=128;rig["startRow"]=(i-1)/2;rig["startCol"]=((i-1)%2)*6;rig["tracker"]=new JObject{["saveVideo"]=false};configured.Add(rig);
+            system=JObject.Parse(ExperimentConfigFiles.ReadAllText(sourceSystem));
+            if(!(system["configs"] is JArray supplied)||supplied.Count==0)throw new ArgumentException("--performance-system requires nonempty configs.");
+            rigs=supplied.Count;desktop=supplied.OfType<JObject>().All(r=>(bool?)r["desktopPreview"]==true);
         }
-        system.Remove("desktopQuickStart");system["configs"]=configured;system["targetDisplay"]=0;system["targetFrameRate"]=60;system["vSyncCount"]=0;
-        system["telemetry"]=new JObject{["enabled"]=true,["port"]=30988,["rateHz"]=20};
-        system["statusOverlay"]=new JObject{["visible"]=true};system["overheadCamera"]=new JObject{["enabled"]=false};
+        else
+        {
+            system=JObject.Parse(File.ReadAllText(Path.Combine(RuntimePaths.ConfigRoot,"Templates/system_config.template.json")));
+            var template=(JObject)system["configs"][0];var configured=new JArray();
+            for(int i=1;i<=rigs;i++)
+            {
+                var rig=(JObject)template.DeepClone();rig["vrId"]="VR"+i;rig["closedLoopMode"]="Rekkefly";
+                rig["zmqAddress"]="127.0.0.1";rig["zmqPort"]=30000+i;rig["targetDisplay"]=0;
+                rig["displayOrder"]=desktop?"F":"DRBLFU";rig["desktopPreview"]=desktop;
+                rig["ledPanelWidth"]=128;rig["ledPanelHeight"]=128;rig["startRow"]=(i-1)/2;rig["startCol"]=((i-1)%2)*6;rig["tracker"]=new JObject{["saveVideo"]=false};configured.Add(rig);
+            }
+            system.Remove("desktopQuickStart");system["configs"]=configured;system["targetDisplay"]=0;system["targetFrameRate"]=60;system["vSyncCount"]=0;
+            system["telemetry"]=new JObject{["enabled"]=true,["port"]=30988,["rateHz"]=20};
+            system["statusOverlay"]=new JObject{["visible"]=true};system["overheadCamera"]=new JObject{["enabled"]=false};
+        }
         string experiment="PerformanceProbe/empty.json";
         var stimulus=new JObject{["objects"]=new JArray(),["closedLoopPosition"]=false,["closedLoopOrientation"]=true,
             ["autopilotEnabled"]=false,["resetPositionOnStart"]=true,["resetRotationOnStart"]=true,
@@ -116,7 +127,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             if(Arg("--performance-agents") is string count)
             {
                 var population=stimulus["swarm"] as JObject??stimulus;
-                population["numberOfLocusts"]=int.Parse(count);population["density"]=null;
+                population["agentCount"]=int.Parse(count);population["numberOfLocusts"]=int.Parse(count);population["density"]=null;
             }
             if(Arg("--performance-visual") is string visual)
             {
@@ -144,22 +155,35 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
         var mirrorEnabled=mirrorLoggers.Select(item=>item.enabled).ToArray();
         var animators=FindObjectsByType<Animator>(FindObjectsSortMode.None);
         var animatorEnabled=animators.Select(item=>item.enabled).ToArray();
+        var skins=FindObjectsByType<SkinnedMeshRenderer>(FindObjectsSortMode.None);
+        var skinEnabled=skins.Select(item=>item.enabled).ToArray();
         var telemetry=FindObjectsByType<ExperimentTelemetry>(FindObjectsSortMode.None);
-        var cameras=FindObjectsByType<Camera>(FindObjectsSortMode.None).Where(c=>c.enabled).ToArray();
+        var cameras=FindObjectsByType<Camera>(FindObjectsSortMode.None).Where(c=>c.enabled && c.GetComponentInParent<DisplayBackgroundClear>()==null).ToArray();
         if(cameras.Length==0||loops.Length==0){failures.Add("No active stimulus camera or rig: this is not a valid rendering benchmark.");Finish();yield break;}
-        if(scene=="Choice"||scene=="Kannadi"||scene.StartsWith("TerrainChoice_",StringComparison.Ordinal))
+        var stimulusCameras=cameras.Where(c=>c.GetComponentInParent<ViewportSetter>()!=null).ToArray();
+        int expectedCameras=main.SystemConfigs.Values.Sum(c=>ViewportSetter.NormalizeDisplayOrder(c.displayOrder).Length);
+        if(stimulusCameras.Length==0 || stimulusCameras.Length!=expectedCameras)failures.Add("Configured stimulus camera count does not match: expected "+expectedCameras+", observed "+stimulusCameras.Length);
+        float? farOverride=null;
+        if(Arg("--performance-far-clip") is string farClip)
         {
-            if(cameras.Length!=rigs*(desktop?1:6))failures.Add("Configured stimulus camera count does not match the apparatus.");
-            foreach(var camera in cameras)
-            {
-                if(camera.targetDisplay!=0)failures.Add("Stimulus camera selected a different output display.");
-                if(!desktop&&(Mathf.Abs(camera.pixelWidth-128)>.25f||Mathf.Abs(camera.pixelHeight-128)>.25f))failures.Add("LED stimulus camera is not 128 by 128 pixels: "+camera.name);
-                if(camera.GetComponentInParent<ViewportSetter>()==null)failures.Add("Stimulus camera bypasses configured viewport routing.");
-            }
-            if(failures.Count>0){Finish();yield break;}
+            if(!float.TryParse(farClip,System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out float far)||float.IsNaN(far)||float.IsInfinity(far)||far<=0)
+            {failures.Add("--performance-far-clip must be positive and finite.");Finish();yield break;}
+            farOverride=far;
         }
+        foreach(var camera in stimulusCameras)
+        {
+            if(!main.TryGetSystemConfigForGameObject(camera.gameObject,out var config)){failures.Add("Unowned stimulus camera: "+camera.name);continue;}
+            if(camera.targetDisplay!=config.targetDisplay)failures.Add("Wrong output display: "+config.vrId);
+            if(!config.desktopPreview&&(Mathf.Abs(camera.pixelWidth-config.ledPanelWidth)>.25f||Mathf.Abs(camera.pixelHeight-config.ledPanelHeight)>.25f))failures.Add("Wrong panel dimensions: "+config.vrId+" "+camera.name);
+            if(farOverride.HasValue)
+            {
+                if(farOverride.Value<=camera.nearClipPlane)failures.Add("Far clip must exceed near clip: "+camera.name);
+                else camera.farClipPlane=farOverride.Value;
+            }
+        }
+        if(failures.Count>0){Finish();yield break;}
         float measureSeconds=float.Parse(Arg("--performance-seconds","5"),System.Globalization.CultureInfo.InvariantCulture);
-        string[] phases={"all-60","all-120","all-uncapped","tracking-off","listeners-off","logging-off","population-logging-off","world-logging-off","all-evidence-off","animation-off","telemetry-off","overlays-off","minimal-rendering","no-cameras","offscreen-128","all-uncapped-repeat","vsync-1","vsync-2","all-60-repeat"};
+        string[] phases={"all-60","all-120","all-uncapped","tracking-off","listeners-off","logging-off","population-logging-off","world-logging-off","all-evidence-off","animation-off","skinned-renderers-off","telemetry-off","overlays-off","minimal-rendering","no-cameras","offscreen-128","all-uncapped-repeat","vsync-1","vsync-2","all-60-repeat"};
         string requestedPhases=Arg("--performance-phases");
         if(!string.IsNullOrWhiteSpace(requestedPhases))
         {
@@ -179,6 +203,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             foreach(var item in worldLoggers)item.enabled=phase!="world-logging-off"&&phase!="all-evidence-off";
             if(phase=="all-evidence-off")foreach(var item in loggers)item.enabled=false;
             for(int i=0;i<animators.Length;i++)if(animators[i]!=null)animators[i].enabled=phase!="animation-off"&&animatorEnabled[i];
+            for(int i=0;i<skins.Length;i++)if(skins[i]!=null)skins[i].enabled=phase!="skinned-renderers-off"&&skinEnabled[i];
             foreach(var item in telemetry)item.enabled=publish;
             OperatorOverlayVisibility.SetHidden(minimal||phase=="overlays-off");
             var textures=new List<RenderTexture>();
@@ -209,7 +234,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             double seconds=Time.realtimeSinceStartupAsDouble-started;
             double processCpuMs=System.Diagnostics.Process.GetCurrentProcess().TotalProcessorTime.TotalMilliseconds-cpuStarted;
             long allocatedBytes=GC.GetAllocatedBytesForCurrentThread()-allocatedStarted;
-            results.Add(new {phase,scene,sourceExperiment,sourcePhase,requestedRigs=rigs,observedRigs=loops.Length,observedDataLoggers=loggers.Length,observedPopulation=FindObjectsByType<LocustSpawner>(FindObjectsSortMode.None).Select(item=>new{item.numberOfLocusts,item.agentVisual,spawned=item.Spawned.Count}).ToArray(),observedAnimators=animators.Length,layout=desktop?"desktop":"LED-six-128",seconds,frames=intervals.values.Count,
+            results.Add(new {phase,scene,sourceSystem,sourceExperiment,sourcePhase,expectedCameras,observedStimulusCameras=stimulusCameras.Length,requestedRigs=rigs,observedRigs=loops.Length,observedDataLoggers=loggers.Length,observedPopulation=FindObjectsByType<LocustSpawner>(FindObjectsSortMode.None).Select(item=>new{item.numberOfLocusts,item.agentVisual,spawned=item.Spawned.Count}).ToArray(),observedAnimators=animators.Length,layout=sourceSystem!=null?"supplied-system":desktop?"desktop":"LED-six-128",seconds,frames=intervals.values.Count,
                 fps=1000*intervals.values.Count/intervals.values.Sum(),phaseBoundaryFps=intervals.values.Count/seconds,completeIntervalSeconds=intervals.values.Sum()/1000,rawFrameMs=intervals.values.ToArray(),rawSamples=rawSamples.ToArray(),frameStartMs=SummarizeFrameStarts(),frameMs=intervals.Summary(),cpuMainMs=cpuMain.Summary(),cpuRenderMs=cpuRender.Summary(),gpuMs=gpu.Summary(),presentWaitMs=present.Summary(),
                 populationCaptureMs=populationCapture.Summary(),worldCaptureMs=worldCapture.Summary(),
                 processCpuMs,processCpuPercentOfOneCore=processCpuMs/(seconds*10),processCpuMsPerFrame=processCpuMs/Math.Max(1,intervals.values.Count),
@@ -217,8 +242,11 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
                 mainThreadAllocatedBytesPerFrame=allocationCounterAvailable?(double?)(allocatedBytes/(double)Math.Max(1,intervals.values.Count)):null,
                 collections=new[]{endedGc0-collectionsStarted[0],endedGc1-collectionsStarted[1],endedGc2-collectionsStarted[2]},focused=Application.isFocused,
                 target=Application.targetFrameRate,vsync=QualitySettings.vSyncCount,refreshNumerator=Screen.currentResolution.refreshRateRatio.numerator,refreshDenominator=Screen.currentResolution.refreshRateRatio.denominator,fullScreen=Screen.fullScreenMode.ToString(),metalDisplayLink=Environment.GetEnvironmentVariable("UNITY_USE_METAL_DISPLAY_LINK"),frameTimingAvailable=FrameTimingManager.IsFeatureEnabled(),
-                cameras=cameras.Select(c=>new {c.name,enabled=c.enabled,rect=new[]{c.rect.x,c.rect.y,c.rect.width,c.rect.height},c.targetDisplay,offscreen=c.targetTexture!=null,c.pixelWidth,c.pixelHeight}).ToArray(),
+                backgroundClearCameras=FindObjectsByType<Camera>(FindObjectsSortMode.None).Count(c=>c.enabled && c.GetComponentInParent<DisplayBackgroundClear>()!=null),
+                cameras=cameras.Select(c=>new {c.name,enabled=c.enabled,rect=new[]{c.rect.x,c.rect.y,c.rect.width,c.rect.height},c.targetDisplay,offscreen=c.targetTexture!=null,c.pixelWidth,c.pixelHeight,c.nearClipPlane,c.farClipPlane}).ToArray(),
                 listenersEnabled=tracking&&phase!="listeners-off",closedLoopsEnabled=tracking,trackingFresh=listeners.Select(l=>l.HasFreshPose()).ToArray(),trackingSequences=listeners.Select(l=>l.ReadRawSample().sequence).ToArray(),
+                populationRecording=populationLoggers.Select(item=>new{item.name,item.PendingFrames,item.DroppedFrames,item.WrittenRows,item.Failure}).ToArray(),
+                mirrorRecording=mirrorLoggers.Select(item=>new{item.name,item.PendingFrames,item.DroppedFrames,item.Failure}).ToArray(),
                 recordingEnabled=logging,telemetryEnabled=publish,overlayHidden=OperatorOverlayVisibility.Hidden,counters=counters.Select(c=>c.Report()).ToArray()});
             foreach(var counter in counters)counter.Dispose();counters=null;
             foreach(var camera in cameras)camera.targetTexture=null;
@@ -251,14 +279,14 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
         sample.timingFrameStartTimestamp=frame.frameStartTimestamp;sample.timingCpuMainMs=frame.cpuMainThreadFrameTime;
         sample.timingCpuRenderMs=frame.cpuRenderThreadFrameTime;sample.timingGpuMs=frame.gpuFrameTime;sample.timingPresentWaitMs=frame.cpuMainThreadPresentWaitTime;
         rawSamples.Add(sample);
-        cpuMain.Add(frame.cpuMainThreadFrameTime);cpuRender.Add(frame.cpuRenderThreadFrameTime);gpu.Add(frame.gpuFrameTime);present.Add(frame.cpuMainThreadPresentWaitTime);
+        cpuMain.Add(frame.cpuMainThreadFrameTime);cpuRender.Add(frame.cpuRenderThreadFrameTime);if(frame.gpuFrameTime>0)gpu.Add(frame.gpuFrameTime);present.Add(frame.cpuMainThreadPresentWaitTime);
     }
     private static long Last(Counter counter)=>counter.recorder.Valid&&counter.recorder.Count>0?counter.recorder.LastValue:0;
     private object SummarizeFrameStarts(){var series=new Series();foreach(var sample in rawSamples)series.Add(sample.frameStartMs);return series.Summary();}
     private void Log(string text,string stack,LogType type){if(type==LogType.Exception||type==LogType.Error)failures.Add(text);}
     private void Save()
-    {File.WriteAllText(Path.Combine(output,"results.json"),JsonConvert.SerializeObject(new {unity=Application.unityVersion,os=SystemInfo.operatingSystem,cpu=SystemInfo.processorType,gpu=SystemInfo.graphicsDeviceName,
+    {File.WriteAllText(Path.Combine(output,"results.json"),JsonConvert.SerializeObject(new {unity=Application.unityVersion,os=SystemInfo.operatingSystem,cpu=SystemInfo.processorType,gpu=SystemInfo.graphicsDeviceName,graphicsApi=SystemInfo.graphicsDeviceType.ToString(),
         width=Screen.width,height=Screen.height,quality=QualitySettings.names[QualitySettings.GetQualityLevel()],qualitySettings=new{QualitySettings.shadows,QualitySettings.shadowDistance,QualitySettings.skinWeights,QualitySettings.pixelLightCount,QualitySettings.antiAliasing},failures,results,
-        note="Explicit standalone software probe; no animal measurement. On-screen Metal presentation, CPU callbacks, target-FPS pacing and GPU workload are different limits. Raw profiler LastValue belongs to the last completed profiler frame; FrameTiming timestamps identify delayed timing samples. Zero timing timestamp means unavailable/duplicate, not zero work. Raw samples retain frame-start, wall intervals, allocations and GC deltas. Unavailable counters remain explicit; this is not a guarantee of LED timing."},Formatting.Indented));}
+        note="Explicit standalone software probe; no animal measurement. On-screen presentation, CPU callbacks, target-FPS pacing and GPU workload are different limits. Raw profiler LastValue belongs to the last completed profiler frame; FrameTiming timestamps identify delayed timing samples. Zero timing timestamp means unavailable/duplicate, not zero work. Raw samples retain frame-start, wall intervals, allocations and GC deltas. Unavailable counters remain explicit; this is not a guarantee of LED timing."},Formatting.Indented));}
     private void Finish(){Save();Application.logMessageReceived-=Log;Application.Quit(failures.Count==0?0:1);}
 }

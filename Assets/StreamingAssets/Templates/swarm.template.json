@@ -9,6 +9,7 @@
   "numberOfLocusts": 256,
   "density": null,
   "spawnAreaSize": 200,
+  "spawnType": "Random",
   "mu": 0,
   "kappa": 100000,
   "locustSpeed": 2,
@@ -168,7 +169,7 @@
   "nearClipMetres": null,
   "locustSpeedStdDev": 0,
   "volumeHalfExtentMetres": null,
-  "preserveBoundaryOvershoot": false,
+  "preserveBoundaryOvershoot": true,
   "headingReferenceId": "",
   "directionDistribution": "Legacy"
 }

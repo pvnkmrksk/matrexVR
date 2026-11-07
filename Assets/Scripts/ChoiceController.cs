@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using InSceneSequence;
@@ -22,6 +23,7 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
     private Texture2D runtimeSkyboxTexture;
     private readonly Dictionary<Camera, CameraClearFlags> skyboxCameraFlags = new Dictionary<Camera, CameraClearFlags>();
     private readonly Dictionary<Skybox, bool> cameraSkyboxOverrides = new Dictionary<Skybox, bool>();
+    internal object[] AuthoredTargets { get; private set; } = System.Array.Empty<object>();
 
     private void Awake()
     {
@@ -67,7 +69,8 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         }
 
         phased = ExperimentPhases.IsPhase(parameters);
-        SceneConfig config = phased ? ExperimentPhases.Read(parameters).ToObject<SceneConfig>() : LoadSceneConfig(parameters["configFile"].ToString());
+        JObject document = phased ? ExperimentPhases.Read(parameters) : LoadSceneConfig(parameters["configFile"].ToString());
+        SceneConfig config = document?.ToObject<SceneConfig>();
         if (config == null)
         {
             return;
@@ -82,14 +85,66 @@ public class ChoiceController : MonoBehaviour, IInSceneSequencer
         if (parameters.TryGetValue("rugosity", out var patch) && patch != null)
             rugosityOverride = patch as JObject ?? JObject.FromObject(patch);
         RugosityWorld.Apply(gameObject.scene, config.rugosity, rugosityOverride);
+        AuthoredTargets = CaptureAuthoredTargets(document);
     }
 
-    private SceneConfig LoadSceneConfig(string configFile)
+    private JObject LoadSceneConfig(string configFile)
     {
         string jsonPath = ExperimentConfigFiles.Resolve(configFile);
 
         string jsonString = ExperimentConfigFiles.ReadAllText(jsonPath);
-        return JsonConvert.DeserializeObject<SceneConfig>(jsonString);
+        return JsonConvert.DeserializeObject<JObject>(jsonString);
+    }
+
+    // Project the same authored ground-plane geometry used by the saved dashboard.
+    // Capture only display labels and numeric geometry, independent of model files.
+    private static object[] CaptureAuthoredTargets(JObject document)
+    {
+        if (!(document?["objects"] is JArray objects)) return System.Array.Empty<object>();
+        var targets = new List<object>();
+        foreach (var item in objects.OfType<JObject>())
+        {
+            if (!(item["position"] is JObject position)) continue;
+            double x, z, angle, radius;
+            var polarRadius = AuthoredNumber(position, "radius");
+            var polarAngle = AuthoredNumber(position, "angle");
+            if (polarRadius.HasValue && polarAngle.HasValue)
+            {
+                radius = polarRadius.Value;
+                if (radius <= 0) continue;
+                angle = polarAngle.Value;
+                x = radius * System.Math.Sin(angle * System.Math.PI / 180);
+                z = radius * System.Math.Cos(angle * System.Math.PI / 180);
+            }
+            else
+            {
+                var authoredX = AuthoredNumber(position, "x");
+                var authoredZ = AuthoredNumber(position, "z");
+                if (!authoredX.HasValue || !authoredZ.HasValue) continue;
+                x = authoredX.Value;
+                z = authoredZ.Value;
+                radius = System.Math.Sqrt(x * x + z * z);
+                angle = System.Math.Atan2(x, z) * 180 / System.Math.PI;
+            }
+            double scale = AuthoredNumber(item["scale"] as JObject, "x") ?? 1;
+            if (scale == 0) scale = 1;
+            if (new[] { x, z, angle, radius, scale }.Any(value => double.IsNaN(value) || double.IsInfinity(value))) continue;
+            string type = item.Value<string>("type");
+            if (string.IsNullOrWhiteSpace(type) || type.Length > 64 || type.Contains('/') || type.Contains('\\') || type.Contains(':') || type.Any(char.IsControl))
+                type = "object";
+            string side = x < -1e-6 ? "left" : x > 1e-6 ? "right" : "centre";
+            targets.Add(new { x, z, angle, r = radius, scale = System.Math.Abs(scale), type, side });
+            if (targets.Count == 32) break;
+        }
+        return targets.ToArray();
+    }
+
+    private static double? AuthoredNumber(JObject value, string field)
+    {
+        if (!(value?[field] is JValue token)) return null;
+        var culture = CultureInfo.InvariantCulture;
+        return double.TryParse(token.ToString(culture), NumberStyles.Float, culture, out double number)
+            ? number : (double?)null;
     }
 
     private void ApplyConfig(SceneConfig config)

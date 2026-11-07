@@ -19,6 +19,12 @@ public static class MatrexReleaseBuilder
   PlayerSettings.macRetinaSupport=true;PlayerSettings.resizableWindow=true;PlayerSettings.allowFullscreenSwitch=false;
   if(Array.IndexOf(args,"-localDesktopBuild")>=0) PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Standalone,"org.pvnkmrksk.matrexvr.local");
   PlayerSettings.SetScriptingBackend(UnityEditor.Build.NamedBuildTarget.Standalone,ScriptingImplementation.Mono2x);
+  // Linux GUI launches must use the same renderer as the validated LED workload.
+  if(target==BuildTarget.StandaloneLinux64)
+  {
+   PlayerSettings.SetUseDefaultGraphicsAPIs(target,false);
+   PlayerSettings.SetGraphicsAPIs(target,new[]{UnityEngine.Rendering.GraphicsDeviceType.Vulkan,UnityEngine.Rendering.GraphicsDeviceType.OpenGLCore});
+  }
   if(target==BuildTarget.StandaloneOSX)EditorUserBuildSettings.SetPlatformSettings("Standalone","OSXUniversal","Architecture","x64ARM64");
   string[] scenes=EditorBuildSettings.scenes.Where(s=>s.enabled).Select(s=>s.path).Distinct().ToArray();
   // Keep old-tag builder injection working: this method does not depend on a new runtime type.
@@ -29,7 +35,7 @@ public static class MatrexReleaseBuilder
   AssetDatabase.ImportAsset(identityPath,ImportAssetOptions.ForceSynchronousImport);
   Directory.CreateDirectory(Path.GetDirectoryName(output));
   var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=scenes,locationPathName=output,target=target,options=BuildOptions.None});
-  var summary=new {version,target=target.ToString(),result=report.summary.result.ToString(),errors=report.summary.totalErrors,warnings=report.summary.totalWarnings,bytes=report.summary.totalSize,buildGuid=report.summary.guid.ToString(),scenes=scenes};
+  var summary=new {version,target=target.ToString(),result=report.summary.result.ToString(),errors=report.summary.totalErrors,warnings=report.summary.totalWarnings,bytes=report.summary.totalSize,buildGuid=report.summary.guid.ToString(),graphicsApis=PlayerSettings.GetGraphicsAPIs(target).Select(api=>api.ToString()).ToArray(),scenes=scenes};
   File.WriteAllText(Path.Combine(Path.GetDirectoryName(output),"build-report.json"),Newtonsoft.Json.JsonConvert.SerializeObject(summary,Newtonsoft.Json.Formatting.Indented));
   if(report.summary.result!=BuildResult.Succeeded)throw new Exception("Build failed: "+report.summary.result);
  }

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -75,6 +76,7 @@ public class MainController : MonoBehaviour
     }
     private int selectedVRIndex = 1;
     public int SelectedVRIndex => selectedVRIndex;
+    public bool AcceptsManualInput(int rigIndex) => selectedVRIndex == 0 || rigIndex == 0 || selectedVRIndex == rigIndex;
     public bool CurrentAutoTrimEnabled => sequenceStarted && GetCurrentSequenceStep()?.autoTrim == true;
     private AutoTrimConfig currentAutoTrimSettings = new AutoTrimConfig();
     private bool? flightCheckOverride;
@@ -109,6 +111,8 @@ public class MainController : MonoBehaviour
     public string CurrentExperimentTitle { get; private set; }
     public bool SequencePreparing { get; private set; }
     public bool SequenceStopping { get; private set; }
+    private bool returningToSetup;
+    private GameObject savingTransition;
     public string RecordingTransitionError { get; private set; }
     private readonly List<string> recordingWarnings = new List<string>();
     public IReadOnlyList<string> RecordingWarnings => recordingWarnings;
@@ -327,7 +331,7 @@ public class MainController : MonoBehaviour
                     Debugger.Log($"Loaded system config for: {config.vrId} with targetDisplay: {config.targetDisplay}", 3);
                 }
 
-                if (!systemConfigs.ContainsKey("VR" + selectedVRIndex) && systemConfigs.Count > 0)
+                if (selectedVRIndex != 0 && !systemConfigs.ContainsKey("VR" + selectedVRIndex) && systemConfigs.Count > 0)
                         selectedVRIndex = systemConfigs.Keys.Select(RuntimeRigRegistry.ParseIndex).Min();
                 Debugger.Log($"Successfully loaded system config file: {systemConfigFileName}", 3);
             }
@@ -686,7 +690,11 @@ public class MainController : MonoBehaviour
         Debugger.Log("MainController.OnSceneLoaded()", 3);
         // Saved replay system/layout owns its additive environment, including its rig count.
         if (mode == LoadSceneMode.Additive && FindFirstObjectByType<ReplayController>() != null) return;
-        if (mode == LoadSceneMode.Single) SceneTransitionPending = false;
+        if (mode == LoadSceneMode.Single)
+        {
+            SceneTransitionPending = false;
+            if (scene.name == "ControlScene" && savingTransition == null) returningToSetup = false;
+        }
         try { RuntimeRigRegistry.Configure(scene, systemConfigs); }
         catch (System.Exception error) { FailExperiment(error); return; }
 
@@ -781,8 +789,8 @@ public class MainController : MonoBehaviour
     {
         int[] ids = systemConfigs.Keys.Select(RuntimeRigRegistry.ParseIndex).OrderBy(i => i).ToArray();
         if (ids.Length == 0) return;
-        int at = System.Array.IndexOf(ids, selectedVRIndex);
-        selectedVRIndex = ids[(at + 1) % ids.Length];
+        int next = System.Array.IndexOf(ids, selectedVRIndex) + 1;
+        selectedVRIndex = next == ids.Length ? 0 : ids[next];
     }
 
     private void HandleBogongGainInput()
@@ -790,10 +798,14 @@ public class MainController : MonoBehaviour
         if (ExperimentInput.IsEditingText) return;
         var keys = UnityEngine.InputSystem.Keyboard.current;
         if (keys == null) return;
+        bool upperRigs = keys.shiftKey.isPressed;
         for (int index = 0; index < animalDigitKeys.Length; index++)
-            if (keys[animalDigitKeys[index]].wasPressedThisFrame || keys[animalNumberKeys[index]].wasPressedThisFrame)
-                if (systemConfigs.ContainsKey("VR" + (index + 1))) selectedVRIndex = index + 1;
-        if (keys.digit0Key.wasPressedThisFrame || keys.numpad0Key.wasPressedThisFrame) SelectNextAnimal();
+        {
+            if (!keys[animalDigitKeys[index]].wasPressedThisFrame && !keys[animalNumberKeys[index]].wasPressedThisFrame) continue;
+            int rigIndex = index + (upperRigs ? 10 : 1);
+            if (systemConfigs.ContainsKey("VR" + rigIndex)) selectedVRIndex = rigIndex;
+        }
+        if (keys.digit0Key.wasPressedThisFrame || keys.numpad0Key.wasPressedThisFrame) selectedVRIndex = 0;
         string vrId = "VR" + selectedVRIndex;
         if (!vrClosedLoops.TryGetValue(vrId, out ClosedLoop tracking) || tracking == null || !tracking.UsesBogongInput) return;
         // BogongAustralia: dcOffsetStep (0.005) * 100 * dt; held brackets select the direction.
@@ -815,28 +827,91 @@ public class MainController : MonoBehaviour
 
     void Update()
     {
-        HandleBogongGainInput();
-        if (sequenceStarted)
+        // Handle Escape before a timed scene transition can start in the same frame.
+        if (ExperimentInput.CancelPressed)
         {
-            ManageTimerAndTransitions();
+            HandleEscape();
+            return;
         }
-
-        // One owner for Escape: stop the experiment; Escape in Control exits the player.
-        if (ExperimentInput.CancelReleased) HandleEscape();
+        HandleBogongGainInput();
+        if (sequenceStarted) ManageTimerAndTransitions();
     }
 
     public void HandleEscape()
     {
+        if (returningToSetup) return;
+        Scene activeScene = SceneManager.GetActiveScene();
+        string scene = activeScene.name;
+        bool saving = SequenceStopping || MasterDataLogger.Instance?.IsFinalizing == true;
+        if (saving && scene == "ControlScene") return;
         if (SequencePreparing) { StopSequence("cancelled-during-model-load"); return; }
-        if(SceneManager.GetActiveScene().name=="ReplayScene" && FindFirstObjectByType<ReplayController>()?.TryCloseModal()==true)return;
-        if (SceneManager.GetActiveScene().name == "ControlScene")
+        if (scene == "ReplayScene" && FindFirstObjectByType<ReplayController>()?.TryCloseModal() == true) return;
+        if (scene == "ControlScene")
         {
             if(ConfigurationUI.ConfigWorkbench.Instance?.TryHandleSetupEscape()==true)return;
             Application.Quit();
             return;
         }
-        StopSequence();
-        SceneManager.LoadScene("ControlScene");
+        returningToSetup = true;
+        if (scene == "ReplayScene")
+        {
+            if (!saving) StopSequence();
+            SceneManager.LoadScene("ControlScene");
+            return;
+        }
+
+        savingTransition = ShowSavingTransition(activeScene);
+        if (!saving) StopSequence();
+        StartCoroutine(ReturnToSetupAfterSavingFrame());
+    }
+
+    private static GameObject ShowSavingTransition(Scene scene)
+    {
+        // Persistent display-clear cameras remain active while the stimulus cameras stop.
+        foreach (var setter in FindObjectsByType<ViewportSetter>(FindObjectsSortMode.None))
+            if (setter.gameObject.scene == scene) setter.enabled = false;
+        foreach (var camera in FindObjectsByType<Camera>(FindObjectsSortMode.None))
+            if (camera.gameObject.scene == scene) camera.enabled = false;
+
+        var overlay = new GameObject("Saving data transition", typeof(RectTransform), typeof(Canvas));
+        DontDestroyOnLoad(overlay);
+        var canvas = overlay.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 32000;
+        var backdrop = new GameObject("Backdrop", typeof(RectTransform), typeof(UnityEngine.UI.Image));
+        backdrop.GetComponent<UnityEngine.UI.Image>().color = Color.black;
+        StretchOverlay(backdrop, overlay.transform);
+
+        var heading = new GameObject("Saving data", typeof(RectTransform), typeof(UnityEngine.UI.Text));
+        StretchOverlay(heading, overlay.transform);
+        var label = heading.GetComponent<UnityEngine.UI.Text>();
+        label.font = Resources.Load<Font>("ConfigurationUI/Fonts/Inter-Regular") ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        label.fontSize = Mathf.RoundToInt(34 * DesktopDisplay.UiScale);
+        label.alignment = TextAnchor.MiddleCenter;
+        label.color = Color.white;
+        label.text = "Saving data…";
+        return overlay;
+    }
+
+    private static void StretchOverlay(GameObject item, Transform parent)
+    {
+        var rect = item.GetComponent<RectTransform>();
+        rect.SetParent(parent, false);
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = rect.offsetMax = Vector2.zero;
+    }
+
+    private IEnumerator ReturnToSetupAfterSavingFrame()
+    {
+        // Let the saving frame render before Unity begins loading the next scene.
+        yield return null;
+        yield return SceneManager.LoadSceneAsync("ControlScene");
+        // The setup workbench builds its own saving screen on Start.
+        yield return null;
+        Destroy(savingTransition);
+        savingTransition = null;
+        returningToSetup = false;
     }
 
     void LoadScene(SequenceStep step)
@@ -845,9 +920,6 @@ public class MainController : MonoBehaviour
         phaseRunner?.Cancel();
         Debugger.Log("MainController.LoadScene()", 3);
         SyncTimestamp();
-
-        // Clear the screen to black before loading the new scene
-        ClearScreenToBlack();
 
         SceneManager.LoadScene(SceneCompatibility.Resolve(step.sceneName));
     }

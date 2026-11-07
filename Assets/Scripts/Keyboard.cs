@@ -17,10 +17,12 @@ public class Keyboard : MonoBehaviour
     private void OnDisable() => MainController.SystemConfigurationChanged -= ApplySystemConfig;
     private void Start() => ApplySystemConfig();
     private bool manualEnabled = true;
+    private int rigIndex;
     private void ApplySystemConfig()
     {
         var main = MainController.Instance;
         if (main == null || !main.TryGetSystemConfigForGameObject(gameObject, out SystemConfig system)) return;
+        rigIndex = RuntimeRigRegistry.ParseIndex(system.vrId);
         var config = system.manualControls;
         if (config == null) return; // Preserve existing prefab tuning when the optional block is absent.
         manualEnabled = config.enabled;
@@ -36,7 +38,7 @@ public class Keyboard : MonoBehaviour
 
     public void ApplyInput(float deltaTime)
     {
-        bool manualInput = manualEnabled && !ExperimentInput.IsEditingText;
+        bool manualInput = manualEnabled && !ExperimentInput.IsEditingText && MainController.Instance?.AcceptsManualInput(rigIndex) != false;
         if (manualInput && ExperimentInput.ControlHeld && ExperimentInput.Pressed("Pause"))
             autopilotEnabled = !autopilotEnabled;
         // One adjustment per press, independent of frame rate. No simultaneous movement.

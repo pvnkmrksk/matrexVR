@@ -207,7 +207,7 @@ public partial class ReplayController : MonoBehaviour
                     foreach(var rig in run.archive.Rigs.Values)foreach(var sample in rig)run.worldState.RequireFrame(sample.presentationId,sample.unityFrame);
                 }
                 if(includeAgents)
-                    foreach(string file in ReplaySessionArchive.CsvFiles(run.archive.DirectoryPath))
+                    foreach(string file in ReplaySessionArchive.RecordedFiles(run.archive.DirectoryPath))
                     {
                         try
                         {
@@ -223,7 +223,10 @@ public partial class ReplayController : MonoBehaviour
                         }
                         catch(Exception error){if(run.archive.Presentations.IsCurrentContract)throw;run.archive.Warn("Population recording unavailable: "+Path.GetFileName(file)+" — "+error.Message);}
                     }
-                if(run.agents.Count==0)run.archive.Warn("No recorded population tracks were loaded. Unrecorded agents are not resimulated as if they were the original experiment.");
+                if (run.agents.Count == 0)
+                    run.archive.Warn((bool?)run.archive.SystemConfiguration?["saveSwarmData"] == false
+                        ? "Population recording was disabled for this run. Replay shows the recorded animal tracks without the virtual populations."
+                        : "No recorded population tracks were loaded. Unrecorded agents are not resimulated as if they were the original experiment.");
                 return run;
             }
             catch {run.worldState?.Dispose();foreach(var stream in run.agents)stream.Dispose();throw;}
@@ -239,9 +242,9 @@ public partial class ReplayController : MonoBehaviour
         if(archive.Presentations.IsCurrentContract)interpolateAnimalPoses=false;
         foreach(var stream in loaded.agents)populations.Add(new Population{stream=stream});
         absoluteSessionPath=archive.DirectoryPath;folderInput=absoluteSessionPath;replayTime=archive.FirstExperimentTime;referenceSample=null;
-        BuildMarkers();BuildStepTimeline();
+        BuildMarkers();BuildReplayViewOrder();BuildStepTimeline();
         environmentLoader.BeginSession(archive,rigOrder,loaded.worldState);
-        mediaPanel=new ReplayMediaPanel(this,()=>isPlaying=false);mediaPanel.SetRigs(rigOrder);mediaPanel.Load(archive.DirectoryPath,archive.OriginTicks);
+        mediaPanel=new ReplayMediaPanel(this,()=>isPlaying=false,cameraViewOrder.Count<=1);mediaPanel.SetRigs(cameraViewOrder);mediaPanel.Load(archive.DirectoryPath,archive.OriginTicks);
         FitOverview();ApplyView();RenderFrame();
         loading=false;loadProgress="";
     }
@@ -335,7 +338,7 @@ public partial class ReplayController : MonoBehaviour
         float span=Mathf.Max(5,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z));
         overviewPivot=trajectoryBounds.center;overviewYaw=0;overviewPitch=90;
         overviewDistance=trajectoryBounds.extents.y+span*2+10;overviewUserAdjusted=false;overviewDragButton=-1;
-        overview.rect=CurrentReplayViewport();
+        overview.rect=WorkspaceReplayViewport();
         float aspect=Mathf.Max(.1f,overview.pixelWidth/(float)Mathf.Max(1,overview.pixelHeight));
         overview.orthographicSize=Mathf.Max(2,Mathf.Max(trajectoryBounds.extents.z,trajectoryBounds.extents.x/aspect))*1.15f;
         if(overviewPerspective)overviewDistance=overview.orthographicSize/Mathf.Tan(25*Mathf.Deg2Rad);
@@ -348,7 +351,15 @@ public partial class ReplayController : MonoBehaviour
         if(overview!=null)overview.enabled=selectedView<0;
         if(selectedView<0 && !overviewUserAdjusted)FitOverview();
         if(selectedView>=0)overviewDragButton=-1;
-        for(int i=0;i<rigOrder.Count;i++)if(camerasByRig.TryGetValue(rigOrder[i],out var camera)){camera.targetTexture=null;FitReplayAnimalViewport(camera);camera.enabled=selectedView==i;}
+        if(UseReplayGrid)return;
+        ReleaseReplayGrid();
+        if(previewCamera!=null){previewCamera.targetTexture=null;previewCamera=null;}
+        for(int i=0;i<rigOrder.Count;i++)if(camerasByRig.TryGetValue(rigOrder[i],out var camera))
+        {
+            camera.targetTexture=null;
+            FitReplayAnimalViewport(camera);
+            camera.enabled=selectedView==i;
+        }
     }
     public void ShowAnimalView(string id)
     {
@@ -357,7 +368,6 @@ public partial class ReplayController : MonoBehaviour
         selectedView=index;ApplyView();
     }
     public void ShowOverview(){selectedView=-1;ApplyView();}
-    private void CycleView(){selectedView++;if(selectedView>=rigOrder.Count)selectedView=-1;ApplyView();}
 
     private void ApplyOverviewPose()
     {
@@ -614,26 +624,33 @@ public partial class ReplayController : MonoBehaviour
     }
     private void UpdateAnimalPreview()
     {
-        if(mediaPanel==null)return;
+        if(UpdateReplayGrid() || mediaPanel==null)return;
         bool mainPixelView = selectedView >= 0 && pixelScaleAnimalView;
         if((selectedView>=0 && !mainPixelView) || (!mainPixelView && !mediaPanel.Expanded) || OperatorOverlayVisibility.Hidden)
         {
-            if(previewCamera!=null){previewCamera.targetTexture=null;if(selectedView<0)previewCamera.enabled=false;previewCamera=null;}
+            if(previewCamera!=null)
+            {
+                previewCamera.targetTexture=null;
+                previewCamera.enabled=selectedView>=0;
+                FitReplayAnimalViewport(previewCamera);
+                previewCamera=null;
+            }
             mediaPanel.SetAnimalPreview(null,null);return;
         }
         string id=mainPixelView?rigOrder[selectedView]:mediaPanel.PreviewRig;
         if(id==null || !camerasByRig.TryGetValue(id,out var camera))return;
         if(previewCamera!=null && previewCamera!=camera){previewCamera.targetTexture=null;previewCamera.enabled=false;}
-        var saved=(archive?.SystemConfiguration?["configs"] as JArray)?.OfType<JObject>().FirstOrDefault(config=>(string)config["vrId"]==id);
+        var saved=SavedReplayRig(id);
         bool desktop=(bool?)saved?["desktopPreview"]==true;
         int width=desktop?(mainPixelView?Mathf.Clamp(Screen.width,128,4096):512):Mathf.Clamp((int?)saved?["ledPanelWidth"]??128,1,4096);
         int height=desktop?Mathf.Max(1,Mathf.RoundToInt(width/Mathf.Max(.01f,camera.aspect))):Mathf.Clamp((int?)saved?["ledPanelHeight"]??128,1,1024);
         height=Mathf.Clamp(height,1,4096);
-        if(animalPreviewTexture==null || animalPreviewTexture.width!=width || animalPreviewTexture.height!=height)
+        var filter=desktop?FilterMode.Bilinear:FilterMode.Point;
+        if(animalPreviewTexture==null || animalPreviewTexture.width!=width || animalPreviewTexture.height!=height || animalPreviewTexture.filterMode!=filter)
         {
             if(previewCamera!=null)previewCamera.targetTexture=null;
             if(animalPreviewTexture!=null){animalPreviewTexture.Release();Destroy(animalPreviewTexture);}
-            animalPreviewTexture=new RenderTexture(width,height,24){name="Replay front panel preview",filterMode=desktop?FilterMode.Bilinear:FilterMode.Point};animalPreviewTexture.Create();
+            animalPreviewTexture=new RenderTexture(width,height,24){name="Replay front panel preview",filterMode=filter};animalPreviewTexture.Create();
         }
         previewCamera=camera;camera.targetTexture=animalPreviewTexture;camera.rect=new Rect(0,0,1,1);camera.enabled=environmentLoader?.Loading!=true;
         mediaPanel.SetAnimalPreview(mainPixelView?null:animalPreviewTexture,"Animal "+id+" · front"+(environmentLoader?.Loading==true?" · restoring scene":""));
@@ -691,6 +708,9 @@ public partial class ReplayController : MonoBehaviour
         timelineMouseCaptured=timelineMouseUpSeen=false;
         overviewUserAdjusted=false;overviewDragButton=-1;
         followedRig = null;
+        ReleaseReplayGrid();
+        savedReplayRigs.Clear();
+        cameraViewOrder.Clear();
         mediaPanel?.Dispose();mediaPanel=null;recordedDashboard?.CloseSession();recordedDashboard=null;
         if(previewCamera!=null){previewCamera.targetTexture=null;previewCamera=null;}
         if(animalPreviewTexture!=null){animalPreviewTexture.Release();Destroy(animalPreviewTexture);animalPreviewTexture=null;}
@@ -701,6 +721,7 @@ public partial class ReplayController : MonoBehaviour
     }
     private void OnDestroy()
     {
+        ReleaseReplayGrid();
         mediaPanel?.Dispose();recordedDashboard?.CloseSession();
         if(previewCamera!=null)previewCamera.targetTexture=null;
         if(animalPreviewTexture!=null){animalPreviewTexture.Release();Destroy(animalPreviewTexture);}

@@ -30,7 +30,7 @@ namespace ConfigurationUI
             // Programmatic fallback only; Tab traverses the actual controls.
             root.focusable=true;root.tabIndex=-1;
             root.RegisterCallback<KeyDownEvent>(evt=>{
-                if(preparing)return;
+                if(preparing||nativeFilePickerPending||SavingScreenVisible)return;
                 bool command=evt.ctrlKey||evt.commandKey;
                 Action action=null;
                 if(evt.keyCode==KeyCode.F1)action=ShowKeyboardHelp;
@@ -51,6 +51,7 @@ namespace ConfigurationUI
         // cannot close a dialog and then also quit the application in that frame.
         public bool TryHandleSetupEscape()
         {
+            if(SavingScreenVisible||nativeFilePickerPending||libraryPicker!=null)return true;
             if(modal!=null){CloseModal();return true;}
             if(rawPending){UpdateStatus("JSON draft kept. Apply or discard it before leaving this editor.");return true;}
             if(!homeMode){Guard(ShowSessionHome);return true;}

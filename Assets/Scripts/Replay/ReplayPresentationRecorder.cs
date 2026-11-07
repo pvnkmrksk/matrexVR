@@ -60,9 +60,13 @@ public static class ReplayPresentationRecorder
             visuals.Add(new JObject{["family"]="Kannadi",["kind"]=rig.IsSwarm?"Swarm":"Kannadi",["rig"]="VR"+rig.VRIndex,
                 ["layer"]=RuntimeRigRegistry.LayerLabel(RuntimeRigRegistry.StimulusLayer(rig.VRIndex)),["prefab"]=rig.tilePrefab!=null?rig.tilePrefab.name:null});
         foreach(var spawner in UnityEngine.Object.FindObjectsByType<LocustSpawner>(FindObjectsSortMode.None).Where(spawner=>spawner.gameObject.scene==scene))
-            visuals.Add(new JObject{["family"]="Swarm",["kind"]="Swarm",["layer"]=RuntimeRigRegistry.LayerLabel(spawner.ResolvedLayer),
+        {
+            var visual = new JObject { ["family"]="Swarm",["kind"]="Swarm",["layer"]=RuntimeRigRegistry.LayerLabel(spawner.ResolvedLayer),
                 ["prefab"]=spawner.locustPrefab!=null?spawner.locustPrefab.name:null,["agentVisual"]=spawner.agentVisual,
-                ["worldUnitsPerMetre"]=spawner.worldUnitsPerMetre,["bogongVisual"]=spawner.bogongVisual!=null?ReplayConfigurationJson.Capture(spawner.bogongVisual):null});
+                ["worldUnitsPerMetre"]=spawner.worldUnitsPerMetre,["bogongVisual"]=spawner.bogongVisual!=null?ReplayConfigurationJson.Capture(spawner.bogongVisual):null };
+            if (spawner.agentGroups?.Length > 0) visual["agentGroups"] = JArray.FromObject(spawner.agentGroups);
+            visuals.Add(visual);
+        }
         entry["populationVisuals"]=visuals;
         entry["sha256"] = ReplayPresentationJournal.HashEntry(entry);
         File.AppendAllText(Path.Combine(logger.directoryPath, FileName), entry.ToString(Formatting.None) + "\n");

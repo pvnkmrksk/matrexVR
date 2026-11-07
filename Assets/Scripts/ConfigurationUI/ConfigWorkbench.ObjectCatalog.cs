@@ -36,6 +36,16 @@ namespace ConfigurationUI
                 var modelPicker=new DropdownField(modelLabels,modelPaths.IndexOf(modelCurrent)){name="external-model-"+string.Join("-",parts),tooltip="Choose an embedded GLB file under StreamingAssets. Drop new .glb files there and reopen this editor to refresh the list."};
                 var modelRow=new VisualElement();modelRow.AddToClassList("external-model-control");modelPicker.AddToClassList("model-file-menu");
                 var modelInput=new TextField {value=modelCurrent,isDelayed=true,name="external-model-path-"+string.Join("-",parts),tooltip="Model path relative to StreamingAssets, or an existing absolute GLB path. The original model is archived with the run."};modelInput.textEdition.placeholder="Optional .glb path";modelRow.Add(modelInput);modelRow.Add(modelPicker);
+                var browse=IconButton("file","Browse for a GLB file",()=>BrowseFile("Open GLB model","glb",path=>{
+                    assign(new JValue(path));
+                    RefreshBoundText(modelInput,path);
+                    if(!modelPaths.Contains(path))
+                    {
+                        modelPaths.Add(path);modelLabels.Add(path);modelPicker.choices=modelLabels;
+                    }
+                    modelPicker.SetValueWithoutNotify(path);
+                }));
+                browse.name="browse-external-model-"+string.Join("-",parts);modelRow.Add(browse);
                 BindDelayedText(modelInput,text=>assign(new JValue(text)));
                 modelPicker.RegisterValueChangedCallback(e=>Guard(()=>{RequireApplied();string chosen=modelPaths[modelLabels.IndexOf(e.newValue)];assign(new JValue(chosen));RefreshBoundText(modelInput,chosen);}));control=modelRow;return true;
             }

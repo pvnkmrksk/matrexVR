@@ -175,7 +175,7 @@ public sealed class DesktopDashboard : MonoBehaviour
                 catch (Newtonsoft.Json.JsonException) { } // An interrupted older launch can leave a partial receipt.
                 catch (InvalidCastException) { }
             }
-            var info = TrackerProcessManager.DetachedStart(executable, new[] { "--no-browser", "--live-only", "--host", "127.0.0.1", "--port", "8060", "--telemetry", Endpoint(), "--telemetry-topic", MainController.Instance?.TelemetrySettings?.topic ?? "matrex.telemetry.v2" }, Path.GetDirectoryName(executable), Path.Combine(state, "dashboard.log"));
+            var info = TrackerProcessManager.DetachedStart(executable, new[] { "--no-browser", "--host", "127.0.0.1", "--port", "8060", "--telemetry", Endpoint(), "--telemetry-topic", MainController.Instance?.TelemetrySettings?.topic ?? "matrex.telemetry.v2" }, Path.GetDirectoryName(executable), Path.Combine(state, "dashboard.log"));
             using (var process = Process.Start(info))
             {
                 if (process == null) throw new IOException("The viewer process could not start.");

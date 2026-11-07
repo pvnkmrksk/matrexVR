@@ -106,6 +106,7 @@ public static class OperatorOverlayVisibility
     public static void SetHidden(bool value)
     {
         if(Hidden==value)return;Hidden=value;Changed?.Invoke();
-        if(value)for(int i=0;i<Display.displays.Length;i++)if(Display.displays[i].active)DisplayFrameClear.ClearOnce(i);
+        if(value)for(int i=0;i<Display.displays.Length;i++)
+            if(Display.displays[i].active&&!DisplayBackgroundClear.CoversDisplay(i))DisplayFrameClear.ClearOnce(i);
     }
 }

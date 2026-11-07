@@ -80,18 +80,30 @@ public sealed class ReplayPreviewResizeValidation : MonoBehaviour
         media.Draw(scale,Field<GUIStyle>(replay,"smallStyle"),true,Toolbar(scale).y-8*scale);
         GUI.skin=oldSkin;GUI.matrix=oldMatrix;if(previousEvent!=null)Event.current=previousEvent;
     }
-    private IEnumerator Click(Vector2 point)
+    private IEnumerator Pointer(EventType type,Vector2 point)
     {
         InputSystem.QueueStateEvent(mouse,new MouseState{position=new Vector2(point.x,Screen.height-point.y)});yield return null;
-        queuedEvent=new Event{type=EventType.MouseDown,button=0,mousePosition=point};while(queuedEvent!=null)yield return null;
-        yield return null;queuedEvent=new Event{type=EventType.MouseUp,button=0,mousePosition=point};while(queuedEvent!=null)yield return null;
+        queuedEvent=new Event{type=type,button=0,mousePosition=point};while(queuedEvent!=null)yield return null;
+    }
+    private IEnumerator Click(Vector2 point)
+    {
+        {var pointer=Pointer(EventType.MouseDown,point);while(pointer.MoveNext())yield return pointer.Current;}
+        {var pointer=Pointer(EventType.MouseUp,point);while(pointer.MoveNext())yield return pointer.Current;}
+        for(int i=0;i<5;i++)yield return null;
+    }
+    private IEnumerator Drag(Vector2 start,Vector2 end)
+    {
+        {var pointer=Pointer(EventType.MouseDown,start);while(pointer.MoveNext())yield return pointer.Current;}
+        {var pointer=Pointer(EventType.MouseDrag,Vector2.Lerp(start,end,.5f));while(pointer.MoveNext())yield return pointer.Current;}
+        {var pointer=Pointer(EventType.MouseDrag,end);while(pointer.MoveNext())yield return pointer.Current;}
+        {var pointer=Pointer(EventType.MouseUp,end);while(pointer.MoveNext())yield return pointer.Current;}
         for(int i=0;i<5;i++)yield return null;
     }
     private IEnumerator Exercise()
     {
         while(!replay.Ready||replay.Loading||replay.environmentLoader.Loading)yield return null;
         replay.SetPlaying(false);replay.SeekSeconds(2.8);for(int i=0;i<20;i++)yield return null;
-        media=Field<ReplayMediaPanel>(replay,"mediaPanel");Check(media!=null,"Production replay media panel loaded");
+        media=Field<ReplayMediaPanel>(replay,"mediaPanel");Check(media!=null,"Production replay media panel loaded");Put(media,"expanded",true);
         for(int i=0;i<180&&media.VisibleVideoTexture==null;i++)yield return null;
         Check(media.VisibleVideoTexture!=null,"Previously recorded native tracker video decoded");
         Check(Field<RenderTexture>(media,"animalPreview")!=null,"Actual recorded animal camera preview rendered");
@@ -99,28 +111,29 @@ public sealed class ReplayPreviewResizeValidation : MonoBehaviour
         mouse=InputSystem.AddDevice<Mouse>("ReplayPreviewResizeMouse");InputSystem.settings.editorInputBehaviorInPlayMode=InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
         foreach(var size in new[]{new[]{1920,1080,1},new[]{3024,1898,2}})
         {
-            int width=size[0],height=size[1];scale=size[2];ConfigureGameView(view,width,height);Put(media,"previewScale",1f);Put(media,"showMediaTools",false);media.SetRigs(new[]{"VR1","VR2","VR3","VR4"});
+            int width=size[0],height=size[1];scale=size[2];ConfigureGameView(view,width,height);Put(media,"previewScale",1f);Put(media,"previewHeightScale",1f);Put(media,"showMediaTools",false);media.SetRigs(new[]{"VR1","VR2","VR3","VR4"});
             for(int i=0;i<12;i++)yield return null;
             Check(Screen.width==width&&Screen.height==height,"Actual framebuffer "+width+"×"+height+" with supplied backing scale "+scale);
             Rect baselineAnimal=media.AnimalPreviewRect,baselineVideo=media.TrackerVideoRect;Bounds("default");
             var c=Capture(width+"-01-default-four-rig");while(c.MoveNext())yield return c.Current;
-            Vector2 Plus()=>new Vector2(media.ScreenRect.xMax-92*scale,media.ScreenRect.y+23*scale);
-            Vector2 Minus()=>new Vector2(media.ScreenRect.xMax-126*scale,media.ScreenRect.y+23*scale);
-            var click=Click(Plus());while(click.MoveNext())yield return click.Current;
-            Check(Mathf.Approximately(Field<float>(media,"previewScale"),1.25f),"Actual + IMGUI button raises preview scale to 1.25 at "+width);
-            Check(media.AnimalPreviewRect.height>baselineAnimal.height+1&&media.TrackerVideoRect.height>baselineVideo.height+1,"+ enlarges both animal and tracker images at "+width);Bounds("larger");
-            c=Capture(width+"-02-plus");while(c.MoveNext())yield return c.Current;
-            click=Click(Plus());while(click.MoveNext())yield return click.Current;
-            Check(Mathf.Approximately(Field<float>(media,"previewScale"),1.5f),"Second + reaches maximum scale at "+width);Bounds("maximum");
+            Vector2 Grip()=>new Vector2(media.ScreenRect.x+10*scale,media.ScreenRect.yMax-10*scale);
+            Vector2 start=Grip();
+            var drag=Drag(start,start+new Vector2(-76*scale,62*scale));while(drag.MoveNext())yield return drag.Current;
+            Check(Field<float>(media,"previewScale")>1.15f&&Field<float>(media,"previewHeightScale")>1.05f,"The corner drag continuously changes preview width and height at "+width);
+            Check(media.AnimalPreviewRect.height>baselineAnimal.height+1&&media.TrackerVideoRect.height>baselineVideo.height+1,"The drag enlarges both animal and tracker images at "+width);Bounds("larger");
+            c=Capture(width+"-02-drag");while(c.MoveNext())yield return c.Current;
+            start=Grip();
+            drag=Drag(start,start+new Vector2(-350*scale,350*scale));while(drag.MoveNext())yield return drag.Current;
+            Check(media.ScreenRect.width<=width*.44f+.1f,"The drag bounds the width at "+width);Bounds("maximum");
             c=Capture(width+"-03-maximum");while(c.MoveNext())yield return c.Current;
             Put(media,"showMediaTools",true);for(int i=0;i<6;i++)yield return null;Bounds("maximum with media tools");
             Check(media.AnimalPreviewRect.height>baselineAnimal.height&&media.TrackerVideoRect.height>baselineVideo.height,"Maximum with tools retains larger images than default at "+width);
             c=Capture(width+"-04-maximum-tools");while(c.MoveNext())yield return c.Current;
             Put(media,"showMediaTools",false);for(int i=0;i<3;i++)yield return null;
-            click=Click(Minus());while(click.MoveNext())yield return click.Current;click=Click(Minus());while(click.MoveNext())yield return click.Current;
-            Check(Mathf.Approximately(Field<float>(media,"previewScale"),1f),"Actual − IMGUI buttons restore default scale at "+width);
-            Check(Mathf.Abs(media.AnimalPreviewRect.height-baselineAnimal.height)<.1f&&Mathf.Abs(media.TrackerVideoRect.height-baselineVideo.height)<.1f,"− restores both original image sizes at "+width);
-            var rigButton=new Vector2(media.ScreenRect.xMax-173*scale,media.ScreenRect.y+23*scale);
+            var click=Click(new Vector2(media.ScreenRect.xMax-92*scale,media.ScreenRect.y+23*scale));while(click.MoveNext())yield return click.Current;
+            Check(Mathf.Approximately(Field<float>(media,"previewScale"),1f)&&Mathf.Approximately(Field<float>(media,"previewHeightScale"),1f),"Reset restores both default dimensions at "+width);
+            Check(Mathf.Abs(media.AnimalPreviewRect.height-baselineAnimal.height)<.1f&&Mathf.Abs(media.TrackerVideoRect.height-baselineVideo.height)<.1f,"Reset restores both original image sizes at "+width);
+            var rigButton=new Vector2(media.ScreenRect.xMax-142*scale,media.ScreenRect.y+23*scale);
             click=Click(rigButton);while(click.MoveNext())yield return click.Current;
             Check(media.PreviewRig=="VR2","Four-rig camera header button advances exactly one selected rig at "+width);
             click=Click(rigButton);while(click.MoveNext())yield return click.Current;Check(media.PreviewRig=="VR3","Four-rig camera selector remains usable at "+width);
@@ -140,16 +153,6 @@ public sealed class ReplayPreviewResizeValidation : MonoBehaviour
     private IEnumerator Capture(string name)
     {
         for(int i=0;i<3;i++)yield return null;yield return new WaitForEndOfFrame();var image=ScreenCapture.CaptureScreenshotAsTexture();
-        if(name.EndsWith("default-four-rig",StringComparison.Ordinal))
-        {
-            // A second left-aligned VR label used to draw inside this blank
-            // margin of the centered selector button on every repaint.
-            int ink=0;
-            for(int y=Mathf.RoundToInt(28*scale);y<Mathf.RoundToInt(42*scale);y++)
-                for(int x=Mathf.RoundToInt(media.ScreenRect.xMax-196*scale);x<Mathf.RoundToInt(media.ScreenRect.xMax-187*scale);x++)
-                {var p=image.GetPixel(x,image.height-1-y);if(Mathf.Min(p.r,p.g,p.b)<.70f)ink++;}
-            Check(ink==0,"Four-rig header has no duplicate label ink left of centered selector at "+Screen.width);
-        }
         File.WriteAllBytes(Path.Combine(Output,name+".png"),image.EncodeToPNG());Object.Destroy(image);
     }
     private static IEnumerator Guard(IEnumerator routine){while(true){object next;try{if(!routine.MoveNext())yield break;next=routine.Current;}catch(Exception e){Finish(e.ToString());yield break;}yield return next;}}

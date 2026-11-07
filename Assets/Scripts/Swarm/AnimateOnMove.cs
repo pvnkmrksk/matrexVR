@@ -3,7 +3,7 @@ using UnityEngine.Serialization;
 using System.Collections.Generic;
 
 /// <summary>Translation-only animation gate, measured in world units per second (cm/s in this project).</summary>
-[DefaultExecutionOrder(150)]
+[DefaultExecutionOrder(510)]
 public class AnimateOnMove : MonoBehaviour
 {
     [SerializeField, FormerlySerializedAs("noiseThreshold")] private float speedThreshold = 0.5f;
@@ -15,6 +15,9 @@ public class AnimateOnMove : MonoBehaviour
     private Vector2 periodicSize;
     private float playbackSpeed = 1f;
     private bool configured;
+    private bool externalSampling, walking;
+    private StockLocustPlayback clipPlayback;
+    private int clipIndex;
     public float CurrentSpeed { get; private set; }
 
     public static void ConfigureHierarchy(GameObject root, Transform source, bool gate, float threshold, Vector2 wrapSize)
@@ -44,6 +47,7 @@ public class AnimateOnMove : MonoBehaviour
             if (legacyAnimation != null)
                 foreach (AnimationState state in legacyAnimation) legacySpeeds[state.name] = state.speed;
         }
+        externalSampling = false;
         movementSource = source != null ? source : transform;
         speedThreshold = Mathf.Max(0, threshold);
         periodicSize = wrapSize;
@@ -73,12 +77,61 @@ public class AnimateOnMove : MonoBehaviour
     }
     private void SetPlayback(bool moving)
     {
-        if (animator != null) animator.speed = moving ? playbackSpeed : 0;
+        float speed = moving ? playbackSpeed : 0;
+        if (clipPlayback != null) clipPlayback.SetSpeed(clipIndex, speed);
+        else if (animator != null) animator.speed = speed;
         if (legacyAnimation != null)
             foreach (AnimationState state in legacyAnimation)
-                state.speed = moving && legacySpeeds.TryGetValue(state.name, out float speed) ? speed : 0;
+                state.speed = moving && legacySpeeds.TryGetValue(state.name, out float legacySpeed) ? legacySpeed : 0;
     }
-    private void OnDisable() => SetPlayback(true);
+    internal void AttachClipPlayback(StockLocustPlayback playback, int index)
+    {
+        clipPlayback = playback;
+        clipIndex = index;
+    }
+
+    internal void DetachClipPlayback(StockLocustPlayback playback)
+    {
+        if (clipPlayback == playback) clipPlayback = null;
+    }
+
+    internal bool CanSampleExternally => configured && enabled && animator != null &&
+        legacyAnimation == null && movementSource == transform;
+
+    internal void BeginExternalSampling()
+    {
+        externalSampling = true;
+        walking = false;
+        CurrentSpeed = 0;
+        enabled = false;
+        SetPlayback(false);
+    }
+
+    internal void ApplySampledSpeed(float speed)
+    {
+        if (!externalSampling) return;
+        CurrentSpeed = speed;
+        // Start at the configured threshold. Stop below 80% to avoid chattering.
+        bool moving = speed > speedThreshold * (walking ? .8f : 1f);
+        if (moving == walking) return;
+        walking = moving;
+        SetPlayback(walking);
+    }
+
+    internal void EndExternalSampling()
+    {
+        if (!externalSampling) return;
+        externalSampling = false;
+        lastPosition = movementSource != null ? movementSource.position : transform.position;
+        CurrentSpeed = 0;
+        SetPlayback(false);
+        enabled = true;
+    }
+
+    private void OnDisable()
+    {
+        if (!externalSampling) SetPlayback(true);
+    }
     // Legacy public setters retained for existing callers.
     public void SetNoiseThreshold(float threshold) => speedThreshold = Mathf.Max(0, threshold);
     public void SetEnabled(bool value) => Configure(movementSource, value, speedThreshold, periodicSize);

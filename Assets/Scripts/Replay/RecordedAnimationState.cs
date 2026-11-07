@@ -302,6 +302,8 @@ public sealed class RecordedAnimationSnapshot : AsyncSwarmWriter.IPackedAnimatio
 public sealed class RecordedAnimationCapture
 {
     private readonly GameObject root;
+    private readonly StockLocustPlayback clipPlayback;
+    private readonly int clipIndex;
     private Animator[] animators;
     private string[] paths;
     private BogongSwarmRenderer ownProcedural;
@@ -317,6 +319,7 @@ public sealed class RecordedAnimationCapture
     public RecordedAnimationCapture(GameObject source)
     {
         root = source;
+        StockLocustPlayback.TryGet(source, out clipPlayback, out clipIndex);
         jsonText=new StringWriter(json,CultureInfo.InvariantCulture);
         animators = root.GetComponentsInChildren<Animator>(true);
         evidence.animators=new RecordedAnimationState.AnimatorPose[animators.Length];
@@ -352,6 +355,20 @@ public sealed class RecordedAnimationCapture
         var procedural = batch != null ? batch : ownProcedural;
         if (animators.Length == 0 && legacy.Length == 0 && procedural == null) return null;
         evidence.realizedPose=null;evidence.blendShapes=null;evidence.procedural=null;
+        if (clipPlayback != null && clipPlayback.UsesCache)
+        {
+            var pose = evidence.animators[0];
+            if (pose == null)
+            {
+                pose = new RecordedAnimationState.AnimatorPose {
+                    path = "", layers = new[] { new RecordedAnimationState.LayerPose { state = clipPlayback.StateHash, weight = 1 } },
+                    parameters = Array.Empty<RecordedAnimationState.ParameterPose>()
+                };
+                evidence.animators[0] = pose;
+            }
+            clipPlayback.ReadState(clipIndex, out pose.layers[0].time, out pose.speed);
+            return evidence;
+        }
         bool captureRealizedPose = false;
         for (int i = 0; i < animators.Length; i++)
         {

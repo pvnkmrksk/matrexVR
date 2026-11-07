@@ -75,7 +75,25 @@ namespace ConfigurationUI
             var present=DisplayKeys(payload,schema).Where(key=>key!="enabled"&&!new[]{"preStimulus","stimulus","postStimulus"}.Contains(key)).ToList();
             if(category=="Basics")
             {
-                Section(scroll,"Experiment","sequence",payload,schema,prefix,new[]{"durationSeconds","populationMode",AgentCountKey(payload),"numberOfRings","dimension"});
+                bool swarm = selected.SchemaId=="swarm" || selected.SchemaId=="kannadi" &&
+                    string.Equals(payload["populationMode"]?.ToString(),"Swarm",StringComparison.OrdinalIgnoreCase);
+                Section(scroll,"Experiment","sequence",payload,schema,prefix,swarm
+                    ? new[]{"durationSeconds","populationMode"}
+                    : new[]{"durationSeconds","populationMode","numberOfRings"});
+                if(swarm && payload["swarm"]?.Type!=JTokenType.Null)
+                {
+                    bool nested=payload["swarm"] is JObject;
+                    JObject population=nested?(JObject)payload["swarm"]:payload;
+                    JObject populationSchema=nested?ConfigSchema.Child(schema,"swarm"):schema;
+                    string[] populationPath=nested?prefix.Concat(new[]{"swarm"}).ToArray():prefix;
+                    Section(scroll,"Population and spawn","swarm",population,populationSchema,populationPath,
+                        new[]{AgentCountKey(population),"agentGroups","dimension","spawnType","spawnAreaSize","spawnVolumeSize","spawnCenter"});
+                    Section(scroll,"Periodic arena","navigation",population,populationSchema,populationPath,
+                        new[]{"periodicBoundary","boundaryLengthX","boundaryLengthZ","followAnimalPosition","wrapY","boundaryHeight","volumeHalfExtentMetres"});
+                    Section(scroll,"Camera distance","visibility",population,populationSchema,populationPath,new[]{"farClipMetres","nearClipMetres"});
+                }
+                else if(selected.SchemaId=="kannadi" && !swarm)
+                    Section(scroll,"Periodic arena","navigation",payload,schema,prefix,new[]{"periodicBoundary","boundaryLengthX","boundaryLengthZ"});
                 Section(scroll,"Tracking","navigation",payload,schema,prefix,new[]{"closedLoopOrientation","closedLoopPosition"});
                 var shortcuts=Row("editor-shortcuts");scroll.Add(shortcuts);
                 shortcuts.Add(StudioButton("Objects & sky","palette",()=>{settingsTab="Appearance";BuildContent();},"quiet"));
@@ -184,7 +202,17 @@ namespace ConfigurationUI
             {
                 setting.AddToClassList("vector-setting");
                 var vector=Row("vector-controls"); setting.Add(vector);
-                foreach(string axis in new[]{"x","y","z"}) { string component=axis; var field=NumberControl(obj[axis],ConfigSchema.Child(schema,axis),axis,v=>StudioEdit(doc,r=>{ if(!(ConfigDocument.At(r,parts) is JObject)) AssignAt(r,parts,obj.DeepClone()); ConfigDocument.At(r,parts)[component]=v; },false),false); field.tooltip=ConfigParameterHelp.Description(axis,parts.Concat(new[]{axis}).ToArray(),ConfigSchema.Child(schema,axis)); vector.Add(new Label(axis.ToUpperInvariant())); vector.Add(field); }
+                foreach(string axis in new[]{"x","y","z"})
+                {
+                    var component=Row("vector-axis"); vector.Add(component);
+                    var axisSchema=ConfigSchema.Child(schema,axis);
+                    var field=NumberControl(obj[axis],axisSchema,axis,v=>StudioEdit(doc,r=>{
+                        if(!(ConfigDocument.At(r,parts) is JObject)) AssignAt(r,parts,obj.DeepClone());
+                        ConfigDocument.At(r,parts)[axis]=v;
+                    },false),false);
+                    field.tooltip=ConfigParameterHelp.Description(axis,parts.Concat(new[]{axis}).ToArray(),axisSchema);
+                    component.Add(new Label(axis.ToUpperInvariant())); component.Add(field);
+                }
             }
             else if(shown is JObject color && new[]{"r","g","b"}.All(k=>color[k]!=null))
             {
@@ -217,7 +245,10 @@ namespace ConfigurationUI
                         timeSwitch.tooltip="ON samples the current UTC instant at experiment start. OFF uses the configured local date, time and UTC offset.";currentTime.Add(timeSwitch);fold.Add(currentTime);
                         BindViewState(timeSwitch,()=>{string time=ConfigDocument.At(doc.Root,parts)?["localTime"]?.ToString();timeSwitch.SetValueWithoutNotify(string.IsNullOrWhiteSpace(time)||string.Equals(time,"now",StringComparison.OrdinalIgnoreCase));});
                     }
-                    foreach(string property in DisplayKeys(nested,schema).Concat(key=="nightSky"?new[]{"utcOffsetHours"}:Array.Empty<string>()).Distinct().Where(p=>p!=flag))
+                    IEnumerable<string> optional = key=="swarm" && schema["properties"] is JObject fields
+                        ? fields.Properties().Select(p=>p.Name)
+                        : key=="nightSky"?new[]{"utcOffsetHours"}:Array.Empty<string>();
+                    foreach(string property in DisplayKeys(nested,schema).Concat(optional).Distinct().Where(p=>p!=flag))
                         fold.Add(Setting(doc,parts.Concat(new[]{property}).ToArray(),ConfigSchema.Child(schema,property),nested,schema));
                 };
                 BindViewState(fold,()=>fold.contentContainer.SetEnabled(flag==null || ExperimentBlocks.Flag(ConfigDocument.At(doc.Root,parts)?[flag],ExperimentBlocks.Flag(schema["properties"]?[flag]?["default"],true))));
@@ -228,7 +259,7 @@ namespace ConfigurationUI
             }
             else if(shown is JArray array)
             {
-                var controls=Row(); controls.Add(Pill(array.Count+" items","accent")); controls.Add(StudioButton("Edit items","settings",()=>{ selected=doc; advancedMode=true; path.Clear(); path.AddRange(parts); BuildContent(); },"quiet"));
+                var controls=Row(); controls.Add(Pill(array.Count+(key=="agentGroups"?" groups":" items"),"accent")); controls.Add(StudioButton("Edit items","settings",()=>{ selected=doc; advancedMode=true; path.Clear(); path.AddRange(parts); BuildContent(); },"quiet"));
                 controls.Add(IconButton("plus","Add item",()=>StudioEdit(doc,r=>{if(!(ConfigDocument.At(r,parts) is JArray))AssignAt(r,parts,array.DeepClone());((JArray)ConfigDocument.At(r,parts)).Add(ConfigSchema.NewValue(ConfigSchema.Child(schema,"",true)));}))); setting.Add(controls);
             }
             else if(key=="utcOffsetHours")
@@ -242,7 +273,7 @@ namespace ConfigurationUI
             else if(shown==null || shown.Type==JTokenType.Null)
             {
                 var controls=Row(); controls.Add(Pill(value==null?"Inherited / scene default":"Unset · null","muted-pill"));
-                controls.Add(Button("Set value",()=>assign(ConfigSchema.NewValue(schema),true),"quiet")); setting.Add(controls);
+                controls.Add(Button("Set value",()=>assign(NewSettingValue(key,owner,schema),true),"quiet")); setting.Add(controls);
             }
             else if(key=="closedLoopMode")
             {
@@ -262,7 +293,7 @@ namespace ConfigurationUI
             else if(schema["enum"] is JArray options)
             {
                 setting.AddToClassList("choice-setting");
-                var dropdown=EnumControl(options,shown,v=>assign(v,false)); setting.Add(dropdown);
+                var dropdown=EnumControl(options,shown,v=>assign(v,key=="populationMode")); setting.Add(dropdown);
             }
             else if(LosslessJson.Kind(shown)=="number" || LosslessJson.Kind(shown)=="integer")
             {
@@ -272,13 +303,15 @@ namespace ConfigurationUI
             else
             {
                 setting.AddToClassList("text-setting");
-                if(key.EndsWith("File") || key.EndsWith("Path") || key=="design" || key=="configFile") setting.AddToClassList("path-setting");
+                if(IsPathSetting(key)) setting.AddToClassList("path-setting");
                 var input=new TextField { value=shown.ToString(),isDelayed=true,multiline=key=="comments" }; setting.Add(input); BindDelayedText(input,text=>assign(new JValue(text),false));
                 BindViewState(input,()=>RefreshBoundText(input,ConfigSchema.EffectiveValue(ConfigDocument.At(doc.Root,parts),schema)?.ToString()));
             }
             Action enable=()=>{
                 var currentOwner=ConfigSchema.EffectiveValue(ConfigDocument.At(doc.Root,parts.Take(parts.Length-1).ToArray()),ownerSchema,true);
                 bool active=ConfigSchema.Enabled(currentOwner,ownerSchema,key,Context)&&ConfigSchema.Visible(currentOwner,ownerSchema,key,Context);
+                if((key=="agentCount"||key=="numberOfLocusts"||key=="density") &&
+                    currentOwner?["agentGroups"] is JArray groups && groups.Count>0)active=false;
                 if(key=="localTime"&&parts.Contains("nightSky"))
                 {var local=ConfigDocument.At(doc.Root,parts.Take(parts.Length-1).ToArray())?["localTime"]?.ToString();active&=!string.IsNullOrWhiteSpace(local)&&!string.Equals(local,"now",StringComparison.OrdinalIgnoreCase);}
                 if(EditingSky)
@@ -294,6 +327,26 @@ namespace ConfigurationUI
             };
             if(!buildingObjectCard)AddObjectPreview(setting,doc,parts);
             BindViewState(setting,enable); return setting;
+        }
+
+        private static bool IsPathSetting(string key) => key.EndsWith("File",StringComparison.Ordinal) ||
+            key.EndsWith("Path",StringComparison.Ordinal) || key=="design";
+
+        private static JToken NewSettingValue(string key,JObject owner,JObject schema)
+        {
+            if(key=="nearClipMetres") return new JValue(.001);
+            if(key=="farClipMetres") return new JValue(10);
+            if(key=="boundaryLengthX" || key=="boundaryLengthZ") return new JValue(200);
+            if(key!="spawnAreaSize" && key!="spawnVolumeSize" && key!="boundaryHeight") return ConfigSchema.NewValue(schema);
+            double x=ExperimentBlocks.Number(owner["boundaryLengthX"],200);
+            double z=ExperimentBlocks.Number(owner["boundaryLengthZ"],200);
+            double y=ExperimentBlocks.Number(owner["boundaryHeight"],Math.Min(x,z));
+            double side=Math.Min(1,Math.Min(x,Math.Min(y,z)));
+            if(key=="boundaryHeight") return new JValue(ExperimentBlocks.Number((owner["spawnVolumeSize"] as JObject)?["y"],
+                ExperimentBlocks.Number(owner["spawnAreaSize"],Math.Min(200,Math.Min(x,z)))));
+            if(key=="spawnAreaSize") return new JValue(side);
+            if(key=="spawnVolumeSize") return new JObject { ["x"]=side,["y"]=side,["z"]=side };
+            return ConfigSchema.NewValue(schema);
         }
         private int selectedSkyMode;
         private void BuildSkyChoices(VisualElement target,JObject payload,JObject schema,string[] prefix)
@@ -336,7 +389,8 @@ namespace ConfigurationUI
             JToken draft=null;
             Action flush=()=>{ if(draft==null) return; var number=draft; draft=null;numberDrafts.Remove(control); Guard(()=>{commit(number);lastValidText=number.ToString();MarkEditorCommitted(input,lastValidText);});RefreshSaveAvailability(); };
             var range=schema["x-ui"]?["slider"] as JObject;
-            bool integer=schema["type"] is JArray types?types.Any(t=>t.ToString()=="integer"):schema["type"]?.ToString()=="integer";
+            bool integer=ConfigSchema.Types(schema).Contains("integer") ||
+                (schema["type"]==null && LosslessJson.Kind(value)=="integer");
             string step=integer?"1":(range?["step"]?.ToString()??"0.1");
             Action<int,int> increment=(direction,power)=>Guard(()=>{
                 pending?.Pause();draft=null;numberDrafts.Remove(control);textDrafts.Remove(input);

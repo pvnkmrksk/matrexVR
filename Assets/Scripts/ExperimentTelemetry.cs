@@ -201,6 +201,7 @@ public sealed class ExperimentTelemetry : MonoBehaviour
                 ZmqListener.RawSample raw = listener != null ? listener.ReadRawSample() : default;
                 rigs.Add(new {
                     vrId = id, active = rig.isActiveAndEnabled,
+                    poseContinuityId = rig.PoseContinuityId,
                     pose = new { x = position.x, y = position.y, z = position.z, pitch = euler.x, yaw = euler.y, roll = euler.z },
                     headingDegrees = euler.y,
                     input = new { source = rig.GetCurrentMode().ToString(),
@@ -283,6 +284,8 @@ public sealed class ExperimentTelemetry : MonoBehaviour
         var scene = SceneManager.GetActiveScene();
         var step = main != null ? main.GetCurrentSequenceStep() : null;
         var metadata = main?.CurrentAnimalMetadata;
+        var choice = FindObjectsByType<ChoiceController>(FindObjectsSortMode.None)
+            .FirstOrDefault(controller => controller.gameObject.scene == scene);
         var animals = new List<object>();
         if (main != null)
             foreach (var rig in main.SystemConfigs.Values.OrderBy(r => RuntimeRigRegistry.ParseIndex(r.vrId)))
@@ -304,7 +307,8 @@ public sealed class ExperimentTelemetry : MonoBehaviour
                 durationSeconds = step?.duration ?? 0 },
             scene = new { name = scene.name, buildIndex = scene.buildIndex,
                 worldUnitsPerMetre = Terrain.activeTerrains.Any(t => t.gameObject.scene == scene) ? 1 : 100 },
-            telemetry = new { topic = settings?.topic ?? "matrex.telemetry.v2", contextIntervalSeconds = settings?.contextIntervalSeconds ?? 2 }, animals };
+            telemetry = new { topic = settings?.topic ?? "matrex.telemetry.v2", contextIntervalSeconds = settings?.contextIntervalSeconds ?? 2 },
+            animals, targets = choice?.AuthoredTargets };
     }
 
     private static object Sample(ZmqListener.RawSample raw, ClosedLoop rig)

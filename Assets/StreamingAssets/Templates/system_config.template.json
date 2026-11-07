@@ -123,6 +123,7 @@
     "trailWidthPixels": 1.5,
     "trailBreakDistance": 50
   },
+  "saveSwarmData": true,
   "targetFrameRate": 60,
   "vSyncCount": 0
 }

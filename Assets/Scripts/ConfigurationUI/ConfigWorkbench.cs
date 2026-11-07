@@ -85,7 +85,8 @@ namespace ConfigurationUI
                     ApplyResponsiveLayout(evt.newRect.width);
                 });
                 InstallEditPointerTracking();
-                BuildShell(); BuildNavigation(); BuildContent();
+                DesktopDisplay.PresentationChanged+=ResetWindowInput;
+                BuildShell(); BuildNavigation(); BuildContent(); AddRecordingSavingScreen();
                 // Cover the previous form and stop its raycasts; metadata is generated for the actual rig list.
                 foreach(var raycaster in FindObjectsByType<UnityEngine.UI.GraphicRaycaster>(FindObjectsSortMode.None))
                     if(raycaster.gameObject.scene==gameObject.scene && raycaster.enabled) { legacyRaycasters.Add(raycaster); raycaster.enabled=false; }
@@ -220,15 +221,15 @@ namespace ConfigurationUI
             else
             {
                 breadcrumb=new Label("$"+(path.Count==0?"":" / "+string.Join(" / ",path))); breadcrumb.AddToClassList("breadcrumb"); body.Add(breadcrumb);
-                var tools=Row(); body.Add(tools);
+                var tools=Row("parameter-tools"); body.Add(tools);
                 tools.Add(Button("↑ Parent",()=>{ if(path.Count>0) { path.RemoveAt(path.Count-1); BuildContent(); } }));
-                search=new TextField { value=filter }; search.AddToClassList("search"); tools.Add(search);
+                search=new TextField("Find") { value=filter, tooltip="Find a parameter or its current value." }; search.AddToClassList("search"); tools.Add(search);
                 search.RegisterValueChangedCallback(e=>{ filter=e.newValue; RefreshRows(); });
-                omitted=new Toggle("Omitted fields") { value=false }; tools.Add(omitted); omitted.RegisterValueChangedCallback(_=>RefreshRows());
-                inapplicable=new Toggle("All modes") { value=false }; tools.Add(inapplicable); inapplicable.RegisterValueChangedCallback(_=>RefreshRows());
+                omitted=StateSwitch(false,_=>RefreshRows(),"show-omitted-parameters"); omitted.text="Omitted fields"; tools.Add(omitted);
+                inapplicable=StateSwitch(false,_=>RefreshRows(),"show-all-parameter-modes"); inapplicable.text="All modes"; tools.Add(inapplicable);
                 fields=new ListView(rows,64,()=>new VisualElement(),BindRow) { selectionType=SelectionType.None,virtualizationMethod=CollectionVirtualizationMethod.FixedHeight };
                 fields.AddToClassList("fields"); body.Add(fields); RefreshRows();
-                var add=Row(); body.Add(add);
+                var add=Row("parameter-tools"); body.Add(add);
                 if(Current is JArray)
                     add.Add(Button("+ Add item",()=>Change(node=>{
                         var array=(JArray)node; var value=ConfigSchema.NewValue(ConfigSchema.Child(CurrentSchema,"",true));
@@ -282,62 +283,73 @@ namespace ConfigurationUI
             string key=rows[index]; bool array=Current is JArray;
             JToken value=array?Current[int.Parse(key)]:Current[key]; JObject schema=ConfigSchema.Child(CurrentSchema,key,array);
             var caption=new VisualElement(); caption.AddToClassList("caption"); row.Add(caption);
-            caption.Add(new Label(array?ItemLabel(value,int.Parse(key)):Pretty(key)));
-            var hint=new Label(array?"item "+key:key+(schema["x-ui"]?["unit"]!=null?" · "+schema["x-ui"]["unit"]:"")); hint.AddToClassList("key-hint"); caption.Add(hint);
+            var title=new Label(array?ItemLabel(value,int.Parse(key)):Pretty(key)); title.AddToClassList("field-title"); caption.Add(title);
+            var hint=new Label(array?"Item "+(int.Parse(key)+1):key+(schema["x-ui"]?["unit"]!=null?" · "+schema["x-ui"]["unit"]:"")); hint.AddToClassList("key-hint"); caption.Add(hint);
             row.tooltip=ConfigParameterHelp.Description(key,path.Concat(new[]{key}).ToArray(),schema);
             var edit=Row("field-controls"); row.Add(edit);
+            var control=Row("field-value"); edit.Add(control);
+            var actions=Row("field-actions"); edit.Add(actions);
             BindViewState(edit,()=>edit.SetEnabled(array || ConfigSchema.Enabled(Current,CurrentSchema,key,Context)));
             Action<JToken> replace=v=>{
                 bool structural=value==null || value is JContainer || v is JContainer || value.Type==JTokenType.Null || v.Type==JTokenType.Null;
                 if(structural)Change(node=>{ if(array) ((JArray)node)[int.Parse(key)]=v; else node[key]=v; });
                 else StudioEdit(selected,_=>{var node=Current;if(array)((JArray)node)[int.Parse(key)]=v;else node[key]=v;},false);
             };
-            if(TryChoiceCatalogControl(path.Concat(new[]{key}).ToArray(),value,replace,out var catalogControl))edit.Add(catalogControl);
-            else if(value==null) edit.Add(Button("+ Set value",()=>replace(ConfigSchema.NewValue(schema)),"quiet"));
+            if(TryChoiceCatalogControl(path.Concat(new[]{key}).ToArray(),value,replace,out var catalogControl))control.Add(catalogControl);
+            else if(value==null) control.Add(Button("+ Set value",()=>replace(ConfigSchema.NewValue(schema)),"quiet"));
             else if(value is JContainer && !(value is JValue))
             {
                 // JRaw is a scalar JValue; object/array forms are opened lazily.
-                edit.Add(Button(value is JArray a?a.Count+" items  →":"Configure  →",()=>{ path.Add(key); BuildContent(); }));
+                control.Add(Button(value is JArray a?a.Count+" items  →":"Configure  →",()=>{ path.Add(key); BuildContent(); }));
             }
             else if(value.Type==JTokenType.Null)
-            { edit.Add(new Label("null · unset / inherited")); edit.Add(Button("Set",()=>replace(ConfigSchema.NewValue(schema)))); }
+            { control.Add(new Label("Unset · null")); control.Add(Button("Set",()=>replace(ConfigSchema.NewValue(schema)))); }
             else if(BooleanControl(value,schema))
             {
-                var toggle=StateSwitch(ExperimentBlocks.Flag(value),on=>replace(BooleanValue(on,value,schema))); edit.Add(toggle);
+                var toggle=StateSwitch(ExperimentBlocks.Flag(value),on=>replace(BooleanValue(on,value,schema))); control.Add(toggle);
             }
             else if(schema["enum"] is JArray options)
             {
-                edit.Add(EnumControl(options,value,replace));
+                var choice=EnumControl(options,value,replace);
+                choice.AddToClassList("property-choice"); control.Add(choice);
             }
+            else if(LosslessJson.Kind(value)=="number" || LosslessJson.Kind(value)=="integer")
+                control.Add(NumberControl(value,schema,key,replace,false));
             else
             {
-                var text=new TextField { value=value.ToString(),isDelayed=true }; edit.Add(text);
-                BindDelayedText(text,entered=>{
-                    try
-                    {
-                        JToken v=value.Type==JTokenType.String?new JValue(entered):LosslessJson.Parse(entered);
-                        string kind=LosslessJson.Kind(v); if(value.Type!=JTokenType.String && kind!="number" && kind!="integer") throw new ArgumentException("Enter a JSON number; use the JSON view to change its type.");
-                        replace(v);
-                    }
-                    catch { text.SetValueWithoutNotify(value.ToString()); throw; }
-                });
+                var text=new TextField { value=value.ToString(),isDelayed=true };
+                text.AddToClassList(IsPathSetting(key)?"property-path":"property-text"); control.Add(text);
+                BindDelayedText(text,entered=>replace(new JValue(entered)));
             }
             if(value!=null)
             {
-                if(ConfigSchema.Types(schema).Contains("null") && value.Type!=JTokenType.Null) edit.Add(Button("∅",()=>replace(JValue.CreateNull()),"mini"));
+                if(ConfigSchema.Types(schema).Contains("null") && value.Type!=JTokenType.Null)
+                {
+                    var clear=Button("∅",()=>replace(JValue.CreateNull()),"mini");
+                    clear.tooltip="Set value to null"; actions.Add(clear);
+                }
                 if(array)
                 {
                     int position=int.Parse(key);
-                    edit.Add(IconButton("copy","Duplicate item",()=>Change(node=>((JArray)node).Insert(position+1,node[position].DeepClone()))));
-                    edit.Add(IconButton("up","Move item up",()=>Move(position,-1))); edit.Add(IconButton("down","Move item down",()=>Move(position,1)));
+                    actions.Add(IconButton("copy","Duplicate item",()=>Change(node=>((JArray)node).Insert(position+1,node[position].DeepClone()))));
+                    var up=IconButton("up","Move item up",()=>Move(position,-1)); up.SetEnabled(position>0); actions.Add(up);
+                    var down=IconButton("down","Move item down",()=>Move(position,1)); down.SetEnabled(position<((JArray)Current).Count-1); actions.Add(down);
                 }
-                edit.Add(IconButton("trash","Remove value",()=>Change(node=>{ if(array) ((JArray)node).RemoveAt(int.Parse(key)); else ((JObject)node).Property(key).Remove(); })));
+                actions.Add(IconButton("trash","Remove value",()=>Change(node=>{ if(array) ((JArray)node).RemoveAt(int.Parse(key)); else ((JObject)node).Property(key).Remove(); })));
             }
         }
         private void Move(int position,int offset)
         { Change(node=>{ var array=(JArray)node; int target=position+offset; if(target<0 || target>=array.Count) return; var value=array[position]; array.RemoveAt(position); array.Insert(target,value); }); }
-        private static string ItemLabel(JToken value,int index)
-        { return value is JObject obj?(string)(obj["vrId"]??obj["sceneName"]??obj["name"]??obj["type"])??"Item "+(index+1):"Item "+(index+1); }
+        private string ItemLabel(JToken value,int index)
+        {
+            if(value is JObject obj)
+            {
+                if(path.LastOrDefault()=="agentGroups")
+                    return (obj["appearance"]?.ToString()??"Stock")+(obj["count"]!=null?" · "+obj["count"]:"");
+                return (string)(obj["vrId"]??obj["sceneName"]??obj["name"]??obj["type"])??"Item "+(index+1);
+            }
+            return "Item "+(index+1);
+        }
         private void UpdateStatus(string message=null)
         {
             UpdateFrameRate();RefreshNavigationLabels();
@@ -378,7 +390,7 @@ namespace ConfigurationUI
             var title=new Label("Session metadata"); title.AddToClassList("title"); body.Add(title);
             EnsureMetadata();
             var scroll=new ScrollView(); scroll.AddToClassList("metadata"); body.Add(scroll);
-            var experimenter=new TextField("Experimenter") { value=metadata.ExperimenterName }; scroll.Add(experimenter); experimenter.RegisterValueChangedCallback(e=>{metadata.ExperimenterName=e.newValue;UpdateStatus();});
+            var experimenter=new TextField("Experimenter") { value=metadata.ExperimenterName }; experimenter.AddToClassList("metadata-scalar"); scroll.Add(experimenter); experimenter.RegisterValueChangedCallback(e=>{metadata.ExperimenterName=e.newValue;UpdateStatus();});
             var comments=new TextField("Comments") { multiline=true,value=metadata.Comments }; scroll.Add(comments); comments.RegisterValueChangedCallback(e=>{metadata.Comments=e.newValue;UpdateStatus();});
             foreach(var rig in (Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>())
             {
@@ -388,9 +400,12 @@ namespace ConfigurationUI
                 var f=fly;
                 foreach(string key in new[]{"AnimalID","AgeDays","StarvedSinceHours"})
                 {
-                    var property=typeof(AnimalMetadata).GetProperty(key); var field=new TextField(Human(key)) { value=(string)property.GetValue(f) }; scroll.Add(field); field.RegisterValueChangedCallback(e=>{property.SetValue(f,e.newValue);UpdateStatus();});
+                    var property=typeof(AnimalMetadata).GetProperty(key); var field=new TextField(Human(key)) { value=(string)property.GetValue(f) };
+                    field.AddToClassList("metadata-scalar");
+                    if(key!="AnimalID")field.AddToClassList("metadata-quantity");
+                    scroll.Add(field); field.RegisterValueChangedCallback(e=>{property.SetValue(f,e.newValue);UpdateStatus();});
                 }
-                var sex=new DropdownField("Sex",new List<string>{"Unspecified","Female","Male"},0) { value=string.IsNullOrEmpty(f.Sex)?"Unspecified":f.Sex }; scroll.Add(sex); sex.RegisterValueChangedCallback(e=>{f.Sex=e.newValue;UpdateStatus();});
+                var sex=new DropdownField("Sex",new List<string>{"Unspecified","Female","Male"},0) { value=string.IsNullOrEmpty(f.Sex)?"Unspecified":f.Sex }; sex.AddToClassList("metadata-scalar"); scroll.Add(sex); sex.RegisterValueChangedCallback(e=>{f.Sex=e.newValue;UpdateStatus();});
             }
             scroll.Add(Button("Save metadata",()=>{ SaveMetadata(); UpdateStatus("Session metadata saved."); }));
             UpdateStatus();
@@ -672,7 +687,7 @@ namespace ConfigurationUI
         private void RestoreSetupAfterStart()
         {
             preparing=false;enabled=true;Document.enabled=true;root=Document.rootVisualElement;root.AddToClassList("workbench");
-            WorkbenchTypography.Apply(root);root.styleSheets.Add(Resources.Load<StyleSheet>("ConfigurationUI/workbench"));BuildShell();BuildNavigation();BuildContent();
+            WorkbenchTypography.Apply(root);root.styleSheets.Add(Resources.Load<StyleSheet>("ConfigurationUI/workbench"));BuildShell();BuildNavigation();BuildContent();AddRecordingSavingScreen();
         }
         private IEnumerator WaitForSequencePreparation(MainController main)
         {
@@ -684,6 +699,7 @@ namespace ConfigurationUI
             }
             if(main!=null&&main.SequenceRunning){Destroy(gameObject);yield break;}
             preparing=false;body.SetEnabled(true);side.SetEnabled(true);RefreshStartCaption();
+            UpdateRecordingFinalizationBanner();
             UpdateStatus(main?.SequenceError??"Experiment preparation cancelled.");
         }
         private void OnDisable()
@@ -691,6 +707,7 @@ namespace ConfigurationUI
         private void OnDestroy()
         {
             LeaveRecordingLibrary();
+            DesktopDisplay.PresentationChanged-=ResetWindowInput;
             keyboardFocusFallback?.Pause();
             pendingPointerRebuild?.Pause();
             pendingBlockRefresh?.Pause();
@@ -698,6 +715,16 @@ namespace ConfigurationUI
             if(panel!=null) Destroy(panel);
             if(Instance==this) Instance=null;
         }
-        private void OnApplicationFocus(bool focused){if(!focused)editPointerHeld=false;}
+        private void OnApplicationFocus(bool focused)
+        {
+            if(!focused)ResetWindowInput();
+        }
+        private void ResetWindowInput()
+        {
+            editPointerHeld=false;
+            int pointerId=PointerId.mousePointerId;
+            if(root?.panel?.GetCapturingElement(pointerId) is VisualElement capture)capture.ReleasePointer(pointerId);
+            if(panel!=null)panel.scale=DesktopDisplay.UiScale;
+        }
     }
 }

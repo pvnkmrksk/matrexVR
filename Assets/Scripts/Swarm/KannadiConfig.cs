@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -9,6 +10,9 @@ using UnityEngine;
 // Kept separate from Choice's schema so numeric locust gains do not change other experiments.
 [JsonConverter(typeof(StringEnumConverter))]
 public enum RandomInitialHeadingDistribution { Continuous, Cardinal }
+
+[JsonConverter(typeof(StringEnumConverter))]
+public enum SwarmSpawnType { Random, Grid }
 
 [Serializable]
 public class KannadiConfig : SwarmConfig
@@ -27,7 +31,6 @@ public class KannadiConfig : SwarmConfig
     public float? hexRadius;
     public float? spacing; // Legacy name; hexRadius takes precedence.
     public string kannadiTilePrefab;
-    public bool periodicBoundary = true;
     public string skyboxPath; // An explicit horizontal panorama takes precedence over nightSky.
     public NightSkyConfig nightSky; // Omitted preserves the existing scene background.
     public bool autopilotEnabled = false;
@@ -100,6 +103,9 @@ public class KannadiConfig : SwarmConfig
         if (!Finite(radius) || radius <= 0) throw new ArgumentException("Kannadi hexRadius/spacing must be positive and finite.");
         if (numberOfRings > 100) throw new ArgumentException("Kannadi numberOfRings exceeds the supported limit of 100.");
         ValidateSwarm();
+        if (HasAgentGroups && (!string.IsNullOrWhiteSpace(kannadiModelPath) ||
+            (!string.IsNullOrWhiteSpace(kannadiTilePrefab) && kannadiTilePrefab != "SimulatedLocust")))
+            throw new ArgumentException("agentGroups require the built-in SimulatedLocust model.");
         if (string.IsNullOrWhiteSpace(skyboxPath) && nightSky != null && nightSky.enabled) nightSky.Validate();
         if (!Finite(autopilotSpeed) || autopilotSpeed < 0)
             throw new ArgumentException("autopilotSpeed must be finite and nonnegative (world units per second).");
@@ -207,15 +213,28 @@ public class LocustGainConverter : JsonConverter
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => throw new NotSupportedException();
 }
 
+[JsonConverter(typeof(StringEnumConverter))]
+public enum SwarmAgentAppearance { Stock, Black }
+
+[Serializable]
+public class SwarmAgentGroupConfig
+{
+    public int count = 128;
+    public Vector3Config spawnOffset = new Vector3Config();
+    public SwarmAgentAppearance appearance;
+}
+
 [Serializable]
 public class SwarmConfig
 {
+    internal const float DefaultBoundaryLength = 200f;
     public string modelPath; // Optional embedded GLB visual for generated or recorded agents.
     public ModelAppearanceConfig modelAppearance;
     public string trajectoryFile = ""; // Blank retains the generated swarm.
     public SwarmPlaybackConfig playback = new SwarmPlaybackConfig();
     public float? worldUnitsPerMetre; // Omitted: scenes with active Terrain=1; legacy walking scenes=100.
     public float? nearClipMetres;
+    public float? farClipMetres;
     public bool useHeadingReference = false;
     public string headingReferenceId = ""; // Empty retains the existing within-experiment reference.
     public string directionDistribution = "Legacy"; // VonMises opts into the normalized circular sampler.
@@ -227,6 +246,7 @@ public class SwarmConfig
     public int? numberOfLocusts;
     public int? agentCount; // Preferred neutral name; takes precedence over numberOfLocusts.
     public float? density;
+    public SwarmSpawnType spawnType = SwarmSpawnType.Random;
     public float? spawnAreaSize;
     public float? mu;
     public float? kappa;
@@ -235,11 +255,14 @@ public class SwarmConfig
     public float? agentSpeed;
     public float? agentSpeedStdDev;
     public float? locoSpeed; // Historical spelling accepted on input.
-    [JsonIgnore] public int? EffectiveAgentCount => agentCount ?? numberOfLocusts;
+    public SwarmAgentGroupConfig[] agentGroups;
+    [JsonIgnore] public bool HasAgentGroups => agentGroups != null && agentGroups.Length != 0;
+    [JsonIgnore] public int? EffectiveAgentCount => HasAgentGroups
+        ? agentGroups.Sum(group => group.count) : agentCount ?? numberOfLocusts;
     [JsonIgnore] public float? EffectiveAgentSpeed => agentSpeed ?? locustSpeed ?? locoSpeed;
     [JsonIgnore] public float EffectiveAgentSpeedStdDev => agentSpeedStdDev ?? locustSpeedStdDev;
     public float? volumeHalfExtentMetres; // Optional generated cube: +/- this physical distance on each axis.
-    public bool preserveBoundaryOvershoot; // Opt-in exact periodic wrapping instead of legacy edge snapping.
+    public bool preserveBoundaryOvershoot = true; // Retained for existing files. Generated swarms always preserve overshoot.
     // "2D" is the historical X/Z swarm. "3D" enables a sampled Y volume and Y wrapping.
     public string dimension = "2D";
     public Vector3Config spawnCenter;
@@ -250,8 +273,9 @@ public class SwarmConfig
     public bool wrapY;
     public string agentVisual = "ScenePrefab";
     public BogongVisualConfig bogongVisual;
-    public float boundaryLengthX = 200f;
-    public float boundaryLengthZ = 200f;
+    public bool periodicBoundary = true;
+    public float? boundaryLengthX;
+    public float? boundaryLengthZ;
     public bool animateOnMove;
     public float animationSpeedThreshold = 0.5f;
     public void ValidateSwarm()
@@ -265,10 +289,13 @@ public class SwarmConfig
         playback?.Validate();
         if (nearClipMetres.HasValue && (!Finite(nearClipMetres.Value) || nearClipMetres <= 0))
             throw new ArgumentException("nearClipMetres must be positive metres.");
+        if (farClipMetres.HasValue && (!Finite(farClipMetres.Value) || farClipMetres <= 0 || farClipMetres <= nearClipMetres))
+            throw new ArgumentException("farClipMetres must be positive and greater than nearClipMetres when both are set.");
         if (worldUnitsPerMetre.HasValue && (!Finite(worldUnitsPerMetre.Value) || worldUnitsPerMetre <= 0))
             throw new ArgumentException("worldUnitsPerMetre must be positive.");
-        if (!Finite(boundaryLengthX) || !Finite(boundaryLengthZ) || boundaryLengthX <= 0 || boundaryLengthZ <= 0)
-            throw new ArgumentException("Boundary dimensions must be positive and finite.");
+        foreach (var length in new[] { boundaryLengthX, boundaryLengthZ })
+            if (length.HasValue && (!Finite(length.Value) || length <= 0))
+                throw new ArgumentException("Boundary dimensions must be positive and finite.");
         if (!Finite(animationSpeedThreshold) || animationSpeedThreshold < 0)
             throw new ArgumentException("animationSpeedThreshold must be finite and nonnegative (world units per second).");
         if (numberOfLocusts.HasValue && numberOfLocusts.Value < 0)
@@ -277,6 +304,8 @@ public class SwarmConfig
             throw new ArgumentException("agentCount must be nonnegative.");
         if (density.HasValue && (!Finite(density.Value) || density.Value < 0))
             throw new ArgumentException("density must be finite and nonnegative agents per world-unit area/volume.");
+        if (!Enum.IsDefined(typeof(SwarmSpawnType), spawnType))
+            throw new ArgumentException("spawnType must be Random or Grid.");
         if (spawnAreaSize.HasValue && (!Finite(spawnAreaSize.Value) || spawnAreaSize.Value <= 0))
             throw new ArgumentException("spawnAreaSize must be positive and finite.");
         if (mu.HasValue && !Finite(mu.Value))
@@ -303,10 +332,68 @@ public class SwarmConfig
             throw new ArgumentException("kappaElevation must be finite and nonnegative.");
         if (boundaryHeight.HasValue && (!Finite(boundaryHeight.Value) || boundaryHeight.Value <= 0))
             throw new ArgumentException("boundaryHeight must be positive and finite when supplied.");
+        if (!volumeHalfExtentMetres.HasValue || worldUnitsPerMetre.HasValue)
+            ValidateSpawnBounds(worldUnitsPerMetre ?? 1);
         if (!string.Equals(agentVisual, "ScenePrefab", StringComparison.OrdinalIgnoreCase) &&
             !string.Equals(agentVisual, "Bogong", StringComparison.OrdinalIgnoreCase))
             throw new ArgumentException("agentVisual must be ScenePrefab or Bogong.");
         bogongVisual?.Validate();
+        if (HasAgentGroups)
+        {
+            if (!string.IsNullOrWhiteSpace(trajectoryFile) || !string.IsNullOrWhiteSpace(modelPath) ||
+                !string.Equals(agentVisual, "ScenePrefab", StringComparison.OrdinalIgnoreCase) || modelAppearance?.enabled == true)
+                throw new ArgumentException("agentGroups require generated stock locusts and supply their own appearances.");
+            long total = 0;
+            foreach (var group in agentGroups)
+            {
+                if (group == null || group.count <= 0 || !Enum.IsDefined(typeof(SwarmAgentAppearance), group.appearance))
+                    throw new ArgumentException("Every agent group needs a positive count and a Stock or Black appearance.");
+                ValidateVector(group.spawnOffset, "agentGroups spawnOffset", false);
+                if (!string.Equals(dimension, "3D", StringComparison.OrdinalIgnoreCase) && (group.spawnOffset?.y ?? 0) != 0)
+                    throw new ArgumentException("agentGroups spawnOffset.y must be zero in a 2D swarm.");
+                total += group.count;
+            }
+            if (total > int.MaxValue) throw new ArgumentException("The combined agent group count is too large.");
+        }
+    }
+
+    internal float? PhysicalArenaSize(float unitsPerMetre) => volumeHalfExtentMetres.HasValue
+        ? (float)(2d * volumeHalfExtentMetres.Value * unitsPerMetre) : (float?)null;
+
+    internal void ValidateSpawnBounds(float unitsPerMetre)
+    {
+        if (!string.IsNullOrWhiteSpace(trajectoryFile)) return;
+        float? cubeSide = PhysicalArenaSize(unitsPerMetre);
+        if (cubeSide.HasValue && (!Finite(cubeSide.Value) || cubeSide.Value <= 0))
+            throw new ArgumentException("volumeHalfExtentMetres must produce a positive finite arena size in scene units.");
+        if (!periodicBoundary) return;
+        float? x = spawnVolumeSize?.x ?? spawnAreaSize;
+        float? z = spawnVolumeSize?.z ?? spawnAreaSize;
+        if (x > (boundaryLengthX ?? cubeSide ?? DefaultBoundaryLength) || z > (boundaryLengthZ ?? cubeSide ?? DefaultBoundaryLength))
+            throw new ArgumentException("The spawn area must fit inside the periodic X and Z lengths.");
+        bool verticalWrap = wrapY && string.Equals(dimension, "3D", StringComparison.OrdinalIgnoreCase);
+        if (verticalWrap && (spawnVolumeSize?.y ?? spawnAreaSize) > (boundaryHeight ?? cubeSide))
+            throw new ArgumentException("The spawn volume must fit inside the periodic boundary height.");
+        if (!HasAgentGroups) return;
+        float lengthX = boundaryLengthX ?? cubeSide ?? DefaultBoundaryLength;
+        float lengthZ = boundaryLengthZ ?? cubeSide ?? DefaultBoundaryLength;
+        float? lengthY = verticalWrap ? boundaryHeight ?? cubeSide : null;
+        float implicitSize = Math.Min(cubeSide ?? 0, Math.Min(lengthX, lengthZ));
+        if (lengthY.HasValue) implicitSize = Math.Min(implicitSize, lengthY.Value);
+        ValidateAgentGroupBounds(new Vector3(x ?? implicitSize, spawnVolumeSize?.y ?? spawnAreaSize ?? implicitSize, z ?? implicitSize),
+            lengthX, lengthZ, lengthY);
+    }
+    internal void ValidateAgentGroupBounds(Vector3 size, float lengthX, float lengthZ, float? lengthY)
+    {
+        if (!HasAgentGroups || !periodicBoundary) return;
+        foreach (var group in agentGroups)
+        {
+            if (group == null) continue; // ValidateSwarm reports malformed entries.
+            Vector3 offset = group.spawnOffset?.ToVector3() ?? Vector3.zero;
+            if (size.x + 2d * Math.Abs(offset.x) > lengthX || size.z + 2d * Math.Abs(offset.z) > lengthZ ||
+                lengthY.HasValue && size.y + 2d * Math.Abs(offset.y) > lengthY.Value)
+                throw new ArgumentException("Every agent group's spawn area and offset must fit inside the shared periodic arena.");
+        }
     }
     private static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
     private static void ValidateVector(Vector3Config value, string name, bool positive)

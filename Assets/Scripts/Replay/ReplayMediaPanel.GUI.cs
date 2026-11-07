@@ -9,6 +9,8 @@ public sealed partial class ReplayMediaPanel
     private bool showMediaTools;
     private GUIStyle mediaHeading,mediaCaption,mediaFormTitle;
     private int mediaFontSize;
+    private Vector2 mediaResizePointer;
+    private const int ResizeMediaCard = 143294;
     private void EnsureMediaStyles(GUIStyle source,float scale)
     {
         if(textStyle!=null&&mediaFontSize==source.fontSize&&textStyle.font==source.font)return;
@@ -26,8 +28,9 @@ public sealed partial class ReplayMediaPanel
         if(clearFocus){GUI.FocusControl(null);clearFocus=false;}
         EnsureMediaStyles(smallStyle,scale);
         mediaCaption.normal.textColor=smallStyle.normal.textColor;
-        float margin=12*scale,row=28*scale,width=Mathf.Min(350*scale*previewScale,Screen.width*.40f);
-        width=Mathf.Max(Mathf.Min(280*scale,Screen.width*.40f),width);
+        float margin=12*scale,row=28*scale;
+        float maximumWidth=Screen.width*.44f;
+        float width=Mathf.Clamp(350*scale*previewScale,Mathf.Min(280*scale,maximumWidth),maximumWidth);
         float inner=width-24*scale;
         bool hasAnimal=animalPreview!=null,hasVideo=clip!=null || pendingArchive!=null;
         string caption=VideoCaption();
@@ -42,7 +45,7 @@ public sealed partial class ReplayMediaPanel
             if(showMediaTools)chrome+=2*(row+6*scale)+6*scale;
         }
         int imageCount=(hasAnimal?1:0)+(hasVideo?1:0);
-        float requestedImageHeight=Mathf.Min(inner*.56f,Screen.height*.19f*previewScale);
+        float requestedImageHeight=Mathf.Min(inner*.85f,Screen.height*.17f*previewHeightScale);
         // Grow the actual images with the preview control, then share the
         // remaining viewport budget so neither image can cover the transport.
         float imageHeight=imageCount>0?Mathf.Min(requestedImageHeight,Mathf.Max(0,(availableHeight-chrome)/imageCount)):0;
@@ -51,15 +54,26 @@ public sealed partial class ReplayMediaPanel
         visibleRect=new Rect(Screen.width-width-margin,margin,width,height);
         GUI.Box(visibleRect,GUIContent.none);float x=visibleRect.x+12*scale,y=visibleRect.y+9*scale,w=inner;
         GUI.enabled=interactable && !HasModal && pendingOperation==null;
-        GUI.Label(new Rect(x,y,w-192*scale,row),"Cameras",mediaHeading);
+        ReplayController.DrawReplayIcon(new Rect(x,y+5*scale,18*scale,18*scale),"camera",Color.white);
+        GUI.Label(new Rect(x+24*scale,y,w-172*scale,row),"Footage",mediaHeading);
         if(rigs.Count>1)
         {
-            if(GUI.Button(new Rect(x+w-188*scale,y,54*scale,row),PreviewRig??"VR1"))selectedRig=(selectedRig+1)%rigs.Count;
+            if(GUI.Button(new Rect(x+w-160*scale,y,60*scale,row),new GUIContent(PreviewRig??"VR1","Select the next rig in numeric order.")))
+                selectedRig=(selectedRig+1)%rigs.Count;
         }
-        else GUI.Label(new Rect(x+w-188*scale,y,54*scale,row),PreviewRig??"VR1",mediaHeading);
-        if(GUI.Button(new Rect(x+w-128*scale,y,28*scale,row),new GUIContent("−","Make previews smaller.")))previewScale=Mathf.Max(.75f,previewScale-.25f);
-        if(GUI.Button(new Rect(x+w-94*scale,y,28*scale,row),new GUIContent("+","Make previews larger.")))previewScale=Mathf.Min(1.5f,previewScale+.25f);
+        else GUI.Label(new Rect(x+w-158*scale,y,54*scale,row),PreviewRig??"VR1",mediaHeading);
+        var resetRect=new Rect(x+w-94*scale,y,28*scale,row);
+        if(GUI.Button(resetRect,new GUIContent("","Restore the default camera panel size.")))
+            previewScale=previewHeightScale=1;
+        ReplayController.DrawReplayIcon(new Rect(resetRect.x+6*scale,y+6*scale,16*scale,16*scale),"refresh-cw",Color.white);
         if(GUI.Button(new Rect(x+w-60*scale,y,60*scale,row),expanded?"Hide":"Show"))expanded=!expanded;
+        var resizeRect=new Rect(visibleRect.x,visibleRect.yMax-20*scale,20*scale,20*scale);
+        if(ReplayController.DragReplayHandle(resizeRect,ResizeMediaCard,GUI.enabled && expanded,true,ref mediaResizePointer,out var delta))
+        {
+            previewScale=Mathf.Clamp((width-delta.x)/(350*scale),.8f,maximumWidth/(350*scale));
+            previewHeightScale=Mathf.Clamp(previewHeightScale+delta.y/(Mathf.Max(1,imageCount)*Screen.height*.17f),.5f,3f);
+        }
+        if(expanded)ReplayController.DrawReplayIcon(resizeRect,"grip-vertical",new Color(.47f,.63f,.71f));
         y+=row+10*scale;
         if(expanded)
         {

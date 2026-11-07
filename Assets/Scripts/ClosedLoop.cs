@@ -21,7 +21,7 @@ public class ClosedLoop : MonoBehaviour
 
     // Stores the initial world rotation, including any random rotation applied at start
     private Quaternion _initialWorldRotation;
-    private float _nextStalePoseWarningTime;
+    private bool reportedStalePose;
     private float locustPositionGain = 1f;
     private float locustOrientationGain = 1f;
     private bool useLocustGains;
@@ -37,6 +37,9 @@ public class ClosedLoop : MonoBehaviour
     [SerializeField] private float torqueGainStep = .1f;
     private float lastYawInput, lastYawOutput;
     private string registeredVrId;
+    private int manualRigIndex;
+    private static long nextPoseContinuityId;
+    public long PoseContinuityId { get; private set; }
     public KineflyAutoTrim AutoTrim { get; } = new KineflyAutoTrim();
     public bool SupportsAutoTrim => TrackerBackend.IsFlight(currentMode) && !useLocustGains && useYawMode && !useForceMode;
     public ZmqListener.RawSample LastConsumedSample { get; private set; }
@@ -95,6 +98,7 @@ public class ClosedLoop : MonoBehaviour
         if (main != null)
         {
             registeredVrId = main.GetSystemConfigForGameObject(gameObject).vrId;
+            manualRigIndex = RuntimeRigRegistry.ParseIndex(registeredVrId);
             main.RegisterVRClosedLoop(registeredVrId, this);
         }
         ResetPositionAndRotation();
@@ -132,15 +136,16 @@ public class ClosedLoop : MonoBehaviour
 
         if (useLocustGains && !_zmqListener.HasFreshPose())
         {
-            if (Time.unscaledTime >= _nextStalePoseWarningTime)
+            if (!reportedStalePose)
             {
+                reportedStalePose = true;
                 Debug.LogWarning(
                     $"[{gameObject.name}] FicTrac/ZMQ pose is stale ({_zmqListener.SecondsSinceLastPose:F2}s since last update)."
                 );
-                _nextStalePoseWarningTime = Time.unscaledTime + 5f;
             }
             return;
         }
+        reportedStalePose = false;
 
         if (!_isInitialized)
         {
@@ -252,15 +257,19 @@ public class ClosedLoop : MonoBehaviour
     public void ResetPositionAndRotation()
     {
         transform.SetPositionAndRotation(_initialPosition, _initialRotation);
+        MarkPositionDiscontinuity();
         if (useLocustGains) _initialWorldRotation = _initialRotation;
         _isInitialized = false;
         _ficTracRotationOffset = Quaternion.identity;
         _initializationTimer = 0f;
         _lastFicTracData = Vector3.zero;
-        _nextStalePoseWarningTime = 0f;
+        reportedStalePose = false;
         lastYawInput = lastYawOutput = 0;
         Debug.Log("Reset to initial position and rotation. Waiting for re-initialization...");
     }
+
+    // A new ID persists across telemetry snapshots, including when a subscriber misses the reset frame.
+    internal void MarkPositionDiscontinuity() => PoseContinuityId = ++nextPoseContinuityId;
 
     // Manual yaw rotates the displacement reference; measured yaw deltas remain additive.
     public void ApplyManualRotation(Quaternion worldDelta)
@@ -346,7 +355,12 @@ public class ClosedLoop : MonoBehaviour
     {
         if (!resetPosition && !resetRotation) return;
         if (resetPosition && resetRotation) { SetPositionAndRotation(position, rotation); return; }
-        if (resetPosition) { _initialPosition = position; transform.position = position; }
+        if (resetPosition)
+        {
+            _initialPosition = position;
+            transform.position = position;
+            MarkPositionDiscontinuity();
+        }
         if (resetRotation)
         {
             Quaternion delta = rotation * Quaternion.Inverse(transform.rotation);
@@ -369,6 +383,7 @@ public class ClosedLoop : MonoBehaviour
 
     private bool HandleInput()
     {
+        if (MainController.Instance?.AcceptsManualInput(manualRigIndex) == false) return false;
         if (ExperimentInput.Pressed(resetKey, KeyCode.R, "Reset"))
         {
             ResetPositionAndRotation();

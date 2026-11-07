@@ -38,7 +38,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         var schemas = new JObject {
             ["system"] = new JObject { ["type"]="object", ["additionalProperties"]=true, ["properties"]=new JObject {
                 ["targetDisplay"]=Schema(typeof(int)), ["targetFrameRate"]=Schema(typeof(int)), ["vSyncCount"]=Schema(typeof(int)),
-                ["configs"]=Schema(typeof(SystemConfig[])), ["telemetry"]=Schema(typeof(TelemetryConfig)),
+                ["saveSwarmData"]=Schema(typeof(bool)), ["configs"]=Schema(typeof(SystemConfig[])), ["telemetry"]=Schema(typeof(TelemetryConfig)),
                 ["statusOverlay"]=Schema(typeof(StatusOverlayConfig)), ["overheadCamera"]=Schema(typeof(OverheadCameraConfig)),
                 ["frameOverlay"]=Schema(typeof(OverlayPlacementConfig)),["desktopControls"]=Schema(typeof(OverlayPlacementConfig)) } },
             ["sequence"]=Schema(typeof(SequenceConfig)), ["choice"]=Schema(typeof(SceneConfig)),
@@ -93,7 +93,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
                 props["durationSeconds"]=new JObject { ["type"]="number",["exclusiveMinimum"]=0,["default"]=10,["x-ui"]=new JObject { ["unit"]="seconds",["slider"]=new JObject { ["min"]=1,["max"]=3600,["step"]=1 } } };
                 props["autoTrimSettings"]=Schema(typeof(AutoTrimConfig));
                 props["headingReference"]=Schema(typeof(HeadingReferenceConfig));
-                if(property.Name=="swarm") props["swarm"]=Schema(typeof(SwarmConfig));
+                if(property.Name=="swarm"||property.Name=="kannadi") props["swarm"]=Schema(typeof(SwarmConfig));
                 schema["properties"]["preStimulus"]=phase.DeepClone();
                 schema["properties"]["preStimulus"]["properties"]["enabled"]["default"]=false;
                 schema["properties"]["stimulus"]=phase.DeepClone();
@@ -116,6 +116,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         system["properties"]["targetDisplay"]["default"]=1;
         system["properties"]["targetFrameRate"]["default"]=60;
         system["properties"]["vSyncCount"]["default"]=0;
+        system["properties"]["saveSwarmData"]["default"]=true;
         system["properties"]["vSyncCount"]["minimum"]=0; system["properties"]["vSyncCount"]["maximum"]=4;
         system["properties"]["targetFrameRate"]["x-ui"]=new JObject { ["enabledWhen"]=Rule("vSyncCount",0),["help"]="Positive FPS, or -1 for uncapped. vSync overrides this value." };
         system["properties"]["targetFrameRate"]["x-ui"]["slider"]=new JObject { ["min"]=30,["max"]=240,["step"]=1 };
@@ -126,6 +127,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         schemas["sequence"]["required"]=new JArray("sequences");
         schemas["sequence"]["properties"]["sequences"]["type"]="array";
         schemas["swarm"]["properties"]["swarm"]=Schema(typeof(SwarmConfig));
+        schemas["kannadi"]["properties"]["swarm"]=Schema(typeof(SwarmConfig));
         var item=schemas["sequence"]["properties"]["sequences"]["items"];
         item["required"]=new JArray("sceneName","duration","parameters");
         item["properties"]["duration"]["exclusiveMinimum"]=0;
@@ -234,7 +236,22 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(new[]{"agentSpeed","locoSpeed","agentSpeedStdDev","locustSpeedStdDev","volumeHalfExtentMetres","preserveBoundaryOvershoot"}.Contains(name))
             ui["visibleWhen"]=Rule("trajectoryFile","");
         if(new[]{"agentCount","agentSpeed","locoSpeed"}.Contains(name)) child["minimum"]=0;
-        if(name=="agentCount") ui["help"]="Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.";
+        if(name=="agentCount") ui["help"]="Number of simulated agents. A nonempty agent groups list supplies the total instead.";
+        if(name=="agentGroups")
+        {
+            child["default"]=new JArray();
+            ui["help"]="Optional generated stock-locust groups. Each group can have its own count, position offset and appearance. Groups share motion and the periodic arena.";
+        }
+        if(owner==typeof(SwarmAgentGroupConfig))
+        {
+            if(name=="count") child["minimum"]=1;
+            if(name=="spawnOffset")
+            {
+                ui["unit"]="scene units";
+                ui["help"]="Offset from the shared spawn center. Use X for left/right and Z for front/back. Y is available for 3D swarms.";
+            }
+            if(name=="appearance") ui["help"]="Stock uses the original textured locust. Black uses an opaque flat silhouette of the same animated model.";
+        }
         if(name=="agentSpeed") ui["help"]="Generated agent speed in scene units/s. Takes precedence over locustSpeed and locoSpeed. Recorded trajectory timing is controlled by playback.speed.";
         if(name=="locoSpeed") ui["help"]="Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitted.";
         if(name=="locustSpeedStdDev" || name=="agentSpeedStdDev")
@@ -245,9 +262,14 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(name=="volumeHalfExtentMetres")
         {
             child["exclusiveMinimum"]=0;
-            ui["help"]="Physical half extent of the generated cube. 2 gives +/-2 m, a 4 m cube; overrides spawn/boundary sizes. Null preserves legacy sizes.";
+            ui["help"]="Physical half extent of the generated arena. 2 gives +/-2 m, a 4 m span. Supplies default periodic lengths and spawn size. Explicit lengths and spawn dimensions take precedence.";
         }
-        if(name=="preserveBoundaryOvershoot") ui["help"]="Keep excess travel when wrapping the generated population; legacy edge snapping is used when false.";
+        if(name=="preserveBoundaryOvershoot") ui["help"]="Retained in existing files. Generated agents always retain excess travel across periodic edges.";
+        if((owner==typeof(SwarmConfig)||owner==typeof(KannadiConfig)) && new[]{"boundaryLengthX","boundaryLengthZ","boundaryHeight","spawnAreaSize"}.Contains(name))
+        {
+            child["exclusiveMinimum"]=0;
+            ui["unit"]="scene units";
+        }
         if(name=="headingReferenceId")
         {
             ui["enabledWhen"]=Rule("useHeadingReference",true);

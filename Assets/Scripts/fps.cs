@@ -31,7 +31,7 @@ public class fps : MonoBehaviour
     private int timingSamples, gpuSamples;
     private ulong previousTimestamp;
     private bool timingsEnabled;
-    private string graphicsApi;
+    private string graphicsApi, graphicsDevice;
     private int frames;
     private System.Diagnostics.Process measuredProcess;
     private TimeSpan previousProcessCpu;
@@ -50,6 +50,7 @@ public class fps : MonoBehaviour
         catch { measuredProcess?.Dispose();measuredProcess=null; }
         timingsEnabled = FrameTimingManager.IsFeatureEnabled();
         graphicsApi = SystemInfo.graphicsDeviceType.ToString();
+        graphicsDevice = SystemInfo.graphicsDeviceName;
         DontDestroyOnLoad(gameObject);
         GameObject canvasObject = new GameObject("FPS Canvas", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
         canvasObject.transform.SetParent(transform, false);
@@ -59,20 +60,23 @@ public class fps : MonoBehaviour
         RectTransform box = new GameObject("FPS", typeof(RectTransform), typeof(Image), typeof(Button)).GetComponent<RectTransform>();
         displayBox=box;
         box.SetParent(canvasObject.transform, false);
-        box.anchorMin = box.anchorMax = box.pivot = Vector2.one;
-        box.anchoredPosition = new Vector2(-12, -12);
-        box.sizeDelta = new Vector2(520, 72);
+        box.anchorMin = box.anchorMax = box.pivot = Vector2.zero;
+        box.anchoredPosition = new Vector2(12, 12);
+        box.sizeDelta = new Vector2(360, 116);
         box.GetComponent<Image>().color = new Color(0, 0, 0, 0.65f);
         box.GetComponent<Image>().raycastTarget = true;
         var editCap=box.GetComponent<Button>();editCap.targetGraphic=box.GetComponent<Image>();editCap.onClick.AddListener(ConfigurationUI.ConfigWorkbench.RequestFrameRateSetting);
         label = new GameObject("FPS Label", typeof(RectTransform), typeof(Text)).GetComponent<Text>();
         label.transform.SetParent(box, false);
-        label.rectTransform.anchorMin = Vector2.zero; label.rectTransform.anchorMax = Vector2.one;
-        label.rectTransform.offsetMin = label.rectTransform.offsetMax = Vector2.zero;
-        label.font = Resources.Load<Font>("ConfigurationUI/Fonts/Inter-Regular")??Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        label.fontSize = 16;
+        label.rectTransform.anchorMin = label.rectTransform.anchorMax = label.rectTransform.pivot = new Vector2(0, 1);
+        label.rectTransform.anchoredPosition = new Vector2(8, -8);
+        label.rectTransform.sizeDelta = new Vector2(344, 100);
+        label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        label.fontSize = 12;
         label.color = new Color(.71f,.79f,.85f);
-        label.alignment = TextAnchor.MiddleCenter;
+        label.alignment = TextAnchor.UpperLeft;
+        label.supportRichText = false;
+        label.verticalOverflow = VerticalWrapMode.Overflow;
         label.raycastTarget = false;
         label.text = "— FPS";
         MainController.SystemConfigurationChanged += ApplyDisplay;
@@ -103,7 +107,9 @@ public class fps : MonoBehaviour
         var placement=MainController.Instance!=null?MainController.Instance.FrameOverlaySettings:new OverlayPlacementConfig();
         if(!placement.visible){displayCanvas.enabled=false;OperatorOverlayLayout.Release("fps");return;}
         var screen=OperatorOverlayLayout.DisplaySize(displayCanvas.targetDisplay);float scale=DesktopDisplay.UiScale;
-        var size=new Vector2(310,58)*scale;displayBox.sizeDelta=size;label.fontSize=Mathf.RoundToInt(12*scale);
+        var size=new Vector2(360,116)*scale;displayBox.sizeDelta=size;label.fontSize=Mathf.RoundToInt(12*scale);
+        label.rectTransform.anchoredPosition=new Vector2(8,-8)*scale;
+        label.rectTransform.sizeDelta=size-new Vector2(16,16)*scale;
         if(layoutVersion!=OperatorOverlayLayout.Revision||lastWidth!=(int)screen.x||lastHeight!=(int)screen.y||lastSize!=size)
         {
             displayCanvas.enabled=OperatorOverlayLayout.Reserve("fps",displayCanvas.targetDisplay,placement.Preferred(new Rect(screen.x-size.x-12,screen.y-size.y-12,size.x,size.y)),out var placed);
@@ -188,7 +194,9 @@ public class fps : MonoBehaviour
             : Application.targetFrameRate > 0 ? $"target {Application.targetFrameRate} | VSync OFF" : "uncapped | VSync OFF";
         label.text = $"{Latest.framesPerSecond:0} FPS | {target}\n" +
             $"Frame {Latest.frameMeanMs:F1} / peak {Latest.framePeakMs:F1} ms" + (Latest.budgetMs.HasValue ? $" | budget {Latest.budgetMs:F1} ms\n" : "\n") +
-            $"CPU proc {Ms(Latest.processCpuMsPerFrame)} | GPU {Ms(Latest.gpuMs)} | present wait {Ms(Latest.presentWaitMs)} ms";
+            $"CPU main {Ms(Latest.cpuMainMs)} / render {Ms(Latest.cpuRenderMs)} ms\n" +
+            $"CPU load {(Latest.processCpuPercentOfOneCore.HasValue ? (Latest.processCpuPercentOfOneCore.Value / Math.Max(1, SystemInfo.processorCount)).ToString("F1") + "% of PC" : "unavailable")} | wait {Ms(Latest.presentWaitMs)} ms\n" +
+            $"GPU {(Latest.gpuMs.HasValue ? Ms(Latest.gpuMs) + " ms" : "timing unavailable")} | {graphicsApi}\n" + graphicsDevice;
         elapsed = peakInterval = cpuMain = cpuRender = gpu = presentWait = 0;
         frames = timingSamples = gpuSamples = 0;
     }

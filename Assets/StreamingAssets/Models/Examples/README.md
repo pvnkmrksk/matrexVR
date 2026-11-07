@@ -5,6 +5,7 @@ These are real files loaded by the same runtime GLB importer as your own models.
 | File | Example |
 | --- | --- |
 | `SimulatedLocust.glb` | Existing MATREX locust re-exported with its skeleton, textures and animation. Source and hash: `SimulatedLocust.provenance.json`. |
+| `SimulatedLocustBlack.glb` | The same portable locust with an opaque flat-black material. Skin and animation are preserved. |
 | `RiggedSimple.glb` | Downloaded skeletal-animation sample by Cesium, CC BY 4.0. |
 | `AnimatedMorphCube.glb` | Downloaded morph-animation sample credited to Microsoft, CC0. |
 

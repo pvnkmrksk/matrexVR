@@ -155,6 +155,18 @@ namespace ConfigurationUI
             var layout=new Foldout {name="apparatus-layout-details",text="Display layout",value=false};layout.AddToClassList("editor-disclosure");scroll.Add(layout);
             var maps=new VisualElement {name="apparatus-map-host"};layout.Add(maps);BindViewState(maps,()=>{maps.Clear();BuildApparatusDisplayMap(maps,(JObject)Workspace.System.Root);});
             var rigs=DesktopApparatusProfile.Rigs(system).ToList();
+            if(rigs.Count>1)
+            {
+                var shared=Row("apparatus-shared-options");
+                shared.Add(StudioButton("Apply common VR settings…","system",ShowCommonRigSettings,"quiet"));
+                if(output=="led")
+                {
+                    var stack=StudioButton("Stack LED rows","led-panels",()=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.StackRows((JObject)r,ApparatusDisplayFallback)),"quiet");
+                    stack.tooltip="Set column 0 and place each LED strip after the previous rig on its output display. Undo restores the existing offsets.";
+                    shared.Add(stack);
+                }
+                scroll.Add(shared);
+            }
             for(int i=0;i<rigs.Count;i++)BuildApparatusRig(scroll,rigs[i],i,output);
             var monitorOptions=new Foldout {name="apparatus-operator-options",text="Operator display & monitoring",value=false};monitorOptions.AddToClassList("apparatus-advanced");scroll.Add(monitorOptions);
             var displayNames=DesktopDisplay.DisplayNames.ToList();
@@ -165,7 +177,7 @@ namespace ConfigurationUI
                 display.RegisterValueChangedCallback(e=>DesktopDisplay.SelectDisplay(displayNames.IndexOf(e.newValue)));monitorOptions.Add(display);
             }
             var schema=Workspace.Schemas.Get("system");
-            Section(monitorOptions,"Rendering & timing","system",system,schema,Array.Empty<string>(),new[]{"targetDisplay","targetFrameRate","vSyncCount"});
+            Section(monitorOptions,"Rendering & timing","system",system,schema,Array.Empty<string>(),new[]{"targetDisplay","targetFrameRate","vSyncCount","saveSwarmData"});
             Section(monitorOptions,"Telemetry & overview","radio",system,schema,Array.Empty<string>(),new[]{"telemetry","overheadCamera"});
             AddOverlayAdvancedSettings(monitorOptions);
             foreach(string warning in DesktopApparatusProfile.SharedInputWarnings(system))scroll.Add(SessionLabel(warning,"apparatus-validation"));
@@ -176,6 +188,53 @@ namespace ConfigurationUI
             complete.tooltip="Validate and save this system JSON, then return to the experiment workspace. Unknown JSON fields and untouched calibration settings are retained.";
             scroll.Add(SessionLabel("Panel cells start at row 0 / column 0. Letters match the runtime cameras: D Down, R Right, B Back, L Left, F Front, U Up.","apparatus-note"));
         }
+        private void ShowCommonRigSettings()
+        {
+            RequireApplied();
+            var first=DesktopApparatusProfile.Rigs(Workspace.System.Root).First();
+            bool led=DesktopApparatusProfile.Presentation(Workspace.System.Root)=="led";
+            var dialog=OpenModal("Common VR settings","Start with the first VR’s settings. The checked groups are copied to every VR in one undoable edit.");
+            var useHost=new Toggle("Tracker host"){value=true};
+            var host=new TextField("Host or IP address"){value=(string)first["zmqAddress"]??"localhost"};
+            dialog.Add(useHost);dialog.Add(host);
+            useHost.RegisterValueChangedCallback(e=>host.SetEnabled(e.newValue));
+            var usePanels=new Toggle("LED panel geometry"){value=led};
+            var panelFields=Row("apparatus-grid");
+            var width=new IntegerField("Width (px)"){value=DesktopApparatusProfile.Integer(first["ledPanelWidth"],128)};
+            var height=new IntegerField("Height (px)"){value=DesktopApparatusProfile.Integer(first["ledPanelHeight"],128)};
+            var order=new TextField("Face order"){value=DesktopApparatusProfile.Order(first)};
+            width.AddToClassList("apparatus-input"); height.AddToClassList("apparatus-input"); order.AddToClassList("apparatus-input");
+            panelFields.Add(width);panelFields.Add(height);panelFields.Add(order);
+            if(led){dialog.Add(usePanels);dialog.Add(panelFields);}
+            usePanels.RegisterValueChangedCallback(e=>panelFields.SetEnabled(e.newValue));
+            var useDisplay=new Toggle("Output display");
+            var display=new IntegerField("Physical display number"){value=ApparatusOutputDisplay(first)+1};
+            display.AddToClassList("apparatus-input"); display.SetEnabled(false);
+            if(led){dialog.Add(useDisplay);dialog.Add(display);}
+            useDisplay.RegisterValueChangedCallback(e=>display.SetEnabled(e.newValue));
+            dialog.Add(SessionLabel("Tracker ports, calibration files and panel offsets stay individual. Use Stack LED rows to recalculate offsets after resizing panels.","apparatus-note"));
+            dialog.Add(StudioButton("Apply to all VRs","system",()=>{
+                string address=host.value.Trim();
+                if(useHost.value&&string.IsNullOrEmpty(address))throw new ArgumentException("Enter a tracker host or IP address.");
+                if(usePanels.value&&(width.value<1||height.value<1))throw new ArgumentException("Enter positive panel dimensions.");
+                if(useDisplay.value&&(display.value<1||display.value>DesktopApparatusProfile.MonitorCount(Workspace.System.Root,ApparatusDisplayFallback)))
+                    throw new ArgumentException("Choose a configured display number.");
+                StudioEdit(Workspace.System,root=>{
+                    foreach(var rig in DesktopApparatusProfile.Rigs(root))
+                    {
+                        if(useHost.value)rig["zmqAddress"]=address;
+                        if(usePanels.value)
+                        {
+                            DesktopApparatusProfile.SetOrder(rig,order.value);
+                            rig["ledPanelWidth"]=width.value;rig["ledPanelHeight"]=height.value;
+                        }
+                        if(useDisplay.value)rig["targetDisplay"]=display.value-1;
+                    }
+                });
+                CloseModal();
+            },"primary"));
+        }
+
         private IntegerField ApparatusInteger(string label,string name,int value,Action<int> change,string help,int minimum=0,int maximum=int.MaxValue)
         {
             var field=new IntegerField(label){name=name,value=value,isDelayed=true,tooltip=help};field.AddToClassList("apparatus-input");

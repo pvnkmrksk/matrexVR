@@ -10,6 +10,18 @@ public class LocustSpawner : MonoBehaviour
 
     [Tooltip("The size of the area in which the locusts will be spawned")]
     public float spawnAreaSize = 200;
+    public SwarmSpawnType spawnType;
+    private float? sceneSpawnAreaSize;
+    internal float SceneSpawnAreaSize => sceneSpawnAreaSize ??= spawnAreaSize;
+    internal Vector3 SpawnOrigin
+    {
+        get
+        {
+            Vector3 center = useSpawnCenter ? spawnCenter : transform.position;
+            if (!Is3D()) center.y = -0.25f;
+            return center;
+        }
+    }
 
     //add tooltip
     [Tooltip("The mu value for the Van Mises distribution in degrees (0 to 360)")]
@@ -27,7 +39,7 @@ public class LocustSpawner : MonoBehaviour
     [Tooltip("The speed of the locusts")]
     public float locustSpeed = 3.0f; // Default speed for locusts
     public float locustSpeedStdDev;
-    public bool preserveBoundaryOvershoot;
+    public bool periodicBoundary = true;
     [System.NonSerialized] public int RuntimeLayer = -1;
     public int ResolvedLayer => RuntimeLayer >= 0 ? RuntimeLayer : LayerMask.NameToLayer(layerName);
     public string layerName = "LocustLayer"; // Default value
@@ -59,6 +71,8 @@ public class LocustSpawner : MonoBehaviour
     public int SpawnRevision { get; private set; }
     private bool initialized;
     private GameObject batchedVisual;
+    private readonly System.Collections.Generic.List<GameObject> nativeBatches = new System.Collections.Generic.List<GameObject>();
+    [System.NonSerialized] public SwarmAgentGroupConfig[] agentGroups;
     [System.NonSerialized] public string trajectoryFile;
     [System.NonSerialized] public SwarmPlaybackConfig playbackSettings;
     [System.NonSerialized] public Transform playbackTarget;
@@ -67,16 +81,32 @@ public class LocustSpawner : MonoBehaviour
     [System.NonSerialized] public float worldUnitsPerMetre = 100f;
     private SwarmTrajectoryPlayback playback;
     private GeneratedSwarmMotion generatedMotion;
-    private readonly System.Collections.Generic.Dictionary<Camera, float> originalNearClips = new System.Collections.Generic.Dictionary<Camera, float>();
+    private readonly System.Collections.Generic.Dictionary<Camera, Vector2> originalClipPlanes = new System.Collections.Generic.Dictionary<Camera, Vector2>();
 
-    public void OverrideNearClip(Camera[] cameras, float distance)
+    public void OverrideClipPlanes(Camera[] cameras, float? near, float? far)
     {
         foreach (Camera camera in cameras)
         {
             if (!camera.name.StartsWith("Main Camera ")) continue;
-            if (!originalNearClips.ContainsKey(camera)) originalNearClips.Add(camera, camera.nearClipPlane);
-            camera.nearClipPlane = distance;
+            float nearPlane = near ?? camera.nearClipPlane;
+            float farPlane = far ?? camera.farClipPlane;
+            if (nearPlane <= 0 || farPlane <= nearPlane || float.IsInfinity(farPlane))
+                throw new System.ArgumentException("Swarm camera clip planes require a positive near plane and a larger finite far plane (" + camera.name + ").");
         }
+        foreach (Camera camera in cameras)
+        {
+            if (!camera.name.StartsWith("Main Camera ")) continue;
+            if (!originalClipPlanes.ContainsKey(camera))
+                originalClipPlanes.Add(camera, new Vector2(camera.nearClipPlane, camera.farClipPlane));
+            SetClipPlanes(camera, near ?? camera.nearClipPlane, far ?? camera.farClipPlane);
+        }
+    }
+
+    private static void SetClipPlanes(Camera camera, float near, float far)
+    {
+        if (near >= camera.farClipPlane) camera.farClipPlane = far;
+        camera.nearClipPlane = near;
+        camera.farClipPlane = far;
     }
 
     void Start()
@@ -129,11 +159,20 @@ public class LocustSpawner : MonoBehaviour
     }
     private void Cleanup()
     {
-        foreach (var entry in originalNearClips) if (entry.Key != null) entry.Key.nearClipPlane = entry.Value;
-        originalNearClips.Clear();
+        foreach (var entry in originalClipPlanes)
+            if (entry.Key != null) SetClipPlanes(entry.Key, entry.Value.x, entry.Value.y);
+        originalClipPlanes.Clear();
         if (playback != null) { playback.enabled = false; Release(playback); playback = null; }
         if (generatedMotion != null) { generatedMotion.enabled = false; Release(generatedMotion); generatedMotion = null; }
         if (batchedVisual != null) { batchedVisual.SetActive(false); Release(batchedVisual); batchedVisual = null; }
+        foreach (var batch in nativeBatches)
+        {
+            if (batch == null) continue;
+            batch.GetComponent<StockLocustPlayback>()?.Discard();
+            batch.SetActive(false);
+            Release(batch);
+        }
+        nativeBatches.Clear();
         foreach (GameObject locust in spawned)
             if (locust != null) { locust.SetActive(false); Release(locust); }
         spawned.Clear();
@@ -155,62 +194,100 @@ public class LocustSpawner : MonoBehaviour
             );
             locustLayer = gameObject.layer; // Default to the game object's layer
         }
-        for (int i = 0; i < numberOfLocusts; i++)
+        bool is3D = Is3D();
+        bool grid = spawnType == SwarmSpawnType.Grid;
+        var gridSpeedRandom = grid && locustSpeedStdDev > 0 ? new System.Random(0) : null;
+        Vector3 center = SpawnOrigin;
+        Vector3 size = useSpawnVolume ? spawnVolumeSize : Vector3.one * spawnAreaSize;
+        BoundaryManager bounds = periodicBoundary ? boundaryManager : null;
+        Vector2 wrap = bounds != null ? new Vector2(bounds.LengthX, bounds.LengthZ) : Vector2.zero;
+        int groups = agentGroups?.Length ?? 1;
+        bool bogong = UsesBogongVisual();
+        for (int groupIndex = 0; groupIndex < groups; groupIndex++)
         {
-            Vector3 center = useSpawnCenter
-                ? spawnCenter
-                : new Vector3(transform.position.x, Is3D() ? transform.position.y : -0.25f, transform.position.z);
-            Vector3 size = useSpawnVolume ? spawnVolumeSize : new Vector3(spawnAreaSize, Is3D() ? spawnAreaSize : 0f, spawnAreaSize);
-            Vector3 spawnPosition = new Vector3(
-                Random.Range(center.x - size.x / 2f, center.x + size.x / 2f),
-                Is3D() ? Random.Range(center.y - size.y / 2f, center.y + size.y / 2f) : -0.25f,
-                Random.Range(center.z - size.z / 2f, center.z + size.z / 2f));
-
-            spawnPosition = center + spawnRotation * (spawnPosition - center);
-            GameObject locust = UsesBogongVisual()
-                ? CreateBogongAgent(spawnPosition, i)
-                : ExternalModelLibrary.InstantiatePrefab(locustPrefab); // Spawned independent of the game object
-            locust.transform.SetPositionAndRotation(spawnPosition, Quaternion.identity);
-            if (!UsesBogongVisual() && locustPrefab.GetComponent<UnityGLTF.InstantiatedGLTFObject>() != null)
+            var group = agentGroups?[groupIndex];
+            int count = group?.count ?? numberOfLocusts;
+            Vector3 groupCenter = center + spawnRotation * (group?.spawnOffset?.ToVector3() ?? Vector3.zero);
+            var groupAgents = new GameObject[count];
+            var phases = new float[count];
+            for (int i = 0; i < count; i++)
             {
-                ExternalModelLibrary.ConfigureAnimation(locust);
-                if (locust.GetComponent<LocustMover>() == null) locust.AddComponent<LocustMover>();
+                int globalIndex = spawned.Count;
+                Vector3 offset = grid ? Vector3.Scale(size, GridOffset(i, count, is3D)) : new Vector3(
+                    Random.Range(-size.x / 2f, size.x / 2f),
+                    is3D ? Random.Range(-size.y / 2f, size.y / 2f) : 0f,
+                    Random.Range(-size.z / 2f, size.z / 2f));
+                Vector3 spawnPosition = groupCenter + spawnRotation * offset;
+                GameObject locust = bogong
+                    ? CreateBogongAgent(spawnPosition, globalIndex)
+                    : ExternalModelLibrary.InstantiatePrefab(locustPrefab);
+                locust.transform.SetPositionAndRotation(spawnPosition, Quaternion.identity);
+                if (!bogong && locustPrefab.GetComponent<UnityGLTF.InstantiatedGLTFObject>() != null)
+                {
+                    ExternalModelLibrary.ConfigureAnimation(locust);
+                    if (locust.GetComponent<LocustMover>() == null) locust.AddComponent<LocustMover>();
+                }
+                spawned.Add(locust);
+                groupAgents[i] = locust;
+                if (!bogong) ModelAppearance.Apply(locust, modelAppearance);
+                if (group?.appearance == SwarmAgentAppearance.Black) StockLocustAppearance.ApplyBlack(locust);
+                locust.layer = locustLayer;
+                SetLayerRecursively(locust.transform, locustLayer);
+                locust.transform.localRotation = grid
+                    ? Quaternion.Euler(is3D ? muElevation : 0f, mu + 360f * i / count, 0f)
+                    : GenerateSwarmRotation();
+                LocustMover mover = locust.GetComponent<LocustMover>();
+                if (mover != null)
+                {
+                    mover.speed = GeneratedSwarmMotion.SampleSpeed(locustSpeed, locustSpeedStdDev, gridSpeedRandom);
+                    mover.boundaryManager = bounds;
+                }
+                locust.name = layerName + "_Locust_" + globalIndex;
+                locust.tag = "SimulatedLocust";
+                AnimateOnMove.ConfigureHierarchy(locust, locust.transform, animateOnMove, animationSpeedThreshold, wrap);
+                if (locust.GetComponent<Animator>() != null)
+                    phases[i] = grid ? (float)i / count : Random.value;
             }
-            spawned.Add(locust);
-            if (!UsesBogongVisual()) ModelAppearance.Apply(locust, modelAppearance);
-            locust.layer = locustLayer; // Set the layer of the spawned locust
-            SetLayerRecursively(locust.transform, locustLayer); // Set layer for all children
 
-            locust.transform.localRotation = GenerateSwarmRotation(); // Set the local rotation
-            if (locust.GetComponent<LocustMover>() != null)
-                locust.GetComponent<LocustMover>().speed = GeneratedSwarmMotion.SampleSpeed(locustSpeed, locustSpeedStdDev);
-            locust.name = layerName + "_Locust_" + i; // Set the name
-            locust.tag = "SimulatedLocust"; // Set the tag for the locust
-            float wrap = boundaryManager != null ? boundaryManager.boundarySize : 0;
-            AnimateOnMove.ConfigureHierarchy(locust, locust.transform, animateOnMove, animationSpeedThreshold, new Vector2(wrap, wrap));
-            // Get the Animator component
-            Animator locustAnimator = locust.GetComponent<Animator>();
-
-            if (locustAnimator)
+            if (bogong) continue;
+            var batch = NativeLocustBatchRenderer.TryCreate(transform, locustLayer, locustPrefab, groupAgents, phases);
+            if (batch != null) nativeBatches.Add(batch);
+            if (batch != null && batch.GetComponent<StockLocustPlayback>()?.UsesCache == true) continue;
+            for (int i = 0; i < count; i++)
             {
-                // Assuming the animation state you want to desynchronize is the default one at layer 0
-                AnimatorStateInfo state = locustAnimator.GetCurrentAnimatorStateInfo(0);
-                locustAnimator.Play(state.fullPathHash, -1, Random.value); // Random normalized time between 0 and 1
-            }
-
-            // Set the boundary manager for the locust
-            LocustMover locustMover = locust.GetComponent<LocustMover>();
-            if (locustMover)
-            {
-                locustMover.boundaryManager = boundaryManager;
+                var animator = groupAgents[i].GetComponent<Animator>();
+                if (animator != null) animator.Play(animator.GetCurrentAnimatorStateInfo(0).fullPathHash, -1, phases[i]);
             }
         }
         BuildBatch(locustLayer);
-        if (preserveBoundaryOvershoot)
+        if (spawned.Count > 0)
         {
             generatedMotion = gameObject.AddComponent<GeneratedSwarmMotion>();
-            generatedMotion.Configure(spawned);
+            bool stockAnimation = animateOnMove && locustPrefab != null &&
+                Resources.Load<KannadiPrefabCatalog>("KannadiPrefabCatalog")?.Find("SimulatedLocust") == locustPrefab;
+            generatedMotion.Configure(spawned, bounds, stockAnimation);
         }
+    }
+
+    private static Vector3 GridOffset(int index, int count, bool is3D)
+    {
+        int layers = is3D ? Mathf.CeilToInt(Mathf.Pow(count, 1f / 3f)) : 1;
+        int layer = GridGroup(ref index, ref count, layers);
+        int rows = Mathf.CeilToInt(Mathf.Sqrt(count));
+        int row = GridGroup(ref index, ref count, rows);
+        return new Vector3((index + .5f) / count - .5f, (layer + .5f) / layers - .5f, (row + .5f) / rows - .5f);
+    }
+
+    // Split agents evenly between rows/layers. The last row still spans the footprint.
+    private static int GridGroup(ref int index, ref int count, int groups)
+    {
+        int shortSize = count / groups;
+        int longGroups = count % groups;
+        int longEnd = longGroups * (shortSize + 1);
+        int group = index < longEnd ? index / (shortSize + 1) : longGroups + (index - longEnd) / shortSize;
+        index -= group * shortSize + Mathf.Min(group, longGroups);
+        count = shortSize + (group < longGroups ? 1 : 0);
+        return group;
     }
 
     private void BuildBatch(int locustLayer)
@@ -274,7 +351,7 @@ public class LocustSpawner : MonoBehaviour
         BuildBatch(layer);
     }
 
-    private bool Is3D() => string.Equals(dimension, "3D", System.StringComparison.OrdinalIgnoreCase);
+    internal bool Is3D() => string.Equals(dimension, "3D", System.StringComparison.OrdinalIgnoreCase);
     private bool UsesBogongVisual() => string.Equals(agentVisual, "Bogong", System.StringComparison.OrdinalIgnoreCase);
     private bool UsesMothVisual() => string.Equals(bogongVisual?.shape, "Moth", System.StringComparison.OrdinalIgnoreCase);
 
