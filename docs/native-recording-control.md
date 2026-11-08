@@ -29,7 +29,9 @@ The native apps opt in through `--control-dir ABSOLUTE_PRIVATE_DIRECTORY --contr
 
 Local request/reply files carry matching random IDs, instance identity and expiry. Commands are `status`, `record_start`, ownership-fenced `record_stop`, `start` and `pause`. `record_stop` requires the expected take directory and immutable stop request ID. `pause` affects tracking and is distinct from recorder Stop. Idle status, stable file size or elapsed delay never prove closure.
 
-The reviewed source adapters currently ship for **Mac arm64**. The flight detector and walking numerical core are unchanged. Intel Mac, Windows and Linux packages retain their previous capabilities and report automatic video as unavailable, with update/Manual guidance. VR can still start. Physical camera start/stop, exposure timing, attached hardware and other-platform runtime acceptance remain pending.
+The reviewed source adapters ship for **Mac arm64**. MATREX VR **0.4.3 Linux x86-64** also has a separately checksummed **HejjéTrac recording adapter** on its release page. The add-on retains the upstream 0.5.0 tracking engine and adds the local mailbox and worker-side ownership check. Extract it and run its included installer against the MATREX `Companions` directory. Existing tracker calibration stays in the same profile. Start the bundled tracker again and set the session and rig to save video with **Automatic · experiment**. [Adapter download and instructions](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.4.3) · [Linux lifecycle results](hejjetrac-linux-recording-validation.json)
+
+The base Linux archive ships the official upstream tracker. The flight detector and walking numerical core are unchanged. Stock Linux, Intel Mac, and Windows packages report automatic video as unavailable when the verified endpoint is absent. VR can still start. Physical camera start/stop, exposure timing, attached hardware and other-platform runtime acceptance remain pending.
 
 After upgrading, an already-open tracker may still be the older executable.
 Close that tracker with the explicit tracker-window control, then initialize it
