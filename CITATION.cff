@@ -9,7 +9,7 @@ authors:
     given-names: "August"
   - family-names: "Lee"
     given-names: "Chi-Yu"
-version: "0.4.3"
+version: "0.4.4"
 date-released: "2026-11-08"
 repository-code: "https://github.com/pvnkmrksk/matrexVR"
 url: "https://pvnkmrksk.github.io/matrexVR/"

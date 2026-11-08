@@ -1,4 +1,4 @@
-MATREX VR 0.4.1 — DESKTOP PATCH: AGENT CONTROL AND RECORDING WORKFLOWS
+MATREX VR 0.4.4 — INDEPENDENT TRACKERS AND KANNADI MULTIPLAYER
 Engine: Unity 6000.3.16f1
 https://github.com/pvnkmrksk/matrexVR
 https://pvnkmrksk.github.io/matrexVR/
@@ -27,10 +27,9 @@ Success: a scene runs, a completed recording appears, and its replay timeline
 advances. Pose/configuration recording does not require tracker video. Keep the
 whole run folder AND this creating player build for future replay.
 
-Forest and Walking are under Demo options & tracker windows. Walking uses a
-finite prerecorded sample; More -> Rig manager... -> Start all in its tracker
-window plays the sample again. Demo input is labelled simulated or prerecorded.
-Trackers are independent applications; closing Unity does not close them.
+Forest and Walking are under Demo options. Both demonstrations use keyboard
+controls and run independently of tracker input. Trackers are independent
+applications; closing Unity does not close them.
 
 Existing profiles retain their saved startup flags. If a sequence auto-starts,
 press Escape once or relaunch with -configure to enter setup. Escape from setup
@@ -39,7 +38,7 @@ quits the player. For example:
   "./MATREX VR.x86_64" -configure
 
 Full five-minute guide and troubleshooting:
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.1/docs/five-minute-start.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.4/docs/five-minute-start.md
 
 2. CONFIGURE A REAL APPARATUS
 
@@ -49,8 +48,13 @@ Use this configuration saves the apparatus. VR1 through VR16 identify routing;
 Animal ID labels the real animal. The public starter is not hardware calibration.
 Review every copied rig's endpoint and display rectangles on the actual apparatus.
 
-Use Open tracker to inspect camera selection, source, calibration and input before
-starting. Preflight creates no experiment pose recording. Automatic recorder mode
+Install Rekkefly for flight or HejjéTrac for walking from its own project:
+  https://github.com/pvnkmrksk/rekkefly/releases
+  https://github.com/pvnkmrksk/hejjetrac/releases
+In Configure, MATREX displays the detected local launcher. If the field is blank,
+use Browse to choose the installed executable or complete macOS app. Select the
+rig's tracker calibration separately. Use Open tracker to check source and input
+before starting. Preflight creates no experiment pose recording. Automatic recorder mode
 does not begin its native take until experiment Start. Manual mode leaves recorder
 operation to the tracker/operator; it can therefore include preflight footage.
 Rekkefly is flight input; HejjéTrac walking uses cumulative displacement. Legacy
@@ -114,11 +118,10 @@ and the finalization evidence. Do not infer completion from stable file sizes.
 Trackers remain open independently. Reinitialize an old running tracker after an
 upgrade; replacing the app does not replace an already-running native process.
 
-This release's reviewed Mac arm64 Rekkefly correction supports automatic owned
-recording. Its bundled HejjéTrac and other-platform companions retain their pinned
-capabilities: automatic recording can be unavailable; Manual/external operation
-and pose recording remain separate. The release manifest and companion catalog
-identify the actual payloads. Physical camera acceptance remains a separate test.
+Automatic owned recording requires the local recording mailbox in the installed
+tracker. Tracking, Manual recorder mode and VR pose recording are independent.
+The native tracker projects publish their own packages and system requirements.
+Check physical camera acquisition on the apparatus.
 
 5. REPLAY AND PRESERVE EVIDENCE
 
@@ -159,7 +162,7 @@ connect through stdio with Python 3.11+ and the pinned SDK; uv run --locked --sc
 prepares it. Python is needed only for this optional adapter. The adapter may also be used from the
 matching source checkout's tools/ directory. Prepare dependencies before offline
 experiments. Full client configuration and tool reference:
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.1/docs/ai-control.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.4/docs/ai-control.md
 
 Discover -> read workspace/schema -> edit JSON with its current revision -> save
 and validate -> start -> poll status -> stop -> await finalization -> replay.
@@ -167,7 +170,7 @@ Accepted Start means preparation began, not that a scene or recorder is ready.
 Read is_error results; after timeout inspect actual status before another mutation.
 Re-read stale revisions/conflicts. Quit and relaunch without --control-dir to
 remove the endpoint. Agent/contributor context:
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.1/AGENTS.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.4/AGENTS.md
 
 7. EVERYDAY CONTROLS
 
@@ -190,14 +193,9 @@ This is separate from tracker input; a static website cannot consume raw ZMQ.
 macOS packages are ad hoc signed, not notarized. Use Finder Open and the relevant
 Privacy & Security option if prompted. Linux needs a graphical desktop and a
 compatible graphics driver; restore executable permission if extraction loses it.
-Bundled Linux HejjéTrac requires glibc 2.39 or newer; use a verified compatible
-external tracker on older distributions.
-
-Intel Mac/Windows/Linux strict live-flight camera paths lack the reviewed arm64
-correction and can be refused rather than silently substituting sample data.
-Their automatic recorder capabilities are also limited. The linked recorded
-Daari Deepa viewer is supported by the reviewed Mac arm64 dashboard; other
-payloads can report it unavailable. Internal Unity replay is independent.
+Check the native tracker release for its platform requirements and live-camera
+support. The linked recorded Daari Deepa viewer depends on the installed
+dashboard build. Internal Unity replay is independent.
 
 Software acceptance uses generated/sample input and isolated profiles. Windows
 and Linux are cross-built without native walkthroughs. Native OS pointer testing
@@ -208,4 +206,4 @@ For a problem report include OS, exact build, action/error and runtime_trace.log
 
 Detailed manuals, release evidence and limitations:
   https://pvnkmrksk.github.io/matrexVR/manual/
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.1/docs/releases.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.4/docs/releases.md
