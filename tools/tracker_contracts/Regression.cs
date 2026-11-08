@@ -79,6 +79,14 @@ public static class Regression
             var modern=TrackerProcessManager.PrepareInstalledAsync(new SystemConfig{vrId="VR-CAPABLE",closedLoopMode=ClosedLoopMode.Hejjetrac,zmqAddress="localhost",zmqPort=9871,
                 tracker=new TrackerLaunchConfig{executablePath=args[0],configFile=config,saveVideo=true}},false).GetAwaiter().GetResult();
             Check(modern.supportsRecordingControl&&modern.recordingWarning==null,"The current upstream mailbox flags enable owned automatic video");
+            var strictRig=new SystemConfig{vrId="VR-STRICT",closedLoopMode=ClosedLoopMode.Rekkefly,zmqAddress="localhost",zmqPort=9871,
+                tracker=new TrackerLaunchConfig{executablePath=legacyExecutable,configFile=config,strictCameraFallback=true}};
+            Reject(()=>TrackerProcessManager.PrepareInstalledAsync(strictRig,false).GetAwaiter().GetResult(),"Strict camera fallback rejects older binaries without sending an unknown flag");
+            strictRig.tracker.executablePath=args[0];
+            var strict=TrackerProcessManager.PrepareInstalledAsync(strictRig,false).GetAwaiter().GetResult();
+            Check(TrackerProcessManager.Arguments(strict.rig).Contains("--no-camera-fallback"),"Current Rekkefly receives an explicit camera-only request");
+            Reject(()=>TrackerProcessManager.PrepareInstalledAsync(strictRig,true).GetAwaiter().GetResult(),"A hardware-free demo cannot launch a configured live tracker");
+
             Check(File.ReadAllText(config)=="zmq_port : 9871\nzmq_host : 127.0.0.1\n","Installed discovery and launch leave explicit calibration untouched");
             Check(TrackerInstallation.Find(ClosedLoopMode.FicTrac)==""&&TrackerInstallation.Find(ClosedLoopMode.Kinefly)=="","Legacy input names remain externally managed unless the operator selects an executable");
             Reject(()=>TrackerInstallation.ResolveSelection("relative-launcher",ClosedLoopMode.Hejjetrac),"Relative native launchers cannot resolve via the working directory");

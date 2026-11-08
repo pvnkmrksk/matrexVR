@@ -16,8 +16,8 @@ public static class TrackerInstallation
     private static readonly bool Unix = Mac || RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
     private static readonly string[] FlightNames = { "rekkefly", "Rekkefly" };
     private static readonly string[] WalkingNames = { "hejjetrac", "hejjetrak", "HejjéTrac", "Hejjetrak", "Hejjetrac" };
-    private static readonly ConcurrentDictionary<(string path, long size, long ticks), Lazy<bool>> ControlSupport =
-        new ConcurrentDictionary<(string path, long size, long ticks), Lazy<bool>>();
+    private static readonly ConcurrentDictionary<(string path, long size, long ticks), Lazy<string>> Help =
+        new ConcurrentDictionary<(string path, long size, long ticks), Lazy<string>>();
 
     private static string[] Names(ClosedLoopMode mode) => TrackerBackend.IsFlight(mode) ? FlightNames :
         TrackerBackend.IsWalking(mode) ? WalkingNames : Array.Empty<string>();
@@ -53,7 +53,7 @@ public static class TrackerInstallation
 
     private static IEnumerable<string> Directories(string[] names, string home)
     {
-        var candidates = new List<string>();
+        var candidates = new List<string>((Environment.GetEnvironmentVariable("PATH") ?? "").Split(Path.PathSeparator));
         if (Windows)
         {
             foreach (string root in new[] { Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
@@ -76,7 +76,6 @@ public static class TrackerInstallation
                 candidates.Add(Path.Combine("/opt", name, "bin"));
             }
         }
-        candidates.AddRange((Environment.GetEnvironmentVariable("PATH") ?? "").Split(Path.PathSeparator));
         return candidates.Select(path => path.Trim().Trim('"'))
             .Where(path => !string.IsNullOrWhiteSpace(path) && Path.IsPathFullyQualified(path))
             .Distinct(Windows ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
@@ -114,14 +113,18 @@ public static class TrackerInstallation
     [DllImport("libc", EntryPoint = "access")]
     private static extern int access(string pathname, int mode);
 
-    internal static bool SupportsRecordingControl(string executable)
+    internal static bool SupportsRecordingControl(string executable) =>
+        SupportsOption(executable,"--control-dir") && SupportsOption(executable,"--control-instance");
+
+    internal static bool SupportsOption(string executable,string option)
     {
         var file = new FileInfo(executable);
         var identity = (executable, file.Length, file.LastWriteTimeUtc.Ticks);
-        return ControlSupport.GetOrAdd(identity, key => new Lazy<bool>(() => ProbeControl(key.path))).Value;
+        string help=Help.GetOrAdd(identity, key => new Lazy<string>(() => ReadHelp(key.path))).Value;
+        return Regex.IsMatch(help,@"(^|\s)"+Regex.Escape(option)+@"(\s|=|$)");
     }
 
-    private static bool ProbeControl(string executable)
+    private static string ReadHelp(string executable)
     {
         const int budgetMs = 650;
         var clock = Stopwatch.StartNew();
@@ -135,24 +138,22 @@ public static class TrackerInstallation
             };
             using (var process = Process.Start(start))
             {
-                if (process == null) return false;
+                if (process == null) return "";
                 Task<string> output = process.StandardOutput.ReadToEndAsync();
                 Task<string> error = process.StandardError.ReadToEndAsync();
                 if (!process.WaitForExit(Math.Max(0, budgetMs - (int)clock.ElapsedMilliseconds)))
                 {
                     try { process.Kill(); }
                     catch (InvalidOperationException) { }
-                    return false;
+                    return "";
                 }
                 if (process.ExitCode != 0 || !Task.WaitAll(new Task[] { output, error },
-                    Math.Max(0, budgetMs - (int)clock.ElapsedMilliseconds))) return false;
-                string help = output.Result + "\n" + error.Result;
-                return Regex.IsMatch(help, @"(^|\s)--control-dir(\s|=|$)") &&
-                    Regex.IsMatch(help, @"(^|\s)--control-instance(\s|=|$)");
+                    Math.Max(0, budgetMs - (int)clock.ElapsedMilliseconds))) return "";
+                return output.Result + "\n" + error.Result;
             }
         }
         catch (Exception error) when (error is IOException || error is InvalidOperationException ||
             error is System.ComponentModel.Win32Exception || error is AggregateException)
-        { return false; }
+        { return ""; }
     }
 }

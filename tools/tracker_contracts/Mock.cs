@@ -16,7 +16,7 @@ class Mock
         {
             Console.WriteLine(AppContext.BaseDirectory.Contains("legacy-tracker")
                 ? "Tracker options: --control-stdio --control-bind"
-                : "Tracker options: --control-dir <DIRECTORY> --control-instance <INSTANCE>");
+                : "Tracker options: --control-dir <DIRECTORY> --control-instance <INSTANCE> --no-camera-fallback");
             return;
         }
         string Argument(string name){int i=Array.IndexOf(args,name);return i>=0&&i+1<args.Length?args[i+1]:null;}

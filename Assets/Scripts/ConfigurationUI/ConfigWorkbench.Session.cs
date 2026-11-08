@@ -127,7 +127,7 @@ namespace ConfigurationUI
             Action refresh=()=>{
                 var videoRigs=DesktopApparatusProfile.Rigs(Workspace.System.Root).Where(r=>TrackerBackend.TryParse(r["closedLoopMode"]?.ToString(),out var mode)&&(TrackerBackend.IsFlight(mode)||TrackerBackend.IsWalking(mode))).ToList();
                 int videoCount=videoRigs.Count(r=>{JToken value=(r["tracker"] as JObject)?["saveVideo"];return value?.Type!=JTokenType.Boolean||(bool)value;});
-                if(!ExperimentBlocks.Flag(Workspace.System.Root["saveTrackerVideo"],true))videoCount=0;
+                if(CurrentDemo||!ExperimentBlocks.Flag(Workspace.System.Root["saveTrackerVideo"],true))videoCount=0;
                 state.text=videoCount==0?"Data only":videoCount==videoRigs.Count?"Data + tracker video":"Data + video · "+videoCount+" / "+videoRigs.Count;
             };refresh();state.schedule.Execute(refresh).Every(500);
             summary.tooltip="Tracking data and configuration snapshots are saved with each experiment. Tracker video follows each rig’s saveVideo setting. Change recording options in Animal & recording details before initializing tracking.";
@@ -153,7 +153,7 @@ namespace ConfigurationUI
                 video.EnableInClassList("is-on",enabled);
                 refresh();
             });
-            summary.Add(video);
+            if(!CurrentDemo)summary.Add(video);
             var options=StudioButton("Options","settings",()=>{
                 sessionDetailsOpen=true;var details=root.Q<Foldout>("recording-details");if(details!=null){details.value=true;details.schedule.Execute(()=>details.GetFirstAncestorOfType<ScrollView>()?.ScrollTo(details));}
             },"quiet");options.name="recording-summary-options";summary.Add(options);
@@ -272,7 +272,7 @@ namespace ConfigurationUI
                 sexField.RegisterValueChangedCallback(e=>{fly.Sex=e.newValue;UpdateStatus();});
                 SessionField(traits,"Age (days)","subject-age-"+id,fly.AgeDays,v=>fly.AgeDays=v,"Unspecified");
                 SessionField(card,"Comments","subject-comments-"+id,fly.Comments,v=>fly.Comments=v,"Notes for "+id,true);
-                if(TrackerBackend.TryParse(rig["closedLoopMode"]?.ToString(),out var videoMode)&&(TrackerBackend.IsFlight(videoMode)||TrackerBackend.IsWalking(videoMode)))
+                if(!CurrentDemo&&TrackerBackend.TryParse(rig["closedLoopMode"]?.ToString(),out var videoMode)&&(TrackerBackend.IsFlight(videoMode)||TrackerBackend.IsWalking(videoMode)))
                 {
                     var videoRow=Row("recording-video-option");videoRow.style.marginTop=8;videoRow.style.marginBottom=8;
                     var videoLabel=SessionLabel("Save tracker video","session-hint");videoLabel.style.flexGrow=1;videoLabel.style.flexBasis=0;videoRow.Add(videoLabel);
@@ -299,7 +299,7 @@ namespace ConfigurationUI
                     Action refreshRecording=()=>{recordingState.text=TrackerProcessManager.RecordingStatus(id);recordingState.tooltip=recordingState.text;};
                     refreshRecording();recordingState.schedule.Execute(refreshRecording).Every(300);
                 }
-                AddTrackerControls(card,rig);
+                if(!CurrentDemo)AddTrackerControls(card,rig);
             }
 
         }

@@ -37,6 +37,7 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
         public string vrId,backend,executable,configFile,releaseTag,executableSha256,device,configRoot;
         public int processId,port;
         public long startUtcTicks;
+        public string linuxStartIdentity;
         public bool demo,strictCameraFallback,headless;
         public bool saveVideo;
         public string recordingDirectory,recordingPrefix;
@@ -61,6 +62,29 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
         try { string file=ReceiptPath(id);return File.Exists(file)?JsonConvert.DeserializeObject<Receipt>(File.ReadAllText(file)):null; }
         catch(IOException) { return null; } catch(JsonException) { return null; } catch(UnauthorizedAccessException) { return null; }
     }
+    private static readonly Lazy<string> LinuxBootId=new Lazy<string>(()=>ReadLinuxIdentityFile("/proc/sys/kernel/random/boot_id")?.Trim());
+    private static string ReadLinuxIdentityFile(string path)
+    {
+        try {return File.ReadAllText(path);}
+        catch(Exception error) when(error is IOException||error is UnauthorizedAccessException){return null;}
+    }
+    private static string LinuxStartIdentity(int pid)
+    {
+        if(!RuntimeInformation.IsOSPlatform(OSPlatform.Linux)||string.IsNullOrEmpty(LinuxBootId.Value))return null;
+        string stat=ReadLinuxIdentityFile("/proc/"+pid.ToString(CultureInfo.InvariantCulture)+"/stat");
+        int commandEnd=stat?.LastIndexOf(')')??-1;
+        if(commandEnd<0)return null;
+        // The parenthesized command may contain spaces or parentheses. The
+        // remaining fields start with state (3) and include starttime (22).
+        string[] fields=stat.Substring(commandEnd+1).Split(new[]{' '},StringSplitOptions.RemoveEmptyEntries);
+        if(fields.Length<=19||fields[0]=="Z"||fields[0]=="X")return null;
+        return LinuxBootId.Value+":"+fields[19];
+    }
+    private static bool MatchesProcessStart(Process process,Receipt receipt) =>
+        !string.IsNullOrEmpty(receipt.linuxStartIdentity)
+            ? string.Equals(LinuxStartIdentity(process.Id),receipt.linuxStartIdentity,StringComparison.Ordinal)
+            : process.StartTime.ToUniversalTime().Ticks==receipt.startUtcTicks;
+
     private static Process Match(Receipt receipt,bool requireExecutable)
     {
         if(receipt==null||receipt.processId<=0||receipt.startUtcTicks<=0) return null;
@@ -68,7 +92,7 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
         try
         {
             process=Process.GetProcessById(receipt.processId);
-            if(process.HasExited||process.StartTime.ToUniversalTime().Ticks!=receipt.startUtcTicks) { process.Dispose();return null; }
+            if(process.HasExited||!MatchesProcessStart(process,receipt)) { process.Dispose();return null; }
             if(!requireExecutable)return process; // UI liveness never reads/hashes a large executable.
             try
             {
@@ -212,6 +236,9 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
     {
         Arguments(rig); // Check calibration and endpoint before invoking the executable.
         string executable = rig.tracker.executablePath;
+        if (TrackerBackend.IsFlight(rig.closedLoopMode)&&rig.tracker.strictCameraFallback&&
+            !TrackerInstallation.SupportsOption(executable,"--no-camera-fallback"))
+            throw new InvalidOperationException("This Rekkefly build does not support camera-only launch. Update the tracker or manage its camera input independently.");
         bool automatic = rig.tracker.recordingControl == TrackerRecordingControlMode.Experiment;
         bool supportsControl = automatic && TrackerInstallation.SupportsRecordingControl(executable);
         return new CompanionCatalog.Prepared
@@ -264,7 +291,7 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
             using(var process=macBundle?MacAppLauncher.Launch(executable,args):Process.Start(DetachedStart(executable,args,Path.GetDirectoryName(executable),log)))
             {
                 if(process==null)throw new InvalidOperationException("Tracker process did not start.");
-                var receipt=new Receipt{vrId=rig.vrId,backend=TrackerBackend.DisplayName(rig.closedLoopMode),executable=executable,configFile=ResolveConfig(rig.tracker.configFile),port=rig.zmqPort,processId=process.Id,startUtcTicks=process.StartTime.ToUniversalTime().Ticks,demo=prepared?.demo??false,strictCameraFallback=rig.tracker.strictCameraFallback,device=rig.tracker.device,headless=rig.tracker.headless,configRoot=Path.GetFullPath(RuntimePaths.ConfigRoot),releaseTag=prepared?.releaseTag,executableSha256=prepared?.executableSha256??HashFile(executable),
+                var receipt=new Receipt{vrId=rig.vrId,backend=TrackerBackend.DisplayName(rig.closedLoopMode),executable=executable,configFile=ResolveConfig(rig.tracker.configFile),port=rig.zmqPort,processId=process.Id,startUtcTicks=process.StartTime.ToUniversalTime().Ticks,linuxStartIdentity=LinuxStartIdentity(process.Id),demo=prepared?.demo??false,strictCameraFallback=rig.tracker.strictCameraFallback,device=rig.tracker.device,headless=rig.tracker.headless,configRoot=Path.GetFullPath(RuntimePaths.ConfigRoot),releaseTag=prepared?.releaseTag,executableSha256=prepared?.executableSha256??HashFile(executable),
                     saveVideo=rig.tracker.saveVideo,recordingDirectory=rig.tracker.recordingDirectory,recordingPrefix=rig.tracker.recordingPrefix,
                     recordingControl=rig.tracker.recordingControl,controlDirectory=controlDirectory,controlInstance=controlInstance};
                 string file=ReceiptPath(rig.vrId),temporary=file+".writing";
