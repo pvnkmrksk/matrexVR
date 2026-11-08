@@ -1,6 +1,6 @@
 # Optomotor schema fields
 
-This atlas lists **573 emitted property paths** from the current `optomotor` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **589 emitted property paths** from the current `optomotor` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -312,6 +312,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | Default | `0.5` |
 | `minimum` | `0` |
 | `maximum` | `1` |
+
+### `objects[].appearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `objects[].appearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `objects[].appearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `objects[].appearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
 
 ### `objects[].scale`
 
@@ -2281,6 +2319,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | Default | `0.5` |
 | `minimum` | `0` |
 | `maximum` | `1` |
+
+### `preStimulus.objects[].appearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.objects[].appearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.objects[].appearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.objects[].appearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
 
 ### `preStimulus.objects[].scale`
 
@@ -4284,6 +4360,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | `minimum` | `0` |
 | `maximum` | `1` |
 
+### `stimulus.objects[].appearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.objects[].appearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.objects[].appearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.objects[].appearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
 ### `stimulus.objects[].scale`
 
 Omitted object resolves to (1,1,1); scalar fields in a supplied object default to 0. Use {x:1,y:1,z:1} for unit scale.
@@ -6285,6 +6399,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | Default | `0.5` |
 | `minimum` | `0` |
 | `maximum` | `1` |
+
+### `postStimulus.objects[].appearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.objects[].appearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.objects[].appearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.objects[].appearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
 
 ### `postStimulus.objects[].scale`
 

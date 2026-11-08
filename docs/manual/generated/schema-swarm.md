@@ -1,6 +1,6 @@
 # Swarm schema fields
 
-This atlas lists **1343 emitted property paths** from the current `swarm` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **1447 emitted property paths** from the current `swarm` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -337,6 +337,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | Default | `0.5` |
 | `minimum` | `0` |
 | `maximum` | `1` |
+
+### `objects[].appearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `objects[].appearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `objects[].appearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `objects[].appearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
 
 ### `objects[].scale`
 
@@ -1742,6 +1780,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | `minimum` | `0` |
 | `maximum` | `1` |
 
+### `modelAppearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `modelAppearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `modelAppearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `modelAppearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
 ## trajectoryFile group
 
 ### `trajectoryFile`
@@ -2041,7 +2117,7 @@ Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a
 
 ### `spawnRelativeToAnimal`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Center the initial spawn on the observer's starting position, plus the spawn offset. Follow Animal Position separately controls whether the periodic arena moves after the run starts.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -2053,7 +2129,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `followAnimalPosition`
 
-Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
+Move the periodic arena with the observer so the animal stays inside the swarm as it travels. Agents still move at their own world velocity and wrap at the moving edges. Turn this off to let the animal leave a fixed swarm. Spawn Relative to Animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -2080,7 +2156,7 @@ Population per rig; template 256 means 1024 total.
 
 ### `agentCount`
 
-Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.
+Number of simulated agents. A nonempty agent groups list supplies the total instead.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -2252,6 +2328,107 @@ Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitt
 | UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+## agentGroups group
+
+### `agentGroups`
+
+Optional generated stock-locust groups. Each group can have its own count, position offset and appearance. Groups share motion and the periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+[]
+```
+
+</details>
+
+## agentGroups[] group
+
+### `agentGroups[].count`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `128` |
+| `minimum` | `1` |
+| `maximum` | `2147483647` |
+
+### `agentGroups[].spawnOffset`
+
+Offset from the shared spawn center. Use X for left/right and Z for front/back. Y is available for 3D swarms.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| UI unit label | scene units |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 0.0,
+  "y": 0.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `agentGroups[].spawnOffset.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `agentGroups[].spawnOffset.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `agentGroups[].spawnOffset.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `agentGroups[].appearance`
+
+Stock uses the original textured locust. Black uses an opaque flat silhouette of the same animated model.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Stock"` |
+| `enum` | `["Stock","Black",0,1]` |
 
 ## volumeHalfExtentMetres group
 
@@ -3820,6 +3997,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | `minimum` | `0` |
 | `maximum` | `1` |
 
+### `preStimulus.objects[].appearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.objects[].appearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.objects[].appearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.objects[].appearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
 ### `preStimulus.objects[].scale`
 
 Omitted object resolves to (1,1,1); scalar fields in a supplied object default to 0. Use {x:1,y:1,z:1} for unit scale.
@@ -5180,6 +5395,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | `minimum` | `0` |
 | `maximum` | `1` |
 
+### `preStimulus.modelAppearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.modelAppearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.modelAppearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.modelAppearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
 ### `preStimulus.trajectoryFile`
 
 StreamingAssets-relative or absolute CSV path. Blank preserves generated motion. Supplied missing/malformed files raise errors.
@@ -5461,7 +5714,7 @@ Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a
 
 ### `preStimulus.spawnRelativeToAnimal`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Center the initial spawn on the observer's starting position, plus the spawn offset. Follow Animal Position separately controls whether the periodic arena moves after the run starts.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -5471,7 +5724,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `preStimulus.followAnimalPosition`
 
-Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
+Move the periodic arena with the observer so the animal stays inside the swarm as it travels. Agents still move at their own world velocity and wrap at the moving edges. Turn this off to let the animal leave a fixed swarm. Spawn Relative to Animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -5494,7 +5747,7 @@ Population per rig; template 256 means 1024 total.
 
 ### `preStimulus.agentCount`
 
-Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.
+Number of simulated agents. A nonempty agent groups list supplies the total instead.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -5646,6 +5899,103 @@ Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitt
 | UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.agentGroups`
+
+Optional generated stock-locust groups. Each group can have its own count, position offset and appearance. Groups share motion and the periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+[]
+```
+
+</details>
+
+### `preStimulus.agentGroups[].count`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `128` |
+| `minimum` | `1` |
+| `maximum` | `2147483647` |
+
+### `preStimulus.agentGroups[].spawnOffset`
+
+Offset from the shared spawn center. Use X for left/right and Z for front/back. Y is available for 3D swarms.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| UI unit label | scene units |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 0.0,
+  "y": 0.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `preStimulus.agentGroups[].spawnOffset.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.agentGroups[].spawnOffset.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.agentGroups[].spawnOffset.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.agentGroups[].appearance`
+
+Stock uses the original textured locust. Black uses an opaque flat silhouette of the same animated model.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Stock"` |
+| `enum` | `["Stock","Black",0,1]` |
 
 ### `preStimulus.volumeHalfExtentMetres`
 
@@ -6983,6 +7333,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | `minimum` | `0` |
 | `maximum` | `1` |
 
+### `preStimulus.swarm.modelAppearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.swarm.modelAppearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.swarm.modelAppearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.swarm.modelAppearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
 ### `preStimulus.swarm.trajectoryFile`
 
 StreamingAssets-relative or absolute CSV path. Blank preserves generated motion. Supplied missing/malformed files raise errors.
@@ -7264,7 +7652,7 @@ Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a
 
 ### `preStimulus.swarm.spawnRelativeToAnimal`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Center the initial spawn on the observer's starting position, plus the spawn offset. Follow Animal Position separately controls whether the periodic arena moves after the run starts.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -7274,7 +7662,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `preStimulus.swarm.followAnimalPosition`
 
-Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
+Move the periodic arena with the observer so the animal stays inside the swarm as it travels. Agents still move at their own world velocity and wrap at the moving edges. Turn this off to let the animal leave a fixed swarm. Spawn Relative to Animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -7297,7 +7685,7 @@ Population per rig; template 256 means 1024 total.
 
 ### `preStimulus.swarm.agentCount`
 
-Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.
+Number of simulated agents. A nonempty agent groups list supplies the total instead.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -7449,6 +7837,103 @@ Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitt
 | UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `preStimulus.swarm.agentGroups`
+
+Optional generated stock-locust groups. Each group can have its own count, position offset and appearance. Groups share motion and the periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+[]
+```
+
+</details>
+
+### `preStimulus.swarm.agentGroups[].count`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `128` |
+| `minimum` | `1` |
+| `maximum` | `2147483647` |
+
+### `preStimulus.swarm.agentGroups[].spawnOffset`
+
+Offset from the shared spawn center. Use X for left/right and Z for front/back. Y is available for 3D swarms.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| UI unit label | scene units |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 0.0,
+  "y": 0.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `preStimulus.swarm.agentGroups[].spawnOffset.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.agentGroups[].spawnOffset.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.agentGroups[].spawnOffset.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `preStimulus.swarm.agentGroups[].appearance`
+
+Stock uses the original textured locust. Black uses an opaque flat silhouette of the same animated model.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Stock"` |
+| `enum` | `["Stock","Black",0,1]` |
 
 ### `preStimulus.swarm.volumeHalfExtentMetres`
 
@@ -8330,6 +8815,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | Default | `0.5` |
 | `minimum` | `0` |
 | `maximum` | `1` |
+
+### `stimulus.objects[].appearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.objects[].appearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.objects[].appearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.objects[].appearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
 
 ### `stimulus.objects[].scale`
 
@@ -9691,6 +10214,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | `minimum` | `0` |
 | `maximum` | `1` |
 
+### `stimulus.modelAppearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.modelAppearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.modelAppearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.modelAppearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
 ### `stimulus.trajectoryFile`
 
 StreamingAssets-relative or absolute CSV path. Blank preserves generated motion. Supplied missing/malformed files raise errors.
@@ -9972,7 +10533,7 @@ Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a
 
 ### `stimulus.spawnRelativeToAnimal`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Center the initial spawn on the observer's starting position, plus the spawn offset. Follow Animal Position separately controls whether the periodic arena moves after the run starts.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -9982,7 +10543,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `stimulus.followAnimalPosition`
 
-Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
+Move the periodic arena with the observer so the animal stays inside the swarm as it travels. Agents still move at their own world velocity and wrap at the moving edges. Turn this off to let the animal leave a fixed swarm. Spawn Relative to Animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -10005,7 +10566,7 @@ Population per rig; template 256 means 1024 total.
 
 ### `stimulus.agentCount`
 
-Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.
+Number of simulated agents. A nonempty agent groups list supplies the total instead.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -10157,6 +10718,103 @@ Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitt
 | UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `stimulus.agentGroups`
+
+Optional generated stock-locust groups. Each group can have its own count, position offset and appearance. Groups share motion and the periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+[]
+```
+
+</details>
+
+### `stimulus.agentGroups[].count`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `128` |
+| `minimum` | `1` |
+| `maximum` | `2147483647` |
+
+### `stimulus.agentGroups[].spawnOffset`
+
+Offset from the shared spawn center. Use X for left/right and Z for front/back. Y is available for 3D swarms.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| UI unit label | scene units |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 0.0,
+  "y": 0.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `stimulus.agentGroups[].spawnOffset.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.agentGroups[].spawnOffset.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.agentGroups[].spawnOffset.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.agentGroups[].appearance`
+
+Stock uses the original textured locust. Black uses an opaque flat silhouette of the same animated model.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Stock"` |
+| `enum` | `["Stock","Black",0,1]` |
 
 ### `stimulus.volumeHalfExtentMetres`
 
@@ -11494,6 +12152,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | `minimum` | `0` |
 | `maximum` | `1` |
 
+### `stimulus.swarm.modelAppearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.swarm.modelAppearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.swarm.modelAppearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.swarm.modelAppearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
 ### `stimulus.swarm.trajectoryFile`
 
 StreamingAssets-relative or absolute CSV path. Blank preserves generated motion. Supplied missing/malformed files raise errors.
@@ -11775,7 +12471,7 @@ Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a
 
 ### `stimulus.swarm.spawnRelativeToAnimal`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Center the initial spawn on the observer's starting position, plus the spawn offset. Follow Animal Position separately controls whether the periodic arena moves after the run starts.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -11785,7 +12481,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `stimulus.swarm.followAnimalPosition`
 
-Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
+Move the periodic arena with the observer so the animal stays inside the swarm as it travels. Agents still move at their own world velocity and wrap at the moving edges. Turn this off to let the animal leave a fixed swarm. Spawn Relative to Animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -11808,7 +12504,7 @@ Population per rig; template 256 means 1024 total.
 
 ### `stimulus.swarm.agentCount`
 
-Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.
+Number of simulated agents. A nonempty agent groups list supplies the total instead.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -11960,6 +12656,103 @@ Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitt
 | UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `stimulus.swarm.agentGroups`
+
+Optional generated stock-locust groups. Each group can have its own count, position offset and appearance. Groups share motion and the periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+[]
+```
+
+</details>
+
+### `stimulus.swarm.agentGroups[].count`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `128` |
+| `minimum` | `1` |
+| `maximum` | `2147483647` |
+
+### `stimulus.swarm.agentGroups[].spawnOffset`
+
+Offset from the shared spawn center. Use X for left/right and Z for front/back. Y is available for 3D swarms.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| UI unit label | scene units |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 0.0,
+  "y": 0.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `stimulus.swarm.agentGroups[].spawnOffset.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.agentGroups[].spawnOffset.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.agentGroups[].spawnOffset.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `stimulus.swarm.agentGroups[].appearance`
+
+Stock uses the original textured locust. Black uses an opaque flat silhouette of the same animated model.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Stock"` |
+| `enum` | `["Stock","Black",0,1]` |
 
 ### `stimulus.swarm.volumeHalfExtentMetres`
 
@@ -12841,6 +13634,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | Default | `0.5` |
 | `minimum` | `0` |
 | `maximum` | `1` |
+
+### `postStimulus.objects[].appearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.objects[].appearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.objects[].appearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.objects[].appearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
 
 ### `postStimulus.objects[].scale`
 
@@ -14202,6 +15033,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | `minimum` | `0` |
 | `maximum` | `1` |
 
+### `postStimulus.modelAppearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.modelAppearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.modelAppearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.modelAppearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
 ### `postStimulus.trajectoryFile`
 
 StreamingAssets-relative or absolute CSV path. Blank preserves generated motion. Supplied missing/malformed files raise errors.
@@ -14483,7 +15352,7 @@ Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a
 
 ### `postStimulus.spawnRelativeToAnimal`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Center the initial spawn on the observer's starting position, plus the spawn offset. Follow Animal Position separately controls whether the periodic arena moves after the run starts.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -14493,7 +15362,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `postStimulus.followAnimalPosition`
 
-Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
+Move the periodic arena with the observer so the animal stays inside the swarm as it travels. Agents still move at their own world velocity and wrap at the moving edges. Turn this off to let the animal leave a fixed swarm. Spawn Relative to Animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -14516,7 +15385,7 @@ Population per rig; template 256 means 1024 total.
 
 ### `postStimulus.agentCount`
 
-Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.
+Number of simulated agents. A nonempty agent groups list supplies the total instead.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -14668,6 +15537,103 @@ Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitt
 | UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.agentGroups`
+
+Optional generated stock-locust groups. Each group can have its own count, position offset and appearance. Groups share motion and the periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+[]
+```
+
+</details>
+
+### `postStimulus.agentGroups[].count`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `128` |
+| `minimum` | `1` |
+| `maximum` | `2147483647` |
+
+### `postStimulus.agentGroups[].spawnOffset`
+
+Offset from the shared spawn center. Use X for left/right and Z for front/back. Y is available for 3D swarms.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| UI unit label | scene units |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 0.0,
+  "y": 0.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `postStimulus.agentGroups[].spawnOffset.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.agentGroups[].spawnOffset.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.agentGroups[].spawnOffset.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.agentGroups[].appearance`
+
+Stock uses the original textured locust. Black uses an opaque flat silhouette of the same animated model.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Stock"` |
+| `enum` | `["Stock","Black",0,1]` |
 
 ### `postStimulus.volumeHalfExtentMetres`
 
@@ -16005,6 +16971,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | `minimum` | `0` |
 | `maximum` | `1` |
 
+### `postStimulus.swarm.modelAppearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.swarm.modelAppearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.swarm.modelAppearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.swarm.modelAppearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
 ### `postStimulus.swarm.trajectoryFile`
 
 StreamingAssets-relative or absolute CSV path. Blank preserves generated motion. Supplied missing/malformed files raise errors.
@@ -16286,7 +17290,7 @@ Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a
 
 ### `postStimulus.swarm.spawnRelativeToAnimal`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Center the initial spawn on the observer's starting position, plus the spawn offset. Follow Animal Position separately controls whether the periodic arena moves after the run starts.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -16296,7 +17300,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `postStimulus.swarm.followAnimalPosition`
 
-Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
+Move the periodic arena with the observer so the animal stays inside the swarm as it travels. Agents still move at their own world velocity and wrap at the moving edges. Turn this off to let the animal leave a fixed swarm. Spawn Relative to Animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -16319,7 +17323,7 @@ Population per rig; template 256 means 1024 total.
 
 ### `postStimulus.swarm.agentCount`
 
-Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.
+Number of simulated agents. A nonempty agent groups list supplies the total instead.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -16471,6 +17475,103 @@ Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitt
 | UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `postStimulus.swarm.agentGroups`
+
+Optional generated stock-locust groups. Each group can have its own count, position offset and appearance. Groups share motion and the periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+[]
+```
+
+</details>
+
+### `postStimulus.swarm.agentGroups[].count`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `128` |
+| `minimum` | `1` |
+| `maximum` | `2147483647` |
+
+### `postStimulus.swarm.agentGroups[].spawnOffset`
+
+Offset from the shared spawn center. Use X for left/right and Z for front/back. Y is available for 3D swarms.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| UI unit label | scene units |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 0.0,
+  "y": 0.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `postStimulus.swarm.agentGroups[].spawnOffset.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.agentGroups[].spawnOffset.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.agentGroups[].spawnOffset.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `postStimulus.swarm.agentGroups[].appearance`
+
+Stock uses the original textured locust. Black uses an opaque flat silhouette of the same animated model.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Stock"` |
+| `enum` | `["Stock","Black",0,1]` |
 
 ### `postStimulus.swarm.volumeHalfExtentMetres`
 
@@ -17167,6 +18268,44 @@ Legacy compatibility; unlit visual ignores PBR lighting.
 | `minimum` | `0` |
 | `maximum` | `1` |
 
+### `swarm.modelAppearance.textureVariants`
+
+Named replacement base-color images for this model's existing UVs. Use PNG or JPEG.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `swarm.modelAppearance.textureVariants[].name`
+
+Logged step label; keep names unique and avoid CSV delimiters.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `swarm.modelAppearance.textureVariants[].texturePath`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `swarm.modelAppearance.selectedTextureVariant`
+
+Select a named base-color texture. An empty selection retains the original texture settings.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `""` |
+
 ### `swarm.trajectoryFile`
 
 StreamingAssets-relative or absolute CSV path. Blank preserves generated motion. Supplied missing/malformed files raise errors.
@@ -17448,7 +18587,7 @@ Legacy retains historical scatter and kappa>=10000 point motion. VonMises uses a
 
 ### `swarm.spawnRelativeToAnimal`
 
-Start and retain the volume around the current observer. Individual moths move at their own world velocity; they are not dragged by observer motion.
+Center the initial spawn on the observer's starting position, plus the spawn offset. Follow Animal Position separately controls whether the periodic arena moves after the run starts.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -17458,7 +18597,7 @@ Start and retain the volume around the current observer. Individual moths move a
 
 ### `swarm.followAnimalPosition`
 
-Move the periodic arena with the observer to keep recycling the population nearby. Each agent still travels at its own world velocity. Turn this off for a fixed arena the observer can travel away from. Spawn relative to animal sets the starting location separately.
+Move the periodic arena with the observer so the animal stays inside the swarm as it travels. Agents still move at their own world velocity and wrap at the moving edges. Turn this off to let the animal leave a fixed swarm. Spawn Relative to Animal sets the starting location separately.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -17481,7 +18620,7 @@ Population per rig; template 256 means 1024 total.
 
 ### `swarm.agentCount`
 
-Number of simulated agents. Takes precedence over legacy numberOfLocusts; omitted preserves the existing scene/config count.
+Number of simulated agents. A nonempty agent groups list supplies the total instead.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -17633,6 +18772,103 @@ Legacy agent-speed spelling. Used only when agentSpeed and locustSpeed are omitt
 | UI soft slider range | `{"min":0.0,"max":30.0,"step":0.1}`; display/edit convenience, not an extra runtime constraint. |
 
 UI `visibleWhen`: `{"property":"trajectoryFile","oneOf":[""]}`. This governs the form, not removal of stored values.
+
+### `swarm.agentGroups`
+
+Optional generated stock-locust groups. Each group can have its own count, position offset and appearance. Groups share motion and the periodic arena.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `array or null` |
+| Required by parent schema | No |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+[]
+```
+
+</details>
+
+### `swarm.agentGroups[].count`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `128` |
+| `minimum` | `1` |
+| `maximum` | `2147483647` |
+
+### `swarm.agentGroups[].spawnOffset`
+
+Offset from the shared spawn center. Use X for left/right and Z for front/back. Y is available for 3D swarms.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| UI unit label | scene units |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "x": 0.0,
+  "y": 0.0,
+  "z": 0.0
+}
+```
+
+</details>
+
+### `swarm.agentGroups[].spawnOffset.x`
+
+X component. Unity +X points right/east. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.agentGroups[].spawnOffset.y`
+
+Y component. Unity +Y points up. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.agentGroups[].spawnOffset.z`
+
+Z component. Unity +Z points forward/north. Distances use scene units: metres on terrain, centimetres for walking.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `0.0` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+
+### `swarm.agentGroups[].appearance`
+
+Stock uses the original textured locust. Black uses an opaque flat silhouette of the same animated model.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Stock"` |
+| `enum` | `["Stock","Black",0,1]` |
 
 ### `swarm.volumeHalfExtentMetres`
 

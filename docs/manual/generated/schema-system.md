@@ -1,6 +1,6 @@
 # System schema fields
 
-This atlas lists **75 emitted property paths** from the current `system` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **79 emitted property paths** from the current `system` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -50,6 +50,69 @@ UI `enabledWhen`: `{"property":"vSyncCount","oneOf":[0]}`. This governs the form
 | Default | `0` |
 | `minimum` | `0` |
 | `maximum` | `4` |
+
+## stimulusResolution group
+
+### `stimulusResolution`
+
+Fullscreen render size for a monitor rig on MATREX display 1. Setup uses native size. Calibrated LED viewports keep their pixel layout, and secondary displays use their system resolution.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| `additionalProperties` | `true` |
+
+<details><summary>Exact emitted default JSON</summary>
+
+```json
+{
+  "mode": "1920x1080",
+  "width": 1920,
+  "height": 1080
+}
+```
+
+</details>
+
+### `stimulusResolution.mode`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `"1920x1080"` |
+| `enum` | `["native","1280x720","1600x900","1920x1080","2560x1440","3840x2160","custom"]` |
+
+### `stimulusResolution.width`
+
+Fraction of display width/height.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `1920` |
+| UI unit label | px |
+| `minimum` | `1` |
+| `maximum` | `8192` |
+
+UI `visibleWhen`: `{"property":"mode","oneOf":["custom"]}`. This governs the form, not removal of stored values.
+
+### `stimulusResolution.height`
+
+Fraction of display width/height.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer` |
+| Required by parent schema | No |
+| Default | `1080` |
+| UI unit label | px |
+| `minimum` | `1` |
+| `maximum` | `8192` |
+
+UI `visibleWhen`: `{"property":"mode","oneOf":["custom"]}`. This governs the form, not removal of stored values.
 
 ## saveSwarmData group
 
