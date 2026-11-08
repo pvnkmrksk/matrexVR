@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using ConfigurationUI;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -88,6 +89,14 @@ public static class GuiOptionalTrackerValidation
             {
                 Check(started==4,"An explicit Open tracker failure does not start the experiment");
                 Check(ui.Document.rootVisualElement.Q<UnityEngine.UIElements.Button>("start-experiment").enabledSelf,"The primary Start action is usable after a tracker-opening failure");
+                ui.Workspace.System.Edit(root=>{
+                    foreach (var rig in (JArray)root["configs"])
+                        rig["tracker"] = new JObject { ["saveVideo"]=true, ["recordingControl"]="Experiment" };
+                });
+                var video=ui.Document.rootVisualElement.Q<Button>("save-tracker-video");
+                Check(video!=null,"The session exposes its experiment-wide tracker video switch");
+                using(var toggle=NavigationSubmitEvent.GetPooled()){toggle.target=video;video.SendEvent(toggle);}
+                Check((bool?)ui.Workspace.System.Root["saveTrackerVideo"]==false,"The switch turns off video without editing per-rig settings");
                 Set(ui,"startExperimentForValidation",null);
                 Set(ui,"prepareCompanionForValidation",(Func<SystemConfig,bool,Task<CompanionCatalog.Prepared>>)((rig,demo)=>Task.FromException<CompanionCatalog.Prepared>(new FileNotFoundException("GUI requested missing native bundle"))));
                 var start=ui.Document.rootVisualElement.Q<Button>("start-experiment");using(var evt=NavigationSubmitEvent.GetPooled()){evt.target=start;start.SendEvent(evt);}
@@ -98,6 +107,9 @@ public static class GuiOptionalTrackerValidation
                 var main=MainController.Instance;if(!main.SequenceRunning){if(EditorApplication.timeSinceStartup-began<12)return;throw new Exception("Real GUI Start did not reach the experiment clock: "+main.SequenceError);}
                 Check(main.SequenceRunning,"The real GUI Start callback reaches Main's running experiment despite missing native bundles");
                 Check(main.RecordingWarnings.Count>=16&&System.Linq.Enumerable.Any(main.RecordingWarnings,message=>message.Contains("GUI requested missing native bundle")),"GUI preparation warnings survive Main's configuration reset and remain available during the experiment");
+                foreach (var rig in main.SystemConfigs.Values)
+                    Check((string)TrackerProcessManager.RecordingState(rig.vrId)["state"]=="disabled",
+                        rig.vrId+" requests no native take with the experiment switch off");
                 main.StopSequence("gui-optional-tracker-validation");stage=7;afterFrame=Time.frameCount+4;return;
             }
             if(stage==7)

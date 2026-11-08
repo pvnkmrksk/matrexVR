@@ -2,7 +2,7 @@
 
 Automatic recording now controls the ordinary Rekkefly and HejjéTrac GUI workers. Tracking, calibration and the native window remain independent of the experiment; no second tracker engine is started to control recording.
 
-Each rig exposes a video checkbox and **Automatic experiment / Manual external** choice. Automatic video is best effort: missing, failed, unverified or incompatible trackers produce per-rig warnings while VR startup continues. Available rigs attempt recording independently, so one failed recorder cannot skip another. Manual mode reports operator control and never automatically starts or stops external recording. Turning off video permits input-only use.
+**Start → Save tracker video** is the experiment-wide permission for automatic camera recording. Set `saveTrackerVideo: false` in system JSON or choose **Skip tracker video** to suppress all automatic Start and Stop requests for that run. Omission preserves the existing enabled behavior. Each rig still exposes its own `tracker.saveVideo` checkbox and **Automatic experiment / Manual external** choice. Automatic video is best effort: missing, failed, unverified or incompatible trackers produce per-rig warnings while VR startup continues. Available rigs attempt recording independently, so one failed recorder cannot skip another. Manual mode reports operator control and never automatically starts or stops external recording. Turning off video permits input-only use.
 
 ## Lifecycle contract
 

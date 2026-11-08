@@ -39,7 +39,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
             ["system"] = new JObject { ["type"]="object", ["additionalProperties"]=true, ["properties"]=new JObject {
                 ["targetDisplay"]=Schema(typeof(int)), ["targetFrameRate"]=Schema(typeof(int)), ["vSyncCount"]=Schema(typeof(int)),
                 [StimulusResolutionConfig.Field]=Schema(typeof(StimulusResolutionConfig)),
-                ["saveSwarmData"]=Schema(typeof(bool)), ["configs"]=Schema(typeof(SystemConfig[])), ["telemetry"]=Schema(typeof(TelemetryConfig)),
+                ["saveSwarmData"]=Schema(typeof(bool)), ["saveTrackerVideo"]=Schema(typeof(bool)), ["configs"]=Schema(typeof(SystemConfig[])), ["telemetry"]=Schema(typeof(TelemetryConfig)),
                 ["statusOverlay"]=Schema(typeof(StatusOverlayConfig)), ["overheadCamera"]=Schema(typeof(OverheadCameraConfig)),
                 ["frameOverlay"]=Schema(typeof(OverlayPlacementConfig)),["desktopControls"]=Schema(typeof(OverlayPlacementConfig)) } },
             ["sequence"]=Schema(typeof(SequenceConfig)), ["choice"]=Schema(typeof(SceneConfig)),
@@ -118,6 +118,8 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         system["properties"]["targetFrameRate"]["default"]=60;
         system["properties"]["vSyncCount"]["default"]=0;
         system["properties"]["saveSwarmData"]["default"]=true;
+        system["properties"]["saveTrackerVideo"]["default"]=true;
+        system["properties"]["saveTrackerVideo"]["x-ui"]=new JObject { ["help"]="Permit automatic camera video for this experiment. Individual tracker video settings still apply. Turning this off leaves tracking and VR data recording active." };
         system["properties"]["vSyncCount"]["minimum"]=0; system["properties"]["vSyncCount"]["maximum"]=4;
         var stimulusResolution = system["properties"][StimulusResolutionConfig.Field];
         stimulusResolution["default"] = JToken.FromObject(new StimulusResolutionConfig());

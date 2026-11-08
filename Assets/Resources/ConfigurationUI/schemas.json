@@ -102,6 +102,13 @@
         "type": "boolean",
         "default": true
       },
+      "saveTrackerVideo": {
+        "type": "boolean",
+        "default": true,
+        "x-ui": {
+          "help": "Permit automatic camera video for this experiment. Individual tracker video settings still apply. Turning this off leaves tracking and VR data recording active."
+        }
+      },
       "configs": {
         "type": "array",
         "items": {
@@ -818,7 +825,8 @@
         "mode": "1920x1080",
         "width": 1920,
         "height": 1080
-      }
+      },
+      "saveTrackerVideo": true
     },
     "required": [
       "configs"
@@ -30608,7 +30616,7 @@
       },
       "numberOfLocusts": 64,
       "density": null,
-      "spawnAreaSize": 68,
+      "spawnAreaSize": 100,
       "spawnType": "Grid",
       "mu": 0,
       "kappa": 100000,
@@ -30740,8 +30748,8 @@
         "maskBelowHorizon": false,
         "imageWidth": 4096
       },
-      "boundaryLengthX": 72,
-      "boundaryLengthZ": 72,
+      "boundaryLengthX": 100,
+      "boundaryLengthZ": 100,
       "resetPositionOnStart": true,
       "resetRotationOnStart": true,
       "uniformSkyColor": null,
@@ -30765,14 +30773,14 @@
         "continuationSpeedMetresPerSecond": null,
         "preRollSeconds": 0
       },
-      "worldUnitsPerMetre": null,
+      "worldUnitsPerMetre": 100,
       "nearClipMetres": 0.002,
-      "farClipMetres": 0.6,
+      "farClipMetres": 0.8,
       "locustSpeedStdDev": 0,
-      "volumeHalfExtentMetres": null,
       "preserveBoundaryOvershoot": true,
       "headingReferenceId": "",
-      "directionDistribution": "Legacy"
+      "directionDistribution": "Legacy",
+      "periodicBoundary": true
     }
   },
   "kannadi": {

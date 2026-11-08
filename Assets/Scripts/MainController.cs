@@ -44,6 +44,7 @@ public class MainController : MonoBehaviour
     public int VSyncCount { get; private set; } = 0;
     public OverheadCameraConfig OverheadCameraSettings { get; private set; } = new OverheadCameraConfig();
     private Vector2Int? configuredStimulusResolution;
+    private bool saveTrackerVideo = true;
 
     public List<SequenceStep> sequenceSteps = new List<SequenceStep>();
     public List<int> executionOrder = new List<int>();
@@ -307,6 +308,7 @@ public class MainController : MonoBehaviour
             InputKind = fullConfig["desktopQuickStart"] is JObject preview && (bool?)preview["demo"] == true ? "demonstration" : "tracker";
             configuredStimulusResolution = (fullConfig[StimulusResolutionConfig.Field]?.ToObject<StimulusResolutionConfig>()
                 ?? new StimulusResolutionConfig()).RequestedSize();
+            saveTrackerVideo = (bool?)fullConfig["saveTrackerVideo"] ?? true;
             ApplyFrameTiming(fullConfig);
             LoadDiagnosticsConfigurations(fullConfig);
             OverheadCameraSettings = fullConfig["overheadCamera"]?.ToObject<OverheadCameraConfig>() ?? new OverheadCameraConfig();
@@ -624,7 +626,7 @@ public class MainController : MonoBehaviour
             try
             {
                 var recorderPreparation = TrackerProcessManager.BeginExperimentRecordingAsync(
-                    systemConfigs.Values, recordingDirectory, recordingRunId, cancellationToken);
+                    systemConfigs.Values, recordingDirectory, recordingRunId, cancellationToken, saveTrackerVideo);
                 nativeRecordingStartTask = recorderPreparation;
                 var recorderReport = await recorderPreparation;
                 foreach (string warning in recorderReport.Warnings) AddRecordingWarning(warning);

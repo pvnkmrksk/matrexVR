@@ -126,6 +126,7 @@ namespace ConfigurationUI
             Action refresh=()=>{
                 var videoRigs=DesktopApparatusProfile.Rigs(Workspace.System.Root).Where(r=>TrackerBackend.TryParse(r["closedLoopMode"]?.ToString(),out var mode)&&(TrackerBackend.IsFlight(mode)||TrackerBackend.IsWalking(mode))).ToList();
                 int videoCount=videoRigs.Count(r=>{JToken value=(r["tracker"] as JObject)?["saveVideo"];return value?.Type!=JTokenType.Boolean||(bool)value;});
+                if(!ExperimentBlocks.Flag(Workspace.System.Root["saveTrackerVideo"],true))videoCount=0;
                 state.text=videoCount==0?"Data only":videoCount==videoRigs.Count?"Data + tracker video":"Data + video · "+videoCount+" / "+videoRigs.Count;
             };refresh();state.schedule.Execute(refresh).Every(500);
             summary.tooltip="Tracking data and configuration snapshots are saved with each experiment. Tracker video follows each rig’s saveVideo setting. Change recording options in Animal & recording details before initializing tracking.";
@@ -140,6 +141,18 @@ namespace ConfigurationUI
                 swarm.EnableInClassList("is-on",savePopulation);
             });
             summary.Add(swarm);
+            var video=StudioButton("Save tracker video","camera",()=>StudioEdit(Workspace.System,r=>{
+                r["saveTrackerVideo"]=!ExperimentBlocks.Flag(r["saveTrackerVideo"],true);
+            },false),"quiet");
+            video.name="save-tracker-video";
+            video.tooltip="Permit automatic camera video for this experiment. Each rig’s video and recorder-control settings still apply.";
+            BindViewState(video,()=>{
+                bool enabled=ExperimentBlocks.Flag(Workspace.System.Root["saveTrackerVideo"],true);
+                video.Q<Label>().text=enabled?"Save tracker video":"Skip tracker video";
+                video.EnableInClassList("is-on",enabled);
+                refresh();
+            });
+            summary.Add(video);
             var options=StudioButton("Options","settings",()=>{
                 sessionDetailsOpen=true;var details=root.Q<Foldout>("recording-details");if(details!=null){details.value=true;details.schedule.Execute(()=>details.GetFirstAncestorOfType<ScrollView>()?.ScrollTo(details));}
             },"quiet");options.name="recording-summary-options";summary.Add(options);

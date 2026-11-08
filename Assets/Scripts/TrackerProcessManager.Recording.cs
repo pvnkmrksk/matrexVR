@@ -74,7 +74,7 @@ public sealed partial class TrackerProcessManager
             catch(Exception error)when(error is IOException||error is UnauthorizedAccessException){run.EvidenceFailure="Could not preserve native recording-control evidence: "+error.Message;}
         }
     }
-    public static Task<NativeRecordingStartReport> BeginExperimentRecordingAsync(IEnumerable<SystemConfig> configurations,string runDirectory,string runId,CancellationToken token=default)
+    public static Task<NativeRecordingStartReport> BeginExperimentRecordingAsync(IEnumerable<SystemConfig> configurations,string runDirectory,string runId,CancellationToken token=default,bool saveTrackerVideo=true)
     {
         if(string.IsNullOrWhiteSpace(runId)||!Path.IsPathFullyQualified(runDirectory))throw new ArgumentException("Native recording requires the immutable VR run ID and absolute directory.");
         _=Instance;
@@ -85,10 +85,10 @@ public sealed partial class TrackerProcessManager
             if(File.Exists(identityPath)&&(string)NativeRecorderClient.ReadObject(identityPath)["runId"]!=runId)throw new InvalidDataException("Create a new VR recording session before starting another native take.");
             if(!File.Exists(identityPath))File.WriteAllText(identityPath,new JObject{["schemaVersion"]=1,["runId"]=runId,["createdUtc"]=DateTimeOffset.UtcNow}.ToString(Formatting.Indented));
             var run=new RecordingRun{Id=runId,Directory=Path.GetFullPath(runDirectory),ConfigRoot=Path.GetFullPath(RuntimePaths.ConfigRoot),Logger=MasterDataLogger.Instance};
-            recordingRuns[runId]=run;run.BeginTask=BeginRunAsync(run,(configurations??Array.Empty<SystemConfig>()).ToArray(),token);return run.BeginTask;
+            recordingRuns[runId]=run;run.BeginTask=BeginRunAsync(run,(configurations??Array.Empty<SystemConfig>()).ToArray(),token,saveTrackerVideo);return run.BeginTask;
         }
     }
-    private static async Task<NativeRecordingStartReport> BeginRunAsync(RecordingRun run,SystemConfig[] rigs,CancellationToken token)
+    private static async Task<NativeRecordingStartReport> BeginRunAsync(RecordingRun run,SystemConfig[] rigs,CancellationToken token,bool saveTrackerVideo)
     {
         using(var linked=CancellationTokenSource.CreateLinkedTokenSource(token,run.Cancellation.Token))
         {
@@ -97,7 +97,7 @@ public sealed partial class TrackerProcessManager
             foreach(var rig in rigs.Where(rig=>rig!=null))
             {
                 var take=new RecordingTake{Desired=JsonConvert.DeserializeObject<SystemConfig>(JsonConvert.SerializeObject(rig)),RigId=rig.vrId,Backend=TrackerBackend.IsFlight(rig.closedLoopMode)?"rekkefly":"hejjetrac",
-                    Requested=rig.tracker?.saveVideo??true,Automatic=(rig.tracker?.recordingControl??TrackerRecordingControlMode.Experiment)==TrackerRecordingControlMode.Experiment};
+                    Requested=saveTrackerVideo&&(rig.tracker?.saveVideo??true),Automatic=(rig.tracker?.recordingControl??TrackerRecordingControlMode.Experiment)==TrackerRecordingControlMode.Experiment};
                 run.Takes.Add(take);
                 if(!take.Requested){SetRecordingState(run,take,"disabled");continue;}
                 if(!take.Automatic){SetRecordingState(run,take,"manual");continue;}
