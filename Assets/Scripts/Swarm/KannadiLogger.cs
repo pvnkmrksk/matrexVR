@@ -22,6 +22,8 @@ public class KannadiLogger : MonoBehaviour
     public long DroppedFrames => writer?.DroppedFrames ?? 0;
     public string Failure => writer?.Failure;
 
+    private void Awake() => RuntimeStatusOverlay.RegisterStatusSource(this);
+
     void Start()
     {
         if (closedForArchive) return;
@@ -112,7 +114,11 @@ public class KannadiLogger : MonoBehaviour
         if(!writer.Submit(frame))StopForEvidenceFailure("The bounded population recording queue could not accept the rendered frame.");
     }
 
-    void OnDestroy() => CloseForArchive();
+    void OnDestroy()
+    {
+        RuntimeStatusOverlay.UnregisterStatusSource(this);
+        CloseForArchive();
+    }
 
     public void CloseForArchive()
     {

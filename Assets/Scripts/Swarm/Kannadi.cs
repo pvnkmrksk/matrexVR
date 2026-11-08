@@ -28,6 +28,8 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     private float MirrorBoundaryZ => config.boundaryLengthZ ?? SwarmConfig.DefaultBoundaryLength;
     protected virtual float RowSpacing => hexRadius * 2f;
 
+    private void Awake() => RuntimeStatusOverlay.RegisterStatusSource(this);
+
     protected virtual void Start()
     {
         // sceneLoaded initializes before Start; direct scene play still gets a usable grid.
@@ -268,5 +270,9 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             if (clone != null) { clone.SetActive(false); Destroy(clone); }
         Clones = new GameObject[0]; offsets = new Vector3[0];
     }
-    protected virtual void OnDestroy() => CleanupClones();
+    protected virtual void OnDestroy()
+    {
+        RuntimeStatusOverlay.UnregisterStatusSource(this);
+        CleanupClones();
+    }
 }

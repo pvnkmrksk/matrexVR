@@ -17,6 +17,9 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     public sealed class ErrorEntry { public string timestampUtc, type, message, stackTrace; }
     private static readonly object errorLock = new object();
     private static readonly Queue<ErrorEntry> errors = new Queue<ErrorEntry>();
+    private static readonly bool legacyScansForProbe =
+        Array.IndexOf(Environment.GetCommandLineArgs(), "--performance-probe") >= 0 &&
+        Array.IndexOf(Environment.GetCommandLineArgs(), "--legacy-status-overlay-scans") >= 0;
     private static long errorRevision;
     private long shownRevision;
     private GameObject panel;
@@ -43,10 +46,31 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     public bool Visible => visible&&!OperatorOverlayVisibility.Hidden;
     public bool ShouldDisplay => isActiveAndEnabled && Visible && layoutAvailable && !ConfigurationUI.ConfigWorkbench.IsOpen && SceneManager.GetActiveScene().name!="ReplayScene";
 
+    private static class StatusSources<T> where T : Component
+    {
+        internal static readonly HashSet<T> Members = new HashSet<T>();
+    }
+
+    internal static void RegisterStatusSource<T>(T source) where T : Component => StatusSources<T>.Members.Add(source);
+    internal static void UnregisterStatusSource<T>(T source) where T : Component => StatusSources<T>.Members.Remove(source);
+
+    private static IEnumerable<T> StatusMembers<T>() where T : Component
+    {
+        if (legacyScansForProbe || !Application.isPlaying)
+            return FindObjectsByType<T>(FindObjectsSortMode.None);
+        // The old scan excluded inactive objects but included disabled components.
+        // Keep their pending and dropped writer counts visible while the rig is active.
+        return StatusSources<T>.Members.Where(source => source != null && source.gameObject.activeInHierarchy);
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetErrors()
     {
         lock (errorLock) { errors.Clear(); errorRevision = 0; }
+        StatusSources<LocustSpawner>.Members.Clear();
+        StatusSources<Kannadi>.Members.Clear();
+        StatusSources<SwarmLogger>.Members.Clear();
+        StatusSources<KannadiLogger>.Members.Clear();
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -292,14 +316,14 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         int animals = 0, views = 0, queued = 0, writers = 0;
         long dropped = 0;
         double capture = 0;
-        foreach (var population in FindObjectsByType<LocustSpawner>(FindObjectsSortMode.None)) animals += population.Spawned.Count;
-        foreach (var mirror in FindObjectsByType<Kannadi>(FindObjectsSortMode.None))
+        foreach (var population in StatusMembers<LocustSpawner>()) animals += population.Spawned.Count;
+        foreach (var mirror in StatusMembers<Kannadi>())
             if (mirror.isActiveAndEnabled && !mirror.IsSwarm) animals += mirror.Clones.Count(clone => clone != null && clone.activeInHierarchy);
         foreach (var config in main.SystemConfigs.Values) views += ViewportSetter.NormalizeDisplayOrder(config.displayOrder).Length;
         text.AppendLine($"{main.SystemConfigs.Count} VRs · {views} panel views · {animals} locusts");
-        foreach (var logger in FindObjectsByType<SwarmLogger>(FindObjectsSortMode.None))
+        foreach (var logger in StatusMembers<SwarmLogger>())
         { queued += logger.PendingFrames; dropped += logger.DroppedFrames; if (logger.isActiveAndEnabled) { capture += logger.CaptureMilliseconds; writers++; } }
-        foreach (var logger in FindObjectsByType<KannadiLogger>(FindObjectsSortMode.None))
+        foreach (var logger in StatusMembers<KannadiLogger>())
         { queued += logger.PendingFrames; dropped += logger.DroppedFrames; if (logger.isActiveAndEnabled) { capture += logger.CaptureMilliseconds; writers++; } }
         text.AppendLine($"{writers} population writers · capture {capture:F2} ms");
         text.AppendLine($"Recording queued {queued} frames · dropped {dropped}");
@@ -476,7 +500,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         }
         if(showDetails) text.AppendLine($"Telemetry PUB (output): {(telemetry != null ? telemetry.State + " " + telemetry.Endpoint : "starting")}");
         int pending = 0; long dropped = 0; double capture = 0; int loggers = 0;
-        foreach (var logger in FindObjectsByType<SwarmLogger>(FindObjectsSortMode.None))
+        foreach (var logger in StatusMembers<SwarmLogger>())
         { pending += logger.PendingFrames; dropped += logger.DroppedFrames; capture += logger.CaptureMilliseconds; loggers++; }
         if (loggers > 0) text.AppendLine($"Swarm log: worker / capture {capture:F2} ms / queued {pending} / dropped {dropped}");
         AppendErrors(text);

@@ -109,6 +109,8 @@ public class LocustSpawner : MonoBehaviour
         camera.farClipPlane = far;
     }
 
+    private void Awake() => RuntimeStatusOverlay.RegisterStatusSource(this);
+
     void Start()
     {
         if (initialized) return;
@@ -178,7 +180,11 @@ public class LocustSpawner : MonoBehaviour
         spawned.Clear();
         SpawnRevision++;
     }
-    private void OnDestroy() => Cleanup();
+    private void OnDestroy()
+    {
+        RuntimeStatusOverlay.UnregisterStatusSource(this);
+        Cleanup();
+    }
     private static void Release(Object obj) { if (Application.isPlaying) Destroy(obj); else DestroyImmediate(obj); }
 
     void SpawnLocusts()

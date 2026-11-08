@@ -111,6 +111,8 @@ public class SwarmLogger : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void InstallShutdown() { Application.quitting -= AsyncSwarmWriter.DrainAll; Application.quitting += AsyncSwarmWriter.DrainAll; }
 
+    private void Awake() => RuntimeStatusOverlay.RegisterStatusSource(this);
+
     private void Start()
     {
         if (closed) return;
@@ -417,6 +419,7 @@ public class SwarmLogger : MonoBehaviour
 
     private void OnDestroy()
     {
+        RuntimeStatusOverlay.UnregisterStatusSource(this);
         CloseForArchive();
         ReleaseStockCapture();
     }

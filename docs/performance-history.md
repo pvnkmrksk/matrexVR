@@ -72,3 +72,5 @@ Use an isolated profile, the same scene recipe and seed, and fresh writable outp
       --performance-phases all-uncapped --performance-seconds 65
 
 The current tight example uses the eye-level camera. To reproduce the earlier stress geometry, use the referenceTightSwarm experiment in the structured report with the original four-camera, 16-rig apparatus. Use the per-case flags when isolating renderers, workers, timing, or recording. Physical LED scanout and live tracker latency require separate measurements. [Earlier matched Linux workload](population-performance-20261106.md) · [Phase summaries and selected raw intervals](performance-history-results.json)
+
+The post-0.4.2 follow-up moves stock population packet assembly off the Unity thread and removes repeated scene scans from the dense status overlay. At 16 × 1,536 with full recording, the 65-second comparison reached 95.09 FPS and a 16.39 ms p99, with 160.4 million rows and zero recording drops. [Worker capture and CPU timing](population-worker-performance.md)
