@@ -20,11 +20,18 @@ public class SwarmLogger : MonoBehaviour
     private int poseStart = -1;
     private int[] capturedIndices;
     private EulerSample[] eulerCache;
+    private StockPopulationCapture stockCapture;
+    private int stockScheduledFrame = -1;
+    private bool stockEligible;
     private static readonly Unity.Profiling.ProfilerMarker captureMarker = new Unity.Profiling.ProfilerMarker("SwarmLogger.Capture");
     private static readonly Unity.Profiling.ProfilerMarker poseScheduleMarker = new Unity.Profiling.ProfilerMarker("SwarmLogger.SchedulePoseJob");
     private static readonly Unity.Profiling.ProfilerMarker poseWaitMarker = new Unity.Profiling.ProfilerMarker("SwarmLogger.WaitForPoseJob");
     private static readonly bool usePoseJob = Array.IndexOf(Environment.GetCommandLineArgs(), "--serial-swarm-population-capture") < 0;
     private static readonly bool verifyPoseJob = Array.IndexOf(Environment.GetCommandLineArgs(), "--verify-swarm-population-pose-jobs") >= 0;
+    private static readonly bool useStockPackets = usePoseJob &&
+        Array.IndexOf(Environment.GetCommandLineArgs(), "--serial-stock-population-packets") < 0;
+    private static readonly bool verifyStockPackets = verifyPoseJob ||
+        Array.IndexOf(Environment.GetCommandLineArgs(), "--verify-stock-population-packets") >= 0;
     private static readonly List<SwarmLogger> activeLoggers = new List<SwarmLogger>();
     private static TransformAccessArray poseTransforms;
     private static NativeArray<PoseSample> poses;
@@ -39,10 +46,11 @@ public class SwarmLogger : MonoBehaviour
     public double PoseScheduleMilliseconds { get; private set; }
     public double PoseWaitMilliseconds { get; private set; }
     public int JobPoseRows { get; private set; }
+    public int StockPacketRows { get; private set; }
     public long WrittenRows => writer?.WrittenRows ?? 0;
     public string LogPath { get; private set; }
 
-    private readonly struct AgentSource
+    internal readonly struct AgentSource
     {
         public readonly GameObject Object;
         public readonly Transform Transform;
@@ -130,6 +138,7 @@ public class SwarmLogger : MonoBehaviour
     {
         activeLoggers.Remove(this);
         poseStart = -1;
+        stockScheduledFrame = -1;
         sourcesChanged = true;
         if (activeLoggers.Count == 0) ReleasePoseBuffers();
     }
@@ -139,6 +148,7 @@ public class SwarmLogger : MonoBehaviour
     private void RefreshSources()
     {
         if (cachedRevision == spawner.SpawnRevision && cachedMask == locustLayerMask.value) return;
+        ReleaseStockCapture();
         agents.Clear();
         batchRenderer = spawner.GetComponentInChildren<BogongSwarmRenderer>(true);
         int sourceIndex = -1;
@@ -154,6 +164,8 @@ public class SwarmLogger : MonoBehaviour
         capturedIndices = null;
         eulerCache = null;
         sourcesChanged = true;
+        if (useStockPackets && !poseJobFailed && agents.Count >= MinimumJobSize)
+            stockCapture = StockPopulationCapture.TryCreate(agents);
     }
 
     private static void RebuildPoseBuffers(int count)
@@ -166,7 +178,7 @@ public class SwarmLogger : MonoBehaviour
         int offset = 0;
         foreach (var logger in activeLoggers)
         {
-            if (!logger.CanCapture || logger.agents.Count == 0) continue;
+            if (!logger.CanCapture || logger.stockEligible || logger.agents.Count == 0) continue;
             logger.poseStart = offset;
             int length = logger.agents.Count;
             if (logger.capturedIndices == null)
@@ -194,7 +206,13 @@ public class SwarmLogger : MonoBehaviour
                 {
                     if (!logger.CanCapture) continue;
                     logger.RefreshSources();
-                    count += logger.agents.Count;
+                    bool eligible = logger.stockCapture?.CanSchedule == true;
+                    if (logger.stockEligible != eligible)
+                    {
+                        logger.stockEligible = eligible;
+                        sourcesChanged = true;
+                    }
+                    if (!eligible) count += logger.agents.Count;
                 }
                 if (sourcesChanged)
                 {
@@ -205,8 +223,14 @@ public class SwarmLogger : MonoBehaviour
                 {
                     poseHandle = new ReadPoses { Output = poses, Frame = frame }.ScheduleReadOnly(poseTransforms, 64);
                     posePending = true;
-                    JobHandle.ScheduleBatchedJobs();
                 }
+                foreach (var logger in activeLoggers)
+                {
+                    if (!logger.CanCapture || !logger.stockEligible) continue;
+                    logger.stockCapture.Schedule(ref poseHandle, ref posePending);
+                    logger.stockScheduledFrame = frame;
+                }
+                if (posePending) JobHandle.ScheduleBatchedJobs();
             }
             catch (Exception error)
             {
@@ -227,6 +251,7 @@ public class SwarmLogger : MonoBehaviour
             completedFrame = scheduledFrame;
         }
         catch (Exception error) { DisablePoseJob(error); }
+        finally { poseHandle = default; }
     }
 
     private static void DisablePoseJob(Exception error)
@@ -275,7 +300,7 @@ public class SwarmLogger : MonoBehaviour
     private void CaptureFrame(bool allowPoseJob)
     {
         PoseScheduleMilliseconds = PoseWaitMilliseconds = 0;
-        JobPoseRows = 0;
+        JobPoseRows = StockPacketRows = 0;
         if (!CanCapture) return;
         if (writer.Failure != null) { StopForEvidenceFailure(writer.Failure); return; }
         long start = System.Diagnostics.Stopwatch.GetTimestamp();
@@ -286,14 +311,23 @@ public class SwarmLogger : MonoBehaviour
             try
             {
                 RefreshSources();
+                DateTime timestamp = RecordedFrameClock.Now;
                 bool readJob = allowPoseJob && poseStart >= 0 && !poseJobFailed &&
                     (posePending || completedFrame == frameNumber);
-                var frame = writer.Rent(agents.Count);
-                frame.timestamp = RecordedFrameClock.Now; frame.unityFrame = frameNumber;
+                AsyncSwarmWriter.Frame packet = null;
+                if (allowPoseJob && stockScheduledFrame == frameNumber && !poseJobFailed)
+                {
+                    FinishPoseCapture();
+                    if (completedFrame == frameNumber && stockCapture != null)
+                        packet = stockCapture.RentFrame(writer, agents, verifyStockPackets);
+                }
+                var frame = packet ?? writer.Rent(agents.Count);
+                frame.timestamp = timestamp; frame.unityFrame = frameNumber;
                 frame.skyboxId = NightSkyController.CurrentId;
                 frame.skyboxSampleUtc = NightSkyController.CurrentSampleUtc;
                 frame.phase = MainController.RecordedExperimentPhase;
-                CaptureAgents(frame, readJob);
+                if (packet != null) JobPoseRows = StockPacketRows = frame.count;
+                else CaptureAgents(frame, readJob);
                 if (!writer.Submit(frame)) StopForEvidenceFailure("The bounded population recording queue could not accept the rendered frame.");
             }
             finally { FinishPoseCapture(); }
@@ -370,5 +404,20 @@ public class SwarmLogger : MonoBehaviour
         else Debug.LogException(error);
     }
     public void CloseForArchive() { closed = true; sourcesChanged = true; writer?.Complete(); }
-    private void OnDestroy() => CloseForArchive();
+
+    private void ReleaseStockCapture()
+    {
+        if (stockCapture == null) return;
+        CompletePoseJob();
+        stockCapture.Dispose();
+        stockCapture = null;
+        stockEligible = false;
+        stockScheduledFrame = -1;
+    }
+
+    private void OnDestroy()
+    {
+        CloseForArchive();
+        ReleaseStockCapture();
+    }
 }

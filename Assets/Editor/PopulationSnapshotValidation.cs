@@ -102,6 +102,99 @@ public static class PopulationSnapshotValidation
         state.animators[0].path="child/quoted\"";Capture(snapshot,state);
         Check(Cell(snapshot)==Csv(Json(state)),"Non-root Animator keeps standard serializer fallback");
     }
+    private static void StockPacketChecks(string output)
+    {
+        const BindingFlags hiddenInstance = BindingFlags.Instance | BindingFlags.NonPublic;
+        const int state = 82673;
+        var identityType = typeof(AsyncSwarmWriter).GetNestedType("StockIdentity", BindingFlags.NonPublic);
+        var sampleType = typeof(AsyncSwarmWriter).GetNestedType("StockSample", BindingFlags.NonPublic);
+        var captureType = typeof(AsyncSwarmWriter).Assembly.GetType("StockPopulationCapture", true);
+        var materialize = (Action<AsyncSwarmWriter.Frame>)Delegate.CreateDelegate(typeof(Action<AsyncSwarmWriter.Frame>),
+            captureType.GetMethod("Materialize", BindingFlags.Static | BindingFlags.NonPublic));
+        var rentStock = typeof(AsyncSwarmWriter).GetMethod("RentStock", hiddenInstance);
+        var packetSamples = typeof(AsyncSwarmWriter.Frame).GetField("stockSamples", hiddenInstance);
+        var positionField = sampleType.GetField("Position", hiddenInstance);
+        var phaseField = sampleType.GetField("Phase", hiddenInstance);
+        var speedField = sampleType.GetField("Speed", hiddenInstance);
+        var scales = new[] { Vector3.one, Vector3.zero, new Vector3(-1f, 2f, 3f) };
+        var angles = new[] { new Vector3(10f, 359.5f, 0), new Vector3(0, 0, 90f), new Vector3(270f, 11f, 20f) };
+        var identities = Array.CreateInstance(identityType, scales.Length);
+        for (int i = 0; i < scales.Length; i++)
+            identities.SetValue(Activator.CreateInstance(identityType, hiddenInstance, null,
+                new object[] { "agent," + i, "AgentsVR1", i + 2, state, angles[i], scales[i] }, null), i);
+        const string header = "Timestamp,Name,Layer,X,Y,Z,skyboxId,skyboxSampleUtc,experimentPhase,RotationX,RotationY,RotationZ,AnimationState,UnityFrame,ScaleX,ScaleY,ScaleZ";
+        string prefix = Path.Combine(output, "stock-" + Guid.NewGuid().ToString("N"));
+        string packetPath = prefix + "-packet.matpop", serialPath = prefix + "-serial.matpop";
+        var packetWriter = new AsyncSwarmWriter(packetPath, header);
+        var serialWriter = new AsyncSwarmWriter(serialPath, header);
+        try
+        {
+            for (int k = 0; k < 25; k++)
+            {
+                // Alternate packet and ordinary rents on the same writer.
+                bool usePacket = k % 3 != 2;
+                var packet = usePacket
+                    ? (AsyncSwarmWriter.Frame)rentStock.Invoke(packetWriter, new object[] { identities, materialize })
+                    : packetWriter.Rent(scales.Length);
+                var serial = serialWriter.Rent(scales.Length);
+                packet.count = serial.count = scales.Length;
+                packet.unityFrame = serial.unityFrame = 10 + k;
+                packet.timestamp = serial.timestamp = new DateTime(2026, 11, 8, 9, 0, 0).AddMilliseconds(k);
+                packet.skyboxId = serial.skyboxId = "sky";
+                packet.skyboxSampleUtc = serial.skyboxSampleUtc = "";
+                packet.phase = serial.phase = "stimulus";
+                var samples = usePacket ? (Array)packetSamples.GetValue(packet) : null;
+                for (int i = 0; i < scales.Length; i++)
+                {
+                    var position = new Vector3(i + 0.25f, k, -0f);
+                    float phase = (k * scales.Length + i) / 128f;
+                    float speed = i == 0 ? 0 : i * 0.25f;
+                    if (usePacket)
+                    {
+                        object sample = Activator.CreateInstance(sampleType);
+                        positionField.SetValue(sample, position);
+                        phaseField.SetValue(sample, phase);
+                        speedField.SetValue(sample, speed);
+                        samples.SetValue(sample, i);
+                    }
+                    var animation = new RecordedAnimationState {
+                        animators = new[] { new RecordedAnimationState.AnimatorPose {
+                            path = "", speed = speed, parameters = Array.Empty<RecordedAnimationState.ParameterPose>(),
+                            layers = new[] { new RecordedAnimationState.LayerPose { state = state, time = phase, weight = 1 } }
+                        } },
+                        legacy = Array.Empty<RecordedAnimationState.LegacyPose>()
+                    };
+                    var snapshot = new RecordedAnimationSnapshot();
+                    Capture(snapshot, animation);
+                    var row = new AsyncSwarmWriter.Agent {
+                        name = "agent," + i, layer = "AgentsVR1", index = i + 2, animationSnapshot = snapshot,
+                        x = position.x, y = position.y, z = position.z,
+                        rx = angles[i].x, ry = angles[i].y, rz = angles[i].z,
+                        sx = scales[i].x, sy = scales[i].y, sz = scales[i].z
+                    };
+                    serial.agents[i] = row;
+                    if (!usePacket)
+                    {
+                        var packetSnapshot = new RecordedAnimationSnapshot();
+                        Capture(packetSnapshot, animation);
+                        row.animationSnapshot = packetSnapshot;
+                        packet.agents[i] = row;
+                    }
+                }
+                Check(packetWriter.Submit(packet) && serialWriter.Submit(serial), "Both stock and serial frames enter their bounded queues");
+                if (k == 9) Check(SpinWait.SpinUntil(() => packetWriter.PendingFrames == 0, 5000), "Stock frames return to the reusable pool");
+            }
+        }
+        finally
+        {
+            packetWriter.WaitForCompletion();
+            serialWriter.WaitForCompletion();
+        }
+        Check(packetWriter.Failure == null && serialWriter.Failure == null &&
+            packetWriter.WrittenRows == 75 && packetWriter.DroppedFrames == 0, "Stock packet writer preserves every row");
+        Check(File.ReadAllBytes(packetPath).SequenceEqual(File.ReadAllBytes(serialPath)),
+            "Stock and serial capture have identical packed bytes, including zero and negative scales and pooled buffer reuse");
+    }
     public static void Run()
     {
         if(!File.Exists(Path.Combine(Application.dataPath,"../KANNADI_VALIDATION_COPY")))throw new Exception("Use marked disposable project");
@@ -119,7 +212,7 @@ public static class PopulationSnapshotValidation
             rich.realizedPose=null;rich.blendShapes=null;rich.procedural=null;rich.legacy=Array.Empty<RecordedAnimationState.LegacyPose>();
             Capture(snapshot,rich);Check(Cell(snapshot)==Csv(Json(rich)),"Reused snapshot clears transition, blend, procedural and legacy state");
             Capture(snapshot,null);Check(Cell(snapshot)==",","Empty snapshot never writes stale previous evidence");
-            SteadyNumbers();QueueChecks(output);
+            SteadyNumbers();QueueChecks(output);StockPacketChecks(output);
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
             var prefab=Resources.Load<KannadiPrefabCatalog>("KannadiPrefabCatalog").Find("SimulatedLocust");var animal=Object.Instantiate(prefab);
             var animator=animal.GetComponentInChildren<Animator>(true);animator.enabled=true;animator.Rebind();animator.Update(0);

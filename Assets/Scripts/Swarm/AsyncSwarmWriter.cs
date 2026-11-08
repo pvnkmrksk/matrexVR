@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Threading;
+using Vector3 = UnityEngine.Vector3;
 
 /// <summary>Bounded, pooled snapshots. Encoding and file I/O run on one worker.</summary>
 public sealed class AsyncSwarmWriter
@@ -14,9 +15,36 @@ public sealed class AsyncSwarmWriter
     public interface IAnimationSnapshot { void WriteCsvCell(TextWriter output); }
     public interface IPackedAnimationSnapshot : IAnimationSnapshot { void WritePacked(BinaryWriter output); }
     public struct Agent { public string name, layer, animationState; public IAnimationSnapshot animationSnapshot; public int index; public float x, y, z, rx, ry, rz, sx, sy, sz, speed, visibilityPhase; public bool visible; }
+
+    internal readonly struct StockIdentity
+    {
+        internal readonly string Name, Layer;
+        internal readonly int Index, State;
+        internal readonly Vector3 Euler, Scale;
+
+        internal StockIdentity(string name, string layer, int index, int state, Vector3 euler, Vector3 scale)
+        {
+            Name = name;
+            Layer = layer;
+            Index = index;
+            State = state;
+            Euler = euler;
+            Scale = scale;
+        }
+    }
+
+    internal struct StockSample
+    {
+        internal Vector3 Position;
+        internal float Phase, Speed;
+    }
+
     public sealed class Frame
     {
         public Agent[] agents;
+        internal StockIdentity[] stockIdentities;
+        internal StockSample[] stockSamples;
+        internal Action<Frame> prepareForWrite;
         public int count;
         public int unityFrame;
         public DateTime timestamp;
@@ -73,17 +101,43 @@ public sealed class AsyncSwarmWriter
     }
     public Frame Rent(int count)
     {
-        if (!pool.TryDequeue(out Frame frame)) frame = new Frame();
-        if (frame.agents == null || frame.agents.Length < count) frame.agents = new Agent[count];
+        Frame frame = RentFrame();
+        EnsureAgents(frame, count);
         frame.count = 0;
         return frame;
     }
+
+    internal Frame RentStock(StockIdentity[] identities, Action<Frame> prepareForWrite)
+    {
+        Frame frame = RentFrame();
+        if (frame.stockSamples == null || frame.stockSamples.Length < identities.Length)
+            frame.stockSamples = new StockSample[identities.Length];
+        frame.stockIdentities = identities;
+        frame.prepareForWrite = prepareForWrite;
+        frame.count = identities.Length;
+        return frame;
+    }
+
+    private Frame RentFrame() => pool.TryDequeue(out Frame frame) ? frame : new Frame();
+
+    private static void EnsureAgents(Frame frame, int count)
+    {
+        if (frame.agents == null || frame.agents.Length < count) frame.agents = new Agent[count];
+    }
+
+    private void ReturnFrame(Frame frame)
+    {
+        frame.stockIdentities = null;
+        frame.prepareForWrite = null;
+        pool.Enqueue(frame);
+    }
+
     public bool Submit(Frame frame)
     {
         lock (signalGate)
         {
             if (completing || signalDisposed || failure != null || PendingFrames >= Capacity)
-            { Interlocked.Increment(ref droppedFrames); pool.Enqueue(frame); return false; }
+            { Interlocked.Increment(ref droppedFrames); ReturnFrame(frame); return false; }
             int count = Interlocked.Increment(ref pendingCount);
             peakPendingCount = Math.Max(peakPendingCount, count);
             pending.Enqueue(frame);
@@ -207,6 +261,7 @@ public sealed class AsyncSwarmWriter
             {
                 try
                 {
+                    frame.prepareForWrite?.Invoke(frame);
                     write(frame);
                     Interlocked.Add(ref writtenRows, frame.count);
                     Interlocked.Increment(ref writtenFrames);
@@ -219,7 +274,7 @@ public sealed class AsyncSwarmWriter
                 finally
                 {
                     Interlocked.Decrement(ref pendingCount);
-                    pool.Enqueue(frame);
+                    ReturnFrame(frame);
                 }
             }
             if (completing && pending.IsEmpty) return;

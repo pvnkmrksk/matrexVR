@@ -101,7 +101,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
     }
     private Counter mainCounter,waitCounter,presentCounter,scriptsCounter;
     private Series intervals,cpuMain,cpuRender,gpu,present;
-    private Series populationCapture,worldCapture,poseDispatch,poseWait,poseRows;
+    private Series populationCapture,worldCapture,poseDispatch,poseWait,poseRows,stockPacketRows;
     private SwarmLogger[] populationLoggers;
     private KannadiLogger[] mirrorLoggers;
     private RecordedWorldStateWriter[] worldLoggers;
@@ -281,7 +281,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             }
             Array.Clear(stageTicks,0,stageTicks.Length);
             stageTimings=cpuStageNames.Select(_=>new Series()).ToArray();
-            intervals=new Series();cpuMain=new Series();cpuRender=new Series();gpu=new Series();present=new Series();populationCapture=new Series();worldCapture=new Series();poseDispatch=new Series();poseWait=new Series();poseRows=new Series();lastTiming=0;
+            intervals=new Series();cpuMain=new Series();cpuRender=new Series();gpu=new Series();present=new Series();populationCapture=new Series();worldCapture=new Series();poseDispatch=new Series();poseWait=new Series();poseRows=new Series();stockPacketRows=new Series();lastTiming=0;
             counters=new List<Counter>{(mainCounter=new Counter(ProfilerCategory.Internal,"Main Thread")),new Counter(ProfilerCategory.Internal,"Render Thread"),
                 (waitCounter=new Counter(ProfilerCategory.Internal,"WaitForTargetFPS")),(presentCounter=new Counter(ProfilerCategory.Render,"Gfx.WaitForPresentOnGfxThread")),
                 (scriptsCounter=new Counter(ProfilerCategory.Scripts,"BehaviourUpdate")),new Counter(ProfilerCategory.Scripts,"BehaviourLateUpdate"),
@@ -309,7 +309,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             results.Add(new {phase,scene,sourceSystem,sourceExperiment,sourcePhase,expectedCameras,observedStimulusCameras=stimulusCameras.Length,requestedRigs=rigs,observedRigs=loops.Length,observedDataLoggers=loggers.Length,observedPopulation=FindObjectsByType<LocustSpawner>(FindObjectsSortMode.None).Select(item=>new{item.numberOfLocusts,item.agentVisual,spawned=item.Spawned.Count}).ToArray(),observedAnimators=animators.Length,layout=sourceSystem!=null?"supplied-system":desktop?"desktop":"LED-six-128",seconds,frames=intervals.values.Count,
                 fps=1000*intervals.values.Count/intervals.values.Sum(),phaseBoundaryFps=intervals.values.Count/seconds,completeIntervalSeconds=intervals.values.Sum()/1000,rawFrameMs=intervals.values.ToArray(),rawSamples=rawSamples.ToArray(),frameStartMs=SummarizeFrameStarts(),frameMs=intervals.Summary(),cpuMainMs=cpuMain.Summary(),cpuRenderMs=cpuRender.Summary(),gpuMs=gpu.Summary(),presentWaitMs=present.Summary(),
                 populationCaptureMs=populationCapture.Summary(),worldCaptureMs=worldCapture.Summary(),
-                populationPoseDispatchMs=poseDispatch.Summary(),populationPoseWaitMs=poseWait.Summary(),populationJobPoseRows=poseRows.Summary(),
+                populationPoseDispatchMs=poseDispatch.Summary(),populationPoseWaitMs=poseWait.Summary(),populationJobPoseRows=poseRows.Summary(),populationStockPacketRows=stockPacketRows.Summary(),
                 cpuStageMs=cpuStageNames.Select(stage=>new{name=stage.ToString(),statistics=stageTimings[(int)stage].Summary()}).ToArray(),
                 parallelCullGroups=renderBatches.Count(group=>group.UsesParallelCull),
                 parallelDrawPackingGroups=renderBatches.Count(group=>group.UsesParallelDrawPacking),
@@ -362,7 +362,7 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             maxPendingPopulationFramesPerWriter=Math.Max(maxPendingPopulationFramesPerWriter,pendingFrames);
         }
         double schedule=0, wait=0;
-        int jobRows=0;
+        int jobRows=0,packetRows=0;
         foreach(var item in populationLoggers)
         {
             if(item==null||!item.enabled)continue;
@@ -370,8 +370,9 @@ public sealed class RuntimePerformanceProbe : MonoBehaviour
             schedule+=item.PoseScheduleMilliseconds;
             wait+=item.PoseWaitMilliseconds;
             jobRows+=item.JobPoseRows;
+            packetRows+=item.StockPacketRows;
         }
-        poseDispatch.Add(schedule);poseWait.Add(wait);poseRows.Add(jobRows);
+        poseDispatch.Add(schedule);poseWait.Add(wait);poseRows.Add(jobRows);stockPacketRows.Add(packetRows);
         foreach(var item in mirrorLoggers)if(item!=null&&item.enabled)RecordPopulation(item.CaptureMilliseconds,item.PendingFrames);
         maxPendingPopulationFrames=Math.Max(maxPendingPopulationFrames,sample.pendingPopulationFrames);
         foreach(var item in worldLoggers)if(item!=null&&item.enabled)worldMilliseconds+=item.CaptureMilliseconds;

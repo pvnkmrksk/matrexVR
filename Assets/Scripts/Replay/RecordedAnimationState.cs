@@ -101,6 +101,7 @@ public sealed class RecordedAnimationSnapshot : AsyncSwarmWriter.IPackedAnimatio
         return true;
     }
     private static bool Finite(float value)=>!float.IsNaN(value)&&!float.IsInfinity(value);
+    internal static bool SupportsStockPacket => steadySchema;
     private bool TryGetSteadyAnimator(out AnimatorSample sample)
     {
         sample = stockAnimator;
@@ -370,13 +371,20 @@ public sealed class RecordedAnimationCapture
     public void CaptureSnapshot(RecordedAnimationSnapshot destination,BogongSwarmRenderer batch=null,int index=0)
     {
         if(destination==null)throw new ArgumentNullException(nameof(destination));
-        if (usePrimitiveStockSnapshot && clipPlayback != null && clipPlayback.UsesCache &&
-            animators.Length == 1 && legacy.Length == 0 && root != null)
+        if (TryGetStockPacketBinding(out var playback, out int slot))
         {
-            clipPlayback.ReadState(clipIndex, out float normalizedTime, out float speed);
-            if (destination.TrySetStockAnimator(clipPlayback.StateHash, normalizedTime, speed)) return;
+            playback.ReadState(slot, out float normalizedTime, out float speed);
+            if (destination.TrySetStockAnimator(playback.StateHash, normalizedTime, speed)) return;
         }
         destination.CopyFrom(ReadEvidence(batch,index));
+    }
+
+    internal bool TryGetStockPacketBinding(out StockLocustPlayback playback, out int slot)
+    {
+        playback = clipPlayback;
+        slot = clipIndex;
+        return usePrimitiveStockSnapshot && RecordedAnimationSnapshot.SupportsStockPacket &&
+            playback != null && playback.UsesCache && animators.Length == 1 && legacy.Length == 0 && root != null;
     }
     private RecordedAnimationState ReadEvidence(BogongSwarmRenderer batch,int index)
     {

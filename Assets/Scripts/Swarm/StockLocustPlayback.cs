@@ -9,7 +9,7 @@ using UnityEngine;
 [DefaultExecutionOrder(490)]
 public sealed class StockLocustPlayback : MonoBehaviour
 {
-    private struct Playhead
+    internal struct Playhead
     {
         public double phase;
         public float speed;
@@ -107,6 +107,8 @@ public sealed class StockLocustPlayback : MonoBehaviour
     }
 
     internal int SampleIndex(int index) => playheads[index].sample;
+    internal NativeArray<Playhead> RecordingPlayheads => playheads;
+    internal int RecordingSampleCount => clip.SampleCount;
 
     internal static bool TryGet(GameObject agent, out StockLocustPlayback batch, out int index)
     {
