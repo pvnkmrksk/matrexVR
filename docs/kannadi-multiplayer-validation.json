@@ -251,13 +251,13 @@
     "rekkefly": {
       "acknowledged": true,
       "stoppedOwnedTake": true,
-      "nativeFrames": 85,
+      "nativeFrames": 79,
       "archiveState": "finalized",
       "videoClips": 1,
       "trackingStillAvailable": true,
       "discoveredFromPath": true,
       "version": "0.6.3",
-      "packagedNativeExecutable": false
+      "packagedNativeExecutable": true
     }
   }
 }
