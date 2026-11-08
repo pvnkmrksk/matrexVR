@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -142,7 +143,7 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
     }
     public void LaunchPrepared(CompanionCatalog.Prepared prepared)
     {
-        if(prepared==null||prepared.rig==null)throw new ArgumentException("Prepare the bundled tracker first.");
+        if(prepared==null||prepared.rig==null)throw new ArgumentException("Prepare the native tracker first.");
         LaunchInternal(prepared.rig,prepared);
     }
     public void LaunchBundled(SystemConfig rig,bool demo)
@@ -182,7 +183,45 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
         // pauses it and couples its lifetime to the pipe, so it is intentionally absent.
         return new[]{"--config",config,"--windows","1"};
     }
-    public void Launch(SystemConfig rig)=>LaunchInternal(rig,null);
+    public void Launch(SystemConfig rig) => LaunchPrepared(InspectInstalled(ResolveInstalled(rig)));
+
+    public static Task<CompanionCatalog.Prepared> PrepareInstalledAsync(SystemConfig rig, bool demo)
+    {
+        if(demo)throw new InvalidOperationException("Live trackers are disabled in the hardware-free demo.");
+        var resolved = ResolveInstalled(rig);
+        return Task.Run(() => InspectInstalled(resolved));
+    }
+
+    private static SystemConfig ResolveInstalled(SystemConfig source)
+    {
+        if(source==null || string.IsNullOrWhiteSpace(source.vrId))
+            throw new ArgumentException("Select a configured rig first.");
+        var rig = JsonConvert.DeserializeObject<SystemConfig>(JsonConvert.SerializeObject(source));
+        if (rig.tracker == null) rig.tracker = new TrackerLaunchConfig();
+        string executable = rig.tracker.executablePath;
+        if (string.IsNullOrWhiteSpace(executable)) executable = TrackerInstallation.Find(rig.closedLoopMode);
+        if (string.IsNullOrWhiteSpace(executable))
+            throw new FileNotFoundException(TrackerBackend.DisplayName(rig.closedLoopMode) +
+                " launcher was not detected. Browse for its installed executable in the tracker settings.");
+        rig.tracker.executablePath = TrackerInstallation.ResolveSelection(executable, rig.closedLoopMode);
+        rig.tracker.configFile = ResolveConfig(rig.tracker.configFile);
+        return rig;
+    }
+
+    private static CompanionCatalog.Prepared InspectInstalled(SystemConfig rig)
+    {
+        Arguments(rig); // Check calibration and endpoint before invoking the executable.
+        string executable = rig.tracker.executablePath;
+        bool automatic = rig.tracker.recordingControl == TrackerRecordingControlMode.Experiment;
+        bool supportsControl = automatic && TrackerInstallation.SupportsRecordingControl(executable);
+        return new CompanionCatalog.Prepared
+        {
+            rig = rig, executableSha256 = HashFile(executable), supportsRecordingControl = supportsControl,
+            recordingWarning = automatic && rig.tracker.saveVideo && !supportsControl
+                ? "This tracker build does not expose automatic video control. Tracking can continue. Update the tracker or choose Manual recording control."
+                : null
+        };
+    }
     private void LaunchInternal(SystemConfig rig,CompanionCatalog.Prepared prepared)
     {
         if(rig==null||string.IsNullOrWhiteSpace(rig.vrId))throw new ArgumentException("Select a configured rig first.");
@@ -198,7 +237,8 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
                     bool deviceChanged=!string.IsNullOrWhiteSpace(rig.tracker?.device)&&!string.Equals(previous.device,rig.tracker.device,StringComparison.Ordinal);
                     bool headlessChanged=rig.tracker?.headless==true&&!previous.headless;
                     bool profileChanged=!string.IsNullOrWhiteSpace(previous.configRoot)&&!SameRecordingPath(previous.configRoot,RuntimePaths.ConfigRoot);
-                    if(deviceChanged||headlessChanged||profileChanged||previous.recordingControl!=(rig.tracker?.recordingControl??TrackerRecordingControlMode.Experiment)||previous.port!=rig.zmqPort||previous.backend!=TrackerBackend.DisplayName(rig.closedLoopMode)||requestedConfig!=previous.configFile||previous.strictCameraFallback!=(rig.tracker?.strictCameraFallback??false)||(string.IsNullOrEmpty(previous.controlDirectory)&&previous.saveVideo!=(rig.tracker?.saveVideo??true))||(prepared!=null&&previous.executableSha256!=prepared.executableSha256))
+                    bool executableChanged=!string.IsNullOrWhiteSpace(rig.tracker?.executablePath)&&!SameRecordingPath(previous.executable,rig.tracker.executablePath);
+                    if(deviceChanged||headlessChanged||profileChanged||executableChanged||previous.recordingControl!=(rig.tracker?.recordingControl??TrackerRecordingControlMode.Experiment)||previous.port!=rig.zmqPort||previous.backend!=TrackerBackend.DisplayName(rig.closedLoopMode)||requestedConfig!=previous.configFile||previous.strictCameraFallback!=(rig.tracker?.strictCameraFallback??false)||(string.IsNullOrEmpty(previous.controlDirectory)&&previous.saveVideo!=(rig.tracker?.saveVideo??true))||(prepared!=null&&previous.executableSha256!=prepared.executableSha256))
                         throw new InvalidOperationException("This rig already has an independent tracker window using another source/configuration. Close it or choose Stop tracker before switching.");
                     RegisterMedia(previous);MonitorRecordingExit(previous);
                     return; // Start is idempotent, including after restarting Unity.
@@ -214,7 +254,7 @@ public sealed partial class TrackerProcessManager : MonoBehaviour
             if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX)&&rig.tracker.strictCameraFallback&&!macBundle)
                 throw new ArgumentException("Camera-only tracking on macOS requires the complete native .app bundle so camera permission belongs to the tracker.");
             string controlInstance=null,controlDirectory=null;
-            bool supportsControl=prepared?.supportsRecordingControl??rig.tracker.saveVideo;
+            bool supportsControl=prepared?.supportsRecordingControl==true;
             if(rig.tracker.recordingControl==TrackerRecordingControlMode.Experiment&&supportsControl)
             {
                 controlInstance=Guid.NewGuid().ToString("N");controlDirectory=Path.Combine(StateRoot,"control",controlInstance);

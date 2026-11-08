@@ -85,7 +85,10 @@ def main():
     parser.add_argument('--app', type=Path, default=ROOT / 'Preview/MATREX VR.app')
     parser.add_argument('--version', default='0.5.0-dev', help='Application version embedded in the local player and its recordings')
     parser.add_argument('--library', type=Path, default=ROOT / '.release-work/project-v0.3/Library')
-    parser.add_argument('--skip-companions', action='store_true', help='Advanced development-only opt-out')
+    trackers = parser.add_mutually_exclusive_group()
+    trackers.add_argument('--with-companions', action='store_true', help='Reproduce historical builds with pinned tracker payloads')
+    trackers.add_argument('--skip-companions', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--without-dashboard', action='store_true', help='Omit the independent dashboard package')
     parser.add_argument('--skip-native-camera-fix', action='store_true', help='Advanced development-only opt-out; bundled flight camera input then remains unavailable')
     parser.add_argument('--verified-native-binary', type=Path, help='Explicit previously built unsigned native correction, verified against --native-binary-provenance instead of invoking Cargo')
     parser.add_argument('--native-binary-provenance', type=Path, help='Prior MATREX-NATIVE-PROVENANCE.json for --verified-native-binary; source/patch integrity is still checked')
@@ -103,13 +106,13 @@ def main():
     args.local_dashboard_archive = args.local_dashboard_archive.resolve()
     if (args.verified_native_binary is None) != (args.native_binary_provenance is None):
         parser.error('--verified-native-binary and --native-binary-provenance must be supplied together')
-    if args.verified_native_binary is not None and (args.skip_companions or args.skip_native_camera_fix or platform.machine() != 'arm64'):
+    if args.verified_native_binary is not None and (not args.with_companions or args.skip_native_camera_fix or platform.machine() != 'arm64'):
         parser.error('Verified native reuse requires Apple Silicon companion packaging with the native camera correction enabled')
     if (args.verified_hejjetrac_binary is None) != (args.hejjetrac_binary_provenance is None):
         parser.error('--verified-hejjetrac-binary and --hejjetrac-binary-provenance must be supplied together')
-    if args.verified_hejjetrac_binary is not None and (args.skip_companions or args.skip_hejjetrac_recording_control or platform.machine() != 'arm64'):
+    if args.verified_hejjetrac_binary is not None and (not args.with_companions or args.skip_hejjetrac_recording_control or platform.machine() != 'arm64'):
         parser.error('Verified HejjéTrac reuse requires the Mac arm64 recording adapter enabled')
-    local_dashboard = platform.machine() == 'arm64' and not args.skip_companions and not args.skip_local_dashboard
+    local_dashboard = platform.machine() == 'arm64' and not args.without_dashboard and not args.skip_local_dashboard
     if local_dashboard and not args.prepare_only and not args.local_dashboard_archive.is_file():
         parser.error('Reviewed local dashboard archive is absent: '+str(args.local_dashboard_archive)+'. See tools/native_patches/README.md for the pinned source build.')
     prepare(args.project, args.library)
@@ -121,10 +124,10 @@ def main():
         '-executeMethod', 'MatrexReleaseBuilder.Build', '-releaseTarget', 'StandaloneOSX',
         '-releaseVersion', args.version, '-releaseOutput', args.app, '-localDesktopBuild',
         '-logFile', ROOT / '.local/build.log')
-    if not args.skip_companions:
-        payload = args.app / 'Contents/Companions'
-        if payload.exists():
-            shutil.rmtree(payload)  # Immutable build output; calibration/installations live outside the app.
+    payload = args.app / 'Contents/Companions'
+    if payload.exists():
+        shutil.rmtree(payload)  # Rebuild the immutable payload; calibration/installations live outside the app.
+    if args.with_companions:
         run(sys.executable, ROOT / 'tools/companion_bundles.py', '--platform', 'macOS', '--output', args.app / 'Contents/Companions')
         if platform.machine() == 'arm64' and not args.skip_native_camera_fix:
             native_args = ['--verified-binary', args.verified_native_binary, '--binary-provenance', args.native_binary_provenance] if args.verified_native_binary is not None else []
@@ -132,6 +135,7 @@ def main():
         if platform.machine() == 'arm64' and not args.skip_hejjetrac_recording_control:
             hj_args = ['--verified-binary', args.verified_hejjetrac_binary, '--binary-provenance', args.hejjetrac_binary_provenance] if args.verified_hejjetrac_binary is not None else []
             run(sys.executable, ROOT / 'tools/build_local_hejjetrac.py', '--companions', args.app / 'Contents/Companions', *hj_args)
+    if not args.without_dashboard:
         dashboard_args = ['--local-archive', args.local_dashboard_archive] if local_dashboard else []
         run(sys.executable, ROOT / 'tools/stage_local_dashboard.py', '--output', args.app / 'Contents/Companions', *dashboard_args)
     stage_mcp_adapter(args.app)

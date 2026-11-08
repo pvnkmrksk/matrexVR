@@ -11,8 +11,8 @@ namespace ConfigurationUI
     /// <summary>Lightweight desktop-only run controls; apparatus/LED experiments keep their own HUD.</summary>
     public sealed class DesktopPreviewHud : MonoBehaviour
     {
-        internal const string WalkingDemoHelp="Walking demo plays a short recorded sample. To replay it in the same tracker window: More → Rig manager… → Start all. You can explore the world with manual controls.";
-        internal const string WalkingDemoTooltip="Short recorded walking sample. Replay in HejjéTrac: More → Rig manager… → Start all. Manual exploration remains available.";
+        internal const string WalkingDemoHelp="Walk through the demo with the keyboard. The demo runs independently of camera tracking.";
+        internal const string WalkingDemoTooltip="Show the keyboard controls for the walking demo.";
         private PanelSettings panel;
         private Label input;
         private VisualElement help,hudRoot,bar;
@@ -49,7 +49,7 @@ namespace ConfigurationUI
             bool walkingDemo=demo&&(string)marker?["mode"]=="walking";
             bar=new VisualElement();bar.AddToClassList("desktop-run-bar");bar.style.flexWrap=Wrap.Wrap;root.Add(bar);
             var badge=new Label(demo?"DEMO":"TRACKER INPUT");badge.AddToClassList("desktop-input-badge");bar.Add(badge);
-            badge.tooltip=demo?"Demonstration input is simulated or prerecorded.":"A connected publisher is not proof of a physical camera. Verify the source and tracking quality in the native tracker window.";
+            badge.tooltip=demo?"Demonstration movement comes from the keyboard and simulation.":"A connected publisher is not proof of a physical camera. Verify the source and tracking quality in the native tracker window.";
             input=new Label("Waiting for tracker");input.AddToClassList("desktop-input-status");bar.Add(input);
             forward=ActionButton("Auto forward",()=>{
                 var keyboards=FindObjectsByType<Keyboard>(FindObjectsSortMode.None);bool on=keyboards.Any(k=>k.AutopilotEnabled);
@@ -63,7 +63,7 @@ namespace ConfigurationUI
             help.Add(new Label("Arrow keys  Move    ·    A / D  Turn    ·    Z / C  Down / up (flight)"));
             help.Add(new Label("Ctrl+Space  Auto forward    ·    R  Reset pose    ·    Esc  Stop and save"));
             help.Add(new Label("1–9  Select VR    ·    Shift+1–7  Select VR10–16    ·    0  Control all    ·    Tab  Toggle overlays"));
-            help.Add(new Label(walkingDemo?WalkingDemoHelp:demo?"Demo input is simulated or prerecorded and labeled in the recording. Tracker windows run independently.":"Tracker input is connected over the configured transport. Verify camera source, calibration and tracking quality in its window."));
+            help.Add(new Label(walkingDemo?WalkingDemoHelp:demo?"Demo movement comes from the keyboard and simulation and is labeled in the recording.":"Tracker input is connected over the configured transport. Verify camera source, calibration and tracking quality in its window."));
             OperatorOverlayVisibility.Changed+=Refresh;
             DesktopDisplay.PresentationChanged+=ResetWindowInput;
             root.schedule.Execute(Refresh).Every(500);Refresh();
@@ -99,8 +99,9 @@ namespace ConfigurationUI
                 var sample=listener!=null?listener.ReadRawSample():default;
                 if(sample.hasPose && DateTime.UtcNow.Ticks-sample.receivedUtcTicks<TimeSpan.TicksPerSecond)fresh++;
             }
-            input.text=fresh==expected&&fresh>0?"Tracking input connected":"Waiting for tracking input";
-            input.EnableInClassList("input-stale",fresh<expected);
+            bool demo=main.InputKind=="demonstration";
+            input.text=demo?"Keyboard and simulated movement":fresh==expected&&fresh>0?"Tracking input connected":"Waiting for tracking input";
+            input.EnableInClassList("input-stale",!demo&&fresh<expected);
             bool on=FindObjectsByType<Keyboard>(FindObjectsSortMode.None).Any(k=>k.AutopilotEnabled);
             forward.text="Auto forward "+(on?"on":"off");
             if(Mathf.Abs(panel.scale-DesktopDisplay.UiScale)>.01f)panel.scale=DesktopDisplay.UiScale;

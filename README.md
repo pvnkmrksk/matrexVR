@@ -93,7 +93,7 @@ Actual Unity renders with synthetic inputs. The forest capture is an optional **
 | :--- | :--- | :--- |
 | [Five-minute demo → recording → replay](docs/five-minute-start.md) | [Configuration studio](docs/configuration-ui.md) | [Recording formats & units](docs/data-formats.md) |
 | [Tracker integration](docs/tracker-integration.md) | [Templates & examples](Assets/StreamingAssets/Examples/README.md) | [Snapshots & provenance](docs/run-config-snapshots.md) |
-| [Bundled companion apps](docs/bundled-companions.md) | [Add an experiment](docs/experiment-workflow.md) | [Saved-run replay](docs/replay.md) |
+| [Native trackers and dashboard](docs/bundled-companions.md) | [Add an experiment](docs/experiment-workflow.md) | [Saved-run replay](docs/replay.md) |
 | [Release history](docs/releases.md) | [Parameter reference](docs/configuration-reference.md) | [Full searchable manual](https://pvnkmrksk.github.io/matrexVR/manual/) |
 
 For contributors and coding agents, begin with **[AGENTS.md](AGENTS.md)** for repository context, ownership and validation commands, then [JSON/MCP control](docs/ai-control.md) for the optional local experiment interface. [Installation and storage paths](docs/getting-started.md) cover player setup; [current development plans](docs/overhaul-0.5-plan.md) and the [GUI/recorder follow-up](docs/gui-recording-performance-followup.md) describe ongoing work rather than released features.
@@ -102,7 +102,7 @@ For contributors and coding agents, begin with **[AGENTS.md](AGENTS.md)** for re
 
 | Component | Role |
 | :--- | :--- |
-| [**Rekkefly**](https://github.com/pvnkmrksk/rekkefly) / [**HejjéTrac**](https://github.com/pvnkmrksk/hejjetrak) | Native flight/wing tracking or spherical-treadmill walking input. |
+| [**Rekkefly**](https://github.com/pvnkmrksk/rekkefly) / [**HejjéTrac**](https://github.com/pvnkmrksk/hejjetrac) | Native flight/wing tracking or spherical-treadmill walking input. |
 | **MATREX VR** | Visual environments, experimental sequencing and recording. |
 | [**Daari Deepa**](https://pvnkmrksk.github.io/trajectory-dashboard/) | Optional external live plots and saved-trajectory analysis. |
 

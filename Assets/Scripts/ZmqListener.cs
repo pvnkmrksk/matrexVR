@@ -113,6 +113,12 @@ public class ZmqListener : MonoBehaviour
         ApplySystemConfig();
         workerFailure = null;
         lock(poseLock) {receiverSessionId=Guid.NewGuid().ToString("N");sourceEpoch=0;sourceFrame=sourceSequence=sourceTimestamp=sourceClock=sourceSessionId=null;hasPose=false;}
+        if (MainController.Instance?.InputKind == "demonstration")
+        {
+            Endpoint = null;
+            workerState = "demo input";
+            return;
+        }
         string endpoint = $"tcp://{address}:{port}";
         Endpoint = endpoint;
         workerState = "starting";

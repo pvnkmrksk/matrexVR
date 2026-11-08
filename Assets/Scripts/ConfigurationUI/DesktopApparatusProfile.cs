@@ -23,13 +23,15 @@ namespace ConfigurationUI
         }
         public static int OutputDisplay(JToken root,JObject rig,int? fallback=null) => Integer(rig?["targetDisplay"],fallback??Integer(root?["targetDisplay"],1));
         public static int MonitorCount(JToken root,int? fallbackDisplay=null) => Math.Max(1,Integer(Profile(root)?["monitorCount"],Rigs(root).Select(r=>OutputDisplay(root,r,fallbackDisplay)+1).DefaultIfEmpty(1).Max()));
-        public static bool ShouldPrepareCompanions(JToken root) => IsConfigured(root)&&Flag(Profile(root)?["launchBundledTrackers"]);
-        public static bool ShouldLaunchBundledForRig(JToken root,JObject rig) => ShouldPrepareCompanions(root)&&EligibleForBundled(rig);
-        private static bool EligibleForBundled(JObject rig)
+        public const string LaunchInstalledKey="launchInstalledTrackers";
+        public static bool LaunchInstalledWithStart(JToken root) =>
+            Flag(Profile(root)?[LaunchInstalledKey]??Profile(root)?["launchBundledTrackers"]);
+        public static bool ShouldPrepareCompanions(JToken root) => IsConfigured(root)&&LaunchInstalledWithStart(root);
+        public static bool LocalNativeTracker(JObject rig)
         {
-            if(rig==null||!string.IsNullOrWhiteSpace((string)rig["tracker"]?["executablePath"])||!string.IsNullOrWhiteSpace((string)rig["tracker"]?["configFile"]))return false;
+            if(rig==null||!LocalAddress((string)rig["zmqAddress"]))return false;
             string mode=(rig["closedLoopMode"]?.ToString()??"").ToLowerInvariant();
-            return (mode=="rekkefly"||mode=="hejjetrac"||mode=="hejjétrac"||mode=="hejjetrak")&&LocalAddress((string)rig["zmqAddress"]);
+            return mode=="rekkefly"||mode=="hejjetrac"||mode=="hejjétrac"||mode=="hejjetrak"||mode=="3"||mode=="4";
         }
         private static string Endpoint(JObject rig)
         {
@@ -53,7 +55,7 @@ namespace ConfigurationUI
             if(presentation!="led"&&presentation!="desktop")throw new ArgumentException("Choose LED panels or desktop preview.");
             var marker=Marker(root);marker["version"]=1;marker["configured"]=false;marker["presentation"]=presentation;
             if(marker["monitorCount"]==null)marker["monitorCount"]=Math.Max(1,Rigs(root).Select(r=>OutputDisplay(root,r,fallbackDisplay)+1).DefaultIfEmpty(1).Max());
-            if(marker["launchBundledTrackers"]==null)marker["launchBundledTrackers"]=fromDemo;
+            if(marker[LaunchInstalledKey]==null)marker[LaunchInstalledKey]=marker["launchBundledTrackers"]?.DeepClone()??new JValue(fromDemo);
             root.Remove("desktopQuickStart");
             foreach(var rig in Rigs(root))
             {
@@ -74,7 +76,7 @@ namespace ConfigurationUI
             if(errors.Count>0)throw new ArgumentException(string.Join("\n",errors));
             var marker=Marker(root);marker["version"]=1;marker["configured"]=true;marker["presentation"]=Presentation(root);
             if(marker["monitorCount"]==null)marker["monitorCount"]=MonitorCount(root,fallbackDisplay);
-            if(marker["launchBundledTrackers"]==null)marker["launchBundledTrackers"]=false;
+            if(marker[LaunchInstalledKey]==null)marker[LaunchInstalledKey]=marker["launchBundledTrackers"]?.DeepClone()??new JValue(false);
             root.Remove("desktopQuickStart");
         }
         public static void ResizeRigs(JObject root,int count,int? fallbackDisplay=null)
@@ -186,9 +188,10 @@ namespace ConfigurationUI
                 if(string.IsNullOrEmpty(host)||port<1||port>65535)errors.Add(id+": enter a host and a tracker port from 1–65535.");
 
             }
-            if(Flag(Profile(root)?["launchBundledTrackers"]))
-                foreach(var group in rigs.Where(EligibleForBundled).GroupBy(Endpoint,StringComparer.OrdinalIgnoreCase))
-                    if(group.Count()>1)errors.Add("Multiple bundled native trackers would bind the same tracker endpoint "+group.Key+". Use separate ports or select external/manual input to share one publisher.");
+            if(LaunchInstalledWithStart(root))
+                foreach(var group in rigs.Where(rig=>LocalNativeTracker(rig)&&!string.IsNullOrWhiteSpace((string)rig["tracker"]?["configFile"]))
+                    .GroupBy(Endpoint,StringComparer.OrdinalIgnoreCase))
+                    if(group.Count()>1)errors.Add("Multiple local trackers would bind the same tracker endpoint "+group.Key+". Use separate ports or disable automatic launch to share an independent publisher.");
             foreach(var group in rigs.Where(r=>Flag(r["desktopPreview"])).GroupBy(r=>OutputDisplay(root,r,fallbackDisplay)))
                 if(group.Count()>1)errors.Add("Desktop preview rigs need separate output displays; multiple full-screen views cannot share display "+(group.Key+1)+".");
             return errors;

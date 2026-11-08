@@ -278,8 +278,8 @@ public static class ConfigurationDashboardValidation
             else if(stage==14)
             {
                 Check(root.Q<Button>("start-experiment").Q<Label>().text=="Start demo","Demo action is visibly labeled instead of pretending to measure an animal");
-                Check(root.Q<DropdownField>("quickstart-input").value.StartsWith("Demo"),"Demo input is clearly selected");
-                Check(root.Q<Button>("quickstart-open-tracker")!=null&&root.Q<Button>("quickstart-stop-tracker")!=null,"Native companion has direct independent app controls");
+                Check(root.Q<DropdownField>("quickstart-demo-mode")!=null,"Demo input is clearly selected");
+                Check(root.Q<Button>("initialize-tracking")==null,"Hardware-free demo does not offer live tracker launch");
                 Capture("quickstart-retina-3024");Submit(root.Q<Button>("quickstart-mode-walking"));
                 Check(DesktopQuickStart.Mode(ui.Workspace)=="walking"&&(string)ui.Workspace.System.Root["configs"][0]["closedLoopMode"]=="Hejjetrac","Walking selector opens the canonical walking starter");
                 Submit(root.Q<Button>("quickstart-world-forest"));Check(DesktopQuickStart.Scene(ui.Workspace)=="forest","Forest selector opens its own ready sequence");
@@ -289,16 +289,17 @@ public static class ConfigurationDashboardValidation
             else if(stage==15)
             {
                 Capture("forest-retina-3024");foreach(var schema in ui.Workspace.Schemas.Catalog.Properties())HelpCoverage((JObject)schema.Value,new string[0]);
+                Call(ui,"ChooseQuickStart","flying","forest",false);
                 var source=ui.Workspace.System.Root["configs"][0];
                 var reopened=new ConfigWorkspace(ui.Workspace.System.Path,ui.Workspace.Sequence.Path,ui.Workspace.Schemas);
-                Check(DesktopQuickStart.IsQuickStart(reopened)&&DesktopQuickStart.IsDemo(reopened)&&root.Q<DropdownField>("quickstart-input").value.StartsWith("Demo"),"Reopened starter files preserve explicit Demo selection in the native workspace");
+                Check(DesktopQuickStart.IsQuickStart(reopened)&&DesktopQuickStart.IsDemo(reopened)&&root.Q<DropdownField>("quickstart-demo-mode")!=null,"Reopened starter files preserve explicit Demo selection in the native workspace");
                 Check(source["targetDisplay"] is JRaw && source["sphereDiameter"] is JRaw,"Start regression uses real lossless integer and fractional workspace tokens");
                 preparationSystemJson=ui.Workspace.System.Root.ToString(Formatting.None);trackerWasRunning=TrackerProcessManager.IsRunning("VR1");
                 preparation=new System.Threading.Tasks.TaskCompletionSource<CompanionCatalog.Prepared>();prepareCalls=launchCalls=startCalls=0;
                 Put(ui,"prepareCompanionForValidation",new Func<SystemConfig,bool,System.Threading.Tasks.Task<CompanionCatalog.Prepared>>((rig,demo)=>{
                     prepareCalls++;
                     Check(rig.targetDisplay==0&&Mathf.Abs(rig.sphereDiameter-2.6f)<.001f&&rig.zmqPort==9871,"Actual Start converts lossless integer and float fields to the runtime tracker model");
-                    Check(rig.desktopPreview&&rig.closedLoopMode==ClosedLoopMode.Rekkefly&&demo,"Actual Start preserves backend, desktop preview and explicit demo mode");
+                    Check(rig.desktopPreview&&rig.closedLoopMode==ClosedLoopMode.Rekkefly&&!demo,"Live Start preserves backend and desktop preview while keeping demo input separate");
                     return preparation.Task;
                 }));
                 Put(ui,"launchCompanionForValidation",new Action<CompanionCatalog.Prepared>(_=>launchCalls++));

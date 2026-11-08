@@ -1,6 +1,12 @@
-# Bundled native tracking apps
+# Native tracking apps and the dashboard
 
-Desktop packages include pinned native Rekkefly and HejjéTrac packages. The
+Current MATREX desktop packages expect independent tracker installations. In
+Configure, the launcher displays a detected path from common operating-system
+install locations or `PATH`. If detection leaves it blank, use Browse to select
+the executable or complete macOS app. A per-rig override takes precedence over
+detection. Choose the rig's calibration separately. [HejjéTrac releases](https://github.com/pvnkmrksk/hejjetrac/releases) · [Rekkefly releases](https://github.com/pvnkmrksk/rekkefly/releases)
+
+Older desktop archives include pinned Rekkefly and HejjéTrac packages. The
 quick-start workflow chooses flying or walking and distinguishes **demo input**
 from a real camera. Flying demo uses the native synthetic source; walking demo
 uses the attributed recorded sample shipped by HejjéTrac. Neither is a measured
@@ -62,8 +68,7 @@ python3 tools/companion_bundles.py --refresh-lock
 python3 tools/build_release.py --ref HEAD --version VERSION --platform all
 ```
 
-Bundling is the default; `--without-companions` is an advanced source-build
-opt-out for trackers. The dashboard is independently bundled by default;
+An explicit `--with-companions` selects tracker bundling for a source build. The dashboard is independently bundled by default;
 `--without-dashboard` omits it. Staging directly for a local Mac build is also supported:
 
 ```sh

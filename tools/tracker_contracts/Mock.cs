@@ -12,6 +12,13 @@ class Mock
     {string temporary=path+".writing";File.WriteAllText(temporary,value.ToJsonString());File.Move(temporary,path,true);}
     static void Main(string[] args)
     {
+        if (args.SequenceEqual(new[]{"--help"}))
+        {
+            Console.WriteLine(AppContext.BaseDirectory.Contains("legacy-tracker")
+                ? "Tracker options: --control-stdio --control-bind"
+                : "Tracker options: --control-dir <DIRECTORY> --control-instance <INSTANCE>");
+            return;
+        }
         string Argument(string name){int i=Array.IndexOf(args,name);return i>=0&&i+1<args.Length?args[i+1]:null;}
         string log=Environment.GetEnvironmentVariable("MATREX_TRACKER_ARGUMENT_LOG");if(log!=null)File.WriteAllText(log,JsonSerializer.Serialize(args));
         string directory=Argument("--control-dir"),instance=Argument("--control-instance"),config=Argument("--config");

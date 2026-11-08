@@ -308,7 +308,7 @@ public class MainController : MonoBehaviour
             InputKind = fullConfig["desktopQuickStart"] is JObject preview && (bool?)preview["demo"] == true ? "demonstration" : "tracker";
             configuredStimulusResolution = (fullConfig[StimulusResolutionConfig.Field]?.ToObject<StimulusResolutionConfig>()
                 ?? new StimulusResolutionConfig()).RequestedSize();
-            saveTrackerVideo = (bool?)fullConfig["saveTrackerVideo"] ?? true;
+            saveTrackerVideo = InputKind!="demonstration" && ((bool?)fullConfig["saveTrackerVideo"] ?? true);
             ApplyFrameTiming(fullConfig);
             LoadDiagnosticsConfigurations(fullConfig);
             OverheadCameraSettings = fullConfig["overheadCamera"]?.ToObject<OverheadCameraConfig>() ?? new OverheadCameraConfig();

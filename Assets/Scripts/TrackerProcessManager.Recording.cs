@@ -131,10 +131,14 @@ public sealed partial class TrackerProcessManager
         if(owner.port!=desired.zmqPort)throw new InvalidOperationException("The owned tracker uses another input port; it was left unchanged.");
         if(owner.recordingControl!=TrackerRecordingControlMode.Experiment)throw new InvalidOperationException("The owned tracker uses manual recording control; it was left unchanged.");
         var requested=desired.tracker;
-        if(!string.IsNullOrWhiteSpace(requested?.executablePath)&&(!Path.IsPathFullyQualified(requested.executablePath)||!SameRecordingPath(requested.executablePath,owner.executable)))
+        string executable=requested?.executablePath;
+        bool installed=string.IsNullOrEmpty(owner.releaseTag);
+        if(installed&&string.IsNullOrWhiteSpace(executable))executable=TrackerInstallation.Find(desired.closedLoopMode);
+        if((installed||!string.IsNullOrWhiteSpace(executable))&&
+            !SameRecordingPath(TrackerInstallation.ResolveSelection(executable,desired.closedLoopMode),owner.executable))
             throw new InvalidOperationException("The selected executable differs from the owned tracker; it was left unchanged.");
         bool explicitCalibration=!string.IsNullOrWhiteSpace(requested?.configFile);
-        if(explicitCalibration&&!SameRecordingPath(ResolveConfig(requested.configFile),owner.configFile))
+        if((installed||explicitCalibration)&&!SameRecordingPath(ResolveConfig(requested?.configFile),owner.configFile))
             throw new InvalidOperationException("The selected calibration/config differs from the owned tracker; it was left unchanged.");
         if(!string.IsNullOrWhiteSpace(requested?.device)&&!string.Equals(requested.device,owner.device,StringComparison.Ordinal))
             throw new InvalidOperationException("The selected device differs from the owned tracker; it was left unchanged.");

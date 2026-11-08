@@ -14,6 +14,9 @@ On Linux with Vulkan, 16 rigs each showed 64 locusts through four 128 × 128 fac
 
 The 70-second candidate retests kept full VR recording enabled. Entrainment measured 59.95 FPS and a 17.58 ms p99. The grid swarm measured 59.92 FPS and a 17.42 ms p99. Both had zero intervals above 20 ms and zero population drops. The Linux HejjéTrac payload is the checksum-verified upstream v0.5.0 archive. [HejjéTrac release](https://github.com/pvnkmrksk/hejjetrac/releases/tag/v0.5.0)
 
-## Linux HejjéTrac recording adapter
+## Independent HejjéTrac recording
 
-The separate recording adapter adds the owned-take protocol to HejjéTrac 0.5.0. Install it into the extracted MATREX `Companions` directory using the included instructions. It preserves the stock payload and calibration. The released MATREX player verified first-frame acknowledgement, a fenced Stop, clip archival and continued tracking with the adapter on sample input. [Validation results](https://github.com/pvnkmrksk/matrexVR/blob/main/docs/hejjetrac-linux-recording-validation.json)
+The experiment-owned recording protocol is now maintained in HejjéTrac itself.
+Install the compatible tracker from the upstream project. The archived Linux
+0.4.3 MATREX package retains its original HejjéTrac 0.5.0 payload.
+[HejjéTrac releases](https://github.com/pvnkmrksk/hejjetrac/releases) · [Original sample validation](hejjetrac-linux-recording-validation.json)

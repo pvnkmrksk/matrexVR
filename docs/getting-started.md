@@ -8,7 +8,7 @@ Choose an operating-system ZIP from [GitHub Releases](https://github.com/pvnkmrk
 
 - **Windows:** open the `.exe`. Its adjacent `_Data` directory and DLLs are required.
 - **macOS:** open the `.app` (universal Apple silicon/Intel package). Releases are ad hoc signed but not notarized; use Finder's Open action and the corresponding Privacy & Security option if macOS requests it.
-- **Linux:** open the `.x86_64` player in a graphical desktop with a compatible graphics driver. If extraction loses the executable permission, restore it in file properties or with `chmod +x`. The bundled HejjéTrac binary requires **glibc 2.39 or newer**; use an independently verified compatible external tracker on older distributions.
+- **Linux:** open the `.x86_64` player in a graphical desktop with a compatible graphics driver. If extraction loses the executable permission, restore it in file properties or with `chmod +x`. Check the independently installed tracker’s release for its Linux requirements.
 
 Read the version's included `START-HERE.txt`. **0.1** starts on the historical metadata form, with a manual-start Choice_Selwyn sequence. **0.2** retains the Config UI Test branch's automatic seven-condition TerrainCueLab sequence, 30 seconds per condition. Press Escape to return to Control, or launch with `-configure` to enter setup immediately. These version defaults are preserved for provenance.
 
@@ -26,7 +26,9 @@ open "/path/to/MATREX VR.app" --args -configure
 
 In the studio, **System config** describes hardware, **Sequence config** arranges experiment blocks, and **Experiment configs** edits each referenced stimulus. Session cards describe the real animals; `VR1`, `VR2`, etc. remain hardware routing identifiers. Set tracker endpoint/mode, sphere diameter and display layout for your actual apparatus. A supplied public system template opens the application; it does not calibrate an LED array.
 
-Choose `closedLoopMode: "Rekkefly"` for modern flight input or `"Hejjetrac"` for walking. Historical `"Kinefly"` flight and `"FicTrac"` walking names remain recognized; walking uses a separate cumulative-displacement contract. [System examples](../Assets/StreamingAssets/Examples/System) and [input/data documentation](data-formats.md) describe the difference. A tracking publisher is needed for closed-loop motion, not for browsing setup or using configured manual controls.
+Choose `closedLoopMode: "Rekkefly"` for modern flight input or `"Hejjetrac"` for walking. Historical `"Kinefly"` flight and `"FicTrac"` walking names remain recognized; walking uses a separate cumulative-displacement contract. [System examples](../Assets/StreamingAssets/Examples/System) and [input/data documentation](data-formats.md) describe the difference. Closed-loop motion uses a tracking publisher. Setup and keyboard control can run on their own.
+
+Install the tracker independently. In **Configure**, choose the rig, then check **Tracker launcher**. MATREX shows a detected executable from standard install locations or `PATH`. If the field is blank, choose **Browse** and select the installed executable or complete macOS app. Select that rig's calibration file separately. [HejjéTrac releases](https://github.com/pvnkmrksk/hejjetrac/releases) · [Rekkefly releases](https://github.com/pvnkmrksk/rekkefly/releases)
 
 In 0.4.1, use **Open tracker** (called **Initialize tracking** in earlier interfaces) to open the independent tracker and inspect input/calibration while setup remains open. This does not start an experiment or create its pose recording. Review **Save tracker video** and recorder-control mode before acquisition, then use **Save setup** and **Start experiment**. Recorder behavior depends on the build and companion capabilities: archived 0.4 trackers can record continuously from preflight; 0.4.1 supports acknowledged experiment-owned takes on compatible companions. See [native recording control](native-recording-control.md). Auto start controls the next launch. Escape returns from a run to Control; Escape from Control exits the standalone player. Each studio-started experiment gets a separate recording directory.
 
@@ -112,7 +114,7 @@ Custom experiments require Unity scene/asset/controller authoring. Add them to t
 | --- | --- |
 | An experiment starts before setup appears | Press **Escape** once, or relaunch with `-configure`. Existing sequences keep their saved Auto start setting. |
 | Home has no **Start demo** button | You may have a configured apparatus or an archived build. Follow its `START-HERE.txt`; use separate `--config-dir` and `--data-dir` paths for a disposable demo profile. |
-| A demo has no fresh tracking input | Check its native demo window and input status. Keep demonstration mode selected; use manual arrows/A/D to inspect the scene while diagnosing input. See [bundled companions](bundled-companions.md). |
+| A demo has no tracking input | Use the arrows and A/D to move. For closed-loop input, configure a real apparatus and check the independently installed tracker. See [native trackers](bundled-companions.md). |
 | A saved run is missing from Replay | Check the root displayed above the library, wait for that run to finish saving, then **Refresh**. Use **Browse…** for a different installation's complete run folder. |
 | Camera video is absent | Inspect saved recorder evidence. A working scene or pose CSV does not establish a completed video take; [recorder controls](native-recording-control.md) describe the states. |
 | A source project has compile/import errors | Confirm Unity **6000.3.16f1**, let package restoration finish, and check the first Console error before trying to run a scene. |

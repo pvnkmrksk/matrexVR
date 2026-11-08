@@ -14,7 +14,7 @@ public static class ReplayFolderPicker
     public static Task<string> ChooseAsync() => ChoosePathAsync("Open saved experiment run", "Open run", RuntimePaths.RunDataRoot, null);
     public static Task<string> ChooseMediaAsync() => ChoosePathAsync("Import tracker recording", "Choose recording", RuntimePaths.RunDataRoot, null);
     public static Task<string> ChooseFileAsync(string title, string initialDirectory, string extension) =>
-        ChoosePathAsync(title, "Open file", initialDirectory, extension);
+        ChoosePathAsync(title, "Open file", initialDirectory, extension ?? "");
 
     private static Task<string> ChoosePathAsync(string title, string prompt, string initialDirectory, string extension)
     {
@@ -46,14 +46,15 @@ public static class ReplayFolderPicker
             {
                 var arguments = new System.Collections.Generic.List<string> { "--file-selection", "--title=" + title };
                 if (Directory.Exists(initialDirectory)) arguments.Add("--filename=" + initialDirectory.TrimEnd('/') + "/");
-                arguments.Add(extension == null ? "--directory" : "--file-filter=Files | *." + extension + " *." + extension.ToUpperInvariant());
+                if(extension==null) arguments.Add("--directory");
+                else if(extension.Length>0) arguments.Add("--file-filter=Files | *." + extension + " *." + extension.ToUpperInvariant());
                 return Run("/usr/bin/zenity", arguments.ToArray());
             }
             if (File.Exists("/usr/bin/kdialog"))
             {
                 string directory = Directory.Exists(initialDirectory) ? initialDirectory : ".";
                 return extension == null ? Run("/usr/bin/kdialog", "--getexistingdirectory", directory, "--title", title)
-                    : Run("/usr/bin/kdialog", "--getopenfilename", directory, "*." + extension, "--title", title);
+                    : Run("/usr/bin/kdialog", "--getopenfilename", directory, extension.Length==0?"*":"*." + extension, "--title", title);
             }
             throw new InvalidOperationException("No system file picker is installed (zenity or kdialog).");
         });
@@ -124,7 +125,7 @@ public static class ReplayFolderPicker
             MacSetObject(panel,MacSel("setPrompt:"),MacString(prompt));
             MacBool(panel,MacSel("setCanChooseDirectories:"),extension==null);
             MacBool(panel,MacSel("setCanChooseFiles:"),extension!=null);
-            if(extension!=null)
+            if(!string.IsNullOrEmpty(extension))
                 MacSetObject(panel,MacSel("setAllowedFileTypes:"),MacObject(MacClass("NSArray"),MacSel("arrayWithObject:"),MacString(extension)));
             MacBool(panel,MacSel("setAllowsMultipleSelection:"),false);
             MacBool(panel,MacSel("setCanCreateDirectories:"),false);
@@ -225,7 +226,8 @@ public static class ReplayFolderPicker
     {
         const int pathCapacity = 32768;
         var path = Marshal.AllocHGlobal(pathCapacity * sizeof(char));
-        var filter = Marshal.StringToHGlobalUni(extension.ToUpperInvariant() + " files (*." + extension + ")\0*." + extension + "\0\0");
+        var filter = Marshal.StringToHGlobalUni(extension.Length==0?"All files (*.*)\0*.*\0\0":
+            extension.ToUpperInvariant() + " files (*." + extension + ")\0*." + extension + "\0\0");
         try
         {
             Marshal.WriteInt16(path, 0);

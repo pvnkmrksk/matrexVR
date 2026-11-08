@@ -454,7 +454,7 @@ namespace ConfigurationUI
             var errors=ValidateSetupForStart(Workspace);
             if(errors.Count>0)throw new InvalidOperationException(string.Join("\n",errors));
             PrepareRunMetadata();Workspace.SaveAll();
-            if(DesktopQuickStart.IsQuickStart(Workspace)||DesktopApparatusProfile.ShouldPrepareCompanions(Workspace.System.Root))
+            if(!CurrentDemo&&(DesktopQuickStart.IsQuickStart(Workspace)||DesktopApparatusProfile.ShouldPrepareCompanions(Workspace.System.Root)))
             {
                 BeginCompanionPreparation(true);return;
             }
@@ -486,13 +486,15 @@ namespace ConfigurationUI
                     yield return id+": LED layout needs "+right+" × "+bottom+" pixels on display "+(display+1)+", which currently provides "+width+" × "+height+". Adjust the panel map in Configure.";
             }
         }
-        private void OpenQuickTracker()
+        private void OpenQuickTracker() => OpenTracker();
+        private void OpenTracker(string rigId=null)
         {
             if(preparing)return;RequireApplied();
+            if(CurrentDemo)throw new InvalidOperationException("Configure a live apparatus to initialize a tracker. The demo uses keyboard and simulated movement.");
             var errors=ConfigSchema.Validate(Workspace.System.Root,Workspace.Schemas.Get("system"));
             if(errors.Count>0)throw new InvalidOperationException(string.Join("; ",errors));
             Workspace.System.Save();MainController.Instance?.ConfigureTrackingWhileIdle(Workspace.System.Path);
-            BeginCompanionPreparation(false);
+            BeginTrackerPreparation(false,rigId);
         }
         private readonly List<string> companionWarnings=new List<string>();
         private void CompanionWarning(string message)
@@ -500,18 +502,19 @@ namespace ConfigurationUI
             if(!companionWarnings.Contains(message))companionWarnings.Add(message);
             preparationStatus="VR ready · tracker unavailable";UpdateStatus(preparationStatus);
         }
-        private void BeginCompanionPreparation(bool startAfter)
+        private void BeginCompanionPreparation(bool startAfter) => BeginTrackerPreparation(startAfter,null);
+        private void BeginTrackerPreparation(bool startAfter,string rigId)
         {
             companionWarnings.Clear();
             preparing=true;preparationStatus="Preparing the native tracker…";
             body.SetEnabled(false);side.SetEnabled(false);RefreshPreparingCaption();UpdateStatus();
-            StartCoroutine(PrepareQuickStartRun(++preparationVersion,startAfter));
+            StartCoroutine(PrepareQuickStartRun(++preparationVersion,startAfter,rigId));
         }
         private void RefreshPreparingCaption()
         {var caption=start?.Q<Label>();if(caption!=null)caption.text="Preparing…";}
-        private IEnumerator PrepareQuickStartRun(int version,bool startAfter)
+        private IEnumerator PrepareQuickStartRun(int version,bool startAfter,string rigId)
         {
-            var operation=PrepareQuickStartRunCore(version,startAfter);
+            var operation=PrepareQuickStartRunCore(version,startAfter,rigId);
             try
             {
                 while(true)
@@ -535,16 +538,17 @@ namespace ConfigurationUI
                 }
             }
         }
-        private IEnumerator PrepareQuickStartRunCore(int version,bool startAfter)
+        private IEnumerator PrepareQuickStartRunCore(int version,bool startAfter,string rigId)
         {
-            // Paint the first progress frame before verifying or installing any companion.
+            // Paint the first progress frame before checking the installed tracker.
             yield return null;
             if(!isActiveAndEnabled||version!=preparationVersion)yield break;
             bool demo=CurrentDemo;
-            bool configured=DesktopApparatusProfile.IsConfigured(Workspace.System.Root);
-            var rigs=(Workspace.System.Root["configs"] as JArray??new JArray()).OfType<JObject>()
-                .Where(r=>!configured||DesktopApparatusProfile.ShouldLaunchBundledForRig(Workspace.System.Root,r))
+            var rigs=DesktopApparatusProfile.Rigs(Workspace.System.Root)
+                .Where(r=>rigId!=null?(string)r["vrId"]==rigId:DesktopApparatusProfile.LocalNativeTracker(r))
                 .Select(LosslessJson.ToRuntime<SystemConfig>).ToList();
+            if(!startAfter&&rigs.Count==0)
+            {PreparationFailed(new InvalidOperationException("No local tracker is configured. Select a local Rekkefly or HejjéTrac input in Configure."));yield break;}
             double trackerDeadline=Time.realtimeSinceStartupAsDouble+2.5;
             foreach(var rig in rigs)
             {
@@ -552,9 +556,9 @@ namespace ConfigurationUI
                 System.Threading.Tasks.Task<CompanionCatalog.Prepared> task;
                 try{
 #if UNITY_EDITOR
-                    task=prepareCompanionForValidation!=null?prepareCompanionForValidation(rig,demo):CompanionCatalog.PrepareAsync(rig,demo);
+                    task=prepareCompanionForValidation!=null?prepareCompanionForValidation(rig,demo):TrackerProcessManager.PrepareInstalledAsync(rig,demo);
 #else
-                    task=CompanionCatalog.PrepareAsync(rig,demo);
+                    task=TrackerProcessManager.PrepareInstalledAsync(rig,demo);
 #endif
                 }
                 catch(Exception error){if(!startAfter){PreparationFailed(error);yield break;}CompanionWarning(rig.vrId+": "+error.GetBaseException().Message);continue;}
@@ -603,7 +607,7 @@ namespace ConfigurationUI
                 ExperimentBlocks.Title(BlockReference(BuilderSteps.OfType<JObject>().FirstOrDefault())??"Experiment");
             bool automatic=metadata.ExperimentName=="Demo · Forest"||metadata.ExperimentName=="Demo · Night sky";
             if(string.IsNullOrWhiteSpace(metadata.ExperimentName)||automatic)metadata.ExperimentName=(demo?"Demo · ":"")+title;
-            const string comment="Demonstration input (simulated or prerecorded); not a new live animal measurement.";
+            const string comment="Demonstration input (keyboard and simulated movement).";
             if(demo&&string.IsNullOrWhiteSpace(metadata.Comments))metadata.Comments=comment;
             else if(!demo&&metadata.Comments==comment)metadata.Comments="";
         }

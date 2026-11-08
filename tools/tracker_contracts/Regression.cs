@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -60,6 +61,45 @@ public static class Regression
             rig.zmqAddress="192.168.1.1";Reject(()=>TrackerProcessManager.Arguments(rig),"Local launch rejects remote input address");rig.zmqAddress="localhost";
             File.WriteAllText(config,"zmq_port : 9871\nzmq_host : 0.0.0.0\n");Reject(()=>TrackerProcessManager.Arguments(rig),"Local launch rejects non-loopback tracker bind");File.WriteAllText(config,"zmq_port : 9871\nzmq_host : 127.0.0.1\n");
             Reject(()=>TrackerProcessManager.JoinArguments(new[]{"unsafe\nargument"}),"Arguments reject control characters");
+            var legacyDirectory=Directory.CreateDirectory(Path.Combine(temp,"legacy-tracker")).FullName;
+            foreach(string file in Directory.EnumerateFiles(Path.GetDirectoryName(args[0])))
+                File.Copy(file,Path.Combine(legacyDirectory,Path.GetFileName(file)));
+            string legacyExecutable=Path.Combine(legacyDirectory,Path.GetFileName(args[0]));
+            var stockRig=new SystemConfig{vrId="VR-STOCK",closedLoopMode=ClosedLoopMode.Hejjetrac,zmqAddress="127.0.0.1",zmqPort=9871,
+                tracker=new TrackerLaunchConfig{executablePath=legacyExecutable,configFile=config,saveVideo=true}};
+            var legacyTracker=TrackerProcessManager.PrepareInstalledAsync(stockRig,false).GetAwaiter().GetResult();
+            Check(!legacyTracker.supportsRecordingControl&&legacyTracker.recordingWarning!=null,"Older HejjéTrac CLI can track without receiving unsupported mailbox arguments");
+            try
+            {
+                TrackerProcessManager.Instance.LaunchPrepared(legacyTracker);
+                var receipt=Directory.EnumerateFiles(Path.Combine(UnityEngine.Application.persistentDataPath,"Companions","processes"),"*.json").Select(path=>JObject.Parse(File.ReadAllText(path))).Single(value=>(string)value["vrId"]==stockRig.vrId);
+                Check(TrackerProcessManager.IsRunning(stockRig.vrId)&&receipt["controlDirectory"]?.Type==JTokenType.Null,"Legacy tracker launches independently with automatic video unavailable");
+            }
+            finally {TrackerProcessManager.Instance.Stop(stockRig.vrId);}
+            var modern=TrackerProcessManager.PrepareInstalledAsync(new SystemConfig{vrId="VR-CAPABLE",closedLoopMode=ClosedLoopMode.Hejjetrac,zmqAddress="localhost",zmqPort=9871,
+                tracker=new TrackerLaunchConfig{executablePath=args[0],configFile=config,saveVideo=true}},false).GetAwaiter().GetResult();
+            Check(modern.supportsRecordingControl&&modern.recordingWarning==null,"The current upstream mailbox flags enable owned automatic video");
+            Check(File.ReadAllText(config)=="zmq_port : 9871\nzmq_host : 127.0.0.1\n","Installed discovery and launch leave explicit calibration untouched");
+            Check(TrackerInstallation.Find(ClosedLoopMode.FicTrac)==""&&TrackerInstallation.Find(ClosedLoopMode.Kinefly)=="","Legacy input names remain externally managed unless the operator selects an executable");
+            Reject(()=>TrackerInstallation.ResolveSelection("relative-launcher",ClosedLoopMode.Hejjetrac),"Relative native launchers cannot resolve via the working directory");
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                string installDirectory=Directory.CreateDirectory(Path.Combine(temp,"installed")).FullName;
+                string installed=Path.Combine(installDirectory,"rekkefly");
+                foreach(string file in Directory.EnumerateFiles(Path.GetDirectoryName(args[0])))
+                    File.Copy(file,Path.Combine(installDirectory,Path.GetFileName(file)));
+                File.Copy(args[0],installed);
+                string previousPath=Environment.GetEnvironmentVariable("PATH");
+                try
+                {
+                    Environment.SetEnvironmentVariable("PATH",installDirectory+Path.PathSeparator+previousPath);
+                    Check(TrackerInstallation.Find(ClosedLoopMode.Rekkefly)==installed,"A native executable in an OS PATH directory is detected");
+                    var resolved=TrackerProcessManager.PrepareInstalledAsync(new SystemConfig{vrId="VR-DETECTED",closedLoopMode=ClosedLoopMode.Rekkefly,zmqAddress="localhost",zmqPort=9871,
+                        tracker=new TrackerLaunchConfig{configFile=config,saveVideo=true}},false).GetAwaiter().GetResult();
+                    Check(resolved.rig.tracker.executablePath==installed&&resolved.rig.tracker.configFile==config,"Detection fills the effective launcher while retaining the independent calibration");
+                }
+                finally {Environment.SetEnvironmentVariable("PATH",previousPath);}
+            }
             using(var unrelated=Process.Start(new ProcessStartInfo{FileName=args[0],UseShellExecute=false,RedirectStandardInput=true,RedirectStandardOutput=true}))
             {
                 var manager=TrackerProcessManager.Instance;
@@ -67,12 +107,12 @@ public static class Regression
                 foreach(var mode in new[]{ClosedLoopMode.Rekkefly,ClosedLoopMode.Hejjetrac})
                 {
                     rig.closedLoopMode=mode;string log=Path.Combine(temp,"argv.json");Environment.SetEnvironmentVariable("MATREX_TRACKER_ARGUMENT_LOG",log);manager.Launch(rig);for(int wait=0;wait<100 && !File.Exists(log);wait++)Thread.Sleep(10);
-                    Check(JArray.Parse(File.ReadAllText(log)).Select(t=>(string)t).SequenceEqual(TrackerProcessManager.Arguments(rig)),"Native argv preserves spaces, Unicode and quotes without shell: "+mode);File.Delete(log);
+                    Check(JArray.Parse(File.ReadAllText(log)).Select(t=>(string)t).Take(TrackerProcessManager.Arguments(rig).Length).SequenceEqual(TrackerProcessManager.Arguments(rig)),"Native argv preserves spaces, Unicode and quotes without shell: "+mode);File.Delete(log);
                     Check(TrackerProcessManager.IsRunning(rig.vrId),"Native owned mock process runs: "+mode);
                     var owned=TrackerProcessManager.RecordingProvenance(rig.vrId);
                     Check((bool)owned["identityVerified"]&&(bool)owned["processRunning"]&&(string)owned["backend"]==TrackerBackend.DisplayName(mode)&&(string)owned["configFile"]==config&&((string)owned["executableSha256"]).Length==64,"Run provenance captures exact owned process and config: "+mode);
                     Check((string)owned["actualInputSource"]=="unverified","Process ownership never claims a measured camera source: "+mode);
-                    rig.tracker.saveVideo=true;Reject(()=>CompanionCatalog.Prepare(rig,true),"Running recorder transition rejects before native calibration is touched: "+mode);rig.tracker.saveVideo=false;string before=TrackerProcessManager.Status(rig.vrId);manager.Launch(rig);Check(TrackerProcessManager.Status(rig.vrId)==before,"Repeated Start reuses the same native process: "+mode);
+                    rig.tracker.saveVideo=true;TrackerProcessManager.RequireRecordingTransitionReady(rig);rig.tracker.saveVideo=false;string before=TrackerProcessManager.Status(rig.vrId);manager.Launch(rig);Check(TrackerProcessManager.Status(rig.vrId)==before,"Repeated Start reuses the same native process: "+mode);
                     string backend=TrackerBackend.DisplayName(mode);
                     rig.closedLoopMode=mode==ClosedLoopMode.Rekkefly?ClosedLoopMode.Hejjetrac:ClosedLoopMode.Rekkefly;
                     Check(TrackerProcessManager.Status(rig.vrId).StartsWith(backend+" running"),"Owned process status retains its original backend after selection edits: "+mode);

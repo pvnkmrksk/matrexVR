@@ -124,7 +124,7 @@ def stage_mcp_adapter(stage, platform, revision):
     return dict(sourceRevision=revision, transport='stdio', enabledByDefault=False, files=files)
 
 
-def package(build, output, version, platform, revision, project, quickstart, with_companions=True, with_dashboard=True,
+def package(build, output, version, platform, revision, project, quickstart, with_companions=False, with_dashboard=True,
             local_native_camera_fix=False, local_dashboard_archive=None,
             verified_native_binary=None, native_binary_provenance=None):
     label = 'macOS-universal' if platform == 'macOS' else platform
@@ -226,7 +226,9 @@ def main():
     parser.add_argument('--ref', default='HEAD')
     parser.add_argument('--version', required=True)
     parser.add_argument('--platform', choices=[*TARGETS, 'all'], default='all')
-    parser.add_argument('--without-companions', action='store_true', help='Advanced/source-only build: omit pinned native tracker packages')
+    trackers = parser.add_mutually_exclusive_group()
+    trackers.add_argument('--with-companions', action='store_true', help='Reproduce historical builds with pinned tracker payloads')
+    trackers.add_argument('--without-companions', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--without-dashboard', action='store_true', help='Advanced/source-only build: omit the pinned offline dashboard package')
     parser.add_argument('--local-native-camera-fix', action='store_true',
                         help='Opt in to the reviewed local Mac arm64 Rekkefly correction; other platforms keep official packages')
@@ -243,7 +245,7 @@ def main():
     if not re.fullmatch(r'\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?', args.version):
         parser.error('--version must be a semantic version such as 0.3.0')
     try:
-        validate_local_payload_options(args.platform, not args.without_companions, not args.without_dashboard,
+        validate_local_payload_options(args.platform, args.with_companions, not args.without_dashboard,
                                        args.local_native_camera_fix, args.local_dashboard_archive,
                                        args.verified_native_binary, args.native_binary_provenance)
     except (ValueError, OSError) as error:
@@ -265,7 +267,7 @@ def main():
                         '-executeMethod', 'MatrexReleaseBuilder.Build', '-releaseVersion', args.version, '-releaseTarget', target,
                         '-releaseOutput', str(build / executable), '-logFile', str(log)], check=True)
         package(build, workspace, args.version, platform, revision, project, args.quickstart,
-                with_companions=not args.without_companions, with_dashboard=not args.without_dashboard,
+                with_companions=args.with_companions, with_dashboard=not args.without_dashboard,
                 local_native_camera_fix=args.local_native_camera_fix, local_dashboard_archive=args.local_dashboard_archive,
                 verified_native_binary=args.verified_native_binary, native_binary_provenance=args.native_binary_provenance)
 

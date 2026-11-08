@@ -12,7 +12,7 @@ This guide follows the **0.4.1 desktop Home workflow**. Archived versions can us
 | --- | --- |
 | Windows | The `.exe`, beside its `_Data` folder and DLLs. |
 | macOS | `MATREX VR.app`. If macOS prompts because the app is not notarized, use Finder's Open action and the corresponding Privacy & Security option. |
-| Linux | The `.x86_64` player in a graphical desktop. Restore executable permission if needed. Bundled HejjéTrac requires glibc 2.39 or newer. |
+| Linux | The `.x86_64` player in a graphical desktop. Restore executable permission if needed. |
 
 You need no Unity Editor or Python to run the player. If you already built the local macOS preview, open **`Preview/Open MATREX VR.command`** instead; it selects the visible `Preview/Config` and `Preview/RunData` folders.
 
@@ -20,9 +20,9 @@ You need no Unity Editor or Python to run the player. If you already built the l
 
 ## 2. Start the hardware-free demo
 
-On a fresh desktop profile, leave **Night sky** and the flying demonstration selected, then choose **Start demo**. Optional Forest and walking examples live under **Demo options & tracker windows**. Flying uses generated input; walking uses a finite prerecorded sample. These are demonstration data.
+On a fresh desktop profile, leave **Night sky** and the flying demonstration selected, then choose **Start demo**. Optional Forest and walking examples live under **Demo options**. Use the keyboard to move through either demonstration.
 
-**Checkpoint:** the environment appears and the run controls are visible. A native demo tracker may open as a separate application. Its input status should explain the selected source. Tracker windows run independently of Unity.
+**Checkpoint:** the environment appears and the run controls are visible. Demonstration mode leaves installed tracking apps and cameras independent.
 
 A configured apparatus can open a different Home screen. To try a disposable fresh profile, launch with separate absolute `--config-dir` and `--data-dir` paths; [launch examples](getting-started.md#configuration-and-data-locations) explain the options. Keep calibrated configurations in their existing directory.
 

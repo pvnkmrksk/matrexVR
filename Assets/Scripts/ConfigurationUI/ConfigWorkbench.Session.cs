@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using UnityEngine.UIElements;
@@ -166,13 +167,19 @@ namespace ConfigurationUI
             var previews=Row("world-previews");worlds.Add(previews);
             previews.Add(WorldChoice("night-sky","Night sky","Terrain beneath an astronomical sky.","night"));
             previews.Add(WorldChoice("forest","Forest","Explore a landscape of trees.","forest"));
-            var options=new Foldout {name="demo-options",text="Demo options & tracker windows",value=false};options.AddToClassList("apparatus-advanced");parent.Add(options);
-            var movement=new DropdownField("Demonstration",new List<string>{"Flying · simulated input","Walking · recorded sample"},CurrentMovement=="walking"?1:0){name="quickstart-demo-mode"};
+            var options=new Foldout {name="demo-options",text="Demo options",value=false};options.AddToClassList("apparatus-advanced");parent.Add(options);
+            var movement=new DropdownField("Demonstration",new List<string>{"Flying · simulated input","Walking · keyboard controls"},CurrentMovement=="walking"?1:0){name="quickstart-demo-mode"};
             movement.tooltip="This changes the hardware-free demo only. Configure real walking/flying inputs with the apparatus.";
             movement.RegisterValueChangedCallback(e=>ChooseQuickStart(e.newValue.StartsWith("Walking",StringComparison.Ordinal)?"walking":"flying",CurrentWorld,true));options.Add(movement);
             if(CurrentMovement=="walking")options.Add(SessionLabel(DesktopPreviewHud.WalkingDemoHelp,"apparatus-note"));
-            AddQuickTrackerControls(options);
-            var preparation=StudioButton("Open tracker","camera",OpenQuickTracker,"quiet");preparation.name="initialize-tracking";preparation.tooltip="Open tracking now to check input and calibration. This keeps the setup open and does not start an experiment or create a run recording.";parent.Add(preparation);
+            if(!CurrentDemo)
+            {
+                foreach(var rig in DesktopApparatusProfile.Rigs(Workspace.System.Root))AddTrackerControls(options,rig);
+                var preparation=StudioButton("Open tracker","camera",OpenQuickTracker,"quiet");
+                preparation.name="initialize-tracking";
+                preparation.tooltip="Open tracking to check input and calibration before the experiment starts.";
+                parent.Add(preparation);
+            }
             var links=Row("tracker-links");options.Add(links);AddSessionPlotLink(links);
             links.Add(StudioButton(CurrentMovement=="walking"?"About HejjéTrac":"About Rekkefly","external",()=>UnityEngine.Application.OpenURL(CurrentMovement=="walking"?"https://github.com/pvnkmrksk/hejjetrak":"https://github.com/pvnkmrksk/rekkefly"),"text-link"));
             var configure=Row("demo-configure");parent.Add(configure);configure.Add(new WorkbenchIcon("system"));
@@ -187,19 +194,15 @@ namespace ConfigurationUI
             var summary=Row("daily-apparatus-summary");parent.Add(summary);summary.Add(new WorkbenchIcon("system"));
             var text=SessionLabel(rigs.Count+(rigs.Count==1?" VR":" VRs")+" · "+(DesktopApparatusProfile.Presentation(Workspace.System.Root)=="led"?"LED panels":"Desktop preview")+" · "+string.Join(" / ",rigs.Select(RigMode).Distinct()),"apparatus-copy");text.name="configured-apparatus-summary";text.tooltip=SystemHeadline();summary.Add(text);
             var links=Row("tracker-links");parent.Add(links);AddSessionPlotLink(links);
-            if(DesktopApparatusProfile.ShouldPrepareCompanions(Workspace.System.Root))
+            if(rigs.Any(DesktopApparatusProfile.LocalNativeTracker))
             {
                 var open=StudioButton("Open tracker","camera",OpenQuickTracker,"quiet");open.name="initialize-tracking";open.tooltip="Open or show the independent native tracker windows to check input before starting. This does not start the experiment or create a run recording. Camera calibration stays in those windows.";links.Add(open);
             }
             var state=new Foldout {name="session-tracker-windows",text="Trackers",value=false};state.AddToClassList("apparatus-advanced");parent.Add(state);
             foreach(var rig in rigs)
             {
-                string id=(string)rig["vrId"];
-                var row=Row("session-native-row");state.Add(row);
-                var label=SessionLabel(id+" · "+RigMode(rig),"apparatus-copy");label.style.flexGrow=1;row.Add(label);
-                var show=StudioButton("Show","external",()=>TrackerProcessManager.Instance.Show(id),"quiet");row.Add(show);
-                var stop=StudioButton("Stop","stop",()=>TrackerProcessManager.Instance.Stop(id),"quiet");row.Add(stop);
-                Action refresh=()=>{bool running=TrackerProcessManager.IsRunning(id);label.text=id+" · "+(running?TrackerProcessManager.Status(id):rig["zmqAddress"]+":"+rig["zmqPort"]+" · input configured");show.SetEnabled(running);stop.SetEnabled(running);};refresh();row.schedule.Execute(refresh).Every(500);
+                var panel=new Foldout {text=(string)rig["vrId"]+" · "+RigMode(rig),value=rigs.Count==1};
+                state.Add(panel);AddTrackerControls(panel,rig);
             }
         }
         private void AddSessionPlotLink(VisualElement parent)
@@ -207,21 +210,6 @@ namespace ConfigurationUI
             var plots=StudioButton("Plots","radio",DesktopDashboard.Open,"text-link");plots.name="open-live-plots";plots.tooltip="Open the optional independent live trajectory dashboard. Plotting is separate from stimulus rendering.";parent.Add(plots);
             var state=SessionLabel("","viewer-launch-state");parent.Add(state);
             state.schedule.Execute(()=>{if(!DesktopDashboard.Status.StartsWith("Optional",StringComparison.Ordinal))state.text=DesktopDashboard.Status;}).Every(500);
-        }
-        private void AddQuickTrackerControls(VisualElement parent)
-        {
-            var rig=(Workspace.System.Root["configs"] as JArray)?.OfType<JObject>().FirstOrDefault();if(rig==null)return;
-            string id=(string)rig["vrId"];
-            var row=Row("quick-tracker-status");parent.Add(row);
-            var state=SessionLabel("Tracker ready to open","tracker-app-state");row.Add(state);
-            var open=StudioButton("Open tracker","external",()=>{
-                if(TrackerProcessManager.IsRunning(id))TrackerProcessManager.Instance.Show(id);else OpenQuickTracker();
-            },"text-link");open.name="quickstart-open-tracker";row.Add(open);
-            open.tooltip="Open the independent tracker or bring its existing window forward for camera selection and calibration.";
-            var stop=StudioButton("Stop tracker","stop",()=>TrackerProcessManager.Instance.Stop(id),"text-link");stop.name="quickstart-stop-tracker";row.Add(stop);
-            stop.tooltip="Explicitly stop the tracker opened for this rig. Closing MATREX does not close independent tracker windows.";
-            Action refresh=()=>{bool running=TrackerProcessManager.IsRunning(id);state.text=running?TrackerProcessManager.Status(id):"Independent tracker · opens with Start";stop.SetEnabled(running);open.SetEnabled(true);var caption=open.Q<Label>();if(caption!=null)caption.text=running?"Show tracker":"Open tracker";};
-            refresh();row.schedule.Execute(refresh).Every(500);
         }
         private Button MovementChoice(string mode,string title,string detail,string icon)
         {
@@ -242,7 +230,7 @@ namespace ConfigurationUI
         {
             if(replayLibraryMode){RefreshLibraryFooter();return;}
             if(start==null)return;var label=start.Q<Label>();if(label!=null)label.text=ApparatusDraft?"Use configuration":CurrentDemo?"Start demo":"Start experiment";
-            start.tooltip=ApparatusDraft?"Validate and save the apparatus, then return to the experiment workspace. The experiment does not start.":CurrentDemo?"Start this clearly marked demo, including the native tracker companion. No hardware is required.":"Save and validate the current sequence, connect its configured tracking input and start recording.";
+            start.tooltip=ApparatusDraft?"Validate and save the apparatus, then return to the experiment workspace. The experiment does not start.":CurrentDemo?"Start this clearly marked demo, with keyboard controls and simulated movement. No hardware is required.":"Save and validate the current sequence, connect its configured tracking input and start recording.";
         }
         private void BuildSessionDetails(VisualElement parent)
         {
@@ -341,26 +329,71 @@ namespace ConfigurationUI
         private void AddTrackerControls(VisualElement parent,JObject rig)
         {
             string id=(string)rig["vrId"];
-            if(string.IsNullOrWhiteSpace(id)) return;
-            var launch=rig["tracker"] as JObject;
-            bool configured=!string.IsNullOrWhiteSpace((string)launch?["executablePath"]);
-            // A running independent tracker keeps its explicit Stop control even
-            // after optional launch configuration is cleared.
-            if(!configured && !TrackerProcessManager.IsRunning(id)) return;
+            if(string.IsNullOrWhiteSpace(id))return;
             var container=new VisualElement();container.AddToClassList("tracker-controls");parent.Add(container);
-            var state=new Label();state.style.fontSize=12;state.style.whiteSpace=WhiteSpace.Normal;container.Add(state);
+            var state=SessionLabel("","apparatus-note");container.Add(state);
             var row=Row();container.Add(row);
-            var start=StudioButton("Launch tracker","play",()=>{
-                RequireApplied();
-                TrackerProcessManager.Instance.Launch(LosslessJson.ToRuntime<SystemConfig>(rig));
-                UpdateStatus(id+" tracker launched. Verify tracking input before starting the experiment.");
-            },"quiet");start.name="tracker-launch-"+id;row.Add(start);
+            var start=StudioButton("Launch tracker","play",()=>OpenTracker(id),"quiet");start.name="tracker-launch-"+id;row.Add(start);
+            var show=StudioButton("Show","external",()=>TrackerProcessManager.Instance.Show(id),"quiet");row.Add(show);
             var stop=StudioButton("Stop tracker","stop",()=>{
                 TrackerProcessManager.Instance.Stop(id);UpdateStatus(id+" tracker stopped.");
             },"quiet");stop.name="tracker-stop-"+id;row.Add(stop);
-            stop.tooltip="Stop only the tracker MATREX launched for this rig. Save calibration edits in the tracker before stopping; an unresponsive process is terminated.";
-            Action refresh=()=>{ bool running=TrackerProcessManager.IsRunning(id);state.text=running?TrackerProcessManager.Status(id):configured?"Tracker app · ready to launch":"Tracker launch is not configured";state.tooltip=TrackerProcessManager.Status(id);start.SetEnabled(configured&&!running);stop.SetEnabled(running); };
+            stop.tooltip="Stop only the tracker MATREX launched for this rig. Save calibration in its window first.";
+            bool supportedBackend=TrackerBackend.TryParse(rig["closedLoopMode"]?.ToString(),out var mode);
+            bool canConfigure=!CurrentDemo&&supportedBackend&&
+                (TrackerBackend.IsFlight(mode)||TrackerBackend.IsWalking(mode))&&DesktopApparatusProfile.LocalAddress((string)rig["zmqAddress"]);
+            JObject CurrentRig(JToken root)=>DesktopApparatusProfile.Rigs(root).SingleOrDefault(r=>(string)r["vrId"]==id);
+            string TrackerValue(string key)=>(string)CurrentRig(Workspace.System.Root)?["tracker"]?[key]??"";
+            void SetTrackerValue(string key,string value)
+            {
+                StudioEdit(Workspace.System,root=>{
+                    var current=CurrentRig(root);
+                    if(current==null)throw new ArgumentException("The selected rig changed. Reopen its tracker settings.");
+                    if(!(current["tracker"] is JObject tracker)){tracker=new JObject();current["tracker"]=tracker;}
+                    tracker[key]=value;
+                },false);
+            }
+            string detected=canConfigure?TrackerInstallation.Find(mode):"";
+            string EffectiveLauncher()
+            {
+                string configured=TrackerValue("executablePath");
+                return string.IsNullOrWhiteSpace(configured)?detected:configured;
+            }
+            Action refresh=()=>{
+                bool running=TrackerProcessManager.IsRunning(id);
+                bool hasLauncher=canConfigure&&!string.IsNullOrWhiteSpace(EffectiveLauncher());
+                bool hasCalibration=canConfigure&&!string.IsNullOrWhiteSpace(TrackerValue("configFile"));
+                state.text=running?TrackerProcessManager.Status(id):!canConfigure?"Tracking input is managed independently.":
+                    !hasLauncher?"Tracker launcher was not detected. Install "+TrackerBackend.DisplayName(mode)+" or browse for its executable.":
+                    !hasCalibration?"Select the tracker calibration file for "+id+".":"Installed tracker and calibration are ready.";
+                start.SetEnabled(hasLauncher&&hasCalibration&&!running);show.SetEnabled(running);stop.SetEnabled(running);
+            };
             refresh();row.schedule.Execute(refresh).Every(500);
+            if(!canConfigure)return;
+
+            var launcherRow=Row();container.Add(launcherRow);
+            var launcher=ApparatusText("Tracker launcher","tracker-executable-"+id,EffectiveLauncher(),value=>
+                SetTrackerValue("executablePath",string.IsNullOrWhiteSpace(value)?"":TrackerInstallation.ResolveSelection(value,mode)),
+                "This rig uses the detected installation when no override is set. Browse for the executable or complete macOS app to select a different build.");
+            launcher.style.flexGrow=1;launcherRow.Add(launcher);
+            launcherRow.Add(StudioButton("Browse…","file",()=>BrowseFile("Choose "+TrackerBackend.DisplayName(mode)+" launcher",null,path=>
+                SetTrackerValue("executablePath",TrackerInstallation.ResolveSelection(path,mode))),"quiet"));
+            launcherRow.Add(StudioButton("Detect","search",()=>{
+                detected=TrackerInstallation.Find(mode);
+                if(string.IsNullOrWhiteSpace(TrackerValue("executablePath")))RefreshBoundText(launcher,detected);
+                refresh();
+                UpdateStatus(string.IsNullOrEmpty(detected)?"No installed tracker was detected. Browse for its launcher.":
+                    string.IsNullOrWhiteSpace(TrackerValue("executablePath"))?"Detected "+detected:"Detected "+detected+". The configured override remains selected.");
+            },"quiet"));
+            BindViewState(launcher,()=>{RefreshBoundText(launcher,EffectiveLauncher());refresh();});
+
+            var calibrationRow=Row();container.Add(calibrationRow);
+            var calibration=ApparatusText("Tracker calibration","tracker-calibration-"+id,TrackerValue("configFile"),
+                value=>SetTrackerValue("configFile",value),"Choose the calibration/profile for this rig. MATREX passes it to the tracker without modifying it.");
+            calibration.style.flexGrow=1;calibrationRow.Add(calibration);
+            calibrationRow.Add(StudioButton("Browse…","file",()=>BrowseFile("Choose tracker calibration",null,path=>
+                SetTrackerValue("configFile",Path.GetFullPath(path))),"quiet"));
+            BindViewState(calibration,()=>RefreshBoundText(calibration,TrackerValue("configFile")));
         }
         private void BindSessionBlock(VisualElement holder,int index)
         {

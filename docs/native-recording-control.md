@@ -29,9 +29,12 @@ The native apps opt in through `--control-dir ABSOLUTE_PRIVATE_DIRECTORY --contr
 
 Local request/reply files carry matching random IDs, instance identity and expiry. Commands are `status`, `record_start`, ownership-fenced `record_stop`, `start` and `pause`. `record_stop` requires the expected take directory and immutable stop request ID. `pause` affects tracking and is distinct from recorder Stop. Idle status, stable file size or elapsed delay never prove closure.
 
-The reviewed source adapters ship for **Mac arm64**. MATREX VR **0.4.3 Linux x86-64** also has a separately checksummed **HejjéTrac recording adapter** on its release page. The add-on retains the upstream 0.5.0 tracking engine and adds the local mailbox and worker-side ownership check. Extract it and run its included installer against the MATREX `Companions` directory. Existing tracker calibration stays in the same profile. Start the bundled tracker again and set the session and rig to save video with **Automatic · experiment**. [Adapter download and instructions](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.4.3) · [Linux lifecycle results](hejjetrac-linux-recording-validation.json)
-
-The base Linux archive ships the official upstream tracker. The flight detector and walking numerical core are unchanged. Stock Linux, Intel Mac, and Windows packages report automatic video as unavailable when the verified endpoint is absent. VR can still start. Physical camera start/stop, exposure timing, attached hardware and other-platform runtime acceptance remain pending.
+Install a tracker release that exposes both mailbox options and advertises the
+three capabilities above. In Configure, confirm the detected tracker launcher or
+browse to its executable or macOS app. Select the rig calibration separately,
+then enable the session video switch and choose **Automatic · experiment** for
+the rig. A legacy tracker can still publish motion and record manually.
+[HejjéTrac releases](https://github.com/pvnkmrksk/hejjetrac/releases) · [Rekkefly releases](https://github.com/pvnkmrksk/rekkefly/releases)
 
 After upgrading, an already-open tracker may still be the older executable.
 Close that tracker with the explicit tracker-window control, then initialize it
@@ -43,16 +46,16 @@ an older endpoint rather than assuming that a visible tracker window is capable.
 
 The [pinned source patches and locks](../tools/native_patches/README.md) record exact upstream commits, patch hashes and capabilities. They preserve native attributed resources and distinguish local builds from upstream releases. Existing user checkouts and unpublished work were not overwritten.
 
-Build the current desktop and both adapters with:
+To reproduce the historical source adapters in a local companion-enabled build:
 
 ```sh
-python3 tools/build_local_desktop.py
+python3 tools/build_local_desktop.py --with-companions
 ```
 
 A previous unsigned source build can be reused explicitly, after source/patch and executable-provenance verification:
 
 ```sh
-python3 tools/build_local_desktop.py \
+python3 tools/build_local_desktop.py --with-companions \
   --verified-native-binary /absolute/path/to/rekkefly \
   --native-binary-provenance /absolute/path/to/rekkefly-provenance.json \
   --verified-hejjetrac-binary /absolute/path/to/fictrac-desktop \

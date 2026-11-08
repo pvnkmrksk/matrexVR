@@ -457,7 +457,7 @@ namespace ConfigurationUI
                 string chosen=await ReplayFolderPicker.ChooseFileAsync(title,RuntimePaths.ConfigRoot,extension);
                 if(string.IsNullOrEmpty(chosen)||this==null||!isActiveAndEnabled||
                     modal!=originalModal||selected!=originalDocument||viewGeneration!=originalView)return;
-                if(!string.Equals(Path.GetExtension(chosen),"."+extension,StringComparison.OrdinalIgnoreCase))
+                if(!string.IsNullOrEmpty(extension)&&!string.Equals(Path.GetExtension(chosen),"."+extension,StringComparison.OrdinalIgnoreCase))
                     throw new IOException("Choose a ."+extension+" file.");
                 Guard(()=>{RequireApplied();accept(chosen);});
             }

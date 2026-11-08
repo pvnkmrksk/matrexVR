@@ -150,8 +150,8 @@ namespace ConfigurationUI
             }
             overview.Add(presentation);
             var native=Row("apparatus-native-option");scroll.Add(native);
-            native.Add(StateSwitch(DesktopApparatusProfile.Flag((system[DesktopApparatusProfile.MarkerName] as JObject)?["launchBundledTrackers"]),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.Marker((JObject)r)["launchBundledTrackers"]=value,false),"apparatus-native-trackers"));
-            var nativeLabel=SessionLabel("Launch bundled native trackers with Start","apparatus-copy");nativeLabel.tooltip="Only local modern Rekkefly/HejjéTrac rigs without an explicit executable/calibration override are launched. Disable this when sharing an externally started publisher. Remote and legacy endpoints remain externally managed.";native.Add(nativeLabel);
+            native.Add(StateSwitch(DesktopApparatusProfile.LaunchInstalledWithStart(system),value=>StudioEdit(Workspace.System,r=>DesktopApparatusProfile.Marker((JObject)r)[DesktopApparatusProfile.LaunchInstalledKey]=value,false),"apparatus-native-trackers"));
+            var nativeLabel=SessionLabel("Launch installed trackers with Start","apparatus-copy");nativeLabel.tooltip="Launch local Rekkefly or HejjéTrac rigs using their installed launcher and individual calibration files. Disable this when another app manages your tracker. Remote and legacy inputs remain independent.";native.Add(nativeLabel);
             var layout=new Foldout {name="apparatus-layout-details",text="Display layout",value=false};layout.AddToClassList("editor-disclosure");scroll.Add(layout);
             var maps=new VisualElement {name="apparatus-map-host"};layout.Add(maps);BindViewState(maps,()=>{maps.Clear();BuildApparatusDisplayMap(maps,(JObject)Workspace.System.Root);});
             var rigs=DesktopApparatusProfile.Rigs(system).ToList();
@@ -250,7 +250,7 @@ namespace ConfigurationUI
         private void BuildApparatusRig(VisualElement parent,JObject rig,int index,string presentation)
         {
             string id=(string)rig["vrId"]??"VR"+(index+1);string[] RigPath(string key)=>new[]{"configs",index.ToString(),key};
-            Action<string,JToken,bool> set=(key,value,rebuild)=>StudioEdit(Workspace.System,r=>r["configs"][index][key]=value,key=="vrId"&&rebuild);
+            Action<string,JToken,bool> set=(key,value,rebuild)=>StudioEdit(Workspace.System,r=>r["configs"][index][key]=value,(key=="vrId"||key=="closedLoopMode"||key=="zmqAddress")&&rebuild);
             var fold=new Foldout {name="apparatus-rig-"+id,text=id+" · "+RigMode(rig)+" · "+DesktopApparatusProfile.Order(rig).Length+" faces · "+rig["zmqAddress"]+":"+rig["zmqPort"],value=index==0};fold.AddToClassList("apparatus-rig");parent.Add(fold);
             BindViewState(fold,()=>{var current=(JObject)Workspace.System.Root["configs"][index];fold.text=(string)current["vrId"]+" · "+RigMode(current)+" · "+DesktopApparatusProfile.Order(current).Length+" faces · "+current["zmqAddress"]+":"+current["zmqPort"];});
             var identity=Row("apparatus-grid");fold.Add(identity);
@@ -266,7 +266,7 @@ namespace ConfigurationUI
             identity.Add(ApparatusText("Species","apparatus-species-"+id,(string)rig["speciesName"],value=>set("speciesName",value,false),"Common or scientific species name stored in system JSON and copied to the animal’s recording metadata."));
             var connections=new Foldout {name="apparatus-connections-"+id,text="Connections",value=false};connections.AddToClassList("editor-disclosure");fold.Add(connections);
             var transport=Row("apparatus-grid");connections.Add(transport);
-            transport.Add(ApparatusText("Tracker host","apparatus-host-"+id,(string)rig["zmqAddress"]??"localhost",value=>set("zmqAddress",value,true),"Host running the tracker publisher. Use localhost for bundled native apps; a remote host remains externally managed."));
+            transport.Add(ApparatusText("Tracker host","apparatus-host-"+id,(string)rig["zmqAddress"]??"localhost",value=>set("zmqAddress",value,true),"Host running the tracker publisher. Use localhost for a tracker MATREX opens on this computer. A remote tracker stays independently managed."));
             transport.Add(ApparatusInteger("Tracker port","apparatus-port-"+id,DesktopApparatusProfile.Integer(rig["zmqPort"],9871),value=>set("zmqPort",value,true),"ZeroMQ tracking input port. Each rig on the same host requires its own port.",1,65535));
             transport.Add(ApparatusInteger("Output display","apparatus-display-"+id,ApparatusOutputDisplay(rig)+1,value=>set("targetDisplay",value-1,true),"Physical output display, numbered from1 here. System JSON stores display0 for the first output. The preview below shows every configured rectangle on that display.",1,32));
             {
@@ -292,8 +292,12 @@ namespace ConfigurationUI
             var monitorNote=SessionLabel("Monitor output uses one full-screen Front camera. LED geometry is retained above and becomes editable again when LED panels are selected.","apparatus-note");fold.Add(monitorNote);BindViewState(monitorNote,()=>monitorNote.EnableInClassList("inactive-note",DesktopApparatusProfile.Presentation(Workspace.System.Root)!="desktop"));
             var advanced=new Foldout {name="apparatus-rig-advanced-"+id,text="Calibration & advanced input",value=false};advanced.AddToClassList("apparatus-advanced");fold.Add(advanced);
             var rigSchema=(JObject)Workspace.Schemas.Get("system")["properties"]["configs"]["items"];
-            foreach(string key in new[]{"sphereDiameter","manualControls","tracker"})advanced.Add(Setting(Workspace.System,RigPath(key),ConfigSchema.Child(rigSchema,key),rig,rigSchema));
+            foreach(string key in new[]{"sphereDiameter","manualControls"})advanced.Add(Setting(Workspace.System,RigPath(key),ConfigSchema.Child(rigSchema,key),rig,rigSchema));
             AddTrackerControls(advanced,rig);
+            var launchOptions=new Foldout {text="Tracker launch options",value=false};launchOptions.AddToClassList("editor-disclosure");advanced.Add(launchOptions);
+            var trackerSchema=ConfigSchema.Child(rigSchema,"tracker");
+            foreach(var option in ((JObject)trackerSchema["properties"]).Properties().Where(option=>option.Name!="executablePath"&&option.Name!="configFile"))
+                launchOptions.Add(Setting(Workspace.System,new[]{"configs",index.ToString(),"tracker",option.Name},(JObject)option.Value,rig["tracker"] as JObject,trackerSchema));
             // A hardware label may change while editing. View identity follows its
             // array slot so renaming VR2 does not close its form or lose focus.
             fold.viewDataKey="apparatus-rig-slot-"+index;

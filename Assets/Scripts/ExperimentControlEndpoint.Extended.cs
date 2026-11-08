@@ -105,7 +105,12 @@ public sealed partial class ExperimentControlEndpoint
             case "tracker_control":
                 var gui=Setup();gui.RequireControlEditReady();string id=RequiredText(args,"vrId"),action=RequiredText(args,"action");
                 var rig=(gui.Workspace.System.Root["configs"] as JArray)?.OfType<JObject>().SingleOrDefault(value=>(string)value["vrId"]==id)??throw new ArgumentException("Unknown configured rig.");
-                if(action=="launch")TrackerProcessManager.Instance.Launch(LosslessJson.ToRuntime<SystemConfig>(rig));
+                if(action=="launch")
+                {
+                    if(DesktopQuickStart.IsQuickStart(gui.Workspace)&&DesktopQuickStart.IsDemo(gui.Workspace))
+                        throw new InvalidOperationException("Configure a live apparatus before initializing a tracker.");
+                    TrackerProcessManager.Instance.Launch(LosslessJson.ToRuntime<SystemConfig>(rig));
+                }
                 else if(action=="stop")TrackerProcessManager.Instance.Stop(id);
                 else throw new ArgumentException("Tracker action must be launch or stop.");
                 return new JObject{["vrId"]=id,["processRunning"]=TrackerProcessManager.IsRunning(id),["status"]=TrackerProcessManager.Status(id),["inputAcknowledged"]=false};

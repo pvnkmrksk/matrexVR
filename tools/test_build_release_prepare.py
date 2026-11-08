@@ -16,6 +16,8 @@ builder = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(builder)
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_local_rekkefly
+import companion_bundles
+import stage_local_dashboard
 
 
 class PinnedBuildTests(unittest.TestCase):
@@ -121,6 +123,38 @@ class McpPackagingTests(unittest.TestCase):
                             self.assertTrue(entry["path"].startswith(expected))
                     self.assertTrue(Path(str(archive) + ".sha256").is_file())
 
+    def test_default_release_stages_dashboard_without_trackers(self):
+        with tempfile.TemporaryDirectory() as folder:
+            output = Path(folder)
+            root = output / "repo"
+            revision = self.fixture(root, {})
+            build = output / "build"
+            build.mkdir()
+            (build / builder.TARGETS["Linux"][2]).write_text("player")
+            (build / "build-report.json").write_text(json.dumps({"result": "Succeeded", "errors": 0}))
+            quickstart = output / "quickstart.txt"
+            quickstart.write_text("fixture quickstart")
+
+            def stage_dashboard(platforms, target, cache):
+                self.assertEqual(platforms, ["linux-x64"])
+                target.mkdir()
+                (target / "dashboard-catalog.json").write_text("{}")
+                return [{"platform": "linux-x64"}]
+
+            with patch.object(builder, "ROOT", root), patch.object(companion_bundles, "stage") as trackers, \
+                 patch.object(stage_local_dashboard, "stage", side_effect=stage_dashboard) as dashboard:
+                builder.package(build, output, "0.4.4", "Linux", revision, output, quickstart)
+            trackers.assert_not_called()
+            dashboard.assert_called_once()
+            archive, = output.glob("*.zip")
+            with zipfile.ZipFile(archive) as zipped:
+                prefix = archive.stem + "/"
+                manifest = json.loads(zipped.read(prefix + "release-manifest.json"))
+                self.assertFalse(manifest["companionsBundled"])
+                self.assertTrue(manifest["dashboardBundled"])
+                self.assertNotIn(prefix + "Companions/catalog.json", zipped.namelist())
+                self.assertIn(prefix + "Companions/dashboard-catalog.json", zipped.namelist())
+
     def test_historical_revision_does_not_inject_current_mcp_files(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder) / "repo"
@@ -195,7 +229,7 @@ class VerifiedNativeReuseTests(unittest.TestCase):
             quickstart = root / "quickstart.txt"
             quickstart.write_text("fixture")
             arguments = ["build_release.py", "--version", "0.0.1", "--platform", "all", "--unity", str(unity),
-                         "--workspace", str(root / "release"), "--quickstart", str(quickstart), "--local-native-camera-fix",
+                         "--workspace", str(root / "release"), "--quickstart", str(quickstart), "--with-companions", "--local-native-camera-fix",
                          "--verified-native-binary", str(binary), "--native-binary-provenance", str(provenance)]
             with patch.object(builder.sys, "argv", arguments), patch.object(builder.sys, "platform", "darwin"), \
                  patch.object(builder.host_platform, "machine", return_value="arm64"), \
@@ -205,6 +239,7 @@ class VerifiedNativeReuseTests(unittest.TestCase):
             self.assertEqual(run.call_count, 3)
             self.assertEqual([call.args[3] for call in package.call_args_list], ["macOS", "Windows", "Linux"])
             for call in package.call_args_list:
+                self.assertTrue(call.kwargs["with_companions"])
                 self.assertTrue(call.kwargs["local_native_camera_fix"])
                 self.assertEqual(call.kwargs["verified_native_binary"], binary)
                 self.assertEqual(call.kwargs["native_binary_provenance"], provenance)
