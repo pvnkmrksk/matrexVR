@@ -77,9 +77,8 @@ namespace ConfigurationUI
             {
                 bool swarm = selected.SchemaId=="swarm" || selected.SchemaId=="kannadi" &&
                     string.Equals(payload["populationMode"]?.ToString(),"Swarm",StringComparison.OrdinalIgnoreCase);
-                Section(scroll,"Experiment","sequence",payload,schema,prefix,swarm
-                    ? new[]{"durationSeconds","populationMode"}
-                    : new[]{"durationSeconds","populationMode","numberOfRings"});
+                Section(scroll,"Experiment","sequence",payload,schema,prefix,selected.SchemaId=="kannadi"
+                    ? new[]{"durationSeconds","populationMode"} : new[]{"durationSeconds"});
                 if(swarm && payload["swarm"]?.Type!=JTokenType.Null)
                 {
                     bool nested=payload["swarm"] is JObject;
@@ -89,13 +88,19 @@ namespace ConfigurationUI
                     var populationFields=new List<string>{"dimension","spawnType","spawnRelativeToAnimal","spawnAreaSize","spawnVolumeSize","spawnCenter","agentGroups"};
                     if(!(population["agentGroups"] is JArray groups) || groups.Count==0)
                         populationFields.Insert(0,AgentCountKey(population));
-                    Section(scroll,"Population and spawn","swarm",population,populationSchema,populationPath,populationFields);
+                    Section(scroll,"Generated swarm and spawn","swarm",population,populationSchema,populationPath,populationFields);
                     Section(scroll,"Periodic arena","navigation",population,populationSchema,populationPath,
                         new[]{"periodicBoundary","boundaryLengthX","boundaryLengthZ","followAnimalPosition","wrapY","boundaryHeight","volumeHalfExtentMetres"});
                     Section(scroll,"Camera distance","visibility",population,populationSchema,populationPath,new[]{"farClipMetres","nearClipMetres"});
                 }
-                else if(selected.SchemaId=="kannadi" && !swarm)
+                else if(selected.SchemaId=="kannadi")
+                {
+                    Section(scroll,"Kannadi multiplayer","swarm",payload,schema,prefix,new[]{"mirrorSpawn","numberOfRings","hexRadius"});
+                    var peers=new Foldout {name="multiplayer-visibility",text="Peer visibility · all other rigs by default",value=false};
+                    peers.AddToClassList("editor-disclosure");scroll.Add(peers);
+                    Section(peers,"Visibility","visibility",payload,schema,prefix,new[]{ExperimentVisibility.Field});
                     Section(scroll,"Periodic arena","navigation",payload,schema,prefix,new[]{"periodicBoundary","boundaryLengthX","boundaryLengthZ"});
+                }
                 Section(scroll,"Tracking","navigation",payload,schema,prefix,new[]{"closedLoopOrientation","closedLoopPosition"});
                 var shortcuts=Row("editor-shortcuts");scroll.Add(shortcuts);
                 shortcuts.Add(StudioButton("Objects & sky","palette",()=>{settingsTab="Appearance";BuildContent();},"quiet"));
@@ -125,7 +130,9 @@ namespace ConfigurationUI
                 Section(scroll,"Tracking","navigation",payload,schema,prefix,present.Where(key=>key.StartsWith("closedLoop")||key.StartsWith("walking")));
                 Section(scroll,"Movement","motion",payload,schema,prefix,present.Where(key=>key.StartsWith("autopilot")||new[]{"aglHeight",AgentSpeedKey(payload),"animateOnMove"}.Contains(key)));
                 var pose=new Foldout {name="motion-pose-details",text="Starting pose & resets",value=false};pose.AddToClassList("editor-disclosure");scroll.Add(pose);
-                Section(pose,"Pose","settings",payload,schema,prefix,present.Where(key=>key.StartsWith("initial")||key.StartsWith("reset")||key=="randomInitialRotation"));
+                var poseKeys=present.Where(key=>key.StartsWith("initial")||key.StartsWith("reset")||key=="randomInitialRotation");
+                if(selected.SchemaId=="kannadi") poseKeys=poseKeys.Concat(new[]{"vrConfigs"});
+                Section(pose,"Pose","settings",payload,schema,prefix,poseKeys);
                 var environment=new Foldout {name="motion-environment-details",text="Wind & terrain",value=false};environment.AddToClassList("editor-disclosure");scroll.Add(environment);
                 Section(environment,"Environment","motion",payload,schema,prefix,present.Where(key=>key.StartsWith("wind")||key=="groundLayerMask"));
             }
@@ -184,7 +191,7 @@ namespace ConfigurationUI
         {
             string key=parts.Last(); JToken value=ConfigDocument.At(doc.Root,parts);
             var setting=new VisualElement(); setting.AddToClassList("studio-setting"); setting.name="setting-"+string.Join("-",parts);
-            var label=Row("setting-label"); setting.Add(label); var caption=new Label(Pretty(key)); caption.AddToClassList("setting-title"); label.Add(caption);
+            var label=Row("setting-label"); setting.Add(label); var caption=new Label(key=="mirrorSpawn"?"Tracked start layout":Pretty(key)); caption.AddToClassList("setting-title"); label.Add(caption);
             string unit=(string)schema["x-ui"]?["unit"]; if(!string.IsNullOrEmpty(unit)) label.Add(Pill(unit,"unit-pill"));
             if(schema["default"]!=null && schema["default"].Type!=JTokenType.Null)
             { var inherited=Pill("Inherited","muted-pill"); inherited.tooltip="Not explicitly set in this file. The displayed value comes from the runtime/schema default."; inherited.AddToClassList("inherited-indicator"); label.Add(inherited); BindViewState(inherited,()=>inherited.style.visibility=ConfigDocument.At(doc.Root,parts)==null?Visibility.Visible:Visibility.Hidden); }
@@ -202,6 +209,22 @@ namespace ConfigurationUI
                 var fallback=Pill("Check JSON","muted-pill");fallback.tooltip="This file contains an invalid value. The control displays its default; edit the value to repair it. Starting stays disabled until validation passes.";label.Add(fallback);BindViewState(fallback,()=>fallback.style.visibility=ConfigSchema.Validate(ConfigDocument.At(doc.Root,parts),schema).Count>0?Visibility.Visible:Visibility.Hidden);
             }
             if(parts.Length==1&&key==StimulusResolutionConfig.Field)BuildStimulusResolutionControls(setting,doc,parts,schema);
+            else if(key=="mirrorSpawn" && schema["properties"] is JObject)
+            {
+                if(shown is JObject preset)
+                {
+                    setting.AddToClassList("container-setting");
+                    foreach(string field in new[]{"layout","width","depth"})
+                        setting.Add(Setting(doc,parts.Concat(new[]{field}).ToArray(),ConfigSchema.Child(schema,field),preset,schema));
+                    setting.Add(Button("Use authored poses",()=>assign(JValue.CreateNull(),true),"quiet"));
+                }
+                else
+                {
+                    var controls=Row();controls.Add(Pill("Shared / per-rig poses","muted-pill"));
+                    controls.Add(Button("Choose a spawn layout",()=>assign(ConfigSchema.NewValue(schema),true),"quiet"));
+                    setting.Add(controls);
+                }
+            }
             else if(key=="agentGroups"&&schema["items"] is JObject) BuildSwarmGroups(setting,doc,parts,schema);
             else if(key=="modelAppearance"&&schema["properties"]!=null){setting.AddToClassList("surface-setting");BuildSurfaceControls(setting,schema,parts);}
             else if(TryVisibilityControl(doc,parts,out var visibilityControl)){setting.AddToClassList("visibility-setting");setting.Add(visibilityControl);}
@@ -303,6 +326,13 @@ namespace ConfigurationUI
             {
                 var choices=new List<string>{"Built-in / GLB model","Bogong visual"};var current=shown?.ToString()??"ScenePrefab";if(current!="ScenePrefab"&&current!="Bogong")choices.Add(current);
                 var picker=new DropdownField(choices,current=="Bogong"?1:current=="ScenePrefab"?0:2);picker.RegisterValueChangedCallback(evt=>assign(new JValue(evt.newValue==choices[0]?"ScenePrefab":evt.newValue==choices[1]?"Bogong":evt.newValue),false));setting.AddToClassList("choice-setting");setting.Add(picker);
+            }
+            else if(key=="populationMode")
+            {
+                var choices=new List<string>{"Kannadi multiplayer","Generated swarm"};
+                var picker=new DropdownField(choices,string.Equals(shown.ToString(),"Swarm",StringComparison.OrdinalIgnoreCase)?1:0);
+                picker.RegisterValueChangedCallback(evt=>assign(new JValue(evt.newValue==choices[1]?"Swarm":"Mirror"),true));
+                setting.AddToClassList("choice-setting");setting.Add(picker);
             }
             else if(schema["enum"] is JArray options)
             {

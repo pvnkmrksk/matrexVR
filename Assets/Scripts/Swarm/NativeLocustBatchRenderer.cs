@@ -45,6 +45,8 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
     private SkinnedMeshRenderer[] skins;
     private Transform[] roots;
     private GameObject[] agentObjects;
+    private int layerMask;
+    private int[] agentLayerMasks;
     internal bool UsesParallelCull => replacingSkins && cullRadii.IsCreated;
     internal bool UsesParallelDrawPacking => UsesParallelCull && parallelDrawPacking;
     private float[] radii;
@@ -60,7 +62,9 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
     private NativeArray<Matrix4x4> clipRootMatrices;
     private float[] clipOffsets;
     private NativeArray<float> cullRadii;
+    private NativeArray<int> cullAgentLayers;
     private NativeArray<int> cullCameraIndices;
+    private NativeArray<int> cullCameraMasks;
     private NativeArray<byte> cullResults;
     private int[] cullSlots = Array.Empty<int>();
     private NativeArray<float> packetPhases;
@@ -125,14 +129,23 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
     {
         [ReadOnly] public NativeArray<Matrix4x4> roots;
         [ReadOnly] public NativeArray<float> radii;
+        [ReadOnly] public NativeArray<int> agentLayers;
+        [ReadOnly] public NativeArray<int> cameraMasks;
         [ReadOnly] public NativeArray<int> cameraIndices;
         [ReadOnly] public NativeArray<float4> planes;
         [WriteOnly] public NativeArray<byte> results;
+        public bool layered;
 
         public void Execute(int index)
         {
             int agent = index % roots.Length;
-            int firstPlane = cameraIndices[index / roots.Length] * PlanesPerCamera;
+            int cameraSlot = index / roots.Length;
+            if (layered && (agentLayers[agent] & cameraMasks[cameraSlot]) == 0)
+            {
+                results[index] = Culled;
+                return;
+            }
+            int firstPlane = cameraIndices[cameraSlot] * PlanesPerCamera;
             Matrix4x4 root = roots[agent];
             var center = new float3(root.m03, root.m13, root.m23);
             byte visibility = Visible;
@@ -214,10 +227,12 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         cullFrame = -1;
     }
 
+    internal static bool Available => requested && Application.isPlaying && SupportsStockForward();
+
     internal static GameObject TryCreate(Transform parent, int layer, GameObject prefab,
-        IReadOnlyList<GameObject> agents, IReadOnlyList<float> initialPhases = null)
+        IReadOnlyList<GameObject> agents, IReadOnlyList<float> initialPhases = null, bool layered = false)
     {
-        if (!requested || !Application.isPlaying || prefab == null || agents.Count < 32) return null;
+        if (!requested || !Application.isPlaying || prefab == null || agents.Count < (layered ? 2 : 32)) return null;
         var catalog = Resources.Load<KannadiPrefabCatalog>("KannadiPrefabCatalog");
         if (catalog == null || prefab != catalog.Find("SimulatedLocust")) return null;
         if (!SupportsStockForward())
@@ -231,7 +246,7 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         var batch = host.AddComponent<NativeLocustBatchRenderer>();
         try
         {
-            if (batch.Configure(agents, initialPhases))
+            if (batch.Configure(agents, initialPhases, layered))
             {
                 host.AddComponent<NativeLocustBatchSubmission>();
                 return host;
@@ -254,7 +269,7 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         QualitySettings.skinWeights == SkinWeights.OneBone && QualitySettings.shadows == ShadowQuality.Disable &&
         QualitySettings.pixelLightCount == 0 && (LightmapSettings.lightProbes == null || LightmapSettings.lightProbes.count == 0);
 
-    private bool Configure(IReadOnlyList<GameObject> agents, IReadOnlyList<float> initialPhases)
+    private bool Configure(IReadOnlyList<GameObject> agents, IReadOnlyList<float> initialPhases, bool layered)
     {
         var template = Resources.Load<Material>("NativeLocust/InstancedStock");
         var first = agents[0].GetComponentInChildren<SkinnedMeshRenderer>();
@@ -276,6 +291,8 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         skins = new SkinnedMeshRenderer[agents.Count];
         roots = new Transform[agents.Count];
         agentObjects = new GameObject[agents.Count];
+        layerMask = layered ? 0 : 1 << gameObject.layer;
+        if (layered) agentLayerMasks = new int[agents.Count];
         radii = new float[agents.Count];
         activeAgents = new bool[agents.Count];
         worldBounds = new Bounds[agents.Count];
@@ -293,6 +310,11 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
             skins[i] = skin;
             roots[i] = agent.transform;
             agentObjects[i] = agent;
+            if (layered)
+            {
+                agentLayerMasks[i] = 1 << skin.gameObject.layer;
+                layerMask |= agentLayerMasks[i];
+            }
             Vector3 scale = skin.transform.lossyScale;
             if (scale.x <= 0 || Mathf.Abs(scale.x - scale.y) > .001f || Mathf.Abs(scale.x - scale.z) > .001f) return false;
             // Use a rotation-independent conservative bound about the root.
@@ -349,7 +371,13 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
             float maxScale = Mathf.Max(Mathf.Abs(scale.x), Mathf.Max(Mathf.Abs(scale.y), Mathf.Abs(scale.z)));
             radii[i] = Mathf.Max(radii[i], clip.BoundingRadius * maxScale);
         }
-        if (parallelCull && roots.Length >= MinimumParallelCull) cullRadii = new NativeArray<float>(radii, Allocator.Persistent);
+        if (parallelCull && roots.Length >= MinimumParallelCull)
+        {
+            cullRadii = new NativeArray<float>(radii, Allocator.Persistent);
+            cullAgentLayers = agentLayerMasks != null
+                ? new NativeArray<int>(agentLayerMasks, Allocator.Persistent)
+                : new NativeArray<int>(1, Allocator.Persistent);
+        }
         properties.SetBuffer(BoneData, clipMatrices);
         return true;
     }
@@ -387,7 +415,7 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         }
         Camera.GetAllCameras(cameras);
         int groupLayers = 0;
-        foreach (var group in groups) groupLayers |= 1 << group.gameObject.layer;
+        foreach (var group in groups) groupLayers |= group.layerMask;
         int unsupportedLayers = 0;
         for (int i = 0; i < cameraCount; i++)
         {
@@ -403,7 +431,7 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         {
             var group = groups[i];
             string reason = group.playback != null && !group.playback.UsesCache ? "shared clip playback stopped" :
-                (unsupportedLayers & (1 << group.gameObject.layer)) != 0 ? "a visible camera requires an unsupported rendering pass" : null;
+                (unsupportedLayers & group.layerMask) != 0 ? "a visible camera requires an unsupported rendering pass" : null;
             if (reason == null)
             {
                 useCameraJobs |= group.cullRadii.IsCreated;
@@ -449,7 +477,7 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
             cameraMasks[i] = mask;
             if (cullFrame != lastFrame) continue;
             ref var snapshot = ref cameraSnapshots[i];
-            snapshot.unchanged = snapshot.mask != 0 && mask != 0 &&
+            snapshot.unchanged = snapshot.mask != 0 && snapshot.mask == mask &&
                 snapshot.clipMatrix.Equals(CameraClipMatrix(camera));
         }
         for (int i = groups.Count - 1; i >= 0; i--)
@@ -520,24 +548,27 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         if (cullSlots.Length < cameraCount)
         {
             if (cullCameraIndices.IsCreated) cullCameraIndices.Dispose();
+            if (cullCameraMasks.IsCreated) cullCameraMasks.Dispose();
             if (cullResults.IsCreated) cullResults.Dispose();
             cullSlots = new int[cameraCount];
             cullCameraIndices = new NativeArray<int>(cameraCount, Allocator.Persistent);
+            cullCameraMasks = new NativeArray<int>(cameraCount, Allocator.Persistent);
             cullResults = new NativeArray<byte>(checked(cameraCount * roots.Length), Allocator.Persistent);
         }
         int selected = 0;
-        int layerMask = 1 << gameObject.layer;
         for (int i = 0; i < cameraCount; i++)
         {
             cullSlots[i] = -1;
             if ((cameraSnapshots[i].mask & layerMask) == 0) continue;
             cullSlots[i] = selected;
+            cullCameraMasks[selected] = cameraSnapshots[i].mask;
             cullCameraIndices[selected++] = i;
         }
         if (selected == 0) return rootsReady;
         bool pack = parallelDrawPacking && TryPreparePackets(selected);
         JobHandle cull = new CullAgents {
             roots = clipRootMatrices, radii = cullRadii, cameraIndices = cullCameraIndices,
+            agentLayers = cullAgentLayers, cameraMasks = cullCameraMasks, layered = agentLayerMasks != null,
             planes = cameraPlanes, results = cullResults
         }.Schedule(selected * roots.Length, 128, rootsReady);
         if (!pack) return cull;
@@ -594,10 +625,8 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         bool packetsReady = packetFrame == lastFrame && AllAgentsActive();
         bool agentDataReady = false;
         if (!cached) gpuMatrices.SetData(matrices);
-        int layer = gameObject.layer;
         var parameters = new RenderParams(material)
         {
-            layer = layer,
             matProps = properties,
             lightProbeUsage = LightProbeUsage.Off,
             reflectionProbeUsage = reflectionUsage,
@@ -607,9 +636,13 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         };
         for (int c = 0; c < cameraCount; c++)
         {
-            if ((cameraMasks[c] & (1 << layer)) == 0) continue;
+            int visibleLayers = cameraMasks[c] & layerMask;
+            if (visibleLayers == 0) continue;
             var camera = cameras[c];
             parameters.camera = camera;
+            // The submission is camera-specific. Use a layer accepted by this
+            // camera and filter each body by its original layer before packing.
+            parameters.layer = math.tzcnt((uint)visibleLayers);
             int cullSlot = cached && cullRadii.IsCreated && cullFrame == lastFrame && cameraSnapshots[c].unchanged
                 ? cullSlots[c] : -1;
             if (packetsReady && cullSlot >= 0 && packetCounts[cullSlot] >= 0)
@@ -625,7 +658,8 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
                 agentDataReady = true;
             }
             if (cullSlot < 0) GeometryUtility.CalculateFrustumPlanes(camera, frustum);
-            DrawInstances(ref parameters, cached, cullSlot < 0 ? frustum : cameraSnapshots[c].planes, cullSlot * roots.Length);
+            DrawInstances(ref parameters, cached, cullSlot < 0 ? frustum : cameraSnapshots[c].planes,
+                cullSlot * roots.Length, visibleLayers);
         }
     }
 
@@ -671,13 +705,13 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         }
     }
 
-    private void DrawInstances(ref RenderParams parameters, bool cached, Plane[] planes, int cullOffset)
+    private void DrawInstances(ref RenderParams parameters, bool cached, Plane[] planes, int cullOffset, int visibleLayers)
     {
         int count = 0;
         Bounds bounds = default;
         for (int i = 0; i < roots.Length; i++)
         {
-            if (!activeAgents[i]) continue;
+            if (!activeAgents[i] || (agentLayerMasks != null && (agentLayerMasks[i] & visibleLayers) == 0)) continue;
             byte visibility = cullOffset < 0 ? Boundary : cullResults[cullOffset + i];
             if (visibility == Culled || (visibility == Boundary && !GeometryUtility.TestPlanesAABB(planes, worldBounds[i]))) continue;
             if (cached) instances[count] = clipRootMatrices[i];
@@ -769,7 +803,9 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         if (clipRoots.isCreated) clipRoots.Dispose();
         if (clipRootMatrices.IsCreated) clipRootMatrices.Dispose();
         if (cullRadii.IsCreated) cullRadii.Dispose();
+        if (cullAgentLayers.IsCreated) cullAgentLayers.Dispose();
         if (cullCameraIndices.IsCreated) cullCameraIndices.Dispose();
+        if (cullCameraMasks.IsCreated) cullCameraMasks.Dispose();
         if (cullResults.IsCreated) cullResults.Dispose();
         if (packetPhases.IsCreated) packetPhases.Dispose();
         DisposePacketStorage();

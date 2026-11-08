@@ -30,6 +30,7 @@ public class KannadiConfig : SwarmConfig
     public int? numberOfRings;
     public float? hexRadius;
     public float? spacing; // Legacy name; hexRadius takes precedence.
+    public KannadiSpawnConfig mirrorSpawn;
     public string kannadiTilePrefab;
     public string skyboxPath; // An explicit horizontal panorama takes precedence over nightSky.
     public NightSkyConfig nightSky; // Omitted preserves the existing scene background.
@@ -105,6 +106,8 @@ public class KannadiConfig : SwarmConfig
         if (!Finite(radius) || radius <= 0) throw new ArgumentException("Kannadi hexRadius/spacing must be positive and finite.");
         if (numberOfRings > 100) throw new ArgumentException("Kannadi numberOfRings exceeds the supported limit of 100.");
         ValidateSwarm();
+        if (mirrorSpawn != null && string.Equals(populationMode, "Mirror", StringComparison.OrdinalIgnoreCase))
+            mirrorSpawn.Validate(periodicBoundary, boundaryLengthX ?? DefaultBoundaryLength, boundaryLengthZ ?? DefaultBoundaryLength);
         if (HasAgentGroups && (!string.IsNullOrWhiteSpace(kannadiModelPath) ||
             (!string.IsNullOrWhiteSpace(kannadiTilePrefab) && kannadiTilePrefab != "SimulatedLocust")))
             throw new ArgumentException("agentGroups require the built-in SimulatedLocust model.");
@@ -138,6 +141,41 @@ public class KannadiConfig : SwarmConfig
         if (gain.HasValue && (!Finite(gain.Value) || gain < 0))
             throw new ArgumentException("Closed-loop gains must be finite and nonnegative.");
     }
+}
+
+[Serializable]
+public sealed class KannadiSpawnConfig
+{
+    public SwarmSpawnType layout = SwarmSpawnType.Grid;
+    public float width = 100f;
+    public float depth = 100f;
+
+    internal void Validate(bool periodic, float boundaryX, float boundaryZ)
+    {
+        if (!Enum.IsDefined(typeof(SwarmSpawnType), layout))
+            throw new ArgumentException("mirrorSpawn.layout must be Grid or Random.");
+        if (float.IsNaN(width) || float.IsInfinity(width) || width <= 0 ||
+            float.IsNaN(depth) || float.IsInfinity(depth) || depth <= 0)
+            throw new ArgumentException("Kannadi multiplayer spawn width and depth must be positive and finite.");
+        if (periodic && (width > boundaryX || depth > boundaryZ))
+            throw new ArgumentException("Kannadi multiplayer spawn dimensions must fit inside the periodic arena.");
+    }
+
+    internal Vector3 Position(Vector3 center, int ordinal, int count, float sampleX = .5f, float sampleZ = .5f)
+    {
+        if (layout == SwarmSpawnType.Random)
+            return new Vector3(center.x + (sampleX - .5f) * width, center.y, center.z + (sampleZ - .5f) * depth);
+        int columns = (int)Math.Ceiling(Math.Sqrt(count));
+        int rows = (count + columns - 1) / columns;
+        int row = ordinal / columns;
+        int rowLength = Math.Min(columns, count - row * columns);
+        float x = ((ordinal % columns + .5f) / rowLength - .5f) * width;
+        float z = ((row + .5f) / rows - .5f) * depth;
+        return new Vector3(center.x + x, center.y, center.z + z);
+    }
+
+    internal float Yaw(float center, int ordinal, int count, float sample = 0) =>
+        center + 360f * (layout == SwarmSpawnType.Random ? sample : ordinal / (float)count);
 }
 
 [Serializable]

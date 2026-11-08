@@ -39,7 +39,11 @@ The modern Bogong visual supports dot/angular modes and a physical moth represen
 
 **ಕನ್ನಡಿ (Kannadi) means “mirror” in Kannada.** Kannadi replicates the tracked animal's pose across a configurable hexagonal matrix. The replicas are virtual **agents**, derived from real animal motion rather than independently measured animals.
 
-`numberOfRings`, `hexRadius` (legacy `spacing`) and the selected `kannadiTilePrefab` determine the arrangement. Per-animal `vrConfigs` can set initial pose and `watchIndex`. A specified watch index chooses a configured animal population; without it the view contains the other animal layers. Self-view handling skips the overlapping centre where appropriate. Camera masks retain shared floor/world geometry while replacing animal-layer visibility.
+Each rig sees every other rig by default. Open **Peer visibility** in Basics to enable and edit the observer-by-source matrix. It starts with the diagonal off. The legacy `watchIndex` can select a single population when the matrix is disabled. The floor and shared world stay visible according to their own camera settings.
+
+`numberOfRings`, `hexRadius` (legacy `spacing`) and the selected `kannadiTilePrefab` determine the tracked copies. Zero rings displays one body for each visible peer. One ring displays seven bodies per peer, and two rings display nineteen. The **Tracked start layout** can place the source rigs in a grid with evenly spaced headings or sample random poses in a rectangular area. It follows the position and rotation reset switches. Explicit per-rig `vrConfigs` poses take precedence. The spawn width and depth can be smaller than the periodic arena.
+
+**Generated swarm** is a separate population mode for simulated or replayed agents. A sequence can give each animal a private generated swarm for entrainment, then switch to Kannadi multiplayer to expose it to the other tracked animals. Compatible stock bodies share an instanced renderer automatically, with the visibility matrix applied per observer.
 
 The full matrix is a stimulus arrangement, not a second physical tracking array. A recorded Kannadi clone row identifies a visible-model root; a root can contain a mirrored band rather than one biological animal. The [data reference](../data-formats.md) explains the schema, and [integration history](../kannadi-modernization.md) retains the original validation context.
 

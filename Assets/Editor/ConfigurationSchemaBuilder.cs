@@ -302,7 +302,19 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(name=="title"||name=="comments"||name=="group")child["default"]="";
         if(name=="group")ui["help"]="Optional group name for adjacent sequence blocks. Blocks with the same group stay in order and are shuffled together. Reuse the name only within that contiguous group.";
         if(name=="populationMode")
-        { child["enum"]=new JArray("Mirror","Swarm");ui["help"]="Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world."; }
+        { child["enum"]=new JArray("Mirror","Swarm");ui["help"]="Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."; }
+        if(owner==typeof(KannadiConfig) && name=="mirrorSpawn")
+            ui["help"]="Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply.";
+        if(owner==typeof(KannadiConfig) && name=="numberOfRings")
+            ui["help"]="Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.";
+        if(owner==typeof(KannadiConfig) && name=="hexRadius")
+        { ui["unit"]="scene units"; ui["help"]="Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view."; }
+        if(owner==typeof(KannadiSpawnConfig) && (name=="width" || name=="depth"))
+        {
+            child["exclusiveMinimum"]=0;
+            ui["unit"]="scene units";
+            ui["help"]=name=="width"?"Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled.":"Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled.";
+        }
         if(name=="modelPath"||name=="kannadiModelPath")
         {child["default"]="";ui["help"]="Optional embedded .glb model path relative to StreamingAssets. Overrides the built-in object/model. Model bytes are archived with the recording for replay.";}
         if(name=="animationClip")ui["help"]="Optional animation clip in the imported model. Leave blank to use its first clip.";

@@ -22,11 +22,69 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     private int? watchIndex;
     private bool initialized;
     private LocustSpawner swarmSpawner;
-    private string swarmPopulationKey, mirrorPopulationKey;
+    private string swarmPopulationKey, mirrorPopulationKey, mirrorAppearanceKey;
+    private MirrorBatch mirrorBatch;
     public bool IsSwarm => string.Equals(config.populationMode, "Swarm", StringComparison.OrdinalIgnoreCase);
     private float MirrorBoundaryX => config.boundaryLengthX ?? SwarmConfig.DefaultBoundaryLength;
     private float MirrorBoundaryZ => config.boundaryLengthZ ?? SwarmConfig.DefaultBoundaryLength;
     protected virtual float RowSpacing => hexRadius * 2f;
+
+    // One batch can represent several tracked rigs. Each body retains its source
+    // rig's stimulus layer, so every observer's visibility rules still apply.
+    private sealed class MirrorBatch
+    {
+        internal readonly Kannadi[] Rigs;
+        private readonly List<GameObject> hosts = new List<GameObject>();
+        private bool pending = true;
+
+        internal MirrorBatch(Kannadi[] rigs) => Rigs = rigs;
+
+        internal void Invalidate()
+        {
+            foreach (var host in hosts)
+                if (host != null) { host.SetActive(false); UnityEngine.Object.Destroy(host); }
+            hosts.Clear();
+            pending = true;
+        }
+
+        internal void RebuildIfPending()
+        {
+            if (!pending) return;
+            pending = false;
+            if (!NativeLocustBatchRenderer.Available) return;
+            var stock = Resources.Load<KannadiPrefabCatalog>("KannadiPrefabCatalog")?.Find("SimulatedLocust");
+            if (stock == null) return;
+            var byMaterial = new Dictionary<Material, List<GameObject>>();
+            Kannadi owner = null;
+            foreach (var rig in Rigs)
+            {
+                if (rig == null || !rig.isActiveAndEnabled || rig.IsSwarm || rig.tilePrefab != stock) continue;
+                if (owner == null) owner = rig;
+                foreach (var clone in rig.Clones)
+                {
+                    if (clone == null || !clone.activeInHierarchy) continue;
+                    var material = clone.GetComponentInChildren<SkinnedMeshRenderer>()?.sharedMaterial;
+                    if (material == null) continue;
+                    if (!byMaterial.TryGetValue(material, out var agents))
+                        byMaterial.Add(material, agents = new List<GameObject>());
+                    agents.Add(clone);
+                }
+            }
+            foreach (var agents in byMaterial.Values)
+            {
+                if (agents.Count < 2) continue;
+                var phases = new float[agents.Count];
+                for (int i = 0; i < agents.Count; i++)
+                {
+                    var animator = agents[i].GetComponent<Animator>();
+                    if (animator != null && animator.isInitialized)
+                        phases[i] = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
+                }
+                var host = NativeLocustBatchRenderer.TryCreate(owner.transform, agents[0].layer, stock, agents, phases, layered: true);
+                if (host != null) hosts.Add(host);
+            }
+        }
+    }
 
     private void Awake() => RuntimeStatusOverlay.RegisterStatusSource(this);
 
@@ -51,6 +109,13 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             Kannadi[] rigs = FindObjectsOfType<Kannadi>().Where(r => r.isActiveAndEnabled && r.gameObject.scene == gameObject.scene).OrderBy(r => r.VRIndex).ToArray();
             // Validate all prefab selections before replacing any existing grid.
             var selected = rigs.Select(r => r.ResolvePrefab(next)).ToArray();
+            var batch = mirrorBatch ?? rigs.FirstOrDefault()?.mirrorBatch;
+            if (batch == null || !batch.Rigs.SequenceEqual(rigs))
+            {
+                batch?.Invalidate();
+                batch = new MirrorBatch(rigs);
+            }
+            foreach (var rig in rigs) rig.mirrorBatch = batch;
             for (int i = 0; i < rigs.Length; i++)
             {
                 var rig = rigs[i];
@@ -59,8 +124,9 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
                     StimulusHeadingReference.For(tracking).Begin(next.headingReference, result => {
                         if (result != null && next.useHeadingReference) rig.GenerateHexGrid();
                     });
-                using (ExperimentRandom.ScopeFor(rig, "kannadi-initialization")) rig.Apply(next, selected[i]);
+                using (ExperimentRandom.ScopeFor(rig, "kannadi-initialization")) rig.Apply(next, selected[i], i, rigs.Length);
             }
+            batch.RebuildIfPending();
             NightSkyController.Apply(gameObject, next.nightSky, next.skyboxPath, next.uniformSkyColor);
             var world = GetComponent<KannadiWorldObjects>() ?? gameObject.AddComponent<KannadiWorldObjects>();
             world.Apply(next.objects, rigs.Select(r => r.GetComponent<ClosedLoop>()).Where(r => r != null).ToArray());
@@ -90,7 +156,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
         return prefab;
     }
 
-    private void Apply(KannadiConfig next, GameObject prefab)
+    private void Apply(KannadiConfig next, GameObject prefab, int ordinal, int rigCount)
     {
         bool wasSwarm = IsSwarm;
         config = next;
@@ -101,7 +167,23 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
         watchIndex = vr?.watchIndex;
         Vector3 position = (vr?.initialPosition ?? next.initialPosition)?.ToVector3() ?? transform.position;
         Quaternion rotation = Quaternion.Euler((vr?.initialRotation ?? next.initialRotation)?.ToVector3() ?? transform.eulerAngles);
-        if (next.randomInitialRotation && next.resetRotationOnStart)
+        if (!IsSwarm && next.mirrorSpawn != null)
+        {
+            bool random = next.mirrorSpawn.layout == SwarmSpawnType.Random;
+            if (next.resetPositionOnStart && vr?.initialPosition == null)
+            {
+                var center = next.initialPosition?.ToVector3() ?? new Vector3(0, position.y, 0);
+                position = random
+                    ? next.mirrorSpawn.Position(center, ordinal, rigCount, UnityEngine.Random.value, UnityEngine.Random.value)
+                    : next.mirrorSpawn.Position(center, ordinal, rigCount);
+            }
+            if (next.resetRotationOnStart && vr?.initialRotation == null)
+            {
+                float yaw = next.mirrorSpawn.Yaw(next.initialRotation?.y ?? 0, ordinal, rigCount, random ? UnityEngine.Random.value : 0);
+                rotation = Quaternion.Euler(rotation.eulerAngles.x, yaw, rotation.eulerAngles.z);
+            }
+        }
+        else if (next.randomInitialRotation && next.resetRotationOnStart)
             rotation = Quaternion.Euler(rotation.eulerAngles.x, next.SampleInitialYaw(UnityEngine.Random.value), rotation.eulerAngles.z);
         ClosedLoop closedLoop = GetComponent<ClosedLoop>();
         if (closedLoop != null)
@@ -137,9 +219,15 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             var logger = GetComponent<SwarmLogger>(); if (logger != null) logger.enabled = false;
             string key = JsonConvert.SerializeObject(new { numberOfRings, hexRadius, prefab = prefab.GetInstanceID(), next.animateOnMove,
                 next.animationSpeedThreshold, next.periodicBoundary, next.boundaryLengthX, next.boundaryLengthZ, next.useHeadingReference, watchIndex });
+            string appearanceKey = JsonConvert.SerializeObject(next.modelAppearance);
             if (!(initialized && !wasSwarm && !next.resetPositionOnStart && mirrorPopulationKey == key)) GenerateHexGrid();
+            else if (mirrorAppearanceKey != appearanceKey)
+            {
+                mirrorBatch?.Invalidate();
+                foreach (var clone in Clones) ModelAppearance.Apply(clone, next.modelAppearance);
+            }
+            mirrorAppearanceKey = appearanceKey;
             mirrorPopulationKey = key; swarmPopulationKey = null;
-            foreach (var clone in Clones) ModelAppearance.Apply(clone, next.modelAppearance);
         }
         initialized = true;
         var mirrorLogger = GetComponent<KannadiLogger>();
@@ -217,6 +305,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
                 Vector2 wrapSize = config.periodicBoundary ? new Vector2(MirrorBoundaryX, MirrorBoundaryZ) : Vector2.zero;
                 AnimateOnMove.ConfigureHierarchy(clone, transform, config.animateOnMove, config.animationSpeedThreshold, wrapSize);
                 clone.AddComponent<KannadiMirrorTile>().ConfigureAnimation(transform, config.animateOnMove, config.animationSpeedThreshold, wrapSize);
+                ModelAppearance.Apply(clone, config.modelAppearance);
                 copies.Add(clone); positions.Add(offset);
             }
         }
@@ -254,6 +343,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             transform.position = wrapped;
         }
         UpdateClones();
+        mirrorBatch?.RebuildIfPending();
     }
     private void UpdateClones()
     {
@@ -266,6 +356,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     }
     private void CleanupClones()
     {
+        if (Clones.Length != 0) mirrorBatch?.Invalidate();
         foreach (GameObject clone in Clones)
             if (clone != null) { clone.SetActive(false); Destroy(clone); }
         Clones = new GameObject[0]; offsets = new Vector3[0];

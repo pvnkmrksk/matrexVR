@@ -24,7 +24,7 @@ public static class Regression
         Directory.CreateDirectory(scratch);
         try
         {
-            Metadata(); Swarms(); Descriptions(); Documents(scratch); Schemas(args[0]);
+            Metadata(); Swarms(); MultiplayerSpawn(); Descriptions(); Documents(scratch); Schemas(args[0]);
             Console.WriteLine(JsonConvert.SerializeObject(new { checks = checks.Count, passed = checks }, Formatting.Indented));
             return 0;
         }
@@ -105,6 +105,29 @@ public static class Regression
         mixed.agentGroups[1].count = 0;
         Reject(mixed.ValidateSwarm, "Agent group counts must be positive");
     }
+    private static void MultiplayerSpawn()
+    {
+        var config = KannadiConfig.Load(new Dictionary<string, object> { [ExperimentPhases.PayloadKey] =
+            JObject.Parse(@"{'periodicBoundary':true,'boundaryLengthX':100,'boundaryLengthZ':60,
+                'mirrorSpawn':{'layout':'Grid','width':100,'depth':60}}") });
+        var center = new UnityEngine.Vector3(0, 3, 0);
+        var grid = Enumerable.Range(0, 16).Select(i => config.mirrorSpawn.Position(center, i, 16)).ToArray();
+        Check(grid.Select(point => (point.x, point.z)).Distinct().Count() == 16 && grid.All(point => point.y == 3) &&
+            grid[0].x == -37.5f && grid[0].z == -22.5f && grid[15].x == 37.5f && grid[15].z == 22.5f,
+            "Multiplayer grid places 16 tracked sources inside the arena without changing eye height");
+        Check(Enumerable.Range(0, 16).All(i => config.mirrorSpawn.Yaw(15, i, 16) == 15 + i * 22.5f),
+            "Multiplayer grid headings cover the circle evenly from the shared initial heading");
+        config.mirrorSpawn.layout = SwarmSpawnType.Random;
+        var random = config.mirrorSpawn.Position(center, 3, 16, .25f, .75f);
+        Check(random.x == -25 && random.y == 3 && random.z == 15 && config.mirrorSpawn.Yaw(15, 3, 16, .25f) == 105,
+            "Seeded samples map to the configured multiplayer spawn box and full heading range");
+        config.mirrorSpawn.width = 101;
+        Reject(config.Validate, "A multiplayer spawn area cannot exceed the periodic arena");
+        config.periodicBoundary = false;
+        config.Validate();
+        Check(new KannadiConfig().mirrorSpawn == null, "Omitting the multiplayer spawn layout keeps existing authored pose behavior");
+    }
+
     private static void Documents(string scratch)
     {
         string path = Path.Combine(scratch, "experiment.json");

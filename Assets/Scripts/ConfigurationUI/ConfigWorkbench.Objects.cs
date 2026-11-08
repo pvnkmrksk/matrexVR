@@ -69,7 +69,7 @@ namespace ConfigurationUI
         }
         private void BuildPopulationAppearance(VisualElement target,JObject payload,JObject schema,string[] prefix)
         {
-            bool mirror=schema["properties"]?["kannadiModelPath"]!=null&&!string.Equals((string)payload["populationMode"],"Swarm",StringComparison.OrdinalIgnoreCase);
+            bool mirror=selected.SchemaId=="kannadi"&&!string.Equals((string)payload["populationMode"],"Swarm",StringComparison.OrdinalIgnoreCase);
             if(!mirror && payload["swarm"] is JObject nested)
             {
                 payload=nested;
@@ -78,13 +78,13 @@ namespace ConfigurationUI
             }
             string file=mirror?"kannadiModelPath":"modelPath",builtin=mirror?"kannadiTilePrefab":"agentVisual";
             if(schema["properties"]?[file]==null&&schema["properties"]?[builtin]==null)return;
-            var heading=Row("section-heading");heading.Add(new WorkbenchIcon("object"));heading.Add(new Label("Population model"));target.Add(heading);
+            var heading=Row("section-heading");heading.Add(new WorkbenchIcon("object"));heading.Add(new Label(mirror?"Tracked animal model":"Generated swarm model"));target.Add(heading);
             var row=Row("object-visual-row");target.Add(row);var controls=new VisualElement();controls.AddToClassList("object-main-controls");row.Add(controls);
             buildingObjectCard=true;
             try
             {
                 foreach(string key in new[]{builtin,file,"modelAppearance"})if(schema["properties"]?[key]!=null)controls.Add(Setting(selected,prefix.Concat(new[]{key}).ToArray(),ConfigSchema.Child(schema,key),payload,schema));
-                if(schema["properties"]?["bogongVisual"]!=null)
+                if(!mirror && schema["properties"]?["bogongVisual"]!=null)
                 {var details=new Foldout{text="Bogong visual settings",value=false};details.AddToClassList("editor-disclosure");controls.Add(details);details.Add(Setting(selected,prefix.Concat(new[]{"bogongVisual"}).ToArray(),ConfigSchema.Child(schema,"bogongVisual"),payload,schema));}
             }
             finally{buildingObjectCard=false;}
