@@ -2,6 +2,10 @@
 
 [GitHub Releases](https://github.com/pvnkmrksk/matrexVR/releases) is the publication record. A local build or source change is not a published binary. The [website](https://pvnkmrksk.github.io/matrexVR/) discovers real uploaded ZIPs; it never constructs a download URL for an absent asset.
 
+## 0.4.3 — 1 m Kannadi swarms and experiment video controls
+
+The Linux x86-64 patch release adds a ready-to-load two-phase Kannadi sequence and a run-wide tracker video switch. It also includes worker population capture, the status-overlay timing fix, and the updated Full HD workbench. [GitHub release](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.4.3) · [Detailed release notes](release-notes-0.4.3.md)
+
 ## 0.4.2 — streamed swarm recording and parallel rendering
 
 The v0.4.2 desktop archive targets Linux x86-64. Its release manifest identifies the exact source, build, scenes, and bundled companions. [GitHub release and SHA-256 download](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.4.2) · [Detailed release notes](release-notes-0.4.2.md)
