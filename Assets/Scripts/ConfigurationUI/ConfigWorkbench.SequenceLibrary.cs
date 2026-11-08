@@ -15,6 +15,8 @@ namespace ConfigurationUI
             { Title=title;Reference=reference;Description=description; }
         }
         private static readonly SequenceStarter[] SequenceStarters = {
+            new SequenceStarter("Kannadi · entrainment then swarm","Examples/Sequences/kannadi-entrainment-swarm.sequence.json",
+                "120 seconds of ordered entrainment, then a 300-second grid swarm. Both use 64 locusts in a 1 m square."),
             new SequenceStarter("World examples · Flat world / open base","Examples/Worlds/flat-base.sequence.json",
                 "A large flat textured ground for open or desert-style experiments. Add objects, a sky and sunlight without rebuilding."),
             new SequenceStarter("World examples · Forest floor","Examples/Worlds/forest-floor.sequence.json",
@@ -38,7 +40,7 @@ namespace ConfigurationUI
             new SequenceStarter("Kannadi · tight stock and black swarms","Examples/Sequences/kannadi-tight-swarms.sequence.json",
                 "Two close-range 128-locust blocks. The second shows textured locusts on one side and black silhouettes on the other."),
             new SequenceStarter("Kannadi · centred stock swarms","Examples/Sequences/kannadi-centred-swarms.sequence.json",
-                "Two centred stock-locust blocks, with 64 and 206 agents per rig."),
+                "Two centred stock-locust blocks, with 64 and 206 agents in the same 1 m square."),
             new SequenceStarter("Social coupling · control","Examples/Sequences/social-coupling-control.sequence.json",
                 "The same linked Kannadi social scene without prior swarm entrainment.")
         };

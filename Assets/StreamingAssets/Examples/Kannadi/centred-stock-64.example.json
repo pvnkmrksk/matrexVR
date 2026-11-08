@@ -34,10 +34,10 @@
     "z": 0
   },
   "spawnType": "Grid",
-  "boundaryLengthX": 72,
-  "boundaryLengthZ": 72,
+  "boundaryLengthX": 100,
+  "boundaryLengthZ": 100,
   "periodicBoundary": true,
-  "farClipMetres": 0.6,
+  "farClipMetres": 0.8,
   "nearClipMetres": 0.002,
   "agentSpeed": 0.8,
   "directionDistribution": "Legacy",
@@ -47,8 +47,9 @@
   "animationSpeedThreshold": 0.5,
   "agentCount": 64,
   "spawnVolumeSize": {
-    "x": 68,
+    "x": 100,
     "y": 1,
-    "z": 68
-  }
+    "z": 100
+  },
+  "spawnAreaSize": 100
 }

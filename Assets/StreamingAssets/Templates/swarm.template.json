@@ -8,7 +8,7 @@
   },
   "numberOfLocusts": 64,
   "density": null,
-  "spawnAreaSize": 68,
+  "spawnAreaSize": 100,
   "spawnType": "Grid",
   "mu": 0,
   "kappa": 100000,
@@ -140,8 +140,8 @@
     "maskBelowHorizon": false,
     "imageWidth": 4096
   },
-  "boundaryLengthX": 72,
-  "boundaryLengthZ": 72,
+  "boundaryLengthX": 100,
+  "boundaryLengthZ": 100,
   "resetPositionOnStart": true,
   "resetRotationOnStart": true,
   "uniformSkyColor": null,
@@ -165,12 +165,12 @@
     "continuationSpeedMetresPerSecond": null,
     "preRollSeconds": 0
   },
-  "worldUnitsPerMetre": null,
+  "worldUnitsPerMetre": 100,
   "nearClipMetres": 0.002,
-  "farClipMetres": 0.6,
+  "farClipMetres": 0.8,
   "locustSpeedStdDev": 0,
-  "volumeHalfExtentMetres": null,
   "preserveBoundaryOvershoot": true,
   "headingReferenceId": "",
-  "directionDistribution": "Legacy"
+  "directionDistribution": "Legacy",
+  "periodicBoundary": true
 }

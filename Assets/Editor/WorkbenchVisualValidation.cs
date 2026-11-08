@@ -116,6 +116,7 @@ public static class WorkbenchVisualValidation
             ("Terrain · visible relief, flat navigation","Examples/Rugosity/sequence-treatment-visual-terrain_navigation-flat.json",4),
             ("Terrain · flat appearance, relief navigation","Examples/Rugosity/sequence-treatment-visual-flat_navigation-terrain.json",4),
             ("Terrain · matched flat","Examples/Rugosity/sequence-treatment-matched-flat.json",4),
+            ("Kannadi · entrainment then swarm","Examples/Sequences/kannadi-entrainment-swarm.sequence.json",1),
             ("Kannadi · entrainment then social coupling","Examples/Sequences/kannadi-entrainment-social.sequence.json",1),
             ("Kannadi · centred stock swarms","Examples/Sequences/kannadi-centred-swarms.sequence.json",2),
             ("Social coupling · control","Examples/Sequences/social-coupling-control.sequence.json",1)

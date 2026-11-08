@@ -1,0 +1,21 @@
+{
+  "title": "Entrainment then Kannadi swarm",
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "randomSeedMode": "Fixed",
+  "randomSeed": 4318,
+  "returnToSetup": true,
+  "sequences": [
+    {
+      "sceneName": "Kannadi",
+      "duration": 420,
+      "gain": 1,
+      "autoTrim": false,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Kannadi/entrainment-swarm.phases.json"
+      }
+    }
+  ]
+}

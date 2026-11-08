@@ -9,7 +9,7 @@
   "initialHeadingDistribution": "Cardinal",
   "initialPosition": {
     "x": 0,
-    "y": 1,
+    "y": 1.35,
     "z": 0
   },
   "initialRotation": {
@@ -22,7 +22,7 @@
       "vrIndex": 1,
       "initialPosition": {
         "x": 0,
-        "y": 1,
+        "y": 1.35,
         "z": 5
       },
       "initialRotation": {
@@ -35,7 +35,7 @@
       "vrIndex": 2,
       "initialPosition": {
         "x": 5,
-        "y": 1,
+        "y": 1.35,
         "z": 0
       },
       "initialRotation": {
@@ -48,7 +48,7 @@
       "vrIndex": 3,
       "initialPosition": {
         "x": 0,
-        "y": 1,
+        "y": 1.35,
         "z": -5
       },
       "initialRotation": {
@@ -61,7 +61,7 @@
       "vrIndex": 4,
       "initialPosition": {
         "x": -5,
-        "y": 1,
+        "y": 1.35,
         "z": 0
       },
       "initialRotation": {
@@ -82,8 +82,8 @@
   },
   "trajectoryFile": "",
   "worldUnitsPerMetre": 100,
-  "nearClipMetres": 0.001,
-  "agentCount": 256,
+  "nearClipMetres": 0.002,
+  "agentCount": 64,
   "agentSpeed": 2,
   "agentSpeedStdDev": 0,
   "spawnRelativeToAnimal": true,
@@ -93,15 +93,18 @@
     "y": 0,
     "z": 0
   },
-  "volumeHalfExtentMetres": 2,
   "dimension": "2D",
   "directionDistribution": "VonMises",
   "mu": 0,
   "kappa": 100,
   "preserveBoundaryOvershoot": true,
-  "boundaryLengthX": 400,
-  "boundaryLengthZ": 400,
+  "boundaryLengthX": 100,
+  "boundaryLengthZ": 100,
   "animateOnMove": true,
   "animationSpeedThreshold": 0.5,
-  "agentVisual": "ScenePrefab"
+  "agentVisual": "ScenePrefab",
+  "periodicBoundary": true,
+  "spawnAreaSize": 100,
+  "farClipMetres": 0.8,
+  "spawnType": "Random"
 }
