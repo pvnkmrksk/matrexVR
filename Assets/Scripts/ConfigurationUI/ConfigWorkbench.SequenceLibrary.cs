@@ -15,7 +15,9 @@ namespace ConfigurationUI
             { Title=title;Reference=reference;Description=description; }
         }
         private static readonly SequenceStarter[] SequenceStarters = {
-            new SequenceStarter("Kannadi · entrainment then swarm","Examples/Sequences/kannadi-entrainment-swarm.sequence.json",
+            new SequenceStarter("Kannadi · entrainment then multiplayer","Examples/Sequences/kannadi-entrainment-multiplayer.sequence.json",
+                "For 16 rigs. Each animal starts with 15 generated locusts, then sees the other 15 tracked animals. The visibility matrix starts with all peers on and self off."),
+            new SequenceStarter("Generated swarm · ordered then grid","Examples/Sequences/kannadi-entrainment-swarm.sequence.json",
                 "120 seconds of ordered entrainment, then a 300-second grid swarm. Both use 64 locusts in a 1 m square."),
             new SequenceStarter("World examples · Flat world / open base","Examples/Worlds/flat-base.sequence.json",
                 "A large flat textured ground for open or desert-style experiments. Add objects, a sky and sunlight without rebuilding."),
@@ -39,7 +41,7 @@ namespace ConfigurationUI
                 "One Kannadi experiment: 120 seconds of entrainment, then 300 seconds of social coupling. Phases stay together and retain tracked pose without reloading."),
             new SequenceStarter("Kannadi · tight stock and black swarms","Examples/Sequences/kannadi-tight-swarms.sequence.json",
                 "Two close-range 128-locust blocks. The second shows textured locusts on one side and black silhouettes on the other."),
-            new SequenceStarter("Kannadi · centred stock swarms","Examples/Sequences/kannadi-centred-swarms.sequence.json",
+            new SequenceStarter("Generated swarms · 64 and 206 locusts","Examples/Sequences/kannadi-centred-swarms.sequence.json",
                 "Two centred stock-locust blocks, with 64 and 206 agents in the same 1 m square."),
             new SequenceStarter("Social coupling · control","Examples/Sequences/social-coupling-control.sequence.json",
                 "The same linked Kannadi social scene without prior swarm entrainment.")

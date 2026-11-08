@@ -94,7 +94,11 @@ Current desktop source uses `RuntimePaths.ConfigRoot` and `RunDataRoot`: a writa
 
 ## Stable forms and edit-time previews
 
-For Kannadi groups, **Basics → Population and spawn** shows count, appearance, and X/Y/Z spawn offsets on each group card. **Advanced list** opens the same group data for detailed editing. **Load → Kannadi · centred stock swarms** opens repeatable 64- and 206-locust presets with a 1 m square spawn area and a matching 1 m square periodic arena. The camera is 1.6 cm above the planar spawn surface, and its far clip is 80 cm. **Load → Kannadi · entrainment then swarm** uses 64 locusts per square metre in both phases, preserves the tracked pose at the transition, and keeps the scene loaded. Existing experiment files retain their authored values.
+A generated swarm contains simulated agents, such as dots or animated locusts. Each observer can have its own population. **Basics → Population and spawn** exposes group counts, appearance and offsets. **Generated swarms · 64 and 206 locusts** opens two independent stock-locust examples in a 1 m square with matching periodic boundaries.
+
+Kannadi multiplayer renders the other tracked animals. The default visibility matrix enables all peer pairs and clears the diagonal so each animal's own body stays hidden. Each ring adds reflected copies that follow the tracked source. With zero rings there is one body per source, and with one ring there are seven.
+
+**Load → Kannadi · entrainment then multiplayer** is a matched 16-rig example. For 120 seconds each rig sees 15 generated locusts in its own 1 m arena. Then for 300 seconds each observer sees the other 15 tracked rigs. The transition keeps tracked position and heading. If you change the rig count, rings, or visibility, adjust the entrainment count to match the desired number of displayed peers.
 
 The experiment editor has four conceptual tabs: **Basics**, **Appearance**, **Motion** and **Advanced**. Basics keeps duration and tracking controls together. Appearance groups each object’s built-in choice or external **Custom GLB** path, color override and rendered preview; position, size, animation and surface details are explicit disclosures. Population GLBs use the same compact color controls, while procedural Bogong visuals retain their own appearance settings. Motion groups movement and optional pose/reset controls. Advanced holds visibility, tuning and complete parameter access. The editable human-readable title and relative JSON path share a compact header; the notes icon opens configuration comments.
 

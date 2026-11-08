@@ -1,5 +1,5 @@
 {
-  "title": "Entrainment then Kannadi swarm",
+  "title": "Generated swarm · ordered then grid",
   "comments": "Ordered headings for 120 seconds, then an evenly spaced swarm with evenly distributed headings for 300 seconds. Both use 64 locusts per square metre. The animal keeps its tracked pose at the changeover.",
   "preStimulus": {
     "closedLoopPosition": 1,

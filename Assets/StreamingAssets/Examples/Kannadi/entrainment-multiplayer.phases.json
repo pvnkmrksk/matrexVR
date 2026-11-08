@@ -1,0 +1,318 @@
+{
+  "title": "Entrainment then Kannadi multiplayer · 16 rigs",
+  "comments": "Each rig starts in an independent arena with 15 generated locusts. The multiplayer phase retains the tracked poses and shows the other 15 rigs. Increase rings to show additional copies that follow each tracked peer.",
+  "preStimulus": {
+    "closedLoopPosition": 1,
+    "closedLoopOrientation": 1,
+    "autopilotEnabled": false,
+    "autopilotSpeed": 2,
+    "resetPositionOnStart": true,
+    "resetRotationOnStart": true,
+    "randomInitialRotation": true,
+    "initialHeadingDistribution": "Cardinal",
+    "initialPosition": {
+      "x": 0,
+      "y": 1.35,
+      "z": 0
+    },
+    "initialRotation": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "vrConfigs": [
+      {
+        "vrIndex": 1,
+        "initialPosition": {
+          "x": -33,
+          "y": 1.35,
+          "z": -33
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 2,
+        "initialPosition": {
+          "x": -11,
+          "y": 1.35,
+          "z": -33
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 90,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 3,
+        "initialPosition": {
+          "x": 11,
+          "y": 1.35,
+          "z": -33
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 180,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 4,
+        "initialPosition": {
+          "x": 33,
+          "y": 1.35,
+          "z": -33
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 270,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 5,
+        "initialPosition": {
+          "x": -33,
+          "y": 1.35,
+          "z": -11
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 6,
+        "initialPosition": {
+          "x": -11,
+          "y": 1.35,
+          "z": -11
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 90,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 7,
+        "initialPosition": {
+          "x": 11,
+          "y": 1.35,
+          "z": -11
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 180,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 8,
+        "initialPosition": {
+          "x": 33,
+          "y": 1.35,
+          "z": -11
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 270,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 9,
+        "initialPosition": {
+          "x": -33,
+          "y": 1.35,
+          "z": 11
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 10,
+        "initialPosition": {
+          "x": -11,
+          "y": 1.35,
+          "z": 11
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 90,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 11,
+        "initialPosition": {
+          "x": 11,
+          "y": 1.35,
+          "z": 11
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 180,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 12,
+        "initialPosition": {
+          "x": 33,
+          "y": 1.35,
+          "z": 11
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 270,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 13,
+        "initialPosition": {
+          "x": -33,
+          "y": 1.35,
+          "z": 33
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 14,
+        "initialPosition": {
+          "x": -11,
+          "y": 1.35,
+          "z": 33
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 90,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 15,
+        "initialPosition": {
+          "x": 11,
+          "y": 1.35,
+          "z": 33
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 180,
+          "z": 0
+        }
+      },
+      {
+        "vrIndex": 16,
+        "initialPosition": {
+          "x": 33,
+          "y": 1.35,
+          "z": 33
+        },
+        "initialRotation": {
+          "x": 0,
+          "y": 270,
+          "z": 0
+        }
+      }
+    ],
+    "uniformSkyColor": {
+      "r": 0.65,
+      "g": 0.65,
+      "b": 0.65,
+      "a": 1
+    },
+    "nightSky": {
+      "enabled": false
+    },
+    "trajectoryFile": "",
+    "worldUnitsPerMetre": 100,
+    "nearClipMetres": 0.002,
+    "agentCount": 15,
+    "agentSpeed": 2,
+    "agentSpeedStdDev": 0,
+    "spawnRelativeToAnimal": true,
+    "followAnimalPosition": true,
+    "spawnCenter": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "dimension": "2D",
+    "directionDistribution": "VonMises",
+    "mu": 0,
+    "kappa": 100,
+    "preserveBoundaryOvershoot": true,
+    "boundaryLengthX": 100,
+    "boundaryLengthZ": 100,
+    "animateOnMove": true,
+    "animationSpeedThreshold": 0.5,
+    "agentVisual": "ScenePrefab",
+    "enabled": true,
+    "durationSeconds": 120,
+    "populationMode": "Swarm",
+    "periodicBoundary": true,
+    "spawnAreaSize": 100,
+    "farClipMetres": 0.8,
+    "spawnType": "Random"
+  },
+  "stimulus": {
+    "enabled": true,
+    "durationSeconds": 300,
+    "populationMode": "Mirror",
+    "numberOfRings": 0,
+    "hexRadius": 10,
+    "kannadiTilePrefab": "SimulatedLocust",
+    "worldUnitsPerMetre": 100,
+    "closedLoopPosition": 1,
+    "closedLoopOrientation": 1,
+    "resetPositionOnStart": false,
+    "resetRotationOnStart": false,
+    "animateOnMove": true,
+    "animationSpeedThreshold": 0.5,
+    "periodicBoundary": true,
+    "boundaryLengthX": 100,
+    "boundaryLengthZ": 100,
+    "uniformSkyColor": {
+      "r": 0.65,
+      "g": 0.65,
+      "b": 0.65,
+      "a": 1
+    },
+    "visibilityMatrix": {
+      "enabled": true,
+      "rows": [
+        [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
+        [true, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
+        [true, true, false, true, true, true, true, true, true, true, true, true, true, true, true, true],
+        [true, true, true, false, true, true, true, true, true, true, true, true, true, true, true, true],
+        [true, true, true, true, false, true, true, true, true, true, true, true, true, true, true, true],
+        [true, true, true, true, true, false, true, true, true, true, true, true, true, true, true, true],
+        [true, true, true, true, true, true, false, true, true, true, true, true, true, true, true, true],
+        [true, true, true, true, true, true, true, false, true, true, true, true, true, true, true, true],
+        [true, true, true, true, true, true, true, true, false, true, true, true, true, true, true, true],
+        [true, true, true, true, true, true, true, true, true, false, true, true, true, true, true, true],
+        [true, true, true, true, true, true, true, true, true, true, false, true, true, true, true, true],
+        [true, true, true, true, true, true, true, true, true, true, true, false, true, true, true, true],
+        [true, true, true, true, true, true, true, true, true, true, true, true, false, true, true, true],
+        [true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, true],
+        [true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true],
+        [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false]
+      ]
+    }
+  }
+}
