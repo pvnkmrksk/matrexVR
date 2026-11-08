@@ -34,33 +34,33 @@
       }
     },
     "hejjetrac": {
-      "repository": "https://github.com/pvnkmrksk/hejjetrak",
-      "releaseTag": "v0.1.4",
-      "releaseUrl": "https://github.com/pvnkmrksk/hejjetrak/releases/tag/v0.1.4",
+      "repository": "https://github.com/pvnkmrksk/hejjetrac",
+      "releaseTag": "v0.5.0",
+      "releaseUrl": "https://github.com/pvnkmrksk/hejjetrac/releases/tag/v0.5.0",
       "platforms": {
         "macos-arm64": {
           "asset": "hejjetrac-macos-arm64.zip",
-          "url": "https://github.com/pvnkmrksk/hejjetrak/releases/download/v0.1.4/hejjetrac-macos-arm64.zip",
-          "sha256": "ea22e1f7d4081475d7b6349518423dccdda14117fc55bea89a755f61b43b6692",
-          "sizeBytes": 21963615
+          "url": "https://github.com/pvnkmrksk/hejjetrac/releases/download/v0.5.0/hejjetrac-macos-arm64.zip",
+          "sha256": "532cc848762a6bd4a7d1489bff2dcc892dd5cb1781ada5e04d3ba74b90ed92ed",
+          "sizeBytes": 37715325
         },
         "macos-x64": {
           "asset": "hejjetrac-macos-x86_64.zip",
-          "url": "https://github.com/pvnkmrksk/hejjetrak/releases/download/v0.1.4/hejjetrac-macos-x86_64.zip",
-          "sha256": "1a63a88cb0e2e9962bbc136e1bd1743da1e2e36a04fc0abbdff03e6081be66d2",
-          "sizeBytes": 22812679
+          "url": "https://github.com/pvnkmrksk/hejjetrac/releases/download/v0.5.0/hejjetrac-macos-x86_64.zip",
+          "sha256": "bd962ae5ed3f5bd1b4eb788cff3eec31570fac71bbc21ed7b8d0a3e114cabedf",
+          "sizeBytes": 38586441
         },
         "windows-x64": {
           "asset": "hejjetrac-windows-amd64.zip",
-          "url": "https://github.com/pvnkmrksk/hejjetrak/releases/download/v0.1.4/hejjetrac-windows-amd64.zip",
-          "sha256": "36078bcd19d9bcc4619e43dd9148987715f7acb0f310754c5d293722f7fe574a",
-          "sizeBytes": 32500293
+          "url": "https://github.com/pvnkmrksk/hejjetrac/releases/download/v0.5.0/hejjetrac-windows-amd64.zip",
+          "sha256": "ec687dc19e3b1ec87222647280ad4a2c348ecb5d0e38214c139fb1516ada4bff",
+          "sizeBytes": 37814540
         },
         "linux-x64": {
           "asset": "hejjetrac-linux-x86_64.tar.gz",
-          "url": "https://github.com/pvnkmrksk/hejjetrak/releases/download/v0.1.4/hejjetrac-linux-x86_64.tar.gz",
-          "sha256": "98658a477920926f781d4f1704426515b50ac397681cc07fad3a6819bab6afaf",
-          "sizeBytes": 23280186
+          "url": "https://github.com/pvnkmrksk/hejjetrac/releases/download/v0.5.0/hejjetrac-linux-x86_64.tar.gz",
+          "sha256": "fab1e6e51e39de07dcee367c35832722dc0b0ad8559e34a77bf5d93522605c96",
+          "sizeBytes": 38349016
         }
       }
     }
