@@ -310,6 +310,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             }
         }
         Clones = copies.ToArray(); offsets = positions.ToArray();
+        mirrorBatch?.Invalidate();
         UpdateClones();
     }
 
