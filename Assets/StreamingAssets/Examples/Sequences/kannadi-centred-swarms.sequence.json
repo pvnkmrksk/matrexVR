@@ -1,0 +1,25 @@
+{
+  "title": "Inside a Kannadi swarm",
+  "autoStart": false,
+  "loop": false,
+  "randomSeedMode": "Fixed",
+  "randomSeed": 4318,
+  "sequences": [
+    {
+      "sceneName": "Kannadi",
+      "duration": 90,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Kannadi/centred-stock-64.example.json"
+      }
+    },
+    {
+      "sceneName": "Kannadi",
+      "duration": 90,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Kannadi/centred-stock-206.example.json"
+      }
+    }
+  ]
+}

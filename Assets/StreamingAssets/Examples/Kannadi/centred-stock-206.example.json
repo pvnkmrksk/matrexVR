@@ -1,0 +1,54 @@
+{
+  "title": "Inside a swarm · 206 stock locusts",
+  "populationMode": "Swarm",
+  "kannadiTilePrefab": "SimulatedLocust",
+  "worldUnitsPerMetre": 100,
+  "initialPosition": {
+    "x": 0,
+    "y": 1.35,
+    "z": 0
+  },
+  "initialRotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "closedLoopPosition": 0,
+  "closedLoopOrientation": 0,
+  "uniformSkyColor": {
+    "r": 0.65,
+    "g": 0.65,
+    "b": 0.65,
+    "a": 1
+  },
+  "backgroundColor": {
+    "r": 0.65,
+    "g": 0.65,
+    "b": 0.65,
+    "a": 1
+  },
+  "spawnRelativeToAnimal": true,
+  "spawnCenter": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "spawnType": "Grid",
+  "boundaryLengthX": 72,
+  "boundaryLengthZ": 72,
+  "periodicBoundary": true,
+  "farClipMetres": 0.6,
+  "nearClipMetres": 0.002,
+  "agentSpeed": 0.8,
+  "directionDistribution": "Legacy",
+  "mu": 90,
+  "kappa": 10000,
+  "animateOnMove": true,
+  "animationSpeedThreshold": 0.5,
+  "agentCount": 206,
+  "spawnVolumeSize": {
+    "x": 68,
+    "y": 1,
+    "z": 68
+  }
+}

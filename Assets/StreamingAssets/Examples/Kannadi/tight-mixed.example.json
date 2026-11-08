@@ -1,11 +1,11 @@
 {
-  "title": "Close range · stock and black locusts",
+  "title": "Close range \u00b7 stock and black locusts",
   "populationMode": "Swarm",
   "kannadiTilePrefab": "SimulatedLocust",
   "worldUnitsPerMetre": 100,
   "initialPosition": {
     "x": 0,
-    "y": 2.6,
+    "y": 1.35,
     "z": 0
   },
   "initialRotation": {
@@ -30,7 +30,7 @@
   "spawnRelativeToAnimal": true,
   "spawnCenter": {
     "x": 0,
-    "y": -1.6,
+    "y": 0,
     "z": 18
   },
   "spawnType": "Random",
