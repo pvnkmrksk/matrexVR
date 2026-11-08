@@ -190,5 +190,74 @@
     "videoClips": 1,
     "trackingStillAvailable": true,
     "discoveredFromPath": true
+  },
+  "generated64": {
+    "configuration": "16 private swarms of 64 stock locusts each in 1 m square, 64 cameras, synthetic FT25 walking input, 60 FPS software cap, VR and population recording on",
+    "seconds": 70.00675006200001,
+    "frames": 4195,
+    "fps": 59.938147239450345,
+    "frameMs": {
+      "samples": 4195,
+      "mean": 16.683865719189527,
+      "minimum": 8.994782000000257,
+      "median": 16.676306999997337,
+      "p95": 17.117491999997014,
+      "p99": 18.896055999999106,
+      "maximum": 20.124281000001076,
+      "standardDeviation": 0.4679676074546844
+    },
+    "framesAbove20Ms": 1,
+    "framesAbove33_33Ms": 0,
+    "cpuMainMs": {
+      "samples": 4195,
+      "mean": 4.492386232419548,
+      "minimum": 3.533024,
+      "median": 3.964189,
+      "p95": 6.113075,
+      "p99": 7.311538,
+      "maximum": 13.304272,
+      "standardDeviation": 0.944776307504032
+    },
+    "gpuMs": {
+      "samples": 4195,
+      "mean": 4.859010288438629,
+      "minimum": 2.8416,
+      "median": 4.893952,
+      "p95": 4.977152,
+      "p99": 4.997632,
+      "maximum": 6.40896,
+      "standardDeviation": 0.22492078548228242
+    },
+    "peakProcessCpuPercentOfMachine": 6.236,
+    "peakMainCpuPercentOfCore": 44.892,
+    "processCpuPercentOfOneCore": 177.8971311904977,
+    "finalizationSeconds": 1.4296997019999935,
+    "cachedAnimationGroups": 16,
+    "cachedAnimationAgents": 1024,
+    "populationLoggerDrops": 0
+  },
+  "nativeTrackers": {
+    "hejjetrac": {
+      "acknowledged": true,
+      "stoppedOwnedTake": true,
+      "nativeFrames": 16,
+      "archiveState": "finalized",
+      "videoClips": 1,
+      "trackingStillAvailable": true,
+      "discoveredFromPath": true,
+      "version": "0.5.2",
+      "packagedNativeExecutable": true
+    },
+    "rekkefly": {
+      "acknowledged": true,
+      "stoppedOwnedTake": true,
+      "nativeFrames": 85,
+      "archiveState": "finalized",
+      "videoClips": 1,
+      "trackingStillAvailable": true,
+      "discoveredFromPath": true,
+      "version": "0.6.3",
+      "packagedNativeExecutable": false
+    }
   }
 }
