@@ -1,0 +1,194 @@
+{
+  "sourceRevision": "897e206ebe71ac33e153d1362c1319c75b757b7b",
+  "build": "MATREX VR 0.4.4 Linux x86-64",
+  "scene": "Kannadi",
+  "input": "16 independent synthetic FicTrac FT25 publishers at approximately 50 Hz",
+  "parallelBenchmarks": false,
+  "configuration": "16 rigs, 64 128x128 cameras, zero rings, 1m periodic square, VR and mirror logs enabled, tracker video off for timing",
+  "host": {
+    "os": "Linux 6.8 Ubuntu 22.04 64bit",
+    "cpu": "13th Gen Intel(R) Core(TM) i9-13900K",
+    "gpu": "NVIDIA GeForce RTX 4070",
+    "graphicsApi": "Vulkan",
+    "jobWorkers": 31
+  },
+  "seconds": 70.01158952200001,
+  "frames": 4196,
+  "fps": 59.94714285658987,
+  "frameMs": {
+    "samples": 4196,
+    "mean": 16.681362152526205,
+    "minimum": 13.632757000003437,
+    "median": 16.6667609999962,
+    "p95": 17.059897000002877,
+    "p99": 17.683819000005485,
+    "maximum": 19.86364899998705,
+    "standardDeviation": 0.3946233395006636
+  },
+  "cpuMainMs": {
+    "samples": 4196,
+    "mean": 2.9954423984747316,
+    "minimum": 2.470176,
+    "median": 2.760325,
+    "p95": 4.357852,
+    "p99": 5.004137,
+    "maximum": 6.375402,
+    "standardDeviation": 0.5809364191242561
+  },
+  "cpuRenderMs": {
+    "samples": 4196,
+    "mean": 1.610304985700666,
+    "minimum": 0.588844,
+    "median": 1.557688,
+    "p95": 2.455288,
+    "p99": 2.993867,
+    "maximum": 3.210653,
+    "standardDeviation": 0.39175493925677296
+  },
+  "gpuMs": {
+    "samples": 4196,
+    "mean": 4.5270547035271544,
+    "minimum": 2.601216,
+    "median": 4.557056,
+    "p95": 4.59904,
+    "p99": 4.616192,
+    "maximum": 12.79232,
+    "standardDeviation": 0.30759781749607323
+  },
+  "framesAbove20Ms": 0,
+  "processCpuPercentOfOneCore": 149.6323690338167,
+  "peakProcessCpuPercentOfMachine": 5.146,
+  "peakMainCpuPercentOfCore": 34.937,
+  "finalizationSeconds": 1.3954733540000035,
+  "trackedSequences": [
+    3723,
+    3723,
+    3723,
+    3723,
+    3723,
+    3723,
+    3723,
+    3723,
+    3723,
+    3723,
+    3723,
+    3723,
+    3723,
+    3723,
+    3723,
+    3723
+  ],
+  "mirrorRecording": [
+    {
+      "name": "VR6 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR4 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR11 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR7 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR12 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR1 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR9 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR5 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR16 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR14 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR13 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR15 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR3 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR10 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR8 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    },
+    {
+      "name": "VR2 Kannadi",
+      "PendingFrames": 0,
+      "DroppedFrames": 0,
+      "Failure": null
+    }
+  ],
+  "visibility": {
+    "VR1ChangedPixels": 119,
+    "VR2ChangedPixels": 0,
+    "VR1PeerCountBefore": 15,
+    "VR1PeerCountAfter": 0
+  },
+  "nativeSample": {
+    "acknowledged": true,
+    "stoppedOwnedTake": true,
+    "nativeFrames": 16,
+    "archiveState": "finalized",
+    "videoClips": 1,
+    "trackingStillAvailable": true,
+    "discoveredFromPath": true
+  }
+}

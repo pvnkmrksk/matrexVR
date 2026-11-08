@@ -1,0 +1,14 @@
+# MATREX VR 0.4.4 for Linux x86-64
+
+- Install HejjéTrac or Rekkefly from its own project. MATREX Setup discovers a local launcher in standard OS locations or on `PATH`. When discovery leaves the launcher field empty, use **Browse** to select the executable or macOS app. Select each rig’s calibration separately. The Linux archive includes Daari Deepa. [HejjéTrac releases](https://github.com/pvnkmrksk/hejjetrac/releases) · [Rekkefly releases](https://github.com/pvnkmrksk/rekkefly/releases)
+- The **Kannadi · entrainment then multiplayer** starter gives each of 16 rigs 15 generated locusts in a private 1 m square for 120 seconds. It then keeps the tracked poses and shows the other 15 rigs for 300 seconds. The visibility matrix starts with self hidden and all peers visible. The separate **Generated swarms · 64 and 206 locusts** example remains available.
+- Configure tracked start poses with a grid, random placement, or explicit per-rig poses. Zero rings shows one body per visible peer. One ring shows up to seven bodies for each peer, including its central body. Compatible stock bodies automatically share the batched renderer and retain each observer’s visibility rules. Generated swarms and multiplayer are separate phase modes.
+- Automatic tracker video uses the installed native recording endpoint. MATREX checks for the mailbox options at launch and verifies the endpoint before requesting video. Manual recording and pose logging remain available independently.
+
+## Linux verification
+
+- The packaged player retained all 16 poses at the phase change, batched 16 stock bodies at zero rings and 112 at one ring, and finalized the run archive. Clearing VR1’s visibility row changed 119 pixels of its 512 × 128 view and zero pixels of VR2’s view.
+- With 16 synthetic walking publishers, 64 cameras, full VR logging and a 60 FPS cap, the player averaged **59.95 FPS** over 70 seconds. Frame intervals were **16.67 ms median, 17.68 ms p99 and 19.86 ms maximum**. None exceeded 20 ms. All 16 mirror recorders reported zero drops. Run finalization took 1.40 seconds.
+- A Linux player run discovered HejjéTrac on `PATH`, acknowledged a take from prerecorded walking input, received the exact owned Stop receipt, archived one clip and left tracking running. Native camera hardware, LED scanout and MATREX desktop behavior on macOS and Windows require their own tests.
+
+[Configuration guide](https://github.com/pvnkmrksk/matrexVR/blob/main/docs/configuration-ui.md) · [Validation data](https://github.com/pvnkmrksk/matrexVR/blob/main/docs/kannadi-multiplayer-validation.json)
