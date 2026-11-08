@@ -125,5 +125,10 @@
   },
   "saveSwarmData": true,
   "targetFrameRate": 60,
-  "vSyncCount": 0
+  "vSyncCount": 0,
+  "stimulusResolution": {
+    "mode": "1920x1080",
+    "width": 1920,
+    "height": 1080
+  }
 }

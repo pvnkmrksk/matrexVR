@@ -36,10 +36,10 @@ namespace ConfigurationUI
                     if(skin!=null)
                     {
                         var clone=to.AddComponent<SkinnedMeshRenderer>();CopyRenderer(skin,clone);
-                        clone.sharedMesh=skin.sharedMesh;clone.localBounds=skin.localBounds;clone.quality=skin.quality;
-                        clone.updateWhenOffscreen=true;
                         clone.bones=skin.bones.Select(bone=>bone!=null&&map.TryGetValue(bone,out var value)?value:null).ToArray();
                         clone.rootBone=skin.rootBone!=null&&map.TryGetValue(skin.rootBone,out var rootBone)?rootBone:null;
+                        clone.sharedMesh=skin.sharedMesh;clone.localBounds=skin.localBounds;clone.quality=skin.quality;
+                        clone.updateWhenOffscreen=true;
                         for(int i=0;i<(skin.sharedMesh?.blendShapeCount??0);i++)clone.SetBlendShapeWeight(i,skin.GetBlendShapeWeight(i));
                     }
                 }

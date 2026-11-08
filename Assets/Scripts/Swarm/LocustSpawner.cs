@@ -71,6 +71,7 @@ public class LocustSpawner : MonoBehaviour
     public int SpawnRevision { get; private set; }
     private bool initialized;
     private GameObject batchedVisual;
+    private Material sharedAppearance;
     private readonly System.Collections.Generic.List<GameObject> nativeBatches = new System.Collections.Generic.List<GameObject>();
     [System.NonSerialized] public SwarmAgentGroupConfig[] agentGroups;
     [System.NonSerialized] public string trajectoryFile;
@@ -178,6 +179,8 @@ public class LocustSpawner : MonoBehaviour
         foreach (GameObject locust in spawned)
             if (locust != null) { locust.SetActive(false); Release(locust); }
         spawned.Clear();
+        ModelAppearance.ReleaseMaterial(sharedAppearance);
+        sharedAppearance = null;
         SpawnRevision++;
     }
     private void OnDestroy()
@@ -207,12 +210,21 @@ public class LocustSpawner : MonoBehaviour
         Vector3 size = useSpawnVolume ? spawnVolumeSize : Vector3.one * spawnAreaSize;
         BoundaryManager bounds = periodicBoundary ? boundaryManager : null;
         Vector2 wrap = bounds != null ? new Vector2(bounds.LengthX, bounds.LengthZ) : Vector2.zero;
-        int groups = agentGroups?.Length ?? 1;
+        bool hasAgentGroups = agentGroups?.Length > 0;
+        int groups = hasAgentGroups ? agentGroups.Length : 1;
         bool bogong = UsesBogongVisual();
+        Material sourceAppearance = null;
+        bool resolvedSharedAppearance = false;
         for (int groupIndex = 0; groupIndex < groups; groupIndex++)
         {
-            var group = agentGroups?[groupIndex];
+            var group = hasAgentGroups ? agentGroups[groupIndex] : null;
             int count = group?.count ?? numberOfLocusts;
+            bool black = group?.appearance == SwarmAgentAppearance.Black;
+            if (!bogong && !black && count > 0 && !resolvedSharedAppearance)
+            {
+                sharedAppearance = StockLocustAppearance.TryCreateSharedVariant(locustPrefab, modelAppearance, out sourceAppearance);
+                resolvedSharedAppearance = true;
+            }
             Vector3 groupCenter = center + spawnRotation * (group?.spawnOffset?.ToVector3() ?? Vector3.zero);
             var groupAgents = new GameObject[count];
             var phases = new float[count];
@@ -235,8 +247,9 @@ public class LocustSpawner : MonoBehaviour
                 }
                 spawned.Add(locust);
                 groupAgents[i] = locust;
-                if (!bogong) ModelAppearance.Apply(locust, modelAppearance);
-                if (group?.appearance == SwarmAgentAppearance.Black) StockLocustAppearance.ApplyBlack(locust);
+                if (black) StockLocustAppearance.ApplyBlack(locust);
+                else if (!bogong && !StockLocustAppearance.ApplySharedVariant(locust, sourceAppearance, sharedAppearance))
+                    ModelAppearance.Apply(locust, modelAppearance);
                 locust.layer = locustLayer;
                 SetLayerRecursively(locust.transform, locustLayer);
                 locust.transform.localRotation = grid

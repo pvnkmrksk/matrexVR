@@ -135,7 +135,7 @@ namespace ConfigurationUI
                             }
                         }
                     }
-                    CheckFiles(json,"$",errors,label,true);
+                    CheckFiles(json,"$",errors,label,true,doc.SchemaId=="sequence");
                 }
                 catch(Exception e) { errors.Add(label+": "+e.GetBaseException().Message); }
                 if(doc.Conflict) errors.Add(label+": external edit conflict.");
@@ -226,7 +226,7 @@ namespace ConfigurationUI
                 }
             }
         }
-        private static void CheckFiles(JToken token,string path,List<string> errors,string label,bool enabled)
+        private static void CheckFiles(JToken token,string path,List<string> errors,string label,bool enabled,bool sequenceDocument)
         {
             if(token is JObject obj)
             {
@@ -234,10 +234,19 @@ namespace ConfigurationUI
                 foreach(var p in obj.Properties())
                 {
                     if(enabled && new[]{"trajectoryFile","skyboxPath"}.Contains(p.Name) && p.Value.Type==JTokenType.String && !string.IsNullOrWhiteSpace((string)p.Value) && !File.Exists(ExperimentConfigFiles.Resolve((string)p.Value))) errors.Add(label+": "+path+"."+p.Name+" file does not exist.");
-                    CheckFiles(p.Value,path+"."+p.Name,errors,label,enabled);
+                    if (enabled && ModelTextureLibrary.IsAppearance(p.Name) && p.Value is JObject appearance)
+                    {
+                        var settings = appearance.ToObject<ModelAppearanceConfig>();
+                        if (sequenceDocument) settings.ValidateTextureVariants();
+                        else settings.Validate();
+                        foreach (var variant in settings.textureVariants ?? Array.Empty<ModelTextureVariantConfig>())
+                            if (!File.Exists(ExperimentConfigFiles.Resolve(variant.texturePath)))
+                                errors.Add(label + ": texture variant '" + variant.name + "' file does not exist.");
+                    }
+                    CheckFiles(p.Value,path+"."+p.Name,errors,label,enabled,sequenceDocument);
                 }
             }
-            else if(token is JArray array) foreach(var value in array) CheckFiles(value,path+"[]",errors,label,enabled);
+            else if(token is JArray array) foreach(var value in array) CheckFiles(value,path+"[]",errors,label,enabled,sequenceDocument);
         }
         public void SaveAll()
         {

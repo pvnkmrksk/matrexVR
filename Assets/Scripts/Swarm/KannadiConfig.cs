@@ -54,17 +54,7 @@ public class KannadiConfig : SwarmConfig
             json = ExperimentPhases.Read(parameters);
         else if (parameters != null && parameters.TryGetValue("configFile", out object file))
             json = JObject.Parse(ExperimentConfigFiles.ReadAllText(file.ToString()));
-        // Inline sequence parameters override the referenced experiment file.
-        if (parameters != null && !ExperimentPhases.IsPhase(parameters))
-        {
-            JObject inline = JObject.FromObject(parameters);
-            // Autopilot belongs to the referenced individual config file;
-            // sequence-level duplicates cannot override it.
-            inline.Remove("autopilotEnabled");
-            inline.Remove("autopilotSpeed");
-            inline.Remove("headingReference"); // Experiment-file only; never a sequence override.
-            json.Merge(inline, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace });
-        }
+        MergeInline(json, parameters);
         if (ExperimentPhases.IsPhase(parameters))
             foreach (string key in new[] { "populationMode", "worldUnitsPerMetre" })
                 if (json[key] == null && parameters.TryGetValue(key, out object value)) json[key] = JToken.FromObject(value);
@@ -89,6 +79,18 @@ public class KannadiConfig : SwarmConfig
         config.SwarmEnabled = swarmEnabled;
         config.Validate();
         return config;
+    }
+
+    // Replay uses the same merge before reconstructing the configured Kannadi visuals.
+    internal static void MergeInline(JObject json, Dictionary<string, object> parameters)
+    {
+        if (parameters == null || ExperimentPhases.IsPhase(parameters)) return;
+        JObject inline = JObject.FromObject(parameters);
+        // These settings belong to the experiment file.
+        inline.Remove("autopilotEnabled");
+        inline.Remove("autopilotSpeed");
+        inline.Remove("headingReference");
+        json.Merge(inline, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Replace });
     }
 
     public void Validate()
@@ -341,7 +343,8 @@ public class SwarmConfig
         if (HasAgentGroups)
         {
             if (!string.IsNullOrWhiteSpace(trajectoryFile) || !string.IsNullOrWhiteSpace(modelPath) ||
-                !string.Equals(agentVisual, "ScenePrefab", StringComparison.OrdinalIgnoreCase) || modelAppearance?.enabled == true)
+                !string.Equals(agentVisual, "ScenePrefab", StringComparison.OrdinalIgnoreCase) ||
+                modelAppearance?.enabled == true)
                 throw new ArgumentException("agentGroups require generated stock locusts and supply their own appearances.");
             long total = 0;
             foreach (var group in agentGroups)

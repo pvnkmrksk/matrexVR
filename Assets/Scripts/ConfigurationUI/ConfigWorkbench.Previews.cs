@@ -18,7 +18,7 @@ namespace ConfigurationUI
             if(!new[]{"type","material","modelPath","kannadiModelPath","kannadiTilePrefab","agentVisual"}.Contains(key))return;
             if((key=="type"||key=="material")&&!ChoiceAssetCatalog.IsObjectField(path))return;
             string scene=key=="kannadiTilePrefab"||key=="agentVisual"||key=="kannadiModelPath"?"Kannadi":ChoiceCatalogScene();
-            if(key=="modelPath"&&selected.SchemaId=="swarm")scene="Kannadi";
+            if(key=="modelPath"&&!path.Contains("objects")&&(document.SchemaId=="swarm"||document.SchemaId=="kannadi"||path.Contains("swarm")))scene="Kannadi";
             JObject Owner()=>ConfigDocument.At(document.Root,path.Take(path.Length-1).ToArray()) as JObject??new JObject();
             var pane=new EditPreviewPane(false,()=>new JObject{["value"]=ConfigDocument.At(document.Root,path)?.DeepClone(),["model"]=Owner()["modelPath"]?.DeepClone(),["agentVisual"]=Owner()["agentVisual"]?.DeepClone(),["tile"]=Owner()["kannadiTilePrefab"]?.DeepClone(),["material"]=Owner()["material"]?.DeepClone(),["clip"]=Owner()["animationClip"]?.DeepClone(),["appearance"]=(Owner()["appearance"]??Owner()["modelAppearance"])?.DeepClone()}.ToString(Formatting.None),async cancellation=>{
                 var owner=(JObject)Owner().DeepClone();string value=ConfigDocument.At(document.Root,path)?.ToString()??"";
@@ -90,10 +90,11 @@ namespace ConfigurationUI
             public EditPreviewPane(bool sky,Func<string> fingerprint,Func<CancellationToken,Task<Texture2D>> render)
             {
                 this.fingerprint=fingerprint;this.render=render;AddToClassList("edit-rendered-preview");
+                EnableInClassList("edit-sky-preview",sky);
                 image=new Image{scaleMode=ScaleMode.ScaleToFit};image.AddToClassList("edit-preview-image");Add(image);
                 caption=new Label("Preparing preview…");caption.AddToClassList("edit-preview-caption");Add(caption);
-                readyCaption=sky?"Sky preview · Unity +Z, 256 px":"Object preview · rendered sample";
-                tooltip=sky?"Rendered only while editing. The camera looks along Unity +Z. The experiment uses the full panorama at its configured resolution.":"A visual-only copy of the selected mesh and materials. Experiment scripts, tracking and recording never run in a thumbnail.";
+                readyCaption=sky?"Sky preview · 256 × 128":"Object preview · rendered sample";
+                tooltip=sky?"Rendered only while editing. Custom panoramas and star maps show the full 360° view.":"A visual-only copy of the selected mesh and materials. Experiment scripts, tracking and recording never run in a thumbnail.";
                 RegisterCallback<AttachToPanelEvent>(_=>{attached=true;Refresh();});
                 RegisterCallback<DetachFromPanelEvent>(_=>{attached=false;generation++;cancellation?.Cancel();Release();});
                 schedule.Execute(Tick).Every(200);
@@ -108,7 +109,10 @@ namespace ConfigurationUI
             {
                 if(!attached||panel==null||resolvedStyle.display==DisplayStyle.None||worldBound.width<=0)return false;
                 for(var parent=hierarchy.parent;parent!=null;parent=parent.hierarchy.parent)
+                {
+                    if(parent.resolvedStyle.display==DisplayStyle.None)return false;
                     if(parent is ScrollView scroll&&!scroll.contentViewport.worldBound.Overlaps(worldBound))return false;
+                }
                 return true;
             }
             private async void Tick()

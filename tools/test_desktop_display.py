@@ -24,7 +24,7 @@ namespace UnityEngine {
  public static class PlayerPrefs {public static int display;public static int GetInt(string name,int fallback)=>display;public static void SetInt(string name,int value){display=value;}public static void Save(){}}
  public static class Mathf {public static int Clamp(int v,int low,int high)=>Math.Max(low,Math.Min(high,v));public static float Clamp(float v,float low,float high)=>Math.Max(low,Math.Min(high,v));}
  public struct DisplayInfo:IEquatable<DisplayInfo> {public int id,width,height;public string name;public bool Equals(DisplayInfo other)=>id==other.id&&width==other.width&&height==other.height&&name==other.name;}
- public struct Vector2Int {public static Vector2Int zero=>default;}
+ public struct Vector2Int {public int x,y;public Vector2Int(int x,int y){this.x=x;this.y=y;}public static Vector2Int zero=>default;}
  public enum FullScreenMode {FullScreenWindow,Windowed}
  public struct Resolution {public int width,height;}
  public sealed class AsyncOperation {public bool isDone;}
@@ -52,7 +52,8 @@ static class Regression {
  static DesktopDisplay Reset(int count=1,int selected=0){
   Time.realtimeSinceStartupAsDouble=0;PlayerPrefs.display=selected;Screen.layout.Clear();for(int i=0;i<count;i++)Screen.layout.Add(Panel(i));
   Screen.mainWindowDisplayInfo=Panel(0);Screen.currentResolution=new Resolution{width=3024,height=1964};Screen.width=3024;Screen.height=1898;
-  Screen.moves=Screen.resolutions=0;Screen.throwMove=Screen.throwResolution=false;Screen.operation=new AsyncOperation();Screen.fullScreenMode=FullScreenMode.FullScreenWindow;Debug.logs.Clear();Debug.warnings.Clear();return new DesktopDisplay();
+  Screen.moves=Screen.resolutions=0;Screen.throwMove=Screen.throwResolution=false;Screen.operation=new AsyncOperation();Screen.fullScreenMode=FullScreenMode.FullScreenWindow;Debug.logs.Clear();Debug.warnings.Clear();var display=new DesktopDisplay();
+  typeof(DesktopDisplay).GetField("instance",BindingFlags.Static|BindingFlags.NonPublic).SetValue(null,display);return display;
  }
  static IEnumerator Apply(DesktopDisplay display)=>(IEnumerator)typeof(DesktopDisplay).GetMethod("Apply",BindingFlags.Instance|BindingFlags.NonPublic).Invoke(display,null);
  static bool Changing(DesktopDisplay display)=>(bool)typeof(DesktopDisplay).GetField("changing",BindingFlags.Instance|BindingFlags.NonPublic).GetValue(display);
@@ -69,6 +70,12 @@ static class Regression {
   display=Reset(2,1);Screen.throwMove=true;Drain(Apply(display));Check(Screen.resolutions==1&&!Changing(display)&&Debug.warnings.Any(line=>line.Contains("native move rejected")),"native move exceptions must not block fullscreen");
   display=Reset();Screen.currentResolution=default;Drain(Apply(display));Check(Screen.width==3024&&Screen.height==1964,"invalid resolution must use current display dimensions");
   display=Reset();Screen.currentResolution=new Resolution{width=1440,height=900};Drain(Apply(display));Check(Screen.width==3024&&Screen.height==1964,"remembered low-resolution rendering must not shrink native Retina setup space");
+  display=Reset(2,0);Drain(Apply(display));Screen.mainWindowDisplayInfo=Panel(1,2560,1440);
+  DesktopDisplay.SetStimulusResolution(new Vector2Int(1920,1080));Drain(Apply(display));
+  Check(Screen.width==1920&&Screen.height==1080&&Screen.fullScreenMode==FullScreenMode.FullScreenWindow,"stimulus override must use the requested fullscreen render size");
+  Check(Screen.moves==0&&DesktopDisplay.PresentationSettled,"a stimulus resize must preserve the current physical monitor");
+  DesktopDisplay.SetStimulusResolution(null);Drain(Apply(display));
+  Check(Screen.width==2560&&Screen.height==1440&&Screen.moves==0,"returning to setup must restore native fullscreen on the current monitor");
   display=Reset();Screen.mainWindowDisplayInfo=default;Screen.currentResolution=new Resolution{width=1920,height=1080};Drain(Apply(display));Check(Screen.width==1920&&Screen.height==1080,"unavailable display metadata must fall back to current resolution");
   display=Reset();Screen.throwResolution=true;bool failed=false;try{Drain(Apply(display));}catch(InvalidOperationException){failed=true;}Check(failed&&!Changing(display),"native resize exceptions must release changing state for a later retry");Screen.throwResolution=false;Drain(Apply(display));Check(Screen.resolutions==1&&!Changing(display),"a failed resize must remain retryable");
   display=Reset(2,1);routine=Apply(display);Check(routine.MoveNext()&&Changing(display),"pending move must enter changing state");((IDisposable)routine).Dispose();Check(!Changing(display),"disposing a pending startup coroutine must release changing state");

@@ -177,7 +177,7 @@ namespace ConfigurationUI
                 display.RegisterValueChangedCallback(e=>DesktopDisplay.SelectDisplay(displayNames.IndexOf(e.newValue)));monitorOptions.Add(display);
             }
             var schema=Workspace.Schemas.Get("system");
-            Section(monitorOptions,"Rendering & timing","system",system,schema,Array.Empty<string>(),new[]{"targetDisplay","targetFrameRate","vSyncCount","saveSwarmData"});
+            Section(monitorOptions,"Rendering & timing","system",system,schema,Array.Empty<string>(),new[]{"targetDisplay",StimulusResolutionConfig.Field,"targetFrameRate","vSyncCount","saveSwarmData"});
             Section(monitorOptions,"Telemetry & overview","radio",system,schema,Array.Empty<string>(),new[]{"telemetry","overheadCamera"});
             AddOverlayAdvancedSettings(monitorOptions);
             foreach(string warning in DesktopApparatusProfile.SharedInputWarnings(system))scroll.Add(SessionLabel(warning,"apparatus-validation"));

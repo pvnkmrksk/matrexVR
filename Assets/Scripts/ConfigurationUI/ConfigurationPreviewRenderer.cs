@@ -30,7 +30,13 @@ namespace ConfigurationUI
                 else throw new ArgumentException("Procedural objects do not have a static visual preview.");
                 if (source != null && material != null)
                     foreach (var renderer in visual.GetComponentsInChildren<Renderer>(true)) renderer.sharedMaterial = material;
-                ModelAppearance.Apply(visual, appearance);
+                if(appearance?.HasSelectedTexture==true)
+                {
+                    string file=ExperimentConfigFiles.Resolve(appearance.SelectedTexturePath());
+                    if(new FileInfo(file).Length>64*1024*1024)
+                        throw new ArgumentException("Texture preview is limited to 64 MiB. The full image can still be used in an experiment.");
+                }
+                ModelAppearance.Apply(visual,appearance,preview:true);
                 var renderers=visual.GetComponentsInChildren<Renderer>(false);
                 bool any=false;var bounds=new Bounds();
                 foreach(var renderer in renderers)
@@ -80,24 +86,22 @@ namespace ConfigurationUI
                         bool choice=scene=="Choice"||scene=="Choice_desync";
                         if(!string.IsNullOrWhiteSpace(path))
                         {
-                            string resolved=Path.IsPathRooted(path)?path:Path.Combine(RuntimePaths.ConfigRoot,path);
+                            string resolved=ExperimentConfigFiles.Resolve(path);
                             if(new FileInfo(resolved).Length>64*1024*1024)throw new ArgumentException("Image preview is limited to 64 MiB. The full image can still be used in an experiment.");
                             panorama=new Texture2D(2,2,TextureFormat.RGBA32,false,choice);
                             if(!panorama.LoadImage(File.ReadAllBytes(resolved))||panorama.width!=panorama.height*2)throw new ArgumentException("Choose a 2:1 panorama PNG or JPEG.");
-                            sky=choice?StockSky("Panoramic"):new Material(Resources.Load<Shader>("NightSky/Panorama"));
+                            return PanoramaThumbnail(panorama,ExperimentSky.Rotation(config));
                         }
                         else if(stars!=null&&ExperimentBlocks.Flag(stars["enabled"],true))
                         {
                             var settings=stars.ToObject<NightSkyConfig>();var sample=settings.ResolveStartUtc(now);if(settings.roundToInterval)sample=settings.SampleUtc(sample);
                             using(var bake=new NightSkyImageRenderer())panorama=bake.Render(settings,sample,Width*4);
-                            sky=new Material(Resources.Load<Shader>("NightSky/Panorama"));
+                            return PanoramaThumbnail(panorama,ExperimentSky.Rotation(config));
                         }
                         else
                         {
                             sky=StockSky("Procedural");
                         }
-                        if(panorama!=null){panorama.wrapModeU=TextureWrapMode.Repeat;panorama.wrapModeV=TextureWrapMode.Clamp;panorama.filterMode=FilterMode.Bilinear;sky.mainTexture=panorama;}
-                        if(sky.HasProperty("_Rotation"))sky.SetFloat("_Rotation",ExperimentSky.Rotation(config));
                         sky.hideFlags=HideFlags.HideAndDontSave;stage.camera.gameObject.AddComponent<Skybox>().material=sky;stage.camera.clearFlags=CameraClearFlags.Skybox;
                     }
                     if(config?["sun"] is JObject sun)
@@ -111,6 +115,30 @@ namespace ConfigurationUI
                 }
             }
             finally{PreviewVisuals.Dispose(panorama);PreviewVisuals.Dispose(sky);}
+        }
+        private static Texture2D PanoramaThumbnail(Texture2D panorama,float rotation)
+        {
+            var previous=RenderTexture.active;
+            var target=RenderTexture.GetTemporary(Width,Width/2,0,RenderTextureFormat.ARGB32);
+            Texture2D image=null;
+            try
+            {
+                panorama.wrapModeU=TextureWrapMode.Repeat;
+                panorama.wrapModeV=TextureWrapMode.Clamp;
+                panorama.filterMode=FilterMode.Bilinear;
+                Graphics.Blit(panorama,target,Vector2.one,new Vector2(rotation/360f,0));
+                RenderTexture.active=target;
+                image=new Texture2D(Width,Width/2,TextureFormat.RGBA32,false);
+                image.ReadPixels(new Rect(0,0,Width,Width/2),0,0);
+                image.Apply(false,false);
+                var result=image;image=null;return result;
+            }
+            finally
+            {
+                RenderTexture.active=previous;
+                RenderTexture.ReleaseTemporary(target);
+                PreviewVisuals.Dispose(image);
+            }
         }
         private static Material StockSky(string name)
         {

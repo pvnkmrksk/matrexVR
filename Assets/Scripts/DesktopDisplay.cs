@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-/// <summary>Desktop presentation is native fullscreen; LED viewport calibration remains independent.</summary>
+/// <summary>Borderless desktop presentation and the main output's experiment render size.</summary>
 [DefaultExecutionOrder(-10000)]
 public sealed class DesktopDisplay : MonoBehaviour
 {
@@ -13,7 +13,9 @@ public sealed class DesktopDisplay : MonoBehaviour
     private static DesktopDisplay instance;
     private readonly List<DisplayInfo> displays = new List<DisplayInfo>();
     private bool changing;
+    private bool windowMoveRequested = true;
     private int requestedRevision;
+    private Vector2Int? stimulusResolution;
     private DisplayInfo lastDisplay;
     public static event Action PresentationChanged;
     private float nextCheck;
@@ -56,15 +58,29 @@ public sealed class DesktopDisplay : MonoBehaviour
         var host = new GameObject("Native desktop presentation");
         DontDestroyOnLoad(host); instance = host.AddComponent<DesktopDisplay>();
     }
-    private IEnumerator Start() { yield return Apply(); }
+    private void Start() { if (!changing) StartCoroutine(Apply()); }
     public static void SelectDisplay(int index)
     {
         var layout = new List<DisplayInfo>(); Screen.GetDisplayLayout(layout);
         if (index < 0 || index >= layout.Count) throw new ArgumentOutOfRangeException(nameof(index));
         PlayerPrefs.SetInt(Preference, index); PlayerPrefs.Save();
         if (instance == null) return;
-        instance.requestedRevision++;
-        if (!instance.changing) instance.StartCoroutine(instance.Apply());
+        instance.windowMoveRequested = true;
+        instance.RequestApply();
+    }
+    internal static bool PresentationSettled => instance == null || !instance.changing;
+
+    internal static void SetStimulusResolution(Vector2Int? size)
+    {
+        if (instance == null || Nullable.Equals(instance.stimulusResolution, size)) return;
+        instance.stimulusResolution = size;
+        instance.RequestApply();
+    }
+
+    private void RequestApply()
+    {
+        requestedRevision++;
+        if (!changing) StartCoroutine(Apply());
     }
     private IEnumerator Apply()
     {
@@ -72,20 +88,22 @@ public sealed class DesktopDisplay : MonoBehaviour
         int revision = requestedRevision;
         try
         {
-            Screen.GetDisplayLayout(displays);
-            int index = Mathf.Clamp(SelectedDisplay, 0, Math.Max(0, displays.Count - 1));
-            // The player already opens on a display. Reissuing an asynchronous native
-            // move to that same monitor during Cocoa/fullscreen startup is unnecessary.
-            if (displays.Count > 1 && !displays[index].Equals(Screen.mainWindowDisplayInfo))
+            if (windowMoveRequested)
             {
-                PresentationChanged?.Invoke();
-                AsyncOperation move = null;
-                try { move = Screen.MoveMainWindowTo(displays[index], Vector2Int.zero); }
-                catch (Exception error) { Debug.LogWarning("[DesktopDisplay] Cannot move application window: " + error.Message); }
-                double deadline = Time.realtimeSinceStartupAsDouble + WindowMoveTimeoutSeconds;
-                while (move != null && !move.isDone && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
-                if (move != null && !move.isDone)
-                    Debug.LogWarning("[DesktopDisplay] Application display move timed out; continuing fullscreen on the current display.");
+                windowMoveRequested = false;
+                Screen.GetDisplayLayout(displays);
+                int index = Mathf.Clamp(SelectedDisplay, 0, Math.Max(0, displays.Count - 1));
+                if (displays.Count > 1 && !displays[index].Equals(Screen.mainWindowDisplayInfo))
+                {
+                    PresentationChanged?.Invoke();
+                    AsyncOperation move = null;
+                    try { move = Screen.MoveMainWindowTo(displays[index], Vector2Int.zero); }
+                    catch (Exception error) { Debug.LogWarning("[DesktopDisplay] Cannot move application window: " + error.Message); }
+                    double deadline = Time.realtimeSinceStartupAsDouble + WindowMoveTimeoutSeconds;
+                    while (move != null && !move.isDone && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+                    if (move != null && !move.isDone)
+                        Debug.LogWarning("[DesktopDisplay] Application display move timed out; continuing fullscreen on the current display.");
+                }
             }
 #if MATREX_ALLOW_WINDOWED
             // A source build may opt out; production players do not expose a low-resolution window mode.
@@ -101,16 +119,24 @@ public sealed class DesktopDisplay : MonoBehaviour
                 var native = Screen.currentResolution;
                 width = native.width; height = native.height;
             }
+            Vector2Int? requestedSize = stimulusResolution;
+            if (requestedSize.HasValue)
+            {
+                width = requestedSize.Value.x;
+                height = requestedSize.Value.y;
+            }
             Screen.SetResolution(Math.Max(1, width), Math.Max(1, height), FullScreenMode.FullScreenWindow);
             yield return null; yield return null;
-            Debug.Log("[DesktopDisplay] Native fullscreen " + Screen.width + "×" + Screen.height + "; UI backing scale " + UiScale + "; " + Screen.mainWindowDisplayInfo.name);
+            if (requestedSize.HasValue && (Screen.width != width || Screen.height != height))
+                Debug.LogWarning($"[DesktopDisplay] Requested stimulus {width}×{height}. The player reports {Screen.width}×{Screen.height}.");
+            Debug.Log($"[DesktopDisplay] {(requestedSize.HasValue ? "Stimulus" : "Native")} fullscreen {Screen.width}×{Screen.height} on {Screen.mainWindowDisplayInfo.name} (UI backing scale {UiScale}).");
         }
         finally
         {
             lastDisplay = Screen.mainWindowDisplayInfo;
             changing = false;
             PresentationChanged?.Invoke();
-            if (revision != requestedRevision) StartCoroutine(Apply());
+            if (revision != requestedRevision && !changing) StartCoroutine(Apply());
         }
     }
     private void Update()

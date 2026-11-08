@@ -70,8 +70,11 @@ public static class ConfigurationPreviewValidation
             var panorama=new JObject{["skyboxPath"]=panoramaPath,["panoramaRotationDegrees"]=0};
             var first=ConfigurationPreviewRenderer.Sky(panorama,"Kannadi",DateTimeOffset.UtcNow);panorama["panoramaRotationDegrees"]=180;
             var rotated=ConfigurationPreviewRenderer.Sky(panorama,"Kannadi",DateTimeOffset.UtcNow);
-            Check(Hash(first)!=Hash(rotated),"Panorama rotation changes the visible sky preview");Save(first,"custom-sky");Save(rotated,"rotated-sky");PreviewVisuals.Dispose(first);PreviewVisuals.Dispose(rotated);
-            var choice=ConfigurationPreviewRenderer.Sky(panorama,"Choice",DateTimeOffset.UtcNow);Check(choice.GetPixels32().Any(pixel=>pixel.r>20||pixel.g>20||pixel.b>20),"Choice uses the supported Unity panoramic shader for its custom preview");PreviewVisuals.Dispose(choice);
+            Check(Hash(first)!=Hash(rotated),"Panorama rotation changes the visible sky preview");
+            var fullPanorama=first.GetPixels32();
+            Check(fullPanorama[32].r>200&&fullPanorama[96].g>200&&fullPanorama[160].b>200&&fullPanorama[224].r>200&&fullPanorama[224].g>200,
+                "Custom preview shows all four longitude bands in the same image");Save(first,"custom-sky");Save(rotated,"rotated-sky");PreviewVisuals.Dispose(first);PreviewVisuals.Dispose(rotated);
+            var choice=ConfigurationPreviewRenderer.Sky(panorama,"Choice",DateTimeOffset.UtcNow);Check(choice.GetPixels32().Any(pixel=>pixel.r>20||pixel.g>20||pixel.b>20),"Choice displays its complete custom panorama");PreviewVisuals.Dispose(choice);
             var settings=new NightSkyConfig{date="2026-10-29",localTime="22:00:00",utcOffsetHours=0,latitude=47.68,longitude=9.18,exposure=4};
             var instant=settings.ResolveStartUtc(DateTimeOffset.UtcNow);Texture2D map;
             using(var renderer=new NightSkyImageRenderer())

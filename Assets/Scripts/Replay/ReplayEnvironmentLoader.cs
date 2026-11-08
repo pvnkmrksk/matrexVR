@@ -41,12 +41,13 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private readonly Dictionary<string,ReplaySessionArchive.Sample> latestAsynchronousSamples = new Dictionary<string,ReplaySessionArchive.Sample>();
     private readonly Dictionary<string,Transform> asynchronousRoots = new Dictionary<string,Transform>();
     private readonly Dictionary<string,string> archivedModelKeys = new Dictionary<string,string>();
+    private readonly Dictionary<string,Texture2D> archivedTextures = new Dictionary<string,Texture2D>(StringComparer.Ordinal);
     private readonly Dictionary<ReplayAnimationDriver,double> objectAnimations = new Dictionary<ReplayAnimationDriver,double>();
     private ReplaySessionArchive archive;
     private ReplaySessionArchive.Sample requested;
     private Scene importedScene;
     private string importedName, loadedSceneName, appliedKey;
-    private JObject currentConfig;
+    private JObject currentConfig, currentVisualConfig;
     private Material skyMaterial, previousSky;
     private Texture2D skyTexture;
     private string currentSky;
@@ -75,8 +76,9 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     {
         session.RequireCompatibleBuild();
         worldFrames?.Dispose();worldFrames=frames??(session.Presentations.IsCurrentContract?new RecordedWorldStateReader(session.DirectoryPath):null);
-        archive=session;SetRigIds(ids);requested=null;appliedKey=null;currentConfig=null;importedName=null;cameraStateKeys.Clear();latestAsynchronousSamples.Clear();
+        archive=session;SetRigIds(ids);requested=null;appliedKey=null;currentConfig=currentVisualConfig=null;importedName=null;cameraStateKeys.Clear();latestAsynchronousSamples.Clear();
         ClearEnvironment();ReleaseSky();archivedModelKeys.Clear();
+        ModelTextureLibrary.Clear(archivedTextures);
         FidelityStatus="Saved configurations loaded; waiting for recorded scene";
     }
     public void SetRigIds(IEnumerable<string> ids){rigIds.Clear();if(ids!=null)rigIds.AddRange(ids);}
@@ -120,10 +122,18 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                 }
                 else if(target.scene!="ReplayScene")Warn("Recorded scene is not included in this build: "+target.scene+". Showing trajectories and available saved objects.");
             }
+            JObject savedConfig = null, visualConfig = null;
             if (appliedKey != target.ContextKey)
             {
-                var savedConfig = archive?.ExperimentFor(target);
-                foreach (string reference in ExternalModelLibrary.CollectReferences(savedConfig).Distinct())
+                savedConfig = archive?.ExperimentFor(target);
+                visualConfig = savedConfig;
+                if (savedConfig != null && archive?.Presentations.IsCurrentContract == true && target.scene == "Kannadi" &&
+                    archive.Presentations.For(target.presentationId)["parameters"] is JObject authoredParameters)
+                {
+                    visualConfig = (JObject)savedConfig.DeepClone();
+                    KannadiConfig.MergeInline(visualConfig, authoredParameters.ToObject<Dictionary<string, object>>());
+                }
+                foreach (string reference in ExternalModelLibrary.CollectReferences(visualConfig).Distinct())
                 {
                     archivedModelKeys.Remove(reference);
                     string path = archive?.Resolve(reference);
@@ -143,7 +153,11 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                 if(appliedKey!=target.ContextKey)
                 {
                     ClearEnvironment();
-                    currentConfig=archive?.ExperimentFor(target);
+                    currentConfig=savedConfig;
+                    currentVisualConfig=visualConfig;
+                    using (new ReplayExecutionContext(archive, currentPresentation, archivedModelKeys, archivedTextures))
+                        foreach (string reference in ModelTextureLibrary.CollectReferences(currentVisualConfig).Distinct())
+                            ReplayExecutionContext.Texture(reference);
                     if(archive.Presentations.IsCurrentContract)RestoreCanonicalPresentation(target);
                     else if(!(currentConfig?["steps"] is JArray))RestoreObjects(currentConfig,target);
                     else foreach(var sample in latestAsynchronousSamples.Values.Where(sample=>sample.scene==target.scene).ToArray())RestoreAsynchronousSample(sample);
@@ -340,7 +354,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                 root.SetParent(controller.transform,false);
                 var step=recordedStep;
                 if(step!=null)
-                    using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys))
+                    using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys,archivedTextures))
                         controller.RecreateRecordedStep(sample.rig,step,root,importedRigs.TryGetValue(sample.rig,out var rig)?rig:null);
                 else root.gameObject.AddComponent<RecordedWorldStateTarget>().Key="dynamic:"+sample.rig;
             }
@@ -536,7 +550,8 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             var band=original.CreateRecordedBandVisual(name,parent);FreezeVisual(band);band.AddComponent<ReplayAnimationDriver>();
             int bandLayer=RecordedLayer(layer);if(bandLayer>=0)SetLayer(band,bandLayer);return band;
         }
-        JObject swarm=currentConfig?["swarm"] as JObject??currentConfig;
+        JObject visuals = currentVisualConfig ?? currentConfig;
+        JObject swarm=visuals?["swarm"] as JObject??visuals;
         var manifest=(currentPresentation?["populationVisuals"] as JArray??new JArray()).OfType<JObject>().Where(value=>(string)value["kind"]==kind&&((string)value["layer"]==layer||RecordedLayer((string)value["layer"])>=0&&RecordedLayer((string)value["layer"])==RecordedLayer(layer))).ToArray();
         var resolved=manifest.FirstOrDefault(value=>(string)value["family"]=="Kannadi")??manifest.FirstOrDefault();
         var resolvedSwarm=manifest.FirstOrDefault(value=>(string)value["family"]=="Swarm");
@@ -551,9 +566,9 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             return agent;
         }
         var catalog=Resources.Load<KannadiPrefabCatalog>("KannadiPrefabCatalog");
-        string externalPath = (string)currentConfig?["kannadiModelPath"];
+        string externalPath = (string)visuals?["kannadiModelPath"];
         if (string.IsNullOrWhiteSpace(externalPath)) externalPath = (string)swarm?["modelPath"];
-        string selection=kind=="Kannadi"?(string)currentConfig?["kannadiTilePrefab"]:(string)swarm?["locustPrefab"];
+        string selection=kind=="Kannadi"?(string)visuals?["kannadiTilePrefab"]:(string)swarm?["locustPrefab"];
         GameObject prefab=!string.IsNullOrEmpty(selection)?catalog?.Find(selection):catalog?.Find("SimulatedLocust");
         if(archive.Presentations.IsCurrentContract&&resolved!=null)
         {
@@ -562,8 +577,8 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                 string rigId=(string)resolved["rig"];
                 var original=importedRigs.TryGetValue(rigId,out var rig)?rig.GetComponent<Kannadi>():null;
                 if(original==null)throw new InvalidDataException("Original Kannadi population factory is missing: "+rigId);
-                var settings=currentConfig.ToObject<KannadiConfig>();settings.kannadiTilePrefab=(string)resolved["prefab"];
-                using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys))prefab=original.ResolvePrefab(settings);
+                var settings=visuals.ToObject<KannadiConfig>();settings.kannadiTilePrefab=(string)resolved["prefab"];
+                using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys,archivedTextures))prefab=original.ResolvePrefab(settings);
             }
             else prefab=catalog?.Find((string)resolved["prefab"]);
         }
@@ -579,7 +594,8 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         if (groups != null && groups.Count > 0 && GroupAppearance(name, groups) == SwarmAgentAppearance.Black)
             StockLocustAppearance.ApplyBlack(go);
         else
-            ModelAppearance.Apply(go, (kind == "Kannadi" ? currentConfig?["modelAppearance"] : swarm?["modelAppearance"])?.ToObject<ModelAppearanceConfig>());
+            using (new ReplayExecutionContext(archive, currentPresentation, archivedModelKeys, archivedTextures))
+                ModelAppearance.Apply(go, (kind == "Kannadi" ? visuals?["modelAppearance"] : swarm?["modelAppearance"])?.ToObject<ModelAppearanceConfig>());
         if(prefab==null){go.transform.SetParent(parent,false);go.transform.localScale=Vector3.one*fallbackSize;Warn("An agent model was unavailable; pose markers are shown.");}
         go.name="Recorded agent "+name;FreezeVisual(go);
         go.AddComponent<ReplayAnimationDriver>();
@@ -644,7 +660,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         Scene prior=SceneManager.GetActiveScene();SceneManager.SetActiveScene(importedScene);
         try
         {
-            using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys))
+            using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys,archivedTextures))
             using(ExperimentRandom.RestoreCheckpoint((JObject)currentPresentation["initializationRandom"]))
             {
                 ExperimentVisibility.Restore(importedScene);
@@ -659,7 +675,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
                 {
                     var host=roots.FirstOrDefault(root=>root.GetComponentInChildren<Kannadi>(true)!=null);
                     if(host!=null)
-                        (host.GetComponent<KannadiWorldObjects>()??host.AddComponent<KannadiWorldObjects>()).Apply(currentConfig["objects"]?.ToObject<SceneObject[]>(),ReplayExecutionContext.Rigs(importedScene));
+                        (host.GetComponent<KannadiWorldObjects>()??host.AddComponent<KannadiWorldObjects>()).Apply(currentVisualConfig?["objects"]?.ToObject<SceneObject[]>(),ReplayExecutionContext.Rigs(importedScene));
                 }
                 ExperimentWorldObjects.Apply(importedScene,currentConfig);
                 RestoreRugosity(currentConfig);ExperimentSun.Apply(importedScene,currentConfig);
@@ -679,7 +695,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         try
         {
             JObject clock;
-            using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys))
+            using(new ReplayExecutionContext(archive,currentPresentation,archivedModelKeys,archivedTextures))
                 clock=worldFrames.Apply(sample.presentationId,sample.unityFrame,FindObjectsByType<RecordedWorldStateTarget>(FindObjectsInactive.Include,FindObjectsSortMode.None));
             foreach(var camera in gameObject.scene.GetRootGameObjects().SelectMany(root=>root.GetComponentsInChildren<Camera>(true)))
                 (camera.GetComponent<ReplayRenderClock>()??camera.gameObject.AddComponent<ReplayRenderClock>()).SetClock((JObject)clock["shaderGlobals"]);
@@ -705,6 +721,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private void OnDestroy()
     {
         worldFrames?.Dispose();worldFrames=null;
+        ModelTextureLibrary.Clear(archivedTextures);
         SceneManager.sceneLoaded-=FreezeLoadedScene;ReleaseSky();
         foreach(var light in previewLights)if(light.Key!=null)light.Key.enabled=light.Value;
         if(importedScene.IsValid() && importedScene.isLoaded)SceneManager.UnloadSceneAsync(importedScene);

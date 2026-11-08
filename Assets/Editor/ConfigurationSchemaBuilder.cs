@@ -38,6 +38,7 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         var schemas = new JObject {
             ["system"] = new JObject { ["type"]="object", ["additionalProperties"]=true, ["properties"]=new JObject {
                 ["targetDisplay"]=Schema(typeof(int)), ["targetFrameRate"]=Schema(typeof(int)), ["vSyncCount"]=Schema(typeof(int)),
+                [StimulusResolutionConfig.Field]=Schema(typeof(StimulusResolutionConfig)),
                 ["saveSwarmData"]=Schema(typeof(bool)), ["configs"]=Schema(typeof(SystemConfig[])), ["telemetry"]=Schema(typeof(TelemetryConfig)),
                 ["statusOverlay"]=Schema(typeof(StatusOverlayConfig)), ["overheadCamera"]=Schema(typeof(OverheadCameraConfig)),
                 ["frameOverlay"]=Schema(typeof(OverlayPlacementConfig)),["desktopControls"]=Schema(typeof(OverlayPlacementConfig)) } },
@@ -118,6 +119,17 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         system["properties"]["vSyncCount"]["default"]=0;
         system["properties"]["saveSwarmData"]["default"]=true;
         system["properties"]["vSyncCount"]["minimum"]=0; system["properties"]["vSyncCount"]["maximum"]=4;
+        var stimulusResolution = system["properties"][StimulusResolutionConfig.Field];
+        stimulusResolution["default"] = JToken.FromObject(new StimulusResolutionConfig());
+        stimulusResolution["x-ui"] = new JObject { ["help"] = StimulusResolutionConfig.Help };
+        var resolutionFields = stimulusResolution["properties"];
+        resolutionFields["mode"]["enum"] = new JArray(StimulusResolutionConfig.Modes);
+        foreach (string field in new[] { "width", "height" })
+        {
+            resolutionFields[field]["minimum"] = 1;
+            resolutionFields[field]["maximum"] = StimulusResolutionConfig.MaximumDimension;
+            resolutionFields[field]["x-ui"] = new JObject { ["unit"] = "px", ["visibleWhen"] = Rule("mode", StimulusResolutionConfig.CustomMode) };
+        }
         system["properties"]["targetFrameRate"]["x-ui"]=new JObject { ["enabledWhen"]=Rule("vSyncCount",0),["help"]="Positive FPS, or -1 for uncapped. vSync overrides this value." };
         system["properties"]["targetFrameRate"]["x-ui"]["slider"]=new JObject { ["min"]=30,["max"]=240,["step"]=1 };
         var rig=system["properties"]["configs"]["items"];

@@ -626,8 +626,18 @@ Button.desktop-run-button { height: 31px; min-height: 31px; font-size: 11px; mar
 .object-main-controls > .path-setting > .setting-label { flex-basis: auto; margin: 0 0 5px; }
 .external-model-control { width: 100%; }
 .external-model-control > DropdownField, .external-model-control > TextField { width: 100%; min-width: 0; margin: 0 0 4px; }
-.object-preview-slot { width: 280px; min-width: 280px; flex-shrink: 0; }
-.object-preview-slot .edit-rendered-preview { margin-top: 0; }
+.object-preview-slot { width: 344px; min-width: 0; max-width: 100%; flex-shrink: 0; }
+.object-preview-slot .edit-rendered-preview { width: 100%; height: 248px; min-height: 248px; max-height: 248px; margin-top: 0; }
+.object-preview-slot .edit-sky-preview { height: 192px; min-height: 192px; max-height: 192px; }
+.object-preview-slot .edit-preview-image { flex-grow: 1; flex-shrink: 1; height: auto; min-height: 0; }
+.compact-layout .object-preview-slot { width: 264px; }
+.compact-layout .object-preview-slot .edit-rendered-preview { height: 170px; min-height: 170px; max-height: 170px; }
+.narrow-layout .object-visual-row { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
+.narrow-layout .object-main-controls { flex-grow: 0; flex-basis: auto; min-width: 0; margin-right: 0; }
+.narrow-layout .object-preview-slot { align-self: flex-start; margin-top: 8px; }
+.object-main-controls .asset-picker-control { max-width: 420px; }
+.object-main-controls .external-model-control { max-width: 680px; }
+.sky-main-controls > DropdownField { max-width: 420px; }
 .object-color-row { min-height: 42px; justify-content: space-between; padding: 4px 10px; background-color: rgb(27,37,47); border-radius: 4px; }
 .object-color-row .color-control { flex-shrink: 0; }
 .surface-details { margin: 8px 0 0; }
@@ -653,3 +663,34 @@ Button.desktop-run-button { height: 31px; min-height: 31px; font-size: 11px; mar
 
 .studio-setting.surface-setting { width: 100%; max-width: 100%; flex-direction: column; align-items: stretch; }
 .surface-setting > .surface-details > .unity-foldout__toggle { display: flex; }
+
+
+/* Swarm groups retain compact controls while the cards use available columns. */
+.studio-setting.swarm-group-setting { width: 100%; max-width: 100%; margin-right: 0; }
+.swarm-group-toolbar { flex-wrap: wrap; margin-bottom: 6px; }
+.swarm-group-toolbar > .quiet-hint { margin: 0 8px; }
+.swarm-group-grid { flex-wrap: wrap; align-items: stretch; }
+.swarm-group-card { width: 420px; max-width: 100%; padding: 10px 12px; margin: 0 8px 8px 0; border-width: 1px; border-radius: 5px; border-color: rgb(55, 75, 91); background-color: rgb(23, 31, 40); }
+.swarm-group-header { margin-bottom: 6px; }
+.swarm-group-header > Label { flex-grow: 1; color: rgb(215, 229, 239); -unity-font-style: bold; }
+.swarm-group-header > Button { flex-shrink: 0; }
+.swarm-group-values { flex-wrap: wrap; align-items: flex-start; }
+.swarm-group-field { flex-shrink: 0; margin: 0 12px 6px 0; }
+.swarm-group-field > DropdownField { width: 152px; margin-left: 0; }
+.swarm-group-label { color: rgb(180, 198, 212); font-size: 12px; margin-bottom: 4px; }
+#show-appearance-previews { margin-left: 8px; }
+
+
+/* Names remain short while image paths can use the rest of the dialog row. */
+.texture-variant-picker { flex-wrap: wrap; margin-bottom: 7px; }
+.texture-variant-picker > DropdownField { width: 335px; max-width: 100%; margin-left: 0; }
+.texture-variant-picker .unity-base-field__label { min-width: 0; width: 104px; }
+.texture-variant-list { flex-grow: 1; min-height: 0; }
+.texture-variant-entry { flex-wrap: wrap; padding: 7px 8px; margin-bottom: 7px; background-color: rgb(23, 31, 40); border-radius: 4px; }
+.texture-variant-entry > .texture-variant-name, .texture-variant-entry > .texture-variant-path { flex-direction: column; align-items: stretch; margin-right: 8px; }
+.texture-variant-entry .unity-base-field__label { min-width: 0; width: auto; margin-bottom: 4px; }
+.texture-variant-name { width: 184px; max-width: 100%; }
+.texture-variant-path { flex-grow: 1; flex-basis: 300px; min-width: 175px; }
+.texture-variant-format { width: 76px; margin: 19px 4px 0; }
+.texture-variant-entry > Button { margin-top: 19px; flex-shrink: 0; }
+.texture-variant-actions { flex-wrap: wrap; margin-top: 10px; }

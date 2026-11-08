@@ -12,9 +12,22 @@ public sealed class ReplayExecutionContext : IDisposable
     private readonly ReplaySessionArchive archive;
     private readonly JObject presentation;
     private readonly IReadOnlyDictionary<string,string> modelKeys;
+    private readonly Dictionary<string, Texture2D> textures;
     public static bool Active => current != null;
-    public ReplayExecutionContext(ReplaySessionArchive archive, JObject presentation, IReadOnlyDictionary<string,string> modelKeys)
-    { prior = current; this.archive = archive; this.presentation = presentation; this.modelKeys = modelKeys; current = this; }
+    public ReplayExecutionContext(ReplaySessionArchive archive, JObject presentation, IReadOnlyDictionary<string,string> modelKeys,
+        Dictionary<string, Texture2D> textures)
+    {
+        prior = current; this.archive = archive; this.presentation = presentation; this.modelKeys = modelKeys;
+        this.textures = textures; current = this;
+    }
+
+    internal static Texture2D Texture(string reference)
+    {
+        if (current.textures.TryGetValue(reference, out var texture) && texture != null) return texture;
+        texture = ModelTextureLibrary.Decode(reference, File.ReadAllBytes(Resolve(reference)));
+        current.textures[reference] = texture;
+        return texture;
+    }
     public static string Resolve(string reference)
     {
         if (current == null) return null;

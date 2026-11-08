@@ -35,6 +35,69 @@
         "maximum": 4,
         "default": 0
       },
+      "stimulusResolution": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "mode": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "1920x1080",
+            "enum": [
+              "native",
+              "1280x720",
+              "1600x900",
+              "1920x1080",
+              "2560x1440",
+              "3840x2160",
+              "custom"
+            ]
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8192,
+            "default": 1920,
+            "x-ui": {
+              "unit": "px",
+              "visibleWhen": {
+                "property": "mode",
+                "oneOf": [
+                  "custom"
+                ]
+              }
+            }
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8192,
+            "default": 1080,
+            "x-ui": {
+              "unit": "px",
+              "visibleWhen": {
+                "property": "mode",
+                "oneOf": [
+                  "custom"
+                ]
+              }
+            }
+          }
+        },
+        "default": {
+          "mode": "1920x1080",
+          "width": 1920,
+          "height": 1080
+        },
+        "x-ui": {
+          "help": "Fullscreen render size for a monitor rig on MATREX display 1. Setup uses native size. Calibrated LED viewports keep their pixel layout, and secondary displays use their system resolution."
+        }
+      },
       "saveSwarmData": {
         "type": "boolean",
         "default": true
@@ -750,7 +813,12 @@
       },
       "saveSwarmData": true,
       "targetFrameRate": 60,
-      "vSyncCount": 0
+      "vSyncCount": 0,
+      "stimulusResolution": {
+        "mode": "1920x1080",
+        "width": 1920,
+        "height": 1080
+      }
     },
     "required": [
       "configs"
@@ -1737,6 +1805,49 @@
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.5
+              },
+              "textureVariants": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "texturePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    }
+                  }
+                },
+                "default": null,
+                "x-ui": {
+                  "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                }
+              },
+              "selectedTextureVariant": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                }
               }
             },
             "default": null
@@ -3061,6 +3172,49 @@
                   "minimum": 0,
                   "maximum": 1,
                   "default": 0.5
+                },
+                "textureVariants": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "default": null
+                      },
+                      "texturePath": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "default": null
+                      }
+                    }
+                  },
+                  "default": null,
+                  "x-ui": {
+                    "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                  }
+                },
+                "selectedTextureVariant": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": "",
+                  "x-ui": {
+                    "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                  }
                 }
               },
               "default": null
@@ -4692,6 +4846,49 @@
                     "minimum": 0,
                     "maximum": 1,
                     "default": 0.5
+                  },
+                  "textureVariants": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        },
+                        "texturePath": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        }
+                      }
+                    },
+                    "default": null,
+                    "x-ui": {
+                      "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                    }
+                  },
+                  "selectedTextureVariant": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": "",
+                    "x-ui": {
+                      "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                    }
                   }
                 },
                 "default": null
@@ -6015,6 +6212,49 @@
                       "minimum": 0,
                       "maximum": 1,
                       "default": 0.5
+                    },
+                    "textureVariants": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          },
+                          "texturePath": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          }
+                        }
+                      },
+                      "default": null,
+                      "x-ui": {
+                        "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                      }
+                    },
+                    "selectedTextureVariant": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": "",
+                      "x-ui": {
+                        "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                      }
                     }
                   },
                   "default": null
@@ -7652,6 +7892,49 @@
                     "minimum": 0,
                     "maximum": 1,
                     "default": 0.5
+                  },
+                  "textureVariants": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        },
+                        "texturePath": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        }
+                      }
+                    },
+                    "default": null,
+                    "x-ui": {
+                      "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                    }
+                  },
+                  "selectedTextureVariant": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": "",
+                    "x-ui": {
+                      "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                    }
                   }
                 },
                 "default": null
@@ -8975,6 +9258,49 @@
                       "minimum": 0,
                       "maximum": 1,
                       "default": 0.5
+                    },
+                    "textureVariants": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          },
+                          "texturePath": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          }
+                        }
+                      },
+                      "default": null,
+                      "x-ui": {
+                        "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                      }
+                    },
+                    "selectedTextureVariant": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": "",
+                      "x-ui": {
+                        "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                      }
                     }
                   },
                   "default": null
@@ -10612,6 +10938,49 @@
                     "minimum": 0,
                     "maximum": 1,
                     "default": 0.5
+                  },
+                  "textureVariants": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        },
+                        "texturePath": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        }
+                      }
+                    },
+                    "default": null,
+                    "x-ui": {
+                      "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                    }
+                  },
+                  "selectedTextureVariant": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": "",
+                    "x-ui": {
+                      "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                    }
                   }
                 },
                 "default": null
@@ -11935,6 +12304,49 @@
                       "minimum": 0,
                       "maximum": 1,
                       "default": 0.5
+                    },
+                    "textureVariants": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          },
+                          "texturePath": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          }
+                        }
+                      },
+                      "default": null,
+                      "x-ui": {
+                        "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                      }
+                    },
+                    "selectedTextureVariant": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": "",
+                      "x-ui": {
+                        "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                      }
                     }
                   },
                   "default": null
@@ -13455,6 +13867,49 @@
                   "minimum": 0,
                   "maximum": 1,
                   "default": 0.5
+                },
+                "textureVariants": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "default": null
+                      },
+                      "texturePath": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "default": null
+                      }
+                    }
+                  },
+                  "default": null,
+                  "x-ui": {
+                    "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                  }
+                },
+                "selectedTextureVariant": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": "",
+                  "x-ui": {
+                    "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                  }
                 }
               },
               "default": null
@@ -14518,6 +14973,49 @@
             "minimum": 0,
             "maximum": 1,
             "default": 0.5
+          },
+          "textureVariants": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "texturePath": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                }
+              }
+            },
+            "default": null,
+            "x-ui": {
+              "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+            }
+          },
+          "selectedTextureVariant": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+            }
           }
         },
         "default": null
@@ -16399,6 +16897,49 @@
                       "minimum": 0,
                       "maximum": 1,
                       "default": 0.5
+                    },
+                    "textureVariants": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          },
+                          "texturePath": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          }
+                        }
+                      },
+                      "default": null,
+                      "x-ui": {
+                        "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                      }
+                    },
+                    "selectedTextureVariant": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": "",
+                      "x-ui": {
+                        "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                      }
                     }
                   },
                   "default": null
@@ -17461,6 +18002,49 @@
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.5
+              },
+              "textureVariants": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "texturePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    }
+                  }
+                },
+                "default": null,
+                "x-ui": {
+                  "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                }
+              },
+              "selectedTextureVariant": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                }
               }
             },
             "default": null
@@ -19209,6 +19793,49 @@
                     "minimum": 0,
                     "maximum": 1,
                     "default": 0.5
+                  },
+                  "textureVariants": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        },
+                        "texturePath": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        }
+                      }
+                    },
+                    "default": null,
+                    "x-ui": {
+                      "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                    }
+                  },
+                  "selectedTextureVariant": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": "",
+                    "x-ui": {
+                      "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                    }
                   }
                 },
                 "default": null
@@ -20516,6 +21143,49 @@
                       "minimum": 0,
                       "maximum": 1,
                       "default": 0.5
+                    },
+                    "textureVariants": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          },
+                          "texturePath": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          }
+                        }
+                      },
+                      "default": null,
+                      "x-ui": {
+                        "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                      }
+                    },
+                    "selectedTextureVariant": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": "",
+                      "x-ui": {
+                        "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                      }
                     }
                   },
                   "default": null
@@ -21578,6 +22248,49 @@
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.5
+              },
+              "textureVariants": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "texturePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    }
+                  }
+                },
+                "default": null,
+                "x-ui": {
+                  "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                }
+              },
+              "selectedTextureVariant": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                }
               }
             },
             "default": null
@@ -23326,6 +24039,49 @@
                     "minimum": 0,
                     "maximum": 1,
                     "default": 0.5
+                  },
+                  "textureVariants": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        },
+                        "texturePath": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        }
+                      }
+                    },
+                    "default": null,
+                    "x-ui": {
+                      "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                    }
+                  },
+                  "selectedTextureVariant": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": "",
+                    "x-ui": {
+                      "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                    }
                   }
                 },
                 "default": null
@@ -24633,6 +25389,49 @@
                       "minimum": 0,
                       "maximum": 1,
                       "default": 0.5
+                    },
+                    "textureVariants": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          },
+                          "texturePath": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          }
+                        }
+                      },
+                      "default": null,
+                      "x-ui": {
+                        "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                      }
+                    },
+                    "selectedTextureVariant": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": "",
+                      "x-ui": {
+                        "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                      }
                     }
                   },
                   "default": null
@@ -25695,6 +26494,49 @@
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.5
+              },
+              "textureVariants": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "texturePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    }
+                  }
+                },
+                "default": null,
+                "x-ui": {
+                  "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                }
+              },
+              "selectedTextureVariant": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                }
               }
             },
             "default": null
@@ -27443,6 +28285,49 @@
                     "minimum": 0,
                     "maximum": 1,
                     "default": 0.5
+                  },
+                  "textureVariants": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        },
+                        "texturePath": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        }
+                      }
+                    },
+                    "default": null,
+                    "x-ui": {
+                      "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                    }
+                  },
+                  "selectedTextureVariant": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": "",
+                    "x-ui": {
+                      "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                    }
                   }
                 },
                 "default": null
@@ -28614,6 +29499,49 @@
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.5
+              },
+              "textureVariants": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "texturePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    }
+                  }
+                },
+                "default": null,
+                "x-ui": {
+                  "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                }
+              },
+              "selectedTextureVariant": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                }
               }
             },
             "default": null
@@ -29678,10 +30606,10 @@
         "measureDuringPresentation": false,
         "saveAs": ""
       },
-      "numberOfLocusts": 256,
+      "numberOfLocusts": 64,
       "density": null,
-      "spawnAreaSize": 200,
-      "spawnType": "Random",
+      "spawnAreaSize": 68,
+      "spawnType": "Grid",
       "mu": 0,
       "kappa": 100000,
       "locustSpeed": 2,
@@ -29726,7 +30654,7 @@
           "vrIndex": 1,
           "initialPosition": {
             "x": 0.0,
-            "y": 1.0,
+            "y": 1.35,
             "z": 5.0
           },
           "initialRotation": {
@@ -29742,7 +30670,7 @@
           "vrIndex": 2,
           "initialPosition": {
             "x": 5.0,
-            "y": 1.0,
+            "y": 1.35,
             "z": 0.0
           },
           "initialRotation": {
@@ -29758,7 +30686,7 @@
           "vrIndex": 3,
           "initialPosition": {
             "x": 0.0,
-            "y": 1.0,
+            "y": 1.35,
             "z": -5.0
           },
           "initialRotation": {
@@ -29774,7 +30702,7 @@
           "vrIndex": 4,
           "initialPosition": {
             "x": -5.0,
-            "y": 1.0,
+            "y": 1.35,
             "z": 0.0
           },
           "initialRotation": {
@@ -29812,13 +30740,13 @@
         "maskBelowHorizon": false,
         "imageWidth": 4096
       },
-      "boundaryLengthX": 200,
-      "boundaryLengthZ": 200,
+      "boundaryLengthX": 72,
+      "boundaryLengthZ": 72,
       "resetPositionOnStart": true,
       "resetRotationOnStart": true,
       "uniformSkyColor": null,
       "useHeadingReference": false,
-      "spawnRelativeToAnimal": false,
+      "spawnRelativeToAnimal": true,
       "followAnimalPosition": false,
       "randomInitialRotation": false,
       "trajectoryFile": "",
@@ -29838,7 +30766,8 @@
         "preRollSeconds": 0
       },
       "worldUnitsPerMetre": null,
-      "nearClipMetres": null,
+      "nearClipMetres": 0.002,
+      "farClipMetres": 0.6,
       "locustSpeedStdDev": 0,
       "volumeHalfExtentMetres": null,
       "preserveBoundaryOvershoot": true,
@@ -30098,6 +31027,49 @@
                   "minimum": 0,
                   "maximum": 1,
                   "default": 0.5
+                },
+                "textureVariants": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "default": null
+                      },
+                      "texturePath": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "default": null
+                      }
+                    }
+                  },
+                  "default": null,
+                  "x-ui": {
+                    "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                  }
+                },
+                "selectedTextureVariant": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": "",
+                  "x-ui": {
+                    "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                  }
                 }
               },
               "default": null
@@ -31161,6 +32133,49 @@
             "minimum": 0,
             "maximum": 1,
             "default": 0.5
+          },
+          "textureVariants": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                },
+                "texturePath": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null
+                }
+              }
+            },
+            "default": null,
+            "x-ui": {
+              "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+            }
+          },
+          "selectedTextureVariant": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": "",
+            "x-ui": {
+              "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+            }
           }
         },
         "default": null
@@ -33042,6 +34057,49 @@
                       "minimum": 0,
                       "maximum": 1,
                       "default": 0.5
+                    },
+                    "textureVariants": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          },
+                          "texturePath": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          }
+                        }
+                      },
+                      "default": null,
+                      "x-ui": {
+                        "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                      }
+                    },
+                    "selectedTextureVariant": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": "",
+                      "x-ui": {
+                        "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                      }
                     }
                   },
                   "default": null
@@ -34104,6 +35162,49 @@
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.5
+              },
+              "textureVariants": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "texturePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    }
+                  }
+                },
+                "default": null,
+                "x-ui": {
+                  "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                }
+              },
+              "selectedTextureVariant": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                }
               }
             },
             "default": null
@@ -35852,6 +36953,49 @@
                     "minimum": 0,
                     "maximum": 1,
                     "default": 0.5
+                  },
+                  "textureVariants": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        },
+                        "texturePath": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        }
+                      }
+                    },
+                    "default": null,
+                    "x-ui": {
+                      "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                    }
+                  },
+                  "selectedTextureVariant": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": "",
+                    "x-ui": {
+                      "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                    }
                   }
                 },
                 "default": null
@@ -37159,6 +38303,49 @@
                       "minimum": 0,
                       "maximum": 1,
                       "default": 0.5
+                    },
+                    "textureVariants": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          },
+                          "texturePath": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          }
+                        }
+                      },
+                      "default": null,
+                      "x-ui": {
+                        "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                      }
+                    },
+                    "selectedTextureVariant": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": "",
+                      "x-ui": {
+                        "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                      }
                     }
                   },
                   "default": null
@@ -38221,6 +39408,49 @@
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.5
+              },
+              "textureVariants": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "texturePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    }
+                  }
+                },
+                "default": null,
+                "x-ui": {
+                  "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                }
+              },
+              "selectedTextureVariant": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                }
               }
             },
             "default": null
@@ -39969,6 +41199,49 @@
                     "minimum": 0,
                     "maximum": 1,
                     "default": 0.5
+                  },
+                  "textureVariants": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        },
+                        "texturePath": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        }
+                      }
+                    },
+                    "default": null,
+                    "x-ui": {
+                      "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                    }
+                  },
+                  "selectedTextureVariant": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": "",
+                    "x-ui": {
+                      "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                    }
                   }
                 },
                 "default": null
@@ -41276,6 +42549,49 @@
                       "minimum": 0,
                       "maximum": 1,
                       "default": 0.5
+                    },
+                    "textureVariants": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          },
+                          "texturePath": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          }
+                        }
+                      },
+                      "default": null,
+                      "x-ui": {
+                        "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                      }
+                    },
+                    "selectedTextureVariant": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": "",
+                      "x-ui": {
+                        "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                      }
                     }
                   },
                   "default": null
@@ -42338,6 +43654,49 @@
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.5
+              },
+              "textureVariants": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "texturePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    }
+                  }
+                },
+                "default": null,
+                "x-ui": {
+                  "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                }
+              },
+              "selectedTextureVariant": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                }
               }
             },
             "default": null
@@ -44086,6 +45445,49 @@
                     "minimum": 0,
                     "maximum": 1,
                     "default": 0.5
+                  },
+                  "textureVariants": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        },
+                        "texturePath": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "default": null
+                        }
+                      }
+                    },
+                    "default": null,
+                    "x-ui": {
+                      "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                    }
+                  },
+                  "selectedTextureVariant": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "default": "",
+                    "x-ui": {
+                      "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                    }
                   }
                 },
                 "default": null
@@ -45257,6 +46659,49 @@
                 "minimum": 0,
                 "maximum": 1,
                 "default": 0.5
+              },
+              "textureVariants": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    },
+                    "texturePath": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": null
+                    }
+                  }
+                },
+                "default": null,
+                "x-ui": {
+                  "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                }
+              },
+              "selectedTextureVariant": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": "",
+                "x-ui": {
+                  "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                }
               }
             },
             "default": null
@@ -46629,6 +48074,49 @@
                   "minimum": 0,
                   "maximum": 1,
                   "default": 0.5
+                },
+                "textureVariants": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                      "name": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "default": null
+                      },
+                      "texturePath": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "default": null
+                      }
+                    }
+                  },
+                  "default": null,
+                  "x-ui": {
+                    "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                  }
+                },
+                "selectedTextureVariant": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": "",
+                  "x-ui": {
+                    "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                  }
                 }
               },
               "default": null
@@ -48182,6 +49670,49 @@
                       "minimum": 0,
                       "maximum": 1,
                       "default": 0.5
+                    },
+                    "textureVariants": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          },
+                          "texturePath": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          }
+                        }
+                      },
+                      "default": null,
+                      "x-ui": {
+                        "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                      }
+                    },
+                    "selectedTextureVariant": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": "",
+                      "x-ui": {
+                        "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                      }
                     }
                   },
                   "default": null
@@ -49790,6 +51321,49 @@
                       "minimum": 0,
                       "maximum": 1,
                       "default": 0.5
+                    },
+                    "textureVariants": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          },
+                          "texturePath": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          }
+                        }
+                      },
+                      "default": null,
+                      "x-ui": {
+                        "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                      }
+                    },
+                    "selectedTextureVariant": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": "",
+                      "x-ui": {
+                        "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                      }
                     }
                   },
                   "default": null
@@ -51398,6 +52972,49 @@
                       "minimum": 0,
                       "maximum": 1,
                       "default": 0.5
+                    },
+                    "textureVariants": {
+                      "type": [
+                        "array",
+                        "null"
+                      ],
+                      "items": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                          "name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          },
+                          "texturePath": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "default": null
+                          }
+                        }
+                      },
+                      "default": null,
+                      "x-ui": {
+                        "help": "Named replacement base-color images for this model's existing UVs. Use PNG or JPEG."
+                      }
+                    },
+                    "selectedTextureVariant": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "default": "",
+                      "x-ui": {
+                        "help": "Select a named base-color texture. An empty selection retains the original texture settings."
+                      }
                     }
                   },
                   "default": null

@@ -43,6 +43,7 @@ public class MainController : MonoBehaviour
     public int TargetFrameRate { get; private set; } = 60;
     public int VSyncCount { get; private set; } = 0;
     public OverheadCameraConfig OverheadCameraSettings { get; private set; } = new OverheadCameraConfig();
+    private Vector2Int? configuredStimulusResolution;
 
     public List<SequenceStep> sequenceSteps = new List<SequenceStep>();
     public List<int> executionOrder = new List<int>();
@@ -304,6 +305,8 @@ public class MainController : MonoBehaviour
             // Parse the JSON using JObject instead of dynamic
             JObject fullConfig = JObject.Parse(jsonText);
             InputKind = fullConfig["desktopQuickStart"] is JObject preview && (bool?)preview["demo"] == true ? "demonstration" : "tracker";
+            configuredStimulusResolution = (fullConfig[StimulusResolutionConfig.Field]?.ToObject<StimulusResolutionConfig>()
+                ?? new StimulusResolutionConfig()).RequestedSize();
             ApplyFrameTiming(fullConfig);
             LoadDiagnosticsConfigurations(fullConfig);
             OverheadCameraSettings = fullConfig["overheadCamera"]?.ToObject<OverheadCameraConfig>() ?? new OverheadCameraConfig();
@@ -478,6 +481,7 @@ public class MainController : MonoBehaviour
         preparationCancellation?.Cancel();
         SequencePreparing = false;
         sequenceStarted = false;
+        DesktopDisplay.SetStimulusResolution(null);
         savedHeadings.Clear();
         phaseRunner?.Cancel();
         currentStep = 0;
@@ -588,11 +592,21 @@ public class MainController : MonoBehaviour
         var cancellationToken = preparationCancellation.Token;
         try
         {
-            // Import before starting the stimulus clock: loading a model must not shorten a trial.
-            foreach (string reference in sequenceSteps.SelectMany(step => ExternalModelLibrary.CollectReferences(
+            // Decode before starting the stimulus clock so loading cannot shorten a trial.
+            var documents = sequenceSteps.SelectMany(step => new[] {
                 step.parameters != null && (step.parameters.ContainsKey("configFile") || step.parameters.ContainsKey("design"))
-                    ? ExperimentPhases.Read(step.parameters, step.parameters.ContainsKey("configFile") ? "configFile" : "design") : null)
-                .Concat(ExternalModelLibrary.CollectReferences(step.parameters != null ? JObject.FromObject(step.parameters) : null))).Distinct())
+                    ? ExperimentPhases.Read(step.parameters, step.parameters.ContainsKey("configFile") ? "configFile" : "design") : null,
+                step.parameters != null ? JObject.FromObject(step.parameters) : null
+            }).ToArray();
+            ModelTextureLibrary.ClearRun();
+            foreach (string reference in documents.SelectMany(ModelTextureLibrary.CollectReferences).Distinct())
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                ModelTextureLibrary.PreloadRun(reference, ExperimentConfigFiles.ReadAllBytes(reference, RunConfigArchive.ModelTextureRole));
+                await System.Threading.Tasks.Task.Yield();
+                if (generation != preparationGeneration) return;
+            }
+            foreach (string reference in documents.SelectMany(ExternalModelLibrary.CollectReferences).Distinct())
             {
                 await ExternalModelLibrary.PreloadAsync(reference, ExperimentConfigFiles.ReadAllBytes(reference, "model"),
                     cancellationToken);
@@ -621,6 +635,18 @@ public class MainController : MonoBehaviour
                 AddRecordingWarning("Tracker recording unavailable: " + error.GetBaseException().Message);
             }
             if (generation != preparationGeneration) return;
+            DesktopDisplay.SetStimulusResolution(StimulusResolutionConfig.UsesMainMonitor(systemConfigs.Values)
+                ? configuredStimulusResolution : null);
+            if (!DesktopDisplay.PresentationSettled)
+            {
+                PreparationStatus = "Applying fullscreen stimulus resolution…";
+                while (!DesktopDisplay.PresentationSettled)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await System.Threading.Tasks.Task.Yield();
+                }
+                if (generation != preparationGeneration) return;
+            }
             ExperimentRandom.Begin(randomSeedMode, randomSeed, MasterDataLogger.Instance.directoryPath, SequenceTitle, sequenceConfigFileName);
             SequencePreparing = false;
             PreparationStatus = null;
@@ -1087,6 +1113,7 @@ private void FailExperiment(System.Exception error)
     SequencePreparing = false;
     SequenceError = error.Message;
     sequenceStarted = false;
+    DesktopDisplay.SetStimulusResolution(null);
     phaseRunner?.Cancel();
     foreach (ClosedLoop rig in vrClosedLoops.Values)
         if (rig != null) rig.AutoTrim.Disable();
@@ -1309,9 +1336,53 @@ public class SequenceItem
 public enum ClosedLoopMode { FicTrac = 0, Kinefly = 1, Tirbala = 2, Hejjetrac = 3, Rekkefly = 4 }
 
 [System.Serializable]
+public sealed class StimulusResolutionConfig
+{
+    public const string Field = "stimulusResolution";
+    public const string NativeMode = "native";
+    public const string CustomMode = "custom";
+    public const string DefaultMode = "1920x1080";
+    public const int MaximumDimension = 8192;
+    public const string Help = "Fullscreen render size for a monitor rig on MATREX display 1. Setup uses native size. Calibrated LED viewports keep their pixel layout, and secondary displays use their system resolution.";
+    public static IReadOnlyList<string> Modes { get; } = System.Array.AsReadOnly(new[] {
+        NativeMode, "1280x720", "1600x900", DefaultMode, "2560x1440", "3840x2160", CustomMode
+    });
+
+    public string mode = DefaultMode;
+    public int width = 1920;
+    public int height = 1080;
+
+    internal Vector2Int? RequestedSize()
+    {
+        if (mode == NativeMode) return null;
+        if (mode == CustomMode)
+        {
+            if (width < 1 || width > MaximumDimension || height < 1 || height > MaximumDimension)
+                throw new System.ArgumentException($"Stimulus width and height must be from 1 to {MaximumDimension} pixels.");
+            return new Vector2Int(width, height);
+        }
+        if (!Modes.Contains(mode)) throw new System.ArgumentException($"Unknown stimulus resolution mode '{mode}'.");
+        var parts = mode.Split('x');
+        return new Vector2Int(int.Parse(parts[0]), int.Parse(parts[1]));
+    }
+
+    internal static bool UsesMainMonitor(IEnumerable<SystemConfig> rigs)
+    {
+        bool mainMonitor = false;
+        foreach (var rig in rigs)
+        {
+            if (rig.targetDisplay != 0) continue;
+            if (!rig.desktopPreview) return false;
+            mainMonitor = true;
+        }
+        return mainMonitor;
+    }
+}
+
+[System.Serializable]
 public class SystemConfig
 {
-    public bool desktopPreview = false; // One front view fills its native-resolution desktop window.
+    public bool desktopPreview = false; // One camera face fills the rig's assigned monitor output.
     public ClosedLoopMode closedLoopMode = ClosedLoopMode.FicTrac;
     public ManualControlConfig manualControls;
     public float sphereDiameter = 1.0f;

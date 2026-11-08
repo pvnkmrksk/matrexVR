@@ -30,6 +30,32 @@ public static class Regression
         string json=Newtonsoft.Json.JsonConvert.SerializeObject(new{rigs=archive.Rigs.Count,rows=archive.Rigs.Values.Sum(samples=>samples.Count),archive.Duration,archive.FirstExperimentTime,contexts=contexts.Length,restoredConfigurations=restored,representativePopulation=agents,warnings=archive.Warnings},Newtonsoft.Json.Formatting.Indented);
         if(report!=null)File.WriteAllText(report,json);Console.WriteLine(json);
     }
+    private static void TextureArchive(string root)
+    {
+        string profile = Path.Combine(root, "texture-profile"), run = Path.Combine(root, "texture-run");
+        Directory.CreateDirectory(profile);
+        string image = Path.Combine(profile, "chosen.png");
+        byte[] original = {1, 2, 3, 4}, replacement = {5, 6, 7, 8};
+        File.WriteAllBytes(image, original);
+        File.WriteAllText(Path.Combine(profile, "system_config.json"), "{}");
+        File.WriteAllText(Path.Combine(profile, "sequenceConfig.json"),
+            @"{'sequences':[{'parameters':{'configFile':'swarm.json'}}]}");
+        File.WriteAllText(Path.Combine(profile, "swarm.json"),
+            @"{'modelAppearance':{'enabled':false,'textureVariants':[{'name':'Chosen','texturePath':'chosen.png'}],'selectedTextureVariant':'Chosen'}}");
+        var saved = new RunConfigArchive(run, profile, "fixture", "test");
+        saved.CaptureStartup("Kannadi");
+        File.WriteAllBytes(image, replacement);
+        Check(saved.ReadBytes("chosen.png", RunConfigArchive.ModelTextureRole, "Kannadi").SequenceEqual(original),
+            "Texture preload uses the first exact archived bytes despite source replacement");
+        File.Delete(image);
+        saved.ReadText("swarm.json", "experiment", "Kannadi");
+        saved.RequireComplete();
+        string archived = new ReplaySessionArchive(run).Resolve("chosen.png");
+        Check(File.ReadAllBytes(archived).SequenceEqual(original), "Replay resolves the hashed texture with its source removed");
+        File.WriteAllBytes(archived, replacement);
+        Reject(() => new ReplaySessionArchive(run).Resolve("chosen.png"), "Replay rejects a modified texture snapshot");
+    }
+
     private static string Row(string time,string rig,string scene,int step,int x,int yaw,string config="choice.json")=>
         "2026-01-01 "+time+","+rig+","+scene+","+step+","+config+","+x+",0,0,0,"+yaw+",0,0,condition,stimulus,";
     private static void Gzip(string path,string text)
@@ -244,6 +270,7 @@ public static class Regression
                 bool rejected=false;try{requiredArchive.RequireComplete();}catch(IOException){rejected=true;}
                 Check(rejected,"optional tracker exclusion keeps missing required "+requiredKind+" dependencies strict");
             }
+            TextureArchive(root);
             nativeArchive.CaptureCompanions(new[]{
                 new JObject{["vrId"]="VR1",["backend"]="Rekkefly",["identityVerified"]=true,["matchesConfiguredRig"]=true,["configFile"]=calibration,["releaseTag"]="local-test",["executableSha256"]=new string('a',64),["demoRequested"]=false,["strictCameraFallback"]=true,["actualInputSource"]="unverified"},
                 new JObject{["vrId"]="VR2",["identityVerified"]=false,["matchesConfiguredRig"]=true,["configFile"]=sidecar},

@@ -37,6 +37,8 @@ namespace ConfigurationUI
                 "One Kannadi experiment: 120 seconds of entrainment, then 300 seconds of social coupling. Phases stay together and retain tracked pose without reloading."),
             new SequenceStarter("Kannadi · tight stock and black swarms","Examples/Sequences/kannadi-tight-swarms.sequence.json",
                 "Two close-range 128-locust blocks. The second shows textured locusts on one side and black silhouettes on the other."),
+            new SequenceStarter("Kannadi · centred stock swarms","Examples/Sequences/kannadi-centred-swarms.sequence.json",
+                "Two centred stock-locust blocks, with 64 and 206 agents per rig."),
             new SequenceStarter("Social coupling · control","Examples/Sequences/social-coupling-control.sequence.json",
                 "The same linked Kannadi social scene without prior swarm entrainment.")
         };

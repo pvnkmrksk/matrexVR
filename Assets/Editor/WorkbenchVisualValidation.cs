@@ -24,10 +24,12 @@ public static class WorkbenchVisualValidation
     private static readonly List<string> checks = new List<string>(), errors = new List<string>();
     private static readonly List<object> geometry = new List<object>();
     private static int stage, nextFrame;
-    private static double deadline,hoverDeadline;
+    private static double deadline,hoverDeadline,previewDeadline;
     private static RenderTexture target;
     private static ConfigDocument experiment;
-    private static string terrainBaseBeforeOverride,terrainSequenceBeforeOverride;
+    private static string terrainBaseBeforeOverride,terrainSequenceBeforeOverride,appearanceBeforePreviewToggle;
+    private static Texture2D originalModelPreview;
+    private static Color32[] originalModelPixels;
     private static string Output => Path.Combine(Application.dataPath, "../workbench-visual-validation");
     static WorkbenchVisualValidation()
     {
@@ -52,10 +54,39 @@ public static class WorkbenchVisualValidation
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "sequenceConfig.json"), File.ReadAllText(Path.Combine(profile, "sequence.json")));
         File.WriteAllText(Path.Combine(Application.streamingAssetsPath, "visual-motion.example.json"),
             "{\"closedLoopOrientation\":true,\"closedLoopPosition\":false,\"autopilotEnabled\":true,\"autopilotSpeed\":7,\"walkingPositionGain\":0.01,\"windSpeed\":0,\"windDirection\":0,\"resetPositionOnStart\":false,\"resetRotationOnStart\":true,\"randomInitialRotation\":true}");
+        if(parameterLayout) WriteAppearanceFixture();
         SessionState.SetBool(Key+".ParameterLayout",parameterLayout);
         SessionState.SetBool(Key, true);
         EditorSceneManager.OpenScene("Assets/Scenes/ControlScene.unity");
         EditorApplication.isPlaying = true;
+    }
+    private static void WriteAppearanceFixture()
+    {
+        string assets=Application.streamingAssetsPath;
+        void WriteTexture(string name,int width,int height,Color32 color)
+        {
+            var image=new Texture2D(width,height,TextureFormat.RGBA32,false);
+            try
+            {
+                image.SetPixels32(Enumerable.Repeat(color,width*height).ToArray());
+                image.Apply();
+                File.WriteAllBytes(Path.Combine(assets,name),image.EncodeToPNG());
+            }
+            finally { Object.DestroyImmediate(image); }
+        }
+        WriteTexture("visual-amber.png",4,4,new Color32(255,64,8,255));
+        WriteTexture("visual-blue.png",4,4,new Color32(8,48,255,255));
+        WriteTexture("visual-panorama.png",8,4,new Color32(52,134,218,255));
+        var config=new JObject {
+            ["objects"]=new JArray(new JObject {
+                ["enabled"]=true,["type"]="Cube",["modelPath"]="Models/Examples/SimulatedLocust.glb",
+                ["appearance"]=new JObject {["textureVariants"]=new JArray(
+                    new JObject {["name"]="Warm",["texturePath"]="visual-amber.png",["_fixture"]="retain"},
+                    new JObject {["name"]="Cool",["texturePath"]="visual-blue.png"})}
+            }),
+            ["skyboxPath"]="visual-panorama.png"
+        };
+        File.WriteAllText(Path.Combine(assets,"visual-appearance.example.json"),config.ToString(Formatting.None));
     }
     private static void Loaded(Scene scene, LoadSceneMode mode)
     { foreach (var listener in Object.FindObjectsByType<ZmqListener>(FindObjectsSortMode.None)) listener.enabled = false; }
@@ -80,28 +111,29 @@ public static class WorkbenchVisualValidation
         var original = ui.Workspace.Sequence;
         string systemPath = ui.Workspace.System.Path, systemJson = ui.Workspace.System.Root.ToString();
         original.Edit(json => json["_visualDraftProbe"] = true);
-        string[] references = {
-            "Examples/Rugosity/sequence-treatment-matched-terrain.json",
-            "Examples/Rugosity/sequence-treatment-visual-terrain_navigation-flat.json",
-            "Examples/Rugosity/sequence-treatment-visual-flat_navigation-terrain.json",
-            "Examples/Rugosity/sequence-treatment-matched-flat.json",
-            "Examples/Sequences/swarm-entrainment-social.sequence.json",
-            "Examples/Sequences/social-coupling-control.sequence.json"
+        var presets=new[] {
+            ("Terrain · matched relief","Examples/Rugosity/sequence-treatment-matched-terrain.json",4),
+            ("Terrain · visible relief, flat navigation","Examples/Rugosity/sequence-treatment-visual-terrain_navigation-flat.json",4),
+            ("Terrain · flat appearance, relief navigation","Examples/Rugosity/sequence-treatment-visual-flat_navigation-terrain.json",4),
+            ("Terrain · matched flat","Examples/Rugosity/sequence-treatment-matched-flat.json",4),
+            ("Kannadi · entrainment then social coupling","Examples/Sequences/kannadi-entrainment-social.sequence.json",1),
+            ("Kannadi · centred stock swarms","Examples/Sequences/kannadi-centred-swarms.sequence.json",2),
+            ("Social coupling · control","Examples/Sequences/social-coupling-control.sequence.json",1)
         };
-        int[] counts = { 4, 4, 4, 4, 2, 1 };
-        for (int i = 0; i < references.Length; i++)
+        for(int i=0;i<presets.Length;i++)
         {
-            var chooser = ui.Document.rootVisualElement.Q<DropdownField>("sequence-starter-choice");
-            Check(chooser.choices.Count == 6, "Six prepared sequence options are available");
-            chooser.value = chooser.choices[i];
-            Check(ui.Document.rootVisualElement.Q<Label>("sequence-starter-timing").text.Contains("block"), "Sequence shows its current duration and block count");
+            var (title,reference,count)=presets[i];
+            var chooser=ui.Document.rootVisualElement.Q<DropdownField>("sequence-starter-choice");
+            Check(chooser.choices.Contains(title),"Prepared sequence is listed: "+title);
+            chooser.value=title;
+            Check(ui.Document.rootVisualElement.Q<Label>("sequence-starter-timing").text.Contains("block"),"Sequence shows its current duration and block count");
             Submit(ui.Document.rootVisualElement.Q<Button>("sequence-starter-load"));
-            Check(ui.Workspace.Sequence.Path == Path.GetFullPath(ExperimentConfigFiles.Resolve(references[i])), "Prepared sequence loads: " + references[i]);
-            Check(((JArray)ui.Workspace.Sequence.Root["sequences"]).Count == counts[i], "Loaded sequence has expected block count");
-            Check(ui.Workspace.System.Path == systemPath && ui.Workspace.System.Root.ToString() == systemJson, "Loading retains the exact apparatus");
-            Check(ui.Workspace.Documents.Contains(original) && original.Dirty && (bool)original.Root["_visualDraftProbe"], "Other sequence draft remains available");
-            Check(!MainController.Instance.SequenceRunning, "Loading never starts an experiment");
-            if (i + 1 < references.Length) Call(ui, "ShowSequenceLibrary");
+            Check(ui.Workspace.Sequence.Path==Path.GetFullPath(ExperimentConfigFiles.Resolve(reference)),"Prepared sequence loads: "+reference);
+            Check(((JArray)ui.Workspace.Sequence.Root["sequences"]).Count==count,"Loaded sequence has expected block count");
+            Check(ui.Workspace.System.Path==systemPath&&ui.Workspace.System.Root.ToString()==systemJson,"Loading retains the exact apparatus");
+            Check(ui.Workspace.Documents.Contains(original)&&original.Dirty&&(bool)original.Root["_visualDraftProbe"],"Other sequence draft remains available");
+            Check(!MainController.Instance.SequenceRunning,"Loading never starts an experiment");
+            if(i+1<presets.Length)Call(ui,"ShowSequenceLibrary");
         }
         original.Undo(); ui.Workspace.SelectPrimary("sequence", original.Path); Call(ui, "ShowSessionHome");
     }
@@ -261,13 +293,68 @@ public static class WorkbenchVisualValidation
         var dropdown=root.Q<DropdownField>();
         Check(dropdown!=null&&dropdown.value.StartsWith("TerrainChoice_",StringComparison.Ordinal),"Friendly scene dropdown retains the actual Unity scene value");
     }
-    private static void OpenSwarmGroups(ConfigWorkbench ui)
+    private static VisualElement CheckInlineGroups(ConfigWorkbench ui,bool wide)
     {
-        experiment=ui.Workspace.Open("Examples/Kannadi/tight-mixed.example.json","kannadi");
-        Call(ui,"Select",experiment);
-        var path=(List<string>)typeof(ConfigWorkbench).GetField("path",Hidden).GetValue(ui);
-        path.Add("agentGroups");
-        Call(ui,"BuildContent");
+        var root=ui.Document.rootVisualElement;
+        var first=root.Q<VisualElement>("swarm-group-0");
+        var second=root.Q<VisualElement>("swarm-group-1");
+        Check(first!=null&&second!=null,"Both swarm group cards are exposed in Basics");
+        Check(wide?second.worldBound.xMin>=first.worldBound.xMax&&Mathf.Abs(second.worldBound.yMin-first.worldBound.yMin)<1:
+            second.worldBound.yMin>=first.worldBound.yMax,"Group cards fit side by side at Full HD and stack in a compact window");
+        Check(root.Q<Label>("swarm-group-total").text=="2 groups · 128 agents per rig","Group summary reflects the configured population");
+        foreach(var card in new[]{first,second})
+        {
+            var count=card.Q<TextField>("number-count");
+            Check(count!=null&&count.worldBound.width>=96&&count.worldBound.width<=120,"Inline Count uses a compact exact number box");
+            foreach(string axis in new[]{"x","y","z"})
+            {
+                var input=card.Q<TextField>("number-"+axis);
+                Check(input!=null&&input.worldBound.width>=72&&input.worldBound.width<=92&&input.worldBound.xMax<=card.worldBound.xMax+1,
+                    "Inline spawn offset "+axis+" remains within the group card");
+            }
+        }
+        var appearance=second.Q<DropdownField>("swarm-group-appearance-1");
+        Check(appearance!=null&&appearance.value=="Black"&&appearance.worldBound.width<=160,"The second group exposes its Black appearance inline");
+        geometry.Add(new {control="inline-swarm-groups",firstX=first.worldBound.xMin,firstY=first.worldBound.yMin,
+            secondX=second.worldBound.xMin,secondY=second.worldBound.yMin,cardWidth=first.worldBound.width,
+            targetWidth=target.width,targetHeight=target.height});
+        return second;
+    }
+
+    private static VisualElement PreviewPane(ConfigWorkbench ui,string name)
+    {
+        return ui.Document.rootVisualElement.Q<VisualElement>(name);
+    }
+
+    private static void CheckPreviewPlacement(ConfigWorkbench ui,bool wide)
+    {
+        var root=ui.Document.rootVisualElement;
+        Check(root.ClassListContains("narrow-layout")==!wide,
+            "Preview breakpoint matches the test size. Root width "+root.layout.width+", target width "+target.width);
+        foreach(string name in new[]{"object-preview-objects-0-modelPath","sky-rendered-preview"})
+        {
+            var pane=PreviewPane(ui,name);
+            Check(pane!=null&&pane.worldBound.width>=230&&pane.worldBound.width<=345,"Preview has a usable bounded width: "+name);
+            var row=pane.parent.parent;
+            var controls=row.Q<VisualElement>(className:"object-main-controls");
+            geometry.Add(new {control=name,previewX=pane.worldBound.xMin,previewY=pane.worldBound.yMin,
+                previewWidth=pane.worldBound.width,editorRight=controls.worldBound.xMax,editorBottom=controls.worldBound.yMax,
+                rootWidth=root.layout.width,rowWidth=row.layout.width,rowDirection=row.resolvedStyle.flexDirection.ToString(),
+                targetWidth=target.width,targetHeight=target.height});
+            Check(wide?pane.worldBound.xMin>=controls.worldBound.xMax-1:pane.worldBound.yMin>=controls.worldBound.yMax-1,
+                "Preview uses the side column when wide and wraps when narrow: "+name+
+                " · pane "+pane.worldBound+" · controls "+controls.worldBound);
+            Check(pane.worldBound.xMax<=row.worldBound.xMax+1,"Preview stays within the appearance row: "+name);
+        }
+    }
+
+    private static Texture2D ReadyPreview(ConfigWorkbench ui,string name)
+    {
+        var pane=PreviewPane(ui,name);
+        var image=pane?.Q<Image>()?.image as Texture2D;
+        if(image==null&&EditorApplication.timeSinceStartup>=previewDeadline)
+            throw new Exception("Preview did not render: "+name+" · "+pane?.Q<Label>()?.text);
+        return image;
     }
     private static void CheckGroupInputs(ConfigWorkbench ui)
     {
@@ -300,26 +387,124 @@ public static class WorkbenchVisualValidation
             {
                 case 0:
                     Render(ui,1920,1080,1);
-                    if(SessionState.GetBool(Key+".ParameterLayout",false)){OpenSwarmGroups(ui);Next(90,60);}
+                    if(SessionState.GetBool(Key+".ParameterLayout",false))
+                    {EditPage(ui,"Examples/Kannadi/tight-mixed.example.json","kannadi","Basics");Next(100,60);}
                     else Next(1,60);
                     break;
+                case 100:
+                {
+                    var root=ui.Document.rootVisualElement;
+                    root.Q<ScrollView>("settings-editor-scroll").ScrollTo(root.Q<VisualElement>("setting-agentGroups"));
+                    Next(90);break;
+                }
                 case 90:
+                {
+                    var group=CheckInlineGroups(ui,true);
+                    var viewport=ui.Document.rootVisualElement.Q<ScrollView>("settings-editor-scroll").contentViewport.worldBound;
+                    Check(group.worldBound.yMin>=viewport.yMin-1&&group.worldBound.yMax<=viewport.yMax+1,
+                        "Full HD capture includes the complete group cards and all three spawn offsets");
+                    Capture("swarm-groups-inline-1920x1080");
+                    string before=experiment.Root.ToString(Formatting.None);
+                    Submit(group.Q<Button>("spin-up-count"));
+                    Check(experiment.Root["agentGroups"][1]["count"].ToString()=="65","Inline Count updates the existing group");
+                    Check(ui.Document.rootVisualElement.Q<Label>("swarm-group-total").text.Contains("129 agents"),"Inline group summary updates after the count edit");
+                    group.Q<DropdownField>("swarm-group-appearance-1").value="Stock";
+                    Check((string)experiment.Root["agentGroups"][1]["appearance"]=="Stock","Inline appearance edits the selected group");
+                    Submit(group.Q<Button>("spin-up-x"));
+                    Check(experiment.Root["agentGroups"][1]["spawnOffset"]["x"].ToString()=="7.1","Inline X offset is editable");
+                    experiment.Undo();experiment.Undo();experiment.Undo();
+                    Check(experiment.Root.ToString(Formatting.None)==before,"Undo restores the exact original grouped configuration");
+                    Call(ui,"BuildContent");Render(ui,1024,720,1);Next(102);break;
+                }
+                case 102:
+                {
+                    var root=ui.Document.rootVisualElement;
+                    root.Q<ScrollView>("settings-editor-scroll").ScrollTo(root.Q<VisualElement>("swarm-group-0"));
+                    Next(91);break;
+                }
+                case 91:
+                {
+                    CheckInlineGroups(ui,false);
+                    Capture("swarm-groups-inline-1024x720");
+                    var group=ui.Document.rootVisualElement.Q<VisualElement>("setting-agentGroups");
+                    Submit(group.Query<Button>().ToList().Single(button=>button.Q<Label>()?.text=="Advanced list"));Next(92);break;
+                }
+                case 92:
+                {
                     var groups=ui.Document.rootVisualElement.Q<ListView>(className:"fields");
                     var labels=groups.Query<Label>(className:"field-title").ToList();
-                    Check(labels.Any(label=>label.text=="Stock · 64"),"Group list names the stock appearance and count");
+                    Check(labels.Any(label=>label.text=="Stock · 64"),"Advanced list names the stock appearance and count");
                     var black=labels.Single(label=>label.text=="Black · 64");
-                    Capture("swarm-group-list-1920x1080");
-                    Submit(black.parent.parent.Q<VisualElement>(className:"field-value").Q<Button>());Next(91);break;
-                case 91:
-                    CheckGroupInputs(ui);Capture("swarm-group-fields-1920x1080");
-                    var beforeGroupEdit=experiment.Root.ToString(Formatting.None);
-                    Submit(ui.Document.rootVisualElement.Q<Button>("spin-up-count"));
-                    Check(experiment.Root["agentGroups"][1]["count"].ToString()=="65","Nested number stepper edits the existing configuration draft");
-                    experiment.Undo();
-                    Check(experiment.Root.ToString(Formatting.None)==beforeGroupEdit,"Undo restores the exact grouped configuration");
-                    Call(ui,"BuildContent");Render(ui,1024,720,1);Next(92);break;
-                case 92:
-                    CheckGroupInputs(ui);Capture("swarm-group-fields-1024x720");Finish(null);break;
+                    Submit(black.parent.parent.Q<VisualElement>(className:"field-value").Q<Button>());Next(93);break;
+                }
+                case 93:
+                    CheckGroupInputs(ui);Capture("swarm-group-fields-1024x720");
+                    Render(ui,1920,1080,1);EditPage(ui,"visual-appearance.example.json","choice","Sky");
+                    previewDeadline=EditorApplication.timeSinceStartup+30;Next(94);break;
+                case 94:
+                {
+                    var image=ReadyPreview(ui,"object-preview-objects-0-modelPath");
+                    if(image==null)return;
+                    originalModelPreview=image;originalModelPixels=image.GetPixels32();
+                    CheckPreviewPlacement(ui,true);
+                    Capture("appearance-split-model-1920x1080");
+                    var root=ui.Document.rootVisualElement;
+                    var picker=root.Q<DropdownField>("model-texture-variant-objects-0-appearance");
+                    Check(picker!=null&&picker.value==""&&picker.choices.SequenceEqual(new[]{"","Warm","Cool"}),"Texture picker shows Original and both configured variants");
+                    Submit(root.Q<Button>("edit-model-textures-objects-0-appearance"));Next(95);break;
+                }
+                case 95:
+                {
+                    var root=ui.Document.rootVisualElement;
+                    var dialog=root.Q<VisualElement>("texture-variants-dialog");
+                    var name=dialog.Q<TextField>("texture-variant-name-0");
+                    var imagePath=dialog.Q<TextField>("texture-variant-path-0");
+                    Check(name.worldBound.width<=190&&imagePath.worldBound.width>name.worldBound.width&&
+                        imagePath.worldBound.xMax<=dialog.worldBound.xMax,"Texture variant names remain compact while image paths have room");
+                    Check(dialog.Q<Button>("browse-texture-variant-0")!=null,"Image editor exposes native browsing");
+                    name.value="Amber";
+                    Check((string)experiment.Root["objects"][0]["appearance"]["textureVariants"][0]["name"]=="Warm","Texture editor does not mutate the configuration before Apply");
+                    Capture("texture-variant-editor-1920x1080");
+                    Submit(dialog.Q<Button>("apply-texture-variants"));
+                    Check((string)experiment.Root["objects"][0]["appearance"]["textureVariants"][0]["name"]=="Amber"&&
+                        (string)experiment.Root["objects"][0]["appearance"]["textureVariants"][0]["_fixture"]=="retain","Apply saves the name and retains unrelated entry fields");
+                    root.Q<DropdownField>("model-texture-variant-objects-0-appearance").value="Cool";
+                    Check((string)experiment.Root["objects"][0]["appearance"]["selectedTextureVariant"]=="Cool","Selecting a variant writes its configured name");
+                    previewDeadline=EditorApplication.timeSinceStartup+30;Next(96);break;
+                }
+                case 96:
+                {
+                    var image=ReadyPreview(ui,"object-preview-objects-0-modelPath");
+                    if(image==null||ReferenceEquals(image,originalModelPreview))
+                    {
+                        if(EditorApplication.timeSinceStartup>=previewDeadline)throw new Exception("Selected texture did not refresh the model preview");
+                        return;
+                    }
+                    Check(!image.GetPixels32().SequenceEqual(originalModelPixels),"Selecting the replacement image visibly changes the model preview");
+                    Capture("appearance-selected-texture-1920x1080");
+                    var root=ui.Document.rootVisualElement;
+                    root.Q<ScrollView>("settings-editor-scroll").ScrollTo(PreviewPane(ui,"sky-rendered-preview"));
+                    previewDeadline=EditorApplication.timeSinceStartup+30;Next(97);break;
+                }
+                case 97:
+                    if(ReadyPreview(ui,"sky-rendered-preview")==null)return;
+                    Capture("appearance-split-panorama-1920x1080");
+                    appearanceBeforePreviewToggle=experiment.Root.ToString(Formatting.None);
+                    ui.Document.rootVisualElement.Q<Toggle>("show-appearance-previews").value=false;Next(98);break;
+                case 98:
+                    Check(!ui.Document.rootVisualElement.Query<VisualElement>(className:"edit-rendered-preview").ToList().Any(),
+                        "Turning off previews detaches both model and sky panes");
+                    Check(experiment.Root.ToString(Formatting.None)==appearanceBeforePreviewToggle,"Preview visibility does not edit experiment JSON");
+                    Render(ui,960,720,1);
+                    ui.Document.rootVisualElement.Q<Toggle>("show-appearance-previews").value=true;Next(99);break;
+                case 99:
+                    CheckPreviewPlacement(ui,false);
+                    ui.Document.rootVisualElement.Q<ScrollView>("settings-editor-scroll").ScrollTo(PreviewPane(ui,"object-preview-objects-0-modelPath"));
+                    previewDeadline=EditorApplication.timeSinceStartup+30;Next(101);break;
+                case 101:
+                    if(ReadyPreview(ui,"object-preview-objects-0-modelPath")==null)return;
+                    Capture("appearance-preview-960x720");
+                    Check(!MainController.Instance.SequenceRunning,"Parameter-layout validation never starts acquisition");Finish(null);break;
                 case 1:
                     Shell(ui); Typography(); Capture("home-1920x1080");
                     File.WriteAllLines(Path.Combine(Output,"foldout-visual-tree.txt"),ui.Document.rootVisualElement.Q<Foldout>("navigation-files").Query<VisualElement>().ToList().Select(e=>e.GetType().Name+" / "+e.name+" / "+string.Join(" ",e.GetClasses())+" / bg="+e.resolvedStyle.backgroundColor+" border="+e.resolvedStyle.borderTopWidth));
@@ -444,7 +629,7 @@ public static class WorkbenchVisualValidation
         File.WriteAllText(Path.Combine(Output, "results.json"), JsonConvert.SerializeObject(new {
             checks = checks.Count, failure, errors, geometry, passed = checks, unity = Application.unityVersion,
             scope = SessionState.GetBool(Key+".ParameterLayout",false)?
-                "Native UI Toolkit advanced swarm group controls at 1920×1080 and 1024×720. No trackers or experiment started.":
+                "Native UI Toolkit inline and advanced swarm groups, split GLB and panorama previews, and texture editing at 1920×1080, 1024×720 and 960×720. No trackers or experiment started.":
                 "Native UI Toolkit offscreen rendering at Full HD, 4K at 2× scale and 2560×1440 at 1.25× scale. Synthetic configs; no trackers or experiment started."
         }, Formatting.Indented));
         EditorApplication.Exit(failure == null && errors.Count == 0 ? 0 : 1);

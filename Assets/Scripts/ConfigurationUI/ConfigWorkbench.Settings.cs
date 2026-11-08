@@ -86,8 +86,10 @@ namespace ConfigurationUI
                     JObject population=nested?(JObject)payload["swarm"]:payload;
                     JObject populationSchema=nested?ConfigSchema.Child(schema,"swarm"):schema;
                     string[] populationPath=nested?prefix.Concat(new[]{"swarm"}).ToArray():prefix;
-                    Section(scroll,"Population and spawn","swarm",population,populationSchema,populationPath,
-                        new[]{AgentCountKey(population),"agentGroups","dimension","spawnType","spawnAreaSize","spawnVolumeSize","spawnCenter"});
+                    var populationFields=new List<string>{"dimension","spawnType","spawnRelativeToAnimal","spawnAreaSize","spawnVolumeSize","spawnCenter","agentGroups"};
+                    if(!(population["agentGroups"] is JArray groups) || groups.Count==0)
+                        populationFields.Insert(0,AgentCountKey(population));
+                    Section(scroll,"Population and spawn","swarm",population,populationSchema,populationPath,populationFields);
                     Section(scroll,"Periodic arena","navigation",population,populationSchema,populationPath,
                         new[]{"periodicBoundary","boundaryLengthX","boundaryLengthZ","followAnimalPosition","wrapY","boundaryHeight","volumeHalfExtentMetres"});
                     Section(scroll,"Camera distance","visibility",population,populationSchema,populationPath,new[]{"farClipMetres","nearClipMetres"});
@@ -101,12 +103,22 @@ namespace ConfigurationUI
             }
             else if(category=="Appearance")
             {
+                var previews=StateSwitch(appearancePreviews,enabled=>{
+                    appearancePreviews=enabled;
+                    RebuildPreservingView();
+                },"show-appearance-previews");
+                previews.text="Show previews";
+                previews.tooltip="Show visual-only model and sky previews while setting up the experiment.";
+                editToolbar.Add(previews);
                 BuildPopulationAppearance(scroll,payload,schema,prefix);
                 if(schema["properties"]?["objects"]!=null||payload["objects"] is JArray)BuildObjectCollection(scroll,payload,schema,prefix);
                 var sky=new Foldout {name="appearance-sky",text="Sky & light",value=settingsTab=="Sky"||!(payload["objects"] is JArray objects)||objects.Count==0};sky.AddToClassList("editor-disclosure");scroll.Add(sky);
-                BuildSkyChoices(sky,payload,schema,prefix);
+                var skyRow=Row("object-visual-row");sky.Add(skyRow);
+                var skyControls=new VisualElement();skyControls.AddToClassList("object-main-controls");skyControls.AddToClassList("sky-main-controls");skyRow.Add(skyControls);
+                BuildSkyChoices(skyControls,payload,schema,prefix);
                 var skyKeys=new[]{"uniformSkyColor","skyboxPath","panoramaRotationDegrees","nightSky","sun"};
-                Section(sky,"Background & sun","sky",payload,schema,prefix,skyKeys);
+                Section(skyControls,"Background & sun","sky",payload,schema,prefix,skyKeys);
+                if(appearancePreviews) AddSkyPreview(AddAppearancePreviewSlot(skyRow),selected,prefix);
             }
             else if(category=="Motion")
             {
@@ -189,7 +201,9 @@ namespace ConfigurationUI
             {
                 var fallback=Pill("Check JSON","muted-pill");fallback.tooltip="This file contains an invalid value. The control displays its default; edit the value to repair it. Starting stays disabled until validation passes.";label.Add(fallback);BindViewState(fallback,()=>fallback.style.visibility=ConfigSchema.Validate(ConfigDocument.At(doc.Root,parts),schema).Count>0?Visibility.Visible:Visibility.Hidden);
             }
-            if(key=="modelAppearance"&&schema["properties"]!=null){setting.AddToClassList("surface-setting");BuildSurfaceControls(setting,schema,parts);}
+            if(parts.Length==1&&key==StimulusResolutionConfig.Field)BuildStimulusResolutionControls(setting,doc,parts,schema);
+            else if(key=="agentGroups"&&schema["items"] is JObject) BuildSwarmGroups(setting,doc,parts,schema);
+            else if(key=="modelAppearance"&&schema["properties"]!=null){setting.AddToClassList("surface-setting");BuildSurfaceControls(setting,schema,parts);}
             else if(TryVisibilityControl(doc,parts,out var visibilityControl)){setting.AddToClassList("visibility-setting");setting.Add(visibilityControl);}
             else if(TryChoiceCatalogControl(parts,value,v=>assign(v,false),out var catalogControl))setting.Add(catalogControl);
             else if(BooleanControl(shown,schema))
@@ -259,7 +273,7 @@ namespace ConfigurationUI
             }
             else if(shown is JArray array)
             {
-                var controls=Row(); controls.Add(Pill(array.Count+(key=="agentGroups"?" groups":" items"),"accent")); controls.Add(StudioButton("Edit items","settings",()=>{ selected=doc; advancedMode=true; path.Clear(); path.AddRange(parts); BuildContent(); },"quiet"));
+                var controls=Row(); controls.Add(Pill(array.Count+" items","accent")); controls.Add(StudioButton("Edit items","settings",()=>{ selected=doc; advancedMode=true; path.Clear(); path.AddRange(parts); BuildContent(); },"quiet"));
                 controls.Add(IconButton("plus","Add item",()=>StudioEdit(doc,r=>{if(!(ConfigDocument.At(r,parts) is JArray))AssignAt(r,parts,array.DeepClone());((JArray)ConfigDocument.At(r,parts)).Add(ConfigSchema.NewValue(ConfigSchema.Child(schema,"",true)));}))); setting.Add(controls);
             }
             else if(key=="utcOffsetHours")
@@ -329,6 +343,96 @@ namespace ConfigurationUI
             BindViewState(setting,enable); return setting;
         }
 
+        private void BuildSwarmGroups(VisualElement setting,ConfigDocument document,string[] groupPath,JObject schema)
+        {
+            JArray Groups(JToken root)=>ConfigDocument.At(root,groupPath) as JArray;
+            var groups=Groups(document.Root);
+            var itemSchema=ConfigSchema.Child(schema,"",true);
+            var countSchema=ConfigSchema.Child(itemSchema,"count");
+            var appearanceSchema=ConfigSchema.Child(itemSchema,"appearance");
+            var offsetSchema=ConfigSchema.Child(itemSchema,"spawnOffset");
+            var toolbar=Row("swarm-group-toolbar"); setting.Add(toolbar);
+            var add=StudioButton("Add group","plus",()=>StudioEdit(document,root=>{
+                if(Groups(root)==null) AssignAt(root,groupPath,new JArray());
+                Groups(root).Add(ConfigSchema.NewValue(itemSchema));
+            }),"quiet");
+            add.name="add-swarm-group";
+            toolbar.Add(add);
+            if(groups==null || groups.Count==0)return;
+
+            setting.AddToClassList("swarm-group-setting");
+            var summary=new Label {name="swarm-group-total"};
+            summary.AddToClassList("quiet-hint");
+            toolbar.Add(summary);
+            BindViewState(summary,()=>{
+                var current=Groups(document.Root);
+                if(current==null){summary.text="";return;}
+                long total=0;
+                foreach(var item in current)
+                {
+                    JToken count=(item as JObject)?["count"]??countSchema["default"];
+                    if(!(item is JObject)||!int.TryParse(count?.ToString(),NumberStyles.Integer,CultureInfo.InvariantCulture,out int n)||n<=0)
+                    { summary.text=current.Count+" groups · check counts";return; }
+                    total+=n;
+                }
+                summary.text=current.Count+(current.Count==1?" group":" groups")+" · "+total+" agents per rig";
+            });
+            var advanced=StudioButton("Advanced list","settings",()=>{
+                RequireApplied(); selected=document; advancedMode=true; path.Clear(); path.AddRange(groupPath); BuildContent();
+            },"quiet");
+            toolbar.Add(advanced);
+
+            var cards=Row("swarm-group-grid"); setting.Add(cards);
+            for(int index=0;index<groups.Count;index++)
+            {
+                int slot=index;
+                string[] itemPath=groupPath.Concat(new[]{slot.ToString(CultureInfo.InvariantCulture)}).ToArray();
+                var item=groups[slot] as JObject;
+                var card=new VisualElement {name="swarm-group-"+slot};
+                card.AddToClassList("swarm-group-card"); cards.Add(card);
+                var header=Row("swarm-group-header"); card.Add(header);
+                header.Add(new Label("Group "+(slot+1)));
+                header.Add(IconButton("copy","Duplicate group "+(slot+1),()=>StudioEdit(document,root=>Groups(root).Insert(slot+1,Groups(root)[slot].DeepClone()))));
+                header.Add(IconButton("trash","Remove group "+(slot+1),()=>StudioEdit(document,root=>Groups(root).RemoveAt(slot))));
+                void SetValue(string[] keys,JToken value)=>StudioEdit(document,root=>{
+                    if(!(Groups(root)[slot] is JObject)) Groups(root)[slot]=new JObject();
+                    AssignAt(root,itemPath.Concat(keys).ToArray(),value);
+                },false);
+
+                var values=Row("swarm-group-values"); card.Add(values);
+                JToken shownCount=ConfigSchema.EffectiveValue(item?["count"],countSchema)??new JValue(128);
+                AddSwarmGroupField(values,"Count",NumberControl(shownCount,countSchema,"count",v=>SetValue(new[]{"count"},v),false));
+                JToken shownAppearance=ConfigSchema.EffectiveValue(item?["appearance"],appearanceSchema)??new JValue("Stock");
+                if(shownAppearance.Type==JTokenType.Raw&&int.TryParse(shownAppearance.ToString(),NumberStyles.Integer,CultureInfo.InvariantCulture,out int choice))
+                    shownAppearance=new JValue(choice);
+                if(appearanceSchema["enum"] is JArray options)
+                {
+                    var appearance=EnumControl(options,shownAppearance,v=>SetValue(new[]{"appearance"},v));
+                    appearance.name="swarm-group-appearance-"+slot;
+                    AddSwarmGroupField(values,"Appearance",appearance);
+                }
+
+                var offsetLabel=new Label("Spawn offset · scene units");
+                offsetLabel.tooltip=(string)offsetSchema["x-ui"]?["help"];
+                offsetLabel.AddToClassList("swarm-group-label");card.Add(offsetLabel);
+                var offsets=Row("swarm-group-values");card.Add(offsets);
+                foreach(string axis in new[]{"x","y","z"})
+                {
+                    var axisSchema=ConfigSchema.Child(offsetSchema,axis);
+                    JToken axisValue=ConfigSchema.EffectiveValue((item?["spawnOffset"] as JObject)?[axis],axisSchema)??new JValue(0);
+                    var field=NumberControl(axisValue,axisSchema,axis,v=>SetValue(new[]{"spawnOffset",axis},v),false,84);
+                    AddSwarmGroupField(offsets,axis.ToUpperInvariant(),field);
+                }
+            }
+        }
+
+        private static void AddSwarmGroupField(VisualElement target,string label,VisualElement control)
+        {
+            var field=new VisualElement();field.AddToClassList("swarm-group-field");
+            var caption=new Label(label);caption.AddToClassList("swarm-group-label");field.Add(caption);
+            field.Add(control);target.Add(field);
+        }
+
         private static bool IsPathSetting(string key) => key.EndsWith("File",StringComparison.Ordinal) ||
             key.EndsWith("Path",StringComparison.Ordinal) || key=="design";
 
@@ -355,7 +459,6 @@ namespace ConfigurationUI
             int mode=payload["uniformSkyColor"] is JObject?1:!string.IsNullOrWhiteSpace((string)payload["skyboxPath"])?2:ExperimentBlocks.Flag(payload["nightSky"]?["enabled"])?3:0;
             selectedSkyMode=mode;
             var chooser=new DropdownField("Sky background",choices,mode){name="sky-background-mode",tooltip="Choose the sky shown by this phase. Default uses the scene's sky. A panorama uses a local image; starry night uses location and time."};target.Add(chooser);
-            AddSkyPreview(target,selected,prefix);
             Action<int,string> apply=(next,path)=>{
                 selectedSkyMode=next;
                 StudioEdit(selected,r=>{
@@ -370,21 +473,29 @@ namespace ConfigurationUI
             chooser.RegisterValueChangedCallback(e=>Guard(()=>{
                 RequireApplied();int next=choices.IndexOf(e.newValue);
                 if(next!=2){apply(next,null);return;}
-                var dialog=OpenModal("Choose panorama","Enter an image path relative to StreamingAssets. Its image is archived with the run.");dialog.AddToClassList("small-dialog");
-                var input=new TextField("Image path"){name="panorama-path",value=(string)payload["skyboxPath"]??"",isDelayed=true};dialog.Add(input);
+                var dialog=OpenModal("Choose panorama","Select a 2:1 PNG or JPEG image. MATREX archives the image with the run.");
+                dialog.AddToClassList("small-dialog");
+                var input=new TextField("Image path"){name="panorama-path",value=(string)payload["skyboxPath"]??"",isDelayed=true};
+                dialog.Add(input);
+                var formats=new List<string>{"png","jpg","jpeg"};
+                int formatIndex=formats.IndexOf(System.IO.Path.GetExtension(input.value).TrimStart('.').ToLowerInvariant());
+                var format=new DropdownField(formats,Math.Max(0,formatIndex)){tooltip="Filter the native image picker by file format."};
+                var browse=Row();browse.Add(format);
+                browse.Add(StudioButton("Browse…","file",()=>BrowseFile("Open sky panorama",format.value,chosen=>input.value=chosen),"quiet"));
+                dialog.Add(browse);
                 dialog.Add(StudioButton("Use panorama","sky",()=>{
                     RequireApplied();string reference=input.value.Trim();if(string.IsNullOrEmpty(reference)||!System.IO.File.Exists(ExperimentConfigFiles.Resolve(reference)))throw new ArgumentException("Choose an existing panorama image.");
                     apply(2,reference);CloseModal();
                 },"primary"));
             }));
         }
-        private VisualElement NumberControl(JToken value,JObject schema,string key,Action<JToken> commit,bool allowSlider=true)
+        private VisualElement NumberControl(JToken value,JObject schema,string key,Action<JToken> commit,bool allowSlider=true,float inputWidth=112)
         {
             var control=new VisualElement(); control.AddToClassList("number-control");
             var spin=Row("spin-box"); control.Add(spin);
             var input=new TextField { value=value.ToString(),isDelayed=true,name="number-"+key }; input.AddToClassList("exact-number"); spin.Add(input);
             string lastValidText=value.ToString();
-            input.style.width=112;
+            input.style.width=inputWidth;
             Slider slider=null; IVisualElementScheduledItem pending=null;
             JToken draft=null;
             Action flush=()=>{ if(draft==null) return; var number=draft; draft=null;numberDrafts.Remove(control); Guard(()=>{commit(number);lastValidText=number.ToString();MarkEditorCommitted(input,lastValidText);});RefreshSaveAvailability(); };

@@ -79,6 +79,7 @@ public static class RuntimeModelExamplesValidation
                         Check(blue.GetPixels32().Count(pixel=>pixel.b>pixel.r+20)>25,name+": chosen blue appearance is visible in the real GPU preview");
                     }
                     finally { if(red!=null)Object.DestroyImmediate(red);if(blue!=null)Object.DestroyImmediate(blue); }
+                    if (name == "SimulatedLocust") TextureVariants(prefab, instance);
                     ModelAppearance.Apply(instance,Appearance(Color.green));
                     var target=instance.AddComponent<RecordedWorldStateTarget>();target.Key="model-appearance-test";var world=target.Capture(true);
                     Check(world!=null&&world["nodes"].Any(node=>node["renderers"].Any()),name+": actual renderer appearance enters extensible world evidence");
@@ -93,6 +94,56 @@ public static class RuntimeModelExamplesValidation
         File.WriteAllText(Path.Combine(Output,"results.json"),JsonConvert.SerializeObject(new{checks=checks.Count,passed=checks,failure,unity=Application.unityVersion,scope="Actual exported locust plus downloaded Khronos skeletal/morph GLBs through production runtime importer, GPU color previews, original deformed animation forward/backward restore and immutable source assets; no physical hardware."},Formatting.Indented));
         EditorApplication.Exit(failure==null?0:1);
     }
+    private static void TextureVariants(GameObject prefab, GameObject instance)
+    {
+        string red = Path.Combine(Output, "locust-texture-red.png");
+        string blue = Path.Combine(Output, "locust-texture-blue.png");
+        WriteTexture(red, Color.red);
+        WriteTexture(blue, Color.blue);
+        var settings = new ModelAppearanceConfig {
+            enabled = false, keepTexture = false, selectedTextureVariant = "Red",
+            textureVariants = new[] {
+                new ModelTextureVariantConfig { name = "Red", texturePath = red },
+                new ModelTextureVariantConfig { name = "Blue", texturePath = blue }
+            }
+        };
+        var renderer = instance.GetComponentInChildren<SkinnedMeshRenderer>(true);
+        Material[] original = renderer.sharedMaterials;
+        Texture2D redPreview = null, bluePreview = null;
+        try
+        {
+            var clips = PreviewVisuals.Animations(prefab);
+            redPreview = ConfigurationPreviewRenderer.Object(prefab, clips, appearance: settings);
+            settings.selectedTextureVariant = "blue";
+            bluePreview = ConfigurationPreviewRenderer.Object(prefab, clips, appearance: settings);
+            Check(redPreview.GetPixels32().Count(pixel => pixel.r > pixel.b + 20) > 25, "Red PNG replaces base-color pixels with tint disabled");
+            Check(bluePreview.GetPixels32().Count(pixel => pixel.b > pixel.r + 20) > 25, "Blue PNG replaces base-color pixels with tint disabled");
+            File.WriteAllBytes(Path.Combine(Output, "locust-selected-red.png"), redPreview.EncodeToPNG());
+            File.WriteAllBytes(Path.Combine(Output, "locust-selected-blue.png"), bluePreview.EncodeToPNG());
+            ModelAppearance.Apply(instance, settings, preview: true);
+            Check(!renderer.sharedMaterials.SequenceEqual(original), "Selecting an external texture uses instance-owned materials");
+            settings.selectedTextureVariant = "";
+            ModelAppearance.Apply(instance, settings, preview: true);
+            Check(renderer.sharedMaterials.SequenceEqual(original), "Original restores the imported material objects");
+        }
+        finally
+        {
+            if (redPreview != null) Object.DestroyImmediate(redPreview);
+            if (bluePreview != null) Object.DestroyImmediate(bluePreview);
+        }
+    }
+    private static void WriteTexture(string path, Color color)
+    {
+        var texture = new Texture2D(8, 8);
+        try
+        {
+            texture.SetPixels(Enumerable.Repeat(color, 64).ToArray());
+            texture.Apply();
+            File.WriteAllBytes(path, texture.EncodeToPNG());
+        }
+        finally { Object.DestroyImmediate(texture); }
+    }
+
     private static ModelAppearanceConfig Appearance(Color color)=>new ModelAppearanceConfig{enabled=true,keepTexture=false,color=new ColorConfig{r=color.r,g=color.g,b=color.b,a=1},metallic=0,smoothness=.4f};
     private static void MaterialIsolation()
     {

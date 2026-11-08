@@ -128,7 +128,7 @@ public static class SameBuildReplayValidation
         var host=new GameObject("original optomotor");var controller=host.AddComponent<OptomotorSceneController>();typeof(OptomotorSceneController).GetField("drumPrefab",Hidden).SetValue(controller,AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/OptomotorDrum.prefab"));Invoke(controller,"Awake");
         var target=Object.FindObjectsByType<RecordedWorldStateTarget>(FindObjectsSortMode.None).Single(value=>value.Key=="optomotor-drum");Invoke(target.GetComponent<SinusoidalGrating>(),"Awake");Invoke(target.GetComponent<DrumRotator>(),"Awake");
         var config=JObject.Parse("{\"stimuli\":[{\"frequency\":3,\"contrast\":0.9,\"dutyCycle\":0.3,\"color1\":\"#FF0000\",\"color2\":\"#FFFFFF\"},{\"frequency\":11,\"contrast\":0.6,\"dutyCycle\":0.7,\"color1\":\"#0000FF\",\"color2\":\"#FFFFFF\"}]}");
-        using(new ReplayExecutionContext(archive,new JObject(),new Dictionary<string,string>()))
+        using(new ReplayExecutionContext(archive,new JObject(),new Dictionary<string,string>(),new Dictionary<string,Texture2D>()))
         {
             controller.InitializeScene(new Dictionary<string,object>{{"configFile","recorded.json"},{"__experimentPhase",config}});target.transform.rotation=Quaternion.Euler(0,37,0);
             var first=target.Capture(true);string pixels=RunConfigArchive.Hash(((Texture2D)target.GetComponent<Renderer>().sharedMaterial.mainTexture).GetRawTextureData());

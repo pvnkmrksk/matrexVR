@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 /// <summary>Immutable config/input snapshots with a manifest. File IO runs only at load/phase boundaries.</summary>
 public sealed class RunConfigArchive
 {
+    public const string ModelTextureRole = "model-texture";
     private sealed class Snapshot
     {
         public string sourcePath, sourceRelativePath, sha256, snapshotPath, readablePath;
@@ -45,10 +46,11 @@ public sealed class RunConfigArchive
     {
         lock(gate)
         {
-            string path=Resolve(reference);
+            var frozen = FrozenTexture(reference, role);
+            string path = frozen?.sourcePath ?? Resolve(reference);
             try
             {
-                byte[] bytes=File.ReadAllBytes(path);
+                byte[] bytes = ReadSourceBytes(path, frozen);
                 CaptureBytes(path,reference,role,bytes,true,scene,new HashSet<string>(),true);
                 WriteManifest();
                 return bytes;
@@ -135,16 +137,35 @@ public sealed class RunConfigArchive
     }
     private void CaptureFile(string reference,string role,bool consumed,bool required,string scene,HashSet<string> visited)
     {
-        string path=Resolve(reference);
+        var frozen = FrozenTexture(reference, role);
+        string path = frozen?.sourcePath ?? Resolve(reference);
         // An optional occurrence must not suppress a later required occurrence of the same file.
         if(!visited.Add(path+"|"+required)) return;
-        try {CaptureBytes(path,reference,role,File.ReadAllBytes(path),consumed,scene,visited,required);}
+        try {CaptureBytes(path,reference,role,ReadSourceBytes(path, frozen),consumed,scene,visited,required);}
         catch(Exception error)
         {
             if(required) errors[path]=error.Message;
             else unavailableOptional.Add(reference+": "+error.Message);
         }
     }
+    private Snapshot FrozenTexture(string reference, string role)
+    {
+        if (role != ModelTextureRole) return null;
+        // Freeze the texture used for the entire recording even if its source
+        // file is replaced between preparation and a later phase.
+        string path = Resolve(reference);
+        return snapshots.Values.FirstOrDefault(file => file.roles.Contains(ModelTextureRole) &&
+            (file.sourcePath == path || file.references.Contains(reference)));
+    }
+
+    private byte[] ReadSourceBytes(string path, Snapshot frozen)
+    {
+        if (frozen == null) return File.ReadAllBytes(path);
+        byte[] bytes = File.ReadAllBytes(Path.Combine(directory, frozen.snapshotPath));
+        if (Hash(bytes) != frozen.sha256) throw new InvalidDataException("Saved texture checksum mismatch: " + path);
+        return bytes;
+    }
+
     private void CaptureBytes(string path,string reference,string role,byte[] bytes,bool consumed,string scene,HashSet<string> visited,bool required)
     {
         string hash=Hash(bytes),key=path+"|"+hash;
@@ -194,6 +215,11 @@ public sealed class RunConfigArchive
                 // required experiment document. CaptureCompanions snapshots only
                 // verified matching native configurations and records failures.
                 if(systemDocument && property.Name=="tracker") continue;
+                if ((property.Name == "appearance" || property.Name == "modelAppearance") &&
+                    property.Value is JObject appearance && appearance["textureVariants"] is JArray variants)
+                    foreach (var variant in variants.OfType<JObject>())
+                        if (variant["texturePath"]?.Type == JTokenType.String && !string.IsNullOrWhiteSpace((string)variant["texturePath"]))
+                            CaptureFile((string)variant["texturePath"], ModelTextureRole, false, required, scene, visited);
                 string role=property.Name=="configFile"?"experiment":property.Name=="design"?"design":
                     property.Name=="trajectoryFile"?"trajectory":property.Name=="skyboxPath"?"skybox":
                     property.Name=="modelPath" || property.Name=="kannadiModelPath"?"model":null;
