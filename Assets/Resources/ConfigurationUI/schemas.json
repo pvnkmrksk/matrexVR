@@ -13638,10 +13638,11 @@
         "default": "Mirror",
         "enum": [
           "Mirror",
-          "Swarm"
+          "Swarm",
+          "Mixed"
         ],
         "x-ui": {
-          "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
+          "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig. Mixed shows a single shared generated swarm together with other tracked animals and their copies."
         }
       },
       "kannadiModelPath": {
@@ -14522,6 +14523,49 @@
         "default": null,
         "x-ui": {
           "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+        }
+      },
+      "avatarCopyOffsets": {
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "x": {
+              "type": "number",
+              "minimum": -3.40282347E+38,
+              "maximum": 3.40282347E+38,
+              "default": 0.0
+            },
+            "y": {
+              "type": "number",
+              "minimum": -3.40282347E+38,
+              "maximum": 3.40282347E+38,
+              "default": 0.0
+            },
+            "z": {
+              "type": "number",
+              "minimum": -3.40282347E+38,
+              "maximum": 3.40282347E+38,
+              "default": 0.0
+            }
+          }
+        },
+        "x-ui": {
+          "visibleWhen": {
+            "property": "populationMode",
+            "oneOf": [
+              "Mixed"
+            ]
+          },
+          "unit": "scene units",
+          "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
         }
       },
       "kannadiTilePrefab": {
@@ -16721,10 +16765,11 @@
             "default": "Mirror",
             "enum": [
               "Mirror",
-              "Swarm"
+              "Swarm",
+              "Mixed"
             ],
             "x-ui": {
-              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
+              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig. Mixed shows a single shared generated swarm together with other tracked animals and their copies."
             }
           },
           "kannadiModelPath": {
@@ -17604,6 +17649,49 @@
             "default": null,
             "x-ui": {
               "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+            }
+          },
+          "avatarCopyOffsets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                },
+                "z": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                }
+              }
+            },
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mixed"
+                ]
+              },
+              "unit": "scene units",
+              "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
             }
           },
           "kannadiTilePrefab": {
@@ -21020,10 +21108,11 @@
             "default": "Mirror",
             "enum": [
               "Mirror",
-              "Swarm"
+              "Swarm",
+              "Mixed"
             ],
             "x-ui": {
-              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
+              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig. Mixed shows a single shared generated swarm together with other tracked animals and their copies."
             }
           },
           "kannadiModelPath": {
@@ -21903,6 +21992,49 @@
             "default": null,
             "x-ui": {
               "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+            }
+          },
+          "avatarCopyOffsets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                },
+                "z": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                }
+              }
+            },
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mixed"
+                ]
+              },
+              "unit": "scene units",
+              "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
             }
           },
           "kannadiTilePrefab": {
@@ -25319,10 +25451,11 @@
             "default": "Mirror",
             "enum": [
               "Mirror",
-              "Swarm"
+              "Swarm",
+              "Mixed"
             ],
             "x-ui": {
-              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
+              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig. Mixed shows a single shared generated swarm together with other tracked animals and their copies."
             }
           },
           "kannadiModelPath": {
@@ -26202,6 +26335,49 @@
             "default": null,
             "x-ui": {
               "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+            }
+          },
+          "avatarCopyOffsets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                },
+                "z": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                }
+              }
+            },
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mixed"
+                ]
+              },
+              "unit": "scene units",
+              "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
             }
           },
           "kannadiTilePrefab": {
@@ -31010,10 +31186,11 @@
         "default": "Mirror",
         "enum": [
           "Mirror",
-          "Swarm"
+          "Swarm",
+          "Mixed"
         ],
         "x-ui": {
-          "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
+          "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig. Mixed shows a single shared generated swarm together with other tracked animals and their copies."
         }
       },
       "kannadiModelPath": {
@@ -31894,6 +32071,49 @@
         "default": null,
         "x-ui": {
           "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+        }
+      },
+      "avatarCopyOffsets": {
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "x": {
+              "type": "number",
+              "minimum": -3.40282347E+38,
+              "maximum": 3.40282347E+38,
+              "default": 0.0
+            },
+            "y": {
+              "type": "number",
+              "minimum": -3.40282347E+38,
+              "maximum": 3.40282347E+38,
+              "default": 0.0
+            },
+            "z": {
+              "type": "number",
+              "minimum": -3.40282347E+38,
+              "maximum": 3.40282347E+38,
+              "default": 0.0
+            }
+          }
+        },
+        "x-ui": {
+          "visibleWhen": {
+            "property": "populationMode",
+            "oneOf": [
+              "Mixed"
+            ]
+          },
+          "unit": "scene units",
+          "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
         }
       },
       "kannadiTilePrefab": {
@@ -34093,10 +34313,11 @@
             "default": "Mirror",
             "enum": [
               "Mirror",
-              "Swarm"
+              "Swarm",
+              "Mixed"
             ],
             "x-ui": {
-              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
+              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig. Mixed shows a single shared generated swarm together with other tracked animals and their copies."
             }
           },
           "kannadiModelPath": {
@@ -34976,6 +35197,49 @@
             "default": null,
             "x-ui": {
               "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+            }
+          },
+          "avatarCopyOffsets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                },
+                "z": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                }
+              }
+            },
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mixed"
+                ]
+              },
+              "unit": "scene units",
+              "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
             }
           },
           "kannadiTilePrefab": {
@@ -38392,10 +38656,11 @@
             "default": "Mirror",
             "enum": [
               "Mirror",
-              "Swarm"
+              "Swarm",
+              "Mixed"
             ],
             "x-ui": {
-              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
+              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig. Mixed shows a single shared generated swarm together with other tracked animals and their copies."
             }
           },
           "kannadiModelPath": {
@@ -39275,6 +39540,49 @@
             "default": null,
             "x-ui": {
               "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+            }
+          },
+          "avatarCopyOffsets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                },
+                "z": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                }
+              }
+            },
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mixed"
+                ]
+              },
+              "unit": "scene units",
+              "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
             }
           },
           "kannadiTilePrefab": {
@@ -42691,10 +42999,11 @@
             "default": "Mirror",
             "enum": [
               "Mirror",
-              "Swarm"
+              "Swarm",
+              "Mixed"
             ],
             "x-ui": {
-              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."
+              "help": "Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig. Mixed shows a single shared generated swarm together with other tracked animals and their copies."
             }
           },
           "kannadiModelPath": {
@@ -43574,6 +43883,49 @@
             "default": null,
             "x-ui": {
               "help": "Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply."
+            }
+          },
+          "avatarCopyOffsets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": true,
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                },
+                "z": {
+                  "type": "number",
+                  "minimum": -3.40282347E+38,
+                  "maximum": 3.40282347E+38,
+                  "default": 0.0
+                }
+              }
+            },
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mixed"
+                ]
+              },
+              "unit": "scene units",
+              "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
             }
           },
           "kannadiTilePrefab": {

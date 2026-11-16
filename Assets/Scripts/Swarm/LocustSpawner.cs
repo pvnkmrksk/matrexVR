@@ -69,6 +69,8 @@ public class LocustSpawner : MonoBehaviour
     private readonly System.Collections.Generic.List<GameObject> spawned = new System.Collections.Generic.List<GameObject>();
     public System.Collections.Generic.IReadOnlyList<GameObject> Spawned => spawned;
     public int SpawnRevision { get; private set; }
+    internal int PopulationCount => removalOrder == null ? spawned.Count : numberOfLocusts;
+    private int[] removalOrder;
     private bool initialized;
     private GameObject batchedVisual;
     private Material sharedAppearance;
@@ -149,6 +151,34 @@ public class LocustSpawner : MonoBehaviour
         initialized = true; // Start must not spawn during assessment.
     }
 
+    internal void InitializeRemovalOrder()
+    {
+        removalOrder = new int[spawned.Count];
+        for (int i = 0; i < removalOrder.Length; i++) removalOrder[i] = i;
+        var random = ExperimentRandom.ForComponent(this, "shared-swarm-removal");
+        for (int i = removalOrder.Length - 1; i > 0; i--)
+        {
+            int j = random.Next(i + 1);
+            (removalOrder[i], removalOrder[j]) = (removalOrder[j], removalOrder[i]);
+        }
+    }
+
+    internal void ReduceGeneratedPopulationTo(int count)
+    {
+        if (removalOrder == null || count < 0 || count > numberOfLocusts)
+            throw new System.InvalidOperationException("The shared swarm can only remove generated locusts from its initial population.");
+        if (count == numberOfLocusts) return;
+        // Keep the original list slots so the motion, rendering and recorder retain survivor identity.
+        for (int i = removalOrder.Length - numberOfLocusts; i < removalOrder.Length - count; i++)
+            spawned[removalOrder[i]].SetActive(false);
+        numberOfLocusts = count;
+        SpawnRevision++;
+        if (count != 0) return;
+        if (generatedMotion != null) generatedMotion.enabled = false;
+        foreach (var batch in nativeBatches)
+            if (batch != null) batch.SetActive(false);
+    }
+
     public void Rebuild()
     {
         using (ExperimentRandom.ScopeFor(this, "swarm-initialization"))
@@ -179,6 +209,7 @@ public class LocustSpawner : MonoBehaviour
         foreach (GameObject locust in spawned)
             if (locust != null) { locust.SetActive(false); Release(locust); }
         spawned.Clear();
+        removalOrder = null;
         ModelAppearance.ReleaseMaterial(sharedAppearance);
         sharedAppearance = null;
         SpawnRevision++;

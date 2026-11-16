@@ -302,9 +302,15 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(name=="title"||name=="comments"||name=="group")child["default"]="";
         if(name=="group")ui["help"]="Optional group name for adjacent sequence blocks. Blocks with the same group stay in order and are shuffled together. Reuse the name only within that contiguous group.";
         if(name=="populationMode")
-        { child["enum"]=new JArray("Mirror","Swarm");ui["help"]="Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig."; }
+        { child["enum"]=new JArray("Mirror","Swarm","Mixed");ui["help"]="Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig. Mixed shows a single shared generated swarm together with other tracked animals and their copies."; }
         if(owner==typeof(KannadiConfig) && name=="mirrorSpawn")
             ui["help"]="Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply.";
+        if(owner==typeof(KannadiConfig) && name=="avatarCopyOffsets")
+        {
+            ui["visibleWhen"]=Rule("populationMode","Mixed");
+            ui["unit"]="scene units";
+            ui["help"]="Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies.";
+        }
         if(owner==typeof(KannadiConfig) && name=="numberOfRings")
             ui["help"]="Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.";
         if(owner==typeof(KannadiConfig) && name=="hexRadius")

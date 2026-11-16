@@ -316,7 +316,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         int animals = 0, views = 0, queued = 0, writers = 0;
         long dropped = 0;
         double capture = 0;
-        foreach (var population in StatusMembers<LocustSpawner>()) animals += population.Spawned.Count;
+        foreach (var population in StatusMembers<LocustSpawner>()) animals += population.PopulationCount;
         foreach (var mirror in StatusMembers<Kannadi>())
             if (mirror.isActiveAndEnabled && !mirror.IsSwarm) animals += mirror.Clones.Count(clone => clone != null && clone.activeInHierarchy);
         foreach (var config in main.SystemConfigs.Values) views += ViewportSetter.NormalizeDisplayOrder(config.displayOrder).Length;

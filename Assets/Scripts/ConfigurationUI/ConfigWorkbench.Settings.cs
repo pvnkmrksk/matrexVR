@@ -75,11 +75,20 @@ namespace ConfigurationUI
             var present=DisplayKeys(payload,schema).Where(key=>key!="enabled"&&!new[]{"preStimulus","stimulus","postStimulus"}.Contains(key)).ToList();
             if(category=="Basics")
             {
+                bool mixed = selected.SchemaId=="kannadi" &&
+                    string.Equals(payload["populationMode"]?.ToString(),"Mixed",StringComparison.OrdinalIgnoreCase);
                 bool swarm = selected.SchemaId=="swarm" || selected.SchemaId=="kannadi" &&
                     string.Equals(payload["populationMode"]?.ToString(),"Swarm",StringComparison.OrdinalIgnoreCase);
                 Section(scroll,"Experiment","sequence",payload,schema,prefix,selected.SchemaId=="kannadi"
                     ? new[]{"durationSeconds","populationMode"} : new[]{"durationSeconds"});
-                if(swarm && payload["swarm"]?.Type!=JTokenType.Null)
+                if(mixed)
+                {
+                    Section(scroll,"Shared swarm","swarm",payload,schema,prefix,new[]{"agentCount","spawnType","spawnAreaSize","spawnVolumeSize","spawnCenter"});
+                    Section(scroll,"Tracked locusts","swarm",payload,schema,prefix,new[]{"mirrorSpawn","avatarCopyOffsets"});
+                    Section(scroll,"Periodic arena","navigation",payload,schema,prefix,new[]{"boundaryLengthX","boundaryLengthZ"});
+                    Section(scroll,"Camera distance","visibility",payload,schema,prefix,new[]{"farClipMetres","nearClipMetres"});
+                }
+                else if(swarm && payload["swarm"]?.Type!=JTokenType.Null)
                 {
                     bool nested=payload["swarm"] is JObject;
                     JObject population=nested?(JObject)payload["swarm"]:payload;
@@ -329,9 +338,11 @@ namespace ConfigurationUI
             }
             else if(key=="populationMode")
             {
-                var choices=new List<string>{"Kannadi multiplayer","Generated swarm"};
-                var picker=new DropdownField(choices,string.Equals(shown.ToString(),"Swarm",StringComparison.OrdinalIgnoreCase)?1:0);
-                picker.RegisterValueChangedCallback(evt=>assign(new JValue(evt.newValue==choices[1]?"Swarm":"Mirror"),true));
+                var choices=new List<string>{"Kannadi multiplayer","Generated swarm","Shared swarm and multiplayer"};
+                var modes=new[]{"Mirror","Swarm","Mixed"};
+                int selectedMode=Array.FindIndex(modes,mode=>string.Equals(shown.ToString(),mode,StringComparison.OrdinalIgnoreCase));
+                var picker=new DropdownField(choices,Math.Max(0,selectedMode));
+                picker.RegisterValueChangedCallback(evt=>assign(new JValue(modes[choices.IndexOf(evt.newValue)]),true));
                 setting.AddToClassList("choice-setting");setting.Add(picker);
             }
             else if(schema["enum"] is JArray options)

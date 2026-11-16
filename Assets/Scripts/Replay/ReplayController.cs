@@ -662,7 +662,7 @@ public partial class ReplayController : MonoBehaviour
     }
     public static int AnimalCameraMask(string id)
     {
-        int isolated=RuntimeRigRegistry.StimulusMask|LayerMask.GetMask("ChoiceVR1","ChoiceVR2","ChoiceVR3","ChoiceVR4");
+        int isolated=RuntimeRigRegistry.StimulusMask|LayerMask.GetMask("ChoiceVR1","ChoiceVR2","ChoiceVR3","ChoiceVR4",Kannadi.SharedSwarmLayerName);
         int index=RuntimeRigRegistry.ParseIndex(ReplayEnvironmentLoader.CanonicalRig(id));
         int own=RuntimeRigRegistry.StimulusLayer(index),objects=ReplayEnvironmentLoader.ObjectLayerForRig(id);
         int visible=(own>=0?1<<own:0)|(objects>=0?1<<objects:0);

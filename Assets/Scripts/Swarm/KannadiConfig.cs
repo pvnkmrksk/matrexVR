@@ -18,6 +18,7 @@ public enum SwarmSpawnType { Random, Grid }
 public class KannadiConfig : SwarmConfig
 {
     public string populationMode = "Mirror";
+    [JsonIgnore] public bool IsMixed => string.Equals(populationMode, "Mixed", StringComparison.OrdinalIgnoreCase);
     public string kannadiModelPath;
     public SceneObject[] objects = Array.Empty<SceneObject>();
     public SunConfig sun;
@@ -31,6 +32,7 @@ public class KannadiConfig : SwarmConfig
     public float? hexRadius;
     public float? spacing; // Legacy name; hexRadius takes precedence.
     public KannadiSpawnConfig mirrorSpawn;
+    public Vector3Config[] avatarCopyOffsets = Array.Empty<Vector3Config>();
     public string kannadiTilePrefab;
     public string skyboxPath; // An explicit horizontal panorama takes precedence over nightSky.
     public NightSkyConfig nightSky; // Omitted preserves the existing scene background.
@@ -79,6 +81,8 @@ public class KannadiConfig : SwarmConfig
         KannadiConfig config = json.ToObject<KannadiConfig>();
         config.SwarmEnabled = swarmEnabled;
         config.Validate();
+        if (config.IsMixed && json["visibilityMatrix"] is JObject visibility && (bool?)visibility["enabled"] == true)
+            throw new ArgumentException("Mixed Kannadi uses all other rigs and requires the visibility matrix to be disabled.");
         return config;
     }
 
@@ -96,8 +100,8 @@ public class KannadiConfig : SwarmConfig
 
     public void Validate()
     {
-        if (!string.Equals(populationMode, "Mirror", StringComparison.OrdinalIgnoreCase) && !string.Equals(populationMode, "Swarm", StringComparison.OrdinalIgnoreCase))
-            throw new ArgumentException("populationMode must be Mirror or Swarm.");
+        if (!IsMixed && !string.Equals(populationMode, "Mirror", StringComparison.OrdinalIgnoreCase) && !string.Equals(populationMode, "Swarm", StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("populationMode must be Mirror, Swarm or Mixed.");
         sun?.Validate();
         if (!Enum.IsDefined(typeof(RandomInitialHeadingDistribution), initialHeadingDistribution))
             throw new ArgumentException("initialHeadingDistribution must be Continuous or Cardinal.");
@@ -106,8 +110,9 @@ public class KannadiConfig : SwarmConfig
         if (!Finite(radius) || radius <= 0) throw new ArgumentException("Kannadi hexRadius/spacing must be positive and finite.");
         if (numberOfRings > 100) throw new ArgumentException("Kannadi numberOfRings exceeds the supported limit of 100.");
         ValidateSwarm();
-        if (mirrorSpawn != null && string.Equals(populationMode, "Mirror", StringComparison.OrdinalIgnoreCase))
+        if (mirrorSpawn != null && (IsMixed || string.Equals(populationMode, "Mirror", StringComparison.OrdinalIgnoreCase)))
             mirrorSpawn.Validate(periodicBoundary, boundaryLengthX ?? DefaultBoundaryLength, boundaryLengthZ ?? DefaultBoundaryLength);
+        if (IsMixed) ValidateMixed();
         if (HasAgentGroups && (!string.IsNullOrWhiteSpace(kannadiModelPath) ||
             (!string.IsNullOrWhiteSpace(kannadiTilePrefab) && kannadiTilePrefab != "SimulatedLocust")))
             throw new ArgumentException("agentGroups require the built-in SimulatedLocust model.");
@@ -123,7 +128,31 @@ public class KannadiConfig : SwarmConfig
                 throw new ArgumentException("vrConfigs must contain unique vrIndex values from 1 through 16.");
             if (vr.watchIndex.HasValue && (vr.watchIndex < 1 || vr.watchIndex > RuntimeRigRegistry.MaximumRigCount))
                 throw new ArgumentException("watchIndex must be a configured rig index from 1 through 16, or omitted to see the other animals.");
+            if (IsMixed && vr.watchIndex.HasValue)
+                throw new ArgumentException("Mixed Kannadi shows all the other rigs and requires watchIndex to be omitted.");
             ValidateGain(vr.closedLoopPosition); ValidateGain(vr.closedLoopOrientation);
+        }
+    }
+    private void ValidateMixed()
+    {
+        if (!agentCount.HasValue || HasAgentGroups || !string.IsNullOrWhiteSpace(trajectoryFile))
+            throw new ArgumentException("Mixed Kannadi requires an explicit agentCount for a single generated swarm.");
+        if (!periodicBoundary || spawnRelativeToAnimal || followAnimalPosition || useHeadingReference || headingReference != null ||
+            !string.Equals(dimension, "2D", StringComparison.OrdinalIgnoreCase) || volumeHalfExtentMetres.HasValue ||
+            (spawnCenter != null && (spawnCenter.x != 0 || spawnCenter.z != 0)))
+            throw new ArgumentException("Mixed Kannadi requires a shared 2D periodic arena centered at the world origin.");
+        if (!string.Equals(agentVisual, "ScenePrefab", StringComparison.OrdinalIgnoreCase) ||
+            !string.IsNullOrWhiteSpace(modelPath) || !string.IsNullOrWhiteSpace(kannadiModelPath) ||
+            (!string.IsNullOrWhiteSpace(kannadiTilePrefab) && kannadiTilePrefab != "SimulatedLocust"))
+            throw new ArgumentException("Mixed Kannadi uses the built-in SimulatedLocust model.");
+
+        if (avatarCopyOffsets == null)
+            throw new ArgumentException("avatarCopyOffsets must be an array, empty when there are no copies.");
+        var used = new HashSet<Vector3> { Vector3.zero };
+        foreach (var offset in avatarCopyOffsets)
+        {
+            if (offset == null || !Finite(offset.x) || !Finite(offset.z) || offset.y != 0 || !used.Add(offset.ToVector3()))
+                throw new ArgumentException("avatarCopyOffsets must be distinct nonzero finite X/Z offsets with Y set to zero.");
         }
     }
     // A uniform draw is supplied by the scene so legacy files consume the same one
