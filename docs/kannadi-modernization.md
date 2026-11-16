@@ -43,11 +43,11 @@ Panel size, row, column, horizontal/vertical direction, and target display come 
 | `vrConfigs` | Entries with `vrIndex` 1–4, optional `initialPosition`, `initialRotation` in degrees, `watchIndex`, and per-rig gain overrides. |
 | `watchIndex` | Omitted: see the other tracked animals' layers. 1–4: see only that animal's replicas, while retaining the shared floor/background. Own index: see own replicas except the center. |
 | `animateOnMove` | Boolean animation gate, enabled in the supplied Swarm and Kannadi configs. `false` restores continuous animation. |
-| `animationSpeedThreshold` | Default `0.5` world units/second (cm/s). Walking animation runs only **above** the threshold. Measures planar translation of the root, not animated bones; rotation in place does not count. Legacy `animationNoiseThreshold` is accepted when the new field is absent. |
+| `animationSpeedThreshold` | Default `0.5` world units/second (cm/s). The measured speed must exceed this threshold to start walking animation. Legacy `animationNoiseThreshold` is accepted when the new field is absent. |
 
 Both Swarm and Kannadi support `reloadScene: false` sequence steps. Reconfiguration replaces old agents instead of accumulating populations. Bands mirror the tracked rig; their members do not continue autonomous walking. Clone height comes from the selected prefab rather than a hard-coded offset.
 
-For animation gating, Kannadi replicas and band members follow the tracked rig's translation; autonomous Swarm locusts use their own translation. Periodic wrapping is accounted for so crossing an arena boundary does not create a false speed spike. You can set either field inline in a sequence step or in its referenced experiment file:
+Kannadi replicas and band members use the tracked rig's net horizontal displacement over the last 300 ms, accounting for periodic wrapping. Autonomous Swarm locusts measure their own movement. The walking clip plays at its normal rate at 2 cm/s and scales in proportion to measured speed while walking. Set either field inline in a sequence step or in its referenced experiment file.
 
 ```json
 "animateOnMove": true,

@@ -190,12 +190,14 @@ Templates: `swarm.template.json`, `kannadi.template.json`, `kinematic.template.j
 |---|---|---|
 | `closedLoopPosition` | null → 1 | Nonnegative translation multiplier. Booleans remain accepted: true=1, false=0. |
 | `closedLoopOrientation` | null → 1 | Nonnegative **angular multiplier**: 1 means one world degree per sensor degree; 0 disables turning, 0.5 halves yaw, 2 doubles it. No turn-speed cap or smoothing. |
-| `animateOnMove` | false | Enable leg-animation gating; templates set true. |
-| `animationSpeedThreshold` | 0.5 | cm/s planar translation; animate only strictly above threshold. Rotation alone does not animate. |
+| `animateOnMove` | false | Drive the leg animation from movement speed. Templates set true. |
+| `animationSpeedThreshold` | 0.5 | Planar speed in cm/s that must be exceeded to start walking animation. |
 | `autopilotEnabled` | false | Constant forward motion for walking/Swarm/Kannadi templates. Migration/flying templates set this to true. Ctrl+Space toggles it during a run. |
 | `autopilotSpeed` | 10 | Constant forward speed in world units/second; cm/s in the current walking scale. |
 | `vrConfigs` | null | Optional per-rig pose/gain overrides below. |
 | `animationNoiseThreshold` | legacy alias | Used only when `animationSpeedThreshold` is absent. Prefer the canonical name. |
+
+The standard animation gate uses net horizontal displacement over the preceding 300 ms, accounting for periodic wrapping. Walking playback runs at the model's normal rate at 2 cm/s and scales in proportion to the measured speed while the gate is open.
 
 The Swarm/Kannadi walking path uses **unit gain by default for both translation and yaw**. Explicit numeric fields override those defaults; per-rig values take precedence over global values. Walking gain operates on displacement/angle, independent of render FPS. The former locust turn-speed interpretation has been removed. Walking yaw differences use the shortest signed angle across 0/360; the input must not turn more than 180 degrees between consumed samples to avoid angular aliasing.
 

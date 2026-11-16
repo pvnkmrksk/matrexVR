@@ -240,7 +240,8 @@ public static class GeneratedSwarmValidation
                 animators.Where((animator, i) => i % 10 != 0).All(animator => animator.speed == 0),
                 "Only the first cohort changes playback on the first frame.");
             for (int i = 0; i < 9; i++) driver.Advance(.25f);
-            Check(animators.All(animator => animator.speed > 0), "All ten cohorts started within ten frames.");
+            Check(animators.All(animator => Mathf.Abs(animator.speed - .4f) < .001f),
+                "All ten cohorts reach the proportional rate within ten frames.");
 
             void AdvanceAtSpeed(float speed)
             {
@@ -256,6 +257,9 @@ public static class GeneratedSwarmValidation
             AdvanceAtSpeed(.8f);
             Check(animators.All(animator => animator.speed > 0) && gates.All(gate => Mathf.Abs(gate.CurrentSpeed - .8f) < .001f),
                 "The upper threshold restarts playback and the measured speed is independent of frame time.");
+            AdvanceAtSpeed(1.6f);
+            Check(animators.All(animator => Mathf.Abs(animator.speed - .8f) < .001f),
+                "Doubling generated movement speed doubles playback even while already walking.");
             driver.Advance(0);
             Check(animators.All(animator => animator.speed == 0), "A zero-time frame pauses and clears every cohort.");
             driver.Configure(Array.Empty<GameObject>(), bounds);

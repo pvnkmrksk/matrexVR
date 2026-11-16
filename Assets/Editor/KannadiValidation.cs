@@ -316,31 +316,106 @@ public static class KannadiValidation
         Vector2 extent = GameObject.Find("Overview Panel").GetComponent<RectTransform>().anchorMax - GameObject.Find("Overview Panel").GetComponent<RectTransform>().anchorMin;
         Check(Vector2.Distance(extent, new Vector2(0.4f, 0.4f)) < 0.001f, "larger forty-percent overview panel");
     }
+    public static void ValidateAnimationGate()
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Locust/SimulatedLocust.prefab");
+        Check(prefab != null, "stock locust prefab is available");
+        var root = new GameObject("Tracked animation validation");
+        var locust = Object.Instantiate(prefab);
+        try
+        {
+            AnimateOnMove.ConfigureHierarchy(locust, root.transform, true, 0.5f, Vector2.zero);
+            CheckAnimationGate(locust.GetComponentInChildren<AnimateOnMove>(), root.transform);
+            Debug.Log("Kannadi animation gate validation passed (" + checks + " checks).");
+        }
+        finally
+        {
+            Object.DestroyImmediate(locust);
+            Object.DestroyImmediate(root);
+        }
+    }
+
     private static void CheckAnimationGate()
     {
         var gate = rigs[0].Clones[0].GetComponentInChildren<AnimateOnMove>();
         Check(gate != null && gate.enabled, "Kannadi animation gate enabled from experiment config");
-        Animator animator = gate.GetComponent<Animator>();
         Transform root = rigs[0].transform;
         Vector3 originalPosition = root.position;
         Quaternion originalRotation = root.rotation;
+        try { CheckAnimationGate(gate, root); }
+        finally
+        {
+            root.SetPositionAndRotation(originalPosition, originalRotation);
+            gate.Configure(root, true, 0.5f, new Vector2(200, 200));
+        }
+    }
+
+    private static void CheckAnimationGate(AnimateOnMove gate, Transform root)
+    {
+        Animator animator = gate.GetComponent<Animator>();
+        void Sample(Vector3 delta, float seconds)
+        {
+            root.position += delta;
+            Call(gate, "MeasureTranslation", seconds);
+        }
+
+        root.position = Vector3.zero;
+        gate.Configure(root, true, 0.5f, Vector2.zero);
+        for (int i = 0; i < 30; i++)
+        {
+            Sample(Vector3.right * (i % 2 == 0 ? 0.03f : -0.03f), 0.02f);
+            Check(gate.CurrentSpeed <= 0.101f && animator.speed == 0, "the speed window cancels tracking jitter from startup");
+        }
+
+        gate.Configure(root, true, 0.5f, Vector2.zero);
+        Sample(Vector3.right * 0.15f, 0.3f);
+        Check(Mathf.Abs(gate.CurrentSpeed - 0.5f) < 0.001f && animator.speed == 0, "walking starts strictly above the threshold");
+        Sample(Vector3.right * 0.153f, 0.3f);
+        Check(Mathf.Abs(gate.CurrentSpeed - 0.51f) < 0.001f && animator.speed > 0, "sustained translation above the threshold animates legs");
+
+        gate.Configure(root, true, 0.5f, Vector2.zero);
+        Sample(Vector3.right * 0.12f, 0.2f);
+        Sample(Vector3.right * 0.3f, 0.2f);
+        Check(Mathf.Abs(gate.CurrentSpeed - 1.2f) < 0.001f, "the window retains only the fraction of the oldest frame inside the cutoff");
+        foreach (float duration in new[] { 0.07f, 0.11f, 0.14f })
+            Sample(Vector3.forward * (2f * duration), duration);
+        Check(Mathf.Abs(gate.CurrentSpeed - 2f) < 0.001f && Mathf.Abs(animator.speed - 1f) < 0.001f,
+            "steady travel at two world units per second gives the original playback rate across unequal frame durations");
+        Sample(Vector3.forward * 1.48f, 0.37f);
+        Check(Mathf.Abs(gate.CurrentSpeed - 4f) < 0.001f && Mathf.Abs(animator.speed - 2f) < 0.001f,
+            "doubling steady travel speed doubles playback while already walking");
+
+        root.rotation *= Quaternion.Euler(0, 90, 0);
+        Sample(Vector3.up, 0.3f);
+        Check(gate.CurrentSpeed < 0.001f && animator.speed == 0, "yaw and vertical movement do not extend horizontal walking");
+        Sample(Vector3.right * 0.6f, 0.3f);
+        Sample(Vector3.right * 10f, 0f);
+        Check(gate.CurrentSpeed == 0 && animator.speed == 0, "a zero-time frame clears the walking estimate");
+        Sample(Vector3.zero, 0.1f);
+        Check(gate.CurrentSpeed == 0 && animator.speed == 0, "the first sample after zero time uses the new position baseline");
+
+        Sample(Vector3.right * 0.6f, 0.3f);
+        root.position = new Vector3(99.98f, 1, 0);
         gate.Configure(root, true, 0.5f, new Vector2(200, 200));
-        root.position += Vector3.right * 0.049f; Call(gate, "MeasureTranslation", 0.1f);
-        Check(Mathf.Abs(gate.CurrentSpeed - 0.49f) < 0.001f && animator.speed == 0, "translation below 0.5 cm/s stops legs");
-        root.position += Vector3.right * 0.051f; Call(gate, "MeasureTranslation", 0.1f);
-        Check(Mathf.Abs(gate.CurrentSpeed - 0.51f) < 0.001f && animator.speed > 0, "translation above 0.5 cm/s animates legs");
-        root.rotation *= Quaternion.Euler(0, 90, 0); Call(gate, "MeasureTranslation", 0.1f);
-        Check(gate.CurrentSpeed == 0 && animator.speed == 0, "rotation in place cannot animate legs");
-        root.position = new Vector3(99.98f, 1, 0); gate.Configure(root, true, 0.5f, new Vector2(200, 200));
-        root.position = new Vector3(-99.98f, 1, 0); Call(gate, "MeasureTranslation", 0.1f);
+        root.position = new Vector3(-99.98f, 1, 0);
+        Sample(Vector3.zero, 0.1f);
+        Check(Mathf.Abs(gate.CurrentSpeed - 0.04f / 0.3f) < 0.001f && animator.speed == 0,
+            "reconfiguring clears the old history and starts a fresh window across the seam");
+        Sample(Vector3.right * 0.04f, 0.1f);
+        Sample(Vector3.right * 0.04f, 0.1f);
         Check(Mathf.Abs(gate.CurrentSpeed - 0.4f) < 0.001f && animator.speed == 0, "periodic wrap does not create false high walking speed");
+
+        root.position = Vector3.zero;
+        gate.Configure(root, true, 0.5f, new Vector2(0.4f, 0f));
+        Sample(Vector3.right * 0.15f, 0.1f);
+        Sample(Vector3.left * 0.25f, 0.1f);
+        Sample(Vector3.right * 0.15f, 0.1f);
+        Check(Mathf.Abs(gate.CurrentSpeed - 1.5f) < 0.001f, "wrap correction preserves travel through a full period inside the window");
         gate.Configure(root, false, 0.5f, Vector2.zero);
-        Check(!gate.enabled && animator.speed > 0, "boolean disables speed gating and restores animation");
+        Check(!gate.enabled && Mathf.Abs(animator.speed - 1f) < 0.001f, "disabling speed gating restores the original playback rate");
         gate.Configure(root, true, 2f, Vector2.zero);
-        root.position += Vector3.right * 0.1f; Call(gate, "MeasureTranslation", 0.1f);
-        Check(animator.speed == 0, "custom speed threshold is respected in world units");
-        root.SetPositionAndRotation(originalPosition, originalRotation);
-        gate.Configure(root, true, 0.5f, new Vector2(200, 200));
+        Sample(Vector3.right * 0.3f, 0.3f);
+        Check(Mathf.Abs(gate.CurrentSpeed - 1f) < 0.001f && animator.speed == 0, "custom speed threshold is respected in world units");
         Check(KannadiConfig.Load(Params("{\"animationNoiseThreshold\":0.25}")).animationSpeedThreshold == 0.25f, "legacy animation threshold remains compatible");
         bool rejected = false;
         try { KannadiConfig.Load(Params("{\"animationSpeedThreshold\":-1}")); } catch (ArgumentException) { rejected = true; }
