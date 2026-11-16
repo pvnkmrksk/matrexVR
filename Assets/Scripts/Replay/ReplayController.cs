@@ -521,6 +521,7 @@ public partial class ReplayController : MonoBehaviour
             {
                 pair.Value.cullingMask=AnimalCameraMask(pair.Key);
                 if(matchRecordedCamera)environmentLoader.ConfigureAnimalCamera(pair.Key,pair.Value);
+                environmentLoader.ConfigureAnimalPeriodicView(pair.Key,pair.Value,matchRecordedCamera);
                 FitReplayAnimalViewport(pair.Value);
             }
             cameraLayoutVersion=environmentLoader.ContextVersion;

@@ -80,6 +80,9 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
     private readonly Plane[] frustum = new Plane[PlanesPerCamera];
     private readonly Matrix4x4[] instances = new Matrix4x4[MaxInstances];
     private readonly float[] offsets = new float[MaxInstances];
+    private readonly List<Vector3> tileOffsets = new List<Vector3>();
+    private Matrix4x4[] tiledInstances;
+    private float largestRadius;
     private int boneCount;
     private ReflectionProbeUsage reflectionUsage;
     private bool replacingSkins;
@@ -340,6 +343,7 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
 
         bool cached = TryConfigureClip(agents, initialPhases);
         if (!cached) ConfigureLiveBones(pose);
+        foreach (float radius in radii) largestRadius = Mathf.Max(largestRadius, radius);
         replacingSkins = true;
         foreach (var skin in skins) skin.enabled = false;
         groups.Add(this);
@@ -643,6 +647,18 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
             // The submission is camera-specific. Use a layer accepted by this
             // camera and filter each body by its original layer before packing.
             parameters.layer = math.tzcnt((uint)visibleLayers);
+            if (PeriodicArenaView.TryGet(camera, out var periodicView))
+            {
+                if (!agentDataReady)
+                {
+                    PrepareAgentData(cached);
+                    agentDataReady = true;
+                }
+                GeometryUtility.CalculateFrustumPlanes(camera, frustum);
+                periodicView.GetTileOffsets(largestRadius, tileOffsets);
+                DrawTiledInstances(ref parameters, cached, visibleLayers);
+                continue;
+            }
             int cullSlot = cached && cullRadii.IsCreated && cullFrame == lastFrame && cameraSnapshots[c].unchanged
                 ? cullSlots[c] : -1;
             if (packetsReady && cullSlot >= 0 && packetCounts[cullSlot] >= 0)
@@ -719,11 +735,44 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
             if (count == 0) bounds = worldBounds[i]; else bounds.Encapsulate(worldBounds[i]);
             if (++count == MaxInstances)
             {
-                Submit(ref parameters, bounds, count);
+                Submit(ref parameters, bounds, count, instances);
                 count = 0;
             }
         }
-        if (count != 0) Submit(ref parameters, bounds, count);
+        if (count != 0) Submit(ref parameters, bounds, count, instances);
+    }
+
+    private void DrawTiledInstances(ref RenderParams parameters, bool cached, int visibleLayers)
+    {
+        if (tileOffsets.Count == 0) return;
+        tiledInstances ??= new Matrix4x4[MaxInstances];
+        int count = 0;
+        Bounds bounds = default;
+        foreach (Vector3 tile in tileOffsets)
+        {
+            for (int i = 0; i < roots.Length; i++)
+            {
+                if (!activeAgents[i] || (agentLayerMasks != null && (agentLayerMasks[i] & visibleLayers) == 0)) continue;
+                Bounds imageBounds = worldBounds[i];
+                imageBounds.center += tile;
+                if (!GeometryUtility.TestPlanesAABB(frustum, imageBounds)) continue;
+
+                // Cached bones are root-local. Live bones are already in world space,
+                // so only the tile translation belongs in their instance matrix.
+                Matrix4x4 image = cached ? clipRootMatrices[i] : Matrix4x4.identity;
+                image.m03 += tile.x;
+                image.m23 += tile.z;
+                tiledInstances[count] = image;
+                offsets[count] = cached ? clipOffsets[i] : i * boneCount;
+                if (count == 0) bounds = imageBounds; else bounds.Encapsulate(imageBounds);
+                if (++count == MaxInstances)
+                {
+                    Submit(ref parameters, bounds, count, tiledInstances);
+                    count = 0;
+                }
+            }
+        }
+        if (count != 0) Submit(ref parameters, bounds, count, tiledInstances);
     }
 
     private void CompareGeometry()
@@ -759,11 +808,11 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         finally { Destroy(reference); }
     }
 
-    private void Submit(ref RenderParams parameters, Bounds bounds, int count)
+    private void Submit(ref RenderParams parameters, Bounds bounds, int count, Matrix4x4[] drawInstances)
     {
         parameters.worldBounds = bounds;
         properties.SetFloatArray(BoneOffset, offsets);
-        Graphics.RenderMeshInstanced(parameters, mesh, 0, instances, count);
+        Graphics.RenderMeshInstanced(parameters, mesh, 0, drawInstances, count);
     }
 
     private void RestoreSkins()

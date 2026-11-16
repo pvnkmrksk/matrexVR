@@ -34,6 +34,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private readonly Dictionary<string,Transform> importedRigs = new Dictionary<string,Transform>();
     private readonly Dictionary<string,Camera> importedFrontCameras = new Dictionary<string,Camera>();
     private readonly Dictionary<string,string> cameraStateKeys = new Dictionary<string,string>();
+    private readonly Dictionary<Camera, Vector2> unmatchedCameraClipPlanes = new Dictionary<Camera, Vector2>();
     private readonly List<string> rigIds = new List<string>();
     private readonly Dictionary<Light,bool> previewLights = new Dictionary<Light,bool>();
     private readonly Dictionary<string,JObject> legacySteps = new Dictionary<string,JObject>();
@@ -55,6 +56,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     private Color importedAmbientLight, importedAmbientSky, importedAmbientEquator, importedAmbientGround, importedFogColor;
     private RecordedWorldStateReader worldFrames;
     private JObject currentPresentation;
+    private Vector2? periodicViewArenaSize;
     private UnityEngine.Rendering.AmbientMode importedAmbientMode;
     private bool importedFog;
     private float importedFogDensity, importedFogStart, importedFogEnd;
@@ -77,6 +79,8 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         session.RequireCompatibleBuild();
         worldFrames?.Dispose();worldFrames=frames??(session.Presentations.IsCurrentContract?new RecordedWorldStateReader(session.DirectoryPath):null);
         archive=session;SetRigIds(ids);requested=null;appliedKey=null;currentConfig=currentVisualConfig=currentPresentation=null;importedName=null;cameraStateKeys.Clear();latestAsynchronousSamples.Clear();
+        periodicViewArenaSize = null;
+        unmatchedCameraClipPlanes.Clear();
         ClearEnvironment();ReleaseSky();archivedModelKeys.Clear();
         ModelTextureLibrary.Clear(archivedTextures);
         FidelityStatus="Saved configurations loaded; waiting for recorded scene";
@@ -322,6 +326,40 @@ public class ReplayEnvironmentLoader : MonoBehaviour
             }
         if(skyTexture!=null)target.clearFlags=CameraClearFlags.Skybox;
         target.cullingMask = RecordedAnimalCameraMask(id, ReplayController.AnimalCameraMask(id));
+    }
+
+    internal void ConfigureAnimalPeriodicView(string id, Camera camera, bool matchRecordedCamera)
+    {
+        // An unmatched replay camera can keep its own framing. Its ordinary far
+        // plane is much longer than an experiment rig's tiled view.
+        if (periodicViewArenaSize.HasValue)
+        {
+            if (!matchRecordedCamera && !unmatchedCameraClipPlanes.ContainsKey(camera))
+                unmatchedCameraClipPlanes.Add(camera, new Vector2(camera.nearClipPlane, camera.farClipPlane));
+            if (!(currentPresentation["mixedPopulation"]?["cameraClipPlanesByRig"]?[id] is JArray recordedClips) || recordedClips.Count != 2)
+                throw new InvalidDataException("Recorded periodic animal view has no clip planes for " + id + ".");
+            float near = (float)recordedClips[0], far = (float)recordedClips[1];
+            if (!(near > 0) || !(far > near) || float.IsInfinity(far))
+                throw new InvalidDataException("Recorded periodic animal view has invalid clip planes for " + id + ".");
+            if (near != camera.nearClipPlane || far != camera.farClipPlane)
+            {
+                camera.nearClipPlane = near;
+                camera.farClipPlane = far;
+                camera.ResetProjectionMatrix();
+            }
+        }
+        else if (unmatchedCameraClipPlanes.TryGetValue(camera, out Vector2 clips))
+        {
+            unmatchedCameraClipPlanes.Remove(camera);
+            if (!matchRecordedCamera)
+            {
+                camera.nearClipPlane = clips.x;
+                camera.farClipPlane = clips.y;
+                camera.ResetProjectionMatrix();
+            }
+        }
+        Vector2 size = periodicViewArenaSize.GetValueOrDefault();
+        PeriodicArenaView.Configure(camera, periodicViewArenaSize.HasValue, size.x, size.y);
     }
 
     public int RecordedAnimalCameraMask(string id, int fallback)
@@ -613,6 +651,8 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         go.name="Recorded agent "+name;FreezeVisual(go);
         go.AddComponent<ReplayAnimationDriver>();
         int layerId=RecordedLayer(layer);if(layerId>=0)SetLayer(go,layerId);
+        if (periodicViewArenaSize.HasValue)
+            PeriodicArenaView.RegisterBody(go);
         return go;
     }
     private static SwarmAgentAppearance GroupAppearance(string name, JArray groups)
@@ -665,6 +705,19 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     {
         if(!importedScene.IsValid()||!importedScene.isLoaded)throw new InvalidDataException("Acquisition scene is missing from its own build.");
         currentPresentation=archive.Presentations.For(sample.presentationId);
+        periodicViewArenaSize = null;
+        if (currentPresentation["mixedPopulation"]?["periodicView"] is JToken periodicView)
+        {
+            if (!(periodicView is JObject bounds))
+                throw new InvalidDataException("Recorded periodic animal view settings are invalid.");
+            float width = (float?)bounds["width"] ?? 0;
+            float depth = (float?)bounds["depth"] ?? 0;
+            if (!(width > 0) || !(depth > 0) || float.IsInfinity(width) || float.IsInfinity(depth))
+                throw new InvalidDataException("Recorded periodic animal view requires finite positive arena dimensions.");
+            periodicViewArenaSize = new Vector2(width, depth);
+        }
+        else if ((bool?)currentVisualConfig?[nameof(KannadiConfig.seamlessPeriodicView)] == true)
+            throw new InvalidDataException("Recorded periodic animal view settings are missing.");
         var parameters=currentPresentation["parameters"].ToObject<Dictionary<string,object>>();
         parameters[ExperimentPhases.PayloadKey]=currentConfig.DeepClone();
         foreach(var saved in currentPresentation["rigsBeforeApply"] as JArray??new JArray())

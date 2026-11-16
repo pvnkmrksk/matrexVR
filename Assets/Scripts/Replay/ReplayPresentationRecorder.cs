@@ -59,6 +59,7 @@ public static class ReplayPresentationRecorder
         var mixedPeerIds = new JObject();
         var mixedCameraClipPlanes = new JObject();
         JArray mixedSimulatedIds = null;
+        Vector2? periodicViewArenaSize = null;
         foreach(var rig in UnityEngine.Object.FindObjectsByType<Kannadi>(FindObjectsSortMode.None).Where(rig=>rig.gameObject.scene==scene))
         {
             string rigId = "VR" + rig.VRIndex;
@@ -66,6 +67,7 @@ public static class ReplayPresentationRecorder
                 ["layer"]=RuntimeRigRegistry.LayerLabel(RuntimeRigRegistry.StimulusLayer(rig.VRIndex)),["prefab"]=rig.tilePrefab!=null?rig.tilePrefab.name:null});
             if (!rig.IsMixed || !rig.isActiveAndEnabled) continue;
             mixedPeerIds[rigId] = new JArray(rig.Clones.Where(body => body != null && body.activeInHierarchy).Select(body => body.name));
+            if (rig.SeamlessPeriodicView) periodicViewArenaSize = rig.PeriodicViewArenaSize;
             var front = rig.GetComponentsInChildren<Camera>(true).FirstOrDefault(camera => camera.name == "Main Camera F");
             if (front != null) mixedCameraClipPlanes[rigId] = new JArray(front.nearClipPlane, front.farClipPlane);
         }
@@ -83,11 +85,16 @@ public static class ReplayPresentationRecorder
             mixedSimulatedIds = new JArray(spawner.Spawned.Where(body => body != null && body.activeInHierarchy).Select(body => body.name));
         }
         if (mixedPeerIds.Count > 0)
-            entry["mixedPopulation"] = new JObject {
+        {
+            var mixed = new JObject {
                 ["simulatedIds"] = mixedSimulatedIds ?? throw new InvalidOperationException("The mixed Kannadi presentation has no shared swarm."),
                 ["peerIdsByRig"] = mixedPeerIds,
                 ["cameraClipPlanesByRig"] = mixedCameraClipPlanes
             };
+            if (periodicViewArenaSize is Vector2 size)
+                mixed["periodicView"] = new JObject { ["width"] = size.x, ["depth"] = size.y };
+            entry["mixedPopulation"] = mixed;
+        }
         entry["populationVisuals"]=visuals;
         entry["sha256"] = ReplayPresentationJournal.HashEntry(entry);
         File.AppendAllText(Path.Combine(logger.directoryPath, FileName), entry.ToString(Formatting.None) + "\n");

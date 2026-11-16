@@ -29,6 +29,8 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     private SharedSwarm sharedSwarm;
     public bool IsSwarm => string.Equals(config.populationMode, "Swarm", StringComparison.OrdinalIgnoreCase);
     public bool IsMixed => config.IsMixed;
+    internal bool SeamlessPeriodicView => IsMixed && config.seamlessPeriodicView;
+    internal Vector2 PeriodicViewArenaSize => new Vector2(MirrorBoundaryX, MirrorBoundaryZ);
     private float MirrorBoundaryX => config.boundaryLengthX ?? SwarmConfig.DefaultBoundaryLength;
     private float MirrorBoundaryZ => config.boundaryLengthZ ?? SwarmConfig.DefaultBoundaryLength;
     protected virtual float RowSpacing => hexRadius * 2f;
@@ -126,6 +128,8 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
                 spawner.layerName = SharedSwarmLayerName;
                 spawner.loadConfigFromJsonFile = false;
                 SwarmConfiguration.Apply(spawner, settings, null);
+                if (settings.seamlessPeriodicView)
+                    foreach (var body in spawner.Spawned) PeriodicArenaView.RegisterBody(body);
                 spawner.InitializeRemovalOrder();
                 var cameras = rigs.SelectMany(rig => rig.GetComponentsInChildren<Camera>(true)).ToArray();
                 spawner.OverrideClipPlanes(cameras, settings.nearClipMetres * spawner.worldUnitsPerMetre,
@@ -387,6 +391,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
         {
             // Preserve the floor and shared world, replace only the animal layers.
             camera.cullingMask = (camera.cullingMask & ~swarmMask & ~markerMask) | visible;
+            PeriodicArenaView.Configure(camera, SeamlessPeriodicView, MirrorBoundaryX, MirrorBoundaryZ);
             if (config.backgroundColor != null)
             {
                 ColorConfig c = config.backgroundColor;
@@ -450,6 +455,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             offset.y = tilePrefab.transform.position.y;
             positions[i] = offset;
             bodies[i] = CreateAvatar(layer, i);
+            if (SeamlessPeriodicView) PeriodicArenaView.RegisterBody(bodies[i]);
         }
         Clones = bodies;
         offsets = positions;
