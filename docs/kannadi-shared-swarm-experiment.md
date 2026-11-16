@@ -33,7 +33,9 @@ The first two pairs form a cross. The last two pairs form a second cross turned 
 
 ## Arena and density
 
-The arena is a 1 m × 1 m square. Tracked and simulated bodies wrap at the edges. Kannadi renders each body at its wrapped world position with its usual camera range, so an observer can see fewer neighbors near a border.
+The arena is a 1 m × 1 m square. Tracked and simulated bodies wrap at the edges.
+
+The see-through test build enables `seamlessPeriodicView`. Each rig can see bodies across the arena edges at the existing 80 cm viewing range. This can show the same body in more than one direction. The experiment log still counts 135 bodies per rig in one square and records each body's position once. The overhead view shows one square.
 
 Random removal gives each simulated locust the same chance of being removed regardless of its position or heading. Uniformly distributed simulated positions remain uniform on average after removal. Local density also depends on where peers move and how their copies are placed.
 

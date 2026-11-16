@@ -311,6 +311,11 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
             ui["unit"]="scene units";
             ui["help"]="Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies.";
         }
+        if(owner==typeof(KannadiConfig) && name=="seamlessPeriodicView")
+        {
+            ui["visibleWhen"]=Rule("populationMode","Mixed");
+            ui["help"]="Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same.";
+        }
         if(owner==typeof(KannadiConfig) && name=="numberOfRings")
             ui["help"]="Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.";
         if(owner==typeof(KannadiConfig) && name=="hexRadius")

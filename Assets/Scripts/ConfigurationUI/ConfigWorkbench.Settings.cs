@@ -85,7 +85,7 @@ namespace ConfigurationUI
                 {
                     Section(scroll,"Shared swarm","swarm",payload,schema,prefix,new[]{"agentCount","spawnType","spawnAreaSize","spawnVolumeSize","spawnCenter"});
                     Section(scroll,"Tracked locusts","swarm",payload,schema,prefix,new[]{"mirrorSpawn","avatarCopyOffsets"});
-                    Section(scroll,"Periodic arena","navigation",payload,schema,prefix,new[]{"boundaryLengthX","boundaryLengthZ"});
+                    Section(scroll,"Periodic arena","navigation",payload,schema,prefix,new[]{"seamlessPeriodicView","boundaryLengthX","boundaryLengthZ"});
                     Section(scroll,"Camera distance","visibility",payload,schema,prefix,new[]{"farClipMetres","nearClipMetres"});
                 }
                 else if(swarm && payload["swarm"]?.Type!=JTokenType.Null)
@@ -200,7 +200,7 @@ namespace ConfigurationUI
         {
             string key=parts.Last(); JToken value=ConfigDocument.At(doc.Root,parts);
             var setting=new VisualElement(); setting.AddToClassList("studio-setting"); setting.name="setting-"+string.Join("-",parts);
-            var label=Row("setting-label"); setting.Add(label); var caption=new Label(key=="mirrorSpawn"?"Tracked start layout":Pretty(key)); caption.AddToClassList("setting-title"); label.Add(caption);
+            var label=Row("setting-label"); setting.Add(label); var caption=new Label(key=="mirrorSpawn"?"Tracked start layout":key=="seamlessPeriodicView"?"See-through boundaries":Pretty(key)); caption.AddToClassList("setting-title"); label.Add(caption);
             string unit=(string)schema["x-ui"]?["unit"]; if(!string.IsNullOrEmpty(unit)) label.Add(Pill(unit,"unit-pill"));
             if(schema["default"]!=null && schema["default"].Type!=JTokenType.Null)
             { var inherited=Pill("Inherited","muted-pill"); inherited.tooltip="Not explicitly set in this file. The displayed value comes from the runtime/schema default."; inherited.AddToClassList("inherited-indicator"); label.Add(inherited); BindViewState(inherited,()=>inherited.style.visibility=ConfigDocument.At(doc.Root,parts)==null?Visibility.Visible:Visibility.Hidden); }

@@ -14568,6 +14568,19 @@
           "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
         }
       },
+      "seamlessPeriodicView": {
+        "type": "boolean",
+        "default": false,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "populationMode",
+            "oneOf": [
+              "Mixed"
+            ]
+          },
+          "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
+        }
+      },
       "kannadiTilePrefab": {
         "type": [
           "string",
@@ -17692,6 +17705,19 @@
               },
               "unit": "scene units",
               "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
+            }
+          },
+          "seamlessPeriodicView": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mixed"
+                ]
+              },
+              "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
             }
           },
           "kannadiTilePrefab": {
@@ -22037,6 +22063,19 @@
               "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
             }
           },
+          "seamlessPeriodicView": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mixed"
+                ]
+              },
+              "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
+            }
+          },
           "kannadiTilePrefab": {
             "type": [
               "string",
@@ -26378,6 +26417,19 @@
               },
               "unit": "scene units",
               "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
+            }
+          },
+          "seamlessPeriodicView": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mixed"
+                ]
+              },
+              "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
             }
           },
           "kannadiTilePrefab": {
@@ -32116,6 +32168,19 @@
           "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
         }
       },
+      "seamlessPeriodicView": {
+        "type": "boolean",
+        "default": false,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "populationMode",
+            "oneOf": [
+              "Mixed"
+            ]
+          },
+          "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
+        }
+      },
       "kannadiTilePrefab": {
         "type": [
           "string",
@@ -35240,6 +35305,19 @@
               },
               "unit": "scene units",
               "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
+            }
+          },
+          "seamlessPeriodicView": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mixed"
+                ]
+              },
+              "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
             }
           },
           "kannadiTilePrefab": {
@@ -39585,6 +39663,19 @@
               "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
             }
           },
+          "seamlessPeriodicView": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mixed"
+                ]
+              },
+              "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
+            }
+          },
           "kannadiTilePrefab": {
             "type": [
               "string",
@@ -43926,6 +44017,19 @@
               },
               "unit": "scene units",
               "help": "Ordered X/Z offsets active for this step. Each tracked locust has a central avatar at zero plus one copy per offset. Keep earlier offsets in the same order when appending copies."
+            }
+          },
+          "seamlessPeriodicView": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mixed"
+                ]
+              },
+              "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
             }
           },
           "kannadiTilePrefab": {

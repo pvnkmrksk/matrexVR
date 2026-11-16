@@ -33,6 +33,7 @@ public class KannadiConfig : SwarmConfig
     public float? spacing; // Legacy name; hexRadius takes precedence.
     public KannadiSpawnConfig mirrorSpawn;
     public Vector3Config[] avatarCopyOffsets = Array.Empty<Vector3Config>();
+    public bool seamlessPeriodicView;
     public string kannadiTilePrefab;
     public string skyboxPath; // An explicit horizontal panorama takes precedence over nightSky.
     public NightSkyConfig nightSky; // Omitted preserves the existing scene background.
@@ -102,6 +103,8 @@ public class KannadiConfig : SwarmConfig
     {
         if (!IsMixed && !string.Equals(populationMode, "Mirror", StringComparison.OrdinalIgnoreCase) && !string.Equals(populationMode, "Swarm", StringComparison.OrdinalIgnoreCase))
             throw new ArgumentException("populationMode must be Mirror, Swarm or Mixed.");
+        if (seamlessPeriodicView && !IsMixed)
+            throw new ArgumentException("See-through boundaries are available in Mixed Kannadi.");
         sun?.Validate();
         if (!Enum.IsDefined(typeof(RandomInitialHeadingDistribution), initialHeadingDistribution))
             throw new ArgumentException("initialHeadingDistribution must be Continuous or Cardinal.");
