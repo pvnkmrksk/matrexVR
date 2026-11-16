@@ -56,17 +56,38 @@ public static class ReplayPresentationRecorder
         entry["rigsAfterApply"] = Rigs(main);
         var scene=UnityEngine.SceneManagement.SceneManager.GetActiveScene();
         var visuals=new JArray();
+        var mixedPeerIds = new JObject();
+        var mixedCameraClipPlanes = new JObject();
+        JArray mixedSimulatedIds = null;
         foreach(var rig in UnityEngine.Object.FindObjectsByType<Kannadi>(FindObjectsSortMode.None).Where(rig=>rig.gameObject.scene==scene))
-            visuals.Add(new JObject{["family"]="Kannadi",["kind"]=rig.IsSwarm?"Swarm":"Kannadi",["rig"]="VR"+rig.VRIndex,
+        {
+            string rigId = "VR" + rig.VRIndex;
+            visuals.Add(new JObject{["family"]="Kannadi",["kind"]=rig.IsSwarm?"Swarm":"Kannadi",["rig"]=rigId,
                 ["layer"]=RuntimeRigRegistry.LayerLabel(RuntimeRigRegistry.StimulusLayer(rig.VRIndex)),["prefab"]=rig.tilePrefab!=null?rig.tilePrefab.name:null});
+            if (!rig.IsMixed || !rig.isActiveAndEnabled) continue;
+            mixedPeerIds[rigId] = new JArray(rig.Clones.Where(body => body != null && body.activeInHierarchy).Select(body => body.name));
+            var front = rig.GetComponentsInChildren<Camera>(true).FirstOrDefault(camera => camera.name == "Main Camera F");
+            if (front != null) mixedCameraClipPlanes[rigId] = new JArray(front.nearClipPlane, front.farClipPlane);
+        }
         foreach(var spawner in UnityEngine.Object.FindObjectsByType<LocustSpawner>(FindObjectsSortMode.None).Where(spawner=>spawner.gameObject.scene==scene))
         {
-            var visual = new JObject { ["family"]="Swarm",["kind"]="Swarm",["layer"]=RuntimeRigRegistry.LayerLabel(spawner.ResolvedLayer),
+            string layer = RuntimeRigRegistry.LayerLabel(spawner.ResolvedLayer);
+            var visual = new JObject { ["family"]="Swarm",["kind"]="Swarm",["layer"]=layer,
                 ["prefab"]=spawner.locustPrefab!=null?spawner.locustPrefab.name:null,["agentVisual"]=spawner.agentVisual,
                 ["worldUnitsPerMetre"]=spawner.worldUnitsPerMetre,["bogongVisual"]=spawner.bogongVisual!=null?ReplayConfigurationJson.Capture(spawner.bogongVisual):null };
             if (spawner.agentGroups?.Length > 0) visual["agentGroups"] = JArray.FromObject(spawner.agentGroups);
             visuals.Add(visual);
+            if (layer != Kannadi.SharedSwarmLayerName) continue;
+            if (mixedSimulatedIds != null)
+                throw new InvalidOperationException("A mixed Kannadi presentation has more than one shared swarm.");
+            mixedSimulatedIds = new JArray(spawner.Spawned.Where(body => body != null && body.activeInHierarchy).Select(body => body.name));
         }
+        if (mixedPeerIds.Count > 0)
+            entry["mixedPopulation"] = new JObject {
+                ["simulatedIds"] = mixedSimulatedIds ?? throw new InvalidOperationException("The mixed Kannadi presentation has no shared swarm."),
+                ["peerIdsByRig"] = mixedPeerIds,
+                ["cameraClipPlanesByRig"] = mixedCameraClipPlanes
+            };
         entry["populationVisuals"]=visuals;
         entry["sha256"] = ReplayPresentationJournal.HashEntry(entry);
         File.AppendAllText(Path.Combine(logger.directoryPath, FileName), entry.ToString(Formatting.None) + "\n");

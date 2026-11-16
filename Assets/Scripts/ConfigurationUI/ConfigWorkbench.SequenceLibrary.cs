@@ -17,6 +17,8 @@ namespace ConfigurationUI
         private static readonly SequenceStarter[] SequenceStarters = {
             new SequenceStarter("Kannadi · entrainment then multiplayer","Examples/Sequences/kannadi-entrainment-multiplayer.sequence.json",
                 "For 16 rigs. Each animal starts with 15 generated locusts, then sees the other 15 tracked animals. The visibility matrix starts with all peers on and self off."),
+            new SequenceStarter("Kannadi · shared swarm and multiplayer","Examples/Sequences/kannadi-shared-swarm.sequence.json",
+                "A 25-minute experiment for 16 rigs. Every five minutes, 30 simulated locusts are replaced with avatar copies. Each rig has 135 bodies throughout."),
             new SequenceStarter("Generated swarm · ordered then grid","Examples/Sequences/kannadi-entrainment-swarm.sequence.json",
                 "120 seconds of ordered entrainment, then a 300-second grid swarm. Both use 64 locusts in a 1 m square."),
             new SequenceStarter("World examples · Flat world / open base","Examples/Worlds/flat-base.sequence.json",

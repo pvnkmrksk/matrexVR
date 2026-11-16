@@ -153,11 +153,12 @@ public class SwarmLogger : MonoBehaviour
         ReleaseStockCapture();
         agents.Clear();
         batchRenderer = spawner.GetComponentInChildren<BogongSwarmRenderer>(true);
+        bool sharedSwarm = LayerMask.LayerToName(spawner.ResolvedLayer) == Kannadi.SharedSwarmLayerName;
         int sourceIndex = -1;
         foreach (var agent in spawner.Spawned)
         {
             sourceIndex++;
-            if (agent != null && (locustLayerMask.value & (1 << agent.layer)) != 0)
+            if (agent != null && (!sharedSwarm || agent.activeInHierarchy) && (locustLayerMask.value & (1 << agent.layer)) != 0)
                 agents.Add(new AgentSource(agent, sourceIndex));
         }
         cachedRevision = spawner.SpawnRevision;

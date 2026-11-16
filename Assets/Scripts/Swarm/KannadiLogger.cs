@@ -92,13 +92,15 @@ public class KannadiLogger : MonoBehaviour
         }
         var frame=writer.Rent(clones.Length);
         frame.timestamp=RecordedFrameClock.Now;frame.unityFrame=Time.frameCount;frame.vrIndex=vrIndex;
-        frame.numberOfRings=kannadi.numberOfRings;frame.hexRadius=kannadi.hexRadius;
+        // Mixed presentations use explicit offsets, with no hexagonal ring or radius.
+        frame.numberOfRings=kannadi.IsMixed ? 0 : kannadi.numberOfRings;
+        frame.hexRadius=kannadi.IsMixed ? 0 : kannadi.hexRadius;
         frame.skyboxId=NightSkyController.CurrentId;frame.skyboxSampleUtc=NightSkyController.CurrentSampleUtc;
         frame.phase=MainController.RecordedExperimentPhase;
 
         for (int i = 0; i < clones.Length; i++)
         {
-            if (clones[i] != null)
+            if (clones[i] != null && clones[i].activeInHierarchy)
             {
                 Vector3 position = clones[i].transform.position;
                 Vector3 rotation = clones[i].transform.rotation.eulerAngles;

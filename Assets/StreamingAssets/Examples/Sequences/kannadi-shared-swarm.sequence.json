@@ -1,0 +1,95 @@
+{
+  "title": "Kannadi · shared swarm and multiplayer",
+  "autoStart": false,
+  "loop": false,
+  "randomise": false,
+  "returnToSetup": true,
+  "randomSeedMode": "Random",
+  "sequences": [
+    {
+      "title": "120 simulated locusts · 0 copies per peer",
+      "sceneName": "Kannadi",
+      "duration": 300,
+      "reloadScene": true,
+      "parameters": {
+        "configFile": "Examples/Kannadi/shared-swarm.example.json"
+      }
+    },
+    {
+      "title": "90 simulated locusts · 2 copies per peer",
+      "sceneName": "Kannadi",
+      "duration": 300,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Kannadi/shared-swarm.example.json",
+        "resetPositionOnStart": false,
+        "resetRotationOnStart": false,
+        "agentCount": 90,
+        "avatarCopyOffsets": [
+          { "x": 25, "y": 0, "z": 16 },
+          { "x": -25, "y": 0, "z": -16 }
+        ]
+      }
+    },
+    {
+      "title": "60 simulated locusts · 4 copies per peer",
+      "sceneName": "Kannadi",
+      "duration": 300,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Kannadi/shared-swarm.example.json",
+        "resetPositionOnStart": false,
+        "resetRotationOnStart": false,
+        "agentCount": 60,
+        "avatarCopyOffsets": [
+          { "x": 25, "y": 0, "z": 16 },
+          { "x": -25, "y": 0, "z": -16 },
+          { "x": -16, "y": 0, "z": 25 },
+          { "x": 16, "y": 0, "z": -25 }
+        ]
+      }
+    },
+    {
+      "title": "30 simulated locusts · 6 copies per peer",
+      "sceneName": "Kannadi",
+      "duration": 300,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Kannadi/shared-swarm.example.json",
+        "resetPositionOnStart": false,
+        "resetRotationOnStart": false,
+        "agentCount": 30,
+        "avatarCopyOffsets": [
+          { "x": 25, "y": 0, "z": 16 },
+          { "x": -25, "y": 0, "z": -16 },
+          { "x": -16, "y": 0, "z": 25 },
+          { "x": 16, "y": 0, "z": -25 },
+          { "x": 6, "y": 0, "z": 33 },
+          { "x": -6, "y": 0, "z": -33 }
+        ]
+      }
+    },
+    {
+      "title": "0 simulated locusts · 8 copies per peer",
+      "sceneName": "Kannadi",
+      "duration": 300,
+      "reloadScene": false,
+      "parameters": {
+        "configFile": "Examples/Kannadi/shared-swarm.example.json",
+        "resetPositionOnStart": false,
+        "resetRotationOnStart": false,
+        "agentCount": 0,
+        "avatarCopyOffsets": [
+          { "x": 25, "y": 0, "z": 16 },
+          { "x": -25, "y": 0, "z": -16 },
+          { "x": -16, "y": 0, "z": 25 },
+          { "x": 16, "y": 0, "z": -25 },
+          { "x": 6, "y": 0, "z": 33 },
+          { "x": -6, "y": 0, "z": -33 },
+          { "x": -33, "y": 0, "z": 6 },
+          { "x": 33, "y": 0, "z": -6 }
+        ]
+      }
+    }
+  ]
+}

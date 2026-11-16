@@ -76,7 +76,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     {
         session.RequireCompatibleBuild();
         worldFrames?.Dispose();worldFrames=frames??(session.Presentations.IsCurrentContract?new RecordedWorldStateReader(session.DirectoryPath):null);
-        archive=session;SetRigIds(ids);requested=null;appliedKey=null;currentConfig=currentVisualConfig=null;importedName=null;cameraStateKeys.Clear();latestAsynchronousSamples.Clear();
+        archive=session;SetRigIds(ids);requested=null;appliedKey=null;currentConfig=currentVisualConfig=currentPresentation=null;importedName=null;cameraStateKeys.Clear();latestAsynchronousSamples.Clear();
         ClearEnvironment();ReleaseSky();archivedModelKeys.Clear();
         ModelTextureLibrary.Clear(archivedTextures);
         FidelityStatus="Saved configurations loaded; waiting for recorded scene";
@@ -279,6 +279,12 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         target.transform.localPosition=rig.InverseTransformPoint(source.transform.position);
         target.transform.localRotation=Quaternion.Inverse(rig.rotation)*source.transform.rotation;
         target.fieldOfView=source.fieldOfView;target.nearClipPlane=source.nearClipPlane;target.farClipPlane=source.farClipPlane;
+        var mixedClipPlanes = currentPresentation?["mixedPopulation"]?["cameraClipPlanesByRig"]?[id] as JArray;
+        if (mixedClipPlanes != null)
+        {
+            target.nearClipPlane = (float)mixedClipPlanes[0];
+            target.farClipPlane = (float)mixedClipPlanes[1];
+        }
         target.orthographic=source.orthographic;target.orthographicSize=source.orthographicSize;
         target.allowHDR=source.allowHDR;target.allowMSAA=source.allowMSAA;target.renderingPath=source.renderingPath;
         var saved=(archive?.SystemConfiguration?["configs"] as JArray)?.OfType<JObject>().FirstOrDefault(config=>(string)config["vrId"]==id);
@@ -297,7 +303,8 @@ public class ReplayEnvironmentLoader : MonoBehaviour
         // Frozen source viewports can have zero area before their disabled
         // ViewportSetter runs. Keep valid custom projections; otherwise use
         // the copied lens with the known original aspect instead of NaNs.
-        if(valid)target.projectionMatrix=projection;
+        // The imported Kannadi camera did not run the live swarm clip override.
+        if(valid && mixedClipPlanes == null)target.projectionMatrix=projection;
         else target.ResetProjectionMatrix();
         float available=Mathf.Max(.01f,Screen.width/(Screen.height*.8f));
         target.rect=aspect<=available?new Rect((1-aspect/available)*.5f,.20f,aspect/available,.80f):new Rect(0,.20f+(.80f-.80f*available/aspect)*.5f,1,.80f*available/aspect);
@@ -319,8 +326,14 @@ public class ReplayEnvironmentLoader : MonoBehaviour
 
     public int RecordedAnimalCameraMask(string id, int fallback)
     {
-        bool mirror = string.Equals(importedName, "Kannadi", StringComparison.OrdinalIgnoreCase) &&
-            !string.Equals((string)currentConfig?["populationMode"], "Swarm", StringComparison.OrdinalIgnoreCase);
+        bool kannadi = string.Equals(importedName, "Kannadi", StringComparison.OrdinalIgnoreCase);
+        if (kannadi && currentPresentation?["mixedPopulation"] is JObject)
+        {
+            int observer = RuntimeRigRegistry.ParseIndex(CanonicalRig(id));
+            return (fallback & ~RuntimeRigRegistry.StimulusMask) |
+                RuntimeRigRegistry.PeerStimulusMask(observer) | Kannadi.SharedSwarmMask;
+        }
+        bool mirror = kannadi && !string.Equals((string)currentConfig?["populationMode"], "Swarm", StringComparison.OrdinalIgnoreCase);
         if (!mirror) return ExperimentVisibility.CameraMask(currentConfig, id, fallback);
         int index = RuntimeRigRegistry.ParseIndex(CanonicalRig(id));
         var own = (currentConfig?["vrConfigs"] as JArray)?.OfType<JObject>().FirstOrDefault(value => (int?)value["vrIndex"] == index);
