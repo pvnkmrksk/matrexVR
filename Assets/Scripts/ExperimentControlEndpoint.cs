@@ -110,7 +110,8 @@ public sealed partial class ExperimentControlEndpoint : MonoBehaviour
     private static void RequireIdle()
     {
         var main = MainController.Instance;
-        if (main?.SequenceRunning == true || main?.SequencePreparing == true || main?.SequenceStopping == true || ConfigWorkbench.Instance?.IsPreparing == true)
+        if (main?.SequenceRunning == true || main?.SequencePreparing == true || main?.SequenceStopping == true ||
+            ConfigWorkbench.Instance?.IsPreparing == true || ConfigWorkbench.Instance?.PreExperimentOpen == true)
             throw new InvalidOperationException("Return to idle setup before changing experiment configuration.");
     }
     public JObject Execute(string method, JObject args)
@@ -122,6 +123,7 @@ public sealed partial class ExperimentControlEndpoint : MonoBehaviour
             case "status": return new JObject {
                 ["protocolVersion"] = 2, ["scene"] = SceneManager.GetActiveScene().name,
                 ["sequenceRunning"] = main?.SequenceRunning ?? false, ["sequencePreparing"] = main?.SequencePreparing ?? false,
+                ["preExperimentActive"] = main?.PreExperimentActive ?? false,
                 ["sequenceStopping"] = main?.SequenceStopping ?? false, ["recordingError"] = main?.RecordingTransitionError,
                 ["recordingWarnings"] = main == null ? new JArray() : JArray.FromObject(main.RecordingWarnings),
                 ["sequenceTitle"] = main?.SequenceTitle, ["phase"] = MainController.RecordedExperimentPhase, ["sequenceError"] = main?.SequenceError,
@@ -143,11 +145,17 @@ public sealed partial class ExperimentControlEndpoint : MonoBehaviour
                 gui.StartFilesFromControl(system, sequence); return new JObject { ["accepted"] = true, ["note"] = "Start uses the GUI workflow; poll status for asynchronous preparation or errors." };
             case "stop":
                 if (main == null) throw new InvalidOperationException("No experiment controller is available.");
+                if (gui?.PreExperimentOpen == true && !main.SequencePreparing && !main.SequenceRunning)
+                {
+                    gui.CancelPreExperiment();
+                    return new JObject { ["accepted"] = true, ["recordersFinishing"] = false };
+                }
                 bool returnToSetup = SceneManager.GetActiveScene().name != "ControlScene" || main.SequencePreparing || gui?.IsPreparing == true;
                 main.StopSequence("local-control-stop");
                 if (returnToSetup) SceneManager.LoadScene("ControlScene");
                 return new JObject { ["accepted"] = true, ["recordersFinishing"] = main.SequenceStopping };
             case "replay_open":
+                if(gui?.PreExperimentOpen == true) throw new InvalidOperationException("Cancel the pre-experiment scene before opening replay.");
                 if (gui?.ControlHasUnsavedDraft == true || gui?.ControlHasModal == true) throw new InvalidOperationException("Save/discard the GUI draft and close its dialog before opening replay.");
                 string folder = RequiredPath(args, "directory");
                 if (!Directory.Exists(folder)) throw new DirectoryNotFoundException(folder);

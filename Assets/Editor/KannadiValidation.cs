@@ -310,9 +310,9 @@ public static class KannadiValidation
         RectTransform fpsBox = GameObject.Find("FPS").GetComponent<RectTransform>();
         Check(fpsBox.anchorMin == Vector2.one && fpsBox.anchorMax == Vector2.one && fpsBox.anchoredPosition.x < 0 && fpsBox.anchoredPosition.y < 0, "FPS anchored inside top-right corner");
         var floor = GameObject.Find("Plane").GetComponent<Renderer>();
-        Check(floor.sharedMaterial.name == "LocustDryGrass" && floor.sharedMaterial.mainTexture != null && floor.sharedMaterial.shader.isSupported, "dry grass ground material available in scene");
+        Check(floor.sharedMaterial.name == "LocustSandyGround" && floor.sharedMaterial.mainTexture != null && floor.sharedMaterial.shader.isSupported, "textured sandy ground material available in scene");
         // Current scenes use a 2000x Unity plane (20000 cm) and 200 texture repeats.
-        Check(Mathf.Approximately(floor.bounds.size.x / floor.sharedMaterial.mainTextureScale.x, 100), "grass tile spans 100 world centimeters for optic flow");
+        Check(Mathf.Approximately(floor.bounds.size.x / floor.sharedMaterial.mainTextureScale.x, 100), "ground tile spans 100 world centimeters for optic flow");
         Vector2 extent = GameObject.Find("Overview Panel").GetComponent<RectTransform>().anchorMax - GameObject.Find("Overview Panel").GetComponent<RectTransform>().anchorMin;
         Check(Vector2.Distance(extent, new Vector2(0.4f, 0.4f)) < 0.001f, "larger forty-percent overview panel");
     }

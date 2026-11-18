@@ -12,6 +12,7 @@ public class ClosedLoop : MonoBehaviour
     private Quaternion _initialRotation;
     private Vector3 _lastFicTracData;
     private bool _isInitialized = false;
+    private bool initializeOnFreshSample;
     private Quaternion _ficTracRotationOffset;
     private float _initializationTimer;
 
@@ -97,6 +98,7 @@ public class ClosedLoop : MonoBehaviour
         if (useLocustGains) _initialWorldRotation = _initialRotation;
         if (main != null)
         {
+            initializeOnFreshSample = main.PrimeTrackingWithFirstFreshSample(gameObject.scene);
             registeredVrId = main.GetSystemConfigForGameObject(gameObject).vrId;
             manualRigIndex = RuntimeRigRegistry.ParseIndex(registeredVrId);
             main.RegisterVRClosedLoop(registeredVrId, this);
@@ -150,7 +152,12 @@ public class ClosedLoop : MonoBehaviour
         if (!_isInitialized)
         {
             _initializationTimer += Time.deltaTime;
-            if (_initializationTimer >= initializationDelay)
+            if (initializeOnFreshSample)
+            {
+                if (!_zmqListener.HasFreshPose()) return;
+                InitializeFicTracData();
+            }
+            else if (_initializationTimer >= initializationDelay)
             {
                 InitializeFicTracData();
             }
@@ -163,6 +170,7 @@ public class ClosedLoop : MonoBehaviour
 
     private void InitializeFicTracData()
     {
+        initializeOnFreshSample = false;
         _lastFicTracData = GetCurrentFicTracData();
         float initialYaw = _lastFicTracData.z;
 

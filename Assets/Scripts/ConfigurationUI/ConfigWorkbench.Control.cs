@@ -25,7 +25,7 @@ namespace ConfigurationUI
         public string ControlPreparationStatus => preparationStatus;
         public void RequireControlEditReady()
         {
-            if(modal!=null||IsPreparing||rawPending||HasPendingEditorDrafts||ControlTextEditing)
+            if(modal!=null||IsPreparing||PreExperimentOpen||rawPending||HasPendingEditorDrafts||ControlTextEditing)
                 throw new InvalidOperationException("Finish the current dialog or text/JSON input before changing setup through control.");
         }
         public void SelectFilesFromControl(string system,string sequence)
@@ -108,20 +108,20 @@ namespace ConfigurationUI
         }
         public void StartCurrentFromControl()
         {
-            if (modal != null || IsPreparing) throw new InvalidOperationException("Finish the open setup dialog/preparation before starting.");
+            if (modal != null || IsPreparing || PreExperimentOpen) throw new InvalidOperationException("Finish the open setup dialog/preparation before starting.");
             // A normal button click commits a delayed text field by moving focus.
             root?.panel?.focusController?.focusedElement?.Blur();
-            StartExperiment();
+            StartExperiment(false);
         }
         public void StartFilesFromControl(string system, string sequence)
         {
-            if (modal != null || IsPreparing) throw new InvalidOperationException("Finish the open setup dialog/preparation before starting.");
+            if (modal != null || IsPreparing || PreExperimentOpen) throw new InvalidOperationException("Finish the open setup dialog/preparation before starting.");
             if (ControlTextEditing)
                 throw new InvalidOperationException("Finish editing the focused text field before replacing the selected setup, or use start_current.");
             RequireApplied();
             if (ControlHasUnsavedDraft) throw new InvalidOperationException("Unsaved setup changes are preserved. Save/discard them or use start_current to run the current GUI draft.");
             SelectFilesFromControl(system,sequence);
-            StartExperiment();
+            StartExperiment(false);
         }
     }
 }

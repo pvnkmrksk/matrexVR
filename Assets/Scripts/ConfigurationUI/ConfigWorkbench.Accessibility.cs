@@ -30,7 +30,7 @@ namespace ConfigurationUI
             // Programmatic fallback only; Tab traverses the actual controls.
             root.focusable=true;root.tabIndex=-1;
             root.RegisterCallback<KeyDownEvent>(evt=>{
-                if(preparing||nativeFilePickerPending||SavingScreenVisible)return;
+                if(preparing||PreExperimentOpen||nativeFilePickerPending||SavingScreenVisible)return;
                 bool command=evt.ctrlKey||evt.commandKey;
                 Action action=null;
                 if(evt.keyCode==KeyCode.F1)action=ShowKeyboardHelp;
@@ -53,6 +53,7 @@ namespace ConfigurationUI
         {
             if(SavingScreenVisible||nativeFilePickerPending||libraryPicker!=null)return true;
             if(modal!=null){CloseModal();return true;}
+            if(PreExperimentOpen){CancelPreExperiment();return true;}
             if(rawPending){UpdateStatus("JSON draft kept. Apply or discard it before leaving this editor.");return true;}
             if(!homeMode){Guard(ShowSessionHome);return true;}
             return false;

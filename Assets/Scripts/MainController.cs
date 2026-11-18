@@ -27,6 +27,7 @@ public class MainController : MonoBehaviour
     public string ExperimentPhase => phaseRunner != null && phaseRunner.Active ? phaseRunner.CurrentPhase : AssessmentPending ? "assessment" : "stimulus";
     // Shared by recorded rows and live telemetry; do not label idle/error rows as stimulus.
     public static string RecordedExperimentPhase => Instance == null ? "idle" :
+        Instance.PreExperimentActive && !Instance.SequenceRunning ? "pre-experiment" :
         Instance.SequenceError != null || Instance.AssessmentFailed ? "error" :
         !Instance.SequenceRunning ? "idle" : Instance.ExperimentPhase;
     public double RemainingPhaseSeconds => phaseRunner != null && phaseRunner.Active ? phaseRunner.RemainingPhaseSeconds : Mathf.Max(0,timer);
@@ -134,6 +135,12 @@ public class MainController : MonoBehaviour
     private string randomSeedMode = "Fixed";
     private int randomSeed = 1;
     private int preparationGeneration;
+    private PreExperimentWorld preExperimentWorld;
+    private double preExperimentOpenedAt;
+    private double? preExperimentSeconds;
+    private int preExperimentFirstScene;
+    private int initialPresentationFrame = -1;
+    public bool PreExperimentActive => preExperimentWorld != null;
     public bool ReturnToSetupAfterSequence { get; private set; }
 
     // Called only from the idle setup screen, after validation and saving.
@@ -145,6 +152,9 @@ public class MainController : MonoBehaviour
         DesktopQuickStart.RememberWorkspace(systemFile, sequenceFile);
         masterDataLogger = MasterDataLogger.Instance;
         masterDataLogger.BeginConfiguredSession(systemFile, sequenceFile);
+        preExperimentSeconds = PreExperimentActive ? Time.realtimeSinceStartupAsDouble - preExperimentOpenedAt : null;
+        preExperimentFirstScene = 0;
+        initialPresentationFrame = -1;
         recordingRunId = null;
         recordingDirectory = null;
         nativeRecordingStartTask = System.Threading.Tasks.Task.CompletedTask;
@@ -466,6 +476,31 @@ public class MainController : MonoBehaviour
         }
     }
 
+    public void BeginPreExperiment(string systemFile)
+    {
+        if (PreExperimentActive) return;
+        Scene scene = SceneManager.GetActiveScene();
+        if (scene.name != "ControlScene")
+            throw new System.InvalidOperationException("Open the experiment workbench to prepare the animals.");
+        ConfigureTrackingWhileIdle(systemFile);
+        preExperimentWorld = PreExperimentWorld.Create(scene);
+        preExperimentOpenedAt = Time.realtimeSinceStartupAsDouble;
+        SequenceError = null;
+        if (StimulusResolutionConfig.UsesMainMonitor(systemConfigs.Values))
+            DesktopDisplay.SetStimulusResolution(configuredStimulusResolution);
+    }
+
+    public void EndPreExperiment()
+    {
+        if (preExperimentWorld == null) return;
+        preExperimentWorld.Dispose();
+        preExperimentWorld = null;
+        if (!SequenceRunning && !SequencePreparing) DesktopDisplay.SetStimulusResolution(null);
+    }
+
+    internal bool PrimeTrackingWithFirstFreshSample(Scene scene) =>
+        preExperimentSeconds.HasValue && preExperimentFirstScene == scene.handle;
+
     // Method to set a different system config file
     public void SetSystemConfigFile(string fileName)
     {
@@ -478,6 +513,13 @@ public class MainController : MonoBehaviour
 
     public void StopSequence(string endReason)
     {
+        if (PreExperimentActive && !SequencePreparing && !sequenceStarted)
+        {
+            EndPreExperiment();
+            return;
+        }
+        EndPreExperiment();
+        ClearStartFrameCapture();
         ExperimentRandom.End();
         preparationGeneration++;
         preparationCancellation?.Cancel();
@@ -722,6 +764,12 @@ public class MainController : MonoBehaviour
         {
             SceneTransitionPending = false;
             if (scene.name == "ControlScene" && savingTransition == null) returningToSetup = false;
+            if (scene.name != "ControlScene")
+            {
+                EndPreExperiment();
+                if (sequenceStarted && preExperimentSeconds.HasValue && preExperimentFirstScene == 0)
+                    preExperimentFirstScene = scene.handle;
+            }
         }
         try { RuntimeRigRegistry.Configure(scene, systemConfigs); }
         catch (System.Exception error) { FailExperiment(error); return; }
@@ -849,6 +897,8 @@ public class MainController : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
         if (Instance == this)
         {
+            EndPreExperiment();
+            ClearStartFrameCapture();
             Instance = null;
         }
     }
@@ -994,7 +1044,7 @@ public class MainController : MonoBehaviour
                     randomise = config.randomise; // Get the randomise parameter
                     loopSequence = config.loop; // Set looping based on config
                     LoopStartIndex = config.loopStartIndex;
-                    autoStart = config.autoStart;
+                    autoStart = config.autoStart && !config.preExperimentScene;
                     SequenceTitle = config.title;
                     randomSeedMode = config.randomSeedMode ?? "Fixed";
                     randomSeed = config.randomSeed;
@@ -1087,11 +1137,51 @@ private void ApplyExperiment(Dictionary<string, object> parameters, System.Actio
             ExperimentRandom.SeedParticles(SceneManager.GetActiveScene(), "trial:" + currentTrial + ":row:" + executionOrder[currentStep] + ":phase:" + ExperimentPhase);
             ReplayPresentationRecorder.Commit(presentation, this);
         }
+        if (preExperimentSeconds.HasValue && currentTrial == 0 && currentStep == 0 && initialPresentationFrame < 0)
+        {
+            initialPresentationFrame = Time.frameCount;
+            Camera.onPostRender += RecordFirstExperimentFrame;
+        }
         StartCoroutine(RecordingThumbnail.Capture(SceneManager.GetActiveScene(), MasterDataLogger.Instance.directoryPath));
         MasterDataLogger.Instance.ConfigArchive.RequireComplete();
         if (step != null) ApplyAutoTrimToClosedLoopComponents(step);
     };
     if (!phaseRunner.TryBegin(resolved, applyConfigured, FailExperiment)) applyConfigured(resolved);
+}
+
+private void RecordFirstExperimentFrame(Camera camera)
+{
+    if (!sequenceStarted || camera.targetTexture != null || !camera.enabled ||
+        camera.gameObject.scene.handle != preExperimentFirstScene ||
+        camera.GetComponentInParent<ViewportSetter>() == null) return;
+
+    Camera.onPostRender -= RecordFirstExperimentFrame;
+    var record = new JObject
+    {
+        ["scene"] = camera.gameObject.scene.name,
+        ["presentationId"] = ReplayPresentationRecorder.CurrentPresentationId,
+        ["unityFrame"] = Time.frameCount,
+        ["monotonicSeconds"] = RecordedFrameClock.MonotonicSeconds,
+        ["utc"] = RecordedFrameClock.Now.ToUniversalTime().ToString("O"),
+        ["preExperimentSeconds"] = preExperimentSeconds.Value
+    };
+    try
+    {
+        File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath, "experiment_start.json"),
+            record.ToString(Newtonsoft.Json.Formatting.Indented));
+    }
+    catch (System.Exception error)
+    {
+        AddRecordingWarning("Could not write the experiment start marker: " + error.Message);
+    }
+}
+
+private void ClearStartFrameCapture()
+{
+    Camera.onPostRender -= RecordFirstExperimentFrame;
+    preExperimentSeconds = null;
+    preExperimentFirstScene = 0;
+    initialPresentationFrame = -1;
 }
 
 public void FailRecordingEvidence(System.Exception error)
@@ -1109,6 +1199,8 @@ public void FailRecordingEvidence(System.Exception error)
 
 private void FailExperiment(System.Exception error)
 {
+    EndPreExperiment();
+    ClearStartFrameCapture();
     ExperimentRandom.End();
     preparationGeneration++;
     preparationCancellation?.Cancel();
@@ -1158,6 +1250,9 @@ public bool AssessmentPending
 
 void ManageTimerAndTransitions()
 {
+    if (preExperimentSeconds.HasValue && currentTrial == 0 && currentStep == 0 &&
+        (SceneTransitionPending || initialPresentationFrame == Time.frameCount)) return;
+
     // Phased files own their complete schedule. Flat files retain a presentation
     // timer that waits for any legacy heading observation.
     if (phaseRunner != null && phaseRunner.Active)
@@ -1313,6 +1408,7 @@ public class SequenceConfig
         }
     }
     public bool autoStart = false;
+    public bool preExperimentScene = false;
     public bool randomise = false; // Added field
     public bool loop = true; // Added field for controlling whether the sequence should loop
     public SequenceItem[] sequences;

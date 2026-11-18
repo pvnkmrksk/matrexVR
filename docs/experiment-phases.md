@@ -45,6 +45,12 @@ Use the [complete canonical template](../Assets/StreamingAssets/Templates/experi
 - Choice, Swarm, Kannadi, Optomotor and Dynamic Choice accept phase payloads. Dynamic Choice retains its design schema (`steps`, `intertrial`, etc.) inside each phase and still uses `parameters.design`. Its inner trials/triggers restart when entering a new phase.
 - Mixing flat experiment settings with phase objects is rejected, avoiding silently ignored settings. Phase durations must be explicit; invalid settings appear in the status/error panel.
 
+## Pre-experiment scene
+
+Enable **Pre-experiment scene** in the sequence settings to use **Prepare experiment** on the Start screen. The configured displays show a closed-loop floor and landmarks while you place the animals. Each rig's tracking state appears on the operator screen. Use **Start experiment** to open the recording and begin the timed sequence, or **Cancel setup** to return to the workbench. If tracking is missing or stale, the Start button names the affected rigs and asks you to confirm.
+
+This setup runs once before the sequence, including its timed `preStimulus` phases. For a run started this way, `experiment_start.json` records the setup duration and identifies the first rendered Unity frame of the experiment.
+
 ## Independent pose resets
 
 `resetPositionOnStart` and `resetRotationOnStart` both default **true**. They control the application of `initialPosition` and `initialRotation` at phase/experiment start. Random initial yaw applies when `randomInitialRotation: true` and rotation reset is enabled. Turning both resets off preserves the live transform **and tracking integration**.

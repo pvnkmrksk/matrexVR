@@ -19,7 +19,7 @@ namespace ConfigurationUI
         private float libraryNextFreshnessCheck;
         private bool libraryFreshnessRunning;
         private string libraryDirectoryToken;
-        private string libraryRoot,libraryCache,librarySelected,libraryMessage;
+        private string libraryRoot,libraryPreviousRoot,libraryCache,librarySelected,libraryMessage;
         private readonly Dictionary<string,RecordingLibrary.Entry> libraryEntries=new Dictionary<string,RecordingLibrary.Entry>(StringComparer.Ordinal);
         private readonly HashSet<string> libraryExternal=new HashSet<string>(StringComparer.Ordinal);
         private readonly HashSet<string> libraryChecked=new HashSet<string>(StringComparer.Ordinal);
@@ -70,6 +70,8 @@ namespace ConfigurationUI
         {
             RequireApplied();CloseModal();StopLibraryWork();replayLibraryMode=true;homeMode=experimentIndexMode=metadataMode=jsonMode=advancedMode=false;
             selected=Workspace.Sequence;path.Clear();libraryRoot=RuntimePaths.RunDataRoot;
+            libraryPreviousRoot=RuntimePaths.ReplayLibraryRoot;
+            if(string.Equals(libraryPreviousRoot,libraryRoot,StringComparison.Ordinal))libraryPreviousRoot=null;
             libraryCache=Path.Combine(Application.temporaryCachePath,"MatrexRecordingLibrary");
             BuildNavigation();BuildContent();StartLibraryScan();
         }
@@ -87,9 +89,14 @@ namespace ConfigurationUI
             libraryState=SessionLabel(libraryMessage??"Scanning local recordings…","recording-library-state");libraryState.name="recording-library-state";body.Add(libraryState);
             var split=Row("recording-library-split");split.style.alignItems=Align.FlexStart;body.Add(split);
             var local=new VisualElement();local.AddToClassList("recording-library-local");split.Add(local);
-            local.Add(SessionLabel("THIS INSTALLATION · RUN DATA","apparatus-eyebrow"));
+            local.Add(SessionLabel("RECORDINGS","apparatus-eyebrow"));
             string rootDirectory=libraryRoot??RuntimePaths.RunDataRoot;
             var location=SessionLabel(rootDirectory,"recording-library-root");location.name="recording-library-root";location.tooltip=rootDirectory+"\nRecordings from this installation. --data-dir overrides the location; Browse opens saved recordings elsewhere.";local.Add(location);
+            if(libraryPreviousRoot!=null)
+            {
+                var previous=SessionLabel("Includes finalized recordings from "+Path.GetFileName(Path.GetDirectoryName(libraryPreviousRoot)),"recording-library-root");
+                previous.tooltip=libraryPreviousRoot;local.Add(previous);
+            }
             libraryEmpty=SessionLabel("No recordings found yet. Start an experiment, or Browse to a saved run folder.","recording-library-empty");local.Add(libraryEmpty);
             libraryList=new ListView(libraryVisible,90,()=>new VisualElement(),BindLibraryRow){name="recording-library-list",selectionType=SelectionType.Single,virtualizationMethod=CollectionVirtualizationMethod.FixedHeight};libraryList.style.flexGrow=1;local.Add(libraryList);
             libraryList.selectionChanged+=selection=>{var entry=selection.OfType<RecordingLibrary.Entry>().FirstOrDefault();if(entry!=null){librarySelected=entry.DirectoryPath;RefreshLibraryDetails();RefreshLibraryFooter();}};
@@ -105,12 +112,19 @@ namespace ConfigurationUI
         private void StartLibraryScan()
         {
             if(!replayLibraryMode)return;StopLibraryWork();libraryCancellation=new CancellationTokenSource();var token=libraryCancellation.Token;int version=libraryGeneration;
-            string directory=libraryRoot,cache=libraryCache,priority=librarySelected;var external=libraryExternal.ToArray();libraryRunning=true;libraryMessage="Scanning local recordings…";RefreshLibraryFooter();
+            string directory=libraryRoot,previous=libraryPreviousRoot,cache=libraryCache,priority=librarySelected;var external=libraryExternal.ToArray();libraryRunning=true;libraryMessage="Scanning local recordings…";RefreshLibraryFooter();
             Task.Run(()=>{
                 try
                 {
                     var entries=RecordingLibrary.Discover(directory,token).ToList();
-                    libraryUpdates.Enqueue(new LibraryUpdate{Version=version,Initial=entries,DirectoryToken=LibraryDirectoryToken(directory)});
+                    string message="Recordings indexed. Choose a run to inspect its saved context.";
+                    if(previous!=null)
+                    {
+                        try {entries.AddRange(RecordingLibrary.Discover(previous,token,finalizedOnly:true));}
+                        catch(IOException){message="Local recordings indexed. The previous recording folder is unavailable.";}
+                        catch(UnauthorizedAccessException){message="Local recordings indexed. The previous recording folder is unavailable.";}
+                    }
+                    libraryUpdates.Enqueue(new LibraryUpdate{Version=version,Initial=entries,DirectoryToken=LibraryDirectoryToken(directory,previous)});
                     foreach(var entry in entries.OrderBy(e=>e.DirectoryPath==priority?0:1))
                     {
                         token.ThrowIfCancellationRequested();
@@ -118,7 +132,7 @@ namespace ConfigurationUI
                     }
                     foreach(string path in external.Where(path=>entries.All(e=>e.DirectoryPath!=path)))
                         libraryUpdates.Enqueue(new LibraryUpdate{Version=version,Entry=RecordingLibrary.Inspect(path,cache,token)});
-                    libraryUpdates.Enqueue(new LibraryUpdate{Version=version,Done=true,Message="Recordings indexed. Choose a run to inspect its saved context."});
+                    libraryUpdates.Enqueue(new LibraryUpdate{Version=version,Done=true,Message=message});
                 }
                 catch(OperationCanceledException){}
                 catch(Exception error){libraryUpdates.Enqueue(new LibraryUpdate{Version=version,Done=true,Message="Library could not finish scanning: "+error.Message});}
@@ -174,16 +188,20 @@ namespace ConfigurationUI
             if(changed){RefreshLibraryRows();RefreshLibraryDetails();RefreshLibraryFooter();}
             RefreshLibraryFooter();CheckLibraryFreshness();
         }
-        private static string LibraryDirectoryToken(string directory)
-        {try{return string.Join("|",Directory.EnumerateDirectories(directory).OrderBy(p=>p,StringComparer.Ordinal).Select(p=>Path.GetFileName(p)+":"+Directory.GetLastWriteTimeUtc(p).Ticks));}catch{return "unavailable";}}
+        private static string LibraryDirectoryToken(string directory,string previous)
+        {
+            string RootToken(string root)
+            {try{return string.Join("|",Directory.EnumerateDirectories(root).OrderBy(p=>p,StringComparer.Ordinal).Select(p=>Path.GetFileName(p)+":"+Directory.GetLastWriteTimeUtc(p).Ticks));}catch{return "unavailable";}}
+            return previous==null?RootToken(directory):RootToken(directory)+"\n"+RootToken(previous);
+        }
         private void CheckLibraryFreshness()
         {
             if(libraryRunning||libraryFreshnessRunning||libraryPicker!=null||Time.realtimeSinceStartup<libraryNextFreshnessCheck)return;
             libraryNextFreshnessCheck=Time.realtimeSinceStartup+5;libraryFreshnessRunning=true;
-            int version=libraryGeneration;string directory=libraryRoot,previous=libraryDirectoryToken;
+            int version=libraryGeneration;string directory=libraryRoot,previous=libraryPreviousRoot,priorToken=libraryDirectoryToken;
             var entries=libraryEntries.Values.Where(e=>e.Indexed&&e.FreshnessToken!=null).Select(e=>Tuple.Create(e.DirectoryPath,e.FreshnessToken)).ToArray();
             Task.Run(()=>{
-                bool refresh=LibraryDirectoryToken(directory)!=previous;
+                bool refresh=LibraryDirectoryToken(directory,previous)!=priorToken;
                 try{foreach(var entry in entries){if(RecordingLibrary.GetFreshnessToken(entry.Item1)!=entry.Item2){refresh=true;break;}}}catch{refresh=true;}
                 libraryUpdates.Enqueue(new LibraryUpdate{Version=version,FreshnessResult=true,NeedsRefresh=refresh});
             });

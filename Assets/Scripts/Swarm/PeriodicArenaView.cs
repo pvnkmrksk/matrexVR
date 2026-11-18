@@ -229,7 +229,7 @@ public sealed class PeriodicArenaView : MonoBehaviour
                 return false;
             Layer = renderer.gameObject.layer;
             WorldBounds = renderer.bounds;
-            localToWorld = renderer.localToWorldMatrix;
+            localToWorld = skin != null ? skin.transform.localToWorldMatrix : renderer.localToWorldMatrix;
             return true;
         }
 
@@ -246,8 +246,8 @@ public sealed class PeriodicArenaView : MonoBehaviour
                         bakedMesh = new Mesh { name = "Periodic locust skin" };
                         bakedMesh.MarkDynamic();
                     }
-                    // Keep the original renderer matrix responsible for scale, exactly once.
-                    skin.BakeMesh(bakedMesh, false);
+                    // Bake in the skin's local space and apply its transform scale once when drawing.
+                    skin.BakeMesh(bakedMesh, true);
                     mesh = bakedMesh;
                 }
                 renderer.GetSharedMaterials(materials);

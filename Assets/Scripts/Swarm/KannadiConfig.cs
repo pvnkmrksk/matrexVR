@@ -34,6 +34,8 @@ public class KannadiConfig : SwarmConfig
     public KannadiSpawnConfig mirrorSpawn;
     public Vector3Config[] avatarCopyOffsets = Array.Empty<Vector3Config>();
     public bool seamlessPeriodicView;
+    public bool hideInactiveAnimals;
+    public bool hideStationaryAnimals;
     public string kannadiTilePrefab;
     public string skyboxPath; // An explicit horizontal panorama takes precedence over nightSky.
     public NightSkyConfig nightSky; // Omitted preserves the existing scene background.
