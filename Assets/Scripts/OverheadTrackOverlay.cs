@@ -17,6 +17,7 @@ public class OverheadTrackOverlay : MaskableGraphic
     private sealed class Track
     {
         public ClosedLoop rig;
+        public Kannadi mirror;
         public int number;
         public Vector2 actualPosition, markerPosition;
         public bool onScreen;
@@ -24,6 +25,7 @@ public class OverheadTrackOverlay : MaskableGraphic
         public Text label;
         public Vector2 heading = Vector2.up;
         public readonly List<Sample> samples = new List<Sample>();
+        public bool AnimalVisible => mirror == null || mirror.AnimalsVisible;
     }
 
     private readonly List<Track> tracks = new List<Track>();
@@ -92,7 +94,7 @@ public class OverheadTrackOverlay : MaskableGraphic
             label.raycastTarget = false;
             label.GetComponent<Outline>().effectColor = new Color(0, 0, 0, 0.9f);
             label.GetComponent<Outline>().effectDistance = Vector2.one;
-            tracks.Add(new Track { rig = rig, number = number, tint = tint, label = label });
+            tracks.Add(new Track { rig = rig, mirror = rig.GetComponent<Kannadi>(), number = number, tint = tint, label = label });
         }
         for (int i = tracks.Count - 1; i >= 0; i--)
         {
@@ -110,7 +112,7 @@ public class OverheadTrackOverlay : MaskableGraphic
     {
         foreach (Track track in tracks)
         {
-            if (track.rig == null) continue;
+            if (track.rig == null || !track.AnimalVisible) continue;
             // Stationary samples also expire: an old path disappears while the animal rests.
             track.samples.RemoveAll(s => s.time < now - HistorySeconds);
             if (HistorySeconds <= 0) { track.samples.Clear(); continue; }
@@ -124,6 +126,8 @@ public class OverheadTrackOverlay : MaskableGraphic
         if (!visible || overview == null || settings == null) return;
         float now = Time.unscaledTime;
         if (now >= nextDiscovery) { RefreshRigs(); nextDiscovery = now + 0.5f; }
+        foreach (Track track in tracks)
+            if (!track.AnimalVisible) track.samples.Clear();
         if (now >= nextSample) { SampleTrajectories(now); nextSample = now + SampleInterval; }
         UpdateLabels();
         SetVerticesDirty();
@@ -139,7 +143,7 @@ public class OverheadTrackOverlay : MaskableGraphic
     {
         position = Vector2.zero;
         heading = track.heading;
-        if (track.rig == null || !track.rig.isActiveAndEnabled || !Project(track.rig.transform.position, out position)) return false;
+        if (track.rig == null || !track.rig.isActiveAndEnabled || !track.AnimalVisible || !Project(track.rig.transform.position, out position)) return false;
         Vector3 forward = Vector3.ProjectOnPlane(track.rig.transform.forward, Vector3.up).normalized;
         if (Project(track.rig.transform.position + forward, out Vector2 tip) && (tip - position).sqrMagnitude > 0.000001f)
             heading = track.heading = (tip - position).normalized;

@@ -299,6 +299,8 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
             child["minimum"]=0;
             ui["help"]="Zero-based row to restart after the final row: 0 repeats everything; 1 runs row 0 once, then repeats rows 1 onward. Requires fixed order when nonzero.";
         }
+        if(name=="preExperimentScene")
+            ui["help"]="Show a live closed-loop world for animal placement and tracking checks. The operator starts the recorded sequence from the setup scene.";
         if(name=="title"||name=="comments"||name=="group")child["default"]="";
         if(name=="group")ui["help"]="Optional group name for adjacent sequence blocks. Blocks with the same group stay in order and are shuffled together. Reuse the name only within that contiguous group.";
         if(name=="populationMode")
@@ -315,6 +317,18 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         {
             ui["visibleWhen"]=Rule("populationMode","Mixed");
             ui["help"]="Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same.";
+        }
+        if(owner==typeof(KannadiConfig) && name=="hideInactiveAnimals")
+        {
+            ui["visibleWhen"]=Rule("populationMode","Mirror","Mixed");
+            child["default"]=false;
+            ui["help"]="Show a tracked animal and its copies only while its tracker is sending fresh poses. A tracker can go one second without a pose before its animal is hidden.";
+        }
+        if(owner==typeof(KannadiConfig) && name=="hideStationaryAnimals")
+        {
+            ui["visibleWhen"]=Rule("populationMode","Mirror","Mixed");
+            child["default"]=false;
+            ui["help"]="Show a tracked animal and its copies after one continuous second above the animation speed threshold. Hide them after one continuous second below 80% of that threshold. The visibility rule uses smoothed horizontal speed.";
         }
         if(owner==typeof(KannadiConfig) && name=="numberOfRings")
             ui["help"]="Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.";

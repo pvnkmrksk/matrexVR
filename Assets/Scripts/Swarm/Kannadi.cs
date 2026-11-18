@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 public class Kannadi : MonoBehaviour, IInSceneSequencer
 {
     internal const string SharedSwarmLayerName = "KannadiSharedSwarm";
+    private const double WalkingVisibilityHoldSeconds = 1.0;
     internal static int SharedSwarmMask => LayerMask.GetMask(SharedSwarmLayerName);
     public GameObject tilePrefab;
     public int numberOfRings = 3;
@@ -27,12 +28,21 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     private string swarmPopulationKey, mirrorPopulationKey, mirrorAppearanceKey;
     private MirrorBatch mirrorBatch;
     private SharedSwarm sharedSwarm;
+    private ZmqListener tracker;
+    private ClosedLoop trackedRig;
+    private AnimateOnMove.TranslationSpeed walkingSpeed;
+    private long walkingPoseContinuityId;
+    private bool walkingAnimalVisible;
+    private double? walkingVisibilitySince;
+    private int refreshBandRenderersThroughFrame = -1;
     public bool IsSwarm => string.Equals(config.populationMode, "Swarm", StringComparison.OrdinalIgnoreCase);
     public bool IsMixed => config.IsMixed;
+    internal bool AnimalsVisible { get; private set; } = true;
     internal bool SeamlessPeriodicView => IsMixed && config.seamlessPeriodicView;
     internal Vector2 PeriodicViewArenaSize => new Vector2(MirrorBoundaryX, MirrorBoundaryZ);
     private float MirrorBoundaryX => config.boundaryLengthX ?? SwarmConfig.DefaultBoundaryLength;
     private float MirrorBoundaryZ => config.boundaryLengthZ ?? SwarmConfig.DefaultBoundaryLength;
+    private Vector2 AnimationWrapSize => config.periodicBoundary ? PeriodicViewArenaSize : Vector2.zero;
     protected virtual float RowSpacing => hexRadius * 2f;
 
     // One batch can represent several tracked rigs. Each body retains its source
@@ -182,7 +192,11 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
         }
     }
 
-    private void Awake() => RuntimeStatusOverlay.RegisterStatusSource(this);
+    private void Awake()
+    {
+        tracker = GetComponent<ZmqListener>();
+        RuntimeStatusOverlay.RegisterStatusSource(this);
+    }
 
     protected virtual void Start()
     {
@@ -281,6 +295,8 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     {
         bool wasSwarm = IsSwarm;
         bool wasMixed = IsMixed;
+        Vector2 previousWrapSize = AnimationWrapSize;
+        float previousWalkingThreshold = config.animationSpeedThreshold;
         config = next;
         tilePrefab = prefab;
         numberOfRings = next.numberOfRings ?? numberOfRings;
@@ -309,7 +325,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
         }
         else if (next.randomInitialRotation && next.resetRotationOnStart)
             rotation = Quaternion.Euler(rotation.eulerAngles.x, next.SampleInitialYaw(UnityEngine.Random.value), rotation.eulerAngles.z);
-        ClosedLoop closedLoop = GetComponent<ClosedLoop>();
+        ClosedLoop closedLoop = trackedRig = GetComponent<ClosedLoop>();
         if (closedLoop != null)
         {
             closedLoop.ApplyStartPose(position, rotation, next.resetPositionOnStart, next.resetRotationOnStart);
@@ -317,7 +333,24 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
                                       vr?.closedLoopOrientation ?? next.closedLoopOrientation ?? 1f);
         }
         else transform.SetPositionAndRotation(next.resetPositionOnStart ? position : transform.position, next.resetRotationOnStart ? rotation : transform.rotation);
+        if (IsSwarm || !next.hideStationaryAnimals)
+            walkingSpeed = null;
+        else if (walkingSpeed == null || next.resetPositionOnStart || !previousWrapSize.Equals(AnimationWrapSize))
+        {
+            if (walkingSpeed == null)
+            {
+                walkingSpeed = new AnimateOnMove.TranslationSpeed(transform.position, AnimationWrapSize);
+                walkingAnimalVisible = false;
+            }
+            else
+                walkingSpeed.Reset(transform.position, AnimationWrapSize);
+            walkingVisibilitySince = null;
+            walkingPoseContinuityId = trackedRig != null ? trackedRig.PoseContinuityId : 0;
+        }
+        else if (previousWalkingThreshold != next.animationSpeedThreshold)
+            walkingVisibilitySince = null;
         ConfigureCameras();
+        UpdateAnimalVisibility();
         if (IsSwarm)
         {
             CleanupClones();
@@ -351,7 +384,8 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
         {
             DisablePrivateSwarm();
             string key = JsonConvert.SerializeObject(new { numberOfRings, hexRadius, prefab = prefab.GetInstanceID(), next.animateOnMove,
-                next.animationSpeedThreshold, next.periodicBoundary, next.boundaryLengthX, next.boundaryLengthZ, next.useHeadingReference, watchIndex });
+                next.animationSpeedThreshold, next.hideStationaryAnimals, next.periodicBoundary, next.boundaryLengthX, next.boundaryLengthZ,
+                next.useHeadingReference, watchIndex });
             string appearanceKey = JsonConvert.SerializeObject(next.modelAppearance);
             if (!(initialized && !wasSwarm && !next.resetPositionOnStart && mirrorPopulationKey == key)) GenerateHexGrid();
             else if (mirrorAppearanceKey != appearanceKey)
@@ -481,11 +515,13 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             band.lockBoundaryWithAnimalPosition = true;
             band.customParentTransform = null;
             band.gameObject.layer = layer;
+            // BandSpawner.Start adds child renderers after the avatar is created.
+            if (!AnimalsVisible) refreshBandRenderersThroughFrame = Time.frameCount + 1;
         }
-        Vector2 wrapSize = config.periodicBoundary ? new Vector2(MirrorBoundaryX, MirrorBoundaryZ) : Vector2.zero;
-        AnimateOnMove.ConfigureHierarchy(clone, transform, config.animateOnMove, config.animationSpeedThreshold, wrapSize);
-        clone.AddComponent<KannadiMirrorTile>().ConfigureAnimation(transform, config.animateOnMove, config.animationSpeedThreshold, wrapSize);
+        AnimateOnMove.ConfigureHierarchy(clone, transform, config.animateOnMove, config.animationSpeedThreshold, AnimationWrapSize, walkingSpeed);
+        clone.AddComponent<KannadiMirrorTile>().ConfigureAnimation(transform, config.animateOnMove, config.animationSpeedThreshold, AnimationWrapSize, walkingSpeed);
         ModelAppearance.Apply(clone, config.modelAppearance);
+        if (!AnimalsVisible) SetAvatarVisibility(clone);
         return clone;
     }
 
@@ -509,18 +545,71 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
     protected virtual void LateUpdate()
     {
         if (!initialized) return;
+        // A rig reset should clear the speed window. The regular arena wrap below remains part of continuous motion.
+        bool resetWalkingSpeed = walkingSpeed != null && trackedRig != null &&
+            trackedRig.PoseContinuityId != walkingPoseContinuityId;
         if (!IsSwarm && config.periodicBoundary)
         {
             Vector3 position = transform.position;
             Vector3 wrapped = WrapPosition(position);
             if (Mathf.Abs(wrapped.x - position.x) > MirrorBoundaryX / 2f ||
                 Mathf.Abs(wrapped.z - position.z) > MirrorBoundaryZ / 2f)
-                GetComponent<ClosedLoop>()?.MarkPositionDiscontinuity();
+                trackedRig?.MarkPositionDiscontinuity();
             transform.position = wrapped;
         }
+        if (walkingSpeed != null)
+        {
+            if (resetWalkingSpeed)
+            {
+                walkingSpeed.Reset(transform.position, AnimationWrapSize);
+                walkingVisibilitySince = null;
+            }
+            else
+            {
+                walkingSpeed.Sample(transform.position, Time.deltaTime, config.animationSpeedThreshold, useHysteresis: true);
+                UpdateWalkingVisibility(walkingSpeed.Speed, Time.timeAsDouble);
+            }
+            walkingPoseContinuityId = trackedRig != null ? trackedRig.PoseContinuityId : 0;
+        }
+        UpdateAnimalVisibility();
         UpdateClones();
         mirrorBatch?.RebuildIfPending();
     }
+
+    private void UpdateWalkingVisibility(float speed, double time)
+    {
+        float startThreshold = config.animationSpeedThreshold;
+        float stopThreshold = startThreshold * AnimateOnMove.WalkingStopThresholdRatio;
+        // A zero threshold still allows a fully stationary animal to hide.
+        bool shouldChange = walkingAnimalVisible ? speed < stopThreshold || speed == 0f : speed > startThreshold;
+        if (!shouldChange)
+        {
+            walkingVisibilitySince = null;
+            return;
+        }
+        walkingVisibilitySince ??= time;
+        if (time - walkingVisibilitySince.Value < WalkingVisibilityHoldSeconds) return;
+
+        walkingAnimalVisible = !walkingAnimalVisible;
+        walkingVisibilitySince = null;
+    }
+
+    private void UpdateAnimalVisibility()
+    {
+        bool visible = IsSwarm || ((walkingSpeed == null || walkingAnimalVisible) &&
+            (!config.hideInactiveAnimals || (tracker != null && tracker.isActiveAndEnabled && tracker.HasFreshPose())));
+        if (AnimalsVisible == visible && Time.frameCount > refreshBandRenderersThroughFrame) return;
+        AnimalsVisible = visible;
+        foreach (var clone in Clones)
+            if (clone != null) SetAvatarVisibility(clone);
+    }
+
+    private void SetAvatarVisibility(GameObject avatar)
+    {
+        foreach (var renderer in avatar.GetComponentsInChildren<Renderer>(true))
+            renderer.forceRenderingOff = !AnimalsVisible;
+    }
+
     private void UpdateClones(int firstOrdinal = 0)
     {
         for (int i = firstOrdinal; i < Clones.Length; i++)

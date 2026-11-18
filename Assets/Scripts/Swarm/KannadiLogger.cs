@@ -90,7 +90,8 @@ public class KannadiLogger : MonoBehaviour
             capturedClones = clones; animationCaptures = new RecordedAnimationCapture[clones.Length];names=new string[clones.Length];
             for (int i = 0; i < clones.Length; i++) if (clones[i] != null) {animationCaptures[i] = new RecordedAnimationCapture(clones[i]);names[i]=clones[i].name;}
         }
-        var frame=writer.Rent(clones.Length);
+        int visibleCount = kannadi.AnimalsVisible ? clones.Length : 0;
+        var frame=writer.Rent(visibleCount);
         frame.timestamp=RecordedFrameClock.Now;frame.unityFrame=Time.frameCount;frame.vrIndex=vrIndex;
         // Mixed presentations use explicit offsets, with no hexagonal ring or radius.
         frame.numberOfRings=kannadi.IsMixed ? 0 : kannadi.numberOfRings;
@@ -98,7 +99,8 @@ public class KannadiLogger : MonoBehaviour
         frame.skyboxId=NightSkyController.CurrentId;frame.skyboxSampleUtc=NightSkyController.CurrentSampleUtc;
         frame.phase=MainController.RecordedExperimentPhase;
 
-        for (int i = 0; i < clones.Length; i++)
+        // An empty frame keeps replay synchronized while these bodies are hidden.
+        for (int i = 0; i < visibleCount; i++)
         {
             if (clones[i] != null && clones[i].activeInHierarchy)
             {

@@ -626,7 +626,7 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         bool cached = playback != null;
         if (cached && !playback.UsesCache)
             throw new InvalidOperationException("Shared clip playback stopped before draw submission.");
-        bool packetsReady = packetFrame == lastFrame && AllAgentsActive();
+        bool packetsReady = packetFrame == lastFrame && AllAgentsVisible();
         bool agentDataReady = false;
         if (!cached) gpuMatrices.SetData(matrices);
         var parameters = new RenderParams(material)
@@ -679,10 +679,14 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
         }
     }
 
-    private bool AllAgentsActive()
+    private bool IsAgentVisible(int index) =>
+        agentObjects[index] != null && agentObjects[index].activeInHierarchy &&
+        (agentLayerMasks == null || (skins[index] != null && !skins[index].forceRenderingOff));
+
+    private bool AllAgentsVisible()
     {
-        foreach (var agent in agentObjects)
-            if (agent == null || !agent.activeInHierarchy) return false;
+        for (int i = 0; i < agentObjects.Length; i++)
+            if (!IsAgentVisible(i)) return false;
         return true;
     }
 
@@ -690,8 +694,7 @@ public sealed class NativeLocustBatchRenderer : MonoBehaviour
     {
         for (int i = 0; i < roots.Length; i++)
         {
-            var agent = agentObjects[i];
-            activeAgents[i] = agent != null && agent.activeInHierarchy;
+            activeAgents[i] = IsAgentVisible(i);
             if (!activeAgents[i]) continue;
             Vector3 center;
             if (cached)

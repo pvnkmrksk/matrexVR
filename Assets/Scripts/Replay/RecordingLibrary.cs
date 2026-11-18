@@ -46,7 +46,7 @@ public static class RecordingLibrary
         catch(ArgumentException){return false;}
         catch(NotSupportedException){return false;}
     }
-    public static IReadOnlyList<Entry> Discover(string root,CancellationToken cancellation=default)
+    public static IReadOnlyList<Entry> Discover(string root,CancellationToken cancellation=default,bool finalizedOnly=false)
     {
         root=Path.GetFullPath(root);if(!Directory.Exists(root))return Array.Empty<Entry>();
         var entries=new List<Entry>();
@@ -54,7 +54,15 @@ public static class RecordingLibrary
         {
             cancellation.ThrowIfCancellationRequested();string name=Path.GetFileName(directory);
             if(name.StartsWith(".",StringComparison.Ordinal)||name.Equals("Backup",StringComparison.OrdinalIgnoreCase)||name.Equals("Cache",StringComparison.OrdinalIgnoreCase))continue;
-            try {if(HasPoseHeader(directory,cancellation))entries.Add(Preview(directory));}
+            try
+            {
+                if (finalizedOnly)
+                {
+                    var lifecycle = ReadSmall(Path.Combine(directory,RecordingSummary.ManifestName))?["lifecycle"];
+                    if ((string)lifecycle?["status"] != "finalized" || (bool?)lifecycle?["writersDrained"] != true) continue;
+                }
+                if(HasPoseHeader(directory,cancellation))entries.Add(Preview(directory));
+            }
             catch(OperationCanceledException){throw;}
             catch(Exception error){var entry=Preview(directory);entry.Error="Cannot inspect recording: "+error.Message;entry.Indexed=true;entries.Add(entry);}
         }

@@ -109,7 +109,15 @@ namespace ConfigurationUI
         private Button Button(string label,Action action,string css=null)
         { var button=new Button(()=>Guard(()=>{ FlushNumbers(); action(); })) { text=label }; if(css!=null) button.AddToClassList(css); return button; }
         private void Guard(Action action)
-        { try { action(); } catch(Exception error) { if(status!=null) { status.text=error.GetBaseException().Message; status.AddToClassList("error"); } } }
+        {
+            try { action(); }
+            catch(Exception error)
+            {
+                string message=error.GetBaseException().Message;
+                if(PreExperimentOpen)UpdatePreExperimentPanel(message);
+                else if(status!=null){status.text=message;status.AddToClassList("error");}
+            }
+        }
         private VisualElement Row(string css="row") { var row=new VisualElement(); row.AddToClassList("row"); if(css!="row") row.AddToClassList(css); return row; }
         private void BuildShell()
         {
@@ -352,6 +360,11 @@ namespace ConfigurationUI
         }
         private void UpdateStatus(string message=null)
         {
+            if(PreExperimentOpen)
+            {
+                if(message!=null)UpdatePreExperimentPanel(message);
+                return;
+            }
             UpdateFrameRate();RefreshNavigationLabels();
             if(replayLibraryMode){RefreshLibraryFooter(message);return;}
             if(preparing)
@@ -377,6 +390,7 @@ namespace ConfigurationUI
         private void PollFiles()
         {
             if(MainController.Instance==null || MainController.Instance.SequenceRunning) { Destroy(gameObject); return; }
+            if(PreExperimentOpen)return;
             bool changed=false;
             Guard(()=>{
                 foreach(var doc in Workspace.Documents.ToArray())
@@ -447,13 +461,25 @@ namespace ConfigurationUI
             }
             if(firstLoad)savedMetadataFingerprint=MetadataFingerprint();
         }
-        public void StartExperiment()
+        public void StartExperiment() => StartExperiment(true);
+        private void StartExperiment(bool allowPreExperiment)
         {
-            if(preparing)return;
+            if(preparing||PreExperimentOpen)return;
             RequireApplied();
             var errors=ValidateSetupForStart(Workspace);
             if(errors.Count>0)throw new InvalidOperationException(string.Join("\n",errors));
             PrepareRunMetadata();Workspace.SaveAll();
+            if(allowPreExperiment&&UsePreExperimentScene)
+            {
+                if(!CurrentDemo&&(DesktopQuickStart.IsQuickStart(Workspace)||DesktopApparatusProfile.ShouldPrepareCompanions(Workspace.System.Root)))
+                    BeginTrackerPreparation(true,null,OpenPreExperiment);
+                else
+                {
+                    companionWarnings.Clear();
+                    OpenPreExperiment();
+                }
+                return;
+            }
             if(!CurrentDemo&&(DesktopQuickStart.IsQuickStart(Workspace)||DesktopApparatusProfile.ShouldPrepareCompanions(Workspace.System.Root)))
             {
                 BeginCompanionPreparation(true);return;
@@ -503,18 +529,18 @@ namespace ConfigurationUI
             preparationStatus="VR ready · tracker unavailable";UpdateStatus(preparationStatus);
         }
         private void BeginCompanionPreparation(bool startAfter) => BeginTrackerPreparation(startAfter,null);
-        private void BeginTrackerPreparation(bool startAfter,string rigId)
+        private void BeginTrackerPreparation(bool startAfter,string rigId,Action onPrepared=null)
         {
             companionWarnings.Clear();
             preparing=true;preparationStatus="Preparing the native tracker…";
             body.SetEnabled(false);side.SetEnabled(false);RefreshPreparingCaption();UpdateStatus();
-            StartCoroutine(PrepareQuickStartRun(++preparationVersion,startAfter,rigId));
+            StartCoroutine(PrepareQuickStartRun(++preparationVersion,startAfter,rigId,onPrepared));
         }
         private void RefreshPreparingCaption()
         {var caption=start?.Q<Label>();if(caption!=null)caption.text="Preparing…";}
-        private IEnumerator PrepareQuickStartRun(int version,bool startAfter,string rigId)
+        private IEnumerator PrepareQuickStartRun(int version,bool startAfter,string rigId,Action onPrepared)
         {
-            var operation=PrepareQuickStartRunCore(version,startAfter,rigId);
+            var operation=PrepareQuickStartRunCore(version,startAfter,rigId,onPrepared);
             try
             {
                 while(true)
@@ -522,7 +548,12 @@ namespace ConfigurationUI
                     bool more=false;object current=null;Exception failure=null;
                     try { more=operation.MoveNext();if(more)current=operation.Current; }
                     catch(Exception error) { failure=error; }
-                    if(failure!=null) { if(!startAfter)PreparationFailed(failure);else{CompanionWarning(failure.GetBaseException().Message);PrepareRunMetadata();StartAfterPreviousRecording();}yield break; }
+                    if(failure!=null)
+                    {
+                        if(!startAfter||onPrepared!=null)PreparationFailed(failure);
+                        else{CompanionWarning(failure.GetBaseException().Message);PrepareRunMetadata();StartAfterPreviousRecording();}
+                        yield break;
+                    }
                     if(!more)yield break;
                     yield return current;
                 }
@@ -538,7 +569,7 @@ namespace ConfigurationUI
                 }
             }
         }
-        private IEnumerator PrepareQuickStartRunCore(int version,bool startAfter,string rigId)
+        private IEnumerator PrepareQuickStartRunCore(int version,bool startAfter,string rigId,Action onPrepared)
         {
             // Paint the first progress frame before checking the installed tracker.
             yield return null;
@@ -598,7 +629,7 @@ namespace ConfigurationUI
             catch(Exception error){PreparationFailed(error);yield break;}
             yield return null;
             if(!isActiveAndEnabled||version!=preparationVersion)yield break;
-            StartAfterPreviousRecording();
+            if(onPrepared!=null)onPrepared();else StartAfterPreviousRecording();
         }
         private void PrepareRunMetadata()
         {
@@ -674,6 +705,14 @@ namespace ConfigurationUI
             string metadataJson=SaveMetadata();
             File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"AnimalMetadata.json"),metadataJson);
             File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"FlyMetaData.json"),metadataJson);
+            if(PreExperimentOpen)
+            {
+                main.StartSequence();
+                if(main.SequencePreparing)StartCoroutine(WaitForSequencePreparation(main));
+                else if(main.SequenceRunning)Destroy(gameObject);
+                else FinishPreExperimentStart(main);
+                return;
+            }
             Document.enabled=false;root.Clear();enabled=false;
             main.StartSequence();
             if(main.SequencePreparing)
@@ -702,6 +741,7 @@ namespace ConfigurationUI
                 yield return null;
             }
             if(main!=null&&main.SequenceRunning){Destroy(gameObject);yield break;}
+            if(PreExperimentOpen){FinishPreExperimentStart(main);yield break;}
             preparing=false;body.SetEnabled(true);side.SetEnabled(true);RefreshStartCaption();
             UpdateRecordingFinalizationBanner();
             UpdateStatus(main?.SequenceError??"Experiment preparation cancelled.");
@@ -710,6 +750,7 @@ namespace ConfigurationUI
         {if(preparing){preparing=false;preparationVersion++;}}
         private void OnDestroy()
         {
+            OperatorOverlayLayout.Release(PreExperimentOverlay);
             LeaveRecordingLibrary();
             DesktopDisplay.PresentationChanged-=ResetWindowInput;
             keyboardFocusFallback?.Pause();

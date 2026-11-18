@@ -34,6 +34,16 @@ namespace ConfigurationUI
                 toggle.text=text;item.Add(toggle);
                 toggle.tooltip=key=="autoStart"?"Start the saved sequence on the next application launch. This session starts with Start experiment.":key=="loop"?"Repeat the sequence from the chosen block.":"Shuffle complete blocks or phase groups, retaining their internal order.";
             }
+            var preExperimentOption=Row("sequence-option");
+            preExperimentOption.Add(new WorkbenchIcon("motion"));
+            var preExperiment=StateSwitch(UsePreExperimentScene,on=>{
+                StudioEdit(Workspace.Sequence,r=>r["preExperimentScene"]=on,false);
+                RefreshStartCaption();
+            },"sequence-preExperimentScene");
+            preExperiment.text="Pre-experiment scene";
+            preExperiment.tooltip="Show live closed-loop feedback while you place animals and check tracking. Start experiment begins the timed sequence and recording.";
+            preExperimentOption.Add(preExperiment);
+            flags.Add(preExperimentOption);
             var loopStart=new IntegerField("Repeat from block") {
                 name="sequence-loop-start", value=(int?)Workspace.Sequence.Root["loopStartIndex"]+1??1,isDelayed=true,
                 tooltip="1 repeats every block. 2 runs the first block once, then repeats from the second block. Available with looping and listed order." };
@@ -229,8 +239,12 @@ namespace ConfigurationUI
         private void RefreshStartCaption()
         {
             if(replayLibraryMode){RefreshLibraryFooter();return;}
-            if(start==null)return;var label=start.Q<Label>();if(label!=null)label.text=ApparatusDraft?"Use configuration":CurrentDemo?"Start demo":"Start experiment";
-            start.tooltip=ApparatusDraft?"Validate and save the apparatus, then return to the experiment workspace. The experiment does not start.":CurrentDemo?"Start this clearly marked demo, with keyboard controls and simulated movement. No hardware is required.":"Save and validate the current sequence, connect its configured tracking input and start recording.";
+            if(start==null)return;
+            var label=start.Q<Label>();
+            if(label!=null)label.text=ApparatusDraft?"Use configuration":UsePreExperimentScene?(CurrentDemo?"Prepare demo":"Prepare experiment"):(CurrentDemo?"Start demo":"Start experiment");
+            start.tooltip=ApparatusDraft?"Validate and save the apparatus, then return to the experiment workspace. The experiment does not start.":
+                UsePreExperimentScene?"Save the current sequence and open the live pre-experiment scene. Recording begins after Start experiment.":
+                CurrentDemo?"Start this clearly marked demo, with keyboard controls and simulated movement. No hardware is required.":"Save and validate the current sequence, connect its configured tracking input and start recording.";
         }
         private void BuildSessionDetails(VisualElement parent)
         {

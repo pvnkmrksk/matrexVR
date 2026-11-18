@@ -879,6 +879,13 @@
         "type": "boolean",
         "default": false
       },
+      "preExperimentScene": {
+        "type": "boolean",
+        "default": false,
+        "x-ui": {
+          "help": "Show a live closed-loop world for animal placement and tracking checks. The operator starts the recorded sequence from the setup scene."
+        }
+      },
       "randomise": {
         "type": "boolean",
         "default": false
@@ -14581,6 +14588,34 @@
           "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
         }
       },
+      "hideInactiveAnimals": {
+        "type": "boolean",
+        "default": false,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "populationMode",
+            "oneOf": [
+              "Mirror",
+              "Mixed"
+            ]
+          },
+          "help": "Show a tracked animal and its copies only while its tracker is sending fresh poses. A tracker can go one second without a pose before its animal is hidden."
+        }
+      },
+      "hideStationaryAnimals": {
+        "type": "boolean",
+        "default": false,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "populationMode",
+            "oneOf": [
+              "Mirror",
+              "Mixed"
+            ]
+          },
+          "help": "Show a tracked animal and its copies after one continuous second above the animation speed threshold. Hide them after one continuous second below 80% of that threshold. The visibility rule uses smoothed horizontal speed."
+        }
+      },
       "kannadiTilePrefab": {
         "type": [
           "string",
@@ -17718,6 +17753,34 @@
                 ]
               },
               "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
+            }
+          },
+          "hideInactiveAnimals": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mirror",
+                  "Mixed"
+                ]
+              },
+              "help": "Show a tracked animal and its copies only while its tracker is sending fresh poses. A tracker can go one second without a pose before its animal is hidden."
+            }
+          },
+          "hideStationaryAnimals": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mirror",
+                  "Mixed"
+                ]
+              },
+              "help": "Show a tracked animal and its copies after one continuous second above the animation speed threshold. Hide them after one continuous second below 80% of that threshold. The visibility rule uses smoothed horizontal speed."
             }
           },
           "kannadiTilePrefab": {
@@ -22076,6 +22139,34 @@
               "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
             }
           },
+          "hideInactiveAnimals": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mirror",
+                  "Mixed"
+                ]
+              },
+              "help": "Show a tracked animal and its copies only while its tracker is sending fresh poses. A tracker can go one second without a pose before its animal is hidden."
+            }
+          },
+          "hideStationaryAnimals": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mirror",
+                  "Mixed"
+                ]
+              },
+              "help": "Show a tracked animal and its copies after one continuous second above the animation speed threshold. Hide them after one continuous second below 80% of that threshold. The visibility rule uses smoothed horizontal speed."
+            }
+          },
           "kannadiTilePrefab": {
             "type": [
               "string",
@@ -26430,6 +26521,34 @@
                 ]
               },
               "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
+            }
+          },
+          "hideInactiveAnimals": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mirror",
+                  "Mixed"
+                ]
+              },
+              "help": "Show a tracked animal and its copies only while its tracker is sending fresh poses. A tracker can go one second without a pose before its animal is hidden."
+            }
+          },
+          "hideStationaryAnimals": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mirror",
+                  "Mixed"
+                ]
+              },
+              "help": "Show a tracked animal and its copies after one continuous second above the animation speed threshold. Hide them after one continuous second below 80% of that threshold. The visibility rule uses smoothed horizontal speed."
             }
           },
           "kannadiTilePrefab": {
@@ -32181,6 +32300,34 @@
           "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
         }
       },
+      "hideInactiveAnimals": {
+        "type": "boolean",
+        "default": false,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "populationMode",
+            "oneOf": [
+              "Mirror",
+              "Mixed"
+            ]
+          },
+          "help": "Show a tracked animal and its copies only while its tracker is sending fresh poses. A tracker can go one second without a pose before its animal is hidden."
+        }
+      },
+      "hideStationaryAnimals": {
+        "type": "boolean",
+        "default": false,
+        "x-ui": {
+          "visibleWhen": {
+            "property": "populationMode",
+            "oneOf": [
+              "Mirror",
+              "Mixed"
+            ]
+          },
+          "help": "Show a tracked animal and its copies after one continuous second above the animation speed threshold. Hide them after one continuous second below 80% of that threshold. The visibility rule uses smoothed horizontal speed."
+        }
+      },
       "kannadiTilePrefab": {
         "type": [
           "string",
@@ -35318,6 +35465,34 @@
                 ]
               },
               "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
+            }
+          },
+          "hideInactiveAnimals": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mirror",
+                  "Mixed"
+                ]
+              },
+              "help": "Show a tracked animal and its copies only while its tracker is sending fresh poses. A tracker can go one second without a pose before its animal is hidden."
+            }
+          },
+          "hideStationaryAnimals": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mirror",
+                  "Mixed"
+                ]
+              },
+              "help": "Show a tracked animal and its copies after one continuous second above the animation speed threshold. Hide them after one continuous second below 80% of that threshold. The visibility rule uses smoothed horizontal speed."
             }
           },
           "kannadiTilePrefab": {
@@ -39676,6 +39851,34 @@
               "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
             }
           },
+          "hideInactiveAnimals": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mirror",
+                  "Mixed"
+                ]
+              },
+              "help": "Show a tracked animal and its copies only while its tracker is sending fresh poses. A tracker can go one second without a pose before its animal is hidden."
+            }
+          },
+          "hideStationaryAnimals": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mirror",
+                  "Mixed"
+                ]
+              },
+              "help": "Show a tracked animal and its copies after one continuous second above the animation speed threshold. Hide them after one continuous second below 80% of that threshold. The visibility rule uses smoothed horizontal speed."
+            }
+          },
           "kannadiTilePrefab": {
             "type": [
               "string",
@@ -44030,6 +44233,34 @@
                 ]
               },
               "help": "Draw periodic images of locusts across arena borders in each rig's view. The viewing range and recorded populations stay the same."
+            }
+          },
+          "hideInactiveAnimals": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mirror",
+                  "Mixed"
+                ]
+              },
+              "help": "Show a tracked animal and its copies only while its tracker is sending fresh poses. A tracker can go one second without a pose before its animal is hidden."
+            }
+          },
+          "hideStationaryAnimals": {
+            "type": "boolean",
+            "default": false,
+            "x-ui": {
+              "visibleWhen": {
+                "property": "populationMode",
+                "oneOf": [
+                  "Mirror",
+                  "Mixed"
+                ]
+              },
+              "help": "Show a tracked animal and its copies after one continuous second above the animation speed threshold. Hide them after one continuous second below 80% of that threshold. The visibility rule uses smoothed horizontal speed."
             }
           },
           "kannadiTilePrefab": {

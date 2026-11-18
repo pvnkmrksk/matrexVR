@@ -35,10 +35,16 @@ The first two pairs form a cross. The last two pairs form a second cross turned 
 
 The arena is a 1 m × 1 m square. Tracked and simulated bodies wrap at the edges.
 
+The sandy-ground build uses a muted brown material in Kannadi. It retains the original ground texture's spatial pattern and 100 cm tile span, converts its colour to luminance, and softens its contrast to 55%. The ground remains flat and unlit. This is a built-in scene appearance, so use the sandy-ground player for new runs and retain the original player for its recorded sessions.
+
 The see-through test build enables `seamlessPeriodicView`. Each rig can see bodies across the arena edges at the existing 80 cm viewing range. This can show the same body in more than one direction. The experiment log still counts 135 bodies per rig in one square and records each body's position once. The overhead view shows one square.
 
 Random removal gives each simulated locust the same chance of being removed regardless of its position or heading. Uniformly distributed simulated positions remain uniform on average after removal. Local density also depends on where peers move and how their copies are placed.
 
 ## Tracking
 
-The operator can start and stop the trial. The experiment clock advances the phase schedule and ends the run independently of tracker availability. During a tracking gap, the corresponding avatar and copies hold their last pose under Kannadi’s existing tracking behavior.
+The operator can start and stop the trial. The experiment clock advances the phase schedule and ends the run independently of tracker availability. By default, the avatar and copies hold their last pose during a tracking gap.
+
+Set `"hideInactiveAnimals": true` in the Kannadi experiment JSON to hide each tracked animal and its copies until its first pose arrives and whenever the latest pose is more than one second old. They reappear together when fresh tracking resumes. A stationary animal stays visible while its tracker sends poses. The generated swarm still follows the scheduled counts, so the number of visible bodies can fall below 135 while any peer is hidden.
+
+Set `"hideStationaryAnimals": true` to use walking speed for visibility. The avatar, its copies, and their walking animation share one speed estimate over the last 0.30 seconds of horizontal motion. The avatar and copies appear after one continuous second above `animationSpeedThreshold` and hide after one continuous second below 80% of that speed. With the example’s settings, those thresholds are 0.5 cm/s and 0.4 cm/s. Between them, visibility holds and any pending change resets. The view across the arena boundaries follows the same visibility rule.

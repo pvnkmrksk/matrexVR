@@ -144,15 +144,17 @@ public partial class ReplayController
     }
     private void OnGUI()
     {
+        float scale=ReplayUiScale(DesktopDisplay.UiScale,Screen.width);
         if(OperatorOverlayVisibility.Hidden)
         {
+            DrawHighContrastLocusts(scale);
             if(replayPointerControl!=0 && GUIUtility.hotControl==replayPointerControl)GUIUtility.hotControl=0;
             timelineMouseCaptured=timelineMouseUpSeen=false;replayPointerControl=0;return;
         }
         EventType entryType=Event.current!=null?Event.current.type:EventType.Ignore;
         Vector2 legacyPosition=Event.current!=null?Event.current.mousePosition:Vector2.zero;
         NormalizeReplayPointer(Event.current,UnityEngine.InputSystem.Mouse.current,Screen.height);
-        float scale=ReplayUiScale(DesktopDisplay.UiScale,Screen.width);EnsureReplayStyles(scale);
+        EnsureReplayStyles(scale);
         if(pointerTrace && Event.current!=null && (Event.current.type==EventType.MouseDown || Event.current.type==EventType.MouseUp))
             Debug.Log("[Replay pointer] IMGUI frame="+Time.frameCount+" type="+Event.current.type+" position="+Event.current.mousePosition+" legacyPosition="+legacyPosition+" screen="+Screen.width+"x"+Screen.height+" scale="+scale);
         GUISkin previousSkin=GUI.skin;GUI.skin=replaySkin;
@@ -160,6 +162,7 @@ public partial class ReplayController
         Matrix4x4 previousMatrix=GUI.matrix;GUI.matrix=Matrix4x4.identity;
         NormalizeReplayPointer(Event.current,UnityEngine.InputSystem.Mouse.current,Screen.height);
         DrawReplayWorkspace(scale);
+        DrawHighContrastLocusts(scale);
         DrawPixelAnimalView();
         DrawReplayAgentLabels(scale);
         DrawReplayHeader(scale,previousSkin,previousMatrix);

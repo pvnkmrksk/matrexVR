@@ -137,11 +137,20 @@ public partial class ReplayController
         right -= 98 * scale;
         if (selectedView < 0)
         {
-            if (ReplayWorkspaceButton(new Rect(right - 64 * scale, y, 64 * scale, height), "eye", "Fit", "Fit all active tracks into the overview."))
+            if (ReplayWorkspaceButton(new Rect(right - 64 * scale, y, 64 * scale, height), "eye", "Fit",
+                HighContrastOverview ? "Frame the active tracks and visible population." : "Fit all active tracks into the overview."))
                 FitOverview();
             right -= 70 * scale;
             if (ReplayWorkspaceButton(new Rect(right - 122 * scale, y, 122 * scale, height), "panel-left", overviewPerspective ? "Perspective" : "Top-down", "Switch the overview camera between perspective and top-down projection.", overviewPerspective))
                 ToggleOverviewProjection();
+            right -= 128 * scale;
+            if (!overviewPerspective && ReplayWorkspaceButton(new Rect(right - 150 * scale, y, 150 * scale, height), "sun", "High contrast",
+                "Show locust positions as bright dots on a black background.", HighContrastOverview))
+            {
+                overviewHighContrast = !overviewHighContrast;
+                if (overviewUserAdjusted) ApplyOverviewContrast();
+                else FitOverview();
+            }
         }
 
         if (layout.Grid.width > 0)

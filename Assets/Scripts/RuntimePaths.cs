@@ -10,6 +10,7 @@ public static class RuntimePaths
     private static string configRoot, runDataRoot;
     public static string ConfigRoot { get { Initialize(); return configRoot; } }
     public static string RunDataRoot { get { Initialize(); return runDataRoot; } }
+    internal static string ReplayLibraryRoot => Argument("--replay-library-dir");
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Reset() { configRoot = null; runDataRoot = null; }

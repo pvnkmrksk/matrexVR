@@ -54,7 +54,7 @@ namespace ConfigurationUI
 
         private void UpdateRecordingFinalizationBanner()
         {
-            if(recordingFinalizationBanner==null)return;
+            if(recordingFinalizationBanner==null||PreExperimentOpen)return;
             var recorder=MasterDataLogger.Instance;var main=MainController.Instance;
             bool stopping=main?.SequenceStopping==true;
             bool finishing=recorder!=null&&recorder.IsFinalizing;

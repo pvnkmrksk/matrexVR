@@ -14,6 +14,8 @@ In 0.4.1, choose **Replay** from the setup sidebar to open **Replay recordings**
 
 Select a recording to inspect **Recorded files** and **Saved evidence & limitations**, then choose **Replay selected**. This saves the current setup draft before opening the saved run. A finishing recording remains unavailable until its data writers have closed; other recordings can still be opened. Use **Refresh** to rescan or search by name, animal, backend or recorded scene. **Browse…** and **Open an external folder path → Inspect folder** open a recording on another drive or computer without moving it into the local library.
 
+The combined Smoothed Walking Linux package opens finalized runs from the previous Smoothed Walking player and recordings from its own acquisition build. Its launcher adds the earlier RunData folder to the Replay library with `--replay-library-dir`. The player verifies each recording before playback.
+
 You can also launch a player with:
 
 ```sh
@@ -36,6 +38,7 @@ This loads `ReplayScene`. Choose **Open run…**, then **Browse…** or paste th
 - Choose a playback speed from **0.1× to 4×**.
 - **Split** shows up to 16 naturally ordered first-person feeds alongside the **God’s-eye** overview. Drag the divider to resize the panes. **Reset** restores the equal split and frames the overview. **Fit** frames the active tracks.
 - In 0.4, right-drag or **I/J/K/L** turns the overview; middle-drag pans; the wheel zooms. **W/A/S/D** moves horizontally and **Q/E** moves down/up; hold **Shift** to move faster. **Perspective / Top-down view** changes the overview projection. These controls are inactive while editing a path or media form.
+- In **Top-down**, toggle **High contrast** for a black background and bright dots at the recorded locust positions. Rig colors and trails identify tracked animals. **Fit** includes the visible recorded population in this mode.
 - Select **God’s-eye** for the full overview or click a feed to focus that rig. The **Footage** panel pairs a selected rig’s front view with its saved tracker video. Use **Show / Hide** to expand or collapse it. Drag the bottom-left grip to resize the panel, or use its reset icon to restore the default size. **Media tools…** opens import, collection, refresh and offset controls.
 
 In the God’s-eye view, each rig has a stable color, an animated placeholder body and heading arrow. The placeholder identifies the focal animal; its shape is not a measurement of the real animal. The bright tail defaults to five recorded seconds; **Trails** changes its duration and prominence (thickness and visibility). Zero prominence hides trails. The faint path belongs to the current recorded condition. A wire cone indicates the front-camera field of view. VR labels and edge arrows help locate rigs outside the current view. These are analysis annotations, excluded from the saved animal-camera reconstruction. Adaptive clipping improves close inspection; **Fit** restores the full track view.

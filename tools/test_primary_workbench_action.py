@@ -43,6 +43,7 @@ public static class DesktopQuickStart {
 public sealed class ConfigWorkbench {
  private WorkspaceState Workspace=new WorkspaceState();
  private bool ApparatusConfigured=>Workspace.configured;
+ private bool UsePreExperimentScene;
  private bool replayLibraryMode;private int replays;
  private void OpenLibrarySelection(){replays++;}
  private void RefreshLibraryFooter(){start.label.text="Replay selected";}
@@ -70,6 +71,9 @@ TESTS = r'''
   Check(demo.start.label.text=="Start demo","demo caption changed");demo.RunPrimaryAction();Check(demo.started==1&&demo.saved==0,"demo tried to complete apparatus");
   var live=new ConfigWorkbench();live.Workspace.quick=true;live.RefreshStartCaption();live.RunPrimaryAction();
   Check(live.start.label.text=="Start experiment"&&live.started==1&&live.saved==0,"live QuickStart dispatch changed");
+  live.UsePreExperimentScene=true;live.RefreshStartCaption();
+  Check(live.start.label.text=="Prepare experiment"&&live.start.tooltip.Contains("Recording begins after"),"pre-experiment option hides the separate experimental start");
+  demo.UsePreExperimentScene=true;demo.RefreshStartCaption();Check(demo.start.label.text=="Prepare demo","pre-experiment demo action is not visibly labeled");
   var dispatcher=new MainController();ConfigurationUI.ConfigWorkbench.IsOpen=true;ExperimentInput.Cancel.pressed=true;
   Check(ExperimentInput.IsEditingText&&!ExperimentInput.Pressed("Cancel"),"regression fixture no longer reproduces the ordinary text guard during setup");
   dispatcher.Tick();Check(dispatcher.escapes==1,"actual MainController.Update input gate swallowed setup Escape before its handler");

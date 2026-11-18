@@ -158,7 +158,8 @@ public partial class ReplayController : MonoBehaviour
         overview=Camera.main;
         if(overview==null)overview=new GameObject("Replay overview",typeof(Camera)).GetComponent<Camera>();
         overview.depth=10;overview.rect=CurrentReplayViewport();overview.clearFlags=CameraClearFlags.SolidColor;
-        overview.backgroundColor=new Color(.04f,.055f,.075f);overview.orthographic=true;
+        overviewSceneMask=overview.cullingMask;overview.orthographic=true;
+        ApplyOverviewContrast();
         if(scrubSlider!=null)scrubSlider.gameObject.SetActive(false); // Runtime controls work without scene wiring.
         cacheDirectory=Path.Combine(Application.temporaryCachePath,"MatrexReplay",Guid.NewGuid().ToString("N"));
         selectedView=showOverviewOnStart?-1:0;
@@ -335,12 +336,15 @@ public partial class ReplayController : MonoBehaviour
     {
         if(overview==null)return;
         followedRig = null;
-        float span=Mathf.Max(5,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z));
-        overviewPivot=trajectoryBounds.center;overviewYaw=0;overviewPitch=90;
-        overviewDistance=trajectoryBounds.extents.y+span*2+10;overviewUserAdjusted=false;overviewDragButton=-1;
+        Bounds bounds = trajectoryBounds;
+        if (HighContrastOverview)
+            foreach (var visual in VisiblePopulationVisuals()) bounds.Encapsulate(visual.transform.position);
+        float span=Mathf.Max(5,Mathf.Max(bounds.size.x,bounds.size.z));
+        overviewPivot=bounds.center;overviewYaw=0;overviewPitch=90;
+        overviewDistance=bounds.extents.y+span*2+10;overviewUserAdjusted=false;overviewDragButton=-1;
         overview.rect=WorkspaceReplayViewport();
         float aspect=Mathf.Max(.1f,overview.pixelWidth/(float)Mathf.Max(1,overview.pixelHeight));
-        overview.orthographicSize=Mathf.Max(2,Mathf.Max(trajectoryBounds.extents.z,trajectoryBounds.extents.x/aspect))*1.15f;
+        overview.orthographicSize=Mathf.Max(2,Mathf.Max(bounds.extents.z,bounds.extents.x/aspect))*1.15f;
         if(overviewPerspective)overviewDistance=overview.orthographicSize/Mathf.Tan(25*Mathf.Deg2Rad);
         ApplyOverviewPose();
         UpdateReplayCameraClipping();
@@ -373,6 +377,7 @@ public partial class ReplayController : MonoBehaviour
     {
         if(overview==null)return;
         overview.orthographic=!overviewPerspective;overview.fieldOfView=50;
+        ApplyOverviewContrast();
         var rotation=Quaternion.Euler(overviewPitch,overviewYaw,0);
         overview.transform.SetPositionAndRotation(overviewPivot-rotation*Vector3.forward*overviewDistance,rotation);
         UpdateReplayCameraClipping();
@@ -515,7 +520,8 @@ public partial class ReplayController : MonoBehaviour
     private void RenderRecordedFrame()
     {
         if(archive==null||LoadError!=null)return;
-        if(environmentLoader!=null && !environmentLoader.Loading && cameraLayoutVersion!=environmentLoader.ContextVersion)
+        bool restoredContext = environmentLoader != null && !environmentLoader.Loading && cameraLayoutVersion != environmentLoader.ContextVersion;
+        if(restoredContext)
         {
             foreach(var pair in camerasByRig)
             {
@@ -570,7 +576,7 @@ public partial class ReplayController : MonoBehaviour
             if(environmentSample==null)environmentSample=a;
             if(referenceSample==null || (selectedView>=0 && rigOrder[selectedView]==id))referenceSample=a;
         }
-        if(pathsChanged){RefreshTrajectoryBounds();if(selectedView<0 && !overviewUserAdjusted)FitOverview();}
+        if(pathsChanged)RefreshTrajectoryBounds();
         if(environmentSample!=null)environmentLoader?.ApplyRecordedSample(environmentSample);
         float fallbackSize=Mathf.Max(.1f,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z)*.002f);
         foreach(var population in populations)
@@ -609,6 +615,8 @@ public partial class ReplayController : MonoBehaviour
             }
             foreach(var pair in population.visuals)if(pair.Value!=null && !population.active.Contains(pair.Key))pair.Value.SetActive(false);
         }
+        if (selectedView < 0 && !overviewUserAdjusted && (pathsChanged || restoredContext && HighContrastOverview))
+            FitOverview();
         if(scrubSlider!=null && Duration>0)scrubSlider.SetValueWithoutNotify((float)(replayTime/Duration));
         UpdateAnimalPreview();
         if(archive?.Presentations.IsCurrentContract==true)environmentLoader?.ApplyRecordedWorldFrame(environmentSample);

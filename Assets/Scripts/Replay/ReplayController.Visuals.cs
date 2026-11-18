@@ -16,6 +16,58 @@ public partial class ReplayController
     private GUIStyle agentLabelStyle;
     private int clippingContextVersion = -1;
     private Bounds? clippingEnvironment;
+    private bool overviewHighContrast;
+    private int overviewSceneMask;
+
+    private bool HighContrastOverview => overviewHighContrast && !overviewPerspective;
+
+    private void ApplyOverviewContrast()
+    {
+        overview.cullingMask = HighContrastOverview ? LayerMask.GetMask("OverheadCameraMarkers") : overviewSceneMask;
+        overview.backgroundColor = HighContrastOverview ? Color.black : new Color(.04f, .055f, .075f);
+    }
+
+    private Rect OverviewGuiRect()
+    {
+        var pixels = overview.pixelRect;
+        return new Rect(pixels.x, Screen.height - pixels.yMax, pixels.width, pixels.height);
+    }
+
+    private IEnumerable<GameObject> VisiblePopulationVisuals()
+    {
+        foreach (var population in populations)
+        {
+            foreach (int id in population.active)
+            {
+                var visual = population.visuals[id];
+                if (visual != null && visual.activeInHierarchy) yield return visual;
+            }
+        }
+    }
+
+    private void DrawHighContrastLocusts(float scale)
+    {
+        if (Event.current.type != EventType.Repaint || !HighContrastOverview || selectedView >= 0 ||
+            overview == null || archive == null || loading || environmentLoader?.Loading == true) return;
+
+        var viewport = OverviewGuiRect();
+        float size = Mathf.Max(6, 8 * scale);
+        GUI.BeginGroup(viewport);
+        foreach (var visual in VisiblePopulationVisuals()) DrawDot(visual.transform.position, size, Color.white);
+        foreach (var pair in markerByRig)
+            if (pair.Value.activeInHierarchy)
+                DrawDot(pair.Value.transform.position, size * 1.5f, Color.Lerp(agentAnnotations[pair.Key].Tint, Color.white, .35f));
+        GUI.EndGroup();
+
+        void DrawDot(Vector3 position, float diameter, Color color)
+        {
+            var point = overview.WorldToViewportPoint(position);
+            if (point.z <= 0 || point.x < 0 || point.x > 1 || point.y < 0 || point.y > 1) return;
+            float radius = diameter * .5f;
+            var rect = new Rect(point.x * viewport.width - radius, (1 - point.y) * viewport.height - radius, diameter, diameter);
+            GUI.DrawTexture(rect, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, color, 0, radius);
+        }
+    }
 
     private static Rect CurrentReplayViewport() => ReplayViewportRect(Screen.width, Screen.height, ReplayUiScale(DesktopDisplay.UiScale, Screen.width));
 
@@ -125,7 +177,7 @@ public partial class ReplayController
             folderPicker != null || mediaPanel?.HasModal == true || showDetails || Event.current.type != EventType.Repaint) return;
         if (agentLabelStyle == null) agentLabelStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold, clipping = TextClipping.Clip };
         agentLabelStyle.font = GUI.skin.font; agentLabelStyle.fontSize = Mathf.RoundToInt(13 * scale);
-        var pixels = overview.pixelRect; var viewport = new Rect(pixels.x, Screen.height - pixels.yMax, pixels.width, pixels.height);
+        var viewport = OverviewGuiRect();
         annotationLabels.Clear();
         foreach (string id in cameraViewOrder)
         {

@@ -60,7 +60,21 @@ public sealed class ReplaySessionArchive
 
     public void RequireCompatibleBuild()
     {
-        Presentations.ValidateBuild(PlayerBuildIdentity.Capture());
+#if MATREX_SMOOTHED_WALKING_REPLAY && UNITY_STANDALONE_LINUX && !UNITY_EDITOR
+        var acquisition = Presentations.Contract?["player"] as JObject;
+        if (acquisition != null && acquisition["editorRuntimeIdentity"] == null &&
+            (string)acquisition["buildGuid"] == "a5adef84c4674343aa1ed62a93798d91" &&
+            (string)acquisition["applicationVersion"] == "0.4.4-smoothed-walking" &&
+            (string)acquisition["unityVersion"] == "6000.3.16f1" &&
+            (string)acquisition["runtimeSourceFingerprintSha256"] == "4f67c971d0c64b2fd1d1c2d2e228ffaf2a9132fdcd4be91a74b1ff7064ee430e")
+        {
+            Warn("This recording was acquired with the earlier Smoothed Walking build. Its archived evidence is used for replay.");
+        }
+        else
+#endif
+        {
+            Presentations.ValidateBuild(PlayerBuildIdentity.Capture());
+        }
         if(!Presentations.IsCurrentContract)return;
         if(File.Exists(Path.Combine(DirectoryPath,"replay_evidence_errors.jsonl")))
             throw new InvalidDataException("Acquisition stopped because required replay evidence could not be recorded. Inspect replay_evidence_errors.jsonl.");
