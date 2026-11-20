@@ -53,6 +53,7 @@ namespace ConfigurationUI
         {
             if(SavingScreenVisible||nativeFilePickerPending||libraryPicker!=null)return true;
             if(modal!=null){CloseModal();return true;}
+            if(CloseContainedTopicEditor())return true;
             if(PreExperimentOpen){CancelPreExperiment();return true;}
             if(rawPending){UpdateStatus("JSON draft kept. Apply or discard it before leaving this editor.");return true;}
             if(!homeMode){Guard(ShowSessionHome);return true;}

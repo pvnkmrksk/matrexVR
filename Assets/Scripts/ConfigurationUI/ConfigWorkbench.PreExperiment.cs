@@ -18,16 +18,24 @@ namespace ConfigurationUI
         {
             var card = new VisualElement { name = name };
             card.AddToClassList("studio-dialog");
+            card.style.overflow = Overflow.Hidden;
+            card.RegisterCallback<TooltipEvent>(e=>{e.tooltip="";e.StopImmediatePropagation();},TrickleDown.TrickleDown);
+            card.RegisterCallback<ContextualMenuPopulateEvent>(e=>{e.menu.ClearItems();e.StopPropagation();});
             card.style.position = UnityEngine.UIElements.Position.Absolute;
             card.style.paddingLeft = card.style.paddingRight = 5;
             card.style.paddingTop = card.style.paddingBottom = 3;
+            AddPreparationHeading(card,title);
+            root.Add(card);
+            return card;
+        }
+
+        private static void AddPreparationHeading(VisualElement card,string title)
+        {
             var heading = new Label(title);
             heading.style.fontSize = 11;
             heading.style.height = 14;
             heading.style.marginTop = heading.style.marginBottom = 0;
             card.Add(heading);
-            root.Add(card);
-            return card;
         }
 
         private void BuildPreparationMetadata()
@@ -292,14 +300,14 @@ namespace ConfigurationUI
                 preExperimentStatus.text + "\n" + string.Join("\n", companionWarnings);
             preExperimentStatus.EnableInClassList("warning", preExperimentConfirmation != null || !preparing && preExperimentMessage != null);
             preExperimentStart.Q<Label>().text = preExperimentConfirmation != null ? "Start anyway" : CurrentDemo ? "Start demo" : "Start experiment";
-            preExperimentStart.SetEnabled(!preparing && !preExperimentFilesChanged);
+            preExperimentStart.SetEnabled(!preparing && !preExperimentFilesChanged && containedTopicEditors.Count == 0);
             preExperimentCancel.SetEnabled(!main.SequencePreparing && !main.SequenceRunning);
             return missing;
         }
 
         private void CommitPreExperiment()
         {
-            if (!PreExperimentOpen || preparing || MainController.Instance?.PreExperimentActive != true) return;
+            if (!PreExperimentOpen || preparing || containedTopicEditors.Count > 0 || MainController.Instance?.PreExperimentActive != true) return;
             if (Workspace.Documents.Any(document => document.CheckExternalChange() || document.Conflict))
             {
                 preExperimentFilesChanged = true;
@@ -353,6 +361,7 @@ namespace ConfigurationUI
 
         private void ClosePreExperimentPanel()
         {
+            containedTopicEditors.Clear();
             OperatorOverlayLayout.Release(PreExperimentOverlay);
             foreach (var card in preExperimentAnimalCards.Values)
             {

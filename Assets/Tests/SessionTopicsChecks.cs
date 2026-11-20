@@ -13,6 +13,11 @@ public static class SessionTopicsChecks
     public static void Run()
     {
         int checks=0;
+        void Click(Button button)
+        {
+            var handlers=(Action)typeof(Clickable).GetField("clicked",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic).GetValue(button.clickable);
+            handlers();
+        }
         void Check(bool result,string message){if(!result)throw new Exception(message);checks++;}
         var at=new DateTimeOffset(2026,11,20,15,0,0,TimeSpan.FromHours(1));
         var data=new AnimalData {ExperimentName="Fixture",Animals={new AnimalMetadata{VR="VR1",AnimalID="animal-7",Sex="Female",AgeDays="4",Comments="keep draft"}},UsedAnimalIDs={"animal-7"}};
@@ -77,6 +82,34 @@ public static class SessionTopicsChecks
             Check(regular.Q("topic-LastFedAt")!=null,"Launcher lacks selected timestamp");
             Check(regular.Q("topic-Animal-Comments")==null,"Launcher shows unchecked field");
             Check(compact.Query<Button>().ToList().Any(b=>b.text.StartsWith("All ")),"Large compact forms lack full details action");
+            var uiRoot=new VisualElement();var card=new VisualElement {name="preparation-animal-VR1"};uiRoot.Add(card);
+            typeof(ConfigWorkbench).GetField("root",flags).SetValue(wb,uiRoot);
+            typeof(ConfigWorkbench).GetField("preExperimentPanel",flags).SetValue(wb,new VisualElement());
+            var recording=new VisualElement();uiRoot.Add(recording);
+            typeof(ConfigWorkbench).GetField("preExperimentRecording",flags).SetValue(wb,recording);
+            var cards=(System.Collections.Generic.Dictionary<string,VisualElement>)typeof(ConfigWorkbench).GetField("preExperimentAnimalCards",flags).GetValue(wb);cards.Add("VR1",card);
+            typeof(ConfigWorkbench).GetMethod("ShowAllTopicDetails",flags).Invoke(wb,new object[]{animal,"Animal",card});
+            Check(card.Q("contained-topic-editor")!=null&&uiRoot.childCount==2,"All details escaped the animal card");
+            Check(card.Query<DropdownField>().ToList().Count==0,"Preparation still uses native popup dropdowns");
+            int refreshed=0;
+            typeof(ConfigWorkbench).GetMethod("ShowConditionPicker",flags).Invoke(wb,new object[]{animal,Find("Condition"),(Action)(()=>refreshed++),card});
+            var condition=card.Children().Last();
+            Check(condition.Query<Toggle>().ToList().Count==9,"Condition options missing in contained editor");
+            condition.Query<Toggle>().ToList().First(t=>t.label=="Missing right hind leg").value=true;
+            Click(condition.Query<Button>().ToList().Last());
+            Check(refreshed==1&&(SessionTopics.Get(animal,Find("Condition")) as JArray).Any(v=>v.ToString()=="Missing right hind leg"),"Contained condition Apply failed");
+            typeof(ConfigWorkbench).GetMethod("ShowTimestampPicker",flags).Invoke(wb,new object[]{animal,Find("LastFedAt"),(Action)(()=>refreshed++),card});
+            var dateEditor=card.Children().Last();
+            Check(dateEditor.Query<IntegerField>().ToList().Count==4&&dateEditor.Query<DropdownField>().ToList().Count==0,"Date editor escaped containment or used popup month menu");
+            var monthField=dateEditor.Query<BaseField<string>>().ToList().First(f=>f.label=="Month");
+            Click(monthField.Q<Button>());
+            var monthEditor=card.Children().Last();
+            Check(monthEditor.Query<Button>().ToList().Count==13&&uiRoot.childCount==2,"Month options escaped the card");
+            Click(monthEditor.Query<Button>().ToList().First(b=>b.text=="Jan"));
+            Check(monthField.value=="Jan"&&dateEditor.style.display.value!=DisplayStyle.None,"Month choice did not restore date editor");
+            Check(wb.TryHandleSetupEscape()&&wb.PreExperimentOpen&&dateEditor.parent==null,"Escape cancelled preparation instead of closing date editor");
+            Check(uiRoot.Query<VisualElement>().ToList().All(e=>!e.ClassListContains("modal-shade")),"Preparation opened a screen modal");
+
         }finally{UnityEngine.Object.DestroyImmediate(go);}
         var output=Path.Combine(UnityEngine.Application.dataPath,"../session-topics-checks.json");
         File.WriteAllText(output,new JObject{{"passed",true},{"checks",checks}}.ToString());
