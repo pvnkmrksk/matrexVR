@@ -393,6 +393,7 @@ namespace ConfigurationUI
             }
             modalTabKey=null;modalTabNavigation=null;modalFocusInTrace=null;modalFocusOutTrace=null;
             modal?.RemoveFromHierarchy();modal=null;ScheduleKeyboardFocus();
+            if(topicSetupDirty){topicSetupDirty=false;RefreshTopicViews();}
         }
         private void ShowBlockLibrary(int? replace=null)
         {

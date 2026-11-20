@@ -248,10 +248,9 @@ namespace ConfigurationUI
         }
         private void BuildSessionDetails(VisualElement parent)
         {
-            var details=Row("session-details"); parent.Add(details);
-            SessionField(details,"Experiment name","session-experiment-name",metadata.ExperimentName,v=>metadata.ExperimentName=v,"Name this experiment");
-            SessionField(details,"Experimenter","session-experimenter",metadata.ExperimenterName,v=>metadata.ExperimenterName=v,"Your name");
-            SessionField(details,"Overall comments","session-comments",metadata.Comments,v=>metadata.Comments=v,"Notes for this session",true);
+            parent.Add(StudioButton("Choose fields / add topic", "settings", ShowTopicSetup, "quiet"));
+            var details = new VisualElement(); parent.Add(details);
+            BuildTopicFields(details, metadata, "Recording");
 
             var animalHeading=SessionHeading("Animals","person","Names and IDs can be any text. Empty age means unspecified.");parent.Add(animalHeading);
             var increment=StudioButton("Next animal IDs","next",()=>{
@@ -274,18 +273,8 @@ namespace ConfigurationUI
                 var heading=Row("subject-heading"); card.Add(heading); heading.Add(new WorkbenchIcon("person"));
                 var label=new Label(id); label.AddToClassList("subject-name"); heading.Add(label);
                 heading.Add(Pill(RigMode(rig),"accent"));
-                heading.Add(IconButton("settings","More subject details for "+id,()=>ShowSubjectDetails(fly)));
-                SessionField(card,"Animal ID","subject-id-"+id,fly.AnimalID,v=>fly.AnimalID=v,"Any name, label or ID");
-                var species=SessionLabel("Species · "+(string.IsNullOrWhiteSpace((string)rig["speciesName"])?"Unspecified":(string)rig["speciesName"]),"session-hint");
-                species.tooltip="Species is part of the apparatus configuration. Change it in Configure.";card.Add(species);
-                var traits=Row("subject-traits"); card.Add(traits);
-                var sexes=new List<string>{"Unspecified","Female","Male"};
-                string sex=string.IsNullOrEmpty(fly.Sex)?"Unspecified":fly.Sex;
-                if(!sexes.Contains(sex)) sexes.Add(sex); // Preserve labels from existing metadata.
-                var sexField=new DropdownField("Sex",sexes,0) { name="subject-sex-"+id,value=sex,tooltip="Subject sex recorded with the run. Unspecified leaves it unclassified." }; traits.Add(sexField);
-                sexField.RegisterValueChangedCallback(e=>{fly.Sex=e.newValue;UpdateStatus();});
-                SessionField(traits,"Age (days)","subject-age-"+id,fly.AgeDays,v=>fly.AgeDays=v,"Unspecified");
-                SessionField(card,"Comments","subject-comments-"+id,fly.Comments,v=>fly.Comments=v,"Notes for "+id,true);
+
+                BuildTopicFields(card,fly,"Animal");
                 if(!CurrentDemo&&TrackerBackend.TryParse(rig["closedLoopMode"]?.ToString(),out var videoMode)&&(TrackerBackend.IsFlight(videoMode)||TrackerBackend.IsWalking(videoMode)))
                 {
                     var videoRow=Row("recording-video-option");videoRow.style.marginTop=8;videoRow.style.marginBottom=8;
@@ -320,8 +309,7 @@ namespace ConfigurationUI
         private Dictionary<string,string> previousAnimalIds;
         private void ShowSubjectDetails(AnimalMetadata fly)
         {
-            var details=OpenModal(fly.VR+" · subject details","Additional metadata for this subject.");
-            SessionField(details,"Starved since (hours)","subject-starved-"+fly.VR,fly.StarvedSinceHours,v=>fly.StarvedSinceHours=v,"Unspecified");
+            ShowAllTopicDetails(fly,"Animal");
         }
         private string SystemHeadline()
         {

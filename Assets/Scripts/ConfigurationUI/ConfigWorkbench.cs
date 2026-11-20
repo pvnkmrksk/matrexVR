@@ -468,7 +468,7 @@ namespace ConfigurationUI
             RequireApplied();
             var errors=ValidateSetupForStart(Workspace);
             if(errors.Count>0)throw new InvalidOperationException(string.Join("\n",errors));
-            PrepareRunMetadata();Workspace.SaveAll();
+            PrepareRunMetadata();Workspace.SaveAll();SaveMetadata();
             if(allowPreExperiment&&UsePreExperimentScene)
             {
                 if(!CurrentDemo&&(DesktopQuickStart.IsQuickStart(Workspace)||DesktopApparatusProfile.ShouldPrepareCompanions(Workspace.System.Root)))
@@ -699,10 +699,12 @@ namespace ConfigurationUI
             if(startExperimentForValidation!=null){startExperimentForValidation();return;}
 #endif
             var main=MainController.Instance;
+            string metadataDraft=SaveMetadata();
+            string metadataJson=SessionTopics.Snapshot(JsonConvert.DeserializeObject<AnimalData>(metadataDraft),DateTimeOffset.UtcNow);
+            main.SetAnimalMetadata(JsonConvert.DeserializeObject<AnimalData>(metadataJson));
             main.PrepareConfiguredRun(Workspace.System.Path,Workspace.Sequence.Path);
             foreach(string warning in companionWarnings)main.AddRecordingWarning(warning);
             companionWarnings.Clear();
-            string metadataJson=SaveMetadata();
             File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"AnimalMetadata.json"),metadataJson);
             File.WriteAllText(Path.Combine(MasterDataLogger.Instance.directoryPath,"FlyMetaData.json"),metadataJson);
             if(PreExperimentOpen)
