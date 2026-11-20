@@ -33,11 +33,17 @@ public static class SessionTopicsChecks
         var checkbox=new SessionTopics.Topic {Key="custom_false",Scope="Animal",Kind="Checkbox",Label="False",Enabled=true};
         topics.Add(numeric);topics.Add(checkbox);SessionTopics.StoreDefinitions(data,topics);
         SessionTopics.Set(animal,numeric,0);SessionTopics.Set(animal,checkbox,false);
+        SessionTopics.Set(data,Find("LastFedAt","Recording"),at.AddHours(-24).ToString("o"));
+        SessionTopics.Set(data,Find("LastWateredAt","Recording"),at.AddHours(-8).ToString("o"));
+        SessionTopics.Set(data,Find("LifeStage","Recording"),"L5");
         var reloaded=JsonConvert.DeserializeObject<AnimalData>(JsonConvert.SerializeObject(data));
         Check(SessionTopics.Definitions(reloaded).Any(t=>t.Key==custom.Key&&t.Enabled),"Custom definition did not reload");
         Check(SessionTopics.TryTimestamp(SessionTopics.Get(reloaded.Animals[0],Find("LastFedAt")).ToString(),out var stamp)&&stamp==at.AddHours(-18),"Reload changed timestamp instant");
         var run=JObject.Parse(SessionTopics.Snapshot(reloaded,at));var subject=(JObject)run["Animals"][0];
         Check((decimal)subject["StarvedSinceHours"]==18m,"Starvation duration not captured");
+        Check((decimal)run["StarvedSinceHours"]==24m&&(decimal)run["SinceWateredHours"]==8m,"Recording-wide timestamp durations wrong");
+        Check((string)run["Topics"]["LifeStage"]=="L5","Recording-wide instar missing");
+        Check(SessionTopics.Definitions(reloaded).Count(t=>t.Scope=="Recording"&&t.Enabled&&new[]{"LastFedAt","LastWateredAt","LifeStage"}.Contains(t.Key))==3,"Recording topics not enabled");
         Check((decimal)subject["SinceWateredHours"]==2m,"Watering duration not captured");
         Check(subject["Comments"]==null&&reloaded.Animals[0].Comments=="keep draft","Unchecked draft lost or run leaked value");
         Check((string)subject["Topics"][custom.Key]=="B","Custom value missing");
