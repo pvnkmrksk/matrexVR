@@ -149,3 +149,6 @@ Run `AnimalMetadata.json` (and its `FlyMetaData.json` compatibility copy) record
 
 
 Validation: `SessionTopicsChecks.Run` in a disposable Unity project checks definition/value reloads, custom choices and zero/false values, hidden-field omission, ID history filtering, multi-condition values, pressure units, timestamp reloads, known/unknown/future durations and shared launcher/preparation controls (20 checks, including independent recording-wide timestamps and instar). The local standalone acceptance used 16 synthetic tracking rigs, changed a checkbox during preparation, inspected the condition/date selectors, cancelled preparation, started a new recording and verified the archived selected values. This checks metadata and UI behavior, not physical sensor acquisition.
+
+
+Tracker calibration files, executable selection and tracker launch/stop controls are available under **Configure → each rig → Calibration & advanced input**. The everyday Start workspace and animal forms omit these apparatus controls. Preparation continues to show per-rig tracking freshness; recording choices and animal/session metadata remain on the Start screen.

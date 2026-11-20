@@ -182,14 +182,6 @@ namespace ConfigurationUI
             movement.tooltip="This changes the hardware-free demo only. Configure real walking/flying inputs with the apparatus.";
             movement.RegisterValueChangedCallback(e=>ChooseQuickStart(e.newValue.StartsWith("Walking",StringComparison.Ordinal)?"walking":"flying",CurrentWorld,true));options.Add(movement);
             if(CurrentMovement=="walking")options.Add(SessionLabel(DesktopPreviewHud.WalkingDemoHelp,"apparatus-note"));
-            if(!CurrentDemo)
-            {
-                foreach(var rig in DesktopApparatusProfile.Rigs(Workspace.System.Root))AddTrackerControls(options,rig);
-                var preparation=StudioButton("Open tracker","camera",OpenQuickTracker,"quiet");
-                preparation.name="initialize-tracking";
-                preparation.tooltip="Open tracking to check input and calibration before the experiment starts.";
-                parent.Add(preparation);
-            }
             var links=Row("tracker-links");options.Add(links);AddSessionPlotLink(links);
             links.Add(StudioButton(CurrentMovement=="walking"?"About HejjéTrac":"About Rekkefly","external",()=>UnityEngine.Application.OpenURL(CurrentMovement=="walking"?"https://github.com/pvnkmrksk/hejjetrak":"https://github.com/pvnkmrksk/rekkefly"),"text-link"));
             var configure=Row("demo-configure");parent.Add(configure);configure.Add(new WorkbenchIcon("system"));
@@ -204,16 +196,7 @@ namespace ConfigurationUI
             var summary=Row("daily-apparatus-summary");parent.Add(summary);summary.Add(new WorkbenchIcon("system"));
             var text=SessionLabel(rigs.Count+(rigs.Count==1?" VR":" VRs")+" · "+(DesktopApparatusProfile.Presentation(Workspace.System.Root)=="led"?"LED panels":"Desktop preview")+" · "+string.Join(" / ",rigs.Select(RigMode).Distinct()),"apparatus-copy");text.name="configured-apparatus-summary";text.tooltip=SystemHeadline();summary.Add(text);
             var links=Row("tracker-links");parent.Add(links);AddSessionPlotLink(links);
-            if(rigs.Any(DesktopApparatusProfile.LocalNativeTracker))
-            {
-                var open=StudioButton("Open tracker","camera",OpenQuickTracker,"quiet");open.name="initialize-tracking";open.tooltip="Open or show the independent native tracker windows to check input before starting. This does not start the experiment or create a run recording. Camera calibration stays in those windows.";links.Add(open);
-            }
-            var state=new Foldout {name="session-tracker-windows",text="Trackers",value=false};state.AddToClassList("apparatus-advanced");parent.Add(state);
-            foreach(var rig in rigs)
-            {
-                var panel=new Foldout {text=(string)rig["vrId"]+" · "+RigMode(rig),value=rigs.Count==1};
-                state.Add(panel);AddTrackerControls(panel,rig);
-            }
+
         }
         private void AddSessionPlotLink(VisualElement parent)
         {
@@ -302,7 +285,6 @@ namespace ConfigurationUI
                     Action refreshRecording=()=>{recordingState.text=TrackerProcessManager.RecordingStatus(id);recordingState.tooltip=recordingState.text;};
                     refreshRecording();recordingState.schedule.Execute(refreshRecording).Every(300);
                 }
-                if(!CurrentDemo)AddTrackerControls(card,rig);
             }
 
         }
