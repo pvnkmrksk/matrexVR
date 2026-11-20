@@ -11,6 +11,123 @@ namespace ConfigurationUI
         private const string PreExperimentOverlay = "pre-experiment";
         private VisualElement preExperimentPanel;
         private Label preExperimentStatus;
+        private readonly Dictionary<string, VisualElement> preExperimentAnimalCards = new Dictionary<string, VisualElement>();
+        private VisualElement preExperimentRecording;
+
+        private VisualElement PreparationCard(string name, string title)
+        {
+            var card = new VisualElement { name = name };
+            card.AddToClassList("studio-dialog");
+            card.style.position = UnityEngine.UIElements.Position.Absolute;
+            card.style.paddingLeft = card.style.paddingRight = 5;
+            card.style.paddingTop = card.style.paddingBottom = 3;
+            var heading = new Label(title);
+            heading.style.fontSize = 11;
+            heading.style.height = 14;
+            heading.style.marginTop = heading.style.marginBottom = 0;
+            card.Add(heading);
+            root.Add(card);
+            return card;
+        }
+
+        private void BuildPreparationMetadata()
+        {
+            EnsureMetadata();
+            foreach (string id in preExperimentRigs.Keys)
+            {
+                var animal = metadata.Animals.First(a => a.VR == id);
+                var card = PreparationCard("preparation-animal-" + id, id + " · Animal");
+                preExperimentAnimalCards.Add(id, card);
+                BuildTopicFields(card,animal,"Animal",true);
+            }
+            preExperimentRecording = PreparationCard("preparation-recording", "Recording details");
+            preExperimentRecording.style.paddingLeft = preExperimentRecording.style.paddingRight = 12;
+            preExperimentRecording.style.paddingTop = preExperimentRecording.style.paddingBottom = 12;
+            var fields = new ScrollView {horizontalScrollerVisibility = ScrollerVisibility.Hidden};
+            fields.style.flexGrow = 1;
+            preExperimentRecording.Add(fields);
+            BuildTopicFields(fields,metadata,"Recording");
+            preExperimentRecording.Add(StudioButton("Choose fields / add topic","settings",ShowTopicSetup,"quiet"));
+        }
+
+        private static void CompactPreparationField(VisualElement field, Label label)
+        {
+            field.style.height = field.style.minHeight = field.style.maxHeight = 20;
+            field.style.flexShrink = 0;
+            field.style.marginTop = field.style.marginBottom = 0;
+            field.style.marginLeft = field.style.marginRight = 0;
+            field.style.paddingTop = field.style.paddingBottom = 0;
+            field.style.fontSize = 11;
+            label.style.minWidth = label.style.width = 100;
+            label.style.fontSize = 11;
+            label.style.marginRight = 3;
+            label.style.paddingTop = label.style.paddingBottom = 0;
+            field.Query<VisualElement>().ForEach(element => {
+                if (!element.ClassListContains("unity-base-field__input") && !element.ClassListContains("unity-base-text-field__input")) return;
+                element.style.minHeight = 0;
+                element.style.height = 18;
+                element.style.paddingTop = element.style.paddingBottom = 0;
+                element.style.marginTop = element.style.marginBottom = 0;
+                element.style.fontSize = 11;
+            });
+        }
+
+        private void PreparationField(VisualElement parent, string label, string name, string value, Action<string> change, string placeholder)
+        {
+            var field = new TextField(label) { name = name, value = value ?? "" };
+            field.textEdition.placeholder = placeholder;
+            CompactPreparationField(field, field.labelElement);
+            field.RegisterValueChangedCallback(e => change(e.newValue));
+            parent.Add(field);
+        }
+
+        private bool PlacePreparationCard(VisualElement card, Rect desired, Vector2 screen, float scale)
+        {
+            if (!OperatorOverlayLayout.Reserve(card.name, panel.targetDisplay, desired, out var bounds))
+            {
+                // Keep metadata accessible in the controls scroll when no adjacent free area exists.
+                if (card.parent == root) preExperimentPanel.Q<ScrollView>().Add(card);
+                card.style.position = UnityEngine.UIElements.Position.Relative;
+                card.style.left = card.style.top = StyleKeyword.Null;
+                card.style.width = StyleKeyword.Auto;
+                card.style.height = 220;
+                return false;
+            }
+            if (card.parent != root) root.Add(card);
+            card.style.position = UnityEngine.UIElements.Position.Absolute;
+            card.style.left = bounds.x / scale;
+            card.style.top = (screen.y - bounds.yMax) / scale;
+            card.style.width = bounds.width / scale;
+            card.style.height = bounds.height / scale;
+            return true;
+        }
+
+        private void PlacePreparationMetadata()
+        {
+            float scale = panel.scale;
+            var screen = OperatorOverlayLayout.DisplaySize(panel.targetDisplay);
+            float width = Mathf.Min(240 * scale, screen.x);
+            PlacePreparationCard(preExperimentRecording, new Rect(screen.x - 382 * scale - 12, 12, Mathf.Min(382 * scale, screen.x), Mathf.Min(620 * scale, screen.y)), screen, scale);
+            foreach (var entry in preExperimentAnimalCards)
+            {
+                var config = MainController.Instance.SystemConfigs[entry.Key];
+                Rect desired = new Rect(12, screen.y - 124 * scale - 12, width, Mathf.Min(124 * scale, screen.y));
+                if (config.targetDisplay == panel.targetDisplay && !config.desktopPreview)
+                {
+                    string order = ViewportSetter.NormalizeDisplayOrder(config.displayOrder);
+                    if (order.Length > 0)
+                    {
+                        var first = ViewportSetter.PanelRect(0, config, (int)screen.x, (int)screen.y);
+                        var last = ViewportSetter.PanelRect(order.Length - 1, config, (int)screen.x, (int)screen.y);
+                        desired.x = Mathf.Max(first.xMax, last.xMax) * screen.x + 4;
+                        desired.y = first.yMax * screen.y - desired.height;
+                    }
+                }
+                PlacePreparationCard(entry.Value, desired, screen, scale);
+            }
+            preExperimentRecording.SetEnabled(!preparing);
+            foreach (var card in preExperimentAnimalCards.Values) card.SetEnabled(!preparing);
+        }
         private Button preExperimentStart, preExperimentCancel;
         private readonly Dictionary<string, Label> preExperimentRigs = new Dictionary<string, Label>();
         private readonly Dictionary<VisualElement, StyleEnum<Visibility>> preExperimentHidden = new Dictionary<VisualElement, StyleEnum<Visibility>>();
@@ -82,6 +199,7 @@ namespace ConfigurationUI
                 content.Add(actions);
 
                 root.Add(preExperimentPanel);
+                BuildPreparationMetadata();
                 if (!PlacePreExperimentPanel(main.StatusOverlaySettings.targetDisplay))
                     throw new InvalidOperationException("The pre-experiment controls need free space outside the configured LED panels. Choose an operator display with space in the status overlay settings.");
                 preExperimentPanel.schedule.Execute(RefreshPreExperimentPanel).Every(250);
@@ -137,6 +255,7 @@ namespace ConfigurationUI
                 preExperimentPanel.style.width = bounds.width / scale;
                 preExperimentPanel.style.height = bounds.height / scale;
                 preExperimentPanel.style.visibility = Visibility.Visible;
+                PlacePreparationMetadata();
                 return true;
             }
             preExperimentPanel.style.visibility = Visibility.Hidden;
@@ -235,6 +354,18 @@ namespace ConfigurationUI
         private void ClosePreExperimentPanel()
         {
             OperatorOverlayLayout.Release(PreExperimentOverlay);
+            foreach (var card in preExperimentAnimalCards.Values)
+            {
+                OperatorOverlayLayout.Release(card.name);
+                card.RemoveFromHierarchy();
+            }
+            preExperimentAnimalCards.Clear();
+            if (preExperimentRecording != null)
+            {
+                OperatorOverlayLayout.Release(preExperimentRecording.name);
+                preExperimentRecording.RemoveFromHierarchy();
+                preExperimentRecording = null;
+            }
             preExperimentPanel?.RemoveFromHierarchy();
             preExperimentPanel = null;
             preExperimentRigs.Clear();
