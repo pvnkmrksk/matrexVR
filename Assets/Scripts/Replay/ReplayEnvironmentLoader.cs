@@ -17,6 +17,7 @@ public class ReplayEnvironmentLoader : MonoBehaviour
     public Transform environmentRoot;
     public string FidelityStatus { get; private set; } = "No session loaded";
     public bool Loading { get; private set; }
+    public Material RecordedSky => Loading ? null : skyMaterial;
     public int ContextVersion { get; private set; }
     public string ExperimentTitle => (string)currentConfig?["title"];
     public IReadOnlyDictionary<string,Transform> RecordedRigs => importedRigs;

@@ -70,6 +70,8 @@ python3 tools/build_local_desktop.py
 
 The local Mac builder creates **`Preview/MATREX VR.app`** from your checkout with checksum-verified native companions. Open the visible **Preview** folder and double-click **Open MATREX VR.command**, or use **Open MATREX VR Preview.command** at the top of the repository. Editable files are in **Preview/Config** and recordings in **Preview/RunData**; rebuilding keeps both. It publishes no release; the finished app needs neither Unity nor Rust. For source development, add the project to Unity Hub, let pinned packages restore, and open `Assets/Scenes/ControlScene.unity`.
 
+For a staged local build, close Preview and run `python3 tools/build_local_desktop.py --install-preview-from "/path/to/staged/MATREX VR.app"`. The command verifies the app signature and prints the retained previous app’s path for recordings that require that build.
+
 <details>
 <summary><strong>Desktop interface preview</strong></summary>
 

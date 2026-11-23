@@ -29,6 +29,7 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
     private Text autoTrimButtonText;
     private Button flightCheckButton;
     private Text flightCheckButtonText;
+    private string trimTarget;
     private Text selectedRigText;
     private double nextRefresh;
     private int layoutLineCount = -1;
@@ -162,7 +163,8 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         autoTrimButton.targetGraphic = buttonObject.GetComponent<Image>();
         autoTrimButton.onClick.AddListener(() => {
             var main = MainController.Instance;
-            if (main != null) main.SetCurrentAutoTrim(!main.CurrentAutoTrimEnabled);
+            if (trimTarget != null && main != null && main.VRClosedLoops.TryGetValue(trimTarget, out var rig) && rig != null)
+                main.SetCurrentAutoTrim(!rig.AutoTrim.Enabled, trimTarget);
             nextRefresh = 0;
         });
         var buttonLabel = new GameObject("Label", typeof(RectTransform), typeof(Text));
@@ -181,7 +183,8 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         flightCheckButton.targetGraphic = flightButtonObject.GetComponent<Image>();
         flightCheckButton.onClick.AddListener(() => {
             var main = MainController.Instance;
-            if (main != null) main.SetCurrentFlightCheck(!main.CurrentFlightCheckEnabled);
+            if (trimTarget != null && main != null && main.VRClosedLoops.TryGetValue(trimTarget, out var rig) && rig != null)
+                main.SetCurrentFlightCheck(!rig.AutoTrim.FlightCheckEnabled, trimTarget);
             nextRefresh = 0;
         });
         var flightLabelObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
@@ -248,23 +251,26 @@ public sealed class RuntimeStatusOverlay : MonoBehaviour
         long revision;
         lock (errorLock) revision = errorRevision;
         if (revision != shownRevision) { shownRevision = revision; ApplyVisibility(true); nextRefresh = 0; }
-        if (!Visible || label == null || Time.realtimeSinceStartupAsDouble < nextRefresh) return;
+        if (!Visible || label == null) return;
+        var main = MainController.Instance;
+        string selected = main == null ? null : "VR" + main.SelectedVRIndex;
+        if (selected == trimTarget && Time.realtimeSinceStartupAsDouble < nextRefresh) return;
+        trimTarget = selected;
         nextRefresh = Time.realtimeSinceStartupAsDouble + .5;
         if (UnityEngine.EventSystems.EventSystem.current == null)
             new GameObject("Dashboard EventSystem", typeof(UnityEngine.EventSystems.EventSystem), typeof(UnityEngine.InputSystem.UI.InputSystemUIInputModule));
-        var main = MainController.Instance;
-        bool available = false;
-        if (main != null && main.SequenceRunning)
-            foreach (var rig in main.VRClosedLoops.Values) if (rig != null && rig.SupportsAutoTrim) { available = true; break; }
+        ClosedLoop selectedRig = null;
+        bool available = selected != null && main.SequenceRunning && !main.SceneTransitionPending &&
+            main.VRClosedLoops.TryGetValue(selected, out selectedRig) && selectedRig != null && selectedRig.SupportsAutoTrim;
         autoTrimButton.interactable = available;
         autoTrimButton.gameObject.SetActive(showDetails&&available);
-        bool enabled = main != null && main.CurrentAutoTrimEnabled;
-        autoTrimButtonText.text = enabled ? "Auto-trim on · stop" : "Auto-trim off · start";
+        bool enabled = available && selectedRig.AutoTrim.Enabled;
+        autoTrimButtonText.text = selected + (enabled ? " · Stop auto-trim" : " · Start auto-trim");
         autoTrimButton.targetGraphic.color = !available ? new Color(.1f,.13f,.16f) : enabled ? new Color(.08f,.28f,.23f) : new Color(.13f,.18f,.24f);
         flightCheckButton.interactable = available;
         flightCheckButton.gameObject.SetActive(showDetails&&available);
-        bool flightCheck = main == null || main.CurrentFlightCheckEnabled;
-        flightCheckButtonText.text = flightCheck ? "Flight check on · bypass" : "Flight bypassed · restore check";
+        bool flightCheck = !available || selectedRig.AutoTrim.FlightCheckEnabled;
+        flightCheckButtonText.text = selected + (flightCheck ? " · Bypass flight check" : " · Restore flight check");
         flightCheckButton.targetGraphic.color = !available ? new Color(.1f,.13f,.16f) : flightCheck ? new Color(.13f,.18f,.24f) : new Color(.3f,.22f,.12f);
         if (main != null)
             selectedRigText.text = main.SelectedVRIndex == 0 ? "All VRs · next" : $"VR{main.SelectedVRIndex} · next";

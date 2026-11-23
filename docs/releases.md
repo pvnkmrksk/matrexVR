@@ -2,6 +2,13 @@
 
 [GitHub Releases](https://github.com/pvnkmrksk/matrexVR/releases) is the publication record. A local build or source change is not a published binary. The [website](https://pvnkmrksk.github.io/matrexVR/) discovers real uploaded ZIPs; it never constructs a download URL for an absent asset.
 
+## 0.4.5 — selective auto-trim and star sky replay
+
+- Select a flight rig in the run dashboard to start or stop auto-trim or temporarily bypass its flight check. When a row repeats, it starts with its configured settings. Learned per-rig DC offsets still carry forward.
+- The movable God’s-eye view uses the saved sky image for the selected recorded frame. Switch to **Perspective** and tilt up to inspect it. Seeking across phases restores the corresponding archived sky.
+
+[Release notes and screenshots](release-notes-0.4.5.md)
+
 ## 0.4.4 — Independent trackers and Kannadi multiplayer
 
 The Linux package discovers independently installed trackers and includes a number-matched 16-rig starter. Generated locusts entrain each animal in a private arena, then tracked peers replace the generated population. Compatible peer bodies share the renderer and keep the editable visibility matrix. [Linux release](https://github.com/pvnkmrksk/matrexVR/releases/tag/v0.4.4) · [Release notes and verification](release-notes-0.4.4.md)

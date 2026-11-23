@@ -1,4 +1,4 @@
-MATREX VR 0.4.4 — INDEPENDENT TRACKERS AND KANNADI MULTIPLAYER
+MATREX VR 0.4.5 — SELECTIVE AUTO-TRIM AND STAR SKY REPLAY
 Engine: Unity 6000.3.16f1
 https://github.com/pvnkmrksk/matrexVR
 https://pvnkmrksk.github.io/matrexVR/
@@ -21,7 +21,8 @@ On a fresh desktop profile:
   4. Choose Replay in the sidebar. On Replay recordings, select the newest
      completed run, then Replay selected. Refresh rescans the list.
   5. Space pauses/resumes; Left/Right seeks one second (Shift: ten seconds).
-     The default God's-eye view shows the recorded trajectory.
+     The default God's-eye view shows the recorded trajectory. Switch to
+     Perspective and look up to see the archived star sky on a night-sky row.
 
 Success: a scene runs, a completed recording appears, and its replay timeline
 advances. Pose/configuration recording does not require tracker video. Keep the
@@ -38,7 +39,7 @@ quits the player. For example:
   "./MATREX VR.x86_64" -configure
 
 Full five-minute guide and troubleshooting:
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.4/docs/five-minute-start.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.5/docs/five-minute-start.md
 
 2. CONFIGURE A REAL APPARATUS
 
@@ -162,7 +163,7 @@ connect through stdio with Python 3.11+ and the pinned SDK; uv run --locked --sc
 prepares it. Python is needed only for this optional adapter. The adapter may also be used from the
 matching source checkout's tools/ directory. Prepare dependencies before offline
 experiments. Full client configuration and tool reference:
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.4/docs/ai-control.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.5/docs/ai-control.md
 
 Discover -> read workspace/schema -> edit JSON with its current revision -> save
 and validate -> start -> poll status -> stop -> await finalization -> replay.
@@ -170,7 +171,7 @@ Accepted Start means preparation began, not that a scene or recorder is ready.
 Read is_error results; after timeout inspect actual status before another mutation.
 Re-read stale revisions/conflicts. Quit and relaunch without --control-dir to
 remove the endpoint. Agent/contributor context:
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.4/AGENTS.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.5/AGENTS.md
 
 7. EVERYDAY CONTROLS
 
@@ -206,4 +207,4 @@ For a problem report include OS, exact build, action/error and runtime_trace.log
 
 Detailed manuals, release evidence and limitations:
   https://pvnkmrksk.github.io/matrexVR/manual/
-  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.4/docs/releases.md
+  https://github.com/pvnkmrksk/matrexVR/blob/v0.4.5/docs/releases.md

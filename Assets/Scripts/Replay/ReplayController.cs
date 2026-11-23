@@ -83,6 +83,7 @@ public partial class ReplayController : MonoBehaviour
     private ReplaySessionArchive archive;
     private Transform generatedRoot, populationRoot;
     private Camera overview;
+    private Skybox overviewSkybox;
     private double replayTime;
     private bool isPlaying=true, loading, pathFocused, showDetails;
     private int selectedView=-1;
@@ -157,7 +158,9 @@ public partial class ReplayController : MonoBehaviour
         if(environmentLoader==null)environmentLoader=GetComponent<ReplayEnvironmentLoader>()??gameObject.AddComponent<ReplayEnvironmentLoader>();
         overview=Camera.main;
         if(overview==null)overview=new GameObject("Replay overview",typeof(Camera)).GetComponent<Camera>();
-        overview.depth=10;overview.rect=CurrentReplayViewport();overview.clearFlags=CameraClearFlags.SolidColor;
+        overviewSkybox=overview.GetComponent<Skybox>()??overview.gameObject.AddComponent<Skybox>();
+        SetOverviewSky(null);
+        overview.depth=10;overview.rect=CurrentReplayViewport();
         overview.backgroundColor=new Color(.04f,.055f,.075f);overview.orthographic=true;
         if(scrubSlider!=null)scrubSlider.gameObject.SetActive(false); // Runtime controls work without scene wiring.
         cacheDirectory=Path.Combine(Application.temporaryCachePath,"MatrexReplay",Guid.NewGuid().ToString("N"));
@@ -377,6 +380,17 @@ public partial class ReplayController : MonoBehaviour
         overview.transform.SetPositionAndRotation(overviewPivot-rotation*Vector3.forward*overviewDistance,rotation);
         UpdateReplayCameraClipping();
     }
+
+    private void SetOverviewSky(Material sky)
+    {
+        if (overviewSkybox == null) return;
+        if (overviewSkybox.material != sky) overviewSkybox.material = sky;
+        bool hasSky = sky != null;
+        if (overviewSkybox.enabled != hasSky) overviewSkybox.enabled = hasSky;
+        var clearFlags = hasSky ? CameraClearFlags.Skybox : CameraClearFlags.SolidColor;
+        if (overview.clearFlags != clearFlags) overview.clearFlags = clearFlags;
+    }
+
     private void ToggleOverviewProjection()
     {
         if(overview==null)return;
@@ -419,7 +433,7 @@ public partial class ReplayController : MonoBehaviour
             {
                 followedRig = null;
                 if(overviewDragButton==1)
-                {overviewYaw+=delta.x*.2f;overviewPitch=Mathf.Clamp(overviewPitch-delta.y*.2f,10,90);}
+                {overviewYaw+=delta.x*.2f;overviewPitch=Mathf.Clamp(overviewPitch-delta.y*.2f,overviewPerspective?-85:10,90);}
                 else
                 {
                     float height=overviewPerspective?2*overviewDistance*Mathf.Tan(25*Mathf.Deg2Rad):2*overview.orthographicSize;
@@ -449,7 +463,7 @@ public partial class ReplayController : MonoBehaviour
                 Vector3 right=Quaternion.Euler(0,overviewYaw,0)*Vector3.right,forward=Quaternion.Euler(0,overviewYaw,0)*Vector3.forward;
                 float boost=keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed?3:1;
                 overviewPivot+=(right*movement.x+Vector3.up*movement.y+forward*movement.z)*(height*.5f*boost*dt);
-                overviewYaw+=yaw*45*dt;overviewPitch=Mathf.Clamp(overviewPitch+pitch*45*dt,10,90);
+                overviewYaw+=yaw*45*dt;overviewPitch=Mathf.Clamp(overviewPitch+pitch*45*dt,overviewPerspective?-85:10,90);
                 overviewUserAdjusted=true;ApplyOverviewPose();
             }
         }
@@ -571,6 +585,7 @@ public partial class ReplayController : MonoBehaviour
         }
         if(pathsChanged){RefreshTrajectoryBounds();if(selectedView<0 && !overviewUserAdjusted)FitOverview();}
         if(environmentSample!=null)environmentLoader?.ApplyRecordedSample(environmentSample);
+        SetOverviewSky(environmentLoader?.RecordedSky);
         float fallbackSize=Mathf.Max(.1f,Mathf.Max(trajectoryBounds.size.x,trajectoryBounds.size.z)*.002f);
         foreach(var population in populations)
         {
@@ -705,6 +720,7 @@ public partial class ReplayController : MonoBehaviour
 
     private void ClearSessionVisuals()
     {
+        SetOverviewSky(null);
         timelineMouseCaptured=timelineMouseUpSeen=false;
         overviewUserAdjusted=false;overviewDragButton=-1;
         followedRig = null;
