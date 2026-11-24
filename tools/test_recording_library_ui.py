@@ -10,7 +10,7 @@ namespace UnityEngine {public static class Time {public static int frameCount;} 
 namespace UnityEngine.InputSystem {public sealed class ButtonState {public bool isPressed;}public sealed class Mouse {public static Mouse current=new Mouse();public ButtonState leftButton=new ButtonState();}}
 public enum DisplayStyle {None,Flex}public sealed class Styles {public DisplayStyle display;}public sealed class Widget {public string text,value;public Styles style=new Styles();}
 public sealed class Entry {public string DirectoryPath;public bool Omit;}
-public static class RecordingLibrary {public sealed class Entry {public bool Finalized,ChangedDuringScan;public string RecordingState;}}
+public static class RecordingLibrary {public sealed class Entry {public bool Finalized,ChangedDuringScan,PreviewOnly;public string RecordingState;}}
 public sealed class ConfigWorkbench {
  private bool replayLibraryMode=true,libraryRunning=true,editPointerHeld=true,editPointerUsesMouse=true,libraryFreshnessRunning;
  private int editPointerDownFrame=10,libraryGeneration=1,libraryPickerGeneration;private Task<string> libraryPicker;
@@ -18,7 +18,7 @@ public sealed class ConfigWorkbench {
  private readonly Dictionary<string,Entry> libraryEntries=new Dictionary<string,Entry>();
  private readonly HashSet<string> libraryExternal=new HashSet<string>(),libraryChecked=new HashSet<string>();
  private readonly List<Entry> libraryVisible=new List<Entry>();private Widget libraryEmpty=new Widget(),libraryList=new Widget(),librarySearch=new Widget();
- private sealed class LibraryUpdate {public int Version;public List<Entry> Initial;public Entry Entry;public string Message;public bool Done,FreshnessResult,NeedsRefresh;public string DirectoryToken;}
+ private sealed class LibraryUpdate {public int Version;public List<Entry> Initial;public Entry Entry;public string Message;public bool Done,FreshnessResult,NeedsRefresh;public string DirectoryToken,SelectedDirectory;}
  private readonly ConcurrentQueue<LibraryUpdate> libraryUpdates=new ConcurrentQueue<LibraryUpdate>();
  private int rowRefreshes;
  private void InspectExternalFolder(string path){}private void RefreshLibraryFooter(){}private void StartLibraryScan(){}private void RefreshLibraryRows(){rowRefreshes++;}private void RefreshLibraryDetails(){}private void CheckLibraryFreshness(){}

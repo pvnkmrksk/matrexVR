@@ -58,8 +58,17 @@ SHA-256 files under `.release-work/release-X.Y.Z/` by default. It never uploads.
 `build_local_desktop.py` instead snapshots working-tree source into `Preview/`
 and is for local review, not proof of a pinned public build.
 
-Inspect archive inventory, hashes, version/build identity, companion provenance,
-and the included `START-HERE.txt`. Smoke-test the actual player. Distinguish a
+Check the ZIPs, embedded source identity, executable architectures, and the
+included `START-HERE.txt` before publication:
+
+```sh
+python3 tools/verify_release.py --workspace .release-work/release-X.Y.Z \
+  --version X.Y.Z --ref COMMIT
+```
+
+Add `--require-streaming-asset` for each example or template the release promises.
+The command writes `verification.json` beside the ZIPs. Review companion
+provenance in the manifests and smoke-test the actual player. Distinguish a
 cross-build from a native walkthrough and retain known platform/hardware limits.
 
 ## Publish and verify

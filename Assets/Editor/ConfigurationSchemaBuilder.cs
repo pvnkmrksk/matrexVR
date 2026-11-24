@@ -305,6 +305,19 @@ public sealed class ConfigurationSchemaBuilder : IPreprocessBuildWithReport
         if(name=="group")ui["help"]="Optional group name for adjacent sequence blocks. Blocks with the same group stay in order and are shuffled together. Reuse the name only within that contiguous group.";
         if(name=="populationMode")
         { child["enum"]=new JArray("Mirror","Swarm","Mixed");ui["help"]="Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig. Mixed shows a single shared generated swarm together with other tracked animals and their copies."; }
+        if (owner == typeof(KannadiConfig) && name == "initialHeadingSeed")
+            ui["help"] = "Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats.";
+        if (owner == typeof(LocustGroundConfig))
+        {
+            if (name == "groundTexturePath")
+                ui["help"] = "PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay.";
+            if (name == "tilingX" || name == "tilingY")
+            {
+                child["exclusiveMinimum"] = 0;
+                child["default"] = 200;
+                ui["help"] = "Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count.";
+            }
+        }
         if(owner==typeof(KannadiConfig) && name=="mirrorSpawn")
             ui["help"]="Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply.";
         if(owner==typeof(KannadiConfig) && name=="avatarCopyOffsets")

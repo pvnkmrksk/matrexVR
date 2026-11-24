@@ -38,6 +38,7 @@ public class ClosedLoop : MonoBehaviour
     [SerializeField] private float torqueGainStep = .1f;
     private float lastYawInput, lastYawOutput;
     private string registeredVrId;
+    internal string RegisteredVrId => registeredVrId;
     private int manualRigIndex;
     private static long nextPoseContinuityId;
     public long PoseContinuityId { get; private set; }

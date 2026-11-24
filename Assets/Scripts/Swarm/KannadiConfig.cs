@@ -28,6 +28,8 @@ public class KannadiConfig : SwarmConfig
     public bool randomInitialRotation;
     public RandomInitialHeadingDistribution initialHeadingDistribution = RandomInitialHeadingDistribution.Continuous;
     public ColorConfig uniformSkyColor;
+    public LocustGroundConfig groundAppearance;
+    public int? initialHeadingSeed;
     public int? numberOfRings;
     public float? hexRadius;
     public float? spacing; // Legacy name; hexRadius takes precedence.
@@ -108,6 +110,7 @@ public class KannadiConfig : SwarmConfig
         if (seamlessPeriodicView && !IsMixed)
             throw new ArgumentException("See-through boundaries are available in Mixed Kannadi.");
         sun?.Validate();
+        groundAppearance?.Validate();
         if (!Enum.IsDefined(typeof(RandomInitialHeadingDistribution), initialHeadingDistribution))
             throw new ArgumentException("initialHeadingDistribution must be Continuous or Cardinal.");
         headingReference?.Validate();

@@ -70,6 +70,8 @@ python3 tools/build_local_desktop.py
 
 The local Mac builder creates **`Preview/MATREX VR.app`** from your checkout with checksum-verified native companions. Open the visible **Preview** folder and double-click **Open MATREX VR.command**, or use **Open MATREX VR Preview.command** at the top of the repository. Editable files are in **Preview/Config** and recordings in **Preview/RunData**; rebuilding keeps both. It publishes no release; the finished app needs neither Unity nor Rust. For source development, add the project to Unity Hub, let pinned packages restore, and open `Assets/Scenes/ControlScene.unity`.
 
+For a staged local build, close Preview and run `python3 tools/build_local_desktop.py --install-preview-from "/path/to/staged/MATREX VR.app"`. The command verifies the app signature and prints the retained previous app’s path for recordings that require that build.
+
 <details>
 <summary><strong>Desktop interface preview</strong></summary>
 
@@ -211,6 +213,7 @@ Replay reads saved animal poses and recorded stimulus evidence. Preserve the com
 | [Data formats](docs/data-formats.md) / [run snapshots](docs/run-config-snapshots.md) | CSVs, clocks, units, original inputs and immutable versions. |
 | [Replay](docs/replay.md) | Saved-run loading, timeline, overview and reconstruction limits. |
 | [Kannadi](docs/kannadi-modernization.md) | Mirror populations, camera routing and software validation history. |
+| [16-rig desert locust experiment](docs/desert-locust-experiment.md) | Blank control, ordered swarm and Kannadi multiplayer in shuffled cycles. |
 | [Experiment phases](docs/experiment-phases.md) | Pre/stimulus/post conditions and heading references. |
 | [Release history](docs/releases.md) | Archival source pins, platform builds and compatibility changes. |
 

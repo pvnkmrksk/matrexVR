@@ -27,7 +27,10 @@ internal static class ModelTextureLibrary
             if ((bool?)obj["enabled"] == false) yield break;
             foreach (var property in obj.Properties())
             {
-                if (IsAppearance(property.Name) && property.Value is JObject appearance)
+                if (property.Name == "groundTexturePath" && property.Value.Type == JTokenType.String &&
+                    !string.IsNullOrWhiteSpace((string)property.Value))
+                    yield return (string)property.Value;
+                else if (IsAppearance(property.Name) && property.Value is JObject appearance)
                 {
                     var settings = appearance.ToObject<ModelAppearanceConfig>();
                     settings.ValidateTextureVariants();

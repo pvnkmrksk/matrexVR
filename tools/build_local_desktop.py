@@ -4,10 +4,13 @@ from pathlib import Path
 import argparse
 import json
 import platform
+import plistlib
+import re
 import shutil
 import subprocess
 import sys
 import shlex
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 UNITY = Path('/Applications/Unity/Hub/Editor/6000.3.16f1/Unity.app/Contents/MacOS/Unity')
@@ -78,9 +81,46 @@ def write_preview_entrypoints(app):
         'Rebuilding preserves Config and RunData.\n')
 
 
+def install_preview(candidate):
+    """Install a staged local app while preserving the previous creating build."""
+    installed = ROOT / 'Preview/MATREX VR.app'
+    candidate = candidate.resolve()
+    if not installed.is_dir() or not candidate.is_dir() or candidate == installed.resolve():
+        raise ValueError('Provide a staged app separate from the existing Preview/MATREX VR.app.')
+    for app in (installed, candidate):
+        with (app / 'Contents/Info.plist').open('rb') as stream:
+            info = plistlib.load(stream)
+        if info.get('CFBundleIdentifier') != 'org.pvnkmrksk.matrexvr.local':
+            raise ValueError(f'Expected a local MATREX build: {app}')
+    executable = installed / 'Contents/MacOS/MATREX VR'
+    running = subprocess.run(['/usr/bin/pgrep', '-f', '^' + re.escape(str(executable)).replace(r'\ ', ' ') + '( |$)'])
+    if running.returncode != 1:
+        raise RuntimeError('Close the existing Preview before installing a new build, then retry.')
+    run('/usr/bin/codesign', '--verify', '--strict', candidate)
+    local = ROOT / '.local'
+    local.mkdir(exist_ok=True)
+    transaction = Path(tempfile.mkdtemp(prefix='preview-install-', dir=local))
+    staged = transaction / 'Staged.app'
+    previous = transaction / installed.name
+    run('/bin/cp', '-cR', candidate, staged)
+    run('/usr/bin/codesign', '--verify', '--strict', staged)
+    installed.rename(previous)
+    try:
+        staged.rename(installed)
+        run('/usr/bin/codesign', '--verify', '--strict', installed)
+    except BaseException:
+        if installed.exists():
+            installed.rename(staged)
+        previous.rename(installed)
+        raise
+    print('Local app:', installed)
+    print('Previous app:', previous)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--prepare-only', action='store_true')
+    parser.add_argument('--install-preview-from', type=Path, help='Install a signed local app from staging and retain the previous Preview')
     parser.add_argument('--project', type=Path, default=ROOT / '.local/project')
     parser.add_argument('--app', type=Path, default=ROOT / 'Preview/MATREX VR.app')
     parser.add_argument('--version', default='0.5.0-dev', help='Application version embedded in the local player and its recordings')
@@ -98,6 +138,9 @@ def main():
     parser.add_argument('--local-dashboard-archive', type=Path, default=ROOT / '.integration/local-dashboard/DaariDeepa-macos-arm64.zip')
     parser.add_argument('--skip-local-dashboard', action='store_true', help='Advanced development-only opt-out; uses the older published dashboard renderer')
     args = parser.parse_args()
+    if args.install_preview_from is not None:
+        install_preview(args.install_preview_from)
+        return
     # Unity resolves relative output paths against its disposable project, rather
     # than the shell's directory. Normalize before passing paths across processes.
     args.project = args.project.resolve()

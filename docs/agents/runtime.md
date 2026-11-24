@@ -19,6 +19,7 @@ guards, while others execute production methods with stubs. Their scope matters.
 | Config documents, templates, defaults | `python3 tools/test_config_compatibility.py`; `python3 tools/test_effective_config.py`; `python3 tools/validate_config_templates.py` |
 | Apparatus, display routing, paths | `python3 tools/test_apparatus_profile.py`; `python3 tools/test_system_display_routing.py`; `python3 tools/test_desktop_profile_paths.py` |
 | Tracker input or recording ownership | `python3 tools/test_tracker_contracts.py`; `python3 tools/test_native_recording_control.py`; `python3 tools/test_native_tracker_interop.py --help` for configured native integration prerequisites |
+| Trial-local auto-trim overrides and rig selection | `KineflyAutoTrimValidation.Run` in a disposable Unity project |
 | Archive, saved runs, replay | `python3 tools/test_replay_archive.py`; `python3 tools/test_recording_summary.py`; `python3 tools/test_recording_seal.py`; `python3 tools/test_replay_media.py` |
 | GUI actions, selection, focus | `python3 tools/test_primary_workbench_action.py`; `python3 tools/test_sequence_selection.py`; `python3 tools/test_workbench_keyboard_focus.py` |
 | Scene/terrain contracts | `python3 tools/test_terrain_scene_compatibility.py`; `python3 tools/test_terrain_treatments.py`; `python3 tools/test_world_starters.py` |
@@ -63,7 +64,8 @@ python3 tools/run_replay_roundtrip.py \
   --project .local/agent-check/project --output .local/agent-check/roundtrip
 ```
 
-Read `--help` for extended coverage and explicit external-publisher mode. A
+The default roundtrip also checks the archived star sky in the movable overview,
+including a reverse seek. Read `--help` for explicit external-publisher mode. A
 successful synthetic run establishes its fixture's behavior; physical tracker,
 LED timing, and other operating systems need their own acceptance.
 

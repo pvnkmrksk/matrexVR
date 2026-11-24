@@ -1,6 +1,6 @@
 # Swarm schema fields
 
-This atlas lists **1447 emitted property paths** from the current `swarm` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
+This atlas lists **1487 emitted property paths** from the current `swarm` runtime/UI schema. It is generated from the actual bundled JSON rather than a second handwritten parameter list.
 
 The schema default is a serialized type default, not a guarantee that it overrides an authored scene/prefab or a field retained by an in-place controller. Production loaders also enforce cross-field rules. A UI slider is a convenience range, not a runtime clamp. See [parameter semantics](../../configuration-reference.md) and [the exact emitted schema](schema-source.json).
 
@@ -10,7 +10,7 @@ Every field has a deep link and is indexed by the manual search. Array items use
 
 ### `populationMode`
 
-Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world.
+Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -1092,11 +1092,81 @@ Alpha channel, from 0 (transparent) to 1 (opaque).
 | `maximum` | `1` |
 | UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
 
+## groundAppearance group
+
+### `groundAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `groundAppearance.texture`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"SceneDefault"` |
+| `enum` | `["SceneDefault","Sand","Grass","Custom",0,1,2,3]` |
+
+### `groundAppearance.groundTexturePath`
+
+PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `groundAppearance.tilingX`
+
+Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `200` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `groundAppearance.tilingY`
+
+Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `200` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+## initialHeadingSeed group
+
+### `initialHeadingSeed`
+
+Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+
 ## numberOfRings group
 
 ### `numberOfRings`
 
-Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 100.
+Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -1111,13 +1181,14 @@ Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 10
 
 ### `hexRadius`
 
-Band grid spacing parameter in world units; example 10.
+Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
@@ -1134,6 +1205,56 @@ Legacy alias, overridden by hexRadius.
 | Default | `null` |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+
+## mirrorSpawn group
+
+### `mirrorSpawn`
+
+Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `mirrorSpawn.layout`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Grid"` |
+| `enum` | `["Random","Grid",0,1]` |
+
+### `mirrorSpawn.width`
+
+Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `100.0` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `mirrorSpawn.depth`
+
+Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `100.0` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ## kannadiTilePrefab group
 
@@ -3675,7 +3796,7 @@ Optional phase before the main stimulus. It retains its own duration, movement, 
 
 ### `preStimulus.populationMode`
 
-Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world.
+Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -4737,9 +4858,75 @@ Alpha channel, from 0 (transparent) to 1 (opaque).
 | `maximum` | `1` |
 | UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
 
+### `preStimulus.groundAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `preStimulus.groundAppearance.texture`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"SceneDefault"` |
+| `enum` | `["SceneDefault","Sand","Grass","Custom",0,1,2,3]` |
+
+### `preStimulus.groundAppearance.groundTexturePath`
+
+PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `preStimulus.groundAppearance.tilingX`
+
+Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `200` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `preStimulus.groundAppearance.tilingY`
+
+Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `200` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `preStimulus.initialHeadingSeed`
+
+Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+
 ### `preStimulus.numberOfRings`
 
-Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 100.
+Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -4752,13 +4939,14 @@ Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 10
 
 ### `preStimulus.hexRadius`
 
-Band grid spacing parameter in world units; example 10.
+Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
@@ -4773,6 +4961,54 @@ Legacy alias, overridden by hexRadius.
 | Default | `null` |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+
+### `preStimulus.mirrorSpawn`
+
+Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `preStimulus.mirrorSpawn.layout`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Grid"` |
+| `enum` | `["Random","Grid",0,1]` |
+
+### `preStimulus.mirrorSpawn.width`
+
+Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `100.0` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `preStimulus.mirrorSpawn.depth`
+
+Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `100.0` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `preStimulus.kannadiTilePrefab`
 
@@ -8494,7 +8730,7 @@ Main phase of this experiment. Duration, motion and stimuli are configured withi
 
 ### `stimulus.populationMode`
 
-Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world.
+Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -9556,9 +9792,75 @@ Alpha channel, from 0 (transparent) to 1 (opaque).
 | `maximum` | `1` |
 | UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
 
+### `stimulus.groundAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `stimulus.groundAppearance.texture`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"SceneDefault"` |
+| `enum` | `["SceneDefault","Sand","Grass","Custom",0,1,2,3]` |
+
+### `stimulus.groundAppearance.groundTexturePath`
+
+PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `stimulus.groundAppearance.tilingX`
+
+Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `200` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `stimulus.groundAppearance.tilingY`
+
+Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `200` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `stimulus.initialHeadingSeed`
+
+Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+
 ### `stimulus.numberOfRings`
 
-Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 100.
+Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -9571,13 +9873,14 @@ Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 10
 
 ### `stimulus.hexRadius`
 
-Band grid spacing parameter in world units; example 10.
+Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
@@ -9592,6 +9895,54 @@ Legacy alias, overridden by hexRadius.
 | Default | `null` |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+
+### `stimulus.mirrorSpawn`
+
+Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `stimulus.mirrorSpawn.layout`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Grid"` |
+| `enum` | `["Random","Grid",0,1]` |
+
+### `stimulus.mirrorSpawn.width`
+
+Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `100.0` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `stimulus.mirrorSpawn.depth`
+
+Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `100.0` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `stimulus.kannadiTilePrefab`
 
@@ -13313,7 +13664,7 @@ Optional phase after the main stimulus. It retains its own duration, movement, s
 
 ### `postStimulus.populationMode`
 
-Mirror shows other tracked animals and their configured copies. Swarm generates or replays a population in the same Kannadi world.
+Kannadi multiplayer (Mirror) shows other tracked animals and their ring copies. Generated swarm (Swarm) supplies a private simulated or replayed population to each rig.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -14375,9 +14726,75 @@ Alpha channel, from 0 (transparent) to 1 (opaque).
 | `maximum` | `1` |
 | UI soft slider range | `{"min":0.0,"max":1.0,"step":0.01}`; display/edit convenience, not an extra runtime constraint. |
 
+### `postStimulus.groundAppearance`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `postStimulus.groundAppearance.texture`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"SceneDefault"` |
+| `enum` | `["SceneDefault","Sand","Grass","Custom",0,1,2,3]` |
+
+### `postStimulus.groundAppearance.groundTexturePath`
+
+PNG or JPEG path relative to the configuration folder, or an absolute path. The file is archived for replay.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or null` |
+| Required by parent schema | No |
+| Default | `null` |
+
+### `postStimulus.groundAppearance.tilingX`
+
+Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `200` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `postStimulus.groundAppearance.tilingY`
+
+Number of texture repeats across this axis of the ground mesh. Leave blank for the material's authored repeat count.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number or null` |
+| Required by parent schema | No |
+| Default | `200` |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `postStimulus.initialHeadingSeed`
+
+Optional seed for matching randomized per-rig headings across conditions within each sequence cycle. Headings are resampled when the cycle repeats.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `integer or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `minimum` | `-2147483648` |
+| `maximum` | `2147483647` |
+
 ### `postStimulus.numberOfRings`
 
-Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 100.
+Extra hexagonal rings of copies that follow each tracked animal. Zero shows only its central body. One gives seven bodies per visible peer; two give nineteen.
 
 | Contract | Emitted value |
 | --- | --- |
@@ -14390,13 +14807,14 @@ Hex rings: 0=one tile, 1=7, 3=37 per rig. Negative disables replicas. Maximum 10
 
 ### `postStimulus.hexRadius`
 
-Band grid spacing parameter in world units; example 10.
+Scale of the spacing between ring copies. The periodic arena can wrap these copies back into view.
 
 | Contract | Emitted value |
 | --- | --- |
 | Type | `number or null` |
 | Required by parent schema | No |
 | Default | `null` |
+| UI unit label | scene units |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
 
@@ -14411,6 +14829,54 @@ Legacy alias, overridden by hexRadius.
 | Default | `null` |
 | `minimum` | `-3.40282347e+38` |
 | `maximum` | `3.40282347e+38` |
+
+### `postStimulus.mirrorSpawn`
+
+Optional layout for tracked animals. Grid places rigs in index order and spreads their headings over 360 degrees. Random samples each pose in the spawn area. Shared initial position sets the center; explicit per-rig poses override the layout. The position and rotation reset switches still apply.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `object or null` |
+| Required by parent schema | No |
+| Default | `null` |
+| `additionalProperties` | `true` |
+
+### `postStimulus.mirrorSpawn.layout`
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `string or integer` |
+| Required by parent schema | No |
+| Default | `"Grid"` |
+| `enum` | `["Random","Grid",0,1]` |
+
+### `postStimulus.mirrorSpawn.width`
+
+Full X width of the tracked start area. Must fit inside the periodic X length when wrapping is enabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `100.0` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
+
+### `postStimulus.mirrorSpawn.depth`
+
+Full Z depth of the tracked start area. Must fit inside the periodic Z length when wrapping is enabled.
+
+| Contract | Emitted value |
+| --- | --- |
+| Type | `number` |
+| Required by parent schema | No |
+| Default | `100.0` |
+| UI unit label | scene units |
+| `minimum` | `-3.40282347e+38` |
+| `maximum` | `3.40282347e+38` |
+| `exclusiveMinimum` | `0` |
 
 ### `postStimulus.kannadiTilePrefab`
 

@@ -225,6 +225,7 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             }
             // Validate all prefab selections before replacing any existing grid.
             var selected = rigs.Select(r => r.ResolvePrefab(next)).ToArray();
+            LocustGround.Apply(gameObject.scene, next.groundAppearance);
             if (!next.IsMixed && shared != null)
             {
                 shared.Remove();
@@ -318,13 +319,13 @@ public class Kannadi : MonoBehaviour, IInSceneSequencer
             if (next.resetRotationOnStart && vr?.initialRotation == null)
             {
                 float yaw = IsMixed && next.randomInitialRotation
-                    ? next.SampleInitialYaw(UnityEngine.Random.value)
+                    ? next.SampleInitialYaw(ExperimentRandom.InitialHeadingSample(next.initialHeadingSeed, VRIndex))
                     : next.mirrorSpawn.Yaw(next.initialRotation?.y ?? 0, ordinal, rigCount, random ? UnityEngine.Random.value : 0);
                 rotation = Quaternion.Euler(rotation.eulerAngles.x, yaw, rotation.eulerAngles.z);
             }
         }
         else if (next.randomInitialRotation && next.resetRotationOnStart)
-            rotation = Quaternion.Euler(rotation.eulerAngles.x, next.SampleInitialYaw(UnityEngine.Random.value), rotation.eulerAngles.z);
+            rotation = Quaternion.Euler(rotation.eulerAngles.x, next.SampleInitialYaw(ExperimentRandom.InitialHeadingSample(next.initialHeadingSeed, VRIndex)), rotation.eulerAngles.z);
         ClosedLoop closedLoop = trackedRig = GetComponent<ClosedLoop>();
         if (closedLoop != null)
         {

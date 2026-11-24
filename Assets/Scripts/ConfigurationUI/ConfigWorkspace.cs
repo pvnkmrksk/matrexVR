@@ -234,6 +234,14 @@ namespace ConfigurationUI
                 foreach(var p in obj.Properties())
                 {
                     if(enabled && new[]{"trajectoryFile","skyboxPath"}.Contains(p.Name) && p.Value.Type==JTokenType.String && !string.IsNullOrWhiteSpace((string)p.Value) && !File.Exists(ExperimentConfigFiles.Resolve((string)p.Value))) errors.Add(label+": "+path+"."+p.Name+" file does not exist.");
+                    if (enabled && p.Name == "groundTexturePath" && p.Value.Type == JTokenType.String &&
+                        !string.IsNullOrWhiteSpace((string)p.Value))
+                    {
+                        string reference = (string)p.Value;
+                        ModelTextureLibrary.ValidateReference(reference);
+                        if (!File.Exists(ExperimentConfigFiles.Resolve(reference)))
+                            errors.Add(label + ": " + path + "." + p.Name + " file does not exist.");
+                    }
                     if (enabled && ModelTextureLibrary.IsAppearance(p.Name) && p.Value is JObject appearance)
                     {
                         var settings = appearance.ToObject<ModelAppearanceConfig>();

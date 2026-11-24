@@ -1,0 +1,164 @@
+{
+  "title": "Desert · Blank control",
+  "populationMode": "Swarm",
+  "swarm": null,
+  "closedLoopPosition": 1,
+  "closedLoopOrientation": 1,
+  "autopilotEnabled": false,
+  "resetPositionOnStart": true,
+  "resetRotationOnStart": true,
+  "randomInitialRotation": true,
+  "initialHeadingDistribution": "Continuous",
+  "initialHeadingSeed": 4318,
+  "initialRotation": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "vrConfigs": [
+    {
+      "vrIndex": 1,
+      "initialPosition": {
+        "x": -33.67,
+        "y": 1.35,
+        "z": -31.06
+      }
+    },
+    {
+      "vrIndex": 2,
+      "initialPosition": {
+        "x": -11.7,
+        "y": 1.35,
+        "z": -33.89
+      }
+    },
+    {
+      "vrIndex": 3,
+      "initialPosition": {
+        "x": 11.07,
+        "y": 1.35,
+        "z": -33.47
+      }
+    },
+    {
+      "vrIndex": 4,
+      "initialPosition": {
+        "x": 32.28,
+        "y": 1.35,
+        "z": -31.88
+      }
+    },
+    {
+      "vrIndex": 5,
+      "initialPosition": {
+        "x": -34.4,
+        "y": 1.35,
+        "z": -12.65
+      }
+    },
+    {
+      "vrIndex": 6,
+      "initialPosition": {
+        "x": -9.67,
+        "y": 1.35,
+        "z": -11.58
+      }
+    },
+    {
+      "vrIndex": 7,
+      "initialPosition": {
+        "x": 12.47,
+        "y": 1.35,
+        "z": -11.67
+      }
+    },
+    {
+      "vrIndex": 8,
+      "initialPosition": {
+        "x": 32.96,
+        "y": 1.35,
+        "z": -9.74
+      }
+    },
+    {
+      "vrIndex": 9,
+      "initialPosition": {
+        "x": -34.49,
+        "y": 1.35,
+        "z": 12.42
+      }
+    },
+    {
+      "vrIndex": 10,
+      "initialPosition": {
+        "x": -10.7,
+        "y": 1.35,
+        "z": 12.62
+      }
+    },
+    {
+      "vrIndex": 11,
+      "initialPosition": {
+        "x": 11.3,
+        "y": 1.35,
+        "z": 11.23
+      }
+    },
+    {
+      "vrIndex": 12,
+      "initialPosition": {
+        "x": 32.24,
+        "y": 1.35,
+        "z": 9.62
+      }
+    },
+    {
+      "vrIndex": 13,
+      "initialPosition": {
+        "x": -31.61,
+        "y": 1.35,
+        "z": 33.96
+      }
+    },
+    {
+      "vrIndex": 14,
+      "initialPosition": {
+        "x": -10.08,
+        "y": 1.35,
+        "z": 31.47
+      }
+    },
+    {
+      "vrIndex": 15,
+      "initialPosition": {
+        "x": 9.47,
+        "y": 1.35,
+        "z": 33.39
+      }
+    },
+    {
+      "vrIndex": 16,
+      "initialPosition": {
+        "x": 34.46,
+        "y": 1.35,
+        "z": 31.02
+      }
+    }
+  ],
+  "uniformSkyColor": {
+    "r": 0.65,
+    "g": 0.65,
+    "b": 0.65,
+    "a": 1
+  },
+  "groundAppearance": {
+    "texture": "Sand",
+    "tilingX": 200,
+    "tilingY": 200
+  },
+  "kannadiTilePrefab": "SimulatedLocust",
+  "worldUnitsPerMetre": 100,
+  "periodicBoundary": true,
+  "boundaryLengthX": 100,
+  "boundaryLengthZ": 100
+}
